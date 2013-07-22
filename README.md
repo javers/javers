@@ -1,4 +1,4 @@
 javers
 ======
 
-JaVers - domain objects change tracker
+JaVers - domain objects VCS
