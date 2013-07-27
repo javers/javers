@@ -10,7 +10,7 @@ public enum MetaType {
     PRIMITIVE_BOX,
     VALUE_OBJECT,
     /**
-     * Reference to {@link Entity}
+     * Reference to {@link org.javers.model.Entity}
      */
     REFERENCE,
     COLLECTION,
