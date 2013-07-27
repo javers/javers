@@ -1,5 +1,6 @@
 package org.javers.model;
 
+
 import java.util.List;
 
 /**
