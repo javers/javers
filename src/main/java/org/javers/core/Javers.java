@@ -17,6 +17,10 @@ public class Javers {
 
     private Map<Class<?>, Entity> models = new HashMap<>();
 
+    public void manage(Class<?> managedClass) {
+        models.put(managedClass, new Entity());
+    }
+
     public Entity getByClass(Class<?> forClass) {
         if (!isManaged(forClass)) {
             throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, forClass.getSimpleName());
