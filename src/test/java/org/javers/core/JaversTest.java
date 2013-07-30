@@ -3,10 +3,10 @@ package org.javers.core;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.javers.core.exceptions.JaversException;
-import static com.googlecode.catchexception.CatchException.*;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.model.Entity;
 import static org.javers.test.assertion.Assertions.*;
+import static com.googlecode.catchexception.CatchException.*;
 
 
 /**
