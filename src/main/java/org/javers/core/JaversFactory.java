@@ -1,9 +1,5 @@
 package org.javers.core;
 
-import java.util.Collection;
-import java.util.List;
-import org.javers.core.model.DummyUser;
-
 /**
  * Creates JaVers instance based on your domain model metadata and custom configuration.
  *
