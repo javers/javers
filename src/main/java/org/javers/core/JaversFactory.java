@@ -19,5 +19,5 @@ public interface JaversFactory {
      *
      * @param entityClasses list of domain model entities
      */
-    Javers createInferred(Collection<Class<?>> entityClasses);
+    Javers create(Iterable<Class<?>> entityClasses);
 }
