@@ -1,6 +1,7 @@
 package org.javers.model;
 
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -14,6 +15,10 @@ public class Entity {
 
     public Class<?> getSourceClass() {
         return sourceClass;
+    }
+
+    public List<Property> getProperties() {
+        return Collections.unmodifiableList(properties);
     }
 
 }

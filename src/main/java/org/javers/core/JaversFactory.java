@@ -7,7 +7,7 @@ import java.util.Collection;
  *
  * @author bartosz walacik
  */
-public interface JaversFactory {
+public class JaversFactory {
     /**
      * Created JaVers instance with inferred domain model.
      * Uses reasonable defaults. This approach is sufficient for simple domain models.
@@ -19,5 +19,7 @@ public interface JaversFactory {
      *
      * @param entityClasses list of domain model entities
      */
-    Javers create(Iterable<Class<?>> entityClasses);
+    public static Javers create(Iterable<Class<?>> entityClasses) {
+        return null;
+    }
 }
