@@ -1,7 +1,7 @@
 package org.javers.core;
 
 import java.util.HashMap;
-import org.javers.core.exceptions.ExceptionCode;
+import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.exceptions.JaversException;import org.javers.model.Entity;
 
 import java.util.Map;
@@ -17,8 +17,8 @@ public class Javers {
 
     public Entity getByClass(Class<?> forClass) {
         if(!isManaged(forClass)) {
-          throw new JaversException(ExceptionCode.CLASS_NOT_MANAGED.getErrorCode(forClass),
-                  ExceptionCode.CLASS_NOT_MANAGED.getMessage());
+          throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED.getErrorCode(forClass),
+                  JaversExceptionCode.CLASS_NOT_MANAGED.getMessage());
         }
 
         return models.get(forClass);

@@ -4,7 +4,7 @@ package org.javers.core.exceptions;
  * Enums contains all errors.
  * @author bartosz walacik
  */
-public enum ExceptionCode {
+public enum JaversExceptionCode {
 
     /**
      * Class is not defined in javers configuration.
@@ -13,7 +13,7 @@ public enum ExceptionCode {
     private String errorCode;
     private String message;
 
-    private ExceptionCode(String errorCode, String message) {
+    private JaversExceptionCode(String errorCode, String message) {
         this.errorCode = errorCode;
         this.message = message;
     }
