@@ -11,7 +11,7 @@ import static org.javers.test.assertion.Assertions.*;
 
 /**
  *
- * @author Adam Dubiel <adam.dubiel@allegro.pl>
+ * @author Adam Dubiel <adam.dubiel@gmail.com>
  */
 public class JaversTest {
 
