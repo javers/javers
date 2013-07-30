@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import java.util.HashMap;
 import org.javers.core.exceptions.ExceptionCode;
 import org.javers.core.exceptions.JaversException;import org.javers.model.Entity;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class Javers {
-    private Map<Class<?>,Entity> models;
+    private Map<Class<?>,Entity> models = new HashMap<>();
 
     public Entity getByClass(Class<?> forClass) {
         if(!isManaged(forClass)) {
