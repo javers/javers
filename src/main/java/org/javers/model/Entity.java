@@ -13,6 +13,10 @@ public class Entity {
 
     private List<Property> properties;
 
+    public Entity(Class<?> sourceClass) {
+        this.sourceClass = sourceClass;
+    }
+
     public Class<?> getSourceClass() {
         return sourceClass;
     }

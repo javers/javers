@@ -6,18 +6,25 @@ package org.javers.core;
  * @author bartosz walacik
  */
 public class JaversFactory {
-    /**
-     * Created JaVers instance with inferred domain model.
-     * Uses reasonable defaults. This approach is sufficient for simple domain models.
-     * <br/>
-     * For  complex domains use {@link ???}
-     *
-     * <br/>
-     * Uses pure Java Reflection, ignores annotations.
-     *
-     * @param entityClasses list of domain model entities
-     */
-    public static Javers create(Iterable<Class<?>> entityClasses) {
-        return null;
+
+    private Javers javers;
+
+    private JaversFactory() {
+        javers = new Javers();
+    }
+
+    public static JaversFactory javers() {
+        return new JaversFactory();
+    }
+
+    public Javers build() {
+        return javers;
+    }
+
+    public JaversFactory managingClasses(Class<?>... managedClasses) {
+        for (Class<?> managedClass : managedClasses) {
+            javers.manage(managedClass);
+        }
+        return this;
     }
 }

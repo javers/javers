@@ -18,7 +18,8 @@ public class Javers {
     private Map<Class<?>, Entity> models = new HashMap<>();
 
     public void manage(Class<?> managedClass) {
-        models.put(managedClass, new Entity());
+        Entity entity = new Entity(managedClass);
+        models.put(managedClass, entity);
     }
 
     public Entity getByClass(Class<?> forClass) {
