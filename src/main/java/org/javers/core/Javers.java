@@ -2,7 +2,8 @@ package org.javers.core;
 
 import java.util.HashMap;
 import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.core.exceptions.JaversException;import org.javers.model.Entity;
+import org.javers.core.exceptions.JaversException;
+import org.javers.model.Entity;
 
 import java.util.Map;
 
@@ -13,12 +14,12 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class Javers {
-    private Map<Class<?>,Entity> models = new HashMap<>();
+
+    private Map<Class<?>, Entity> models = new HashMap<>();
 
     public Entity getByClass(Class<?> forClass) {
-        if(!isManaged(forClass)) {
-          throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED.getErrorCode(forClass),
-                  JaversExceptionCode.CLASS_NOT_MANAGED.getMessage());
+        if (!isManaged(forClass)) {
+            throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, forClass.getSimpleName());
         }
 
         return models.get(forClass);
@@ -27,5 +28,4 @@ public class Javers {
     public boolean isManaged(Class<?> forClass) {
         return models.get(forClass) != null;
     }
-
 }

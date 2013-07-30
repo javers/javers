@@ -2,6 +2,7 @@ package org.javers.core.exceptions;
 
 /**
  * Basic javers exception.
+ *
  * @author bartosz walacik
  */
 @SuppressWarnings("serial")
@@ -9,14 +10,12 @@ public class JaversException extends RuntimeException {
 
     private JaversExceptionCode code;
 
-    private String errorMessage;
-
-    public JaversException(JaversExceptionCode code, String errorMessage) {
-        super(code + " " + errorMessage);
-        this.errorMessage = errorMessage;
+    public JaversException(JaversExceptionCode code, Object... argumants) {
+        super(code.name() + " " + String.format(code.getMessage(), argumants));
+        this.code = code;
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    public JaversExceptionCode getCode() {
+        return code;
     }
 }

@@ -19,7 +19,7 @@ public class JaversExceptionAssert extends AbstractAssert<JaversExceptionAssert,
     }
 
     public JaversExceptionAssert hasCode(JaversExceptionCode code) {
-        Assertions.assertThat(actual.getErrorMessage());
+        Assertions.assertThat(actual.getCode()).isEqualTo(code);
         return this;
     }
 }

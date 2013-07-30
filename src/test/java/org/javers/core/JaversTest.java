@@ -3,8 +3,9 @@ package org.javers.core;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.javers.core.exceptions.JaversException;
-import static org.fest.assertions.api.Assertions.*;
 import static com.googlecode.catchexception.CatchException.*;
+import org.javers.core.exceptions.JaversExceptionCode;
+import static org.javers.test.assertion.Assertions.*;
 
 
 /**
@@ -27,7 +28,7 @@ public class JaversTest {
         catchException(javers).getByClass(NotManagedClass.class);
 
         // then
-        assertThat(caughtException()).isInstanceOf(JaversException.class);
+        assertThat((JaversException) caughtException()).hasCode(JaversExceptionCode.CLASS_NOT_MANAGED);
 
     }
 
