@@ -1,4 +1,4 @@
-package org.javers.model;
+package org.javers.model.mapping;
 
 /**
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
@@ -7,15 +7,7 @@ public interface Property {
 
     String getName();
 
-    Object getValue();
-
-    void setValue(Object value);
-
-
-    // ValueObject?
-    // Primitive?
-    // Reference
-    ValueType getType();
+    MetaValueType getValueType();
 
     boolean isAtomic();
 
@@ -23,5 +15,11 @@ public interface Property {
      * for ValueType.REFERENCE
      */
     Entity getRefEntity();
+
+    //TODO move to Snapshoot/Wrapper
+    Object getValue();
+
+    //TODO move to Snapshoot/Wrapper
+    void setValue(Object value);
 
 }

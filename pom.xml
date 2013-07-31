@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.javers</groupId>
-    <artifactId>javers-core</artifactId>
-    <packaging>jar</packaging>
-    <version>0.0.0-SNAPSHOT</version>
+    <artifactId>javers-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>0.0.1-SNAPSHOT</version>
 
-    <name>JaVers - domain objects VCS - ${project.version}</name>
+    <name>JaVers - domain objects VCS - parent pom - ${project.version}</name>
 
     <properties>
         <slf4j.version>1.7.2</slf4j.version>
@@ -16,6 +16,11 @@
         <hibernate.version>4.1.9.Final</hibernate.version>
     </properties>
 
+    <modules>
+        <module>javers-core</module>
+    </modules>
+
+    <dependencyManagement>
     <dependencies>
 
         <!-- commons -->
@@ -28,27 +33,19 @@
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.2.1</version>
+        </dependency>       
+	<dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>14.0.1</version>
         </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
+	<dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.1</version>
         </dependency>
-        <!--
-                    <dependency>
-                        <groupId>com.google.guava</groupId>
-                        <artifactId>guava</artifactId>
-                        <version>14.0.1</version>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>joda-time</groupId>
-                        <artifactId>joda-time</artifactId>
-                        <version>2.1</version>
-                    </dependency>
-        -->
-
-        <!-- JPA
+   
+	<!-- JPA
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.0-api</artifactId>
@@ -56,11 +53,6 @@
         </dependency> -->
 
         <!-- logger -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -74,12 +66,12 @@
 
         <!-- tests -->
         <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>6.8</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.8</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.googlecode.catch-exception</groupId>
             <artifactId>catch-exception</artifactId>
             <version>1.0.4</version>
@@ -104,6 +96,9 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    </dependencyManagement>
+
+
 
     <build>
         <pluginManagement>

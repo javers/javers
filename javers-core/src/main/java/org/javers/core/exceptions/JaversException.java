@@ -3,7 +3,7 @@ package org.javers.core.exceptions;
 /**
  * Basic javers exception.
  *
- * @author bartosz walacik
+ *  @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 @SuppressWarnings("serial")
 public class JaversException extends RuntimeException {

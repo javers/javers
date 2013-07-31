@@ -5,12 +5,12 @@ package org.javers.model.mapping;
  *
  * @author bartosz walacik
  */
-public enum MetaType {
+public enum MetaValueType {
     PRIMITIVE,
     PRIMITIVE_BOX,
     VALUE_OBJECT,
     /**
-     * Reference to {@link org.javers.model.Entity}
+     * Reference to {@link Entity}
      */
     REFERENCE,
     COLLECTION,

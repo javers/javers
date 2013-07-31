@@ -1,4 +1,4 @@
-package org.javers.model;
+package org.javers.model.mapping;
 
 /**
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>

@@ -1,4 +1,4 @@
-package org.javers.model;
+package org.javers.model.mapping;
 
 import java.util.Collections;
 import java.util.List;

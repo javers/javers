@@ -1,7 +1,7 @@
 package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
-import org.javers.model.Entity;
+import org.javers.model.mapping.Entity;
 
 /**
  *

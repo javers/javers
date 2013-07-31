@@ -3,7 +3,7 @@ package org.javers.core;
 import java.util.HashMap;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.exceptions.JaversException;
-import org.javers.model.Entity;
+import org.javers.model.mapping.Entity;
 
 import java.util.Map;
 

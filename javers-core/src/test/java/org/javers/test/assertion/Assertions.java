@@ -1,7 +1,7 @@
 package org.javers.test.assertion;
 
 import org.javers.core.exceptions.JaversException;
-import org.javers.model.Entity;
+import org.javers.model.mapping.Entity;
 
 /**
  *
