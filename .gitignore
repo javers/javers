@@ -1,3 +1,4 @@
 .idea/
-javers-core.iml
-target/
+javers-core/javers-core.iml
+javers-core/target/
+javers-all.iml
