@@ -9,8 +9,6 @@ public interface Property {
 
     MetaValueType getValueType();
 
-    boolean isAtomic();
-
     /**
      * for ValueType.REFERENCE
      */

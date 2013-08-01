@@ -11,11 +11,12 @@ JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 JaVers is a tool for tracking changes in object-oriented data.
 
 Most modern applications has multi-layered architecture, as follows:
-* UI layer,
-* domain model
-* persistence layer.
 
-In domain model lives your Entity instances (aka domain objects),
+1. UI layer
+1. domain model layer
+1. persistence layer
+
+In domain model layer lives your Entity instances (aka domain objects),
 persistence layer takes responsibility for saving and loading them from database.
 
 When application is being developed, we usually concentrate on current state of domain objects.
@@ -28,8 +29,7 @@ As a User, I want to know who changed this status, when the change was performed
 The problem is, that both *version* and *change* notions are not easily expressible
 nor in Java language nor in mainstream databases (although NoSQL document databases has advantage here over relational ones).
 
-That is the niche, JaVers fulfills, in JaVers *version* and *change* are **first class citizens**.
-
+That is the niche JaVers fulfills. In JaVers, *version* and *change* are **first class citizens**.
 
 ## Core
 The core functionality is calculating diff between two graphs of objects.
