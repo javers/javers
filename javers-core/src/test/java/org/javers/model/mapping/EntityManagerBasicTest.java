@@ -1,5 +1,7 @@
-package org.javers.core;
+package org.javers.model.mapping;
 
+import org.javers.core.Javers;
+import org.javers.core.JaversFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.javers.core.exceptions.JaversException;
@@ -13,20 +15,20 @@ import static com.googlecode.catchexception.CatchException.*;
  *
  * @author Adam Dubiel <adam.dubiel@gmail.com>
  */
-public class JaversTest {
+public class EntityManagerBasicTest {
 
-    private Javers javers;
+    private EntityManager entityManager;
 
     @BeforeMethod
     public void setUp() {
-        javers = new Javers();
+        entityManager = new EntityManager();
     }
 
     @Test
     public void shouldThrowExceptionIfEntityIsNotManagedWhenTryingToGetIt() {
-        // given - none
-        // when
-        catchException(javers).getByClass(NotManagedClass.class);
+
+        //when
+        catchException(entityManager).getByClass(NotManagedClass.class);
 
         // then
         assertThat((JaversException) caughtException()).hasCode(JaversExceptionCode.CLASS_NOT_MANAGED);
@@ -35,13 +37,25 @@ public class JaversTest {
     @Test
     public void shouldReturnEntityModelForManagedClassAfterMakingItManaged() {
         // given
-        javers.manage(ManagedClass.class);
+        entityManager.manage(ManagedClass.class);
 
         // when
-        Entity entity = javers.getByClass(ManagedClass.class);
+        Entity entity = entityManager.getByClass(ManagedClass.class);
 
         // then
         assertThat(entity).isNotNull();
+    }
+
+    @Test
+    public void shouldReturnTrueForManagedClass() {
+        // given
+        entityManager.manage(ManagedClass.class);
+
+        // when
+        boolean isManaged = entityManager.isManaged(ManagedClass.class);
+
+        // then
+        assertThat(isManaged).isTrue();
     }
 
     private static class NotManagedClass { };

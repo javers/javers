@@ -5,10 +5,19 @@ package org.javers.core.model;
  */
 public class DummyUser {
 
+    private boolean flag;
+    private Boolean bigFlag;
     private int age;
     private String name;
-    private String lastName;
     private Integer largeInt;
+
+    public Boolean getBigFlag() {
+        return bigFlag;
+    }
+
+    public void setBigFlag(Boolean bigFlag) {
+        this.bigFlag = bigFlag;
+    }
 
     public int getAge() {
         return age;
@@ -26,12 +35,12 @@ public class DummyUser {
         this.name = name;
     }
 
-    public String getLastName() {
-        return lastName;
+    public boolean isFlag() {
+        return flag;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setFlag(boolean flag) {
+        this.flag = flag;
     }
 
     public Integer getLargeInt() {

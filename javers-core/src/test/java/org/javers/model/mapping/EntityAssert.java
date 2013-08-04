@@ -1,7 +1,7 @@
-package org.javers.test.assertion;
+package org.javers.model.mapping;
 
 import org.fest.assertions.api.AbstractAssert;
-import org.javers.model.mapping.Entity;
+import org.javers.test.assertion.Assertions;
 
 /**
  *
@@ -17,7 +17,13 @@ public class EntityAssert extends AbstractAssert<EntityAssert, Entity> {
         return new EntityAssert(actual);
     }
 
-    @SuppressWarnings("unchecked")
+    public PropertyAssert hasProperty(String withName) {
+        Property found = actual.getProperty(withName);
+        Assertions.assertThat(found).isNotNull();
+
+        return PropertyAssert.assertThat(found);
+    }
+
     public EntityAssert hasSourceClass(Class<?> sourceClass) {
         Assertions.assertThat(actual.getSourceClass()).isSameAs((Class) sourceClass);
         return this;

@@ -9,19 +9,15 @@ public class JaversFactory {
 
     private Javers javers;
 
-    private JaversFactory() {
+    public JaversFactory() {
         javers = new Javers();
-    }
-
-    public static JaversFactory javers() {
-        return new JaversFactory();
     }
 
     public Javers build() {
         return javers;
     }
 
-    public JaversFactory managingClasses(Class<?>... managedClasses) {
+    public JaversFactory manageClasses(Class<?>... managedClasses) {
         for (Class<?> managedClass : managedClasses) {
             javers.manage(managedClass);
         }

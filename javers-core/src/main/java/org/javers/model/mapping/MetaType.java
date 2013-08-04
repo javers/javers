@@ -5,7 +5,7 @@ package org.javers.model.mapping;
  *
  * @author bartosz walacik
  */
-public enum MetaValueType {
+public enum MetaType {
     PRIMITIVE,
     PRIMITIVE_BOX,
     VALUE_OBJECT,

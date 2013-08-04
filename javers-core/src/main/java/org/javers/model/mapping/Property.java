@@ -7,7 +7,7 @@ public interface Property {
 
     String getName();
 
-    MetaValueType getValueType();
+    MetaType getValueType();
 
     /**
      * for ValueType.REFERENCE
