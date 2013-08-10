@@ -10,8 +10,12 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class EntityManager {
-    private EntityFactory entityFactory = new EntityFactory();
+    private EntityFactory entityFactory;
     private Map<Class<?>, Entity> managedEntities = new HashMap<>();
+
+    public EntityManager(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
+    }
 
     public Entity getByClass(Class<?> forClass) {
         if (!isManaged(forClass)) {
@@ -22,7 +26,7 @@ public class EntityManager {
     }
 
     public void manage(Class<?> classToManage) {
-        Entity entity = entityFactory.createFromBean(classToManage);
+        Entity entity = entityFactory.create(classToManage);
         managedEntities.put(classToManage, entity);
     }
 

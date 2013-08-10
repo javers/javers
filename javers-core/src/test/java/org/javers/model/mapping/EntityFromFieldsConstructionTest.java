@@ -7,12 +7,12 @@ import org.testng.annotations.Test;
  * @author bartosz walacik
  */
 @Test
-public class EntityFromBeanConstructionTest extends EntityConstructionTest {
+public class EntityFromFieldsConstructionTest extends EntityConstructionTest {
 
 
     @BeforeMethod
     public void setUp() {
-        entityFactory = new BeanBasedEntityFactory();
+        entityFactory = new FieldBasedEntityFactory();
     }
 
 }

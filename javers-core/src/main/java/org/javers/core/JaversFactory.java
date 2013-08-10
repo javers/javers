@@ -1,5 +1,10 @@
 package org.javers.core;
 
+import org.javers.model.mapping.BeanBasedEntityFactory;
+import org.javers.model.mapping.EntityFactory;
+import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.FieldBasedEntityFactory;
+
 /**
  * Creates JaVers instance based on your domain model metadata and custom configuration.
  *
@@ -9,8 +14,17 @@ public class JaversFactory {
 
     private Javers javers;
 
-    public JaversFactory() {
-        javers = new Javers();
+    public static JaversFactory beanStyleFactory() {
+        return new JaversFactory( new BeanBasedEntityFactory());
+    }
+
+    public static JaversFactory fieldStyleFactory() {
+        return new JaversFactory( new FieldBasedEntityFactory());
+    }
+
+    private JaversFactory(EntityFactory entityFactory) {
+        EntityManager em = new EntityManager(entityFactory);
+        javers = new Javers(em);
     }
 
     public Javers build() {

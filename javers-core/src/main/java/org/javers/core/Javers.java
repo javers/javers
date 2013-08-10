@@ -13,17 +13,18 @@ import org.javers.model.mapping.EntityManager;
  */
 public class Javers {
 
-    EntityManager entityManager = new EntityManager();
+    EntityManager entityManager;
 
-    protected Javers() {
+    protected Javers(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    protected void manage(Class<?> managedClass) {
+        entityManager.manage(managedClass);
     }
 
     public Entity getByClass(Class<?> forClass) {
         return entityManager.getByClass(forClass);
-    }
-
-    public void manage(Class<?> managedClass) {
-        entityManager.manage(managedClass);
     }
 
     public boolean isManaged(Class<?> forClass) {
