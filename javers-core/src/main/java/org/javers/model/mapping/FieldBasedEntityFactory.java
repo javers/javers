@@ -1,7 +1,7 @@
 package org.javers.model.mapping;
 
 /**
- * @author bartosz walacik
+ * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 public class FieldBasedEntityFactory implements EntityFactory {
 
