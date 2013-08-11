@@ -2,6 +2,8 @@ package org.javers.model.mapping;
 
 import org.fest.assertions.api.Assertions;
 import org.javers.core.model.DummyUser;
+import org.javers.model.mapping.type.ArrayType;
+import org.javers.model.mapping.type.CollectionType;
 import org.javers.model.mapping.type.ContainerType;
 import org.javers.model.mapping.type.PrimitiveType;
 import org.testng.annotations.Test;
@@ -26,7 +28,7 @@ public abstract class EntityConstructionTest {
     }
 
     @Test
-    public void shouldProperties() {
+    public void shouldScanProperties() {
         //when
         Entity entity = entityFactory.create(DummyUser.class);
 
@@ -41,7 +43,7 @@ public abstract class EntityConstructionTest {
 
         //then
         EntityAssert.assertThat(entity).hasProperty("stringSet")
-                .hasJaversType(ContainerType.class)
+                .hasJaversType(CollectionType.class)
                 .hasJavaType(Set.class);
     }
 
@@ -52,7 +54,7 @@ public abstract class EntityConstructionTest {
 
         //then
         EntityAssert.assertThat(entity).hasProperty("integerList")
-                .hasJaversType(ContainerType.class)
+                .hasJaversType(CollectionType.class)
                 .hasJavaType(List.class);
     }
 
@@ -63,7 +65,7 @@ public abstract class EntityConstructionTest {
 
         //then
         EntityAssert.assertThat(entity).hasProperty("intArray")
-                .hasJaversType(ContainerType.class)
+                .hasJaversType(ArrayType.class)
                 .hasJavaType(Array.class);
     }
 

@@ -8,7 +8,15 @@ import java.lang.reflect.Type;
  * @author bartosz walacik
  */
 public class PrimitiveType extends JaversType {
-    public PrimitiveType(Type javaType) {
+
+
+   /* public boolean isMappingForJavaType(Type givenType) {
+        System.out.println("== "+ baseJavaType +" == "+givenType);
+        System.out.println(baseJavaType == givenType);
+        return baseJavaType == givenType;
+    } */
+
+    public PrimitiveType(Class javaType) {
         super(javaType);
     }
 }

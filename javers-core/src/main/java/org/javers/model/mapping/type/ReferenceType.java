@@ -9,7 +9,12 @@ import java.lang.reflect.Type;
  */
 public class ReferenceType extends JaversType {
 
-    public ReferenceType(Type javaType) {
+    @Override
+    public boolean isMappingForJavaType(Class givenType) {
+        throw new RuntimeException("not implemented") ;
+    }
+
+    public ReferenceType(Class javaType) {
         super(javaType);
     }
 }

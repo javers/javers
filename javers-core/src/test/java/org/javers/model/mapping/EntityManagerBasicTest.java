@@ -2,6 +2,7 @@ package org.javers.model.mapping;
 
 import org.javers.core.Javers;
 import org.javers.core.JaversFactory;
+import org.javers.model.mapping.type.TypeMapper;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -22,7 +23,7 @@ public class EntityManagerBasicTest {
 
     @BeforeMethod
     public void setUp() {
-        entityManager = new EntityManager( new BeanBasedEntityFactory());
+        entityManager = new EntityManager( new BeanBasedEntityFactory(new TypeMapper()));
     }
 
     @Test

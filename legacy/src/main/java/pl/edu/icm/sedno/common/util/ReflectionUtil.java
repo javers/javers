@@ -1,5 +1,23 @@
 package pl.edu.icm.sedno.common.util;
 
+import java.lang.*;
+import java.lang.Boolean;
+import java.lang.Byte;
+import java.lang.Character;
+import java.lang.Class;
+import java.lang.ClassNotFoundException;
+import java.lang.Double;
+import java.lang.Exception;
+import java.lang.IllegalArgumentException;
+import java.lang.Integer;
+import java.lang.Long;
+import java.lang.NoSuchMethodException;
+import java.lang.RuntimeException;
+import java.lang.Short;
+import java.lang.String;
+import java.lang.SuppressWarnings;
+import java.lang.System;
+import java.lang.Void;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -67,15 +85,15 @@ public class ReflectionUtil {
     private static Object NULL = new String ("NULL");
     
     public  static final Map<Class, Class> boxingMap = new ImmutableMap.Builder<Class,Class>()
-	    .put(Integer.TYPE ,Integer.class)    
-	    .put(Long.TYPE ,Long.class)         
-	    .put(Double.TYPE ,Double.class)      
-	    .put(Float.TYPE ,Float.class)        
+	    .put(Integer.TYPE ,Integer.class)
+	    .put(Long.TYPE ,Long.class)
+	    .put(Double.TYPE ,Double.class)
+	    .put(java.lang.Float.TYPE ,Float.class)
 	    .put(Boolean.TYPE ,Boolean.class)    
 	    .put(Character.TYPE ,Character.class)
-	    .put(Byte.TYPE ,Byte.class)          
-	    .put(Void.TYPE ,Void.class)          
-	    .put(Short.TYPE ,Short.class).build();         
+	    .put(Byte.TYPE ,Byte.class)
+	    .put(Void.TYPE ,Void.class)
+	    .put(Short.TYPE ,Short.class).build();
     
     /**
      * ex. int -> Integer.class
@@ -302,9 +320,15 @@ public class ReflectionUtil {
     }
     
     public static boolean isGetter(Method m) {
-    	return (m.getName().substring(0,3).equals("get")  ||
-                m.getName().substring(0,2).equals("is") ) &&
-                m.getParameterTypes().length == 0; 
+        if (m.getParameterTypes().length > 0) {
+            return false;
+        }
+
+    	return ( ( m.getName().substring(0,3).equals("get") &&
+                   m.getReturnType() != Boolean.TYPE ) ||
+                 ( m.getName().substring(0,2).equals("is") &&
+                   m.getReturnType() == Boolean.TYPE )
+               );
     }
         
     public static boolean isHibernateProxy(Object obj) {

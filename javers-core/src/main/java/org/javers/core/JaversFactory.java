@@ -4,6 +4,7 @@ import org.javers.model.mapping.BeanBasedEntityFactory;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.FieldBasedEntityFactory;
+import org.javers.model.mapping.type.TypeMapper;
 
 /**
  * Creates JaVers instance based on your domain model metadata and custom configuration.
@@ -15,11 +16,13 @@ public class JaversFactory {
     private Javers javers;
 
     public static JaversFactory beanStyleFactory() {
-        return new JaversFactory( new BeanBasedEntityFactory());
+        TypeMapper mapper = new TypeMapper();
+        return new JaversFactory( new BeanBasedEntityFactory(mapper));
     }
 
     public static JaversFactory fieldStyleFactory() {
-        return new JaversFactory( new FieldBasedEntityFactory());
+        TypeMapper mapper = new TypeMapper();
+        return new JaversFactory( new FieldBasedEntityFactory(mapper));
     }
 
     private JaversFactory(EntityFactory entityFactory) {

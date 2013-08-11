@@ -11,10 +11,11 @@ public class Entity<S> {
 
     private Class<S> sourceClass;
 
-    private List<Property> properties = new ArrayList<>();
+    private List<Property> properties;
 
-    public Entity(Class<S> sourceClass) {
+    public Entity(Class<S> sourceClass, List<Property> properties) {
         this.sourceClass = sourceClass;
+        this.properties = properties;
     }
 
     protected Class<S> getSourceClass() {

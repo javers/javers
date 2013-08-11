@@ -5,16 +5,22 @@ import java.lang.reflect.Type;
 /**
  * Property type that can be managed by Javers, so int, String, Date, etc.
  *
+ * Immutable
+ *
  * @author bartosz walacik
  */
 public abstract class JaversType {
-    private Type javaType;
+    protected final Class baseJavaType;
 
-    protected JaversType(Type javaType) {
-        this.javaType = javaType;
+    protected JaversType(Class baseJavaType) {
+        this.baseJavaType = baseJavaType;
     }
 
-    public Type getJavaType() {
-        return javaType;
+    public boolean isMappingForJavaType(Class givenType) {
+        return baseJavaType.isAssignableFrom(givenType);
+    }
+
+    public Class getBaseJavaType() {
+        return baseJavaType;
     }
 }
