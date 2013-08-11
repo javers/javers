@@ -1,7 +1,5 @@
 package org.javers.model.mapping.type;
 
-import java.lang.reflect.Type;
-
 /**
  * Property type that can be managed by Javers, so int, String, Date, etc.
  *

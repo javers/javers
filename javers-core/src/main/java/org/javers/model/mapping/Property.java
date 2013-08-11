@@ -1,7 +1,6 @@
 package org.javers.model.mapping;
 
 import org.javers.model.mapping.type.JaversType;
-import org.javers.model.mapping.type.MetaType;
 
 /**
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>

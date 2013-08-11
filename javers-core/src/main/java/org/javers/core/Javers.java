@@ -1,7 +1,5 @@
 package org.javers.core;
 
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityManager;
 

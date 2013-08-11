@@ -4,7 +4,6 @@ import org.fest.assertions.api.Assertions;
 import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.type.ArrayType;
 import org.javers.model.mapping.type.CollectionType;
-import org.javers.model.mapping.type.ContainerType;
 import org.javers.model.mapping.type.PrimitiveType;
 import org.testng.annotations.Test;
 

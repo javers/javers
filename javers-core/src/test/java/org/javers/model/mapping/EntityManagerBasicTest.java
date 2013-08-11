@@ -1,16 +1,14 @@
 package org.javers.model.mapping;
 
-import org.javers.core.Javers;
-import org.javers.core.JaversFactory;
-import org.javers.model.mapping.type.TypeMapper;
-import org.mockito.Mockito;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.model.mapping.Entity;
-import static org.javers.test.assertion.Assertions.*;
-import static com.googlecode.catchexception.CatchException.*;
+import org.javers.model.mapping.type.TypeMapper;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
+import static org.javers.test.assertion.Assertions.assertThat;
 
 
 /**
