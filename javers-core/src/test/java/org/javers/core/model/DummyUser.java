@@ -1,5 +1,6 @@
 package org.javers.core.model;
 
+import java.beans.Transient;
 import java.util.List;
 import java.util.Set;
 
@@ -7,6 +8,7 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public class DummyUser extends AbstractDummyUser {
+    private transient int someTransientField;
 
     //primitives and primitive boxes
     private boolean flag;
@@ -19,6 +21,11 @@ public class DummyUser extends AbstractDummyUser {
     private Set<String> stringSet;
     private List<Integer> integerList;
     private int[] intArray;
+
+    @Transient
+    public int getSomeTransientField() {
+        return someTransientField;
+    }
 
     public Boolean getBigFlag() {
         return bigFlag;
@@ -82,5 +89,9 @@ public class DummyUser extends AbstractDummyUser {
 
     public void setIntArray(int[] intArray) {
         this.intArray = intArray;
+    }
+
+    public void setSomeTransientField(int someTransientField) {
+        this.someTransientField = someTransientField;
     }
 }

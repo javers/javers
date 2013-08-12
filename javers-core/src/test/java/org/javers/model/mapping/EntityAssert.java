@@ -24,6 +24,13 @@ public class EntityAssert extends AbstractAssert<EntityAssert, Entity> {
         return PropertyAssert.assertThat(found);
     }
 
+    public PropertyAssert hasntGotProperty(String withName) {
+        Property found = actual.getProperty(withName);
+        Assertions.assertThat(found).isNull();
+
+        return PropertyAssert.assertThat(found);
+    }
+
     public EntityAssert hasSourceClass(Class<?> sourceClass) {
         Assertions.assertThat(actual.getSourceClass()).isSameAs((Class) sourceClass);
         return this;

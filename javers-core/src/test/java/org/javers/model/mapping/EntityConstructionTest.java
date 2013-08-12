@@ -27,12 +27,31 @@ public abstract class EntityConstructionTest {
     }
 
     @Test
-    public void shouldScanDeclaredAndInheritedProperties() {
+    public void shouldScanAllProperties() {
         //when
         Entity entity = entityFactory.create(DummyUser.class);
 
         //then
         Assertions.assertThat(entity.getProperties()).hasSize(9);
+    }
+
+    @Test
+    public void shouldScanInheritedProperty() {
+        //when
+        Entity entity = entityFactory.create(DummyUser.class);
+
+        //then
+        EntityAssert.assertThat(entity).hasProperty("inheritedInt");
+    }
+
+
+    @Test
+    public void shouldNotScanTransientProperty() {
+        //when
+        Entity entity = entityFactory.create(DummyUser.class);
+
+        //then
+        EntityAssert.assertThat(entity).hasntGotProperty("someTransientField");
     }
 
     @Test
