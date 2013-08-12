@@ -38,11 +38,6 @@ public class FieldProperty implements Property {
     }
 
     @Override
-    public Entity getRefEntity() {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public Object getValue() {
         throw new NotImplementedException();
     }

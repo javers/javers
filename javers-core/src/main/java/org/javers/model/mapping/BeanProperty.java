@@ -40,10 +40,6 @@ public class BeanProperty implements Property {
         return javersType;
     }
 
-    @Override
-    public Entity getRefEntity() {
-        throw new NotImplementedException();
-    }
 
     @Override
     public Object getValue() {

@@ -5,6 +5,7 @@ package org.javers.common.validation;
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 public class Validate {
+
     /**
      * Checks if given argument is not null.
      */
@@ -12,5 +13,9 @@ public class Validate {
         if(argument == null) {
             throw new IllegalArgumentException(message);
         }
+    }
+
+    public static void argumentIsNotNull(Object argument) {
+        argumentIsNotNull(argument,"argument should not be null");
     }
 }

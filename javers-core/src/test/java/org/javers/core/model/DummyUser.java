@@ -1,6 +1,7 @@
 package org.javers.core.model;
 
-import java.beans.Transient;
+import javax.persistence.Id;
+import javax.persistence.Transient;
 import java.util.List;
 import java.util.Set;
 
@@ -43,6 +44,7 @@ public class DummyUser extends AbstractDummyUser {
         this.age = age;
     }
 
+    @Id
     public String getName() {
         return name;
     }

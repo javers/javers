@@ -1,6 +1,6 @@
 package org.javers.common.reflection;
 
-import java.beans.Transient;
+import javax.persistence.Transient;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;

@@ -11,11 +11,6 @@ public interface Property {
 
     JaversType getType();
 
-    /**
-     * for ValueType.REFERENCE
-     */
-    Entity getRefEntity();
-
     //TODO move to Snapshoot/Wrapper
     Object getValue();
 
