@@ -1,11 +1,14 @@
 package org.javers.model.mapping;
 
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.validation.Validate;
+import org.javers.common.validation.Validate;
+import org.javers.common.validation.Validate;
 import org.javers.model.mapping.type.JaversType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.reflect.Method;
+
+import static org.javers.common.validation.Validate.*;
 
 /**
  * Immutable
@@ -19,8 +22,8 @@ public class BeanProperty implements Property {
 
     protected BeanProperty(Method getter, JaversType javersType) {
 
-        Validate.isNotNull(getter, "Getter should not be null!");
-        Validate.isNotNull(javersType, "JaversType should not be null!");
+        argumentIsNotNull(getter, "getter should not be null!");
+        argumentIsNotNull(javersType, "javersType should not be null!");
 
         this.getter = getter;
         this.name = ReflectionUtil.getterToField(getter);

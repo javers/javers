@@ -1,10 +1,12 @@
 package org.javers.model.mapping;
 
-import org.javers.core.validation.Validate;
+import org.javers.common.validation.Validate;
 import org.javers.model.mapping.type.JaversType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.reflect.Field;
+
+import static org.javers.common.validation.Validate.*;
 
 /**
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
@@ -16,8 +18,8 @@ public class FieldProperty implements Property {
 
     public FieldProperty(Field field, JaversType javersType) {
 
-        Validate.isNotNull(field, "Field should not be null!");
-        Validate.isNotNull(javersType, "JaversType should not be null!");
+        argumentIsNotNull(field, "Field should not be null!");
+        argumentIsNotNull(javersType, "JaversType should not be null!");
 
         this.field = field;
         this.javersType = javersType;
