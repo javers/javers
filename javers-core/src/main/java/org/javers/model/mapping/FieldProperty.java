@@ -9,17 +9,19 @@ import java.lang.reflect.Field;
 import static org.javers.common.validation.Validate.*;
 
 /**
+ * Immutable
+ *
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 public class FieldProperty implements Property {
 
-    private Field field;
-    private JaversType javersType;
+    private final Field field;
+    private final JaversType javersType;
 
     public FieldProperty(Field field, JaversType javersType) {
 
-        argumentIsNotNull(field, "Field should not be null!");
-        argumentIsNotNull(javersType, "JaversType should not be null!");
+        argumentIsNotNull(field, "field should not be null!");
+        argumentIsNotNull(javersType, "javersType should not be null!");
 
         this.field = field;
         this.javersType = javersType;

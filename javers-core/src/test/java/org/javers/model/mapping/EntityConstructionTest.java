@@ -27,12 +27,12 @@ public abstract class EntityConstructionTest {
     }
 
     @Test
-    public void shouldScanProperties() {
+    public void shouldScanDeclaredAndInheritedProperties() {
         //when
         Entity entity = entityFactory.create(DummyUser.class);
 
         //then
-        Assertions.assertThat(entity.getProperties()).hasSize(8);
+        Assertions.assertThat(entity.getProperties()).hasSize(9);
     }
 
     @Test

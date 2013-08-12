@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * @author bartosz walacik
  */
-public class DummyUser {
+public class DummyUser extends AbstractDummyUser {
 
     //primitives and primitive boxes
     private boolean flag;
