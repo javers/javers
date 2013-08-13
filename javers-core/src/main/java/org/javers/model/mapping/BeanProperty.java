@@ -6,6 +6,7 @@ import org.javers.common.validation.Validate;
 import org.javers.model.mapping.type.JaversType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import javax.persistence.Id;
 import java.lang.reflect.Method;
 
 import static org.javers.common.validation.Validate.*;
@@ -33,6 +34,16 @@ public class BeanProperty implements Property {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Object get(Object target) {
+        return ReflectionUtil.invokeGetterEvenIfPrivate(getter,target);
+    }
+
+    @Override
+    public boolean isId() {
+        return getter.isAnnotationPresent(Id.class);
     }
 
     @Override

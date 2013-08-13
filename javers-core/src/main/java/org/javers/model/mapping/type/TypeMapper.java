@@ -33,13 +33,14 @@ public class TypeMapper {
         addType(new PrimitiveType(Double.class));
         addType(new PrimitiveType(Float.class));
         addType(new PrimitiveType(String.class));
+        addType(new PrimitiveType(Enum.class));
 
         //containers
         addType(new CollectionType(Set.class));
         addType(new CollectionType(List.class));
 
+        //array
         addType(new ArrayType());
-
     }
 
     public JaversType mapType(Class javaType) {
@@ -50,7 +51,7 @@ public class TypeMapper {
             }
         }
 
-        throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType);
+        throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType.getName());
     }
 
     public void addType(JaversType type) {

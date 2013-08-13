@@ -13,16 +13,9 @@ import org.testng.annotations.Test;
 /**
  * @author bartosz walacik
  */
-@Test
-public class ObjectWrapperTest {
+public abstract class ObjectWrapperTest {
 
-    private EntityFactory entityFactory;
-    private ObjectWrapper objectWrapper;
-
-    @BeforeMethod
-    public void setUp() {
-        entityFactory = new BeanBasedEntityFactory(new TypeMapper());
-    }
+    protected EntityFactory entityFactory;
 
     @Test
     public void shouldHoldEntityReference() {
@@ -37,9 +30,30 @@ public class ObjectWrapperTest {
         Assertions.assertThat(wrapper.getEntity()).isSameAs(entity);
     }
 
+    @Test
+    public void shouldHoldCdoReference() {
+        //given
+        DummyUser cdo = new DummyUser();
+        Entity entity = entityFactory.create(DummyUser.class);
+
+        //when
+        ObjectWrapper wrapper = new ObjectWrapper(cdo,entity);
+
+        //then
+        Assertions.assertThat(wrapper.getCdo()).isSameAs(cdo);
+    }
+
 
     @Test
-    public void shouldReturnObjectId() {
+    public void shouldReturnCdoId() {
+        //given
+        DummyUser cdo = new DummyUser("Mad Kaz");
+        Entity entity = entityFactory.create(DummyUser.class);
 
+        //when
+        ObjectWrapper wrapper = new ObjectWrapper(cdo,entity);
+
+        //then
+        Assertions.assertThat(wrapper.getCdoId()).isEqualTo("Mad Kaz");
     }
 }

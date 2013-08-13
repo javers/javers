@@ -9,19 +9,35 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public class DummyUser extends AbstractDummyUser {
+    public enum Sex {FEMALE, MALE, OCCASIONALLY}
+
     private transient int someTransientField;
 
     //primitives and primitive boxes
     private boolean flag;
     private Boolean bigFlag;
     private int age;
+
+    //enum
+    private Sex sex;
+
+    @Id
     private String name;
     private Integer largeInt;
 
-    //containers
+    //collections
     private Set<String> stringSet;
     private List<Integer> integerList;
+
+    //arrays
     private int[] intArray;
+
+    public DummyUser() {
+    }
+
+    public DummyUser(String name) {
+        this.name = name;
+    }
 
     @Transient
     public int getSomeTransientField() {
@@ -47,6 +63,14 @@ public class DummyUser extends AbstractDummyUser {
     @Id
     public String getName() {
         return name;
+    }
+
+    public Sex getSex() {
+        return sex;
+    }
+
+    public void setSex(Sex sex) {
+        this.sex = sex;
     }
 
     public void setName(String name) {

@@ -35,7 +35,7 @@ public class ObjectWrapper implements ObjectNode {
 
     @Override
     public Object getCdoId() {
-        return null;
+        return entity.getIdProperty().get(cdo);
     }
 
     @Override

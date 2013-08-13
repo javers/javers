@@ -4,6 +4,7 @@ import org.javers.common.validation.Validate;
 import org.javers.model.mapping.type.JaversType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import javax.persistence.Id;
 import java.lang.reflect.Field;
 
 import static org.javers.common.validation.Validate.*;
@@ -25,6 +26,16 @@ public class FieldProperty implements Property {
 
         this.field = field;
         this.javersType = javersType;
+    }
+
+    @Override
+    public boolean isId() {
+        return field.isAnnotationPresent(Id.class);
+    }
+
+    @Override
+    public Object get(Object target) {
+        throw new NotImplementedException();
     }
 
     @Override

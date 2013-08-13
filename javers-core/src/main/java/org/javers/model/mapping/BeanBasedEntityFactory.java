@@ -28,7 +28,7 @@ public class BeanBasedEntityFactory extends EntityFactory {
         List<Property> beanProperties = new ArrayList<>();
 
         for (Method getter : getters) {
-            logger.info("getter: "+getter);
+            //logger.info("getter: "+getter);
 
             JaversType javersType = typeMapper.mapType(getter.getReturnType());
             Property beanProperty = new BeanProperty(getter, javersType);

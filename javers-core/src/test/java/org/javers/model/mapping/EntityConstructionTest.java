@@ -32,7 +32,7 @@ public abstract class EntityConstructionTest {
         Entity entity = entityFactory.create(DummyUser.class);
 
         //then
-        Assertions.assertThat(entity.getProperties()).hasSize(9);
+        Assertions.assertThat(entity.getProperties()).hasSize(10);
     }
 
     @Test
@@ -83,10 +83,9 @@ public abstract class EntityConstructionTest {
 
         //then
         EntityAssert.assertThat(entity).hasProperty("intArray")
-                .hasJaversType(ArrayType.class)
-                .hasJavaType(Array.class);
+                    .hasJaversType(ArrayType.class)
+                    .hasJavaType(Array.class);
     }
-
 
     @Test
     public void shouldScanIntProperty() {
@@ -95,8 +94,19 @@ public abstract class EntityConstructionTest {
 
         //then
         EntityAssert.assertThat(entity).hasProperty("age")
-                .hasJaversType(PrimitiveType.class)
-                .hasJavaType(Integer.TYPE);
+                    .hasJaversType(PrimitiveType.class)
+                    .hasJavaType(Integer.TYPE);
+    }
+
+    @Test
+    public void shouldScanEnumProperty() {
+        //when
+        Entity entity = entityFactory.create(DummyUser.class);
+
+        //then
+        EntityAssert.assertThat(entity).hasProperty("sex")
+                    .hasJaversType(PrimitiveType.class)
+                    .hasJavaType(Enum.class);
     }
 
     @Test
@@ -106,8 +116,8 @@ public abstract class EntityConstructionTest {
 
         //then
         EntityAssert.assertThat(entity).hasProperty("largeInt")
-                .hasJaversType(PrimitiveType.class)
-                .hasJavaType(Integer.class);
+                    .hasJaversType(PrimitiveType.class)
+                    .hasJavaType(Integer.class);
     }
 
     @Test
@@ -117,8 +127,8 @@ public abstract class EntityConstructionTest {
 
         //then
         EntityAssert.assertThat(entity).hasProperty("flag")
-                .hasJaversType(PrimitiveType.class)
-                .hasJavaType(Boolean.TYPE);
+                    .hasJaversType(PrimitiveType.class)
+                    .hasJavaType(Boolean.TYPE);
     }
 
     @Test
@@ -128,8 +138,8 @@ public abstract class EntityConstructionTest {
 
         //then
         EntityAssert.assertThat(entity).hasProperty("bigFlag")
-                .hasJaversType(PrimitiveType.class)
-                .hasJavaType(Boolean.class);
+                    .hasJaversType(PrimitiveType.class)
+                    .hasJavaType(Boolean.class);
     }
 
     @Test
@@ -139,7 +149,7 @@ public abstract class EntityConstructionTest {
 
         //then
         EntityAssert.assertThat(entity).hasProperty("name")
-                .hasJaversType(PrimitiveType.class)
-                .hasJavaType(String.class);
+                    .hasJaversType(PrimitiveType.class)
+                    .hasJavaType(String.class);
     }
 }

@@ -19,7 +19,7 @@ public class EntityManager {
 
     public Entity getByClass(Class<?> forClass) {
         if (!isManaged(forClass)) {
-            throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, forClass.getSimpleName());
+            throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, forClass.getName());
         }
 
         return managedEntities.get(forClass);

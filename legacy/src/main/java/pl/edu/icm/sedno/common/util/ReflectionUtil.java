@@ -867,7 +867,7 @@ public class ReflectionUtil {
         } catch (Exception e) {
             throw new RuntimeException("error calling getter",e);
         }
-      }
+    }
     
     private static String fieldToGetterName(String fieldName) {
         return "get" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1,fieldName.length());        

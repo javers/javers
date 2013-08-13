@@ -5,12 +5,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author bartosz walacik
  */
 public class ReflectionUtil {
+
+    private static final Object[] EMPTY_ARRAY = new Object[]{};
 
     public static List<Method> findAllPublicPersistentGetters(Class methodSource) {
         List<Method> result = new ArrayList<>();
@@ -65,4 +66,21 @@ public class ReflectionUtil {
 
         throw new IllegalArgumentException("Method ["+getter+"] is not getter");
     }
+
+    public static Object invokeGetter(Method getter, Object onObject) {
+        try {
+            return getter.invoke(onObject, EMPTY_ARRAY);
+        } catch (Exception e) {
+            throw new RuntimeException("error calling getter '"+getter+"'",e);
+        }
+    }
+
+    public static Object invokeGetterEvenIfPrivate(Method getter, Object onObject) {
+            if (Modifier.isPrivate(getter.getModifiers()) ||
+                Modifier.isProtected(getter.getModifiers()))
+            {
+                getter.setAccessible(true);
+            }
+            return invokeGetter(getter, onObject);
+       }
 }

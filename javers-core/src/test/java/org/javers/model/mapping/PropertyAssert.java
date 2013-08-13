@@ -31,4 +31,9 @@ public class PropertyAssert extends AbstractAssert<PropertyAssert, Property> {
         Assertions.assertThat(actual.getType().getBaseJavaType()).isEqualTo(expected);
         return this;
     }
+
+    public PropertyAssert isId() {
+        Assertions.assertThat(actual.isId()).isTrue();
+        return this;
+    }
 }

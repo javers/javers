@@ -1,6 +1,8 @@
 package org.javers.model.mapping;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.exceptions.JaversException;
+import org.javers.core.exceptions.JaversExceptionCode;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,18 +20,34 @@ public class Entity<S> {
 
     private final List<Property> properties;
 
+    private final Property idProperty;
+
     public Entity(Class<S> sourceClass, List<Property> properties) {
         argumentIsNotNull(sourceClass);
         argumentIsNotNull(properties);
 
         this.sourceClass = sourceClass;
         this.properties = properties;
+        this.idProperty = findIdProperty();
+    }
+
+    private Property findIdProperty() {
+        for (Property p : properties) {
+            if (p.isId()) {
+                return p;
+            }
+        }
+        throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID,sourceClass.getName());
     }
 
     public boolean isInstance(Object cdo) {
         argumentIsNotNull(cdo);
 
         return (sourceClass.isAssignableFrom(cdo.getClass()));
+    }
+
+    public Property getIdProperty() {
+        return idProperty;
     }
 
     public Class<S> getSourceClass() {
