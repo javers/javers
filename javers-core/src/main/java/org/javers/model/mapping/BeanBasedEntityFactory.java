@@ -24,7 +24,7 @@ public class BeanBasedEntityFactory extends EntityFactory {
     public <S> Entity<S> create(Class<S> beanClass) {
 
 
-        List<Method> getters = ReflectionUtil.findAllPublicPersistentGetters(beanClass);
+        List<Method> getters = ReflectionUtil.findAllPersistentGetters(beanClass);
         List<Property> beanProperties = new ArrayList<>();
 
         for (Method getter : getters) {

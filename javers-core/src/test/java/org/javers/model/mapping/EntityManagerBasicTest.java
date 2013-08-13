@@ -6,6 +6,8 @@ import org.javers.model.mapping.type.TypeMapper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import javax.persistence.Id;
+
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.javers.test.assertion.Assertions.assertThat;
@@ -60,5 +62,10 @@ public class EntityManagerBasicTest {
 
     private static class NotManagedClass { };
 
-    private static class ManagedClass { };
+    private static class ManagedClass {
+        @Id
+        private int getId() {
+            return 0;
+        }
+    };
 }

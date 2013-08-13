@@ -13,9 +13,9 @@ public class ReflectionUtil {
 
     private static final Object[] EMPTY_ARRAY = new Object[]{};
 
-    public static List<Method> findAllPublicPersistentGetters(Class methodSource) {
+    public static List<Method> findAllPersistentGetters(Class methodSource) {
         List<Method> result = new ArrayList<>();
-        for(Method m : methodSource.getMethods()) {
+        for(Method m : getAllMethods(methodSource)) {
              if (isPersistentGetter(m)) {
                  result.add(m);
              }
@@ -23,6 +23,24 @@ public class ReflectionUtil {
 
         return result;
     }
+
+    /**
+     * list all class methods, including inherited and private
+     */
+    public static List<Method> getAllMethods(Class methodSource){
+        List<Method> methods = new ArrayList<>();
+
+        Class clazz = methodSource;
+        while (clazz != null) {
+            for (Method m : clazz.getDeclaredMethods()) {
+                methods.add(m);
+            }
+            clazz = clazz.getSuperclass();
+        }
+
+        return methods;
+    }
+
 
     /**
      * true if method is getter and
