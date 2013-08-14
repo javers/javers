@@ -19,6 +19,8 @@ public interface ObjectNode {
 
     /**
      * References to other Entities
+     *
+     * @return never returns null
      */
     List<Edge> getEdges();
 }
