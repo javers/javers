@@ -12,7 +12,7 @@ public class JaversFactoryTest {
     @Test
     public void shouldCreateJavers() throws Exception {
         //given
-        JaversFactory factory = JaversFactory.beanStyleFactory();
+        JaversFactory factory = new JaversFactory();
 
         //when
         Javers javers = factory.build();

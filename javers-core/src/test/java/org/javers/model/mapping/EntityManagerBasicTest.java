@@ -23,7 +23,8 @@ public class EntityManagerBasicTest {
 
     @BeforeMethod
     public void setUp() {
-        entityManager = new EntityManager( new BeanBasedEntityFactory(new TypeMapper()));
+        TypeMapper mapper = new TypeMapper();
+        entityManager = new EntityManager(new BeanBasedEntityFactory(mapper));
     }
 
     @Test

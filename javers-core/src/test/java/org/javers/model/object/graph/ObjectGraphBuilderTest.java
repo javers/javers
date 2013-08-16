@@ -2,10 +2,7 @@ package org.javers.model.object.graph;
 
 
 import org.javers.core.model.DummyUser;
-import org.javers.model.mapping.BeanBasedEntityFactory;
-import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.EntityFactory;
-import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.*;
 import org.javers.model.mapping.type.TypeMapper;
 import org.javers.test.assertion.Assertions;
 import org.testng.annotations.BeforeMethod;
@@ -21,7 +18,10 @@ public class ObjectGraphBuilderTest {
 
     @BeforeMethod
     public void setUp() {
-        entityManager = new EntityManager( new BeanBasedEntityFactory(new TypeMapper()));
+        TypeMapper mapper = new TypeMapper();
+        entityManager = new EntityManager(new BeanBasedEntityFactory(mapper));
+
+        entityManager.manage(DummyUser.class);
     }
 
     @Test
@@ -37,5 +37,26 @@ public class ObjectGraphBuilderTest {
         Assertions.assertThat(node.getEntity().getSourceClass()).isSameAs(DummyUser.class);
         Assertions.assertThat(node.getCdoId()).isEqualTo("Mad Kaz") ;
         Assertions.assertThat(node.getEdges()).isEmpty();
+    }
+
+    @Test
+    public void shouldBuildTwoNodesGraph(){
+        //given
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        DummyUser user = new DummyUser("Mad Kaz");
+        DummyUser superUser = new DummyUser("Mad Stach");
+        user.setSupervisor(superUser);
+
+        //when
+        ObjectNode node = graphBuilder.build(user);
+
+        //then
+        NodeAssert.assertThat(node).hasEdges(1)
+                                   .hasCdoWithId("Mad Kaz");
+
+        Edge edge = node.getEdges().get(0);
+        EdgeAssert.assertThat(edge).hasProperty("supervisor")
+                                   .isSingleEdge()
+                                   .refersToCdoWithId("Mad Stach");
     }
 }

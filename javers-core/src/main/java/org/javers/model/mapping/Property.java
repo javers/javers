@@ -12,9 +12,6 @@ public interface Property {
     JaversType getType();
 
     //TODO move to Snapshoot/Wrapper
-    Object getValue();
-
-    //TODO move to Snapshoot/Wrapper
     void setValue(Object value);
 
     /**
@@ -28,4 +25,6 @@ public interface Property {
      * @param target invocation target
      */
     Object get(Object target);
+
+    boolean isNull(Object target);
 }

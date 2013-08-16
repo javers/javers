@@ -39,6 +39,11 @@ public class FieldProperty implements Property {
     }
 
     @Override
+    public boolean isNull(Object target) {
+        return get(target) == null;
+    }
+
+    @Override
     public String getName() {
         return field.getName();
     }
@@ -46,11 +51,6 @@ public class FieldProperty implements Property {
     @Override
     public JaversType getType() {
         return javersType;
-    }
-
-    @Override
-    public Object getValue() {
-        throw new NotImplementedException();
     }
 
     @Override

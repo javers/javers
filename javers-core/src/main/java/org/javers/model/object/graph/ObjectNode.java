@@ -1,6 +1,5 @@
 package org.javers.model.object.graph;
 
-import com.sun.javafx.geom.Edge;
 import org.javers.model.mapping.Entity;
 
 import java.util.List;

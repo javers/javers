@@ -1,9 +1,8 @@
 package org.javers.model.object.graph;
 
-import com.sun.javafx.geom.*;
-import com.sun.javafx.geom.Edge;
 import org.javers.model.mapping.Entity;
-
+import org.javers.model.mapping.Property;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -17,6 +16,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class ObjectWrapper implements ObjectNode {
     private final Object cdo;
     private final Entity entity;
+    private final List<Edge> edges;
+
 
     public ObjectWrapper(Object cdo, Entity entity) {
         argumentIsNotNull(cdo);
@@ -27,6 +28,7 @@ public class ObjectWrapper implements ObjectNode {
 
         this.cdo = cdo;
         this.entity = entity;
+        this.edges = new ArrayList<>();
     }
 
     public Object getCdo() {
@@ -45,6 +47,10 @@ public class ObjectWrapper implements ObjectNode {
 
     @Override
     public List<Edge> getEdges() {
-        return null;
+        return edges;
+    }
+
+    public void addEdge(Edge edge) {
+        this.edges.add(edge);
     }
 }

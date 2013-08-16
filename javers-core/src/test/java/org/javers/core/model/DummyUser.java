@@ -32,6 +32,12 @@ public class DummyUser extends AbstractDummyUser {
     //arrays
     private int[] intArray;
 
+    //value object
+   // private DummyAddress primaryAddress;
+
+    //reference
+    private DummyUser supervisor;
+
     public DummyUser() {
     }
 
@@ -42,6 +48,14 @@ public class DummyUser extends AbstractDummyUser {
     @Transient
     public int getSomeTransientField() {
         return someTransientField;
+    }
+
+    public DummyUser getSupervisor() {
+        return supervisor;
+    }
+
+    public void setSupervisor(DummyUser supervisor) {
+        this.supervisor = supervisor;
     }
 
     public Boolean getBigFlag() {

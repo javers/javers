@@ -5,6 +5,7 @@ import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.type.ArrayType;
 import org.javers.model.mapping.type.CollectionType;
 import org.javers.model.mapping.type.PrimitiveType;
+import org.javers.model.mapping.type.ReferenceType;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Array;
@@ -32,7 +33,18 @@ public abstract class EntityConstructionTest {
         Entity entity = entityFactory.create(DummyUser.class);
 
         //then
-        Assertions.assertThat(entity.getProperties()).hasSize(10);
+        Assertions.assertThat(entity.getProperties()).hasSize(11);
+    }
+
+    @Test
+    public void shouldScanEntityReferenceProperty() {
+        //when
+        Entity entity = entityFactory.create(DummyUser.class);
+
+        //then
+        EntityAssert.assertThat(entity).hasProperty("supervisor")
+                .hasJaversType(ReferenceType.class)
+                .hasJavaType(DummyUser.class);
     }
 
     @Test

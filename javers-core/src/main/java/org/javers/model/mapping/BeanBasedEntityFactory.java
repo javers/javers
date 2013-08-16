@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author bartosz walacik
@@ -21,10 +20,10 @@ public class BeanBasedEntityFactory extends EntityFactory {
         super(typeMapper);
     }
 
-    public <S> Entity<S> create(Class<S> beanClass) {
+    public <S> Entity<S> create(Class<S> entityClass) {
+        typeMapper.registerReferenceType(entityClass);
 
-
-        List<Method> getters = ReflectionUtil.findAllPersistentGetters(beanClass);
+        List<Method> getters = ReflectionUtil.findAllPersistentGetters(entityClass);
         List<Property> beanProperties = new ArrayList<>();
 
         for (Method getter : getters) {
@@ -34,9 +33,8 @@ public class BeanBasedEntityFactory extends EntityFactory {
             Property beanProperty = new BeanProperty(getter, javersType);
             beanProperties.add(beanProperty);
         }
-        Entity entity = new Entity(beanClass,beanProperties);
 
-        return entity;
+        return new Entity<S>(entityClass,beanProperties);
     }
 
 }

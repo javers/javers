@@ -1,5 +1,7 @@
 package org.javers.model.mapping.type;
 
+import org.javers.model.mapping.Entity;
+
 import java.lang.reflect.Type;
 
 /**
@@ -7,14 +9,9 @@ import java.lang.reflect.Type;
  *
  * @author bartosz walacik
  */
-public class ReferenceType extends JaversType {
-
-    @Override
-    public boolean isMappingForJavaType(Class givenType) {
-        throw new RuntimeException("not implemented") ;
+public class ReferenceType extends JaversType {;
+    public ReferenceType(Class entityClass){
+        super(entityClass);
     }
 
-    public ReferenceType(Class javaType) {
-        super(javaType);
-    }
 }

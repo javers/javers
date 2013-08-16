@@ -2,6 +2,7 @@ package org.javers.model.mapping.type;
 
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.model.mapping.Entity;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -22,18 +23,18 @@ public class TypeMapper {
         mappedTypes = new ArrayList<>();
 
         //primitives
-        addType(new PrimitiveType(Integer.TYPE));
-        addType(new PrimitiveType(Boolean.TYPE));
-        addType(new PrimitiveType(Double.TYPE));
-        addType(new PrimitiveType(Float.TYPE));
+        registerPrimitiveType(Integer.TYPE);
+        registerPrimitiveType(Boolean.TYPE);
+        registerPrimitiveType(Double.TYPE);
+        registerPrimitiveType(Float.TYPE);
 
         //primitive boxes
-        addType(new PrimitiveType(Integer.class));
-        addType(new PrimitiveType(Boolean.class));
-        addType(new PrimitiveType(Double.class));
-        addType(new PrimitiveType(Float.class));
-        addType(new PrimitiveType(String.class));
-        addType(new PrimitiveType(Enum.class));
+        registerPrimitiveType(Integer.class);
+        registerPrimitiveType(Boolean.class);
+        registerPrimitiveType(Double.class);
+        registerPrimitiveType(Float.class);
+        registerPrimitiveType(String.class);
+        registerPrimitiveType(Enum.class);
 
         //containers
         addType(new CollectionType(Set.class));
@@ -54,8 +55,15 @@ public class TypeMapper {
         throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType.getName());
     }
 
-    public void addType(JaversType type) {
+    private void addType(JaversType type) {
         mappedTypes.add(type);
     }
 
+    public void registerPrimitiveType(Class<?> primitiveClass){
+        addType(new PrimitiveType(primitiveClass));
+    }
+
+    public void registerReferenceType(Class<?> entityClass){
+        addType(new ReferenceType(entityClass));
+    }
 }

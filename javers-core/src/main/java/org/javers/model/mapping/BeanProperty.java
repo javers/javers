@@ -42,6 +42,11 @@ public class BeanProperty implements Property {
     }
 
     @Override
+    public boolean isNull(Object target) {
+        return get(target) == null;
+    }
+
+    @Override
     public boolean isId() {
         return getter.isAnnotationPresent(Id.class);
     }
@@ -49,12 +54,6 @@ public class BeanProperty implements Property {
     @Override
     public JaversType getType() {
         return javersType;
-    }
-
-
-    @Override
-    public Object getValue() {
-        throw new NotImplementedException();
     }
 
     @Override

@@ -17,10 +17,11 @@ public class FieldBasedEntityFactory extends EntityFactory {
     }
 
     @Override
-    public <S> Entity<S> create(Class<S> beanClass) {
+    public <S> Entity<S> create(Class<S> entityClass) {
+        typeMapper.registerReferenceType(entityClass);
 
-        Field[] declaredFields = beanClass.getDeclaredFields();
-        List<Property> propertyList = new ArrayList<Property>(declaredFields.length);
+        Field[] declaredFields = entityClass.getDeclaredFields();
+        List<Property> propertyList = new ArrayList<>(declaredFields.length);
 
         for (Field field : declaredFields) {
 
@@ -29,6 +30,6 @@ public class FieldBasedEntityFactory extends EntityFactory {
             propertyList.add(fieldProperty);
         }
 
-        return new Entity<S>(beanClass, propertyList);
+        return new Entity<S>(entityClass,propertyList);
     }
 }

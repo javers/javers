@@ -3,7 +3,9 @@ package org.javers.model.mapping;
 import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.model.mapping.type.ReferenceType;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,6 +54,20 @@ public class Entity<S> {
 
     public Class<S> getSourceClass() {
         return sourceClass;
+    }
+
+    /**
+     * @return list of {@link ReferenceType} properties
+     */
+    public List<Property> getSingleReferences() {
+        List<Property> refProperties = new ArrayList<>();
+
+        for (Property property : properties) {
+            if (property.getType() instanceof ReferenceType){
+                refProperties.add(property);
+            }
+        }
+        return refProperties;
     }
 
     public List<Property> getProperties() {
