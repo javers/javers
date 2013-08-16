@@ -10,11 +10,16 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class SingleEdge extends Edge {
+    private ObjectNode reference;
 
     public SingleEdge(Property property, ObjectNode referenceTarget) {
         super(property);
         Validate.argumentIsNotNull(referenceTarget);
 
-        this.references.add(referenceTarget);
+        this.reference = referenceTarget;
+    }
+
+    public ObjectNode getReference() {
+        return reference;
     }
 }

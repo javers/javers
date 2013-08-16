@@ -8,7 +8,13 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class MultiEdge extends Edge {
+    protected List<ObjectNode> references;
+
     public MultiEdge(Property property) {
         super(property);
+    }
+
+    public List<ObjectNode> getReferences(){
+        return references;
     }
 }

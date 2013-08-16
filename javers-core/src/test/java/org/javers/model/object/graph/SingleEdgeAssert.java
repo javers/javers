@@ -17,8 +17,9 @@ public class SingleEdgeAssert extends AbstractAssert<SingleEdgeAssert, SingleEdg
     }
 
     public SingleEdgeAssert refersToCdoWithId(String expectedCdoId) {
-        Assertions.assertThat(actual.getReferences()).hasSize(1);
-        Assertions.assertThat(actual.getReferences().get(0).getCdoId()).isEqualTo(expectedCdoId);
+        Assertions.assertThat(actual.getReference()).isNotNull();
+
+        Assertions.assertThat(actual.getReference().getCdoId()).isEqualTo(expectedCdoId);
         return this;
     }
 }
