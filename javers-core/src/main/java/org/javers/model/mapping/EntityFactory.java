@@ -8,6 +8,7 @@ import java.util.List;
  * @author bartosz walacik
  */
 public abstract class EntityFactory {
+
     protected TypeMapper typeMapper;
 
     protected EntityFactory(TypeMapper typeMapper) {

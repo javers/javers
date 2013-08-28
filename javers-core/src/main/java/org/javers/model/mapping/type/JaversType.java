@@ -8,6 +8,7 @@ package org.javers.model.mapping.type;
  * @author bartosz walacik
  */
 public abstract class JaversType {
+
     protected final Class baseJavaType;
 
     protected JaversType(Class baseJavaType) {
