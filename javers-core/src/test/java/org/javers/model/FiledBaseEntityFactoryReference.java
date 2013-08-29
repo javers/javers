@@ -9,18 +9,20 @@ import org.javers.model.mapping.type.ReferenceType;
 import org.javers.model.mapping.type.TypeMapper;
 import org.testng.annotations.Test;
 
+import javax.persistence.Id;
+
 /**
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
-public class FIledBaseEntityFactoryReference {
+public class FiledBaseEntityFactoryReference {
 
 
     @Test
-    public void shouldCreaceReferencedType(){
+    public void shouldCreateReferencedType(){
 
         //given
         TypeMapper mapper = new TypeMapper();
-        mapper.addType(new ReferenceType(DummyAddress.class));
+        mapper.registerReferenceType(DummyAddress.class);
         FieldBasedEntityFactory entityFactory = new FieldBasedEntityFactory(mapper);
 
         //when

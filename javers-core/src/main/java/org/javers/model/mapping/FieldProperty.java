@@ -1,13 +1,13 @@
 package org.javers.model.mapping;
 
-import org.javers.common.validation.Validate;
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.model.mapping.type.JaversType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.persistence.Id;
 import java.lang.reflect.Field;
 
-import static org.javers.common.validation.Validate.*;
+import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * Immutable
@@ -35,7 +35,7 @@ public class FieldProperty implements Property {
 
     @Override
     public Object get(Object target) {
-        throw new NotImplementedException();
+        return ReflectionUtil.invokeFieldEvenIfPrivate(field, target);
     }
 
     @Override

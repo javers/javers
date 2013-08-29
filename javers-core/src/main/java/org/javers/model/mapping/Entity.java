@@ -1,6 +1,5 @@
 package org.javers.model.mapping;
 
-import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.model.mapping.type.ReferenceType;
@@ -9,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.javers.common.validation.Validate.*;
+import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * immutable

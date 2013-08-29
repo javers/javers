@@ -1,8 +1,7 @@
 package org.javers.common.reflection;
 
 import javax.persistence.Transient;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,11 +93,33 @@ public class ReflectionUtil {
     }
 
     public static Object invokeGetterEvenIfPrivate(Method getter, Object onObject) {
-            if (Modifier.isPrivate(getter.getModifiers()) ||
-                Modifier.isProtected(getter.getModifiers()))
-            {
-                getter.setAccessible(true);
-            }
+            setAccessibleIfPrivateOrProtected(getter);
             return invokeGetter(getter, onObject);
-       }
+    }
+
+    public static Object invokeFieldEvenIfPrivate(Field field, Object onObject) {
+        setAccessibleIfPrivateOrProtected(field);
+        return invokeField(field, onObject);
+    }
+
+    public static Object invokeField(Field field, Object onObject) {
+
+        try {
+            return field.get(onObject);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("error getting value from field '"+ field.getName() +"'");
+        }
+    }
+
+    private static boolean isPrivateOrProtected(int modifiersCode) {
+        return Modifier.isPrivate(modifiersCode) ||
+                Modifier.isProtected(modifiersCode);
+    }
+
+    private static <T extends AccessibleObject & Member> void setAccessibleIfPrivateOrProtected(T object) {
+        if(isPrivateOrProtected(object.getModifiers()))
+        {
+            object.setAccessible(true);
+        }
+    }
 }

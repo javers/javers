@@ -23,7 +23,7 @@ public class FieldBasedEntityFactory extends EntityFactory {
 
     @Override
     public <S> Entity<S> create(Class<S> beanClass) {
-
+        typeMapper.registerReferenceType(beanClass);
         List<Field> declaredFields = new LinkedList<Field>();
         objectFields(beanClass, declaredFields);
         List<Property> propertyList = new ArrayList<Property>(declaredFields.size());
@@ -33,11 +33,6 @@ public class FieldBasedEntityFactory extends EntityFactory {
             if(fieldIsPersistance(field)) {
 
                 JaversType javersType = typeMapper.mapType(field.getType());
-
-                if(javersType instanceof ReferenceType) {
-
-                }
-
                 Property fieldProperty = new FieldProperty(field, javersType);
                 propertyList.add(fieldProperty);
             }

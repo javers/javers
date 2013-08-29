@@ -59,11 +59,16 @@ public class TypeMapper {
         mappedTypes.add(type);
     }
 
-    public void registerPrimitiveType(Class<?> primitiveClass){
+    public void registerPrimitiveType(Class<?> primitiveClass) {
         addType(new PrimitiveType(primitiveClass));
     }
 
-    public void registerReferenceType(Class<?> entityClass){
+    public void registerReferenceType(Class<?> entityClass) {
         addType(new ReferenceType(entityClass));
+    }
+
+    public void registerObjectValueType(Class<?> objectValue) {
+        addType(new ObjectValueType(objectValue));
+
     }
 }
