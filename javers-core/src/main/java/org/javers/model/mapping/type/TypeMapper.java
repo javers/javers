@@ -51,7 +51,6 @@ public class TypeMapper {
                 return mappedType;
             }
         }
-
         throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType.getName());
     }
 

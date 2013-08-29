@@ -1,7 +1,7 @@
-package org.javers.model.object.graph;
+package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
-import org.javers.test.assertion.Assertions;
+import org.javers.model.object.graph.ObjectNode;
 
 /**
  * @author bartosz walacik

@@ -1,7 +1,10 @@
-package org.javers.model.object.graph;
+package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
-import org.javers.test.assertion.Assertions;
+import org.javers.model.object.graph.Edge;
+import org.javers.model.object.graph.MultiEdge;
+import org.javers.model.object.graph.SingleEdge;
+import org.javers.model.object.graph.SingleEdgeAssert;
 
 /**
  * @author bartosz walacik

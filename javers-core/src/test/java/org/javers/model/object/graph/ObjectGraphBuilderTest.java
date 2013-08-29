@@ -2,33 +2,27 @@ package org.javers.model.object.graph;
 
 
 import org.javers.core.model.DummyUser;
-import org.javers.model.mapping.*;
-import org.javers.model.mapping.type.TypeMapper;
+import org.javers.model.mapping.EntityManager;
 import org.javers.test.assertion.Assertions;
-import org.testng.annotations.BeforeMethod;
+import org.javers.test.assertion.EdgeAssert;
+import org.javers.test.assertion.NodeAssert;
 import org.testng.annotations.Test;
+
+import static org.javers.test.builder.DummyUserBuilder.dummyUser;
 
 /**
  * @author bartosz walacik
  */
 @Test
-public class ObjectGraphBuilderTest {
+public abstract class ObjectGraphBuilderTest {
 
     protected EntityManager entityManager;
-
-    @BeforeMethod
-    public void setUp() {
-        TypeMapper mapper = new TypeMapper();
-        entityManager = new EntityManager(new BeanBasedEntityFactory(mapper));
-
-        entityManager.manage(DummyUser.class);
-    }
 
     @Test
     public void shouldBuildOneNodeGraph(){
         //given
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
-        DummyUser user = new DummyUser("Mad Kaz");
+        DummyUser user = dummyUser().withName("Mad Kaz").build();
 
         //when
         ObjectNode node = graphBuilder.build(user);
@@ -43,20 +37,18 @@ public class ObjectGraphBuilderTest {
     public void shouldBuildTwoNodesGraph(){
         //given
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
-        DummyUser user = new DummyUser("Mad Kaz");
-        DummyUser superUser = new DummyUser("Mad Stach");
-        user.setSupervisor(superUser);
+        DummyUser user = dummyUser().withName("Mad Kaz").withSupervisor("Mad Stach").build();
 
         //when
         ObjectNode node = graphBuilder.build(user);
 
         //then
         NodeAssert.assertThat(node).hasEdges(1)
-                                   .hasCdoWithId("Mad Kaz");
+                .hasCdoWithId("Mad Kaz");
 
         Edge edge = node.getEdges().get(0);
         EdgeAssert.assertThat(edge).hasProperty("supervisor")
-                                   .isSingleEdge()
-                                   .refersToCdoWithId("Mad Stach");
+                .isSingleEdge()
+                .refersToCdoWithId("Mad Stach");
     }
 }

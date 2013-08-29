@@ -1,19 +1,23 @@
 package org.javers.model.object.graph;
 
+import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.BeanBasedEntityFactory;
+import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.type.TypeMapper;
 import org.testng.annotations.BeforeMethod;
 
 import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
 
 /**
- * @author bartosz walacik
+ * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
-public class ObjectWrapperBeanTest extends ObjectWrapperTest {
+public class ObjectGraphFieldBuilderTest extends ObjectGraphBuilderTest {
 
     @BeforeMethod
     public void setUp() {
         TypeMapper mapper = typeMapper().withAllDummyModels().build();
-        entityFactory = new BeanBasedEntityFactory(mapper);
+        entityManager = new EntityManager(new BeanBasedEntityFactory(mapper));
+        entityManager.manage(DummyUser.class);
+
     }
 }
