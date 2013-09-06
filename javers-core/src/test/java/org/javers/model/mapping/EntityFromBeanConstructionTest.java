@@ -16,8 +16,8 @@ public class EntityFromBeanConstructionTest extends EntityConstructionTest {
     @BeforeMethod
     public void setUp() {
         TypeMapper mapper = new TypeMapper();
-        mapper.registerObjectValueType(DummyAddress.class);
-        mapper.registerObjectValueType(DummyUserDetails.class);
+        mapper.registerValueObjectType(DummyAddress.class);
+        mapper.registerValueObjectType(DummyUserDetails.class);
         entityFactory = new BeanBasedEntityFactory(mapper);
     }
 

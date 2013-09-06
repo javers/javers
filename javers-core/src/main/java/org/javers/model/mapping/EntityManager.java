@@ -3,10 +3,8 @@ package org.javers.model.mapping;
 import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.model.mapping.type.EntityReferenceType;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,7 +48,7 @@ public class EntityManager {
 
     public void registerValueObject(Class<?> classToManage) {
         Validate.argumentIsNotNull(classToManage);
-        entityFactory.typeMapper.registerObjectValueType(classToManage);
+        entityFactory.typeMapper.registerValueObjectType(classToManage);
     }
 
     private boolean isRegisterd(Class<?> managedClass) {

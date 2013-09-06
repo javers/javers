@@ -1,5 +1,7 @@
 package org.javers.test.builder;
 
+import org.javers.core.model.DummyAddress;
+import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.type.TypeMapper;
 
@@ -23,7 +25,14 @@ public class TypeMapperTestBuilder {
     }
 
     public TypeMapperTestBuilder registerValueObject(Class<?> objectValue) {
-        typeMapper.registerObjectValueType(objectValue);
+        typeMapper.registerValueObjectType(objectValue);
+        return this;
+    }
+
+    public TypeMapperTestBuilder registerAllDummyTypes() {
+        typeMapper.registerValueObjectType(DummyAddress.class);
+        typeMapper.registerReferenceType(DummyUser.class);
+        typeMapper.registerReferenceType(DummyUserDetails.class);
         return this;
     }
 }

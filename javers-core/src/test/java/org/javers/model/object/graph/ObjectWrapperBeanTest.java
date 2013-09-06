@@ -13,7 +13,7 @@ public class ObjectWrapperBeanTest extends ObjectWrapperTest {
 
     @BeforeMethod
     public void setUp() {
-        TypeMapper mapper = typeMapper().build();
+        TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
         entityFactory = new BeanBasedEntityFactory(mapper);
     }
 }

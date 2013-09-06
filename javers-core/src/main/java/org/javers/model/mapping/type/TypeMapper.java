@@ -76,7 +76,7 @@ public class TypeMapper {
         addType(new EntityReferenceType(entityClass));
     }
 
-    public void registerObjectValueType(Class<?> objectValue) {
+    public void registerValueObjectType(Class<?> objectValue) {
         addType(new ValueObjectType(objectValue));
 
     }

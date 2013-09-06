@@ -17,11 +17,13 @@ public class ObjectGraphBeanBuilderTest extends ObjectGraphBuilderTest {
 
     @BeforeMethod
     public void setUp() {
-        TypeMapper mapper = typeMapper().registerValueObject(DummyAddress.class).build();
+        TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
         entityManager = new EntityManager(new BeanBasedEntityFactory(mapper));
         entityManager.registerEntity(DummyUser.class);
         entityManager.registerEntity(DummyUserDetails.class);
         entityManager.buildManagedClasses();
-
     }
+
+
+
 }
