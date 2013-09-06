@@ -1,6 +1,7 @@
 package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
+import org.javers.model.object.graph.Edge;
 import org.javers.model.object.graph.ObjectNode;
 
 /**
@@ -24,5 +25,25 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
     public NodeAssert hasEdges(int expectedSize) {
         Assertions.assertThat(actual.getEdges()).hasSize(expectedSize);
         return this;
+    }
+
+    public EdgeAssert andFirstEdge() {
+        Assertions.assertThat(actual.getEdges()).isNotEmpty();
+        return EdgeAssert.assertThat(actual.getEdges().get(0));
+    }
+
+    public EdgeAssert hasEdge(String dummyUserDetails) {
+        Assertions.assertThat(actual.getEdges()).isNotEmpty();
+        for (Edge edge : actual.getEdges()) {
+            if(edge.getProperty().getName().equals(dummyUserDetails)) {
+                return EdgeAssert.assertThat(edge);
+            }
+        }
+        Assertions.fail("no such edge: "+ dummyUserDetails);
+        return null; // never happens, Assertions.fail is before this line
+    }
+
+    public NodeAssert hasNoEdges() {
+        return hasEdges(0);
     }
 }

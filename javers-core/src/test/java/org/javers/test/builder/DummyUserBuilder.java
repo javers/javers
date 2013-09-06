@@ -2,6 +2,8 @@ package org.javers.test.builder;
 
 import org.javers.core.model.DummyUser;
 
+import static org.javers.test.builder.DummyUserDetailsTestBuilder.dummyUserDetails;
+
 /**
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
@@ -30,4 +32,21 @@ public class DummyUserBuilder {
         dummyUser.setSupervisor(new DummyUser(supervisorName));
         return this;
     }
+
+    public DummyUserBuilder withSupervisor(DummyUser supervisor) {
+        dummyUser.setSupervisor(supervisor);
+        return this;
+    }
+
+
+    public DummyUserBuilder withDetails() {
+        dummyUser.setDummyUserDetails(dummyUserDetails().build());
+        return this;
+    }
+
+    public DummyUserBuilder withDetails(long id) {
+        dummyUser.setDummyUserDetails(dummyUserDetails().withId(id).build());
+        return this;
+    }
+
 }

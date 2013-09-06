@@ -40,7 +40,6 @@ public class ObjectGraphBuilder {
     private void initEdges(ObjectWrapper node) {
         List<Edge> edges = new ArrayList<>();
 
-
         //init SingleEdges
         List<Property> singleReferences = node.getEntity().getSingleReferences();
         for (Property singleRef : singleReferences)  {
@@ -49,10 +48,8 @@ public class ObjectGraphBuilder {
             }
 
             Object referencedCdo = singleRef.get(node.getCdo());
-
             ObjectWrapper referencedNode =  new ObjectWrapper(referencedCdo,
                                                 entityManager.getByClass(referencedCdo.getClass()));
-
             Edge edge = new SingleEdge(singleRef, referencedNode);
 
             node.addEdge(edge);
