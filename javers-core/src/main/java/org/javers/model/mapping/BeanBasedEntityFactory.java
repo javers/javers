@@ -20,21 +20,23 @@ public class BeanBasedEntityFactory extends EntityFactory {
         super(typeMapper);
     }
 
-    public <S> Entity<S> create(Class<S> entityClass) {
+    @Override
+    public <S> Entity<S> createEntity(Class<S> entityClass) {
         typeMapper.registerReferenceType(entityClass);
+        List<Property> beanProperties = getManagedClassProperties(entityClass);
+        return new Entity<S>(entityClass,beanProperties);
+    }
 
+    private <S> List<Property> getManagedClassProperties(Class<S> entityClass) {
         List<Method> getters = ReflectionUtil.findAllPersistentGetters(entityClass);
         List<Property> beanProperties = new ArrayList<>();
 
         for (Method getter : getters) {
-            //logger.info("getter: "+getter);
-
-            JaversType javersType = typeMapper.mapType(getter.getReturnType());
+            JaversType javersType = typeMapper.getJavesrType(getter.getReturnType());
             Property beanProperty = new BeanProperty(getter, javersType);
             beanProperties.add(beanProperty);
         }
-
-        return new Entity<S>(entityClass,beanProperties);
+        return beanProperties;
     }
 
 }

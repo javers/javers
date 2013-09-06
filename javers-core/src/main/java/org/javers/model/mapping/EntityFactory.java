@@ -15,5 +15,5 @@ public abstract class EntityFactory {
         this.typeMapper = typeMapper;
     }
 
-    public abstract <S> Entity<S> create(Class<S> entityClass);
+    public abstract <S> Entity<S> createEntity(Class<S> entityClass);
 }

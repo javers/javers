@@ -17,7 +17,7 @@ public abstract class ObjectWrapperTest {
     public void shouldHoldEntityReference() {
         //given
         DummyUser cdo = new DummyUser();
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo,entity);
@@ -30,7 +30,7 @@ public abstract class ObjectWrapperTest {
     public void shouldHoldCdoReference() {
         //given
         DummyUser cdo = new DummyUser();
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo,entity);
@@ -44,7 +44,7 @@ public abstract class ObjectWrapperTest {
     public void shouldReturnCdoId() {
         //given
         DummyUser cdo = new DummyUser("Mad Kaz");
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo,entity);

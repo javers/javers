@@ -1,8 +1,10 @@
 package org.javers.model.mapping;
 
+import com.googlecode.catchexception.CatchException;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.model.mapping.type.TypeMapper;
+import org.javers.test.assertion.Assertions;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -38,12 +40,26 @@ public class EntityManagerBasicTest {
     }
 
     @Test
-    public void shouldReturnEntityModelForManagedClassAfterMakingItManaged() {
+    public void shouldThrowExceptionWhenClassIsRegisteredButEntityIsNotBuild() {
         // given
-        entityManager.manage(ManagedClass.class);
+        entityManager.registerEntity(DummyManagedClass.class);
 
         // when
-        Entity entity = entityManager.getByClass(ManagedClass.class);
+        CatchException.catchException(entityManager).getByClass(DummyManagedClass.class);
+
+        //then
+        assertThat(caughtException()).overridingErrorMessage("No exception caught").isNotNull();
+        assertThat((JaversException) caughtException()).hasCode(JaversExceptionCode.ENTITY_MANAGER_NOT_INITIALIZED);
+    }
+
+    @Test
+    public void shouldReturnEntityModelForManagedClassAfterBuildingIt() {
+        // given
+        entityManager.registerEntity(DummyManagedClass.class);
+        entityManager.buildManagedClasses();
+
+        // when
+        ManagedClass entity = entityManager.getByClass(DummyManagedClass.class);
 
         // then
         assertThat(entity).isNotNull();
@@ -52,10 +68,10 @@ public class EntityManagerBasicTest {
     @Test
     public void shouldReturnTrueForManagedClass() {
         // given
-        entityManager.manage(ManagedClass.class);
-
+        entityManager.registerEntity(DummyManagedClass.class);
+        entityManager.buildManagedClasses();
         // when
-        boolean isManaged = entityManager.isManaged(ManagedClass.class);
+        boolean isManaged = entityManager.isManaged(DummyManagedClass.class);
 
         // then
         assertThat(isManaged).isTrue();
@@ -63,7 +79,7 @@ public class EntityManagerBasicTest {
 
     private static class NotManagedClass { };
 
-    private static class ManagedClass {
+    private static class DummyManagedClass {
         @Id
         private int getId() {
             return 0;

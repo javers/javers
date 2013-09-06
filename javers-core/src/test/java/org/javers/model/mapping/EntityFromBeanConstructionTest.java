@@ -1,6 +1,7 @@
 package org.javers.model.mapping;
 
 import org.javers.core.model.DummyAddress;
+import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.type.TypeMapper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -16,13 +17,14 @@ public class EntityFromBeanConstructionTest extends EntityConstructionTest {
     public void setUp() {
         TypeMapper mapper = new TypeMapper();
         mapper.registerObjectValueType(DummyAddress.class);
+        mapper.registerObjectValueType(DummyUserDetails.class);
         entityFactory = new BeanBasedEntityFactory(mapper);
     }
 
     @Test
     public void shouldScanPrivateGetters() {
         //when
-        Entity entity = entityFactory.create(ManagedClass.class);
+        Entity entity = entityFactory.createEntity(ManagedClass.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("id").isId();

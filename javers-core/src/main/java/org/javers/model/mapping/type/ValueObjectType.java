@@ -3,9 +3,8 @@ package org.javers.model.mapping.type;
 /**
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
-public class ObjectValueType extends JaversType {
-
-    protected ObjectValueType(Class baseJavaType) {
+public class ValueObjectType extends JaversType {
+    protected ValueObjectType(Class baseJavaType) {
         super(baseJavaType);
     }
 }

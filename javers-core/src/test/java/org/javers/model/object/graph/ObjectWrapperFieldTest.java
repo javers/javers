@@ -13,7 +13,7 @@ public class ObjectWrapperFieldTest extends ObjectWrapperTest {
 
     @BeforeMethod
     public void setUp() {
-        TypeMapper mapper = typeMapper().withAllDummyModels().build();
+        TypeMapper mapper = typeMapper().build();
         entityFactory = new FieldBasedEntityFactory(mapper);
     }
 }

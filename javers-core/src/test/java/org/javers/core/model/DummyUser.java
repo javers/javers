@@ -32,11 +32,9 @@ public class DummyUser extends AbstractDummyUser {
     //arrays
     private int[] intArray;
 
-    //value object
-    private DummyAddress primaryAddress;
-
-    //reference
+     //reference
     private DummyUser supervisor;
+    private DummyUserDetails dummyUserDetails;
 
     public DummyUser() {
     }
@@ -135,11 +133,11 @@ public class DummyUser extends AbstractDummyUser {
         this.someTransientField = someTransientField;
     }
 
-    public DummyAddress getPrimaryAddress() {
-        return primaryAddress;
+    public DummyUserDetails getDummyUserDetails() {
+        return dummyUserDetails;
     }
 
-    public void setPrimaryAddress(DummyAddress primaryAddress) {
-        this.primaryAddress = primaryAddress;
+    public void setDummyUserDetails(DummyUserDetails dummyUserDetails) {
+        this.dummyUserDetails = dummyUserDetails;
     }
 }

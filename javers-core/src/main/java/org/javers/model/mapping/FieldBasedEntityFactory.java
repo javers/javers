@@ -1,7 +1,6 @@
 package org.javers.model.mapping;
 
 import org.javers.model.mapping.type.JaversType;
-import org.javers.model.mapping.type.ReferenceType;
 import org.javers.model.mapping.type.TypeMapper;
 
 import javax.persistence.Transient;
@@ -22,23 +21,27 @@ public class FieldBasedEntityFactory extends EntityFactory {
     }
 
     @Override
-    public <S> Entity<S> create(Class<S> beanClass) {
-        typeMapper.registerReferenceType(beanClass);
+    public <S> Entity<S> createEntity(Class<S> entityClass) {
+        typeMapper.registerReferenceType(entityClass);
+        List<Property> beanProperties = getManagedClassProperties(entityClass);
+        return new Entity<S>(entityClass,beanProperties);
+    }
+
+    private <S> List<Property> getManagedClassProperties(Class<S> valueObjectClass) {
         List<Field> declaredFields = new LinkedList<Field>();
-        objectFields(beanClass, declaredFields);
+        objectFields(valueObjectClass, declaredFields);
         List<Property> propertyList = new ArrayList<Property>(declaredFields.size());
 
         for (Field field : declaredFields) {
 
             if(fieldIsPersistance(field)) {
 
-                JaversType javersType = typeMapper.mapType(field.getType());
+                JaversType javersType = typeMapper.getJavesrType(field.getType());
                 Property fieldProperty = new FieldProperty(field, javersType);
                 propertyList.add(fieldProperty);
             }
         }
-
-        return new Entity<S>(beanClass, propertyList);
+        return propertyList;
     }
 
     private <S> void objectFields(Class<S> beanClass, List<Field> fields) {

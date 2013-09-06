@@ -2,6 +2,7 @@ package org.javers.core;
 
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.ManagedClass;
 
 /**
  * Facade to JaVers instance.
@@ -25,10 +26,10 @@ public class Javers {
     }
 
     protected void manage(Class<?> managedClass) {
-        entityManager.manage(managedClass);
+        entityManager.registerEntity(managedClass);
     }
 
-    public Entity getByClass(Class<?> forClass) {
+    public ManagedClass getByClass(Class<?> forClass) {
         return entityManager.getByClass(forClass);
     }
 

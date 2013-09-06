@@ -2,11 +2,7 @@ package org.javers.model.mapping.type;
 
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.model.mapping.Entity;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +23,7 @@ public class TypeMapper {
         registerPrimitiveType(Boolean.TYPE);
         registerPrimitiveType(Double.TYPE);
         registerPrimitiveType(Float.TYPE);
+        registerPrimitiveType(Long.TYPE);
 
         //primitive boxes
         registerPrimitiveType(Integer.class);
@@ -35,6 +32,7 @@ public class TypeMapper {
         registerPrimitiveType(Float.class);
         registerPrimitiveType(String.class);
         registerPrimitiveType(Enum.class);
+        registerPrimitiveType(Long.class);
 
         //containers
         addType(new CollectionType(Set.class));
@@ -44,14 +42,26 @@ public class TypeMapper {
         addType(new ArrayType());
     }
 
-    public JaversType mapType(Class javaType) {
+    public JaversType getJavesrType(Class javaType) {
         //TODO add cache?
+        JaversType mappedType = findJavesType(javaType);
+        if(mappedType != null) {
+            return mappedType;
+        }
+        throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType.getName());
+    }
+
+    public boolean isMapped(Class javaType) {
+        return findJavesType(javaType) != null;
+    }
+
+    private JaversType findJavesType(Class javaType) {
         for (JaversType mappedType : mappedTypes) {
             if (mappedType.isMappingForJavaType(javaType)) {
                 return mappedType;
             }
         }
-        throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType.getName());
+        return null;
     }
 
     private void addType(JaversType type) {
@@ -63,11 +73,22 @@ public class TypeMapper {
     }
 
     public void registerReferenceType(Class<?> entityClass) {
-        addType(new ReferenceType(entityClass));
+        addType(new EntityReferenceType(entityClass));
     }
 
     public void registerObjectValueType(Class<?> objectValue) {
-        addType(new ObjectValueType(objectValue));
+        addType(new ValueObjectType(objectValue));
 
+    }
+
+    public List<Class> getReferenceTypes() {
+
+        List<Class> referenceClasses = new ArrayList<>();
+        for(JaversType entry : mappedTypes) {
+            if(entry instanceof EntityReferenceType) {
+                referenceClasses.add((Class)entry.getBaseJavaType());
+            }
+        }
+        return referenceClasses;
     }
 }

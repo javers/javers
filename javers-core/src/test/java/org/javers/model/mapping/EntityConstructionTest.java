@@ -2,10 +2,8 @@ package org.javers.model.mapping;
 
 import org.fest.assertions.api.Assertions;
 import org.javers.core.model.DummyUser;
-import org.javers.model.mapping.type.ArrayType;
-import org.javers.model.mapping.type.CollectionType;
-import org.javers.model.mapping.type.PrimitiveType;
-import org.javers.model.mapping.type.ReferenceType;
+import org.javers.core.model.DummyUserDetails;
+import org.javers.model.mapping.type.*;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Array;
@@ -21,7 +19,7 @@ public abstract class EntityConstructionTest {
     @Test
     public void shouldHoldReferenceToSourceClass() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasSourceClass(DummyUser.class);
@@ -30,7 +28,7 @@ public abstract class EntityConstructionTest {
     @Test
     public void shouldScanAllProperties() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         Assertions.assertThat(entity.getProperties()).hasSize(12);
@@ -39,48 +37,58 @@ public abstract class EntityConstructionTest {
     @Test
     public void shouldScanEntityReferenceProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("supervisor")
-                .hasJaversType(ReferenceType.class)
+                .hasJaversType(EntityReferenceType.class)
                 .hasJavaType(DummyUser.class);
     }
 
     @Test
     public void shouldScanInheritedProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("inheritedInt");
     }
 
-
     @Test
     public void shouldNotScanTransientProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasntGotProperty("someTransientField");
     }
 
+
     @Test
     public void shouldScanSetProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("stringSet")
                 .hasJaversType(CollectionType.class)
                 .hasJavaType(Set.class);
     }
+    //"nabled when value object will be supported
+    @Test(enabled = false)
+    public void shouldScanValueObjectProperty() {
+        //when
+        Entity entity = entityFactory.createEntity(DummyUserDetails.class);
+
+        //then
+        EntityAssert.assertThat(entity).hasProperty("dummyAddress")
+                .hasJaversType(ValueObjectType.class);
+    }
 
     @Test
     public void shouldScanListProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("integerList")
@@ -91,7 +99,7 @@ public abstract class EntityConstructionTest {
     @Test
     public void shouldScanArrayProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("intArray")
@@ -102,7 +110,7 @@ public abstract class EntityConstructionTest {
     @Test
     public void shouldScanIntProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("age")
@@ -113,7 +121,7 @@ public abstract class EntityConstructionTest {
     @Test
     public void shouldScanEnumProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("sex")
@@ -124,7 +132,7 @@ public abstract class EntityConstructionTest {
     @Test
     public void shouldScanIntegerProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("largeInt")
@@ -135,7 +143,7 @@ public abstract class EntityConstructionTest {
     @Test
     public void shouldScanBooleanProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("flag")
@@ -146,7 +154,7 @@ public abstract class EntityConstructionTest {
     @Test
     public void shouldScanBigBooleanProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("bigFlag")
@@ -157,7 +165,7 @@ public abstract class EntityConstructionTest {
     @Test
     public void shouldScanStringProperty() {
         //when
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("name")
