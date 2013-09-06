@@ -23,7 +23,9 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
     }
 
     public NodeAssert hasEdges(int expectedSize) {
-        Assertions.assertThat(actual.getEdges()).hasSize(expectedSize);
+        Assertions.assertThat(actual.getEdges())
+                  .overridingErrorMessage("expected edges:"+expectedSize+" but was:"+actual.getEdges().size())
+                  .hasSize(expectedSize);
         return this;
     }
 
@@ -33,7 +35,7 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
     }
 
     public EdgeAssert hasEdge(String dummyUserDetails) {
-        Assertions.assertThat(actual.getEdges()).isNotEmpty();
+        Assertions.assertThat(actual.getEdges()).overridingErrorMessage("no edges").isNotEmpty();
         for (Edge edge : actual.getEdges()) {
             if(edge.getProperty().getName().equals(dummyUserDetails)) {
                 return EdgeAssert.assertThat(edge);

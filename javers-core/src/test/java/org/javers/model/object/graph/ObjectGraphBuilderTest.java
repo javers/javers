@@ -116,13 +116,13 @@ public abstract class ObjectGraphBuilderTest {
         ObjectNode node = graphBuilder.build(kaz);
 
         //then
-        assertThat(node).hasEdges(1)
+        assertThat(node).hasEdges(2)
                         .hasCdoWithId("Mad Kaz");
 
         assertThat(node).hasEdge("supervisor")
                         .isSingleEdge()
-                        .refersToCdoWithId(1L)
                         .refersToNodeWhich()
+                        .hasCdoWithId("Mad Stach")
                         .hasEdge("dummyUserDetails")
                         .isSingleEdge()
                         .refersToCdoWithId(2L);
