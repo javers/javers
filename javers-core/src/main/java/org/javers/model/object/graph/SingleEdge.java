@@ -7,10 +7,13 @@ import java.util.List;
 
 /**
  * OneToOne or ManyToOne relation
+ * <br/>
+ * Immutable
+ *
  * @author bartosz walacik
  */
 public class SingleEdge extends Edge {
-    private ObjectNode reference;
+    private final ObjectNode reference;
 
     public SingleEdge(Property property, ObjectNode referenceTarget) {
         super(property);

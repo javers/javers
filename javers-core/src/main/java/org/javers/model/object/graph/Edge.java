@@ -8,11 +8,13 @@ import java.util.List;
 
 /**
  * Relation between (Entity) instances
+ * <br/>
+ * Immutable
  *
  * @author bartosz walacik
  */
 public abstract class Edge {
-    protected Property property;
+    protected final Property property;
 
     protected Edge(Property property) {
         Validate.argumentIsNotNull(property);

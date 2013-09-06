@@ -31,11 +31,8 @@ public class ObjectGraphBuilder {
 
         initEdges(node);
 
-        //TODO add recurence
-
         return node;
     }
-
 
     private void initEdges(ObjectWrapper node) {
         List<Edge> edges = new ArrayList<>();
@@ -48,12 +45,15 @@ public class ObjectGraphBuilder {
             }
 
             Object referencedCdo = singleRef.get(node.getCdo());
-            ObjectWrapper referencedNode =  new ObjectWrapper(referencedCdo,
-                                                entityManager.getByClass(referencedCdo.getClass()));
+
+            ObjectWrapper referencedNode = (ObjectWrapper)build(referencedCdo);//recursion here
+
             Edge edge = new SingleEdge(singleRef, referencedNode);
 
             node.addEdge(edge);
         }
+
+        //TODO implement support for multi-edges
     }
 
 }
