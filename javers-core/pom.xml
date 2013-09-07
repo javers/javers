@@ -15,6 +15,8 @@
     <name>JaVers core - ${project.version}</name>
 
     <dependencies>
+        <!-- Beware! JaVers should be lightweight library.
+             We want to keep our dependencies list short! -->
 
     	<!-- commons -->
 
@@ -33,6 +35,12 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <!-- JSon serializer -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
         </dependency>
 
         <!-- tests -->
