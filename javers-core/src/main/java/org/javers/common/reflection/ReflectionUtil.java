@@ -122,4 +122,25 @@ public class ReflectionUtil {
             object.setAccessible(true);
         }
     }
+
+    /**
+     * Returns a class that represents the declared type for the field represented by this object.
+     * For example if the field is java.util.List<org.package.model.DummyObject> the result will be DummyObject.
+     */
+    public static Class getGenericTypeClass(Type type) {
+        if(type instanceof ParameterizedType) {
+            return getClassFromParametrizedTypeArgument((ParameterizedType) type);
+        }
+        throw new IllegalArgumentException("Error can not get any additional data from this type " + type.getClass()
+                +".\nArgument type (java.lang.reflect.Type) should be obtain by invoke java.lang.reflect.Field.getGenericType() or java.lang.reflect.Method.getGenericReturnType()"
+                +"\nFor example ReflectionUtil.getGeneticTypeClass(someReflectField.getGenericType())");
+    }
+
+    private static Class getClassFromParametrizedTypeArgument(ParameterizedType type) {
+        Type[] actualTypeArguments = type.getActualTypeArguments();
+        if(actualTypeArguments.length > 1) {
+            throw new IllegalArgumentException("Error can not determine actual element type. Number of type should by 1 is " + actualTypeArguments.length);
+        }
+        return (Class)actualTypeArguments[0];
+    }
 }

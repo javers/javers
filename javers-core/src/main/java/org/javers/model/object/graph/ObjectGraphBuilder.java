@@ -35,8 +35,7 @@ public class ObjectGraphBuilder {
     }
 
     private void initEdges(ObjectWrapper node) {
-        List<Edge> edges = new ArrayList<>();
-
+        //List<Edge> edges = new ArrayList<>();
         //init SingleEdges
         List<Property> singleReferences = node.getEntity().getSingleReferences();
         for (Property singleRef : singleReferences)  {

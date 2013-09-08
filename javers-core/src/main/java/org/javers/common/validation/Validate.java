@@ -18,4 +18,10 @@ public class Validate {
     public static void argumentIsNotNull(Object argument) {
         argumentIsNotNull(argument,"argument should not be null");
     }
+
+    public static void argumentShouldBeNull(Object argument, String message) {
+        if(argument != null) {
+            throw new IllegalArgumentException(message);
+        }
+    }
 }

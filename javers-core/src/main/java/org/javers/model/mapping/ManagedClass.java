@@ -49,6 +49,17 @@ public abstract class ManagedClass<S> {
         return refProperties;
     }
 
+/*    public List<Property> getMultiReferences() {
+        List<Property> refProperties = new ArrayList<>();
+
+        for (Property property : properties) {
+            if (property.getType() instanceof){
+                refProperties.add(property);
+            }
+        }
+        return refProperties;
+    }*/
+
     public List<Property> getProperties() {
         return Collections.unmodifiableList(properties);
     }
