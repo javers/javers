@@ -44,4 +44,6 @@ public class DummyUserDetails {
     public void setDummyAddress(DummyAddress dummyAddress) {
         this.dummyAddress = dummyAddress;
     }
+
+
 }

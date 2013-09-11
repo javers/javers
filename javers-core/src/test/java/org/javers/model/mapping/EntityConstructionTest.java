@@ -31,7 +31,7 @@ public abstract class EntityConstructionTest {
         Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //then
-        Assertions.assertThat(entity.getProperties()).hasSize(12);
+        Assertions.assertThat(entity.getProperties()).hasSize(14);
     }
 
     @Test

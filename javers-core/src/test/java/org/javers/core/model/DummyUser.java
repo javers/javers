@@ -35,6 +35,8 @@ public class DummyUser extends AbstractDummyUser {
      //reference
     private DummyUser supervisor;
     private DummyUserDetails dummyUserDetails;
+    private List<DummyUserDetails> dummyUserDetailsList;
+    private List<DummyUser> employeesList;
 
     public DummyUser() {
     }
@@ -139,5 +141,21 @@ public class DummyUser extends AbstractDummyUser {
 
     public void setDummyUserDetails(DummyUserDetails dummyUserDetails) {
         this.dummyUserDetails = dummyUserDetails;
+    }
+
+    public List<DummyUserDetails> getDummyUserDetailsList() {
+        return dummyUserDetailsList;
+    }
+
+    public void setDummyUserDetailsList(List<DummyUserDetails> dummyUserDetailsList) {
+        this.dummyUserDetailsList = dummyUserDetailsList;
+    }
+
+    public List<DummyUser> getEmployeesList() {
+        return employeesList;
+    }
+
+    public void setEmployeesList(List<DummyUser> employeesList) {
+        this.employeesList = employeesList;
     }
 }

@@ -3,7 +3,7 @@ package org.javers.model.object.graph;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.Property;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -29,14 +29,38 @@ public class ObjectGraphBuilder {
         argumentIsNotNull(cdo);
         ObjectWrapper node = new ObjectWrapper(cdo, entityManager.getByClass(cdo.getClass()));
 
-        initEdges(node);
+        createEdges(node);
 
         return node;
     }
 
-    private void initEdges(ObjectWrapper node) {
-        //List<Edge> edges = new ArrayList<>();
-        //init SingleEdges
+    private void createEdges(ObjectWrapper node) {
+        createSingleEdge(node);
+        createMultiEdge(node);
+    }
+
+    private void createMultiEdge(ObjectWrapper node) {
+        List<Property> multiReferences = node.getEntity().getMultiReferences();
+        for (Property multiRef : multiReferences)  {
+            if (multiRef.isNull(node.getCdo())) {
+                continue;
+            }
+            Object collectionRefCod = multiRef.get(node.getCdo());
+            MultiEdge multiEdge = initMultiEdge(multiRef, collectionRefCod);
+            node.addEdge(multiEdge);
+        }
+    }
+
+    private MultiEdge initMultiEdge(Property multiRef, Object referencedCdo) {
+        MultiEdge multiEdge = new MultiEdge(multiRef);
+        for(Object o : (Collection)referencedCdo) {
+            ObjectNode objectNode = build(o);
+            multiEdge.addReferenceNode(objectNode);
+        }
+        return multiEdge;
+    }
+
+    private void createSingleEdge(ObjectWrapper node) {
         List<Property> singleReferences = node.getEntity().getSingleReferences();
         for (Property singleRef : singleReferences)  {
             if (singleRef.isNull(node.getCdo())) {
@@ -44,15 +68,11 @@ public class ObjectGraphBuilder {
             }
 
             Object referencedCdo = singleRef.get(node.getCdo());
-
             ObjectWrapper referencedNode = (ObjectWrapper)build(referencedCdo);//recursion here
 
             Edge edge = new SingleEdge(singleRef, referencedNode);
-
             node.addEdge(edge);
         }
-
-        //TODO implement support for multi-edges
     }
 
 }

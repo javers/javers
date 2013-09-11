@@ -1,5 +1,6 @@
 package org.javers.model.mapping;
 
+import org.javers.model.mapping.type.CollectionType;
 import org.javers.model.mapping.type.EntityReferenceType;
 
 import java.util.ArrayList;
@@ -49,16 +50,16 @@ public abstract class ManagedClass<S> {
         return refProperties;
     }
 
-/*    public List<Property> getMultiReferences() {
+    public List<Property> getMultiReferences() {
         List<Property> refProperties = new ArrayList<>();
 
         for (Property property : properties) {
-            if (property.getType() instanceof){
+            if (property.getType() instanceof CollectionType){
                 refProperties.add(property);
             }
         }
         return refProperties;
-    }*/
+    }
 
     public List<Property> getProperties() {
         return Collections.unmodifiableList(properties);
@@ -86,4 +87,5 @@ public abstract class ManagedClass<S> {
         }
         return sourceClass.equals((ManagedClass)obj) && properties.equals(((ManagedClass) obj).getProperties());
     }
+
 }

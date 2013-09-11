@@ -2,6 +2,8 @@ package org.javers.model.object.graph;
 
 import org.javers.model.mapping.Property;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 /**
  * OneToMany or ManyToMany relation
@@ -12,9 +14,14 @@ public class MultiEdge extends Edge {
 
     public MultiEdge(Property property) {
         super(property);
+        references = new ArrayList<>();
     }
 
     public List<ObjectNode> getReferences(){
-        return references;
+        return Collections.unmodifiableList(references);
+    }
+
+    public void addReferenceNode(ObjectNode objectNode) {
+        references.add(objectNode);
     }
 }
