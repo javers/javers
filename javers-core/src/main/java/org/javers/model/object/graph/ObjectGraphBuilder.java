@@ -29,29 +29,29 @@ public class ObjectGraphBuilder {
         argumentIsNotNull(cdo);
         ObjectWrapper node = new ObjectWrapper(cdo, entityManager.getByClass(cdo.getClass()));
 
-        createEdges(node);
+        initEdges(node);
 
         return node;
     }
 
-    private void createEdges(ObjectWrapper node) {
-        createSingleEdge(node);
-        createMultiEdge(node);
+    private void initEdges(ObjectWrapper node) {
+        initSingleEdge(node);
+        initMultiEdge(node);
     }
 
-    private void createMultiEdge(ObjectWrapper node) {
+    private void initMultiEdge(ObjectWrapper node) {
         List<Property> multiReferences = node.getEntity().getMultiReferences();
         for (Property multiRef : multiReferences)  {
             if (multiRef.isNull(node.getCdo())) {
                 continue;
             }
             Object collectionRefCod = multiRef.get(node.getCdo());
-            MultiEdge multiEdge = initMultiEdge(multiRef, collectionRefCod);
+            MultiEdge multiEdge = createMultiEdge(multiRef, collectionRefCod);
             node.addEdge(multiEdge);
         }
     }
 
-    private MultiEdge initMultiEdge(Property multiRef, Object referencedCdo) {
+    private MultiEdge createMultiEdge(Property multiRef, Object referencedCdo) {
         MultiEdge multiEdge = new MultiEdge(multiRef);
         for(Object o : (Collection)referencedCdo) {
             ObjectNode objectNode = build(o);
@@ -60,7 +60,7 @@ public class ObjectGraphBuilder {
         return multiEdge;
     }
 
-    private void createSingleEdge(ObjectWrapper node) {
+    private void initSingleEdge(ObjectWrapper node) {
         List<Property> singleReferences = node.getEntity().getSingleReferences();
         for (Property singleRef : singleReferences)  {
             if (singleRef.isNull(node.getCdo())) {
