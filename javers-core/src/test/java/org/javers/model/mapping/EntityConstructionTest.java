@@ -28,11 +28,6 @@ public abstract class EntityConstructionTest {
     }
 
     @Test
-    public void dronioTest() {
-        fail("This is fail to test drone.io");
-    }
-
-    @Test
     public void shouldScanAllProperties() {
         //when
         Entity entity = entityFactory.createEntity(DummyUser.class);
