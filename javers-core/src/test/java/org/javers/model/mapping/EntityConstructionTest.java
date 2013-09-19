@@ -10,6 +10,8 @@ import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Set;
 
+import static junit.framework.Assert.fail;
+
 /**
  * @author bartosz walacik
  */
@@ -23,6 +25,11 @@ public abstract class EntityConstructionTest {
 
         //then
         EntityAssert.assertThat(entity).hasSourceClass(DummyUser.class);
+    }
+
+    @Test
+    public void dronioTest() {
+        fail("This is fail to test drone.io");
     }
 
     @Test
