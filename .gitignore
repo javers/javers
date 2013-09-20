@@ -1,4 +1,6 @@
-.idea/
-javers-core/javers-core.iml
-javers-core/target/
-javers-all.iml
+# IDE
+.idea
+*.iml
+
+# Maven
+target
