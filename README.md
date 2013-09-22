@@ -35,3 +35,6 @@ That is the niche JaVers fulfills. In JaVers, *version* and *change* are **first
 
 ## Core
 The core functionality is calculating diff between two graphs of objects.
+
+## CI status
+[![Build Status](https://drone.io/bitbucket.org/javers/javers/status.png)](https://drone.io/bitbucket.org/javers/javers/latest)

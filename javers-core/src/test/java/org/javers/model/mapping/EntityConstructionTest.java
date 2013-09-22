@@ -10,6 +10,8 @@ import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Set;
 
+import static junit.framework.Assert.fail;
+
 /**
  * @author bartosz walacik
  */
