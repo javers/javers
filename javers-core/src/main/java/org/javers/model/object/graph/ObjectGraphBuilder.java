@@ -54,7 +54,7 @@ public class ObjectGraphBuilder {
     private MultiEdge createMultiEdge(Property multiRef, Object referencedCdo) {
         MultiEdge multiEdge = new MultiEdge(multiRef);
         for(Object o : (Collection)referencedCdo) {
-            ObjectNode objectNode = build(o);
+            ObjectNode objectNode = build(o); //recursion here
             multiEdge.addReferenceNode(objectNode);
         }
         return multiEdge;
@@ -74,5 +74,4 @@ public class ObjectGraphBuilder {
             node.addEdge(edge);
         }
     }
-
 }
