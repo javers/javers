@@ -11,14 +11,14 @@ import org.javers.model.mapping.Property;
  * @author bartosz walacik
  */
 public class ReferenceAdded extends PropertyChange {
-    private final Object reference;
+    private final GlobalCdoId reference;
 
-    public ReferenceAdded(GlobalCdoId globalCdoId, Property property, Object reference) {
+    public ReferenceAdded(GlobalCdoId globalCdoId, Property property, GlobalCdoId reference) {
         super(globalCdoId, property);
         this.reference = reference;
     }
 
-    public Object getAddedReference() {
+    public GlobalCdoId getAddedReference() {
         return reference;
     }
 }

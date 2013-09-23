@@ -11,20 +11,20 @@ import org.javers.model.mapping.Property;
  * @author bartosz walacik
  */
 public class ReferenceChanged extends PropertyChange {
-    private final Object leftReference;
-    private final Object rightReference;
+    private final GlobalCdoId leftReference;
+    private final GlobalCdoId rightReference;
 
-    public ReferenceChanged(GlobalCdoId globalCdoId, Property property, Object leftReference, Object rightReference) {
+    public ReferenceChanged(GlobalCdoId globalCdoId, Property property, GlobalCdoId leftReference, GlobalCdoId rightReference) {
         super(globalCdoId, property);
         this.leftReference = leftReference;
         this.rightReference = rightReference;
     }
 
-    public Object getLeftReference() {
+    public GlobalCdoId getLeftReference() {
         return leftReference;
     }
 
-    public Object getRightReference() {
+    public GlobalCdoId getRightReference() {
         return rightReference;
     }
 }

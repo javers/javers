@@ -11,14 +11,14 @@ import org.javers.model.mapping.Property;
  * @author bartosz walacik
  */
 public class ReferenceRemoved extends PropertyChange {
-    private final Object reference;
+    private final GlobalCdoId reference;
 
-    public ReferenceRemoved(GlobalCdoId globalCdoId, Property property, Object reference) {
+    public ReferenceRemoved(GlobalCdoId globalCdoId, Property property, GlobalCdoId reference) {
         super(globalCdoId, property);
         this.reference = reference;
     }
 
-    public Object getRemovedReference() {
+    public GlobalCdoId getRemovedReference() {
         return reference;
     }
 }
