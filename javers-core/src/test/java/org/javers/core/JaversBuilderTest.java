@@ -1,22 +1,23 @@
 package org.javers.core;
 
-import org.javers.test.assertion.Assertions;
 import org.testng.annotations.Test;
 
-import static org.javers.test.assertion.Assertions.*;
+import static org.javers.test.assertion.Assertions.assertThat;
 
 /**
  * @author bartosz walacik
  */
-public class JaversFactoryTest {
+public class JaversBuilderTest {
+
     @Test
     public void shouldCreateJavers() throws Exception {
         //given
-        JaversFactory factory = new JaversFactory();
+        JaversBuilder builder = new JaversBuilder();
 
         //when
-        Javers javers = factory.build();
+        Javers javers = builder.build();
 
         assertThat(javers).isNotNull();
     }
+
 }
