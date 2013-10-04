@@ -5,13 +5,14 @@ import org.javers.core.MappingStyle;
 import org.javers.model.pico.ModelJaversModule;
 import org.picocontainer.DefaultPicoContainer;
 import org.picocontainer.PicoContainer;
+import org.picocontainer.behaviors.Caching;
 
 public class JaversContainerFactory {
 
     public static PicoContainer create(MappingStyle configuredStyle) {
         JaversModule[] modules = {new CoreJaversModule(), new ModelJaversModule(configuredStyle)};
 
-        DefaultPicoContainer javersContainer = new DefaultPicoContainer();
+        DefaultPicoContainer javersContainer = new DefaultPicoContainer(new Caching());
         for (JaversModule module : modules) {
             module.addModuleComponentsTo(javersContainer);
         }
