@@ -7,6 +7,9 @@ import org.picocontainer.DefaultPicoContainer;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.behaviors.Caching;
 
+/**
+ * @author Piotr Betkier
+ */
 public class JaversContainerFactory {
 
     public static PicoContainer create(MappingStyle configuredStyle) {
@@ -14,7 +17,9 @@ public class JaversContainerFactory {
 
         DefaultPicoContainer javersContainer = new DefaultPicoContainer(new Caching());
         for (JaversModule module : modules) {
-            module.addModuleComponentsTo(javersContainer);
+            for (Class component : module.getModuleComponents()) {
+                javersContainer.addComponent(component);
+            }
         }
 
         return javersContainer;

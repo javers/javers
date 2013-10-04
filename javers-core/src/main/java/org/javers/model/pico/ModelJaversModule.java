@@ -1,14 +1,26 @@
 package org.javers.model.pico;
 
-import org.javers.common.pico.BaseJaversModule;
+import org.javers.common.pico.JaversModule;
+import org.javers.common.validation.Validate;
 import org.javers.core.MappingStyle;
 import org.javers.model.mapping.BeanBasedEntityFactory;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.FieldBasedEntityFactory;
 import org.javers.model.mapping.type.TypeMapper;
-import org.picocontainer.MutablePicoContainer;
 
-public class ModelJaversModule extends BaseJaversModule {
+import java.util.*;
+
+/**
+ * @author Piotr Betkier
+ */
+public class ModelJaversModule implements JaversModule {
+
+    private static Class[] moduleComponents = new Class[] {EntityManager.class, TypeMapper.class};
+
+    private static Map<MappingStyle, Class> entityFactoriesMapping = new HashMap() {{
+        put(MappingStyle.BEAN, BeanBasedEntityFactory.class);
+        put(MappingStyle.FIELD, FieldBasedEntityFactory.class);
+    }};
 
     private MappingStyle configuredStyle;
 
@@ -17,15 +29,14 @@ public class ModelJaversModule extends BaseJaversModule {
     }
 
     @Override
-    protected Class[] getSimpleModuleComponents() {
-        return new Class[] {EntityManager.class, BeanBasedEntityFactory.class, TypeMapper.class};
+    public Collection<Class> getModuleComponents() {
+        Collection<Class> components = new ArrayList<>();
+        Collections.addAll(components, moduleComponents);
+
+        Validate.conditionFulfilled(entityFactoriesMapping.containsKey(configuredStyle),
+                                    "No EntityFactory defined for " + configuredStyle);
+        components.add(entityFactoriesMapping.get(configuredStyle));
+        return components;
     }
 
-    @Override
-    protected void addComplexModuleComponentsTo(MutablePicoContainer container) {
-        container.addConfig(EntityFactoryFactory.CONFIGURED_MAPPING_STYLE_KEY, configuredStyle);
-        container.addComponent(EntityFactoryFactory.getEntityFactoryKeyName(MappingStyle.BEAN), BeanBasedEntityFactory.class);
-        container.addComponent(EntityFactoryFactory.getEntityFactoryKeyName(MappingStyle.FIELD), FieldBasedEntityFactory.class);
-        container.addAdapter(new EntityFactoryFactory());
-    }
 }

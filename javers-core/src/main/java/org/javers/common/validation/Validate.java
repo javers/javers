@@ -24,4 +24,10 @@ public class Validate {
             throw new IllegalArgumentException(message);
         }
     }
+
+    public static void conditionFulfilled(boolean condition, String message) {
+        if (!condition) {
+            throw new IllegalStateException(message);
+        }
+    }
 }

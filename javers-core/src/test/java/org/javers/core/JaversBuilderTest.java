@@ -11,11 +11,8 @@ public class JaversBuilderTest {
 
     @Test
     public void shouldCreateJavers() throws Exception {
-        //given
-        JaversBuilder builder = new JaversBuilder();
-
         //when
-        Javers javers = builder.build();
+        Javers javers = new JaversBuilder().build();
 
         //then
         assertThat(javers).isNotNull();

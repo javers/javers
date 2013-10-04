@@ -1,13 +1,22 @@
 package org.javers.core.pico;
 
-import org.javers.common.pico.BaseJaversModule;
+import org.javers.common.pico.JaversModule;
 import org.javers.core.Javers;
 
-public class CoreJaversModule extends BaseJaversModule {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
+/**
+ * @author Piotr Betkier
+ */
+public class CoreJaversModule implements JaversModule {
+
+    private static Class[] moduleComponents = new Class[] {Javers.class};
 
     @Override
-    protected Class[] getSimpleModuleComponents() {
-        return new Class[] {Javers.class};
+    public Collection<Class> getModuleComponents() {
+        return Arrays.asList(moduleComponents);
     }
 
 }

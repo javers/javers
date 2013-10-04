@@ -1,9 +1,12 @@
 package org.javers.common.pico;
 
-import org.picocontainer.MutablePicoContainer;
+import java.util.Collection;
 
+/**
+ * @author Piotr Betkier
+ */
 public interface JaversModule {
 
-    void addModuleComponentsTo(MutablePicoContainer container);
+    public Collection<Class> getModuleComponents();
 
 }
