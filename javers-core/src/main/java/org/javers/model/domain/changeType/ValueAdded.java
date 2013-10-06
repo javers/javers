@@ -2,6 +2,7 @@ package org.javers.model.domain.changeType;
 
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.PropertyChange;
+import org.javers.model.domain.Value;
 import org.javers.model.mapping.Property;
 
 /**
@@ -10,14 +11,14 @@ import org.javers.model.mapping.Property;
  * @author bartosz walacik
  */
 public class ValueAdded extends PropertyChange {
-    private final Object value;
+    private final Value value;
 
     public ValueAdded(GlobalCdoId globalCdoId, Property property, Object value) {
         super(globalCdoId, property);
-        this.value = value;
+        this.value = new Value(value);
     }
 
     public Object getAddedValue() {
-        return value;
+        return value.getValue();
     }
 }
