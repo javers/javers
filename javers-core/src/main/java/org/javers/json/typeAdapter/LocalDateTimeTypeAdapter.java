@@ -12,7 +12,7 @@ import org.joda.time.format.ISODateTimeFormat;
  * @author bartosz walacik
  */
 public class LocalDateTimeTypeAdapter extends BasicStringTypeAdapter<LocalDateTime> {
-    private static final DateTimeFormatter ISO_FORMATTER = ISODateTimeFormat.dateHourMinute();
+    private static final DateTimeFormatter ISO_FORMATTER = ISODateTimeFormat.dateHourMinuteSecond();
 
     @Override
     public String serialize(LocalDateTime sourceValue) {

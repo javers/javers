@@ -57,11 +57,11 @@ public class JsonConverterTest {
         JsonConverter jsonConverter = new JsonConverter();
 
         //when
-        LocalDateTime date = new LocalDateTime(2001,12,1,22,23);
+        LocalDateTime date = new LocalDateTime(2001,12,1,22,23,03);
         String json = jsonConverter.toJson(date);
 
         //then
-        Assertions.assertThat(json).isEqualTo("\"2001-12-01T22:23\"");
+        Assertions.assertThat(json).isEqualTo("\"2001-12-01T22:23:03\"");
     }
 
     @Test
@@ -70,10 +70,10 @@ public class JsonConverterTest {
         JsonConverter jsonConverter = new JsonConverter();
 
         //when
-        LocalDateTime date = jsonConverter.fromJson("\"2001-12-01T22:23\"", LocalDateTime.class);
+        LocalDateTime date = jsonConverter.fromJson("\"2001-12-01T22:23:03\"", LocalDateTime.class);
 
         //then
-        Assertions.assertThat(date).isEqualTo(new LocalDateTime(2001,12,1,22,23));
+        Assertions.assertThat(date).isEqualTo(new LocalDateTime(2001,12,1,22,23,03));
     }
 
     @Test
