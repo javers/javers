@@ -1,10 +1,17 @@
 package org.javers.json;
 
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.ImmutableList;
 import org.fest.assertions.data.Offset;
 import org.javers.test.assertion.Assertions;
 import org.joda.time.LocalDateTime;
 import org.junit.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author bartosz walacik
@@ -47,7 +54,6 @@ public class JsonConverterTest {
         //then
         Assertions.assertThat(value).isEqualTo(1/3., Offset.offset(0.0000000000000001));
 
-
         //{"iLocalMillis":1007245380000,"iChronology":{"iBase":{"iMinDaysInFirstWeek":4}}}
     }
 
@@ -74,6 +80,54 @@ public class JsonConverterTest {
 
         //then
         Assertions.assertThat(date).isEqualTo(new LocalDateTime(2001,12,1,22,23,03));
+    }
+
+    @Test
+    public void customTypeAdaptersShouldBeNullSafeWhenConvertingToJson() {
+        //given
+        JsonConverter jsonConverter = new JsonConverter();
+
+        //when
+        String valueJson = jsonConverter.toJson(null, LocalDateTime.class);
+
+        //then
+        Assertions.assertThat(valueJson).isEqualTo("null");
+    }
+
+    @Test
+    public void customTypeAdaptersShouldBeNullSafeWhenConvertingFromJson() {
+        //given
+        JsonConverter jsonConverter = new JsonConverter();
+
+        //when
+        LocalDateTime value = jsonConverter.fromJson("null", LocalDateTime.class);
+
+        //then
+        Assertions.assertThat(value).isNull();
+    }
+
+    @Test
+    public void shouldConvertBigDecimalToJson(){
+        //given
+        JsonConverter jsonConverter = new JsonConverter();
+
+        //when
+        BigDecimal value= new BigDecimal(22.22).setScale(3, RoundingMode.HALF_UP);
+        String valueJson = jsonConverter.toJson(value);
+
+        //then
+        Assertions.assertThat(valueJson).isEqualTo("22.220");
+    }
+
+    @Test
+    public void shouldConvertBigDecimalFromJson() {
+        //given
+        JsonConverter jsonConverter = new JsonConverter();
+
+        BigDecimal value = jsonConverter.fromJson("22.220",BigDecimal.class);
+
+        //then
+        Assertions.assertThat(value).isEqualTo(new BigDecimal(22.22).setScale(3, RoundingMode.HALF_UP));
     }
 
     @Test
@@ -110,5 +164,29 @@ public class JsonConverterTest {
 
         //then
         Assertions.assertThat(value).isNull();
+    }
+
+    @Test
+    public void shouldUseCustomTypeAdapterWhenConvertingToJson() {
+        //given
+        JsonConverter jsonConverter = new JsonConverter(ImmutableList.of((JsonTypeAdapter)new DummyJsonPersonTypeAdapter()));
+
+        //when
+        String json = jsonConverter.toJson( new DummyJsonPerson("mad","kaz"));
+
+        //then
+        Assertions.assertThat(json).isEqualTo("\"mad@kaz\"");
+    }
+
+    @Test
+    public void shouldUseCustomTypeAdapterWhenConvertingFromJson() {
+        //given
+        JsonConverter jsonConverter = new JsonConverter(ImmutableList.of((JsonTypeAdapter)new DummyJsonPersonTypeAdapter()));
+
+        //when
+        DummyJsonPerson person = jsonConverter.fromJson("\"mad@kaz\"",DummyJsonPerson.class);
+
+        //then
+        Assertions.assertThat(person).isEqualTo(new DummyJsonPerson("mad","kaz"));
     }
 }

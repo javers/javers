@@ -7,7 +7,11 @@ import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * Serializes LocalDateTime to JSON String using ISO date format yyyy-MM-dd'T'HH:mm,
- * for ex. "2001-12-01T22:23"
+ * for ex. 2001-12-01T22:23
+ * <br/><br/>
+ *
+ * Without typeAdapter, LocalDateTime written to JSON would be:
+ * {"iLocalMillis":1007245380000,"iChronology":{"iBase":{"iMinDaysInFirstWeek":4}}}
  *
  * @author bartosz walacik
  */

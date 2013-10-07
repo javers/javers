@@ -47,10 +47,10 @@ public class JsonConverter {
         gson = initGsonBuilder().create();
     }
 
-    public JsonConverter(Collection<JsonTypeAdapter> adapters) {
+    public JsonConverter(Collection<JsonTypeAdapter> customAdapters) {
         GsonBuilder gsonBuilder = initGsonBuilder();
 
-        registerAdapters(gsonBuilder, adapters);
+        registerAdapters(gsonBuilder, customAdapters);
 
         gson = gsonBuilder.create();
     }
@@ -96,6 +96,11 @@ public class JsonConverter {
     public String toJson(Object value) {
         return gson.toJson(value);
     }
+
+    public String toJson(Object value, Type requiredType) {
+        return gson.toJson(value);
+    }
+
 
     public <T> T fromJson(String json, Class<T> expectedType) {
         return gson.fromJson(json,expectedType);
