@@ -8,6 +8,7 @@ JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 * Pawel Cierpiatka - first contributor
 * Maciej Zasada  - contributor
 * Piotr Betkier - contributor
+* Paweł Szymczyk - contributor
 
 ## Abstract
 JaVers is a tool for tracking changes in object-oriented data.
