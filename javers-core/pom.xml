@@ -47,6 +47,12 @@
             <artifactId>jackson-core</artifactId>
         </dependency>
 
+        <!-- dependency injection -->
+        <dependency>
+            <groupId>org.picocontainer</groupId>
+            <artifactId>picocontainer</artifactId>
+        </dependency>
+
         <!-- tests -->
         <dependency>
              <groupId>org.testng</groupId>

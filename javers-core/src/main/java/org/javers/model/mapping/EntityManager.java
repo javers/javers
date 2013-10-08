@@ -11,16 +11,15 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class EntityManager {
+
     private EntityFactory entityFactory;
-    //private TypeMapper typeMapper;
+
     private Map<Class<?>, Entity> managedEntities = new HashMap<>();
 
     public EntityManager(EntityFactory entityFactory) {
-        //Validate.argumentIsNotNull(typeMapper);
         Validate.argumentIsNotNull(entityFactory);
 
         this.entityFactory = entityFactory;
-        //this.typeMapper = typeMapper;
     }
 
     /**
@@ -30,7 +29,7 @@ public class EntityManager {
         if (!isRegisterd(forClass)) {
             throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, forClass.getName());
         }
-        if(isRegisterd(forClass) && !isManaged(forClass)){
+        if (isRegisterd(forClass) && !isManaged(forClass)) {
             throw new JaversException(JaversExceptionCode.ENTITY_MANAGER_NOT_INITIALIZED, forClass.getName());
         }
         return managedEntities.get(forClass);
@@ -39,7 +38,7 @@ public class EntityManager {
     public void registerEntity(Class<?> classToManage) {
         Validate.argumentIsNotNull(classToManage);
 
-        if (isRegisterd(classToManage)){
+        if (isRegisterd(classToManage)) {
             return; //already managed
         }
 
@@ -64,7 +63,7 @@ public class EntityManager {
      */
     public void buildManagedClasses() {
 
-        for(Class referenceClass : entityFactory.typeMapper.getReferenceTypes()) {
+        for (Class referenceClass : entityFactory.typeMapper.getReferenceTypes()) {
             Entity entity = entityFactory.createEntity(referenceClass);
             managedEntities.put(referenceClass, entity);
         }
