@@ -1,7 +1,6 @@
 package org.javers.model.mapping;
 
 import org.javers.model.mapping.type.TypeMapper;
-import org.javers.model.mapping.util.managedClassPropertyScanner.FieldBasedScanner;
 import org.testng.annotations.BeforeMethod;
 
 import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
