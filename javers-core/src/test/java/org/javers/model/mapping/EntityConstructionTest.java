@@ -2,15 +2,16 @@ package org.javers.model.mapping;
 
 import org.fest.assertions.api.Assertions;
 import org.javers.core.model.DummyUser;
-import org.javers.core.model.DummyUserDetails;
-import org.javers.model.mapping.type.*;
+import org.javers.model.mapping.type.ArrayType;
+import org.javers.model.mapping.type.CollectionType;
+import org.javers.model.mapping.type.EntityReferenceType;
+import org.javers.model.mapping.type.PrimitiveType;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Set;
 
-import static junit.framework.Assert.fail;
 
 /**
  * @author bartosz walacik
@@ -75,16 +76,6 @@ public abstract class EntityConstructionTest {
         EntityAssert.assertThat(entity).hasProperty("stringSet")
                 .hasJaversType(CollectionType.class)
                 .hasJavaType(Set.class);
-    }
-    //"nabled when value object will be supported
-    @Test(enabled = false)
-    public void shouldScanValueObjectProperty() {
-        //when
-        Entity entity = entityFactory.createEntity(DummyUserDetails.class);
-
-        //then
-        EntityAssert.assertThat(entity).hasProperty("dummyAddress")
-                .hasJaversType(ValueObjectType.class);
     }
 
     @Test

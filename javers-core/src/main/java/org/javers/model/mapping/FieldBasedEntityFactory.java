@@ -17,45 +17,13 @@ import java.util.List;
 public class FieldBasedEntityFactory extends EntityFactory {
 
     public FieldBasedEntityFactory(TypeMapper typeMapper) {
-        super(typeMapper);
+        super(typeMapper, new FieldBasedManagedClassPropertyScanner(typeMapper));
     }
 
     @Override
-    public <S> Entity<S> createEntity(Class<S> entityClass) {
+    public <S> Entity<S> create(Class<S> entityClass) {
         typeMapper.registerReferenceType(entityClass);
-        List<Property> beanProperties = getManagedClassProperties(entityClass);
+        List<Property> beanProperties = scanner.scan(entityClass);
         return new Entity<S>(entityClass,beanProperties);
     }
-
-    private <S> List<Property> getManagedClassProperties(Class<S> valueObjectClass) {
-        List<Field> declaredFields = new LinkedList<Field>();
-        objectFields(valueObjectClass, declaredFields);
-        List<Property> propertyList = new ArrayList<Property>(declaredFields.size());
-
-        for (Field field : declaredFields) {
-
-            if(fieldIsPersistance(field)) {
-
-                JaversType javersType = typeMapper.getJavesrType(field.getType());
-                Property fieldProperty = new FieldProperty(field, javersType);
-                propertyList.add(fieldProperty);
-            }
-        }
-        return propertyList;
-    }
-
-    private <S> void objectFields(Class<S> beanClass, List<Field> fields) {
-
-        if(beanClass.getSuperclass() != null && !beanClass.getSuperclass().isInstance(Object.class)) {
-            objectFields(beanClass.getSuperclass(), fields);
-        }
-
-        fields.addAll(Arrays.asList(beanClass.getDeclaredFields()));
-    }
-
-    private boolean fieldIsPersistance(Field field) {
-        return Modifier.isTransient(field.getModifiers()) == false
-               && field.getAnnotation(Transient.class) == null;
-    }
-
 }

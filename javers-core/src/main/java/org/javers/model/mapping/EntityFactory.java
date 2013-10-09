@@ -7,13 +7,13 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public abstract class EntityFactory {
+public abstract class EntityFactory extends ManagedClassFactory<Entity>{
 
-    protected TypeMapper typeMapper;
-
-    protected EntityFactory(TypeMapper typeMapper) {
-        this.typeMapper = typeMapper;
+    protected EntityFactory(TypeMapper typeMapper, ManagedClassPropertyScanner scanner) {
+        super(typeMapper, scanner);
     }
 
-    public abstract <S> Entity<S> createEntity(Class<S> entityClass);
+    public <S> Entity<S> createEntity(Class<S> entityClass){
+        return create(entityClass);
+    }
 }
