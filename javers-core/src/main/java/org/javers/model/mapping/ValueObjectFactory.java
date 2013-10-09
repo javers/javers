@@ -1,8 +1,7 @@
 package org.javers.model.mapping;
 
 import org.javers.model.mapping.type.TypeMapper;
-
-import java.util.ArrayList;
+import org.javers.model.mapping.util.managedClassPropertyScanner.Scanner;
 
 /**
  * @author pawel szymczyk
@@ -11,7 +10,7 @@ public abstract class ValueObjectFactory extends  ManagedClassFactory<ValueObjec
 
     protected TypeMapper typeMapper;
 
-    protected ValueObjectFactory(TypeMapper typeMapper, ManagedClassPropertyScanner scanner) {
+    protected ValueObjectFactory(TypeMapper typeMapper, Scanner scanner) {
         super(typeMapper, scanner);
     }
 

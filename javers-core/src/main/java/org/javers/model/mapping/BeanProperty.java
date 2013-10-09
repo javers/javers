@@ -21,7 +21,7 @@ public class BeanProperty implements Property {
     private final String name;
     private final JaversType javersType;
 
-    protected BeanProperty(Method getter, JaversType javersType) {
+    public BeanProperty(Method getter, JaversType javersType) {
 
         argumentIsNotNull(getter, "getter should not be null!");
         argumentIsNotNull(javersType, "javersType should not be null!");

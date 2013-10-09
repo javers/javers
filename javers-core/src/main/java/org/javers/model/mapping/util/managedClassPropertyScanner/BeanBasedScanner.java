@@ -1,6 +1,8 @@
-package org.javers.model.mapping;
+package org.javers.model.mapping.util.managedClassPropertyScanner;
 
 import org.javers.common.reflection.ReflectionUtil;
+import org.javers.model.mapping.BeanProperty;
+import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
 
@@ -11,12 +13,27 @@ import java.util.List;
 /**
  * @author pawel szymczyk
  */
-public class BeanBasedManagedClassPropertyScanner extends ManagedClassPropertyScanner {
+public class BeanBasedScanner extends Scanner {
 
-    private TypeMapper typeMapper;
+    private static volatile BeanBasedScanner scanner;
 
-    public BeanBasedManagedClassPropertyScanner(TypeMapper typeMapper) {
-        this.typeMapper = typeMapper;
+    private BeanBasedScanner(TypeMapper typeMapper) {
+        super(typeMapper);
+    }
+
+    public static BeanBasedScanner getInstane(TypeMapper typeMapper) {
+       return  getSingletonInstance(typeMapper);
+    }
+
+    private static BeanBasedScanner getSingletonInstance(TypeMapper typeMapper) {
+        if (scanner == null) {
+            synchronized (Scanner.class) {
+                if (scanner == null) {
+                    scanner = new BeanBasedScanner(typeMapper);
+                }
+            }
+        }
+        return scanner;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.javers.model.mapping;
 
 import org.javers.model.mapping.type.TypeMapper;
+import org.javers.model.mapping.util.managedClassPropertyScanner.BeanBasedScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,7 @@ public class BeanBasedEntityFactory extends EntityFactory {
     private static final Logger logger = LoggerFactory.getLogger(BeanBasedEntityFactory.class);
 
     public BeanBasedEntityFactory(TypeMapper typeMapper) {
-        super(typeMapper, new BeanBasedManagedClassPropertyScanner(typeMapper));
+        super(typeMapper, BeanBasedScanner.getInstane(typeMapper));
     }
 
 

@@ -1,14 +1,8 @@
 package org.javers.model.mapping;
 
-import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
+import org.javers.model.mapping.util.managedClassPropertyScanner.FieldBasedScanner;
 
-import javax.persistence.Transient;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -17,7 +11,7 @@ import java.util.List;
 public class FieldBasedEntityFactory extends EntityFactory {
 
     public FieldBasedEntityFactory(TypeMapper typeMapper) {
-        super(typeMapper, new FieldBasedManagedClassPropertyScanner(typeMapper));
+        super(typeMapper, FieldBasedScanner.getInstane(typeMapper));
     }
 
     @Override

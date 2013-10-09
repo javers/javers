@@ -1,6 +1,7 @@
 package org.javers.model.mapping;
 
 import org.javers.model.mapping.type.TypeMapper;
+import org.javers.model.mapping.util.managedClassPropertyScanner.BeanBasedScanner;
 
 /**
  * @author pawel szymczyk
@@ -8,7 +9,7 @@ import org.javers.model.mapping.type.TypeMapper;
 public class BeanBasedValueObjectFactory extends ValueObjectFactory{
 
     public BeanBasedValueObjectFactory(TypeMapper typeMapper) {
-        super(typeMapper, new BeanBasedManagedClassPropertyScanner(typeMapper));
+        super(typeMapper, BeanBasedScanner.getInstane(typeMapper));
     }
 
     @Override

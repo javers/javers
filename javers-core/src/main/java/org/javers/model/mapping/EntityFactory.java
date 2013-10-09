@@ -1,15 +1,14 @@
 package org.javers.model.mapping;
 
 import org.javers.model.mapping.type.TypeMapper;
-
-import java.util.List;
+import org.javers.model.mapping.util.managedClassPropertyScanner.Scanner;
 
 /**
  * @author bartosz walacik
  */
 public abstract class EntityFactory extends ManagedClassFactory<Entity>{
 
-    protected EntityFactory(TypeMapper typeMapper, ManagedClassPropertyScanner scanner) {
+    protected EntityFactory(TypeMapper typeMapper, Scanner scanner) {
         super(typeMapper, scanner);
     }
 

@@ -1,7 +1,5 @@
 package org.javers.model.mapping;
 
-import org.javers.core.model.DummyAddress;
-import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.type.TypeMapper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -14,11 +12,9 @@ import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
 @Test
 public class EntityFromFieldsConstructionTest extends EntityConstructionTest {
 
-
     @BeforeMethod
     public void setUp() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
         entityFactory = new FieldBasedEntityFactory(typeMapper);
     }
-
 }
