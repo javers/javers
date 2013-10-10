@@ -16,6 +16,9 @@ import java.util.Set;
 import static org.javers.test.builder.DummyUserBuilder.dummyUser;
 import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
 
+/**
+ * @author Maciej Zasada
+ */
 public class DFSGraphToSetConverterTest {
 
     private DFSGraphToSetConverter converter;
@@ -33,15 +36,28 @@ public class DFSGraphToSetConverterTest {
     }
 
     @Test
-    public void shouldConvertGraphIntoSet() {
+    public void shouldConvertNodeWithMultiEdgeIntoSet() {
         // given:
-        DummyUser user = dummyUser().withName("Mad Kaz").build();
+        DummyUser user = dummyUser().withDetailsList(2).build();
         ObjectNode graph = objectGraphBuilder.build(user);
 
         // when:
         Set<ObjectNode> objectNodes = converter.convertFromGraph(graph);
 
         // then:
-        Assert.assertEquals(1, objectNodes.size());
+        Assert.assertEquals(3, objectNodes.size());
+    }
+
+    @Test
+    public void shouldConvertNodeWithSingeEdgeIntoSet() {
+        // given:
+        DummyUser user = dummyUser().withDetails(2L).build();
+        ObjectNode graph = objectGraphBuilder.build(user);
+
+        // when:
+        Set<ObjectNode> objectNodes = converter.convertFromGraph(graph);
+
+        // then:
+        Assert.assertEquals(2, objectNodes.size());
     }
 }
