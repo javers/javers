@@ -12,33 +12,40 @@ import java.util.Set;
 /**
  * @author Maciej Zasada
  */
-public class DFSGraphToSetConverter implements GraphToSetConverter, EdgeVisitor {
-
-    private final Set<ObjectNode> visitedNodes = new HashSet<>();
+public class DFSGraphToSetConverter implements GraphToSetConverter {
 
     @Override
     public Set<ObjectNode> convertFromGraph(ObjectNode graph) {
-        visitedNodes.clear();
-        visitNode(graph);
-        return new HashSet<>(visitedNodes);
+        DFSGraphTraverser dfsGraphTraverser = new DFSGraphTraverser();
+        dfsGraphTraverser.visitNode(graph);
+        return dfsGraphTraverser.getVisitedNodes();
     }
 
-    @Override
-    public void visit(SingleEdge edge) {
-        visitNode(edge.getReference());
-    }
+    private class DFSGraphTraverser implements EdgeVisitor {
 
-    @Override
-    public void visit(MultiEdge edge) {
-        for (ObjectNode objectNode : edge.getReferences()) {
-            visitNode(objectNode);
+        private final Set<ObjectNode> visitedNodes = new HashSet<>();
+
+        @Override
+        public void visit(SingleEdge edge) {
+            visitNode(edge.getReference());
         }
-    }
 
-    private void visitNode(ObjectNode objectNode) {
-        visitedNodes.add(objectNode);
-        for (Edge edge : objectNode.getEdges()) {
-            edge.accept(this);
+        @Override
+        public void visit(MultiEdge edge) {
+            for (ObjectNode objectNode : edge.getReferences()) {
+                visitNode(objectNode);
+            }
+        }
+
+        private void visitNode(ObjectNode objectNode) {
+            visitedNodes.add(objectNode);
+            for (Edge edge : objectNode.getEdges()) {
+                edge.accept(this);
+            }
+        }
+
+        private Set<ObjectNode> getVisitedNodes() {
+            return visitedNodes;
         }
     }
 }
