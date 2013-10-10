@@ -2,6 +2,8 @@ package org.javers.model.object.graph;
 
 import org.javers.common.validation.Validate;
 import org.javers.model.mapping.Property;
+import org.javers.model.object.graph.visitors.EdgeVisitor;
+import org.javers.model.visitors.Visitable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
  *
  * @author bartosz walacik
  */
-public abstract class Edge {
+public abstract class Edge implements Visitable<EdgeVisitor>{
     protected final Property property;
 
     protected Edge(Property property) {

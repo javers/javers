@@ -2,6 +2,7 @@ package org.javers.model.object.graph;
 
 import org.javers.common.validation.Validate;
 import org.javers.model.mapping.Property;
+import org.javers.model.object.graph.visitors.EdgeVisitor;
 
 import java.util.List;
 
@@ -24,5 +25,10 @@ public class SingleEdge extends Edge {
 
     public ObjectNode getReference() {
         return reference;
+    }
+
+    @Override
+    public void accept(EdgeVisitor visitor) {
+        visitor.visit(this);
     }
 }
