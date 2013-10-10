@@ -1,4 +1,4 @@
-package org.javers.model.mapping.util.managedClassPropertyScanner;
+package org.javers.common.scanner;
 
 import org.javers.model.mapping.PropertiesAssert;
 import org.javers.model.mapping.Property;
