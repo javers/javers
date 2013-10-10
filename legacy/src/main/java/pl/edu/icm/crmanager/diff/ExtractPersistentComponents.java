@@ -1,10 +1,10 @@
 package pl.edu.icm.crmanager.diff;
 
-import pl.edu.icm.sedno.common.model.DataObject;
-import pl.edu.icm.sedno.patterns.Visitor;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import pl.edu.icm.sedno.common.model.DataObject;
+import pl.edu.icm.sedno.patterns.Visitor;
 
 /**
  * Callback używany do diffa, wyciąga nietransientowe pod-obiekty do listy (root też)

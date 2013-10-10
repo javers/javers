@@ -1,20 +1,40 @@
 package pl.edu.icm.crmanager.model;
 
-import com.google.common.collect.Lists;
-import org.hibernate.Hibernate;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.Where;
-import pl.edu.icm.sedno.common.model.DataObject;
-import pl.edu.icm.sedno.common.model.SednoDate;
-import pl.edu.icm.sedno.patterns.Visitor;
-
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
+
+import pl.edu.icm.sedno.common.model.DataObject;
+import pl.edu.icm.sedno.common.model.SednoDate;
+import pl.edu.icm.sedno.patterns.Visitor;
+
+import com.google.common.collect.Lists;
 
 /**
  * 

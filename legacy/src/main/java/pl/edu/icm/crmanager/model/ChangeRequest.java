@@ -1,10 +1,31 @@
 package pl.edu.icm.crmanager.model;
 
-import com.google.common.base.Preconditions;
+import static pl.edu.icm.sedno.common.model.ADataObject.formatGlobalId;
+
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
+
 import pl.edu.icm.crmanager.exception.CrmRuntimeException;
 import pl.edu.icm.crmanager.utils.CrmReflectionUtil;
 import pl.edu.icm.sedno.common.hibernate.StringPersistedUserType;
@@ -14,15 +35,7 @@ import pl.edu.icm.sedno.common.util.ReflectionUtil;
 import pl.edu.icm.sedno.common.util.UnproxyHVisitor;
 import pl.edu.icm.sedno.patterns.Visitor;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Date;
-import java.util.List;
-
-import static pl.edu.icm.sedno.common.model.ADataObject.formatGlobalId;
+import com.google.common.base.Preconditions;
 
 @Entity(name="crm_request")
 //@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

@@ -1,12 +1,23 @@
 package pl.edu.icm.crmanager.diff;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+
 import pl.edu.icm.crmanager.exception.CrmRuntimeException;
-import pl.edu.icm.crmanager.logic.*;
+import pl.edu.icm.crmanager.logic.BCodeGeneratorImpl;
+import pl.edu.icm.crmanager.logic.ChangeRequestManager;
+import pl.edu.icm.crmanager.logic.CrmSessionFactory;
+import pl.edu.icm.crmanager.logic.MethodType;
+import pl.edu.icm.crmanager.logic.NewObjectVisitor;
 import pl.edu.icm.crmanager.model.RecType;
 import pl.edu.icm.crmanager.model.Revision;
 import pl.edu.icm.sedno.common.dao.DataObjectDAO;
@@ -15,12 +26,9 @@ import pl.edu.icm.sedno.common.model.DataObject;
 import pl.edu.icm.sedno.common.util.BeanUtil;
 import pl.edu.icm.sedno.common.util.PropertyChange;
 import pl.edu.icm.sedno.common.util.ReflectionUtil;
-
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import pl.edu.icm.sedno.patterns.EvictVisitor;
+import pl.edu.icm.sedno.patterns.InitializeVisitor;
+import pl.edu.icm.sedno.patterns.Visitor;
 
 /**
  * Nowa implementacja działająca bez proxy

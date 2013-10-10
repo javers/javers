@@ -1,15 +1,17 @@
 package pl.edu.icm.crmanager.logic;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+
 import pl.edu.icm.crmanager.diff.CrmDiffService;
 import pl.edu.icm.crmanager.model.ContributionTestEntity;
 import pl.edu.icm.crmanager.model.WorkTestEntity;
 import pl.edu.icm.sedno.common.dao.DataObjectDAO;
-
-import javax.sql.DataSource;
-import java.util.HashSet;
-import java.util.Set;
 
 public class CrmDiffServiceTestBase {
     static final int OLD_SOME_INT = 5;

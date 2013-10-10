@@ -1,18 +1,24 @@
 package pl.edu.icm.sedno.common.util;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.BeanWrapperImpl;
+
+import pl.edu.icm.crmanager.exception.UnsupportedMapping;
+import pl.edu.icm.sedno.common.dao.CriterionIsNotUnique;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.BeanWrapperImpl;
-import pl.edu.icm.crmanager.exception.UnsupportedMapping;
-import pl.edu.icm.sedno.common.dao.CriterionIsNotUnique;
-
-import java.util.AbstractMap.SimpleEntry;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * @author bart

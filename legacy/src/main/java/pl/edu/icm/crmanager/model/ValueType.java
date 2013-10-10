@@ -1,12 +1,12 @@
 package pl.edu.icm.crmanager.model;
 
-import pl.edu.icm.crmanager.exception.CrmRuntimeException;
-import pl.edu.icm.sedno.common.model.DataObject;
-import pl.edu.icm.sedno.common.model.SednoDate;
-
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+
+import pl.edu.icm.crmanager.exception.CrmRuntimeException;
+import pl.edu.icm.sedno.common.model.DataObject;
+import pl.edu.icm.sedno.common.model.SednoDate;
 
 /**
  * Value types supported by CRM

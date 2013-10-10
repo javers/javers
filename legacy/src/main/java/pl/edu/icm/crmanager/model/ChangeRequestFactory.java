@@ -1,8 +1,17 @@
 package pl.edu.icm.crmanager.model;
 
-import com.google.common.primitives.Primitives;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.ConcurrentMap;
+
 import net.sf.ehcache.store.chm.ConcurrentHashMap;
+
 import org.springframework.util.ObjectUtils;
+
 import pl.edu.icm.crmanager.exception.CrmRuntimeException;
 import pl.edu.icm.crmanager.exception.UnsupportedMapping;
 import pl.edu.icm.crmanager.logic.BCodeGeneratorImpl;
@@ -11,13 +20,7 @@ import pl.edu.icm.sedno.common.hibernate.StringPersistedUserType;
 import pl.edu.icm.sedno.common.model.DataObject;
 import pl.edu.icm.sedno.common.util.ReflectionUtil;
 
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.ConcurrentMap;
+import com.google.common.primitives.Primitives;
 
 /**
  * @author bart

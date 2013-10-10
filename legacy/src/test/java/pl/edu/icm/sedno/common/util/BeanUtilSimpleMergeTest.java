@@ -1,15 +1,17 @@
 package pl.edu.icm.sedno.common.util;
 
+import java.math.BigDecimal;
+
 import junit.framework.Assert;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import pl.edu.icm.sedno.common.model.SednoDate;
 import pl.edu.icm.sedno.common.util.MergeTestBean.MTestEnum;
-
-import java.math.BigDecimal;
 
 /**
  * @author bart

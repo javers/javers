@@ -1,13 +1,14 @@
 package pl.edu.icm.crmanager.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import pl.edu.icm.sedno.common.model.DataObject;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import pl.edu.icm.sedno.common.model.DataObject;
 
 /**
  * @author bart

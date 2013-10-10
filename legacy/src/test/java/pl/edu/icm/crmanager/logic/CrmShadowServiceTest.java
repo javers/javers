@@ -1,8 +1,14 @@
 package pl.edu.icm.crmanager.logic;
 
+import static org.fest.assertions.Assertions.assertThat;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import org.fest.assertions.Assertions;
 import org.fest.assertions.Delta;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -10,14 +16,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import pl.edu.icm.crmanager.diff.CrmShadowService;
-import pl.edu.icm.crmanager.model.*;
+import pl.edu.icm.crmanager.model.ContributionTestEntity;
+import pl.edu.icm.crmanager.model.FullText;
+import pl.edu.icm.crmanager.model.Person;
+import pl.edu.icm.crmanager.model.Revision;
+import pl.edu.icm.crmanager.model.WorkTestEntity;
 import pl.edu.icm.crmanager.model.WorkTestEntity.WorkType;
 import pl.edu.icm.sedno.common.model.SednoDate;
-
-import java.util.Set;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * 

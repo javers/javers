@@ -1,11 +1,11 @@
 package pl.edu.icm.crmanager.logic;
 
+import java.util.List;
+
 import pl.edu.icm.crmanager.model.ChangeAction;
 import pl.edu.icm.crmanager.model.ChangeRequest;
 import pl.edu.icm.crmanager.model.Revision;
 import pl.edu.icm.sedno.common.model.DataObject;
-
-import java.util.List;
 
 /**
  * <pre>

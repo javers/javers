@@ -1,9 +1,16 @@
 package pl.edu.icm.crmanager.diff;
 
+import static pl.edu.icm.sedno.common.model.ADataObject.formatGlobalId;
+
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import pl.edu.icm.crmanager.exception.CrmRuntimeException;
 import pl.edu.icm.crmanager.logic.ChangeRequestManager;
 import pl.edu.icm.crmanager.logic.RevisionService;
@@ -12,12 +19,6 @@ import pl.edu.icm.crmanager.model.ChangeRequest;
 import pl.edu.icm.crmanager.model.Revision;
 import pl.edu.icm.sedno.common.dao.DataObjectDAO;
 import pl.edu.icm.sedno.common.model.DataObject;
-
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
-import static pl.edu.icm.sedno.common.model.ADataObject.formatGlobalId;
 
 /**
  * @author bart

@@ -1,6 +1,10 @@
 package pl.edu.icm.crmanager.logic;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,13 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import pl.edu.icm.crmanager.exception.CrmRuntimeException;
 import pl.edu.icm.crmanager.model.ContributionTestEntity;
 import pl.edu.icm.crmanager.model.WorkTestEntity;
 import pl.edu.icm.sedno.common.dao.DataObjectDAO;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author bart
