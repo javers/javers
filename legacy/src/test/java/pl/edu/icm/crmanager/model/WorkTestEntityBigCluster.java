@@ -1,9 +1,9 @@
 package pl.edu.icm.crmanager.model;
 
-import javax.persistence.Entity;
-
 import pl.edu.icm.common.iddict.model.ClusterSize;
 import pl.edu.icm.common.iddict.model.SingleMaltCluster;
+
+import javax.persistence.Entity;
 
 @Entity
 @ClusterSize(isBig=true)

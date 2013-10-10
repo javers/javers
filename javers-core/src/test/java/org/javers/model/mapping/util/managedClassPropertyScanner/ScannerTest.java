@@ -1,7 +1,9 @@
-package org.javers.model.mapping;
+package org.javers.model.mapping.util.managedClassPropertyScanner;
 
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
+import org.javers.model.mapping.PropertiesAssert;
+import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.*;
 import org.javers.model.mapping.util.managedClassPropertyScanner.Scanner;
 import org.javers.test.assertion.Assertions;

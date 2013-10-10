@@ -1,8 +1,8 @@
 package pl.edu.icm.crmanager.model;
 
-import java.io.Serializable;
-
 import com.google.common.base.Objects;
+
+import java.io.Serializable;
 
 /**
  * 

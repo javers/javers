@@ -1,7 +1,12 @@
 package pl.edu.icm.sedno.common.util;
 
-import static pl.edu.icm.sedno.common.util.ReflectionUtil.getTypeParameter;
-import static pl.edu.icm.sedno.common.util.ReflectionUtil.isGenericType;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanWrapper;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -10,20 +15,10 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanWrapper;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
+import static pl.edu.icm.sedno.common.util.ReflectionUtil.getTypeParameter;
+import static pl.edu.icm.sedno.common.util.ReflectionUtil.isGenericType;
 
 
 /**

@@ -1,8 +1,6 @@
 package org.javers.model.mapping;
 
 import org.javers.core.model.DummyAddress;
-import org.javers.core.model.DummyNetworkAddress;
-import org.javers.model.mapping.type.ValueObjectType;
 import org.testng.annotations.Test;
 
 import static org.fest.assertions.api.Assertions.assertThat;

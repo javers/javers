@@ -1,18 +1,13 @@
 package pl.edu.icm.crmanager.logic;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 import org.apache.commons.lang.NotImplementedException;
-
 import pl.edu.icm.crmanager.exception.CrmRuntimeException;
 import pl.edu.icm.crmanager.model.CrmProxy;
 import pl.edu.icm.crmanager.model.Revision;
 import pl.edu.icm.crmanager.utils.CrmReflectionUtil;
 import pl.edu.icm.sedno.common.model.DataObject;
+
+import java.util.*;
 
 /**
  * 

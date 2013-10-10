@@ -1,7 +1,5 @@
 package pl.edu.icm.crmanager.logic;
 
-import java.util.HashSet;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,12 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import pl.edu.icm.crmanager.model.*;
 
-import pl.edu.icm.crmanager.model.ContributionTestEntity;
-import pl.edu.icm.crmanager.model.CrmProxy;
-import pl.edu.icm.crmanager.model.RecType;
-import pl.edu.icm.crmanager.model.Revision;
-import pl.edu.icm.crmanager.model.WorkTestEntity;
+import java.util.HashSet;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)

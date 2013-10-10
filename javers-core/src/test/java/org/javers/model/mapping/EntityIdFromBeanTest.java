@@ -1,9 +1,5 @@
 package org.javers.model.mapping;
 
-import org.javers.core.model.DummyAddress;
-import org.javers.core.model.DummyNetworkAddress;
-import org.javers.core.model.DummyUser;
-import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.type.TypeMapper;
 import org.testng.annotations.BeforeMethod;
 

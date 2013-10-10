@@ -1,7 +1,8 @@
-package org.javers.model.mapping;
+package org.javers.model.mapping.util.managedClassPropertyScanner;
 
+import org.javers.model.mapping.PropertiesAssert;
+import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.TypeMapper;
-import org.javers.model.mapping.util.managedClassPropertyScanner.BeanBasedScanner;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -36,5 +37,4 @@ public class BeanBasedScannerTest extends ScannerTest{
             return 0;
         }
     };
-
 }

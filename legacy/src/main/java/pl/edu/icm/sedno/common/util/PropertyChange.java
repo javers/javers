@@ -1,11 +1,10 @@
 package pl.edu.icm.sedno.common.util;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-
+import com.google.common.base.Objects;
 import pl.edu.icm.crmanager.model.RecType;
 
-import com.google.common.base.Objects;
+import java.io.Serializable;
+import java.lang.reflect.Method;
 
 /**
  * DTO used by {@link BeanUtil#diff()}

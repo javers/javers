@@ -1,20 +1,9 @@
 package pl.edu.icm.crmanager.logic;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
 import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtMethod;
 import javassist.NotFoundException;
-
-import javax.persistence.Id;
-
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -25,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
-
 import pl.edu.icm.crmanager.exception.CrmRuntimeException;
 import pl.edu.icm.crmanager.model.CrmImmutable;
 import pl.edu.icm.crmanager.model.CrmProxy;
@@ -36,6 +24,15 @@ import pl.edu.icm.sedno.common.model.DataObject;
 import pl.edu.icm.sedno.common.util.JavassistBuilder;
 import pl.edu.icm.sedno.common.util.ReflectionUtil;
 import pl.edu.icm.sedno.common.util.Suplement;
+
+import javax.persistence.Id;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Implementacja BCodeGenerator na Javassist

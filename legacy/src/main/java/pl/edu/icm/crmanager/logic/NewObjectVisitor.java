@@ -1,13 +1,13 @@
 package pl.edu.icm.crmanager.logic;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import pl.edu.icm.crmanager.model.CrmSession;
 import pl.edu.icm.sedno.common.dao.DataObjectDAO;
 import pl.edu.icm.sedno.common.model.DataObject;
 import pl.edu.icm.sedno.patterns.Visitor;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Visitor do rejestrowania nowych obiektów oraz ich child-objektów

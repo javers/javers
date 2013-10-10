@@ -1,42 +1,27 @@
 package pl.edu.icm.crmanager.logic;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-
 import pl.edu.icm.crmanager.exception.CrmRuntimeException;
 import pl.edu.icm.crmanager.exception.UnsupportedMapping;
-import pl.edu.icm.crmanager.model.Change;
-import pl.edu.icm.crmanager.model.ChangeImportant;
-import pl.edu.icm.crmanager.model.ChangeImportantVoter;
-import pl.edu.icm.crmanager.model.ChangeRequest;
-import pl.edu.icm.crmanager.model.ChangeVoter;
-import pl.edu.icm.crmanager.model.RecType;
-import pl.edu.icm.crmanager.model.Revision;
+import pl.edu.icm.crmanager.model.*;
 import pl.edu.icm.crmanager.model.Revision.RevisionStatus;
-import pl.edu.icm.crmanager.model.RootModPoint;
 import pl.edu.icm.sedno.common.dao.DataObjectDAO;
-import pl.edu.icm.sedno.common.dao.ObjectNotFoundException;
 import pl.edu.icm.sedno.common.model.DataObject;
 import pl.edu.icm.sedno.common.model.DataObject.DataObjectStatus;
 import pl.edu.icm.sedno.common.util.ReflectionUtil;
 import pl.edu.icm.sedno.patterns.PersistVisitor;
 import pl.edu.icm.sedno.patterns.Visitor;
+
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 

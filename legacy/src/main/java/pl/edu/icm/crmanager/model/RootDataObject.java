@@ -1,14 +1,9 @@
 package pl.edu.icm.crmanager.model;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
-
 import pl.edu.icm.sedno.common.model.ADataObject;
+
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * ROOT ENTITY of an AGGREGATE

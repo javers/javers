@@ -1,16 +1,8 @@
 package pl.edu.icm.crmanager.logic;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static pl.edu.icm.crmanager.logic.CrmShadowServiceTest.NEW_DOUBLE_VALUE;
-import static pl.edu.icm.crmanager.logic.CrmShadowServiceTest.NEW_SEDNO_DATE;
-import static pl.edu.icm.crmanager.logic.CrmShadowServiceTest.OLD_DOUBLE_VALUE;
-import static pl.edu.icm.crmanager.logic.CrmShadowServiceTest.OLD_PERSON;
-import static pl.edu.icm.crmanager.logic.CrmShadowServiceTest.OLD_SEDNO_DATE;
-
 import org.fest.assertions.Assertions;
 import org.fest.assertions.Delta;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -18,13 +10,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import pl.edu.icm.crmanager.diff.CrmShadowService;
 import pl.edu.icm.crmanager.model.ContributionTestEntity;
 import pl.edu.icm.crmanager.model.Person;
 import pl.edu.icm.crmanager.model.Revision;
 import pl.edu.icm.crmanager.model.WorkTestEntity;
 import pl.edu.icm.sedno.common.model.SednoDate;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static pl.edu.icm.crmanager.logic.CrmShadowServiceTest.*;
 
 /**
  * 

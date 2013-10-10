@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import pl.edu.icm.crmanager.exception.CrmRuntimeException;
 import pl.edu.icm.crmanager.model.CrmSession;
 

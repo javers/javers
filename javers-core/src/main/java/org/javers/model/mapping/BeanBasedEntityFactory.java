@@ -11,17 +11,15 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class BeanBasedEntityFactory extends EntityFactory {
-    private static final Logger logger = LoggerFactory.getLogger(BeanBasedEntityFactory.class);
 
     public BeanBasedEntityFactory(TypeMapper typeMapper) {
         super(typeMapper, BeanBasedScanner.getInstane(typeMapper));
     }
 
-
     @Override
     public <S> Entity<S> create(Class<S> entityClass) {
         typeMapper.registerReferenceType(entityClass);
         List<Property> beanProperties = scanner.scan(entityClass);
-        return new Entity<S>(entityClass,beanProperties);
+        return new Entity<>(entityClass,beanProperties);
     }
 }

@@ -1,9 +1,7 @@
 package pl.edu.icm.crmanager.logic;
 
 import junit.framework.Assert;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import pl.edu.icm.crmanager.model.WorkTestEntity;
 import pl.edu.icm.sedno.common.dao.DataObjectDAO;
 

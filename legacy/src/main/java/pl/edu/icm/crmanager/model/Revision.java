@@ -1,40 +1,25 @@
 package pl.edu.icm.crmanager.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Transient;
-
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import pl.edu.icm.crmanager.exception.CrmRuntimeException;
 import pl.edu.icm.crmanager.utils.CrmReflectionUtil;
 import pl.edu.icm.sedno.common.model.ADataObject;
 import pl.edu.icm.sedno.common.model.DataObject;
 import pl.edu.icm.sedno.common.util.PropertyChange;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("serial")
 @Entity(name="crm_revision")

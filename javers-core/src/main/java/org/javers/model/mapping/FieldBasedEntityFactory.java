@@ -1,6 +1,7 @@
 package org.javers.model.mapping;
 
 import org.javers.model.mapping.type.TypeMapper;
+import org.javers.model.mapping.util.managedClassPropertyScanner.FieldBasedScanner;
 
 import java.util.List;
 

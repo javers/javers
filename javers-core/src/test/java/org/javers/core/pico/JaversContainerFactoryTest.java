@@ -7,7 +7,6 @@ import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.FieldBasedEntityFactory;
 import org.javers.model.mapping.type.TypeMapper;
-import org.junit.Before;
 import org.picocontainer.PicoContainer;
 import org.testng.annotations.Test;
 

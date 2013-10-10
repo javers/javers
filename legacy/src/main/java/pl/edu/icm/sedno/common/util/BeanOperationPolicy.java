@@ -1,16 +1,14 @@
 package pl.edu.icm.sedno.common.util;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
+import org.joda.time.base.BaseLocal;
+import pl.edu.icm.sedno.common.model.SednoDate;
+
 import java.beans.PropertyDescriptor;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.joda.time.base.BaseLocal;
-
-import pl.edu.icm.sedno.common.model.SednoDate;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 /**
  * @author bart

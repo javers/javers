@@ -1,23 +1,21 @@
 package pl.edu.icm.sedno.common.util;
 
-import static org.fest.assertions.Assertions.assertThat;
-
-import java.util.AbstractMap.SimpleEntry;
-import java.util.HashMap;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import pl.edu.icm.crmanager.model.RecType;
 import pl.edu.icm.sedno.common.model.SednoDate;
 import pl.edu.icm.sedno.common.util.MergeTestBean.MTestEnum;
 
-import com.google.common.collect.Lists;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author bart

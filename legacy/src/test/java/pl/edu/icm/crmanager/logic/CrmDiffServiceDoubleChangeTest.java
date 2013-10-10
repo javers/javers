@@ -1,7 +1,5 @@
 package pl.edu.icm.crmanager.logic;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 import org.fest.assertions.Delta;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,10 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import pl.edu.icm.crmanager.model.ChangeRequest;
 import pl.edu.icm.crmanager.model.Revision;
 import pl.edu.icm.crmanager.model.Revision.RevisionStatus;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author bart

@@ -1,7 +1,6 @@
 package pl.edu.icm.crmanager.logic;
 
 import org.springframework.stereotype.Service;
-
 import pl.edu.icm.crmanager.model.CrmProxy;
 import pl.edu.icm.crmanager.utils.CrmReflectionUtil;
 import pl.edu.icm.sedno.common.model.DataObject;

@@ -1,15 +1,13 @@
 package pl.edu.icm.sedno.common.util;
 
-import java.lang.annotation.Annotation;
-import java.util.Set;
-
-import javax.persistence.Id;
-import javax.persistence.Version;
-
+import com.google.common.collect.Sets;
 import pl.edu.icm.crmanager.model.CrmImmutable;
 import pl.edu.icm.crmanager.model.CrmTransparent;
 
-import com.google.common.collect.Sets;
+import javax.persistence.Id;
+import javax.persistence.Version;
+import java.lang.annotation.Annotation;
+import java.util.Set;
 
 /**
  * @author bart

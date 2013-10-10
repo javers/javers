@@ -1,14 +1,12 @@
 package pl.edu.icm.crmanager.logic;
 
-import java.util.List;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang.NotImplementedException;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import pl.edu.icm.crmanager.diff.ExtractPersistentComponents;
 import pl.edu.icm.crmanager.model.ChangeAction;
 import pl.edu.icm.crmanager.model.ChangeRequest;
@@ -18,7 +16,7 @@ import pl.edu.icm.sedno.common.dao.DataObjectDAO;
 import pl.edu.icm.sedno.common.model.DataObject;
 import pl.edu.icm.sedno.common.model.Indexable;
 
-import com.google.common.base.Preconditions;
+import java.util.List;
 
 /**
  * 

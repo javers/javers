@@ -1,10 +1,8 @@
 package pl.edu.icm.crmanager.model;
 
-import javax.jws.HandlerChain;
-import javax.persistence.Embeddable;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
+
+import javax.persistence.Embeddable;
 
 @Embeddable
 public class Person implements CrmComplexEmbeddable{

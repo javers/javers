@@ -1,50 +1,8 @@
 package pl.edu.icm.sedno.common.util;
 
-import java.lang.*;
-import java.lang.Boolean;
-import java.lang.Byte;
-import java.lang.Character;
-import java.lang.Class;
-import java.lang.ClassNotFoundException;
-import java.lang.Double;
-import java.lang.Exception;
-import java.lang.IllegalArgumentException;
-import java.lang.Integer;
-import java.lang.Long;
-import java.lang.NoSuchMethodException;
-import java.lang.RuntimeException;
-import java.lang.Short;
-import java.lang.String;
-import java.lang.SuppressWarnings;
-import java.lang.System;
-import java.lang.Void;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Transient;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.*;
 import net.sf.cglib.proxy.Enhancer;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
@@ -53,15 +11,13 @@ import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import pl.edu.icm.sedno.common.model.DataObject;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import javax.persistence.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Zbiór statycznych metod-helperów dla celów refleksji

@@ -1,4 +1,4 @@
-package org.javers.model.mapping;
+package org.javers.model.mapping.util.managedClassPropertyScanner;
 
 import org.javers.model.mapping.type.TypeMapper;
 import org.testng.annotations.BeforeMethod;

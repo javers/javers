@@ -1,25 +1,13 @@
 package pl.edu.icm.crmanager.diff;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
-
 import pl.edu.icm.crmanager.exception.CrmRuntimeException;
 import pl.edu.icm.crmanager.exception.UnsupportedMapping;
-import pl.edu.icm.crmanager.logic.BCodeGenerator;
-import pl.edu.icm.crmanager.logic.BCodeGeneratorImpl;
-import pl.edu.icm.crmanager.logic.ChangeRequestManager;
-import pl.edu.icm.crmanager.logic.CrmSessionFactory;
-import pl.edu.icm.crmanager.logic.MethodType;
+import pl.edu.icm.crmanager.logic.*;
 import pl.edu.icm.crmanager.model.Revision;
 import pl.edu.icm.sedno.common.dao.DataObjectDAO;
 import pl.edu.icm.sedno.common.model.ADataObjectUtil;
@@ -28,6 +16,9 @@ import pl.edu.icm.sedno.common.util.ReflectionUtil;
 import pl.edu.icm.sedno.patterns.EvictVisitor;
 import pl.edu.icm.sedno.patterns.InitializeVisitor;
 import pl.edu.icm.sedno.patterns.Visitor;
+
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * stara implementacja działająca na proxy
