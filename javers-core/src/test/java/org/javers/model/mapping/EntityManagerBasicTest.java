@@ -4,6 +4,7 @@ import com.googlecode.catchexception.CatchException;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.model.mapping.type.TypeMapper;
+import org.javers.test.assertion.Assertions;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

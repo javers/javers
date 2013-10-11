@@ -1,7 +1,7 @@
 package org.javers.model.object.graph;
 
 import org.javers.model.mapping.Entity;
-
+import org.javers.model.mapping.Property;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,5 +1,6 @@
 package org.javers.model.object.graph;
 
+import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.BeanBasedEntityFactory;

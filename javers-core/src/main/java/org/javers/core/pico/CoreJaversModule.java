@@ -3,6 +3,7 @@ package org.javers.core.pico;
 import org.javers.common.pico.JaversModule;
 import org.javers.core.Javers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 

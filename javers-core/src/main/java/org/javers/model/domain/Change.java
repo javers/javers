@@ -1,5 +1,7 @@
 package org.javers.model.domain;
 
+import org.javers.model.mapping.Property;
+
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**

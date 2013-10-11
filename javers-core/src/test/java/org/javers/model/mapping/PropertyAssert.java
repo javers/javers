@@ -4,6 +4,8 @@ import org.fest.assertions.api.AbstractAssert;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.test.assertion.Assertions;
 
+import java.lang.reflect.Type;
+
 /**
  * @author bartosz walacik
  */
