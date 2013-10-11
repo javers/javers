@@ -7,7 +7,6 @@ import javax.persistence.Id;
  */
 public class DummyUserDetails {
 
-
     private Long id;
     private String someValue;
     private boolean isTrue;
