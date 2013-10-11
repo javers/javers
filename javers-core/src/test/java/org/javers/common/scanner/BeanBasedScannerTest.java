@@ -1,5 +1,6 @@
 package org.javers.common.scanner;
 
+import org.javers.model.mapping.BeanBasedPropertyScanner;
 import org.javers.model.mapping.PropertiesAssert;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.TypeMapper;
@@ -14,18 +15,18 @@ import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
 /**
  * @author pawel szymczyk
  */
-public class BeanBasedScannerTest extends ScannerTest{
+public class BeanBasedScannerTest extends PropertyScannerTest {
 
     @BeforeMethod
     public void setUp() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
-        scanner = BeanBasedScanner.getInstane(typeMapper);
+        propertyScanner = BeanBasedPropertyScanner.getInstane(typeMapper);
     }
 
     @Test
     public void shouldScanPrivateGetters() {
         //when
-        List<Property> properties = scanner.scan(ManagedClass.class);
+        List<Property> properties = propertyScanner.scan(ManagedClass.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("id").isId();

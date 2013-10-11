@@ -1,7 +1,5 @@
-package org.javers.common.scanner;
+package org.javers.model.mapping;
 
-import org.javers.model.mapping.FieldProperty;
-import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
 
@@ -16,23 +14,23 @@ import java.util.List;
 /**
  * @author pawel szymczyk
  */
-public class FieldBasedScanner extends Scanner {
+public class FieldBasedPropertyScanner extends PropertyScanner {
 
-    private static volatile FieldBasedScanner scanner;
+    private static volatile FieldBasedPropertyScanner scanner;
 
-    private FieldBasedScanner(TypeMapper typeMapper) {
+    private FieldBasedPropertyScanner(TypeMapper typeMapper) {
         super(typeMapper);
     }
 
-    public static FieldBasedScanner getInstane(TypeMapper typeMapper) {
+    public static FieldBasedPropertyScanner getInstane(TypeMapper typeMapper) {
         return  getSingletonInstance(typeMapper);
     }
 
-    private static FieldBasedScanner getSingletonInstance(TypeMapper typeMapper) {
+    private static FieldBasedPropertyScanner getSingletonInstance(TypeMapper typeMapper) {
         if (scanner == null) {
-            synchronized (Scanner.class) {
+            synchronized (PropertyScanner.class) {
                 if (scanner == null) {
-                    scanner = new FieldBasedScanner(typeMapper);
+                    scanner = new FieldBasedPropertyScanner(typeMapper);
                 }
             }
         }

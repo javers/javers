@@ -4,8 +4,8 @@ import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.PropertiesAssert;
 import org.javers.model.mapping.Property;
+import org.javers.model.mapping.PropertyScanner;
 import org.javers.model.mapping.type.*;
-import org.javers.common.scanner.Scanner;
 import org.javers.test.assertion.Assertions;
 import org.testng.annotations.Test;
 
@@ -16,14 +16,14 @@ import java.util.Set;
 /**
  * @author pawel szymczyk
  */
-public abstract class ScannerTest {
+public abstract class PropertyScannerTest {
 
-    protected Scanner scanner;
+    protected PropertyScanner propertyScanner;
 
     @Test
     public void shouldScanAllProperties() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         Assertions.assertThat(properties).hasSize(14);
@@ -32,7 +32,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanEntityReferenceProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("supervisor")
@@ -45,7 +45,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanInheritedProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("inheritedInt");
@@ -54,7 +54,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldNotScanTransientProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasntGotProperty("someTransientField");
@@ -64,7 +64,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanSetProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("stringSet")
@@ -75,7 +75,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanListProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("integerList")
@@ -86,7 +86,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanArrayProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("intArray")
@@ -97,7 +97,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanIntProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("age")
@@ -108,7 +108,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanEnumProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("sex")
@@ -119,7 +119,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanIntegerProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("largeInt")
@@ -130,7 +130,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanBooleanProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("flag")
@@ -141,7 +141,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanBigBooleanProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("bigFlag")
@@ -152,7 +152,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanStringProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUser.class);
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("name")
@@ -163,7 +163,7 @@ public abstract class ScannerTest {
     @Test
     public void shouldScanValueObjectProperty() {
         //when
-        List<Property> properties = scanner.scan(DummyUserDetails.class);
+        List<Property> properties = propertyScanner.scan(DummyUserDetails.class);
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("dummyAddress")

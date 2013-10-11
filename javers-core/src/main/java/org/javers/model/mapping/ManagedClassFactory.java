@@ -1,19 +1,18 @@
 package org.javers.model.mapping;
 
 import org.javers.model.mapping.type.TypeMapper;
-import org.javers.common.scanner.Scanner;
 
 /**
  * @author pawel szymczyk
  */
 public abstract class ManagedClassFactory<T extends ManagedClass> {
 
-    protected Scanner scanner;
+    protected PropertyScanner propertyScanner;
     protected TypeMapper typeMapper;
 
-    protected ManagedClassFactory(TypeMapper typeMapper, Scanner scanner) {
+    protected ManagedClassFactory(TypeMapper typeMapper, PropertyScanner propertyScanner) {
         this.typeMapper = typeMapper;
-        this.scanner = scanner;
+        this.propertyScanner = propertyScanner;
     }
 
     public abstract <S> T create(Class<S> clazz);

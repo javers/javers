@@ -1,8 +1,6 @@
-package org.javers.common.scanner;
+package org.javers.model.mapping;
 
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.model.mapping.BeanProperty;
-import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
 
@@ -13,23 +11,23 @@ import java.util.List;
 /**
  * @author pawel szymczyk
  */
-public class BeanBasedScanner extends Scanner {
+public class BeanBasedPropertyScanner extends PropertyScanner {
 
-    private static volatile BeanBasedScanner scanner;
+    private static volatile BeanBasedPropertyScanner scanner;
 
-    private BeanBasedScanner(TypeMapper typeMapper) {
+    private BeanBasedPropertyScanner(TypeMapper typeMapper) {
         super(typeMapper);
     }
 
-    public static BeanBasedScanner getInstane(TypeMapper typeMapper) {
+    public static BeanBasedPropertyScanner getInstane(TypeMapper typeMapper) {
        return  getSingletonInstance(typeMapper);
     }
 
-    private static BeanBasedScanner getSingletonInstance(TypeMapper typeMapper) {
+    private static BeanBasedPropertyScanner getSingletonInstance(TypeMapper typeMapper) {
         if (scanner == null) {
-            synchronized (Scanner.class) {
+            synchronized (PropertyScanner.class) {
                 if (scanner == null) {
-                    scanner = new BeanBasedScanner(typeMapper);
+                    scanner = new BeanBasedPropertyScanner(typeMapper);
                 }
             }
         }
