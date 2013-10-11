@@ -17,6 +17,6 @@ public class FieldBasedEntityFactory extends EntityFactory {
     public <S> Entity<S> create(Class<S> entityClass) {
         typeMapper.registerReferenceType(entityClass);
         List<Property> beanProperties = propertyScanner.scan(entityClass);
-        return new Entity<S>(entityClass,beanProperties);
+        return new Entity<>(entityClass,beanProperties);
     }
 }
