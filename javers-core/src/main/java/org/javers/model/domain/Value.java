@@ -3,6 +3,10 @@ package org.javers.model.domain;
 /**
  * Wrapper for client's primitives and Value Objects,
  * holds original value and its JSON serialized form.
+ * <br/><br/>
+ *
+ * Value needs to be dehydrated before persisting.
+ * Dehydration is simply serialization to JSON.
  *
  * @author bartosz walacik
  */
@@ -27,22 +31,21 @@ public class Value {
     }
 
     /**
-     * Hydrated (fresh) Value needs to be dehydrated before persisting.
-     * When in dehydrated state - Value is serialized to JSON
+     * True if Value is not serialized to JSON yet.
      */
     public boolean isHydrated() {
         return isHydrated;
     }
 
     /**
-     * original value
+     * original Value
      */
     public Object getValue() {
         return value;
     }
 
     /**
-     * value serialized to JSON
+     * Value serialized to JSON
      */
     public String getJson() {
         return json;

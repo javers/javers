@@ -18,11 +18,22 @@ public class ValueChange extends PropertyChange {
         this.rightValue = new Value(rightValue);
     }
 
-    public Object getLeftValue() {
-        return leftValue.getValue();
+    /**
+     * never returns null
+     */
+    public Value getLeftValue() {
+        return leftValue;
     }
 
-    public Object getRightValue() {
-        return rightValue.getValue();
+    /**
+     * never returns null
+     */
+    public Value getRightValue() {
+        return rightValue;
+    }
+
+    public void dehydrate(String leftValueJSON, String rightValueJson) {
+        leftValue.dehydrate(leftValueJSON);
+        rightValue.dehydrate(rightValueJson);
     }
 }

@@ -6,19 +6,17 @@ import org.javers.model.domain.Value;
 import org.javers.model.mapping.Property;
 
 /**
- * element added to collection of values
+ * element added to collection
  *
  * @author bartosz walacik
  */
-public class ValueAdded extends PropertyChange {
-    private final Value value;
+public class ValueAdded extends ValueAddOrRemove {
 
     public ValueAdded(GlobalCdoId globalCdoId, Property property, Object value) {
-        super(globalCdoId, property);
-        this.value = new Value(value);
+        super(globalCdoId, property, value);
     }
 
-    public Object getAddedValue() {
-        return value.getValue();
+    public Value getAddedValue() {
+        return value;
     }
 }
