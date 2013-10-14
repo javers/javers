@@ -20,10 +20,10 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
  * In this case diff is done between previous and current state of a bunch of domain objects.
  * <br/><br/>
  *
- * Diff is an <i>aggregate</i> which holds following data:
+ * Diff holds following data:
  * <ul>
  *     <li>who did change the data - {@link #getUserId()}</li>
- *     <li>when the change was made - {@link #getRevisionDate()}</li>
+ *     <li>when the change was made - {@link #getDiffDate()}</li>
  *     <li>list of atomic changes between two graphs</li>
  * </ul>
  *
@@ -32,6 +32,7 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
  *
  * <h2>Hints for DiffRepository implementation</h2>
  * <ul>
+ *    <li/>In Domain-driven design language, Diff is an <i>aggregate</i>, while Change is a <i>Value Object</i>.
  *    <li/>After persisting in database, Diff is considered immutable so it can not be updated.
  *    <li/>Since Diff is an <i>aggregate</i> it can be neatly persisted in document database like MongoDB.
  *    <li/>Persisting Diff in any kind of database is easy. Javers provides flexible
@@ -48,13 +49,13 @@ public class Diff {
     private long id;
     private final List<Change> changes;
     private final String userId;
-    private final LocalDateTime revisionDate;
+    private final LocalDateTime diffDate;
 
     public Diff(String userId) {
         argumentIsNotNull(userId);
 
         this.userId = userId;
-        this.revisionDate = new LocalDateTime();
+        this.diffDate = new LocalDateTime();
         this.changes = new ArrayList<>();
     }
 
@@ -90,10 +91,10 @@ public class Diff {
     }
 
     /**
-     * date when revision was made by user
+     * date when change was made by user
      */
-    public LocalDateTime getRevisionDate() {
-        return revisionDate;
+    public LocalDateTime getDiffDate() {
+        return diffDate;
     }
 
     /**

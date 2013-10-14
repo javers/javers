@@ -2,6 +2,9 @@ package org.javers.repository.api;
 
 import org.javers.model.domain.Diff;
 import org.javers.model.domain.Change;
+import org.javers.model.domain.GlobalCdoId;
+
+import java.util.List;
 
 /**
  * Diff repository is responsible for persisting diffs calculated by javers core.
@@ -34,4 +37,17 @@ public interface DiffRepository {
      * @return null if not found
      */
      Diff getById(long diffId);
+
+    /**
+     * Finds all changes made on single domain object.
+     * Outcome list has to be ordered chronologically by {@link Diff#getDiffDate()}.
+     * <br/><br/>
+     *
+     * All Diffs referenced through {@link org.javers.model.domain.Change#getParent()}
+     * have to be fully initialized.
+     *
+     * @param globalCdoId
+     * @return never returns null
+     */
+     List<Change> findByGlobalCdoId(GlobalCdoId globalCdoId);
 }
