@@ -53,8 +53,6 @@ public class JsonConverterTest {
 
         //then
         Assertions.assertThat(value).isEqualTo(1/3., Offset.offset(0.0000000000000001));
-
-        //{"iLocalMillis":1007245380000,"iChronology":{"iBase":{"iMinDaysInFirstWeek":4}}}
     }
 
     @Test
