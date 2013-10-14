@@ -15,8 +15,24 @@ import com.google.gson.JsonPrimitive;
  */
 public abstract class BasicStringTypeAdapter<T> implements JsonTypeAdapter<T> {
 
+    /**
+     * Example serialization for LocalDateTime:
+     * <pre>
+     * public String serialize(LocalDateTime sourceValue) {
+     *     return ISO_FORMATTER.print(sourceValue);
+     * }
+     * </pre>
+     */
     public abstract String serialize(T sourceValue);
 
+    /**
+     * Example deserialization for LocalDateTime
+     * <pre>
+     * public LocalDateTime deserialize(String serializedValue) {
+     *     return ISO_FORMATTER.parseLocalDateTime(serializedValue);
+     * }
+     * </pre>
+     */
     public abstract T deserialize(String serializedValue);
 
     @Override
