@@ -26,7 +26,7 @@ public abstract class BasicStringTypeAdapter<T> implements JsonTypeAdapter<T> {
     public abstract String serialize(T sourceValue);
 
     /**
-     * Example deserialization for LocalDateTime
+     * Example deserialization for LocalDateTime:
      * <pre>
      * public LocalDateTime deserialize(String serializedValue) {
      *     return ISO_FORMATTER.parseLocalDateTime(serializedValue);
