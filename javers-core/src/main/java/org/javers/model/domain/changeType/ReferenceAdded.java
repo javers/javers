@@ -1,6 +1,7 @@
 package org.javers.model.domain.changeType;
 
 import org.javers.model.domain.Change;
+import org.javers.model.domain.Diff;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.PropertyChange;
 import org.javers.model.mapping.Property;
@@ -13,8 +14,8 @@ import org.javers.model.mapping.Property;
 public class ReferenceAdded extends PropertyChange {
     private final GlobalCdoId reference;
 
-    public ReferenceAdded(GlobalCdoId globalCdoId, Property property, GlobalCdoId reference) {
-        super(globalCdoId, property);
+    public ReferenceAdded(GlobalCdoId globalCdoId, Diff parent, Property property, GlobalCdoId reference) {
+        super(globalCdoId, parent, property);
         this.reference = reference;
     }
 
