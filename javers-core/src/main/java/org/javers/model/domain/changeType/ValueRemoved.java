@@ -1,24 +1,22 @@
 package org.javers.model.domain.changeType;
 
-import org.javers.model.domain.Change;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.PropertyChange;
+import org.javers.model.domain.Value;
 import org.javers.model.mapping.Property;
 
 /**
- * element removed from collection of values
+ * element removed from collection
  *
  * @author bartosz walacik
  */
-public class ValueRemoved extends PropertyChange {
-    private final Object value;
+public class ValueRemoved extends ValueAddOrRemove {
 
     public ValueRemoved(GlobalCdoId globalCdoId, Property property, Object value) {
-        super(globalCdoId, property);
-        this.value = value;
+        super(globalCdoId, property, value);
     }
 
-    public Object getRemovedValue() {
+    public Value getRemovedValue() {
         return value;
     }
 }

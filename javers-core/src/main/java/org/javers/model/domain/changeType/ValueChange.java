@@ -1,28 +1,39 @@
 package org.javers.model.domain.changeType;
 
-import org.javers.model.domain.Change;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.PropertyChange;
+import org.javers.model.domain.Value;
 import org.javers.model.mapping.Property;
 
 /**
  * @author bartosz walacik
  */
 public class ValueChange extends PropertyChange {
-    private final Object leftValue;
-    private final Object rightValue;
+    private final Value leftValue;
+    private final Value rightValue;
 
     public ValueChange(GlobalCdoId globalCdoId, Property property, Object leftValue, Object rightValue) {
         super(globalCdoId, property);
-        this.leftValue = leftValue;
-        this.rightValue = rightValue;
+        this.leftValue = new Value(leftValue);
+        this.rightValue = new Value(rightValue);
     }
 
-    public Object getLeftValue() {
+    /**
+     * never returns null
+     */
+    public Value getLeftValue() {
         return leftValue;
     }
 
-    public Object getRightValue() {
+    /**
+     * never returns null
+     */
+    public Value getRightValue() {
         return rightValue;
+    }
+
+    public void dehydrate(String leftValueJSON, String rightValueJson) {
+        leftValue.dehydrate(leftValueJSON);
+        rightValue.dehydrate(rightValueJson);
     }
 }
