@@ -25,6 +25,13 @@ public class Validate {
         }
     }
 
+    public static void argumentCheck(boolean argumentCondition, String message) {
+        if (!argumentCondition) {
+            throw new IllegalArgumentException(message);
+        }
+
+    }
+
     public static void conditionFulfilled(boolean condition, String message) {
         if (!condition) {
             throw new IllegalStateException(message);
