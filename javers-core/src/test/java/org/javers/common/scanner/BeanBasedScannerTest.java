@@ -20,7 +20,7 @@ public class BeanBasedScannerTest extends PropertyScannerTest {
     @BeforeMethod
     public void setUp() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
-        propertyScanner = BeanBasedPropertyScanner.getInstane(typeMapper);
+        propertyScanner = new BeanBasedPropertyScanner(typeMapper);
     }
 
     @Test

@@ -14,6 +14,6 @@ public class FieldBasedScannerTest extends PropertyScannerTest {
     @BeforeMethod
     public void setUp() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
-        propertyScanner = FieldBasedPropertyScanner.getInstane(typeMapper);
+        propertyScanner = new FieldBasedPropertyScanner(typeMapper);
     }
 }

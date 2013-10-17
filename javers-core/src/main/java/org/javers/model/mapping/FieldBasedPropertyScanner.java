@@ -16,25 +16,8 @@ import java.util.List;
  */
 public class FieldBasedPropertyScanner extends PropertyScanner {
 
-    private static volatile FieldBasedPropertyScanner scanner;
-
-    private FieldBasedPropertyScanner(TypeMapper typeMapper) {
+    public FieldBasedPropertyScanner(TypeMapper typeMapper) {
         super(typeMapper);
-    }
-
-    public static FieldBasedPropertyScanner getInstane(TypeMapper typeMapper) {
-        return  getSingletonInstance(typeMapper);
-    }
-
-    private static FieldBasedPropertyScanner getSingletonInstance(TypeMapper typeMapper) {
-        if (scanner == null) {
-            synchronized (PropertyScanner.class) {
-                if (scanner == null) {
-                    scanner = new FieldBasedPropertyScanner(typeMapper);
-                }
-            }
-        }
-        return scanner;
     }
 
     @Override

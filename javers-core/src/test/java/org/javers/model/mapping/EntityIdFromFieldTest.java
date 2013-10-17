@@ -17,6 +17,7 @@ public class EntityIdFromFieldTest extends EntityIdTest {
                                 .registerEntity(DummyUserDetails.class)
                                 .registerValueObject(DummyNetworkAddress.class)
                                 .build();
-        entityFactory = new FieldBasedEntityFactory(mapper);
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(mapper);
+        entityFactory = new EntityFactory(mapper, scanner);
     }
 }

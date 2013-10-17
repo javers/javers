@@ -13,25 +13,8 @@ import java.util.List;
  */
 public class BeanBasedPropertyScanner extends PropertyScanner {
 
-    private static volatile BeanBasedPropertyScanner scanner;
-
-    private BeanBasedPropertyScanner(TypeMapper typeMapper) {
+    public BeanBasedPropertyScanner(TypeMapper typeMapper) {
         super(typeMapper);
-    }
-
-    public static BeanBasedPropertyScanner getInstane(TypeMapper typeMapper) {
-       return  getSingletonInstance(typeMapper);
-    }
-
-    private static BeanBasedPropertyScanner getSingletonInstance(TypeMapper typeMapper) {
-        if (scanner == null) {
-            synchronized (PropertyScanner.class) {
-                if (scanner == null) {
-                    scanner = new BeanBasedPropertyScanner(typeMapper);
-                }
-            }
-        }
-        return scanner;
     }
 
     @Override

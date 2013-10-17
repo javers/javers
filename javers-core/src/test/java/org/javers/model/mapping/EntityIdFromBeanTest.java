@@ -13,6 +13,7 @@ public class EntityIdFromBeanTest extends EntityIdTest {
     @BeforeMethod
     public void setUp() {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
-        entityFactory = new BeanBasedEntityFactory(mapper);
+        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
+        entityFactory = new EntityFactory(mapper, scanner);
     }
 }

@@ -13,6 +13,7 @@ public class EntityFromBeanConstructionTest extends EntityConstructionTest {
     @BeforeMethod
     public void setUp() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
-        entityFactory = new BeanBasedEntityFactory(typeMapper);
+        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(typeMapper);
+        entityFactory = new EntityFactory(typeMapper, scanner);
     }
 }

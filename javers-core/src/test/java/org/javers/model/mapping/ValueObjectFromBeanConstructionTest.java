@@ -13,6 +13,7 @@ public class ValueObjectFromBeanConstructionTest extends ValueObjectConstruction
     @BeforeMethod
     public void setUp() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
-        factory = new BeanBasedValueObjectFactory(typeMapper);
+        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(typeMapper);
+        factory = new ValueObjectFactory(typeMapper, scanner);
     }
 }
