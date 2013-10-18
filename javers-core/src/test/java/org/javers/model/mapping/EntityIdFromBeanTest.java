@@ -1,8 +1,5 @@
 package org.javers.model.mapping;
 
-import org.javers.core.model.DummyAddress;
-import org.javers.core.model.DummyUser;
-import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.type.TypeMapper;
 import org.testng.annotations.BeforeMethod;
 
@@ -15,8 +12,8 @@ public class EntityIdFromBeanTest extends EntityIdTest {
 
     @BeforeMethod
     public void setUp() {
-
-        TypeMapper mapper = typeMapper().registerValueObject(DummyUserDetails.class).build();
-        entityFactory = new BeanBasedEntityFactory(mapper);
+        TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
+        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
+        entityFactory = new EntityFactory(mapper, scanner);
     }
 }

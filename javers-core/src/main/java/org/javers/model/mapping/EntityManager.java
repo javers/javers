@@ -47,6 +47,11 @@ public class EntityManager {
 
     public void registerValueObject(Class<?> classToManage) {
         Validate.argumentIsNotNull(classToManage);
+
+        if (isRegisterd(classToManage)) {
+            return; //already managed
+        }
+
         entityFactory.typeMapper.registerValueObjectType(classToManage);
     }
 

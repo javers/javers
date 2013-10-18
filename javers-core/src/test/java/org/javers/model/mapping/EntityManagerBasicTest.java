@@ -26,7 +26,8 @@ public class EntityManagerBasicTest {
     @BeforeMethod
     public void setUp() {
         TypeMapper mapper = new TypeMapper();
-        entityManager = new EntityManager(new BeanBasedEntityFactory(mapper));
+        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
+        entityManager = new EntityManager(new EntityFactory(mapper, scanner));
     }
 
     @Test

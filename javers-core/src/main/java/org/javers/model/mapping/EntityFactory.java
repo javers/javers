@@ -7,13 +7,20 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public abstract class EntityFactory {
+public class EntityFactory extends ManagedClassFactory<Entity>{
 
-    protected TypeMapper typeMapper;
-
-    protected EntityFactory(TypeMapper typeMapper) {
-        this.typeMapper = typeMapper;
+    public EntityFactory(TypeMapper typeMapper, PropertyScanner propertyScanner) {
+        super(typeMapper, propertyScanner);
     }
 
-    public abstract <S> Entity<S> createEntity(Class<S> entityClass);
+    public <S> Entity createEntity(Class<S> clazz) {
+        return create(clazz);
+    }
+
+    @Override
+    public <S> Entity create(Class<S> clazz) {
+        typeMapper.registerReferenceType(clazz);
+        List<Property> beanProperties = propertyScanner.scan(clazz);
+        return new Entity<>(clazz, beanProperties);
+    }
 }
