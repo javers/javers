@@ -3,8 +3,6 @@ package org.javers.model.mapping;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -14,7 +12,6 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class BeanBasedEntityFactory extends EntityFactory {
-    private static final Logger logger = LoggerFactory.getLogger(BeanBasedEntityFactory.class);
 
     public BeanBasedEntityFactory(TypeMapper typeMapper) {
         super(typeMapper);

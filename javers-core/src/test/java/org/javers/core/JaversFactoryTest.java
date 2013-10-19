@@ -1,9 +1,9 @@
 package org.javers.core;
 
-import org.javers.test.assertion.Assertions;
-import org.testng.annotations.Test;
 
-import static org.javers.test.assertion.Assertions.*;
+import org.junit.Test;
+
+import static org.javers.test.assertion.Assertions.assertThat;
 
 /**
  * @author bartosz walacik

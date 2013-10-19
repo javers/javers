@@ -1,10 +1,13 @@
-package org.javers.model.mapping;
+package org.javers.common.reflection.org.javers.model.mapping;
 
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyUser;
-import org.testng.annotations.Test;
+import org.javers.model.mapping.Entity;
+import org.javers.model.mapping.EntityFactory;
+import org.javers.test.assertion.EntityAssert;
+import org.junit.Test;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static com.googlecode.catchexception.apis.CatchExceptionBdd.*;
 import static org.fest.assertions.api.Assertions.assertThat;
