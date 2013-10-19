@@ -5,6 +5,7 @@ import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.BeanBasedPropertyScanner;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.FieldBasedPropertyScanner;
 import org.javers.model.mapping.type.TypeMapper;
 import org.testng.annotations.BeforeMethod;
 
@@ -18,7 +19,7 @@ public class ObjectGraphFieldBuilderTest extends ObjectGraphBuilderTest {
     @BeforeMethod
     public void setUp() {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
-        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(mapper);
         entityManager = new EntityManager(new EntityFactory(mapper, scanner));
         entityManager.registerEntity(DummyUser.class);
         entityManager.registerEntity(DummyUserDetails.class);
