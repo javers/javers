@@ -19,7 +19,6 @@ public class EntityFactory extends ManagedClassFactory<Entity>{
 
     @Override
     public <S> Entity create(Class<S> clazz) {
-        typeMapper.registerReferenceType(clazz);
         List<Property> beanProperties = propertyScanner.scan(clazz);
         return new Entity<>(clazz, beanProperties);
     }
