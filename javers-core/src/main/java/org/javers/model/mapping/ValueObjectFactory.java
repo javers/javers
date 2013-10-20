@@ -13,6 +13,7 @@ public class ValueObjectFactory extends  ManagedClassFactory<ValueObject>{
         super(typeMapper, propertyScanner);
     }
 
+    @Override
     public <T> ValueObject<T> create(Class<T> clazz) {
         return new ValueObject<>(clazz, propertyScanner.scan(clazz));
     }
