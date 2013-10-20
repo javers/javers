@@ -5,7 +5,11 @@ import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.PropertiesAssert;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.PropertyScanner;
-import org.javers.model.mapping.type.*;
+import org.javers.model.mapping.type.ArrayType;
+import org.javers.model.mapping.type.CollectionType;
+import org.javers.model.mapping.type.EntityReferenceType;
+import org.javers.model.mapping.type.PrimitiveType;
+import org.javers.model.mapping.type.ValueObjectType;
 import org.javers.test.assertion.Assertions;
 import org.testng.annotations.Test;
 
