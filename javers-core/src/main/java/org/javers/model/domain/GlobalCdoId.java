@@ -1,18 +1,16 @@
 package org.javers.model.domain;
 
-import org.javers.model.mapping.Entity;
-
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
+import org.javers.model.mapping.Entity;
+
 /**
- * Clients domain object global ID
- * <br/>
- *
+ * Clients domain object global ID <br/>
+ * <p/>
  * Immutable
  */
 public class GlobalCdoId {
     private final Entity entity;
-
     /**
      * Identifiers of client's domain objects should be unique in Entity scope
      */
@@ -32,5 +30,24 @@ public class GlobalCdoId {
 
     public Object getCdoId() {
         return cdoId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || obj.getClass() != getClass()) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        GlobalCdoId other = (GlobalCdoId) obj;
+        return cdoId.equals(other.cdoId) && entity.equals(other.entity);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = entity.hashCode();
+        result = 31 * result + cdoId.hashCode();
+        return result;
     }
 }
