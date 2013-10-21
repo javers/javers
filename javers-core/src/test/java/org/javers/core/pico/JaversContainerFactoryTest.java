@@ -2,6 +2,7 @@ package org.javers.core.pico;
 
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
+import org.javers.core.diff.DiffFactory;
 import org.javers.model.mapping.BeanBasedEntityFactory;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
@@ -39,6 +40,7 @@ public class JaversContainerFactoryTest {
         assertThat(container.getComponent(Javers.class)).isNotNull();
         assertThat(container.getComponent(EntityManager.class)).isNotNull();
         assertThat(container.getComponent(TypeMapper.class)).isNotNull();
+        assertThat(container.getComponent(DiffFactory.class)).isNotNull();
     }
 
     @Test
