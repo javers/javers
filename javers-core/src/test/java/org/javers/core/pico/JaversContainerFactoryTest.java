@@ -2,13 +2,8 @@ package org.javers.core.pico;
 
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
-import org.javers.core.diff.DiffFactory;
-import org.javers.model.mapping.BeanBasedEntityFactory;
-import org.javers.model.mapping.EntityFactory;
-import org.javers.model.mapping.EntityManager;
-import org.javers.model.mapping.FieldBasedEntityFactory;
+import org.javers.model.mapping.*;
 import org.javers.model.mapping.type.TypeMapper;
-import org.junit.Before;
 import org.picocontainer.PicoContainer;
 import org.testng.annotations.Test;
 
@@ -57,39 +52,39 @@ public class JaversContainerFactoryTest {
     }
 
     @Test
-    public void shouldContainFieldBasedEntityFactoryWhenFieldStyle(){
+    public void shouldContainFieldBasedPropertyScannerWhenFieldStyle(){
         //given
         PicoContainer container = JaversContainerFactory.create(MappingStyle.FIELD);
 
         //then
-        assertThat(container.getComponent(EntityFactory.class)).isInstanceOf(FieldBasedEntityFactory.class);
+        assertThat(container.getComponent(PropertyScanner.class)).isInstanceOf(FieldBasedPropertyScanner.class);
     }
 
     @Test
-    public void shouldContainBeanBasedEntityFactoryWhenBeanStyle(){
+    public void shouldContainBeanBasedPropertyScannerWhenBeanStyle(){
         //given
         PicoContainer container = JaversContainerFactory.create(MappingStyle.BEAN);
 
         //then
-        assertThat(container.getComponent(EntityFactory.class)).isInstanceOf(BeanBasedEntityFactory.class);
+        assertThat(container.getComponent(PropertyScanner.class)).isInstanceOf(BeanBasedPropertyScanner.class);
     }
 
 
     @Test
-    public void shouldNotContainFieldBasedEntityFactoryWhenBeanStyle(){
+    public void shouldNotContainFieldBasedPropertyScannerWhenBeanStyle(){
         //given
         PicoContainer container = JaversContainerFactory.create(MappingStyle.BEAN);
 
         //then
-        assertThat(container.getComponent(FieldBasedEntityFactory.class)).isNull();
+        assertThat(container.getComponent(FieldBasedPropertyScanner.class)).isNull();
     }
 
     @Test
-    public void shouldNotContainBeanBasedEntityFactoryWhenFieldStyle(){
+    public void shouldNotContainBeanBasedPropertyScannerWhenFieldStyle(){
         //given
         PicoContainer container = JaversContainerFactory.create(MappingStyle.FIELD);
 
         //then
-        assertThat(container.getComponent(BeanBasedEntityFactory.class)).isNull();
+        assertThat(container.getComponent(BeanBasedPropertyScanner.class)).isNull();
     }
 }
