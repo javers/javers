@@ -19,6 +19,7 @@ import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
 /**
  * @author Maciej Zasada
  */
+@Test
 public class DFSGraphToSetConverterTest {
 
     private DFSGraphToSetConverter converter;
@@ -35,7 +36,6 @@ public class DFSGraphToSetConverterTest {
         objectGraphBuilder = new ObjectGraphBuilder(entityManager);
     }
 
-    @Test
     public void shouldConvertNodeWithMultiEdgeIntoSet() {
         // given:
         DummyUser user = dummyUser().withName("1").withDetailsList(2).build();
@@ -48,7 +48,6 @@ public class DFSGraphToSetConverterTest {
         Assert.assertEquals(3, objectNodes.size());
     }
 
-    @Test
     public void shouldConvertNodeWithSingeEdgeIntoSet() {
         // given:
         DummyUser user = dummyUser().withName("1").withDetails(2L).build();

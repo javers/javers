@@ -64,11 +64,23 @@ public class ObjectWrapper implements ObjectNode {
         }
 
         ObjectWrapper that = (ObjectWrapper) o;
-        return getCdoId().equals(that.getCdoId());
+        if (entity.getSourceClass() != that.entity.getSourceClass()) {
+            return false;
+        }
+
+        Object cdoId = getCdoId();
+        if (cdoId == null) {
+            return cdo.equals(that.cdo);
+        }
+        return cdoId.equals(that.getCdoId());
     }
 
     @Override
     public int hashCode() {
+        Object cdoId = getCdoId();
+        if (cdoId == null) {
+            return cdo.hashCode();
+        }
         return getCdoId().hashCode();
     }
 }
