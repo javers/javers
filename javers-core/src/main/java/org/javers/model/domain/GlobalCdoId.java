@@ -41,12 +41,12 @@ public class GlobalCdoId {
             return true;
         }
         GlobalCdoId other = (GlobalCdoId) obj;
-        return cdoId.equals(other.cdoId) && entity.equals(other.entity);
+        return cdoId.equals(other.cdoId) && entity.getSourceClass().equals(other.entity.getSourceClass());
     }
 
     @Override
     public int hashCode() {
-        int result = entity.hashCode();
+        int result = entity.getSourceClass().hashCode();
         result = 31 * result + cdoId.hashCode();
         return result;
     }

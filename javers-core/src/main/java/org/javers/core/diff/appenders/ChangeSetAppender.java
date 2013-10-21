@@ -19,6 +19,6 @@ public abstract class ChangeSetAppender {
     return new GlobalCdoId(objectNode.getEntity(), objectNode.getCdoId());
   }
 
-  public abstract Set<Change> getChangeSet(Diff diff, Set<ObjectNode> previousGraph, Set<ObjectNode> currentGraph);
+  protected abstract Set<Change> getChangeSet(Diff diff, Set<ObjectNode> previousGraph, Set<ObjectNode> currentGraph);
 
 }

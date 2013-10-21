@@ -17,7 +17,7 @@ public class NewObjectAppender extends ChangeSetAppender {
     return Sets.transform(newObjectNodes, new Function<ObjectNode, Change>() {
       @Override
       public NewObject apply(ObjectNode input) {
-        return new NewObject(createFromObjectNode(input), null);
+        return new NewObject(createFromObjectNode(input), diff);
       }
     });
   }

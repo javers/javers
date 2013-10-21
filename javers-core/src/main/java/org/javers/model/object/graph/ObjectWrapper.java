@@ -1,7 +1,6 @@
 package org.javers.model.object.graph;
 
 import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.Property;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,5 +51,21 @@ public class ObjectWrapper implements ObjectNode {
 
     public void addEdge(Edge edge) {
         this.edges.add(edge);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        ObjectWrapper that = (ObjectWrapper) o;
+        return getCdoId().equals(that.getCdoId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getCdoId().hashCode();
     }
 }
