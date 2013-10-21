@@ -1,6 +1,7 @@
 package org.javers.model.object.graph;
 
 import org.javers.model.mapping.Entity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class ObjectWrapper implements ObjectNode {
     public ObjectWrapper(Object cdo, Entity entity) {
         argumentIsNotNull(cdo);
         argumentIsNotNull(entity);
-        if (!entity.isInstance(cdo)){
+        if (!entity.isInstance(cdo)) {
             throw new IllegalArgumentException("cdo is not an instance of entity");
         }
 
@@ -55,10 +56,12 @@ public class ObjectWrapper implements ObjectNode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         ObjectWrapper that = (ObjectWrapper) o;
         return getCdoId().equals(that.getCdoId());
