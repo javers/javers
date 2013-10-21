@@ -2,6 +2,7 @@ package org.javers.core.pico;
 
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
+import org.javers.core.diff.DiffFactory;
 import org.javers.model.mapping.*;
 import org.javers.model.mapping.type.TypeMapper;
 import org.picocontainer.PicoContainer;
