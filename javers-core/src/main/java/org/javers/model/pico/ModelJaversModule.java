@@ -36,7 +36,7 @@ public class ModelJaversModule implements JaversModule {
         Collections.addAll(components, moduleComponents);
 
         Validate.conditionFulfilled(propertyScannersMapping.containsKey(configuredStyle),
-                "No EntityFactory defined for " + configuredStyle);
+                "No PropertyScanner defined for " + configuredStyle);
         components.add(propertyScannersMapping.get(configuredStyle));
         return components;
     }

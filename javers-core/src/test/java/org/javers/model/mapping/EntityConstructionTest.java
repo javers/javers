@@ -14,7 +14,7 @@ public abstract class EntityConstructionTest {
     @Test
     public void shouldHoldReferenceToSourceClass() {
         //when
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasSourceClass(DummyUser.class);
@@ -23,7 +23,7 @@ public abstract class EntityConstructionTest {
      @Test
      public void shouldScanAllProperties() {
         //when
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         //then
         Assertions.assertThat(entity.getProperties()).hasSize(14);

@@ -1,7 +1,6 @@
 package org.javers.model.object.graph;
 
 import org.javers.core.model.DummyUser;
-import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.test.assertion.Assertions;
@@ -18,7 +17,7 @@ public abstract class ObjectWrapperTest {
     public void shouldHoldEntityReference() {
         //given
         DummyUser cdo = new DummyUser();
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo,entity);
@@ -31,7 +30,7 @@ public abstract class ObjectWrapperTest {
     public void shouldHoldCdoReference() {
         //given
         DummyUser cdo = new DummyUser();
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo,entity);
@@ -45,7 +44,7 @@ public abstract class ObjectWrapperTest {
     public void shouldReturnCdoId() {
         //given
         DummyUser cdo = new DummyUser("Mad Kaz");
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo,entity);

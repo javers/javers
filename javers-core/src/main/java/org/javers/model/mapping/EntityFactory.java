@@ -13,10 +13,6 @@ public class EntityFactory extends ManagedClassFactory<Entity>{
         super(propertyScanner);
     }
 
-    public <S> Entity createEntity(Class<S> clazz) {
-        return create(clazz);
-    }
-
     @Override
     public <S> Entity create(Class<S> clazz) {
         List<Property> beanProperties = propertyScanner.scan(clazz);

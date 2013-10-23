@@ -21,9 +21,9 @@ public class FieldBasedPropertyScanner extends PropertyScanner {
     }
 
     @Override
-    public  List<Property> scan(Class<?> valueObjectClass) {
+    public  List<Property> scan(Class<?> managedClass) {
         List<Field> declaredFields = new LinkedList<Field>();
-        objectFields(valueObjectClass, declaredFields);
+        getClassFields(managedClass, declaredFields);
         List<Property> propertyList = new ArrayList<Property>(declaredFields.size());
 
         for (Field field : declaredFields) {
@@ -38,10 +38,10 @@ public class FieldBasedPropertyScanner extends PropertyScanner {
         return propertyList;
     }
 
-    private void objectFields(Class<?> beanClass, List<Field> fields) {
+    private void getClassFields(Class<?> beanClass, List<Field> fields) {
 
         if(beanClass.getSuperclass() != null && !beanClass.getSuperclass().isInstance(Object.class)) {
-            objectFields(beanClass.getSuperclass(), fields);
+            getClassFields(beanClass.getSuperclass(), fields);
         }
 
         fields.addAll(Arrays.asList(beanClass.getDeclaredFields()));
