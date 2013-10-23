@@ -22,4 +22,16 @@ public abstract class JaversType {
     public Class getBaseJavaType() {
         return baseJavaType;
     }
+
+    public boolean isValueObject() {
+        return false;
+    }
+
+    public boolean isEntityReferenceType() {
+        return false;
+    }
+
+    public boolean isReferencedType() {
+        return false;
+    }
 }

@@ -15,6 +15,6 @@ public class EntityIdFromFieldTest extends EntityIdTest {
     public void setUp() {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
         FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(mapper);
-        entityFactory = new EntityFactory(mapper, scanner);
+        entityFactory = new EntityFactory(scanner);
     }
 }

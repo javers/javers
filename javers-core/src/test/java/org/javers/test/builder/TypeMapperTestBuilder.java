@@ -26,7 +26,7 @@ public class TypeMapperTestBuilder {
     }
 
     public TypeMapperTestBuilder registerEntity(Class<?> entity) {
-        typeMapper.registerReferenceType(entity);
+        typeMapper.registerEntityReferenceType(entity);
         return this;
     }
 
@@ -37,8 +37,8 @@ public class TypeMapperTestBuilder {
 
     public TypeMapperTestBuilder registerAllDummyTypes() {
         typeMapper.registerValueObjectType(DummyAddress.class);
-        typeMapper.registerReferenceType(DummyUser.class);
-        typeMapper.registerReferenceType(DummyUserDetails.class);
+        typeMapper.registerEntityReferenceType(DummyUser.class);
+        typeMapper.registerEntityReferenceType(DummyUserDetails.class);
         typeMapper.registerValueObjectType(DummyNetworkAddress.class);
         return this;
     }

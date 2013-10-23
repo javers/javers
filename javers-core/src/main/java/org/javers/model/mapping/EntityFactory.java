@@ -9,8 +9,8 @@ import java.util.List;
  */
 public class EntityFactory extends ManagedClassFactory<Entity>{
 
-    public EntityFactory(TypeMapper typeMapper, PropertyScanner propertyScanner) {
-        super(typeMapper, propertyScanner);
+    public EntityFactory(PropertyScanner propertyScanner) {
+        super(propertyScanner);
     }
 
     public <S> Entity createEntity(Class<S> clazz) {

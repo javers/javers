@@ -77,15 +77,21 @@ public abstract class ManagedClass<S> {
 
     @Override
     public int hashCode() {
-        return sourceClass.hashCode();
+        int result = sourceClass != null ? sourceClass.hashCode() : 0;
+        result = 31 * result + (properties != null ? properties.hashCode() : 0);
+        return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Entity)) {
-            return false;
-        }
-        return sourceClass.equals((ManagedClass)obj) && properties.equals(((ManagedClass) obj).getProperties());
-    }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        ManagedClass that = (ManagedClass) o;
+
+        if (properties != null ? !properties.equals(that.properties) : that.properties != null) return false;
+        if (sourceClass != null ? !sourceClass.equals(that.sourceClass) : that.sourceClass != null) return false;
+
+        return true;
+    }
 }

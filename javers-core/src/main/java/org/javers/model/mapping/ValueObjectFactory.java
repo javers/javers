@@ -7,10 +7,8 @@ import org.javers.model.mapping.type.TypeMapper;
  */
 public class ValueObjectFactory extends  ManagedClassFactory<ValueObject>{
 
-    protected TypeMapper typeMapper;
-
-    protected ValueObjectFactory(TypeMapper typeMapper, PropertyScanner propertyScanner) {
-        super(typeMapper, propertyScanner);
+    public ValueObjectFactory(PropertyScanner propertyScanner) {
+        super(propertyScanner);
     }
 
     @Override
