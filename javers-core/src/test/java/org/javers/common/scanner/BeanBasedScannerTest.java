@@ -29,13 +29,6 @@ public class BeanBasedScannerTest extends PropertyScannerTest {
         List<Property> properties = propertyScanner.scan(ManagedClass.class);
 
         //then
-        PropertiesAssert.assertThat(properties).hasProperty("id").isId();
+        PropertiesAssert.assertThat(properties).hasProperty("privateProperty");
     }
-
-    private static class ManagedClass {
-        @Id
-        private int getId() {
-            return 0;
-        }
-    };
 }
