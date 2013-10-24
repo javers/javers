@@ -23,7 +23,7 @@ public class FieldBasedPropertyScanner extends PropertyScanner {
     @Override
     public  List<Property> scan(Class<?> managedClass) {
         List<Field> declaredFields = new LinkedList<Field>();
-        getClassFields(managedClass, declaredFields);
+        declaredFields.addAll(getFields(managedClass));
         List<Property> propertyList = new ArrayList<Property>(declaredFields.size());
 
         for (Field field : declaredFields) {
@@ -38,13 +38,17 @@ public class FieldBasedPropertyScanner extends PropertyScanner {
         return propertyList;
     }
 
-    private void getClassFields(Class<?> beanClass, List<Field> fields) {
-
-        if(beanClass.getSuperclass() != null && !beanClass.getSuperclass().isInstance(Object.class)) {
-            getClassFields(beanClass.getSuperclass(), fields);
+    private List<Field> getFields(Class<?> clazz) {
+        List<Field> superFields;
+        if (clazz.getSuperclass() == Object.class) { //recursion stop condition
+            superFields = new ArrayList<>();
+        }
+        else {
+            superFields = getFields(clazz.getSuperclass());
         }
 
-        fields.addAll(Arrays.asList(beanClass.getDeclaredFields()));
+        superFields.addAll( Arrays.asList(clazz.getDeclaredFields()) );
+        return superFields;
     }
 
     private boolean fieldIsPersistance(Field field) {
