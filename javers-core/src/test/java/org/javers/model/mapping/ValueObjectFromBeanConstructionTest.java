@@ -14,6 +14,6 @@ public class ValueObjectFromBeanConstructionTest extends ValueObjectConstruction
     public void setUp() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(typeMapper);
-        factory = new ValueObjectFactory(typeMapper, scanner);
+        factory = new ValueObjectFactory(scanner);
     }
 }

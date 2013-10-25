@@ -5,6 +5,8 @@ import org.javers.test.assertion.Assertions;
 
 import java.util.List;
 
+import static org.fest.assertions.api.Fail.fail;
+
 /**
  * @author pawel szymczyk
  */
@@ -39,5 +41,13 @@ public class PropertiesAssert extends AbstractAssert<PropertiesAssert, List<Prop
         Assertions.assertThat(found).isNull();
 
         return PropertyAssert.assertThat(found);
+    }
+
+    public PropertiesAssert hasId() {
+        for (Property property : actual) {
+            if (property.isId()) return this;
+        }
+        fail("Id not found");
+        return null;
     }
 }

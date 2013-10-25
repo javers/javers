@@ -5,7 +5,11 @@ import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.PropertiesAssert;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.PropertyScanner;
-import org.javers.model.mapping.type.*;
+import org.javers.model.mapping.type.ArrayType;
+import org.javers.model.mapping.type.CollectionType;
+import org.javers.model.mapping.type.EntityReferenceType;
+import org.javers.model.mapping.type.PrimitiveType;
+import org.javers.model.mapping.type.ValueObjectType;
 import org.javers.test.assertion.Assertions;
 import org.testng.annotations.Test;
 
@@ -13,12 +17,23 @@ import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Set;
 
+import static org.fest.assertions.api.Fail.fail;
+
 /**
  * @author pawel szymczyk
  */
 public abstract class PropertyScannerTest {
 
     protected PropertyScanner propertyScanner;
+
+    @Test
+    public void shouldScanId() throws Throwable {
+        //when
+        List<Property> properties = propertyScanner.scan(DummyUser.class);
+
+        //then
+        PropertiesAssert.assertThat(properties).hasId();
+    }
 
     @Test
     public void shouldScanAllProperties() {
@@ -169,4 +184,13 @@ public abstract class PropertyScannerTest {
         PropertiesAssert.assertThat(properties).hasProperty("dummyAddress")
                 .hasJaversType(ValueObjectType.class);
     }
+
+    protected static class ManagedClass {
+
+        private int privateProperty;
+
+        private int getPrivateProperty() {
+            return 0;
+        }
+    };
 }

@@ -13,11 +13,8 @@ import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
 public class EntityIdFromFieldTest extends EntityIdTest {
     @BeforeMethod
     public void setUp() {
-        TypeMapper mapper = typeMapper()
-                                .registerEntity(DummyUserDetails.class)
-                                .registerValueObject(DummyNetworkAddress.class)
-                                .build();
+        TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
         FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(mapper);
-        entityFactory = new EntityFactory(mapper, scanner);
+        entityFactory = new EntityFactory(scanner);
     }
 }

@@ -1,5 +1,6 @@
 package org.javers.model.object.graph;
 
+import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.Property;
 
@@ -27,7 +28,8 @@ public class ObjectGraphBuilder {
      */
     public ObjectNode build(Object cdo) {
         argumentIsNotNull(cdo);
-        ObjectWrapper node = new ObjectWrapper(cdo, entityManager.getByClass(cdo.getClass()));
+        //TODO do wywalenia żutowanko, z pytaniem czy VO beda wrapowane?
+        ObjectWrapper node = new ObjectWrapper(cdo, (Entity) entityManager.getByClass(cdo.getClass()));
 
         initEdges(node);
 

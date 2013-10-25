@@ -8,10 +8,8 @@ import org.javers.model.mapping.type.TypeMapper;
 public abstract class ManagedClassFactory<T extends ManagedClass> {
 
     protected PropertyScanner propertyScanner;
-    protected TypeMapper typeMapper;
 
-    protected ManagedClassFactory(TypeMapper typeMapper, PropertyScanner propertyScanner) {
-        this.typeMapper = typeMapper;
+    protected ManagedClassFactory(PropertyScanner propertyScanner) {
         this.propertyScanner = propertyScanner;
     }
 
