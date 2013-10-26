@@ -12,12 +12,12 @@ import org.javers.model.object.graph.ObjectNode;
 public class NewObjectAppender extends ChangeSetAppender {
 
   @Override
-  public Set<Change> getChangeSet(final Diff diff, Set<ObjectNode> previousGraph, Set<ObjectNode> currentGraph) {
+  public Set<Change> getChangeSet(Set<ObjectNode> previousGraph, Set<ObjectNode> currentGraph) {
     Set<ObjectNode> newObjectNodes = Sets.difference(currentGraph, previousGraph);
     return Sets.transform(newObjectNodes, new Function<ObjectNode, Change>() {
       @Override
       public NewObject apply(ObjectNode input) {
-        return new NewObject(input.getGlobalCdoId(), diff);
+        return new NewObject(input.getGlobalCdoId());
       }
     });
   }

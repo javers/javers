@@ -12,12 +12,12 @@ import org.javers.model.object.graph.ObjectNode;
 public class ObjectRemovedAppender extends ChangeSetAppender {
 
   @Override
-  public Set<Change> getChangeSet(final Diff diff, Set<ObjectNode> previousGraph, Set<ObjectNode> currentGraph) {
+  public Set<Change> getChangeSet(Set<ObjectNode> previousGraph, Set<ObjectNode> currentGraph) {
     Set<ObjectNode> removedObjectNodes = Sets.difference(previousGraph, currentGraph);
     return Sets.transform(removedObjectNodes, new Function<ObjectNode, Change>() {
       @Override
       public ObjectRemoved apply(ObjectNode input) {
-        return new ObjectRemoved(input.getGlobalCdoId(), diff);
+        return new ObjectRemoved(input.getGlobalCdoId());
       }
     });
   }

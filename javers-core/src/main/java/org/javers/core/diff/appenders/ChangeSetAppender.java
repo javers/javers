@@ -10,11 +10,11 @@ import org.javers.model.object.graph.ObjectNode;
 public abstract class ChangeSetAppender {
 
   public void append(Diff currentDiff, Set<ObjectNode> previousGraph, Set<ObjectNode> currentGraph) {
-    for (Change change : getChangeSet(currentDiff, previousGraph, currentGraph)) {
+    for (Change change : getChangeSet(previousGraph, currentGraph)) {
       currentDiff.addChange(change);
     }
   }
 
-  protected abstract Set<Change> getChangeSet(Diff diff, Set<ObjectNode> previousGraph, Set<ObjectNode> currentGraph);
+  protected abstract Set<Change> getChangeSet(Set<ObjectNode> previousGraph, Set<ObjectNode> currentGraph);
 
 }

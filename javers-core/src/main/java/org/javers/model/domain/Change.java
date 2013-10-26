@@ -1,5 +1,6 @@
 package org.javers.model.domain;
 
+import org.javers.common.validation.Validate;
 import org.javers.model.mapping.Property;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -20,14 +21,12 @@ import org.javers.model.domain.changeType.*;
  * @author bartosz walacik
  */
 public abstract class Change {
-    private final Diff parent;
+    private Diff parent;
     private final GlobalCdoId globalCdoId;
 
-    protected Change(GlobalCdoId globalCdoId, Diff parent) {
+    protected Change(GlobalCdoId globalCdoId) {
         argumentIsNotNull(globalCdoId);
-        argumentIsNotNull(parent);
         this.globalCdoId = globalCdoId;
-        this.parent = parent;
     }
 
     /**
@@ -42,5 +41,10 @@ public abstract class Change {
      */
     public Diff getParent() {
         return parent;
+    }
+
+    public void bind(Diff parent) {
+        Validate.conditionFulfilled(this.parent == null, "parent Diff already set");
+        this.parent = parent;
     }
 }

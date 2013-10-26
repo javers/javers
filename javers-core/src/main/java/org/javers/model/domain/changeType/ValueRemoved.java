@@ -13,8 +13,8 @@ import org.javers.model.mapping.Property;
  */
 public class ValueRemoved extends ValueAddOrRemove {
 
-    public ValueRemoved(GlobalCdoId globalCdoId, Diff parent, Property property, Object value) {
-        super(globalCdoId, parent, property, value);
+    public ValueRemoved(GlobalCdoId globalCdoId, Property property, Object value) {
+        super(globalCdoId, property, value);
     }
 
     public Value getRemovedValue() {

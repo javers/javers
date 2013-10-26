@@ -14,8 +14,8 @@ import org.javers.model.mapping.Property;
 public class ReferenceAdded extends PropertyChange {
     private final GlobalCdoId reference;
 
-    public ReferenceAdded(GlobalCdoId globalCdoId, Diff parent, Property property, GlobalCdoId reference) {
-        super(globalCdoId, parent, property);
+    public ReferenceAdded(GlobalCdoId globalCdoId, Property property, GlobalCdoId reference) {
+        super(globalCdoId, property);
         this.reference = reference;
     }
 

@@ -15,8 +15,8 @@ public class ReferenceChanged extends PropertyChange {
     private final GlobalCdoId leftReference;
     private final GlobalCdoId rightReference;
 
-    public ReferenceChanged(GlobalCdoId globalCdoId, Diff parent, Property property, GlobalCdoId leftReference, GlobalCdoId rightReference) {
-        super(globalCdoId, parent, property);
+    public ReferenceChanged(GlobalCdoId globalCdoId, Property property, GlobalCdoId leftReference, GlobalCdoId rightReference) {
+        super(globalCdoId, property);
         this.leftReference = leftReference;
         this.rightReference = rightReference;
     }
