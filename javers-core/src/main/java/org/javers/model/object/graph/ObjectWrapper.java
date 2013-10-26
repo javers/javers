@@ -1,5 +1,6 @@
 package org.javers.model.object.graph;
 
+import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Entity;
 
 import java.util.ArrayList;
@@ -38,6 +39,11 @@ public class ObjectWrapper implements ObjectNode {
     @Override
     public Object getCdoId() {
         return entity.getIdProperty().get(cdo);
+    }
+
+    @Override
+    public GlobalCdoId getGlobalCdoId() {
+        return new GlobalCdoId(entity, getCdoId());
     }
 
     @Override

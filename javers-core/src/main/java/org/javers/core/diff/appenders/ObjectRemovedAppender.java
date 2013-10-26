@@ -17,7 +17,7 @@ public class ObjectRemovedAppender extends ChangeSetAppender {
     return Sets.transform(removedObjectNodes, new Function<ObjectNode, Change>() {
       @Override
       public ObjectRemoved apply(ObjectNode input) {
-        return new ObjectRemoved(createFromObjectNode(input), diff);
+        return new ObjectRemoved(input.getGlobalCdoId(), diff);
       }
     });
   }
