@@ -4,6 +4,8 @@ import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.test.assertion.Assertions;
+import static org.javers.test.builder.DummyUserBuilder.dummyUser;
+import org.javers.test.builder.DummyUserBuilder;
 import org.testng.annotations.Test;
 
 /**
@@ -16,7 +18,7 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldHoldEntityReference() {
         //given
-        DummyUser cdo = new DummyUser();
+        DummyUser cdo = dummyUser().build();
         Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //when
@@ -29,7 +31,7 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldHoldCdoReference() {
         //given
-        DummyUser cdo = new DummyUser();
+        DummyUser cdo = dummyUser().build();
         Entity entity = entityFactory.createEntity(DummyUser.class);
 
         //when
@@ -66,7 +68,7 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldNotBeEqualWithDifferentIdValue() {
         //given
-        ObjectWrapper first = new ObjectWrapper(new DummyUser(), entityFactory.createEntity(DummyUser.class));
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("stach"), entityFactory.createEntity(DummyUser.class));
         ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax 1"), entityFactory.createEntity(DummyUser.class));
 
         //when + then

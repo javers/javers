@@ -18,6 +18,7 @@ public class ObjectWrapper implements ObjectNode {
     private final Object cdo;
     private final Entity entity;
     private final List<Edge> edges;
+    private final GlobalCdoId globalCdoId;
 
 
     public ObjectWrapper(Object cdo, Entity entity) {
@@ -30,6 +31,7 @@ public class ObjectWrapper implements ObjectNode {
         this.cdo = cdo;
         this.entity = entity;
         this.edges = new ArrayList<>();
+        this.globalCdoId = new GlobalCdoId(entity, getCdoId());
     }
 
     public Object getCdo() {
@@ -43,7 +45,7 @@ public class ObjectWrapper implements ObjectNode {
 
     @Override
     public GlobalCdoId getGlobalCdoId() {
-        return new GlobalCdoId(entity, getCdoId());
+        return globalCdoId;
     }
 
     @Override
@@ -62,31 +64,16 @@ public class ObjectWrapper implements ObjectNode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
         ObjectWrapper that = (ObjectWrapper) o;
-        if (entity.getSourceClass() != that.entity.getSourceClass()) {
-            return false;
-        }
-
-        Object cdoId = getCdoId();
-        if (cdoId == null) {
-            return cdo.equals(that.cdo);
-        }
-        return cdoId.equals(that.getCdoId());
+        return globalCdoId.equals(that.globalCdoId);
     }
 
     @Override
     public int hashCode() {
-        Object cdoId = getCdoId();
-        if (cdoId == null) {
-            return cdo.hashCode();
-        }
-        return getCdoId().hashCode();
+        return globalCdoId.hashCode();
     }
 }
