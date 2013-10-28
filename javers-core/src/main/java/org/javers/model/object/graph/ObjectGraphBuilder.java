@@ -2,11 +2,14 @@ package org.javers.model.object.graph;
 
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.ManagedClass;
 import org.javers.model.mapping.Property;
+import org.javers.model.mapping.ValueObject;
 
 import java.util.Collection;
 import java.util.List;
 
+import static org.javers.common.validation.Validate.argumentCheck;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
@@ -29,8 +32,16 @@ public class ObjectGraphBuilder {
      */
     public ObjectNode build(Object cdo) {
         argumentIsNotNull(cdo);
-        //TODO do wywalenia żutowanko, z pytaniem czy VO beda wrapowane?
-        ObjectWrapper node = new ObjectWrapper(cdo, (Entity) entityManager.getByClass(cdo.getClass()));
+        ManagedClass managedClass = entityManager.getByClass(cdo.getClass());
+
+        argumentIsNotNull(managedClass);
+        if (managedClass instanceof ValueObject) {
+            throw new IllegalArgumentException("Error can not build graph from an object of " + cdo.getClass() + ".\n"
+                    + " Expected object managed as Entity but was Value Object.\n"
+                    + " Value Object isn't client's domain object.");
+        }
+
+        ObjectWrapper node = new ObjectWrapper(cdo, (Entity) managedClass);
 
         initEdges(node);
 
