@@ -29,7 +29,6 @@ public class EntityManager {
     private ManagedClasses managedEntities = new ManagedClasses();
 
     public EntityManager(EntityFactory entityFactory, ValueObjectFactory valueObjectFactory, TypeMapper typeMapper) {
-        //TODO troche glupio to wyglada, na chwile obecna nie wiem co z tym zrobic (czy w ogole cos robic)
         Validate.argumentIsNotNull(entityFactory);
         Validate.argumentIsNotNull(valueObjectFactory);
         Validate.argumentIsNotNull(typeMapper);

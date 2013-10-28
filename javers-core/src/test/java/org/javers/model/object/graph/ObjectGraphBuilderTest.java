@@ -1,11 +1,14 @@
 package org.javers.model.object.graph;
 
 
+import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.EntityManager;
 import org.javers.test.assertion.Assertions;
 import org.testng.annotations.Test;
 
+import static com.googlecode.catchexception.CatchException.caughtException;
+import static com.googlecode.catchexception.apis.CatchExceptionBdd.when;
 import static org.javers.test.assertion.NodeAssert.assertThat;
 import static org.javers.test.builder.DummyUserBuilder.dummyUser;
 
@@ -213,5 +216,21 @@ public abstract class ObjectGraphBuilderTest {
                 .haveAtLeastMultiEdge(1)
                 .hasEdge("employeesList")
                 .isMultiEdge();
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenTryToBuildFromValueObject() throws Throwable {
+        //given
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        DummyAddress valueObject = new DummyAddress();
+
+        when(graphBuilder).build(valueObject);
+
+        //then
+        org.fest.assertions.api.Assertions.assertThat(caughtException())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Error can not build graph from an object of " + valueObject.getClass() + ".\n"
+                        + " Expected object managed as Entity but was Value Object.\n"
+                        + " Value Object isn't client's domain object.");
     }
 }
