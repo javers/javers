@@ -218,7 +218,7 @@ public abstract class ObjectGraphBuilderTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenTryToBuildFromValueObject() throws Throwable {
+    public void shouldThrowExceptionWhenTryToBuildGraphFromValueObject() throws Throwable {
         //given
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyAddress valueObject = new DummyAddress();
