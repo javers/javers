@@ -22,8 +22,9 @@ public class ObjectGraphBuilder {
     }
 
     /**
-     * @param cdo client's domain object, it should be root of an aggregate, tree root
-     *            or any node in objects graph from all other nodes are navigable
+     * @param cdo client's domain object, instance of managed Entity.
+     *            It should be root of an aggregate, tree root
+     *            or any node in objects graph from where all other nodes are navigable
      * @return graph node
      */
     public ObjectNode build(Object cdo) {
