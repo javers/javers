@@ -3,8 +3,10 @@ package org.javers.model.mapping;
 import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.model.mapping.type.EntityReferenceType;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
+import org.javers.model.mapping.type.ValueObjectType;
 
 /**
  * EntityManager bootstrap is two-phased:
@@ -26,7 +28,7 @@ public class EntityManager {
     private final ValueObjectFactory valueObjectFactory;
     private final TypeMapper typeMapper;
 
-    private ManagedClasses managedEntities = new ManagedClasses();
+    private ManagedClasses managedClasses = new ManagedClasses();
 
     public EntityManager(EntityFactory entityFactory, ValueObjectFactory valueObjectFactory, TypeMapper typeMapper) {
         //TODO troche glupio to wyglada, na chwile obecna nie wiem co z tym zrobic (czy w ogole cos robic)
@@ -49,27 +51,27 @@ public class EntityManager {
         if (isRegisterd(clazz) && !isManaged(clazz)) {
             throw new JaversException(JaversExceptionCode.ENTITY_MANAGER_NOT_INITIALIZED, clazz.getName());
         }
-        return managedEntities.getBySourceClass(clazz);
+        return managedClasses.getBySourceClass(clazz);
     }
 
-    public void registerEntity(Class<?> classToManage) {
-        Validate.argumentIsNotNull(classToManage);
+    public void registerEntity(Class<?> entityClass) {
+        Validate.argumentIsNotNull(entityClass);
 
-        if (isRegisterd(classToManage)) {
+        if (isRegisterd(entityClass)) {
             return; //already managed
         }
 
-        typeMapper.registerEntityReferenceType(classToManage);
+        typeMapper.registerEntityReferenceType(entityClass);
     }
 
-    public void registerValueObject(Class<?> classToManage) {
-        Validate.argumentIsNotNull(classToManage);
+    public void registerValueObject(Class<?> valueObjectClass) {
+        Validate.argumentIsNotNull(valueObjectClass);
 
-        if (isRegisterd(classToManage)) {
+        if (isRegisterd(valueObjectClass)) {
             return; //already managed
         }
 
-        typeMapper.registerValueObjectType(classToManage);
+        typeMapper.registerValueObjectType(valueObjectClass);
     }
 
     private boolean isRegisterd(Class<?> managedClass) {
@@ -77,29 +79,40 @@ public class EntityManager {
     }
 
     public boolean isManaged(Class<?> clazz) {
-        return managedEntities.containsManagedClassWithSourceClass(clazz);
+        return managedClasses.containsManagedClassWithSourceClass(clazz);
+    }
+
+    /**
+     * EntityManager is up & ready after calling {@link #buildManagedClasses()}
+     */
+    public boolean isInitialized() {
+        return managedClasses.count() == typeMapper.getMappedEntityReferenceTypes().size() +
+                                          typeMapper.getMappedValueObjectTypes().size();
     }
 
     /**
      * call that if all Entities and ValueObject are registered
      */
     public void buildManagedClasses() {
-        for (Class referenceClass : typeMapper.getReferenceTypes()) {
-            manage(referenceClass);
+        for (EntityReferenceType refType : typeMapper.getMappedEntityReferenceTypes()) {
+            manage(refType.getBaseJavaType());
+        }
+        for (ValueObjectType voType : typeMapper.getMappedValueObjectTypes()) {
+            manage(voType.getBaseJavaType());
         }
     }
 
     private void manage(Class referenceClass) {
         ManagedClassFactory managedClassFactory = selectFactoryAccording(referenceClass);
         ManagedClass managedClass = managedClassFactory.create(referenceClass);
-        managedEntities.add(managedClass);
+        managedClasses.add(managedClass);
     }
 
     private ManagedClassFactory selectFactoryAccording(Class referenceClass) {
         JaversType javersType = typeMapper.getJavesrType(referenceClass);
-        if (javersType.isEntityReferenceType()) {
+        if (javersType instanceof EntityReferenceType) {
             return entityFactory;
-        } else if (javersType.isValueObject()){
+        } else if (javersType instanceof ValueObjectType){
             return valueObjectFactory;
         }
         throw new IllegalArgumentException("Only EntityReferenceType or ValueObjectType is a legal argument");
