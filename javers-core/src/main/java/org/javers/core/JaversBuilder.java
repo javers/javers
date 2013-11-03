@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
@@ -20,15 +21,12 @@ public class JaversBuilder {
     private static final MappingStyle DEFAULT_MAPPING_STYLE = MappingStyle.BEAN;
 
     private MappingStyle mappingStyle;
-    private List<Class> entityClasses;
-    private List<Class> valueObjectClasses;
-    private boolean built;
+    private List<Class> entityClasses = new ArrayList<>();
+    private List<Class> valueObjectClasses = new ArrayList<>();
+    private List<JaversModule> externalModules = new ArrayList<>();
     private PicoContainer container;
 
     private JaversBuilder(){
-       built = false;
-       entityClasses = new ArrayList<>();
-       valueObjectClasses = new ArrayList<>();
     }
 
     public static JaversBuilder javers() {
@@ -36,7 +34,7 @@ public class JaversBuilder {
     }
 
     public Javers build() {
-        if (built) {
+        if (isBuilt()) {
             throw new JaversException(JaversExceptionCode.JAVERS_ALREADY_BUILT);
         }
 
@@ -44,11 +42,49 @@ public class JaversBuilder {
         registerManagedClasses();
         bootEntityManager();
 
-        built = true;
         return container.getComponent(Javers.class);
     }
+
+    public JaversBuilder registerEntity(Class<?> entityClass) {
+        Validate.argumentIsNotNull(entityClass);
+        entityClasses.add(entityClass);
+        return this;
+    }
+
+    public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
+        Validate.argumentIsNotNull(valueObjectClass);
+        valueObjectClasses.add(valueObjectClass);
+        return this;
+    }
+
+    public JaversBuilder withMappingStyle(MappingStyle mappingStyle) {
+        Validate.argumentIsNotNull(mappingStyle);
+
+        this.mappingStyle = mappingStyle;
+        return this;
+    }
+
+    public JaversBuilder addModule(JaversModule javersModule) {
+        Validate.argumentIsNotNull(javersModule);
+        externalModules.add(javersModule);
+        return this;
+    }
+
+    /**
+     * for testing only
+     */
+    protected PicoContainer getContainer() {
+        return container;
+    }
+
+    //-- private
+
+    private boolean isBuilt() {
+        return container != null;
+    }
+
     private void bootPicoContainer() {
-        container = JaversContainerFactory.create(usedMappingStyle());
+        container = JaversContainerFactory.create(usedMappingStyle(), externalModules);
     }
 
     private void registerManagedClasses() {
@@ -83,22 +119,5 @@ public class JaversBuilder {
         return this;
     }*/
 
-    public JaversBuilder registerEntity(Class<?> entityClass) {
-        Validate.argumentIsNotNull(entityClass);
-        entityClasses.add(entityClass);
-        return this;
-    }
 
-    public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
-        Validate.argumentIsNotNull(valueObjectClass);
-        valueObjectClasses.add(valueObjectClass);
-        return this;
-    }
-
-    public JaversBuilder withMappingStyle(MappingStyle mappingStyle) {
-        Validate.argumentIsNotNull(mappingStyle);
-
-        this.mappingStyle = mappingStyle;
-        return this;
-    }
 }

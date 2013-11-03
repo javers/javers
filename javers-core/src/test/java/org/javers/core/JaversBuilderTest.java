@@ -1,11 +1,6 @@
 package org.javers.core;
 
-import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyNetworkAddress;
-import org.javers.core.model.DummyUser;
-import org.javers.core.model.DummyUserDetails;
-import org.javers.test.assertion.Assertions;
-import org.joda.time.LocalDateTime;
 import org.testng.annotations.Test;
 
 import javax.persistence.Id;
@@ -17,6 +12,18 @@ import static org.javers.test.assertion.Assertions.assertThat;
  * @author bartosz walacik
  */
 public class JaversBuilderTest {
+
+    @Test
+    public void shouldBootNotCoreModules() {
+        //given
+        JaversBuilder javersBuilder = javers();
+
+        //when
+        javersBuilder.addModule(new DummyJaversModule()).build();
+
+        //then
+        assertThat(javersBuilder.getContainer().getComponent(DummyJaversBean.class)).isNotNull();
+    }
 
     @Test
     public void shouldManageEntity() {
@@ -54,7 +61,6 @@ public class JaversBuilderTest {
         //then
         assertThat(javers1).isNotSameAs(javers2);
     }
-
 
     private class DummyEntity {
         private int id;
