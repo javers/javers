@@ -14,7 +14,7 @@ import static org.javers.test.assertion.Assertions.assertThat;
 public class JaversBuilderTest {
 
     @Test
-    public void shouldBootNotCoreModules() {
+    public void shouldBootNonCoreModule() {
         //given
         JaversBuilder javersBuilder = javers();
 
