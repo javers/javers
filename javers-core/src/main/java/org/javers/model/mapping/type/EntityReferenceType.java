@@ -5,13 +5,8 @@ package org.javers.model.mapping.type;
  *
  * @author bartosz walacik
  */
-public class EntityReferenceType extends ReferenceType {
+public class EntityReferenceType extends JaversType {
     public EntityReferenceType(Class entityClass){
         super(entityClass);
-    }
-
-    @Override
-    public boolean isEntityReferenceType() {
-        return true;
     }
 }
