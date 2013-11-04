@@ -14,7 +14,8 @@ public enum JaversExceptionCode {
     TYPE_NOT_MAPPED ("Property Type '%s' is not mapped. Implement UserType and add it to your JaVers configuration.") ,
     ENTITY_WITHOUT_ID ("Class '%s' has no Id property. Use @Id annotation to mark unique Entity identifier"),
     //TODO better exception messages - User Friendly!
-    ENTITY_MANAGER_NOT_INITIALIZED("EntityManager is not initialized properly. You should call buildManagedClasses()");
+    ENTITY_MANAGER_NOT_INITIALIZED("EntityManager is not initialized properly. You should call buildManagedClasses()"),
+    UNEXPECTED_VALUE_OBJECT("Can't build graph from Value Object '%s', expected Entity instance.");
 
     private String message;
 

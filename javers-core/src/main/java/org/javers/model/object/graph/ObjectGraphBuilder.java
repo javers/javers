@@ -1,5 +1,7 @@
 package org.javers.model.object.graph;
 
+import org.javers.core.exceptions.JaversException;
+import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.ManagedClass;
@@ -9,7 +11,6 @@ import org.javers.model.mapping.ValueObject;
 import java.util.Collection;
 import java.util.List;
 
-import static org.javers.common.validation.Validate.argumentCheck;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
@@ -35,9 +36,7 @@ public class ObjectGraphBuilder {
 
         argumentIsNotNull(managedClass);
         if (managedClass instanceof ValueObject) {
-            throw new IllegalArgumentException("Error can not build graph from an object of " + cdo.getClass() + ".\n"
-                    + " Expected object managed as Entity but was Value Object.\n"
-                    + " Value Object isn't client's domain object.");
+            throw new JaversException(JaversExceptionCode.UNEXPECTED_VALUE_OBJECT, cdo.getClass().getName());
         }
 
         ObjectWrapper node = new ObjectWrapper(cdo, (Entity) managedClass);
