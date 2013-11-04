@@ -15,6 +15,6 @@ public abstract class ChangeSetAppender {
     }
   }
 
-  protected abstract Set<Change> getChangeSet(Set<ObjectNode> previousGraph, Set<ObjectNode> currentGraph);
+  protected abstract Set<Change> getChangeSet(Set<ObjectNode> leftGraph, Set<ObjectNode> rightGraph);
 
 }
