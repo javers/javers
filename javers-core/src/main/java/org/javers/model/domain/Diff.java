@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.javers.common.validation.Validate.argumentCheck;
-import static org.javers.common.validation.Validate.argumentIsNotNull;
-import static org.javers.common.validation.Validate.conditionFulfilled;
+import static org.javers.common.validation.Validate.*;
 
 /**
  * <h2>Main entity in Javers model</h2>

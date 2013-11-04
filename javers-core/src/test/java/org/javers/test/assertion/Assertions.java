@@ -2,7 +2,6 @@ package org.javers.test.assertion;
 
 import org.javers.core.exceptions.JaversException;
 import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.EntityAssert;
 import org.javers.model.object.graph.ObjectNode;
 
 /**

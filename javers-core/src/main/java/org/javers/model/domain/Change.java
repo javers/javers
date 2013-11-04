@@ -1,9 +1,9 @@
 package org.javers.model.domain;
 
-import org.javers.model.mapping.Property;
+import org.javers.model.domain.changeType.ReferenceChanged;
+import org.javers.model.domain.changeType.ValueChange;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
-import org.javers.model.domain.changeType.*;
 
 /**
  * Change represents <b>atomic</b> difference between two objects.

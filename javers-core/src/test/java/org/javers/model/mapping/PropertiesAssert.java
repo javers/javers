@@ -2,6 +2,7 @@ package org.javers.model.mapping;
 
 import org.fest.assertions.api.AbstractAssert;
 import org.javers.test.assertion.Assertions;
+import org.javers.test.assertion.PropertyAssert;
 
 import java.util.List;
 

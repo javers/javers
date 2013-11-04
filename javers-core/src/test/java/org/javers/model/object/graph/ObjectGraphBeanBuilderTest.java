@@ -7,16 +7,16 @@ import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.ValueObjectFactory;
 import org.javers.model.mapping.type.TypeMapper;
-import org.testng.annotations.BeforeMethod;
+import org.junit.Before;
 
 import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
 
 /**
- * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
+ * @author Pawel Cierpiatka
  */
 public class ObjectGraphBeanBuilderTest extends ObjectGraphBuilderTest {
 
-    @BeforeMethod
+    @Before
     public void setUp() {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);

@@ -1,6 +1,7 @@
 package org.javers.core;
 
-import org.testng.annotations.Test;
+
+import org.junit.Test;
 
 import static org.javers.test.assertion.Assertions.assertThat;
 

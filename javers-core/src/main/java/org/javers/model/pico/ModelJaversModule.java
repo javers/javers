@@ -3,11 +3,7 @@ package org.javers.model.pico;
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
 import org.javers.core.MappingStyle;
-import org.javers.model.mapping.BeanBasedPropertyScanner;
-import org.javers.model.mapping.EntityFactory;
-import org.javers.model.mapping.EntityManager;
-import org.javers.model.mapping.FieldBasedPropertyScanner;
-import org.javers.model.mapping.ValueObjectFactory;
+import org.javers.model.mapping.*;
 import org.javers.model.mapping.type.TypeMapper;
 
 import java.util.*;

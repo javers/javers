@@ -4,7 +4,7 @@ import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.test.assertion.Assertions;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 /**
  * @author bartosz walacik

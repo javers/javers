@@ -4,7 +4,7 @@ package org.javers.model.object.graph;
 import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.EntityManager;
 import org.javers.test.assertion.Assertions;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import static org.javers.test.assertion.NodeAssert.assertThat;
 import static org.javers.test.builder.DummyUserBuilder.dummyUser;
@@ -12,7 +12,6 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser;
 /**
  * @author bartosz walacik
  */
-@Test
 public abstract class ObjectGraphBuilderTest {
 
     protected EntityManager entityManager;

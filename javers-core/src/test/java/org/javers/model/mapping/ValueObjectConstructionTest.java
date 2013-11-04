@@ -1,7 +1,7 @@
 package org.javers.model.mapping;
 
 import org.javers.core.model.DummyAddress;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 

@@ -3,8 +3,6 @@ package org.javers.model.object.graph;
 import org.javers.common.validation.Validate;
 import org.javers.model.mapping.Property;
 
-import java.util.List;
-
 /**
  * OneToOne or ManyToOne relation
  * <br/>
