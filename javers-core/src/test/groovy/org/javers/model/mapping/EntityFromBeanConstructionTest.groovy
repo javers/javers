@@ -1,11 +1,11 @@
 package org.javers.model.mapping
 
-import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserDetails
 import org.javers.model.mapping.type.TypeMapper
 import org.javers.model.mapping.type.ValueObjectType
 
 import static org.javers.test.assertion.EntityAssert.assertThat
+import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper
 
 /**
  * @author Pawel Cierpiatka
@@ -13,15 +13,14 @@ import static org.javers.test.assertion.EntityAssert.assertThat
 class EntityFromBeanConstructionTest extends EntityConstructionTest {
 
     def setupSpec() {
-        TypeMapper mapper = new TypeMapper();
-        mapper.registerValueObjectType(DummyAddress.class);
-        mapper.registerValueObjectType(DummyUserDetails.class);
-        entityFactory = new BeanBasedEntityFactory(mapper);
+        TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
+        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(typeMapper);
+        entityFactory = new EntityFactory(scanner);
     }
 
     def "should scan value object property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUserDetails.class);
+        Entity entity = entityFactory.create(DummyUserDetails.class);
 
         then:
         assertThat(entity).hasProperty("dummyAddress")

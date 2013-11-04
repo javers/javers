@@ -8,6 +8,9 @@ import java.util.List;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
+ * Class in client's domain model
+ * <br/>
+ *
  * immutable
  *
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>

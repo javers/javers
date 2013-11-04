@@ -1,8 +1,8 @@
 package org.javers.model.mapping
 
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyUserDetails
 import org.javers.model.mapping.type.TypeMapper
+
+import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper
 
 /**
  * @author Pawel Cierpiatka
@@ -10,9 +10,8 @@ import org.javers.model.mapping.type.TypeMapper
 class EntityFromFieldsConstructionTest extends EntityConstructionTest {
 
     def setupSpec() {
-        TypeMapper mapper = new TypeMapper();
-        mapper.registerValueObjectType(DummyAddress.class);
-        mapper.registerValueObjectType(DummyUserDetails.class);
-        entityFactory = new FieldBasedEntityFactory(mapper);
+        TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(typeMapper);
+        entityFactory = new EntityFactory(scanner);
     }
 }

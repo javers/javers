@@ -72,7 +72,7 @@ public class TypeMapper {
         addType(new PrimitiveType(primitiveClass));
     }
 
-    public void registerReferenceType(Class<?> entityClass) {
+    public void registerEntityReferenceType(Class<?> entityClass) {
         addType(new EntityReferenceType(entityClass));
     }
 
@@ -85,7 +85,7 @@ public class TypeMapper {
 
         List<Class> referenceClasses = new ArrayList<>();
         for(JaversType entry : mappedTypes) {
-            if(entry instanceof EntityReferenceType) {
+            if(entry.isReferencedType()) {
                 referenceClasses.add((Class)entry.getBaseJavaType());
             }
         }

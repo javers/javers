@@ -1,19 +1,19 @@
 package org.javers.model.mapping;
 
-import org.javers.model.mapping.type.TypeMapper;
-
 import java.util.List;
 
 /**
  * @author bartosz walacik
  */
-public abstract class EntityFactory {
+public class EntityFactory extends ManagedClassFactory<Entity>{
 
-    protected TypeMapper typeMapper;
-
-    protected EntityFactory(TypeMapper typeMapper) {
-        this.typeMapper = typeMapper;
+    public EntityFactory(PropertyScanner propertyScanner) {
+        super(propertyScanner);
     }
 
-    public abstract <S> Entity<S> createEntity(Class<S> entityClass);
+    @Override
+    public <S> Entity create(Class<S> clazz) {
+        List<Property> beanProperties = propertyScanner.scan(clazz);
+        return new Entity<>(clazz, beanProperties);
+    }
 }

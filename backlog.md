@@ -3,7 +3,7 @@
 
 ##Co dalej robimy??? Grooming, priorytety, ...##
 
-1. multi-edges graphs (OneToMany support) <- TO REVIEW
+
 1. diff data model (Changes, Commits/Revisions, etc) (B)
   - diff to json serializer                          (B)
 1. configuring

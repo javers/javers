@@ -1,17 +1,16 @@
 package org.javers.core;
 
-import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.ManagedClass;
 
 /**
  * Facade to JaVers instance.
- * Should be constructed by {@link JaversFactory} provided with your domain model metadata and configuration.
+ * Should be constructed by {@link JaversBuilder} provided with your domain model metadata and configuration.
  * <br/>
  *
  * Domain TODO: move to doc
  * <ul>
- *   <li>Entity - a class in client's domain model. List of those classes should be provided to JaversFactory</li>
+ *   <li>Entity - a class in client's domain model. List of those classes should be provided to JaversBuilder</li>
  *   <li>CDO - client's domain object, instance of an Entity</li>
  * </ul>
  *
@@ -21,7 +20,7 @@ public class Javers {
 
     EntityManager entityManager;
 
-    protected Javers(EntityManager entityManager) {
+    public Javers(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

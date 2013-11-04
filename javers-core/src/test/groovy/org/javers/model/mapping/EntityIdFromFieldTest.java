@@ -1,6 +1,5 @@
 package org.javers.model.mapping;
 
-import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Before;
 
@@ -13,7 +12,8 @@ public class EntityIdFromFieldTest extends EntityIdTest {
 
     @Before
     public void setUp() {
-        TypeMapper mapper = typeMapper().registerValueObject(DummyUserDetails.class).build();
-        entityFactory = new FieldBasedEntityFactory(mapper);
+        TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(mapper);
+        entityFactory = new EntityFactory(scanner);
     }
 }

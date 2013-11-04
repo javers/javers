@@ -1,8 +1,6 @@
 package org.javers.model.mapping
 
 import org.javers.core.model.DummyUser
-import org.javers.model.mapping.Entity
-import org.javers.model.mapping.EntityFactory
 import org.javers.model.mapping.type.ArrayType
 import org.javers.model.mapping.type.CollectionType
 import org.javers.model.mapping.type.EntityReferenceType
@@ -13,7 +11,7 @@ import spock.lang.Specification
 
 import java.lang.reflect.Array
 
-import static org.javers.test.CustomAssert.*
+import static org.javers.test.CustomAssert.assertThat
 
 
 /**
@@ -27,7 +25,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should hold reference to source class"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         entity.getSourceClass() == DummyUser.class
@@ -35,7 +33,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan all properties"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity.getProperties()).hasSize(14);
@@ -43,7 +41,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan entity reference property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity).hasProperty("supervisor")
@@ -54,7 +52,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan inherited property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity).hasProperty("inheritedInt");
@@ -62,7 +60,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should not scan transient property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         EntityAssert.assertThat(entity).hasntGotProperty("someTransientField");
@@ -71,7 +69,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan set property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity).hasProperty("stringSet")
@@ -82,7 +80,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan list property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity).hasProperty("integerList")
@@ -92,7 +90,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan array property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity).hasProperty("intArray")
@@ -102,7 +100,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan int property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity).hasProperty("age")
@@ -112,7 +110,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan enum property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity).hasProperty("sex")
@@ -122,7 +120,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan integer property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity).hasProperty("largeInt")
@@ -132,7 +130,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan boolean property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity).hasProperty("flag")
@@ -142,7 +140,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan big boolean property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity).hasProperty("bigFlag")
@@ -152,7 +150,7 @@ abstract class EntityConstructionTest extends Specification {
 
     def "should scan string property"() {
         when:
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         then:
         assertThat(entity).hasProperty("name")

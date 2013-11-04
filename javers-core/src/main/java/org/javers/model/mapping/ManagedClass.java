@@ -82,10 +82,11 @@ public abstract class ManagedClass<S> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Entity)) {
+        if (obj == null || obj.getClass() != getClass()) {
             return false;
         }
-        return sourceClass.equals((ManagedClass)obj) && properties.equals(((ManagedClass) obj).getProperties());
-    }
 
+        ManagedClass other = (ManagedClass)obj;
+        return sourceClass.equals(other.sourceClass);
+    }
 }

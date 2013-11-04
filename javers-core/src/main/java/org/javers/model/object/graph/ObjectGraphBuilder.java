@@ -1,5 +1,6 @@
 package org.javers.model.object.graph;
 
+import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.Property;
 
@@ -21,13 +22,15 @@ public class ObjectGraphBuilder {
     }
 
     /**
-     * @param cdo client's domain object, it should be root of an aggregate, tree root
-     *            or any node in objects graph from all other nodes are navigable
+     * @param cdo client's domain object, instance of managed Entity.
+     *            It should be root of an aggregate, tree root
+     *            or any node in objects graph from where all other nodes are navigable
      * @return graph node
      */
     public ObjectNode build(Object cdo) {
         argumentIsNotNull(cdo);
-        ObjectWrapper node = new ObjectWrapper(cdo, entityManager.getByClass(cdo.getClass()));
+        //TODO do wywalenia żutowanko, z pytaniem czy VO beda wrapowane?
+        ObjectWrapper node = new ObjectWrapper(cdo, (Entity) entityManager.getByClass(cdo.getClass()));
 
         initEdges(node);
 
@@ -54,7 +57,7 @@ public class ObjectGraphBuilder {
     private MultiEdge createMultiEdge(Property multiRef, Object referencedCdo) {
         MultiEdge multiEdge = new MultiEdge(multiRef);
         for(Object o : (Collection)referencedCdo) {
-            ObjectNode objectNode = build(o);
+            ObjectNode objectNode = build(o); //recursion here
             multiEdge.addReferenceNode(objectNode);
         }
         return multiEdge;
@@ -74,5 +77,4 @@ public class ObjectGraphBuilder {
             node.addEdge(edge);
         }
     }
-
 }
