@@ -7,6 +7,7 @@ import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.BeanBasedPropertyScanner;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.ValueObjectFactory;
 import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 import org.javers.model.object.graph.ObjectNode;
@@ -23,7 +24,9 @@ public class ChangeSetAppenderTest {
     public void setUp() {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
-        EntityManager entityManager = new EntityManager(new EntityFactory(mapper, scanner));
+        EntityFactory entityFactory = new EntityFactory(scanner);
+        ValueObjectFactory valueObjectFactory = new ValueObjectFactory(scanner);
+        EntityManager entityManager = new EntityManager(entityFactory, valueObjectFactory, mapper);
         entityManager.registerEntity(DummyUser.class);
         entityManager.registerEntity(DummyUserDetails.class);
         entityManager.buildManagedClasses();

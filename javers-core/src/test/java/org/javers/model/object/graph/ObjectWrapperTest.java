@@ -4,7 +4,9 @@ import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.test.assertion.Assertions;
+
 import static org.javers.test.builder.DummyUserBuilder.dummyUser;
+
 import org.javers.test.builder.DummyUserBuilder;
 import org.testng.annotations.Test;
 
@@ -19,7 +21,7 @@ public abstract class ObjectWrapperTest {
     public void shouldHoldEntityReference() {
         //given
         DummyUser cdo = dummyUser().build();
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo, entity);
@@ -32,7 +34,7 @@ public abstract class ObjectWrapperTest {
     public void shouldHoldCdoReference() {
         //given
         DummyUser cdo = dummyUser().build();
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo, entity);
@@ -44,8 +46,8 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldReturnCdoId() {
         //given
-        DummyUser cdo = new DummyUser("Mad Kaz");
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        DummyUser cdo = dummyUser().withName("Mad Kaz").build();
+        Entity entity = entityFactory.create(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo, entity);
@@ -57,8 +59,8 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldBeEqualByIdValueAndEntityClass() {
         //given
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.createEntity(DummyUser.class));
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.createEntity(DummyUser.class));
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
+        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
 
         //when + then
         Assertions.assertThat(first.hashCode()).isEqualTo(second.hashCode());
@@ -68,8 +70,8 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldNotBeEqualWithDifferentIdValue() {
         //given
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("stach"), entityFactory.createEntity(DummyUser.class));
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax 1"), entityFactory.createEntity(DummyUser.class));
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("stach"), entityFactory.create(DummyUser.class));
+        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax 1"), entityFactory.create(DummyUser.class));
 
         //when + then
         Assertions.assertThat(first).isNotEqualTo(second);
@@ -78,7 +80,7 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldHaveReflexiveEqualsMethod() {
         // given
-        ObjectWrapper objectWrapper = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.createEntity(DummyUser.class));
+        ObjectWrapper objectWrapper = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
 
         //when + then
         Assertions.assertThat(objectWrapper).isEqualTo(objectWrapper);
@@ -87,9 +89,9 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldHaveSymmetricAndTransitiveEqualsMethod() {
         //given
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.createEntity(DummyUser.class));
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.createEntity(DummyUser.class));
-        ObjectWrapper third = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.createEntity(DummyUser.class));
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
+        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
+        ObjectWrapper third = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
 
         //when + then
         Assertions.assertThat(first).isEqualTo(second);
@@ -100,7 +102,7 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldReturnFalseWhenEqualsMethodHasNullArg() {
         //given
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.createEntity(DummyUser.class));
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
 
         //when + then
         Assertions.assertThat(first).isNotEqualTo(null);
