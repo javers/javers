@@ -1,4 +1,4 @@
-package org.javers.common.reflection.org.javers.model.mapping
+package org.javers.model.mapping
 
 import org.javers.core.model.DummyUser
 import org.javers.model.mapping.Entity

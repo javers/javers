@@ -1,4 +1,4 @@
-package org.javers.common.reflection.org.javers.model.mapping;
+package org.javers.model.mapping;
 
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;

@@ -1,4 +1,4 @@
-package org.javers.common.reflection.org.javers.model.mapping;
+package org.javers.model.mapping;
 
 import com.googlecode.catchexception.CatchException;
 import org.javers.core.exceptions.JaversException;
