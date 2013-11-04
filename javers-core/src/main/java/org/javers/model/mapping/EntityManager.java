@@ -102,14 +102,14 @@ public class EntityManager {
         }
     }
 
-    private void manage(Class referenceClass) {
-        ManagedClassFactory managedClassFactory = selectFactoryAccording(referenceClass);
-        ManagedClass managedClass = managedClassFactory.create(referenceClass);
+    private void manage(Class classToManage) {
+        ManagedClassFactory managedClassFactory = selectFactoryAccording(classToManage);
+        ManagedClass managedClass = managedClassFactory.create(classToManage);
         managedClasses.add(managedClass);
     }
 
-    private ManagedClassFactory selectFactoryAccording(Class referenceClass) {
-        JaversType javersType = typeMapper.getJavesrType(referenceClass);
+    private ManagedClassFactory selectFactoryAccording(Class classToManage) {
+        JaversType javersType = typeMapper.getJavesrType(classToManage);
         if (javersType instanceof EntityReferenceType) {
             return entityFactory;
         } else if (javersType instanceof ValueObjectType){
