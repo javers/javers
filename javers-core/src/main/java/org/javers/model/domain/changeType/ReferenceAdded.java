@@ -1,7 +1,5 @@
 package org.javers.model.domain.changeType;
 
-import org.javers.model.domain.Change;
-import org.javers.model.domain.Diff;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.PropertyChange;
 import org.javers.model.mapping.Property;

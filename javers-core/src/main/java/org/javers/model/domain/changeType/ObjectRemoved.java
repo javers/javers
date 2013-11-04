@@ -1,7 +1,6 @@
 package org.javers.model.domain.changeType;
 
 import org.javers.model.domain.Change;
-import org.javers.model.domain.Diff;
 import org.javers.model.domain.GlobalCdoId;
 
 /**
