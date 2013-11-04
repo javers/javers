@@ -17,5 +17,5 @@ public abstract class PropertyScanner {
         this.typeMapper = typeMapper;
     }
 
-    public abstract List<Property> scan(Class<?> entityClass);
+    public abstract List<Property> scan(Class<?> managedClass);
 }

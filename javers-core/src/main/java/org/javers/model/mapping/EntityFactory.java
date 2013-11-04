@@ -9,17 +9,12 @@ import java.util.List;
  */
 public class EntityFactory extends ManagedClassFactory<Entity>{
 
-    public EntityFactory(TypeMapper typeMapper, PropertyScanner propertyScanner) {
-        super(typeMapper, propertyScanner);
-    }
-
-    public <S> Entity createEntity(Class<S> clazz) {
-        return create(clazz);
+    public EntityFactory(PropertyScanner propertyScanner) {
+        super(propertyScanner);
     }
 
     @Override
     public <S> Entity create(Class<S> clazz) {
-        typeMapper.registerReferenceType(clazz);
         List<Property> beanProperties = propertyScanner.scan(clazz);
         return new Entity<>(clazz, beanProperties);
     }

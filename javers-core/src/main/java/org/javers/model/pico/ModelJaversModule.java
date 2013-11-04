@@ -7,6 +7,7 @@ import org.javers.model.mapping.BeanBasedPropertyScanner;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.FieldBasedPropertyScanner;
+import org.javers.model.mapping.ValueObjectFactory;
 import org.javers.model.mapping.type.TypeMapper;
 
 import java.util.*;
@@ -16,7 +17,7 @@ import java.util.*;
  */
 public class ModelJaversModule implements JaversModule {
 
-    private static Class[] moduleComponents = new Class[] {EntityManager.class, TypeMapper.class, EntityFactory.class};
+    private static Class[] moduleComponents = new Class[] {EntityManager.class, TypeMapper.class, EntityFactory.class, ValueObjectFactory.class};
 
     private static Map<MappingStyle, Class> propertyScannersMapping = new HashMap() {{
         put(MappingStyle.BEAN, BeanBasedPropertyScanner.class);
@@ -35,7 +36,7 @@ public class ModelJaversModule implements JaversModule {
         Collections.addAll(components, moduleComponents);
 
         Validate.conditionFulfilled(propertyScannersMapping.containsKey(configuredStyle),
-                "No EntityFactory defined for " + configuredStyle);
+                "No PropertyScanner defined for " + configuredStyle);
         components.add(propertyScannersMapping.get(configuredStyle));
         return components;
     }

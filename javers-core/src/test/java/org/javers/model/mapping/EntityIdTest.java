@@ -18,7 +18,7 @@ public abstract class EntityIdTest {
     @Test
     public void shouldScanIdProperty() {
         //when
-        Entity entity = entityFactory.createEntity(DummyUser.class);
+        Entity entity = entityFactory.create(DummyUser.class);
 
         //then
         EntityAssert.assertThat(entity).hasProperty("name").isId();
@@ -26,7 +26,7 @@ public abstract class EntityIdTest {
 
     @Test
     public void shouldThrowExceptionWhenEntityWithoutId() {
-        when(entityFactory).createEntity(DummyAddress.class);
+        when(entityFactory).create(DummyAddress.class);
 
         //then
         assertThat(caughtException()).isInstanceOf(JaversException.class)

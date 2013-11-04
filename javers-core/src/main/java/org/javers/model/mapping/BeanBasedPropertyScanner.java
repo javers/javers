@@ -18,8 +18,8 @@ public class BeanBasedPropertyScanner extends PropertyScanner {
     }
 
     @Override
-    public List<Property> scan(Class<?> entityClass) {
-            List<Method> getters = ReflectionUtil.findAllPersistentGetters(entityClass);
+    public List<Property> scan(Class<?> managedClass) {
+            List<Method> getters = ReflectionUtil.findAllPersistentGetters(managedClass);
             List<Property> beanProperties = new ArrayList<>();
 
             for (Method getter : getters) {

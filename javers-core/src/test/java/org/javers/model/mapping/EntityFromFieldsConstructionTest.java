@@ -16,6 +16,6 @@ public class EntityFromFieldsConstructionTest extends EntityConstructionTest {
     public void setUp() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
         FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(typeMapper);
-        entityFactory = new EntityFactory(typeMapper, scanner);
+        entityFactory = new EntityFactory(scanner);
     }
 }
