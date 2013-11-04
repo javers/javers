@@ -20,7 +20,8 @@ public enum JaversExceptionCode {
     MALFORMED_PROPERTY(BOOTSTRAP_ERROR + "value '%s' is invalid for property '%s'. Fix it in your classpath:javers.properties"),
     CLASSPATH_RESOURCE_NOT_FOUND(BOOTSTRAP_ERROR + "classpath resource '%s' could not be found"),
     ALREADY_BUILT(BOOTSTRAP_ERROR + "instance already built, each AbstractJaversBuilder may produce only one target instance"),
-    CONTAINER_NOT_READY(BOOTSTRAP_ERROR +"pico container is not ready");
+    CONTAINER_NOT_READY(BOOTSTRAP_ERROR +"pico container is not ready"),
+    UNEXPECTED_VALUE_OBJECT("Can't build graph from Value Object '%s', expected Entity instance.");
 
     private String message;
 
