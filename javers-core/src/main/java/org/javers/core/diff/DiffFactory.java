@@ -12,23 +12,23 @@ import org.javers.model.object.graph.ObjectNode;
  */
 public class DiffFactory {
 
-  private GraphToSetConverter graphToSetConverter;
-  private List<ChangeSetAppender> changeSetAppenders;
+    private GraphToSetConverter graphToSetConverter;
+    private List<ChangeSetAppender> changeSetAppenders;
 
-  public DiffFactory(GraphToSetConverter graphToSetConverter, List<ChangeSetAppender> changeSetAppenders) {
-    this.graphToSetConverter = graphToSetConverter;
-    this.changeSetAppenders = changeSetAppenders;
-  }
-
-  public Diff create(String userId, ObjectNode previousRevision, ObjectNode currentRevision) {
-    Diff diff = new Diff(userId);
-    Set<ObjectNode> previousGraph = graphToSetConverter.convertFromGraph(previousRevision);
-    Set<ObjectNode> currentGraph = graphToSetConverter.convertFromGraph(currentRevision);
-
-    for (ChangeSetAppender changeSetAppender : changeSetAppenders) {
-      changeSetAppender.append(diff, previousGraph, currentGraph);
+    public DiffFactory(GraphToSetConverter graphToSetConverter, List<ChangeSetAppender> changeSetAppenders) {
+        this.graphToSetConverter = graphToSetConverter;
+        this.changeSetAppenders = changeSetAppenders;
     }
 
-    return diff;
-  }
+    public Diff create(String userId, ObjectNode leftRoot, ObjectNode rightRoot) {
+        Diff diff = new Diff(userId);
+        Set<ObjectNode> leftGraph = graphToSetConverter.convertFromGraph(leftRoot);
+        Set<ObjectNode> rightGraph = graphToSetConverter.convertFromGraph(rightRoot);
+
+        for (ChangeSetAppender changeSetAppender : changeSetAppenders) {
+            changeSetAppender.append(diff, leftGraph, rightGraph);
+        }
+
+        return diff;
+    }
 }
