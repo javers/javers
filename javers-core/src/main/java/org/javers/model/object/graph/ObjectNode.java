@@ -4,7 +4,6 @@ import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Entity;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Node in client's domain objects graph (CDO graph)

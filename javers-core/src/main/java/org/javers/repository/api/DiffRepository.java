@@ -1,7 +1,7 @@
 package org.javers.repository.api;
 
-import org.javers.model.domain.Diff;
 import org.javers.model.domain.Change;
+import org.javers.model.domain.Diff;
 import org.javers.model.domain.GlobalCdoId;
 
 import java.util.List;
