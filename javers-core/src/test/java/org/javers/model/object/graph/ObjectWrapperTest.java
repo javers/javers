@@ -7,8 +7,7 @@ import org.javers.test.assertion.Assertions;
 
 import static org.javers.test.builder.DummyUserBuilder.dummyUser;
 
-import org.javers.test.builder.DummyUserBuilder;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 /**
  * @author bartosz walacik

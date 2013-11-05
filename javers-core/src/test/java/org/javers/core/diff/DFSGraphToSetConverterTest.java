@@ -15,19 +15,18 @@ import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 import org.javers.model.object.graph.ObjectNode;
 import org.junit.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Maciej Zasada
  */
-@Test
 public class DFSGraphToSetConverterTest {
 
     private DFSGraphToSetConverter converter;
     private ObjectGraphBuilder objectGraphBuilder;
 
-    @BeforeMethod
+    @Before
     public void setUp() {
         converter = new DFSGraphToSetConverter();
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
@@ -41,6 +40,7 @@ public class DFSGraphToSetConverterTest {
         objectGraphBuilder = new ObjectGraphBuilder(entityManager);
     }
 
+    @Test
     public void shouldConvertNodeWithMultiEdgeIntoSet() {
         // given:
         DummyUser user = dummyUser().withName("1").withDetailsList(2).build();
@@ -53,6 +53,7 @@ public class DFSGraphToSetConverterTest {
         Assert.assertEquals(3, objectNodes.size());
     }
 
+    @Test
     public void shouldConvertNodeWithSingeEdgeIntoSet() {
         // given:
         DummyUser user = dummyUser().withName("1").withDetails(2L).build();

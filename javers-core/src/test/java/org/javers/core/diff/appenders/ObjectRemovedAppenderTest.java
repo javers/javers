@@ -1,23 +1,23 @@
 package org.javers.core.diff.appenders;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.javers.common.collections.Sets;
 import org.javers.core.model.DummyUser;
 import org.javers.model.domain.Diff;
 import org.javers.model.object.graph.ObjectNode;
 import org.javers.test.assertion.DiffAssert;
-import org.testng.annotations.Test;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.junit.Test;
 
 /**
  * @author Maciej Zasada
  */
-@Test
 public class ObjectRemovedAppenderTest extends ChangeSetAppenderTest {
 
     private ObjectRemovedAppender objectRemovedAppender = new ObjectRemovedAppender();
 
+    @Test
     public void shouldAppendRemovedObjectToDiff() {
         // given:
         Diff diff = new Diff("userId");
@@ -34,6 +34,7 @@ public class ObjectRemovedAppenderTest extends ChangeSetAppenderTest {
         diffAssert.getChangeAtIndex(1).isObjectRemoved();
     }
 
+    @Test
     public void shouldSkipPreviouslyExistingObjectsInDiff() {
         // given:
         Diff diff = new Diff("userId");
@@ -45,9 +46,11 @@ public class ObjectRemovedAppenderTest extends ChangeSetAppenderTest {
         objectRemovedAppender.append(diff, previousGraph, currentGraph);
 
         // then:
-        DiffAssert.assertThat(diff).hasChangesCount(1).getChangeAtIndex(0).isObjectRemoved().hasCdoId("2").hasEntityTypeOf(DummyUser.class).hasParentEqualTo(diff);
+        DiffAssert.assertThat(diff).hasChangesCount(1).getChangeAtIndex(0).isObjectRemoved().hasCdoId("2")
+                .hasEntityTypeOf(DummyUser.class).hasParentEqualTo(diff);
     }
 
+    @Test
     public void shouldNotFindAnyRemovedObjectsForDiff() {
         // given:
         Diff diff = new Diff("userId");

@@ -8,16 +8,16 @@ import org.javers.core.model.DummyUser;
 import org.javers.model.domain.Diff;
 import org.javers.model.object.graph.ObjectNode;
 import org.javers.test.assertion.DiffAssert;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 /**
  * @author Maciej Zasada
  */
-@Test
 public class NewObjectAppenderTest extends ChangeSetAppenderTest {
 
     private NewObjectAppender newObjectAppender = new NewObjectAppender();
 
+    @Test
     public void shouldAppendNewObjectToDiff() {
         // given:
         Diff diff = new Diff("userId");
@@ -34,6 +34,7 @@ public class NewObjectAppenderTest extends ChangeSetAppenderTest {
         diffAssert.getChangeAtIndex(1).isNewObject();
     }
 
+    @Test
     public void shouldSkipPreviouslyExistingObjectsInDiff() {
         // given:
         Diff diff = new Diff("userId");
@@ -48,6 +49,7 @@ public class NewObjectAppenderTest extends ChangeSetAppenderTest {
         DiffAssert.assertThat(diff).hasChangesCount(1).getChangeAtIndex(0).isNewObject().hasCdoId("2").hasEntityTypeOf(DummyUser.class).hasParentEqualTo(diff);
     }
 
+    @Test
     public void shouldNotFindAnyNewObjectsForDiff() {
         // given:
         Diff diff = new Diff("userId");

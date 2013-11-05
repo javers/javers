@@ -12,15 +12,15 @@ import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 import org.javers.model.object.graph.ObjectNode;
 import org.javers.test.builder.DummyUserBuilder;
-import org.testng.annotations.BeforeMethod;
+import org.junit.Before;
 
 /**
  * @author Maciej Zasada
  */
-public class ChangeSetAppenderTest {
+public abstract class ChangeSetAppenderTest {
     protected ObjectGraphBuilder objectGraphBuilder;
 
-    @BeforeMethod
+    @Before
     public void setUp() {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);

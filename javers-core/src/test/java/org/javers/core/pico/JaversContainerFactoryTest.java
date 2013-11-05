@@ -1,14 +1,17 @@
 package org.javers.core.pico;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
 import org.javers.core.diff.DiffFactory;
-import org.javers.model.mapping.*;
+import org.javers.model.mapping.BeanBasedPropertyScanner;
+import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.FieldBasedPropertyScanner;
+import org.javers.model.mapping.PropertyScanner;
 import org.javers.model.mapping.type.TypeMapper;
+import org.junit.Test;
 import org.picocontainer.PicoContainer;
-import org.testng.annotations.Test;
-
-import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * @author bartosz walacik
@@ -17,22 +20,21 @@ public class JaversContainerFactoryTest {
 
     @Test
     public void shouldCreateMultipleJaversContainers() {
-        //when
+        // when
         PicoContainer container1 = JaversContainerFactory.create(MappingStyle.BEAN);
         PicoContainer container2 = JaversContainerFactory.create(MappingStyle.BEAN);
 
-        //then
+        // then
         assertThat(container1).isNotSameAs(container2);
-        assertThat(container1.getComponent(EntityManager.class))
-      .isNotSameAs(container2.getComponent(EntityManager.class));
+        assertThat(container1.getComponent(EntityManager.class)).isNotSameAs(container2.getComponent(EntityManager.class));
     }
 
     @Test
-    public void shouldContainRequiredJaversBeans(){
-        //given
+    public void shouldContainRequiredJaversBeans() {
+        // given
         PicoContainer container = JaversContainerFactory.create(MappingStyle.BEAN);
 
-        //then
+        // then
         assertThat(container.getComponent(Javers.class)).isNotNull();
         assertThat(container.getComponent(EntityManager.class)).isNotNull();
         assertThat(container.getComponent(TypeMapper.class)).isNotNull();
@@ -41,51 +43,50 @@ public class JaversContainerFactoryTest {
 
     @Test
     public void shouldContainSingletons() {
-        //given
+        // given
         PicoContainer container = JaversContainerFactory.create(MappingStyle.BEAN);
 
-        //when
+        // when
         Javers javers = container.getComponent(Javers.class);
         Javers javersSecondRef = container.getComponent(Javers.class);
 
-        //then
+        // then
         assertThat(javers).isSameAs(javersSecondRef);
     }
 
     @Test
-    public void shouldContainFieldBasedPropertyScannerWhenFieldStyle(){
-        //given
+    public void shouldContainFieldBasedPropertyScannerWhenFieldStyle() {
+        // given
         PicoContainer container = JaversContainerFactory.create(MappingStyle.FIELD);
 
-        //then
+        // then
         assertThat(container.getComponent(PropertyScanner.class)).isInstanceOf(FieldBasedPropertyScanner.class);
     }
 
     @Test
-    public void shouldContainBeanBasedPropertyScannerWhenBeanStyle(){
-        //given
+    public void shouldContainBeanBasedPropertyScannerWhenBeanStyle() {
+        // given
         PicoContainer container = JaversContainerFactory.create(MappingStyle.BEAN);
 
-        //then
+        // then
         assertThat(container.getComponent(PropertyScanner.class)).isInstanceOf(BeanBasedPropertyScanner.class);
     }
 
-
     @Test
-    public void shouldNotContainFieldBasedPropertyScannerWhenBeanStyle(){
-        //given
+    public void shouldNotContainFieldBasedPropertyScannerWhenBeanStyle() {
+        // given
         PicoContainer container = JaversContainerFactory.create(MappingStyle.BEAN);
 
-        //then
+        // then
         assertThat(container.getComponent(FieldBasedPropertyScanner.class)).isNull();
     }
 
     @Test
-    public void shouldNotContainBeanBasedPropertyScannerWhenFieldStyle(){
-        //given
+    public void shouldNotContainBeanBasedPropertyScannerWhenFieldStyle() {
+        // given
         PicoContainer container = JaversContainerFactory.create(MappingStyle.FIELD);
 
-        //then
+        // then
         assertThat(container.getComponent(BeanBasedPropertyScanner.class)).isNull();
     }
 }

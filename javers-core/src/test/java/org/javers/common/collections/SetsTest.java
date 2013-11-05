@@ -3,8 +3,8 @@ package org.javers.common.collections;
 import java.util.Arrays;
 import java.util.Set;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class SetsTest {
 
