@@ -86,8 +86,7 @@ public class EntityManager {
      * EntityManager is up & ready after calling {@link #buildManagedClasses()}
      */
     public boolean isInitialized() {
-        return managedClasses.count() == typeMapper.getMappedEntityReferenceTypes().size() +
-                                          typeMapper.getMappedValueObjectTypes().size();
+        return managedClasses.count() == typeMapper.getCountOfEntitiesAndValueObjects();
     }
 
     /**

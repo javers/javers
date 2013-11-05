@@ -110,14 +110,4 @@ public class JaversBuilder {
         }
         return mappingStyle;
     }
-
-    /*
-    public JaversBuilder addManagedClasses(Class<?>... managedClasses) {
-        for (Class<?> managedClass : managedClasses) {
-            addManagedClass(managedClass);
-        }
-        return this;
-    }*/
-
-
 }

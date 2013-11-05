@@ -1,6 +1,8 @@
 package org.javers.core;
 
 import org.javers.core.model.DummyNetworkAddress;
+import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.type.TypeMapper;
 import org.testng.annotations.Test;
 
 import javax.persistence.Id;
@@ -32,6 +34,30 @@ public class JaversBuilderTest {
 
         //then
         assertThat(javers.isManaged(DummyEntity.class)).isTrue();
+    }
+
+    @Test
+    public void shouldInitializeEntityManager() {
+        //given
+        JaversBuilder javersBuilder = javers().registerEntity(DummyEntity.class)
+                                              .registerValueObject(DummyNetworkAddress.class);
+
+        //when
+        javersBuilder.build();
+
+        //then
+        EntityManager em = getEntityManager(javersBuilder);
+        TypeMapper tm    = getTypeMapper(javersBuilder);
+        assertThat(em.isInitialized()).isTrue();
+        assertThat(tm.getCountOfEntitiesAndValueObjects()).isEqualTo(2);
+    }
+
+    private EntityManager getEntityManager(JaversBuilder javersBuilder) {
+        return (EntityManager)javersBuilder.getContainer().getComponent(EntityManager.class);
+    }
+
+    private TypeMapper getTypeMapper(JaversBuilder javersBuilder) {
+        return (TypeMapper)javersBuilder.getContainer().getComponent(TypeMapper.class);
     }
 
     @Test
