@@ -27,11 +27,11 @@ import static org.mockito.Mockito.*;
  *
  * @author Adam Dubiel <adam.dubiel@gmail.com>
  */
-public class EntityManagerBasicTest1{
+public class EntityManagerBasicTest {
 
     private EntityManager entityManager;
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         TypeMapper mapper = new TypeMapper();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
@@ -148,7 +148,7 @@ public class EntityManagerBasicTest1{
     public void shouldThrowExceptionWhenTryToManageNotReferencedType() throws Throwable {
         //given
         TypeMapper typeMapper = mock(TypeMapper.class);
-        when(typeMapper.getReferenceTypes()).thenReturn(arrayWithPrimitiveJavaTypes());
+        //when(typeMapper.getReferenceTypes()).thenReturn(arrayWithPrimitiveJavaTypes());
         when(typeMapper.getJavesrType(ofPrimitiveJavaType())).thenReturn(javersPrimitiveType());
         EntityManager entityManager = new EntityManager(mock(EntityFactory.class), mock(ValueObjectFactory.class), typeMapper);
 

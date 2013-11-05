@@ -18,14 +18,13 @@ import org.javers.model.mapping.ManagedClass;
  */
 public class Javers {
 
-    EntityManager entityManager;
+    private EntityManager entityManager;
 
+    /**
+     * JaVers instance should be constructed by {@link JaversBuilder}
+     */
     public Javers(EntityManager entityManager) {
         this.entityManager = entityManager;
-    }
-
-    protected void manage(Class<?> managedClass) {
-        entityManager.registerEntity(managedClass);
     }
 
     public ManagedClass getByClass(Class<?> forClass) {
