@@ -1,6 +1,9 @@
 package org.javers.core;
 
 
+import org.javers.core.model.DummyNetworkAddress;
+import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Test;
 
 import javax.persistence.Id;
