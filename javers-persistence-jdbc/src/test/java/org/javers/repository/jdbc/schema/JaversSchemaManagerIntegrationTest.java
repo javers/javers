@@ -1,9 +1,9 @@
 package org.javers.repository.jdbc.schema;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.polyjdbc.core.dialect.Dialect;
 import org.polyjdbc.core.dialect.DialectRegistry;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 import org.polyjdbc.core.integration.DataSourceFactory;
 
 import javax.sql.DataSource;
@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 public class JaversSchemaManagerIntegrationTest {
     private JaversSchemaManager javersSchemaManager;
 
-    @BeforeTest
+    @Before
     public void before() {
         Dialect dialect = DialectRegistry.H2.getDialect();
         DataSource dataSource = DataSourceFactory.create(dialect, "jdbc:h2:mem:test", "", "");
