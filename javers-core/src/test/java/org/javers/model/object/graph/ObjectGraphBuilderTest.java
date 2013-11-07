@@ -7,7 +7,7 @@ import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.EntityManager;
 import org.javers.test.assertion.Assertions;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static com.googlecode.catchexception.apis.CatchExceptionBdd.when;
@@ -18,7 +18,6 @@ import static org.javers.test.assertion.JaversExceptionAssert.assertThat;
 /**
  * @author bartosz walacik
  */
-@Test
 public abstract class ObjectGraphBuilderTest {
 
     protected EntityManager entityManager;

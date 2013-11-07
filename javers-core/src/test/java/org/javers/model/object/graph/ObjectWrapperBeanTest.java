@@ -3,7 +3,7 @@ package org.javers.model.object.graph;
 import org.javers.model.mapping.BeanBasedPropertyScanner;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.type.TypeMapper;
-import org.testng.annotations.BeforeMethod;
+import org.junit.Before;
 
 import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
 
@@ -12,7 +12,7 @@ import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
  */
 public class ObjectWrapperBeanTest extends ObjectWrapperTest {
 
-    @BeforeMethod
+    @Before
     public void setUp() {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);

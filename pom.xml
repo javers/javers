@@ -53,6 +53,9 @@
         <logback.version>1.0.9</logback.version>
         <spring.version>3.2.1.RELEASE</spring.version>
         <hibernate.version>4.1.9.Final</hibernate.version>
+        <groovy.version>2.1.7</groovy.version>
+        <spock.version>0.7-groovy-2.0</spock.version>
+        <gmaven.version>1.2</gmaven.version>
     </properties>
 
     <modules>
@@ -93,13 +96,6 @@
             <artifactId>jackson-core</artifactId>
             <version>2.1.4</version>
         </dependency>
-   
-	<!-- JPA
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <version>1.0.1.Final</version>
-        </dependency> -->
 
         <!-- logger -->
         <dependency>
@@ -129,9 +125,9 @@
 
         <!-- tests -->
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.8</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -158,6 +154,52 @@
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
+        <!-- spoc -->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovy.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant-launcher</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jline</groupId>
+                    <artifactId>jline</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>test</scope>
+        </dependency>
+        <!-- Spock -->
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <version>${spock.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.gmaven.runtime</groupId>
+            <artifactId>gmaven-runtime-1.7</artifactId>
+            <version>${gmaven.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-all</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     </dependencyManagement>
 

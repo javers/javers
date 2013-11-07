@@ -1,10 +1,8 @@
-package org.javers.model.mapping;
+package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
+import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;
-import org.javers.test.assertion.Assertions;
-
-import java.lang.reflect.Type;
 
 /**
  * @author bartosz walacik
@@ -20,9 +18,6 @@ public class PropertyAssert extends AbstractAssert<PropertyAssert, Property> {
     }
 
     public PropertyAssert hasJaversType(Class<? extends JaversType> expectedJaversType) {
-        System.out.println(actual.getType());
-        System.out.println(actual.getType().getClass());
-
         Assertions.assertThat( (Class) actual.getType().getClass()).isEqualTo((Class)expectedJaversType);
         return this;
     }

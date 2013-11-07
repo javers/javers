@@ -3,9 +3,6 @@ package org.javers.model.object.graph;
 import org.javers.common.validation.Validate;
 import org.javers.model.mapping.Property;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Relation between (Entity) instances
  * <br/>

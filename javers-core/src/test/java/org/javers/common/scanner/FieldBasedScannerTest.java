@@ -4,10 +4,9 @@ import org.javers.model.mapping.FieldBasedPropertyScanner;
 import org.javers.model.mapping.PropertiesAssert;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.TypeMapper;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import javax.persistence.Id;
 import java.util.List;
 
 import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
@@ -17,7 +16,7 @@ import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
  */
 public class FieldBasedScannerTest extends PropertyScannerTest {
 
-    @BeforeMethod
+    @Before
     public void setUp() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
         propertyScanner = new FieldBasedPropertyScanner(typeMapper);

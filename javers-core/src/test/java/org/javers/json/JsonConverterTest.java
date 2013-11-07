@@ -1,17 +1,13 @@
 package org.javers.json;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.ImmutableList;
 import org.fest.assertions.data.Offset;
 import org.javers.test.assertion.Assertions;
 import org.joda.time.LocalDateTime;
-import org.junit.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author bartosz walacik

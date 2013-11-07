@@ -15,6 +15,7 @@ public enum JaversExceptionCode {
     ENTITY_WITHOUT_ID ("Class '%s' has no Id property. Use @Id annotation to mark unique Entity identifier"),
     //TODO better exception messages - User Friendly!
     ENTITY_MANAGER_NOT_INITIALIZED("EntityManager is not initialized properly. You should call buildManagedClasses()"),
+    JAVERS_ALREADY_BUILT("JaVers instance already built, each JaversBuilder may produce only one JaVers instance"),
     UNEXPECTED_VALUE_OBJECT("Can't build graph from Value Object '%s', expected Entity instance.");
 
     private String message;

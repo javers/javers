@@ -1,7 +1,7 @@
 package org.javers.model.mapping;
 
 import org.javers.model.mapping.type.TypeMapper;
-import org.testng.annotations.BeforeMethod;
+import org.junit.Before;
 
 import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
 
@@ -10,7 +10,7 @@ import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper;
  */
 public class ValueObjectFromFieldsConstructionTest extends ValueObjectConstructionTest{
 
-    @BeforeMethod
+    @Before
     public void setUp() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
         FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(typeMapper);

@@ -55,6 +55,11 @@ public class TypeMapper {
         return findJavesType(javaType) != null;
     }
 
+    public int getCountOfEntitiesAndValueObjects() {
+        return getMappedEntityReferenceTypes().size() +
+               getMappedValueObjectTypes().size();
+    }
+
     private JaversType findJavesType(Class javaType) {
         for (JaversType mappedType : mappedTypes) {
             if (mappedType.isMappingForJavaType(javaType)) {
@@ -81,8 +86,26 @@ public class TypeMapper {
 
     }
 
-    public List<Class> getReferenceTypes() {
+    public <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
+        List<T> result = new ArrayList<>();
+        for(JaversType jType : mappedTypes) {
+            if(ofType.isAssignableFrom(jType.getClass()) ) {
+                result.add((T)jType);
+            }
+        }
+        return result;
+    }
 
+    public List<ValueObjectType> getMappedValueObjectTypes() {
+        return getMappedTypes(ValueObjectType.class);
+    }
+
+    public List<EntityReferenceType> getMappedEntityReferenceTypes() {
+        return getMappedTypes(EntityReferenceType.class);
+    }
+
+    /*
+    public List<Class> getReferenceTypes() {
         List<Class> referenceClasses = new ArrayList<>();
         for(JaversType entry : mappedTypes) {
             if(entry.isReferencedType()) {
@@ -90,5 +113,5 @@ public class TypeMapper {
             }
         }
         return referenceClasses;
-    }
+    }*/
 }
