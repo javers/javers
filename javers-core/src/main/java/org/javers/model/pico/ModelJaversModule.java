@@ -2,9 +2,16 @@ package org.javers.model.pico;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
+import org.javers.core.JaversConfiguration;
 import org.javers.core.MappingStyle;
-import org.javers.model.mapping.*;
+import org.javers.model.mapping.BeanBasedPropertyScanner;
+import org.javers.model.mapping.EntityFactory;
+import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.FieldBasedPropertyScanner;
+import org.javers.model.mapping.ValueObjectFactory;
 import org.javers.model.mapping.type.TypeMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -12,6 +19,7 @@ import java.util.*;
  * @author Piotr Betkier
  */
 public class ModelJaversModule implements JaversModule {
+    private static final Logger logger = LoggerFactory.getLogger(ModelJaversModule.class);
 
     private static Class[] moduleComponents = new Class[] {EntityManager.class, TypeMapper.class, EntityFactory.class, ValueObjectFactory.class};
 
@@ -20,10 +28,10 @@ public class ModelJaversModule implements JaversModule {
         put(MappingStyle.FIELD, FieldBasedPropertyScanner.class);
     }};
 
-    private MappingStyle configuredStyle;
+    private JaversConfiguration javersConfiguration;
 
-    public ModelJaversModule(MappingStyle configuredStyle) {
-        this.configuredStyle = configuredStyle;
+    public ModelJaversModule(JaversConfiguration javersConfiguration) {
+        this.javersConfiguration = javersConfiguration;
     }
 
     @Override
@@ -31,10 +39,19 @@ public class ModelJaversModule implements JaversModule {
         Collection<Class> components = new ArrayList<>();
         Collections.addAll(components, moduleComponents);
 
-        Validate.conditionFulfilled(propertyScannersMapping.containsKey(configuredStyle),
-                "No PropertyScanner defined for " + configuredStyle);
-        components.add(propertyScannersMapping.get(configuredStyle));
+        addPropertyScanner(components);
+        
         return components;
+    }
+
+    private void addPropertyScanner(Collection<Class> components) {
+        MappingStyle mappingStyle = javersConfiguration.getMappingStyle();
+        logger.info("using "+mappingStyle.name()+ " mappingStyle");
+
+        Validate.conditionFulfilled(propertyScannersMapping.containsKey(mappingStyle),
+                "No PropertyScanner defined for " + mappingStyle);
+
+        components.add(propertyScannersMapping.get(mappingStyle));
     }
 
 }
