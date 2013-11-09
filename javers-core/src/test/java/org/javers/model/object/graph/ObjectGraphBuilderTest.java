@@ -1,13 +1,19 @@
 package org.javers.model.object.graph;
 
 
+import org.javers.core.exceptions.JaversException;
+import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.EntityManager;
 import org.javers.test.assertion.Assertions;
 import org.junit.Test;
 
+import static com.googlecode.catchexception.CatchException.caughtException;
+import static com.googlecode.catchexception.apis.CatchExceptionBdd.when;
 import static org.javers.test.assertion.NodeAssert.assertThat;
 import static org.javers.test.builder.DummyUserBuilder.dummyUser;
+import static org.javers.test.assertion.JaversExceptionAssert.assertThat;
 
 /**
  * @author bartosz walacik
@@ -212,5 +218,18 @@ public abstract class ObjectGraphBuilderTest {
                 .haveAtLeastMultiEdge(1)
                 .hasEdge("employeesList")
                 .isMultiEdge();
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenTryToBuildGraphFromValueObject() throws Throwable {
+        //given
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        DummyAddress valueObject = new DummyAddress();
+
+        when(graphBuilder).build(valueObject);
+
+        //then
+        assertThat((JaversException) caughtException())
+                .hasCode(JaversExceptionCode.UNEXPECTED_VALUE_OBJECT);
     }
 }
