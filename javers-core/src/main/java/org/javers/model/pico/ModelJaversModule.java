@@ -2,7 +2,7 @@ package org.javers.model.pico;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
-import org.javers.core.JaversConfiguration;
+import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.MappingStyle;
 import org.javers.model.mapping.BeanBasedPropertyScanner;
 import org.javers.model.mapping.EntityFactory;
@@ -28,9 +28,9 @@ public class ModelJaversModule implements JaversModule {
         put(MappingStyle.FIELD, FieldBasedPropertyScanner.class);
     }};
 
-    private JaversConfiguration javersConfiguration;
+    private JaversCoreConfiguration javersConfiguration;
 
-    public ModelJaversModule(JaversConfiguration javersConfiguration) {
+    public ModelJaversModule(JaversCoreConfiguration javersConfiguration) {
         this.javersConfiguration = javersConfiguration;
     }
 

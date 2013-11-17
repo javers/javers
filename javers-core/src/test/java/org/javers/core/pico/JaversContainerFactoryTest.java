@@ -1,7 +1,8 @@
 package org.javers.core.pico;
 
+import com.google.common.collect.ImmutableList;
 import org.javers.core.Javers;
-import org.javers.core.JaversConfiguration;
+import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.MappingStyle;
 import org.javers.model.mapping.*;
 import org.javers.model.mapping.type.TypeMapper;
@@ -15,19 +16,10 @@ import static org.fest.assertions.api.Assertions.assertThat;
 public class JaversContainerFactoryTest {
 
     @Test
-    public void JaversContainerShouldLoadDefaultPropertiesFile() {
-        //when
-        PicoContainer javersContainer = JaversContainerFactory.create();
-
-        //then
-        assertThat(javersContainer.getComponent(PropertyScanner.class)).isInstanceOf(BeanBasedPropertyScanner.class);
-    }
-
-    @Test
     public void shouldCreateMultipleJaversContainers() {
         //when
-        PicoContainer container1 = JaversContainerFactory.create();
-        PicoContainer container2 = JaversContainerFactory.create();
+        PicoContainer container1 = JaversContainerFactory.createDefaultCore();
+        PicoContainer container2 = JaversContainerFactory.createDefaultCore();
 
         //then
         assertThat(container1).isNotSameAs(container2);
@@ -38,7 +30,7 @@ public class JaversContainerFactoryTest {
     @Test
     public void shouldContainRequiredJaversBeans(){
         //when
-        PicoContainer container = JaversContainerFactory.create();
+        PicoContainer container = JaversContainerFactory.createDefaultCore();
 
         //then
         assertThat(container.getComponent(Javers.class)).isNotNull();
@@ -49,7 +41,7 @@ public class JaversContainerFactoryTest {
     @Test
     public void shouldContainSingletons() {
         //given
-        PicoContainer container = JaversContainerFactory.create();
+        PicoContainer container = JaversContainerFactory.createDefaultCore();
 
         //when
         Javers javers = container.getComponent(Javers.class);
@@ -57,41 +49,5 @@ public class JaversContainerFactoryTest {
 
         //then
         assertThat(javers).isSameAs(javersSecondRef);
-    }
-
-    @Test
-    public void shouldContainFieldBasedPropertyScannerWhenFieldStyle(){
-        //when
-        PicoContainer container = JaversContainerFactory.create(new JaversConfiguration().withMappingStyle(MappingStyle.FIELD));
-
-        //then
-        assertThat(container.getComponent(PropertyScanner.class)).isInstanceOf(FieldBasedPropertyScanner.class);
-    }
-
-    @Test
-    public void shouldContainBeanBasedPropertyScannerWhenBeanStyle(){
-        //when
-        PicoContainer container = JaversContainerFactory.create(new JaversConfiguration().withMappingStyle(MappingStyle.BEAN));
-
-        //then
-        assertThat(container.getComponent(PropertyScanner.class)).isInstanceOf(BeanBasedPropertyScanner.class);
-    }
-
-    @Test
-    public void shouldNotContainFieldBasedPropertyScannerWhenBeanStyle() {
-        //when
-        PicoContainer container = JaversContainerFactory.create(new JaversConfiguration().withMappingStyle(MappingStyle.BEAN));
-
-        //then
-        assertThat(container.getComponent(FieldBasedPropertyScanner.class)).isNull();
-    }
-
-    @Test
-    public void shouldNotContainBeanBasedPropertyScannerWhenFieldStyle(){
-        //when
-        PicoContainer container = JaversContainerFactory.create(new JaversConfiguration().withMappingStyle(MappingStyle.FIELD));
-
-        //then
-        assertThat(container.getComponent(BeanBasedPropertyScanner.class)).isNull();
     }
 }

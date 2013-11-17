@@ -16,7 +16,7 @@
     <description>Polyjdbc-based impl of Javers repository</description>
 
     <properties>
-        <polyjdbc.version>0.2.0-SNAPSHOT</polyjdbc.version>
+        <polyjdbc.version>0.2.0</polyjdbc.version>
     </properties>
 
     <dependencies>
@@ -36,7 +36,6 @@
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
             <version>1.4</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- tests -->

@@ -19,8 +19,8 @@ public enum JaversExceptionCode {
     UNDEFINED_PROPERTY(BOOTSTRAP_ERROR + "undefined mandatory property '%s'. Define it in your classpath:javers.properties"),
     MALFORMED_PROPERTY(BOOTSTRAP_ERROR + "value '%s' is invalid for property '%s'. Fix it in your classpath:javers.properties"),
     CLASSPATH_RESOURCE_NOT_FOUND(BOOTSTRAP_ERROR + "classpath resource '%s' could not be found"),
-    JAVERS_ALREADY_BUILT(BOOTSTRAP_ERROR + "JaVers instance already built, each JaversBuilder may produce only one JaVers instance");
-
+    ALREADY_BUILT(BOOTSTRAP_ERROR + "instance already built, each AbstractJaversBuilder may produce only one target instance"),
+    CONTAINER_NOT_READY(BOOTSTRAP_ERROR +"pico container is not ready");
 
     private String message;
 
