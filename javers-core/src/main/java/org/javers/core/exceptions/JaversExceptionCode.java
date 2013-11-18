@@ -12,6 +12,7 @@ public enum JaversExceptionCode {
      * Class is not defined in Javers configuration.
      */
     CLASS_NOT_MANAGED(RUNTIME_ERROR + "Class '%s' is not managed. Add this class to your JaVers configuration."),
+    UNEXPECTED_VALUE_OBJECT(RUNTIME_ERROR + "Can't start building graph from Value Object '%s', expected Entity instance."),
     TYPE_NOT_MAPPED (BOOTSTRAP_ERROR + "Property Type '%s' is not mapped. Implement UserType and add it to your JaVers configuration.") ,
     ENTITY_WITHOUT_ID (BOOTSTRAP_ERROR + "Class '%s' has no Id property. Use @Id annotation to mark unique Entity identifier"),
     //TODO better exception messages - User Friendly!
@@ -22,6 +23,7 @@ public enum JaversExceptionCode {
     ALREADY_BUILT(BOOTSTRAP_ERROR + "instance already built, each AbstractJaversBuilder may produce only one target instance"),
     CONTAINER_NOT_READY(BOOTSTRAP_ERROR +"pico container is not ready"),
     UNEXPECTED_VALUE_OBJECT("Can't build graph from Value Object '%s', expected Entity instance.");
+
 
     private String message;
 
