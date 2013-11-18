@@ -25,6 +25,15 @@ public class Validate {
     }
 
     /**
+     * @throws  IllegalArgumentException
+     */
+    public static void argumentsAreNotNull(Object... arguments) {
+        for (Object argument:arguments) {
+            argumentIsNotNull(argument);
+        }
+    }
+
+    /**
      * @deprecated every time when an argument should be null a fairy dies ...
      */
     public static void argumentShouldBeNull(Object argument, String message) {
