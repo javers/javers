@@ -14,8 +14,6 @@ import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Test;
 import org.picocontainer.PicoContainer;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 /**
  * @author bartosz walacik
  */
