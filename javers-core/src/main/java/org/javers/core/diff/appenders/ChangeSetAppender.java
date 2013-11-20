@@ -9,8 +9,8 @@ import org.javers.model.object.graph.ObjectNode;
 
 public abstract class ChangeSetAppender {
 
-  public void append(Diff currentDiff, Set<ObjectNode> previousGraph, Set<ObjectNode> currentGraph) {
-    for (Change change : getChangeSet(previousGraph, currentGraph)) {
+  public void append(Diff currentDiff, Set<ObjectNode> leftGraph, Set<ObjectNode> rightGraph) {
+    for (Change change : getChangeSet(leftGraph, rightGraph)) {
       currentDiff.addChange(change);
     }
   }
