@@ -8,6 +8,8 @@ import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.mapping.type.ValueObjectType;
 
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
+
 /**
  * EntityManager bootstrap is two-phased:
  * <ol>
@@ -31,10 +33,7 @@ public class EntityManager {
     private ManagedClasses managedClasses = new ManagedClasses();
 
     public EntityManager(EntityFactory entityFactory, ValueObjectFactory valueObjectFactory, TypeMapper typeMapper) {
-        //TODO troche glupio to wyglada, na chwile obecna nie wiem co z tym zrobic (czy w ogole cos robic)
-        Validate.argumentIsNotNull(entityFactory);
-        Validate.argumentIsNotNull(valueObjectFactory);
-        Validate.argumentIsNotNull(typeMapper);
+        argumentsAreNotNull(entityFactory, valueObjectFactory, typeMapper);
 
         this.entityFactory = entityFactory;
         this.typeMapper = typeMapper;

@@ -60,6 +60,7 @@
 
     <modules>
         <module>javers-core</module>
+        <module>javers-persistence-jdbc</module>
     </modules>
 
     <dependencyManagement>

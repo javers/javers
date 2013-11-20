@@ -18,15 +18,14 @@ import java.util.List;
  */
 public class JaversBuilder {
 
-    private static final MappingStyle DEFAULT_MAPPING_STYLE = MappingStyle.BEAN;
-
-    private MappingStyle mappingStyle;
+    private JaversConfiguration javersConfiguration;
     private List<Class> entityClasses = new ArrayList<>();
     private List<Class> valueObjectClasses = new ArrayList<>();
     private List<JaversModule> externalModules = new ArrayList<>();
     private PicoContainer container;
 
-    private JaversBuilder(){
+    private JaversBuilder() {
+        javersConfiguration = new JaversConfiguration();
     }
 
     public static JaversBuilder javers() {
@@ -58,9 +57,7 @@ public class JaversBuilder {
     }
 
     public JaversBuilder withMappingStyle(MappingStyle mappingStyle) {
-        Validate.argumentIsNotNull(mappingStyle);
-
-        this.mappingStyle = mappingStyle;
+        javersConfiguration.withMappingStyle(mappingStyle);
         return this;
     }
 
@@ -84,7 +81,7 @@ public class JaversBuilder {
     }
 
     private void bootPicoContainer() {
-        container = JaversContainerFactory.create(usedMappingStyle(), externalModules);
+        container = JaversContainerFactory.create(javersConfiguration, externalModules);
     }
 
     private void registerManagedClasses() {
@@ -102,12 +99,5 @@ public class JaversBuilder {
     private void bootEntityManager() {
         EntityManager entityManager = container.getComponent(EntityManager.class);
         entityManager.buildManagedClasses();
-    }
-
-    private MappingStyle usedMappingStyle() {
-        if (mappingStyle == null) {
-            return DEFAULT_MAPPING_STYLE;
-        }
-        return mappingStyle;
     }
 }

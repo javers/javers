@@ -7,6 +7,8 @@ package org.javers.core.exceptions;
  */
 @SuppressWarnings("serial")
 public class JaversException extends RuntimeException {
+    public static final String BOOTSTRAP_ERROR = "JaVers bootstrap error - ";
+    public static final String RUNTIME_ERROR = "JaVers runtime error - ";
 
     private JaversExceptionCode code;
 
