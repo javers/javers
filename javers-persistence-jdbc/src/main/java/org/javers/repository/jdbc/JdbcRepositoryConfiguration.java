@@ -1,6 +1,7 @@
 package org.javers.repository.jdbc;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.AbstractConfiguration;
 import org.javers.core.PropertyConfiguration;
 import org.polyjdbc.core.dialect.Dialect;
 
@@ -11,13 +12,11 @@ import static org.javers.repository.jdbc.DataSourceFactory.*;
 /**
  * @author bartosz walacik
  */
-public class JdbcRepositoryConfiguration {
+public class JdbcRepositoryConfiguration extends AbstractConfiguration {
     public static final String DIALECT_PROPERTY =   "jdbc.dialect";
     public static final String URL_PROPERTY =       "jdbc.database.url";
     public static final String USERNAME_PROPERTY =  "jdbc.database.username";
     public static final String PASSWORD_PROPERTY =  "jdbc.database.password";
-
-    private PropertyConfiguration propertyConfiguration;
 
     private DialectName dialectName;
     private String databaseUrl;
@@ -25,30 +24,25 @@ public class JdbcRepositoryConfiguration {
     private String password;
 
     public JdbcRepositoryConfiguration() {
-        propertyConfiguration = new PropertyConfiguration("jdbc-default.properties");
-        assemble();
+        readProperties("jdbc-default.properties");
     }
 
-    public JdbcRepositoryConfiguration withDialect(DialectName dialect) {
+    public void withDialect(DialectName dialect) {
         Validate.argumentIsNotNull(dialect);
         this.dialectName = dialect;
-        return this;
     }
 
-    public JdbcRepositoryConfiguration withDatabaseUrl(String databaseUrl) {
+    public void withDatabaseUrl(String databaseUrl) {
         Validate.argumentIsNotNull(databaseUrl);
         this.databaseUrl = databaseUrl;
-        return this;
     }
 
-    public JdbcRepositoryConfiguration withUsername(String username) {
+    public void withUsername(String username) {
         this.username = username;
-        return this;
     }
 
-    public JdbcRepositoryConfiguration withPassword(String password) {
+    public void withPassword(String password) {
         this.password = password;
-        return this;
     }
 
     //-- getters
@@ -95,18 +89,19 @@ public class JdbcRepositoryConfiguration {
                            getPassword());
     }
 
+    @Override
     public void assemble() {
-        if (propertyConfiguration.contains(DIALECT_PROPERTY)) {
-            dialectName = propertyConfiguration.getEnumProperty(DIALECT_PROPERTY, DialectName.class);
+        if (containsPropertyKey(DIALECT_PROPERTY)) {
+            dialectName = getEnumProperty(DIALECT_PROPERTY, DialectName.class);
         }
-        if (propertyConfiguration.contains(URL_PROPERTY))  {
-            databaseUrl = propertyConfiguration.getStringProperty(URL_PROPERTY);
+        if (containsPropertyKey(URL_PROPERTY))  {
+            databaseUrl = getStringProperty(URL_PROPERTY);
         }
-        if (propertyConfiguration.contains(USERNAME_PROPERTY))  {
-            username = propertyConfiguration.getStringProperty(USERNAME_PROPERTY);
+        if (containsPropertyKey(USERNAME_PROPERTY))  {
+            username = getStringProperty(USERNAME_PROPERTY);
         }
-        if (propertyConfiguration.contains(PASSWORD_PROPERTY))  {
-            password = propertyConfiguration.getStringProperty(PASSWORD_PROPERTY);
+        if (containsPropertyKey(PASSWORD_PROPERTY))  {
+            password = getStringProperty(PASSWORD_PROPERTY);
         }
     }
 

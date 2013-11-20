@@ -73,5 +73,4 @@ public class JdbcDiffRepositoryBuilderTest {
 
         return result;
     }
-    //DataSource dataSource = DataSourceFactory.create(dialect,"jdbc:postgresql://localhost/javers_devel","javers","p_javers");
-}
+ }

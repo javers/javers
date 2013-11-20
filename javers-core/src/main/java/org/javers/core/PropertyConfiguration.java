@@ -3,15 +3,19 @@ package org.javers.core;
 import java.util.Properties;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.pico.PropertiesUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author bartosz walacik
  */
 public class PropertyConfiguration {
+    private static final Logger logger = LoggerFactory.getLogger(PropertyConfiguration.class);
+
     /**
      * raw String properties bag, loaded from configuration file
      */
-    private Properties properties;
+    private final Properties properties;
 
     /**
      * Empty Configuration
@@ -22,9 +26,10 @@ public class PropertyConfiguration {
 
     /**
      * loads a properties file from classpath
-     * @param classpathName classpath resource name
+     * @param classpathName classpath resource name, ex. "resources/config.properties"
      */
     public PropertyConfiguration(String classpathName) {
+        logger.info("reading properties file - "+classpathName);
         properties = PropertiesUtil.getProperties(classpathName);
     }
 

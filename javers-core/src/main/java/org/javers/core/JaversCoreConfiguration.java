@@ -5,10 +5,8 @@ import org.javers.common.validation.Validate;
 /**
  * @author bartosz walacik
  */
-public class JaversCoreConfiguration {
+public class JaversCoreConfiguration extends AbstractConfiguration {
     public static final String MAPPING_STYLE_PROPERTY_NAME = "core.mappingStyle";
-
-    private PropertyConfiguration propertyConfiguration;
 
     //enum properties
     private MappingStyle mappingStyle;
@@ -34,8 +32,10 @@ public class JaversCoreConfiguration {
         return this;
     }
 
-    //@Override
+    @Override
     protected void assemble() {
-        mappingStyle = propertyConfiguration.getEnumProperty(MAPPING_STYLE_PROPERTY_NAME, MappingStyle.class);
+        if (containsPropertyKey(MAPPING_STYLE_PROPERTY_NAME)) {
+            mappingStyle = getEnumProperty(MAPPING_STYLE_PROPERTY_NAME, MappingStyle.class);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package org.javers.repository.jdbc;
 
+import org.javers.common.validation.Validate;
 import org.javers.core.AbstractJaversBuilder;
 import org.javers.repository.jdbc.pico.JdbcJaversModule;
 import org.javers.repository.jdbc.schema.JaversSchemaManager;
@@ -10,6 +11,11 @@ import javax.sql.DataSource;
 import java.util.Arrays;
 
 /**
+ * Supports two configuring methods:
+ * <ul>
+ *     <li/>by properties file, see {@link #configure(String)}
+ *     <li/>programmatically using builder style methods
+ * </ul>
  * @author bartosz walacik
  */
 public class JdbcDiffRepositoryBuilder extends AbstractJaversBuilder {
@@ -23,6 +29,42 @@ public class JdbcDiffRepositoryBuilder extends AbstractJaversBuilder {
 
     public static JdbcDiffRepositoryBuilder jdbcDiffRepository() {
         return new JdbcDiffRepositoryBuilder();
+    }
+
+    /**
+     * loads a properties file from classpath, example file:
+     * <pre>
+     *   jdbc.dialect =POSTGRES
+     *   jdbc.database.url =jdbc:postgresql://localhost/javers_db
+     *   jdbc.database.username =javers
+     *   jdbc.database.password =javers
+     * </pre>
+     * @param classpathName classpath resource name, ex. "configuration/jdbc-postgres.properties",
+     *                      see {@link ClassLoader#getResourceAsStream(String)}
+     */
+    public JdbcDiffRepositoryBuilder configure(String classpathName){
+        jdbcConfiguration.readProperties(classpathName);
+        return this;
+    }
+
+    public JdbcDiffRepositoryBuilder withDialect(DialectName dialect) {
+        jdbcConfiguration.withDialect(dialect);
+        return this;
+    }
+
+    public JdbcDiffRepositoryBuilder withDatabaseUrl(String databaseUrl) {
+        jdbcConfiguration.withDatabaseUrl(databaseUrl);
+        return this;
+    }
+
+    public JdbcDiffRepositoryBuilder withUsername(String username) {
+        jdbcConfiguration.withUsername(username);
+        return this;
+    }
+
+    public JdbcDiffRepositoryBuilder withPassword(String password) {
+        jdbcConfiguration.withPassword(password);
+        return this;
     }
 
     public JdbcDiffRepository build() {
