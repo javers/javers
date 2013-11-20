@@ -1,6 +1,7 @@
 package org.javers.model.object.graph;
 
 import org.javers.model.mapping.Property;
+import org.javers.model.visitors.Visitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,8 +26,15 @@ public class MultiEdge extends Edge {
         references.add(objectNode);
     }
 
+
     @Override
-    public void accept(EdgeVisitor visitor) {
+    public void accept(Visitor visitor) {
+
         visitor.visit(this);
+
+        for(ObjectNode objectNode : references) {
+            objectNode.accept(visitor);
+        }
+
     }
 }

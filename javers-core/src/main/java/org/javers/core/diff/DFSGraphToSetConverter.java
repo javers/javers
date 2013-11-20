@@ -1,10 +1,8 @@
 package org.javers.core.diff;
 
-import org.javers.model.object.graph.Edge;
-import org.javers.model.object.graph.MultiEdge;
-import org.javers.model.object.graph.ObjectNode;
-import org.javers.model.object.graph.SingleEdge;
-import org.javers.model.object.graph.EdgeVisitor;
+import org.javers.model.object.graph.*;
+import org.javers.model.visitors.Visitable;
+import org.javers.model.visitors.Visitor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,21 +19,9 @@ public class DFSGraphToSetConverter implements GraphToSetConverter {
         return dfsGraphTraverser.getVisitedNodes();
     }
 
-    private class DFSGraphTraverser implements EdgeVisitor {
+    private class DFSGraphTraverser implements Visitor {
 
         private final Set<ObjectNode> visitedNodes = new HashSet<>();
-
-        @Override
-        public void visit(SingleEdge edge) {
-            visitNode(edge.getReference());
-        }
-
-        @Override
-        public void visit(MultiEdge edge) {
-            for (ObjectNode objectNode : edge.getReferences()) {
-                visitNode(objectNode);
-            }
-        }
 
         private void visitNode(ObjectNode objectNode) {
             visitedNodes.add(objectNode);
@@ -47,5 +33,16 @@ public class DFSGraphToSetConverter implements GraphToSetConverter {
         private Set<ObjectNode> getVisitedNodes() {
             return visitedNodes;
         }
+
+        @Override
+        public void visit(Object object) {
+
+            if(object instanceof ObjectNode) {
+                visitedNodes.add((ObjectNode) object);
+            }
+        }
+
+
+
     }
 }

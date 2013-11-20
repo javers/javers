@@ -1,6 +1,6 @@
 package org.javers.model.visitors;
 
-public interface Visitable<V extends Visitor> {
+public interface Visitable {
 
-  void accept(V visitor);
+  void accept(Visitor visitor);
 }
