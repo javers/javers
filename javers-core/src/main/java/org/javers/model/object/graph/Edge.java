@@ -11,7 +11,7 @@ import org.javers.model.visitors.Visitable;
  *
  * @author bartosz walacik
  */
-public abstract class Edge implements Visitable<EdgeVisitor>{
+public abstract class Edge implements Visitable<EdgeVisitor> {
     protected final Property property;
 
     protected Edge(Property property) {
@@ -21,5 +21,20 @@ public abstract class Edge implements Visitable<EdgeVisitor>{
 
     public Property getProperty() {
         return property;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Edge that = (Edge) obj;
+        return property.equals(that.property);
+    }
+
+    @Override
+    public int hashCode() {
+        return property.hashCode();
     }
 }

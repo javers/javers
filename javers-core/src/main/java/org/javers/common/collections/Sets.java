@@ -1,6 +1,7 @@
 package org.javers.common.collections;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +25,11 @@ public class Sets {
     }
 
     public static <E> Set<E> asSet(E... elements) {
-        return new HashSet<>(Arrays.asList(elements));
+        return asSet(Arrays.asList(elements));
+    }
+
+    public static <E> Set<E> asSet(Collection<E> elements) {
+        return new HashSet<>(elements);
     }
 
     public static <F, T> Set<T> transform(Set<F> input, Function<F, T> transformation) {

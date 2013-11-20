@@ -57,4 +57,18 @@ public class FieldProperty implements Property {
     public void setValue(Object value) {
         throw new NotImplementedException();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FieldProperty that = (FieldProperty) o;
+        return field.equals(that.field) && javersType.equals(that.javersType);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * field.hashCode() + javersType.hashCode();
+    }
 }
