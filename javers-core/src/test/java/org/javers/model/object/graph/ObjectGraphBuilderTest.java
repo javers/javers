@@ -9,6 +9,8 @@ import org.javers.model.mapping.EntityManager;
 import org.javers.test.assertion.Assertions;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static com.googlecode.catchexception.apis.CatchExceptionBdd.when;
 import static org.javers.test.assertion.NodeAssert.assertThat;
@@ -113,7 +115,7 @@ public abstract class ObjectGraphBuilderTest {
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).build();
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withDetails(1L).withSupervisor(stach).build();
-
+        stach.setEmployeesList(Arrays.asList(kaz));
         //when
         ObjectNode node = graphBuilder.build(kaz);
 
