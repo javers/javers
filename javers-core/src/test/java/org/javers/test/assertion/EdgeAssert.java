@@ -23,13 +23,21 @@ public class EdgeAssert extends AbstractAssert<EdgeAssert, Edge> {
         return this;
     }
 
-    public EdgeAssert isMultiEdge() {
+    public MultiEdgeAssert isMultiEdge(Object... expectedRefCdoId) {
+        return isMultiEdge().refersToCdoWithIds(expectedRefCdoId);
+    }
+
+    public MultiEdgeAssert isMultiEdge() {
         Assertions.assertThat(actual instanceof MultiEdge);
-        return this;
+        return MultiEdgeAssert.assertThat((MultiEdge)actual);
     }
 
     public SingleEdgeAssert isSingleEdge() {
         Assertions.assertThat(actual instanceof SingleEdge);
         return SingleEdgeAssert.assertThat((SingleEdge)actual);
+    }
+
+    public SingleEdgeAssert isSingleEdgeTo(Object expectedRefCdoId) {
+       return isSingleEdge().refersToCdoWithId(expectedRefCdoId);
     }
 }

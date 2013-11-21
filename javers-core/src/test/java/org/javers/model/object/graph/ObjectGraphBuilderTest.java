@@ -9,10 +9,9 @@ import org.javers.model.mapping.EntityManager;
 import org.javers.test.assertion.Assertions;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static com.googlecode.catchexception.apis.CatchExceptionBdd.when;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.javers.test.assertion.NodeAssert.assertThat;
 import static org.javers.test.builder.DummyUserBuilder.dummyUser;
 import static org.javers.test.assertion.JaversExceptionAssert.assertThat;
@@ -34,9 +33,9 @@ public abstract class ObjectGraphBuilderTest {
         ObjectNode node = graphBuilder.build(user);
 
         //then
-        Assertions.assertThat(node.getEntity().getSourceClass()).isSameAs(DummyUser.class);
-        Assertions.assertThat(node.getCdoId()).isEqualTo("Mad Kaz") ;
-        Assertions.assertThat(node.getEdges()).isEmpty();
+        assertThat(node.getEntity().getSourceClass()).isSameAs(DummyUser.class);
+        assertThat(node.getCdoId()).isEqualTo("Mad Kaz") ;
+        assertThat(node.getEdges()).isEmpty();
     }
 
     @Test
@@ -50,11 +49,9 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasEdges(1)
-                        .hasCdoWithId("Mad Kaz")
-                        .andFirstEdge() //jump to EdgeAssert
-                        .hasProperty("supervisor")
-                        .isSingleEdge()
-                        .refersToCdoWithId("Mad Stach");
+                        .hasCdoId("Mad Kaz")
+                        .hasEdge("supervisor") //jump to EdgeAssert
+                        .isSingleEdgeTo("Mad Stach");
     }
 
     @Test
@@ -68,11 +65,9 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasEdges(1)
-                        .hasCdoWithId("Mad Kaz")
-                        .andFirstEdge() //jump to EdgeAssert
-                        .hasProperty("dummyUserDetails")
-                        .isSingleEdge()
-                        .refersToCdoWithId(1L);
+                        .hasCdoId("Mad Kaz")
+                        .hasEdge("dummyUserDetails")//jump to EdgeAssert
+                        .isSingleEdgeTo(1L);
     }
 
     @Test
@@ -92,22 +87,20 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasEdges(1)
-                        .hasCdoWithId("Mad Kaz 0")
-                        .hasEdge("supervisor")
-                        .isSingleEdge()
-                        .refersToNodeWhich()
-                .hasEdges(1)
-                .hasCdoWithId("Mad Kaz 1")
-                .hasEdge("supervisor")
-                .isSingleEdge()
-                .refersToNodeWhich()
+                        .hasCdoId("Mad Kaz 0")
+                        .hasSingleEdge("supervisor")
+                     .andTargetNode()
+                        .hasEdges(1)
+                        .hasCdoId("Mad Kaz 1")
+                        .hasSingleEdge("supervisor")
+                     .andTargetNode()
                         .hasNoEdges()
-                        .hasCdoWithId("Mad Kaz 2");
+                        .hasCdoId("Mad Kaz 2");
     }
 
     @Test
     public void shouldBuildFourNodesGraphWithThreeLevels() {
-        // kaz - kas.details
+        // kaz - kaz.details
         //    \
         //      stach - stach.details
 
@@ -115,111 +108,103 @@ public abstract class ObjectGraphBuilderTest {
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).build();
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withDetails(1L).withSupervisor(stach).build();
-        stach.setEmployeesList(Arrays.asList(kaz));
+
         //when
         ObjectNode node = graphBuilder.build(kaz);
 
         //then
         assertThat(node).hasEdges(2)
-                        .hasCdoWithId("Mad Kaz");
-
-        assertThat(node).hasEdge("supervisor")
+                        .hasCdoId("Mad Kaz")
+                  .and().hasEdge("supervisor")
                         .isSingleEdge()
-                        .refersToNodeWhich()
-                        .hasCdoWithId("Mad Stach")
+                        .andTargetNode()
+                        .hasCdoId("Mad Stach")
                         .hasEdge("dummyUserDetails")
-                        .isSingleEdge()
-                        .refersToCdoWithId(2L);
+                        .isSingleEdgeTo(2L);
 
         assertThat(node).hasEdge("dummyUserDetails")
-                        .isSingleEdge()
-                        .refersToCdoWithId(1L);
+                        .isSingleEdgeTo(1L);
     }
 
     @Test
     public void shouldBuildGraphWithOneSingleEdgeAndOneMultiEdge(){
+        //       stach - details
+        //       \
+        //        detailsList
+        //         /   |   \
+        //      id    id    id
+
         //given
-        int numberOfDetailsInList = 3;
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
-        DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).withDetailsList(numberOfDetailsInList).build();
+        DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).withDetailsList(3).build();
 
         //when
         ObjectNode node = graphBuilder.build(stach);
 
         //then
-        assertThat(node).hasEdges(2).haveAtLeastSingleEdge(1).haveAtLeastMultiEdge(1);
+        assertThat(node).hasEdges(2);
+        assertThat(node).hasSingleEdge("dummyUserDetails");
+        assertThat(node).hasMultiEdge("dummyUserDetailsList").ofSize(3);
     }
 
     @Test
     public void shouldBuildGraphWithThreeLevelsWithMultiEdge() {
-        // kaz - kas.details
+        // kaz
         //    \
-        //      stach - stach.details
+        //      stach
         //       \
         //        detailsList
         //         /   |   \
         //      id    id    id
+
         //given
-        int numberOfDetailsInList = 3;
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
-        DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).withDetailsList(numberOfDetailsInList).build();
-        DummyUser kaz   = dummyUser().withName("Mad Kaz").withDetails(1L).withSupervisor(stach).build();
+        DummyUser stach = dummyUser().withName("Stach").withDetailsList(3).build();
+        DummyUser kaz   = dummyUser().withName("Mad Kaz").withSupervisor(stach).build();
 
         //when
         ObjectNode node = graphBuilder.build(kaz);
 
         //then
-        assertThat(node).hasEdges(2)
-                .hasCdoWithId("Mad Kaz");
-
-        assertThat(node).hasEdge("supervisor")
-                .isSingleEdge()
-                .refersToNodeWhich()
-                .hasCdoWithId("Mad Stach")
-                .haveAtLeastMultiEdge(1)
-                .hasEdge("dummyUserDetails")
-                .isSingleEdge()
-                .refersToCdoWithId(2L);
-
-        assertThat(node).hasEdge("dummyUserDetails")
-                .isSingleEdge()
-                .refersToCdoWithId(1L);
+        assertThat(node).hasCdoId("Mad Kaz")
+                        .hasEdge("supervisor")
+                        .isSingleEdgeTo("Stach")
+                        .andTargetNode()
+                        .hasMultiEdge("dummyUserDetailsList").ofSize(3);
     }
 
-    public void shouldBuildGraphWithMultiEdgeContainMultiEdge(){
-        // kaz
-        //   \
-        //     stach
-        //    /  |  \
-        //  Em1  Em2  rob
+    @Test
+    public void shouldBuildGraphWithMultiEdgeToNodeWithMultiEdge(){
+        //              kaz
+        //                 \
+        //                 stach
+        //              /    |    \
+        //             rob   Em1  Em2
         //           /  |  \
-        //          Em4 Em5 Em6
+        //          Em1 Em2 Em3
         //given
         int numberOfElements = 3;
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
-        DummyUser rob = dummyUser().withName("Mad Rob").withEmployees(3).build();
-        DummyUser stach = dummyUser().withName("Mad Stach")
-                .withDetails(2L)
-                .withDetailsList(numberOfElements)
-                .withEmployees(2)
-                .build();
-        stach.getEmployeesList().add(rob);
-        DummyUser kaz   = dummyUser().withName("Mad Kaz").withDetails(1L).withSupervisor(stach).build();
+        DummyUser rob = dummyUser().withName("rob").withEmployees(3).build();
+        DummyUser stach = dummyUser().withName("stach")
+                                     .withEmployee(rob)
+                                     .withEmployees(2)
+                                     .build();
+        DummyUser kaz   = dummyUser().withName("kaz").withSupervisor(stach).build();
 
         //when
         ObjectNode node = graphBuilder.build(kaz);
 
         //then
-        assertThat(node).hasEdges(2)
-                .hasCdoWithId("Mad Kaz");
-
-        assertThat(node).hasEdge("supervisor")
-                .isSingleEdge()
-                .refersToNodeWhich()
-                .hasCdoWithId("Mad Stach")
-                .haveAtLeastMultiEdge(1)
-                .hasEdge("employeesList")
-                .isMultiEdge();
+        assertThat(node).hasCdoId("kaz")
+                  .and().hasEdge("supervisor")
+                        .isSingleEdgeTo("stach")
+                        .andTargetNode()
+                        .hasEdge("employeesList")
+                        .isMultiEdge("Em1","Em2","rob")
+                        .andTargetNode("rob")
+                        .hasEdge("employeesList")
+                        .isMultiEdge("Em1", "Em2", "Em3");
     }
 
     @Test
@@ -233,5 +218,34 @@ public abstract class ObjectGraphBuilderTest {
         //then
         assertThat((JaversException) caughtException())
                 .hasCode(JaversExceptionCode.UNEXPECTED_VALUE_OBJECT);
+    }
+
+    @Test
+    public void shouldManageGraphCycles(){
+        //superKaz
+        //  \ \   \
+        //   kaz   \
+        //    \     \
+        //      microKaz
+
+        //given
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+
+        DummyUser superKaz = dummyUser().withName("superKaz").build();
+        DummyUser kaz   =    dummyUser().withName("kaz").withSupervisor(superKaz).build();
+        DummyUser microKaz = dummyUser().withName("microKaz").withSupervisor(kaz).build();
+        superKaz.setEmployeesList(kaz, microKaz);
+
+        //when
+        ObjectNode node = graphBuilder.build(superKaz);
+
+        //then
+        assertThat(node).hasEdges(1)
+                        .hasCdoId("superKaz")
+                        .hasEdge("employeesList")
+                        .isMultiEdge("kaz", "microKaz")
+                        .andTargetNode("kaz")
+                        .hasEdge("supervisor")
+                        .isSingleEdgeTo("superKaz");
     }
 }

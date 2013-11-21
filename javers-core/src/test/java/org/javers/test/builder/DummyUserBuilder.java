@@ -2,6 +2,7 @@ package org.javers.test.builder;
 
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
+import org.spockframework.compiler.SpecParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import static org.javers.test.builder.DummyUserDetailsTestBuilder.dummyUserDetai
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 public class DummyUserBuilder {
-    private static int DUMMY_ID = 0;
+    private int DUMMY_ID = 1;
     private DummyUser dummyUser;
 
     private DummyUserBuilder() {
@@ -64,13 +65,14 @@ public class DummyUserBuilder {
         return this;
     }
     public DummyUserBuilder withEmployees(int numberOfEmployees) {
-        List<DummyUser> employeesList = new ArrayList<>(numberOfEmployees);
-        for(int i = 0; i < numberOfEmployees; i ++) {
-            employeesList.add(new DummyUser("Em " + DUMMY_ID));
-            DUMMY_ID ++;
+        for(int i = 0; i < numberOfEmployees; i++) {
+            dummyUser.addEmployee(new DummyUser("Em" + DUMMY_ID++));
         }
-        dummyUser.setEmployeesList(employeesList);
         return this;
     }
 
+    public DummyUserBuilder withEmployee(DummyUser rob) {
+        dummyUser.addEmployee(rob);
+        return this;
+    }
 }
