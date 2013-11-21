@@ -1,7 +1,11 @@
 package org.javers.core.model;
 
+import com.google.common.collect.ImmutableList;
+
 import javax.persistence.Id;
 import javax.persistence.Transient;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -9,6 +13,7 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public class DummyUser extends AbstractDummyUser {
+
     public enum Sex {FEMALE, MALE, OCCASIONALLY}
 
     private transient int someTransientField;
@@ -43,6 +48,13 @@ public class DummyUser extends AbstractDummyUser {
 
     public DummyUser(String name) {
         this.name = name;
+    }
+
+    public void addEmployee(DummyUser dummyUser) {
+        if (employeesList == null) {
+            employeesList = new ArrayList<>();
+        }
+        employeesList.add(dummyUser);
     }
 
     @Transient
@@ -153,6 +165,10 @@ public class DummyUser extends AbstractDummyUser {
 
     public List<DummyUser> getEmployeesList() {
         return employeesList;
+    }
+
+    public void setEmployeesList(DummyUser... employeesList) {
+        this.employeesList = Arrays.asList(employeesList);
     }
 
     public void setEmployeesList(List<DummyUser> employeesList) {
