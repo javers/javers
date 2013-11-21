@@ -6,6 +6,8 @@ import org.junit.Test;
 import static org.javers.repository.jdbc.JdbcDiffRepositoryBuilder.jdbcDiffRepository;
 
 /**
+ * [Integration Test] requires PostgreSQL
+ *
  * @author bartosz walacik
  */
 public class JdbcDiffRepositoryIntegrationTest {
