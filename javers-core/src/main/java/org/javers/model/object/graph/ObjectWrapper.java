@@ -1,5 +1,6 @@
 package org.javers.model.object.graph;
 
+import org.javers.model.domain.Cdo;
 import org.javers.model.mapping.Entity;
 
 import java.util.ArrayList;
@@ -14,35 +15,34 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class ObjectWrapper implements ObjectNode {
-    private final Object cdo;
-    private final Entity entity;
+    private final Cdo cdo;
     private final List<Edge> edges;
 
 
-    public ObjectWrapper(Object cdo, Entity entity) {
+    public ObjectWrapper(Cdo cdo) {
         argumentIsNotNull(cdo);
-        argumentIsNotNull(entity);
-        if (!entity.isInstance(cdo)){
-            throw new IllegalArgumentException("cdo is not an instance of entity");
-        }
-
         this.cdo = cdo;
-        this.entity = entity;
         this.edges = new ArrayList<>();
     }
 
-    public Object getCdo() {
-        return cdo;
+    @Deprecated
+    public ObjectWrapper(Object cdo, Entity entity) {
+        this(new Cdo(cdo, entity));
     }
 
+    public Object unwrapCdo() {
+        return cdo.getWrappedCdo();
+    }
+
+    //TODO change name to getCdoLocalId
     @Override
     public Object getCdoId() {
-        return entity.getIdProperty().get(cdo);
+        return cdo.getLocalId();
     }
 
     @Override
     public Entity getEntity() {
-        return entity;
+        return cdo.getEntity();
     }
 
     @Override

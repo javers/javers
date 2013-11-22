@@ -6,7 +6,6 @@ import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.EntityManager;
-import org.javers.test.assertion.Assertions;
 import org.junit.Test;
 
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -30,7 +29,7 @@ public abstract class ObjectGraphBuilderTest {
         DummyUser user = dummyUser().withName("Mad Kaz").build();
 
         //when
-        ObjectNode node = graphBuilder.build(user);
+        ObjectNode node = graphBuilder.buildGraph(user);
 
         //then
         assertThat(node.getEntity().getSourceClass()).isSameAs(DummyUser.class);
@@ -45,7 +44,7 @@ public abstract class ObjectGraphBuilderTest {
         DummyUser user = dummyUser().withName("Mad Kaz").withSupervisor("Mad Stach").build();
 
         //when
-        ObjectNode node = graphBuilder.build(user);
+        ObjectNode node = graphBuilder.buildGraph(user);
 
         //then
         assertThat(node).hasEdges(1)
@@ -61,7 +60,7 @@ public abstract class ObjectGraphBuilderTest {
         DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build();
 
         //when
-        ObjectNode node = graphBuilder.build(user);
+        ObjectNode node = graphBuilder.buildGraph(user);
 
         //then
         assertThat(node).hasEdges(1)
@@ -83,7 +82,7 @@ public abstract class ObjectGraphBuilderTest {
         }
 
         //when
-        ObjectNode node = graphBuilder.build(kaziki[0]);
+        ObjectNode node = graphBuilder.buildGraph(kaziki[0]);
 
         //then
         assertThat(node).hasEdges(1)
@@ -110,7 +109,7 @@ public abstract class ObjectGraphBuilderTest {
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withDetails(1L).withSupervisor(stach).build();
 
         //when
-        ObjectNode node = graphBuilder.build(kaz);
+        ObjectNode node = graphBuilder.buildGraph(kaz);
 
         //then
         assertThat(node).hasEdges(2)
@@ -139,7 +138,7 @@ public abstract class ObjectGraphBuilderTest {
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).withDetailsList(3).build();
 
         //when
-        ObjectNode node = graphBuilder.build(stach);
+        ObjectNode node = graphBuilder.buildGraph(stach);
 
         //then
         assertThat(node).hasEdges(2);
@@ -163,7 +162,7 @@ public abstract class ObjectGraphBuilderTest {
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withSupervisor(stach).build();
 
         //when
-        ObjectNode node = graphBuilder.build(kaz);
+        ObjectNode node = graphBuilder.buildGraph(kaz);
 
         //then
         assertThat(node).hasCdoId("Mad Kaz")
@@ -193,7 +192,7 @@ public abstract class ObjectGraphBuilderTest {
         DummyUser kaz   = dummyUser().withName("kaz").withSupervisor(stach).build();
 
         //when
-        ObjectNode node = graphBuilder.build(kaz);
+        ObjectNode node = graphBuilder.buildGraph(kaz);
 
         //then
         assertThat(node).hasCdoId("kaz")
@@ -213,7 +212,7 @@ public abstract class ObjectGraphBuilderTest {
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyAddress valueObject = new DummyAddress();
 
-        when(graphBuilder).build(valueObject);
+        when(graphBuilder).buildGraph(valueObject);
 
         //then
         assertThat((JaversException) caughtException())
@@ -237,14 +236,25 @@ public abstract class ObjectGraphBuilderTest {
         superKaz.setEmployeesList(kaz, microKaz);
 
         //when
-        ObjectNode node = graphBuilder.build(superKaz);
+        ObjectNode node = graphBuilder.buildGraph(superKaz);
 
         //then
-        assertThat(node).hasEdges(1)
-                        .hasCdoId("superKaz")
+
+        //small cycle
+        assertThat(node).hasCdoId("superKaz")
                         .hasEdge("employeesList")
                         .isMultiEdge("kaz", "microKaz")
                         .andTargetNode("kaz")
+                        .hasEdge("supervisor")
+                        .isSingleEdgeTo("superKaz");
+
+        //large cycle
+        assertThat(node).hasCdoId("superKaz")
+                        .hasMultiEdge("employeesList")
+                        .andTargetNode("microKaz")
+                        .hasEdge("supervisor")
+                        .isSingleEdgeTo("kaz")
+                        .andTargetNode()
                         .hasEdge("supervisor")
                         .isSingleEdgeTo("superKaz");
     }

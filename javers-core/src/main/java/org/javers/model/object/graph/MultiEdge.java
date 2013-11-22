@@ -10,7 +10,7 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class MultiEdge extends Edge {
-    protected List<ObjectNode> references;
+    protected List<ObjectNode> references; //should not be empty
 
     public MultiEdge(Property property) {
         super(property);
@@ -32,7 +32,6 @@ public class MultiEdge extends Edge {
         }
         return null;
     }
-
 
     public void addReferenceNode(ObjectNode objectNode) {
         references.add(objectNode);
