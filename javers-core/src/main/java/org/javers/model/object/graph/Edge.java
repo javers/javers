@@ -1,6 +1,7 @@
 package org.javers.model.object.graph;
 
 import org.javers.common.validation.Validate;
+import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.Property;
 
 /**
@@ -21,4 +22,7 @@ public abstract class Edge {
     public Property getProperty() {
         return property;
     }
+
+    //not sure if it is useful
+    //public abstract Entity getReferencedEntity();
 }
