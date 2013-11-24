@@ -16,7 +16,7 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldHoldEntityReference() {
         //given
-        DummyUser cdo = new DummyUser();
+        DummyUser cdo = new DummyUser("kaz");
         Entity entity = entityFactory.create(DummyUser.class);
 
         //when
@@ -29,14 +29,14 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldHoldCdoReference() {
         //given
-        DummyUser cdo = new DummyUser();
+        DummyUser cdo = new DummyUser("kaz");
         Entity entity = entityFactory.create(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo,entity);
 
         //then
-        Assertions.assertThat(wrapper.getCdo()).isSameAs(cdo);
+        Assertions.assertThat(wrapper.unwrapCdo()).isSameAs(cdo);
     }
 
 
