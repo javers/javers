@@ -21,12 +21,11 @@ public class JaversContainerFactory {
     public static PicoContainer create(List<JaversModule> modules, List<?> beans) {
         Validate.argumentIsNotNull(modules);
 
-        //MutablePicoContainer container = new DefaultPicoContainer(new PropertiesPicoContainer(configuration.getProperties()));
         MutablePicoContainer container = new DefaultPicoContainer();
 
         for (JaversModule module : modules) {
             for (Class component : module.getModuleComponents()) {
-                container.as(/*Characteristics.USE_NAMES,*/Characteristics.CACHE).addComponent(component);
+                container.as(Characteristics.CACHE).addComponent(component);
             }
         }
 
