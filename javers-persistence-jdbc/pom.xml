@@ -16,7 +16,7 @@
     <description>Polyjdbc-based impl of Javers repository</description>
 
     <properties>
-        <polyjdbc.version>0.2.0</polyjdbc.version>
+        <polyjdbc.version>0.2.1</polyjdbc.version>
     </properties>
 
     <dependencies>
@@ -39,6 +39,22 @@
         </dependency>
 
         <!-- tests -->
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.gmaven.runtime</groupId>
+            <artifactId>gmaven-runtime-1.7</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-all</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

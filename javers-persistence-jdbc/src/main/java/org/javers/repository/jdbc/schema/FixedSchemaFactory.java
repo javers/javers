@@ -20,8 +20,8 @@ public class FixedSchemaFactory {
 
         schema.addRelation(DIFF_TABLE_NAME)
               .withAttribute().longAttr("id").withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
-              .withAttribute().string("user_id").withMaxLength(255).notNull().and()
-               // .with(new DateAttribute(dialect, "diff_date"))
+              .withAttribute().text("user_id").notNull().and()
+              .withAttribute().timestamp("diff_date").notNull().and()
               .primaryKey("javers_diff_pk").using("id").and()
               .build();
         schema.addSequence("seq_javers_diff").build();
@@ -32,6 +32,9 @@ public class FixedSchemaFactory {
               .foreignKey("javers_change_fk_diff").on("fk_diff").references(DIFF_TABLE_NAME,"id").and()
               .primaryKey("javers_change_pk").using("fk_diff","change_no").and()
               .build();
+
+        schema.addIndex("javers_diff_pk_idx").indexing("id").on(DIFF_TABLE_NAME).build();
+        schema.addIndex("javers_change_fk_diff_idx").indexing("fk_diff").on(CHANGE_TABLE_NAME).build();
 
         return schema;
     }

@@ -1,7 +1,9 @@
-package org.javers.repository.jdbc;
+package org.javers.repository.jdbc
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.Test
+import spock.lang.Ignore;
+import spock.lang.Shared
+import spock.lang.Specification
 
 import static org.javers.repository.jdbc.JdbcDiffRepositoryBuilder.jdbcDiffRepository;
 
@@ -10,15 +12,17 @@ import static org.javers.repository.jdbc.JdbcDiffRepositoryBuilder.jdbcDiffRepos
  *
  * @author bartosz walacik
  */
-public class JdbcDiffRepositoryIntegrationTest {
+class JdbcDiffRepositoryIntegrationTest extends Specification {
 
-    @Test
     @Ignore
-    public void buildPostgreSchema() {
-        //when
+    def "should create Postgre schema"() {
+        when:
         JdbcDiffRepository jdbcDiffRepository = jdbcDiffRepository()
                 .configure("integration/jdbc-postgre-test.properties")
-                .build();
-        //
+                .build()
+
+        then:
+        //?
+        true
     }
 }
