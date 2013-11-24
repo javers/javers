@@ -25,17 +25,21 @@ public class JaversContainerFactory {
 
         for (JaversModule module : modules) {
             for (Class component : module.getModuleComponents()) {
-                container.as(Characteristics.CACHE).addComponent(component);
+                addComponent(container, component);
             }
         }
 
         if (beans != null) {
             for (Object bean : beans) {
-                container.as(Characteristics.CACHE).addComponent(bean);
+                addComponent(container, bean);
             }
         }
 
         return container;
+    }
+
+    private static void addComponent(MutablePicoContainer container, Object classOrInstance) {
+        container.as(Characteristics.CACHE).addComponent(classOrInstance);
     }
 
     public static PicoContainer createDefaultCore() {
