@@ -1,5 +1,6 @@
 package org.javers.model.object.graph;
 
+import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Entity;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface ObjectNode {
      * @return never returns null
      */
     List<Edge> getEdges();
+
+    GlobalCdoId getGlobalCdoId();
 }

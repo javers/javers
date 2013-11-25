@@ -36,7 +36,7 @@ public class BeanProperty implements Property {
 
     @Override
     public Object get(Object target) {
-        return ReflectionUtil.invokeGetterEvenIfPrivate(getter,target);
+        return ReflectionUtil.invokeGetterEvenIfPrivate(getter, target);
     }
 
     @Override
@@ -57,5 +57,19 @@ public class BeanProperty implements Property {
     @Override
     public void setValue(Object value) {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BeanProperty that = (BeanProperty) o;
+        return getter.equals(that.getter) && javersType.equals(that.javersType);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * getter.hashCode() + javersType.hashCode();
     }
 }

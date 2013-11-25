@@ -36,4 +36,9 @@ public class MultiEdge extends Edge {
     public void addReferenceNode(ObjectNode objectNode) {
         references.add(objectNode);
     }
+
+    @Override
+    public void accept(EdgeVisitor visitor) {
+        visitor.visit(this);
+    }
 }

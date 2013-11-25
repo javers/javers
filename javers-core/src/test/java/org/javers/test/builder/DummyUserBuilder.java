@@ -25,6 +25,9 @@ public class DummyUserBuilder {
     }
 
     public DummyUser build() {
+        if (dummyUser.getName() == null){
+            dummyUser.setName("some");
+        }
         return dummyUser;
     }
 

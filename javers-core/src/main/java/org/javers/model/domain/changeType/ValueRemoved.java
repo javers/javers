@@ -1,6 +1,5 @@
 package org.javers.model.domain.changeType;
 
-import org.javers.model.domain.Diff;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.Value;
 import org.javers.model.mapping.Property;
@@ -12,8 +11,8 @@ import org.javers.model.mapping.Property;
  */
 public class ValueRemoved extends ValueAddOrRemove {
 
-    public ValueRemoved(GlobalCdoId globalCdoId, Diff parent, Property property, Object value) {
-        super(globalCdoId, parent, property, value);
+    public ValueRemoved(GlobalCdoId globalCdoId, Property property, Object value) {
+        super(globalCdoId, property, value);
     }
 
     public Value getRemovedValue() {

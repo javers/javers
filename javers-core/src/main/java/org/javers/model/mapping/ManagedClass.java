@@ -89,4 +89,5 @@ public abstract class ManagedClass<S> {
         ManagedClass other = (ManagedClass)obj;
         return sourceClass.equals(other.sourceClass);
     }
+
 }

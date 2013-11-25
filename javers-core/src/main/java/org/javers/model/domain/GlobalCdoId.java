@@ -4,8 +4,13 @@ import org.javers.model.mapping.Entity;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
+import org.javers.model.mapping.Entity;
+
 /**
- * Holder for client's domain object global ID
+ * Clients domain object global ID
+ * <br/>
+ *
+ * Immutable
  */
 public class GlobalCdoId {
     private final Entity entity;
@@ -28,25 +33,5 @@ public class GlobalCdoId {
 
     public Object getLocalCdoId() {
         return cdoId;
-    }
-
-    @Override
-    public String toString() {
-        return entity.getSourceClass().getName()+"#"+cdoId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null) { return false;}
-        if (!(o instanceof GlobalCdoId)) {return false;}
-
-        GlobalCdoId other = (GlobalCdoId) o;
-        return (entity.equals(other.entity) && cdoId.equals(other.cdoId));
-    }
-
-    @Override
-    public int hashCode() {
-        return entity.hashCode() + cdoId.hashCode();
     }
 }

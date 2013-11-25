@@ -24,4 +24,9 @@ public class SingleEdge extends Edge {
     public ObjectNode getReference() {
         return reference;
     }
+
+    @Override
+    public void accept(EdgeVisitor visitor) {
+        visitor.visit(this);
+    }
 }

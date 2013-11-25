@@ -1,6 +1,7 @@
 package org.javers.model.object.graph;
 
 import org.javers.model.domain.Cdo;
+import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Entity;
 
 import java.util.ArrayList;
@@ -52,5 +53,21 @@ public class ObjectWrapper implements ObjectNode {
 
     public void addEdge(Edge edge) {
         this.edges.add(edge);
+    }
+}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ObjectWrapper that = (ObjectWrapper) o;
+        return globalCdoId.equals(that.globalCdoId);
+    }
+
+    @Override
+    public int hashCode() {
+        return globalCdoId.hashCode();
     }
 }

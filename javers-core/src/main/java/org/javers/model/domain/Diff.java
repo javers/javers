@@ -118,6 +118,7 @@ public class Diff {
 
     public void addChange(Change change) {
         changes.add(change);
+        change.bind(this);
     }
 
 }

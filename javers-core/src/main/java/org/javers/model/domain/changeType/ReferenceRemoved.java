@@ -1,6 +1,5 @@
 package org.javers.model.domain.changeType;
 
-import org.javers.model.domain.Diff;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.PropertyChange;
 import org.javers.model.mapping.Property;
@@ -13,8 +12,8 @@ import org.javers.model.mapping.Property;
 public class ReferenceRemoved extends PropertyChange {
     private final GlobalCdoId reference;
 
-    public ReferenceRemoved(GlobalCdoId globalCdoId, Diff parent, Property property, GlobalCdoId reference) {
-        super(globalCdoId, parent, property);
+    public ReferenceRemoved(GlobalCdoId globalCdoId, Property property, GlobalCdoId reference) {
+        super(globalCdoId, property);
         this.reference = reference;
     }
 

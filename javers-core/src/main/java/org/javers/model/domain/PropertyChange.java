@@ -10,8 +10,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public abstract class PropertyChange extends Change {
     private final Property property;
 
-    protected PropertyChange(GlobalCdoId globalCdoId, Diff parent, Property property) {
-        super(globalCdoId, parent);
+    protected PropertyChange(GlobalCdoId globalCdoId, Property property) {
+        super(globalCdoId);
         argumentIsNotNull(property);
         this.property = property;
     }
