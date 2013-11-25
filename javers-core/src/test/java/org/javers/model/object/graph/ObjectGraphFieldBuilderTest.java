@@ -21,7 +21,7 @@ public class ObjectGraphFieldBuilderTest extends ObjectGraphBuilderTest {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
         FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(mapper);
         EntityFactory ef = new EntityFactory(scanner);
-        ValueObjectFactory vf = new ValueObjectFactory(scanner);
+        ValueObjectFactory vf = new ValueObjectFactory();
         entityManager = new EntityManager(ef, vf, mapper);
         entityManager.registerEntity(DummyUser.class);
         entityManager.registerEntity(DummyUserDetails.class);
