@@ -3,6 +3,8 @@ package org.javers.model.object.graph;
 import org.javers.model.domain.Cdo;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Entity;
+import org.javers.model.visitors.Visitable;
+import org.javers.model.visitors.Visitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,5 +73,14 @@ public class ObjectWrapper implements ObjectNode {
     @Override
     public int hashCode() {
         return cdo.hashCode();
+    }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+
+        for(Edge edge : edges) {
+            edge.accept(visitor);
+        }
     }
 }

@@ -2,6 +2,7 @@ package org.javers.model.object.graph;
 
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Entity;
+import org.javers.model.visitors.Visitable;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  *
  * @author bartosz walacik
  */
-public interface ObjectNode {
+public interface ObjectNode extends Visitable {
 
     Entity getEntity();
 

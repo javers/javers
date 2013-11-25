@@ -11,7 +11,7 @@ import org.javers.model.visitors.Visitable;
  *
  * @author bartosz walacik
  */
-public abstract class Edge implements Visitable<EdgeVisitor> {
+public abstract class Edge implements Visitable {
     protected final Property property;
 
     protected Edge(Property property) {
