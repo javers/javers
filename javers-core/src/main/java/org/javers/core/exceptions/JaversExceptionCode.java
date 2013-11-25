@@ -17,6 +17,7 @@ public enum JaversExceptionCode {
 
     UNEXPECTED_VALUE_OBJECT(RUNTIME_ERROR + "Can't start building graph from Value Object '%s', expected Entity instance."),
 
+    UNEXPECTED_VALUE_OBJECT(RUNTIME_ERROR + "Can't start building graph from Value Object '%s', expected Entity instance."),
     TYPE_NOT_MAPPED (BOOTSTRAP_ERROR + "Property Type '%s' is not mapped. Implement UserType and add it to your JaVers configuration.") ,
 
     ENTITY_WITHOUT_ID (BOOTSTRAP_ERROR + "Class '%s' has no Id property. Use @Id annotation to mark unique Entity identifier"),
@@ -28,6 +29,8 @@ public enum JaversExceptionCode {
     MALFORMED_PROPERTY(BOOTSTRAP_ERROR + "value '%s' is invalid for property '%s'. Fix it in your classpath:javers.properties"),
 
     CLASSPATH_RESOURCE_NOT_FOUND(BOOTSTRAP_ERROR + "classpath resource '%s' could not be found"),
+    JAVERS_ALREADY_BUILT(BOOTSTRAP_ERROR + "JaVers instance already built, each JaversBuilder may produce only one JaVers instance");
+
 
     ALREADY_BUILT(BOOTSTRAP_ERROR + "instance already built, each AbstractJaversBuilder may produce only one target instance"),
 

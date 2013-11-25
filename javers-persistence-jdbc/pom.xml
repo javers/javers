@@ -94,6 +94,14 @@
             <version>9.2-1003-jdbc4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.polyjdbc</groupId>
+            <artifactId>polyjdbc</artifactId>
+            <version>${polyjdbc.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

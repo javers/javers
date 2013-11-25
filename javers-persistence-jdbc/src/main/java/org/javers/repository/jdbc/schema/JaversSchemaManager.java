@@ -1,6 +1,7 @@
 package org.javers.repository.jdbc.schema;
 
 import org.javers.common.validation.Validate;
+import org.javers.common.validation.Validate;
 import org.polyjdbc.core.dialect.Dialect;
 import org.polyjdbc.core.schema.*;
 import org.polyjdbc.core.schema.model.Schema;
@@ -14,6 +15,9 @@ import javax.sql.DataSource;
 
 import static org.javers.common.validation.Validate.*;
 
+
+import static org.javers.common.validation.Validate.*;
+
 /**
  * @author bartosz walacik
  */
@@ -24,10 +28,10 @@ public class JaversSchemaManager {
     private FixedSchemaFactory schemaFactory;
     private TransactionManager transactionManager;
 
-    public JaversSchemaManager(Dialect dialect, FixedSchemaFactory schemaFactory, TransactionManager transactionManager) {
-        this.schema = schemaFactory.getSchema(dialect);
-        this.transactionManager = transactionManager;
-        this.schemaFactory = schemaFactory;
+    public JaversSchemaManager(DataSource dataSource, Dialect dialect, FixedSchemaFactory schemaFactory) {
+        this.schema = schemaFactory.getSchema();
+        this.dataSource = dataSource;
+        this.dialect = dialect;
     }
 
     public void createSchemaIfNotExists(){
