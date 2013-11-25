@@ -1,9 +1,6 @@
 package org.javers.core.diff.visitors;
 
-import org.javers.model.object.graph.Edge;
-import org.javers.model.object.graph.EdgeVisitor;
-import org.javers.model.object.graph.MultiEdge;
-import org.javers.model.object.graph.SingleEdge;
+import org.javers.model.object.graph.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -27,8 +24,7 @@ public class EdgeProjectingVisitor implements EdgeVisitor {
         return this;
     }
 
-    @Override
-    public void visit(SingleEdge edge) {
+    private void visit(SingleEdge edge) {
         if (singleEdgesProjection.containsKey(edge)) {
             singleEdgesProjection.put(edge, edge);
         } else {
@@ -36,8 +32,7 @@ public class EdgeProjectingVisitor implements EdgeVisitor {
         }
     }
 
-    @Override
-    public void visit(MultiEdge edge) {
+    private void visit(MultiEdge edge) {
         if (multiEdgesProjection.containsKey(edge)) {
             multiEdgesProjection.put(edge, edge);
         } else {
@@ -51,5 +46,14 @@ public class EdgeProjectingVisitor implements EdgeVisitor {
 
     public Map<MultiEdge, MultiEdge> getMultiEdgesProjection() {
         return Collections.unmodifiableMap(multiEdgesProjection);
+    }
+
+    @Override
+    public void visit(Object object) {
+        if(object instanceof SingleEdge) {
+            visit((SingleEdge)object);
+        } else if (object instanceof MultiEdge) {
+            visit((MultiEdge)object);
+        }
     }
 }
