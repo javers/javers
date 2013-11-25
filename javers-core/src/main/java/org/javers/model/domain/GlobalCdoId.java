@@ -1,22 +1,22 @@
 package org.javers.model.domain;
 
+import org.javers.model.mapping.Entity;
+
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 import org.javers.model.mapping.Entity;
 
 /**
- * Clients domain object global ID <br/>
- * <p/>
- * Immutable
+ * Holder for client's domain object global ID
  */
 public class GlobalCdoId {
     private final Entity entity;
-    /**
-     * Identifiers of client's domain objects should be unique in Entity scope
-     */
     private final Object cdoId;
 
-    public GlobalCdoId(Entity entity, Object cdoId) {
+    /**
+     * @param cdoId Identifier of client's domain objects, should be unique in Entity scope
+     */
+    public GlobalCdoId(Object cdoId, Entity entity) {
         argumentIsNotNull(cdoId);
         argumentIsNotNull(entity);
 
@@ -28,23 +28,27 @@ public class GlobalCdoId {
         return entity;
     }
 
-    public Object getCdoId() {
+    public Object getLocalCdoId() {
         return cdoId;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null || obj.getClass() != getClass()) {
-            return false;
-        }
-        GlobalCdoId other = (GlobalCdoId) obj;
-        return cdoId.equals(other.cdoId) && entity.equals(other.entity);
+    public String toString() {
+        return entity.getSourceClass().getName()+"#"+cdoId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null) { return false;}
+        if (!(o instanceof GlobalCdoId)) {return false;}
+
+        GlobalCdoId other = (GlobalCdoId) o;
+        return (entity.equals(other.entity) && cdoId.equals(other.cdoId));
     }
 
     @Override
     public int hashCode() {
-        int result = entity.hashCode();
-        result = 31 * result + cdoId.hashCode();
-        return result;
+        return entity.hashCode() + cdoId.hashCode();
     }
 }

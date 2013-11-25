@@ -1,10 +1,16 @@
 package org.javers.core;
 
 
+import org.fest.assertions.api.Assertions;
 import org.javers.core.model.DummyNetworkAddress;
+import org.javers.core.pico.JaversContainerFactory;
+import org.javers.model.mapping.BeanBasedPropertyScanner;
 import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.PropertyScanner;
 import org.javers.model.mapping.type.TypeMapper;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.picocontainer.PicoContainer;
 
 import javax.persistence.Id;
 
@@ -12,11 +18,25 @@ import static org.javers.core.JaversBuilder.javers;
 import static org.javers.test.assertion.Assertions.assertThat;
 
 /**
+ * [Integration Test]
+ *
  * @author bartosz walacik
  */
 public class JaversBuilderTest {
 
     @Test
+    public void shouldLoadDefaultPropertiesFile() {
+        //given
+        JaversBuilder javersBuilder = javers();
+
+        //when
+        javersBuilder.build();
+
+        //then
+        Assertions.assertThat(javersBuilder.getContainerComponent(PropertyScanner.class)).isInstanceOf(BeanBasedPropertyScanner.class);
+    }
+
+    @Deprecated //javersBuilder.addModule is deprecated
     public void shouldBootNonCoreModule() {
         //given
         JaversBuilder javersBuilder = javers();
@@ -25,7 +45,7 @@ public class JaversBuilderTest {
         javersBuilder.addModule(new DummyJaversModule()).build();
 
         //then
-        assertThat(javersBuilder.getContainer().getComponent(DummyJaversBean.class)).isNotNull();
+        assertThat(javersBuilder.getContainerComponent(DummyJaversBean.class)).isNotNull();
     }
 
     @Test
@@ -54,11 +74,11 @@ public class JaversBuilderTest {
     }
 
     private EntityManager getEntityManager(JaversBuilder javersBuilder) {
-        return (EntityManager)javersBuilder.getContainer().getComponent(EntityManager.class);
+        return (EntityManager)javersBuilder.getContainerComponent(EntityManager.class);
     }
 
     private TypeMapper getTypeMapper(JaversBuilder javersBuilder) {
-        return (TypeMapper)javersBuilder.getContainer().getComponent(TypeMapper.class);
+        return (TypeMapper)javersBuilder.getContainerComponent(TypeMapper.class);
     }
 
     @Test

@@ -1,11 +1,8 @@
 package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
-import org.fest.assertions.core.Condition;
 import org.javers.model.object.graph.Edge;
-import org.javers.model.object.graph.MultiEdge;
 import org.javers.model.object.graph.ObjectNode;
-import org.javers.model.object.graph.SingleEdge;
 
 /**
  * @author bartosz walacik
@@ -20,8 +17,8 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
         return new NodeAssert(actual);
     }
 
-    public NodeAssert hasCdoWithId(String expectedCdoId) {
-        Assertions.assertThat(actual.getCdoId()).isEqualTo(expectedCdoId);
+    public NodeAssert hasCdoId(String expectedCdoId) {
+        Assertions.assertThat(actual.getLocalCdoId()).isEqualTo(expectedCdoId);
         return this;
     }
 
@@ -52,23 +49,15 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
         return hasEdges(0);
     }
 
-    public NodeAssert haveAtLeastMultiEdge(int numberOfOccurrence) {
-        Assertions.assertThat(actual.getEdges()).haveAtLeast(numberOfOccurrence, new Condition<Edge>() {
-            @Override
-            public boolean matches(Edge value) {
-                return value instanceof MultiEdge;
-            }
-        });
+    public NodeAssert and() {
         return this;
     }
 
-    public NodeAssert haveAtLeastSingleEdge(int numberOfOccurrence) {
-        Assertions.assertThat(actual.getEdges()).haveAtLeast(numberOfOccurrence, new Condition<Edge>() {
-            @Override
-            public boolean matches(Edge value) {
-                return value instanceof SingleEdge;
-            }
-        });
-        return this;
+    public SingleEdgeAssert hasSingleEdge(String edgeName) {
+        return hasEdge(edgeName).isSingleEdge();
+    }
+
+    public MultiEdgeAssert hasMultiEdge(String edgeName) {
+        return hasEdge(edgeName).isMultiEdge();
     }
 }

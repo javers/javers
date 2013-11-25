@@ -2,42 +2,48 @@ package org.javers.core.pico;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
-import org.javers.core.MappingStyle;
+import org.javers.core.JaversCoreConfiguration;
 import org.javers.model.pico.ModelJaversModule;
+import org.picocontainer.Characteristics;
 import org.picocontainer.DefaultPicoContainer;
+import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoContainer;
-import org.picocontainer.behaviors.Caching;
+import org.picocontainer.containers.PropertiesPicoContainer;
 
 import java.util.*;
 
 /**
  * @author Piotr Betkier
+ * @author bartosz walacik
  */
 public class JaversContainerFactory {
 
-    public static PicoContainer create(MappingStyle configuredStyle) {
-        return create(configuredStyle, Collections.EMPTY_LIST);
-    }
+    public static PicoContainer create(List<JaversModule> modules, List<?> beans) {
+        Validate.argumentIsNotNull(modules);
 
-    public static PicoContainer create(MappingStyle configuredStyle, Collection<JaversModule> externalModules) {
-        Validate.argumentIsNotNull(configuredStyle);
-        Validate.argumentIsNotNull(externalModules);
+        MutablePicoContainer container = new DefaultPicoContainer();
 
-        List<JaversModule> modules = new ArrayList<>();
-        modules.addAll(getCoreModules(configuredStyle));
-        modules.addAll(externalModules);
-
-        DefaultPicoContainer javersContainer = new DefaultPicoContainer(new Caching());
         for (JaversModule module : modules) {
             for (Class component : module.getModuleComponents()) {
-                javersContainer.addComponent(component);
+                addComponent(container, component);
             }
         }
 
-        return javersContainer;
+        if (beans != null) {
+            for (Object bean : beans) {
+                addComponent(container, bean);
+            }
+        }
+
+        return container;
     }
 
-    private static List<JaversModule> getCoreModules(MappingStyle configuredStyle) {
-        return Arrays.asList(new CoreJaversModule(),new ModelJaversModule(configuredStyle));
+    private static void addComponent(MutablePicoContainer container, Object classOrInstance) {
+        container.as(Characteristics.CACHE).addComponent(classOrInstance);
+    }
+
+    public static PicoContainer createDefaultCore() {
+        List<JaversModule> coreModules = Arrays.asList(new CoreJaversModule(), new ModelJaversModule(new JaversCoreConfiguration()));
+        return create(coreModules,null);
     }
 }

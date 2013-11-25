@@ -2,31 +2,37 @@ package org.javers.core;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.core.pico.JaversContainerFactory;
+import org.javers.core.pico.CoreJaversModule;
 import org.javers.model.mapping.EntityManager;
-import org.picocontainer.PicoContainer;
+import org.javers.model.pico.ModelJaversModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Creates JaVers instance based on your domain model metadata and custom configuration.
+ * <br/>
+ * Supports two configuring methods:
+ * <ul>
+ *     <li/>by properties file, see {TBA ...}
+ *     <li/>programmatically using builder style methods
+ * </ul>
  *
  * @author bartosz walacik
  */
-public class JaversBuilder {
-
-    private static final MappingStyle DEFAULT_MAPPING_STYLE = MappingStyle.BEAN;
-
-    private MappingStyle mappingStyle;
+public class JaversBuilder extends AbstractJaversBuilder {
+    private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
+    //
+    private JaversCoreConfiguration coreConfiguration;
     private List<Class> entityClasses = new ArrayList<>();
     private List<Class> valueObjectClasses = new ArrayList<>();
     private List<JaversModule> externalModules = new ArrayList<>();
-    private PicoContainer container;
 
-    private JaversBuilder(){
+    private JaversBuilder() {
+        coreConfiguration = new JaversCoreConfiguration();
     }
 
     public static JaversBuilder javers() {
@@ -34,15 +40,14 @@ public class JaversBuilder {
     }
 
     public Javers build() {
-        if (isBuilt()) {
-            throw new JaversException(JaversExceptionCode.JAVERS_ALREADY_BUILT);
-        }
+        logger.info("starting up javers ...");
 
-        bootPicoContainer();
+        bootContainer(getCoreModules(coreConfiguration), null);
         registerManagedClasses();
         bootEntityManager();
 
-        return container.getComponent(Javers.class);
+        logger.info("javers instance is up & ready");
+        return getContainerComponent(Javers.class);
     }
 
     public JaversBuilder registerEntity(Class<?> entityClass) {
@@ -58,37 +63,23 @@ public class JaversBuilder {
     }
 
     public JaversBuilder withMappingStyle(MappingStyle mappingStyle) {
-        Validate.argumentIsNotNull(mappingStyle);
-
-        this.mappingStyle = mappingStyle;
+        coreConfiguration.withMappingStyle(mappingStyle);
         return this;
     }
 
+    @Deprecated
     public JaversBuilder addModule(JaversModule javersModule) {
         Validate.argumentIsNotNull(javersModule);
         externalModules.add(javersModule);
         return this;
     }
 
-    /**
-     * for testing only
-     */
-    protected PicoContainer getContainer() {
-        return container;
-    }
-
-    //-- private
-
-    private boolean isBuilt() {
-        return container != null;
-    }
-
-    private void bootPicoContainer() {
-        container = JaversContainerFactory.create(usedMappingStyle(), externalModules);
+    private List<JaversModule> getCoreModules(JaversCoreConfiguration configuration) {
+        return Arrays.asList(new CoreJaversModule(), new ModelJaversModule(configuration));
     }
 
     private void registerManagedClasses() {
-        EntityManager entityManager = container.getComponent(EntityManager.class);
+        EntityManager entityManager = getContainerComponent(EntityManager.class);
 
         for (Class<?> clazz : entityClasses) {
             entityManager.registerEntity(clazz);
@@ -100,14 +91,7 @@ public class JaversBuilder {
     }
 
     private void bootEntityManager() {
-        EntityManager entityManager = container.getComponent(EntityManager.class);
+        EntityManager entityManager = getContainerComponent(EntityManager.class);
         entityManager.buildManagedClasses();
-    }
-
-    private MappingStyle usedMappingStyle() {
-        if (mappingStyle == null) {
-            return DEFAULT_MAPPING_STYLE;
-        }
-        return mappingStyle;
     }
 }

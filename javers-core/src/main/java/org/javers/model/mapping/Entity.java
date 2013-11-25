@@ -1,5 +1,6 @@
 package org.javers.model.mapping;
 
+import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 
@@ -33,6 +34,21 @@ public class Entity<S> extends ManagedClass<S> {
             }
         }
         throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID,sourceClass.getName());
+    }
+
+    /**
+     * @param cdo instance of {@link #getSourceClass()}
+     * @return returns ID of given cdo
+     */
+    public Object getCdoIdOf(Object cdo) {
+        Validate.argumentIsNotNull(cdo);
+        Validate.argumentCheck(getSourceClass().isInstance(cdo),
+                               "expected instance of "+getSourceClass().getName()+", got instance of "+cdo.getClass().getName());
+        return getIdProperty().get(cdo);
+    }
+
+    public boolean isInstance(Object cdo) {
+        return getSourceClass().isInstance(cdo);
     }
 
     public Property getIdProperty() {

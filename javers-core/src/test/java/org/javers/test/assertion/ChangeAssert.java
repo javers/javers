@@ -5,6 +5,7 @@ import org.javers.model.domain.Change;
 import org.javers.model.domain.Diff;
 import org.javers.model.domain.changeType.NewObject;
 import org.javers.model.domain.changeType.ObjectRemoved;
+import org.javers.model.domain.changeType.ReferenceAdded;
 
 /**
  * @author Maciej Zasada
@@ -30,7 +31,12 @@ public class ChangeAssert extends AbstractAssert<ChangeAssert, Change> {
     }
 
     public ChangeAssert hasCdoId(Object cdoId) {
-        Assertions.assertThat(actual.getGlobalCdoId().getCdoId()).isEqualTo(cdoId);
+        Assertions.assertThat(actual.getGlobalCdoId().getLocalCdoId()).isEqualTo(cdoId);
+        return this;
+    }
+
+    public ChangeAssert isReferenceAdded() {
+        Assertions.assertThat(actual).isExactlyInstanceOf(ReferenceAdded.class);
         return this;
     }
 

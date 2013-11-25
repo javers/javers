@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Flattens given graph into set using Depth-first search approach.
+ *
  * @author Maciej Zasada
  */
 public class DFSGraphToSetConverter implements GraphToSetConverter {

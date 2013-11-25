@@ -44,7 +44,7 @@ public class DFSGraphToSetConverterTest {
     public void shouldConvertNodeWithMultiEdgeIntoSet() {
         // given:
         DummyUser user = dummyUser().withName("1").withDetailsList(2).build();
-        ObjectNode graph = objectGraphBuilder.build(user);
+        ObjectNode graph = objectGraphBuilder.buildGraph(user);
 
         // when:
         Set<ObjectNode> objectNodes = converter.convertFromGraph(graph);
@@ -57,7 +57,7 @@ public class DFSGraphToSetConverterTest {
     public void shouldConvertNodeWithSingeEdgeIntoSet() {
         // given:
         DummyUser user = dummyUser().withName("1").withDetails(2L).build();
-        ObjectNode graph = objectGraphBuilder.build(user);
+        ObjectNode graph = objectGraphBuilder.buildGraph(user);
 
         // when:
         Set<ObjectNode> objectNodes = converter.convertFromGraph(graph);

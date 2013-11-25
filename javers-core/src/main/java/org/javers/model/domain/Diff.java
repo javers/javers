@@ -35,8 +35,8 @@ import static org.javers.common.validation.Validate.*;
  *    <li/>Since Diff is an <i>aggregate</i> it can be neatly persisted in document database like MongoDB.
  *    <li/>Persisting Diff in any kind of database is easy. Javers provides flexible
  *         JSON serialization/deserialization engine,
- *         designed as abstraction layer between Java types and concrete database types.
- *    <li/>Essentially, object-oriented data are persisted as JSON values or JSON documents.
+ *         designed as abstraction layer between Java types and specific database types.
+ *    <li/>Essentially, object-oriented data are persisted as JSON.
  * </ul>
  *
  * @see org.javers.json.JsonConverter

@@ -1,5 +1,6 @@
 package org.javers.model.object.graph;
 
+import org.javers.model.domain.Cdo;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Entity;
 import org.javers.model.visitors.Visitable;
@@ -11,48 +12,43 @@ import java.util.List;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * Wrapper for live client's domain object (aka CDO),
- * captures current state of it.
+ * Wrapper for live client's domain object (aka CDO)
  *
  * @author bartosz walacik
  */
 public class ObjectWrapper implements ObjectNode {
-    private final Object cdo;
-    private final Entity entity;
+    private final Cdo cdo;
     private final List<Edge> edges;
-    private final GlobalCdoId globalCdoId;
 
 
-    public ObjectWrapper(Object cdo, Entity entity) {
+    public ObjectWrapper(Cdo cdo) {
         argumentIsNotNull(cdo);
-        argumentIsNotNull(entity);
-        if (!entity.isInstance(cdo)) {
-            throw new IllegalArgumentException("cdo is not an instance of entity");
-        }
-
         this.cdo = cdo;
-        this.entity = entity;
         this.edges = new ArrayList<>();
-        this.globalCdoId = new GlobalCdoId(entity, getCdoId());
     }
 
-    public Object getCdo() {
-        return cdo;
+    @Deprecated
+    public ObjectWrapper(Object cdo, Entity entity) {
+        this(new Cdo(cdo, entity));
+    }
+
+    public Object unwrapCdo() {
+        return cdo.getWrappedCdo();
     }
 
     @Override
-    public Object getCdoId() {
-        return entity.getIdProperty().get(cdo);
+    public Object getLocalCdoId() {
+        return cdo.getLocalId();
     }
 
     @Override
     public GlobalCdoId getGlobalCdoId() {
-        return globalCdoId;
+        return cdo.getGlobalId();
     }
 
     @Override
     public Entity getEntity() {
-        return entity;
+        return cdo.getEntity();
     }
 
     @Override
@@ -71,12 +67,12 @@ public class ObjectWrapper implements ObjectNode {
         }
 
         ObjectWrapper that = (ObjectWrapper) o;
-        return globalCdoId.equals(that.globalCdoId);
+        return cdo.equals(that.cdo);
     }
 
     @Override
     public int hashCode() {
-        return globalCdoId.hashCode();
+        return cdo.hashCode();
     }
 
     @Override

@@ -18,7 +18,7 @@ import org.junit.Before;
  * @author Maciej Zasada
  */
 public abstract class ChangeSetAppenderTest {
-    protected ObjectGraphBuilder objectGraphBuilder;
+    protected  EntityManager entityManager;
 
     @Before
     public void setUp() {
@@ -26,14 +26,15 @@ public abstract class ChangeSetAppenderTest {
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
         EntityFactory entityFactory = new EntityFactory(scanner);
         ValueObjectFactory valueObjectFactory = new ValueObjectFactory(scanner);
-        EntityManager entityManager = new EntityManager(entityFactory, valueObjectFactory, mapper);
+        entityManager = new EntityManager(entityFactory, valueObjectFactory, mapper);
         entityManager.registerEntity(DummyUser.class);
         entityManager.registerEntity(DummyUserDetails.class);
         entityManager.buildManagedClasses();
-        objectGraphBuilder = new ObjectGraphBuilder(entityManager);
+
     }
 
     protected ObjectNode createObjectNodeWithId(String id) {
-        return objectGraphBuilder.build(DummyUserBuilder.dummyUser().withName(id).build());
+        ObjectGraphBuilder objectGraphBuilder = new ObjectGraphBuilder(entityManager);
+        return objectGraphBuilder.buildGraph(DummyUserBuilder.dummyUser().withName(id).build());
     }
 }

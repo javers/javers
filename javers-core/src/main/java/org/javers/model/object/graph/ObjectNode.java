@@ -15,7 +15,7 @@ public interface ObjectNode extends Visitable {
 
     Entity getEntity();
 
-    Object getCdoId();
+    Object getLocalCdoId();
 
     /**
      * References to other Entities

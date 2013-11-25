@@ -11,7 +11,7 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class MultiEdge extends Edge {
-    protected List<ObjectNode> references;
+    protected List<ObjectNode> references; //should not be empty
 
     public MultiEdge(Property property) {
         super(property);
@@ -20,6 +20,18 @@ public class MultiEdge extends Edge {
 
     public List<ObjectNode> getReferences(){
         return Collections.unmodifiableList(references);
+    }
+
+    /**
+     * @return null if not found
+     */
+    public ObjectNode getReference(Object referencedCdoId){
+        for (ObjectNode ref: references) {
+            if (ref.getLocalCdoId().equals(referencedCdoId)) {
+                return ref;
+            }
+        }
+        return null;
     }
 
     public void addReferenceNode(ObjectNode objectNode) {

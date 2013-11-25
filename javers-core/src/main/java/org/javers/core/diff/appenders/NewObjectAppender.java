@@ -5,7 +5,6 @@ import java.util.Set;
 import org.javers.common.collections.Function;
 import org.javers.common.collections.Sets;
 import org.javers.model.domain.Change;
-import org.javers.model.domain.Diff;
 import org.javers.model.domain.changeType.NewObject;
 import org.javers.model.object.graph.ObjectNode;
 

@@ -18,14 +18,12 @@ public class SingleEdgeAssert extends AbstractAssert<SingleEdgeAssert, SingleEdg
 
     public SingleEdgeAssert refersToCdoWithId(Object expectedCdoId) {
         Assertions.assertThat(actual.getReference()).isNotNull();
-
-        Assertions.assertThat(actual.getReference().getCdoId()).isEqualTo(expectedCdoId);
+        Assertions.assertThat(actual.getReference().getLocalCdoId()).isEqualTo(expectedCdoId);
         return this;
     }
 
-    public NodeAssert refersToNodeWhich() {
+    public NodeAssert andTargetNode() {
         Assertions.assertThat(actual.getReference()).isNotNull();
-
         return NodeAssert.assertThat(actual.getReference());
     }
 }
