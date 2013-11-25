@@ -10,8 +10,7 @@ import java.util.List;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * Wrapper for live client's domain object (aka CDO),
- * captures current state of it.
+ * Wrapper for live client's domain object (aka CDO)
  *
  * @author bartosz walacik
  */
@@ -35,10 +34,14 @@ public class ObjectWrapper implements ObjectNode {
         return cdo.getWrappedCdo();
     }
 
-    //TODO change name to getCdoLocalId
     @Override
-    public Object getCdoId() {
+    public Object getLocalCdoId() {
         return cdo.getLocalId();
+    }
+
+    @Override
+    public GlobalCdoId getGlobalCdoId() {
+        return cdo.getGlobalId();
     }
 
     @Override
@@ -54,7 +57,6 @@ public class ObjectWrapper implements ObjectNode {
     public void addEdge(Edge edge) {
         this.edges.add(edge);
     }
-}
 
     @Override
     public boolean equals(Object o) {
@@ -63,11 +65,11 @@ public class ObjectWrapper implements ObjectNode {
         }
 
         ObjectWrapper that = (ObjectWrapper) o;
-        return globalCdoId.equals(that.globalCdoId);
+        return cdo.equals(that.cdo);
     }
 
     @Override
     public int hashCode() {
-        return globalCdoId.hashCode();
+        return cdo.hashCode();
     }
 }

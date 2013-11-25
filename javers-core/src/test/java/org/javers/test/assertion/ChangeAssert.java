@@ -31,7 +31,7 @@ public class ChangeAssert extends AbstractAssert<ChangeAssert, Change> {
     }
 
     public ChangeAssert hasCdoId(Object cdoId) {
-        Assertions.assertThat(actual.getGlobalCdoId().getCdoId()).isEqualTo(cdoId);
+        Assertions.assertThat(actual.getGlobalCdoId().getLocalCdoId()).isEqualTo(cdoId);
         return this;
     }
 

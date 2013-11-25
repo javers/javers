@@ -1,16 +1,10 @@
 package org.javers.core.pico;
 
-import com.google.common.collect.ImmutableList;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.javers.core.Javers;
-import org.javers.core.JaversCoreConfiguration;
-import org.javers.core.MappingStyle;
 import org.javers.core.diff.DiffFactory;
-import org.javers.model.mapping.BeanBasedPropertyScanner;
 import org.javers.model.mapping.EntityManager;
-import org.javers.model.mapping.FieldBasedPropertyScanner;
-import org.javers.model.mapping.PropertyScanner;
 import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Test;
 import org.picocontainer.PicoContainer;

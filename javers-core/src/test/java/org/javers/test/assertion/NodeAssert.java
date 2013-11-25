@@ -1,12 +1,8 @@
 package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
-import org.fest.assertions.core.Condition;
 import org.javers.model.object.graph.Edge;
-import org.javers.model.object.graph.MultiEdge;
 import org.javers.model.object.graph.ObjectNode;
-import org.javers.model.object.graph.SingleEdge;
-import org.mockito.AdditionalMatchers;
 
 /**
  * @author bartosz walacik
@@ -22,7 +18,7 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
     }
 
     public NodeAssert hasCdoId(String expectedCdoId) {
-        Assertions.assertThat(actual.getCdoId()).isEqualTo(expectedCdoId);
+        Assertions.assertThat(actual.getLocalCdoId()).isEqualTo(expectedCdoId);
         return this;
     }
 

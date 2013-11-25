@@ -4,10 +4,8 @@ import com.google.common.collect.Lists;
 import org.fest.assertions.api.AbstractAssert;
 import org.javers.model.object.graph.MultiEdge;
 import org.javers.model.object.graph.ObjectNode;
-import org.javers.model.object.graph.SingleEdge;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author bartosz walacik
@@ -29,7 +27,7 @@ public class MultiEdgeAssert extends AbstractAssert<MultiEdgeAssert, MultiEdge> 
     public MultiEdgeAssert refersToCdoWithIds(Object... expectedRefCdoIds) {
         List actualCdoIds = Lists.newArrayList();
         for (ObjectNode node : actual.getReferences()) {
-            actualCdoIds.add(node.getCdoId());
+            actualCdoIds.add(node.getLocalCdoId());
         }
 
         Assertions.assertThat(actualCdoIds).containsOnly(expectedRefCdoIds);

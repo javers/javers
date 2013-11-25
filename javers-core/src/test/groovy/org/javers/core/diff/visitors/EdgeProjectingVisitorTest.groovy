@@ -5,7 +5,7 @@ import org.javers.model.mapping.Property
 import org.javers.model.object.graph.MultiEdge
 import org.javers.model.object.graph.ObjectNode
 import spock.lang.Specification
-
+import org.javers.model.object.graph.ObjectGraphBuilder
 import static org.javers.test.EntityManagerFactory.createWithEntities
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
@@ -15,11 +15,6 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 class EdgeProjectingVisitorTest extends Specification {
 
     EdgeProjectingVisitor edgeProjectingVisitor = new EdgeProjectingVisitor()
-    def objectGraphBuilder
-
-    def setup() {
-        objectGraphBuilder = new org.javers.model.object.graph.ObjectGraphBuilder(createWithEntities(DummyUser))
-    }
 
     def "should project left edge to the right edge"() {
         given:
@@ -38,6 +33,7 @@ class EdgeProjectingVisitorTest extends Specification {
     }
 
     private ObjectNode node(String id) {
-        objectGraphBuilder.build(dummyUser().withName(id).build())
+        ObjectGraphBuilder objectGraphBuilder = new ObjectGraphBuilder(createWithEntities(DummyUser));
+        objectGraphBuilder.buildGraph(dummyUser().withName(id).build())
     }
 }

@@ -14,8 +14,7 @@ public interface ObjectNode {
 
     Entity getEntity();
 
-    //TODO change name to getCdoLocalId
-    Object getCdoId();
+    Object getLocalCdoId();
 
     /**
      * References to other Entities

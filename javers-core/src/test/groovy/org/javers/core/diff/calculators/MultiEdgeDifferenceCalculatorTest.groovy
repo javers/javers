@@ -11,24 +11,23 @@ import spock.lang.Specification
 import static org.javers.test.EntityManagerFactory.createWithEntities
 import static org.javers.test.assertion.ChangeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import org.javers.model.object.graph.ObjectGraphBuilder
 
 class MultiEdgeDifferenceCalculatorTest extends Specification {
 
     MultiEdgeDifferenceCalculator calculator = new MultiEdgeDifferenceCalculator()
 
     def entityManager
-    def objectGraphBuilder
 
     def setup() {
         entityManager = createWithEntities(DummyUser)
-        objectGraphBuilder = new org.javers.model.object.graph.ObjectGraphBuilder(entityManager)
     }
 
     def "should find added references to MultiEdge"() {
         given:
         def leftEdge = multiEdge([])
         def rightEdge = multiEdge([node("1"), node("2")])
-        def ownerId = new GlobalCdoId(entityManager.getByClass(DummyUser), "0101")
+        def ownerId = new GlobalCdoId("0101", entityManager.getByClass(DummyUser))
 
         when:
         def references = calculator.findAddedReferences(leftEdge, rightEdge, ownerId)
@@ -43,7 +42,7 @@ class MultiEdgeDifferenceCalculatorTest extends Specification {
         given:
         def leftEdge = multiEdge([node("1")])
         def rightEdge = multiEdge([node("1"), node("2")])
-        def ownerId = new GlobalCdoId(entityManager.getByClass(DummyUser), "0010")
+        def ownerId = new GlobalCdoId("0010", entityManager.getByClass(DummyUser))
 
         when:
         def references = calculator.findAddedReferences(leftEdge, rightEdge, ownerId)
@@ -51,14 +50,14 @@ class MultiEdgeDifferenceCalculatorTest extends Specification {
         then:
         references.size() == 1
         assertThat(references[0]).isReferenceAdded().hasCdoId("0010").hasEntityTypeOf(DummyUser)
-        ((ReferenceAdded) references[0]).getAddedReference().getCdoId() == "2"
+        ((ReferenceAdded) references[0]).getAddedReference().getLocalCdoId() == "2"
     }
 
     def "should not find any added references"() {
         given:
         def leftEdge = multiEdge([node("1"), node("2")])
         def rightEdge = multiEdge([node("2")])
-        def ownerId = new GlobalCdoId(entityManager.getByClass(DummyUser), "0010")
+        def ownerId = new GlobalCdoId("0010", entityManager.getByClass(DummyUser))
 
         when:
         def references = calculator.findAddedReferences(leftEdge, rightEdge, ownerId)
@@ -72,6 +71,7 @@ class MultiEdgeDifferenceCalculatorTest extends Specification {
     }
 
     private ObjectNode node(String id) {
-        objectGraphBuilder.build(dummyUser().withName(id).build())
+        ObjectGraphBuilder objectGraphBuilder = new ObjectGraphBuilder(entityManager)
+        objectGraphBuilder.buildGraph(dummyUser().withName(id).build())
     }
 }

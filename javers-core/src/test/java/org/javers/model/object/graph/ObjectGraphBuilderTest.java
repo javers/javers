@@ -33,7 +33,7 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node.getEntity().getSourceClass()).isSameAs(DummyUser.class);
-        assertThat(node.getCdoId()).isEqualTo("Mad Kaz") ;
+        assertThat(node.getLocalCdoId()).isEqualTo("Mad Kaz") ;
         assertThat(node.getEdges()).isEmpty();
     }
 

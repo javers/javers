@@ -26,7 +26,7 @@ public class MultiEdge extends Edge {
      */
     public ObjectNode getReference(Object referencedCdoId){
         for (ObjectNode ref: references) {
-            if (ref.getCdoId().equals(referencedCdoId)) {
+            if (ref.getLocalCdoId().equals(referencedCdoId)) {
                 return ref;
             }
         }

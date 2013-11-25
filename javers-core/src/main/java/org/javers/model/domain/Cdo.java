@@ -50,7 +50,6 @@ public class Cdo {
         if (!(o instanceof Cdo)) {return false;}
 
         Cdo other = (Cdo) o;
-
         return ( globalId.equals(other.globalId));
     }
 

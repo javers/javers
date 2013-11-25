@@ -53,7 +53,7 @@ public abstract class ObjectWrapperTest {
         ObjectWrapper wrapper = new ObjectWrapper(cdo, entity);
 
         //then
-        Assertions.assertThat(wrapper.getCdoId()).isEqualTo("Mad Kaz");
+        Assertions.assertThat(wrapper.getLocalCdoId()).isEqualTo("Mad Kaz");
     }
 
     @Test
