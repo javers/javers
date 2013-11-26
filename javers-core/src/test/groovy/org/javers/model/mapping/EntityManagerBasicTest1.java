@@ -37,7 +37,7 @@ public class EntityManagerBasicTest1 {
         TypeMapper mapper = new TypeMapper();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
         EntityFactory entityFactory = new EntityFactory(scanner);
-        ValueObjectFactory valueObjectFactory = new ValueObjectFactory(scanner);
+        ValueObjectFactory valueObjectFactory = new ValueObjectFactory();
         entityManager = new EntityManager(entityFactory, valueObjectFactory, mapper);
     }
 

@@ -19,7 +19,7 @@ public class ManagedClassesTest {
         typeMapper.registerValueObjectType(DummyNetworkAddress.class);
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(typeMapper);
 
-        managedClass = new ValueObject<DummyNetworkAddress>(DummyNetworkAddress.class, scanner.scan(DummyNetworkAddress.class));
+        managedClass = new ValueObject<>(DummyNetworkAddress.class);
     }
 
     @Test
