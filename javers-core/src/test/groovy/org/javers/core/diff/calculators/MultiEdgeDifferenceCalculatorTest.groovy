@@ -6,6 +6,7 @@ import org.javers.model.domain.changeType.ReferenceAdded
 import org.javers.model.mapping.Property
 import org.javers.model.object.graph.MultiEdge
 import org.javers.model.object.graph.ObjectNode
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.javers.test.EntityManagerFactory.createWithEntities
@@ -16,6 +17,7 @@ import org.javers.model.object.graph.ObjectGraphBuilder
 /**
  * @author Maciej Zasada
  */
+@Deprecated
 class MultiEdgeDifferenceCalculatorTest extends Specification {
 
     MultiEdgeDifferenceCalculator calculator = new MultiEdgeDifferenceCalculator()
@@ -26,6 +28,7 @@ class MultiEdgeDifferenceCalculatorTest extends Specification {
         entityManager = createWithEntities(DummyUser)
     }
 
+    @Ignore
     def "should find added references to MultiEdge"() {
         given:
         def leftEdge = multiEdge([])
@@ -41,6 +44,7 @@ class MultiEdgeDifferenceCalculatorTest extends Specification {
         assertThat(references[1]).isReferenceAdded().hasCdoId("0101").hasEntityTypeOf(DummyUser)
     }
 
+    @Ignore
     def "should find skip previously existing references"() {
         given:
         def leftEdge = multiEdge([node("1")])
@@ -56,6 +60,7 @@ class MultiEdgeDifferenceCalculatorTest extends Specification {
         ((ReferenceAdded) references[0]).getAddedReference().getLocalCdoId() == "2"
     }
 
+    @Ignore
     def "should not find any added references"() {
         given:
         def leftEdge = multiEdge([node("1"), node("2")])

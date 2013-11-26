@@ -12,9 +12,8 @@ import java.util.Set;
  *
  * @author Maciej Zasada
  */
-public class DFSGraphToSetConverter implements GraphToSetConverter {
+public class DFSGraphToSetConverter  {
 
-    @Override
     public Set<ObjectNode> convertFromGraph(ObjectNode graph) {
         CollectNodesVisitor visitor = new CollectNodesVisitor();
         graph.accept(visitor);

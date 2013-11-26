@@ -4,19 +4,17 @@ import static java.util.Map.Entry;
 
 import java.util.*;
 
-import org.javers.common.collections.Sets;
-import org.javers.core.diff.appenders.ChangeSetAppender;
 import org.javers.core.diff.calculators.MultiEdgeDifferenceCalculator;
 import org.javers.core.diff.visitors.EdgeProjectingVisitor;
 import org.javers.model.domain.Change;
 import org.javers.model.domain.GlobalCdoId;
-import org.javers.model.domain.changeType.ReferenceAdded;
 import org.javers.model.object.graph.*;
 
 /**
  * @author Maciej Zasada
  */
-public class PropertyChangeSetAppender extends ChangeSetAppender {
+@Deprecated
+public class PropertyChangeSetAppender  {
 
     private MultiEdgeDifferenceCalculator multiEdgeDifferenceCalculator;
 
@@ -24,7 +22,6 @@ public class PropertyChangeSetAppender extends ChangeSetAppender {
         this.multiEdgeDifferenceCalculator = multiEdgeDifferenceCalculator;
     }
 
-    @Override
     protected Set<Change> getChangeSet(Set<ObjectNode> leftGraph, Set<ObjectNode> rightGraph) {
         Set<Change> changeSet = new HashSet<>();
         Map<GlobalCdoId, ObjectNode> leftHashTable = buildMapFrom(leftGraph);

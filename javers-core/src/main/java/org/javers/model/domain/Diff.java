@@ -2,9 +2,7 @@ package org.javers.model.domain;
 
 import org.joda.time.LocalDateTime;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.javers.common.validation.Validate.*;
 
@@ -121,4 +119,9 @@ public class Diff {
         change.bind(this);
     }
 
+    public void addChanges(Collection<Change> changeSet) {
+        for (Change change : changeSet) {
+            addChange(change);
+        }
+    }
 }

@@ -12,7 +12,7 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public class GraphVisitor implements Visitor<ObjectNode> {
-    private Set<GlobalCdoId> visited = new HashSet<>();
+    private Set<ObjectNode> visited = new HashSet<>();
 
     @Override
     public final void visit(ObjectNode node) {
@@ -27,10 +27,10 @@ public class GraphVisitor implements Visitor<ObjectNode> {
     }
 
     public boolean wasVisited(ObjectNode node) {
-        return visited.contains(node.getGlobalCdoId());
+        return visited.contains(node);
     }
 
     private void markVisited(ObjectNode node) {
-        visited.add(node.getGlobalCdoId());
+        visited.add(node);
     }
 }
