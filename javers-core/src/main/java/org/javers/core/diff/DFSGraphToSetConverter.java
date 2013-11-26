@@ -16,19 +16,8 @@ public class DFSGraphToSetConverter implements GraphToSetConverter {
 
     @Override
     public Set<ObjectNode> convertFromGraph(ObjectNode graph) {
-        DFSGraphTraverser dfsGraphTraverser = new DFSGraphTraverser();
-        graph.accept(dfsGraphTraverser);
-        return dfsGraphTraverser.visitedNodes;
-    }
-
-    private class DFSGraphTraverser implements Visitor {
-        private final Set<ObjectNode> visitedNodes = new HashSet<>();
-
-        @Override
-        public void visit(Object object) {
-            if(object instanceof ObjectNode) {
-                visitedNodes.add((ObjectNode) object);
-            }
-        }
+        CollectNodesVisitor visitor = new CollectNodesVisitor();
+        graph.accept(visitor);
+        return visitor.getNodes();
     }
 }

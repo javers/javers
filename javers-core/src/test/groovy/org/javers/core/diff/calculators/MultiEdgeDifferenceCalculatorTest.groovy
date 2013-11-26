@@ -13,6 +13,9 @@ import static org.javers.test.assertion.ChangeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import org.javers.model.object.graph.ObjectGraphBuilder
 
+/**
+ * @author Maciej Zasada
+ */
 class MultiEdgeDifferenceCalculatorTest extends Specification {
 
     MultiEdgeDifferenceCalculator calculator = new MultiEdgeDifferenceCalculator()

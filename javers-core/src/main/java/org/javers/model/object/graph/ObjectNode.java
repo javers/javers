@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author bartosz walacik
  */
-public interface ObjectNode extends Visitable {
+public interface ObjectNode extends Visitable<GraphVisitor> {
 
     Entity getEntity();
 

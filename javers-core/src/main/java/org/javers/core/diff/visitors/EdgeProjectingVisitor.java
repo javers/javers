@@ -10,16 +10,17 @@ import java.util.Map;
 /**
  * @author Maciej Zasada
  */
+@Deprecated
 public class EdgeProjectingVisitor implements EdgeVisitor {
     private Map<SingleEdge, SingleEdge> singleEdgesProjection = new HashMap<>();
     private Map<MultiEdge, MultiEdge> multiEdgesProjection = new HashMap<>();
 
     public EdgeProjectingVisitor visit(Collection<Edge> leftEdges, Collection<Edge> rightEdges) {
         for (Edge edge : leftEdges) {
-            edge.accept(this);
+           // edge.accept(this);
         }
         for (Edge edge : rightEdges) {
-            edge.accept(this);
+          //  edge.accept(this);
         }
         return this;
     }

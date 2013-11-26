@@ -40,13 +40,9 @@ public class MultiEdge extends Edge {
 
 
     @Override
-    public void accept(Visitor visitor) {
-
-        visitor.visit(this);
-
+    public void accept(GraphVisitor visitor) {
         for(ObjectNode objectNode : references) {
             objectNode.accept(visitor);
         }
-
     }
 }

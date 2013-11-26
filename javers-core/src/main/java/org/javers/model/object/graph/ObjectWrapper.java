@@ -76,7 +76,11 @@ public class ObjectWrapper implements ObjectNode {
     }
 
     @Override
-    public void accept(Visitor visitor) {
+    public void accept(GraphVisitor visitor) {
+        if(visitor.wasVisited(this)){
+            return;
+        }
+
         visitor.visit(this);
 
         for(Edge edge : edges) {
