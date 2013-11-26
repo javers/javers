@@ -1,5 +1,7 @@
 package org.javers.model.mapping;
 
+import org.javers.common.validation.Validate;
+
 import java.util.List;
 
 /**
@@ -7,8 +9,11 @@ import java.util.List;
  */
 public class EntityFactory extends ManagedClassFactory<Entity>{
 
+    private PropertyScanner propertyScanner;
+
     public EntityFactory(PropertyScanner propertyScanner) {
-        super(propertyScanner);
+        Validate.argumentIsNotNull(propertyScanner);
+        this.propertyScanner = propertyScanner;
     }
 
     @Override

@@ -1,16 +1,23 @@
 package org.javers.model.mapping;
 
 import org.javers.core.model.DummyAddress;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.MockitoAnnotations;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * @author pawel szymczyk
  */
-public abstract class ValueObjectConstructionTest {
+public class ValueObjectConstructionTest {
 
-    protected ValueObjectFactory factory;
+    private ValueObjectFactory factory;
+
+    @Before
+    public void setUp() throws Throwable {
+        factory = new ValueObjectFactory();
+    }
 
     @Test
     public void shouldCreateValueObject() throws Throwable {

@@ -14,7 +14,7 @@ class EntityManagerFactory {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
         EntityFactory entityFactory = new EntityFactory(scanner);
-        ValueObjectFactory valueObjectFactory = new ValueObjectFactory(scanner);
+        ValueObjectFactory valueObjectFactory = new ValueObjectFactory();
         EntityManager entityManager = new EntityManager(entityFactory, valueObjectFactory, mapper);
         for (Class<?> entity : entityClasses) {
             entityManager.registerEntity(entity);

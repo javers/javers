@@ -5,10 +5,7 @@ package org.javers.model.mapping;
  */
 public abstract class ManagedClassFactory<T extends ManagedClass> {
 
-    protected PropertyScanner propertyScanner;
-
-    protected ManagedClassFactory(PropertyScanner propertyScanner) {
-        this.propertyScanner = propertyScanner;
+    protected ManagedClassFactory() {
     }
 
     public abstract <S> T create(Class<S> clazz);
