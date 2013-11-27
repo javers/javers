@@ -7,6 +7,7 @@ import org.javers.model.domain.changeType.ValueChange
 import org.javers.model.mapping.Entity
 import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
+import org.javers.test.builder.DummyUserBuilder
 
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
@@ -24,7 +25,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         when:
         Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new NodePair(left,right),sex);
+            new ValueChangeAppender().calculateChanges(new NodePair(left,right),sex)
 
         then:
         changes.size() == 0
@@ -38,7 +39,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         when:
         Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new NodePair(left,right),sex);
+            new ValueChangeAppender().calculateChanges(new NodePair(left,right),sex)
 
         then:
         //TODO clever custom assertion
@@ -50,7 +51,25 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         change.rightValue.value == OCCASIONALLY
     }
 
-    //todo add test for other simple types
+    def "should append Integer valueChange" () {
+        given:
+        ObjectNode left =  buildDummyUserNode(DummyUserBuilder.dummyUser().withName("1").build())
+        ObjectNode right = buildDummyUserNode(DummyUserBuilder.dummyUser().withName("1").withInteger(5).build())
+        Property largeInt = getEntity(DummyUser).getProperty("largeInt")
+
+        when:
+        Collection<ValueChange> changes =
+            new ValueChangeAppender().calculateChanges(new NodePair(left,right),largeInt)
+
+        then:
+        //TODO clever custom assertion
+        changes.size() == 1
+        ValueChange change = changes.iterator().next()
+        change.property == largeInt
+        change.globalCdoId.localCdoId == "1"
+        change.leftValue.value == null
+        change.rightValue.value == 5
+    }
 
     //todo add test for ValueObject
 

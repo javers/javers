@@ -46,10 +46,7 @@ public class DiffFactory {
             List<Property> nodeProperties = pair.getEntity().getProperties();
             for (Property property : nodeProperties) {
                 for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
-                    if (!appender.supports(property))  {
-                        continue;
-                    }
-                    diff.addChanges((Collection)appender.calculateChanges(pair,property));
+                    diff.addChanges((Collection)appender.calculateChangesIfSupported(pair,property));
                 }
             }
         }

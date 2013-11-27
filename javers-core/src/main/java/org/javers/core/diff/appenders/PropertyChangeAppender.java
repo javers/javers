@@ -8,6 +8,7 @@ import org.javers.model.mapping.type.*;
 import org.javers.model.object.graph.ObjectNode;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -20,11 +21,26 @@ public abstract class PropertyChangeAppender <T extends PropertyChange> {
     protected final static Set<Class<JaversType>> VALUE_TYPES = (Set) Sets.asSet(PrimitiveType.class, ValueObjectType.class);
     protected final static Set<Class<JaversType>> ENTITY_REF_TYPES = (Set) Sets.asSet(EntityReferenceType.class);
 
-    public final boolean supports(Property property) {
+    /**
+     * checks if given property is supported and if so,
+     * delegates calculation to concrete appender in calculateChanges()
+     *
+     * @param pair
+     * @param property
+     * @return
+     */
+    public final Collection<T> calculateChangesIfSupported(NodePair pair, Property property) {
+        if (!supports(property)) {
+             return Collections.EMPTY_SET;
+        }
+        return calculateChanges(pair, property);
+    }
+
+    protected boolean supports(Property property) {
         return getSupportedPropertyTypes().contains(property.getType().getClass());
     }
 
     protected abstract Set<Class<JaversType>> getSupportedPropertyTypes();
 
-    public abstract Collection<T> calculateChanges(NodePair pair, Property supportedProperty);
+    protected abstract Collection<T> calculateChanges(NodePair pair, Property supportedProperty);
 }

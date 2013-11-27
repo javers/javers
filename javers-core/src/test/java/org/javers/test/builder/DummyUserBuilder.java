@@ -37,6 +37,11 @@ public class DummyUserBuilder {
         return this;
     }
 
+    public DummyUserBuilder withInteger(Integer largeInt) {
+        dummyUser.setLargeInt(largeInt);
+        return this;
+    }
+
     public DummyUserBuilder withSex(Sex sex) {
         dummyUser.setSex(sex);
         return this;

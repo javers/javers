@@ -21,15 +21,19 @@ abstract class AbstractDiffTest extends Specification {
         javersTestBuilder.createObjectGraphBuilder().buildGraph(root)
     }
 
-    ObjectNode buildDummyUserNode(String userId) {
-        buildDummyUserNode(userId,null)
-    }
-
     Entity getEntity(Class forClass) {
         return (Entity)javersTestBuilder.entityManager.getByClass(forClass)
     }
 
     ObjectNode buildDummyUserNode(String userId, Sex sex) {
         buildGraph(DummyUserBuilder.dummyUser().withName(userId).withSex(sex).build())
+    }
+
+    ObjectNode buildDummyUserNode(DummyUser user) {
+        buildGraph(user)
+    }
+
+    ObjectNode buildDummyUserNode(String userId) {
+        buildDummyUserNode(userId,null)
     }
 }
