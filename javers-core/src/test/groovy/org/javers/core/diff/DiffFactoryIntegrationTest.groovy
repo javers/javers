@@ -1,10 +1,9 @@
 package org.javers.core.diff
 
 /**
- * [Integration Test]
  *
  * @author bartosz walacik
  */
-class DiffFactoryTest {
+class DiffFactoryIntegrationTest {
     //TODO implement ME!
 }
