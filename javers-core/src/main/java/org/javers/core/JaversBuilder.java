@@ -50,9 +50,23 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return getContainerComponent(Javers.class);
     }
 
-    public JaversBuilder registerEntity(Class<?> entityClass) {
+    public JaversBuilder registerEntity(Class<?>...entityClasses) {
+        for(Class clazz : entityClasses) {
+            registerEntity(clazz);
+        }
+        return this;
+    }
+
+    private JaversBuilder registerEntity(Class<?> entityClass) {
         Validate.argumentIsNotNull(entityClass);
         entityClasses.add(entityClass);
+        return this;
+    }
+
+    public JaversBuilder registerValueObject(Class<?>...valueObjectClasses) {
+        for(Class clazz : valueObjectClasses) {
+            registerValueObject(clazz);
+        }
         return this;
     }
 
