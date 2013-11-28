@@ -50,4 +50,8 @@ public class ChangeAssert extends AbstractAssert<ChangeAssert, Change> {
         return this;
     }
 
+    public ChangeAssert hasCdo(Object expected) {
+        Assertions.assertThat(actual.getAffectedCdo()).isSameAs(expected);
+        return this;
+    }
 }

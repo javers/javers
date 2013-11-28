@@ -9,7 +9,8 @@ import org.javers.model.domain.GlobalCdoId;
  * @author bartosz walacik
  */
 public class NewObject extends Change {
-    public NewObject(GlobalCdoId added) {
+    public NewObject(GlobalCdoId added, Object newCdo) {
         super(added);
+        setAffectedCdo(newCdo);
     }
 }

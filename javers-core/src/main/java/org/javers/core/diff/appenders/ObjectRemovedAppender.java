@@ -16,7 +16,7 @@ public class ObjectRemovedAppender implements NodeChangeAppender {
     return Sets.transform(removedObjectNodes, new Function<ObjectNode, Change>() {
       @Override
       public ObjectRemoved apply(ObjectNode input) {
-        return new ObjectRemoved(input.getGlobalCdoId());
+        return new ObjectRemoved(input.getGlobalCdoId(), input.getCdo().getWrappedCdo());
       }
     });
   }
