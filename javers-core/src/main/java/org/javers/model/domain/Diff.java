@@ -121,4 +121,8 @@ public class Diff {
         change.bind(this);
     }
 
+    public boolean hasChanges() {
+        return !changes.isEmpty();
+    }
+
 }

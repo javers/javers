@@ -11,13 +11,14 @@ import org.javers.core.diff.appenders.NewObjectAppender;
 import org.javers.core.diff.appenders.ObjectRemovedAppender;
 import org.javers.core.diff.appenders.PropertyChangeSetAppender;
 import org.javers.core.diff.calculators.MultiEdgeDifferenceCalculator;
+import org.javers.model.object.graph.ObjectGraphBuilder;
 
 /**
  * @author Piotr Betkier
  */
 public class CoreJaversModule implements JaversModule {
 
-    private static Class[] moduleComponents = new Class[]{Javers.class, DiffFactory.class,
+    private static Class[] moduleComponents = new Class[]{Javers.class, DiffFactory.class, ObjectGraphBuilder.class,
             DFSGraphToSetConverter.class, NewObjectAppender.class, ObjectRemovedAppender.class,
             PropertyChangeSetAppender.class, MultiEdgeDifferenceCalculator.class};
 
