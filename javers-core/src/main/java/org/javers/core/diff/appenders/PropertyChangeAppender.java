@@ -12,7 +12,8 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Property scope change appender
+ * Property scope change appender,
+ * follows Chain-of-responsibility pattern
  *
  * @author bartosz walacik
  */
@@ -24,10 +25,6 @@ public abstract class PropertyChangeAppender <T extends PropertyChange> {
     /**
      * checks if given property is supported and if so,
      * delegates calculation to concrete appender in calculateChanges()
-     *
-     * @param pair
-     * @param property
-     * @return
      */
     public final Collection<T> calculateChangesIfSupported(NodePair pair, Property property) {
         if (!supports(property)) {
