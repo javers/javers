@@ -80,12 +80,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    private JaversBuilder registerEntity(Class<?> entityClass) {
-        Validate.argumentIsNotNull(entityClass);
-        entityClasses.add(entityClass);
-        return this;
-    }
-
     public JaversBuilder registerValueObject(Class<?>...valueObjectClasses) {
         for(Class clazz : valueObjectClasses) {
             registerValueObject(clazz);
