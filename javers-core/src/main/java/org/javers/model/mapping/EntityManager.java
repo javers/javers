@@ -8,6 +8,11 @@ import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.mapping.type.ValueObjectType;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
@@ -30,7 +35,8 @@ public class EntityManager {
     private final ValueObjectFactory valueObjectFactory;
     private final TypeMapper typeMapper;
 
-    private ManagedClasses managedClasses = new ManagedClasses();
+    private final Set<EntityDefinition> entityDefinitions = new HashSet<>();
+    private final ManagedClasses managedClasses = new ManagedClasses();
 
     public EntityManager(EntityFactory entityFactory, ValueObjectFactory valueObjectFactory, TypeMapper typeMapper) {
         argumentsAreNotNull(entityFactory, valueObjectFactory, typeMapper);
@@ -53,16 +59,23 @@ public class EntityManager {
         return managedClasses.getBySourceClass(clazz);
     }
 
+    @Deprecated
     public void registerEntity(Class<?> entityClass) {
-        Validate.argumentIsNotNull(entityClass);
+        registerEntity(new EntityDefinition(entityClass));
+    }
 
-        if (isRegisterd(entityClass)) {
+    public void registerEntity(EntityDefinition def) {
+        Validate.argumentIsNotNull(def);
+
+        if (isRegisterd(def)) {
             return; //already managed
         }
 
-        typeMapper.registerEntityReferenceType(entityClass);
+        typeMapper.registerEntityReferenceType(def.getClazz());
+        entityDefinitions.add(def);
     }
 
+    //TODO refactor to ValueObjectDefinition extends ManagedClassDefinition
     public void registerValueObject(Class<?> valueObjectClass) {
         Validate.argumentIsNotNull(valueObjectClass);
 
@@ -75,6 +88,10 @@ public class EntityManager {
 
     private boolean isRegisterd(Class<?> managedClass) {
         return typeMapper.isMapped(managedClass);
+    }
+
+    private boolean isRegisterd(EntityDefinition def) {
+        return entityDefinitions.contains(def);
     }
 
     public boolean isManaged(Class<?> clazz) {
@@ -92,27 +109,19 @@ public class EntityManager {
      * call that if all Entities and ValueObject are registered
      */
     public void buildManagedClasses() {
-        for (EntityReferenceType refType : typeMapper.getMappedEntityReferenceTypes()) {
-            manage(refType.getBaseJavaType());
+        for (EntityDefinition entityDef : entityDefinitions) {
+            manageEntity(entityDef);
         }
         for (ValueObjectType voType : typeMapper.getMappedValueObjectTypes()) {
-            manage(voType.getBaseJavaType());
+            manageValueObject(voType.getBaseJavaType());
         }
     }
 
-    private void manage(Class classToManage) {
-        ManagedClassFactory managedClassFactory = selectFactoryAccording(classToManage);
-        ManagedClass managedClass = managedClassFactory.create(classToManage);
-        managedClasses.add(managedClass);
+    private void manageEntity(EntityDefinition entityDef) {
+        managedClasses.add(entityFactory.create(entityDef));
     }
 
-    private ManagedClassFactory selectFactoryAccording(Class classToManage) {
-        JaversType javersType = typeMapper.getJavesrType(classToManage);
-        if (javersType instanceof EntityReferenceType) {
-            return entityFactory;
-        } else if (javersType instanceof ValueObjectType){
-            return valueObjectFactory;
-        }
-        throw new IllegalArgumentException("Only EntityReferenceType or ValueObjectType is a legal argument");
+    private void manageValueObject(Class classToManage) {
+        managedClasses.add(valueObjectFactory.create(classToManage));
     }
 }

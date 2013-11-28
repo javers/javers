@@ -45,7 +45,7 @@ public class BeanProperty implements Property {
     }
 
     @Override
-    public boolean isId() {
+    public boolean looksLikeId() {
         return getter.isAnnotationPresent(Id.class);
     }
 

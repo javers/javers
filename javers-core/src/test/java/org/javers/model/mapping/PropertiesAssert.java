@@ -46,7 +46,7 @@ public class PropertiesAssert extends AbstractAssert<PropertiesAssert, List<Prop
 
     public PropertiesAssert hasId() {
         for (Property property : actual) {
-            if (property.isId()) return this;
+            if (property.looksLikeId()) return this;
         }
         fail("Id not found");
         return null;

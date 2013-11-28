@@ -8,6 +8,8 @@ import org.javers.core.model.DummyUser;
 import org.javers.model.mapping.type.ArrayType;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
+import org.javers.test.assertion.Assertions;
+import org.javers.test.assertion.EntityAssert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -112,18 +114,17 @@ public class EntityManagerBasicTest1 {
     }
 
     @Test
-    public void shouldNotRegisterEntityMoreThanOnce() throws Throwable {
+    public void shouldNotRegisterEntityInTypeMapperMoreThanOnce() throws Throwable {
         //given
-        Class alreadyMappedEntity = DummyUser.class;
-        TypeMapper typeMapper = mock(TypeMapper.class);
-        when(typeMapper.isMapped(alreadyMappedEntity)).thenReturn(true);
+        TypeMapper typeMapper = new TypeMapper();
         EntityManager entityManager = new EntityManager(mock(EntityFactory.class), mock(ValueObjectFactory.class), typeMapper);
 
         //when
-        entityManager.registerEntity(alreadyMappedEntity);
+        entityManager.registerEntity(DummyUser.class);
+        entityManager.registerEntity(DummyUser.class);
 
         //then
-        verify(typeMapper, hadNoInteractionWith()).registerEntityReferenceType(alreadyMappedEntity);
+        Assertions.assertThat(typeMapper.getMappedEntityReferenceTypes()).hasSize(1);
     }
 
     @Test
