@@ -35,7 +35,7 @@ public class JaversSpringFactory implements FactoryBean<Javers> {
             javersBuilder.registerEntity(clazz);
         }
 
-        for(Class clazz : entityClasses) {
+        for(Class clazz : valueObject) {
             javersBuilder.registerValueObject(clazz);
         }
 
