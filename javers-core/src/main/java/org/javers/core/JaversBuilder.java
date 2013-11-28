@@ -3,14 +3,13 @@ package org.javers.core;
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
 import org.javers.core.pico.CoreJaversModule;
+import org.javers.model.mapping.EntityDefinition;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.pico.ModelJaversModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Creates JaVers instance based on your domain model metadata and custom configuration.
@@ -27,8 +26,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
     //
     private JaversCoreConfiguration coreConfiguration;
-    private List<Class> entityClasses = new ArrayList<>();
-    private List<Class> valueObjectClasses = new ArrayList<>();
+    private Set<EntityDefinition> entityDefinitions = new HashSet<>();
+    private Set<Class> valueObjectClasses = new HashSet<>();
     private List<JaversModule> externalModules = new ArrayList<>();
 
     private JaversBuilder() {
@@ -50,6 +49,30 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return getContainerComponent(Javers.class);
     }
 
+    /**
+     * gives you Entity with id-property selected on the basis of @Id annotation
+     */
+    public JaversBuilder registerEntity(Class<?> entityClass) {
+        Validate.argumentIsNotNull(entityClass);
+        entityDefinitions.add(new EntityDefinition(entityClass));
+        return this;
+    }
+
+    /**
+     * gives you Entity with id-property selected explicitly by name
+     */
+    public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName) {
+        Validate.argumentsAreNotNull(entityClass, idPropertyName);
+        entityDefinitions.add( new EntityDefinition(entityClass, idPropertyName) );
+        return this;
+    }
+
+    public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
+        Validate.argumentIsNotNull(valueObjectClass);
+        valueObjectClasses.add(valueObjectClass);
+        return this;
+    }
+
     public JaversBuilder registerEntity(Class<?>...entityClasses) {
         for(Class clazz : entityClasses) {
             registerEntity(clazz);
@@ -69,13 +92,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         }
         return this;
     }
-
-    public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
-        Validate.argumentIsNotNull(valueObjectClass);
-        valueObjectClasses.add(valueObjectClass);
-        return this;
-    }
-
+    
     public JaversBuilder withMappingStyle(MappingStyle mappingStyle) {
         coreConfiguration.withMappingStyle(mappingStyle);
         return this;
@@ -95,8 +112,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private void registerManagedClasses() {
         EntityManager entityManager = getContainerComponent(EntityManager.class);
 
-        for (Class<?> clazz : entityClasses) {
-            entityManager.registerEntity(clazz);
+        for (EntityDefinition def : entityDefinitions) {
+            entityManager.registerEntity(def);
         }
 
         for (Class<?> clazz : valueObjectClasses) {

@@ -31,7 +31,9 @@ public enum JaversExceptionCode {
 
     ALREADY_BUILT(BOOTSTRAP_ERROR + "instance already built, each AbstractJaversBuilder may produce only one target instance"),
 
-    CONTAINER_NOT_READY(BOOTSTRAP_ERROR +"pico container is not ready");
+    CONTAINER_NOT_READY(BOOTSTRAP_ERROR +"pico container is not ready"),
+
+    PROPERTY_NOT_FOUND(BOOTSTRAP_ERROR +"property '%s' not found in class '%s'");
 
     private String message;
 

@@ -29,7 +29,7 @@ public class FieldProperty implements Property {
     }
 
     @Override
-    public boolean isId() {
+    public boolean looksLikeId() {
         return field.isAnnotationPresent(Id.class);
     }
 

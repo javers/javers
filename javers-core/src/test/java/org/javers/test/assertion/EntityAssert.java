@@ -18,6 +18,11 @@ public class EntityAssert extends AbstractAssert<EntityAssert, Entity> {
         return new EntityAssert(actual);
     }
 
+    public EntityAssert hasIdProperty(String withName) {
+       actual.getIdProperty().getName().equals(withName);
+       return this;
+    }
+
     public PropertyAssert hasProperty(String withName) {
         Property found = actual.getProperty(withName);
         Assertions.assertThat(found).isNotNull();

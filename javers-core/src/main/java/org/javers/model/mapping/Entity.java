@@ -25,17 +25,25 @@ public class Entity<S> extends ManagedClass<S> {
     private final Property idProperty;
     private final List<Property> properties;
 
-
-    public Entity(Class<S> sourceClass, List<Property> properties) {
+    /**
+     * @param idProperty null means - give me defaults
+     */
+    public Entity(Class<S> sourceClass, List<Property> properties, Property idProperty) {
         super(sourceClass);
         argumentIsNotNull(properties);
         this.properties = properties;
-        this.idProperty = findIdProperty();
+
+        if (idProperty == null) {
+            this.idProperty = findDefaultIdProperty();
+        }
+        else {
+            this.idProperty = idProperty;
+        }
     }
 
-    private Property findIdProperty() {
+    private Property findDefaultIdProperty() {
         for (Property p : properties) {
-            if (p.isId()) {
+            if (p.looksLikeId()) {
                 return p;
             }
         }
