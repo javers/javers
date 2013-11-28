@@ -13,6 +13,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author Maciej Zasada
  */
+@Deprecated
 class EdgeProjectingVisitorTest extends Specification {
 
     EdgeProjectingVisitor edgeProjectingVisitor = new EdgeProjectingVisitor()

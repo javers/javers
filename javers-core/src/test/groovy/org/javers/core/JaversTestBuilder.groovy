@@ -1,4 +1,5 @@
 package org.javers.core
+
 import org.javers.model.object.graph.ObjectGraphBuilder
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
@@ -37,7 +38,7 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(EntityManager)
     }
 
-    ObjectGraphBuilder getObjectGraphBuilder() {
+    ObjectGraphBuilder createObjectGraphBuilder() {
         new ObjectGraphBuilder(getEntityManager())
     }
 

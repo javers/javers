@@ -8,7 +8,7 @@ import org.javers.model.domain.Change;
 import org.javers.model.domain.changeType.NewObject;
 import org.javers.model.object.graph.ObjectNode;
 
-public class NewObjectAppender extends ChangeSetAppender {
+public class NewObjectAppender implements NodeChangeAppender {
 
   @Override
   public Set<Change> getChangeSet(Set<ObjectNode> leftGraph, Set<ObjectNode> rightGraph) {

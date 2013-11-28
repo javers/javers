@@ -1,5 +1,7 @@
 package org.javers.model.mapping.type;
 
+import org.javers.core.diff.appenders.PropertyChangeAppender;
+
 /**
  * Property type that can be managed by Javers, so int, String, Date, etc.
  * <p/>
