@@ -35,10 +35,15 @@ public class ObjectWrapper implements ObjectNode {
     }
 
     /**
-     * never returns null
+     * @return never returns null
      */
     public Object unwrapCdo() {
         return cdo.getWrappedCdo();
+    }
+
+    @Override
+    public Cdo getCdo() {
+        return cdo;
     }
 
     @Override

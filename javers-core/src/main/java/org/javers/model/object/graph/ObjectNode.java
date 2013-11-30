@@ -31,5 +31,13 @@ public interface ObjectNode extends Visitable<GraphVisitor> {
      */
     List<Edge> getEdges();
 
+    /**
+     * @return never returns null
+     */
     GlobalCdoId getGlobalCdoId();
+
+    /**
+     * @return never returns null
+     */
+    public Cdo getCdo();
 }

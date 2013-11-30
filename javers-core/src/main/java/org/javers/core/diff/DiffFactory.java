@@ -9,6 +9,7 @@ import org.javers.core.diff.appenders.NewObjectAppender;
 import org.javers.core.diff.appenders.NodeChangeAppender;
 import org.javers.core.diff.appenders.ObjectRemovedAppender;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
+import org.javers.model.domain.Change;
 import org.javers.model.domain.Diff;
 import org.javers.model.mapping.Property;
 import org.javers.model.object.graph.ObjectNode;
@@ -46,7 +47,11 @@ public class DiffFactory {
             List<Property> nodeProperties = pair.getEntity().getProperties();
             for (Property property : nodeProperties) {
                 for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
-                    diff.addChanges((Collection)appender.calculateChangesIfSupported(pair,property));
+                    Collection<Change> changes = appender.calculateChangesIfSupported(pair,property);
+                    for (Change change : changes) {
+                        change.setAffectedCdo(pair.getRight().getCdo().getWrappedCdo());
+                        diff.addChange(change);
+                    }
                 }
             }
         }
