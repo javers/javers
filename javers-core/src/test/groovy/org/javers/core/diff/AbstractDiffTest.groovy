@@ -2,6 +2,7 @@ package org.javers.core.diff
 
 import org.javers.core.JaversTestBuilder
 import org.javers.core.model.DummyUser
+import org.javers.core.model.DummyUserDetails
 import org.javers.model.mapping.Entity
 import org.javers.model.object.graph.ObjectNode
 import org.javers.test.builder.DummyUserBuilder
@@ -35,5 +36,13 @@ abstract class AbstractDiffTest extends Specification {
 
     ObjectNode buildDummyUserNode(String userId) {
         buildDummyUserNode(userId,null)
+    }
+
+    ObjectNode buildDummyUserNode(String userId, boolean flag) {
+        buildGraph(DummyUserBuilder.dummyUser().withName(userId).withFlag(flag).build())
+    }
+
+    ObjectNode buildDummyUserDetailsNode(DummyUserDetails dummyUserDetails) {
+        buildGraph(dummyUserDetails)
     }
 }
