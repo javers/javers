@@ -17,7 +17,8 @@ class ObjectRemovedAppenderTest extends AbstractDiffTest {
         given:
         Diff diff = new Diff("userId")
 
-        Set<ObjectNode> previousGraph = Sets.asSet(buildDummyUserNode("0"))
+        def node = buildDummyUserNode("0")
+        Set<ObjectNode> previousGraph = Sets.asSet(node)
         Set<ObjectNode> currentGraph = Sets.asSet()
 
         when:
@@ -25,7 +26,7 @@ class ObjectRemovedAppenderTest extends AbstractDiffTest {
 
         then:
         assertThat(diff).hasChangesCount(1)
-        assertThat(diff).getChangeAtIndex(0).isObjectRemoved().hasCdoId("0").hasEntityTypeOf(DummyUser.class).hasParentEqualTo(diff)
+        assertThat(diff).getChangeAtIndex(0).isObjectRemoved().hasCdoId("0").hasEntityTypeOf(DummyUser.class).hasParentEqualTo(diff).hasCdo(node.cdo.wrappedCdo)
     }
 
     def "should append removedObjects to diff"() {

@@ -17,15 +17,16 @@ class NewObjectAppenderTest extends AbstractDiffTest {
         given:
         Diff diff = new Diff("userId")
 
+        def node = buildDummyUserNode("1")
         Set<ObjectNode> previousGraph = Sets.asSet()
-        Set<ObjectNode> currentGraph = Sets.asSet(buildDummyUserNode("1"))
+        Set<ObjectNode> currentGraph = Sets.asSet(node)
 
         when:
         diff.addChanges(new NewObjectAppender().getChangeSet(previousGraph, currentGraph))
 
         then:
         assertThat(diff).hasChangesCount(1)
-        assertThat(diff).getChangeAtIndex(0).isNewObject().hasCdoId("1").hasEntityTypeOf(DummyUser.class).hasParentEqualTo(diff)
+        assertThat(diff).getChangeAtIndex(0).isNewObject().hasCdoId("1").hasEntityTypeOf(DummyUser.class).hasParentEqualTo(diff).hasCdo(node.cdo.wrappedCdo)
     }
 
     def "should append newObjects to diff"() {
