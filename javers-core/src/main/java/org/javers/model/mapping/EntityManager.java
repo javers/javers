@@ -47,7 +47,7 @@ public class EntityManager {
     }
 
     /**
-     * @throws JaversException if class is not managed
+     * @throws JaversException if class is not managed or EntityManager is not initialized
      */
     public ManagedClass getByClass(Class<?> clazz) {
         if (!isRegisterd(clazz)) {
