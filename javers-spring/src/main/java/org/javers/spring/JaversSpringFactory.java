@@ -25,11 +25,9 @@ public class JaversSpringFactory implements FactoryBean<Javers> {
 
         JaversBuilder javersBuilder = JaversBuilder.javers();
 
-        /*
-        WAITING FOR JAVERS CREW :)
-        for (Map.Entry<Class, String> entrie : customsId.entrySet()) {
-            javersBuilder.registerEntityWithCustomId(entrie.getKey(), entrie.getValue());
-        }*/
+        for (Map.Entry<Class, String> entry : describedEntityClasses.entrySet()) {
+            javersBuilder.registerEntity(entry.getKey(), entry.getValue());
+        }
 
         for(Class clazz : entityClasses) {
             javersBuilder.registerEntity(clazz);
@@ -41,7 +39,6 @@ public class JaversSpringFactory implements FactoryBean<Javers> {
 
         return javersBuilder.build();
     }
-
 
     @Override
     public Class<?> getObjectType() {
