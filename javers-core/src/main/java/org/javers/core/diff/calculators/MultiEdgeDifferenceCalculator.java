@@ -13,6 +13,7 @@ import java.util.Set;
 /**
  * @author Maciej Zasada
  */
+@Deprecated
 public class MultiEdgeDifferenceCalculator {
 
     public Set<Change> calculateMultiEdgeDifference(MultiEdge left, MultiEdge right, GlobalCdoId ownerNodeCdoId) {

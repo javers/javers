@@ -22,6 +22,9 @@ public class Cdo {
         this.globalId = new GlobalCdoId(entity.getCdoIdOf(cdo),entity);
     }
 
+    /**
+     * never returns null
+     */
     public Object getWrappedCdo() {
         return wrappedCdo;
     }

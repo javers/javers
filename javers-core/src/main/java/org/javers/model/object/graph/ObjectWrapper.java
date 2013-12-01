@@ -1,8 +1,10 @@
 package org.javers.model.object.graph;
 
+import org.javers.common.validation.Validate;
 import org.javers.model.domain.Cdo;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Entity;
+import org.javers.model.mapping.Property;
 import org.javers.model.visitors.Visitable;
 import org.javers.model.visitors.Visitor;
 
@@ -32,8 +34,22 @@ public class ObjectWrapper implements ObjectNode {
         this(new Cdo(cdo, entity));
     }
 
+    /**
+     * @return never returns null
+     */
     public Object unwrapCdo() {
         return cdo.getWrappedCdo();
+    }
+
+    @Override
+    public Cdo getCdo() {
+        return cdo;
+    }
+
+    @Override
+    public Object getPropertyValue(Property property) {
+        Validate.argumentIsNotNull(property);
+        return property.get(unwrapCdo());
     }
 
     @Override

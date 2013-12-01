@@ -29,7 +29,7 @@ class PropertyAssert {
     }
 
     def PropertyAssert isId() {
-        assert actual.isId() == true;
+        assert actual.looksLikeId() == true;
         return this;
     }
 }

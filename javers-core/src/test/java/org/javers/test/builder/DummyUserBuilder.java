@@ -7,6 +7,7 @@ import org.spockframework.compiler.SpecParser;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.javers.core.model.DummyUser.*;
 import static org.javers.test.builder.DummyUserDetailsTestBuilder.dummyUserDetails;
 
 /**
@@ -33,6 +34,16 @@ public class DummyUserBuilder {
 
     public DummyUserBuilder withName(String name) {
         dummyUser.setName(name);
+        return this;
+    }
+
+    public DummyUserBuilder withInteger(Integer largeInt) {
+        dummyUser.setLargeInt(largeInt);
+        return this;
+    }
+
+    public DummyUserBuilder withSex(Sex sex) {
+        dummyUser.setSex(sex);
         return this;
     }
 

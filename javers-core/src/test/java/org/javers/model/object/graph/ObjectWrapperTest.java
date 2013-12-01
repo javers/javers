@@ -1,6 +1,7 @@
 package org.javers.model.object.graph;
 
 import org.javers.core.model.DummyUser;
+import org.javers.model.domain.Cdo;
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.test.assertion.Assertions;
@@ -8,6 +9,7 @@ import org.javers.test.assertion.Assertions;
 import static org.javers.test.builder.DummyUserBuilder.dummyUser;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * @author bartosz walacik
@@ -106,5 +108,17 @@ public abstract class ObjectWrapperTest {
 
         //when + then
         Assertions.assertThat(first).isNotEqualTo(null);
+    }
+
+    @Test
+    public void shouldDelegateEqualsAndHashCodeToCdo() {
+        //given
+        Cdo mockedCdo = Mockito.mock(Cdo.class);
+        ObjectWrapper node1 = new ObjectWrapper(mockedCdo);
+        ObjectWrapper node2 = new ObjectWrapper(mockedCdo);
+
+        //when + then
+        Assertions.assertThat(node1.equals(node2)).isTrue();
+        Assertions.assertThat(node1.hashCode()).isEqualTo(mockedCdo.hashCode());
     }
 }

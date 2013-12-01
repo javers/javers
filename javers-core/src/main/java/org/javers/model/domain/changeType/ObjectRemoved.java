@@ -9,7 +9,8 @@ import org.javers.model.domain.GlobalCdoId;
  * @author bartosz walacik
  */
 public class ObjectRemoved extends Change {
-    public ObjectRemoved(GlobalCdoId removed) {
+    public ObjectRemoved(GlobalCdoId removed, Object removedCdo) {
         super(removed);
+        setAffectedCdo(removedCdo);
     }
 }

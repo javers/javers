@@ -15,9 +15,9 @@ public interface Property {
     void setValue(Object value);
 
     /**
-     * true if property is an unique identifier of Entity
+     * true if property looks like identifier of an Entity, for example has @Id annotation
      */
-    boolean isId();
+    boolean looksLikeId();
 
     /**
      * returns property value, even if private
