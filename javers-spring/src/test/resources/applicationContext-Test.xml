@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       default-autowire="byName"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+    <bean id="javers" class="org.javers.spring.JaversSpringFactory">
+        <property name="entityClasses">
+            <list>
+                <value>org.javers.core.model.DummyUserDetails</value>
+            </list>
+        </property>
+        <property name="valueObject">
+            <list>
+                <value>org.javers.core.model.DummyNetworkAddress</value>
+                <value>org.javers.core.model.DummyAddress</value>
+            </list>
+        </property>
+        <property name="describedEntityClasses">
+            <map>
+                <entry key="org.javers.core.model.DummyUser" value="age"/>
+            </map>
+        </property>
+    </bean>
+
+</beans>

@@ -1,7 +1,5 @@
 package org.javers.core.model;
 
-import com.google.common.collect.ImmutableList;
-
 import javax.persistence.Id;
 import javax.persistence.Transient;
 import java.util.ArrayList;
