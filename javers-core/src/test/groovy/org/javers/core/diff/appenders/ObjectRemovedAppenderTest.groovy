@@ -1,12 +1,12 @@
 package org.javers.core.diff.appenders
 
-import groovy.transform.TypeChecked
 import org.javers.common.collections.Sets
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.model.DummyUser
 import org.javers.model.domain.Diff
 import org.javers.model.object.graph.ObjectNode
 import static org.javers.test.assertion.DiffAssert.assertThat
+import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
  * @author Maciej Zasada
@@ -17,7 +17,7 @@ class ObjectRemovedAppenderTest extends AbstractDiffTest {
         given:
         Diff diff = new Diff("userId")
 
-        def node = buildDummyUserNode("0")
+        def node = buildGraph(dummyUser().withName("0").build())
         Set<ObjectNode> previousGraph = Sets.asSet(node)
         Set<ObjectNode> currentGraph = Sets.asSet()
 
@@ -33,8 +33,11 @@ class ObjectRemovedAppenderTest extends AbstractDiffTest {
         given:
         Diff diff = new Diff("userId")
 
-        Set<ObjectNode> previousGraph = Sets.asSet(buildDummyUserNode("2"), buildDummyUserNode("0"), buildDummyUserNode("1"))
-        Set<ObjectNode> currentGraph = Sets.asSet(buildDummyUserNode("0"))
+        Set<ObjectNode> previousGraph = Sets.asSet(
+                buildGraph(dummyUser().withName("2").build()),
+                buildGraph(dummyUser().withName("0").build()),
+                buildGraph(dummyUser().withName("1").build()))
+        Set<ObjectNode> currentGraph = Sets.asSet(buildGraph(dummyUser().withName("0").build()))
 
         when:
         diff.addChanges(new ObjectRemovedAppender().getChangeSet(previousGraph, currentGraph))
@@ -49,8 +52,8 @@ class ObjectRemovedAppenderTest extends AbstractDiffTest {
         given:
         Diff diff = new Diff("userId")
 
-        Set<ObjectNode> previousGraph = Sets.asSet(buildDummyUserNode("1"))
-        Set<ObjectNode> currentGraph = Sets.asSet(buildDummyUserNode("1"))
+        Set<ObjectNode> previousGraph = Sets.asSet(buildGraph(dummyUser().withName("1").build()))
+        Set<ObjectNode> currentGraph = Sets.asSet(buildGraph(dummyUser().withName("1").build()))
 
         when:
         diff.addChanges(new ObjectRemovedAppender().getChangeSet(previousGraph, currentGraph))

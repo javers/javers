@@ -16,6 +16,14 @@ public class DummyAddress extends AbstractDummyAddress{
     private DummyNetworkAddress networkAddress;
     private transient int someTransientField;
 
+    public DummyAddress() {
+    }
+
+    public DummyAddress(String city, String street) {
+        this.city = city;
+        this.street = street;
+    }
+
     public String getCity() {
         return city;
     }

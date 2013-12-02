@@ -1,20 +1,21 @@
 package org.javers.test.builder;
 
+import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyUserDetails;
 
 /**
  * @author bartosz walacik
  */
-public class DummyUserDetailsTestBuilder {
+public class DummyUserDetailsBuilder {
     private static final long DEFAULT_ID = 1L;
     private DummyUserDetails dummyUserDetails;
 
-    private DummyUserDetailsTestBuilder() {
+    private DummyUserDetailsBuilder() {
         dummyUserDetails = new DummyUserDetails();
     }
 
-    public static DummyUserDetailsTestBuilder dummyUserDetails() {
-        return new DummyUserDetailsTestBuilder();
+    public static DummyUserDetailsBuilder dummyUserDetails() {
+        return new DummyUserDetailsBuilder();
     }
 
     public DummyUserDetails build() {
@@ -24,8 +25,13 @@ public class DummyUserDetailsTestBuilder {
         return dummyUserDetails;
     }
 
-    public DummyUserDetailsTestBuilder withId(long id) {
+    public DummyUserDetailsBuilder withId(long id) {
         dummyUserDetails.setId(id);
+        return this;
+    }
+
+    public DummyUserDetailsBuilder withAddress(String street, String city) {
+        dummyUserDetails.setDummyAddress(new DummyAddress(street, city));
         return this;
     }
 }

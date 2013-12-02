@@ -2,13 +2,12 @@ package org.javers.test.builder;
 
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
-import org.spockframework.compiler.SpecParser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.javers.core.model.DummyUser.*;
-import static org.javers.test.builder.DummyUserDetailsTestBuilder.dummyUserDetails;
+import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails;
 
 /**
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
@@ -87,6 +86,21 @@ public class DummyUserBuilder {
 
     public DummyUserBuilder withEmployee(DummyUser rob) {
         dummyUser.addEmployee(rob);
+        return this;
+    }
+
+    public DummyUserBuilder withFlag(boolean flag) {
+        dummyUser.setFlag(flag);
+        return this;
+    }
+
+    public DummyUserBuilder withBoxedFlag(Boolean boxedFlag) {
+        dummyUser.setBigFlag(boxedFlag);
+        return this;
+    }
+
+    public DummyUserBuilder withAge(int age) {
+        dummyUser.setAge(age);
         return this;
     }
 }
