@@ -45,6 +45,8 @@ public class Javers {
     }
 
     public Diff compare(String user, Object left, Object right) {
-        return diffFactory.create(user, objectGraphBuilder.buildGraph(left), objectGraphBuilder.buildGraph(right));
+        ObjectGraphBuilder leftGraph = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder rightGraph = new ObjectGraphBuilder(entityManager);
+        return diffFactory.create(user, leftGraph.buildGraph(left), rightGraph.buildGraph(right));
     }
 }
