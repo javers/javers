@@ -11,7 +11,7 @@
     <groupId>org.javers</groupId>
     <artifactId>javers-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.0</version>
+    <version>0.2.0-SNAPSHOT</version>
 
     <name>JaVers - domain objects VCS - parent pom - ${project.version}</name>
     <description>Parent pom and reactor for all JaVers modules</description>
@@ -292,7 +292,7 @@
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
-                        <phase>deploy</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>sign</goal>
                         </goals>
