@@ -28,9 +28,11 @@ JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 ## Project team
 * Bartosz Walacik - owner,
 * Pawel Cierpiatka - first contributor,
-* Maciej Zasada  - contributor,
-* Piotr Betkier - contributor,
 * Paweł Szymczyk - contributor.
+
+### Former contributors
+* Piotr Betkier
+* Maciej Zasada
 
 ## CI status
 [![Build Status](https://drone.io/bitbucket.org/javers/javers/status.png)](https://drone.io/bitbucket.org/javers/javers/latest)

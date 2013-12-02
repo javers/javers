@@ -13,6 +13,8 @@ import org.javers.test.builder.DummyUserDetailsBuilder
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
 import static org.javers.test.ValueChangesAssert.assertThat
+import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
 /**
  * @author bartosz walacik
@@ -21,8 +23,8 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should not append valueChange when values are equal" () {
         given:
-        ObjectNode left =  buildDummyUserNode("1", FEMALE)
-        ObjectNode right = buildDummyUserNode("1", FEMALE)
+        ObjectNode left =  buildGraph(dummyUser().withName("1").withSex(FEMALE).build())
+        ObjectNode right = buildGraph(dummyUser().withName("1").withSex(FEMALE).build())
         Property sex = getEntity(DummyUser).getProperty("sex")
 
         when:
@@ -35,8 +37,8 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append Enum valueChange" () {
         given:
-        ObjectNode left =  buildDummyUserNode("1", FEMALE)
-        ObjectNode right = buildDummyUserNode("1", OCCASIONALLY)
+        ObjectNode left =  buildGraph(dummyUser().withName("1").withSex(FEMALE).build())
+        ObjectNode right = buildGraph(dummyUser().withName("1").withSex(OCCASIONALLY).build())
         Property sex = getEntity(DummyUser).getProperty("sex")
 
         when:
@@ -55,8 +57,8 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append int valueChange" () {
         given:
-        ObjectNode left =  buildDummyUserNode(DummyUserBuilder.dummyUser().withName("1").withAge(1).build())
-        ObjectNode right = buildDummyUserNode(DummyUserBuilder.dummyUser().withName("1").withAge(2).build())
+        ObjectNode left =  buildGraph(dummyUser().withName("1").withAge(1).build())
+        ObjectNode right = buildGraph(dummyUser().withName("1").withAge(2).build())
         Property age = getEntity(DummyUser).getProperty("age")
 
         when:
@@ -75,8 +77,8 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append Integer valueChange" () {
         given:
-        ObjectNode left =  buildDummyUserNode(DummyUserBuilder.dummyUser().withName("1").build())
-        ObjectNode right = buildDummyUserNode(DummyUserBuilder.dummyUser().withName("1").withInteger(5).build())
+        ObjectNode left =  buildGraph(dummyUser().withName("1").build())
+        ObjectNode right = buildGraph(dummyUser().withName("1").withInteger(5).build())
         Property largeInt = getEntity(DummyUser).getProperty("largeInt")
 
         when:
@@ -95,8 +97,8 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append boolean valueChange" () {
         given:
-        ObjectNode left =  buildDummyUserNode("1", true)
-        ObjectNode right = buildDummyUserNode("1", false)
+        ObjectNode left =  buildGraph(dummyUser().withName("1").withFlag(true).build())
+        ObjectNode right = buildGraph(dummyUser().withName("1").withFlag(false).build())
         Property flag = getEntity(DummyUser).getProperty("flag")
 
         when:
@@ -115,8 +117,8 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append Boolean valueChange" () {
         given:
-        ObjectNode left =  buildDummyUserNode(DummyUserBuilder.dummyUser().withName("1").build())
-        ObjectNode right = buildDummyUserNode(DummyUserBuilder.dummyUser().withName("1").withBoxedFlag(true).build())
+        ObjectNode left =  buildGraph(dummyUser().withName("1").build())
+        ObjectNode right = buildGraph(dummyUser().withName("1").withBoxedFlag(true).build())
         Property flag = getEntity(DummyUser).getProperty("bigFlag")
 
         when:
@@ -136,16 +138,16 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append ValueObject valueChange" () {
         given:
-        DummyUserDetails leftDummyUserDetails = DummyUserDetailsBuilder.dummyUserDetails()
+        DummyUserDetails leftDummyUserDetails = dummyUserDetails()
                 .withId(1)
                 .withAddress("Washington Street", "Boston")
                 .build();
-        DummyUserDetails rightDummyUserDetails = DummyUserDetailsBuilder.dummyUserDetails()
+        DummyUserDetails rightDummyUserDetails = dummyUserDetails()
                 .withId(1)
                 .withAddress("Wall Street", "New York")
                 .build();
-        ObjectNode left = buildDummyUserDetailsNode(leftDummyUserDetails)
-        ObjectNode right = buildDummyUserDetailsNode(rightDummyUserDetails)
+        ObjectNode left = buildGraph(leftDummyUserDetails)
+        ObjectNode right = buildGraph(rightDummyUserDetails)
         Property address = getEntity(DummyUserDetails).getProperty("dummyAddress")
 
         when:
