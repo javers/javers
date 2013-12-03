@@ -258,4 +258,22 @@ public abstract class ObjectGraphBuilderTest {
                         .hasEdge("supervisor")
                         .isSingleEdgeTo("superKaz");
     }
+
+    @Test
+    public void shouldBuildGraphWithPrimitiveTypesSet() throws Throwable {
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        DummyUser dummyUser = dummyUser().withName("name").withStringsSet("1", "2", "3").build();
+
+        //throw exception
+        ObjectNode node = graphBuilder.buildGraph(dummyUser);
+    }
+
+    @Test
+    public void shouldBuildGraphWithPrimitiveTypesList() throws Throwable {
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        DummyUser dummyUser = dummyUser().withName("name").withIntegerList(1, 2, 3, 4).build();
+
+        //throw exception
+        ObjectNode node = graphBuilder.buildGraph(dummyUser);
+    }
 }
