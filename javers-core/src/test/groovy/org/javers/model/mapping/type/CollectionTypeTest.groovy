@@ -20,7 +20,7 @@ class CollectionTypeTest extends Specification{
         Set<String> genericWithArgument
     }
 
-    def "should be not generic if baseJavaType is not generic"(){
+    def "should not be generic if baseJavaType is not generic"(){
         given:
         Field noGeneric = getFieldFromClass(Dummy, "noGeneric")
 
