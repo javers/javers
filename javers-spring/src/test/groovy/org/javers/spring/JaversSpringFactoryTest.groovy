@@ -16,8 +16,8 @@ class JaversSpringFactoryTest extends Specification {
         JaversSpringFactory javersSpringFactory = new JaversSpringFactory()
 
         when:
-        javersSpringFactory.setEntityClasses([DummyUser, DummyUserDetails])
-        javersSpringFactory.setValueObject([DummyAddress, DummyNetworkAddress])
+        javersSpringFactory.entityClasses = [DummyUser, DummyUserDetails]
+        javersSpringFactory.valueObject = [DummyAddress, DummyNetworkAddress]
 
         then:
         javersSpringFactory.object.isManaged(DummyUser.class)
@@ -28,9 +28,9 @@ class JaversSpringFactoryTest extends Specification {
         JaversSpringFactory javersSpringFactory = new JaversSpringFactory()
 
         when:
-        javersSpringFactory.setDescribedEntityClasses([(DummyUser) : "age"])
-        javersSpringFactory.setEntityClasses([DummyUserDetails])
-        javersSpringFactory.setValueObject([DummyAddress, DummyNetworkAddress])
+        javersSpringFactory.describedEntityClasses = [(DummyUser) : "age"]
+        javersSpringFactory.entityClasses = [DummyUserDetails]
+        javersSpringFactory.valueObject = [DummyAddress, DummyNetworkAddress]
 
         then:
         javersSpringFactory.object.isManaged(DummyUser.class)
