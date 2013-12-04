@@ -11,7 +11,7 @@
                 <value>org.javers.core.model.DummyUserDetails</value>
             </list>
         </property>
-        <property name="valueObject">
+        <property name="valueObjects">
             <list>
                 <value>org.javers.core.model.DummyNetworkAddress</value>
                 <value>org.javers.core.model.DummyAddress</value>
