@@ -3,14 +3,14 @@ package org.javers.core;
 
 import org.fest.assertions.api.Assertions;
 import org.javers.core.model.DummyNetworkAddress;
-import org.javers.core.pico.JaversContainerFactory;
+import org.javers.model.domain.Diff;
 import org.javers.model.mapping.BeanBasedPropertyScanner;
+import org.javers.model.mapping.Category;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.PropertyScanner;
 import org.javers.model.mapping.type.TypeMapper;
-import org.junit.Ignore;
+import org.javers.test.builder.CategoryTestBuilder;
 import org.junit.Test;
-import org.picocontainer.PicoContainer;
 
 import javax.persistence.Id;
 
@@ -107,6 +107,21 @@ public class JaversBuilderTest {
 
         //then
         assertThat(javers1).isNotSameAs(javers2);
+    }
+
+    //@Test
+    public void killJaversTest() {
+       //given
+        Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(10,25).build();
+        Category cat2 = CategoryTestBuilder.category().deepWithChildNumber(10,25).build();
+        Javers javers = javers().registerEntity(Category.class).build();
+
+        //when
+        Diff diff = javers.compare("me", cat1, cat2);
+
+        //then
+        assertThat((diff.getChanges())).hasSize(0);
+
     }
 
     private class DummyEntity {
