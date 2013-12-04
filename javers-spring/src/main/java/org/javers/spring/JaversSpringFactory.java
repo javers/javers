@@ -2,6 +2,7 @@ package org.javers.spring;
 
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
+import org.javers.core.MappingStyle;
 import org.springframework.beans.factory.FactoryBean;
 
 import java.util.ArrayList;
@@ -20,6 +21,9 @@ public class JaversSpringFactory implements FactoryBean<Javers> {
 
     private Map<Class, String> describedEntityClasses = new HashMap<>();
 
+    private MappingStyle mappingStyle = MappingStyle.BEAN;
+
+
     @Override
     public Javers getObject() throws Exception {
 
@@ -36,6 +40,8 @@ public class JaversSpringFactory implements FactoryBean<Javers> {
         for(Class clazz : valueObject) {
             javersBuilder.registerValueObject(clazz);
         }
+
+        javersBuilder.withMappingStyle(mappingStyle);
 
         return javersBuilder.build();
     }
@@ -60,5 +66,9 @@ public class JaversSpringFactory implements FactoryBean<Javers> {
 
     public void setDescribedEntityClasses(Map<Class, String> describedEntityClasses) {
         this.describedEntityClasses = describedEntityClasses;
+    }
+
+    public void setMappingStyle(MappingStyle mappingStyle) {
+        this.mappingStyle = mappingStyle;
     }
 }
