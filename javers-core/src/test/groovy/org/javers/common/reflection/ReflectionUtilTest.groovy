@@ -8,7 +8,7 @@ import java.lang.reflect.Method
 
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 import static org.javers.common.reflection.ReflectionTestHelper.getMethodFromClass
-import static org.javers.common.reflection.ReflectionUtil.getGenericTypeClass
+import static org.javers.common.reflection.ReflectionUtil.getParametrizedTypeFirstArgument
 
 /**
  * @author Pawel Cierpiatka
@@ -21,7 +21,7 @@ class ReflectionUtilTest extends Specification {
             Field dummyUsersList = getFieldFromClass(ReflectionTestModel.class, "dummyUserList");
 
         when :
-            Class arrayDeclaredType = getGenericTypeClass(dummyUsersList.getGenericType());
+            Class arrayDeclaredType = getParametrizedTypeFirstArgument(dummyUsersList.getGenericType());
 
         then:
             arrayDeclaredType == DummyUser.class
@@ -34,7 +34,7 @@ class ReflectionUtilTest extends Specification {
             Field dummyUsersSet = getFieldFromClass(ReflectionTestModel.class, "dummyUserSet");
 
         when :
-            Class setDeclaredType = getGenericTypeClass(dummyUsersSet.getGenericType());
+            Class setDeclaredType = getParametrizedTypeFirstArgument(dummyUsersSet.getGenericType());
 
         then :
             setDeclaredType == DummyUser.class
@@ -45,7 +45,7 @@ class ReflectionUtilTest extends Specification {
             Field dummyUsersQueue = getFieldFromClass(ReflectionTestModel.class, "dummyUserQueue");
 
         when :
-            Class queueDeclaredType = getGenericTypeClass(dummyUsersQueue.getGenericType());
+            Class queueDeclaredType = getParametrizedTypeFirstArgument(dummyUsersQueue.getGenericType());
 
         then :
             queueDeclaredType == DummyUser.class;
@@ -56,7 +56,7 @@ class ReflectionUtilTest extends Specification {
             Method dummyUsersList = getMethodFromClass(ReflectionTestModel.class, "getDummyUserList");
 
         when :
-            Class arrayDeclaredType = getGenericTypeClass(dummyUsersList.getGenericReturnType());
+            Class arrayDeclaredType = getParametrizedTypeFirstArgument(dummyUsersList.getGenericReturnType());
 
         then :
             arrayDeclaredType == DummyUser.class
@@ -67,7 +67,7 @@ class ReflectionUtilTest extends Specification {
             Method dummyUsersSet = getMethodFromClass(ReflectionTestModel.class, "getDummyUserSet");
 
         when :
-            Class setDeclaredType = getGenericTypeClass(dummyUsersSet.getGenericReturnType());
+            Class setDeclaredType = getParametrizedTypeFirstArgument(dummyUsersSet.getGenericReturnType());
 
         then :
             setDeclaredType == DummyUser.class
@@ -78,7 +78,7 @@ class ReflectionUtilTest extends Specification {
             Method dummyUsersList = getMethodFromClass(ReflectionTestModel.class, "getDummyUserList");
 
         when :
-            Class arrayDeclaredType = getGenericTypeClass(dummyUsersList.getGenericReturnType());
+            Class arrayDeclaredType = getParametrizedTypeFirstArgument(dummyUsersList.getGenericReturnType());
 
         then :
             arrayDeclaredType == DummyUser.class

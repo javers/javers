@@ -70,7 +70,7 @@ public class Entity<S> extends ManagedClass<S> {
     }
 
     /**
-     * @return list of {@link org.javers.model.mapping.type.EntityReferenceType} properties
+     * @return list of {@link EntityReferenceType} properties
      */
     public List<Property> getSingleReferences() {
         List<Property> refProperties = new ArrayList<>();
@@ -83,7 +83,7 @@ public class Entity<S> extends ManagedClass<S> {
         return refProperties;
     }
 
-    public List<Property> getMultiReferences() {
+    public List<Property> getCollectionTypeProperties() {
         List<Property> refProperties = new ArrayList<>();
 
         for (Property property : properties) {

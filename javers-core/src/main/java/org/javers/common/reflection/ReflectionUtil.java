@@ -123,23 +123,31 @@ public class ReflectionUtil {
         }
     }
 
+    public static boolean isGeneric(Class clazz){
+        return false;
+    }
+
     /**
-     * Returns a class that represents the declared type for the field represented by this object.
-     * For example if the field is java.util.List<org.package.model.DummyObject> the result will be DummyObject.
+     * Returns a class that represents the declared type argument for given type.
+     * For example if type is List<org.package.model.DummyObject>, returns be DummyObject.class
      */
-    public static Class getGenericTypeClass(Type type) {
+    @Deprecated
+    public static Class getGenericTypeArgument(Type type) {
         if(type instanceof ParameterizedType) {
-            return getClassFromParametrizedTypeArgument((ParameterizedType) type);
+            return getParametrizedTypeFirstArgument((ParameterizedType) type);
         }
         throw new IllegalArgumentException("Error can not get any additional data from this type " + type.getClass()
                 +".\nArgument type (java.lang.reflect.Type) should be obtain by invoke java.lang.reflect.Field.getGenericType() or java.lang.reflect.Method.getGenericReturnType()"
                 +"\nFor example ReflectionUtil.getGeneticTypeClass(someReflectField.getGenericType())");
     }
 
-    private static Class getClassFromParametrizedTypeArgument(ParameterizedType type) {
+    /**
+     * @throws IllegalArgumentException if given type has more than one type argument
+     */
+    public static Class getParametrizedTypeFirstArgument(ParameterizedType type) {
         Type[] actualTypeArguments = type.getActualTypeArguments();
         if(actualTypeArguments.length > 1) {
-            throw new IllegalArgumentException("Error can not determine actual element type. Number of type should by 1 is " + actualTypeArguments.length);
+            throw new IllegalArgumentException("Error, can not determine actual element type argument. More than one type argument in ["+type.getClass().getName()+"]");
         }
         return (Class)actualTypeArguments[0];
     }

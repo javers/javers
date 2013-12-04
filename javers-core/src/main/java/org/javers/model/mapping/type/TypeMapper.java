@@ -34,10 +34,6 @@ public class TypeMapper {
         registerPrimitiveType(Enum.class);
         registerPrimitiveType(Long.class);
 
-        //containers
-        addType(new CollectionType(Set.class));
-        addType(new CollectionType(List.class));
-
         //array
         addType(new ArrayType());
     }

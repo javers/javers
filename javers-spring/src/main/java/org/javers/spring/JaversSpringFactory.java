@@ -16,7 +16,7 @@ public class JaversSpringFactory implements FactoryBean<Javers> {
 
     private List<Class> entityClasses = new ArrayList<>();
 
-    private List<Class> valueObject = new ArrayList<>();
+    private List<Class> valueObjects = new ArrayList<>();
 
     private Map<Class, String> describedEntityClasses = new HashMap<>();
 
@@ -33,7 +33,7 @@ public class JaversSpringFactory implements FactoryBean<Javers> {
             javersBuilder.registerEntity(clazz);
         }
 
-        for(Class clazz : valueObject) {
+        for(Class clazz : valueObjects) {
             javersBuilder.registerValueObject(clazz);
         }
 
@@ -54,8 +54,8 @@ public class JaversSpringFactory implements FactoryBean<Javers> {
         this.entityClasses = entityClasses;
     }
 
-    public void setValueObject(List<Class> valueObject) {
-        this.valueObject = valueObject;
+    public void setValueObjects(List<Class> valueObjects) {
+        this.valueObjects = valueObjects;
     }
 
     public void setDescribedEntityClasses(Map<Class, String> describedEntityClasses) {

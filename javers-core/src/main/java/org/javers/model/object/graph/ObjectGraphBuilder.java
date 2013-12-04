@@ -88,7 +88,7 @@ public class ObjectGraphBuilder {
     }
 
     private void buildMultiEdges(ObjectWrapper node) {
-        List<Property> multiReferences = node.getEntity().getMultiReferences();
+        List<Property> multiReferences = node.getEntity().getCollectionTypeProperties();
         for (Property multiRef : multiReferences)  {
             if (multiRef.isNull(node.unwrapCdo())) {
                 continue;
