@@ -109,21 +109,6 @@ public class JaversBuilderTest {
         assertThat(javers1).isNotSameAs(javers2);
     }
 
-    //@Test
-    public void killJaversTest() {
-       //given
-        Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(10,25).build();
-        Category cat2 = CategoryTestBuilder.category().deepWithChildNumber(10,25).build();
-        Javers javers = javers().registerEntity(Category.class).build();
-
-        //when
-        Diff diff = javers.compare("me", cat1, cat2);
-
-        //then
-        assertThat((diff.getChanges())).hasSize(0);
-
-    }
-
     private class DummyEntity {
         private int id;
         private DummyEntity parent;

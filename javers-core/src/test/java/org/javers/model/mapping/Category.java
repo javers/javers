@@ -13,7 +13,12 @@ public class Category {
     private Long id;
     private String name;
     private Category parent;
-    private List<Category> categorys = new ArrayList<>();
+    private List<Category> categories = new ArrayList<>();
+
+    public Category(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     @Id
     public Long getId() {
@@ -32,12 +37,12 @@ public class Category {
         this.name = name;
     }
 
-    public List<Category> getCategorys() {
-        return categorys;
+    public List<Category> getCategories() {
+        return categories;
     }
 
-    public void setCategorys(List<Category> categorys) {
-        this.categorys = categorys;
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
     }
 
     public Category getParent() {
@@ -50,6 +55,6 @@ public class Category {
 
     public void addChild(Category child) {
         child.setParent(this);
-        categorys.add(child);
+        categories.add(child);
     }
 }

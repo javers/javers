@@ -1,51 +1,62 @@
 package org.javers.test.builder;
 
 import org.javers.model.mapping.Category;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pawel Cierpiatka
  */
 public class CategoryTestBuilder {
+    private static final Logger logger = LoggerFactory.getLogger(CategoryTestBuilder.class);
 
-    private Category category;
+    private Category root;
+    private long nodes;
+    private int idMultiplier;
 
-    public static CategoryTestBuilder category() {
-        return new CategoryTestBuilder();
+    private CategoryTestBuilder(int idMultiplier) {
+        this.idMultiplier = idMultiplier;
     }
 
+    public static CategoryTestBuilder category() {
+        return new CategoryTestBuilder(1);
+    }
+
+    public static CategoryTestBuilder category(int idMultiplier) {
+        return new CategoryTestBuilder(idMultiplier);
+    }
 
     public CategoryTestBuilder deepWithChildNumber(int level, int numberOfChild) {
-        category = new Category();
-        category.setId(0L);
-        category.setName("root");
-        create(category, level, numberOfChild);
-
+        root = crateCategory("root");
+        create(root, level, numberOfChild);
         return this;
+    }
 
+    private Category crateCategory(String namePrefix) {
+        nodes++;
+        return new Category(nodes*idMultiplier, namePrefix+" "+nodes*idMultiplier);
     }
 
     private void create(Category cat, int level, int numberOfChild) {
-
         if(level <= 0){
             return;
         }
-        createCategoryChild(cat, numberOfChild, level);
-        for(Category c : cat.getCategorys()) {
+        createCategoryChildren(cat, numberOfChild, level);
+        for(Category c : cat.getCategories()) {
             create(c, level - 1, numberOfChild);
         }
     }
 
-    private void createCategoryChild(Category root, int numberOfChild, int level) {
+    private void createCategoryChildren(Category parent, int numberOfChild, int level) {
         for (int i = 0; i<numberOfChild; i++) {
-            Category child = new Category();
-            child.setId(Long.valueOf(root.getId() + i + 1) * level);
-            child.setName("Name " + child.getId());
-            root.addChild(child);
+            Category child =  crateCategory("Name");
+            parent.addChild(child);
         }
     }
 
     public Category build() {
-        return category;
+        logger.info("created Category tree with "+nodes+" nodes");
+        return root;
     }
 
 }
