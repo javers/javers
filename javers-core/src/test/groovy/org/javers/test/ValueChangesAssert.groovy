@@ -21,7 +21,7 @@ class ValueChangesAssert {
         return this;
     }
 
-    def ValueChangeAssert assertThatFirstElement() {
+    def ValueChangeAssert assertThatFirstChange() {
         return ValueChangeAssert.assertThat(actual.iterator().next())
     }
 

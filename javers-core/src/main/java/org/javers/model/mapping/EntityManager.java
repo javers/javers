@@ -8,9 +8,7 @@ import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.mapping.type.ValueObjectType;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -47,16 +45,28 @@ public class EntityManager {
     }
 
     /**
+     * clazz - only class of Entity or ValueObject
+     *
      * @throws JaversException if class is not managed or EntityManager is not initialized
      */
-    public ManagedClass getByClass(Class<?> clazz) {
+    public ManagedClass getByClass(Class clazz) {
         if (!isRegisterd(clazz)) {
+            throw new JaversException(JaversExceptionCode.CLASS_NOT_MAPPED, clazz.getName());
+        }
+
+        if (!isSourceClassOfManagedClass(clazz)) {
             throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, clazz.getName());
         }
+
         if (isRegisterd(clazz) && !isManaged(clazz)) {
             throw new JaversException(JaversExceptionCode.ENTITY_MANAGER_NOT_INITIALIZED, clazz.getName());
         }
         return managedClasses.getBySourceClass(clazz);
+    }
+
+    private boolean isSourceClassOfManagedClass(Class clazz) {
+        return (typeMapper.getJavesrType(clazz) instanceof EntityReferenceType) ||
+                (typeMapper.getJavesrType(clazz) instanceof ValueObjectType);
     }
 
     @Deprecated

@@ -9,7 +9,10 @@ import org.javers.model.domain.changeType.ReferenceAdded;
 
 /**
  * @author Maciej Zasada
+ *
+ * use ChangesAssert
  */
+@Deprecated
 public class ChangeAssert extends AbstractAssert<ChangeAssert, Change> {
 
     private ChangeAssert(Change actual) {

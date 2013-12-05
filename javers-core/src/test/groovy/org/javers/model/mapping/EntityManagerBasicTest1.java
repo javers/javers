@@ -5,19 +5,13 @@ import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.model.DummyNetworkAddress;
 import org.javers.core.model.DummyUser;
-import org.javers.model.mapping.type.ArrayType;
-import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
 import org.javers.test.assertion.Assertions;
-import org.javers.test.assertion.EntityAssert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.verification.VerificationMode;
 
 import javax.persistence.Id;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -43,6 +37,7 @@ public class EntityManagerBasicTest1 {
         entityManager = new EntityManager(entityFactory, valueObjectFactory, mapper);
     }
 
+
     @Test
     public void shouldThrowExceptionIfEntityIsNotManagedWhenTryingToGetIt() {
 
@@ -50,7 +45,7 @@ public class EntityManagerBasicTest1 {
         catchException(entityManager).getByClass(NotManagedClass.class);
 
         // then
-        assertThat((JaversException) caughtException()).hasCode(JaversExceptionCode.CLASS_NOT_MANAGED);
+        assertThat((JaversException) caughtException()).hasCode(JaversExceptionCode.CLASS_NOT_MAPPED);
     }
 
     @Test
