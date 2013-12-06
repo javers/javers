@@ -27,17 +27,17 @@ class DiffFactoryIntegrationTest extends Specification {
         diff.changes.size() == 0
     }
 
-    def "should manage full diff on very big graphs"() {
+    def "should manage full diff on big graphs"() {
         given:
-        Category cat1 = category().deepWithChildNumber(6,6).build()
-        Category cat2 = category(-1).deepWithChildNumber(6,6).build()
+        Category cat1 = category().deepWithChildNumber(5,5).build()
+        Category cat2 = category(-1).deepWithChildNumber(5,5).build()
         Javers javers = javers().registerEntity(Category).build()
 
         when:
         Diff diff = javers.compare("me", cat1, cat2)
 
         then:
-        diff.changes.size() == 55987 * 2
+        diff.changes.size() == 3906 * 2
     }
 
 
