@@ -1,6 +1,5 @@
 package org.javers.model.mapping
 
-import com.googlecode.catchexception.CatchException
 import org.javers.core.exceptions.JaversException
 import org.javers.core.exceptions.JaversExceptionCode
 import org.javers.core.model.DummyManagedClass
@@ -10,10 +9,7 @@ import org.javers.model.mapping.type.TypeMapper
 import org.javers.test.assertion.Assertions
 import spock.lang.Specification
 
-import static com.googlecode.catchexception.CatchException.catchException
-import static com.googlecode.catchexception.CatchException.caughtException
 import static org.fest.assertions.api.Assertions.assertThat
-import static org.javers.test.assertion.Assertions.assertThat
 import static org.mockito.Mockito.mock
 
 class EntityManagerTest extends Specification{
@@ -31,10 +27,11 @@ class EntityManagerTest extends Specification{
     def "should throw exception if entity is not managed when trying to get it"() {
 
         when:
-        catchException(entityManager).getByClass(DummyNotManagedClass)
+        entityManager.getByClass(DummyNotManagedClass)
 
         then:
-        assertThat((JaversException) caughtException()).hasCode(JaversExceptionCode.CLASS_NOT_MANAGED)
+        JaversException ex = thrown()
+        ex.code == JaversExceptionCode.CLASS_NOT_MANAGED
     }
 
     def "should throw exception when class is registered but entity is not build"() {
@@ -43,20 +40,20 @@ class EntityManagerTest extends Specification{
         entityManager.registerEntity(entityDefinition)
 
         when:
-        CatchException.catchException(entityManager).getByClass(DummyManagedClass)
+        entityManager.getByClass(DummyManagedClass)
 
         then:
-        assertThat(caughtException()).overridingErrorMessage("No exception caught").isNotNull()
-        assertThat((JaversException) caughtException()).hasCode(JaversExceptionCode.ENTITY_MANAGER_NOT_INITIALIZED)
+        JaversException ex = thrown()
+        ex.code == JaversExceptionCode.ENTITY_MANAGER_NOT_INITIALIZED
     }
 
     def "should throw exception when class is mapped but is not instance of ManagedClass"() {
         when:
-        CatchException.catchException(entityManager).getByClass(Integer)
+        entityManager.getByClass(Integer)
 
         then:
-        assertThat(caughtException()).overridingErrorMessage("No exception caught").isNotNull()
-        assertThat((JaversException) caughtException()).hasCode(JaversExceptionCode.EXPECTED_ENTITY_OR_VALUE_OBJECT_SOURCE_CLASS)
+        JaversException ex = thrown()
+        ex.code == JaversExceptionCode.EXPECTED_ENTITY_OR_VALUE_OBJECT_SOURCE_CLASS
     }
 
     def "should return entity model for managed class after Building it"() {
