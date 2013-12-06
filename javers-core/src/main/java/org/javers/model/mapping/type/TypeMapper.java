@@ -3,9 +3,11 @@ package org.javers.model.mapping.type;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Maps Java types into Javers types
@@ -13,10 +15,10 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public class TypeMapper {
-    private List<JaversType> mappedTypes;
+    private Map<Type, JaversType> mappedTypes;
 
     public TypeMapper() {
-        mappedTypes = new ArrayList<>();
+        mappedTypes = new HashMap<>();
 
         //primitives
         registerPrimitiveType(Integer.TYPE);
@@ -38,17 +40,15 @@ public class TypeMapper {
         addType(new ArrayType());
     }
 
-    public JaversType getJavesrType(Class javaType) {
-        //TODO add cache?
-        JaversType mappedType = findJavesType(javaType);
-        if(mappedType != null) {
-            return mappedType;
+    public JaversType getJavesrType(Type javaType) {
+        if (!isMapped(javaType))  {
+            throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType);
         }
-        throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType.getName());
+        return mappedTypes.get(javaType);
     }
 
-    public boolean isMapped(Class javaType) {
-        return findJavesType(javaType) != null;
+    public boolean isMapped(Type javaType) {
+        return mappedTypes.containsKey(javaType);
     }
 
     public int getCountOfEntitiesAndValueObjects() {
@@ -56,17 +56,12 @@ public class TypeMapper {
                getMappedValueObjectTypes().size();
     }
 
-    private JaversType findJavesType(Class javaType) {
-        for (JaversType mappedType : mappedTypes) {
-            if (mappedType.isMappingForJavaType(javaType)) {
-                return mappedType;
-            }
-        }
-        return null;
+    private void addType(JaversType jType) {
+        mappedTypes.put(jType.getBaseJavaType(), jType);
     }
 
-    private void addType(JaversType type) {
-        mappedTypes.add(type);
+    public void registerCollectionType(Type collectionType) {
+        addType(new CollectionType(collectionType));
     }
 
     public void registerPrimitiveType(Class<?> primitiveClass) {
@@ -84,7 +79,7 @@ public class TypeMapper {
 
     public <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
         List<T> result = new ArrayList<>();
-        for(JaversType jType : mappedTypes) {
+        for(JaversType jType : mappedTypes.values()) {
             if(ofType.isAssignableFrom(jType.getClass()) ) {
                 result.add((T)jType);
             }

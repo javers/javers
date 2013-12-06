@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
  *
  * @author Adam Dubiel <adam.dubiel@gmail.com>
  */
-public class EntityManagerBasicTest1 {
+public class EntityManagerBasicTest {
 
     private EntityManager entityManager;
 
@@ -39,8 +39,7 @@ public class EntityManagerBasicTest1 {
         TypeMapper mapper = new TypeMapper();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
         EntityFactory entityFactory = new EntityFactory(scanner);
-        ValueObjectFactory valueObjectFactory = new ValueObjectFactory();
-        entityManager = new EntityManager(entityFactory, valueObjectFactory, mapper);
+        entityManager = new EntityManager(entityFactory, mapper);
     }
 
     @Test
@@ -117,7 +116,7 @@ public class EntityManagerBasicTest1 {
     public void shouldNotRegisterEntityInTypeMapperMoreThanOnce() throws Throwable {
         //given
         TypeMapper typeMapper = new TypeMapper();
-        EntityManager entityManager = new EntityManager(mock(EntityFactory.class), mock(ValueObjectFactory.class), typeMapper);
+        EntityManager entityManager = new EntityManager(mock(EntityFactory.class), typeMapper);
 
         //when
         entityManager.registerEntity(DummyUser.class);
@@ -133,7 +132,7 @@ public class EntityManagerBasicTest1 {
         Class alreadyMappedValueObject = DummyNetworkAddress.class;
         TypeMapper typeMapper = mock(TypeMapper.class);
         when(typeMapper.isMapped(alreadyMappedValueObject)).thenReturn(true);
-        EntityManager entityManager = new EntityManager(mock(EntityFactory.class), mock(ValueObjectFactory.class), typeMapper);
+        EntityManager entityManager = new EntityManager(mock(EntityFactory.class), typeMapper);
 
         //when
         entityManager.registerValueObject(alreadyMappedValueObject);
@@ -153,7 +152,7 @@ public class EntityManagerBasicTest1 {
         TypeMapper typeMapper = mock(TypeMapper.class);
         //when(typeMapper.getReferenceTypes()).thenReturn(arrayWithPrimitiveJavaTypes());
         when(typeMapper.getJavesrType(ofPrimitiveJavaType())).thenReturn(javersPrimitiveType());
-        EntityManager entityManager = new EntityManager(mock(EntityFactory.class), mock(ValueObjectFactory.class), typeMapper);
+        EntityManager entityManager = new EntityManager(mock(EntityFactory.class), typeMapper);
 
         //when
         try {

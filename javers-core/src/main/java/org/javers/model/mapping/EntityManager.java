@@ -66,6 +66,14 @@ public class EntityManager {
         managedClassDefinitions.add(def);
     }
 
+    public void registerEntity(Class<?> clazz) {
+        register(new EntityDefinition(clazz));
+    }
+
+    public void registerValueObject(Class<?> clazz) {
+        register(new ValueObjectDefinition(clazz));
+    }
+
     private boolean isRegistered(ManagedClassDefinition def) {
         return managedClassDefinitions.contains(def);
     }

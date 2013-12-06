@@ -11,7 +11,7 @@ public class ArrayType extends ContainerType {
     }
 
     @Override
-    public boolean isMappingForJavaType(Class givenType) {
+    public boolean isMappingForJavaClass(Class givenType) {
         return givenType.isArray();
     }
 }
