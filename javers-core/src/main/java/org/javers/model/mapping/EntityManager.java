@@ -53,10 +53,20 @@ public class EntityManager {
         if (!isRegisterd(clazz)) {
             throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, clazz.getName());
         }
+
+        if (!isManagedClass(clazz)) {
+            throw new JaversException(JaversExceptionCode.EXPECTED_ENTITY_OR_VALUE_OBJECT_SOURCE_CLASS, clazz.getName());
+        }
+
         if (isRegisterd(clazz) && !isManaged(clazz)) {
             throw new JaversException(JaversExceptionCode.ENTITY_MANAGER_NOT_INITIALIZED, clazz.getName());
         }
         return managedClasses.getBySourceClass(clazz);
+    }
+
+    private boolean isManagedClass(Class<?> clazz) {
+        JaversType javersType = typeMapper.getJavesrType(clazz);
+        return (javersType instanceof EntityReferenceType || javersType instanceof ValueObjectType);
     }
 
     @Deprecated
