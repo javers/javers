@@ -40,4 +40,6 @@ public interface ObjectNode extends Visitable<GraphVisitor> {
      * @return never returns null
      */
     public Cdo getCdo();
+
+    void getEntity(Property supportedProperty);
 }

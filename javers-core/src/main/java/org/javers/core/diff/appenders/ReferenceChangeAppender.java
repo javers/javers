@@ -41,14 +41,10 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
         ObjectNode left = pair.getLeft();
         ObjectNode right =pair.getRight();
 
-        Object leftReference = left.getPropertyValue(supportedProperty);
-        Object rightReference = right.getPropertyValue(supportedProperty);
-        ManagedClass leftManagedClass = entityManager.getByClass(leftReference.getClass());
-        ManagedClass rightManagedClass = entityManager.getByClass(rightReference.getClass());
+        Entity entity = left.getEntity(supportedProperty);
 
-        if (leftReference == rightReference) {
-            return Collections.EMPTY_SET;
-        }
+
+
 
         return Sets.asSet(new ReferenceChanged(pair.getGlobalCdoId(),
                             supportedProperty,
