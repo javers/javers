@@ -1,7 +1,6 @@
 package org.javers.test
 
 import org.javers.model.domain.changeType.ReferenceChanged
-import org.javers.model.domain.changeType.ValueChange
 import org.javers.model.mapping.Property
 
 

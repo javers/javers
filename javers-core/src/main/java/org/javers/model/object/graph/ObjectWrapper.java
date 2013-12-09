@@ -46,6 +46,28 @@ public class ObjectWrapper implements ObjectNode {
         return cdo;
     }
 
+    //TODO add test
+    @Override
+    public boolean isEntity(Property property) {
+        for (Edge edge : edges) {
+            if (edge.getProperty().equals(property)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //TODO add test
+    @Override
+    public GlobalCdoId getGlobalCdoIdOf(Property property) {
+        for (Edge edge: edges) {
+            if (edge.getProperty().equals(property)) {
+                return ((SingleEdge) edge).getReferencedGlobalCdoId(Direction.IN);
+            }
+        }
+        return null;
+    }
+
     @Override
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);

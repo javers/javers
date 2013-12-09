@@ -20,13 +20,13 @@ public class MultiEdgeAssert extends AbstractAssert<MultiEdgeAssert, MultiEdge> 
     }
 
     public MultiEdgeAssert ofSize(int expectedSize) {
-        Assertions.assertThat(actual.getReferences()).hasSize(expectedSize);
+        Assertions.assertThat(actual.getInReferences()).hasSize(expectedSize);
         return this;
     }
 
     public MultiEdgeAssert refersToCdoWithIds(Object... expectedRefCdoIds) {
         List actualCdoIds = Lists.newArrayList();
-        for (ObjectNode node : actual.getReferences()) {
+        for (ObjectNode node : actual.getInReferences()) {
             actualCdoIds.add(node.getLocalCdoId());
         }
 

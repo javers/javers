@@ -5,6 +5,7 @@ import org.javers.core.diff.NodePair
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.model.domain.Change
+import org.javers.model.domain.GlobalCdoId
 import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
 
@@ -26,7 +27,7 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
         when:
         Collection<Change> changes =
-            new ReferenceChangeAppender(entityManager).calculateChanges(new NodePair(leftNode, rightNode), property);
+            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property);
 
         then:
         assertThat changes hasSize 0
@@ -42,15 +43,15 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
         when:
         Collection<Change> changes =
-            new ReferenceChangeAppender(entityManager).calculateChanges(new NodePair(leftNode, rightNode), property);
+            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property);
 
         then:
         assertThat(changes)
             .hasSize(1)
             .assertThatFirstChange()
             .hasCdoId("1")
-            .hasLeftReference(leftReference.dummyUserDetails)
-            .hasRightReference(rightReference.dummyUserDetails)
+            .hasLeftReference(new GlobalCdoId(leftReference.dummyUserDetails.id, getEntity(DummyUserDetails)))
+            .hasRightReference(new GlobalCdoId(rightReference.dummyUserDetails.id, getEntity(DummyUserDetails)))
             .hasProperty(property)
     }
 
@@ -64,7 +65,7 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
         when:
         Collection<Change> changes =
-            new ReferenceChangeAppender(entityManager).calculateChanges(new NodePair(leftNode, rightNode), property);
+            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property);
 
         then:
         assertThat changes hasSize 0
@@ -80,7 +81,7 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
         when:
         Collection<Change> changes =
-            new ReferenceChangeAppender(entityManager).calculateChanges(new NodePair(leftNode, rightNode), property);
+            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property);
 
         then:
         assertThat changes hasSize 0

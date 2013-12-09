@@ -39,7 +39,9 @@ public interface ObjectNode extends Visitable<GraphVisitor> {
     /**
      * @return never returns null
      */
-    public Cdo getCdo();
+    Cdo getCdo();
 
-    void getEntity(Property supportedProperty);
+    boolean isEntity(Property property);
+
+    GlobalCdoId getGlobalCdoIdOf(Property property);
 }

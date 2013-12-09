@@ -1,9 +1,8 @@
 package org.javers.model.object.graph;
 
 import org.javers.common.validation.Validate;
-import org.javers.model.mapping.Entity;
+import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Property;
-import org.javers.model.visitors.Visitor;
 
 /**
  * OneToOne or ManyToOne relation
@@ -14,21 +13,32 @@ import org.javers.model.visitors.Visitor;
  */
 public class SingleEdge extends Edge {
 
-    private final ObjectNode reference;
+    private final ObjectNode inReference;
+    private final ObjectNode outReference;
 
-    public SingleEdge(Property property, ObjectNode reference) {
+    public SingleEdge(Property property, ObjectNode outReference, ObjectNode inReference) {
         super(property);
-        Validate.argumentIsNotNull(reference);
+        Validate.argumentIsNotNull(outReference);
+        Validate.argumentIsNotNull(inReference);
 
-        this.reference = reference;
+        this.outReference = outReference;
+        this.inReference = inReference;
     }
 
-    public ObjectNode getReference() {
-        return reference;
+    public ObjectNode getInReference() {
+        return inReference;
     }
 
     @Override
     public void accept(GraphVisitor visitor) {
-        reference.accept(visitor);
+        inReference.accept(visitor);
+    }
+
+    public GlobalCdoId getReferencedGlobalCdoId(Direction direction) {
+        if (direction == Direction.IN) {
+            return inReference.getGlobalCdoId();
+        } else {
+            return outReference.getGlobalCdoId();
+        }
     }
 }

@@ -82,7 +82,7 @@ public class ObjectGraphBuilder {
             Object referencedRawCdo = singleRef.get(node.unwrapCdo());
             ObjectNode referencedNode = buildNodeOrReuse(asCdo(referencedRawCdo));
 
-            Edge edge = new SingleEdge(singleRef, referencedNode);
+            Edge edge = new SingleEdge(singleRef, node, referencedNode);
             node.addEdge(edge);
         }
     }
@@ -97,16 +97,17 @@ public class ObjectGraphBuilder {
             if (collectionOfReferences.isEmpty()){
                 continue;
             }
-            MultiEdge multiEdge = createMultiEdge(multiRef, collectionOfReferences);
+            MultiEdge multiEdge = createMultiEdge(multiRef, node, collectionOfReferences);
             node.addEdge(multiEdge);
         }
     }
 
-    private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences) {
+    private MultiEdge createMultiEdge(Property multiRef, ObjectNode node, Collection collectionOfReferences) {
         MultiEdge multiEdge = new MultiEdge(multiRef);
+        multiEdge.addOutReferenceNode(node);
         for(Object referencedRawCdo : collectionOfReferences) {
             ObjectNode objectNode = buildNodeOrReuse(asCdo(referencedRawCdo));
-            multiEdge.addReferenceNode(objectNode);
+            multiEdge.addInReferenceNode(objectNode);
         }
         return multiEdge;
     }
