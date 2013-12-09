@@ -8,7 +8,9 @@ import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.mapping.type.ValueObjectType;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -45,17 +47,15 @@ public class EntityManager {
     }
 
     /**
-     * clazz - only class of Entity or ValueObject
-     *
      * @throws JaversException if class is not managed or EntityManager is not initialized
      */
-    public ManagedClass getByClass(Class clazz) {
+    public ManagedClass getByClass(Class<?> clazz) {
         if (!isRegisterd(clazz)) {
-            throw new JaversException(JaversExceptionCode.CLASS_NOT_MAPPED, clazz.getName());
+            throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, clazz.getName());
         }
 
-        if (!isSourceClassOfManagedClass(clazz)) {
-            throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, clazz.getName());
+        if (!isManagedClass(clazz)) {
+            throw new JaversException(JaversExceptionCode.EXPECTED_ENTITY_OR_VALUE_OBJECT_SOURCE_CLASS, clazz.getName());
         }
 
         if (isRegisterd(clazz) && !isManaged(clazz)) {
@@ -64,9 +64,9 @@ public class EntityManager {
         return managedClasses.getBySourceClass(clazz);
     }
 
-    private boolean isSourceClassOfManagedClass(Class clazz) {
-        return (typeMapper.getJavesrType(clazz) instanceof EntityReferenceType) ||
-                (typeMapper.getJavesrType(clazz) instanceof ValueObjectType);
+    private boolean isManagedClass(Class<?> clazz) {
+        JaversType javersType = typeMapper.getJavesrType(clazz);
+        return (javersType instanceof EntityReferenceType || javersType instanceof ValueObjectType);
     }
 
     @Deprecated

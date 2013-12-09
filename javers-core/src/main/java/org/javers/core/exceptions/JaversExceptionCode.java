@@ -10,15 +10,11 @@ import static org.javers.core.exceptions.JaversException.*;
 public enum JaversExceptionCode {
     //TODO better exception messages - User Friendly!
 
+    EXPECTED_ENTITY_OR_VALUE_OBJECT_SOURCE_CLASS(RUNTIME_ERROR + "Class '%s' is mapped in Javers, but is not Entity or ValueObject source class"),
     /**
      * Class is not defined in Javers configuration or is not source class of ValueObject or Entity.
      */
-    CLASS_NOT_MANAGED(RUNTIME_ERROR + "Class '%s' is mapped, but is not source class of Entity or ValueObject"),
-
-    /**
-     * Class is not defined in Javers configuration
-     */
-    CLASS_NOT_MAPPED(RUNTIME_ERROR + "Class '%s' is not mapped. Add this class to your JaVers configuration."),
+    CLASS_NOT_MANAGED(RUNTIME_ERROR + "Class '%s' is not managed. Add this class to your JaVers configuration."),
 
     UNEXPECTED_VALUE_OBJECT(RUNTIME_ERROR + "Can't start building graph from Value Object '%s', expected Entity instance."),
 
