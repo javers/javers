@@ -126,21 +126,6 @@ public class EntityManagerBasicTest {
         Assertions.assertThat(typeMapper.getMappedEntityReferenceTypes()).hasSize(1);
     }
 
-    @Test
-    public void shouldNotRegisterValueObjectMoreThanOnce() throws Throwable {
-        //given
-        Class alreadyMappedValueObject = DummyNetworkAddress.class;
-        TypeMapper typeMapper = mock(TypeMapper.class);
-        when(typeMapper.isMapped(alreadyMappedValueObject)).thenReturn(true);
-        EntityManager entityManager = new EntityManager(mock(EntityFactory.class), typeMapper);
-
-        //when
-        entityManager.registerValueObject(alreadyMappedValueObject);
-
-        //then
-        verify(typeMapper, hadNoInteractionWith()).registerValueObjectType(alreadyMappedValueObject);
-    }
-
     private VerificationMode hadNoInteractionWith() {
         return times(0);
     }

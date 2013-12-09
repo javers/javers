@@ -1,8 +1,12 @@
 package org.javers.common.reflection;
 
+import org.javers.core.exceptions.JaversException;
+import org.javers.core.exceptions.JaversExceptionCode;
+
 import javax.persistence.Transient;
 import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -150,5 +154,36 @@ public class ReflectionUtil {
             throw new IllegalArgumentException("Error, can not determine actual element type argument. More than one type argument in ["+type.getClass().getName()+"]");
         }
         return (Class)actualTypeArguments[0];
+    }
+
+    /**
+     * Makes sense only for {@link ParameterizedType}
+     */
+    public static List<Class> extractActualClassTypeArguments(Type javaType) {
+        if (!(javaType instanceof ParameterizedType)) {
+            return Collections.emptyList();
+        }
+
+        ParameterizedType parameterizedType = (ParameterizedType)javaType;
+
+        List<Class> result = new ArrayList<>();
+        for (Type t : parameterizedType.getActualTypeArguments() ) {
+            if (t instanceof Class) {
+                result.add((Class)t);
+            }
+        }
+
+        return Collections.unmodifiableList(result);
+    }
+
+    public static Class extractClass(Type javaType) {
+        if (javaType instanceof ParameterizedType &&
+                ((ParameterizedType)javaType).getRawType() instanceof Class){
+            return (Class)((ParameterizedType)javaType).getRawType();
+        }  else if (javaType instanceof Class) {
+            return (Class)javaType;
+        }
+
+        throw new JaversException(JaversExceptionCode.CLASS_EXTRACTION_ERROR, javaType);
     }
 }

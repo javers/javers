@@ -11,19 +11,25 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public class CollectionType extends ContainerType {
 
-    private Class elementType;
+    private final Class elementType;
 
     public CollectionType(Type genericJavaType) {
         super(genericJavaType);
+
+        if (getActualClassTypeArguments().size() == 1) {
+            elementType = getActualClassTypeArguments().get(0);
+        } else {
+            elementType = null;
+        }
     }
 
     /**
-     * When Collection is parametrized type,
-     * returns JaversType of type argument.
+     * Collection content type,
+     * when Collection is generic Type with exact one actual Class argument
      * <br/>
-     * For example, if baseJavaType = List<String>, returns JaversType of String
+     * For example, if baseJavaType = List<String>, returns String.class
      */
-    public JaversType getElementType() {
-        return null;
+    public Class getElementType() {
+        return elementType;
     }
 }

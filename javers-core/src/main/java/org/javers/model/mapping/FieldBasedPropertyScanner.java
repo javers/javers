@@ -22,14 +22,12 @@ public class FieldBasedPropertyScanner extends PropertyScanner {
 
     @Override
     public  List<Property> scan(Class<?> managedClass) {
-        List<Field> declaredFields = new LinkedList<Field>();
+        List<Field> declaredFields = new LinkedList<>();
         declaredFields.addAll(getFields(managedClass));
-        List<Property> propertyList = new ArrayList<Property>(declaredFields.size());
+        List<Property> propertyList = new ArrayList<>(declaredFields.size());
 
         for (Field field : declaredFields) {
-
-            if(fieldIsPersistance(field)) {
-
+            if(isPersistent(field)) {
                 JaversType javersType = typeMapper.getJavesrType(field.getType());
                 Property fieldProperty = new FieldProperty(field, javersType);
                 propertyList.add(fieldProperty);
@@ -51,7 +49,7 @@ public class FieldBasedPropertyScanner extends PropertyScanner {
         return superFields;
     }
 
-    private boolean fieldIsPersistance(Field field) {
+    private boolean isPersistent(Field field) {
         return Modifier.isTransient(field.getModifiers()) == false
                 && field.getAnnotation(Transient.class) == null;
     }

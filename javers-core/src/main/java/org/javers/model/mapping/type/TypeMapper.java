@@ -1,13 +1,16 @@
 package org.javers.model.mapping.type;
 
+import org.javers.common.reflection.ReflectionUtil;
+import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.javers.common.reflection.ReflectionUtil.extractClass;
+import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * Maps Java types into Javers types
@@ -38,16 +41,65 @@ public class TypeMapper {
 
         //array
         addType(new ArrayType());
+
+        //Collections
+        addType(new CollectionType(Set.class));
+        addType(new CollectionType(List.class));
     }
 
+    /**
+     * @throws JaversExceptionCode TYPE_NOT_MAPPED
+     */
     public JaversType getJavesrType(Type javaType) {
-        if (!isMapped(javaType))  {
-            throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType);
+        argumentIsNotNull(javaType);
+
+        JaversType jType = getMatchingJaversType(javaType);
+        if (jType != null) {
+            return jType;
         }
+
+        //try to spawn generic from prototype
+        if (javaType instanceof  ParameterizedType) {
+            JaversType spawned = spawnGenericFromPrototype((ParameterizedType)javaType);
+            addType(spawned);
+            return spawned;
+        }
+
+        throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType);
+    }
+
+    /**
+     * @throws JaversExceptionCode TYPE_NOT_MAPPED
+     */
+    private JaversType spawnGenericFromPrototype(ParameterizedType javaType) {
+        JaversType prototype = findNoGenericJaversTypeAssignableFrom(javaType);
+
+        return null;
+    }
+
+    /**
+     * @return null if not found
+     */
+    private JaversType getMatchingJaversType(Type javaType) {
         return mappedTypes.get(javaType);
     }
 
-    public boolean isMapped(Type javaType) {
+    /**
+     * @throws JaversExceptionCode TYPE_NOT_MAPPED
+     */
+    private JaversType findNoGenericJaversTypeAssignableFrom(Type javaType) {
+        argumentIsNotNull(javaType);
+
+        for (JaversType javersType : mappedTypes.values()){
+            if(!javersType.isGenericType() && javersType.isAssignableFrom(extractClass(javaType))){
+                return javersType;
+            }
+        }
+
+        throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType);
+    }
+
+    private boolean isMapped(Type javaType) {
         return mappedTypes.containsKey(javaType);
     }
 

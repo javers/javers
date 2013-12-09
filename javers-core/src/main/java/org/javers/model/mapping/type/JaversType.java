@@ -1,11 +1,16 @@
 package org.javers.model.mapping.type;
 
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
-import org.javers.core.diff.appenders.PropertyChangeAppender;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.javers.common.reflection.ReflectionUtil.extractActualClassTypeArguments;
+import static org.javers.common.reflection.ReflectionUtil.extractClass;
 
 /**
  * Property type that can be managed by Javers, so int, String, Date, etc.
@@ -15,8 +20,9 @@ import java.util.Arrays;
  * @author bartosz walacik
  */
 public abstract class JaversType {
-    protected final Type  baseJavaType;
-    protected final Class baseJavaClass;
+    private final Type  baseJavaType;
+    private final Class baseJavaClass;
+    private final List<Class> actualClassTypeArguments;
 
     /**
      * @param baseJavaType Class or ParametrizedType
@@ -26,22 +32,25 @@ public abstract class JaversType {
 
         this.baseJavaType = baseJavaType;
 
-        if (baseJavaType instanceof ParameterizedType) {
-            this.baseJavaClass = (Class)((ParameterizedType) baseJavaType).getRawType();
-        } else if (baseJavaType instanceof Class) {
-            this.baseJavaClass = (Class)baseJavaType;
-        }else {
-            throw new IllegalArgumentException("don't know kow to handle type: "+baseJavaType+". Expected Class|ParametrizedType");
-        }
+        this.baseJavaClass = extractClass(baseJavaType);
+
+        this.actualClassTypeArguments = extractActualClassTypeArguments(baseJavaType);
+
     }
 
-    public boolean isGeneric() {
-        return (baseJavaType instanceof  ParameterizedType);
+    public boolean isAssignableFrom(Class javaClass) {
+        return baseJavaClass.isAssignableFrom(javaClass);
     }
 
-    @Deprecated
-    public boolean isMappingForJavaClass(Class givenJavaClass) {
-        return baseJavaClass.isAssignableFrom(givenJavaClass);
+    protected boolean isGenericType() {
+        return (baseJavaType instanceof ParameterizedType);
+    }
+
+    /**
+     * @return Immutable List, never returns null
+     */
+    protected List<Class> getActualClassTypeArguments() {
+        return actualClassTypeArguments;
     }
 
     public Type getBaseJavaType() {
@@ -67,7 +76,7 @@ public abstract class JaversType {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName()+ "(type:"+baseJavaType+", class:"+baseJavaClass.getName()+")" ;
+        return this.getClass().getSimpleName()+ "(type:"+baseJavaType+")" ;
     }
 
     @Override

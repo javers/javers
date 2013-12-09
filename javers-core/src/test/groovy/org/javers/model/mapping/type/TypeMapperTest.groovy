@@ -12,30 +12,34 @@ import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClas
  */
 class TypeMapperTest extends Specification {
 
+    enum DummyEnum {A,B}
+
     class Dummy <T,X> {
-        Set    noGenericGeneric
+        HashSet hashSet
+        HashSet<String> hashSetWithString
+        DummyEnum dummyEnum
+
         Set<?> wildcardGeneric
         Set<T> parametrizedGeneric
         Set<X> parametrizedGenericX
         Set<String> genericWithString
     }
 
-    def "should map parametrized types as distinct javers types"() {
+    def "should spawn concrete Enum type"() {
         given:
         TypeMapper mapper = new TypeMapper();
-        Type parametrizedGenericType   = getFieldFromClass(Dummy, "parametrizedGeneric").genericType
-        Type parametrizedGenericTypeX  = getFieldFromClass(Dummy, "parametrizedGenericX").genericType
-        Type genericWithStringType =     getFieldFromClass(Dummy, "genericWithString").genericType
+        Type dummyEnum   = getFieldFromClass(Dummy, "dummyEnum").type
 
         when:
-        mapper.registerCollectionType(parametrizedGenericType)
-        mapper.registerCollectionType(parametrizedGenericTypeX)
-        mapper.registerCollectionType(genericWithStringType)
-        mapper.getMappedTypes(CollectionType).each {System.out.println(it)}
+        JaversType jType = mapper.getJavesrType(dummyEnum)
 
         then:
-        mapper.getMappedTypes(CollectionType).size() == 2
-
+        jType.baseJavaType == DummyEnum
+        jType.baseJavaClass == DummyEnum
     }
+
+
+ //   def "should map parametrized types as distinct javers types"() {
+
 
 }
