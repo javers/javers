@@ -37,6 +37,7 @@ class TypeMapperTest extends Specification {
 
         then:
         jType.baseJavaType == DummyEnum
+        jType.class == PrimitiveType
     }
 
     def "should map Set & List by default"() {
@@ -64,13 +65,14 @@ class TypeMapperTest extends Specification {
 
         then:
         jType.baseJavaType == DummySet
+        jType.class == CollectionType
         mapper.getMappedTypes(CollectionType).size() == colPrototypes + 1
     }
 
     def "should spawn generic type from non-generic prototype"() {
         given:
         TypeMapper mapper = new TypeMapper()
-        Type setWithString   = getFieldFromClass(Dummy, "setWithString").type
+        Type setWithString   = getFieldFromClass(Dummy, "setWithString").genericType
 
         when:
         JaversType jType = mapper.getJavesrType(setWithString)
@@ -80,12 +82,12 @@ class TypeMapperTest extends Specification {
     }
 
 
-    def "should map generic types as distinct javers types"() {
+    def "should spawn generic types as distinct javers types"() {
         given:
         TypeMapper mapper = new TypeMapper();
         int colPrototypes  = mapper.getMappedTypes(CollectionType).size()
-        Type setWithString  = getFieldFromClass(Dummy, "setWithString").type
-        Type hashSetWithInt = getFieldFromClass(Dummy, "hashSetWithInt").type
+        Type setWithString  = getFieldFromClass(Dummy, "setWithString").genericType
+        Type hashSetWithInt = getFieldFromClass(Dummy, "hashSetWithInt").genericType
 
         when:
         JaversType setWithStringJaversType  = mapper.getJavesrType(setWithString)

@@ -3,6 +3,7 @@ package org.javers.model.mapping.type;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -36,6 +37,18 @@ public abstract class JaversType {
 
         this.actualClassTypeArguments = extractActualClassTypeArguments(baseJavaType);
 
+    }
+
+    /**
+     * delegates to constructor of this.class
+     */
+    protected JaversType spawn(Type baseJavaType) {
+            try {
+                Constructor c = this.getClass().getConstructor(new Class<?>[]{Type.class});
+                return (JaversType)c.newInstance(new Object[]{baseJavaType});
+            } catch (ReflectiveOperationException exception) {
+                throw new RuntimeException("error calling Constructor " + this.getClass().getSimpleName(), exception);
+            }
     }
 
     public boolean isAssignableFrom(Class javaClass) {

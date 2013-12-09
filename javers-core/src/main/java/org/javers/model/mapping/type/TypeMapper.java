@@ -67,6 +67,8 @@ public class TypeMapper {
     private JaversType spawnFromPrototype(Type javaType) {
         JaversType prototype = findPrototypeAssignableFrom(javaType);
 
+        JaversType spawned = prototype.spawn(javaType);
+
         addType(spawned);
 
         return spawned;
