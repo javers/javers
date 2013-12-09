@@ -40,7 +40,7 @@ public class TypeMapper {
         registerPrimitiveType(Long.class);
 
         //array
-        addType(new ArrayType());
+        addType(new ArrayType(Object[].class));
 
         //Collections
         addType(new CollectionType(Set.class));
@@ -48,6 +48,8 @@ public class TypeMapper {
     }
 
     /**
+     * returns mapped type or spawn new from prototype
+     *
      * @throws JaversExceptionCode TYPE_NOT_MAPPED
      */
     public JaversType getJavesrType(Type javaType) {
@@ -111,7 +113,7 @@ public class TypeMapper {
         mappedTypes.put(jType.getBaseJavaType(), jType);
     }
 
-    public void registerCollectionType(Type collectionType) {
+    public <T extends Collection> void registerCollectionType(Class<T> collectionType) {
         addType(new CollectionType(collectionType));
     }
 

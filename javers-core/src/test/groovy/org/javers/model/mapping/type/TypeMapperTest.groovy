@@ -3,6 +3,7 @@ package org.javers.model.mapping.type
 import com.google.gson.reflect.TypeToken
 import spock.lang.Specification
 
+import java.lang.reflect.Array
 import java.lang.reflect.Field
 import java.lang.reflect.Type
 
@@ -22,15 +23,30 @@ class TypeMapperTest extends Specification {
         DummySet dummySet
         HashSet<String> hashSetWithString
         DummyEnum dummyEnum
-
+        int[] intArray
         Set<String>  setWithString
         HashSet<Integer> hashSetWithInt
+    }
+
+    def "should spawn concrete Array type"() {
+        given:
+        TypeMapper mapper = new TypeMapper();
+        int arrayPrototypes  = mapper.getMappedTypes(ArrayType).size()
+        Type intArray   = getFieldFromClass(Dummy, "intArray").genericType
+
+        when:
+        JaversType jType = mapper.getJavesrType(intArray)
+
+        then:
+        jType.baseJavaType == int[]
+        jType.class == ArrayType
+        mapper.getMappedTypes(ArrayType).size() == arrayPrototypes + 1
     }
 
     def "should spawn concrete Enum type"() {
         given:
         TypeMapper mapper = new TypeMapper();
-        Type dummyEnum   = getFieldFromClass(Dummy, "dummyEnum").type
+        Type dummyEnum   = getFieldFromClass(Dummy, "dummyEnum").genericType
 
         when:
         JaversType jType = mapper.getJavesrType(dummyEnum)
@@ -43,7 +59,7 @@ class TypeMapperTest extends Specification {
     def "should map Set & List by default"() {
         given:
         TypeMapper mapper = new TypeMapper();
-        Type set   = getFieldFromClass(Dummy, "set").type
+        Type set   = getFieldFromClass(Dummy, "set").genericType
 
         when:
         JaversType jType = mapper.getJavesrType(set)
@@ -58,7 +74,7 @@ class TypeMapperTest extends Specification {
         given:
         TypeMapper mapper = new TypeMapper()
         int colPrototypes  = mapper.getMappedTypes(CollectionType).size()
-        Type dummySet   = getFieldFromClass(Dummy, "dummySet").type
+        Type dummySet   = getFieldFromClass(Dummy, "dummySet").genericType
 
         when:
         JaversType jType = mapper.getJavesrType(dummySet)

@@ -5,7 +5,10 @@ import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyUser;
+import org.javers.core.model.DummyUserDetails;
+import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Test;
 
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -21,6 +24,15 @@ import static org.javers.test.assertion.JaversExceptionAssert.assertThat;
 public abstract class ObjectGraphBuilderTest {
 
     protected EntityManager entityManager;
+
+    protected EntityManager buildEntityManager(EntityFactory ef, TypeMapper mapper ) {
+        EntityManager entityManager = new EntityManager(ef, mapper);
+        entityManager.registerEntity(DummyUser.class);
+        entityManager.registerEntity(DummyUserDetails.class);
+        entityManager.registerValueObject(DummyAddress.class);
+        entityManager.buildManagedClasses();
+        return entityManager;
+    }
 
     @Test
     public void shouldBuildOneNodeGraph(){
@@ -261,19 +273,27 @@ public abstract class ObjectGraphBuilderTest {
 
     @Test
     public void shouldBuildGraphWithPrimitiveTypesSet() throws Throwable {
+        //given
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyUser dummyUser = dummyUser().withName("name").withStringsSet("1", "2", "3").build();
 
-        //throw exception
+        //when
         ObjectNode node = graphBuilder.buildGraph(dummyUser);
+
+        //then
+        assertThat(node).hasNoEdges();
     }
 
     @Test
     public void shouldBuildGraphWithPrimitiveTypesList() throws Throwable {
+        //given
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyUser dummyUser = dummyUser().withName("name").withIntegerList(1, 2, 3, 4).build();
 
-        //throw exception
+        //when
         ObjectNode node = graphBuilder.buildGraph(dummyUser);
+
+        //then
+        assertThat(node).hasNoEdges();
     }
 }

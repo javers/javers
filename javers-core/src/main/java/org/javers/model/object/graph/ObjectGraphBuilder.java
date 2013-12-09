@@ -9,6 +9,7 @@ import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.ManagedClass;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.ValueObject;
+import org.javers.model.mapping.type.CollectionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,17 +88,34 @@ public class ObjectGraphBuilder {
         }
     }
 
+    private boolean isCollectionOfEntityReferences(CollectionType collectionType) {
+        Class elementType = collectionType.getElementType();
+
+        if (elementType == null || !entityManager.isManaged(elementType)) {
+            return false;
+        }
+
+        return entityManager.getByClass(elementType) instanceof Entity;
+    }
+
     private void buildMultiEdges(ObjectWrapper node) {
-        List<Property> multiReferences = node.getEntity().getCollectionTypeProperties();
-        for (Property multiRef : multiReferences)  {
-            if (multiRef.isNull(node.unwrapCdo())) {
+        List<Property> collectionProperties = node.getEntity().getCollectionTypeProperties();
+        for (Property colProperty : collectionProperties)  {
+            CollectionType collectionType = (CollectionType)colProperty.getType();
+            if (!isCollectionOfEntityReferences((CollectionType)colProperty.getType())) {
                 continue;
             }
-            Collection collectionOfReferences = (Collection)multiRef.get(node.unwrapCdo());
+
+            if (colProperty.isNull(node.unwrapCdo())) {
+                continue;
+            }
+
+            //looks like we have collection of Entity references
+            Collection collectionOfReferences = (Collection)colProperty.get(node.unwrapCdo());
             if (collectionOfReferences.isEmpty()){
                 continue;
             }
-            MultiEdge multiEdge = createMultiEdge(multiRef, collectionOfReferences);
+            MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences);
             node.addEdge(multiEdge);
         }
     }

@@ -29,11 +29,6 @@ public class PropertyAssert extends AbstractAssert<PropertyAssert, Property> {
         return this;
     }
 
-    public PropertyAssert hasJavaClass(Class expected) {
-        Assertions.assertThat(actual.getType().getBaseJavaClass()).isEqualTo(expected);
-        return this;
-    }
-
     public PropertyAssert hasJavaType(Type expected) {
         Assertions.assertThat(actual.getType().getBaseJavaType()).isEqualTo(expected);
         return this;

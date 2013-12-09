@@ -60,6 +60,8 @@ public abstract class JaversType {
     }
 
     /**
+     * For generics, returns actual Class (type) argument
+     *
      * @return Immutable List, never returns null
      */
     protected List<Class> getActualClassTypeArguments() {
@@ -70,7 +72,7 @@ public abstract class JaversType {
         return baseJavaType;
     }
 
-    public Class getBaseJavaClass() {
+    protected Class getBaseJavaClass() {
         return baseJavaClass;
     }
 

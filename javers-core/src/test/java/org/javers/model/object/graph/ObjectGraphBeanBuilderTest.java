@@ -1,5 +1,6 @@
 package org.javers.model.object.graph;
 
+import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.BeanBasedPropertyScanner;
@@ -17,12 +18,13 @@ public class ObjectGraphBeanBuilderTest extends ObjectGraphBuilderTest {
 
     @Before
     public void setUp() {
-        TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
+        TypeMapper mapper = new TypeMapper();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
         EntityFactory entityFactory = new EntityFactory(scanner);
         entityManager = new EntityManager(entityFactory, mapper);
         entityManager.registerEntity(DummyUser.class);
         entityManager.registerEntity(DummyUserDetails.class);
+        entityManager.registerValueObject(DummyAddress.class);
         entityManager.buildManagedClasses();
     }
 

@@ -47,7 +47,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("supervisor")
             .hasJaversType(EntityReferenceType.class)
-            .hasJavaClass(DummyUser.class);
+            .hasJavaType(DummyUser.class);
     }
 
     @Test
@@ -77,7 +77,6 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("stringSet")
                 .hasJaversType(CollectionType.class)
-                .hasJavaClass(Set.class)
                 .hasJavaType(new TypeToken<Set<String>>(){}.getType());
     }
 
@@ -89,7 +88,6 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("integerList")
                 .hasJaversType(CollectionType.class)
-                .hasJavaClass(List.class)
                 .hasJavaType(new TypeToken<List<Integer>>(){}.getType());
     }
 
@@ -101,7 +99,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("intArray")
                 .hasJaversType(ArrayType.class)
-                .hasJavaClass(Array.class);
+                .hasJavaType(int[].class);
     }
 
     @Test
@@ -112,7 +110,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("age")
                 .hasJaversType(PrimitiveType.class)
-                .hasJavaClass(Integer.TYPE);
+                .hasJavaType(Integer.TYPE);
     }
 
     @Test
@@ -123,7 +121,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("sex")
                 .hasJaversType(PrimitiveType.class)
-                .hasJavaClass(Enum.class);
+                .hasJavaType(DummyUser.Sex.class);
     }
 
     @Test
@@ -134,7 +132,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("largeInt")
                 .hasJaversType(PrimitiveType.class)
-                .hasJavaClass(Integer.class);
+                .hasJavaType(Integer.class);
     }
 
     @Test
@@ -145,7 +143,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("flag")
                 .hasJaversType(PrimitiveType.class)
-                .hasJavaClass(Boolean.TYPE);
+                .hasJavaType(Boolean.TYPE);
     }
 
     @Test
@@ -156,7 +154,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("bigFlag")
                 .hasJaversType(PrimitiveType.class)
-                .hasJavaClass(Boolean.class);
+                .hasJavaType(Boolean.class);
     }
 
     @Test
@@ -167,7 +165,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("name")
                 .hasJaversType(PrimitiveType.class)
-                .hasJavaClass(String.class);
+                .hasJavaType(String.class);
     }
 
     @Test

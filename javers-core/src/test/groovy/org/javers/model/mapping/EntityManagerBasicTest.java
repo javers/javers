@@ -136,7 +136,7 @@ public class EntityManagerBasicTest {
         //given
         TypeMapper typeMapper = mock(TypeMapper.class);
         //when(typeMapper.getReferenceTypes()).thenReturn(arrayWithPrimitiveJavaTypes());
-        when(typeMapper.getJavesrType(ofPrimitiveJavaType())).thenReturn(javersPrimitiveType());
+        //when(typeMapper.getJavesrType(ofPrimitiveJavaType())).thenReturn(javersPrimitiveType());
         EntityManager entityManager = new EntityManager(mock(EntityFactory.class), typeMapper);
 
         //when
@@ -160,7 +160,4 @@ public class EntityManagerBasicTest {
         return ArrayList.class;
     }
 
-    private JaversType javersPrimitiveType() {
-        return new ArrayType();
-    }
 }

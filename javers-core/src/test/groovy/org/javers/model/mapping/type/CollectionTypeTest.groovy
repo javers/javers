@@ -45,7 +45,7 @@ class CollectionTypeTest extends Specification{
         cType.elementType == null
     }
 
-    def "should hold actual Class argument" () {
+    def "should hold actual elementType" () {
         given:
         Type genericWithArgument   =    getFieldFromClass(Dummy, "genericWithArgument").genericType
 
