@@ -43,5 +43,5 @@ public interface ObjectNode extends Visitable<GraphVisitor> {
 
     boolean isEntity(Property property);
 
-    GlobalCdoId getGlobalCdoIdOf(Property property);
+    GlobalCdoId getGlobalCdoId(Property property);
 }

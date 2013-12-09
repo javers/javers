@@ -35,9 +35,9 @@ public class MultiEdge extends Edge {
 
     private List<ObjectNode> getReferences(Direction direction) {
         if (direction == Direction.IN) {
-            return inReferences;
+            return getInReferences();
         } else {
-            return outReferences;
+            return getOutReferences();
         }
     }
 
@@ -52,8 +52,20 @@ public class MultiEdge extends Edge {
     /**
      * @return null if not found
      */
-    public ObjectNode getReference(Object referencedCdoId){
+    public ObjectNode getInReference(Object referencedCdoId){
         for (ObjectNode ref: inReferences) {
+            if (ref.getLocalCdoId().equals(referencedCdoId)) {
+                return ref;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return null if not found
+     */
+    public ObjectNode getOutReference(Object referencedCdoId){
+        for (ObjectNode ref: outReferences) {
             if (ref.getLocalCdoId().equals(referencedCdoId)) {
                 return ref;
             }

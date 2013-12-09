@@ -36,7 +36,7 @@ public class MultiEdgeAssert extends AbstractAssert<MultiEdgeAssert, MultiEdge> 
     }
 
     public NodeAssert andTargetNode(String expectedTargetCdoId) {
-        Assertions.assertThat(actual.getReference(expectedTargetCdoId)).isNotNull();
-        return NodeAssert.assertThat(actual.getReference(expectedTargetCdoId));
+        Assertions.assertThat(actual.getInReference(expectedTargetCdoId)).isNotNull();
+        return NodeAssert.assertThat(actual.getInReference(expectedTargetCdoId));
     }
 }

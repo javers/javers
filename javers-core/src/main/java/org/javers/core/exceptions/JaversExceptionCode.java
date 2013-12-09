@@ -12,7 +12,7 @@ public enum JaversExceptionCode {
 
     EXPECTED_ENTITY_OR_VALUE_OBJECT_SOURCE_CLASS(RUNTIME_ERROR + "Class '%s' is mapped in Javers, but is not Entity or ValueObject source class"),
     /**
-     * Class is not defined in Javers configuration or is not source class of ValueObject or Entity.
+     * Class is not defined in Javers configuration.
      */
     CLASS_NOT_MANAGED(RUNTIME_ERROR + "Class '%s' is not managed. Add this class to your JaVers configuration."),
 

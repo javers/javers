@@ -39,8 +39,8 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
             return Collections.EMPTY_SET;
         }
 
-        GlobalCdoId leftEntity = left.getGlobalCdoIdOf(supportedProperty);
-        GlobalCdoId rightEntity = right.getGlobalCdoIdOf(supportedProperty);
+        GlobalCdoId leftEntity = left.getGlobalCdoId(supportedProperty);
+        GlobalCdoId rightEntity = right.getGlobalCdoId(supportedProperty);
 
         return Sets.asSet(new ReferenceChanged(pair.getGlobalCdoId(),
                 supportedProperty,
