@@ -19,7 +19,7 @@ class EdgeTest extends Specification{
 
     @Shared JaversTestBuilder javersTestBuilder = javersTestAssembly()
 
-    def "should contain out entity out single edge"() {
+    def "should contain out references out single edge"() {
         given:
         DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build()
         ObjectNode node = javersTestBuilder.createObjectGraphBuilder().buildGraph(user)
@@ -31,7 +31,7 @@ class EdgeTest extends Specification{
         cdoId == new GlobalCdoId(user.name, javersTestBuilder.entityManager.getByClass(DummyUser))
     }
 
-    def "should contain out entity in single edge"() {
+    def "should contain out references in single edge"() {
         given:
         DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build()
         ObjectNode node = javersTestBuilder.createObjectGraphBuilder().buildGraph(user)
