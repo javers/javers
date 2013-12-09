@@ -58,23 +58,18 @@ public class TypeMapper {
             return jType;
         }
 
-        //try to spawn generic from prototype
-        if (javaType instanceof  ParameterizedType) {
-            JaversType spawned = spawnGenericFromPrototype((ParameterizedType)javaType);
-            addType(spawned);
-            return spawned;
-        }
-
-        throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType);
+        return spawnFromPrototype(javaType);
     }
 
     /**
      * @throws JaversExceptionCode TYPE_NOT_MAPPED
      */
-    private JaversType spawnGenericFromPrototype(ParameterizedType javaType) {
-        JaversType prototype = findNoGenericJaversTypeAssignableFrom(javaType);
+    private JaversType spawnFromPrototype(Type javaType) {
+        JaversType prototype = findPrototypeAssignableFrom(javaType);
 
-        return null;
+        addType(spawned);
+
+        return spawned;
     }
 
     /**
@@ -85,9 +80,11 @@ public class TypeMapper {
     }
 
     /**
+     * prototypes are non-generic
+     *
      * @throws JaversExceptionCode TYPE_NOT_MAPPED
      */
-    private JaversType findNoGenericJaversTypeAssignableFrom(Type javaType) {
+    private JaversType findPrototypeAssignableFrom(Type javaType) {
         argumentIsNotNull(javaType);
 
         for (JaversType javersType : mappedTypes.values()){

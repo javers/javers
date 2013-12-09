@@ -1,5 +1,6 @@
 package org.javers.model.mapping.type
 
+import com.google.gson.reflect.TypeToken
 import spock.lang.Specification
 
 import java.lang.reflect.Field
@@ -14,15 +15,16 @@ class TypeMapperTest extends Specification {
 
     enum DummyEnum {A,B}
 
+    class DummySet extends HashSet{}
+
     class Dummy <T,X> {
-        HashSet hashSet
+        Set set
+        DummySet dummySet
         HashSet<String> hashSetWithString
         DummyEnum dummyEnum
 
-        Set<?> wildcardGeneric
-        Set<T> parametrizedGeneric
-        Set<X> parametrizedGenericX
-        Set<String> genericWithString
+        Set<String>  setWithString
+        HashSet<Integer> hashSetWithInt
     }
 
     def "should spawn concrete Enum type"() {
@@ -35,11 +37,65 @@ class TypeMapperTest extends Specification {
 
         then:
         jType.baseJavaType == DummyEnum
-        jType.baseJavaClass == DummyEnum
+    }
+
+    def "should map Set & List by default"() {
+        given:
+        TypeMapper mapper = new TypeMapper();
+        Type set   = getFieldFromClass(Dummy, "set").type
+
+        when:
+        JaversType jType = mapper.getJavesrType(set)
+
+        then:
+        jType.baseJavaType == Set
+        mapper.getMappedTypes(CollectionType).size() == 2
     }
 
 
- //   def "should map parametrized types as distinct javers types"() {
+    def "should spawn impl from interface"() {
+        given:
+        TypeMapper mapper = new TypeMapper()
+        int colPrototypes  = mapper.getMappedTypes(CollectionType).size()
+        Type dummySet   = getFieldFromClass(Dummy, "dummySet").type
+
+        when:
+        JaversType jType = mapper.getJavesrType(dummySet)
+
+        then:
+        jType.baseJavaType == DummySet
+        mapper.getMappedTypes(CollectionType).size() == colPrototypes + 1
+    }
+
+    def "should spawn generic type from non-generic prototype"() {
+        given:
+        TypeMapper mapper = new TypeMapper()
+        Type setWithString   = getFieldFromClass(Dummy, "setWithString").type
+
+        when:
+        JaversType jType = mapper.getJavesrType(setWithString)
+
+        then:
+        jType.baseJavaType == new TypeToken<Set<String>>(){}.type
+    }
+
+
+    def "should map generic types as distinct javers types"() {
+        given:
+        TypeMapper mapper = new TypeMapper();
+        int colPrototypes  = mapper.getMappedTypes(CollectionType).size()
+        Type setWithString  = getFieldFromClass(Dummy, "setWithString").type
+        Type hashSetWithInt = getFieldFromClass(Dummy, "hashSetWithInt").type
+
+        when:
+        JaversType setWithStringJaversType  = mapper.getJavesrType(setWithString)
+        JaversType hashSetWithIntJaversType = mapper.getJavesrType(hashSetWithInt)
+
+        then:
+        setWithStringJaversType.baseJavaType  ==  new TypeToken<Set<String>>(){}.type
+        hashSetWithIntJaversType.baseJavaType ==  new TypeToken<HashSet<Integer>>(){}.type
+        mapper.getMappedTypes(CollectionType).size() == colPrototypes + 2
+    }
 
 
 }
