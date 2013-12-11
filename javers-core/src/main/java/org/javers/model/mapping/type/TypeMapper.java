@@ -52,7 +52,7 @@ public class TypeMapper {
      *
      * @throws JaversExceptionCode TYPE_NOT_MAPPED
      */
-    public JaversType getJavesrType(Type javaType) {
+    public JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
 
         JaversType jType = getMatchingJaversType(javaType);

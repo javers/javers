@@ -28,7 +28,7 @@ public class FieldBasedPropertyScanner extends PropertyScanner {
 
         for (Field field : declaredFields) {
             if(isPersistent(field)) {
-                JaversType javersType = typeMapper.getJavesrType(field.getGenericType());
+                JaversType javersType = typeMapper.getJaversType(field.getGenericType());
                 Property fieldProperty = new FieldProperty(field, javersType);
                 propertyList.add(fieldProperty);
             }

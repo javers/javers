@@ -3,8 +3,6 @@ package org.javers.model.mapping.type
 import com.google.gson.reflect.TypeToken
 import spock.lang.Specification
 
-import java.lang.reflect.Array
-import java.lang.reflect.Field
 import java.lang.reflect.Type
 
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
@@ -35,7 +33,7 @@ class TypeMapperTest extends Specification {
         Type intArray   = getFieldFromClass(Dummy, "intArray").genericType
 
         when:
-        JaversType jType = mapper.getJavesrType(intArray)
+        JaversType jType = mapper.getJaversType(intArray)
 
         then:
         jType.baseJavaType == int[]
@@ -49,7 +47,7 @@ class TypeMapperTest extends Specification {
         Type dummyEnum   = getFieldFromClass(Dummy, "dummyEnum").genericType
 
         when:
-        JaversType jType = mapper.getJavesrType(dummyEnum)
+        JaversType jType = mapper.getJaversType(dummyEnum)
 
         then:
         jType.baseJavaType == DummyEnum
@@ -62,7 +60,7 @@ class TypeMapperTest extends Specification {
         Type set   = getFieldFromClass(Dummy, "set").genericType
 
         when:
-        JaversType jType = mapper.getJavesrType(set)
+        JaversType jType = mapper.getJaversType(set)
 
         then:
         jType.baseJavaType == Set
@@ -77,7 +75,7 @@ class TypeMapperTest extends Specification {
         Type dummySet   = getFieldFromClass(Dummy, "dummySet").genericType
 
         when:
-        JaversType jType = mapper.getJavesrType(dummySet)
+        JaversType jType = mapper.getJaversType(dummySet)
 
         then:
         jType.baseJavaType == DummySet
@@ -91,7 +89,7 @@ class TypeMapperTest extends Specification {
         Type setWithString   = getFieldFromClass(Dummy, "setWithString").genericType
 
         when:
-        JaversType jType = mapper.getJavesrType(setWithString)
+        JaversType jType = mapper.getJaversType(setWithString)
 
         then:
         jType.baseJavaType == new TypeToken<Set<String>>(){}.type
@@ -106,8 +104,8 @@ class TypeMapperTest extends Specification {
         Type hashSetWithInt = getFieldFromClass(Dummy, "hashSetWithInt").genericType
 
         when:
-        JaversType setWithStringJaversType  = mapper.getJavesrType(setWithString)
-        JaversType hashSetWithIntJaversType = mapper.getJavesrType(hashSetWithInt)
+        JaversType setWithStringJaversType  = mapper.getJaversType(setWithString)
+        JaversType hashSetWithIntJaversType = mapper.getJaversType(hashSetWithInt)
 
         then:
         setWithStringJaversType.baseJavaType  ==  new TypeToken<Set<String>>(){}.type

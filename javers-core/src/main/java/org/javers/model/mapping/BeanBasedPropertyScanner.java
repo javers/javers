@@ -23,7 +23,7 @@ public class BeanBasedPropertyScanner extends PropertyScanner {
             List<Property> beanProperties = new ArrayList<>();
 
             for (Method getter : getters) {
-                JaversType javersType = typeMapper.getJavesrType(getter.getGenericReturnType());
+                JaversType javersType = typeMapper.getJaversType(getter.getGenericReturnType());
                 Property beanProperty = new BeanProperty(getter, javersType);
                 beanProperties.add(beanProperty);
             }
