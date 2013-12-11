@@ -127,35 +127,6 @@ public class ReflectionUtil {
         }
     }
 
-    public static boolean isGeneric(Class clazz){
-        return false;
-    }
-
-    /**
-     * Returns a class that represents the declared type argument for given type.
-     * For example if type is List<org.package.model.DummyObject>, returns be DummyObject.class
-     */
-    @Deprecated
-    public static Class getGenericTypeArgument(Type type) {
-        if(type instanceof ParameterizedType) {
-            return getParametrizedTypeFirstArgument((ParameterizedType) type);
-        }
-        throw new IllegalArgumentException("Error can not get any additional data from this type " + type.getClass()
-                +".\nArgument type (java.lang.reflect.Type) should be obtain by invoke java.lang.reflect.Field.getGenericType() or java.lang.reflect.Method.getGenericReturnType()"
-                +"\nFor example ReflectionUtil.getGeneticTypeClass(someReflectField.getGenericType())");
-    }
-
-    /**
-     * @throws IllegalArgumentException if given type has more than one type argument
-     */
-    public static Class getParametrizedTypeFirstArgument(ParameterizedType type) {
-        Type[] actualTypeArguments = type.getActualTypeArguments();
-        if(actualTypeArguments.length > 1) {
-            throw new IllegalArgumentException("Error, can not determine actual element type argument. More than one type argument in ["+type.getClass().getName()+"]");
-        }
-        return (Class)actualTypeArguments[0];
-    }
-
     /**
      * Makes sense only for {@link ParameterizedType}
      */

@@ -5,7 +5,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 /**
  * @author bartosz walacik
  */
-public class ManagedClassDefinition {
+public abstract class ManagedClassDefinition {
     private final Class<?> clazz;
 
     public ManagedClassDefinition(Class<?> clazz) {
