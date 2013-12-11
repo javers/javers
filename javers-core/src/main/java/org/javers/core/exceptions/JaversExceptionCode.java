@@ -1,5 +1,7 @@
 package org.javers.core.exceptions;
 
+import org.javers.core.JaversBuilder;
+
 import static org.javers.core.exceptions.JaversException.*;
 
 /**
@@ -18,7 +20,10 @@ public enum JaversExceptionCode {
 
     UNEXPECTED_VALUE_OBJECT(RUNTIME_ERROR + "Can't start building graph from Value Object '%s', expected Entity instance."),
 
-    TYPE_NOT_MAPPED (BOOTSTRAP_ERROR + "Property Type '%s' is not mapped. Implement UserType and add it to your JaVers configuration.") ,
+    TYPE_NOT_MAPPED (BOOTSTRAP_ERROR + "Type '%s' is not mapped and not assignable from any of already mapped types.\n"+
+                                       "Register it via JaversBuilder.registerEntity() or JaversBuilder.registerValueObject()") ,
+
+    CLASS_EXTRACTION_ERROR(BOOTSTRAP_ERROR + "Don't know how to extract Class from type '%s'.") ,
 
     ENTITY_WITHOUT_ID (BOOTSTRAP_ERROR + "Class '%s' has no Id property. Use @Id annotation to mark unique Entity identifier"),
 

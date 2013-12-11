@@ -1,8 +1,12 @@
 package org.javers.common.reflection;
 
+import org.javers.core.exceptions.JaversException;
+import org.javers.core.exceptions.JaversExceptionCode;
+
 import javax.persistence.Transient;
 import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -124,23 +128,33 @@ public class ReflectionUtil {
     }
 
     /**
-     * Returns a class that represents the declared type for the field represented by this object.
-     * For example if the field is java.util.List<org.package.model.DummyObject> the result will be DummyObject.
+     * Makes sense only for {@link ParameterizedType}
      */
-    public static Class getGenericTypeClass(Type type) {
-        if(type instanceof ParameterizedType) {
-            return getClassFromParametrizedTypeArgument((ParameterizedType) type);
+    public static List<Class> extractActualClassTypeArguments(Type javaType) {
+        if (!(javaType instanceof ParameterizedType)) {
+            return Collections.emptyList();
         }
-        throw new IllegalArgumentException("Error can not get any additional data from this type " + type.getClass()
-                +".\nArgument type (java.lang.reflect.Type) should be obtain by invoke java.lang.reflect.Field.getGenericType() or java.lang.reflect.Method.getGenericReturnType()"
-                +"\nFor example ReflectionUtil.getGeneticTypeClass(someReflectField.getGenericType())");
+
+        ParameterizedType parameterizedType = (ParameterizedType)javaType;
+
+        List<Class> result = new ArrayList<>();
+        for (Type t : parameterizedType.getActualTypeArguments() ) {
+            if (t instanceof Class) {
+                result.add((Class)t);
+            }
+        }
+
+        return Collections.unmodifiableList(result);
     }
 
-    private static Class getClassFromParametrizedTypeArgument(ParameterizedType type) {
-        Type[] actualTypeArguments = type.getActualTypeArguments();
-        if(actualTypeArguments.length > 1) {
-            throw new IllegalArgumentException("Error can not determine actual element type. Number of type should by 1 is " + actualTypeArguments.length);
+    public static Class extractClass(Type javaType) {
+        if (javaType instanceof ParameterizedType &&
+                ((ParameterizedType)javaType).getRawType() instanceof Class){
+            return (Class)((ParameterizedType)javaType).getRawType();
+        }  else if (javaType instanceof Class) {
+            return (Class)javaType;
         }
-        return (Class)actualTypeArguments[0];
+
+        throw new JaversException(JaversExceptionCode.CLASS_EXTRACTION_ERROR, javaType);
     }
 }

@@ -1,24 +1,27 @@
 package org.javers.model.mapping.type;
 
-import static org.javers.common.validation.Validate.argumentShouldBeNull;
+import org.javers.common.validation.Validate;
+
+import java.lang.reflect.Type;
+import java.util.Collection;
+
+import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * @author bartosz walacik
  */
 public class CollectionType extends ContainerType {
 
-    private Class elementType;
-
-    public CollectionType(Class javaType) {
-        super(javaType);
+    public CollectionType(Type baseJavaType) {
+        super(baseJavaType);
     }
 
-    public Class getElementType() {
-        return elementType;
-    }
+    @Override
+    protected Class initElementType() {
+        if (getActualClassTypeArguments().size() == 1) {
+            return  getActualClassTypeArguments().get(0);
+        }
 
-    public void assignElementType(Class elementType) {
-        argumentShouldBeNull(elementType, "Element type is already assigned it can not be change.");
-        this.elementType = elementType;
+        return null;
     }
 }

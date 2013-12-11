@@ -23,7 +23,7 @@ public class EntityFactory {
        return create(new EntityDefinition(clazz));
     }
 
-    public <S> Entity create(EntityDefinition entityDefinition) {
+    public Entity create(EntityDefinition entityDefinition) {
 
         List<Property> beanProperties = propertyScanner.scan(entityDefinition.getClazz());
 

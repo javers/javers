@@ -1,5 +1,6 @@
 package org.javers.common.scanner;
 
+import com.google.gson.reflect.TypeToken;
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.PropertiesAssert;
@@ -49,8 +50,6 @@ public abstract class PropertyScannerTest {
             .hasJavaType(DummyUser.class);
     }
 
-
-
     @Test
     public void shouldScanInheritedProperty() {
         //when
@@ -78,7 +77,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("stringSet")
                 .hasJaversType(CollectionType.class)
-                .hasJavaType(Set.class);
+                .hasJavaType(new TypeToken<Set<String>>(){}.getType());
     }
 
     @Test
@@ -89,7 +88,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("integerList")
                 .hasJaversType(CollectionType.class)
-                .hasJavaType(List.class);
+                .hasJavaType(new TypeToken<List<Integer>>(){}.getType());
     }
 
     @Test
@@ -100,7 +99,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("intArray")
                 .hasJaversType(ArrayType.class)
-                .hasJavaType(Array.class);
+                .hasJavaType(int[].class);
     }
 
     @Test
@@ -122,7 +121,7 @@ public abstract class PropertyScannerTest {
         //then
         PropertiesAssert.assertThat(properties).hasProperty("sex")
                 .hasJaversType(PrimitiveType.class)
-                .hasJavaType(Enum.class);
+                .hasJavaType(DummyUser.Sex.class);
     }
 
     @Test

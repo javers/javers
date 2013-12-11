@@ -3,6 +3,8 @@ package org.javers.test
 import org.javers.model.mapping.Property
 import org.javers.model.mapping.type.JaversType
 
+import java.lang.reflect.Type
+
 /**
  * @author Pawel Cierpiatka
  */
@@ -23,7 +25,7 @@ class PropertyAssert {
         return this
     }
 
-    def PropertyAssert hasJavaType(Class expected) {
+    def PropertyAssert hasJavaType(Type expected) {
         assert actual.getType().getBaseJavaType() == expected
         return this;
     }

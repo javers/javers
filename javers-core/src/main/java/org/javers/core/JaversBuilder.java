@@ -5,6 +5,8 @@ import org.javers.common.validation.Validate;
 import org.javers.core.pico.CoreJaversModule;
 import org.javers.model.mapping.EntityDefinition;
 import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.ManagedClassDefinition;
+import org.javers.model.mapping.ValueObjectDefinition;
 import org.javers.model.pico.ModelJaversModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +28,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
     //
     private JaversCoreConfiguration coreConfiguration;
-    private Set<EntityDefinition> entityDefinitions = new HashSet<>();
-    private Set<Class> valueObjectClasses = new HashSet<>();
+    private Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
     private List<JaversModule> externalModules = new ArrayList<>();
 
     private JaversBuilder() {
@@ -54,7 +55,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
         Validate.argumentIsNotNull(entityClass);
-        entityDefinitions.add(new EntityDefinition(entityClass));
+        managedClassDefinitions.add(new EntityDefinition(entityClass));
         return this;
     }
 
@@ -63,13 +64,13 @@ public class JaversBuilder extends AbstractJaversBuilder {
      */
     public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName) {
         Validate.argumentsAreNotNull(entityClass, idPropertyName);
-        entityDefinitions.add( new EntityDefinition(entityClass, idPropertyName) );
+        managedClassDefinitions.add( new EntityDefinition(entityClass, idPropertyName) );
         return this;
     }
 
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         Validate.argumentIsNotNull(valueObjectClass);
-        valueObjectClasses.add(valueObjectClass);
+        managedClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
         return this;
     }
 
@@ -106,12 +107,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private void registerManagedClasses() {
         EntityManager entityManager = getContainerComponent(EntityManager.class);
 
-        for (EntityDefinition def : entityDefinitions) {
-            entityManager.registerEntity(def);
-        }
-
-        for (Class<?> clazz : valueObjectClasses) {
-            entityManager.registerValueObject(clazz);
+        for (ManagedClassDefinition def : managedClassDefinitions) {
+            entityManager.register(def);
         }
     }
 

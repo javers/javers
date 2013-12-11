@@ -8,79 +8,38 @@ import java.lang.reflect.Method
 
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 import static org.javers.common.reflection.ReflectionTestHelper.getMethodFromClass
-import static org.javers.common.reflection.ReflectionUtil.getGenericTypeClass
+import static org.javers.common.reflection.ReflectionUtil.getParametrizedTypeFirstArgument
 
 /**
  * @author Pawel Cierpiatka
  */
 class ReflectionUtilTest extends Specification {
+    class ReflectionTestModel {
+        List<DummyUser> dummyUserList
+        Set noGenericSet
+    }
 
-    def "should return declared list type class from field"() {
-
+    def "should return actual class type argument from field"() {
         given :
-            Field dummyUsersList = getFieldFromClass(ReflectionTestModel.class, "dummyUserList");
+            Field dummyUsersList = getFieldFromClass(ReflectionTestModel.class, "dummyUserList")
 
         when :
-            Class arrayDeclaredType = getGenericTypeClass(dummyUsersList.getGenericType());
+            Class[] args = ReflectionUtil.extractActualClassTypeArguments(dummyUsersList.genericType)
 
         then:
-            arrayDeclaredType == DummyUser.class
-
+            args[0] == DummyUser
     }
 
-    def "should return declared set type class from field"() {
-
+    def "should return empty list when type is not generic"() {
         given :
-            Field dummyUsersSet = getFieldFromClass(ReflectionTestModel.class, "dummyUserSet");
+            Field noGenericSet = getFieldFromClass(ReflectionTestModel.class, "noGenericSet")
 
         when :
-            Class setDeclaredType = getGenericTypeClass(dummyUsersSet.getGenericType());
+            Class[] args = ReflectionUtil.extractActualClassTypeArguments(noGenericSet.genericType)
 
-        then :
-            setDeclaredType == DummyUser.class
+        then:
+            args == []
     }
 
-    def "should return declared queue type class from field"() {
-        given  :
-            Field dummyUsersQueue = getFieldFromClass(ReflectionTestModel.class, "dummyUserQueue");
 
-        when :
-            Class queueDeclaredType = getGenericTypeClass(dummyUsersQueue.getGenericType());
-
-        then :
-            queueDeclaredType == DummyUser.class;
-    }
-
-    def "should return declared list type class from method"() {
-        given :
-            Method dummyUsersList = getMethodFromClass(ReflectionTestModel.class, "getDummyUserList");
-
-        when :
-            Class arrayDeclaredType = getGenericTypeClass(dummyUsersList.getGenericReturnType());
-
-        then :
-            arrayDeclaredType == DummyUser.class
-    }
-
-    def "should return declared set type class from method"() {
-        given :
-            Method dummyUsersSet = getMethodFromClass(ReflectionTestModel.class, "getDummyUserSet");
-
-        when :
-            Class setDeclaredType = getGenericTypeClass(dummyUsersSet.getGenericReturnType());
-
-        then :
-            setDeclaredType == DummyUser.class
-    }
-
-    def "should return declared queue type class from method"() {
-        given:
-            Method dummyUsersList = getMethodFromClass(ReflectionTestModel.class, "getDummyUserList");
-
-        when :
-            Class arrayDeclaredType = getGenericTypeClass(dummyUsersList.getGenericReturnType());
-
-        then :
-            arrayDeclaredType == DummyUser.class
-    }
 }

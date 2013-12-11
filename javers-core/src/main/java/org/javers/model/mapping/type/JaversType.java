@@ -1,6 +1,17 @@
 package org.javers.model.mapping.type;
 
-import org.javers.core.diff.appenders.PropertyChangeAppender;
+import org.javers.common.reflection.ReflectionUtil;
+import org.javers.common.validation.Validate;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.javers.common.reflection.ReflectionUtil.extractActualClassTypeArguments;
+import static org.javers.common.reflection.ReflectionUtil.extractClass;
 
 /**
  * Property type that can be managed by Javers, so int, String, Date, etc.
@@ -10,19 +21,59 @@ import org.javers.core.diff.appenders.PropertyChangeAppender;
  * @author bartosz walacik
  */
 public abstract class JaversType {
+    private final Type  baseJavaType;
+    private final Class baseJavaClass;
+    private final List<Class> actualClassTypeArguments;
 
-    protected final Class baseJavaType;
+    /**
+     * @param baseJavaType Class or ParametrizedType
+     */
+    protected JaversType(Type baseJavaType) {
+        Validate .argumentIsNotNull(baseJavaType);
 
-    protected JaversType(Class baseJavaType) {
         this.baseJavaType = baseJavaType;
+
+        this.baseJavaClass = extractClass(baseJavaType);
+
+        this.actualClassTypeArguments = extractActualClassTypeArguments(baseJavaType);
+
     }
 
-    public boolean isMappingForJavaType(Class givenType) {
-        return baseJavaType.isAssignableFrom(givenType);
+    /**
+     * delegates to constructor of this.class
+     */
+    protected JaversType spawn(Type baseJavaType) {
+            try {
+                Constructor c = this.getClass().getConstructor(new Class<?>[]{Type.class});
+                return (JaversType)c.newInstance(new Object[]{baseJavaType});
+            } catch (ReflectiveOperationException exception) {
+                throw new RuntimeException("error calling Constructor " + this.getClass().getSimpleName(), exception);
+            }
     }
 
-    public Class getBaseJavaType() {
+    public boolean isAssignableFrom(Class javaClass) {
+        return baseJavaClass.isAssignableFrom(javaClass);
+    }
+
+    protected boolean isGenericType() {
+        return (baseJavaType instanceof ParameterizedType);
+    }
+
+    /**
+     * For generics, returns actual Class (type) argument
+     *
+     * @return Immutable List, never returns null
+     */
+    protected List<Class> getActualClassTypeArguments() {
+        return actualClassTypeArguments;
+    }
+
+    public Type getBaseJavaType() {
         return baseJavaType;
+    }
+
+    protected Class getBaseJavaClass() {
+        return baseJavaClass;
     }
 
     @Override
@@ -36,6 +87,11 @@ public abstract class JaversType {
 
         JaversType that = (JaversType) o;
         return baseJavaType.equals(that.baseJavaType);
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName()+ "(type:"+baseJavaType+")" ;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.javers.model.mapping
 
+import com.google.common.reflect.TypeToken
 import org.javers.core.model.DummyUser
 import org.javers.model.mapping.type.ArrayType
 import org.javers.model.mapping.type.CollectionType
@@ -74,7 +75,7 @@ abstract class EntityConstructionTest extends Specification {
         then:
         assertThat(entity).hasProperty("stringSet")
                 .hasJaversType(CollectionType.class)
-                .hasJavaType(Set.class);
+                .hasJavaType(new TypeToken<Set<String>>(){}.getType());
     }
 
 
@@ -85,7 +86,7 @@ abstract class EntityConstructionTest extends Specification {
         then:
         assertThat(entity).hasProperty("integerList")
                 .hasJaversType(CollectionType.class)
-                .hasJavaType(List.class);
+                .hasJavaType(new TypeToken<List<Integer>>(){}.getType());
     }
 
     def "should scan array property"() {
@@ -95,7 +96,7 @@ abstract class EntityConstructionTest extends Specification {
         then:
         assertThat(entity).hasProperty("intArray")
                 .hasJaversType(ArrayType.class)
-                .hasJavaType(Array.class);
+                .hasJavaType(int[].class);
     }
 
     def "should scan int property"() {
@@ -115,7 +116,7 @@ abstract class EntityConstructionTest extends Specification {
         then:
         assertThat(entity).hasProperty("sex")
                 .hasJaversType(PrimitiveType.class)
-                .hasJavaType(Enum.class);
+                .hasJavaType(DummyUser.Sex.class);
     }
 
     def "should scan integer property"() {
