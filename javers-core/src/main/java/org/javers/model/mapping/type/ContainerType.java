@@ -19,9 +19,9 @@ public abstract class ContainerType extends JaversType {
     /**
      * Collection/Array content type.
      * <br/>
-     * When Collection is generic Type with exact one actual Class argument, returns this argument.
+     * When Collection is generic Type with actual Class argument, returns this argument.
      * <br/>
-     * When Array, returns ...
+     * When Array, returns {@link Class#getComponentType()}
      * <br/>
      * For example, if baseJavaType = List<String>, returns String.class
      */
