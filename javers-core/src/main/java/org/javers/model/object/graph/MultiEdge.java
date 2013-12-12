@@ -13,18 +13,14 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class MultiEdge extends Edge {
-    protected List<ObjectNode> inReferences;
-    protected List<ObjectNode> outReferences;
+    protected List<ObjectNode> references;
 
     public MultiEdge(Property property) {
         super(property);
-        outReferences = new ArrayList<>();
-        inReferences = new ArrayList<>();
+        references = new ArrayList<>();
     }
 
-    public List<GlobalCdoId> getReferencedGlobalCdoIds(Direction direction) {
-        List<ObjectNode> references = getReferences(direction);
-
+    public List<GlobalCdoId> getReferencedGlobalCdoIds() {
         return Lists.transform(references, new Function<ObjectNode, GlobalCdoId>() {
             @Override
             public GlobalCdoId apply(ObjectNode input) {
@@ -33,27 +29,15 @@ public class MultiEdge extends Edge {
         });
     }
 
-    private List<ObjectNode> getReferences(Direction direction) {
-        if (direction == Direction.IN) {
-            return getInReferences();
-        } else {
-            return getOutReferences();
-        }
-    }
-
-    public List<ObjectNode> getInReferences(){
-        return Collections.unmodifiableList(inReferences);
-    }
-
-    public List<ObjectNode> getOutReferences(){
-        return Collections.unmodifiableList(outReferences);
+    public List<ObjectNode> getReferences(){
+        return Collections.unmodifiableList(references);
     }
 
     /**
      * @return null if not found
      */
-    public ObjectNode getInReference(Object referencedCdoId){
-        for (ObjectNode ref: inReferences) {
+    public ObjectNode getReference(Object referencedCdoId){
+        for (ObjectNode ref: references) {
             if (ref.getLocalCdoId().equals(referencedCdoId)) {
                 return ref;
             }
@@ -61,29 +45,13 @@ public class MultiEdge extends Edge {
         return null;
     }
 
-    /**
-     * @return null if not found
-     */
-    public ObjectNode getOutReference(Object referencedCdoId){
-        for (ObjectNode ref: outReferences) {
-            if (ref.getLocalCdoId().equals(referencedCdoId)) {
-                return ref;
-            }
-        }
-        return null;
-    }
-
-    public void addOutReferenceNode(ObjectNode objectNode) {
-        outReferences.add(objectNode);
-    }
-
-    public void addInReferenceNode(ObjectNode objectNode) {
-        inReferences.add(objectNode);
+    public void addReferenceNode(ObjectNode objectNode) {
+        references.add(objectNode);
     }
 
     @Override
     public void accept(GraphVisitor visitor) {
-        for(ObjectNode objectNode : inReferences) {
+        for(ObjectNode objectNode : references) {
             objectNode.accept(visitor);
         }
     }

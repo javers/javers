@@ -75,7 +75,7 @@ class MultiEdgeDifferenceCalculatorTest extends Specification {
     }
 
     private MultiEdge multiEdge(references) {
-        new MultiEdge([:] as Property).with { it.inReferences = references; it }
+        new MultiEdge([:] as Property).with { it.references = references; it }
     }
 
     private ObjectNode node(String id) {

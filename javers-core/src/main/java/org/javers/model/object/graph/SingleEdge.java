@@ -13,32 +13,25 @@ import org.javers.model.mapping.Property;
  */
 public class SingleEdge extends Edge {
 
-    private final ObjectNode inReference;
-    private final ObjectNode outReference;
+    private final ObjectNode reference;
 
-    public SingleEdge(Property property, ObjectNode outReference, ObjectNode inReference) {
+    public SingleEdge(Property property, ObjectNode inReference) {
         super(property);
-        Validate.argumentIsNotNull(outReference);
         Validate.argumentIsNotNull(inReference);
 
-        this.outReference = outReference;
-        this.inReference = inReference;
+        this.reference = inReference;
     }
 
-    public ObjectNode getInReference() {
-        return inReference;
+    public ObjectNode getReference() {
+        return reference;
     }
 
     @Override
     public void accept(GraphVisitor visitor) {
-        inReference.accept(visitor);
+        reference.accept(visitor);
     }
 
-    public GlobalCdoId getReferencedGlobalCdoId(Direction direction) {
-        if (direction == Direction.IN) {
-            return inReference.getGlobalCdoId();
-        } else {
-            return outReference.getGlobalCdoId();
-        }
+    public GlobalCdoId getReferencedGlobalCdoId() {
+            return reference.getGlobalCdoId();
     }
 }

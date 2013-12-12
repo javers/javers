@@ -1,5 +1,7 @@
 package org.javers.test.builder;
 
+import com.google.common.collect.Lists;
+import org.javers.common.collections.Sets;
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
 
@@ -101,6 +103,16 @@ public class DummyUserBuilder {
 
     public DummyUserBuilder withAge(int age) {
         dummyUser.setAge(age);
+        return this;
+    }
+
+    public DummyUserBuilder withStringsSet(String... strings) {
+        dummyUser.setStringSet(Sets.asSet(strings));
+        return this;
+    }
+
+    public DummyUserBuilder withIntegerList(Integer... integers) {
+        dummyUser.setIntegerList(Lists.newArrayList(integers));
         return this;
     }
 }

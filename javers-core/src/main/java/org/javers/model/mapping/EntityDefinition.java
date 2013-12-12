@@ -2,19 +2,19 @@ package org.javers.model.mapping;
 
 import org.javers.common.validation.Validate;
 
+import static org.javers.common.validation.Validate.argumentIsNotNull;
+
 /**
  * @author bartosz walacik
  */
-public class EntityDefinition {
-    private final Class<?> clazz;
+public class EntityDefinition  extends ManagedClassDefinition {
     private final String idPropertyName;
 
     /**
      * gives you Entity with id property selected on the basis of @Id annotation
      */
     public EntityDefinition(Class<?> clazz) {
-        Validate.argumentIsNotNull(clazz);
-        this.clazz = clazz;
+        super(clazz);
         this.idPropertyName = null;
     }
 
@@ -22,8 +22,8 @@ public class EntityDefinition {
      * gives you Entity with id property selected explicitly by name
      */
     public EntityDefinition(Class<?> clazz, String idPropertyName) {
-        Validate.argumentsAreNotNull(clazz, idPropertyName);
-        this.clazz = clazz;
+        super(clazz);
+        argumentIsNotNull(idPropertyName);
         this.idPropertyName = idPropertyName;
     }
 
@@ -35,27 +35,7 @@ public class EntityDefinition {
         return !hasDefaultIdSelectionPolicy();
     }
 
-    public Class<?> getClazz() {
-        return clazz;
-    }
-
     public String getIdPropertyName() {
         return idPropertyName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o || getClass() != o.getClass()) {
-            return false;
-        }
-
-        EntityDefinition that = (EntityDefinition) o;
-
-        return clazz.equals(that.clazz);
-    }
-
-    @Override
-    public int hashCode() {
-        return clazz.hashCode();
     }
 }

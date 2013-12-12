@@ -1,5 +1,7 @@
 package org.javers.model.mapping.type;
 
+import java.lang.reflect.Type;
+
 /**
  * Primitive or primitive box
  *
@@ -7,7 +9,7 @@ package org.javers.model.mapping.type;
  */
 public class PrimitiveType extends JaversType {
 
-    public PrimitiveType(Class javaType) {
-        super(javaType);
+    public PrimitiveType(Type baseJavaType) {
+        super(baseJavaType);
     }
 }

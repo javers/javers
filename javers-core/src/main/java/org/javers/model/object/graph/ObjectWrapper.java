@@ -65,7 +65,7 @@ public class ObjectWrapper implements ObjectNode {
     public GlobalCdoId getGlobalCdoId(Property property) {
         for (Edge edge: edges) {
             if (edge.getProperty().equals(property)) {
-                return ((SingleEdge) edge).getReferencedGlobalCdoId(Direction.IN);
+                return ((SingleEdge) edge).getReferencedGlobalCdoId();
             }
         }
         return null;

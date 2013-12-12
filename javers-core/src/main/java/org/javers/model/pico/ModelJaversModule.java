@@ -8,7 +8,6 @@ import org.javers.model.mapping.BeanBasedPropertyScanner;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.FieldBasedPropertyScanner;
-import org.javers.model.mapping.ValueObjectFactory;
 import org.javers.model.mapping.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,7 @@ import java.util.*;
 public class ModelJaversModule implements JaversModule {
     private static final Logger logger = LoggerFactory.getLogger(ModelJaversModule.class);
 
-    private static Class[] moduleComponents = new Class[] {EntityManager.class, TypeMapper.class, EntityFactory.class, ValueObjectFactory.class};
+    private static Class[] moduleComponents = new Class[] {EntityManager.class, TypeMapper.class, EntityFactory.class};
 
     private static Map<MappingStyle, Class> propertyScannersMapping = new HashMap() {{
         put(MappingStyle.BEAN, BeanBasedPropertyScanner.class);

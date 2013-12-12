@@ -24,7 +24,7 @@ public class MultiEdgeDifferenceCalculator {
 
     public Set<Change> findAddedReferences(MultiEdge left, MultiEdge right, GlobalCdoId ownerNodeCdoId) {
         Set<Change> changeSet = new HashSet<>();
-        Set<ObjectNode> addedReferences = Sets.difference(Sets.asSet(right.getInReferences()), Sets.asSet(left.getInReferences()));
+        Set<ObjectNode> addedReferences = Sets.difference(Sets.asSet(right.getReferences()), Sets.asSet(left.getReferences()));
         for (ObjectNode addedReference : addedReferences) {
             changeSet.add(new ReferenceAdded(ownerNodeCdoId, right.getProperty(), addedReference.getGlobalCdoId()));
         }

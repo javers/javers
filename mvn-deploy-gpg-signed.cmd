@@ -1,0 +1,1 @@
+mvn clean deploy -Dgpg.homedir=%APPDATA%/gnupg
