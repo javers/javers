@@ -12,7 +12,6 @@ import static org.javers.core.exceptions.JaversException.*;
 public enum JaversExceptionCode {
     //TODO better exception messages - User Friendly!
 
-    EXPECTED_ENTITY_OR_VALUE_OBJECT_SOURCE_CLASS(RUNTIME_ERROR + "Class '%s' is mapped in Javers, but is not Entity or ValueObject source class"),
     /**
      * Class is not defined in Javers configuration.
      */

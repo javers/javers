@@ -44,7 +44,7 @@ public class EntityManager {
         if (!isRegistered(clazz)) {
             throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, clazz.getName());
         }
-        if (isRegisterd(clazz) && !isManaged(clazz)) {
+        if (isRegistered(clazz) && !isManaged(clazz)) {
             throw new JaversException(JaversExceptionCode.ENTITY_MANAGER_NOT_INITIALIZED, clazz.getName());
         }
         return managedClasses.getBySourceClass(clazz);
