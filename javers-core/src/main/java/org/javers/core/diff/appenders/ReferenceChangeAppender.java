@@ -31,20 +31,17 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
         ObjectNode left = pair.getLeft();
         ObjectNode right =pair.getRight();
 
-        Object leftReference = left.getPropertyValue(property);
-        Object rightReference = right.getPropertyValue(property);
+        GlobalCdoId leftGlobalCdoId = gerReferencedGlobalCdoId(left, property);
+        GlobalCdoId rightGlobalCdoId = gerReferencedGlobalCdoId(right, property);
 
-        if (leftReference == rightReference) {
+        if (leftGlobalCdoId.equals(rightGlobalCdoId)) {
             return Collections.EMPTY_SET;
         }
 
-        GlobalCdoId leftEntity = gerReferencedGlobalCdoId(left, property);
-        GlobalCdoId rightEntity = gerReferencedGlobalCdoId(right, property);
-
         return Sets.asSet(new ReferenceChanged(pair.getGlobalCdoId(),
                 property,
-                leftEntity,
-                rightEntity));
+                leftGlobalCdoId,
+                rightGlobalCdoId));
     }
 
 
