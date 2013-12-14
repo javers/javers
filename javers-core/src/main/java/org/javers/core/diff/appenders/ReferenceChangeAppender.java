@@ -30,8 +30,8 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
         ObjectNode left = pair.getLeft();
         ObjectNode right =pair.getRight();
 
-        GlobalCdoId leftGlobalCdoId = getReferencedGlobalCdoId(left, property);
-        GlobalCdoId rightGlobalCdoId = getReferencedGlobalCdoId(right, property);
+        GlobalCdoId leftGlobalCdoId = ((SingleEdge) left.getEdge(property)).getReference().getGlobalCdoId();
+        GlobalCdoId rightGlobalCdoId = ((SingleEdge) right.getEdge(property)).getReference().getGlobalCdoId();
 
         if (leftGlobalCdoId.equals(rightGlobalCdoId)) {
             return Collections.EMPTY_SET;
@@ -41,17 +41,5 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
                 property,
                 leftGlobalCdoId,
                 rightGlobalCdoId));
-    }
-
-
-    private GlobalCdoId getReferencedGlobalCdoId(ObjectNode node, Property property) {
-        for (Edge edge : node.getEdges()) {
-            if (edge.getProperty().equals(property)) {
-                SingleEdge singleEdge =  (SingleEdge) edge;
-                return singleEdge.getReference().getGlobalCdoId();
-            }
-        }
-
-        return null;
     }
 }
