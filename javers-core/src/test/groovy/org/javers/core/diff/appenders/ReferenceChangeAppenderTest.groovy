@@ -55,35 +55,4 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
             .hasProperty(property)
     }
 
-    def "should not append reference change on primitive"() {
-        given:
-        DummyUser leftReference = dummyUser().withName("1").withInteger(3).build()
-        DummyUser rightReference = dummyUser().withName("1").withInteger(4).build()
-        ObjectNode leftNode = buildGraph(leftReference)
-        ObjectNode rightNode = buildGraph(rightReference)
-        Property property = getEntity(DummyUser).getProperty("largeInt")
-
-        when:
-        Collection<Change> changes =
-            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property);
-
-        then:
-        assertThat changes hasSize 0
-    }
-
-    def "should not append reference change on ValueObject"() {
-        given:
-        DummyUserDetails leftReference = dummyUserDetails().withId(1).withAddress("Green Street", "London").build()
-        DummyUserDetails rightReference = dummyUserDetails().withId(1).withAddress("Yellow Street", "Belfast").build()
-        ObjectNode leftNode = buildGraph(leftReference)
-        ObjectNode rightNode = buildGraph(rightReference)
-        Property property = getEntity(DummyUserDetails).getProperty("dummyAddress")
-
-        when:
-        Collection<Change> changes =
-            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property);
-
-        then:
-        assertThat changes hasSize 0
-    }
 }

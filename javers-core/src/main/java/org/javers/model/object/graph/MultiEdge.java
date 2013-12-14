@@ -20,15 +20,6 @@ public class MultiEdge extends Edge {
         references = new ArrayList<>();
     }
 
-    public List<GlobalCdoId> getReferencedGlobalCdoIds() {
-        return Lists.transform(references, new Function<ObjectNode, GlobalCdoId>() {
-            @Override
-            public GlobalCdoId apply(ObjectNode input) {
-                return new GlobalCdoId(input.getGlobalCdoId(), input.getEntity());
-            }
-        });
-    }
-
     public List<ObjectNode> getReferences(){
         return Collections.unmodifiableList(references);
     }

@@ -103,13 +103,4 @@ class EntityManagerTest extends Specification{
         then:
         typeMapper.mappedValueObjectTypes.size() == 1
     }
-
-    def "should throw exception when class is not instance of managed class"() {
-        when:
-        entityManager.getByClass(Integer.class);
-
-        then:
-        JaversException ex = thrown()
-        ex.code == JaversExceptionCode.EXPECTED_ENTITY_OR_VALUE_OBJECT_SOURCE_CLASS;
-    }
 }

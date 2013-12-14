@@ -30,8 +30,4 @@ public class SingleEdge extends Edge {
     public void accept(GraphVisitor visitor) {
         reference.accept(visitor);
     }
-
-    public GlobalCdoId getReferencedGlobalCdoId() {
-            return reference.getGlobalCdoId();
-    }
 }
