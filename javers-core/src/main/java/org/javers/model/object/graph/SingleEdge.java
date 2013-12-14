@@ -15,8 +15,7 @@ public class SingleEdge extends Edge {
 
     private final ObjectNode reference;
 
-    public SingleEdge(Property property, ObjectNode reference) {
-        super(property);
+    public SingleEdge(ObjectNode reference) {
         Validate.argumentIsNotNull(reference);
 
         this.reference = reference;

@@ -18,11 +18,6 @@ public class EdgeAssert extends AbstractAssert<EdgeAssert, Edge> {
         return new EdgeAssert(actual);
     }
 
-    public EdgeAssert hasProperty(String expectedName) {
-        Assertions.assertThat(actual.getProperty().getName()).isEqualTo(expectedName);
-        return this;
-    }
-
     public MultiEdgeAssert isMultiEdge(Object... expectedRefCdoId) {
         return isMultiEdge().refersToCdoWithIds(expectedRefCdoId);
     }

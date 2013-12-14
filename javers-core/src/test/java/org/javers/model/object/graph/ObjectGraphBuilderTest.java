@@ -6,8 +6,10 @@ import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
+import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Test;
 
@@ -54,6 +56,7 @@ public abstract class ObjectGraphBuilderTest {
         //given
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyUser user = dummyUser().withName("Mad Kaz").withSupervisor("Mad Stach").build();
+        Property property = getProperty("supervisor");
 
         //when
         ObjectNode node = graphBuilder.buildGraph(user);
@@ -61,15 +64,17 @@ public abstract class ObjectGraphBuilderTest {
         //then
         assertThat(node).hasEdges(1)
                         .hasCdoId("Mad Kaz")
-                        .hasEdge("supervisor") //jump to EdgeAssert
+                        .hasEdge(property) //jump to EdgeAssert
                         .isSingleEdgeTo("Mad Stach");
     }
+
 
     @Test
     public void shouldBuildTwoNodesGraphForDifferentEntities() {
         //given
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build();
+        Property property = getProperty("dummyUserDetails");
 
         //when
         ObjectNode node = graphBuilder.buildGraph(user);
@@ -77,7 +82,7 @@ public abstract class ObjectGraphBuilderTest {
         //then
         assertThat(node).hasEdges(1)
                         .hasCdoId("Mad Kaz")
-                        .hasEdge("dummyUserDetails")//jump to EdgeAssert
+                        .hasEdge(property)//jump to EdgeAssert
                         .isSingleEdgeTo(1L);
     }
 
@@ -99,11 +104,11 @@ public abstract class ObjectGraphBuilderTest {
         //then
         assertThat(node).hasEdges(1)
                         .hasCdoId("Mad Kaz 0")
-                        .hasSingleEdge("supervisor")
+                        .hasSingleEdge(getProperty("supervisor"))
                      .andTargetNode()
                         .hasEdges(1)
                         .hasCdoId("Mad Kaz 1")
-                        .hasSingleEdge("supervisor")
+                        .hasSingleEdge(getProperty("supervisor"))
                      .andTargetNode()
                         .hasNoEdges()
                         .hasCdoId("Mad Kaz 2");
@@ -126,14 +131,14 @@ public abstract class ObjectGraphBuilderTest {
         //then
         assertThat(node).hasEdges(2)
                         .hasCdoId("Mad Kaz")
-                  .and().hasEdge("supervisor")
+                  .and().hasEdge(getProperty("supervisor"))
                         .isSingleEdge()
                         .andTargetNode()
                         .hasCdoId("Mad Stach")
-                        .hasEdge("dummyUserDetails")
+                        .hasEdge(getProperty("dummyUserDetails"))
                         .isSingleEdgeTo(2L);
 
-        assertThat(node).hasEdge("dummyUserDetails")
+        assertThat(node).hasEdge(getProperty("dummyUserDetails"))
                         .isSingleEdgeTo(1L);
     }
 
@@ -154,8 +159,8 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasEdges(2);
-        assertThat(node).hasSingleEdge("dummyUserDetails");
-        assertThat(node).hasMultiEdge("dummyUserDetailsList").ofSize(3);
+        assertThat(node).hasSingleEdge(getProperty("dummyUserDetails"));
+        assertThat(node).hasMultiEdge(getProperty("dummyUserDetailsList")).ofSize(3);
     }
 
     @Test
@@ -178,10 +183,10 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasCdoId("Mad Kaz")
-                        .hasEdge("supervisor")
+                        .hasEdge(getProperty("supervisor"))
                         .isSingleEdgeTo("Stach")
                         .andTargetNode()
-                        .hasMultiEdge("dummyUserDetailsList").ofSize(3);
+                        .hasMultiEdge(getProperty("dummyUserDetailsList")).ofSize(3);
     }
 
     @Test
@@ -208,13 +213,13 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasCdoId("kaz")
-                  .and().hasEdge("supervisor")
+                  .and().hasEdge(getProperty("supervisor"))
                         .isSingleEdgeTo("stach")
                         .andTargetNode()
-                        .hasEdge("employeesList")
+                        .hasEdge(getProperty("employeesList"))
                         .isMultiEdge("Em1","Em2","rob")
                         .andTargetNode("rob")
-                        .hasEdge("employeesList")
+                        .hasEdge(getProperty("employeesList"))
                         .isMultiEdge("Em1", "Em2", "Em3");
     }
 
@@ -254,20 +259,20 @@ public abstract class ObjectGraphBuilderTest {
 
         //small cycle
         assertThat(node).hasCdoId("superKaz")
-                        .hasEdge("employeesList")
+                        .hasEdge(getProperty("employeesList"))
                         .isMultiEdge("kaz", "microKaz")
                         .andTargetNode("kaz")
-                        .hasEdge("supervisor")
+                        .hasEdge(getProperty("supervisor"))
                         .isSingleEdgeTo("superKaz");
 
         //large cycle
         assertThat(node).hasCdoId("superKaz")
-                        .hasMultiEdge("employeesList")
+                        .hasMultiEdge(getProperty("employeesList"))
                         .andTargetNode("microKaz")
-                        .hasEdge("supervisor")
+                        .hasEdge(getProperty("supervisor"))
                         .isSingleEdgeTo("kaz")
                         .andTargetNode()
-                        .hasEdge("supervisor")
+                        .hasEdge(getProperty("supervisor"))
                         .isSingleEdgeTo("superKaz");
     }
 
@@ -295,5 +300,9 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasNoEdges();
+    }
+
+    private Property getProperty(String name) {
+        return ((Entity) entityManager.getByClass(DummyUser.class)).getProperty(name);
     }
 }

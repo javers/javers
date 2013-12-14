@@ -1,6 +1,7 @@
 package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
+import org.javers.model.mapping.Property;
 import org.javers.model.object.graph.Edge;
 import org.javers.model.object.graph.ObjectNode;
 
@@ -34,15 +35,8 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
         return EdgeAssert.assertThat(actual.getEdges().get(0));
     }
 
-    public EdgeAssert hasEdge(String edgeName) {
-        Assertions.assertThat(actual.getEdges()).overridingErrorMessage("no edges").isNotEmpty();
-        for (Edge edge : actual.getEdges()) {
-            if(edge.getProperty().getName().equals(edgeName)) {
-                return EdgeAssert.assertThat(edge);
-            }
-        }
-        Assertions.fail("no such edge: "+ edgeName);
-        return null; // never happens, Assertions.fail is before this line
+    public EdgeAssert hasEdge(Property property) {
+        return EdgeAssert.assertThat(actual.getEdge(property));
     }
 
     public NodeAssert hasNoEdges() {
@@ -53,11 +47,11 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
         return this;
     }
 
-    public SingleEdgeAssert hasSingleEdge(String edgeName) {
-        return hasEdge(edgeName).isSingleEdge();
+    public SingleEdgeAssert hasSingleEdge(Property property) {
+        return hasEdge(property).isSingleEdge();
     }
 
-    public MultiEdgeAssert hasMultiEdge(String edgeName) {
-        return hasEdge(edgeName).isMultiEdge();
+    public MultiEdgeAssert hasMultiEdge(Property property) {
+        return hasEdge(property).isMultiEdge();
     }
 }
