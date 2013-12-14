@@ -4,7 +4,6 @@ import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.changeType.ReferenceChanged;
-import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.object.graph.Edge;
@@ -31,8 +30,8 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
         ObjectNode left = pair.getLeft();
         ObjectNode right =pair.getRight();
 
-        GlobalCdoId leftGlobalCdoId = gerReferencedGlobalCdoId(left, property);
-        GlobalCdoId rightGlobalCdoId = gerReferencedGlobalCdoId(right, property);
+        GlobalCdoId leftGlobalCdoId = getReferencedGlobalCdoId(left, property);
+        GlobalCdoId rightGlobalCdoId = getReferencedGlobalCdoId(right, property);
 
         if (leftGlobalCdoId.equals(rightGlobalCdoId)) {
             return Collections.EMPTY_SET;
@@ -45,7 +44,7 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
     }
 
 
-    private GlobalCdoId gerReferencedGlobalCdoId(ObjectNode node, Property property) {
+    private GlobalCdoId getReferencedGlobalCdoId(ObjectNode node, Property property) {
         for (Edge edge : node.getEdges()) {
             if (edge.getProperty().equals(property)) {
                 SingleEdge singleEdge =  (SingleEdge) edge;
