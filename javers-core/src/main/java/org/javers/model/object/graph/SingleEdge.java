@@ -15,11 +15,11 @@ public class SingleEdge extends Edge {
 
     private final ObjectNode reference;
 
-    public SingleEdge(Property property, ObjectNode inReference) {
+    public SingleEdge(Property property, ObjectNode reference) {
         super(property);
-        Validate.argumentIsNotNull(inReference);
+        Validate.argumentIsNotNull(reference);
 
-        this.reference = inReference;
+        this.reference = reference;
     }
 
     public ObjectNode getReference() {
