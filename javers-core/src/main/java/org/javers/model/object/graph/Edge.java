@@ -37,4 +37,7 @@ public abstract class Edge implements Visitable<GraphVisitor> {
     public int hashCode() {
         return property.hashCode();
     }
+
+    //not sure if it is useful
+    //public abstract Entity getReferencedEntity();
 }

@@ -60,9 +60,9 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasEdges(1)
-                .hasCdoId("Mad Kaz")
-                .hasEdge("supervisor") //jump to EdgeAssert
-                .isSingleEdgeTo("Mad Stach");
+                        .hasCdoId("Mad Kaz")
+                        .hasEdge("supervisor") //jump to EdgeAssert
+                        .isSingleEdgeTo("Mad Stach");
     }
 
     @Test
@@ -76,9 +76,9 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasEdges(1)
-                .hasCdoId("Mad Kaz")
-                .hasEdge("dummyUserDetails")//jump to EdgeAssert
-                .isSingleEdgeTo(1L);
+                        .hasCdoId("Mad Kaz")
+                        .hasEdge("dummyUserDetails")//jump to EdgeAssert
+                        .isSingleEdgeTo(1L);
     }
 
     @Test
@@ -98,15 +98,15 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasEdges(1)
-                .hasCdoId("Mad Kaz 0")
-                .hasSingleEdge("supervisor")
-                .andTargetNode()
-                .hasEdges(1)
-                .hasCdoId("Mad Kaz 1")
-                .hasSingleEdge("supervisor")
-                .andTargetNode()
-                .hasNoEdges()
-                .hasCdoId("Mad Kaz 2");
+                        .hasCdoId("Mad Kaz 0")
+                        .hasSingleEdge("supervisor")
+                        .andTargetNode()
+                        .hasEdges(1)
+                        .hasCdoId("Mad Kaz 1")
+                        .hasSingleEdge("supervisor")
+                        .andTargetNode()
+                        .hasNoEdges()
+                        .hasCdoId("Mad Kaz 2");
     }
 
     @Test
@@ -125,16 +125,16 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasEdges(2)
-                .hasCdoId("Mad Kaz")
-                .and().hasEdge("supervisor")
-                .isSingleEdge()
-                .andTargetNode()
-                .hasCdoId("Mad Stach")
-                .hasEdge("dummyUserDetails")
-                .isSingleEdgeTo(2L);
+                        .hasCdoId("Mad Kaz")
+                        .and().hasEdge("supervisor")
+                        .isSingleEdge()
+                        .andTargetNode()
+                        .hasCdoId("Mad Stach")
+                        .hasEdge("dummyUserDetails")
+                        .isSingleEdgeTo(2L);
 
         assertThat(node).hasEdge("dummyUserDetails")
-                .isSingleEdgeTo(1L);
+                        .isSingleEdgeTo(1L);
     }
 
     @Test
@@ -178,10 +178,10 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasCdoId("Mad Kaz")
-                .hasEdge("supervisor")
-                .isSingleEdgeTo("Stach")
-                .andTargetNode()
-                .hasMultiEdge("dummyUserDetailsList").ofSize(3);
+                        .hasEdge("supervisor")
+                        .isSingleEdgeTo("Stach")
+                        .andTargetNode()
+                        .hasMultiEdge("dummyUserDetailsList").ofSize(3);
     }
 
     @Test
@@ -198,9 +198,9 @@ public abstract class ObjectGraphBuilderTest {
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyUser rob = dummyUser().withName("rob").withEmployees(3).build();
         DummyUser stach = dummyUser().withName("stach")
-                .withEmployee(rob)
-                .withEmployees(2)
-                .build();
+                                     .withEmployee(rob)
+                                     .withEmployees(2)
+                                     .build();
         DummyUser kaz   = dummyUser().withName("kaz").withSupervisor(stach).build();
 
         //when
@@ -208,14 +208,14 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasCdoId("kaz")
-                .and().hasEdge("supervisor")
-                .isSingleEdgeTo("stach")
-                .andTargetNode()
-                .hasEdge("employeesList")
-                .isMultiEdge("Em1","Em2","rob")
-                .andTargetNode("rob")
-                .hasEdge("employeesList")
-                .isMultiEdge("Em1", "Em2", "Em3");
+                        .and().hasEdge("supervisor")
+                        .isSingleEdgeTo("stach")
+                        .andTargetNode()
+                        .hasEdge("employeesList")
+                        .isMultiEdge("Em1","Em2","rob")
+                        .andTargetNode("rob")
+                        .hasEdge("employeesList")
+                        .isMultiEdge("Em1", "Em2", "Em3");
     }
 
     @Test
@@ -254,21 +254,21 @@ public abstract class ObjectGraphBuilderTest {
 
         //small cycle
         assertThat(node).hasCdoId("superKaz")
-                .hasEdge("employeesList")
-                .isMultiEdge("kaz", "microKaz")
-                .andTargetNode("kaz")
-                .hasEdge("supervisor")
-                .isSingleEdgeTo("superKaz");
+                        .hasEdge("employeesList")
+                        .isMultiEdge("kaz", "microKaz")
+                        .andTargetNode("kaz")
+                        .hasEdge("supervisor")
+                        .isSingleEdgeTo("superKaz");
 
         //large cycle
         assertThat(node).hasCdoId("superKaz")
-                .hasMultiEdge("employeesList")
-                .andTargetNode("microKaz")
-                .hasEdge("supervisor")
-                .isSingleEdgeTo("kaz")
-                .andTargetNode()
-                .hasEdge("supervisor")
-                .isSingleEdgeTo("superKaz");
+                        .hasMultiEdge("employeesList")
+                        .andTargetNode("microKaz")
+                        .hasEdge("supervisor")
+                        .isSingleEdgeTo("kaz")
+                        .andTargetNode()
+                        .hasEdge("supervisor")
+                        .isSingleEdgeTo("superKaz");
     }
 
     @Test
