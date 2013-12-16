@@ -6,10 +6,8 @@ import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
-import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
-import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Test;
 
@@ -56,34 +54,31 @@ public abstract class ObjectGraphBuilderTest {
         //given
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyUser user = dummyUser().withName("Mad Kaz").withSupervisor("Mad Stach").build();
-        Property property = getProperty("supervisor");
 
         //when
         ObjectNode node = graphBuilder.buildGraph(user);
 
         //then
         assertThat(node).hasEdges(1)
-                        .hasCdoId("Mad Kaz")
-                        .hasEdge(property) //jump to EdgeAssert
-                        .isSingleEdgeTo("Mad Stach");
+                .hasCdoId("Mad Kaz")
+                .hasEdge("supervisor") //jump to EdgeAssert
+                .isSingleEdgeTo("Mad Stach");
     }
-
 
     @Test
     public void shouldBuildTwoNodesGraphForDifferentEntities() {
         //given
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build();
-        Property property = getProperty("dummyUserDetails");
 
         //when
         ObjectNode node = graphBuilder.buildGraph(user);
 
         //then
         assertThat(node).hasEdges(1)
-                        .hasCdoId("Mad Kaz")
-                        .hasEdge(property)//jump to EdgeAssert
-                        .isSingleEdgeTo(1L);
+                .hasCdoId("Mad Kaz")
+                .hasEdge("dummyUserDetails")//jump to EdgeAssert
+                .isSingleEdgeTo(1L);
     }
 
     @Test
@@ -103,15 +98,15 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasEdges(1)
-                        .hasCdoId("Mad Kaz 0")
-                        .hasSingleEdge(getProperty("supervisor"))
-                     .andTargetNode()
-                        .hasEdges(1)
-                        .hasCdoId("Mad Kaz 1")
-                        .hasSingleEdge(getProperty("supervisor"))
-                     .andTargetNode()
-                        .hasNoEdges()
-                        .hasCdoId("Mad Kaz 2");
+                .hasCdoId("Mad Kaz 0")
+                .hasSingleEdge("supervisor")
+                .andTargetNode()
+                .hasEdges(1)
+                .hasCdoId("Mad Kaz 1")
+                .hasSingleEdge("supervisor")
+                .andTargetNode()
+                .hasNoEdges()
+                .hasCdoId("Mad Kaz 2");
     }
 
     @Test
@@ -130,16 +125,16 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasEdges(2)
-                        .hasCdoId("Mad Kaz")
-                  .and().hasEdge(getProperty("supervisor"))
-                        .isSingleEdge()
-                        .andTargetNode()
-                        .hasCdoId("Mad Stach")
-                        .hasEdge(getProperty("dummyUserDetails"))
-                        .isSingleEdgeTo(2L);
+                .hasCdoId("Mad Kaz")
+                .and().hasEdge("supervisor")
+                .isSingleEdge()
+                .andTargetNode()
+                .hasCdoId("Mad Stach")
+                .hasEdge("dummyUserDetails")
+                .isSingleEdgeTo(2L);
 
-        assertThat(node).hasEdge(getProperty("dummyUserDetails"))
-                        .isSingleEdgeTo(1L);
+        assertThat(node).hasEdge("dummyUserDetails")
+                .isSingleEdgeTo(1L);
     }
 
     @Test
@@ -159,8 +154,8 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasEdges(2);
-        assertThat(node).hasSingleEdge(getProperty("dummyUserDetails"));
-        assertThat(node).hasMultiEdge(getProperty("dummyUserDetailsList")).ofSize(3);
+        assertThat(node).hasSingleEdge("dummyUserDetails");
+        assertThat(node).hasMultiEdge("dummyUserDetailsList").ofSize(3);
     }
 
     @Test
@@ -183,10 +178,10 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasCdoId("Mad Kaz")
-                        .hasEdge(getProperty("supervisor"))
-                        .isSingleEdgeTo("Stach")
-                        .andTargetNode()
-                        .hasMultiEdge(getProperty("dummyUserDetailsList")).ofSize(3);
+                .hasEdge("supervisor")
+                .isSingleEdgeTo("Stach")
+                .andTargetNode()
+                .hasMultiEdge("dummyUserDetailsList").ofSize(3);
     }
 
     @Test
@@ -203,9 +198,9 @@ public abstract class ObjectGraphBuilderTest {
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyUser rob = dummyUser().withName("rob").withEmployees(3).build();
         DummyUser stach = dummyUser().withName("stach")
-                                     .withEmployee(rob)
-                                     .withEmployees(2)
-                                     .build();
+                .withEmployee(rob)
+                .withEmployees(2)
+                .build();
         DummyUser kaz   = dummyUser().withName("kaz").withSupervisor(stach).build();
 
         //when
@@ -213,14 +208,14 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasCdoId("kaz")
-                  .and().hasEdge(getProperty("supervisor"))
-                        .isSingleEdgeTo("stach")
-                        .andTargetNode()
-                        .hasEdge(getProperty("employeesList"))
-                        .isMultiEdge("Em1","Em2","rob")
-                        .andTargetNode("rob")
-                        .hasEdge(getProperty("employeesList"))
-                        .isMultiEdge("Em1", "Em2", "Em3");
+                .and().hasEdge("supervisor")
+                .isSingleEdgeTo("stach")
+                .andTargetNode()
+                .hasEdge("employeesList")
+                .isMultiEdge("Em1","Em2","rob")
+                .andTargetNode("rob")
+                .hasEdge("employeesList")
+                .isMultiEdge("Em1", "Em2", "Em3");
     }
 
     @Test
@@ -259,21 +254,21 @@ public abstract class ObjectGraphBuilderTest {
 
         //small cycle
         assertThat(node).hasCdoId("superKaz")
-                        .hasEdge(getProperty("employeesList"))
-                        .isMultiEdge("kaz", "microKaz")
-                        .andTargetNode("kaz")
-                        .hasEdge(getProperty("supervisor"))
-                        .isSingleEdgeTo("superKaz");
+                .hasEdge("employeesList")
+                .isMultiEdge("kaz", "microKaz")
+                .andTargetNode("kaz")
+                .hasEdge("supervisor")
+                .isSingleEdgeTo("superKaz");
 
         //large cycle
         assertThat(node).hasCdoId("superKaz")
-                        .hasMultiEdge(getProperty("employeesList"))
-                        .andTargetNode("microKaz")
-                        .hasEdge(getProperty("supervisor"))
-                        .isSingleEdgeTo("kaz")
-                        .andTargetNode()
-                        .hasEdge(getProperty("supervisor"))
-                        .isSingleEdgeTo("superKaz");
+                .hasMultiEdge("employeesList")
+                .andTargetNode("microKaz")
+                .hasEdge("supervisor")
+                .isSingleEdgeTo("kaz")
+                .andTargetNode()
+                .hasEdge("supervisor")
+                .isSingleEdgeTo("superKaz");
     }
 
     @Test
@@ -300,9 +295,5 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasNoEdges();
-    }
-
-    private Property getProperty(String name) {
-        return ((Entity) entityManager.getByClass(DummyUser.class)).getProperty(name);
     }
 }
