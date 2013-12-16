@@ -24,8 +24,8 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
 
     public NodeAssert hasEdges(int expectedSize) {
         Assertions.assertThat(actual.getEdges())
-                .overridingErrorMessage("expected edges:"+expectedSize+" but was:"+actual.getEdges().size())
-                .hasSize(expectedSize);
+                  .overridingErrorMessage("expected edges:"+expectedSize+" but was:"+actual.getEdges().size())
+                  .hasSize(expectedSize);
         return this;
     }
 

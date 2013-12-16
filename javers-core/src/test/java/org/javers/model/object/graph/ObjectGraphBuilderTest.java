@@ -100,11 +100,11 @@ public abstract class ObjectGraphBuilderTest {
         assertThat(node).hasEdges(1)
                         .hasCdoId("Mad Kaz 0")
                         .hasSingleEdge("supervisor")
-                        .andTargetNode()
+                    .andTargetNode()
                         .hasEdges(1)
                         .hasCdoId("Mad Kaz 1")
                         .hasSingleEdge("supervisor")
-                        .andTargetNode()
+                    .andTargetNode()
                         .hasNoEdges()
                         .hasCdoId("Mad Kaz 2");
     }
@@ -126,7 +126,7 @@ public abstract class ObjectGraphBuilderTest {
         //then
         assertThat(node).hasEdges(2)
                         .hasCdoId("Mad Kaz")
-                        .and().hasEdge("supervisor")
+                    .and().hasEdge("supervisor")
                         .isSingleEdge()
                         .andTargetNode()
                         .hasCdoId("Mad Stach")
@@ -208,7 +208,7 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasCdoId("kaz")
-                        .and().hasEdge("supervisor")
+                    .and().hasEdge("supervisor")
                         .isSingleEdgeTo("stach")
                         .andTargetNode()
                         .hasEdge("employeesList")
