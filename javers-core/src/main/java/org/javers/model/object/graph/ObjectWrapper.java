@@ -79,8 +79,8 @@ public class ObjectWrapper implements ObjectNode {
         return edges.get(property);
     }
 
-    public void addEdge(Property property, Edge edge) {
-        this.edges.put(property, edge);
+    public void addEdge(Edge edge) {
+        this.edges.put(edge.getProperty(), edge);
     }
 
     @Override

@@ -84,7 +84,7 @@ public class ObjectGraphBuilder {
             ObjectNode referencedNode = buildNodeOrReuse(asCdo(referencedRawCdo));
 
             Edge edge = new SingleEdge(singleRef, referencedNode);
-            node.addEdge(singleRef, edge);
+            node.addEdge(edge);
         }
     }
 
@@ -116,7 +116,7 @@ public class ObjectGraphBuilder {
                 continue;
             }
             MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences);
-            node.addEdge(colProperty, multiEdge);
+            node.addEdge(multiEdge);
         }
     }
 
