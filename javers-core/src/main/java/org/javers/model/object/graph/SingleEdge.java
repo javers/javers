@@ -1,7 +1,6 @@
 package org.javers.model.object.graph;
 
 import org.javers.common.validation.Validate;
-import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Property;
 
 /**
@@ -15,7 +14,8 @@ public class SingleEdge extends Edge {
 
     private final ObjectNode reference;
 
-    public SingleEdge(ObjectNode reference) {
+    public SingleEdge(Property property, ObjectNode reference) {
+        super(property);
         Validate.argumentIsNotNull(reference);
 
         this.reference = reference;

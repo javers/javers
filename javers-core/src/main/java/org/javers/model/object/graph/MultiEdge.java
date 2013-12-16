@@ -1,5 +1,7 @@
 package org.javers.model.object.graph;
 
+import org.javers.model.mapping.Property;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +12,8 @@ import java.util.List;
 public class MultiEdge extends Edge {
     protected List<ObjectNode> references;
 
-    public MultiEdge() {
+    public MultiEdge(Property property) {
+        super(property);
         references = new ArrayList<>();
     }
 
