@@ -9,6 +9,8 @@ import org.javers.core.diff.DFSGraphToSetConverter;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.appenders.NewObjectAppender;
 import org.javers.core.diff.appenders.ObjectRemovedAppender;
+import org.javers.core.diff.appenders.ReferenceChangeAppender;
+import org.javers.core.diff.appenders.ValueChangeAppender;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 
 /**
@@ -16,8 +18,15 @@ import org.javers.model.object.graph.ObjectGraphBuilder;
  */
 public class CoreJaversModule implements JaversModule {
 
-    private static Class[] moduleComponents = new Class[]{Javers.class, DiffFactory.class, ObjectGraphBuilder.class,
-            DFSGraphToSetConverter.class, NewObjectAppender.class, ObjectRemovedAppender.class};
+    private static Class[] moduleComponents = new Class[]{
+            Javers.class,
+            DiffFactory.class,
+            ObjectGraphBuilder.class,
+            DFSGraphToSetConverter.class,
+            NewObjectAppender.class,
+            ObjectRemovedAppender.class,
+            ReferenceChangeAppender.class,
+            ValueChangeAppender.class};
 
     @Override
     public Collection<Class> getModuleComponents() {
