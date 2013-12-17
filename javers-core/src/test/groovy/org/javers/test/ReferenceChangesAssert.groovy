@@ -1,5 +1,6 @@
 package org.javers.test
 
+import org.javers.model.domain.GlobalCdoId
 import org.javers.model.domain.changeType.ReferenceChanged
 import org.javers.model.mapping.Property
 
@@ -34,27 +35,39 @@ class ReferenceChangesAssert {
         }
 
         def static ReferenceChangeAssert assertThat(ReferenceChanged actual) {
-            return new ReferenceChangeAssert(actual)
+            new ReferenceChangeAssert(actual)
         }
 
         def hasProperty(Property expected) {
             assert actual.property == expected
-            return this
+            this
         }
 
         def hasCdoId(Object expected) {
             assert actual.globalCdoId.localCdoId == expected
-            return this
+            this
         }
 
-        def hasLeftReference(Object expected) {
+        def hasLeftReference(Class expectedClass, Object expectedCdoId) {
+            assert actual.leftReference.localCdoId == expectedCdoId
+            assert actual.leftReference.entity.sourceClass == expectedClass
+            this
+        }
+
+        def hasRightReference(Class expectedClass, Object expectedCdoId) {
+            assert actual.rightReference.localCdoId == expectedCdoId
+            assert actual.rightReference.entity.sourceClass == expectedClass
+            this
+        }
+
+        def hasLeftReference(GlobalCdoId expected) {
             assert actual.leftReference == expected
-            return this;
+            this
         }
 
-        def hasRightReference(Object expected) {
+        def hasRightReference(GlobalCdoId expected) {
             assert actual.rightReference == expected
-            return this;
+            this
         }
     }
 }
