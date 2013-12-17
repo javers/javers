@@ -29,34 +29,34 @@ class ReferenceChangesAssert {
             new ReferenceChangeAssert(actual:actual)
         }
 
-        ReferenceChanged hasProperty(Property expected) {
+        ReferenceChangeAssert hasProperty(Property expected) {
             assert actual.property == expected
             this
         }
 
-        ReferenceChanged hasCdoId(Object expected) {
+        ReferenceChangeAssert hasCdoId(Object expected) {
             assert actual.globalCdoId.localCdoId == expected
             this
         }
 
-        ReferenceChanged hasLeftReference(Class expectedClass, Object expectedCdoId) {
+        ReferenceChangeAssert hasLeftReference(Class expectedClass, Object expectedCdoId) {
             assert actual.leftReference.localCdoId == expectedCdoId
             assert actual.leftReference.entity.sourceClass == expectedClass
             this
         }
 
-        ReferenceChanged hasRightReference(Class expectedClass, Object expectedCdoId) {
+        ReferenceChangeAssert hasRightReference(Class expectedClass, Object expectedCdoId) {
             assert actual.rightReference.localCdoId == expectedCdoId
             assert actual.rightReference.entity.sourceClass == expectedClass
             this
         }
 
-        ReferenceChanged hasLeftReference(GlobalCdoId expected) {
+        ReferenceChangeAssert hasLeftReference(GlobalCdoId expected) {
             assert actual.leftReference == expected
             this
         }
 
-        ReferenceChanged hasRightReference(GlobalCdoId expected) {
+        ReferenceChangeAssert hasRightReference(GlobalCdoId expected) {
             assert actual.rightReference == expected
             this
         }

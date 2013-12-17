@@ -17,7 +17,7 @@ import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
 class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
-    def "should not append when the same reference"() {
+    def "should not append change when the same references"() {
         given:
         DummyUser leftReference = dummyUser().withName("1").withDetails(2).build()
         DummyUser rightReference = leftReference;
@@ -27,31 +27,49 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
         when:
         Collection<Change> changes =
-            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property);
+            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property)
 
         then:
         assertThat changes hasSize 0
     }
 
-    def "should append reference change"() {
+    def "should compare refs null safely"() {
         given:
-        DummyUser leftReference = dummyUser().withName("1").withDetails(2).build()
-        DummyUser rightReference = dummyUser().withName("1").withDetails(3).build()
-        ObjectNode leftNode = buildGraph(leftReference)
-        ObjectNode rightNode = buildGraph(rightReference)
+        ObjectNode leftNode =  buildGraph(dummyUser().withName("1").withDetails(2).build())
+        ObjectNode rightNode = buildGraph(dummyUser().withName("1").build())
         Property property = getEntity(DummyUser).getProperty("dummyUserDetails")
 
         when:
         Collection<Change> changes =
-            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property);
+            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property)
+
+        then:
+        assertThat(changes)
+                .hasSize(1)
+                .assertThatFirstChange()
+                .hasCdoId("1")
+                .hasLeftReference(DummyUserDetails,2)
+                .hasRightReference(null)
+                .hasProperty(property)
+    }
+
+    def "should append reference change"() {
+        given:
+        ObjectNode leftNode =  buildGraph(dummyUser().withName("1").withDetails(2).build())
+        ObjectNode rightNode = buildGraph(dummyUser().withName("1").withDetails(3).build())
+        Property property = getEntity(DummyUser).getProperty("dummyUserDetails")
+
+        when:
+        Collection<Change> changes =
+            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property)
 
         then:
         assertThat(changes)
             .hasSize(1)
             .assertThatFirstChange()
             .hasCdoId("1")
-            .hasLeftReference(new GlobalCdoId(leftReference.dummyUserDetails.id, getEntity(DummyUserDetails)))
-            .hasRightReference(new GlobalCdoId(rightReference.dummyUserDetails.id, getEntity(DummyUserDetails)))
+            .hasLeftReference(DummyUserDetails,2)
+            .hasRightReference(DummyUserDetails,3)
             .hasProperty(property)
     }
 
