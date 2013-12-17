@@ -5,10 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.javers.core.diff.appenders.NewObjectAppender;
-import org.javers.core.diff.appenders.NodeChangeAppender;
-import org.javers.core.diff.appenders.ObjectRemovedAppender;
-import org.javers.core.diff.appenders.PropertyChangeAppender;
+import org.javers.core.diff.appenders.*;
 import org.javers.model.domain.Change;
 import org.javers.model.domain.Diff;
 import org.javers.model.mapping.Property;
@@ -25,10 +22,12 @@ public class DiffFactory {
     private List<NodeChangeAppender> nodeChangeAppenders;
     private List<PropertyChangeAppender> propertyChangeAppender;
 
-    public DiffFactory(DFSGraphToSetConverter graphToSetConverter) {
+    public DiffFactory(DFSGraphToSetConverter graphToSetConverter,
+                       List<NodeChangeAppender> nodeChangeAppenders,
+                       List<PropertyChangeAppender> propertyChangeAppender) {
         this.graphToSetConverter = graphToSetConverter;
-        this.nodeChangeAppenders = Arrays.asList(new NewObjectAppender(), new ObjectRemovedAppender());
-        this.propertyChangeAppender = Arrays.asList();
+        this.nodeChangeAppenders = nodeChangeAppenders;
+        this.propertyChangeAppender = propertyChangeAppender;
         this.nodeMatcher = new NodeMatcher();
     }
 
