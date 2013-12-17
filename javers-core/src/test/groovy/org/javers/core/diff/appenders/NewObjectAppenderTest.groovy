@@ -5,7 +5,7 @@ import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.model.DummyUser
 import org.javers.model.domain.Diff
 import org.javers.model.object.graph.ObjectNode
-import static org.javers.test.assertion.DiffAssert.assertThat
+import static org.javers.core.diff.DiffAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
@@ -25,7 +25,7 @@ class NewObjectAppenderTest extends AbstractDiffTest {
         diff.addChanges(new NewObjectAppender().getChangeSet(previousGraph, currentGraph))
 
         then:
-        assertThat(diff).hasChangesCount(1)
+        assertThat(diff).hasSize(1)
         assertThat(diff).getChangeAtIndex(0).isNewObject().hasCdoId("1").hasEntityTypeOf(DummyUser.class).hasParentEqualTo(diff).hasCdo(node.cdo.wrappedCdo)
     }
 
@@ -43,7 +43,7 @@ class NewObjectAppenderTest extends AbstractDiffTest {
         diff.addChanges(new NewObjectAppender().getChangeSet(previousGraph, currentGraph))
 
         then:
-        assertThat(diff).hasChangesCount(2)
+        assertThat(diff).hasSize(2)
         assertThat(diff).getChangeAtIndex(0).isNewObject()
         assertThat(diff).getChangeAtIndex(1).isNewObject()
     }
@@ -59,6 +59,6 @@ class NewObjectAppenderTest extends AbstractDiffTest {
         diff.addChanges(new NewObjectAppender().getChangeSet(previousGraph, currentGraph))
 
         then:
-        assertThat(diff).hasChangesCount(0)
+        assertThat(diff).hasSize(0)
     }
 }
