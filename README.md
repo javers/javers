@@ -4,7 +4,7 @@
 JaVers is a lightweight java library for **versioning** your object-oriented data.
 
 We all use Version Control Systems for source code,
-why not to use specialized VCS for our applications to provide *versioning* of mission-critical data?
+why not to use specialized VCS for our applications to provide versioning of mission-critical data?
 
 ### Basic facts about JaVers
 * It's lightweight and versatile. We don't take any assumptions about your data model, bean container or
@@ -12,9 +12,11 @@ why not to use specialized VCS for our applications to provide *versioning* of m
 * Configuration is easy. Since we use JSON for objects serialization, we don't want you to
   provide detailed ORM-like mapping.
   JaVers needs to know only some high-level facts about your data model.
+* JaVers is meant to keeps its versioning records (diffs and snapshots) in
+  application primary database alongside with main data.
+  Naturally there is no direct linking between this two data sets.
 * We use some basic notions following Eric Evans DDD terminology like *Entity* or *Value Objects*,
   pretty much the same like JPA does. We believe that this is right way of describing data.
-
 
 ## Story
 
