@@ -1,5 +1,6 @@
 package org.javers.core.diff.appenders;
 
+import org.javers.common.collections.Objects;
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
 import org.javers.model.domain.GlobalCdoId;
@@ -27,13 +28,13 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
 
     @Override
     public Collection<ReferenceChanged> calculateChanges(NodePair pair, Property property) {
-        ObjectNode left = pair.getLeft();
-        ObjectNode right =pair.getRight();
+        Edge leftSingleEdge = pair.getLeft().getEdge(property);
+        Edge rightSingleEdge = pair.getRight().getEdge(property);
 
-        GlobalCdoId leftGlobalCdoId = ((SingleEdge) left.getEdge(property)).getReference().getGlobalCdoId();
-        GlobalCdoId rightGlobalCdoId = ((SingleEdge) right.getEdge(property)).getReference().getGlobalCdoId();
+        GlobalCdoId leftGlobalCdoId = getGlobalCdoId(leftSingleEdge);
+        GlobalCdoId rightGlobalCdoId = getGlobalCdoId(rightSingleEdge);
 
-        if (leftGlobalCdoId.equals(rightGlobalCdoId)) {
+        if (Objects.nullSafeEquals(leftGlobalCdoId, rightGlobalCdoId)) {
             return Collections.EMPTY_SET;
         }
 
@@ -41,5 +42,9 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
                 property,
                 leftGlobalCdoId,
                 rightGlobalCdoId));
+    }
+
+    private GlobalCdoId getGlobalCdoId(Edge edge) {
+        return edge != null ? ((SingleEdge) edge).getReference().getGlobalCdoId() : null;
     }
 }
