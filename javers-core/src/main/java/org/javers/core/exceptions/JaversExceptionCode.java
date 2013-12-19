@@ -9,7 +9,9 @@ import static org.javers.core.exceptions.JaversException.*;
  *
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
-public enum JaversExceptionCode {
+public enum
+
+        JaversExceptionCode {
     //TODO better exception messages - User Friendly!
 
     /**

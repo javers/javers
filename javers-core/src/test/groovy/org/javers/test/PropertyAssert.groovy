@@ -10,28 +10,28 @@ import java.lang.reflect.Type
  */
 class PropertyAssert {
 
-    def Property actual;
+    Property actual
 
     private PropertyAssert(Property actual) {
         this.actual = actual;
     }
 
-    def static PropertyAssert assertThat(Property actual) {
+    static PropertyAssert assertThat(Property actual) {
         return new PropertyAssert(actual)
     }
 
-    def PropertyAssert hasJaversType(Class<? extends JaversType> expectedJaversType) {
+    PropertyAssert hasJaversType(Class<? extends JaversType> expectedJaversType) {
         assert actual.getType().getClass() == expectedJaversType
         return this
     }
 
-    def PropertyAssert hasJavaType(Type expected) {
+    PropertyAssert hasJavaType(Type expected) {
         assert actual.getType().getBaseJavaType() == expected
         return this;
     }
 
-    def PropertyAssert isId() {
-        assert actual.looksLikeId() == true;
+    PropertyAssert isId() {
+        assert actual.looksLikeId() == true
         return this;
     }
 }

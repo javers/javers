@@ -22,6 +22,11 @@ public class NodePair {
         this.right = right;
     }
 
+    public boolean isNullOnBothSides(Property property) {
+        return left.getPropertyValue(property) == null &&
+               right.getPropertyValue(property) == null;
+    }
+
     public Object getLeftPropertyValue(Property property) {
         return left.getPropertyValue(property);
     }

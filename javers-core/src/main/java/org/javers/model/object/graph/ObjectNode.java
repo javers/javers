@@ -31,6 +31,8 @@ public interface ObjectNode extends Visitable<GraphVisitor> {
      */
     List<Edge> getEdges();
 
+    Edge getEdge(Property property);
+
     /**
      * @return never returns null
      */
@@ -39,5 +41,5 @@ public interface ObjectNode extends Visitable<GraphVisitor> {
     /**
      * @return never returns null
      */
-    public Cdo getCdo();
+    Cdo getCdo();
 }

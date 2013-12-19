@@ -7,14 +7,12 @@ import org.javers.core.model.DummyUserDetails
 import org.javers.model.domain.changeType.ValueChange
 import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
-import org.javers.test.builder.DummyUserBuilder
-import org.javers.test.builder.DummyUserDetailsBuilder
 
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
-import static org.javers.test.ValueChangesAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
+import static org.javers.test.ValueChangesAssert.assertThat
 
 /**
  * @author bartosz walacik
@@ -48,7 +46,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(changes)
             .hasSize(1)
-            .assertThatFirstElement()
+            .assertThatFirstChange()
             .hasProperty(sex)
             .hasCdoId("1")
             .hasLeftValue(FEMALE)
@@ -68,7 +66,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(changes)
                 .hasSize(1)
-                .assertThatFirstElement()
+                .assertThatFirstChange()
                 .hasProperty(age)
                 .hasCdoId("1")
                 .hasLeftValue(1)
@@ -88,7 +86,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(changes)
                 .hasSize(1)
-                .assertThatFirstElement()
+                .assertThatFirstChange()
                 .hasProperty(largeInt)
                 .hasCdoId("1")
                 .doesNotHaveLeftValue()
@@ -108,7 +106,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(changes)
                 .hasSize(1)
-                .assertThatFirstElement()
+                .assertThatFirstChange()
                 .hasProperty(flag)
                 .hasCdoId("1")
                 .hasLeftValue(true)
@@ -128,7 +126,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(changes)
                 .hasSize(1)
-                .assertThatFirstElement()
+                .assertThatFirstChange()
                 .hasProperty(flag)
                 .hasCdoId("1")
                 .doesNotHaveLeftValue()
@@ -157,7 +155,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(changes)
                 .hasSize(1)
-                .assertThatFirstElement()
+                .assertThatFirstChange()
                 .hasProperty(address)
                 .hasCdoId(1)
                 .hasLeftValue(leftDummyUserDetails.dummyAddress)

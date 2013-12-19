@@ -9,7 +9,9 @@ import org.javers.model.visitors.Visitable;
 import org.javers.model.visitors.Visitor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -20,13 +22,13 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public class ObjectWrapper implements ObjectNode {
     private final Cdo cdo;
-    private final List<Edge> edges;
+    private final Map<Property, Edge> edges;
 
 
     public ObjectWrapper(Cdo cdo) {
         argumentIsNotNull(cdo);
         this.cdo = cdo;
-        this.edges = new ArrayList<>();
+        this.edges = new HashMap<>();
     }
 
     @Deprecated
@@ -69,11 +71,16 @@ public class ObjectWrapper implements ObjectNode {
 
     @Override
     public List<Edge> getEdges() {
-        return edges;
+        return new ArrayList<>(edges.values());
+    }
+
+    @Override
+    public Edge getEdge(Property property) {
+        return edges.get(property);
     }
 
     public void addEdge(Edge edge) {
-        this.edges.add(edge);
+        this.edges.put(edge.getProperty(), edge);
     }
 
     @Override
@@ -99,7 +106,7 @@ public class ObjectWrapper implements ObjectNode {
 
         visitor.visit(this);
 
-        for(Edge edge : edges) {
+        for(Edge edge : edges.values()) {
             edge.accept(visitor);
         }
     }
