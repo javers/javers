@@ -12,7 +12,7 @@ why not to use specialized VCS for our applications to provide versioning of mis
 * Configuration is easy. Since we use JSON for objects serialization, we don't want you to
   provide detailed ORM-like mapping.
   JaVers needs to know only some high-level facts about your data model.
-* JaVers is meant to keeps its versioning records (diffs and snapshots) in
+* JaVers is meant to keep its versioning records (diffs and snapshots) in
   application primary database alongside with main data.
   Naturally there is no direct linking between this two data sets.
 * We use some basic notions following Eric Evans DDD terminology like *Entity* or *Value Objects*,
