@@ -20,7 +20,8 @@ Java language nor in the mainstream databases (although NoSQL document databases
 This is the niche JaVers fulfills. In JaVers, *version* and *change* are **first class citizens**.
 
 ## Vision
-With JaVers 1.0 you would be able to perform following operations:
+  With JaVers 1.0 you would be able to perform following operations:
+
 * Commit changes performed on your objects graph with single commit() call.
 * Browse detailed diffs scoped on object graph level,
   to easily track changes of object field values as well as changes of relations between objects.
