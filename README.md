@@ -23,7 +23,7 @@ This is the niche JaVers fulfills. In JaVers, *version* and *change* are **first
   With JaVers 1.0 you would be able to perform following operations:
 
 * Commit changes performed on your objects graph with single commit() call.
-* Browse detailed diffs scoped on object graph level,
+* Browse detailed diffs, scoped on object graph level,
   to easily track changes of object field values as well as changes of relations between objects.
   value & relations but
 * Browse *shadows* - historical versions of object graph loaded directly into your data model classes.
