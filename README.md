@@ -55,5 +55,5 @@ JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 * Piotr Betkier
 * Maciej Zasada
 
-## CI status
-[![Build Status](https://drone.io/bitbucket.org/javers/javers/status.png)](https://drone.io/bitbucket.org/javers/javers/latest)
+## CI status - javers-parent
+[AngularJS [![Build Status](https://travis-ci.org/javers/javers.png?branch=master)](https://travis-ci.org/javers/javers)
