@@ -292,7 +292,15 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+    <profile>
+        <id>sign-artifacts</id>
+        <build>
+        <plugins>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <executions>
@@ -306,7 +314,9 @@
                 </executions>
             </plugin>
         </plugins>
-    </build>
+        </build>
+    </profile>
+    </profiles>
 
     <distributionManagement>
         <repository>
