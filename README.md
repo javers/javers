@@ -35,7 +35,7 @@ This is the niche JaVers fulfills. In JaVers, *version* and *change* are **first
   JaVers needs to know only some high-level facts about your data model.
 * JaVers is meant to keep its versioning records (diffs and snapshots) in
   application primary database alongside with main data.
-  Naturally there is no direct linking between this two data sets.
+  Obviously there is no direct linking between these two data sets.
 * We use some basic notions following Eric Evans DDD terminology like *Entity* or *Value Objects*,
   pretty much the same like JPA does. We believe that this is right way of describing data.
 
