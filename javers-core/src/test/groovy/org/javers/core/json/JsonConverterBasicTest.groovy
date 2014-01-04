@@ -1,11 +1,11 @@
-package org.javers.json
+package org.javers.core.json
 
-import org.joda.time.LocalDateTime
+import org.javers.core.json.JsonConverter
 import spock.lang.Specification
 
 import java.math.RoundingMode
 
-import static org.javers.json.JsonConverterBuilder.jsonConverter
+import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 
 /**
  * @author bartosz walacik

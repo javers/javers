@@ -1,7 +1,7 @@
-package org.javers.json;
+package org.javers.core.json;
 
 import com.google.gson.*;
-import org.javers.json.typeAdapter.LocalDateTimeTypeAdapter;
+import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -26,7 +26,7 @@ import java.util.Collection;
  * <ul>
  *     <li/> {@link BasicStringTypeAdapter} -
  *           extend it if you need to represent value as single String and don't want to deal with JSON API.
- *           For implementation example see {@link org.javers.json.typeAdapter.LocalDateTimeTypeAdapter}.
+ *           For implementation example see {@link org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter}.
  *     <li/> {@link JsonTypeAdapter} - use it if you need full control over JSON conversion
  *     <li/> native Gson {@link TypeAdapter} //TODO not implemented yet
  * </ul>

@@ -1,5 +1,4 @@
-package org.javers.json
-
+package org.javers.core.json
 /**
  * @author bartosz walacik
  */

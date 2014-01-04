@@ -1,4 +1,4 @@
-package org.javers.json
+package org.javers.core.json
 
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader

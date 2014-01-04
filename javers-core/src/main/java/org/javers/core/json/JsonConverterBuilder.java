@@ -1,4 +1,4 @@
-package org.javers.json;
+package org.javers.core.json;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;

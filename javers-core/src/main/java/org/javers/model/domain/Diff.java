@@ -37,7 +37,7 @@ import static org.javers.common.validation.Validate.*;
  *    <li/>Essentially, object-oriented data are persisted as JSON.
  * </ul>
  *
- * @see org.javers.json.JsonConverter
+ * @see org.javers.core.json.JsonConverter
  *
  * @author bartosz walacik
  */

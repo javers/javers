@@ -1,12 +1,9 @@
-package org.javers.json
+package org.javers.core.json
 
-import com.google.common.collect.ImmutableList
 import org.joda.time.LocalDateTime
-import org.junit.Test
 import spock.lang.Specification
 
-import static org.javers.json.JsonConverterBuilder.jsonConverter
-import static org.javers.json.JsonConverterBuilder.jsonConverter
+import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 
 /**
  * @author bartosz walacik

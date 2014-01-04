@@ -1,4 +1,4 @@
-package org.javers.json;
+package org.javers.core.json;
 
 import com.google.gson.JsonElement;
 
@@ -12,7 +12,7 @@ import com.google.gson.JsonElement;
  *
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
  *
- * @see org.javers.json.typeAdapter.LocalDateTimeTypeAdapter
+ * @see org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter
  * @author bartosz walacik
  */
 public interface JsonTypeAdapter<T> {
