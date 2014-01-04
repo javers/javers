@@ -1,13 +1,14 @@
 package org.javers.core.diff
 
+import de.danielbechler.diff.ObjectDiffer
+import de.danielbechler.diff.ObjectDifferFactory
+import de.danielbechler.diff.visitor.PrintingVisitor
 import org.javers.core.Javers
 import org.javers.model.domain.Diff
-import org.javers.model.domain.changeType.NewObject
 import org.javers.model.domain.changeType.ValueChange
-import org.javers.test.builder.CategoryTestBuilder
-import spock.lang.Specification
 import org.javers.model.mapping.Category
-import static org.fest.assertions.api.Assertions.assertThat
+import spock.lang.Specification
+
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.diff.DiffAssert.assertThat
 import static org.javers.test.builder.CategoryTestBuilder.category
@@ -56,6 +57,4 @@ class DiffFactoryIntegrationTest extends Specification {
         then:
         assertThat(diff).hasSize(3906 * 2)
     }
-
-
 }
