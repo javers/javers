@@ -8,6 +8,9 @@ import com.google.gson.JsonPrimitive;
  * Extend it if you need to represent value (T) as single String and don't want to deal with JSON API.
  * <br/><br/>
  *
+ * Implementation shouldn't take care about nulls
+ * br/><br/>
+ *
  * For implementation example see {@link org.javers.json.typeAdapter.LocalDateTimeTypeAdapter}.
  * <br/><br/>
  *
@@ -22,6 +25,7 @@ public abstract class BasicStringTypeAdapter<T> implements JsonTypeAdapter<T> {
      *     return ISO_FORMATTER.print(sourceValue);
      * }
      * </pre>
+     * @param sourceValue not null
      */
     public abstract String serialize(T sourceValue);
 
@@ -32,6 +36,8 @@ public abstract class BasicStringTypeAdapter<T> implements JsonTypeAdapter<T> {
      *     return ISO_FORMATTER.parseLocalDateTime(serializedValue);
      * }
      * </pre>
+     *
+     * @param serializedValue not null
      */
     public abstract T deserialize(String serializedValue);
 

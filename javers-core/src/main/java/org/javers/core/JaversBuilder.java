@@ -7,7 +7,7 @@ import org.javers.model.mapping.EntityDefinition;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.ManagedClassDefinition;
 import org.javers.model.mapping.ValueObjectDefinition;
-import org.javers.model.pico.ModelJaversModule;
+import org.javers.core.pico.ModelJaversModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,14 +74,14 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    public JaversBuilder registerEntity(Class<?>...entityClasses) {
+    public JaversBuilder registerEntities(Class<?>...entityClasses) {
         for(Class clazz : entityClasses) {
             registerEntity(clazz);
         }
         return this;
     }
 
-    public JaversBuilder registerValueObject(Class<?>...valueObjectClasses) {
+    public JaversBuilder registerValueObjects(Class<?>...valueObjectClasses) {
         for(Class clazz : valueObjectClasses) {
             registerValueObject(clazz);
         }

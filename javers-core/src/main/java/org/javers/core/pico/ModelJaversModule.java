@@ -1,4 +1,4 @@
-package org.javers.model.pico;
+package org.javers.core.pico;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;

@@ -1,8 +1,5 @@
 package org.javers.core.diff
 
-import de.danielbechler.diff.ObjectDiffer
-import de.danielbechler.diff.ObjectDifferFactory
-import de.danielbechler.diff.visitor.PrintingVisitor
 import org.javers.core.Javers
 import org.javers.model.domain.Diff
 import org.javers.model.domain.changeType.ValueChange

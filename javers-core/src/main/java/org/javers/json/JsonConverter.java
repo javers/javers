@@ -35,47 +35,42 @@ import java.util.Collection;
  * Those adapters are included by default in Javers setup, see {@link #BUILT_IN_ADAPTERS}
  * <br/>
  *
- * //TODO add nullSafe story
- *
  * @author bartosz walacik
  */
 public class JsonConverter {
     private Gson gson;
+    private GsonBuilder gsonBuilder;
 
     private static final JsonTypeAdapter[] BUILT_IN_ADAPTERS = new JsonTypeAdapter[]{new LocalDateTimeTypeAdapter()};
 
-    public JsonConverter() {
-        gson = initGsonBuilder().create();
+    JsonConverter() {
+        gsonBuilder = new GsonBuilder().serializeNulls();
+        registerJsonTypeAdapters(Arrays.asList(BUILT_IN_ADAPTERS));
     }
 
-    public JsonConverter(Collection<JsonTypeAdapter> customAdapters) {
-        GsonBuilder gsonBuilder = initGsonBuilder();
-
-        registerAdapters(gsonBuilder, customAdapters);
-
+    void initialize() {
         gson = gsonBuilder.create();
     }
 
-    private GsonBuilder initGsonBuilder() {
-        GsonBuilder gsonBuilder = new GsonBuilder().serializeNulls();
-
-        registerAdapters(gsonBuilder, Arrays.asList(BUILT_IN_ADAPTERS));
-
-        return gsonBuilder;
+    /**
+     * @see GsonBuilder#registerTypeAdapter(Type, Object)
+     */
+    void registerNativeTypeAdapter(Type targetType, TypeAdapter nativeAdapter) {
+        gsonBuilder.registerTypeAdapter(targetType, nativeAdapter);
     }
 
-    private void registerAdapters(GsonBuilder gsonBuilder, Collection<JsonTypeAdapter> adapters){
+    void registerJsonTypeAdapters(Collection<JsonTypeAdapter> adapters){
         for (JsonTypeAdapter adapter : adapters) {
-            registerSerializerAndDeserializer(gsonBuilder, adapter);
+            registerJsonTypeAdapter(adapter);
         }
     }
 
     /**
-     * Maps interface of given {@link JsonTypeAdapter}
+     * Maps given {@link JsonTypeAdapter}
      * into pair of {@link JsonDeserializer} and {@link JsonDeserializer}
-     * and registers them with given gsonBuilder
+     * and registers them with this.gsonBuilder
      */
-    private void registerSerializerAndDeserializer(GsonBuilder gsonBuilder, final JsonTypeAdapter adapter) {
+    void registerJsonTypeAdapter(final JsonTypeAdapter adapter) {
         JsonSerializer jsonSerializer = new JsonSerializer() {
             @Override
             public JsonElement serialize(Object value, Type type, JsonSerializationContext jsonSerializationContext) {
@@ -95,15 +90,23 @@ public class JsonConverter {
     }
 
     public String toJson(Object value) {
+        checkState();
         return gson.toJson(value);
     }
 
     public String toJson(Object value, Type requiredType) {
+        checkState();
         return gson.toJson(value);
     }
 
-
     public <T> T fromJson(String json, Class<T> expectedType) {
+        checkState();
         return gson.fromJson(json,expectedType);
+    }
+
+    private void checkState() {
+        if (gson == null) {
+            throw new IllegalStateException("JsonConverter not initialized");
+        }
     }
 }
