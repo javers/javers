@@ -5,7 +5,7 @@ import org.javers.repository.jdbc.pico.JdbcJaversModule;
 import org.javers.repository.jdbc.schema.JaversSchemaManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.picocontainer.PicoContainer;
+
 import java.util.Arrays;
 
 /**
