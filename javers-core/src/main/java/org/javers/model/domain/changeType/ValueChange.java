@@ -1,6 +1,7 @@
 package org.javers.model.domain.changeType;
 
 import org.javers.model.domain.GlobalCdoId;
+import org.javers.model.domain.Value;
 import org.javers.model.mapping.Property;
 
 /**
@@ -28,10 +29,5 @@ public class ValueChange extends PropertyChange {
      */
     public Value getRightValue() {
         return rightValue;
-    }
-
-    public void dehydrate(String leftValueJSON, String rightValueJson) {
-        leftValue.dehydrate(leftValueJSON);
-        rightValue.dehydrate(rightValueJson);
     }
 }

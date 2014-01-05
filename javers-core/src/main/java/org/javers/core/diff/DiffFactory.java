@@ -8,6 +8,7 @@ import java.util.Set;
 import org.javers.core.diff.appenders.*;
 import org.javers.model.domain.Change;
 import org.javers.model.domain.Diff;
+import org.javers.model.domain.ValueDehydrator;
 import org.javers.model.mapping.Property;
 import org.javers.model.object.graph.ObjectNode;
 
@@ -17,6 +18,7 @@ import org.javers.model.object.graph.ObjectNode;
  */
 public class DiffFactory {
 
+    private ValueDehydrator valueDehydrator;
     private NodeMatcher nodeMatcher;
     private DFSGraphToSetConverter graphToSetConverter;
     private List<NodeChangeAppender> nodeChangeAppenders;
@@ -24,11 +26,13 @@ public class DiffFactory {
 
     public DiffFactory(DFSGraphToSetConverter graphToSetConverter,
                        List<NodeChangeAppender> nodeChangeAppenders,
-                       List<PropertyChangeAppender> propertyChangeAppender) {
+                       List<PropertyChangeAppender> propertyChangeAppender,
+                       ValueDehydrator valueDehydrator) {
         this.graphToSetConverter = graphToSetConverter;
         this.nodeChangeAppenders = nodeChangeAppenders;
         this.propertyChangeAppender = propertyChangeAppender;
         this.nodeMatcher = new NodeMatcher();
+        this.valueDehydrator = valueDehydrator;
     }
 
     public Diff create(String userId, ObjectNode leftRoot, ObjectNode rightRoot) {
@@ -57,6 +61,8 @@ public class DiffFactory {
                 }
             }
         }
+
+        valueDehydrator.dehydrate(diff);
 
         return diff;
     }

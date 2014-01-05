@@ -1,6 +1,7 @@
 package org.javers.model.domain.changeType;
 
 import org.javers.model.domain.GlobalCdoId;
+import org.javers.model.domain.Value;
 import org.javers.model.mapping.Property;
 
 /**

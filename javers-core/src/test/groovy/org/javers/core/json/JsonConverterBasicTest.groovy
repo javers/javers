@@ -1,6 +1,6 @@
 package org.javers.core.json
 
-import org.javers.core.json.JsonConverter
+
 import spock.lang.Specification
 
 import java.math.RoundingMode

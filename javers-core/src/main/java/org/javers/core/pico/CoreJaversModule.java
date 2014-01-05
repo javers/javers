@@ -11,6 +11,7 @@ import org.javers.core.diff.appenders.NewObjectAppender;
 import org.javers.core.diff.appenders.ObjectRemovedAppender;
 import org.javers.core.diff.appenders.ReferenceChangeAppender;
 import org.javers.core.diff.appenders.ValueChangeAppender;
+import org.javers.model.domain.ValueDehydrator;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 
 /**
@@ -26,7 +27,8 @@ public class CoreJaversModule implements JaversModule {
             NewObjectAppender.class,
             ObjectRemovedAppender.class,
             ReferenceChangeAppender.class,
-            ValueChangeAppender.class};
+            ValueChangeAppender.class,
+            ValueDehydrator.class};
 
     @Override
     public Collection<Class> getModuleComponents() {

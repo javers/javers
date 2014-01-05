@@ -2,6 +2,8 @@ package org.javers.core;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
+import org.javers.core.json.JsonConverter;
+import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.pico.CoreJaversModule;
 import org.javers.model.mapping.EntityDefinition;
 import org.javers.model.mapping.EntityManager;
@@ -27,12 +29,12 @@ import java.util.*;
 public class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
     //
-    private JaversCoreConfiguration coreConfiguration;
+    private JaversCoreConfiguration coreConfiguration = new JaversCoreConfiguration();
     private Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
     private List<JaversModule> externalModules = new ArrayList<>();
+    private JsonConverterBuilder jsonConverterBuilder = JsonConverterBuilder.jsonConverter();
 
     private JaversBuilder() {
-        coreConfiguration = new JaversCoreConfiguration();
     }
 
     public static JaversBuilder javers() {
@@ -42,7 +44,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     public Javers build() {
         logger.info("starting up javers ...");
 
-        bootContainer(getCoreModules(coreConfiguration), null);
+        bootContainer(getCoreModules(coreConfiguration), jsonConverterBuilder.build());
         registerManagedClasses();
         bootEntityManager();
 

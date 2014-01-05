@@ -2,7 +2,6 @@ package org.javers.core.json;
 
 import com.google.gson.*;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
-
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,9 +25,11 @@ import java.util.Collection;
  * <ul>
  *     <li/> {@link BasicStringTypeAdapter} -
  *           extend it if you need to represent value as single String and don't want to deal with JSON API.
- *           For implementation example see {@link org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter}.
+ *           For concrete class example see {@link LocalDateTimeTypeAdapter}.
  *     <li/> {@link JsonTypeAdapter} - use it if you need full control over JSON conversion
  *     <li/> native Gson {@link TypeAdapter}
+ *     <li/> native Gson {@link JsonSerializer}
+ *     <li/> native Gson {@link JsonDeserializer}
  * </ul>
  *
  * Javers provides JsonTypeAdapter's for some well known Value Object like {@link org.joda.time.LocalDateTime}.
@@ -53,10 +54,25 @@ public class JsonConverter {
     }
 
     /**
-     * @see GsonBuilder#registerTypeAdapter(Type, Object)
+     * @see TypeAdapter
      */
-    void registerNativeTypeAdapter(Type targetType, TypeAdapter nativeAdapter) {
+    void registerNativeGsonTypeAdapter(Type targetType, TypeAdapter nativeAdapter) {
         gsonBuilder.registerTypeAdapter(targetType, nativeAdapter);
+    }
+
+    /**
+     * @see JsonSerializer
+     */
+    void registerNativeGsonSerializer(Type targetType, JsonSerializer<?> jsonSerializer){
+        gsonBuilder.registerTypeAdapter(targetType, jsonSerializer);
+
+    }
+
+    /**
+     * @see JsonDeserializer
+     */
+    void registerNativeGsonDeserializer(Type targetType, JsonDeserializer<?> jsonDeserializer){
+        gsonBuilder.registerTypeAdapter(targetType, jsonDeserializer);
     }
 
     void registerJsonTypeAdapters(Collection<JsonTypeAdapter> adapters){
@@ -85,8 +101,8 @@ public class JsonConverter {
             }
         };
 
-        gsonBuilder.registerTypeAdapter(adapter.getType(), jsonSerializer);
-        gsonBuilder.registerTypeAdapter(adapter.getType(), jsonDeserializer);
+        registerNativeGsonSerializer(adapter.getType(), jsonSerializer);
+        registerNativeGsonDeserializer(adapter.getType(), jsonDeserializer);
     }
 
     public String toJson(Object value) {

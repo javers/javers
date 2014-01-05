@@ -1,6 +1,8 @@
 package org.javers.model.domain;
 
 import org.javers.core.json.JsonConverter;
+import org.javers.model.visitors.ChangeVisitor;
+import org.javers.model.visitors.Visitable;
 import org.joda.time.LocalDateTime;
 
 import java.util.*;
@@ -42,7 +44,7 @@ import static org.javers.common.validation.Validate.*;
  *
  * @author bartosz walacik
  */
-public class Diff {
+public class Diff implements Visitable<ChangeVisitor>{
     private long id;
     private final List<Change> changes;
     private final String userId;
@@ -132,6 +134,13 @@ public class Diff {
     public void addChanges(Collection<Change> changeSet) {
         for (Change change : changeSet) {
             addChange(change);
+        }
+    }
+
+    @Override
+    public void accept(ChangeVisitor changeVisitor) {
+        for(Change change : changes) {
+            change.accept(changeVisitor);
         }
     }
 }

@@ -34,6 +34,10 @@ class JaversTestBuilder {
         new JaversTestBuilder()
     }
 
+    static Javers javers() {
+        new JaversTestBuilder().javersBuilder.getContainerComponent(Javers)
+    }
+
     EntityManager getEntityManager() {
         javersBuilder.getContainerComponent(EntityManager)
     }

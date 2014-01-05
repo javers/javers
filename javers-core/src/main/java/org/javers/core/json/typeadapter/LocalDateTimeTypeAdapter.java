@@ -4,6 +4,8 @@ import org.javers.core.json.BasicStringTypeAdapter;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import java.lang.reflect.Type;
+
 
 /**
  * Serializes LocalDateTime to JSON String using ISO date format yyyy-MM-dd'T'HH:mm,
@@ -29,7 +31,7 @@ public class LocalDateTimeTypeAdapter extends BasicStringTypeAdapter<LocalDateTi
     }
 
     @Override
-    public Class<LocalDateTime> getType() {
+    public Type getType() {
         return LocalDateTime.class;
     }
 }

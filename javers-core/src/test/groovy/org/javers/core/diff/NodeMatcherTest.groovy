@@ -2,6 +2,7 @@ package org.javers.core.diff
 
 import org.javers.common.collections.Sets
 import org.javers.model.object.graph.ObjectNode
+import spock.lang.Specification
 
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 

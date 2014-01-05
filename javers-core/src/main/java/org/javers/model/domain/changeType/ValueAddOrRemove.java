@@ -1,6 +1,7 @@
 package org.javers.model.domain.changeType;
 
 import org.javers.model.domain.GlobalCdoId;
+import org.javers.model.domain.Value;
 import org.javers.model.mapping.Property;
 
 /**
@@ -14,9 +15,5 @@ public abstract class ValueAddOrRemove extends PropertyChange {
     protected ValueAddOrRemove(GlobalCdoId globalCdoId, Property property, Object value) {
         super(globalCdoId, property);
         this.value = new Value(value);
-    }
-
-    public void dehydrate(String valueJSON) {
-        value.dehydrate(valueJSON);
     }
 }

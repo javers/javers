@@ -2,16 +2,17 @@ package org.javers.core.json;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 
 /**
  * Convenient abstract implementation of {@link JsonTypeAdapter}.
- * Extend it if you need to represent value (T) as single String and don't want to deal with JSON API.
+ * Extend it if you need to represent value (T) as single String and don't want to deal with Gson API.
  * <br/><br/>
  *
- * Implementation shouldn't take care about nulls
- * br/><br/>
+ * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
+ * <br/><br/>
  *
- * For implementation example see {@link org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter}.
+ * For concrete class example see {@link LocalDateTimeTypeAdapter}.
  * <br/><br/>
  *
  * @author bartosz walacik

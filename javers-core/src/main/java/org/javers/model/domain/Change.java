@@ -2,6 +2,8 @@ package org.javers.model.domain;
 
 import org.javers.model.domain.changeType.ReferenceChanged;
 import org.javers.model.domain.changeType.ValueChange;
+import org.javers.model.visitors.ChangeVisitor;
+import org.javers.model.visitors.Visitable;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.conditionFulfilled;
@@ -19,7 +21,7 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
  *
  * @author bartosz walacik
  */
-public abstract class Change {
+public abstract class Change implements Visitable<ChangeVisitor> {
     private Diff parent;
     private final GlobalCdoId globalCdoId;
     private Object affectedCdo;
@@ -62,5 +64,10 @@ public abstract class Change {
     protected void bind(Diff parent) {
         conditionFulfilled(this.parent == null, "parent Diff already set");
         this.parent = parent;
+    }
+
+    @Override
+    public void accept(ChangeVisitor changeVisitor) {
+        changeVisitor.visit(this);
     }
 }

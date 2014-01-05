@@ -57,7 +57,7 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
         person == new DummyJsonPerson("mad","kaz")
     }
 
-    def "should use custom native type adapter when converting to json"() {
+    def "should use custom native Gson type adapter when converting to json"() {
         given:
         JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
                                        registerNativeTypeAdapter(DummyJsonPerson, new DummyJsonPersonNativeTypeAdapter()).build()
@@ -69,7 +69,7 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
         json == '"mad@kaz"'
     }
 
-    def  "should use custom native type adapter when converting from json"() {
+    def  "should use custom native Gson type adapter when converting from json"() {
         given:
         JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
                                        registerNativeTypeAdapter(DummyJsonPerson, new DummyJsonPersonNativeTypeAdapter()).build()

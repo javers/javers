@@ -1,6 +1,8 @@
 package org.javers.core.json;
 
 import com.google.gson.JsonElement;
+import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
+import java.lang.reflect.Type;
 
 /**
  * Implement JsonTypeAdapter to add custom JSON serialization and deserialization behaviour,
@@ -11,8 +13,12 @@ import com.google.gson.JsonElement;
  * <br/><br/>
  *
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
+ * <br/><br/>
  *
- * @see org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter
+ * For implementation example see {@link LocalDateTimeTypeAdapter}.
+ * <br/><br/>
+ *
+ * @see LocalDateTimeTypeAdapter
  * @author bartosz walacik
  */
 public interface JsonTypeAdapter<T> {
@@ -30,5 +36,5 @@ public interface JsonTypeAdapter<T> {
     /**
      * target Class, for ex. LocalDateTime
      */
-    Class<T> getType();
+    Type getType();
 }

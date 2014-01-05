@@ -1,4 +1,4 @@
-package org.javers.model.domain.changeType;
+package org.javers.model.domain;
 
 /**
  * Wrapper for client's primitives and Value Objects,

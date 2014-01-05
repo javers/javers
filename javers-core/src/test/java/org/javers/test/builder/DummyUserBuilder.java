@@ -26,6 +26,11 @@ public class DummyUserBuilder {
         return new DummyUserBuilder();
     }
 
+    public static DummyUserBuilder dummyUser(String name) {
+        DummyUserBuilder builder = new DummyUserBuilder();
+        return builder.withName(name);
+    }
+
     public DummyUser build() {
         if (dummyUser.getName() == null){
             dummyUser.setName("some");
