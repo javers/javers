@@ -40,8 +40,4 @@ public class JaversContainerFactory {
         container.as(Characteristics.CACHE).addComponent(classOrInstance);
     }
 
-    public static PicoContainer createDefaultCore() {
-        List<JaversModule> coreModules = Arrays.asList(new CoreJaversModule(), new ModelJaversModule(new JaversCoreConfiguration()));
-        return create(coreModules,null);
-    }
 }
