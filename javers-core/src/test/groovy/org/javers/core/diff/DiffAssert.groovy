@@ -1,10 +1,7 @@
 package org.javers.core.diff
 
-import org.javers.core.diff.appenders.ReferenceChangeAppenderTest
 import org.javers.model.domain.Change
 import org.javers.model.domain.Diff
-import org.javers.test.ReferenceChangesAssert
-import org.javers.test.assertion.ChangeAssert
 
 /**
  * @author bartosz walacik

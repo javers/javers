@@ -1,18 +1,18 @@
 package org.javers.core.diff.appenders
 
+import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat
 import org.javers.core.diff.AbstractDiffTest
+import org.javers.core.diff.ChangeAssert
 import org.javers.core.diff.NodePair
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.model.domain.changeType.ValueChange
 import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
-
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
-import static org.javers.test.ValueChangesAssert.assertThat
 
 /**
  * @author bartosz walacik
@@ -33,6 +33,22 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         changes.size() == 0
     }
 
+    def "should set ValueChange metadata"() {
+        given:
+        ObjectNode left =  buildGraph(dummyUser().withName("1").withSex(FEMALE).build())
+        ObjectNode right = buildGraph(dummyUser().withName("1").withSex(OCCASIONALLY).build())
+        Property sex = getEntity(DummyUser).getProperty("sex")
+
+        when:
+        Collection<ValueChange> changes =
+                new ValueChangeAppender().calculateChanges(new NodePair(left,right),sex)
+
+        then:
+        ChangeAssert.assertThat(changes[0])
+                    .hasCdoId("1")
+                    .hasAffectedCdo(right)
+    }
+
     def "should append Enum valueChange" () {
         given:
         ObjectNode left =  buildGraph(dummyUser().withName("1").withSex(FEMALE).build())
@@ -44,13 +60,11 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
             new ValueChangeAppender().calculateChanges(new NodePair(left,right),sex)
 
         then:
-        assertThat(changes)
-            .hasSize(1)
-            .assertThatFirstChange()
-            .hasProperty(sex)
-            .hasCdoId("1")
-            .hasLeftValue(FEMALE)
-            .hasRightValue(OCCASIONALLY)
+        changes.size() == 1
+        assertThat(changes[0])
+                  .hasProperty(sex)
+                  .hasLeftValue(FEMALE)
+                  .hasRightValue(OCCASIONALLY)
     }
 
     def "should append int valueChange" () {
@@ -64,13 +78,11 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
             new ValueChangeAppender().calculateChanges(new NodePair(left,right),age)
 
         then:
-        assertThat(changes)
-                .hasSize(1)
-                .assertThatFirstChange()
-                .hasProperty(age)
-                .hasCdoId("1")
-                .hasLeftValue(1)
-                .hasRightValue(2)
+        changes.size() == 1
+        assertThat(changes[0])
+                  .hasProperty(age)
+                  .hasLeftValue(1)
+                  .hasRightValue(2)
     }
 
     def "should append Integer valueChange" () {
@@ -84,13 +96,11 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
             new ValueChangeAppender().calculateChanges(new NodePair(left,right),largeInt)
 
         then:
-        assertThat(changes)
-                .hasSize(1)
-                .assertThatFirstChange()
-                .hasProperty(largeInt)
-                .hasCdoId("1")
-                .doesNotHaveLeftValue()
-                .hasRightValue(5)
+        changes.size() == 1
+        assertThat(changes[0])
+                  .hasProperty(largeInt)
+                  .haveLeftValueNull()
+                  .hasRightValue(5)
     }
 
     def "should append boolean valueChange" () {
@@ -104,13 +114,11 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
             new ValueChangeAppender().calculateChanges(new NodePair(left,right),flag)
 
         then:
-        assertThat(changes)
-                .hasSize(1)
-                .assertThatFirstChange()
-                .hasProperty(flag)
-                .hasCdoId("1")
-                .hasLeftValue(true)
-                .hasRightValue(false)
+        changes.size() == 1
+        assertThat(changes[0])
+                  .hasProperty(flag)
+                  .hasLeftValue(true)
+                  .hasRightValue(false)
     }
 
     def "should append Boolean valueChange" () {
@@ -124,13 +132,11 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
             new ValueChangeAppender().calculateChanges(new NodePair(left,right),flag)
 
         then:
-        assertThat(changes)
-                .hasSize(1)
-                .assertThatFirstChange()
-                .hasProperty(flag)
-                .hasCdoId("1")
-                .doesNotHaveLeftValue()
-                .hasRightValue(Boolean.TRUE)
+        changes.size() == 1
+        assertThat(changes[0])
+                  .hasProperty(flag)
+                  .haveLeftValueNull()
+                  .hasRightValue(Boolean.TRUE)
     }
 
 
@@ -153,12 +159,10 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
             new ValueChangeAppender().calculateChanges(new NodePair(left,right),address)
 
         then:
-        assertThat(changes)
-                .hasSize(1)
-                .assertThatFirstChange()
-                .hasProperty(address)
-                .hasCdoId(1)
-                .hasLeftValue(leftDummyUserDetails.dummyAddress)
-                .hasRightValue(rightDummyUserDetails.dummyAddress)
+        changes.size() == 1
+        assertThat(changes[0])
+                  .hasProperty(address)
+                  .hasLeftValue(leftDummyUserDetails.dummyAddress)
+                  .hasRightValue(rightDummyUserDetails.dummyAddress)
     }
 }

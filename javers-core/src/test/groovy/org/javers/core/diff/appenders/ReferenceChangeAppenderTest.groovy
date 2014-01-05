@@ -1,19 +1,16 @@
 package org.javers.core.diff.appenders
 
 import org.javers.core.diff.AbstractDiffTest
+import org.javers.core.diff.ChangeAssert
 import org.javers.core.diff.NodePair
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.model.domain.Change
-import org.javers.model.domain.GlobalCdoId
 import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
 
-import static org.javers.test.ReferenceChangesAssert.assertThat
-
+import static ReferenceChangeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
-import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
-
 
 class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
@@ -30,7 +27,23 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
             new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property)
 
         then:
-        assertThat changes hasSize 0
+        changes.size() ==  0
+    }
+
+    def "should set ReferenceChange metadata"() {
+        given:
+        ObjectNode leftNode =  buildGraph(dummyUser().withName("1").withDetails(2).build())
+        ObjectNode rightNode = buildGraph(dummyUser().withName("1").build())
+        Property property = getEntity(DummyUser).getProperty("dummyUserDetails")
+
+        when:
+        Collection<Change> changes =
+                new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property)
+
+        then:
+        ChangeAssert.assertThat(changes[0])
+                    .hasCdoId("1")
+                    .hasAffectedCdo(rightNode)
     }
 
     def "should compare refs null safely"() {
@@ -44,13 +57,11 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
             new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property)
 
         then:
-        assertThat(changes)
-                .hasSize(1)
-                .assertThatFirstChange()
-                .hasCdoId("1")
-                .hasLeftReference(DummyUserDetails,2)
-                .hasRightReference(null)
-                .hasProperty(property)
+        changes.size() == 1
+        assertThat(changes[0])
+                  .hasLeftReference(DummyUserDetails,2)
+                  .hasRightReference(null)
+                  .hasProperty(property)
     }
 
     def "should append reference change"() {
@@ -64,13 +75,11 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
             new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property)
 
         then:
-        assertThat(changes)
-            .hasSize(1)
-            .assertThatFirstChange()
-            .hasCdoId("1")
-            .hasLeftReference(DummyUserDetails,2)
-            .hasRightReference(DummyUserDetails,3)
-            .hasProperty(property)
+        changes.size() == 1
+        assertThat(changes[0])
+                  .hasLeftReference(DummyUserDetails,2)
+                  .hasRightReference(DummyUserDetails,3)
+                  .hasProperty(property)
     }
 
 }

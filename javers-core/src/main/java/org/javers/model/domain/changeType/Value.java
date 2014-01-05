@@ -1,4 +1,4 @@
-package org.javers.model.domain;
+package org.javers.model.domain.changeType;
 
 /**
  * Wrapper for client's primitives and Value Objects,
@@ -20,12 +20,12 @@ public class Value {
         this.value = value;
     }
 
-    public void hydrate(Object value) {
+    protected void hydrate(Object value) {
         isHydrated = true;
         this.value = value;
     }
 
-    public void dehydrate(String json) {
+    protected void dehydrate(String json) {
         isHydrated = false;
         this.json = json;
     }

@@ -1,5 +1,6 @@
 package org.javers.model.domain;
 
+import org.javers.core.json.JsonConverter;
 import org.joda.time.LocalDateTime;
 
 import java.util.*;
@@ -37,7 +38,7 @@ import static org.javers.common.validation.Validate.*;
  *    <li/>Essentially, object-oriented data are persisted as JSON.
  * </ul>
  *
- * @see org.javers.core.json.JsonConverter
+ * @see JsonConverter
  *
  * @author bartosz walacik
  */
@@ -112,6 +113,11 @@ public class Diff {
      */
     public boolean isNew() {
         return id == 0;
+    }
+
+    public void addChange(Change change, Object affectedCdo) {
+        addChange(change);
+        change.setAffectedCdo(affectedCdo);
     }
 
     public void addChange(Change change) {

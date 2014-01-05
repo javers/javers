@@ -1,9 +1,10 @@
 package org.javers.model.domain;
 
-import org.javers.common.validation.Validate;
+import org.javers.model.domain.changeType.ReferenceChanged;
+import org.javers.model.domain.changeType.ValueChange;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
-import org.javers.model.domain.changeType.*;
+import static org.javers.common.validation.Validate.conditionFulfilled;
 
 /**
  * Change represents <b>atomic</b> difference between two objects.
@@ -38,6 +39,7 @@ public abstract class Change {
     /**
      * Affected Cdo, depending on concrete Change type, it could be new Object, removed Object or new version of changed Object
      * <br/><br/>
+     *
      * <b>Transient</b> reference - not null only or freshly generated diff
      */
     public Object getAffectedCdo() {
@@ -51,14 +53,14 @@ public abstract class Change {
         return parent;
     }
 
-    public void setAffectedCdo(Object affectedCdo) {
-        Validate.argumentIsNotNull(affectedCdo);
-        Validate.conditionFulfilled(this.affectedCdo == null, "affectedCdo already set");
+    protected void setAffectedCdo(Object affectedCdo) {
+        argumentIsNotNull(affectedCdo);
+        conditionFulfilled(this.affectedCdo == null, "affectedCdo already set");
         this.affectedCdo = affectedCdo;
     }
 
-    public void bind(Diff parent) {
-        Validate.conditionFulfilled(this.parent == null, "parent Diff already set");
+    protected void bind(Diff parent) {
+        conditionFulfilled(this.parent == null, "parent Diff already set");
         this.parent = parent;
     }
 }

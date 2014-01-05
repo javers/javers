@@ -28,7 +28,7 @@ import java.util.Collection;
  *           extend it if you need to represent value as single String and don't want to deal with JSON API.
  *           For implementation example see {@link org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter}.
  *     <li/> {@link JsonTypeAdapter} - use it if you need full control over JSON conversion
- *     <li/> native Gson {@link TypeAdapter} //TODO not implemented yet
+ *     <li/> native Gson {@link TypeAdapter}
  * </ul>
  *
  * Javers provides JsonTypeAdapter's for some well known Value Object like {@link org.joda.time.LocalDateTime}.

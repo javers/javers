@@ -1,5 +1,7 @@
-package org.javers.model.domain;
+package org.javers.model.domain.changeType;
 
+import org.javers.model.domain.Change;
+import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Property;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;

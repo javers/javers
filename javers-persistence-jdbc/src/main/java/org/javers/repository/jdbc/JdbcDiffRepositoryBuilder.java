@@ -1,13 +1,11 @@
 package org.javers.repository.jdbc;
 
-import org.javers.common.validation.Validate;
 import org.javers.core.AbstractJaversBuilder;
 import org.javers.repository.jdbc.pico.JdbcJaversModule;
 import org.javers.repository.jdbc.schema.JaversSchemaManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
+import org.picocontainer.PicoContainer;
 import java.util.Arrays;
 
 /**

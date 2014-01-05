@@ -52,8 +52,7 @@ public class DiffFactory {
                 for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
                     Collection<Change> changes = appender.calculateChangesIfSupported(pair,property);
                     for (Change change : changes) {
-                        change.setAffectedCdo(pair.getRight().getCdo().getWrappedCdo());
-                        diff.addChange(change);
+                        diff.addChange(change, pair.getRight().getCdo().getWrappedCdo());
                     }
                 }
             }

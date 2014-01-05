@@ -27,7 +27,12 @@ class ObjectRemovedAppenderTest extends AbstractDiffTest {
 
         then:
         assertThat(diff).hasSize(1)
-        assertThat(diff).getChangeAtIndex(0).isObjectRemoved().hasCdoId("0").hasEntityTypeOf(DummyUser.class).hasParentEqualTo(diff).hasCdo(node.cdo.wrappedCdo)
+        assertThat(diff).getChangeAtIndex(0)
+                        .isObjectRemoved()
+                        .hasCdoId("0")
+                        .hasEntityTypeOf(DummyUser)
+                        .hasParentEqualTo(diff)
+                        .hasAffectedCdo(node)
     }
 
     def "should append removedObjects to diff"() {

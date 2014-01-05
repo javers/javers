@@ -26,7 +26,12 @@ class NewObjectAppenderTest extends AbstractDiffTest {
 
         then:
         assertThat(diff).hasSize(1)
-        assertThat(diff).getChangeAtIndex(0).isNewObject().hasCdoId("1").hasEntityTypeOf(DummyUser.class).hasParentEqualTo(diff).hasCdo(node.cdo.wrappedCdo)
+        assertThat(diff).getChangeAtIndex(0)
+                        .isNewObject()
+                        .hasCdoId("1")
+                        .hasEntityTypeOf(DummyUser)
+                        .hasParentEqualTo(diff)
+                        .hasAffectedCdo(node)
     }
 
     def "should append newObjects to diff"() {
