@@ -1,4 +1,6 @@
-package org.javers.model.domain;
+package org.javers.core.diff;
+
+import com.google.gson.annotations.Expose;
 
 /**
  * Wrapper for client's primitives and Value Objects,
@@ -11,9 +13,11 @@ package org.javers.model.domain;
  * @author bartosz walacik
  */
 public class Value {
-    private boolean isHydrated;
+    private transient boolean isHydrated;
+
     private Object value;
-    private String json;
+
+    private transient String json;
 
     public Value(Object value) {
         isHydrated = true;

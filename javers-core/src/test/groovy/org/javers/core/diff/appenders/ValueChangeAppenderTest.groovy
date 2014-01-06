@@ -6,7 +6,7 @@ import org.javers.core.diff.ChangeAssert
 import org.javers.core.diff.NodePair
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.javers.model.domain.changeType.ValueChange
+import org.javers.core.diff.changetype.ValueChange
 import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
 import static org.javers.core.model.DummyUser.Sex.FEMALE

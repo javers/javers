@@ -1,6 +1,7 @@
-package org.javers.core;
+package org.javers.core.configuration;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.MappingStyle;
 
 /**
  * @author bartosz walacik

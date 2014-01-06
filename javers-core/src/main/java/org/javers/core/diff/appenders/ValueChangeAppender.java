@@ -3,11 +3,9 @@ package org.javers.core.diff.appenders;
 import org.javers.common.collections.Objects;
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
-import org.javers.model.domain.changeType.ValueChange;
+import org.javers.core.diff.changetype.ValueChange;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;
-import org.javers.model.mapping.type.PrimitiveType;
-import org.javers.model.mapping.type.ValueObjectType;
 
 import java.util.Collection;
 import java.util.Collections;

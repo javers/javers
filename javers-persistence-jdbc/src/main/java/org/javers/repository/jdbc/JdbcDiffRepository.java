@@ -1,7 +1,7 @@
 package org.javers.repository.jdbc;
 
-import org.javers.model.domain.Change;
-import org.javers.model.domain.Diff;
+import org.javers.core.diff.Change;
+import org.javers.core.diff.Diff;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.repository.api.DiffRepository;
 

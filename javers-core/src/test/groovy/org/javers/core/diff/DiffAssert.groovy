@@ -1,8 +1,4 @@
 package org.javers.core.diff
-
-import org.javers.model.domain.Change
-import org.javers.model.domain.Diff
-
 /**
  * @author bartosz walacik
  */

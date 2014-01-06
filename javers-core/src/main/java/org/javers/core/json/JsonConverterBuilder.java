@@ -28,7 +28,7 @@ public class JsonConverterBuilder {
     }
 
     /**
-     * @see TypeAdapter
+     * @see JsonConverter#registerNativeGsonTypeAdapter(Type, TypeAdapter)
      */
     public JsonConverterBuilder registerNativeTypeAdapter(Type targetType, TypeAdapter nativeAdapter) {
         Validate.argumentsAreNotNull(targetType, nativeAdapter);

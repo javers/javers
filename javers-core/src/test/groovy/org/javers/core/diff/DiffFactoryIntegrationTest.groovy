@@ -1,17 +1,13 @@
 package org.javers.core.diff
 
 import org.javers.core.Javers
-import org.javers.core.JaversTestBuilder
-import org.javers.core.model.DummyUser
-import org.javers.model.domain.Diff
-import org.javers.model.domain.changeType.ValueChange
+import org.javers.core.diff.changetype.ValueChange
 import org.javers.model.mapping.Category
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.diff.DiffAssert.assertThat
 import static org.javers.test.builder.CategoryTestBuilder.category
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
  *

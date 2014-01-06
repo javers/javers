@@ -1,8 +1,7 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
-import org.javers.model.domain.changeType.ValueAdded;
-import org.javers.model.domain.changeType.ValueRemoved;
+import org.javers.core.diff.changetype.ValueAdded;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;
 

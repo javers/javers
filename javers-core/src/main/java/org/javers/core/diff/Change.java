@@ -1,7 +1,9 @@
-package org.javers.model.domain;
+package org.javers.core.diff;
 
-import org.javers.model.domain.changeType.ReferenceChanged;
-import org.javers.model.domain.changeType.ValueChange;
+import com.google.gson.annotations.Expose;
+import org.javers.model.domain.GlobalCdoId;
+import org.javers.core.diff.changetype.ReferenceChanged;
+import org.javers.core.diff.changetype.ValueChange;
 import org.javers.model.visitors.ChangeVisitor;
 import org.javers.model.visitors.Visitable;
 
@@ -17,14 +19,16 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
  * <br/><br/>
  *
  * Change is a <i>Value Object</i> and typically can not exists without
- * owning {@link Diff}. For more information see {@link Diff} javadoc.
+ * owning {@link org.javers.core.diff.Diff}. For more information see {@link org.javers.core.diff.Diff} javadoc.
  *
  * @author bartosz walacik
  */
 public abstract class Change implements Visitable<ChangeVisitor> {
-    private Diff parent;
+    //private Diff parent;
+
     private final GlobalCdoId globalCdoId;
-    private Object affectedCdo;
+
+    private transient Object affectedCdo;
 
     protected Change(GlobalCdoId globalCdoId) {
         argumentIsNotNull(globalCdoId);
@@ -50,10 +54,10 @@ public abstract class Change implements Visitable<ChangeVisitor> {
 
     /**
      * Owning aggregate
-     */
+     *
     public Diff getParent() {
         return parent;
-    }
+    }*/
 
     protected void setAffectedCdo(Object affectedCdo) {
         argumentIsNotNull(affectedCdo);
@@ -61,10 +65,10 @@ public abstract class Change implements Visitable<ChangeVisitor> {
         this.affectedCdo = affectedCdo;
     }
 
-    protected void bind(Diff parent) {
-        conditionFulfilled(this.parent == null, "parent Diff already set");
-        this.parent = parent;
-    }
+    //protected void bind(Diff parent) {
+    //    conditionFulfilled(this.parent == null, "parent Diff already set");
+    //    this.parent = parent;
+    //}
 
     @Override
     public void accept(ChangeVisitor changeVisitor) {

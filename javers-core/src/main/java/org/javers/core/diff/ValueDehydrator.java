@@ -1,9 +1,9 @@
-package org.javers.model.domain;
+package org.javers.core.diff;
 
 import org.javers.core.json.JsonConverter;
-import org.javers.model.domain.changeType.ValueAdded;
-import org.javers.model.domain.changeType.ValueChange;
-import org.javers.model.domain.changeType.ValueRemoved;
+import org.javers.core.diff.changetype.ValueAdded;
+import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.ValueRemoved;
 import org.javers.model.visitors.ChangeVisitor;
 
 /**

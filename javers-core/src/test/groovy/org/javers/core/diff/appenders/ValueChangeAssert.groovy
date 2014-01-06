@@ -1,6 +1,6 @@
 package org.javers.core.diff.appenders
 
-import org.javers.model.domain.changeType.ValueChange
+import org.javers.core.diff.changetype.ValueChange
 import org.javers.model.mapping.Property
 
 class ValueChangeAssert {

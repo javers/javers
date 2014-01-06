@@ -2,7 +2,7 @@ package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
-import org.javers.model.domain.changeType.PropertyChange;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.*;
 

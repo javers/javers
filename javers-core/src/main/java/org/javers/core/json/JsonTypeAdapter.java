@@ -1,6 +1,8 @@
 package org.javers.core.json;
 
+import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonSerializationContext;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 import java.lang.reflect.Type;
 
@@ -25,13 +27,15 @@ public interface JsonTypeAdapter<T> {
 
     /**
      * @param json not null and not JsonNull
+     * @param jsonDeserializationContext use it to invoke default deserialization on the specified object
      */
-    T fromJson(JsonElement json);
+    T fromJson(JsonElement json, JsonDeserializationContext jsonDeserializationContext);
 
     /**
      * @param sourceValue not null
+     * @param jsonSerializationContext use it to invoke default serialization on the specified object
      */
-    JsonElement toJson(T sourceValue);
+    JsonElement toJson(T sourceValue, JsonSerializationContext jsonSerializationContext);
 
     /**
      * target Class, for ex. LocalDateTime

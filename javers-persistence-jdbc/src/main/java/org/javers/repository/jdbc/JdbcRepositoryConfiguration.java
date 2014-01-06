@@ -1,8 +1,7 @@
 package org.javers.repository.jdbc;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.AbstractConfiguration;
-import org.javers.core.PropertyConfiguration;
+import org.javers.core.configuration.AbstractConfiguration;
 import org.polyjdbc.core.dialect.Dialect;
 
 import javax.sql.DataSource;

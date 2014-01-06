@@ -1,5 +1,6 @@
 package org.javers.model.domain;
 
+import com.google.gson.annotations.Expose;
 import org.javers.model.mapping.Entity;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -10,7 +11,9 @@ import org.javers.model.mapping.Entity;
  * Holder for client's domain object global ID
  */
 public class GlobalCdoId {
-    private final Entity entity;
+
+    private transient final Entity entity;
+
     private final Object cdoId;
 
     /**

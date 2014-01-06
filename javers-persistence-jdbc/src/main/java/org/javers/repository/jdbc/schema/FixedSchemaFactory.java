@@ -1,8 +1,6 @@
 package org.javers.repository.jdbc.schema;
 
-import org.javers.model.domain.Change;
 import org.polyjdbc.core.dialect.Dialect;
-import org.polyjdbc.core.schema.model.DateAttribute;
 import org.polyjdbc.core.schema.model.Schema;
 
 /**

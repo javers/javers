@@ -11,7 +11,7 @@ import org.javers.core.diff.appenders.NewObjectAppender;
 import org.javers.core.diff.appenders.ObjectRemovedAppender;
 import org.javers.core.diff.appenders.ReferenceChangeAppender;
 import org.javers.core.diff.appenders.ValueChangeAppender;
-import org.javers.model.domain.ValueDehydrator;
+import org.javers.core.diff.ValueDehydrator;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 
 /**

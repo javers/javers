@@ -1,4 +1,4 @@
-package org.javers.model.domain;
+package org.javers.core.diff;
 
 import org.javers.core.json.JsonConverter;
 import org.javers.model.visitors.ChangeVisitor;
@@ -124,7 +124,7 @@ public class Diff implements Visitable<ChangeVisitor>{
 
     public void addChange(Change change) {
         changes.add(change);
-        change.bind(this);
+        //change.bind(this);
     }
 
     public boolean hasChanges() {

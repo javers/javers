@@ -2,9 +2,7 @@ package org.javers.core.diff.appenders;
 
 import java.util.Set;
 
-import org.javers.model.domain.Change;
-import org.javers.model.domain.Diff;
-import org.javers.model.domain.GlobalCdoId;
+import org.javers.core.diff.Change;
 import org.javers.model.object.graph.ObjectNode;
 
 /**

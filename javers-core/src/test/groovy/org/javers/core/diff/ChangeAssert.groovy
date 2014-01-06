@@ -1,10 +1,8 @@
 package org.javers.core.diff
 
-import org.javers.model.domain.Change
-import org.javers.model.domain.Diff
-import org.javers.model.domain.changeType.NewObject
-import org.javers.model.domain.changeType.ObjectRemoved
-import org.javers.model.domain.changeType.ReferenceAdded
+import org.javers.core.diff.changetype.NewObject
+import org.javers.core.diff.changetype.ObjectRemoved
+import org.javers.core.diff.changetype.ReferenceAdded
 
 /**
  * @author bartosz walacik
@@ -41,10 +39,10 @@ class ChangeAssert {
         this
     }
 
-    ChangeAssert hasParentEqualTo(Diff diff) {
-        actual.parent == diff
-        this
-    }
+    //ChangeAssert hasParentEqualTo(Diff diff) {
+    //    actual.parent == diff
+    //    this
+    //}
 
     ChangeAssert hasAffectedCdo(Object expectedAffectedCdo) {
         actual.affectedCdo == expectedAffectedCdo

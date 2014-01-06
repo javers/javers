@@ -2,7 +2,6 @@ package org.javers.core.pico;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
-import org.javers.core.JaversCoreConfiguration;
 import org.picocontainer.Characteristics;
 import org.picocontainer.DefaultPicoContainer;
 import org.picocontainer.MutablePicoContainer;

@@ -1,7 +1,8 @@
 package org.javers.core;
 
 import org.javers.core.diff.DiffFactory;
-import org.javers.model.domain.Diff;
+import org.javers.core.json.JsonConverter;
+import org.javers.core.diff.Diff;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.ManagedClass;
 import org.javers.model.object.graph.ObjectGraphBuilder;
@@ -27,14 +28,19 @@ public class Javers {
 
     private ObjectGraphBuilder objectGraphBuilder;
 
-    /**
-     * JaVers instance should be constructed by {@link JaversBuilder}
-     */
-    public Javers(EntityManager entityManager, DiffFactory diffFactory, ObjectGraphBuilder objectGraphBuilder) {
+    private JsonConverter jsonConverter;
+
+    public Javers(EntityManager entityManager, DiffFactory diffFactory, ObjectGraphBuilder objectGraphBuilder, JsonConverter jsonConverter) {
         this.entityManager = entityManager;
         this.diffFactory = diffFactory;
         this.objectGraphBuilder = objectGraphBuilder;
+        this.jsonConverter = jsonConverter;
     }
+
+    /**
+     * JaVers instance should be constructed by {@link JaversBuilder}
+     */
+
 
     public ManagedClass getByClass(Class<?> forClass) {
         return entityManager.getByClass(forClass);
@@ -48,5 +54,9 @@ public class Javers {
         ObjectGraphBuilder leftGraph = new ObjectGraphBuilder(entityManager);
         ObjectGraphBuilder rightGraph = new ObjectGraphBuilder(entityManager);
         return diffFactory.create(user, leftGraph.buildGraph(left), rightGraph.buildGraph(right));
+    }
+
+    public String toJson(Diff diff) {
+        return jsonConverter.toJson(diff);
     }
 }

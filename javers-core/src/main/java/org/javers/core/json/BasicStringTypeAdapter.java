@@ -1,7 +1,9 @@
 package org.javers.core.json;
 
+import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 
 /**
@@ -43,12 +45,12 @@ public abstract class BasicStringTypeAdapter<T> implements JsonTypeAdapter<T> {
     public abstract T deserialize(String serializedValue);
 
     @Override
-    public T fromJson(JsonElement json) {
+    public T fromJson(JsonElement json, JsonDeserializationContext jsonDeserializationContext ) {
         return deserialize(json.getAsJsonPrimitive().getAsString());
     }
 
     @Override
-    public JsonElement toJson(T sourceValue) {
+    public JsonElement toJson(T sourceValue, JsonSerializationContext jsonSerializationContext) {
         return new JsonPrimitive(serialize(sourceValue));
     }
 }

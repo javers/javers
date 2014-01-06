@@ -2,7 +2,7 @@ package org.javers.core;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
-import org.javers.core.json.JsonConverter;
+import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.pico.CoreJaversModule;
 import org.javers.model.mapping.EntityDefinition;

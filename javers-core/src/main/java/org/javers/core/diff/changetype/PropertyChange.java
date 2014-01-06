@@ -1,6 +1,7 @@
-package org.javers.model.domain.changeType;
+package org.javers.core.diff.changetype;
 
-import org.javers.model.domain.Change;
+import com.google.gson.annotations.Expose;
+import org.javers.core.diff.Change;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Property;
 

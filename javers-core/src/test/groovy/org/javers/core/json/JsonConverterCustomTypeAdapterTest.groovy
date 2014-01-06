@@ -10,30 +10,6 @@ import static org.javers.core.json.JsonConverterBuilder.jsonConverter
  */
 class JsonConverterCustomTypeAdapterTest extends Specification {
 
-
-    def "should convert LocalDateTime TO json in ISO format"() {
-        given:
-        JsonConverter jsonConverter = jsonConverter().build()
-
-        when:
-        LocalDateTime date = new LocalDateTime(2001,12,1,22,23,03)
-        String json = jsonConverter.toJson(date)
-
-        then:
-        json == '"2001-12-01T22:23:03"'
-    }
-
-    def "should convert LocalDateTime FROM json in ISO format"() {
-        given:
-        JsonConverter jsonConverter = jsonConverter().build()
-
-        when:
-        LocalDateTime date = jsonConverter.fromJson('"2001-12-01T22:23:03"', LocalDateTime)
-
-        then:
-        date  == new LocalDateTime(2001,12,1,22,23,03)
-    }
-
     def "should use custom type adapter when converting to json"() {
         given:
         JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
@@ -78,28 +54,5 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
 
         then:
         person == new DummyJsonPerson("mad","kaz")
-    }
-
-    def void "custom type adapters should be null safe when converting to json"() {
-        given:
-        JsonConverter jsonConverter = jsonConverter().build()
-
-        when:
-        String json = jsonConverter.toJson(null, LocalDateTime)
-
-        then:
-        json == "null"
-    }
-
-
-    def void "custom type adapters should be null safe when converting from json"() {
-        given:
-        JsonConverter jsonConverter = jsonConverter().build()
-
-        when:
-        LocalDateTime value = jsonConverter.fromJson("null", LocalDateTime)
-
-        then:
-        value == null
     }
 }

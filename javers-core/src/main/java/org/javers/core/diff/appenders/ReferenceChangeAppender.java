@@ -4,11 +4,10 @@ import org.javers.common.collections.Objects;
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
 import org.javers.model.domain.GlobalCdoId;
-import org.javers.model.domain.changeType.ReferenceChanged;
+import org.javers.core.diff.changetype.ReferenceChanged;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.object.graph.Edge;
-import org.javers.model.object.graph.ObjectNode;
 import org.javers.model.object.graph.SingleEdge;
 
 import java.util.Collection;

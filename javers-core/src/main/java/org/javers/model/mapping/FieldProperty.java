@@ -16,8 +16,9 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public class FieldProperty implements Property {
 
-    private final Field field;
-    private final JaversType javersType;
+    private transient final Field field;
+
+    private transient final JaversType javersType;
 
     public FieldProperty(Field field, JaversType javersType) {
 

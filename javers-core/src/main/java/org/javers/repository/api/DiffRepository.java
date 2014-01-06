@@ -1,7 +1,7 @@
 package org.javers.repository.api;
 
-import org.javers.model.domain.Change;
-import org.javers.model.domain.Diff;
+import org.javers.core.diff.Change;
+import org.javers.core.diff.Diff;
 import org.javers.model.domain.GlobalCdoId;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public interface DiffRepository {
      * Outcome list has to be ordered chronologically by {@link Diff#getDiffDate()}.
      * <br/><br/>
      *
-     * All Diffs referenced through {@link org.javers.model.domain.Change#getParent()}
+     * All Diffs referenced through {@link Change#getParent()}
      * have to be fully initialized.
      *
      * @param globalCdoId

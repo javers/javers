@@ -1,5 +1,6 @@
 package org.javers.core
 
+import org.javers.model.mapping.EntityFactory
 import org.javers.model.object.graph.ObjectGraphBuilder
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
@@ -36,6 +37,10 @@ class JaversTestBuilder {
 
     static Javers javers() {
         new JaversTestBuilder().javersBuilder.getContainerComponent(Javers)
+    }
+
+    EntityFactory getEntityFactory() {
+        javersBuilder.getContainerComponent(EntityFactory)
     }
 
     EntityManager getEntityManager() {

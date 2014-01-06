@@ -1,6 +1,9 @@
 package org.javers.core.json;
 
 import com.google.gson.*;
+import org.javers.core.diff.Change;
+import org.javers.core.diff.changetype.NewObject;
+import org.javers.core.json.typeadapter.ChangeTypeAdapter;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -50,10 +53,14 @@ public class JsonConverter {
     }
 
     void initialize() {
-        gson = gsonBuilder.create();
+        registerDiffAdapters();
+
+        gson = gsonBuilder.setPrettyPrinting().create();
     }
 
     /**
+     * @param nativeAdapter should be null safe, if not so,
+     *                      simply call {@link TypeAdapter#nullSafe()} before registering it
      * @see TypeAdapter
      */
     void registerNativeGsonTypeAdapter(Type targetType, TypeAdapter nativeAdapter) {
@@ -87,30 +94,11 @@ public class JsonConverter {
      * and registers them with this.gsonBuilder
      */
     void registerJsonTypeAdapter(final JsonTypeAdapter adapter) {
-        JsonSerializer jsonSerializer = new JsonSerializer() {
-            @Override
-            public JsonElement serialize(Object value, Type type, JsonSerializationContext jsonSerializationContext) {
-                return adapter.toJson(value);
-            }
-        };
-
-        JsonDeserializer jsonDeserializer = new JsonDeserializer() {
-            @Override
-            public Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-                return adapter.fromJson(jsonElement);
-            }
-        };
-
-        registerNativeGsonSerializer(adapter.getType(), jsonSerializer);
-        registerNativeGsonDeserializer(adapter.getType(), jsonDeserializer);
+        registerJsonTypeAdapter(adapter.getType(), adapter);
     }
+
 
     public String toJson(Object value) {
-        checkState();
-        return gson.toJson(value);
-    }
-
-    public String toJson(Object value, Type requiredType) {
         checkState();
         return gson.toJson(value);
     }
@@ -123,6 +111,33 @@ public class JsonConverter {
     private void checkState() {
         if (gson == null) {
             throw new IllegalStateException("JsonConverter not initialized");
+        }
+    }
+
+    private void registerJsonTypeAdapter(Type targetType, final JsonTypeAdapter adapter) {
+        JsonSerializer jsonSerializer = new JsonSerializer() {
+            @Override
+            public JsonElement serialize(Object value, Type type, JsonSerializationContext jsonSerializationContext) {
+                return adapter.toJson(value, jsonSerializationContext);
+            }
+        };
+
+        JsonDeserializer jsonDeserializer = new JsonDeserializer() {
+            @Override
+            public Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+                return adapter.fromJson(jsonElement, jsonDeserializationContext);
+            }
+        };
+
+        registerNativeGsonSerializer(targetType, jsonSerializer);
+        registerNativeGsonDeserializer(targetType, jsonDeserializer);
+    }
+
+    private void registerDiffAdapters() {
+        ChangeTypeAdapter changeTypeAdapter = new ChangeTypeAdapter();
+
+        for (Type targetType : ChangeTypeAdapter.SUPPORTED) {
+            registerJsonTypeAdapter(targetType, changeTypeAdapter);
         }
     }
 }

@@ -5,7 +5,7 @@ import org.javers.core.diff.ChangeAssert
 import org.javers.core.diff.NodePair
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.javers.model.domain.Change
+import org.javers.core.diff.Change
 import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
 

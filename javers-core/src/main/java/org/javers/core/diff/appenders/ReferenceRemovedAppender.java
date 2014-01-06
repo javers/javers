@@ -1,7 +1,7 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
-import org.javers.model.domain.changeType.ReferenceRemoved;
+import org.javers.core.diff.changetype.ReferenceRemoved;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;
 

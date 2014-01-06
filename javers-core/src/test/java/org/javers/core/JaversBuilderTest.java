@@ -3,13 +3,10 @@ package org.javers.core;
 
 import org.fest.assertions.api.Assertions;
 import org.javers.core.model.DummyNetworkAddress;
-import org.javers.model.domain.Diff;
 import org.javers.model.mapping.BeanBasedPropertyScanner;
-import org.javers.model.mapping.Category;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.PropertyScanner;
 import org.javers.model.mapping.type.TypeMapper;
-import org.javers.test.builder.CategoryTestBuilder;
 import org.junit.Test;
 
 import javax.persistence.Id;

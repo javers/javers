@@ -1,8 +1,7 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.diff.ChangeAssert
 import org.javers.model.domain.GlobalCdoId
-import org.javers.model.domain.changeType.ReferenceChanged
+import org.javers.core.diff.changetype.ReferenceChanged
 import org.javers.model.mapping.Property
 
 /**

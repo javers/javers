@@ -1,6 +1,6 @@
-package org.javers.model.domain.changeType;
+package org.javers.core.diff.changetype;
 
-import org.javers.model.domain.Change;
+import org.javers.core.diff.Change;
 import org.javers.model.domain.GlobalCdoId;
 
 /**
@@ -9,8 +9,8 @@ import org.javers.model.domain.GlobalCdoId;
  * @author bartosz walacik
  */
 public class NewObject extends Change {
-    public NewObject(GlobalCdoId added, Object newCdo) {
-        super(added);
+    public NewObject(GlobalCdoId newId, Object newCdo) {
+        super(newId);
         setAffectedCdo(newCdo);
     }
 }

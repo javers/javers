@@ -1,5 +1,6 @@
 package org.javers.model.mapping;
 
+import com.google.gson.annotations.Expose;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.model.mapping.type.JaversType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -15,9 +16,12 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class BeanProperty implements Property {
-    private final Method getter;
+
+    private transient final Method getter;
+
     private final String name;
-    private final JaversType javersType;
+
+    private transient final JaversType javersType;
 
     protected BeanProperty(Method getter, JaversType javersType) {
 

@@ -1,14 +1,10 @@
 package org.javers.core.diff;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import org.javers.core.diff.appenders.*;
-import org.javers.model.domain.Change;
-import org.javers.model.domain.Diff;
-import org.javers.model.domain.ValueDehydrator;
 import org.javers.model.mapping.Property;
 import org.javers.model.object.graph.ObjectNode;
 
