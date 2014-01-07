@@ -13,7 +13,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  * @author bartosz walacik
  */
 class JaversIntegrationTest extends Specification {
-    def "should create valueChange and dehydrate it" () {
+    def "should create valueChange" () {
         given:
         DummyUser user =  dummyUser("id").withSex(FEMALE).build();
         DummyUser user2 = dummyUser("id").withSex(MALE).build();
@@ -27,8 +27,8 @@ class JaversIntegrationTest extends Specification {
         ValueChange change = diff.changes[0]
         change.leftValue.value == FEMALE
         change.rightValue.value == MALE
-        change.leftValue.json == '"FEMALE"'
-        change.rightValue.json == '"MALE"'
+        //change.leftValue.json == '"FEMALE"'
+        //change.rightValue.json == '"MALE"'
     }
 
     def "should serialize whole Diff"() {

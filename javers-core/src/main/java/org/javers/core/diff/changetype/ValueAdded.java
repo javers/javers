@@ -15,7 +15,7 @@ public class ValueAdded extends ValueAddOrRemove {
         super(globalCdoId, property, value);
     }
 
-    public Value getAddedValue() {
+    public Object getAddedValue() {
         return value;
     }
 }

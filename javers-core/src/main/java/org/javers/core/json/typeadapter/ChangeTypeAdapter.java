@@ -7,6 +7,8 @@ import com.google.gson.JsonSerializationContext;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ObjectRemoved;
+import org.javers.core.diff.changetype.PropertyChange;
+import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.model.domain.GlobalCdoId;
 
@@ -16,7 +18,7 @@ import java.lang.reflect.Type;
  * @author bartosz walacik
  */
 public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
-    public static final Type[] SUPPORTED = {NewObject.class, ObjectRemoved.class};
+    public static final Type[] SUPPORTED = {NewObject.class, ObjectRemoved.class, ValueChange.class};
 
     @Override
     public JsonElement toJson(Change sourceValue, JsonSerializationContext jsonSerializationContext) {
@@ -26,7 +28,24 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
 
         jsonObject.add("globalCdoId",globalCdoId(sourceValue.getGlobalCdoId(),jsonSerializationContext));
 
+        if (sourceValue instanceof PropertyChange) {
+            append((PropertyChange) sourceValue, jsonObject);
+        }
+
+        if (sourceValue instanceof  ValueChange) {
+           append((ValueChange)sourceValue, jsonObject,jsonSerializationContext);
+        }
+
         return jsonObject;
+    }
+
+    private void append(PropertyChange change, JsonObject toJson) {
+        toJson.addProperty("property",change.getProperty().getName());
+    }
+
+    private void append(ValueChange change, JsonObject toJson, JsonSerializationContext jsonSerializationContext) {
+        toJson.add("leftValue", jsonSerializationContext.serialize(change.getLeftValue().value()));
+        toJson.add("rightValue", jsonSerializationContext.serialize(change.getRightValue().value()));
     }
 
     private JsonElement globalCdoId(GlobalCdoId globalCdoId, JsonSerializationContext jsonSerializationContext) {
