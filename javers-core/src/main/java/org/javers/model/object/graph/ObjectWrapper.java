@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * Wrapper for live client's domain object (aka CDO)
@@ -31,7 +32,6 @@ public class ObjectWrapper implements ObjectNode {
         this.edges = new HashMap<>();
     }
 
-    @Deprecated
     public ObjectWrapper(Object cdo, Entity entity) {
         this(new Cdo(cdo, entity));
     }

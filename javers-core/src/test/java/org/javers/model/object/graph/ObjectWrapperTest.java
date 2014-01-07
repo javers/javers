@@ -1,15 +1,18 @@
 package org.javers.model.object.graph;
 
+import org.javers.core.exceptions.JaversException;
+import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.model.DummyUser;
 import org.javers.model.domain.Cdo;
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.test.assertion.Assertions;
-
-import static org.javers.test.builder.DummyUserBuilder.dummyUser;
-
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import static org.javers.test.assertion.JaversExceptionAssert.assertThat;
+import static org.javers.test.builder.DummyUserBuilder.dummyUser;
+import static org.junit.Assert.fail;
 
 /**
  * @author bartosz walacik
@@ -44,6 +47,21 @@ public abstract class ObjectWrapperTest {
         Assertions.assertThat(wrapper.unwrapCdo()).isSameAs(cdo);
     }
 
+    @Test
+    public void shouldThrowExceptinWhenEntityWithoutId() {
+        //given
+        DummyUser cdo = new DummyUser();
+        Entity entity = entityFactory.create(DummyUser.class);
+
+        //when
+        try {
+            new ObjectWrapper(cdo, entity);
+            fail();  //no CatchExceptionBdd for constructors :(
+        }
+        catch (JaversException e)          {
+            assertThat(e).hasCode(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID);
+        }
+   }
 
     @Test
     public void shouldReturnCdoId() {

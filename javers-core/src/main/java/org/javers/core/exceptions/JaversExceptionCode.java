@@ -9,10 +9,7 @@ import static org.javers.core.exceptions.JaversException.*;
  *
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
-public enum
-
-        JaversExceptionCode {
-    //TODO better exception messages - User Friendly!
+public enum  JaversExceptionCode {
 
     /**
      * Class is not defined in Javers configuration.
@@ -27,6 +24,7 @@ public enum
     CLASS_EXTRACTION_ERROR(BOOTSTRAP_ERROR + "Don't know how to extract Class from type '%s'.") ,
 
     ENTITY_WITHOUT_ID (BOOTSTRAP_ERROR + "Class '%s' has no Id property. Use @Id annotation to mark unique Entity identifier"),
+    ENTITY_INSTANCE_WITH_NULL_ID(RUNTIME_ERROR + "Found Entity instance of class '%s' with null id"),
 
     ENTITY_MANAGER_NOT_INITIALIZED(BOOTSTRAP_ERROR + "EntityManager is not initialized properly. You should call buildManagedClasses()"),
 

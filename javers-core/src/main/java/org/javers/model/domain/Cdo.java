@@ -1,6 +1,7 @@
 package org.javers.model.domain;
 
-import org.javers.common.validation.Validate;
+import org.javers.core.exceptions.JaversException;
+import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.model.mapping.Entity;
 
 import static org.javers.common.validation.Validate.*;
@@ -18,8 +19,14 @@ public class Cdo {
         argumentIsNotNull(cdo);
         argumentIsNotNull(entity);
         argumentCheck(entity.isInstance(cdo), "cdo is not an instance of entity");
+
+        Object cdoId = entity.getCdoIdOf(cdo);
+        if (cdoId == null) {
+            throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, entity.getClass().getName());
+        }
+
         this.wrappedCdo = cdo;
-        this.globalId = new GlobalCdoId(entity.getCdoIdOf(cdo),entity);
+        this.globalId = new GlobalCdoId(cdoId,entity);
     }
 
     /**

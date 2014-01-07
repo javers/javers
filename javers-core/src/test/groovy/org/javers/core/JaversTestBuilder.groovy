@@ -1,5 +1,6 @@
 package org.javers.core
 
+import org.javers.core.model.DummyUserWithDate
 import org.javers.model.mapping.EntityFactory
 import org.javers.model.object.graph.ObjectGraphBuilder
 import org.javers.core.model.DummyAddress
@@ -26,6 +27,7 @@ class JaversTestBuilder {
 
         javersBuilder.registerEntity(DummyUser)
                      .registerEntity(DummyUserDetails)
+                     .registerEntity(DummyUserWithDate)
                      .registerValueObject(DummyAddress)
                      .registerValueObject(DummyNetworkAddress)
                      .build()

@@ -7,6 +7,8 @@ import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
+import org.javers.core.model.DummyUserWithDate
+import org.joda.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -15,13 +17,14 @@ import static org.javers.core.json.builder.ChangeTestBuilder.newObject
 import static org.javers.core.json.builder.ChangeTestBuilder.objectRemoved
 import static org.javers.core.json.builder.ChangeTestBuilder.referenceChanged
 import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
+import static org.javers.core.model.DummyUserWithDate.dummyUserWithDate
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
 /**
  * @author bartosz walacik
  */
-class JsonConverterChangeAdapterTest extends Specification {
+class JsonConverterDiffIntegrationTest extends Specification {
     class ClassWithChange{
         Change change
     }
@@ -53,6 +56,7 @@ class JsonConverterChangeAdapterTest extends Specification {
         json.leftValue == true
         json.rightValue == false
     }
+
 
     def "should write property name, leftId & rightId for ReferenceChange" () {
         given:
@@ -105,6 +109,22 @@ class JsonConverterChangeAdapterTest extends Specification {
         json.leftValue == null
         json.rightValue == null
 
+    }
+
+    def "should use custom JsonTypeAdapter when writing ImmutableValues for ValueChange" () {
+        given:
+        JsonConverter jsonConverter = jsonConverter().build()
+        def dob = new LocalDateTime()
+        ValueChange change = valueChange(dummyUserWithDate("kaz"),"dob",null, dob)
+
+        when:
+        String jsonText = jsonConverter.toJson(change)
+        System.out.println(jsonText)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.leftValue == LocalDateTimeTypeAdapter.ISO_FORMATTER.print(dob)
+        json.rightValue == null
     }
 
     @Unroll

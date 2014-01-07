@@ -18,7 +18,7 @@ import java.lang.reflect.Type;
  * @author bartosz walacik
  */
 public class LocalDateTimeTypeAdapter extends BasicStringTypeAdapter<LocalDateTime> {
-    private static final DateTimeFormatter ISO_FORMATTER = ISODateTimeFormat.dateHourMinuteSecond();
+    public static final DateTimeFormatter ISO_FORMATTER = ISODateTimeFormat.dateHourMinuteSecond();
 
     @Override
     public String serialize(LocalDateTime sourceValue) {

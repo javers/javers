@@ -89,7 +89,10 @@ public class JaversBuilder extends AbstractJaversBuilder {
         }
         return this;
     }
-    
+
+    /**
+     * {@link MappingStyle#FIELD} by default
+     */
     public JaversBuilder withMappingStyle(MappingStyle mappingStyle) {
         coreConfiguration.withMappingStyle(mappingStyle);
         return this;
