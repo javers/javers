@@ -28,9 +28,10 @@ class ChangeAssert {
         actual.class == ReferenceAdded
         this
     }
-    
-    ChangeAssert hasCdoId(Object localCdoId) {
-        actual.globalCdoId.localCdoId == localCdoId
+
+    ChangeAssert hasGlobalId(Class expected, Object expectedCdoId){
+        assert actual.globalCdoId.entity.sourceClass == expected
+        assert actual.globalCdoId.localCdoId == expectedCdoId
         this
     }
 

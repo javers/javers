@@ -27,7 +27,7 @@ class JaversTestBuilder {
 
         javersBuilder.registerEntity(DummyUser)
                      .registerEntity(DummyUserDetails)
-                     .registerEntity(DummyUserWithDate)
+                    // .registerEntity(DummyUserWithDate)
                      .registerValueObject(DummyAddress)
                      .registerValueObject(DummyNetworkAddress)
                      .build()

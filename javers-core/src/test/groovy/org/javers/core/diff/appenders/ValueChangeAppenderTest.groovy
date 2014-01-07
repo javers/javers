@@ -1,5 +1,11 @@
 package org.javers.core.diff.appenders
 
+import org.javers.core.Javers
+import org.javers.core.JaversTestBuilder
+import org.javers.core.diff.Diff
+import org.javers.core.model.DummyUserWithDate
+import org.joda.time.LocalDateTime
+
 import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.ChangeAssert
@@ -11,6 +17,8 @@ import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
+import static org.javers.core.model.DummyUserWithDate.dummyUserWithDate
+import static org.javers.core.model.DummyUserWithDate.dummyUserWithDate
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
@@ -45,7 +53,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         then:
         ChangeAssert.assertThat(changes[0])
-                    .hasCdoId("1")
+                    .hasGlobalId(DummyUser, "1")
                     .hasAffectedCdo(right)
     }
 
@@ -139,30 +147,44 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
                   .hasRightValue(Boolean.TRUE)
     }
 
-
-    def "should append ValueObject valueChange" () {
+    def "should append ImmutableValue change" () {
         given:
-        DummyUserDetails leftDummyUserDetails = dummyUserDetails()
-                .withId(1)
-                .withAddress("Washington Street", "Boston")
-                .build();
-        DummyUserDetails rightDummyUserDetails = dummyUserDetails()
-                .withId(1)
-                .withAddress("Wall Street", "New York")
-                .build();
-        ObjectNode left = buildGraph(leftDummyUserDetails)
-        ObjectNode right = buildGraph(rightDummyUserDetails)
-        Property address = getEntity(DummyUserDetails).getProperty("dummyAddress")
+        LocalDateTime dob = new LocalDateTime()
+        def leftUser =  dummyUserWithDate("kaz", null)
+        def rightUser = dummyUserWithDate("kaz", dob)
+        ObjectNode left = buildGraph(leftUser)
+        ObjectNode right = buildGraph(rightUser)
+        Property dobProperty = getEntity(DummyUserWithDate).getProperty("dob")
 
         when:
-        Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new NodePair(left,right),address)
+        def changes = new ValueChangeAppender().calculateChanges(new NodePair(left,right), dobProperty)
 
         then:
         changes.size() == 1
         assertThat(changes[0])
+                .hasGlobalId(DummyUserWithDate, "kaz")
+                .hasProperty(dob)
+                .hasLeftValue(null)
+                .hasRightValue(dob)
+    }
+
+    def "should create fragment valueChange for embedded ValueObject" () {
+        given:
+        def leftUser =  dummyUserDetails(1).withAddress("Washington Street", "Boston").build();
+        def rightUser = dummyUserDetails(1).withAddress("Wall Street",       "Boston").build();
+        ObjectNode left = buildGraph(leftUser)
+        ObjectNode right = buildGraph(rightUser)
+        Property address = getEntity(DummyUserDetails).getProperty("dummyAddress")
+
+        when:
+        def changes = new ValueChangeAppender().calculateChanges(new NodePair(left,right),address)
+
+        then:
+        changes.size() == 1
+        assertThat(changes[0])
+                  .hasGlobalId(DummyUserDetails, 1, "street")
                   .hasProperty(address)
-                  .hasLeftValue(leftDummyUserDetails.dummyAddress)
-                  .hasRightValue(rightDummyUserDetails.dummyAddress)
+                  .hasLeftValue("Washington Street")
+                  .hasRightValue("Wall Street")
     }
 }

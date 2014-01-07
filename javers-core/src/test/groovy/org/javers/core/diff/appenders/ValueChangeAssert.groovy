@@ -15,6 +15,13 @@ class ValueChangeAssert {
         return new ValueChangeAssert(actual)
     }
 
+    def hasGlobalId(Class expected, Object expectedCdoId, String expectedFragment ){
+        assert actual.globalCdoId.entity.sourceClass == expected
+        assert actual.globalCdoId.localCdoId == expectedCdoId
+        assert actual.fragment = expectedFragment
+        this
+    }
+
     def hasProperty(Property expected) {
         assert actual.property == expected
         return this
