@@ -58,7 +58,7 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
 
         final JsonObject jsonObject = new JsonObject();
 
-        jsonObject.add("cdoId", context.serialize(globalCdoId.getLocalCdoId()));
+        jsonObject.add("cdoId", context.serialize(globalCdoId.getCdoId()));
         jsonObject.addProperty("entity", globalCdoId.getEntity().getSourceClass().getName());
 
         return jsonObject;

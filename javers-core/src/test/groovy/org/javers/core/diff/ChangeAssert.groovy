@@ -31,7 +31,7 @@ class ChangeAssert {
 
     ChangeAssert hasGlobalId(Class expected, Object expectedCdoId){
         assert actual.globalCdoId.entity.sourceClass == expected
-        assert actual.globalCdoId.localCdoId == expectedCdoId
+        assert actual.globalCdoId.cdoId == expectedCdoId
         this
     }
 

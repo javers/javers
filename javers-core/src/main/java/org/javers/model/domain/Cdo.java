@@ -41,7 +41,7 @@ public class Cdo {
     }
 
     public Object getLocalId() {
-        return globalId.getLocalCdoId();
+        return globalId.getCdoId();
     }
 
     public Entity getEntity() {

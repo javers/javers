@@ -2,7 +2,6 @@ package org.javers.core.diff
 
 import org.javers.common.collections.Sets
 import org.javers.model.object.graph.ObjectNode
-import spock.lang.Specification
 
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
@@ -24,7 +23,7 @@ class NodeMatcherTest extends AbstractDiffTest{
         then:
         pairs.size() == 1
         NodePair pair = pairs.get(0)
-        pair.left.globalCdoId.localCdoId == "1"
-        pair.right.globalCdoId.localCdoId == "1"
+        pair.left.globalCdoId.cdoId == "1"
+        pair.right.globalCdoId.cdoId == "1"
     }
 }
