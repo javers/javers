@@ -1,7 +1,7 @@
 package org.javers.core.diff.appenders
 
 import org.javers.model.domain.GlobalCdoId
-import org.javers.core.diff.changetype.ReferenceChanged
+import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.model.mapping.Property
 
 /**
@@ -9,9 +9,9 @@ import org.javers.model.mapping.Property
  */
 class ReferenceChangeAssert {
 
-    ReferenceChanged actual
+    ReferenceChange actual
 
-    static ReferenceChangeAssert assertThat(ReferenceChanged actual) {
+    static ReferenceChangeAssert assertThat(ReferenceChange actual) {
         new ReferenceChangeAssert(actual:actual)
     }
 

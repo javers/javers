@@ -1,8 +1,6 @@
 package org.javers.core.diff;
 
-import com.google.gson.annotations.Expose;
 import org.javers.model.domain.GlobalCdoId;
-import org.javers.core.diff.changetype.ReferenceChanged;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.model.visitors.ChangeVisitor;
 import org.javers.model.visitors.Visitable;
@@ -14,7 +12,7 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
  * Change represents <b>atomic</b> difference between two objects.
  * <br/><br/>
  *
- * There are several change types: {@link ValueChange}, {@link ReferenceChanged}, ...
+ * There are several change types: {@link ValueChange}, {@link org.javers.core.diff.changetype.ReferenceChange}, ...
  * For complete list see inheritance hierarchy.
  * <br/><br/>
  *

@@ -14,9 +14,14 @@ public class DummyUserDetailsBuilder {
         dummyUserDetails = new DummyUserDetails();
     }
 
+    public static DummyUserDetailsBuilder dummyUserDetails(long withId) {
+        return new DummyUserDetailsBuilder().withId(withId);
+    }
+
     public static DummyUserDetailsBuilder dummyUserDetails() {
         return new DummyUserDetailsBuilder();
     }
+
 
     public DummyUserDetails build() {
         if(dummyUserDetails.getId() == null) {

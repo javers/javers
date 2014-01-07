@@ -10,6 +10,10 @@ import static EntityTestBuilder.entity
 class GlobalCdoIdTestBuilder {
 
       static GlobalCdoId globalCdoId(Object cdo){
+          if (cdo == null) {
+              return null
+          }
+
           Entity entity = entity(cdo.class)
 
           new GlobalCdoId(entity.getCdoIdOf(cdo), entity)

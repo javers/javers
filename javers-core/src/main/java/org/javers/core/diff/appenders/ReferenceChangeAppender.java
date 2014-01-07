@@ -3,8 +3,8 @@ package org.javers.core.diff.appenders;
 import org.javers.common.collections.Objects;
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
+import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.model.domain.GlobalCdoId;
-import org.javers.core.diff.changetype.ReferenceChanged;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.object.graph.Edge;
@@ -18,7 +18,7 @@ import java.util.Set;
  * @author bartosz walacik
  * @author pawel szymczyk
  */
-public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceChanged> {
+public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceChange> {
 
     @Override
     protected Set<Class<JaversType>> getSupportedPropertyTypes() {
@@ -26,7 +26,7 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
     }
 
     @Override
-    public Collection<ReferenceChanged> calculateChanges(NodePair pair, Property property) {
+    public Collection<ReferenceChange> calculateChanges(NodePair pair, Property property) {
         Edge leftSingleEdge = pair.getLeft().getEdge(property);
         Edge rightSingleEdge = pair.getRight().getEdge(property);
 
@@ -37,7 +37,7 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
             return Collections.EMPTY_SET;
         }
 
-        return Sets.asSet(new ReferenceChanged(pair.getGlobalCdoId(),
+        return Sets.asSet(new ReferenceChange(pair.getGlobalCdoId(),
                 property,
                 leftGlobalCdoId,
                 rightGlobalCdoId));

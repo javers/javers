@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
+import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
 import spock.lang.Specification
@@ -12,8 +13,10 @@ import spock.lang.Unroll
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 import static org.javers.core.json.builder.ChangeTestBuilder.newObject
 import static org.javers.core.json.builder.ChangeTestBuilder.objectRemoved
+import static org.javers.core.json.builder.ChangeTestBuilder.referenceChanged
 import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
 /**
  * @author bartosz walacik
@@ -51,6 +54,59 @@ class JsonConverterChangeAdapterTest extends Specification {
         json.rightValue == false
     }
 
+    def "should write property name, leftId & rightId for ReferenceChange" () {
+        given:
+        JsonConverter jsonConverter = jsonConverter().build()
+        ReferenceChange change = referenceChanged(dummyUser().build(),
+                                                   "dummyUserDetails",
+                                                   dummyUserDetails(1).build(),
+                                                   dummyUserDetails(2).build())
+
+        when:
+        String jsonText = jsonConverter.toJson(change)
+        System.out.println(jsonText)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.property == "dummyUserDetails"
+        json.leftReference.cdoId == 1
+        json.leftReference.entity == "org.javers.core.model.DummyUserDetails"
+        json.rightReference.cdoId == 2
+        json.rightReference.entity == "org.javers.core.model.DummyUserDetails"
+    }
+
+    def "should be nullSafe when writing leftId & rightId for ReferenceChange" () {
+        given:
+        JsonConverter jsonConverter = jsonConverter().build()
+        ReferenceChange change = referenceChanged(dummyUser().build(),
+                "dummyUserDetails",null, null)
+
+        when:
+        String jsonText = jsonConverter.toJson(change)
+        System.out.println(jsonText)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.rightReference == null
+        json.leftReference == null
+    }
+
+    def "should be nullSafe when writing left & right value for ValueChange" () {
+        given:
+        JsonConverter jsonConverter = jsonConverter().build()
+        ValueChange change = valueChange(dummyUser("kaz").build(),"bigFlag",null, null)
+
+        when:
+        String jsonText = jsonConverter.toJson(change)
+        System.out.println(jsonText)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.leftValue == null
+        json.rightValue == null
+
+    }
+
     @Unroll
     def "should write globalCdoId for #change.class.simpleName"(){
         given:
@@ -65,10 +121,14 @@ class JsonConverterChangeAdapterTest extends Specification {
         json.globalCdoId.entity == "org.javers.core.model.DummyUser"
 
         where:
-        change << [newObject( dummyUser("kaz").build() ),
-                   objectRemoved( dummyUser("kaz").build() ),
-                   valueChange(dummyUser("kaz").build(),"flag",true,false)]
-        expectedType << [NewObject.simpleName, ObjectRemoved.simpleName, ValueChange.simpleName]
+        change << [newObject(dummyUser("kaz").build()),
+                   objectRemoved(dummyUser("kaz").build()),
+                   valueChange(dummyUser("kaz").build(),"flag",true,false),
+                   referenceChanged(dummyUser("kaz").build(),"dummyUserDetails",dummyUserDetails(1).build(),null)]
+        expectedType << [NewObject.simpleName,
+                         ObjectRemoved.simpleName,
+                         ValueChange.simpleName,
+                         ReferenceChange.simpleName]
 
     }
 
