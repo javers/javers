@@ -20,4 +20,9 @@ public class JaversException extends RuntimeException {
     public JaversExceptionCode getCode() {
         return code;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName()+": "+ getMessage();
+    }
 }

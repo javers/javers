@@ -1,6 +1,7 @@
 package org.javers.core.json.builder
 
 import org.javers.model.domain.GlobalCdoId
+import org.javers.model.domain.InstanceId
 import org.javers.model.mapping.Entity
 import static EntityTestBuilder.entity
 
@@ -9,13 +10,13 @@ import static EntityTestBuilder.entity
  */
 class GlobalCdoIdTestBuilder {
 
-      static GlobalCdoId globalCdoId(Object cdo){
+      static InstanceId instanceId(Object cdo){
           if (cdo == null) {
               return null
           }
 
           Entity entity = entity(cdo.class)
 
-          new GlobalCdoId(entity.getCdoIdOf(cdo), entity)
+          new InstanceId(entity.getCdoIdOf(cdo), entity)
       }
 }

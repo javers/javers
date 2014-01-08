@@ -5,6 +5,7 @@ import org.fest.assertions.api.Assertions;
 import org.javers.core.model.DummyNetworkAddress;
 import org.javers.model.mapping.BeanBasedPropertyScanner;
 import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.FieldBasedPropertyScanner;
 import org.javers.model.mapping.PropertyScanner;
 import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class JaversBuilderTest {
         javersBuilder.build();
 
         //then
-        Assertions.assertThat(javersBuilder.getContainerComponent(PropertyScanner.class)).isInstanceOf(BeanBasedPropertyScanner.class);
+        Assertions.assertThat(javersBuilder.getContainerComponent(PropertyScanner.class)).isInstanceOf(FieldBasedPropertyScanner.class);
     }
 
     @Deprecated //javersBuilder.addModule is deprecated
@@ -107,16 +108,9 @@ public class JaversBuilderTest {
     }
 
     private class DummyEntity {
+        @Id
         private int id;
         private DummyEntity parent;
 
-        @Id
-        private int getId() {
-            return id;
-        }
-
-        private DummyEntity getParent() {
-            return parent;
-        }
     }
 }

@@ -7,7 +7,8 @@ import org.javers.model.mapping.Entity;
 import static org.javers.common.validation.Validate.*;
 
 /**
- * Holder for Client's domain object
+ * Holder for client's domain object,
+ * extracts its {@link GlobalCdoId}
  *
  * @author bartosz walacik
  */
@@ -15,10 +16,13 @@ public class Cdo {
     private final Object wrappedCdo;
     private final GlobalCdoId globalId;
 
+    /**
+     * Creates wrapper for Entity instance
+     */
     public Cdo(Object cdo, Entity entity) {
         argumentIsNotNull(cdo);
         argumentIsNotNull(entity);
-        argumentCheck(entity.isInstance(cdo), "cdo is not an instance of entity");
+        argumentCheck(entity.isInstance(cdo), "cdo is not an instance of given entity");
 
         Object cdoId = entity.getCdoIdOf(cdo);
         if (cdoId == null) {
@@ -26,7 +30,7 @@ public class Cdo {
         }
 
         this.wrappedCdo = cdo;
-        this.globalId = new GlobalCdoId(cdoId,entity);
+        this.globalId = new InstanceId(cdoId,entity);
     }
 
     /**
