@@ -19,4 +19,9 @@ class GlobalCdoIdTestBuilder {
 
           new InstanceId(entity.getCdoIdOf(cdo), entity)
       }
+
+      @Deprecated
+      static GlobalCdoId globalCdoId(Object cdo){
+          // should be removed when all GlobalCdoId will be replaced by InstanceId
+      }
 }
