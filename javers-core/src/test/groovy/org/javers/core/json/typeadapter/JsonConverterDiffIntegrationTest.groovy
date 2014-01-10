@@ -1,28 +1,19 @@
 package org.javers.core.json.typeadapter
 
 import groovy.json.JsonSlurper
-import org.javers.core.Javers
-import org.javers.core.JaversTestBuilder
 import org.javers.core.diff.Change
-import org.javers.core.diff.Diff
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
-import org.javers.core.model.DummyUser
-import org.javers.core.model.DummyUserWithDate
+import org.javers.core.model.DummyAddress
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
-import static org.javers.core.json.builder.ChangeTestBuilder.newObject
-import static org.javers.core.json.builder.ChangeTestBuilder.objectRemoved
-import static org.javers.core.json.builder.ChangeTestBuilder.referenceChanged
-import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
-import static org.javers.core.model.DummyUser.Sex.FEMALE
-import static org.javers.core.model.DummyUser.Sex.MALE
+import static org.javers.core.json.builder.ChangeTestBuilder.*
 import static org.javers.core.model.DummyUserWithDate.dummyUserWithDate
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
@@ -142,9 +133,9 @@ class JsonConverterDiffIntegrationTest extends Specification {
         expect:
         def json = new JsonSlurper().parseText(jsonText)
         json.changeType == expectedType
-        json.globalCdoId.size() == 2
-        json.globalCdoId.cdoId == "kaz"
-        json.globalCdoId.entity == "org.javers.core.model.DummyUser"
+        json.instanceId.size() == 2
+        json.instanceId.cdoId == "kaz"
+        json.instanceId.entity == "org.javers.core.model.DummyUser"
 
         where:
         change << [newObject(dummyUser("kaz").build()),
@@ -158,24 +149,21 @@ class JsonConverterDiffIntegrationTest extends Specification {
 
     }
 
-    def "should serialize whole Diff"() {
+    def "should write ValueObjectId & property for ValueObject property change"() {
         given:
-        DummyUser user =  dummyUser("id").withSex(FEMALE).build();
-        DummyUser user2 = dummyUser("id").withSex(MALE).withDetails(1).build();
-        Javers javers = JaversTestBuilder.javers()
-
+        def jsonConverter = jsonConverter().build()
+        def change = valueObjectPropertyChange(dummyUserDetails(1),
+                                                     DummyAddress,
+                                                     "street",
+                                                     "dummyAddress",
+                                                     "Street 1", "Street 2");
         when:
-        Diff diff = javers.compare("user", user, user2)
-        String jsonText = javers.toJson(diff)
-        System.out.println("jsonText:\n"+jsonText)
-
-        then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.size() == 4
-        json.id == 0
-        json.userId == "user"
-        json.diffDate != null
-        json.changes.size() == 3
-        json.changes[0].changeType == "NewObject"
+        json.property == "street"
+        json.valueObjectId.size() == 3
+        json.valueObjectId.fragment = "dummyAddress"
+        json.valueObjectId.cdoId == "1"
+        json.valueObjectId.entity == "org.javers.core.model.DummyUserDetails"
+
     }
 }
