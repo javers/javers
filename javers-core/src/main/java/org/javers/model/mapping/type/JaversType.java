@@ -14,7 +14,7 @@ import static org.javers.common.reflection.ReflectionUtil.extractActualClassType
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 
 /**
- * Property type that can be managed by Javers, so int, String, Date, etc.
+ * Property type that can be managed by Javers, so int, String, Date, Reference, etc.
  * <p/>
  * Immutable
  *

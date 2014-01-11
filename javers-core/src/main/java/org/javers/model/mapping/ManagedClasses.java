@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
  * @author Pawel Szymczyk
  */
 public class ManagedClasses {

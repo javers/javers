@@ -1,15 +1,15 @@
 package org.javers.model.mapping;
 
-import org.javers.model.mapping.type.CollectionType;
-import org.javers.model.mapping.type.EntityReferenceType;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.javers.model.mapping.type.JaversType;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
+ * Object type that can be managed by Javers,
+ * reflects one class in clients data model.
+ *
+ * Holds list of properties, see {@link JaversType}
+ *
  * @author bartosz walacik
  */
 public abstract class ManagedClass<S> {
