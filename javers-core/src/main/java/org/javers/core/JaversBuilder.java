@@ -5,11 +5,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.pico.CoreJaversModule;
-import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.EntityDefinition;
-import org.javers.model.mapping.EntityManager;
-import org.javers.model.mapping.ManagedClassDefinition;
-import org.javers.model.mapping.ValueObjectDefinition;
+import org.javers.model.mapping.*;
 import org.javers.core.pico.ModelJaversModule;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -82,7 +78,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     public JaversBuilder registerImmutableValue(Class<?> immutableValueClass) {
         Validate.argumentIsNotNull(immutableValueClass);
-        managedClassDefinitions.add(new ValueObjectDefinition(immutableValueClass));
+        managedClassDefinitions.add(new ImmutableValueDefinition(immutableValueClass));
         return this;
     }
 

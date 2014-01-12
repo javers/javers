@@ -138,6 +138,6 @@ public class EntityManager {
 
     private void manageValueObject(ValueObjectDefinition voDef) {
         logger.debug("registering ValueObject[{}]", voDef.getClazz().getName());
-        managedClasses.add(new ValueObject(voDef.getClazz(), null));
+        managedClasses.add(entityFactory.create(voDef));
     }
 }

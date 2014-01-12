@@ -43,4 +43,11 @@ public class EntityFactory {
         }
         throw new JaversException(JaversExceptionCode.PROPERTY_NOT_FOUND,entityDefinition.getIdPropertyName(),entityDefinition.getClazz().getName());
     }
+
+    public ValueObject create(ValueObjectDefinition valueObjectDefinition) {
+        List<Property> beanProperties = propertyScanner.scan(valueObjectDefinition.getClazz());
+
+        return new ValueObject(valueObjectDefinition.getClazz(), beanProperties);
+    }
 }
+

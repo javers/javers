@@ -35,7 +35,6 @@ public class Entity extends ValueObject {
      */
     public Entity(Class sourceClass, List<Property> properties, Property idProperty) {
         super(sourceClass, properties);
-        argumentIsNotNull(properties);
 
         if (idProperty == null) {
             this.idProperty = findDefaultIdProperty();

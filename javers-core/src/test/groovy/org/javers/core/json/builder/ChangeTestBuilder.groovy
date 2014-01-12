@@ -11,6 +11,7 @@ import org.javers.model.mapping.Property
 import org.javers.model.mapping.ValueObject
 
 import static org.javers.core.json.builder.EntityTestBuilder.entity
+import static org.javers.core.json.builder.EntityTestBuilder.valueObject
 import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*
 
 /**
@@ -43,7 +44,7 @@ class ChangeTestBuilder {
                                                  String voPropertyName, String instancePropertyName,
                                                  Object oldVal, Object newVal) {
 
-        ValueObject valueObjectType = new ValueObject(valueObjectClass)
+        ValueObject valueObjectType = valueObject(valueObjectClass)
 
         Property prop = valueObjectType.getProperty(voPropertyName)
         ValueObjectId globalId = valueObjectId(instanceCdo, instancePropertyName)

@@ -26,12 +26,12 @@ class JaversTestBuilder {
     private JaversTestBuilder (){
         javersBuilder = new JaversBuilder()
 
-        javersBuilder.registerEntity(DummyUser)
-                     .registerEntity(DummyUserDetails)
-                     .registerEntity(DummyUserWithDate)
-                     .registerValueObject(DummyAddress)
-                     .registerValueObject(DummyNetworkAddress)
-                     .build()
+       javersBuilder.registerEntity(DummyUser)
+       .registerEntity(DummyUserDetails)
+       .registerEntity(DummyUserWithDate)
+       .registerValueObject(DummyAddress)
+       .registerValueObject(DummyNetworkAddress)
+       .build()
     }
 
     static JaversTestBuilder javersTestAssembly(){
