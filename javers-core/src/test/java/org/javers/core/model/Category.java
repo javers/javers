@@ -1,4 +1,4 @@
-package org.javers.model.mapping;
+package org.javers.core.model;
 
 import javax.persistence.Id;
 import java.util.ArrayList;
@@ -38,14 +38,6 @@ public class Category {
 
     public List<Category> getCategories() {
         return categories;
-    }
-
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
-    }
-
-    public Category getParent() {
-        return parent;
     }
 
     public void setParent(Category parent) {

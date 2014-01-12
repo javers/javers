@@ -5,6 +5,8 @@ import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class ManagedClassesTest {
@@ -17,9 +19,8 @@ public class ManagedClassesTest {
         managedClasses = new ManagedClasses();
         TypeMapper typeMapper = new TypeMapper();
         typeMapper.registerValueType(DummyNetworkAddress.class);
-        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(typeMapper);
 
-        managedClass = new ValueObject(DummyNetworkAddress.class, null);
+        managedClass = new ValueObject(DummyNetworkAddress.class, Collections.EMPTY_LIST);
     }
 
     @Test

@@ -7,6 +7,7 @@ import java.util.List;
  *
  * @author Pawel Szymczyk
  */
+@Deprecated
 public class ManagedClasses {
 
     private List<ManagedClass> list;
