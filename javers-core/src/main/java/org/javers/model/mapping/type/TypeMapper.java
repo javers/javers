@@ -127,7 +127,10 @@ public class TypeMapper {
 
     public void registerValueObjectType(Class<?> objectValue) {
         addType(new ValueObjectType(objectValue));
+    }
 
+    public void registerImmutableValueType(Class<?> objectValue) {
+        addType(new ImmutableValueType(objectValue));
     }
 
     public <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {

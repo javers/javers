@@ -5,6 +5,9 @@ import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.TypeMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,6 +26,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 public class EntityManager {
+    private static final Logger logger = LoggerFactory.getLogger(EntityManager.class);
 
     private final EntityFactory entityFactory;
     private final TypeMapper typeMapper;
@@ -57,11 +61,15 @@ public class EntityManager {
             return; //already managed
         }
 
+        //TODO REFACTOR
         if (def instanceof EntityDefinition) {
             typeMapper.registerEntityReferenceType(def.getClazz());
         }
         if (def instanceof  ValueObjectDefinition) {
             typeMapper.registerValueObjectType(def.getClazz());
+        }
+        if (def instanceof  ImmutableValueDefinition) {
+            typeMapper.registerImmutableValueType(def.getClazz());
         }
         managedClassDefinitions.add(def);
     }
@@ -104,20 +112,32 @@ public class EntityManager {
      */
     public void buildManagedClasses() {
         for (ManagedClassDefinition def : managedClassDefinitions) {
+            //TODO REFACTOR
             if (def instanceof  EntityDefinition) {
                 manageEntity((EntityDefinition)def);
             }
             if (def instanceof  ValueObjectDefinition) {
                 manageValueObject((ValueObjectDefinition)def);
             }
+            if (def instanceof  ImmutableValueDefinition) {
+                manageImmutableValue((ImmutableValueDefinition) def);
+            }
         }
     }
 
+    private void manageImmutableValue(ImmutableValueDefinition def) {
+        logger.debug("registering ImmutableValue[{}]", def.getClazz().getName());
+        managedClasses.add(new ImmutableValue(def.getClazz()));
+
+    }
+
     private void manageEntity(EntityDefinition entityDef) {
+        logger.debug("registering Entity[{}]", entityDef.getClazz().getName());
         managedClasses.add(entityFactory.create(entityDef));
     }
 
     private void manageValueObject(ValueObjectDefinition voDef) {
-        managedClasses.add(new ValueObject(voDef.getClazz()));
+        logger.debug("registering ValueObject[{}]", voDef.getClazz().getName());
+        managedClasses.add(new ValueObject(voDef.getClazz(), null));
     }
 }

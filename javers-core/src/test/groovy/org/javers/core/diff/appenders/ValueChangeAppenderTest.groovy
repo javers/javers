@@ -162,8 +162,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         then:
         changes.size() == 1
         assertThat(changes[0])
-                .hasGlobalId(DummyUserWithDate, "kaz")
-                .hasProperty(dob)
+                .hasProperty(dobProperty)
                 .hasLeftValue(null)
                 .hasRightValue(dob)
     }
@@ -182,7 +181,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         then:
         changes.size() == 1
         assertThat(changes[0])
-                  .hasGlobalId(DummyUserDetails, 1, "dummyAddress")
+                  .hasValueObjectId(DummyUserDetails, 1, "dummyAddress")
                   .hasProperty("street")
                   .hasLeftValue("Washington Street")
                   .hasRightValue("Wall Street")

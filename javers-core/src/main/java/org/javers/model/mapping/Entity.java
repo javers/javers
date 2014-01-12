@@ -3,35 +3,39 @@ package org.javers.model.mapping;
 import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.model.mapping.type.CollectionType;
-import org.javers.model.mapping.type.EntityReferenceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * Class in client's domain model
- * <br/>
+ * Entity class in client's domain model.
+ * Has list of mutable properties and its own identity hold in idProperty.
+ * <p/>
  *
- * immutable
- *
+ * Example:
+ * <pre>
+ *     class Person {
+ *         private int    personId;
+ *         private String firstName;
+ *         private String lastName;
+ *         ...
+ *     }
+ * </pre>
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
-public class Entity<S> extends ManagedClass<S> {
-
+public class Entity extends ValueObject {
+    private static final Logger logger = LoggerFactory.getLogger(Entity.class);
     private final Property idProperty;
-    private final List<Property> properties;
 
     /**
      * @param idProperty null means - give me defaults
      */
-    public Entity(Class<S> sourceClass, List<Property> properties, Property idProperty) {
-        super(sourceClass);
+    public Entity(Class sourceClass, List<Property> properties, Property idProperty) {
+        super(sourceClass, properties);
         argumentIsNotNull(properties);
-        this.properties = properties;
 
         if (idProperty == null) {
             this.idProperty = findDefaultIdProperty();
@@ -42,7 +46,7 @@ public class Entity<S> extends ManagedClass<S> {
     }
 
     private Property findDefaultIdProperty() {
-        for (Property p : properties) {
+        for (Property p : getProperties()) {
             if (p.looksLikeId()) {
                 return p;
             }
@@ -51,14 +55,14 @@ public class Entity<S> extends ManagedClass<S> {
     }
 
     /**
-     * @param cdo instance of {@link #getSourceClass()}
-     * @return returns ID of given cdo
+     * @param instance instance of {@link #getSourceClass()}
+     * @return returns ID of given instance so value of idProperty
      */
-    public Object getCdoIdOf(Object cdo) {
-        Validate.argumentIsNotNull(cdo);
-        Validate.argumentCheck(getSourceClass().isInstance(cdo),
-                               "expected instance of "+getSourceClass().getName()+", got instance of "+cdo.getClass().getName());
-        return getIdProperty().get(cdo);
+    public Object getIdOf(Object instance) {
+        Validate.argumentIsNotNull(instance);
+        Validate.argumentCheck(getSourceClass().isInstance(instance),
+                               "expected instance of "+getSourceClass().getName()+", got instance of "+ instance.getClass().getName());
+        return getIdProperty().get(instance);
     }
 
     public boolean isInstance(Object cdo) {
@@ -69,42 +73,4 @@ public class Entity<S> extends ManagedClass<S> {
         return idProperty;
     }
 
-    /**
-     * @return list of {@link EntityReferenceType} properties
-     */
-    public List<Property> getSingleReferences() {
-        List<Property> refProperties = new ArrayList<>();
-
-        for (Property property : properties) {
-            if (property.getType() instanceof EntityReferenceType){
-                refProperties.add(property);
-            }
-        }
-        return refProperties;
-    }
-
-    public List<Property> getCollectionTypeProperties() {
-        List<Property> refProperties = new ArrayList<>();
-
-        for (Property property : properties) {
-            if (property.getType() instanceof CollectionType){
-                refProperties.add(property);
-            }
-        }
-        return refProperties;
-    }
-
-    public List<Property> getProperties() {
-        return Collections.unmodifiableList(properties);
-    }
-
-    public Property getProperty(String withName) {
-        Property found = null;
-        for (Property property : properties) {
-            if (property.getName().equals(withName)) {
-                found = property;
-            }
-        }
-        return found;
-    }
 }

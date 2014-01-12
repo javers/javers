@@ -18,6 +18,7 @@ public enum  JaversExceptionCode {
 
     UNEXPECTED_VALUE_OBJECT(RUNTIME_ERROR + "Can't start building graph from Value Object '%s', expected Entity instance."),
 
+    @Deprecated
     TYPE_NOT_MAPPED (BOOTSTRAP_ERROR + "Type '%s' is not mapped and not assignable from any of already mapped types.\n"+
                                        "Register it via JaversBuilder.registerEntity() or JaversBuilder.registerValueObject()") ,
 

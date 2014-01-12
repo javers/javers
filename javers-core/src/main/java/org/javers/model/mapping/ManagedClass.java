@@ -1,22 +1,18 @@
 package org.javers.model.mapping;
 
-import org.javers.model.mapping.type.JaversType;
-
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * Object type that can be managed by Javers,
- * reflects one class in clients data model.
- *
- * Holds list of properties, see {@link JaversType}
+ * reflects one class in clients domain model.
  *
  * @author bartosz walacik
  */
-public abstract class ManagedClass<S> {
+public abstract class ManagedClass {
 
-    protected final Class<S> sourceClass;
+    protected final Class sourceClass;
 
-    public ManagedClass(Class<S> sourceClass) {
+    public ManagedClass(Class sourceClass) {
         argumentIsNotNull(sourceClass);
 
         this.sourceClass = sourceClass;
@@ -28,7 +24,7 @@ public abstract class ManagedClass<S> {
         return (sourceClass.isAssignableFrom(cdo.getClass()));
     }
 
-    public Class<S> getSourceClass() {
+    public Class getSourceClass() {
         return sourceClass;
     }
 

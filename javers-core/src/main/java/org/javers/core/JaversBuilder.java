@@ -5,11 +5,13 @@ import org.javers.common.validation.Validate;
 import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.pico.CoreJaversModule;
+import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityDefinition;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.ManagedClassDefinition;
 import org.javers.model.mapping.ValueObjectDefinition;
 import org.javers.core.pico.ModelJaversModule;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private JsonConverterBuilder jsonConverterBuilder = JsonConverterBuilder.jsonConverter();
 
     private JaversBuilder() {
+        //TODO refactor
+        registerImmutableValue(LocalDateTime.class);
     }
 
     public static JaversBuilder javers() {
@@ -53,7 +57,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * gives you Entity with id-property selected on the basis of @Id annotation
+     * registers {@link Entity} with id-property selected on the basis of @Id annotation
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
         Validate.argumentIsNotNull(entityClass);
@@ -62,7 +66,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * gives you Entity with id-property selected explicitly by name
+     * registers {@link Entity} with id-property selected explicitly by name
      */
     public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName) {
         Validate.argumentsAreNotNull(entityClass, idPropertyName);
@@ -73,6 +77,12 @@ public class JaversBuilder extends AbstractJaversBuilder {
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         Validate.argumentIsNotNull(valueObjectClass);
         managedClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
+        return this;
+    }
+
+    public JaversBuilder registerImmutableValue(Class<?> immutableValueClass) {
+        Validate.argumentIsNotNull(immutableValueClass);
+        managedClassDefinitions.add(new ValueObjectDefinition(immutableValueClass));
         return this;
     }
 

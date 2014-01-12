@@ -1,6 +1,5 @@
 package org.javers.core.json.builder
 
-import org.javers.model.domain.GlobalCdoId
 import org.javers.model.domain.InstanceId
 import org.javers.model.domain.ValueObjectId
 import org.javers.model.mapping.Entity
@@ -18,7 +17,7 @@ class GlobalCdoIdTestBuilder {
 
           Entity entity = entity(cdo.class)
 
-          new InstanceId(entity.getCdoIdOf(cdo), entity)
+          new InstanceId(entity.getIdOf(cdo), entity)
       }
 
     static ValueObjectId valueObjectId(Object instanceCdo, String fragment){
@@ -28,6 +27,6 @@ class GlobalCdoIdTestBuilder {
 
         Entity entity = entity(instanceCdo.class)
 
-        new ValueObjectId(entity.getCdoIdOf(instanceCdo), entity, fragment)
+        new ValueObjectId(entity.getIdOf(instanceCdo), entity, fragment)
     }
 }

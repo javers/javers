@@ -152,7 +152,7 @@ public class ObjectGraphBuilder {
     private Entity getEntity(Object cdo) {
         Validate.argumentIsNotNull(cdo);
         ManagedClass managedClass = entityManager.getByClass(cdo.getClass());
-        if (managedClass instanceof ValueObject) {
+        if (!(managedClass instanceof Entity)) {
             throw new JaversException(JaversExceptionCode.UNEXPECTED_VALUE_OBJECT, cdo.getClass().getName());
         }
         return (Entity)managedClass;

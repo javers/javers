@@ -1,12 +1,9 @@
 package org.javers.core.json;
 
 import com.google.gson.*;
-import org.javers.core.diff.Change;
-import org.javers.core.diff.changetype.NewObject;
-import org.javers.core.json.typeadapter.ChangeTypeAdapter;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
+
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -36,7 +33,7 @@ import java.util.Collection;
  * </ul>
  *
  * Javers provides JsonTypeAdapter's for some well known Value Object like {@link org.joda.time.LocalDateTime}.
- * Those adapters are included by default in Javers setup, see {@link #BUILT_IN_ADAPTERS}
+ * Those adapters are included by default in Javers setup, see {@link JsonConverterBuilder#BUILT_IN_ADAPTERS}
  * <br/>
  *
  * @author bartosz walacik
@@ -45,16 +42,11 @@ public class JsonConverter {
     private Gson gson;
     private GsonBuilder gsonBuilder;
 
-    private static final JsonTypeAdapter[] BUILT_IN_ADAPTERS = new JsonTypeAdapter[]{new LocalDateTimeTypeAdapter()};
-
     JsonConverter() {
         gsonBuilder = new GsonBuilder().serializeNulls();
-        registerJsonTypeAdapters(Arrays.asList(BUILT_IN_ADAPTERS));
     }
 
     void initialize() {
-        registerDiffAdapters();
-
         gson = gsonBuilder.setPrettyPrinting().create();
     }
 
@@ -114,7 +106,7 @@ public class JsonConverter {
         }
     }
 
-    private void registerJsonTypeAdapter(Type targetType, final JsonTypeAdapter adapter) {
+    void registerJsonTypeAdapter(Type targetType, final JsonTypeAdapter adapter) {
         JsonSerializer jsonSerializer = new JsonSerializer() {
             @Override
             public JsonElement serialize(Object value, Type type, JsonSerializationContext jsonSerializationContext) {
@@ -131,13 +123,5 @@ public class JsonConverter {
 
         registerNativeGsonSerializer(targetType, jsonSerializer);
         registerNativeGsonDeserializer(targetType, jsonDeserializer);
-    }
-
-    private void registerDiffAdapters() {
-        ChangeTypeAdapter changeTypeAdapter = new ChangeTypeAdapter();
-
-        for (Type targetType : ChangeTypeAdapter.SUPPORTED) {
-            registerJsonTypeAdapter(targetType, changeTypeAdapter);
-        }
     }
 }

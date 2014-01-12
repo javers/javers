@@ -10,8 +10,6 @@ import org.javers.test.assertion.EntityAssert
 import spock.lang.Shared
 import spock.lang.Specification
 
-import java.lang.reflect.Array
-
 import static org.javers.test.CustomAssert.assertThat
 
 

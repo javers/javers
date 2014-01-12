@@ -1,16 +1,8 @@
 package org.javers.model.domain;
 
-import com.google.gson.annotations.Expose;
-import org.javers.common.collections.Objects;
 import org.javers.model.mapping.Entity;
 
-import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
-
-import org.javers.model.mapping.Entity;
-import org.omg.CORBA.*;
-
-import java.lang.Object;
 
 /**
  * Client's domain object global ID

@@ -31,7 +31,6 @@ class JsonConverterDiffIntegrationTest extends Specification {
         JsonConverter jsonConverter = jsonConverter().build()
 
         when:
-        Change change = null;
         String json = jsonConverter.toJson(new ClassWithChange())
 
         then:
@@ -120,8 +119,8 @@ class JsonConverterDiffIntegrationTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.leftValue == LocalDateTimeTypeAdapter.ISO_FORMATTER.print(dob)
-        json.rightValue == null
+        json.leftValue ==  null
+        json.rightValue == LocalDateTimeTypeAdapter.ISO_FORMATTER.print(dob)
     }
 
     @Unroll
@@ -152,16 +151,20 @@ class JsonConverterDiffIntegrationTest extends Specification {
     def "should write ValueObjectId & property for ValueObject property change"() {
         given:
         def jsonConverter = jsonConverter().build()
-        def change = valueObjectPropertyChange(dummyUserDetails(1),
+        def change = valueObjectPropertyChange(dummyUserDetails(1).build(),
                                                      DummyAddress,
                                                      "street",
                                                      "dummyAddress",
                                                      "Street 1", "Street 2");
         when:
+        String jsonText = jsonConverter.toJson(change)
+        System.out.println(jsonText)
+
+        then:
         def json = new JsonSlurper().parseText(jsonText)
         json.property == "street"
         json.valueObjectId.size() == 3
-        json.valueObjectId.fragment = "dummyAddress"
+        json.valueObjectId.fragment == "dummyAddress"
         json.valueObjectId.cdoId == "1"
         json.valueObjectId.entity == "org.javers.core.model.DummyUserDetails"
 

@@ -32,7 +32,7 @@ public class EntityFactory {
             idProperty = findIdPropertyByName(beanProperties, entityDefinition);
         }
 
-        return new Entity<>(entityDefinition.getClazz(), beanProperties, idProperty);
+        return new Entity(entityDefinition.getClazz(), beanProperties, idProperty);
     }
 
     private Property findIdPropertyByName(List<Property> beanProperties, EntityDefinition entityDefinition) {

@@ -4,6 +4,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
+import org.javers.model.mapping.ImmutableValue;
+
 import java.lang.reflect.Type;
 
 /**
@@ -11,7 +13,7 @@ import java.lang.reflect.Type;
  * depending on your domain model.
  * <br/><br/>
  *
- * Value Object eligible for deserialization should have a no-argument constructor (public or private).
+ * {@link ImmutableValue} eligible for deserialization should have a no-argument constructor (public or private).
  * <br/><br/>
  *
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)

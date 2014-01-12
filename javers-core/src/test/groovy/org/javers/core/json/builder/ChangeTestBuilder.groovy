@@ -52,11 +52,11 @@ class ChangeTestBuilder {
     }
 
     static ReferenceChange referenceChanged(Object cdo, String propertyName, Object oldRef , Object newRef) {
-        InstanceId globalId = InstanceId(cdo)
+        InstanceId globalId = instanceId(cdo)
         Property prop = globalId.getEntity().getProperty(propertyName)
 
-        InstanceId oldRefId = InstanceId(oldRef)
-        InstanceId newRefId = InstanceId(newRef)
+        InstanceId oldRefId = instanceId(oldRef)
+        InstanceId newRefId = instanceId(newRef)
 
         new ReferenceChange(globalId,prop, oldRefId, newRefId)
     }

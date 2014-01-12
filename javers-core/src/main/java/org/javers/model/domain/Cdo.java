@@ -24,7 +24,7 @@ public class Cdo {
         argumentIsNotNull(entity);
         argumentCheck(entity.isInstance(cdo), "cdo is not an instance of given entity");
 
-        Object cdoId = entity.getCdoIdOf(cdo);
+        Object cdoId = entity.getIdOf(cdo);
         if (cdoId == null) {
             throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, entity.getClass().getName());
         }

@@ -10,7 +10,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 public class ManagedClassesTest {
 
     private ManagedClasses managedClasses;
-    private ManagedClass<DummyNetworkAddress> managedClass;
+    private ManagedClass managedClass;
 
     @Before
     public void setUp() throws Throwable {
@@ -19,7 +19,7 @@ public class ManagedClassesTest {
         typeMapper.registerValueObjectType(DummyNetworkAddress.class);
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(typeMapper);
 
-        managedClass = new ValueObject<>(DummyNetworkAddress.class);
+        managedClass = new ValueObject(DummyNetworkAddress.class, null);
     }
 
     @Test
