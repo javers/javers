@@ -40,7 +40,7 @@ public class DiffFactory {
 
         //calculate property-to-property diff
         for (NodePair pair : nodeMatcher.match(leftGraph, rightGraph)) {
-            List<Property> nodeProperties = pair.getEntity().getProperties();
+            List<Property> nodeProperties = pair.getManagedClass().getProperties();
             for (Property property : nodeProperties) {
 
                 //optimization, skip all Appenders if null on both sides

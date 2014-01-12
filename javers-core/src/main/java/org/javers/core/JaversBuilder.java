@@ -7,6 +7,8 @@ import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.pico.CoreJaversModule;
 import org.javers.model.mapping.*;
 import org.javers.core.pico.ModelJaversModule;
+import org.javers.model.mapping.type.TypeMapper;
+import org.javers.model.mapping.type.ValueType;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +35,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private JsonConverterBuilder jsonConverterBuilder = JsonConverterBuilder.jsonConverter();
 
     private JaversBuilder() {
-        //TODO refactor
-        registerImmutableValue(LocalDateTime.class);
     }
 
     public static JaversBuilder javers() {
@@ -45,6 +45,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         logger.info("starting up javers ...");
 
         bootContainer(getCoreModules(coreConfiguration), jsonConverterBuilder.build());
+
         registerManagedClasses();
         bootEntityManager();
 
@@ -70,15 +71,21 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
+    /**
+     * registers {@link ValueObject}
+     */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         Validate.argumentIsNotNull(valueObjectClass);
         managedClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
         return this;
     }
 
-    public JaversBuilder registerImmutableValue(Class<?> immutableValueClass) {
-        Validate.argumentIsNotNull(immutableValueClass);
-        managedClassDefinitions.add(new ImmutableValueDefinition(immutableValueClass));
+    /**
+     * registers {@link ValueType}
+     */
+    public JaversBuilder registerValue(Class<?> valueClass) {
+        Validate.argumentIsNotNull(valueClass);
+        typeMapper().registerValueType(valueClass);
         return this;
     }
 
@@ -116,15 +123,22 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private void registerManagedClasses() {
-        EntityManager entityManager = getContainerComponent(EntityManager.class);
-
+        EntityManager entityManager = entityManager();
         for (ManagedClassDefinition def : managedClassDefinitions) {
             entityManager.register(def);
         }
     }
 
+    private EntityManager entityManager() {
+        return getContainerComponent(EntityManager.class);
+    }
+
+    private TypeMapper typeMapper() {
+        return getContainerComponent(TypeMapper.class);
+    }
+
     private void bootEntityManager() {
-        EntityManager entityManager = getContainerComponent(EntityManager.class);
+        EntityManager entityManager = entityManager();
         entityManager.buildManagedClasses();
     }
 }

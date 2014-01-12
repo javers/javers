@@ -29,18 +29,6 @@ class EntityManagerTest extends Specification{
         ex.code == JaversExceptionCode.CLASS_NOT_MANAGED
     }
 
-    def "should throw exception when class is registered but entity is not build"() {
-        given:
-        entityManager.registerEntity(DummyManagedClass)
-
-        when:
-        entityManager.getByClass(DummyManagedClass)
-
-        then:
-        JaversException ex = thrown()
-        ex.code == JaversExceptionCode.ENTITY_MANAGER_NOT_INITIALIZED
-    }
-
     def "should return entity model for managed class after building it"() {
         given:
         entityManager.registerEntity(DummyManagedClass)
@@ -77,7 +65,7 @@ class EntityManagerTest extends Specification{
         isManaged == true
     }
 
-    def "should not register entity in type mapper more than once"() {
+    def "should not register entity in typeMapper more than once"() {
         given:
         TypeMapper typeMapper = new TypeMapper()
         EntityManager entityManager = new EntityManager(Mock(EntityFactory), typeMapper)
@@ -90,17 +78,17 @@ class EntityManagerTest extends Specification{
         typeMapper.mappedEntityReferenceTypes.size() == 1
     }
 
-    def "should not register value object more than once"() {
+    def "should not register valueObject in typeMapper more than once"() {
         given:
-        Class alreadyMappedValueObject = DummyNetworkAddress
         TypeMapper typeMapper = new TypeMapper()
         EntityManager entityManager = new EntityManager(Mock(EntityFactory), typeMapper)
 
         when:
-        entityManager.registerValueObject(alreadyMappedValueObject)
-        entityManager.registerValueObject(alreadyMappedValueObject)
+        def mapped = typeMapper.mappedValueObjectTypes.size()
+        entityManager.registerValueObject(DummyNetworkAddress)
+        entityManager.registerValueObject(DummyNetworkAddress)
 
         then:
-        typeMapper.mappedValueObjectTypes.size() == 1
+        mapped == typeMapper.mappedValueObjectTypes.size() - 1
     }
 }

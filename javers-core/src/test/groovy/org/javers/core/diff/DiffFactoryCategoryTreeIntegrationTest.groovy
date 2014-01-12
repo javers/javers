@@ -10,10 +10,11 @@ import static org.javers.core.diff.DiffAssert.assertThat
 import static org.javers.test.builder.CategoryTestBuilder.category
 
 /**
+ * <b>Use case</b> of our client multiprogram.pl, comparing large Category Trees
  *
  * @author bartosz walacik
  */
-class DiffFactoryIntegrationTest extends Specification {
+class DiffFactoryCategoryTreeIntegrationTest extends Specification {
 
     def "should check all nodes when calculating property changes"(){
         given:

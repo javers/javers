@@ -39,4 +39,9 @@ public class DummyUserDetailsBuilder {
         dummyUserDetails.setDummyAddress(new DummyAddress(street, city));
         return this;
     }
+
+    public DummyUserDetailsBuilder withAddress() {
+        dummyUserDetails.setDummyAddress(new DummyAddress("street", "city"));
+        return this;
+    }
 }

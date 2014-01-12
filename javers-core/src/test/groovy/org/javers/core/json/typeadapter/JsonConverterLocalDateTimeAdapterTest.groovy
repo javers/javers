@@ -10,7 +10,7 @@ import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 /**
  * @author bartosz walacik
  */
-class JsonConverterLDTAdapterTest extends Specification {
+class JsonConverterLocalDateTimeAdapterTest extends Specification {
 
     def "should convert LocalDateTime TO json in ISO format"() {
         given:

@@ -28,57 +28,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class ValueObject extends ManagedClass {
-    private static final Logger logger = LoggerFactory.getLogger(ValueObject.class);
-    protected final List<Property> properties;
 
     public ValueObject(Class sourceClass, List<Property> properties) {
-        super(sourceClass);
-        argumentIsNotNull(properties);
-        this.properties = properties;
-    }
-
-    @Deprecated
-    public ValueObject(Class sourceClass) {
-        super(sourceClass);
-        this.properties = Collections.EMPTY_LIST;
-    }
-
-    /**
-     * @return list of {@link EntityReferenceType} properties
-     */
-    public List<Property> getSingleReferences() {
-        List<Property> refProperties = new ArrayList<>();
-
-        for (Property property : properties) {
-            if (property.getType() instanceof EntityReferenceType){
-                refProperties.add(property);
-            }
-        }
-        return refProperties;
-    }
-
-    public List<Property> getCollectionTypeProperties() {
-        List<Property> refProperties = new ArrayList<>();
-
-        for (Property property : properties) {
-            if (property.getType() instanceof CollectionType){
-                refProperties.add(property);
-            }
-        }
-        return refProperties;
-    }
-
-    public List<Property> getProperties() {
-        return Collections.unmodifiableList(properties);
-    }
-
-    public Property getProperty(String withName) {
-        Property found = null;
-        for (Property property : properties) {
-            if (property.getName().equals(withName)) {
-                found = property;
-            }
-        }
-        return found;
+        super(sourceClass, properties);
     }
 }

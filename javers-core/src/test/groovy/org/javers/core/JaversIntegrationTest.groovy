@@ -4,15 +4,11 @@ import groovy.json.JsonSlurper
 import org.javers.core.model.DummyUser
 import org.javers.core.diff.Diff
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.model.DummyUserWithDate
-import org.javers.test.builder.DummyUserDetailsBuilder
-import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
-import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
 /**
  * @author bartosz walacik

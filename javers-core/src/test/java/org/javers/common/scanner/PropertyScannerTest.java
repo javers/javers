@@ -175,7 +175,7 @@ public abstract class PropertyScannerTest {
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("dummyAddress")
-                .hasJaversType(ValueObjectType.class);
+                        .hasJaversType(ValueType.class);
     }
 
     protected static class ManagedClass {

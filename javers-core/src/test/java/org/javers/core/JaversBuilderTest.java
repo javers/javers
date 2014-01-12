@@ -56,30 +56,6 @@ public class JaversBuilderTest {
     }
 
     @Test
-    public void shouldInitializeEntityManager() {
-        //given
-        JaversBuilder javersBuilder = javers().registerEntity(DummyEntity.class)
-                                              .registerValueObject(DummyNetworkAddress.class);
-
-        //when
-        javersBuilder.build();
-
-        //then
-        EntityManager em = getEntityManager(javersBuilder);
-        TypeMapper tm    = getTypeMapper(javersBuilder);
-        assertThat(em.isInitialized()).isTrue();
-        assertThat(tm.getCountOfEntitiesAndValueObjects()).isEqualTo(2);
-    }
-
-    private EntityManager getEntityManager(JaversBuilder javersBuilder) {
-        return (EntityManager)javersBuilder.getContainerComponent(EntityManager.class);
-    }
-
-    private TypeMapper getTypeMapper(JaversBuilder javersBuilder) {
-        return (TypeMapper)javersBuilder.getContainerComponent(TypeMapper.class);
-    }
-
-    @Test
     public void shouldManageValueObject() {
         //when
         Javers javers = javers().registerValueObject(DummyNetworkAddress.class).build();

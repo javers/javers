@@ -1,6 +1,9 @@
 package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
+import org.javers.model.domain.InstanceId;
+import org.javers.model.domain.UnboundedValueObjectId;
+import org.javers.model.domain.ValueObjectId;
 import org.javers.model.object.graph.Edge;
 import org.javers.model.object.graph.ObjectNode;
 
@@ -17,8 +20,43 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
         return new NodeAssert(actual);
     }
 
-    public NodeAssert hasCdoId(String expectedCdoId) {
-        Assertions.assertThat(actual.getLocalCdoId()).isEqualTo(expectedCdoId);
+    public NodeAssert hasCdoId(Object expectedLocalCdoId) {
+        Assertions.assertThat(actual.getGlobalCdoId()).isInstanceOf(InstanceId.class);
+        InstanceId actualInstanceId = (InstanceId)actual.getGlobalCdoId();
+        Assertions.assertThat(actualInstanceId.getCdoId()).isEqualTo(expectedLocalCdoId);
+        return this;
+    }
+
+    public NodeAssert hasInstanceId(Class expectedSourceClass, Object expectedLocalCdoId) {
+
+        Assertions.assertThat(actual.getGlobalCdoId()).isInstanceOf(InstanceId.class);
+        InstanceId actualInstanceId = (InstanceId)actual.getGlobalCdoId();
+
+        Assertions.assertThat(actualInstanceId.getCdoClass().getSourceClass()).isSameAs(expectedSourceClass);
+        Assertions.assertThat(actualInstanceId.getCdoId()).isEqualTo(expectedLocalCdoId);
+        return this;
+    }
+
+    public NodeAssert hasValueObjectId(Class expectedSourceClass, Object expectedLocalCdoId, String expectedFragment) {
+        /*
+        Assertions.assertThat(actual.getGlobalCdoId()).isInstanceOf(ValueObjectId.class);
+        ValueObjectId vlueObjectId = (ValueObjectId)actual.getGlobalCdoId();
+
+        Assertions.assertThat(vlueObjectId.getCdoClass().getSourceClass()).isSameAs(expectedSourceClass);
+        Assertions.assertThat(vlueObjectId.getCdoId()).isEqualTo(expectedLocalCdoId);
+        Assertions.assertThat(vlueObjectId.getFragment()).isEqualTo(expectedFragment);
+        return this;
+        */
+        throw new IllegalStateException("not implemented");
+    }
+
+    public NodeAssert hasUnboundedValueObjectId(Class expectedSourceClass) {
+        Assertions.assertThat(actual.getGlobalCdoId()).isInstanceOf(UnboundedValueObjectId.class);
+
+        UnboundedValueObjectId unboundedValueObjectId = (UnboundedValueObjectId)actual.getGlobalCdoId();
+
+        Assertions.assertThat(unboundedValueObjectId.getCdoClass().getSourceClass()).isSameAs(expectedSourceClass);
+
         return this;
     }
 
@@ -43,6 +81,11 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
         }
         Assertions.fail("no such edge: "+ edgeName);
         return null; // never happens, Assertions.fail is before this line
+    }
+
+    public NodeAssert hasCdo(Object cdo) {
+        Assertions.assertThat(cdo).isSameAs(actual.getCdo().getWrappedCdo());
+        return this;
     }
 
     public NodeAssert hasNoEdges() {

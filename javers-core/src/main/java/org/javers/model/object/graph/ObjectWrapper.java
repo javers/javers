@@ -3,10 +3,10 @@ package org.javers.model.object.graph;
 import org.javers.common.validation.Validate;
 import org.javers.model.domain.Cdo;
 import org.javers.model.domain.GlobalCdoId;
+import org.javers.model.domain.InstanceId;
 import org.javers.model.mapping.Entity;
+import org.javers.model.mapping.ManagedClass;
 import org.javers.model.mapping.Property;
-import org.javers.model.visitors.Visitable;
-import org.javers.model.visitors.Visitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,14 +14,13 @@ import java.util.List;
 import java.util.Map;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
-import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * Wrapper for live client's domain object (aka CDO)
  *
  * @author bartosz walacik
  */
-public class ObjectWrapper implements ObjectNode {
+public class ObjectWrapper extends ObjectNode {
     private final Cdo cdo;
     private final Map<Property, Edge> edges;
 
@@ -33,7 +32,7 @@ public class ObjectWrapper implements ObjectNode {
     }
 
     public ObjectWrapper(Object cdo, Entity entity) {
-        this(new Cdo(cdo, entity));
+        this(new Cdo(cdo, new InstanceId(cdo,entity)));
     }
 
     /**
@@ -55,18 +54,13 @@ public class ObjectWrapper implements ObjectNode {
     }
 
     @Override
-    public Object getLocalCdoId() {
-        return cdo.getLocalId();
-    }
-
-    @Override
     public GlobalCdoId getGlobalCdoId() {
         return cdo.getGlobalId();
     }
 
     @Override
-    public Entity getEntity() {
-        return cdo.getEntity();
+    public ManagedClass getManagedClass() {
+        return cdo.getManagedClass();
     }
 
     @Override

@@ -17,7 +17,7 @@ class GlobalCdoIdTestBuilder {
 
           Entity entity = entity(cdo.class)
 
-          new InstanceId(entity.getIdOf(cdo), entity)
+          new InstanceId(cdo, entity)
       }
 
     static ValueObjectId valueObjectId(Object instanceCdo, String fragment){

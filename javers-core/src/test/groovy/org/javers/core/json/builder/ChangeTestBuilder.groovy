@@ -33,7 +33,7 @@ class ChangeTestBuilder {
 
     static ValueChange valueChange(Object cdo, String propertyName, Object oldVal, Object newVal) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.getEntity().getProperty(propertyName)
+        Property prop = globalId.cdoClass.getProperty(propertyName)
 
 
         new ValueChange(globalId, prop, oldVal, newVal)
@@ -54,7 +54,7 @@ class ChangeTestBuilder {
 
     static ReferenceChange referenceChanged(Object cdo, String propertyName, Object oldRef , Object newRef) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.getEntity().getProperty(propertyName)
+        Property prop = globalId.cdoClass.getProperty(propertyName)
 
         InstanceId oldRefId = instanceId(oldRef)
         InstanceId newRefId = instanceId(newRef)

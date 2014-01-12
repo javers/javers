@@ -4,6 +4,7 @@ import org.javers.common.validation.Validate;
 import org.javers.model.domain.Cdo;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Entity;
+import org.javers.model.mapping.ManagedClass;
 import org.javers.model.mapping.Property;
 import org.javers.model.object.graph.ObjectNode;
 
@@ -48,7 +49,7 @@ public class NodePair {
         return left.getGlobalCdoId();
     }
 
-    public Entity getEntity() {
-        return left.getEntity();
+    public ManagedClass getManagedClass() {
+        return left.getManagedClass();
     }
 }

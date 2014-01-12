@@ -27,7 +27,7 @@ public class MultiEdgeAssert extends AbstractAssert<MultiEdgeAssert, MultiEdge> 
     public MultiEdgeAssert refersToCdoWithIds(Object... expectedRefCdoIds) {
         List actualCdoIds = Lists.newArrayList();
         for (ObjectNode node : actual.getReferences()) {
-            actualCdoIds.add(node.getLocalCdoId());
+            actualCdoIds.add(node.getGlobalCdoId().getCdoId());
         }
 
         Assertions.assertThat(actualCdoIds).containsOnly(expectedRefCdoIds);
@@ -36,7 +36,20 @@ public class MultiEdgeAssert extends AbstractAssert<MultiEdgeAssert, MultiEdge> 
     }
 
     public NodeAssert andTargetNode(String expectedTargetCdoId) {
-        Assertions.assertThat(actual.getReference(expectedTargetCdoId)).isNotNull();
-        return NodeAssert.assertThat(actual.getReference(expectedTargetCdoId));
+        ObjectNode refNode = getReference(actual, expectedTargetCdoId);
+        Assertions.assertThat(refNode).isNotNull();
+        return NodeAssert.assertThat(refNode);
+    }
+
+    /**
+     * @return null if not found
+     */
+    private ObjectNode getReference(MultiEdge multiEdge, Object referencedCdoId){
+        for (ObjectNode ref: multiEdge.getReferences()) {
+            if (ref.getGlobalCdoId().getCdoId().equals(referencedCdoId)) {
+                return ref;
+            }
+        }
+        return null;
     }
 }

@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class Category {
 
-
+    @Id
     private Long id;
     private String name;
     private Category parent;
@@ -20,7 +20,6 @@ public class Category {
         this.name = name;
     }
 
-    @Id
     public Long getId() {
         return id;
     }

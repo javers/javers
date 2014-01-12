@@ -21,18 +21,6 @@ public class MultiEdge extends Edge {
         return Collections.unmodifiableList(references);
     }
 
-    /**
-     * @return null if not found
-     */
-    public ObjectNode getReference(Object referencedCdoId){
-        for (ObjectNode ref: references) {
-            if (ref.getLocalCdoId().equals(referencedCdoId)) {
-                return ref;
-            }
-        }
-        return null;
-    }
-
     public void addReferenceNode(ObjectNode objectNode) {
         references.add(objectNode);
     }

@@ -76,4 +76,9 @@ public class BeanProperty implements Property {
     public int hashCode() {
         return 31 * getter.hashCode() + javersType.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return getter.getDeclaringClass().getSimpleName()+"."+getter.getName()+"()";
+    }
 }

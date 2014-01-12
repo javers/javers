@@ -1,7 +1,7 @@
 package org.javers.core.model;
 
 /**
- * Value Object
+ * Embedded Value Object
  *
  * @author pawel szymczyk
  */

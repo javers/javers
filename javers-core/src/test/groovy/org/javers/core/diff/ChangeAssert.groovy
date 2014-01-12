@@ -3,6 +3,7 @@ package org.javers.core.diff
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceAdded
+import org.javers.model.domain.InstanceId
 
 /**
  * @author bartosz walacik
@@ -29,21 +30,22 @@ class ChangeAssert {
         this
     }
 
-    ChangeAssert hasGlobalId(Class expected, Object expectedCdoId){
-        assert actual.globalCdoId.entity.sourceClass == expected
+    ChangeAssert hasInstanceId(Class expected, Object expectedCdoId) {
+        assert actual.globalCdoId instanceof InstanceId
+        assert actual.globalCdoId.cdoClass.sourceClass == expected
         assert actual.globalCdoId.cdoId == expectedCdoId
         this
     }
 
     ChangeAssert hasEntityTypeOf(Class<?> entityClass) {
-        actual.globalCdoId.entity.sourceClass == entityClass
+        actual.globalCdoId.cdoClass.sourceClass == entityClass
         this
     }
 
-    //ChangeAssert hasParentEqualTo(Diff diff) {
-    //    actual.parent == diff
-    //    this
-    //}
+    ChangeAssert hasCdoId(Object expectedCdoId) {
+        actual.globalCdoId.cdoId == expectedCdoId
+        this
+    }
 
     ChangeAssert hasAffectedCdo(Object expectedAffectedCdo) {
         actual.affectedCdo == expectedAffectedCdo

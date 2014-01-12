@@ -4,11 +4,14 @@ package org.javers.model.object.graph;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.model.DummyAddress;
+import org.javers.core.model.DummyNetworkAddress;
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.type.TypeMapper;
+import org.javers.test.builder.DummyUserBuilder;
+import org.javers.test.builder.DummyUserDetailsBuilder;
 import org.junit.Test;
 
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -17,6 +20,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.javers.test.assertion.NodeAssert.assertThat;
 import static org.javers.test.builder.DummyUserBuilder.dummyUser;
 import static org.javers.test.assertion.JaversExceptionAssert.assertThat;
+import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails;
 
 /**
  * @author bartosz walacik
@@ -30,12 +34,13 @@ public abstract class ObjectGraphBuilderTest {
         entityManager.registerEntity(DummyUser.class);
         entityManager.registerEntity(DummyUserDetails.class);
         entityManager.registerValueObject(DummyAddress.class);
+        entityManager.registerValueObject(DummyNetworkAddress.class);
         entityManager.buildManagedClasses();
         return entityManager;
     }
 
     @Test
-    public void shouldBuildOneNodeGraph(){
+    public void shouldBuildOneNodeGraphFromEntity(){
         //given
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
         DummyUser user = dummyUser().withName("Mad Kaz").build();
@@ -44,9 +49,40 @@ public abstract class ObjectGraphBuilderTest {
         ObjectNode node = graphBuilder.buildGraph(user);
 
         //then
-        assertThat(node.getEntity().getSourceClass()).isSameAs(DummyUser.class);
-        assertThat(node.getLocalCdoId()).isEqualTo("Mad Kaz") ;
-        assertThat(node.getEdges()).isEmpty();
+        assertThat(node).hasNoEdges()
+                        .hasCdo(user)
+                        .hasInstanceId(DummyUser.class, "Mad Kaz");
+    }
+
+    @Test
+    public void shouldBuildGraphStartingFromRootValueObject(){
+        //given
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        DummyAddress address = new DummyAddress("any","any");
+
+        //when
+        ObjectNode node = graphBuilder.buildGraph(address);
+
+        //then
+        assertThat(node).hasNoEdges()
+                        .hasCdo(node)
+                        .hasUnboundedValueObjectId(DummyAddress.class);
+    }
+
+    @Test
+    public void shouldBuildGraphWithValueObjectNode() {
+        //given
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        DummyUserDetails user = dummyUserDetails(1).withAddress().build();
+
+        //when
+        ObjectNode node = graphBuilder.buildGraph(user);
+
+        assertThat(node).hasSingleEdge("dummyAddress")
+                        .andTargetNode()
+                        .hasNoEdges()
+                        .hasCdo(user.getDummyAddress())
+                        .hasValueObjectId(DummyUser.class, "Mad Kaz", "dummyAddress");
     }
 
     @Test
@@ -216,19 +252,6 @@ public abstract class ObjectGraphBuilderTest {
                         .andTargetNode("rob")
                         .hasEdge("employeesList")
                         .isMultiEdge("Em1", "Em2", "Em3");
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenTryToBuildGraphFromValueObject() throws Throwable {
-        //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
-        DummyAddress valueObject = new DummyAddress();
-
-        when(graphBuilder).buildGraph(valueObject);
-
-        //then
-        assertThat((JaversException) caughtException())
-                .hasCode(JaversExceptionCode.UNEXPECTED_VALUE_OBJECT);
     }
 
     @Test

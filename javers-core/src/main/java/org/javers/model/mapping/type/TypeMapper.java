@@ -1,12 +1,11 @@
 package org.javers.model.mapping.type;
 
-import org.javers.common.reflection.ReflectionUtil;
-import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
+import org.joda.time.LocalDateTime;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.*;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
@@ -42,6 +41,11 @@ public class TypeMapper {
         //array
         addType(new ArrayType(Object[].class));
 
+        //well known Value types
+        registerValueType(LocalDateTime.class);
+        registerValueType(BigDecimal.class);
+        registerValueType(Date.class);
+
         //Collections
         addType(new CollectionType(Set.class));
         addType(new CollectionType(List.class));
@@ -63,6 +67,57 @@ public class TypeMapper {
         return spawnFromPrototype(javaType);
     }
 
+    public <T extends Collection> void registerCollectionType(Class<T> collectionType) {
+        addType(new CollectionType(collectionType));
+    }
+
+    public void registerPrimitiveType(Class<?> primitiveClass) {
+        addType(new PrimitiveType(primitiveClass));
+    }
+
+    public void registerEntityReferenceType(Class<?> entityClass) {
+        addType(new EntityReferenceType(entityClass));
+    }
+
+    public void registerValueType(Class<?> objectValue) {
+        addType(new ValueType(objectValue));
+    }
+
+    <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
+        List<T> result = new ArrayList<>();
+        for(JaversType jType : mappedTypes.values()) {
+            if(ofType.isAssignableFrom(jType.getClass()) ) {
+                result.add((T)jType);
+            }
+        }
+        return result;
+    }
+
+    List<ValueType> getMappedValueObjectTypes() {
+        return getMappedTypes(ValueType.class);
+    }
+
+    List<EntityReferenceType> getMappedEntityReferenceTypes() {
+        return getMappedTypes(EntityReferenceType.class);
+    }
+
+    //-- private
+
+    private void addType(JaversType jType) {
+        mappedTypes.put(jType.getBaseJavaType(), jType);
+    }
+
+    /**
+     * @return null if not found
+     */
+    private JaversType getMatchingJaversType(Type javaType) {
+        return mappedTypes.get(javaType);
+    }
+
+    private boolean isMapped(Type javaType) {
+        return mappedTypes.containsKey(javaType);
+    }
+
     /**
      * @throws JaversExceptionCode TYPE_NOT_MAPPED
      */
@@ -74,13 +129,6 @@ public class TypeMapper {
         addType(spawned);
 
         return spawned;
-    }
-
-    /**
-     * @return null if not found
-     */
-    private JaversType getMatchingJaversType(Type javaType) {
-        return mappedTypes.get(javaType);
     }
 
     /**
@@ -100,65 +148,4 @@ public class TypeMapper {
         throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType);
     }
 
-    private boolean isMapped(Type javaType) {
-        return mappedTypes.containsKey(javaType);
-    }
-
-    public int getCountOfEntitiesAndValueObjects() {
-        return getMappedEntityReferenceTypes().size() +
-               getMappedValueObjectTypes().size();
-    }
-
-    private void addType(JaversType jType) {
-        mappedTypes.put(jType.getBaseJavaType(), jType);
-    }
-
-    public <T extends Collection> void registerCollectionType(Class<T> collectionType) {
-        addType(new CollectionType(collectionType));
-    }
-
-    public void registerPrimitiveType(Class<?> primitiveClass) {
-        addType(new PrimitiveType(primitiveClass));
-    }
-
-    public void registerEntityReferenceType(Class<?> entityClass) {
-        addType(new EntityReferenceType(entityClass));
-    }
-
-    public void registerValueObjectType(Class<?> objectValue) {
-        addType(new ValueObjectType(objectValue));
-    }
-
-    public void registerImmutableValueType(Class<?> objectValue) {
-        addType(new ImmutableValueType(objectValue));
-    }
-
-    public <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
-        List<T> result = new ArrayList<>();
-        for(JaversType jType : mappedTypes.values()) {
-            if(ofType.isAssignableFrom(jType.getClass()) ) {
-                result.add((T)jType);
-            }
-        }
-        return result;
-    }
-
-    public List<ValueObjectType> getMappedValueObjectTypes() {
-        return getMappedTypes(ValueObjectType.class);
-    }
-
-    public List<EntityReferenceType> getMappedEntityReferenceTypes() {
-        return getMappedTypes(EntityReferenceType.class);
-    }
-
-    /*
-    public List<Class> getReferenceTypes() {
-        List<Class> referenceClasses = new ArrayList<>();
-        for(JaversType entry : mappedTypes) {
-            if(entry.isReferencedType()) {
-                referenceClasses.add((Class)entry.getBaseJavaType());
-            }
-        }
-        return referenceClasses;
-    }*/
 }

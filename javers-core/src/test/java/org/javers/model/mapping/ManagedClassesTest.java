@@ -16,7 +16,7 @@ public class ManagedClassesTest {
     public void setUp() throws Throwable {
         managedClasses = new ManagedClasses();
         TypeMapper typeMapper = new TypeMapper();
-        typeMapper.registerValueObjectType(DummyNetworkAddress.class);
+        typeMapper.registerValueType(DummyNetworkAddress.class);
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(typeMapper);
 
         managedClass = new ValueObject(DummyNetworkAddress.class, null);

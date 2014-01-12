@@ -2,6 +2,10 @@ package org.javers.model.domain;
 
 import org.javers.common.validation.Validate;
 import org.javers.model.mapping.Entity;
+import org.javers.model.mapping.ValueObject;
+
+import static org.javers.common.validation.Validate.argumentIsNotNull;
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * ValueObject placeholder identifier.
@@ -12,13 +16,14 @@ import org.javers.model.mapping.Entity;
  *
  * @author bartosz walacik
  */
-public class ValueObjectId extends GlobalCdoId {
+public class ValueObjectId extends UnboundedValueObjectId {
+    private final InstanceId owningInstanceId;
     private final String fragment;
 
-    public ValueObjectId(Object cdoId, Entity entity, String fragment) {
-        super(cdoId, entity);
-        Validate.argumentIsNotNull(fragment);
-
+    public ValueObjectId(ValueObject valueObject, InstanceId owningInstanceId, String fragment) {
+        super(valueObject);
+        argumentsAreNotNull(owningInstanceId, fragment);
+        this.owningInstanceId = owningInstanceId;
         this.fragment = fragment;
     }
 
@@ -31,6 +36,11 @@ public class ValueObjectId extends GlobalCdoId {
     }
 
     @Override
+    public String getCdoId() {
+        return "#"+fragment;
+    }
+
+    @Override
     public String toString() {
         return super.toString()+"#"+fragment;
     }
@@ -38,16 +48,17 @@ public class ValueObjectId extends GlobalCdoId {
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
-        if (o == null) { return false;}
-        if (!(o instanceof GlobalCdoId)) {return false;}
+        if (o == null || !(o instanceof ValueObjectId)) {return false;}
 
         ValueObjectId other = (ValueObjectId) o;
-        return super.equals(other) && this.fragment.equals(other.fragment);
+        return super.equals(other)
+               && this.fragment.equals(other.fragment)
+               && this.owningInstanceId.equals(other.owningInstanceId);
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode() + fragment.hashCode();
+        return super.hashCode() + fragment.hashCode() + owningInstanceId.hashCode();
     }
 
 }

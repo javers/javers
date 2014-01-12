@@ -1,9 +1,6 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.Javers
-import org.javers.core.JaversTestBuilder
-import org.javers.core.diff.Diff
-import org.javers.core.model.DummyUserWithDate
+import org.javers.core.model.DummyUserWithValues
 import org.joda.time.LocalDateTime
 
 import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat
@@ -17,8 +14,8 @@ import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
-import static org.javers.core.model.DummyUserWithDate.dummyUserWithDate
-import static org.javers.core.model.DummyUserWithDate.dummyUserWithDate
+import static DummyUserWithValues.dummyUserWithDate
+import static org.javers.core.model.DummyUserWithValues.dummyUserWithSalary
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
@@ -53,7 +50,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         then:
         ChangeAssert.assertThat(changes[0])
-                    .hasGlobalId(DummyUser, "1")
+                    .hasInstanceId(DummyUser, "1")
                     .hasAffectedCdo(right)
     }
 
@@ -147,14 +144,14 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
                   .hasRightValue(Boolean.TRUE)
     }
 
-    def "should append ImmutableValue change" () {
+    def "should append LocalDateTime Value change" () {
         given:
         LocalDateTime dob = new LocalDateTime()
         def leftUser =  dummyUserWithDate("kaz", null)
         def rightUser = dummyUserWithDate("kaz", dob)
         ObjectNode left = buildGraph(leftUser)
         ObjectNode right = buildGraph(rightUser)
-        Property dobProperty = getEntity(DummyUserWithDate).getProperty("dob")
+        Property dobProperty = getEntity(DummyUserWithValues).getProperty("dob")
 
         when:
         def changes = new ValueChangeAppender().calculateChanges(new NodePair(left,right), dobProperty)
@@ -165,6 +162,26 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
                 .hasProperty(dobProperty)
                 .hasLeftValue(null)
                 .hasRightValue(dob)
+    }
+
+    def "should append BigDecimal Value change" () {
+        given:
+        BigDecimal salary = new BigDecimal(2.5)
+        def leftUser =  dummyUserWithSalary("kaz", null)
+        def rightUser = dummyUserWithSalary("kaz", salary)
+        ObjectNode left = buildGraph(leftUser)
+        ObjectNode right = buildGraph(rightUser)
+        Property salaryProperty = getEntity(DummyUserWithValues).getProperty("salary")
+
+        when:
+        def changes = new ValueChangeAppender().calculateChanges(new NodePair(left,right), salaryProperty)
+
+        then:
+        changes.size() == 1
+        assertThat(changes[0])
+                .hasProperty(salaryProperty)
+                .hasLeftValue(null)
+                .hasRightValue(salary)
     }
 
     def "should create fragment valueChange for embedded ValueObject" () {

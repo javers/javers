@@ -3,12 +3,14 @@ package org.javers.model.domain;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.model.mapping.Entity;
+import org.javers.model.mapping.ManagedClass;
+import org.javers.model.mapping.Property;
+import org.javers.model.mapping.ValueObject;
 
 import static org.javers.common.validation.Validate.*;
 
 /**
- * Holder for client's domain object,
- * extracts its {@link GlobalCdoId}
+ * Holder for client's domain object, {@link Entity} or {@link ValueObject}
  *
  * @author bartosz walacik
  */
@@ -19,19 +21,28 @@ public class Cdo {
     /**
      * Creates wrapper for Entity instance
      */
-    public Cdo(Object cdo, Entity entity) {
-        argumentIsNotNull(cdo);
-        argumentIsNotNull(entity);
-        argumentCheck(entity.isInstance(cdo), "cdo is not an instance of given entity");
+    public Cdo(Object wrappedCdo, GlobalCdoId globalId) {
+        argumentsAreNotNull(wrappedCdo, globalId);
+        argumentCheck(globalId.getCdoClass().isInstance(wrappedCdo), "wrappedCdo is not an instance of given managedClass");
 
-        Object cdoId = entity.getIdOf(cdo);
-        if (cdoId == null) {
-            throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, entity.getClass().getName());
-        }
+        //Object cdoId = entity.getIdOf(cdo);
+        //if (cdoId == null) {
+        //    throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, entity.getClass().getName());
+        //}
+        //new InstanceId(cdoId, entity);
 
-        this.wrappedCdo = cdo;
-        this.globalId = new InstanceId(cdoId,entity);
+        this.globalId = globalId;
+        this.wrappedCdo = wrappedCdo;
+
     }
+
+    /**
+     * Creates wrapper for ValueObject instance
+    public Cdo(InstanceId owningEntityInstanceId, Property location, Object valueObject) {
+        argumentsAreNotNull(owningEntityInstanceId, location, valueObject);
+        this.globalId = new ValueObjectId(owningEntityInstanceId,location.getName());
+        this.wrappedCdo = valueObject;
+    }*/
 
     /**
      * never returns null
@@ -48,8 +59,11 @@ public class Cdo {
         return globalId.getCdoId();
     }
 
-    public Entity getEntity() {
-        return globalId.getEntity();
+    /**
+     * shortcut to {@link GlobalCdoId#getCdoClass()}
+     */
+    public ManagedClass getManagedClass() {
+        return globalId.getCdoClass();
     }
 
     @Override

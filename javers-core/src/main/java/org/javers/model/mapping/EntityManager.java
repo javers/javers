@@ -48,9 +48,6 @@ public class EntityManager {
         if (!isRegistered(clazz)) {
             throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, clazz.getName());
         }
-        if (isRegistered(clazz) && !isManaged(clazz)) {
-            throw new JaversException(JaversExceptionCode.ENTITY_MANAGER_NOT_INITIALIZED, clazz.getName());
-        }
         return managedClasses.getBySourceClass(clazz);
     }
 
@@ -66,10 +63,7 @@ public class EntityManager {
             typeMapper.registerEntityReferenceType(def.getClazz());
         }
         if (def instanceof  ValueObjectDefinition) {
-            typeMapper.registerValueObjectType(def.getClazz());
-        }
-        if (def instanceof  ImmutableValueDefinition) {
-            typeMapper.registerImmutableValueType(def.getClazz());
+            typeMapper.registerValueType(def.getClazz());
         }
         managedClassDefinitions.add(def);
     }
@@ -101,34 +95,17 @@ public class EntityManager {
     }
 
     /**
-     * EntityManager is up & ready after calling {@link #buildManagedClasses()}
-     */
-    public boolean isInitialized() {
-        return managedClasses.count() == typeMapper.getCountOfEntitiesAndValueObjects();
-    }
-
-    /**
      * call that if all Entities and ValueObject are registered
      */
     public void buildManagedClasses() {
         for (ManagedClassDefinition def : managedClassDefinitions) {
-            //TODO REFACTOR
-            if (def instanceof  EntityDefinition) {
+             if (def instanceof  EntityDefinition) {
                 manageEntity((EntityDefinition)def);
             }
             if (def instanceof  ValueObjectDefinition) {
                 manageValueObject((ValueObjectDefinition)def);
             }
-            if (def instanceof  ImmutableValueDefinition) {
-                manageImmutableValue((ImmutableValueDefinition) def);
-            }
         }
-    }
-
-    private void manageImmutableValue(ImmutableValueDefinition def) {
-        logger.debug("registering ImmutableValue[{}]", def.getClazz().getName());
-        managedClasses.add(new ImmutableValue(def.getClazz()));
-
     }
 
     private void manageEntity(EntityDefinition entityDef) {

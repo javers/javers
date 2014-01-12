@@ -1,8 +1,6 @@
 package org.javers.core.json;
 
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonSerializer;
-import com.google.gson.TypeAdapter;
+import com.google.gson.*;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.ChangeTypeAdapter;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;

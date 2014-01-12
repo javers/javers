@@ -6,7 +6,6 @@ import org.javers.core.diff.NodePair
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.diff.Change
-import org.javers.core.model.DummyUserWithDate
 import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
 
@@ -43,7 +42,7 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
         then:
         ChangeAssert.assertThat(changes[0])
-                    .hasGlobalId(DummyUser, "1")
+                    .hasInstanceId(DummyUser, "1")
                     .hasAffectedCdo(rightNode)
     }
 

@@ -31,15 +31,15 @@ public class TypeMapperTestBuilder {
     }
 
     public TypeMapperTestBuilder registerValueObject(Class<?> objectValue) {
-        typeMapper.registerValueObjectType(objectValue);
+        typeMapper.registerValueType(objectValue);
         return this;
     }
 
     public TypeMapperTestBuilder registerAllDummyTypes() {
-        typeMapper.registerValueObjectType(DummyAddress.class);
+        typeMapper.registerValueType(DummyAddress.class);
         typeMapper.registerEntityReferenceType(DummyUser.class);
         typeMapper.registerEntityReferenceType(DummyUserDetails.class);
-        typeMapper.registerValueObjectType(DummyNetworkAddress.class);
+        typeMapper.registerValueType(DummyNetworkAddress.class);
         return this;
     }
 }

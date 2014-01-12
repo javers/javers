@@ -4,6 +4,7 @@ import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.model.DummyUser;
 import org.javers.model.domain.Cdo;
+import org.javers.model.domain.InstanceId;
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityFactory;
 import org.javers.test.assertion.Assertions;
@@ -31,9 +32,22 @@ public abstract class ObjectWrapperTest {
         ObjectWrapper wrapper = new ObjectWrapper(cdo, entity);
 
         //then
-        Assertions.assertThat(wrapper.getEntity()).isSameAs(entity);
+        Assertions.assertThat(wrapper.getManagedClass()).isSameAs(entity);
     }
 
+    @Test
+    public void shouldHoldGlobalCdoId() {
+        //given
+        DummyUser cdo = dummyUser().withName("Mad Kaz").build();
+        Entity entity = entityFactory.create(DummyUser.class);
+
+        //when
+        ObjectWrapper wrapper = new ObjectWrapper(cdo, entity);
+
+        //then
+        Assertions.assertThat(wrapper.getGlobalCdoId())
+                  .isEqualTo(new InstanceId(cdo, entity));
+    } 
     @Test
     public void shouldHoldCdoReference() {
         //given
@@ -62,19 +76,6 @@ public abstract class ObjectWrapperTest {
             assertThat(e).hasCode(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID);
         }
    }
-
-    @Test
-    public void shouldReturnCdoId() {
-        //given
-        DummyUser cdo = dummyUser().withName("Mad Kaz").build();
-        Entity entity = entityFactory.create(DummyUser.class);
-
-        //when
-        ObjectWrapper wrapper = new ObjectWrapper(cdo, entity);
-
-        //then
-        Assertions.assertThat(wrapper.getLocalCdoId()).isEqualTo("Mad Kaz");
-    }
 
     @Test
     public void shouldBeEqualByIdValueAndEntityClass() {

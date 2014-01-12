@@ -26,8 +26,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * </pre>
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
-public class Entity extends ValueObject {
-    private static final Logger logger = LoggerFactory.getLogger(Entity.class);
+public class Entity extends ManagedClass {
     private final Property idProperty;
 
     /**
@@ -44,28 +43,38 @@ public class Entity extends ValueObject {
         }
     }
 
+    /**
+     * @throws JaversException ENTITY_WITHOUT_ID
+     */
     private Property findDefaultIdProperty() {
         for (Property p : getProperties()) {
             if (p.looksLikeId()) {
                 return p;
             }
         }
-        throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID,sourceClass.getName());
+        throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID, sourceClass.getName());
     }
 
     /**
      * @param instance instance of {@link #getSourceClass()}
      * @return returns ID of given instance so value of idProperty
+     * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
+     * @throws JaversException NOT_INSTANCE_OF
      */
     public Object getIdOf(Object instance) {
         Validate.argumentIsNotNull(instance);
+
+        if (!getSourceClass().isInstance(instance)) {
+            throw new JaversException(JaversExceptionCode.NOT_INSTANCE_OF, sourceClass.getName(), instance.getClass().getName());
+        }
         Validate.argumentCheck(getSourceClass().isInstance(instance),
                                "expected instance of "+getSourceClass().getName()+", got instance of "+ instance.getClass().getName());
-        return getIdProperty().get(instance);
-    }
 
-    public boolean isInstance(Object cdo) {
-        return getSourceClass().isInstance(cdo);
+        Object cdoId = getIdProperty().get(instance);
+        if (cdoId == null) {
+            throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, sourceClass.getName());
+        }
+        return cdoId;
     }
 
     public Property getIdProperty() {

@@ -16,8 +16,6 @@ public enum  JaversExceptionCode {
      */
     CLASS_NOT_MANAGED(RUNTIME_ERROR + "Class '%s' is not managed. Add this class to your JaVers configuration."),
 
-    UNEXPECTED_VALUE_OBJECT(RUNTIME_ERROR + "Can't start building graph from Value Object '%s', expected Entity instance."),
-
     @Deprecated
     TYPE_NOT_MAPPED (BOOTSTRAP_ERROR + "Type '%s' is not mapped and not assignable from any of already mapped types.\n"+
                                        "Register it via JaversBuilder.registerEntity() or JaversBuilder.registerValueObject()") ,
@@ -26,8 +24,7 @@ public enum  JaversExceptionCode {
 
     ENTITY_WITHOUT_ID (BOOTSTRAP_ERROR + "Class '%s' has no Id property. Use @Id annotation to mark unique Entity identifier"),
     ENTITY_INSTANCE_WITH_NULL_ID(RUNTIME_ERROR + "Found Entity instance of class '%s' with null id"),
-
-    ENTITY_MANAGER_NOT_INITIALIZED(BOOTSTRAP_ERROR + "EntityManager is not initialized properly. You should call buildManagedClasses()"),
+    NOT_INSTANCE_OF(BOOTSTRAP_ERROR + "expected instance of '%s', got instance of '%s'"),
 
     UNDEFINED_PROPERTY(BOOTSTRAP_ERROR + "undefined mandatory property '%s'. Define it in your classpath:javers.properties"),
 

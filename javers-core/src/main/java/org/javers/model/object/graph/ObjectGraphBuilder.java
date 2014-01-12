@@ -1,14 +1,10 @@
 package org.javers.model.object.graph;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.model.domain.Cdo;
-import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.EntityManager;
-import org.javers.model.mapping.ManagedClass;
-import org.javers.model.mapping.Property;
-import org.javers.model.mapping.ValueObject;
+import org.javers.model.domain.InstanceId;
+import org.javers.model.domain.ValueObjectId;
+import org.javers.model.mapping.*;
 import org.javers.model.mapping.type.CollectionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,13 +35,13 @@ public class ObjectGraphBuilder {
     }
 
     /**
-     * @param cdo Client's domain object, instance of managed Entity.
+     * @param cdo Client's domain object, instance of Entity or ValueObject.
      *            It should be root of an aggregate, tree root
      *            or any node in objects graph from where all other nodes are navigable
      * @return graph node
      */
     public ObjectNode buildGraph(Object cdo) {
-        ObjectNode root = buildNode(asCdo(cdo));
+        ObjectNode root = buildNode(asCdo(cdo, null));
         logger.debug("done building objectGraph for root ["+root+"], nodes: " + reverseCdoIdMap.size());
         switchToBuilt();
         return root;
@@ -74,14 +70,14 @@ public class ObjectGraphBuilder {
     }
 
     private void buildSingleEdges(ObjectWrapper node) {
-        List<Property> singleReferences = node.getEntity().getSingleReferences();
+        List<Property> singleReferences = node.getManagedClass().getSingleReferences();
         for (Property singleRef : singleReferences)  {
             if (singleRef.isNull(node.unwrapCdo())) {
                 continue;
             }
 
             Object referencedRawCdo = singleRef.get(node.unwrapCdo());
-            ObjectNode referencedNode = buildNodeOrReuse(asCdo(referencedRawCdo));
+            ObjectNode referencedNode = buildNodeOrReuse(asCdo(referencedRawCdo, node));
 
             Edge edge = new SingleEdge(singleRef, referencedNode);
             node.addEdge(edge);
@@ -99,7 +95,7 @@ public class ObjectGraphBuilder {
     }
 
     private void buildMultiEdges(ObjectWrapper node) {
-        List<Property> collectionProperties = node.getEntity().getCollectionTypeProperties();
+        List<Property> collectionProperties = node.getManagedClass().getCollectionTypeProperties();
         for (Property colProperty : collectionProperties)  {
             CollectionType collectionType = (CollectionType)colProperty.getType();
             if (!isCollectionOfEntityReferences((CollectionType)colProperty.getType())) {
@@ -115,15 +111,15 @@ public class ObjectGraphBuilder {
             if (collectionOfReferences.isEmpty()){
                 continue;
             }
-            MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences);
+            MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences, node);
             node.addEdge(multiEdge);
         }
     }
 
-    private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences) {
+    private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences, ObjectWrapper owner) {
         MultiEdge multiEdge = new MultiEdge(multiRef);
         for(Object referencedRawCdo : collectionOfReferences) {
-            ObjectNode objectNode = buildNodeOrReuse(asCdo(referencedRawCdo));
+            ObjectNode objectNode = buildNodeOrReuse(asCdo(referencedRawCdo, owner));
             multiEdge.addReferenceNode(objectNode);
         }
         return multiEdge;
@@ -145,16 +141,31 @@ public class ObjectGraphBuilder {
         return buildNode(referencedCdo);//recursion here
     }
 
-    private Cdo asCdo(Object cdo){
-        return new Cdo(cdo, getEntity(cdo));
+    private Cdo asCdo(Object targetCdo, ObjectWrapper owner){
+        ManagedClass targetManagedClass =  getManagedCLass(targetCdo);
+
+        //TODO refactor these IFs
+        if (targetManagedClass instanceof Entity) {
+            Entity entity = (Entity)targetManagedClass;
+            return new Cdo(targetCdo, new InstanceId(targetCdo, entity));
+        }
+        else if (targetManagedClass instanceof ValueObject && owner != null) {
+            ValueObject valueObject = (ValueObject)targetManagedClass;
+            //TODO unsafe casting GlobalCdoId to InstanceId !
+            //TODO what about this zonk?
+            return new Cdo(targetCdo, new ValueObjectId(valueObject, (InstanceId)owner.getGlobalCdoId(), "zonk"));
+        }
+        else if (targetManagedClass instanceof ValueObject && owner == null) {
+            throw new IllegalStateException("unbounded ValueObject not implemented");
+        }
+        else {
+            throw new IllegalStateException("not implemented");
+        }
+
     }
 
-    private Entity getEntity(Object cdo) {
+    private ManagedClass getManagedCLass(Object cdo) {
         Validate.argumentIsNotNull(cdo);
-        ManagedClass managedClass = entityManager.getByClass(cdo.getClass());
-        if (!(managedClass instanceof Entity)) {
-            throw new JaversException(JaversExceptionCode.UNEXPECTED_VALUE_OBJECT, cdo.getClass().getName());
-        }
-        return (Entity)managedClass;
+        return entityManager.getByClass(cdo.getClass());
     }
 }

@@ -2,7 +2,7 @@ package org.javers.model.mapping
 
 import org.javers.core.model.DummyUserDetails
 import org.javers.model.mapping.type.TypeMapper
-import org.javers.model.mapping.type.ValueObjectType
+import org.javers.model.mapping.type.ValueType
 
 import static org.javers.test.assertion.EntityAssert.assertThat
 import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper
@@ -24,7 +24,7 @@ class EntityFromBeanConstructionTest extends EntityConstructionTest {
 
         then:
         assertThat(entity).hasProperty("dummyAddress")
-                .hasJaversType(ValueObjectType.class);
+                          .hasJaversType(ValueType);
     }
 
 }

@@ -1,6 +1,6 @@
 package org.javers.core
 
-import org.javers.core.model.DummyUserWithDate
+import org.javers.core.model.DummyUserWithValues
 import org.javers.model.mapping.EntityFactory
 import org.javers.model.object.graph.ObjectGraphBuilder
 import org.javers.core.model.DummyAddress
@@ -8,7 +8,6 @@ import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails;
 import org.javers.model.mapping.EntityManager
-import org.joda.time.LocalDate;
 
 /**
  * This is just a test builder,
@@ -28,7 +27,7 @@ class JaversTestBuilder {
 
        javersBuilder.registerEntity(DummyUser)
        .registerEntity(DummyUserDetails)
-       .registerEntity(DummyUserWithDate)
+       .registerEntity(DummyUserWithValues)
        .registerValueObject(DummyAddress)
        .registerValueObject(DummyNetworkAddress)
        .build()

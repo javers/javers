@@ -11,6 +11,8 @@ import org.javers.model.domain.ValueObjectId;
 import java.lang.reflect.Type;
 
 /**
+ * Change to JSON serializer
+ *
  * @author bartosz walacik
  */
 public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
@@ -48,8 +50,8 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
     }
 
     private void appendBody(ReferenceChange change, JsonObject toJson, JsonSerializationContext context) {
-        toJson.add("leftReference",  globalCdoId(change.getLeftReference(), context));
-        toJson.add("rightReference", globalCdoId(change.getRightReference(), context));
+        toJson.add("leftReference",  instanceId(change.getLeftReference(), context));
+        toJson.add("rightReference", instanceId(change.getRightReference(), context));
     }
 
     private void appendBody(ValueChange change, JsonObject toJson, JsonSerializationContext context) {
@@ -59,14 +61,14 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
 
     private void appendGlobalId(GlobalCdoId globalCdoId, JsonObject toJson, JsonSerializationContext context) {
         if(globalCdoId instanceof InstanceId) {
-            toJson.add("instanceId", globalCdoId(globalCdoId, context));
+            toJson.add("instanceId", instanceId(globalCdoId, context));
         }
         if(globalCdoId instanceof ValueObjectId) {
             toJson.add("valueObjectId", valueObjectId((ValueObjectId) globalCdoId, context));
         }
     }
 
-    private JsonElement globalCdoId(GlobalCdoId globalCdoId, JsonSerializationContext context) {
+    private JsonElement instanceId(GlobalCdoId globalCdoId, JsonSerializationContext context) {
         if (globalCdoId == null) {
             return JsonNull.INSTANCE;
         }
@@ -74,7 +76,7 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.add("cdoId", context.serialize(globalCdoId.getCdoId()));
-        jsonObject.addProperty("entity", globalCdoId.getEntity().getSourceClass().getName());
+        jsonObject.addProperty("entity", globalCdoId.getCdoClass().getName());
 
         return jsonObject;
     }
@@ -84,7 +86,7 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
             return JsonNull.INSTANCE;
         }
 
-        JsonObject jsonObject = (JsonObject) globalCdoId(valueObjectId, context);
+        JsonObject jsonObject = (JsonObject) instanceId(valueObjectId, context);
         jsonObject.addProperty("fragment", valueObjectId.getFragment());
 
         return jsonObject;

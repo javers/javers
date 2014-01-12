@@ -14,7 +14,7 @@ import spock.lang.Unroll
 
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 import static org.javers.core.json.builder.ChangeTestBuilder.*
-import static org.javers.core.model.DummyUserWithDate.dummyUserWithDate
+import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
@@ -44,7 +44,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        System.out.println(jsonText)
+        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -64,7 +64,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        System.out.println(jsonText)
+        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -83,7 +83,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        System.out.println(jsonText)
+        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -98,7 +98,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        System.out.println(jsonText)
+        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -107,7 +107,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
 
     }
 
-    def "should use custom JsonTypeAdapter when writing ImmutableValues for ValueChange" () {
+    def "should use custom JsonTypeAdapter when writing Values like LocalDateTime for ValueChange" () {
         given:
         JsonConverter jsonConverter = jsonConverter().build()
         def dob = new LocalDateTime()
@@ -115,7 +115,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        System.out.println(jsonText)
+        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -128,6 +128,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
         given:
         JsonConverter jsonConverter = jsonConverter().build()
         String jsonText = jsonConverter.toJson(change)
+        println(jsonText)
 
         expect:
         def json = new JsonSlurper().parseText(jsonText)
@@ -158,7 +159,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
                                                      "Street 1", "Street 2");
         when:
         String jsonText = jsonConverter.toJson(change)
-        System.out.println(jsonText)
+        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -166,7 +167,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
         json.valueObjectId.size() == 3
         json.valueObjectId.fragment == "dummyAddress"
         json.valueObjectId.cdoId == "1"
-        json.valueObjectId.entity == "org.javers.core.model.DummyUserDetails"
+        json.valueObjectId.getManagedClass == "org.javers.core.model.DummyUserDetails"
 
     }
 }

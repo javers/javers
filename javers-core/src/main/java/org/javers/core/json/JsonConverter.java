@@ -2,6 +2,7 @@ package org.javers.core.json;
 
 import com.google.gson.*;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
+import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -32,22 +33,27 @@ import java.util.Collection;
  *     <li/> native Gson {@link JsonDeserializer}
  * </ul>
  *
- * Javers provides JsonTypeAdapter's for some well known Value Object like {@link org.joda.time.LocalDateTime}.
+ * Javers provides JsonTypeAdapter's for some well known Value Object like {@link LocalDateTime}.
  * Those adapters are included by default in Javers setup, see {@link JsonConverterBuilder#BUILT_IN_ADAPTERS}
  * <br/>
  *
  * @author bartosz walacik
  */
 public class JsonConverter {
+    public static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+
     private Gson gson;
     private GsonBuilder gsonBuilder;
 
     JsonConverter() {
-        gsonBuilder = new GsonBuilder().serializeNulls();
+        gsonBuilder = new GsonBuilder();
     }
 
     void initialize() {
-        gson = gsonBuilder.setPrettyPrinting().create();
+        gson = gsonBuilder.serializeNulls()
+                          .setPrettyPrinting()
+                          .setDateFormat(ISO_DATE_TIME_FORMAT)
+                          .create();
     }
 
     /**

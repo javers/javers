@@ -72,4 +72,9 @@ public class FieldProperty implements Property {
     public int hashCode() {
         return 31 * field.hashCode() + javersType.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return field.getDeclaringClass().getSimpleName()+"."+field.getName();
+    }
 }

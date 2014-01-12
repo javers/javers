@@ -3,43 +3,46 @@ package org.javers.model.object.graph;
 import org.javers.model.domain.Cdo;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Entity;
+import org.javers.model.mapping.ManagedClass;
 import org.javers.model.mapping.Property;
+import org.javers.model.mapping.ValueObject;
 import org.javers.model.visitors.Visitable;
 
 import java.util.List;
 
 /**
- * Node in client's domain objects graph (CDO graph)
- * <br/><br/>
+ * Node in client's domain objects graph. Reflects one Cdo, {@link Entity} or {@link ValueObject}
+ * <p/>
  *
  * Implementation should delegate equals() and hashCode() to {@link Cdo}
  *
  * @author bartosz walacik
  */
-public interface ObjectNode extends Visitable<GraphVisitor> {
+public abstract class ObjectNode implements Visitable<GraphVisitor> {
 
-    Entity getEntity();
+    /**
+     * @return never returns null
+     */
+    public abstract Cdo getCdo();
 
-    Object getLocalCdoId();
+    /**
+     * shortcut to {@link Cdo#getManagedClass()}
+     */
+    public abstract ManagedClass getManagedClass();
 
-    Object getPropertyValue(Property property);
+    /**
+     * shortcut to {@link Cdo#getGlobalId()}
+     */
+    public abstract GlobalCdoId getGlobalCdoId();
+
+    public abstract Object getPropertyValue(Property property);
 
     /**
      * References to other Entities
      *
      * @return never returns null
      */
-    List<Edge> getEdges();
+    public abstract List<Edge> getEdges();
 
-    Edge getEdge(Property property);
-
-    /**
-     * @return never returns null
-     */
-    GlobalCdoId getGlobalCdoId();
-
-    /**
-     * @return never returns null
-     */
-    Cdo getCdo();
+    public abstract Edge getEdge(Property property);
 }
