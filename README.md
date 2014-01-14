@@ -47,11 +47,11 @@ This is the niche JaVers fulfills. In JaVers, *version* and *change* are **first
 JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 
 ## Project team
-* Bartosz Walacik - owner,
-* Pawel Cierpiatka - first contributor,
-* Paweł Szymczyk - contributor.
+* Bartosz Walacik - owner, commiter
+* Pawel Cierpiatka - committer,
+* Paweł Szymczyk - committer.
 
-### Former contributors
+### Former commiters
 * Piotr Betkier
 * Maciej Zasada
 
