@@ -8,12 +8,15 @@ import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
 import org.javers.core.model.DummyAddress
+import org.javers.core.model.DummyNetworkAddress
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 import static org.javers.core.json.builder.ChangeTestBuilder.*
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.unboundedValueObjectId
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
@@ -133,9 +136,9 @@ class JsonConverterDiffIntegrationTest extends Specification {
         expect:
         def json = new JsonSlurper().parseText(jsonText)
         json.changeType == expectedType
-        json.instanceId.size() == 2
-        json.instanceId.cdoId == "kaz"
-        json.instanceId.entity == "org.javers.core.model.DummyUser"
+        json.globalCdoId.size() == 2
+        json.globalCdoId.cdoId == "kaz"
+        json.globalCdoId.entity == "org.javers.core.model.DummyUser"
 
         where:
         change << [newObject(dummyUser("kaz").build()),
@@ -149,14 +152,11 @@ class JsonConverterDiffIntegrationTest extends Specification {
 
     }
 
-    def "should write ValueObjectId & property for ValueObject property change"() {
+    def "should write UnboundedValueObjectId & property for unbounded ValueObject property change"() {
         given:
         def jsonConverter = jsonConverter().build()
-        def change = valueObjectPropertyChange(dummyUserDetails(1).build(),
-                                                     DummyAddress,
-                                                     "street",
-                                                     "dummyAddress",
-                                                     "Street 1", "Street 2");
+        def change = unboundedValueObjectPropertyChange(DummyAddress, "street", "Street 1", "Street 2");
+
         when:
         String jsonText = jsonConverter.toJson(change)
         println(jsonText)
@@ -164,10 +164,42 @@ class JsonConverterDiffIntegrationTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.property == "street"
-        json.valueObjectId.size() == 3
-        json.valueObjectId.fragment == "dummyAddress"
-        json.valueObjectId.cdoId == "1"
-        json.valueObjectId.getManagedClass == "org.javers.core.model.DummyUserDetails"
+        json.globalCdoId.size() == 2
+        json.globalCdoId.cdoId == "/"
+        json.globalCdoId.valueObject == "org.javers.core.model.DummyAddress"
+    }
+
+    @Unroll
+    def "should write ValueObjectId ownerId of class #ownerId.class.getSimpleName() "() {
+        given:
+        def jsonSlurper = new JsonSlurper()
+        def jsonConverter = jsonConverter().build()
+        ValueChange change = valueObjectPropertyChange(ownerId, DummyNetworkAddress, "addres", "fragmentProp", "any", "any2")
+        String jsonText = jsonConverter.toJson(change)
+        println(jsonText)
+
+        expect:
+        def json = jsonSlurper.parseText(jsonText)
+        json.property == "addres"
+        json.globalCdoId.size() == 3
+        json.globalCdoId.fragment == "fragmentProp"
+        json.globalCdoId.ownerId == jsonSlurper.parseText(expectedOwnerIdJson)
+        json.globalCdoId.valueObject == "org.javers.core.model.DummyNetworkAddress"
+
+        where:
+        ownerId  << [instanceId(dummyUserDetails(1).build()), //bounded to entity
+                     unboundedValueObjectId(DummyAddress) //bounded to unbounded valueObject
+                    ]
+        expectedOwnerIdJson << [
+                """{
+                     "entity": "org.javers.core.model.DummyUserDetails",
+                     "cdoId": 1
+                }""",
+                """{
+                    "valueObject": "org.javers.core.model.DummyAddress",
+                    "cdoId": "/"
+                }"""
+        ]
 
     }
 }

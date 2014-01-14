@@ -6,7 +6,9 @@ import org.javers.core.diff.changetype.*;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.InstanceId;
+import org.javers.model.domain.UnboundedValueObjectId;
 import org.javers.model.domain.ValueObjectId;
+import org.javers.model.mapping.Entity;
 
 import java.lang.reflect.Type;
 
@@ -50,8 +52,8 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
     }
 
     private void appendBody(ReferenceChange change, JsonObject toJson, JsonSerializationContext context) {
-        toJson.add("leftReference",  instanceId(change.getLeftReference(), context));
-        toJson.add("rightReference", instanceId(change.getRightReference(), context));
+        toJson.add("leftReference",  globalCdoId(change.getLeftReference(), context));
+        toJson.add("rightReference", globalCdoId(change.getRightReference(), context));
     }
 
     private void appendBody(ValueChange change, JsonObject toJson, JsonSerializationContext context) {
@@ -60,38 +62,36 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
     }
 
     private void appendGlobalId(GlobalCdoId globalCdoId, JsonObject toJson, JsonSerializationContext context) {
-        if(globalCdoId instanceof InstanceId) {
-            toJson.add("instanceId", instanceId(globalCdoId, context));
-        }
-        if(globalCdoId instanceof ValueObjectId) {
-            toJson.add("valueObjectId", valueObjectId((ValueObjectId) globalCdoId, context));
-        }
+        toJson.add("globalCdoId", globalCdoId(globalCdoId, context));
     }
 
-    private JsonElement instanceId(GlobalCdoId globalCdoId, JsonSerializationContext context) {
+    private JsonElement globalCdoId(GlobalCdoId globalCdoId, JsonSerializationContext context) {
         if (globalCdoId == null) {
             return JsonNull.INSTANCE;
         }
-
         JsonObject jsonObject = new JsonObject();
 
-        jsonObject.add("cdoId", context.serialize(globalCdoId.getCdoId()));
-        jsonObject.addProperty("entity", globalCdoId.getCdoClass().getName());
-
-        return jsonObject;
-    }
-
-    private JsonElement valueObjectId(ValueObjectId valueObjectId, JsonSerializationContext context) {
-        if (valueObjectId == null) {
-            return JsonNull.INSTANCE;
+        //managedClass
+        if (globalCdoId.getCdoClass() instanceof Entity) {
+            jsonObject.addProperty("entity", globalCdoId.getCdoClass().getName());
+        } else {
+            jsonObject.addProperty("valueObject", globalCdoId.getCdoClass().getName());
         }
 
-        JsonObject jsonObject = (JsonObject) instanceId(valueObjectId, context);
-        jsonObject.addProperty("fragment", valueObjectId.getFragment());
+        //cdoId
+        if (globalCdoId.getCdoId()!=null){
+            jsonObject.add("cdoId", context.serialize(globalCdoId.getCdoId()));
+        }
+
+        //owningId & fragment
+        if(globalCdoId instanceof ValueObjectId) {
+            ValueObjectId valueObjectId = (ValueObjectId)globalCdoId;
+            jsonObject.add("ownerId", globalCdoId(valueObjectId.getOwnerId(), context));
+            jsonObject.addProperty("fragment", valueObjectId.getFragment());
+        }
 
         return jsonObject;
     }
-
 
     @Override
     public Change fromJson(JsonElement json, JsonDeserializationContext jsonDeserializationContext) {

@@ -61,7 +61,6 @@ public abstract class ManagedClass {
     }
 
     /**
-     * @return list of {@link org.javers.model.mapping.type.EntityReferenceType} properties
      */
     public List<Property> getSingleReferences() {
         List<Property> refProperties = new ArrayList<>();

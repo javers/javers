@@ -1,10 +1,7 @@
 package org.javers.model.domain;
 
-import org.javers.common.validation.Validate;
-import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.ValueObject;
 
-import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
@@ -17,13 +14,13 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 public class ValueObjectId extends UnboundedValueObjectId {
-    private final InstanceId owningInstanceId;
+    private final GlobalCdoId ownerId;
     private final String fragment;
 
-    public ValueObjectId(ValueObject valueObject, InstanceId owningInstanceId, String fragment) {
+    public ValueObjectId(ValueObject valueObject, GlobalCdoId ownerId, String fragment) {
         super(valueObject);
-        argumentsAreNotNull(owningInstanceId, fragment);
-        this.owningInstanceId = owningInstanceId;
+        argumentsAreNotNull(ownerId, fragment);
+        this.ownerId = ownerId;
         this.fragment = fragment;
     }
 
@@ -36,8 +33,12 @@ public class ValueObjectId extends UnboundedValueObjectId {
     }
 
     @Override
-    public String getCdoId() {
-        return "#"+fragment;
+    public Object getCdoId() {
+        return null;
+    }
+
+    public GlobalCdoId getOwnerId() {
+        return ownerId;
     }
 
     @Override
@@ -53,12 +54,12 @@ public class ValueObjectId extends UnboundedValueObjectId {
         ValueObjectId other = (ValueObjectId) o;
         return super.equals(other)
                && this.fragment.equals(other.fragment)
-               && this.owningInstanceId.equals(other.owningInstanceId);
+               && this.ownerId.equals(other.ownerId);
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode() + fragment.hashCode() + owningInstanceId.hashCode();
+        return super.hashCode() + fragment.hashCode() + ownerId.hashCode();
     }
 
 }
