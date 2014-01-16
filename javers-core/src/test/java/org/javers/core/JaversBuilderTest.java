@@ -34,18 +34,6 @@ public class JaversBuilderTest {
         Assertions.assertThat(javersBuilder.getContainerComponent(PropertyScanner.class)).isInstanceOf(FieldBasedPropertyScanner.class);
     }
 
-    @Deprecated //javersBuilder.addModule is deprecated
-    public void shouldBootNonCoreModule() {
-        //given
-        JaversBuilder javersBuilder = javers();
-
-        //when
-        javersBuilder.addModule(new DummyJaversModule()).build();
-
-        //then
-        assertThat(javersBuilder.getContainerComponent(DummyJaversBean.class)).isNotNull();
-    }
-
     @Test
     public void shouldManageEntity() {
         //when
