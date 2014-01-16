@@ -5,12 +5,17 @@ import java.util.Collection;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.core.Javers;
+import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.diff.DFSGraphToSetConverter;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.appenders.NewObjectAppender;
 import org.javers.core.diff.appenders.ObjectRemovedAppender;
 import org.javers.core.diff.appenders.ReferenceChangeAppender;
 import org.javers.core.diff.appenders.ValueChangeAppender;
+import org.javers.core.json.JsonConverterBuilder;
+import org.javers.model.mapping.EntityFactory;
+import org.javers.model.mapping.EntityManager;
+import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 
 /**
@@ -26,7 +31,10 @@ public class CoreJaversModule implements JaversModule {
             NewObjectAppender.class,
             ObjectRemovedAppender.class,
             ReferenceChangeAppender.class,
-            ValueChangeAppender.class};
+            JsonConverterBuilder.class,
+            ValueChangeAppender.class,
+            TypeMapper.class,
+            JaversCoreConfiguration.class};
 
     @Override
     public Collection<Class> getModuleComponents() {

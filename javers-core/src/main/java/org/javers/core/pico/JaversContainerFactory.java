@@ -15,15 +15,13 @@ import java.util.*;
  */
 public class JaversContainerFactory {
 
-    public static PicoContainer create(List<JaversModule> modules, List<?> beans) {
+    public static MutablePicoContainer create(List<JaversModule> modules, List<?> beans) {
         Validate.argumentIsNotNull(modules);
 
         MutablePicoContainer container = new DefaultPicoContainer();
 
         for (JaversModule module : modules) {
-            for (Class component : module.getModuleComponents()) {
-                addComponent(container, component);
-            }
+            addModule(container, module);
         }
 
         if (beans != null) {
@@ -35,7 +33,13 @@ public class JaversContainerFactory {
         return container;
     }
 
-    private static void addComponent(MutablePicoContainer container, Object classOrInstance) {
+    public static void addModule(MutablePicoContainer container, JaversModule module) {
+        for (Class component : module.getModuleComponents()) {
+            addComponent(container, component);
+        }
+    }
+
+    public static void addComponent(MutablePicoContainer container, Object classOrInstance) {
         container.as(Characteristics.CACHE).addComponent(classOrInstance);
     }
 

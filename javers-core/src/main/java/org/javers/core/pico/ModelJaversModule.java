@@ -20,7 +20,7 @@ import java.util.*;
 public class ModelJaversModule implements JaversModule {
     private static final Logger logger = LoggerFactory.getLogger(ModelJaversModule.class);
 
-    private static Class[] moduleComponents = new Class[] {EntityManager.class, TypeMapper.class, EntityFactory.class};
+    private static Class[] moduleComponents = new Class[] {EntityManager.class, EntityFactory.class};
 
     private static Map<MappingStyle, Class> propertyScannersMapping = new HashMap() {{
         put(MappingStyle.BEAN, BeanBasedPropertyScanner.class);

@@ -31,7 +31,7 @@ public class LocalDateTimeTypeAdapter extends BasicStringTypeAdapter<LocalDateTi
     }
 
     @Override
-    public Type getType() {
+    public Class getValueType() {
         return LocalDateTime.class;
     }
 }
