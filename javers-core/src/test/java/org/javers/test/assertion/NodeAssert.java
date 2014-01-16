@@ -1,14 +1,11 @@
 package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
-import org.javers.core.json.builder.GlobalCdoIdTestBuilder;
 import org.javers.model.domain.InstanceId;
 import org.javers.model.domain.UnboundedValueObjectId;
 import org.javers.model.domain.ValueObjectId;
 import org.javers.model.object.graph.Edge;
 import org.javers.model.object.graph.ObjectNode;
-
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId;
 
 /**
  * @author bartosz walacik
@@ -45,7 +42,7 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
 
         Assertions.assertThat(valueObjectId.getCdoClass().getSourceClass()).isSameAs(expectedManagedClass);
         Assertions.assertThat(valueObjectId.getCdoId()).isNull();
-        Assertions.assertThat(valueObjectId.getOwnerId()).isEqualTo(instanceId(owner));
+        Assertions.assertThat( ((InstanceId)valueObjectId.getOwnerId()).idEquals(owner)).isTrue();
         Assertions.assertThat(valueObjectId.getFragment()).isEqualTo(expectedFragment);
         return this;
     }
