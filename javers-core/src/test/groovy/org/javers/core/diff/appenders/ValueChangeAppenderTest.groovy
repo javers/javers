@@ -1,5 +1,8 @@
 package org.javers.core.diff.appenders
 
+import org.javers.core.json.builder.EntityTestBuilder
+import org.javers.core.json.builder.GlobalCdoIdTestBuilder
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserWithValues
 import org.joda.time.LocalDateTime
 
@@ -12,6 +15,10 @@ import org.javers.core.model.DummyUserDetails
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
+
+import static org.javers.core.json.builder.EntityTestBuilder.entity
+import static org.javers.core.json.builder.EntityTestBuilder.valueObject
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
 import static DummyUserWithValues.dummyUserWithDate
@@ -186,21 +193,28 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should create fragment valueChange for embedded ValueObject" () {
         given:
-        def leftUser =  dummyUserDetails(1).withAddress("Washington Street", "Boston").build();
-        def rightUser = dummyUserDetails(1).withAddress("Wall Street",       "Boston").build();
+        def leftUser =  dummyUserDetails(1).withAddress("Boston","Washington Street").build();
+        def rightUser = dummyUserDetails(1).withAddress("Boston","Wall Street").build();
         ObjectNode left = buildGraph(leftUser)
         ObjectNode right = buildGraph(rightUser)
-        Property address = getEntity(DummyUserDetails).getProperty("dummyAddress")
+        Property address = entity(DummyUserDetails).getProperty("dummyAddress")
+        Property street =  valueObject(DummyAddress).getProperty("street")
 
         when:
-        def changes = new ValueChangeAppender().calculateChanges(new NodePair(left,right),address)
+        def changes = new ValueChangeAppender().calculateChanges(
+                      new NodePair(followEdge(left,address), followEdge(right,address)),street)
 
         then:
         changes.size() == 1
         assertThat(changes[0])
-                  .hasValueObjectId(DummyUserDetails, 1, "dummyAddress")
-                  .hasProperty("street")
+                  .hasAffectedCdo(rightUser.dummyAddress)
+                  .hasValueObjectId(DummyAddress, instanceId(rightUser), "dummyAddress")
                   .hasLeftValue("Washington Street")
                   .hasRightValue("Wall Street")
+                  .hasProperty(street)
+    }
+
+    ObjectNode followEdge(ObjectNode node, Property property) {
+        node.getEdge(property).reference;
     }
 }

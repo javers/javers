@@ -63,7 +63,7 @@ public class EntityManager {
             typeMapper.registerEntityReferenceType(def.getClazz());
         }
         if (def instanceof  ValueObjectDefinition) {
-            typeMapper.registerValueType(def.getClazz());
+            typeMapper.registerValueObjectType(def.getClazz());
         }
         managedClassDefinitions.add(def);
     }

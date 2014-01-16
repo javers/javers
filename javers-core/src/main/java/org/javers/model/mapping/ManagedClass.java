@@ -2,6 +2,7 @@ package org.javers.model.mapping;
 
 import org.javers.model.mapping.type.CollectionType;
 import org.javers.model.mapping.type.EntityReferenceType;
+import org.javers.model.mapping.type.ValueObjectType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,7 +67,8 @@ public abstract class ManagedClass {
         List<Property> refProperties = new ArrayList<>();
 
         for (Property property : properties) {
-            if (property.getType() instanceof EntityReferenceType){
+            if (property.getType() instanceof EntityReferenceType ||
+                property.getType() instanceof ValueObjectType ){
                 refProperties.add(property);
             }
         }

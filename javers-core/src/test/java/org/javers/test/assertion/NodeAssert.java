@@ -1,11 +1,14 @@
 package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
+import org.javers.core.json.builder.GlobalCdoIdTestBuilder;
 import org.javers.model.domain.InstanceId;
 import org.javers.model.domain.UnboundedValueObjectId;
 import org.javers.model.domain.ValueObjectId;
 import org.javers.model.object.graph.Edge;
 import org.javers.model.object.graph.ObjectNode;
+
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId;
 
 /**
  * @author bartosz walacik
@@ -37,22 +40,17 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
         return this;
     }
 
-    public NodeAssert hasValueObjectId(Class expectedSourceClass, Object expectedLocalCdoId, String expectedFragment) {
-        /*
-        Assertions.assertThat(actual.getGlobalCdoId()).isInstanceOf(ValueObjectId.class);
-        ValueObjectId vlueObjectId = (ValueObjectId)actual.getGlobalCdoId();
+    public NodeAssert hasValueObjectId(Class expectedManagedClass, Object owner, String expectedFragment) {
+        ValueObjectId valueObjectId = (ValueObjectId)actual.getGlobalCdoId();
 
-        Assertions.assertThat(vlueObjectId.getCdoClass().getSourceClass()).isSameAs(expectedSourceClass);
-        Assertions.assertThat(vlueObjectId.getCdoId()).isEqualTo(expectedLocalCdoId);
-        Assertions.assertThat(vlueObjectId.getFragment()).isEqualTo(expectedFragment);
+        Assertions.assertThat(valueObjectId.getCdoClass().getSourceClass()).isSameAs(expectedManagedClass);
+        Assertions.assertThat(valueObjectId.getCdoId()).isNull();
+        Assertions.assertThat(valueObjectId.getOwnerId()).isEqualTo(instanceId(owner));
+        Assertions.assertThat(valueObjectId.getFragment()).isEqualTo(expectedFragment);
         return this;
-        */
-        throw new IllegalStateException("not implemented");
     }
 
     public NodeAssert hasUnboundedValueObjectId(Class expectedSourceClass) {
-        Assertions.assertThat(actual.getGlobalCdoId()).isInstanceOf(UnboundedValueObjectId.class);
-
         UnboundedValueObjectId unboundedValueObjectId = (UnboundedValueObjectId)actual.getGlobalCdoId();
 
         Assertions.assertThat(unboundedValueObjectId.getCdoClass().getSourceClass()).isSameAs(expectedSourceClass);

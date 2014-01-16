@@ -75,6 +75,11 @@ public class TypeMapper {
         addType(new PrimitiveType(primitiveClass));
     }
 
+    @Deprecated
+    public void registerValueObjectType(Class<?> entityClass) {
+        addType(new ValueObjectType(entityClass));
+    }
+
     public void registerEntityReferenceType(Class<?> entityClass) {
         addType(new EntityReferenceType(entityClass));
     }
@@ -93,8 +98,9 @@ public class TypeMapper {
         return result;
     }
 
-    List<ValueType> getMappedValueObjectTypes() {
-        return getMappedTypes(ValueType.class);
+    @Deprecated
+    List<ValueObjectType> getMappedValueObjectTypes() {
+        return getMappedTypes(ValueObjectType.class);
     }
 
     List<EntityReferenceType> getMappedEntityReferenceTypes() {
