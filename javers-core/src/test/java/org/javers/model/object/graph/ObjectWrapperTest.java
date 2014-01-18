@@ -4,9 +4,11 @@ import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.model.DummyUser;
 import org.javers.model.domain.Cdo;
+import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.InstanceId;
 import org.javers.model.mapping.Entity;
 import org.javers.model.mapping.EntityFactory;
+import org.javers.model.mapping.ManagedClass;
 import org.javers.test.assertion.Assertions;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -133,11 +135,13 @@ public abstract class ObjectWrapperTest {
     public void shouldDelegateEqualsAndHashCodeToCdo() {
         //given
         Cdo mockedCdo = Mockito.mock(Cdo.class);
+        GlobalCdoId id = Mockito.mock(GlobalCdoId.class);
+        Mockito.when(mockedCdo.getGlobalId()).thenReturn(id);
         ObjectWrapper node1 = new ObjectWrapper(mockedCdo);
         ObjectWrapper node2 = new ObjectWrapper(mockedCdo);
 
         //when + then
         Assertions.assertThat(node1.equals(node2)).isTrue();
-        Assertions.assertThat(node1.hashCode()).isEqualTo(mockedCdo.hashCode());
+        Assertions.assertThat(node1.hashCode()).isEqualTo(id.hashCode());
     }
 }

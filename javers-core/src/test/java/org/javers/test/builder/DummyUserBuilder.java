@@ -74,6 +74,11 @@ public class DummyUserBuilder {
         return this;
     }
 
+    public DummyUserBuilder withDetails(DummyUserDetails details) {
+        dummyUser.setDummyUserDetails(details);
+        return this;
+    }
+
     public DummyUserBuilder withDetailsList(int numberOfDetailsInList) {
 
         List<DummyUserDetails> detailsList = new ArrayList<>(numberOfDetailsInList);
