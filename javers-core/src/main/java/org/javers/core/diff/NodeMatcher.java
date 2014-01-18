@@ -1,6 +1,5 @@
 package org.javers.core.diff;
 
-import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.object.graph.Fake;
@@ -27,13 +26,13 @@ public class NodeMatcher {
 
         for (ObjectNode left : leftGraph) {
             GlobalCdoId key = left.getGlobalCdoId();
-            if (rightMap.containsKey(key)) {
+            if (rightMap.containsKey(key) && (left.getClass() != Fake.class)) {
                 pairs.add(new NodePair(left,rightMap.get(key)));
                 temp.add(rightMap.get(key));
             }
         }
 
-        for (ObjectNode node : difference(rightGraph, leftGraph)) {
+        for (ObjectNode node : difference(rightGraph, temp)) {
             Fake fake = new Fake(node.getGlobalCdoId());
             pairs.add(new NodePair(fake, node));
         }

@@ -14,7 +14,7 @@ import org.javers.model.object.graph.ObjectNode;
  */
 public class DiffFactory {
 
-     private NodeMatcher nodeMatcher;
+    private NodeMatcher nodeMatcher;
     private DFSGraphToSetConverter graphToSetConverter;
     private List<NodeChangeAppender> nodeChangeAppenders;
     private List<PropertyChangeAppender> propertyChangeAppender;
@@ -38,41 +38,25 @@ public class DiffFactory {
             diff.addChanges(appender.getChangeSet(leftGraph, rightGraph));
         }
 
-//        for (Change change: diff.getChanges()) {
-//            change.
-//            appendPropertyChanges(diff, );
-//        }
-
-        appendPropertyChanges(diff, leftGraph, rightGraph);
-        // new Pair(Fake, right)
-        //calculate
-
-        //valueDehydrator.dehydrate(diff);
-
-        return diff;
-    }
-
-    /**
-     * calculate property-to-property diff
-     * @return
-     */
-    private void appendPropertyChanges(Diff diff, Set<ObjectNode> leftGraph, Set<ObjectNode> rightGraph) {
-
+        //calculate property-to-property diff
         for (NodePair pair : nodeMatcher.match(leftGraph, rightGraph)) {
             List<Property> nodeProperties = pair.getManagedClass().getProperties();
             for (Property property : nodeProperties) {
 
                 //optimization, skip all Appenders if null on both sides
-                if (pair.isNullOnBothSides(property)) { continue;}
+                if (pair.isNullOnBothSides(property)) {
+                    continue;
+                }
 
                 for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
-                    Collection<Change> changes = appender.calculateChangesIfSupported(pair,property);
+                    Collection<Change> changes = appender.calculateChangesIfSupported(pair, property);
                     for (Change change : changes) {
                         diff.addChange(change, pair.getRight().getCdo().getWrappedCdo());
                     }
                 }
             }
-        }
+    }
 
+        return diff;
     }
 }

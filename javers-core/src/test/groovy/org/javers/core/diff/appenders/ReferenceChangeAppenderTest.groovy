@@ -11,6 +11,7 @@ import org.javers.model.object.graph.ObjectNode
 
 import static ReferenceChangeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
 class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
@@ -81,5 +82,4 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
                   .hasRightReference(DummyUserDetails,3)
                   .hasProperty(property)
     }
-
 }

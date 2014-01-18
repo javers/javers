@@ -54,10 +54,13 @@ class JaversIntegrationTest extends Specification {
         json.id == 0
         json.userId == "user"
         json.diffDate != null
-        json.changes.size() == 3
+        json.changes.size() == 5
         json.changes[0].changeType == "NewObject"
         json.changes[1].changeType == "ValueChange"
         json.changes[2].changeType == "ReferenceChange"
+        json.changes[3].changeType == "ValueChange"
+        json.changes[4].changeType == "ValueChange"
+
     }
 
     def "should support custom JsonTypeAdapter for ValueChange"() {

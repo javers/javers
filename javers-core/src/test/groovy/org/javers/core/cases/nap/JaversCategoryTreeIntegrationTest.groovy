@@ -3,6 +3,7 @@ package org.javers.core.cases.nap
 import org.javers.core.Javers
 import org.javers.core.diff.Diff
 import org.javers.core.diff.changetype.ValueChange
+import spock.lang.Ignore
 import spock.lang.Specification
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.diff.DiffAssert.assertThat
@@ -42,6 +43,7 @@ class JaversCategoryTreeIntegrationTest extends Specification {
         diff.changes.size() == 0
     }
 
+    @Ignore("need to calculate diff size")
     def "should manage full diff on big graphs"() {
         given:
         Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()

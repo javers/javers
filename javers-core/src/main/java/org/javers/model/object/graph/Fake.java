@@ -57,11 +57,11 @@ public class Fake extends ObjectNode{
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof ObjectNode)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
-        ObjectWrapper that = (ObjectWrapper) o;
+        ObjectNode that = (ObjectNode) o;
         return id.equals(that.getGlobalCdoId());
     }
 

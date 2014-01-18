@@ -66,7 +66,7 @@ public class Javers {
         return jsonConverter.toJson(diff);
     }
 
-    public  Diff firstDiff(String user, Object object) {
+    public  Diff initialDiff(String user, Object object) {
         ObjectGraphBuilder rightGraph = new ObjectGraphBuilder(entityManager);
         ObjectNode rightNode = rightGraph.buildGraph(object);
 
