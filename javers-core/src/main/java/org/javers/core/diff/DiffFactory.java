@@ -44,18 +44,18 @@ public class DiffFactory {
             for (Property property : nodeProperties) {
 
                 //optimization, skip all Appenders if null on both sides
-                if (pair.isNullOnBothSides(property)) {
-                    continue;
-                }
+                if (pair.isNullOnBothSides(property)) { continue;}
 
                 for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
-                    Collection<Change> changes = appender.calculateChangesIfSupported(pair, property);
+                    Collection<Change> changes = appender.calculateChangesIfSupported(pair,property);
                     for (Change change : changes) {
                         diff.addChange(change, pair.getRight().getCdo().getWrappedCdo());
                     }
                 }
             }
-    }
+        }
+
+        //valueDehydrator.dehydrate(diff);
 
         return diff;
     }

@@ -82,4 +82,5 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
                   .hasRightReference(DummyUserDetails,3)
                   .hasProperty(property)
     }
+
 }

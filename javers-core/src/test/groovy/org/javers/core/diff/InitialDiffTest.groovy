@@ -26,9 +26,9 @@ class InitialDiffTest extends Specification {
 
         where:
         dummyUser                                                                                         || changesSize
-//        dummyUser("zenek").withAge(1)                                                                     || 5
-//        dummyUser("zenek").withDetails()                                                                  || 9
-//        dummyUser("zenek").withSupervisor("marian")                                                       || 11
+        dummyUser("zenek").withAge(1)                                                                     || 5
+        dummyUser("zenek").withDetails()                                                                  || 9
+        dummyUser("zenek").withSupervisor("marian")                                                       || 11
         dummyUser("zenek").withDetails(dummyUserDetails().withAddress("Wall Street", "New York").build()) || 13
 
     }
