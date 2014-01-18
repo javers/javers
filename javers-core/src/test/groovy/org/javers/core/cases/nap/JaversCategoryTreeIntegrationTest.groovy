@@ -1,4 +1,4 @@
-package org.javers.core.diff.categoryTree
+package org.javers.core.cases.nap
 
 import org.javers.core.Javers
 import org.javers.core.diff.Diff
@@ -6,7 +6,7 @@ import org.javers.core.diff.changetype.ValueChange
 import spock.lang.Specification
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.diff.DiffAssert.assertThat
-import static org.javers.core.diff.categoryTree.CategoryTestBuilder.category
+
 import org.javers.core.model.Category
 
 /**
@@ -14,12 +14,12 @@ import org.javers.core.model.Category
  *
  * @author bartosz walacik
  */
-class DiffFactoryCategoryTreeIntegrationTest extends Specification {
+class JaversCategoryTreeIntegrationTest extends Specification {
 
     def "should check all nodes when calculating property changes"(){
         given:
-        Category cat1 = category().deepWithChildNumber(3, 3, "name").build()
-        Category cat2 = category().deepWithChildNumber(3, 3, "newName").build()
+        Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(3, 3, "name").build()
+        Category cat2 = CategoryTestBuilder.category().deepWithChildNumber(3, 3, "newName").build()
         Javers javers = javers().registerEntity(Category).build()
 
         when:
@@ -31,8 +31,8 @@ class DiffFactoryCategoryTreeIntegrationTest extends Specification {
 
     def "should manage empty diff on big graphs"() {
         given:
-        Category cat1 = category().deepWithChildNumber(5,5).build()
-        Category cat2 = category().deepWithChildNumber(5,5).build()
+        Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
+        Category cat2 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
         Javers javers = javers().registerEntity(Category).build()
 
         when:
@@ -44,8 +44,8 @@ class DiffFactoryCategoryTreeIntegrationTest extends Specification {
 
     def "should manage full diff on big graphs"() {
         given:
-        Category cat1 = category().deepWithChildNumber(5,5).build()
-        Category cat2 = category(-1).deepWithChildNumber(5,5).build()
+        Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
+        Category cat2 = CategoryTestBuilder.category(-1).deepWithChildNumber(5,5).build()
         Javers javers = javers().registerEntity(Category).build()
 
         when:

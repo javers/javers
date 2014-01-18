@@ -99,7 +99,7 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
     }
 
     @Override
-    public Type getType() {
+    public Class getValueType() {
         return null;
     }
 }

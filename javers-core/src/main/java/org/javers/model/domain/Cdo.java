@@ -22,24 +22,10 @@ public class Cdo {
         argumentsAreNotNull(wrappedCdo, globalId);
         argumentCheck(globalId.getCdoClass().isInstance(wrappedCdo), "wrappedCdo is not an instance of given managedClass");
 
-        //Object cdoId = entity.getIdOf(cdo);
-        //if (cdoId == null) {
-        //    throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, entity.getClass().getName());
-        //}
-        //new InstanceId(cdoId, entity);
-
-        this.globalId = globalId;
+         this.globalId = globalId;
         this.wrappedCdo = wrappedCdo;
 
     }
-
-    /**
-     * Creates wrapper for ValueObject instance
-    public Cdo(InstanceId owningEntityInstanceId, Property location, Object valueObject) {
-        argumentsAreNotNull(owningEntityInstanceId, location, valueObject);
-        this.globalId = new ValueObjectId(owningEntityInstanceId,location.getName());
-        this.wrappedCdo = valueObject;
-    }*/
 
     /**
      * never returns null
@@ -75,7 +61,7 @@ public class Cdo {
         if (!(o instanceof Cdo)) {return false;}
 
         Cdo other = (Cdo) o;
-        return ( globalId.equals(other.globalId));
+        return  globalId.equals(other.globalId);
     }
 
     @Override

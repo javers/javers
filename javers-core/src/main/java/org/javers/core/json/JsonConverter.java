@@ -92,7 +92,7 @@ public class JsonConverter {
      * and registers them with this.gsonBuilder
      */
     void registerJsonTypeAdapter(final JsonTypeAdapter adapter) {
-        registerJsonTypeAdapter(adapter.getType(), adapter);
+        registerJsonTypeAdapter(adapter.getValueType(), adapter);
     }
 
 

@@ -43,6 +43,17 @@ public class InstanceId extends GlobalCdoId {
         return entity.getSourceClass().getName()+"/"+cdoId;
     }
 
+    public boolean idEquals(Object instance) {
+        if (instance == null) {
+            return false;
+        }
+        if (!entity.getSourceClass().isAssignableFrom(instance.getClass())){
+            return false;
+        }
+
+        return cdoId.equals(entity.getIdOf(instance));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }

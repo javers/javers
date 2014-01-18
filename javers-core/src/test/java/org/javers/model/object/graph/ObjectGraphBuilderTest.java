@@ -65,7 +65,7 @@ public abstract class ObjectGraphBuilderTest {
 
         //then
         assertThat(node).hasNoEdges()
-                        .hasCdo(node)
+                        .hasCdo(address)
                         .hasUnboundedValueObjectId(DummyAddress.class);
     }
 
@@ -78,11 +78,12 @@ public abstract class ObjectGraphBuilderTest {
         //when
         ObjectNode node = graphBuilder.buildGraph(user);
 
-        assertThat(node).hasSingleEdge("dummyAddress")
+        assertThat(node).hasCdo(user)
+                        .hasSingleEdge("dummyAddress")
                         .andTargetNode()
                         .hasNoEdges()
                         .hasCdo(user.getDummyAddress())
-                        .hasValueObjectId(DummyUser.class, "Mad Kaz", "dummyAddress");
+                        .hasValueObjectId(DummyAddress.class, user, "dummyAddress");
     }
 
     @Test

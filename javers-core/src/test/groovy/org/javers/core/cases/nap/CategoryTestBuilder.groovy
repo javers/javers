@@ -1,4 +1,4 @@
-package org.javers.core.diff.categoryTree
+package org.javers.core.cases.nap
 
 import org.javers.core.model.Category
 

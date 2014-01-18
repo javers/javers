@@ -1,9 +1,7 @@
 package org.javers.model.object.graph;
 
 import org.javers.common.validation.Validate;
-import org.javers.model.domain.Cdo;
-import org.javers.model.domain.InstanceId;
-import org.javers.model.domain.ValueObjectId;
+import org.javers.model.domain.*;
 import org.javers.model.mapping.*;
 import org.javers.model.mapping.type.CollectionType;
 import org.slf4j.Logger;
@@ -77,7 +75,8 @@ public class ObjectGraphBuilder {
             }
 
             Object referencedRawCdo = singleRef.get(node.unwrapCdo());
-            ObjectNode referencedNode = buildNodeOrReuse(asCdo(referencedRawCdo, node));
+            ObjectNode referencedNode = buildNodeOrReuse(asCdo(referencedRawCdo,
+                                                         new OwnerContext(node, singleRef.getName())));
 
             Edge edge = new SingleEdge(singleRef, referencedNode);
             node.addEdge(edge);
@@ -111,12 +110,13 @@ public class ObjectGraphBuilder {
             if (collectionOfReferences.isEmpty()){
                 continue;
             }
-            MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences, node);
+            MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences,
+                                                  new OwnerContext(node, colProperty.getName()));
             node.addEdge(multiEdge);
         }
     }
 
-    private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences, ObjectWrapper owner) {
+    private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences, OwnerContext owner) {
         MultiEdge multiEdge = new MultiEdge(multiRef);
         for(Object referencedRawCdo : collectionOfReferences) {
             ObjectNode objectNode = buildNodeOrReuse(asCdo(referencedRawCdo, owner));
@@ -141,7 +141,7 @@ public class ObjectGraphBuilder {
         return buildNode(referencedCdo);//recursion here
     }
 
-    private Cdo asCdo(Object targetCdo, ObjectWrapper owner){
+    private Cdo asCdo(Object targetCdo, OwnerContext owner){
         ManagedClass targetManagedClass =  getManagedCLass(targetCdo);
 
         //TODO refactor these IFs
@@ -151,12 +151,11 @@ public class ObjectGraphBuilder {
         }
         else if (targetManagedClass instanceof ValueObject && owner != null) {
             ValueObject valueObject = (ValueObject)targetManagedClass;
-            //TODO unsafe casting GlobalCdoId to InstanceId !
-            //TODO what about this zonk?
-            return new Cdo(targetCdo, new ValueObjectId(valueObject, (InstanceId)owner.getGlobalCdoId(), "zonk"));
+            return new Cdo(targetCdo, new ValueObjectId(valueObject, owner.getGlobalCdoId(), owner.path));
         }
         else if (targetManagedClass instanceof ValueObject && owner == null) {
-            throw new IllegalStateException("unbounded ValueObject not implemented");
+            ValueObject valueObject = (ValueObject)targetManagedClass;
+            return new Cdo(targetCdo, new UnboundedValueObjectId(valueObject));
         }
         else {
             throw new IllegalStateException("not implemented");
@@ -167,5 +166,19 @@ public class ObjectGraphBuilder {
     private ManagedClass getManagedCLass(Object cdo) {
         Validate.argumentIsNotNull(cdo);
         return entityManager.getByClass(cdo.getClass());
+    }
+
+    private class OwnerContext {
+        ObjectWrapper owner;
+        String path;
+
+        OwnerContext(ObjectWrapper owner, String path) {
+            this.owner = owner;
+            this.path = path;
+        }
+
+        GlobalCdoId getGlobalCdoId() {
+            return owner.getGlobalCdoId();
+        }
     }
 }

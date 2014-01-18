@@ -5,10 +5,9 @@ import org.javers.model.domain.InstanceId
 import org.javers.model.domain.UnboundedValueObjectId
 import org.javers.model.domain.ValueObjectId
 import org.javers.model.mapping.Entity
-import org.javers.model.mapping.ValueObject
 
-import static EntityTestBuilder.valueObject
 import static EntityTestBuilder.entity
+import static EntityTestBuilder.valueObject
 
 /**
  * @author bartosz walacik

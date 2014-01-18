@@ -4,22 +4,27 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
+import org.javers.model.mapping.type.ValueType;
 
 import java.lang.reflect.Type;
 
 /**
+ * Javers abstraction over native
+ * <a href="http://code.google.com/p/google-gson/">Gson</a> TypeAdapter.
+ * <p/>
+ *
  * Implement JsonTypeAdapter to add custom JSON serialization and deserialization behaviour,
  * depending on your domain model.
- * <br/><br/>
+ * <p/>
  *
- * {@link org.javers.model.mapping.type.ValueType} eligible for deserialization should have a no-argument constructor (public or private).
- * <br/><br/>
+ * {@link ValueType} eligible for deserialization should have a no-argument constructor (public or private).
+ * <p/>
  *
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
- * <br/><br/>
+ * <p/>
  *
  * For implementation example see {@link LocalDateTimeTypeAdapter}.
- * <br/><br/>
+ * <p/>
  *
  * @see LocalDateTimeTypeAdapter
  * @see JsonConverter
@@ -40,7 +45,7 @@ public interface JsonTypeAdapter<T> {
     JsonElement toJson(T sourceValue, JsonSerializationContext jsonSerializationContext);
 
     /**
-     * target Class, for ex. LocalDateTime
+     * target class of {@link ValueType}, for ex. Money.class
      */
-    Type getType();
+    Class getValueType();
 }

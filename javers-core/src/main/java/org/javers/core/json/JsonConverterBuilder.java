@@ -20,9 +20,9 @@ public class JsonConverterBuilder {
     private JsonConverter jsonConverter;
 
     /**
-     * use static jsonConverter().build();
+     * choose between new JsonConverterBuilder() or static jsonConverter()
      */
-    private JsonConverterBuilder() {
+    public JsonConverterBuilder() {
         jsonConverter = new JsonConverter();
         jsonConverter.registerJsonTypeAdapters(Arrays.asList(BUILT_IN_ADAPTERS));
         registerChangeTypeAdapter();

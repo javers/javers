@@ -1,9 +1,7 @@
 package org.javers.core.json
 
-import org.joda.time.LocalDateTime
+import org.javers.core.model.DummyPoint
 import spock.lang.Specification
-
-import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 
 /**
  * @author bartosz walacik
@@ -13,46 +11,46 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
     def "should use custom type adapter when converting to json"() {
         given:
         JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
-                                       registerJsonTypeAdapter(new DummyJsonPersonCustomTypeAdapter()).build()
+                                       registerJsonTypeAdapter(new DummyPointJsonTypeAdapter()).build()
 
         when:
-        String json = jsonConverter.toJson( new DummyJsonPerson("mad","kaz"))
+        String json = jsonConverter.toJson( new DummyPoint(1,2))
 
         then:
-        json == '"mad@kaz"'
+        json == '"1,2"'
     }
 
     def  "should use custom type adapter when converting from json"() {
         given:
         JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
-                                       registerJsonTypeAdapter(new DummyJsonPersonCustomTypeAdapter()).build()
+                                       registerJsonTypeAdapter(new DummyPointJsonTypeAdapter()).build()
         when:
-        DummyJsonPerson person = jsonConverter.fromJson('"mad@kaz"',DummyJsonPerson.class)
+        DummyPoint person = jsonConverter.fromJson('"1,2"',DummyPoint.class)
 
         then:
-        person == new DummyJsonPerson("mad","kaz")
+        person == new DummyPoint(1,2)
     }
 
     def "should use custom native Gson type adapter when converting to json"() {
         given:
         JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
-                                       registerNativeTypeAdapter(DummyJsonPerson, new DummyJsonPersonNativeTypeAdapter()).build()
+                                       registerNativeTypeAdapter(DummyPoint, new DummyPointNativeTypeAdapter()).build()
 
         when:
-        String json = jsonConverter.toJson( new DummyJsonPerson("mad","kaz"))
+        String json = jsonConverter.toJson( new DummyPoint(1,2))
 
         then:
-        json == '"mad@kaz"'
+        json == '"1,2"'
     }
 
     def  "should use custom native Gson type adapter when converting from json"() {
         given:
         JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
-                                       registerNativeTypeAdapter(DummyJsonPerson, new DummyJsonPersonNativeTypeAdapter()).build()
+                                       registerNativeTypeAdapter(DummyPoint, new DummyPointNativeTypeAdapter()).build()
         when:
-        DummyJsonPerson person = jsonConverter.fromJson('"mad@kaz"',DummyJsonPerson.class)
+        DummyPoint person = jsonConverter.fromJson('"1,2"',DummyPoint.class)
 
         then:
-        person == new DummyJsonPerson("mad","kaz")
+        person == new DummyPoint(1,2)
     }
 }
