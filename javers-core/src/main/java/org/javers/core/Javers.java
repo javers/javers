@@ -3,9 +3,15 @@ package org.javers.core;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.diff.Diff;
+import org.javers.model.domain.GlobalCdoId;
+import org.javers.model.mapping.EntityFactory;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.ManagedClass;
+import org.javers.model.object.graph.Fake;
 import org.javers.model.object.graph.ObjectGraphBuilder;
+import org.javers.model.object.graph.ObjectNode;
+
+import java.lang.reflect.Field;
 
 /**
  * Facade to JaVers instance.
@@ -58,5 +64,15 @@ public class Javers {
 
     public String toJson(Diff diff) {
         return jsonConverter.toJson(diff);
+    }
+
+    public  Diff firstDiff(String user, Object object) {
+        ObjectGraphBuilder rightGraph = new ObjectGraphBuilder(entityManager);
+        ObjectNode rightNode = rightGraph.buildGraph(object);
+
+        GlobalCdoId id = rightNode.getGlobalCdoId();
+        Fake fake = new Fake(id);
+
+        return diffFactory.create(user, fake, rightNode);
     }
 }

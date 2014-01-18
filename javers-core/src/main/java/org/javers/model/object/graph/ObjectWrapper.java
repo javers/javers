@@ -21,7 +21,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class ObjectWrapper extends ObjectNode {
-    private final Cdo cdo;
+    private Cdo cdo;
     private final Map<Property, Edge> edges;
 
 
@@ -84,12 +84,12 @@ public class ObjectWrapper extends ObjectNode {
         }
 
         ObjectWrapper that = (ObjectWrapper) o;
-        return cdo.equals(that.cdo);
+        return getGlobalCdoId().equals(that.getGlobalCdoId());
     }
 
     @Override
     public int hashCode() {
-        return cdo.hashCode();
+        return getGlobalCdoId().hashCode();
     }
 
     @Override

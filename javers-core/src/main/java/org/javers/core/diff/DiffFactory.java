@@ -38,7 +38,26 @@ public class DiffFactory {
             diff.addChanges(appender.getChangeSet(leftGraph, rightGraph));
         }
 
-        //calculate property-to-property diff
+//        for (Change change: diff.getChanges()) {
+//            change.
+//            appendPropertyChanges(diff, );
+//        }
+
+        appendPropertyChanges(diff, leftGraph, rightGraph);
+        // new Pair(Fake, right)
+        //calculate
+
+        //valueDehydrator.dehydrate(diff);
+
+        return diff;
+    }
+
+    /**
+     * calculate property-to-property diff
+     * @return
+     */
+    private void appendPropertyChanges(Diff diff, Set<ObjectNode> leftGraph, Set<ObjectNode> rightGraph) {
+
         for (NodePair pair : nodeMatcher.match(leftGraph, rightGraph)) {
             List<Property> nodeProperties = pair.getManagedClass().getProperties();
             for (Property property : nodeProperties) {
@@ -55,8 +74,5 @@ public class DiffFactory {
             }
         }
 
-        //valueDehydrator.dehydrate(diff);
-
-        return diff;
     }
 }
