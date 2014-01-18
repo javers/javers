@@ -22,17 +22,17 @@ public class NodeMatcher {
         List<NodePair> pairs = new ArrayList<>();
         Map<GlobalCdoId, ObjectNode> rightMap = asMap(rightGraph);
 
-        Set<ObjectNode> temp = new HashSet<>();
+        Set<ObjectNode> newNodes = new HashSet<>(rightGraph);
 
         for (ObjectNode left : leftGraph) {
             GlobalCdoId key = left.getGlobalCdoId();
             if (rightMap.containsKey(key) && (left.getClass() != Fake.class)) {
                 pairs.add(new NodePair(left,rightMap.get(key)));
-                temp.add(rightMap.get(key));
+                newNodes.remove(rightMap.get(key));
             }
         }
 
-        for (ObjectNode node : difference(rightGraph, temp)) {
+        for (ObjectNode node : newNodes) {
             Fake fake = new Fake(node.getGlobalCdoId());
             pairs.add(new NodePair(fake, node));
         }
