@@ -7,9 +7,6 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.diff.Diff
 import org.javers.core.model.DummyUser
 
-import static org.javers.core.model.DummyUser.Sex.FEMALE
-import static org.javers.core.model.DummyUser.Sex.MALE
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
@@ -23,8 +20,8 @@ class JaversSmartparamIntegrationTest {
                      .registerValueObject(DummyUser)
                      .build()
 
-        def user =  dummyUser("id").withValueMap(null).build()
-        def user2 = dummyUser("id").withValueMap(null).build()
+        def user =  dummyUser("id").withPrimitiveMap(null).build()
+        def user2 = dummyUser("id").withPrimitiveMap(null).build()
         Javers javers = JaversTestBuilder.javers()
 
         when:

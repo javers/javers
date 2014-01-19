@@ -10,17 +10,16 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class EntryAdded extends MapChange {
-    private final Entry added;
+    private final Entry entry;
 
     public EntryAdded(GlobalCdoId globalCdoId, Property property, Map.Entry added) {
         super(globalCdoId, property);
         Validate.argumentsAreNotNull(globalCdoId, property, added);
 
-        this.added = new Entry(added);
+        this.entry = new Entry(added);
     }
 
-    public Entry getAdded() {
-
-        return added;
+    public Entry getEntry() {
+        return entry;
     }
 }

@@ -30,6 +30,7 @@ public class DummyUser extends AbstractDummyUser {
     //collections
     private Set<String> stringSet;
     private List<Integer> integerList;
+    private Map<String, LocalDateTime> primitiveMap;
     private Map<String, LocalDateTime> valueMap;
     private Map<String, DummyUserDetails> objectMap; //not supported
 
@@ -188,5 +189,14 @@ public class DummyUser extends AbstractDummyUser {
 
     public void setEmployeesList(List<DummyUser> employeesList) {
         this.employeesList = employeesList;
+    }
+
+
+    public void setPrimitiveMap(Map<String, LocalDateTime> primitiveMap) {
+        this.primitiveMap = primitiveMap;
+    }
+
+    public Map<String, LocalDateTime> getPrimitiveMap() {
+        return primitiveMap;
     }
 }

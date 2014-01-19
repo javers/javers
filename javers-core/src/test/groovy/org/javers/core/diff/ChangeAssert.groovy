@@ -4,6 +4,7 @@ import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceAdded
 import org.javers.model.domain.InstanceId
+import org.javers.model.mapping.Property
 
 /**
  * @author bartosz walacik
@@ -51,4 +52,10 @@ class ChangeAssert {
         actual.affectedCdo == expectedAffectedCdo
         this
     }
+
+    ChangeAssert hasProperty(Property expected) {
+        assert actual.property == expected
+        this
+    }
+
 }

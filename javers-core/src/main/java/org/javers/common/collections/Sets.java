@@ -1,11 +1,10 @@
 package org.javers.common.collections;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.javers.common.validation.Validate;
+
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * @author Maciej Zasada
@@ -15,9 +14,35 @@ public class Sets {
     private Sets() {
     }
 
+    /**
+     * null args are allowed
+     */
+    public static <E> Set<E> intersection(Set<E> first, Set<E> second) {
+        if (first == null || second == null){
+            return Collections.EMPTY_SET;
+        }
+
+        Set<E> intersection = new HashSet<>();
+
+        for (E e : first) {
+            if (second.contains(e)) {
+                intersection.add(e);
+            }
+        }
+        return intersection;
+    }
+
+    /**
+     * null args are allowed
+     */
     public static <E> Set<E> difference(Set<E> first, Set<E> second) {
-        Validate.argumentIsNotNull(first);
-        Validate.argumentIsNotNull(second);
+        if (first == null){
+            return Collections.EMPTY_SET;
+        }
+
+        if (second == null){
+            return first;
+        }
 
         Set<E> difference = new HashSet<>(first);
         difference.removeAll(second);
@@ -41,5 +66,12 @@ public class Sets {
             result.add(transformation.apply(element));
         }
         return result;
+    }
+
+    private static <E> Set<E> nullSafe(Set<E> set) {
+        if (set == null) {
+            return Collections.EMPTY_SET;
+        }
+        return set;
     }
 }

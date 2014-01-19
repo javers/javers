@@ -74,7 +74,7 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
     }
 
     private void appendBody(EntryAdded change, JsonObject toJson, JsonSerializationContext context) {
-        toJson.add("entry", context.serialize(change.getAdded()));
+        toJson.add("entry", context.serialize(change.getEntry()));
     }
 
     private void appendBody(EntryRemoved change, JsonObject toJson, JsonSerializationContext context) {

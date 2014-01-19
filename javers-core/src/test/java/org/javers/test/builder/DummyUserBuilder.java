@@ -102,8 +102,13 @@ public class DummyUserBuilder {
         return this;
     }
 
-    public DummyUserBuilder withValueMap(Map valueMap) {
-        dummyUser.setValueMap(valueMap);
+    public DummyUserBuilder withValueMap(Map map) {
+        dummyUser.setValueMap(map);
+        return this;
+    }
+
+    public DummyUserBuilder withPrimitiveMap(Map map) {
+        dummyUser.setPrimitiveMap(map);
         return this;
     }
 

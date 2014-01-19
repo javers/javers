@@ -8,10 +8,7 @@ import org.javers.core.Javers;
 import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.diff.DFSGraphToSetConverter;
 import org.javers.core.diff.DiffFactory;
-import org.javers.core.diff.appenders.NewObjectAppender;
-import org.javers.core.diff.appenders.ObjectRemovedAppender;
-import org.javers.core.diff.appenders.ReferenceChangeAppender;
-import org.javers.core.diff.appenders.ValueChangeAppender;
+import org.javers.core.diff.appenders.*;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.object.graph.ObjectGraphBuilder;
@@ -27,6 +24,7 @@ public class CoreJaversModule implements JaversModule {
             ObjectGraphBuilder.class,
             DFSGraphToSetConverter.class,
             NewObjectAppender.class,
+            MapChangeAppender.class,
             ObjectRemovedAppender.class,
             ReferenceChangeAppender.class,
             JsonConverterBuilder.class,

@@ -14,7 +14,7 @@ import org.javers.model.object.graph.ObjectNode;
  */
 public class DiffFactory {
 
-     private NodeMatcher nodeMatcher;
+    private NodeMatcher nodeMatcher;
     private DFSGraphToSetConverter graphToSetConverter;
     private List<NodeChangeAppender> nodeChangeAppenders;
     private List<PropertyChangeAppender> propertyChangeAppender;
