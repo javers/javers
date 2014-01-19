@@ -6,7 +6,7 @@ import org.javers.core.model.DummyUser;
 import org.javers.model.domain.Cdo;
 import org.javers.model.domain.InstanceId;
 import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.EntityFactory;
+import org.javers.model.mapping.ManagedClassFactory;
 import org.javers.test.assertion.Assertions;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -20,13 +20,13 @@ import static org.junit.Assert.fail;
  */
 public abstract class ObjectWrapperTest {
 
-    protected EntityFactory entityFactory;
+    protected ManagedClassFactory managedClassFactory;
 
     @Test
     public void shouldHoldEntityReference() {
         //given
         DummyUser cdo = dummyUser().build();
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = managedClassFactory.create(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo, entity);
@@ -39,7 +39,7 @@ public abstract class ObjectWrapperTest {
     public void shouldHoldGlobalCdoId() {
         //given
         DummyUser cdo = dummyUser().withName("Mad Kaz").build();
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = managedClassFactory.create(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo, entity);
@@ -52,7 +52,7 @@ public abstract class ObjectWrapperTest {
     public void shouldHoldCdoReference() {
         //given
         DummyUser cdo = dummyUser().build();
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = managedClassFactory.create(DummyUser.class);
 
         //when
         ObjectWrapper wrapper = new ObjectWrapper(cdo, entity);
@@ -65,7 +65,7 @@ public abstract class ObjectWrapperTest {
     public void shouldThrowExceptinWhenEntityWithoutId() {
         //given
         DummyUser cdo = new DummyUser();
-        Entity entity = entityFactory.create(DummyUser.class);
+        Entity entity = managedClassFactory.create(DummyUser.class);
 
         //when
         try {
@@ -80,8 +80,8 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldBeEqualByIdValueAndEntityClass() {
         //given
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser.class));
+        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser.class));
 
         //when + then
         Assertions.assertThat(first.hashCode()).isEqualTo(second.hashCode());
@@ -91,8 +91,8 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldNotBeEqualWithDifferentIdValue() {
         //given
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("stach"), entityFactory.create(DummyUser.class));
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax 1"), entityFactory.create(DummyUser.class));
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("stach"), managedClassFactory.create(DummyUser.class));
+        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax 1"), managedClassFactory.create(DummyUser.class));
 
         //when + then
         Assertions.assertThat(first).isNotEqualTo(second);
@@ -101,7 +101,7 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldHaveReflexiveEqualsMethod() {
         // given
-        ObjectWrapper objectWrapper = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
+        ObjectWrapper objectWrapper = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser.class));
 
         //when + then
         Assertions.assertThat(objectWrapper).isEqualTo(objectWrapper);
@@ -110,9 +110,9 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldHaveSymmetricAndTransitiveEqualsMethod() {
         //given
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
-        ObjectWrapper third = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser.class));
+        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser.class));
+        ObjectWrapper third = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser.class));
 
         //when + then
         Assertions.assertThat(first).isEqualTo(second);
@@ -123,7 +123,7 @@ public abstract class ObjectWrapperTest {
     @Test
     public void shouldReturnFalseWhenEqualsMethodHasNullArg() {
         //given
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), entityFactory.create(DummyUser.class));
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser.class));
 
         //when + then
         Assertions.assertThat(first).isNotEqualTo(null);

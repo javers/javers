@@ -1,6 +1,7 @@
 package org.javers.test
 
 import org.javers.model.mapping.Entity
+import org.javers.test.assertion.Assertions
 
 /**
  * @author Pawel Cierpiatka
@@ -13,9 +14,15 @@ class EntityGroovyAssert {
         return new EntityGroovyAssert(actual: entity)
     }
 
-    def PropertyAssert hasProperty(String propertyName) {
+    PropertyAssert hasProperty(String propertyName) {
         def found = actual.getProperties().find { prop -> prop.name == propertyName}
         assert found : "there is no such property ${propertyName}"
-        return PropertyAssert.assertThat(found);;
+        PropertyAssert.assertThat(found)
     }
+
+    void hasNoProperty(String propertyName) {
+        def found = actual.getProperties().find { prop -> prop.name == propertyName}
+        assert found == null
+    }
+
 }

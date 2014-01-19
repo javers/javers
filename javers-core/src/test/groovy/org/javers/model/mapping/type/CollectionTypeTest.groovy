@@ -28,7 +28,6 @@ class CollectionTypeTest extends Specification{
         then:
         cType.baseJavaType == Set
         cType.genericType == false
-        cType.actualClassTypeArguments == []
         cType.elementType == null
     }
 
@@ -41,7 +40,6 @@ class CollectionTypeTest extends Specification{
 
         then:
         cType.genericType == true
-        cType.actualClassTypeArguments == []
         cType.elementType == null
     }
 
@@ -55,7 +53,6 @@ class CollectionTypeTest extends Specification{
         then:
         cType.baseJavaType == new TypeToken<Set<String>>(){}.type
         cType.genericType == true
-        cType.actualClassTypeArguments == [String]
         cType.elementType == String
     }
 }

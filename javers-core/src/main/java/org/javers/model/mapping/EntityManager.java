@@ -28,16 +28,16 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class EntityManager {
     private static final Logger logger = LoggerFactory.getLogger(EntityManager.class);
 
-    private final EntityFactory entityFactory;
+    private final ManagedClassFactory managedClassFactory;
     private final TypeMapper typeMapper;
 
     private final Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
     private final ManagedClasses managedClasses = new ManagedClasses();
 
-    public EntityManager(EntityFactory entityFactory, TypeMapper typeMapper) {
-        argumentsAreNotNull(entityFactory, typeMapper);
+    public EntityManager(ManagedClassFactory managedClassFactory, TypeMapper typeMapper) {
+        argumentsAreNotNull(managedClassFactory, typeMapper);
 
-        this.entityFactory = entityFactory;
+        this.managedClassFactory = managedClassFactory;
         this.typeMapper = typeMapper;
     }
 
@@ -110,11 +110,11 @@ public class EntityManager {
 
     private void manageEntity(EntityDefinition entityDef) {
         logger.debug("registering Entity[{}]", entityDef.getClazz().getName());
-        managedClasses.add(entityFactory.create(entityDef));
+        managedClasses.add(managedClassFactory.create(entityDef));
     }
 
     private void manageValueObject(ValueObjectDefinition voDef) {
         logger.debug("registering ValueObject[{}]", voDef.getClazz().getName());
-        managedClasses.add(entityFactory.create(voDef));
+        managedClasses.add(managedClassFactory.create(voDef));
     }
 }

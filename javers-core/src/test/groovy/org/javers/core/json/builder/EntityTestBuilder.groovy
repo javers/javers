@@ -2,8 +2,7 @@ package org.javers.core.json.builder
 
 import org.javers.core.JaversTestBuilder
 import org.javers.model.mapping.Entity
-import org.javers.model.mapping.EntityFactory
-import org.javers.model.mapping.FieldBasedPropertyScanner
+import org.javers.model.mapping.ManagedClassFactory
 import org.javers.model.mapping.ValueObject
 import org.javers.model.mapping.ValueObjectDefinition
 
@@ -11,7 +10,7 @@ import org.javers.model.mapping.ValueObjectDefinition
  * @author bartosz walacik
  */
 class EntityTestBuilder {
-    EntityFactory entityFactory;
+    ManagedClassFactory entityFactory;
 
     private EntityTestBuilder() {
         entityFactory = JaversTestBuilder.javersTestAssembly().entityFactory

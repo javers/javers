@@ -1,7 +1,7 @@
 package org.javers.model.object.graph;
 
 import org.javers.model.mapping.BeanBasedPropertyScanner;
-import org.javers.model.mapping.EntityFactory;
+import org.javers.model.mapping.ManagedClassFactory;
 import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Before;
 
@@ -14,7 +14,7 @@ public class ObjectGraphBeanBuilderTest extends ObjectGraphBuilderTest {
     public void setUp() {
         TypeMapper mapper = new TypeMapper();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
-        EntityFactory ef = new EntityFactory(scanner);
+        ManagedClassFactory ef = new ManagedClassFactory(scanner,mapper);
         entityManager = buildEntityManager(ef,mapper);
     }
 

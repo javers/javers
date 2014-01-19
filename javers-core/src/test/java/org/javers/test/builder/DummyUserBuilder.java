@@ -7,6 +7,7 @@ import org.javers.core.model.DummyUserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.javers.core.model.DummyUser.*;
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails;
@@ -98,6 +99,11 @@ public class DummyUserBuilder {
 
     public DummyUserBuilder withFlag(boolean flag) {
         dummyUser.setFlag(flag);
+        return this;
+    }
+
+    public DummyUserBuilder withValueMap(Map valueMap) {
+        dummyUser.setValueMap(valueMap);
         return this;
     }
 

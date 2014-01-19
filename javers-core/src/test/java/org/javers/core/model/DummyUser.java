@@ -1,11 +1,10 @@
 package org.javers.core.model;
 
+import org.joda.time.LocalDateTime;
+
 import javax.persistence.Id;
 import javax.persistence.Transient;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author bartosz walacik
@@ -31,6 +30,8 @@ public class DummyUser extends AbstractDummyUser {
     //collections
     private Set<String> stringSet;
     private List<Integer> integerList;
+    private Map<String, LocalDateTime> valueMap;
+    private Map<String, DummyUserDetails> objectMap; //not supported
 
     //arrays
     private int[] intArray;
@@ -53,6 +54,10 @@ public class DummyUser extends AbstractDummyUser {
             employeesList = new ArrayList<>();
         }
         employeesList.add(dummyUser);
+    }
+
+    public Map<String, LocalDateTime> getValueMap() {
+        return valueMap;
     }
 
     @Transient
@@ -145,6 +150,10 @@ public class DummyUser extends AbstractDummyUser {
         this.someTransientField = someTransientField;
     }
 
+    public Map<String, DummyUserDetails> getObjectMap() {
+        return objectMap;
+    }
+
     public DummyUserDetails getDummyUserDetails() {
         return dummyUserDetails;
     }
@@ -167,6 +176,14 @@ public class DummyUser extends AbstractDummyUser {
 
     public void setEmployeesList(DummyUser... employeesList) {
         this.employeesList = Arrays.asList(employeesList);
+    }
+
+    public void setValueMap(Map<String, LocalDateTime> valueMap) {
+        this.valueMap = valueMap;
+    }
+
+    public void setObjectMap(Map<String, DummyUserDetails> objectMap) {
+        this.objectMap = objectMap;
     }
 
     public void setEmployeesList(List<DummyUser> employeesList) {

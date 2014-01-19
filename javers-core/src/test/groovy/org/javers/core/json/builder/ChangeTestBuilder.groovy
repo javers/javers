@@ -1,5 +1,9 @@
 package org.javers.core.json.builder
 
+import org.javers.core.diff.changetype.Entry
+import org.javers.core.diff.changetype.EntryAdded
+import org.javers.core.diff.changetype.EntryChanged
+import org.javers.core.diff.changetype.EntryRemoved
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
@@ -29,7 +33,25 @@ class ChangeTestBuilder {
         new ObjectRemoved(globalId, objectRemoved)
     }
 
-    static ValueChange valueChange(Object cdo, String propertyName, Object oldVal, Object newVal) {
+    static EntryChanged entryChange(Object cdo, String propertyName, key="key", oldVal=null, newVal=null) {
+        InstanceId globalId = instanceId(cdo)
+        Property prop = globalId.cdoClass.getProperty(propertyName)
+        new EntryChanged(globalId,prop,key,oldVal,newVal)
+    }
+
+    static EntryAdded entryAdded(Object cdo, String propertyName, key="key", val=null) {
+        InstanceId globalId = instanceId(cdo)
+        Property prop = globalId.cdoClass.getProperty(propertyName)
+        new EntryAdded(globalId,prop, new Entry(key,val))
+    }
+
+    static EntryRemoved entryRemoved(Object cdo, String propertyName, key="key", val=null) {
+        InstanceId globalId = instanceId(cdo)
+        Property prop = globalId.cdoClass.getProperty(propertyName)
+        new EntryRemoved(globalId,prop,new Entry(key,val))
+    }
+
+    static ValueChange valueChange(Object cdo, String propertyName, oldVal=null, newVal=null) {
         InstanceId globalId = instanceId(cdo)
         Property prop = globalId.cdoClass.getProperty(propertyName)
         new ValueChange(globalId, prop, oldVal, newVal)

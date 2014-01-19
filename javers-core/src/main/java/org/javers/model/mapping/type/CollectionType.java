@@ -11,17 +11,17 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class CollectionType extends ContainerType {
+    private transient Class elementType;
 
     public CollectionType(Type baseJavaType) {
         super(baseJavaType);
+        if (getActualClassTypeArguments().size() == 1) {
+            elementType =  getActualClassTypeArguments().get(0);
+        }
     }
 
     @Override
-    protected Class initElementType() {
-        if (getActualClassTypeArguments().size() == 1) {
-            return  getActualClassTypeArguments().get(0);
-        }
-
-        return null;
+    public Class getElementType() {
+        return elementType;
     }
 }

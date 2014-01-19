@@ -3,29 +3,29 @@ package org.javers.model.mapping.type;
 import java.lang.reflect.Type;
 
 /**
+ * Collection or Array
+ *
  * @author bartosz walacik
  */
 public abstract class ContainerType extends JaversType {
-    private Class elementType;
 
     protected ContainerType(Type baseJavaType) {
         super(baseJavaType);
-
-        elementType = initElementType();
     }
-
-    protected abstract Class initElementType();
 
     /**
      * Collection/Array content type.
-     * <br/>
+     * <p/>
      * When Collection is generic Type with actual Class argument, returns this argument.
-     * <br/>
+     * For example, if baseJavaType = Set&lt;String&gt, returns String.class
+     * <p/>
+     *
+     * For no generic types like Set, or generic types with unbounded type parameter like
+     * Set&lt;V&gt;, Set&lt;?&gt; returns <b>null</b>.
+     * <p/>
+     *
      * When Array, returns {@link Class#getComponentType()}
-     * <br/>
-     * For example, if baseJavaType = List<String>, returns String.class
+     * <p/>
      */
-    public Class getElementType() {
-        return elementType;
-    }
+    public abstract Class getElementType();
 }

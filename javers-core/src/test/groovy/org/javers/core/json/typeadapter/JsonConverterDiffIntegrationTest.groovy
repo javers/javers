@@ -2,6 +2,9 @@ package org.javers.core.json.typeadapter
 
 import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
+import org.javers.core.diff.changetype.EntryAdded
+import org.javers.core.diff.changetype.EntryChanged
+import org.javers.core.diff.changetype.EntryRemoved
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
@@ -47,7 +50,6 @@ class JsonConverterDiffIntegrationTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -56,6 +58,40 @@ class JsonConverterDiffIntegrationTest extends Specification {
         json.rightValue == false
     }
 
+    def "should write property name, key, left & right values for EntryChange" () {
+        given:
+        JsonConverter jsonConverter = jsonConverter().build()
+        EntryChanged change = entryChange(dummyUser("kaz").build(),"valueMap","someKey", 1, 2)
+
+        when:
+        String jsonText = jsonConverter.toJson(change)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.property == "valueMap"
+        json.key == "someKey"
+        json.leftValue == 1
+        json.rightValue == 2
+    }
+
+    @Unroll
+    def "should write property name, key & value for #change.class.simpleName" () {
+        given:
+        JsonConverter jsonConverter = jsonConverter().build()
+        String jsonText = jsonConverter.toJson(change)
+
+        expect:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.property == "valueMap"
+        json.entry.key == "someKey"
+        json.entry.value == 1
+
+        where:
+        change << [
+                entryAdded(dummyUser("kaz").build(),"valueMap","someKey", 1),
+                entryRemoved(dummyUser("kaz").build(),"valueMap","someKey", 1)
+        ]
+    }
 
     def "should write property name, leftId & rightId for ReferenceChange" () {
         given:
@@ -127,7 +163,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
     }
 
     @Unroll
-    def "should write globalCdoId for #change.class.simpleName"(){
+    def "should write changeType & globalCdoId for #change.class.simpleName"(){
         given:
         JsonConverter jsonConverter = jsonConverter().build()
         String jsonText = jsonConverter.toJson(change)
@@ -143,12 +179,20 @@ class JsonConverterDiffIntegrationTest extends Specification {
         where:
         change << [newObject(dummyUser("kaz").build()),
                    objectRemoved(dummyUser("kaz").build()),
-                   valueChange(dummyUser("kaz").build(),"flag",true,false),
-                   referenceChanged(dummyUser("kaz").build(),"dummyUserDetails",dummyUserDetails(1).build(),null)]
+                   valueChange(dummyUser("kaz").build(),"flag"),
+                   referenceChanged(dummyUser("kaz").build(),"dummyUserDetails",dummyUserDetails(1).build(),null),
+                   entryChange(dummyUser("kaz").build(),"valueMap"),
+                   entryAdded(dummyUser("kaz").build(),"valueMap"),
+                   entryRemoved(dummyUser("kaz").build(),"valueMap")
+                  ]
         expectedType << [NewObject.simpleName,
                          ObjectRemoved.simpleName,
                          ValueChange.simpleName,
-                         ReferenceChange.simpleName]
+                         ReferenceChange.simpleName,
+                         EntryChanged.simpleName,
+                         EntryAdded.simpleName,
+                         EntryRemoved.simpleName
+                         ]
 
     }
 

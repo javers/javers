@@ -1,25 +1,18 @@
 package org.javers.model.object.graph;
 
 
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyNetworkAddress;
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
-import org.javers.model.mapping.EntityFactory;
+import org.javers.model.mapping.ManagedClassFactory;
 import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.type.TypeMapper;
-import org.javers.test.builder.DummyUserBuilder;
-import org.javers.test.builder.DummyUserDetailsBuilder;
 import org.junit.Test;
 
-import static com.googlecode.catchexception.CatchException.caughtException;
-import static com.googlecode.catchexception.apis.CatchExceptionBdd.when;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.javers.test.assertion.NodeAssert.assertThat;
 import static org.javers.test.builder.DummyUserBuilder.dummyUser;
-import static org.javers.test.assertion.JaversExceptionAssert.assertThat;
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails;
 
 /**
@@ -29,7 +22,7 @@ public abstract class ObjectGraphBuilderTest {
 
     protected EntityManager entityManager;
 
-    protected EntityManager buildEntityManager(EntityFactory ef, TypeMapper mapper ) {
+    protected EntityManager buildEntityManager(ManagedClassFactory ef, TypeMapper mapper ) {
         EntityManager entityManager = new EntityManager(ef, mapper);
         entityManager.registerEntity(DummyUser.class);
         entityManager.registerEntity(DummyUserDetails.class);

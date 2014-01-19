@@ -49,6 +49,8 @@ public class TypeMapper {
         //Collections
         addType(new CollectionType(Set.class));
         addType(new CollectionType(List.class));
+        //& Maps
+        addType(new MapType(Map.class));
     }
 
     /**
@@ -88,7 +90,14 @@ public class TypeMapper {
         addType(new ValueType(objectValue));
     }
 
-    <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
+    public boolean isPrimitiveOrValue(EntryClass entryClass) {
+        JaversType keyType  = getJaversType(entryClass.getKey());
+        JaversType valueType = getJaversType(entryClass.getValue());
+
+        return  keyType instanceof PrimitiveOrValueType && valueType instanceof PrimitiveOrValueType;
+    }
+
+    public <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
         List<T> result = new ArrayList<>();
         for(JaversType jType : mappedTypes.values()) {
             if(ofType.isAssignableFrom(jType.getClass()) ) {
@@ -98,14 +107,8 @@ public class TypeMapper {
         return result;
     }
 
-    @Deprecated
-    List<ValueObjectType> getMappedValueObjectTypes() {
-        return getMappedTypes(ValueObjectType.class);
-    }
 
-    List<EntityReferenceType> getMappedEntityReferenceTypes() {
-        return getMappedTypes(EntityReferenceType.class);
-    }
+    //-- protected
 
     //-- private
 

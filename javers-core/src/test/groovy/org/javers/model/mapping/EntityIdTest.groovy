@@ -11,7 +11,7 @@ import spock.lang.Specification
  * @author bartosz walacik
  */
 abstract class EntityIdTest extends Specification {
-    protected EntityFactory entityFactory;
+    protected ManagedClassFactory entityFactory;
 
     def "should use @id property by default"() {
         when:

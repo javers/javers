@@ -15,7 +15,7 @@ class EntityFromBeanConstructionTest extends EntityConstructionTest {
     def setupSpec() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(typeMapper);
-        entityFactory = new EntityFactory(scanner);
+        entityFactory = new ManagedClassFactory(scanner,typeMapper);
     }
 
     def "should scan value object property"() {

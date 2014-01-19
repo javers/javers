@@ -8,10 +8,11 @@ import org.javers.model.mapping.Property;
 import org.javers.model.mapping.PropertyScanner;
 import org.javers.model.mapping.type.*;
 import org.javers.test.assertion.Assertions;
+import org.joda.time.LocalDateTime;
 import org.junit.Test;
 
-import java.lang.reflect.Array;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -31,12 +32,14 @@ public abstract class PropertyScannerTest {
     }
 
     @Test
-    public void shouldScanAllProperties() {
+    public void shouldScanValueMapProperty() {
         //when
         List<Property> properties = propertyScanner.scan(DummyUser.class);
 
         //then
-        Assertions.assertThat(properties).hasSize(14);
+        PropertiesAssert.assertThat(properties).hasProperty("valueMap")
+                        .hasJaversType(MapType.class)
+                        .hasJavaType(new TypeToken<Map<String, LocalDateTime>>(){}.getType());
     }
 
     @Test
@@ -46,8 +49,8 @@ public abstract class PropertyScannerTest {
 
         //then
         PropertiesAssert.assertThat(properties).hasProperty("supervisor")
-            .hasJaversType(EntityReferenceType.class)
-            .hasJavaType(DummyUser.class);
+                        .hasJaversType(EntityReferenceType.class)
+                        .hasJavaType(DummyUser.class);
     }
 
     @Test

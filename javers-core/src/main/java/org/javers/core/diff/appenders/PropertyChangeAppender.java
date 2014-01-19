@@ -17,9 +17,9 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public abstract class PropertyChangeAppender <T extends PropertyChange> {
-    protected final static Set<Class<JaversType>> COLLECTION_TYPES = (Set) Sets.asSet(CollectionType.class);
-    protected final static Set<Class<JaversType>> VALUE_TYPES = (Set) Sets.asSet(PrimitiveType.class, ValueType.class);
-    protected final static Set<Class<JaversType>> ENTITY_REF_TYPES = (Set) Sets.asSet(EntityReferenceType.class);
+   // protected final static Set<Class<JaversType>> COLLECTION_TYPES = (Set) Sets.asSet(CollectionType.class);
+   // protected final static Set<Class<JaversType>> VALUE_TYPES = (Set) Sets.asSet(PrimitiveOrValueType.class);
+   // protected final static Set<Class<JaversType>> ENTITY_REF_TYPES = (Set) Sets.asSet(EntityReferenceType.class);
 
     /**
      * checks if given property is supported and if so,
@@ -33,10 +33,10 @@ public abstract class PropertyChangeAppender <T extends PropertyChange> {
     }
 
     protected boolean supports(Property property) {
-        return getSupportedPropertyTypes().contains(property.getType().getClass());
+        return getSupportedPropertyType().isAssignableFrom( property.getType().getClass());
     }
 
-    protected abstract Set<Class<JaversType>> getSupportedPropertyTypes();
+    protected abstract Class<? extends JaversType> getSupportedPropertyType();
 
     protected abstract Collection<T> calculateChanges(NodePair pair, Property supportedProperty);
 }

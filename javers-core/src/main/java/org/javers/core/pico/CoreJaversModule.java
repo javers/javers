@@ -13,8 +13,6 @@ import org.javers.core.diff.appenders.ObjectRemovedAppender;
 import org.javers.core.diff.appenders.ReferenceChangeAppender;
 import org.javers.core.diff.appenders.ValueChangeAppender;
 import org.javers.core.json.JsonConverterBuilder;
-import org.javers.model.mapping.EntityFactory;
-import org.javers.model.mapping.EntityManager;
 import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 

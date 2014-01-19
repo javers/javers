@@ -6,6 +6,7 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.mapping.Property;
+import org.javers.model.mapping.type.EntityReferenceType;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.object.graph.Edge;
 import org.javers.model.object.graph.SingleEdge;
@@ -21,8 +22,8 @@ import java.util.Set;
 public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceChange> {
 
     @Override
-    protected Set<Class<JaversType>> getSupportedPropertyTypes() {
-        return ENTITY_REF_TYPES;
+    protected Class<? extends JaversType> getSupportedPropertyType() {
+        return EntityReferenceType.class;
     }
 
     @Override

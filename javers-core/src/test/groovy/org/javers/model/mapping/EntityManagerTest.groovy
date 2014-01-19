@@ -5,7 +5,9 @@ import org.javers.core.exceptions.JaversExceptionCode
 import org.javers.core.model.DummyManagedClass
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyNotManagedClass
+import org.javers.model.mapping.type.EntityReferenceType
 import org.javers.model.mapping.type.TypeMapper
+import org.javers.model.mapping.type.ValueObjectType
 import spock.lang.Specification
 
 class EntityManagerTest extends Specification{
@@ -15,8 +17,8 @@ class EntityManagerTest extends Specification{
     def setup() {
         TypeMapper mapper = new TypeMapper()
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper)
-        EntityFactory entityFactory = new EntityFactory(scanner)
-        entityManager = new EntityManager(entityFactory, mapper)
+        ManagedClassFactory entityFactory = new ManagedClassFactory(scanner, mapper)
+        entityManager = new EntityManager(entityFactory,mapper)
     }
 
     def "should throw exception if entity is not managed when trying to get it"() {
@@ -68,27 +70,27 @@ class EntityManagerTest extends Specification{
     def "should not register entity in typeMapper more than once"() {
         given:
         TypeMapper typeMapper = new TypeMapper()
-        EntityManager entityManager = new EntityManager(Mock(EntityFactory), typeMapper)
+        EntityManager entityManager = new EntityManager(Mock(ManagedClassFactory), typeMapper)
 
         when:
         entityManager.registerEntity(DummyManagedClass)
         entityManager.registerEntity(DummyManagedClass)
 
         then:
-        typeMapper.mappedEntityReferenceTypes.size() == 1
+        typeMapper.getMappedTypes(EntityReferenceType).size() == 1
     }
 
     def "should not register valueObject in typeMapper more than once"() {
         given:
         TypeMapper typeMapper = new TypeMapper()
-        EntityManager entityManager = new EntityManager(Mock(EntityFactory), typeMapper)
+        EntityManager entityManager = new EntityManager(Mock(ManagedClassFactory), typeMapper)
 
         when:
-        def mapped = typeMapper.mappedValueObjectTypes.size()
+        def mapped = typeMapper.getMappedTypes(ValueObjectType).size()
         entityManager.registerValueObject(DummyNetworkAddress)
         entityManager.registerValueObject(DummyNetworkAddress)
 
         then:
-        mapped == typeMapper.mappedValueObjectTypes.size() - 1
+        typeMapper.getMappedTypes(ValueObjectType).size() == mapped+1
     }
 }

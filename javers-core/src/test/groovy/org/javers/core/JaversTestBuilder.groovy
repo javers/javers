@@ -1,7 +1,7 @@
 package org.javers.core
 
 import org.javers.core.model.DummyUserWithValues
-import org.javers.model.mapping.EntityFactory
+import org.javers.model.mapping.ManagedClassFactory
 import org.javers.model.object.graph.ObjectGraphBuilder
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
@@ -41,8 +41,8 @@ class JaversTestBuilder {
         new JaversTestBuilder().javersBuilder.getContainerComponent(Javers)
     }
 
-    EntityFactory getEntityFactory() {
-        javersBuilder.getContainerComponent(EntityFactory)
+    ManagedClassFactory getEntityFactory() {
+        javersBuilder.getContainerComponent(ManagedClassFactory)
     }
 
     EntityManager getEntityManager() {

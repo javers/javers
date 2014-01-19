@@ -1,4 +1,4 @@
-package org.javers.core.diff;
+package org.javers.core.diff.changetype;
 
 import com.google.gson.annotations.Expose;
 

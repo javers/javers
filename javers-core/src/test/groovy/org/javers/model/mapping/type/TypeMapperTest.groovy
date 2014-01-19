@@ -20,6 +20,7 @@ class TypeMapperTest extends Specification {
         Set set
         DummySet dummySet
         HashSet<String> hashSetWithString
+        HashMap<String , Integer> mapStringToInt
         DummyEnum dummyEnum
         int[] intArray
         Set<String>  setWithString
@@ -83,16 +84,31 @@ class TypeMapperTest extends Specification {
         mapper.getMappedTypes(CollectionType).size() == colPrototypes + 1
     }
 
-    def "should spawn generic type from non-generic prototype"() {
+    def "should spawn generic Set type from non-generic prototype"() {
         given:
         TypeMapper mapper = new TypeMapper()
         Type setWithString   = getFieldFromClass(Dummy, "setWithString").genericType
 
         when:
-        JaversType jType = mapper.getJaversType(setWithString)
+        CollectionType jType = mapper.getJaversType(setWithString)
 
         then:
         jType.baseJavaType == new TypeToken<Set<String>>(){}.type
+        jType.elementType == String
+    }
+
+    def "should spawn generic Map impl from non-generic prototype interface"() {
+        given:
+        TypeMapper mapper = new TypeMapper()
+        Type mapStringToInt   = getFieldFromClass(Dummy, "mapStringToInt").genericType
+
+        when:
+        MapType jType = mapper.getJaversType(mapStringToInt)
+
+        then:
+        jType.baseJavaType == new TypeToken<HashMap<String, Integer>>(){}.type
+        jType.entryClass.key == String
+        jType.entryClass.value == Integer
     }
 
 

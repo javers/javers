@@ -5,8 +5,6 @@ import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.*;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.model.domain.GlobalCdoId;
-import org.javers.model.domain.InstanceId;
-import org.javers.model.domain.UnboundedValueObjectId;
 import org.javers.model.domain.ValueObjectId;
 import org.javers.model.mapping.Entity;
 
@@ -18,7 +16,8 @@ import java.lang.reflect.Type;
  * @author bartosz walacik
  */
 public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
-    public static final Type[] SUPPORTED = {NewObject.class, ObjectRemoved.class, ValueChange.class, ReferenceChange.class};
+    public static final Type[] SUPPORTED = {
+            NewObject.class, ObjectRemoved.class, ValueChange.class, ReferenceChange.class, EntryAdded.class, EntryRemoved.class, EntryChanged.class};
 
     @Override
     public JsonElement toJson(Change change, JsonSerializationContext context) {
@@ -32,12 +31,25 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
             appendPropertyName((PropertyChange) change, jsonObject);
         }
 
+        //lame double dispatch
         if (change instanceof  ValueChange) {
             appendBody((ValueChange) change, jsonObject, context);
         }
 
         if (change instanceof ReferenceChange) {
             appendBody((ReferenceChange) change, jsonObject, context);
+        }
+
+        if (change instanceof EntryChanged) {
+            appendBody((EntryChanged) change, jsonObject, context);
+        }
+
+        if (change instanceof EntryAdded) {
+            appendBody((EntryAdded) change, jsonObject, context);
+        }
+
+        if (change instanceof EntryRemoved) {
+            appendBody((EntryRemoved) change, jsonObject, context);
         }
 
         return jsonObject;
@@ -59,6 +71,20 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
     private void appendBody(ValueChange change, JsonObject toJson, JsonSerializationContext context) {
         toJson.add("leftValue", context.serialize(change.getLeftValue().value()));
         toJson.add("rightValue", context.serialize(change.getRightValue().value()));
+    }
+
+    private void appendBody(EntryAdded change, JsonObject toJson, JsonSerializationContext context) {
+        toJson.add("entry", context.serialize(change.getAdded()));
+    }
+
+    private void appendBody(EntryRemoved change, JsonObject toJson, JsonSerializationContext context) {
+        toJson.add("entry", context.serialize(change.getEntry()));
+    }
+
+    private void appendBody(EntryChanged change, JsonObject toJson, JsonSerializationContext context) {
+        toJson.add("key", context.serialize(change.getKey()));
+        toJson.add("leftValue", context.serialize(change.getLeftValue()));
+        toJson.add("rightValue", context.serialize(change.getRightValue()));
     }
 
     private void appendGlobalId(GlobalCdoId globalCdoId, JsonObject toJson, JsonSerializationContext context) {
