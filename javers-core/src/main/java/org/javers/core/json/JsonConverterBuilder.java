@@ -4,6 +4,7 @@ import com.google.gson.*;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.ChangeTypeAdapter;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
+import org.javers.core.json.typeadapter.LocalDateTypeAdapter;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -15,7 +16,9 @@ import java.util.Collection;
  */
 public class JsonConverterBuilder {
     private static final JsonTypeAdapter[] BUILT_IN_ADAPTERS = new JsonTypeAdapter[] {
-            new LocalDateTimeTypeAdapter()};
+            new LocalDateTimeTypeAdapter(),
+            new LocalDateTypeAdapter()
+    };
 
     private JsonConverter jsonConverter;
 

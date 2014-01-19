@@ -2,13 +2,14 @@ package org.javers.core.json.typeadapter
 
 import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
-import org.javers.core.diff.changetype.EntryAdded
-import org.javers.core.diff.changetype.EntryChanged
-import org.javers.core.diff.changetype.EntryRemoved
+import org.javers.core.diff.changetype.map.EntryAdded
+import org.javers.core.diff.changetype.map.EntryRemoved
+import org.javers.core.diff.changetype.map.EntryValueChanged
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.json.JsonConverter
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
@@ -58,39 +59,37 @@ class JsonConverterDiffIntegrationTest extends Specification {
         json.rightValue == false
     }
 
-    def "should write property name, key, left & right values for EntryChange" () {
+    def "should write EntryChanges for map" () {
         given:
         JsonConverter jsonConverter = jsonConverter().build()
-        EntryChanged change = entryChange(dummyUser("kaz").build(),"valueMap","someKey", 1, 2)
+        def entryChanges = [new EntryAdded("some",1),
+                            new EntryRemoved("some",2),
+                            new EntryValueChanged("mod",3,4)]
+
+        MapChange change = mapChange(dummyUser("kaz").build(),"valueMap",entryChanges)
 
         when:
         String jsonText = jsonConverter.toJson(change)
+        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.property == "valueMap"
-        json.key == "someKey"
-        json.leftValue == 1
-        json.rightValue == 2
-    }
+        json.entryChanges.size() == 3
 
-    @Unroll
-    def "should write property name, key & value for #change.class.simpleName" () {
-        given:
-        JsonConverter jsonConverter = jsonConverter().build()
-        String jsonText = jsonConverter.toJson(change)
+        json.entryChanges[0].entryChangeType == "EntryAdded"
+        json.entryChanges[0].key == "some"
+        json.entryChanges[0].value == 1
 
-        expect:
-        def json = new JsonSlurper().parseText(jsonText)
-        json.property == "valueMap"
-        json.entry.key == "someKey"
-        json.entry.value == 1
+        json.entryChanges[1].entryChangeType == "EntryRemoved"
+        json.entryChanges[1].key == "some"
+        json.entryChanges[1].value == 2
 
-        where:
-        change << [
-                entryAdded(dummyUser("kaz").build(),"valueMap","someKey", 1),
-                entryRemoved(dummyUser("kaz").build(),"valueMap","someKey", 1)
-        ]
+        json.entryChanges[2].entryChangeType == "EntryValueChanged"
+        json.entryChanges[2].key == "mod"
+        json.entryChanges[2].leftValue == 3
+        json.entryChanges[2].rightValue == 4
+
     }
 
     def "should write property name, leftId & rightId for ReferenceChange" () {
@@ -181,18 +180,13 @@ class JsonConverterDiffIntegrationTest extends Specification {
                    objectRemoved(dummyUser("kaz").build()),
                    valueChange(dummyUser("kaz").build(),"flag"),
                    referenceChanged(dummyUser("kaz").build(),"dummyUserDetails",dummyUserDetails(1).build(),null),
-                   entryChange(dummyUser("kaz").build(),"valueMap"),
-                   entryAdded(dummyUser("kaz").build(),"valueMap"),
-                   entryRemoved(dummyUser("kaz").build(),"valueMap")
+                   mapChange(dummyUser("kaz").build(),"valueMap",[])
                   ]
         expectedType << [NewObject.simpleName,
                          ObjectRemoved.simpleName,
                          ValueChange.simpleName,
                          ReferenceChange.simpleName,
-                         EntryChanged.simpleName,
-                         EntryAdded.simpleName,
-                         EntryRemoved.simpleName
-                         ]
+                         MapChange.simpleName]
 
     }
 

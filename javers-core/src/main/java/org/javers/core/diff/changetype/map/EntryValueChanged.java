@@ -1,22 +1,19 @@
-package org.javers.core.diff.changetype;
+package org.javers.core.diff.changetype.map;
 
-import org.javers.common.validation.Validate;
-import org.javers.model.domain.GlobalCdoId;
-import org.javers.model.mapping.Property;
+import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * entry value changed
  *
  * @author bartosz walacik
  */
-public class EntryChanged extends MapChange {
+public class EntryValueChanged extends EntryChange {
     private final Object key;
-
     private final Object leftValue;
     private final Object rightValue;
-    public EntryChanged(GlobalCdoId globalCdoId, Property property, Object key, Object leftValue, Object rightValue) {
-        super(globalCdoId, property);
-        Validate.argumentsAreNotNull(globalCdoId,property,key);
+
+    public EntryValueChanged(Object key, Object leftValue, Object rightValue) {
+        argumentIsNotNull(key);
 
         this.key = key;
         this.leftValue = leftValue;

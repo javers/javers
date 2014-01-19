@@ -3,6 +3,10 @@ package org.javers.core.diff.appenders
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.ChangeAssert
 import org.javers.core.diff.NodePair
+import org.javers.core.diff.changetype.map.EntryAddOrRemove
+import org.javers.core.diff.changetype.map.EntryAdded
+import org.javers.core.diff.changetype.map.EntryRemoved
+import org.javers.core.diff.changetype.map.EntryValueChanged
 import org.javers.core.model.DummyUser
 import org.javers.model.mapping.Property
 import org.javers.model.object.graph.ObjectNode
@@ -51,7 +55,7 @@ class MapChangeAppenderTest extends AbstractDiffTest{
     }
 
     @Unroll
-    def "should append #changeType when left map is #leftMap and rightMap is #rightMap"() {
+    def "should append #changeType.simpleName when left map is #leftMap and rightMap is #rightMap"() {
         given:
         ObjectNode left =  buildGraph(dummyUser("1").withPrimitiveMap(leftMap).build())
         ObjectNode right = buildGraph(dummyUser("1").withPrimitiveMap(rightMap).build())
@@ -60,17 +64,18 @@ class MapChangeAppenderTest extends AbstractDiffTest{
         expect:
         def changes = new MapChangeAppender().calculateChanges(new NodePair(left,right),primitiveMap)
         changes.size() == 1
-        changes[0].entry.key == "some"
-        changes[0].entry.value == 1
-        changes[0].class.simpleName == changeType
+        EntryAddOrRemove entryAddOrRemove = changes[0].entryChanges[0]
+        entryAddOrRemove.key == "some"
+        entryAddOrRemove.value == 1
+        entryAddOrRemove.class == changeType
 
         where:
-        changeType << ["EntryAdded","EntryRemoved","EntryAdded",         "EntryRemoved"]
+        changeType << [EntryAdded,  EntryRemoved,  EntryAdded,           EntryRemoved]
         leftMap <<    [null,        ["some":1],    ["other":1],          ["some":1,"other":1] ]
         rightMap <<   [["some":1],   null,         ["other":1,"some":1], ["other":1] ]
     }
 
-    def "should append EntryChanged when Primitive entry.value is changed"() {
+    def "should append EntryValueChanged when Primitive entry.value is changed"() {
         given:
         ObjectNode left =  buildGraph(dummyUser("1").withPrimitiveMap(["some":1,"other":2] ).build())
         ObjectNode right = buildGraph(dummyUser("1").withPrimitiveMap(["some":2,"other":2]).build())
@@ -81,12 +86,13 @@ class MapChangeAppenderTest extends AbstractDiffTest{
 
         then:
         changes.size() == 1
-        changes[0].key == "some"
-        changes[0].leftValue == 1
-        changes[0].rightValue == 2
+        EntryValueChanged entryValueChanged = changes[0].entryChanges[0]
+        entryValueChanged.key == "some"
+        entryValueChanged.leftValue == 1
+        entryValueChanged.rightValue == 2
     }
 
-    def "should append EntryChanged when ValueType entry.value is changed"() {
+    def "should append EntryValueChanged when ValueType entry.value is changed"() {
 
         def dayOne = new LocalDateTime(2000,1,1,12,1)
         def dayTwo = new LocalDateTime(2000,1,1,12,2)
@@ -103,8 +109,9 @@ class MapChangeAppenderTest extends AbstractDiffTest{
 
         then:
         changes.size() == 1
-        changes[0].key == "some"
-        changes[0].leftValue ==   dayOne
-        changes[0].rightValue ==  dayTwo
+        EntryValueChanged entryValueChanged = changes[0].entryChanges[0]
+        entryValueChanged.key == "some"
+        entryValueChanged.leftValue ==   dayOne
+        entryValueChanged.rightValue ==  dayTwo
     }
 }

@@ -55,20 +55,20 @@ public class ManagedClassFactory {
     }
 
     private List<Property> onlySupported(List<Property> properties){
-        Predicate<Property> notSupported = new Predicate<Property>() {
+        Predicate<Property> supported = new Predicate<Property>() {
             @Override
             public boolean apply(Property property) {
                 if (property.getType() instanceof MapType) {
                    MapType mapType = (MapType)property.getType();
 
-                   return ! typeMapper.isPrimitiveOrValue(mapType.getEntryClass());
+                   return mapType.isObjectToObjectMap() || typeMapper.isPrimitiveOrValue(mapType.getEntryClass());
 
                 }
-                return false;
+                return true;
             }
         };
 
-        return Lists.negativeFilter(properties, notSupported);
+        return Lists.positiveFilter(properties, supported);
     }
 
 

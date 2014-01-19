@@ -4,6 +4,7 @@ import org.javers.common.collections.Maps;
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.*;
+import org.javers.core.diff.changetype.map.*;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.MapType;
@@ -31,27 +32,32 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
             return Collections.EMPTY_SET;
         }
 
-        Collection<MapChange> changes = new ArrayList<>();
+        List<EntryChange> changes = new ArrayList<>();
 
         for (Object commonKey : Maps.commonKeys(leftMap, rightMap)) {
             Object leftVal  = leftMap.get(commonKey);
             Object rightVal = rightMap.get(commonKey);
 
             if (!nullSafeEquals(leftVal, rightVal)){
-                changes.add( new EntryChanged(pair.getGlobalCdoId(), property, commonKey, leftVal, rightVal));
+                changes.add( new EntryValueChanged(commonKey, leftVal, rightVal));
             }
         }
 
         for (Object addedKey : Maps.keysDifference(rightMap,leftMap)) {
             Object addedValue  = rightMap.get(addedKey);
-            changes.add( new EntryAdded(pair.getGlobalCdoId(), property, new Entry(addedKey, addedValue)));
+            changes.add( new EntryAdded(addedKey, addedValue));
         }
 
         for (Object removedKey : Maps.keysDifference(leftMap, rightMap)) {
             Object removedValue  = leftMap.get(removedKey);
-            changes.add( new EntryRemoved(pair.getGlobalCdoId(), property, new Entry(removedKey, removedValue)));
+            changes.add( new EntryRemoved(removedKey, removedValue));
         }
 
-        return changes;
+        if (changes.size()>0) {
+            return Sets.asSet(new MapChange(pair.getGlobalCdoId(), property, changes));
+        }
+        else {
+            return Collections.EMPTY_SET;
+        }
     }
 }
