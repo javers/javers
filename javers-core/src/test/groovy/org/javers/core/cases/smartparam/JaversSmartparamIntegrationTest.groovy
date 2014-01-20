@@ -25,7 +25,7 @@ class JaversSmartparamIntegrationTest extends Specification{
         when:
         Diff diff = javers.compare("user", entry1, entry2)
         String jsonText = javers.toJson(diff)
-        println("jsonText:\n"+jsonText)
+        //println("jsonText:\n"+jsonText)
 
 
         then:
@@ -37,13 +37,18 @@ class JaversSmartparamIntegrationTest extends Specification{
         mapChange.globalCdoId.cdoId == "/"
         mapChange.property == "levels"
         mapChange.entryChanges.size() == 2
-        mapChange.entryChanges[0].entryChangeType == "EntryValueChanged"
-        mapChange.entryChanges[0].key == "date"
-        mapChange.entryChanges[0].leftValue == "2014-01-10"
-        mapChange.entryChanges[0].rightValue == "2014-01-12"
-        mapChange.entryChanges[1].entryChangeType == "EntryAdded"
-        mapChange.entryChanges[1].key == "rate"
-        mapChange.entryChanges[1].value == 10
 
+        with(mapChange.entryChanges[0]) {
+            entryChangeType == "EntryValueChanged"
+            key == "date"
+            leftValue == "2014-01-10"
+            rightValue == "2014-01-12"
+        }
+
+        with(mapChange.entryChanges[1]) {
+            entryChangeType == "EntryAdded"
+            key == "rate"
+            value == 10
+        }
     }
 }
