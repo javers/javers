@@ -76,20 +76,22 @@ class JsonConverterDiffIntegrationTest extends Specification {
         def json = new JsonSlurper().parseText(jsonText)
         json.property == "valueMap"
         json.entryChanges.size() == 3
-
-        json.entryChanges[0].entryChangeType == "EntryAdded"
-        json.entryChanges[0].key == "some"
-        json.entryChanges[0].value == 1
-
-        json.entryChanges[1].entryChangeType == "EntryRemoved"
-        json.entryChanges[1].key == "some"
-        json.entryChanges[1].value == 2
-
-        json.entryChanges[2].entryChangeType == "EntryValueChanged"
-        json.entryChanges[2].key == "mod"
-        json.entryChanges[2].leftValue == 3
-        json.entryChanges[2].rightValue == 4
-
+        with(json.entryChanges[0]){
+            entryChangeType == "EntryAdded"
+            key == "some"
+            value == 1
+        }
+        with(json.entryChanges[1]){
+            entryChangeType == "EntryRemoved"
+            key == "some"
+            value == 2
+        }
+        with(json.entryChanges[2]){
+            entryChangeType == "EntryValueChanged"
+            key == "mod"
+            leftValue == 3
+            rightValue == 4
+        }
     }
 
     def "should write property name, leftId & rightId for ReferenceChange" () {
