@@ -4,6 +4,7 @@ import com.google.gson.TypeAdapter;
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
 import org.javers.core.configuration.JaversCoreConfiguration;
+import org.javers.core.diff.changetype.Value;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.pico.CoreJaversModule;
@@ -14,6 +15,7 @@ import org.javers.model.mapping.type.ValueType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.Boolean;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -121,6 +123,17 @@ public class JaversBuilder extends AbstractJaversBuilder {
     public JaversBuilder registerValueGsonTypeAdapter(Class valueType, TypeAdapter nativeAdapter) {
         registerValue(valueType);
         jsonConverterBuilder().registerNativeTypeAdapter(valueType, nativeAdapter);
+        return this;
+    }
+
+    /**
+     * Switch on when you need type safe {@link Value}s
+     * serialization stored in polymorfic collections like List, List&lt;Object&gt;, Map&lt;Object,Object&gt;, etc.
+     *
+     * @see org.javers.core.json.JsonConverterBuilder#typeSafeValues(boolean)
+     */
+    public JaversBuilder typeSafeValues(){
+        jsonConverterBuilder().typeSafeValues(true);
         return this;
     }
 

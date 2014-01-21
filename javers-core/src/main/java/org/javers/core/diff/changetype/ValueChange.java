@@ -16,17 +16,19 @@ public class ValueChange extends PropertyChange {
         this.rightValue = new Value(rightValue);
     }
 
-    /**
-     * never returns null
-     */
-    public Value getLeftValue() {
+    public Object getLeftValue() {
+        return leftValue.unwrap();
+    }
+
+    public Object getRightValue() {
+        return rightValue.unwrap();
+    }
+
+    public Value getWrappedLeftValue() {
         return leftValue;
     }
 
-    /**
-     * never returns null
-     */
-    public Value getRightValue() {
+    public Value getWrappedRightValue() {
         return rightValue;
     }
 }

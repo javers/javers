@@ -14,7 +14,7 @@ public class ValueRemoved extends ValueAddOrRemove {
         super(globalCdoId, property, value);
     }
 
-    public Value getRemovedValue() {
-        return value;
+    public Object getRemovedValue() {
+        return value.unwrap();
     }
 }

@@ -1,34 +1,48 @@
 package org.javers.core.diff.changetype.map;
 
+import org.javers.core.diff.changetype.Value;
+
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * entry value changed
+ * entry unwrap changed
  *
  * @author bartosz walacik
  */
 public class EntryValueChanged extends EntryChange {
-    private final Object key;
-    private final Object leftValue;
-    private final Object rightValue;
+    private final Value key;
+    private final Value leftValue;
+    private final Value rightValue;
 
     public EntryValueChanged(Object key, Object leftValue, Object rightValue) {
         argumentIsNotNull(key);
 
-        this.key = key;
-        this.leftValue = leftValue;
-        this.rightValue = rightValue;
+        this.key = new Value(key);
+        this.leftValue = new Value(leftValue);
+        this.rightValue = new Value(rightValue);
     }
 
     public Object getKey() {
-        return key;
+        return key.unwrap();
     }
 
     public Object getLeftValue() {
-        return leftValue;
+        return leftValue.unwrap();
     }
 
     public Object getRightValue() {
+        return rightValue.unwrap();
+    }
+
+    public Value getWrappedKey() {
+        return key;
+    }
+
+    public Value getWrappedLeftValue() {
+        return leftValue;
+    }
+
+    public Value getWrappedRightValue() {
         return rightValue;
     }
 }

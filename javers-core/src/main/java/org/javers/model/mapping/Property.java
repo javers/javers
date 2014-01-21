@@ -20,7 +20,7 @@ public interface Property {
     boolean looksLikeId();
 
     /**
-     * returns property value, even if private
+     * returns property unwrap, even if private
      *
      * @param target invocation target
      */

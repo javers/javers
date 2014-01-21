@@ -15,6 +15,6 @@ public class ValueAdded extends ValueAddOrRemove {
     }
 
     public Object getAddedValue() {
-        return value;
+        return value.unwrap();
     }
 }

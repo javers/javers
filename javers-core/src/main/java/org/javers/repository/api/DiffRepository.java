@@ -11,7 +11,7 @@ import java.util.List;
  * <br/><br/>
  *
  * It deals with {@link Diff} <i>aggregate</i>
- * and {@link Change} <i>value object</i>.
+ * and {@link Change} <i>unwrap object</i>.
  *
  * @author bartosz walacik
  */

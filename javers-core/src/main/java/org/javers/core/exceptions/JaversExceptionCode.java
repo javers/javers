@@ -28,7 +28,7 @@ public enum  JaversExceptionCode {
 
     UNDEFINED_PROPERTY(BOOTSTRAP_ERROR + "undefined mandatory property '%s'. Define it in your classpath:javers.properties"),
 
-    MALFORMED_PROPERTY(BOOTSTRAP_ERROR + "value '%s' is invalid for property '%s'. Fix it in your classpath:javers.properties"),
+    MALFORMED_PROPERTY(BOOTSTRAP_ERROR + "unwrap '%s' is invalid for property '%s'. Fix it in your classpath:javers.properties"),
 
     CLASSPATH_RESOURCE_NOT_FOUND(BOOTSTRAP_ERROR + "classpath resource '%s' could not be found"),
 

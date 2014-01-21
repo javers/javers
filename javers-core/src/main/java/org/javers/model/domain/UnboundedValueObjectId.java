@@ -5,14 +5,14 @@ import org.javers.model.mapping.ValueObject;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * Unbounded value object, has '/' as symbolic cdoId representation.
+ * Unbounded unwrap object, has '/' as symbolic cdoId representation.
  * <p/>
- * This kind of Id is assigned by graph builder to value object which is not embedded in any Entity instance.
+ * This kind of Id is assigned by graph builder to unwrap object which is not embedded in any Entity instance.
  * (by design or by accident)
  * <p/>
  *
- * Its recommended to avoid Unbounded value objects since they don't have real global id.
- * Prefer embedding value objects in Entity instances to leverage {@link ValueObjectId} global Id.
+ * Its recommended to avoid Unbounded unwrap objects since they don't have real global id.
+ * Prefer embedding unwrap objects in Entity instances to leverage {@link ValueObjectId} global Id.
  *
  *
  * @author bartosz walacik

@@ -1,6 +1,7 @@
 package org.javers.core.json;
 
 import com.google.gson.*;
+import org.javers.core.diff.changetype.Value;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 import org.joda.time.LocalDateTime;
 
@@ -25,7 +26,7 @@ import java.util.Collection;
  * Javers accepts several kind of plugins:
  * <ul>
  *     <li/> {@link BasicStringTypeAdapter} -
- *           extend it if you need to represent value as single String and don't want to deal with JSON API.
+ *           extend it if you need to represent unwrap as single String and don't want to deal with JSON API.
  *           For concrete class example see {@link LocalDateTimeTypeAdapter}.
  *     <li/> {@link JsonTypeAdapter} - use it if you need full control over JSON conversion
  *     <li/> native Gson {@link TypeAdapter}
@@ -130,4 +131,5 @@ public class JsonConverter {
         registerNativeGsonSerializer(targetType, jsonSerializer);
         registerNativeGsonDeserializer(targetType, jsonDeserializer);
     }
+
 }

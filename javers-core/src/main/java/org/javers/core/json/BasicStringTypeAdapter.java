@@ -8,7 +8,7 @@ import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 
 /**
  * Convenient abstract implementation of {@link JsonTypeAdapter}.
- * Extend it if you need to represent value (T) as single String and don't want to deal with Gson API.
+ * Extend it if you need to represent unwrap (T) as single String and don't want to deal with Gson API.
  * <br/><br/>
  *
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)

@@ -1,5 +1,6 @@
 package org.javers.model.mapping.type;
 
+import org.javers.common.collections.Primitives;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.joda.time.LocalDateTime;
@@ -22,21 +23,14 @@ public class TypeMapper {
     public TypeMapper() {
         mappedTypes = new HashMap<>();
 
-        //primitives
-        registerPrimitiveType(Integer.TYPE);
-        registerPrimitiveType(Boolean.TYPE);
-        registerPrimitiveType(Double.TYPE);
-        registerPrimitiveType(Float.TYPE);
-        registerPrimitiveType(Long.TYPE);
+        //primitives & boxes
+        for (Class primitiveOrBox : Primitives.getPrimitiveAndBoxTypes()) {
+            registerPrimitiveType(primitiveOrBox) ;
+        }
 
-        //primitive boxes
-        registerPrimitiveType(Integer.class);
-        registerPrimitiveType(Boolean.class);
-        registerPrimitiveType(Double.class);
-        registerPrimitiveType(Float.class);
+        //String & Enum
         registerPrimitiveType(String.class);
         registerPrimitiveType(Enum.class);
-        registerPrimitiveType(Long.class);
 
         //array
         addType(new ArrayType(Object[].class));
@@ -49,6 +43,7 @@ public class TypeMapper {
         //Collections
         addType(new CollectionType(Set.class));
         addType(new CollectionType(List.class));
+
         //& Maps
         addType(new MapType(Map.class));
     }

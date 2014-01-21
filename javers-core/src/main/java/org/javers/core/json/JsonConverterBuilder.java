@@ -5,6 +5,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.ChangeTypeAdapter;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 import org.javers.core.json.typeadapter.LocalDateTypeAdapter;
+import org.javers.core.json.typeadapter.ValueTypeAdapter;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -20,6 +21,8 @@ public class JsonConverterBuilder {
             new LocalDateTypeAdapter()
     };
 
+    private boolean typeSafeValues = false;
+
     private JsonConverter jsonConverter;
 
     /**
@@ -33,6 +36,26 @@ public class JsonConverterBuilder {
 
     public static JsonConverterBuilder jsonConverter() {
         return new JsonConverterBuilder();
+    }
+
+    /**
+     * When switched to true, all {@link org.javers.core.diff.changetype.Value}s are serialized type safely as a pair, fo example:
+     * <pre>
+     * {
+     *     "typeAlias": "LocalDate"
+     *     "value": "2001-01-01"
+     * }
+     * </pre>
+     * TypeAlias is defaulted to value.class.simpleName.
+     * <p/>
+     *
+     * Useful when serializing polymorfic collections like List or List&lt;Object&gt;
+     *
+     * @param typeSafeValues default false
+     */
+    public JsonConverterBuilder typeSafeValues(boolean typeSafeValues){
+        this.typeSafeValues = typeSafeValues;
+        return this;
     }
 
     /**
@@ -75,6 +98,9 @@ public class JsonConverterBuilder {
     }
 
     public JsonConverter build() {
+
+        jsonConverter.registerJsonTypeAdapter(new ValueTypeAdapter(typeSafeValues));
+
         jsonConverter.initialize();
         return jsonConverter;
     }

@@ -62,8 +62,8 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
     }
 
     private void appendBody(ValueChange change, JsonObject toJson, JsonSerializationContext context) {
-        toJson.add("leftValue", context.serialize(change.getLeftValue().value()));
-        toJson.add("rightValue", context.serialize(change.getRightValue().value()));
+        toJson.add("leftValue", context.serialize(change.getWrappedLeftValue()));
+        toJson.add("rightValue", context.serialize(change.getWrappedRightValue()));
     }
 
     private void appendBody(MapChange change, JsonObject toJson, JsonSerializationContext context) {
@@ -74,18 +74,17 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
             entryElement.addProperty("entryChangeType", entryChange.getClass().getSimpleName());
 
             if (entryChange instanceof EntryAddOrRemove) {
-                Object key =   ((EntryAddOrRemove) entryChange).getKey();
-                Object value = ((EntryAddOrRemove) entryChange).getValue();
+                EntryAddOrRemove entry = (EntryAddOrRemove)entryChange;
 
-                entryElement.add("key", context.serialize(key));
-                entryElement.add("value", context.serialize(value));
+                entryElement.add("key", context.serialize(entry.getWrappedKey()));
+                entryElement.add("value", context.serialize(entry.getWrappedValue()));
             }
 
             if (entryChange instanceof EntryValueChanged) {
-                EntryValueChanged entryValueChanged = (EntryValueChanged)entryChange;
-                entryElement.add("key", context.serialize(entryValueChanged.getKey()));
-                entryElement.add("leftValue", context.serialize(entryValueChanged.getLeftValue()));
-                entryElement.add("rightValue", context.serialize(entryValueChanged.getRightValue()));
+                EntryValueChanged entry = (EntryValueChanged)entryChange;
+                entryElement.add("key", context.serialize(entry.getWrappedKey()));
+                entryElement.add("leftValue", context.serialize(entry.getWrappedLeftValue()));
+                entryElement.add("rightValue", context.serialize(entry.getWrappedRightValue()));
 
             }
             jsonArray.add(entryElement);
@@ -127,7 +126,7 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
 
     @Override
     public Change fromJson(JsonElement json, JsonDeserializationContext jsonDeserializationContext) {
-        return null;
+        throw new IllegalStateException("not implemented");
     }
 
     @Override

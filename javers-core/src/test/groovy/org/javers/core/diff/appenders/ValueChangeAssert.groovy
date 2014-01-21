@@ -37,12 +37,12 @@ class ValueChangeAssert {
     }
 
     def hasLeftValue(Object expected) {
-        assert actual.leftValue.value == expected
+        assert actual.leftValue == expected
         this;
     }
 
     def hasRightValue(Object expected) {
-        assert actual.rightValue.value == expected
+        assert actual.rightValue == expected
         return this;
     }
 

@@ -5,8 +5,11 @@ import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.Diff
 import org.javers.core.model.DummyParameterEntry
+import org.javers.core.model.DummyUser
 import org.joda.time.LocalDate
 import spock.lang.Specification
+
+import static org.javers.core.model.DummyUser.Sex.FEMALE
 
 /**
  * @author bartosz walacik
@@ -17,16 +20,20 @@ class JaversSmartparamIntegrationTest extends Specification{
         given:
         Javers javers = JaversBuilder.javers()
                                      .registerValueObject(DummyParameterEntry)
+                                     .typeSafeValues()
                                      .build()
 
         def entry1 = new DummyParameterEntry(["date":new LocalDate(2014,01,10)])
-        def entry2 = new DummyParameterEntry(["date":new LocalDate(2014,01,12),"rate":new BigDecimal(10)])
+        def entry2 = new DummyParameterEntry(["date":new LocalDate(2014,01,12),
+                                              "rate":new BigDecimal(10),
+                                              "int" :1,
+                                              "String":"str",
+                                              "enum":FEMALE])
 
         when:
         Diff diff = javers.compare("user", entry1, entry2)
         String jsonText = javers.toJson(diff)
-        //println("jsonText:\n"+jsonText)
-
+        println("jsonText:\n"+jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -36,19 +43,42 @@ class JaversSmartparamIntegrationTest extends Specification{
         mapChange.globalCdoId.valueObject == "org.javers.core.model.DummyParameterEntry"
         mapChange.globalCdoId.cdoId == "/"
         mapChange.property == "levels"
-        mapChange.entryChanges.size() == 2
+        mapChange.entryChanges.size() == 5
+        List sortedEntryChanges = mapChange.entryChanges.sort{it.key}
 
-        with(mapChange.entryChanges[0]) {
-            entryChangeType == "EntryValueChanged"
-            key == "date"
-            leftValue == "2014-01-10"
-            rightValue == "2014-01-12"
+        with(sortedEntryChanges[0]) {
+            entryChangeType == "EntryAdded"
+            key == "String"
+            value == "str"
         }
 
-        with(mapChange.entryChanges[1]) {
+        with(sortedEntryChanges[1]) {
+            entryChangeType == "EntryValueChanged"
+            key == "date"
+            leftValue.typeAlias == "LocalDate"
+            leftValue.value == "2014-01-10"
+            rightValue.value == "2014-01-12"
+            rightValue.typeAlias == "LocalDate"
+        }
+
+        with(sortedEntryChanges[2]) {
+            entryChangeType == "EntryAdded"
+            key == "enum"
+            value.typeAlias == "Sex"
+            value.value == FEMALE.name()
+        }
+
+        with(sortedEntryChanges[3]) {
+            entryChangeType == "EntryAdded"
+            key == "int"
+            value == 1
+        }
+
+        with(sortedEntryChanges[4]) {
             entryChangeType == "EntryAdded"
             key == "rate"
-            value == 10
+            value.typeAlias == "BigDecimal"
+            value.value == 10
         }
     }
 }

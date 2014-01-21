@@ -33,8 +33,8 @@ class JaversIntegrationTest extends Specification {
         then:
         diff.changes.size() == 1
         ValueChange change = diff.changes[0]
-        change.leftValue.value == FEMALE
-        change.rightValue.value == MALE
+        change.leftValue == FEMALE
+        change.rightValue == MALE
     }
 
     def "should serialize whole Diff"() {
