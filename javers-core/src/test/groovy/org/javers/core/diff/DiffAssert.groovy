@@ -14,6 +14,11 @@ class DiffAssert {
         this
     }
 
+    DiffAssert has(int expectedSize, Class<? extends Change> expectedClass) {
+        assert actual.changes.grep{it.class == expectedClass}.size() == expectedSize
+        this
+    }
+
     DiffAssert hasAllOfType(Class<? extends Change> expectedClass) {
         actual.changes.each { assert it.class == expectedClass}
         this

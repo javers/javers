@@ -17,6 +17,7 @@ import java.util.List;
  *
  * @author bartosz walacik
  */
+//TODO refactor -> extends FakeNodePair???
 public class RealNodePair implements NodePair {
     private final ObjectNode left;
     private final ObjectNode right;
@@ -46,11 +47,13 @@ public class RealNodePair implements NodePair {
 
     @Override
     public GlobalCdoId getRightGlobalCdoId(Property property) {
+        //TODO refactor
         return getGlobalCdoId(right.getEdge(property));
     }
 
     @Override
     public GlobalCdoId getLeftGlobalCdoId(Property property) {
+        //TODO refactor
         return getGlobalCdoId(left.getEdge(property));
     }
 
@@ -73,6 +76,7 @@ public class RealNodePair implements NodePair {
         return left.getGlobalCdoId();
     }
 
+    //TODO refactor <-> FakeNodePair
     private GlobalCdoId getGlobalCdoId(Edge edge) {
         return edge != null ? ((SingleEdge) edge).getReference().getGlobalCdoId() : null;
     }

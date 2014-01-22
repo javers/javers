@@ -39,6 +39,7 @@ public class DiffFactory {
             diff.addChanges(appender.getChangeSet(leftGraph, rightGraph));
         }
 
+        //TODO refactor - this difference is calculated also in NewObjectAppender
         for (ObjectNode node : Sets.difference(rightGraph, leftGraph)) {
             FakeNodePair pair = new FakeNodePair(node);
             appendPropertyChanges(diff, pair);
