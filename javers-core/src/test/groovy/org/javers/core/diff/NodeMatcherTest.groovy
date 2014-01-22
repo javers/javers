@@ -18,11 +18,11 @@ class NodeMatcherTest extends AbstractDiffTest{
                                                    buildGraph(dummyUser().withName("2").build()));
 
         when:
-        List<NodePair> pairs = new NodeMatcher().match(previousGraph,currentGraph)
+        List<RealNodePair> pairs = new NodeMatcher().match(previousGraph,currentGraph)
 
         then:
         pairs.size() == 1
-        NodePair pair = pairs.get(0)
+        RealNodePair pair = pairs.get(0)
         pair.left.globalCdoId.cdoId == "1"
         pair.right.globalCdoId.cdoId == "1"
     }

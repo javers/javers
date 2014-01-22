@@ -2,7 +2,7 @@ package org.javers.core.diff.appenders
 
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.ChangeAssert
-import org.javers.core.diff.NodePair
+import org.javers.core.diff.RealNodePair
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.diff.Change
@@ -24,7 +24,7 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
         when:
         Collection<Change> changes =
-            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property)
+            new ReferenceChangeAppender().calculateChanges(new RealNodePair(leftNode, rightNode), property)
 
         then:
         changes.size() ==  0
@@ -38,7 +38,7 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
         when:
         Collection<Change> changes =
-                new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property)
+                new ReferenceChangeAppender().calculateChanges(new RealNodePair(leftNode, rightNode), property)
 
         then:
         ChangeAssert.assertThat(changes[0])
@@ -54,7 +54,7 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
         when:
         Collection<Change> changes =
-            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property)
+            new ReferenceChangeAppender().calculateChanges(new RealNodePair(leftNode, rightNode), property)
 
         then:
         changes.size() == 1
@@ -72,7 +72,7 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
 
         when:
         Collection<Change> changes =
-            new ReferenceChangeAppender().calculateChanges(new NodePair(leftNode, rightNode), property)
+            new ReferenceChangeAppender().calculateChanges(new RealNodePair(leftNode, rightNode), property)
 
         then:
         changes.size() == 1

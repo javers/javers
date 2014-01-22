@@ -2,13 +2,18 @@ package org.javers.core
 
 import groovy.json.JsonSlurper
 import org.javers.core.diff.Diff
+import org.javers.core.diff.changetype.NewObject
+import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.model.DummyPoint
 import org.javers.core.model.DummyUser
+import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.DummyUserWithPoint
 import spock.lang.Specification
+
+import java.sql.Ref
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.model.DummyUser.Sex.FEMALE
@@ -20,6 +25,38 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  * @author bartosz walacik
  */
 class JaversIntegrationTest extends Specification {
+
+    def "should create property changes for each new object"() {
+        given:
+        Javers javers = JaversTestBuilder.javers()
+        DummyUser left = new DummyUser(name: "kazik")
+        DummyUser right = new DummyUser().with {
+            name = "kazik"
+            dummyUserDetails = new DummyUserDetails().with {
+                id = 1
+                isTrue = false
+                it
+            }
+            it
+        }
+
+        when:
+        Diff diff = javers.compare("user", left, right)
+
+        then:
+        with(diff) {
+            changes[0].class == NewObject
+            changes[0].globalCdoId.cdoId == 1
+            changes[1].class == ValueChange
+            changes[1].property.name == "id"
+            changes[2].class == ValueChange
+            changes[2].property.name == "isTrue"
+            changes[3].class == ReferenceChange
+            changes[3].rightReference.cdoId == 1
+
+        }
+    }
+
     //smoke test
     def "should create valueChange with Enum" () {
         given:
@@ -54,10 +91,12 @@ class JaversIntegrationTest extends Specification {
         json.id == 0
         json.userId == "user"
         json.diffDate != null
-        json.changes.size() == 3
+        json.changes.size() == 5
         json.changes[0].changeType == "NewObject"
         json.changes[1].changeType == "ValueChange"
-        json.changes[2].changeType == "ReferenceChange"
+        json.changes[2].changeType == "ValueChange"
+        json.changes[3].changeType == "ValueChange"
+        json.changes[4].changeType == "ReferenceChange"
     }
 
     def "should support custom JsonTypeAdapter for ValueChange"() {

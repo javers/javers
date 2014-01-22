@@ -22,7 +22,7 @@ public class NodeMatcher {
         for (ObjectNode left : leftGraph) {
             GlobalCdoId key = left.getGlobalCdoId();
             if (rightMap.containsKey(key)) {
-                pairs.add(new NodePair(left,rightMap.get(key)));
+                pairs.add(new RealNodePair(left,rightMap.get(key)));
             }
         }
 

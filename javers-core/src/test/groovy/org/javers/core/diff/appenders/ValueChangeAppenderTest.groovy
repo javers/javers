@@ -1,7 +1,5 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.json.builder.EntityTestBuilder
-import org.javers.core.json.builder.GlobalCdoIdTestBuilder
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserWithValues
 import org.joda.time.LocalDateTime
@@ -9,7 +7,7 @@ import org.joda.time.LocalDateTime
 import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.ChangeAssert
-import org.javers.core.diff.NodePair
+import org.javers.core.diff.RealNodePair
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.diff.changetype.ValueChange
@@ -38,7 +36,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property sex = getEntity(DummyUser).getProperty("sex")
 
         when:
-        def changes = new ValueChangeAppender().calculateChanges(new NodePair(left,right),sex)
+        def changes = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
 
         then:
         changes.size() == 0
@@ -52,7 +50,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         when:
         Collection<ValueChange> changes =
-                new ValueChangeAppender().calculateChanges(new NodePair(left,right),sex)
+                new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
 
         then:
         ChangeAssert.assertThat(changes[0])
@@ -69,7 +67,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         when:
         Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new NodePair(left,right),sex)
+            new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
 
         then:
         changes.size() == 1
@@ -87,7 +85,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         when:
         Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new NodePair(left,right),age)
+            new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),age)
 
         then:
         changes.size() == 1
@@ -105,7 +103,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         when:
         Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new NodePair(left,right),largeInt)
+            new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),largeInt)
 
         then:
         changes.size() == 1
@@ -123,7 +121,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         when:
         Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new NodePair(left,right),flag)
+            new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
 
         then:
         changes.size() == 1
@@ -141,7 +139,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         when:
         Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new NodePair(left,right),flag)
+            new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
 
         then:
         changes.size() == 1
@@ -161,7 +159,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property dobProperty = getEntity(DummyUserWithValues).getProperty("dob")
 
         when:
-        def changes = new ValueChangeAppender().calculateChanges(new NodePair(left,right), dobProperty)
+        def changes = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), dobProperty)
 
         then:
         changes.size() == 1
@@ -181,7 +179,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property salaryProperty = getEntity(DummyUserWithValues).getProperty("salary")
 
         when:
-        def changes = new ValueChangeAppender().calculateChanges(new NodePair(left,right), salaryProperty)
+        def changes = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), salaryProperty)
 
         then:
         changes.size() == 1
@@ -202,7 +200,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         when:
         def changes = new ValueChangeAppender().calculateChanges(
-                      new NodePair(followEdge(left,address), followEdge(right,address)),street)
+                      new RealNodePair(followEdge(left,address), followEdge(right,address)),street)
 
         then:
         changes.size() == 1

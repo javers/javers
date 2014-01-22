@@ -1,8 +1,7 @@
 package org.javers.core.diff.appenders
 
 import org.javers.core.diff.AbstractDiffTest
-import org.javers.core.diff.ChangeAssert
-import org.javers.core.diff.NodePair
+import org.javers.core.diff.RealNodePair
 import org.javers.core.diff.changetype.map.EntryAddOrRemove
 import org.javers.core.diff.changetype.map.EntryAdded
 import org.javers.core.diff.changetype.map.EntryRemoved
@@ -29,7 +28,7 @@ class MapChangeAppenderTest extends AbstractDiffTest{
         Property valueMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         expect:
-        def changes = new MapChangeAppender().calculateChanges(new NodePair(left,right),valueMap)
+        def changes = new MapChangeAppender().calculateChanges(new RealNodePair(left,right),valueMap)
         changes.size() == 0
 
         where:
@@ -45,7 +44,7 @@ class MapChangeAppenderTest extends AbstractDiffTest{
         Property primitiveMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         when:
-        def changes =  new MapChangeAppender().calculateChanges(new NodePair(left,right),primitiveMap)
+        def changes =  new MapChangeAppender().calculateChanges(new RealNodePair(left,right),primitiveMap)
 
         then:
         assertThat(changes[0])
@@ -62,7 +61,7 @@ class MapChangeAppenderTest extends AbstractDiffTest{
         Property primitiveMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         expect:
-        def changes = new MapChangeAppender().calculateChanges(new NodePair(left,right),primitiveMap)
+        def changes = new MapChangeAppender().calculateChanges(new RealNodePair(left,right),primitiveMap)
         changes.size() == 1
         EntryAddOrRemove entryAddOrRemove = changes[0].entryChanges[0]
         entryAddOrRemove.key == "some"
@@ -82,7 +81,7 @@ class MapChangeAppenderTest extends AbstractDiffTest{
         Property primitiveMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         when:
-        def changes =  new MapChangeAppender().calculateChanges(new NodePair(left,right),primitiveMap)
+        def changes =  new MapChangeAppender().calculateChanges(new RealNodePair(left,right),primitiveMap)
 
         then:
         changes.size() == 1
@@ -105,7 +104,7 @@ class MapChangeAppenderTest extends AbstractDiffTest{
         Property valueMap = getEntity(DummyUser).getProperty("valueMap")
 
         when:
-        def changes =  new MapChangeAppender().calculateChanges(new NodePair(left,right),valueMap)
+        def changes =  new MapChangeAppender().calculateChanges(new RealNodePair(left,right),valueMap)
 
         then:
         changes.size() == 1

@@ -3,7 +3,6 @@ package org.javers.core.diff.appenders;
 import org.javers.common.collections.Maps;
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.*;
 import org.javers.core.diff.changetype.map.*;
 import org.javers.model.mapping.Property;
 import org.javers.model.mapping.type.JaversType;

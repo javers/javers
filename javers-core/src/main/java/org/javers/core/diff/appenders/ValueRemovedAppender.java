@@ -7,7 +7,6 @@ import org.javers.model.mapping.type.CollectionType;
 import org.javers.model.mapping.type.JaversType;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * @author bartosz walacik
