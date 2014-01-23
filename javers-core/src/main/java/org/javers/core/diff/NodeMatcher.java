@@ -13,13 +13,13 @@ public class NodeMatcher {
     /**
      * matching based on {@link org.javers.model.domain.GlobalCdoId}
      */
-    public List<NodePair> match(Set<ObjectNode> leftGraph, Set<ObjectNode> rightGraph) {
-        Validate.argumentsAreNotNull(leftGraph,rightGraph);
+    public List<NodePair> match(GraphPair graphPair) {
+        Validate.argumentIsNotNull(graphPair);
 
         List<NodePair> pairs = new ArrayList<>();
-        Map<GlobalCdoId, ObjectNode> rightMap = asMap(rightGraph);
+        Map<GlobalCdoId, ObjectNode> rightMap = asMap(graphPair.getRightNodeSet());
 
-        for (ObjectNode left : leftGraph) {
+        for (ObjectNode left : graphPair.getLeftNodeSet()) {
             GlobalCdoId key = left.getGlobalCdoId();
             if (rightMap.containsKey(key)) {
                 pairs.add(new RealNodePair(left,rightMap.get(key)));

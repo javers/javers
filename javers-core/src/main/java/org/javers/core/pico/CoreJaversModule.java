@@ -22,7 +22,6 @@ public class CoreJaversModule implements JaversModule {
             Javers.class,
             DiffFactory.class,
             ObjectGraphBuilder.class,
-            DFSGraphToSetConverter.class,
             NewObjectAppender.class,
             MapChangeAppender.class,
             ObjectRemovedAppender.class,

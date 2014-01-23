@@ -12,18 +12,17 @@ class NodeMatcherTest extends AbstractDiffTest{
 
     def "should match nodes with the same GlobalCdoId"() {
         given:
-        Set<ObjectNode> previousGraph = Sets.asSet(buildGraph(dummyUser().withName("1").build()),
-                                                   buildGraph(dummyUser().withName("3").build()));
-        Set<ObjectNode> currentGraph =  Sets.asSet(buildGraph(dummyUser().withName("1").build()),
-                                                   buildGraph(dummyUser().withName("2").build()));
+        ObjectNode previousGraph = buildGraph(dummyUser().withName("a").withDetails(2).build());
+
+        ObjectNode currentGraph =   buildGraph(dummyUser().withName("b").withDetails(2).build());
 
         when:
-        List<RealNodePair> pairs = new NodeMatcher().match(previousGraph,currentGraph)
+        List<RealNodePair> pairs = new NodeMatcher().match(new GraphPair(previousGraph,currentGraph))
 
         then:
         pairs.size() == 1
         RealNodePair pair = pairs.get(0)
-        pair.left.globalCdoId.cdoId == "1"
-        pair.right.globalCdoId.cdoId == "1"
+        pair.left.globalCdoId.cdoId == 2
+        pair.right.globalCdoId.cdoId == 2
     }
 }

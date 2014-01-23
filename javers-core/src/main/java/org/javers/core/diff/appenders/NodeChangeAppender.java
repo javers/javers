@@ -3,6 +3,7 @@ package org.javers.core.diff.appenders;
 import java.util.Set;
 
 import org.javers.core.diff.Change;
+import org.javers.core.diff.GraphPair;
 import org.javers.model.object.graph.ObjectNode;
 
 /**
@@ -10,6 +11,6 @@ import org.javers.model.object.graph.ObjectNode;
  */
 public interface NodeChangeAppender {
 
-   Set<Change> getChangeSet(Set<ObjectNode> leftGraph, Set<ObjectNode> rightGraph);
+   Set<Change> getChangeSet(GraphPair graphPair);
 
 }

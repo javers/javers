@@ -6,12 +6,11 @@ import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
-import spock.lang.Ignore
+import org.javers.core.model.Category
 import spock.lang.Specification
+
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.diff.DiffAssert.assertThat
-
-import org.javers.core.model.Category
 
 /**
  * <b>Use case</b> of our client multiprogram.pl, comparing large Category Trees

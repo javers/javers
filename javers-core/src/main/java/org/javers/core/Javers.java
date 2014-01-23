@@ -50,6 +50,11 @@ public class Javers {
         return entityManager.isManaged(forClass);
     }
 
+    public Diff initial(String user, Object root) {
+        ObjectGraphBuilder graph = new ObjectGraphBuilder(entityManager);
+        return diffFactory.createInitial(user, graph.buildGraph(root));
+    }
+
     public Diff compare(String user, Object left, Object right) {
         ObjectGraphBuilder leftGraph = new ObjectGraphBuilder(entityManager);
         ObjectGraphBuilder rightGraph = new ObjectGraphBuilder(entityManager);

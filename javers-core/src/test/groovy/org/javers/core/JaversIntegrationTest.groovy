@@ -2,6 +2,7 @@ package org.javers.core
 
 import groovy.json.JsonSlurper
 import org.javers.core.diff.Diff
+import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
@@ -12,8 +13,6 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.DummyUserWithPoint
 import spock.lang.Specification
-
-import java.sql.Ref
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.model.DummyUser.Sex.FEMALE
@@ -26,12 +25,23 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class JaversIntegrationTest extends Specification {
 
-    def "should create property changes for each new object"() {
+    def "should create NewObject for all nodes in initial diff"() {
         given:
         Javers javers = JaversTestBuilder.javers()
-        DummyUser left = new DummyUser(name: "kazik")
-        DummyUser right = new DummyUser().with {
-            name = "kazik"
+        DummyUser left = dummyUser("kazik").withDetails().build()
+
+        when:
+        Diff diff = javers.initial("user",left)
+
+        then:
+        DiffAssert.assertThat(diff).has(2, NewObject)
+    }
+
+    def "should create PropertyChanges for each NewObject"() {
+        given:
+        Javers javers = JaversTestBuilder.javers()
+        DummyUser left =  new DummyUser(name: "kazik")
+        DummyUser right = new DummyUser(name: "kazik").with {
             dummyUserDetails = new DummyUserDetails().with {
                 id = 1
                 isTrue = false
