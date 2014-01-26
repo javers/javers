@@ -1,6 +1,8 @@
-package org.javers.model.mapping;
+package org.javers.core.metamodel.property;
 
 import org.javers.model.mapping.type.JaversType;
+
+import java.lang.reflect.Type;
 
 /**
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
@@ -9,10 +11,9 @@ public interface Property {
 
     String getName();
 
-    JaversType getType();
+    Type getGenericType();
 
-    //TODO move to Snapshoot/Wrapper
-    void setValue(Object value);
+    Class<?> getType();
 
     /**
      * true if property looks like identifier of an Entity, for example has @Id annotation
@@ -20,7 +21,7 @@ public interface Property {
     boolean looksLikeId();
 
     /**
-     * returns property unwrap, even if private
+     * returns property value, even if private
      *
      * @param target invocation target
      */

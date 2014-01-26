@@ -1,7 +1,7 @@
 package org.javers.core.diff.changetype;
 
 import org.javers.model.domain.GlobalCdoId;
-import org.javers.model.mapping.Property;
+import org.javers.core.metamodel.property.Property;
 
 /**
  * reference added to collection (in *ToMany relation)

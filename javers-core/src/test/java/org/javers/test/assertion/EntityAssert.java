@@ -1,8 +1,9 @@
 package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
+import org.javers.core.metamodel.property.PropertyAssert;
 import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.Property;
+import org.javers.core.metamodel.property.Property;
 
 /**
  *

@@ -2,6 +2,7 @@ package org.javers.model.mapping
 
 import org.javers.core.exceptions.JaversException
 import org.javers.core.exceptions.JaversExceptionCode
+import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.model.DummyManagedClass
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyNotManagedClass

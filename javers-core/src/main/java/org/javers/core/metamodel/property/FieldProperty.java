@@ -1,11 +1,11 @@
-package org.javers.model.mapping;
+package org.javers.core.metamodel.property;
 
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.model.mapping.type.JaversType;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.persistence.Id;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -30,6 +30,16 @@ public class FieldProperty implements Property {
     }
 
     @Override
+    public Type getGenericType() {
+        return field.getGenericType();
+    }
+
+    @Override
+    public Class<?> getType() {
+        return field.getType();
+    }
+
+    @Override
     public boolean looksLikeId() {
         return field.isAnnotationPresent(Id.class);
     }
@@ -47,16 +57,6 @@ public class FieldProperty implements Property {
     @Override
     public String getName() {
         return field.getName();
-    }
-
-    @Override
-    public JaversType getType() {
-        return javersType;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        throw new NotImplementedException();
     }
 
     @Override

@@ -20,22 +20,22 @@ import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails;
  */
 public abstract class ObjectGraphBuilderTest {
 
+    protected TypeMapper mapper = new TypeMapper();
     protected EntityManager entityManager;
 
-    protected EntityManager buildEntityManager(ManagedClassFactory ef, TypeMapper mapper ) {
-        EntityManager entityManager = new EntityManager(ef, mapper);
+    protected void buildEntityManager(ManagedClassFactory ef) {
+        entityManager = new EntityManager(ef, mapper);
         entityManager.registerEntity(DummyUser.class);
         entityManager.registerEntity(DummyUserDetails.class);
         entityManager.registerValueObject(DummyAddress.class);
         entityManager.registerValueObject(DummyNetworkAddress.class);
         entityManager.buildManagedClasses();
-        return entityManager;
     }
 
     @Test
     public void shouldBuildOneNodeGraphFromEntity(){
         //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyUser user = dummyUser().withName("Mad Kaz").build();
 
         //when
@@ -50,7 +50,7 @@ public abstract class ObjectGraphBuilderTest {
     @Test
     public void shouldBuildGraphStartingFromRootValueObject(){
         //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyAddress address = new DummyAddress("any","any");
 
         //when
@@ -65,7 +65,7 @@ public abstract class ObjectGraphBuilderTest {
     @Test
     public void shouldBuildGraphWithValueObjectNode() {
         //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyUserDetails user = dummyUserDetails(1).withAddress().build();
 
         //when
@@ -82,7 +82,7 @@ public abstract class ObjectGraphBuilderTest {
     @Test
     public void shouldBuildTwoNodesGraphForTheSameEntity(){
         //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyUser user = dummyUser().withName("Mad Kaz").withSupervisor("Mad Stach").build();
 
         //when
@@ -98,7 +98,7 @@ public abstract class ObjectGraphBuilderTest {
     @Test
     public void shouldBuildTwoNodesGraphForDifferentEntities() {
         //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build();
 
         //when
@@ -114,7 +114,7 @@ public abstract class ObjectGraphBuilderTest {
     @Test
     public void shouldBuildThreeNodesLinearGraph() {
         //kaz0 - kaz1 - kaz2
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyUser[] kaziki = new DummyUser[4];
         for (int i=0; i<3; i++){
             kaziki[i] = dummyUser().withName("Mad Kaz "+i).build();
@@ -146,7 +146,7 @@ public abstract class ObjectGraphBuilderTest {
         //      stach - stach.details
 
         //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).build();
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withDetails(1L).withSupervisor(stach).build();
 
@@ -176,7 +176,7 @@ public abstract class ObjectGraphBuilderTest {
         //      id    id    id
 
         //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).withDetailsList(3).build();
 
         //when
@@ -199,7 +199,7 @@ public abstract class ObjectGraphBuilderTest {
         //      id    id    id
 
         //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyUser stach = dummyUser().withName("Stach").withDetailsList(3).build();
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withSupervisor(stach).build();
 
@@ -225,7 +225,7 @@ public abstract class ObjectGraphBuilderTest {
         //          Em1 Em2 Em3
         //given
         int numberOfElements = 3;
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyUser rob = dummyUser().withName("rob").withEmployees(3).build();
         DummyUser stach = dummyUser().withName("stach")
                                      .withEmployee(rob)
@@ -257,7 +257,7 @@ public abstract class ObjectGraphBuilderTest {
         //      microKaz
 
         //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
 
         DummyUser superKaz = dummyUser().withName("superKaz").build();
         DummyUser kaz   =    dummyUser().withName("kaz").withSupervisor(superKaz).build();
@@ -291,7 +291,7 @@ public abstract class ObjectGraphBuilderTest {
     @Test
     public void shouldBuildGraphWithPrimitiveTypesSet() throws Throwable {
         //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyUser dummyUser = dummyUser().withName("name").withStringsSet("1", "2", "3").build();
 
         //when
@@ -304,7 +304,7 @@ public abstract class ObjectGraphBuilderTest {
     @Test
     public void shouldBuildGraphWithPrimitiveTypesList() throws Throwable {
         //given
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
         DummyUser dummyUser = dummyUser().withName("name").withIntegerList(1, 2, 3, 4).build();
 
         //when

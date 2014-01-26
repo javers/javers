@@ -1,9 +1,8 @@
 package org.javers.core.diff.changetype;
 
-import com.google.gson.annotations.Expose;
 import org.javers.core.diff.Change;
 import org.javers.model.domain.GlobalCdoId;
-import org.javers.model.mapping.Property;
+import org.javers.core.metamodel.property.Property;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 

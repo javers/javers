@@ -1,5 +1,6 @@
 package org.javers.model.mapping
 
+import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.model.mapping.type.TypeMapper
 
 import static org.javers.test.builder.TypeMapperTestBuilder.typeMapper

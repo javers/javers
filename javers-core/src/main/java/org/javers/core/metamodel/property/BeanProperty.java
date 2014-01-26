@@ -1,12 +1,11 @@
-package org.javers.model.mapping;
+package org.javers.core.metamodel.property;
 
-import com.google.gson.annotations.Expose;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.model.mapping.type.JaversType;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.persistence.Id;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -34,6 +33,16 @@ public class BeanProperty implements Property {
     }
 
     @Override
+    public Type getGenericType() {
+        return getter.getGenericReturnType();
+    }
+
+    @Override
+    public Class<?> getType() {
+        return getter.getReturnType();
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -51,16 +60,6 @@ public class BeanProperty implements Property {
     @Override
     public boolean looksLikeId() {
         return getter.isAnnotationPresent(Id.class);
-    }
-
-    @Override
-    public JaversType getType() {
-        return javersType;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        throw new NotImplementedException();
     }
 
     @Override

@@ -1,11 +1,9 @@
 package org.javers.core;
 
-import org.javers.core.pico.JaversContainerFactory;
-import org.javers.model.mapping.BeanBasedPropertyScanner;
-import org.javers.model.mapping.FieldBasedPropertyScanner;
-import org.javers.model.mapping.PropertyScanner;
+import org.javers.core.metamodel.property.BeanBasedPropertyScanner;
+import org.javers.core.metamodel.property.FieldBasedPropertyScanner;
+import org.javers.core.metamodel.property.PropertyScanner;
 import org.junit.Test;
-import org.picocontainer.PicoContainer;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.javers.core.JaversBuilder.*;

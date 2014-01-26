@@ -1,6 +1,6 @@
 package org.javers.test
 
-import org.javers.model.mapping.BeanBasedPropertyScanner
+import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.model.mapping.EntityManager
 import org.javers.model.mapping.ManagedClassFactory
 import org.javers.model.mapping.type.TypeMapper

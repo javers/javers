@@ -2,7 +2,7 @@ package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.model.mapping.Property;
+import org.javers.core.metamodel.property.Property;
 import org.javers.model.mapping.type.*;
 
 import java.util.Collection;
@@ -15,26 +15,24 @@ import java.util.Collections;
  * @author bartosz walacik
  */
 public abstract class PropertyChangeAppender <T extends PropertyChange> {
-   // protected final static Set<Class<JaversType>> COLLECTION_TYPES = (Set) Sets.asSet(CollectionType.class);
-   // protected final static Set<Class<JaversType>> VALUE_TYPES = (Set) Sets.asSet(PrimitiveOrValueType.class);
-   // protected final static Set<Class<JaversType>> ENTITY_REF_TYPES = (Set) Sets.asSet(EntityReferenceType.class);
-
     /**
      * checks if given property is supported and if so,
      * delegates calculation to concrete appender in calculateChanges()
      */
-    public final Collection<T> calculateChangesIfSupported(NodePair pair, Property property) {
-        if (!supports(property)) {
+    public final Collection<T> calculateChangesIfSupported(NodePair pair, Property property, JaversType propertyType) {
+        if (!supports(propertyType)) {
              return Collections.EMPTY_SET;
         }
         return calculateChanges(pair, property);
     }
 
-    protected boolean supports(Property property) {
-        return getSupportedPropertyType().isAssignableFrom( property.getType().getClass());
+    protected boolean supports(JaversType propertyType) {
+        return getSupportedPropertyType().isAssignableFrom( propertyType.getClass() );
     }
 
-    protected abstract Class<? extends JaversType> getSupportedPropertyType();
+    protected Class<? extends JaversType> getSupportedPropertyType(){
+        return null;
+    }
 
     protected abstract Collection<T> calculateChanges(NodePair pair, Property supportedProperty);
 }

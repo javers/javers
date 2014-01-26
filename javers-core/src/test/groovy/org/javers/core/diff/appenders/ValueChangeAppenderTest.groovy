@@ -11,7 +11,7 @@ import org.javers.core.diff.RealNodePair
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.model.mapping.Property
+import org.javers.core.metamodel.property.Property
 import org.javers.model.object.graph.ObjectNode
 
 import static org.javers.core.json.builder.EntityTestBuilder.entity

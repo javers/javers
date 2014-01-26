@@ -36,7 +36,6 @@ abstract class EntityConstructionTest extends Specification {
 
         then:
         assertThat(entity).hasProperty("supervisor")
-                .hasJaversType(EntityReferenceType.class)
                 .hasJavaType(DummyUser)
 
     }
@@ -57,12 +56,12 @@ abstract class EntityConstructionTest extends Specification {
         assertThat(entity).hasProperty("valueMap");
     }
 
-    def "should not scan Object Map property"() {
+    def "should scan Object Map property"() {
         when:
         Entity entity = entityFactory.create(DummyUser);
 
         then:
-        assertThat(entity).hasNoProperty("objectMap");
+        assertThat(entity).hasProperty("objectMap");
     }
     
 
@@ -81,7 +80,6 @@ abstract class EntityConstructionTest extends Specification {
 
         then:
         assertThat(entity).hasProperty("stringSet")
-                .hasJaversType(CollectionType.class)
                 .hasJavaType(new TypeToken<Set<String>>(){}.getType());
     }
 
@@ -92,8 +90,7 @@ abstract class EntityConstructionTest extends Specification {
 
         then:
         assertThat(entity).hasProperty("integerList")
-                .hasJaversType(CollectionType.class)
-                .hasJavaType(new TypeToken<List<Integer>>(){}.getType());
+                          .hasJavaType(new TypeToken<List<Integer>>(){}.getType());
     }
 
     def "should scan array property"() {
@@ -102,7 +99,6 @@ abstract class EntityConstructionTest extends Specification {
 
         then:
         assertThat(entity).hasProperty("intArray")
-                .hasJaversType(ArrayType.class)
                 .hasJavaType(int[].class);
     }
 
@@ -112,7 +108,6 @@ abstract class EntityConstructionTest extends Specification {
 
         then:
         assertThat(entity).hasProperty("age")
-                .hasJaversType(PrimitiveType.class)
                 .hasJavaType(Integer.TYPE);
     }
 
@@ -122,7 +117,6 @@ abstract class EntityConstructionTest extends Specification {
 
         then:
         assertThat(entity).hasProperty("sex")
-                .hasJaversType(PrimitiveType.class)
                 .hasJavaType(DummyUser.Sex.class);
     }
 
@@ -132,7 +126,6 @@ abstract class EntityConstructionTest extends Specification {
 
         then:
         assertThat(entity).hasProperty("largeInt")
-                .hasJaversType(PrimitiveType.class)
                 .hasJavaType(Integer.class);
     }
 
@@ -142,7 +135,6 @@ abstract class EntityConstructionTest extends Specification {
 
         then:
         assertThat(entity).hasProperty("flag")
-                .hasJaversType(PrimitiveType.class)
                 .hasJavaType(Boolean.TYPE);
     }
 
@@ -152,7 +144,6 @@ abstract class EntityConstructionTest extends Specification {
 
         then:
         assertThat(entity).hasProperty("bigFlag")
-                .hasJaversType(PrimitiveType.class)
                 .hasJavaType(Boolean.class);
     }
 
@@ -162,7 +153,6 @@ abstract class EntityConstructionTest extends Specification {
 
         then:
         assertThat(entity).hasProperty("name")
-                .hasJaversType(PrimitiveType.class)
                 .hasJavaType(String.class);
     }
 }

@@ -1,6 +1,6 @@
 package org.javers.model.object.graph;
 
-import org.javers.model.mapping.BeanBasedPropertyScanner;
+import org.javers.core.metamodel.property.BeanBasedPropertyScanner;
 import org.javers.model.mapping.ManagedClassFactory;
 import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Before;

@@ -1,13 +1,10 @@
 package org.javers.model.mapping.type;
 
-import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.javers.common.reflection.ReflectionUtil.extractActualClassTypeArguments;
@@ -40,7 +37,7 @@ public abstract class JaversType {
     }
 
     /**
-     * delegates to constructor of this.class
+     * delegates to proper constructor {@link #JaversType(java.lang.reflect.Type)}
      */
     protected JaversType spawn(Type baseJavaType) {
             try {
@@ -97,5 +94,9 @@ public abstract class JaversType {
     @Override
     public int hashCode() {
         return baseJavaType.hashCode();
+    }
+
+    boolean mayBePrototypeFor(Type javaType) {
+        return !isGenericType() && isAssignableFrom(extractClass(javaType));
     }
 }

@@ -1,7 +1,7 @@
 package org.javers.model.object.graph;
 
 import org.javers.model.mapping.ManagedClassFactory;
-import org.javers.model.mapping.FieldBasedPropertyScanner;
+import org.javers.core.metamodel.property.FieldBasedPropertyScanner;
 import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Before;
 

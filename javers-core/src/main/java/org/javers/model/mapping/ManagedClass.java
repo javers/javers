@@ -1,10 +1,10 @@
 package org.javers.model.mapping;
 
-import org.javers.model.mapping.type.CollectionType;
-import org.javers.model.mapping.type.EntityReferenceType;
-import org.javers.model.mapping.type.ValueObjectType;
+import org.javers.common.collections.Predicate;
+import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -61,33 +61,28 @@ public abstract class ManagedClass {
         return sourceClass.getName();
     }
 
-    /**
-     */
-    public List<Property> getSingleReferences() {
-        List<Property> refProperties = new ArrayList<>();
-
-        for (Property property : properties) {
-            if (property.getType() instanceof EntityReferenceType ||
-                property.getType() instanceof ValueObjectType ){
-                refProperties.add(property);
-            }
-        }
-        return refProperties;
-    }
-
     public List<Property> getCollectionTypeProperties() {
-        List<Property> refProperties = new ArrayList<>();
-
-        for (Property property : properties) {
-            if (property.getType() instanceof CollectionType){
-                refProperties.add(property);
+        return getProperties(new Predicate<Property>() {
+            public boolean apply(Property property) {
+                return (Collection.class.isAssignableFrom(property.getType()));
             }
-        }
-        return refProperties;
+        });
     }
 
     public List<Property> getProperties() {
         return Collections.unmodifiableList(properties);
+    }
+
+    public List<Property> getProperties(Predicate<Property> query) {
+        List<Property> retProperties = new ArrayList<>();
+
+        for (Property property : properties) {
+            if (query.apply(property)){
+                retProperties.add(property);
+            }
+        }
+
+        return retProperties;
     }
 
     public Property getProperty(String withName) {

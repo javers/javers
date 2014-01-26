@@ -3,8 +3,7 @@ package org.javers.model.mapping;
 import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.javers.core.metamodel.property.Property;
 
 import java.util.List;
 
@@ -47,7 +46,7 @@ public class Entity extends ManagedClass {
      * @throws JaversException ENTITY_WITHOUT_ID
      */
     private Property findDefaultIdProperty() {
-        for (Property p : getProperties()) {
+        for (Property p : properties) {
             if (p.looksLikeId()) {
                 return p;
             }
