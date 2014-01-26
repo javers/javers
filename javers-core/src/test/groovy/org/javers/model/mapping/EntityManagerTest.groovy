@@ -17,7 +17,7 @@ class EntityManagerTest extends Specification{
 
     def setup() {
         TypeMapper mapper = new TypeMapper()
-        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper)
+        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner()
         ManagedClassFactory entityFactory = new ManagedClassFactory(scanner, mapper)
         entityManager = new EntityManager(entityFactory,mapper)
     }

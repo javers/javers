@@ -1,7 +1,6 @@
 package org.javers.core.metamodel.property;
 
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.model.mapping.type.JaversType;
 
 import javax.persistence.Id;
 import java.lang.reflect.Method;
@@ -17,19 +16,13 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class BeanProperty implements Property {
 
     private transient final Method getter;
-
     private final String name;
 
-    private transient final JaversType javersType;
-
-    protected BeanProperty(Method getter, JaversType javersType) {
-
+    protected BeanProperty(Method getter) {
         argumentIsNotNull(getter, "getter should not be null!");
-        argumentIsNotNull(javersType, "javersType should not be null!");
 
         this.getter = getter;
         this.name = ReflectionUtil.getterToField(getter);
-        this.javersType = javersType;
     }
 
     @Override
@@ -68,12 +61,12 @@ public class BeanProperty implements Property {
         if (o == null || getClass() != o.getClass()) return false;
 
         BeanProperty that = (BeanProperty) o;
-        return getter.equals(that.getter) && javersType.equals(that.javersType);
+        return getter.equals(that.getter);
     }
 
     @Override
     public int hashCode() {
-        return 31 * getter.hashCode() + javersType.hashCode();
+        return getter.hashCode();
     }
 
     @Override

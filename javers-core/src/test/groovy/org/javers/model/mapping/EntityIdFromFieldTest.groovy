@@ -12,7 +12,7 @@ class EntityIdFromFieldTest extends EntityIdTest {
 
     def setup() {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build()
-        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(mapper)
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner()
         entityFactory = new ManagedClassFactory(scanner,mapper)
     }
 }

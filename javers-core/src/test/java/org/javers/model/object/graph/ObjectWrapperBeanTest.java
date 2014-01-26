@@ -15,7 +15,7 @@ public class ObjectWrapperBeanTest extends ObjectWrapperTest {
     @Before
     public void setUp() {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
-        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper);
+        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner();
         managedClassFactory = new ManagedClassFactory(scanner,mapper);
     }
 }

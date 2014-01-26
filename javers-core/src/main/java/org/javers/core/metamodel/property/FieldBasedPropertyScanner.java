@@ -1,8 +1,5 @@
 package org.javers.core.metamodel.property;
 
-import org.javers.core.exceptions.JaversException;
-import org.javers.model.mapping.type.JaversType;
-import org.javers.model.mapping.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +14,8 @@ import java.util.List;
 /**
  * @author pawel szymczyk
  */
-public class FieldBasedPropertyScanner extends PropertyScanner {
+public class FieldBasedPropertyScanner implements PropertyScanner {
     private static final Logger logger = LoggerFactory.getLogger(FieldBasedPropertyScanner.class);
-
-    public FieldBasedPropertyScanner(TypeMapper typeMapper) {
-        super(typeMapper);
-    }
 
     @Override
     public  List<Property> scan(Class<?> managedClass) {
@@ -32,23 +25,11 @@ public class FieldBasedPropertyScanner extends PropertyScanner {
 
         for (Field field : declaredFields) {
             if(isPersistent(field)) {
-                JaversType javersType = getJaversType(field);
-
-                Property fieldProperty = new FieldProperty(field, javersType);
+                Property fieldProperty = new FieldProperty(field);
                 propertyList.add(fieldProperty);
             }
         }
         return propertyList;
-    }
-
-    private JaversType getJaversType(Field field) {
-        JaversType javersType = null;
-        try {
-            return typeMapper.getJaversType(field.getGenericType());
-        } catch (JaversException e) {
-            logger.error("caught {} when scanning field {}",e,field);
-            throw e;
-        }
     }
 
     private List<Field> getFields(Class<?> clazz) {

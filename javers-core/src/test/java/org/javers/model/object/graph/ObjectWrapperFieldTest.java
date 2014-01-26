@@ -15,7 +15,7 @@ public class ObjectWrapperFieldTest extends ObjectWrapperTest {
     @Before
     public void setUp() {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build();
-        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner (mapper);
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner();
         managedClassFactory = new ManagedClassFactory(scanner,mapper);
     }
 }

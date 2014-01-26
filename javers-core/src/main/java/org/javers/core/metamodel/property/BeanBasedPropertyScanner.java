@@ -1,8 +1,6 @@
 package org.javers.core.metamodel.property;
 
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.model.mapping.type.JaversType;
-import org.javers.model.mapping.type.TypeMapper;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -11,11 +9,7 @@ import java.util.List;
 /**
  * @author pawel szymczyk
  */
-public class BeanBasedPropertyScanner extends PropertyScanner {
-
-    public BeanBasedPropertyScanner(TypeMapper typeMapper) {
-        super(typeMapper);
-    }
+public class BeanBasedPropertyScanner implements PropertyScanner {
 
     @Override
     public List<Property> scan(Class<?> managedClass) {
@@ -23,8 +17,7 @@ public class BeanBasedPropertyScanner extends PropertyScanner {
             List<Property> beanProperties = new ArrayList<>();
 
             for (Method getter : getters) {
-                JaversType javersType = typeMapper.getJaversType(getter.getGenericReturnType());
-                Property beanProperty = new BeanProperty(getter, javersType);
+                Property beanProperty = new BeanProperty(getter);
                 beanProperties.add(beanProperty);
             }
             return beanProperties;

@@ -1,7 +1,5 @@
 package org.javers.core.metamodel.property;
 
-import org.javers.model.mapping.type.JaversType;
-
 import java.lang.reflect.Type;
 
 /**

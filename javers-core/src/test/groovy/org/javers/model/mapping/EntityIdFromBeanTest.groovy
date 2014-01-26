@@ -12,7 +12,7 @@ class EntityIdFromBeanTest extends EntityIdTest {
 
     def setup() {
         TypeMapper mapper = typeMapper().registerAllDummyTypes().build()
-        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper)
+        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner()
         entityFactory = new ManagedClassFactory(scanner,mapper)
     }
 }

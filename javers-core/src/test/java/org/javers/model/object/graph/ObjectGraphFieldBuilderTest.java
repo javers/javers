@@ -11,7 +11,7 @@ public class ObjectGraphFieldBuilderTest extends ObjectGraphBuilderTest {
 
     @Before
     public void setUp() {
-        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(mapper);
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner();
         ManagedClassFactory ef = new ManagedClassFactory(scanner,mapper);
         buildEntityManager(ef);
     }

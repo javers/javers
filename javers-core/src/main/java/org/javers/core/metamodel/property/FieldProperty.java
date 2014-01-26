@@ -1,7 +1,6 @@
 package org.javers.core.metamodel.property;
 
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.model.mapping.type.JaversType;
 
 import javax.persistence.Id;
 import java.lang.reflect.Field;
@@ -18,15 +17,11 @@ public class FieldProperty implements Property {
 
     private transient final Field field;
 
-    private transient final JaversType javersType;
-
-    public FieldProperty(Field field, JaversType javersType) {
+    public FieldProperty(Field field) {
 
         argumentIsNotNull(field, "field should not be null!");
-        argumentIsNotNull(javersType, "javersType should not be null!");
 
         this.field = field;
-        this.javersType = javersType;
     }
 
     @Override
@@ -65,12 +60,12 @@ public class FieldProperty implements Property {
         if (o == null || getClass() != o.getClass()) return false;
 
         FieldProperty that = (FieldProperty) o;
-        return field.equals(that.field) && javersType.equals(that.javersType);
+        return field.equals(that.field);
     }
 
     @Override
     public int hashCode() {
-        return 31 * field.hashCode() + javersType.hashCode();
+        return field.hashCode();
     }
 
     @Override

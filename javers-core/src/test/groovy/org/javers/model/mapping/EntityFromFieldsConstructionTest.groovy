@@ -12,7 +12,7 @@ class EntityFromFieldsConstructionTest extends EntityConstructionTest {
 
     def setupSpec() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
-        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(typeMapper);
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner();
         entityFactory = new ManagedClassFactory(scanner, typeMapper);
     }
 }
