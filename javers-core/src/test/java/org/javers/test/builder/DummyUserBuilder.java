@@ -107,6 +107,11 @@ public class DummyUserBuilder {
         return this;
     }
 
+    public DummyUserBuilder withObjectMap(Map map) {
+        dummyUser.setObjectMap(map);
+        return this;
+    }
+
     public DummyUserBuilder withPrimitiveMap(Map map) {
         dummyUser.setPrimitiveMap(map);
         return this;

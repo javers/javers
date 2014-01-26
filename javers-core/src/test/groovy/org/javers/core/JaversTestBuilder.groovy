@@ -2,6 +2,7 @@ package org.javers.core
 
 import org.javers.core.model.DummyUserWithValues
 import org.javers.model.mapping.ManagedClassFactory
+import org.javers.model.mapping.type.TypeMapper
 import org.javers.model.object.graph.ObjectGraphBuilder
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
@@ -23,7 +24,7 @@ class JaversTestBuilder {
     JaversBuilder javersBuilder
 
     private JaversTestBuilder (){
-        javersBuilder = new JaversBuilder()
+       javersBuilder = new JaversBuilder()
 
        javersBuilder.registerEntity(DummyUser)
        .registerEntity(DummyUserDetails)
@@ -49,8 +50,12 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(EntityManager)
     }
 
+    TypeMapper getTypeMapper(){
+        javersBuilder.getContainerComponent(TypeMapper)
+    }
+
     ObjectGraphBuilder createObjectGraphBuilder() {
-        new ObjectGraphBuilder(getEntityManager())
+        new ObjectGraphBuilder(getEntityManager(), getTypeMapper())
     }
 
 }

@@ -4,7 +4,7 @@ import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceAdded
 import org.javers.model.domain.InstanceId
-import org.javers.model.mapping.Property
+import org.javers.core.metamodel.property.Property
 
 /**
  * @author bartosz walacik

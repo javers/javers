@@ -1,5 +1,6 @@
 package org.javers.model.mapping
 
+import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.model.DummyUserDetails
 import org.javers.model.mapping.type.TypeMapper
 import org.javers.model.mapping.type.ValueType
@@ -14,17 +15,8 @@ class EntityFromBeanConstructionTest extends EntityConstructionTest {
 
     def setupSpec() {
         TypeMapper typeMapper = typeMapper().registerAllDummyTypes().build();
-        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(typeMapper);
+        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner();
         entityFactory = new ManagedClassFactory(scanner,typeMapper);
-    }
-
-    def "should scan value object property"() {
-        when:
-        Entity entity = entityFactory.create(DummyUserDetails.class);
-
-        then:
-        assertThat(entity).hasProperty("dummyAddress")
-                          .hasJaversType(ValueType);
     }
 
 }

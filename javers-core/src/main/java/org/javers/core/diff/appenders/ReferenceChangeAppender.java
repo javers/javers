@@ -1,16 +1,12 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Objects;
-import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.RealNodePair;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.model.domain.GlobalCdoId;
-import org.javers.model.mapping.Property;
+import org.javers.core.metamodel.property.Property;
 import org.javers.model.mapping.type.EntityReferenceType;
 import org.javers.model.mapping.type.JaversType;
-import org.javers.model.object.graph.Edge;
-import org.javers.model.object.graph.SingleEdge;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -35,9 +31,10 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
             return Collections.EMPTY_SET;
         }
 
-        return Sets.asSet(new ReferenceChange(pair.getGlobalCdoId(),
-                property,
-                leftGlobalCdoId,
-                rightGlobalCdoId));
+        return Collections.singleton(
+                        new ReferenceChange(pair.getGlobalCdoId(),
+                        property,
+                        leftGlobalCdoId,
+                        rightGlobalCdoId));
     }
 }

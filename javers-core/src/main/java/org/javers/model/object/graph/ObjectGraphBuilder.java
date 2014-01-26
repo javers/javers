@@ -1,16 +1,15 @@
 package org.javers.model.object.graph;
 
+import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.property.Property;
 import org.javers.model.domain.*;
 import org.javers.model.mapping.*;
-import org.javers.model.mapping.type.CollectionType;
+import org.javers.model.mapping.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -23,13 +22,15 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class ObjectGraphBuilder {
     private static final Logger logger = LoggerFactory.getLogger(ObjectGraphBuilder.class);
 
+    private TypeMapper typeMapper;
     private final EntityManager entityManager;
     private boolean built;
     private Map<Cdo, ObjectWrapper> reverseCdoIdMap;
 
-    public ObjectGraphBuilder(EntityManager entityManager) {
+    public ObjectGraphBuilder(EntityManager entityManager, TypeMapper typeMapper) {
         this.entityManager = entityManager;
         this.reverseCdoIdMap = new HashMap<>();
+        this.typeMapper = typeMapper;
     }
 
     /**
@@ -68,8 +69,7 @@ public class ObjectGraphBuilder {
     }
 
     private void buildSingleEdges(ObjectWrapper node) {
-        List<Property> singleReferences = node.getManagedClass().getSingleReferences();
-        for (Property singleRef : singleReferences)  {
+        for (Property singleRef : getSingleReferences(node.getManagedClass())) {
             if (singleRef.isNull(node.unwrapCdo())) {
                 continue;
             }
@@ -83,24 +83,24 @@ public class ObjectGraphBuilder {
         }
     }
 
-    private boolean isCollectionOfEntityReferences(CollectionType collectionType) {
-        Class elementType = collectionType.getElementType();
+    private List<Property> getSingleReferences(ManagedClass managedClass) {
+        return managedClass.getProperties(new Predicate<Property>() {
+            public boolean apply(Property property) {
+                return (typeMapper.isEntityReferenceOrValueObject(property));
+            }
+        });
+    }
 
-        if (elementType == null || !entityManager.isManaged(elementType)) {
-            return false;
-        }
-
-        return entityManager.getByClass(elementType) instanceof Entity;
+    private List<Property> getCollectionsOfEntityReferences(ManagedClass managedClass) {
+        return managedClass.getProperties(new Predicate<Property>() {
+            public boolean apply(Property property) {
+                return (typeMapper.isCollectionOfEntityReferences(property));
+            }
+        });
     }
 
     private void buildMultiEdges(ObjectWrapper node) {
-        List<Property> collectionProperties = node.getManagedClass().getCollectionTypeProperties();
-        for (Property colProperty : collectionProperties)  {
-            CollectionType collectionType = (CollectionType)colProperty.getType();
-            if (!isCollectionOfEntityReferences((CollectionType)colProperty.getType())) {
-                continue;
-            }
-
+        for (Property colProperty : getCollectionsOfEntityReferences(node.getManagedClass()))  {
             if (colProperty.isNull(node.unwrapCdo())) {
                 continue;
             }

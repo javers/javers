@@ -2,7 +2,7 @@ package org.javers.core.diff.appenders
 
 import org.javers.model.domain.GlobalCdoId
 import org.javers.core.diff.changetype.ReferenceChange
-import org.javers.model.mapping.Property
+import org.javers.core.metamodel.property.Property
 
 /**
  * @author bartosz walacik

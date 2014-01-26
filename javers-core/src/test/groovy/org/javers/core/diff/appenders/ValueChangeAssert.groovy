@@ -1,10 +1,9 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.diff.ChangeAssert
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.model.domain.GlobalCdoId
 import org.javers.model.domain.ValueObjectId
-import org.javers.model.mapping.Property
+import org.javers.core.metamodel.property.Property
 
 class ValueChangeAssert {
 

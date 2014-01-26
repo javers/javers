@@ -1,12 +1,10 @@
-package org.javers.model.mapping;
+package org.javers.core.metamodel.property;
 
-import com.google.gson.annotations.Expose;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.model.mapping.type.JaversType;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.persistence.Id;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -18,19 +16,23 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class BeanProperty implements Property {
 
     private transient final Method getter;
-
     private final String name;
 
-    private transient final JaversType javersType;
-
-    protected BeanProperty(Method getter, JaversType javersType) {
-
+    protected BeanProperty(Method getter) {
         argumentIsNotNull(getter, "getter should not be null!");
-        argumentIsNotNull(javersType, "javersType should not be null!");
 
         this.getter = getter;
         this.name = ReflectionUtil.getterToField(getter);
-        this.javersType = javersType;
+    }
+
+    @Override
+    public Type getGenericType() {
+        return getter.getGenericReturnType();
+    }
+
+    @Override
+    public Class<?> getType() {
+        return getter.getReturnType();
     }
 
     @Override
@@ -54,27 +56,17 @@ public class BeanProperty implements Property {
     }
 
     @Override
-    public JaversType getType() {
-        return javersType;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         BeanProperty that = (BeanProperty) o;
-        return getter.equals(that.getter) && javersType.equals(that.javersType);
+        return getter.equals(that.getter);
     }
 
     @Override
     public int hashCode() {
-        return 31 * getter.hashCode() + javersType.hashCode();
+        return getter.hashCode();
     }
 
     @Override

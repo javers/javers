@@ -1,7 +1,7 @@
 package org.javers.core.diff;
 
 import org.javers.model.domain.GlobalCdoId;
-import org.javers.model.mapping.Property;
+import org.javers.core.metamodel.property.Property;
 import org.javers.model.object.graph.Edge;
 import org.javers.model.object.graph.ObjectNode;
 import org.javers.model.object.graph.SingleEdge;

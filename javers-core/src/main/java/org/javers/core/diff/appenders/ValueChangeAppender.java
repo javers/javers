@@ -1,11 +1,9 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Objects;
-import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.RealNodePair;
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.model.mapping.Property;
+import org.javers.core.metamodel.property.Property;
 import org.javers.model.mapping.type.JaversType;
 import org.javers.model.mapping.type.PrimitiveOrValueType;
 
@@ -35,6 +33,6 @@ public class ValueChangeAppender extends PropertyChangeAppender<ValueChange> {
         }
 
         ValueChange change = new ValueChange(pair.getGlobalCdoId(), property, leftValue, rightValue);
-        return  Sets.asSet(change);
+        return  Collections.singleton(change);
     }
 }

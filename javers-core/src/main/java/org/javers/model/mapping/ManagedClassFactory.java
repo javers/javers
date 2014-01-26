@@ -1,11 +1,10 @@
 package org.javers.model.mapping;
 
-import org.javers.common.collections.Lists;
-import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.model.mapping.type.MapType;
+import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.property.PropertyScanner;
 import org.javers.model.mapping.type.TypeMapper;
 
 import java.util.List;
@@ -37,7 +36,7 @@ public class ManagedClassFactory {
             idProperty = findIdPropertyByName(properties, entityDefinition);
         }
 
-        return new Entity(entityDefinition.getClazz(), onlySupported(properties), idProperty);
+        return new Entity(entityDefinition.getClazz(), properties, idProperty);
     }
 
     private Property findIdPropertyByName(List<Property> beanProperties, EntityDefinition entityDefinition) {
@@ -51,9 +50,10 @@ public class ManagedClassFactory {
 
     public ValueObject create(ValueObjectDefinition valueObjectDefinition) {
         List<Property> properties = propertyScanner.scan(valueObjectDefinition.getClazz());
-        return new ValueObject(valueObjectDefinition.getClazz(), onlySupported(properties));
+        return new ValueObject(valueObjectDefinition.getClazz(), properties);
     }
 
+    /**
     private List<Property> onlySupported(List<Property> properties){
         Predicate<Property> supported = new Predicate<Property>() {
             @Override
@@ -69,7 +69,7 @@ public class ManagedClassFactory {
         };
 
         return Lists.positiveFilter(properties, supported);
-    }
+    }*/
 
 
 }

@@ -1,12 +1,7 @@
 package org.javers.model.mapping;
 
-import org.javers.model.mapping.type.CollectionType;
-import org.javers.model.mapping.type.EntityReferenceType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.javers.core.metamodel.property.Property;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;

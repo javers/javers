@@ -1,11 +1,8 @@
 package org.javers.core.diff;
 
 import org.javers.common.validation.Validate;
-import org.javers.model.domain.Cdo;
 import org.javers.model.domain.GlobalCdoId;
-import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.ManagedClass;
-import org.javers.model.mapping.Property;
+import org.javers.core.metamodel.property.Property;
 import org.javers.model.object.graph.Edge;
 import org.javers.model.object.graph.ObjectNode;
 import org.javers.model.object.graph.SingleEdge;

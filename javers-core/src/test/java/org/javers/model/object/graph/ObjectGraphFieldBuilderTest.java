@@ -1,8 +1,7 @@
 package org.javers.model.object.graph;
 
 import org.javers.model.mapping.ManagedClassFactory;
-import org.javers.model.mapping.FieldBasedPropertyScanner;
-import org.javers.model.mapping.type.TypeMapper;
+import org.javers.core.metamodel.property.FieldBasedPropertyScanner;
 import org.junit.Before;
 
 /**
@@ -12,10 +11,9 @@ public class ObjectGraphFieldBuilderTest extends ObjectGraphBuilderTest {
 
     @Before
     public void setUp() {
-        TypeMapper mapper = new TypeMapper();
-        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner(mapper);
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner();
         ManagedClassFactory ef = new ManagedClassFactory(scanner,mapper);
-        entityManager = buildEntityManager(ef,mapper);
+        buildEntityManager(ef);
     }
 
 }

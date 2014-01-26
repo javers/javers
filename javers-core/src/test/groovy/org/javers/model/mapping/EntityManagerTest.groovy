@@ -2,6 +2,7 @@ package org.javers.model.mapping
 
 import org.javers.core.exceptions.JaversException
 import org.javers.core.exceptions.JaversExceptionCode
+import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.model.DummyManagedClass
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyNotManagedClass
@@ -16,7 +17,7 @@ class EntityManagerTest extends Specification{
 
     def setup() {
         TypeMapper mapper = new TypeMapper()
-        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner(mapper)
+        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner()
         ManagedClassFactory entityFactory = new ManagedClassFactory(scanner, mapper)
         entityManager = new EntityManager(entityFactory,mapper)
     }

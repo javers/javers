@@ -10,7 +10,7 @@ import org.javers.model.domain.GlobalCdoId
 import org.javers.model.domain.InstanceId
 import org.javers.model.domain.UnboundedValueObjectId
 import org.javers.model.domain.ValueObjectId
-import org.javers.model.mapping.Property
+import org.javers.core.metamodel.property.Property
 
 import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*
 
