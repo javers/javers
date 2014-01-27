@@ -1,11 +1,8 @@
-package org.javers.model.mapping;
+package org.javers.core.metamodel.property;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.property.PropertyScanner;
-import org.javers.model.mapping.type.TypeMapper;
 
 import java.util.List;
 
@@ -13,16 +10,13 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class ManagedClassFactory {
-    private TypeMapper typeMapper;
     private PropertyScanner propertyScanner;
 
-    public ManagedClassFactory(PropertyScanner propertyScanner, TypeMapper typeMapper) {
+    public ManagedClassFactory(PropertyScanner propertyScanner) {
         Validate.argumentIsNotNull(propertyScanner);
         this.propertyScanner = propertyScanner;
-        this.typeMapper = typeMapper;
     }
 
-    @Deprecated
     public <S> Entity create(Class<S> clazz) {
        return create(new EntityDefinition(clazz));
     }
@@ -52,25 +46,5 @@ public class ManagedClassFactory {
         List<Property> properties = propertyScanner.scan(valueObjectDefinition.getClazz());
         return new ValueObject(valueObjectDefinition.getClazz(), properties);
     }
-
-    /**
-    private List<Property> onlySupported(List<Property> properties){
-        Predicate<Property> supported = new Predicate<Property>() {
-            @Override
-            public boolean apply(Property property) {
-                if (property.getType() instanceof MapType) {
-                   MapType mapType = (MapType)property.getType();
-
-                   return mapType.isObjectToObjectMap() || typeMapper.isPrimitiveOrValue(mapType.getEntryClass());
-
-                }
-                return true;
-            }
-        };
-
-        return Lists.positiveFilter(properties, supported);
-    }*/
-
-
 }
 

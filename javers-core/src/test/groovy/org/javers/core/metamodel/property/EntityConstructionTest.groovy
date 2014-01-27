@@ -1,17 +1,11 @@
-package org.javers.model.mapping
+package org.javers.core.metamodel.property
 
 import com.google.common.reflect.TypeToken
 import org.javers.core.model.DummyUser
-import org.javers.model.mapping.type.ArrayType
-import org.javers.model.mapping.type.CollectionType
-import org.javers.model.mapping.type.EntityReferenceType
-import org.javers.model.mapping.type.PrimitiveType
-import org.javers.test.assertion.EntityAssert
 import spock.lang.Shared
 import spock.lang.Specification
 
 import static org.javers.test.CustomAssert.assertThat
-
 
 /**
  * @author Pawel Cierpiatka

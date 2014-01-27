@@ -1,14 +1,14 @@
-package org.javers.model.mapping;
+package org.javers.core.metamodel.property;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.model.mapping.type.JaversType;
-import org.javers.model.mapping.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -16,9 +16,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 /**
  * EntityManager bootstrap is two-phased:
  * <ol>
- *     <li/>JaVers bootstrap should
- *          registering client's Entities and ValueObjects through {@link #register(ManagedClassDefinition)}.
- *          In this phase, EntityManager creates proper {@link JaversType}'s in {@link TypeMapper}.
+ *     <li/>JaVers bootstrap should registering client's Entities and ValueObjects.
  *     <li/>When all types are registered, JaVers bootstrap calls {@link #buildManagedClasses()},
  *          in order to create Entities and ValueObjects for all previously registered types.
  * </ol>
@@ -29,16 +27,12 @@ public class EntityManager {
     private static final Logger logger = LoggerFactory.getLogger(EntityManager.class);
 
     private final ManagedClassFactory managedClassFactory;
-    private final TypeMapper typeMapper;
-
     private final Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
-    private final ManagedClasses managedClasses = new ManagedClasses();
+    private final Map<Class,ManagedClass> managedClasses = new HashMap<>();
 
-    public EntityManager(ManagedClassFactory managedClassFactory, TypeMapper typeMapper) {
-        argumentsAreNotNull(managedClassFactory, typeMapper);
-
+    public EntityManager(ManagedClassFactory managedClassFactory) {
+        argumentsAreNotNull(managedClassFactory);
         this.managedClassFactory = managedClassFactory;
-        this.typeMapper = typeMapper;
     }
 
     /**
@@ -48,7 +42,7 @@ public class EntityManager {
         if (!isRegistered(clazz)) {
             throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, clazz.getName());
         }
-        return managedClasses.getBySourceClass(clazz);
+        return managedClasses.get(clazz);
     }
 
     public void register(ManagedClassDefinition def) {
@@ -58,13 +52,6 @@ public class EntityManager {
             return; //already managed
         }
 
-        //TODO REFACTOR
-        if (def instanceof EntityDefinition) {
-            typeMapper.registerEntityReferenceType(def.getClazz());
-        }
-        if (def instanceof  ValueObjectDefinition) {
-            typeMapper.registerValueObjectType(def.getClazz());
-        }
         managedClassDefinitions.add(def);
     }
 
@@ -91,7 +78,7 @@ public class EntityManager {
     }
 
     public boolean isManaged(Class<?> clazz) {
-        return managedClasses.containsManagedClassWithSourceClass(clazz);
+        return managedClasses.containsKey(clazz);
     }
 
     /**
@@ -110,11 +97,11 @@ public class EntityManager {
 
     private void manageEntity(EntityDefinition entityDef) {
         logger.debug("registering Entity[{}]", entityDef.getClazz().getName());
-        managedClasses.add(managedClassFactory.create(entityDef));
+        managedClasses.put(entityDef.getClazz(), managedClassFactory.create(entityDef));
     }
 
     private void manageValueObject(ValueObjectDefinition voDef) {
         logger.debug("registering ValueObject[{}]", voDef.getClazz().getName());
-        managedClasses.add(managedClassFactory.create(voDef));
+        managedClasses.put(voDef.getClazz(), managedClassFactory.create(voDef));
     }
 }

@@ -1,8 +1,7 @@
 package org.javers.model.domain;
 
 import org.javers.core.exceptions.JaversException;
-import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.ManagedClass;
+import org.javers.core.metamodel.property.Entity;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 

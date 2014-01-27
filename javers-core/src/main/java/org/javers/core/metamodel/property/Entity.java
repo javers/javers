@@ -1,13 +1,9 @@
-package org.javers.model.mapping;
+package org.javers.core.metamodel.property;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.core.metamodel.property.Property;
-
 import java.util.List;
-
-import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * Entity class in client's domain model.

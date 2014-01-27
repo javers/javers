@@ -1,10 +1,6 @@
-package org.javers.model.mapping;
-
-import org.javers.core.metamodel.property.Property;
+package org.javers.core.metamodel.property;
 
 import java.util.List;
-
-import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * Class in client's domain model. Has list of mutable properties but no unique identifier.

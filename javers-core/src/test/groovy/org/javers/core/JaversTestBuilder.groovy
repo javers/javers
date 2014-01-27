@@ -1,14 +1,14 @@
 package org.javers.core
 
 import org.javers.core.model.DummyUserWithValues
-import org.javers.model.mapping.ManagedClassFactory
+import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.model.mapping.type.TypeMapper
 import org.javers.model.object.graph.ObjectGraphBuilder
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails;
-import org.javers.model.mapping.EntityManager
+import org.javers.core.metamodel.property.EntityManager
 
 /**
  * This is just a test builder,

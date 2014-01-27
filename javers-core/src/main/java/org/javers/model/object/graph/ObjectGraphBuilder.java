@@ -2,9 +2,8 @@ package org.javers.model.object.graph;
 
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.property.*;
 import org.javers.model.domain.*;
-import org.javers.model.mapping.*;
 import org.javers.model.mapping.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

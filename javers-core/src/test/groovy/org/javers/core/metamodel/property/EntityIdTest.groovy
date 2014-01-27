@@ -1,17 +1,16 @@
-package org.javers.model.mapping;
+package org.javers.core.metamodel.property
 
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.core.model.DummyAddress;
-import org.javers.core.model.DummyUser;
-import org.javers.test.assertion.EntityAssert
+import org.javers.core.exceptions.JaversException
+import org.javers.core.exceptions.JaversExceptionCode
+import org.javers.core.model.DummyAddress
+import org.javers.core.model.DummyUser
 import spock.lang.Specification
 
 /**
  * @author bartosz walacik
  */
 abstract class EntityIdTest extends Specification {
-    protected ManagedClassFactory entityFactory;
+    protected ManagedClassFactory entityFactory
 
     def "should use @id property by default"() {
         when:

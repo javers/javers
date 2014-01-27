@@ -1,13 +1,10 @@
-package org.javers.model.mapping;
+package org.javers.core.metamodel.property;
 
 import org.javers.common.collections.Predicate;
-import org.javers.core.metamodel.property.Property;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 

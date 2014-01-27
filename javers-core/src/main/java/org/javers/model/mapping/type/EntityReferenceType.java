@@ -1,9 +1,7 @@
 package org.javers.model.mapping.type;
 
-import org.javers.core.diff.appenders.PropertyChangeAppender;
-
 /**
- * Reference to {@link org.javers.model.mapping.Entity}
+ * Reference to {@link org.javers.core.metamodel.property.Entity}
  *
  * @author bartosz walacik
  */

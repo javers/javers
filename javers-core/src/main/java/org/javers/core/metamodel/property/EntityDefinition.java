@@ -1,6 +1,4 @@
-package org.javers.model.mapping;
-
-import org.javers.common.validation.Validate;
+package org.javers.core.metamodel.property;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 

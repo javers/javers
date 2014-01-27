@@ -5,8 +5,8 @@ import org.javers.core.model.DummyAddress;
 import org.javers.core.model.DummyNetworkAddress;
 import org.javers.core.model.DummyUser;
 import org.javers.core.model.DummyUserDetails;
-import org.javers.model.mapping.ManagedClassFactory;
-import org.javers.model.mapping.EntityManager;
+import org.javers.core.metamodel.property.ManagedClassFactory;
+import org.javers.core.metamodel.property.EntityManager;
 import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Test;
 
@@ -24,7 +24,15 @@ public abstract class ObjectGraphBuilderTest {
     protected EntityManager entityManager;
 
     protected void buildEntityManager(ManagedClassFactory ef) {
-        entityManager = new EntityManager(ef, mapper);
+
+        //will be refactored ASAP
+        mapper.registerEntityReferenceType(DummyUser.class);
+        mapper.registerEntityReferenceType(DummyUserDetails.class);
+        mapper.registerEntityReferenceType(DummyAddress.class);
+        mapper.registerEntityReferenceType(DummyNetworkAddress.class);
+
+        //will be refactored ASAP
+        entityManager = new EntityManager(ef);
         entityManager.registerEntity(DummyUser.class);
         entityManager.registerEntity(DummyUserDetails.class);
         entityManager.registerValueObject(DummyAddress.class);

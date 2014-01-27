@@ -2,10 +2,10 @@ package org.javers.model.object.graph;
 
 import org.javers.model.domain.Cdo;
 import org.javers.model.domain.GlobalCdoId;
-import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.ManagedClass;
+import org.javers.core.metamodel.property.Entity;
+import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
-import org.javers.model.mapping.ValueObject;
+import org.javers.core.metamodel.property.ValueObject;
 import org.javers.model.visitors.Visitable;
 
 import java.util.List;

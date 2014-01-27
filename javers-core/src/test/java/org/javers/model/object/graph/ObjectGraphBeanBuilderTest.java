@@ -1,7 +1,7 @@
 package org.javers.model.object.graph;
 
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner;
-import org.javers.model.mapping.ManagedClassFactory;
+import org.javers.core.metamodel.property.ManagedClassFactory;
 import org.junit.Before;
 
 /**
@@ -12,7 +12,7 @@ public class ObjectGraphBeanBuilderTest extends ObjectGraphBuilderTest {
     @Before
     public void setUp() {
         BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner();
-        ManagedClassFactory ef = new ManagedClassFactory(scanner,mapper);
+        ManagedClassFactory ef = new ManagedClassFactory(scanner);
         buildEntityManager(ef);
     }
 

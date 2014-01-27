@@ -4,7 +4,7 @@ import org.javers.model.domain.GlobalCdoId
 import org.javers.model.domain.InstanceId
 import org.javers.model.domain.UnboundedValueObjectId
 import org.javers.model.domain.ValueObjectId
-import org.javers.model.mapping.Entity
+import org.javers.core.metamodel.property.Entity
 
 import static EntityTestBuilder.entity
 import static EntityTestBuilder.valueObject

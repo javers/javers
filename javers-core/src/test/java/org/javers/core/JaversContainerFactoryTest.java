@@ -2,14 +2,10 @@ package org.javers.core;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.javers.core.Javers;
-import org.javers.core.JaversBuilder;
 import org.javers.core.diff.DiffFactory;
-import org.javers.core.pico.JaversContainerFactory;
-import org.javers.model.mapping.EntityManager;
+import org.javers.core.metamodel.property.EntityManager;
 import org.javers.model.mapping.type.TypeMapper;
 import org.junit.Test;
-import org.picocontainer.PicoContainer;
 
 /**
  * @author bartosz walacik

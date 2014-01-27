@@ -1,4 +1,4 @@
-package org.javers.model.mapping;
+package org.javers.core.metamodel.property;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
