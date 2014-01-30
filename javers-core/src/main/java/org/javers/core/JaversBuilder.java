@@ -7,15 +7,17 @@ import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.diff.changetype.Value;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
+import org.javers.core.metamodel.property.EntityDefinition;
+import org.javers.core.metamodel.property.EntityManager;
+import org.javers.core.metamodel.property.ManagedClassDefinition;
+import org.javers.core.metamodel.property.ValueObjectDefinition;
 import org.javers.core.pico.CoreJaversModule;
 import org.javers.core.pico.ModelJaversModule;
-import org.javers.model.mapping.*;
 import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.mapping.type.ValueType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.Boolean;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -61,29 +63,41 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers {@link Entity} with id-property selected on the basis of @Id annotation
+     * registers {@link org.javers.core.metamodel.property.Entity} with id-property selected on the basis of @Id annotation
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
         Validate.argumentIsNotNull(entityClass);
-        managedClassDefinitions.add(new EntityDefinition(entityClass));
-        return this;
+        return registerEntity( new EntityDefinition(entityClass));
     }
 
     /**
-     * registers {@link Entity} with id-property selected explicitly by name
+     * registers {@link org.javers.core.metamodel.property.Entity} with id-property selected explicitly by name
      */
     public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName) {
         Validate.argumentsAreNotNull(entityClass, idPropertyName);
-        managedClassDefinitions.add( new EntityDefinition(entityClass, idPropertyName) );
+        return registerEntity( new EntityDefinition(entityClass, idPropertyName) );
+    }
+
+    private JaversBuilder registerEntity(EntityDefinition entityDefinition) {
+        managedClassDefinitions.add( entityDefinition );
+        typeMapper().registerEntityReferenceType(entityDefinition.getClazz());
         return this;
     }
 
     /**
-     * registers {@link ValueObject}
+     * registers {@link org.javers.core.metamodel.property.ValueObject}
      */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         Validate.argumentIsNotNull(valueObjectClass);
         managedClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
+        typeMapper().registerValueObjectType(valueObjectClass);
+        return this;
+    }
+
+    public JaversBuilder registerValueObjects(Class<?>...valueObjectClasses) {
+        for(Class clazz : valueObjectClasses) {
+            registerValueObject(clazz);
+        }
         return this;
     }
 
@@ -140,13 +154,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
     public JaversBuilder registerEntities(Class<?>...entityClasses) {
         for(Class clazz : entityClasses) {
             registerEntity(clazz);
-        }
-        return this;
-    }
-
-    public JaversBuilder registerValueObjects(Class<?>...valueObjectClasses) {
-        for(Class clazz : valueObjectClasses) {
-            registerValueObject(clazz);
         }
         return this;
     }

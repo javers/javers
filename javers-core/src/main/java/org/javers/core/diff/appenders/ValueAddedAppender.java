@@ -1,9 +1,8 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.RealNodePair;
 import org.javers.core.diff.changetype.ValueAdded;
-import org.javers.model.mapping.Property;
+import org.javers.core.metamodel.property.Property;
 import org.javers.model.mapping.type.CollectionType;
 import org.javers.model.mapping.type.JaversType;
 

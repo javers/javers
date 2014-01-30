@@ -3,8 +3,9 @@ package org.javers.core;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.diff.Diff;
-import org.javers.model.mapping.EntityManager;
-import org.javers.model.mapping.ManagedClass;
+import org.javers.core.metamodel.property.EntityManager;
+import org.javers.core.metamodel.property.ManagedClass;
+import org.javers.model.mapping.type.TypeMapper;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 
 /**
@@ -26,14 +27,14 @@ public class Javers {
 
     private DiffFactory diffFactory;
 
-    private ObjectGraphBuilder objectGraphBuilder;
+    private TypeMapper typeMapper;
 
     private JsonConverter jsonConverter;
 
-    public Javers(EntityManager entityManager, DiffFactory diffFactory, ObjectGraphBuilder objectGraphBuilder, JsonConverter jsonConverter) {
+    public Javers(EntityManager entityManager, DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter) {
         this.entityManager = entityManager;
         this.diffFactory = diffFactory;
-        this.objectGraphBuilder = objectGraphBuilder;
+        this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;
     }
 
@@ -51,13 +52,13 @@ public class Javers {
     }
 
     public Diff initial(String user, Object root) {
-        ObjectGraphBuilder graph = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder graph = new ObjectGraphBuilder(entityManager,typeMapper);
         return diffFactory.createInitial(user, graph.buildGraph(root));
     }
 
     public Diff compare(String user, Object left, Object right) {
-        ObjectGraphBuilder leftGraph = new ObjectGraphBuilder(entityManager);
-        ObjectGraphBuilder rightGraph = new ObjectGraphBuilder(entityManager);
+        ObjectGraphBuilder leftGraph = new ObjectGraphBuilder(entityManager,typeMapper);
+        ObjectGraphBuilder rightGraph = new ObjectGraphBuilder(entityManager,typeMapper);
         return diffFactory.create(user, leftGraph.buildGraph(left), rightGraph.buildGraph(right));
     }
 

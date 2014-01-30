@@ -1,6 +1,6 @@
 package org.javers.model.domain;
 
-import org.javers.model.mapping.ValueObject;
+import org.javers.core.metamodel.property.ValueObject;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 

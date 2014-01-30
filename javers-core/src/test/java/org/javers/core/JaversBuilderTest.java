@@ -3,11 +3,8 @@ package org.javers.core;
 
 import org.fest.assertions.api.Assertions;
 import org.javers.core.model.DummyNetworkAddress;
-import org.javers.model.mapping.BeanBasedPropertyScanner;
-import org.javers.model.mapping.EntityManager;
-import org.javers.model.mapping.FieldBasedPropertyScanner;
-import org.javers.model.mapping.PropertyScanner;
-import org.javers.model.mapping.type.TypeMapper;
+import org.javers.core.metamodel.property.FieldBasedPropertyScanner;
+import org.javers.core.metamodel.property.PropertyScanner;
 import org.junit.Test;
 
 import javax.persistence.Id;

@@ -4,9 +4,9 @@ import org.javers.common.validation.Validate;
 import org.javers.model.domain.Cdo;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.InstanceId;
-import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.ManagedClass;
-import org.javers.model.mapping.Property;
+import org.javers.core.metamodel.property.Entity;
+import org.javers.core.metamodel.property.ManagedClass;
+import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
 import java.util.HashMap;

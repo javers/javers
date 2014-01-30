@@ -1,6 +1,6 @@
 package org.javers.model.object.graph;
 
-import org.javers.model.mapping.Property;
+import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
 import java.util.Collections;

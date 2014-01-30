@@ -3,7 +3,7 @@ package org.javers.core.model;
 /**
  * @author bartosz walacik
  */
-public class AbstractDummyUser {
+public abstract class AbstractDummyUser {
     private int inheritedInt;
 
     public int getInheritedInt() {

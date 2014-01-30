@@ -1,11 +1,8 @@
 package org.javers.model.domain;
 
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.model.mapping.Entity;
-import org.javers.model.mapping.ManagedClass;
-import org.javers.model.mapping.Property;
-import org.javers.model.mapping.ValueObject;
+import org.javers.core.metamodel.property.Entity;
+import org.javers.core.metamodel.property.ManagedClass;
+import org.javers.core.metamodel.property.ValueObject;
 
 import static org.javers.common.validation.Validate.*;
 

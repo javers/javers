@@ -1,7 +1,7 @@
 package org.javers.core.diff
 
 import org.javers.core.JaversTestBuilder
-import org.javers.model.mapping.Entity
+import org.javers.core.metamodel.property.Entity
 import org.javers.model.object.graph.ObjectNode
 import spock.lang.Shared
 import spock.lang.Specification

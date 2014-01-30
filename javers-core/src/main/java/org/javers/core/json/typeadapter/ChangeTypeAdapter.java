@@ -7,7 +7,7 @@ import org.javers.core.diff.changetype.map.*;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.domain.ValueObjectId;
-import org.javers.model.mapping.Entity;
+import org.javers.core.metamodel.property.Entity;
 
 import java.lang.reflect.Type;
 

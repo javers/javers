@@ -3,13 +3,15 @@ package org.javers.model.mapping.type;
 import org.javers.common.collections.Primitives;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.core.metamodel.property.Property;
 import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
@@ -18,6 +20,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class TypeMapper {
+    private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
+
     private Map<Type, JaversType> mappedTypes;
 
     public TypeMapper() {
@@ -49,19 +53,49 @@ public class TypeMapper {
     }
 
     /**
-     * returns mapped type or spawn new from prototype
+     * returns mapped type or spawn new one from prototype
      *
      * @throws JaversExceptionCode TYPE_NOT_MAPPED
      */
     public JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
 
-        JaversType jType = getMatchingJaversType(javaType);
+        JaversType jType = getExactMatchingJaversType(javaType);
         if (jType != null) {
             return jType;
         }
 
         return spawnFromPrototype(javaType);
+    }
+
+    public JaversType getPropertyType(Property property){
+        return getJaversType(property.getGenericType());
+    }
+
+    public boolean isEntityReferenceOrValueObject(Property property){
+        JaversType javersType = getPropertyType(property);
+        return (javersType instanceof EntityReferenceType ||
+                javersType instanceof ValueObjectType);
+    }
+
+    public boolean isSupportedMap(MapType propertyType){
+        return propertyType.isObjectToObjectMap() || isPrimitiveOrValue(propertyType.getEntryClass());
+    }
+
+    public boolean isCollectionOfEntityReferences(Property property){
+        JaversType javersType = getPropertyType(property);
+        if (! (javersType instanceof CollectionType)) {
+            return false;
+        }
+        CollectionType collectionType = (CollectionType)javersType;
+
+        if (collectionType.getElementType() == null) {
+            return false;
+        }
+
+        JaversType elementType = getJaversType(collectionType.getElementType());
+
+        return (elementType instanceof EntityReferenceType);
     }
 
     public <T extends Collection> void registerCollectionType(Class<T> collectionType) {
@@ -85,13 +119,6 @@ public class TypeMapper {
         addType(new ValueType(objectValue));
     }
 
-    public boolean isPrimitiveOrValue(EntryClass entryClass) {
-        JaversType keyType  = getJaversType(entryClass.getKey());
-        JaversType valueType = getJaversType(entryClass.getValue());
-
-        return  keyType instanceof PrimitiveOrValueType && valueType instanceof PrimitiveOrValueType;
-    }
-
     public <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
         List<T> result = new ArrayList<>();
         for(JaversType jType : mappedTypes.values()) {
@@ -102,10 +129,17 @@ public class TypeMapper {
         return result;
     }
 
-
     //-- protected
 
+
     //-- private
+
+    private boolean isPrimitiveOrValue(EntryClass entryClass) {
+        JaversType keyType  = getJaversType(entryClass.getKey());
+        JaversType valueType = getJaversType(entryClass.getValue());
+
+        return  keyType instanceof PrimitiveOrValueType && valueType instanceof PrimitiveOrValueType;
+    }
 
     private void addType(JaversType jType) {
         mappedTypes.put(jType.getBaseJavaType(), jType);
@@ -114,7 +148,7 @@ public class TypeMapper {
     /**
      * @return null if not found
      */
-    private JaversType getMatchingJaversType(Type javaType) {
+    private JaversType getExactMatchingJaversType(Type javaType) {
         return mappedTypes.get(javaType);
     }
 
@@ -144,7 +178,7 @@ public class TypeMapper {
         argumentIsNotNull(javaType);
 
         for (JaversType javersType : mappedTypes.values()){
-            if(!javersType.isGenericType() && javersType.isAssignableFrom(extractClass(javaType))){
+            if(javersType.mayBePrototypeFor(javaType)){
                 return javersType;
             }
         }
