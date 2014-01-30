@@ -29,11 +29,11 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
 
     @Override
     protected boolean supports(JaversType propertyType) {
-        if (! (propertyType instanceof MapType)) {
+        if (!super.supports(propertyType)) {
             return false;
         }
-        MapType mapType = (MapType)propertyType;
 
+        MapType mapType = (MapType)propertyType;
         boolean isSupported = typeMapper.isSupportedMap(mapType);
 
         if (!isSupported) {
@@ -41,6 +41,11 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
         }
 
         return isSupported;
+    }
+
+    @Override
+    protected Class<? extends JaversType> getSupportedPropertyType() {
+        return MapType.class;
     }
 
     @Override

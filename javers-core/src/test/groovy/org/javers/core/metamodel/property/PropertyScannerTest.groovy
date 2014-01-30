@@ -5,6 +5,7 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.joda.time.LocalDateTime
+import spock.lang.Shared
 import spock.lang.Specification
 
 import static org.javers.core.metamodel.property.PropertiesAssert.assertThat
@@ -14,7 +15,7 @@ import static org.javers.core.metamodel.property.PropertiesAssert.assertThat
  */
 abstract class PropertyScannerTest extends Specification {
 
-    protected PropertyScanner propertyScanner
+    @Shared PropertyScanner propertyScanner
 
     def shouldScanPrivateProperty() {
         when:

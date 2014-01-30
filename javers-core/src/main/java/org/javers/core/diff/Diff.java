@@ -51,7 +51,7 @@ public class Diff implements Visitable<ChangeVisitor>{
     private final LocalDateTime diffDate;
 
     public Diff(String userId) {
-        argumentIsNotNull(userId);
+        argumentIsNotNull(userId,"userId should not be null");
 
         this.userId = userId;
         this.diffDate = new LocalDateTime();

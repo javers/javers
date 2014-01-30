@@ -4,7 +4,7 @@ package org.javers.core.metamodel.property
  */
 class FieldBasedScannerTest extends PropertyScannerTest {
 
-    def setup() {
+    def setupSpec() {
         propertyScanner = new FieldBasedPropertyScanner()
     }
 }
