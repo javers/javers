@@ -7,7 +7,6 @@ import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.model.mapping.type.TypeMapper
-import org.junit.Test
 import spock.lang.Specification
 
 import static org.javers.test.assertion.NodeAssert.assertThat
@@ -83,7 +82,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .hasSingleEdge("dummyAddress")
                 .andTargetNode()
                 .hasNoEdges()
-                .hasCdo(user.dummyAddress)
+                .hasCdo(user.getDummyAddress())
                 .hasValueObjectId(DummyAddress, user, "dummyAddress")
     }
 

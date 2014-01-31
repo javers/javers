@@ -1,4 +1,4 @@
-package org.javers.core.cases.nap
+package org.javers.test.builder
 
 import org.javers.core.model.Category
 

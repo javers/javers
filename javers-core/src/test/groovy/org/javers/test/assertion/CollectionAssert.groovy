@@ -1,11 +1,11 @@
-package org.javers.test
+package org.javers.test.assertion
 
 /**
  * @author Pawel Cierpiatka
  */
 class CollectionAssert {
 
-    def Collection actual
+    Collection actual
 
     private CollectionAssert(Collection actual) {
         this.actual = actual

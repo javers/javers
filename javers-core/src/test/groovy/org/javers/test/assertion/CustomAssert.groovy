@@ -1,4 +1,4 @@
-package org.javers.test
+package org.javers.test.assertion
 
 import org.javers.core.metamodel.property.Entity
 
@@ -7,8 +7,8 @@ import org.javers.core.metamodel.property.Entity
  */
 class CustomAssert {
 
-    def static EntityGroovyAssert assertThat(Entity actual) {
-        return EntityGroovyAssert.assertThat(actual)
+    def static EntityAssert assertThat(Entity actual) {
+        return EntityAssert.assertThat(actual)
     }
 
     def static CollectionAssert assertThat(Collection actual) {
