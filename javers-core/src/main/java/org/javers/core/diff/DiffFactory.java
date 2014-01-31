@@ -72,13 +72,13 @@ public class DiffFactory {
     private void appendPropertyChanges(Diff diff, NodePair pair) {
         List<Property> nodeProperties = pair.getProperties();
         for (Property property : nodeProperties) {
-            JaversType javersType = typeMapper.getPropertyType(property);
 
             //optimization, skip all Appenders if null on both sides
             if (pair.isNullOnBothSides(property)) {
                 continue;
             }
 
+            JaversType javersType = typeMapper.getPropertyType(property);
             for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
                 Collection<Change> changes = appender.calculateChangesIfSupported(pair, property, javersType);
                 for (Change change : changes) {
