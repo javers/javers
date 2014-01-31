@@ -2,6 +2,7 @@ package org.javers.test.assertion;
 
 import com.google.common.collect.Lists;
 import org.fest.assertions.api.AbstractAssert;
+import org.fest.assertions.api.Assertions;
 import org.javers.model.object.graph.MultiEdge;
 import org.javers.model.object.graph.ObjectNode;
 

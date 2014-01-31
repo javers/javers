@@ -1,6 +1,7 @@
 package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
+import org.fest.assertions.api.Assertions;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 

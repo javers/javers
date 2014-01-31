@@ -1,6 +1,7 @@
 package org.javers.test.assertion;
 
 import org.fest.assertions.api.AbstractAssert;
+import org.fest.assertions.api.Assertions;
 import org.javers.model.domain.InstanceId;
 import org.javers.model.domain.UnboundedValueObjectId;
 import org.javers.model.domain.ValueObjectId;
@@ -60,11 +61,6 @@ public class NodeAssert extends AbstractAssert<NodeAssert, ObjectNode> {
                   .overridingErrorMessage("expected edges:"+expectedSize+" but was:"+actual.getEdges().size())
                   .hasSize(expectedSize);
         return this;
-    }
-
-    public EdgeAssert andFirstEdge() {
-        Assertions.assertThat(actual.getEdges()).isNotEmpty();
-        return EdgeAssert.assertThat(actual.getEdges().get(0));
     }
 
     public EdgeAssert hasEdge(String edgeName) {

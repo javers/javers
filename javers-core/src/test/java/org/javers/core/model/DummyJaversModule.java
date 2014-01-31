@@ -1,6 +1,7 @@
-package org.javers.core;
+package org.javers.core.model;
 
 import org.javers.common.pico.JaversModule;
+import org.javers.core.model.DummyJaversBean;
 
 import java.util.Arrays;
 import java.util.Collection;

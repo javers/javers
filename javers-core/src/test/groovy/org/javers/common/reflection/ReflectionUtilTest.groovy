@@ -4,11 +4,7 @@ import org.javers.core.model.DummyUser
 import spock.lang.Specification
 
 import java.lang.reflect.Field
-import java.lang.reflect.Method
-
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
-import static org.javers.common.reflection.ReflectionTestHelper.getMethodFromClass
-import static org.javers.common.reflection.ReflectionUtil.getParametrizedTypeFirstArgument
 
 /**
  * @author Pawel Cierpiatka
