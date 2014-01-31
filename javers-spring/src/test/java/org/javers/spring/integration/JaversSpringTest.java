@@ -14,10 +14,17 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * @author Pawel Cierpiatka
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-
+@ContextConfiguration(locations = {"classpath:applicationContext-Test.xml"})
 public class JaversSpringTest {
 
+    @Autowired
+    private Javers javers;
 
+    @Test
+    public void shouldAutowiredJavers() {
 
-
+        //then
+        assertThat(javers).isNotNull();
+        assertThat(javers.isManaged(DummyUser.class)).isTrue();
+    }
 }
