@@ -7,8 +7,9 @@ import org.javers.model.object.graph.ObjectGraphBuilder
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyUser
-import org.javers.core.model.DummyUserDetails;
-import org.javers.core.metamodel.property.EntityManager
+import org.javers.core.model.DummyUserDetails
+
+import javax.persistence.EntityManager;
 
 /**
  * This is just a test builder,
@@ -16,38 +17,38 @@ import org.javers.core.metamodel.property.EntityManager
  * <br/><br/>
  *
  * Provides default setup with well known Dummy* Entities.
- * Provides access to protected components like {@link EntityManager}
  *
  * @author bartosz walacik
  */
 class JaversTestBuilder {
     JaversBuilder javersBuilder
 
-    private JaversTestBuilder (){
+    private JaversTestBuilder (MappingStyle mappingStyle) {
        javersBuilder = new JaversBuilder()
 
-       javersBuilder.registerEntity(DummyUser)
-       .registerEntity(DummyUserDetails)
-       .registerEntity(DummyUserWithValues)
-       .registerValueObject(DummyAddress)
-       .registerValueObject(DummyNetworkAddress)
-       .build()
+       javersBuilder.withMappingStyle(mappingStyle)
+                    .registerEntity(DummyUser)
+                    .registerEntity(DummyUserDetails)
+                    .registerEntity(DummyUserWithValues)
+                    .registerValueObject(DummyAddress)
+                    .registerValueObject(DummyNetworkAddress)
+                    .build()
     }
 
     static JaversTestBuilder javersTestAssembly(){
-        new JaversTestBuilder()
+        new JaversTestBuilder(MappingStyle.FIELD)
+    }
+
+    static JaversTestBuilder javersTestAssembly(MappingStyle mappingStyle){
+        new JaversTestBuilder(mappingStyle)
     }
 
     static Javers javers() {
-        new JaversTestBuilder().javersBuilder.getContainerComponent(Javers)
+        new JaversTestBuilder(MappingStyle.FIELD).javersBuilder.getContainerComponent(Javers)
     }
 
     ManagedClassFactory getEntityFactory() {
         javersBuilder.getContainerComponent(ManagedClassFactory)
-    }
-
-    EntityManager getEntityManager() {
-        javersBuilder.getContainerComponent(EntityManager)
     }
 
     TypeMapper getTypeMapper(){
@@ -55,7 +56,7 @@ class JaversTestBuilder {
     }
 
     ObjectGraphBuilder createObjectGraphBuilder() {
-        new ObjectGraphBuilder(getEntityManager(), getTypeMapper())
+        new ObjectGraphBuilder(getTypeMapper())
     }
 
 }

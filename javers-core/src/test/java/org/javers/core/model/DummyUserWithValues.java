@@ -46,6 +46,7 @@ public class DummyUserWithValues {
         return salary;
     }
 
+    @Id
     public String getName() {
         return name;
     }

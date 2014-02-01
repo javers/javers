@@ -2,15 +2,19 @@ package org.javers.core
 
 import org.javers.core.diff.DiffFactory
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
-import org.javers.core.metamodel.property.EntityManager
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
 import org.javers.core.metamodel.property.PropertyScanner
+import org.javers.core.metamodel.property.ValueObject
+import org.javers.core.metamodel.type.EntityType
+import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.metamodel.type.TypeMapper
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import javax.persistence.EntityManager
 import javax.persistence.Id
+import javax.swing.text.html.parser.Entity
 
 import static org.fest.assertions.api.Assertions.assertThat
 import static org.javers.core.JaversBuilder.*
@@ -37,7 +41,7 @@ class JaversBuilderTest extends Specification {
         Javers javers = javers().registerEntity(DummyEntity).build()
 
         then:
-        javers.isManaged(DummyEntity)
+        javers.getForClass(DummyEntity) instanceof EntityType
     }
 
     
@@ -46,7 +50,7 @@ class JaversBuilderTest extends Specification {
         Javers javers = javers().registerValueObject(DummyNetworkAddress).build()
 
         then:
-        javers.isManaged(DummyNetworkAddress)
+        javers.getForClass(DummyNetworkAddress) instanceof ValueObjectType
     }
 
     
@@ -126,7 +130,7 @@ class JaversBuilderTest extends Specification {
         builder2.build()
 
         then:
-        builder1.getContainerComponent(EntityManager) != builder2.getContainerComponent(EntityManager)
+        builder1.getContainerComponent(Javers) != builder2.getContainerComponent(Javers)
     }
 
     @Unroll
@@ -141,7 +145,7 @@ class JaversBuilderTest extends Specification {
         assertThat(builder.getContainerComponent(clazz)) isInstanceOf(clazz)
 
         where:
-        clazz << [Javers, EntityManager, TypeMapper, DiffFactory]
+        clazz << [Javers, TypeMapper, DiffFactory]
     }
 
     def "should contain singletons"() {

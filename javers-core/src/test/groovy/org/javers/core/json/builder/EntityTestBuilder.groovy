@@ -23,7 +23,7 @@ class EntityTestBuilder {
 
     static Entity entity(Class forClass) {
         EntityTestBuilder entityTestBuilder = new EntityTestBuilder()
-        entityTestBuilder.entityFactory.create(forClass)
+        entityTestBuilder.entityFactory.createEntity(forClass)
     }
 
     static ValueObject valueObject(Class forClass) {

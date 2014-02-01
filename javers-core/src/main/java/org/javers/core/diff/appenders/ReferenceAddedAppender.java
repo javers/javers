@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 public class ReferenceAddedAppender extends PropertyChangeAppender<ReferenceAdded> {
 
-    //TODO in fact it should be Collection<EntityReferenceType>
+    //TODO in fact it should be Collection<EntityType>
     @Override
     protected Class<? extends JaversType> getSupportedPropertyType() {
         return CollectionType.class;

@@ -1,13 +1,18 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.core.metamodel.property.ValueObject;
+
 /**
  * @author bartosz walacik
  */
-//TODO merge with ValueObject
-@Deprecated
-public class ValueObjectType extends JaversType{
+public class ValueObjectType extends ManagedType{
 
-    public ValueObjectType(Class voClass){
-        super(voClass);
+    public ValueObjectType(ValueObject valueObject){
+        super(valueObject);
+    }
+
+    @Override
+    ValueObject getManagedClass() {
+        return (ValueObject)super.getManagedClass();
     }
 }

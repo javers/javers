@@ -7,12 +7,9 @@ import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.diff.changetype.Value;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
-import org.javers.core.metamodel.property.EntityDefinition;
-import org.javers.core.metamodel.property.EntityManager;
-import org.javers.core.metamodel.property.ManagedClassDefinition;
-import org.javers.core.metamodel.property.ValueObjectDefinition;
+import org.javers.core.metamodel.property.*;
 import org.javers.core.pico.CoreJaversModule;
-import org.javers.core.pico.ModelJaversModule;
+import org.javers.core.pico.ManagedClassFactoryModule;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
 import org.slf4j.Logger;
@@ -42,6 +39,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private JaversBuilder() {
         logger.debug("starting up javers ...");
+
+        // bootstrap phase 1: core beans
         bootContainer(new CoreJaversModule());
     }
 
@@ -51,12 +50,12 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     public Javers build() {
 
+        // bootstrap phase 2: JSON beans
         bootJsonConverter();
 
-        //bootstrap phase 2
-        addModule(new ModelJaversModule(coreConfiguration()));
-        registerManagedClasses();
-        bootEntityManager();
+        // bootstrap phase 3:
+        // ManagedClassFactory & managed classes registration
+        bootManagedClasses();
 
         logger.info("javers instance is up & ready");
         return getContainerComponent(Javers.class);
@@ -79,8 +78,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private JaversBuilder registerEntity(EntityDefinition entityDefinition) {
-        managedClassDefinitions.add( entityDefinition );
-        typeMapper().registerEntityReferenceType(entityDefinition.getClazz());
+        managedClassDefinitions.add(entityDefinition);
         return this;
     }
 
@@ -90,7 +88,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         Validate.argumentIsNotNull(valueObjectClass);
         managedClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
-        typeMapper().registerValueObjectType(valueObjectClass);
         return this;
     }
 
@@ -162,6 +159,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * {@link MappingStyle#FIELD} by default
      */
     public JaversBuilder withMappingStyle(MappingStyle mappingStyle) {
+        Validate.argumentIsNotNull(mappingStyle);
         coreConfiguration().withMappingStyle(mappingStyle);
         return this;
     }
@@ -174,14 +172,21 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }*/
 
     private void registerManagedClasses() {
-        EntityManager entityManager = entityManager();
+        TypeMapper typeMapper = typeMapper();
         for (ManagedClassDefinition def : managedClassDefinitions) {
-            entityManager.register(def);
+            if (def instanceof ValueObjectDefinition) {
+                ValueObject valueObject = managedClassFactory().create((ValueObjectDefinition)def);
+                typeMapper.registerValueObjectType(valueObject);
+            }
+            if (def instanceof EntityDefinition) {
+                Entity entity = managedClassFactory().create((EntityDefinition)def);
+                typeMapper.registerEntityType(entity);
+            }
         }
     }
 
-    private EntityManager entityManager() {
-        return getContainerComponent(EntityManager.class);
+    private ManagedClassFactory managedClassFactory() {
+        return getContainerComponent(ManagedClassFactory.class);
     }
 
     private TypeMapper typeMapper() {
@@ -196,8 +201,9 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return getContainerComponent(JsonConverterBuilder.class);
     }
 
-    private void bootEntityManager() {
-        entityManager().buildManagedClasses();
+    private void bootManagedClasses() {
+        addModule(new ManagedClassFactoryModule(coreConfiguration()));
+        registerManagedClasses();
     }
 
     private void bootJsonConverter() {

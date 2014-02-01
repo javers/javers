@@ -12,6 +12,7 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityManager;
 import java.util.*;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -25,13 +26,11 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class ObjectGraphBuilder {
     private static final Logger logger = LoggerFactory.getLogger(ObjectGraphBuilder.class);
 
-    private TypeMapper typeMapper;
-    private final EntityManager entityManager;
+    private final TypeMapper typeMapper;
     private boolean built;
-    private Map<Cdo, ObjectWrapper> reverseCdoIdMap;
+    private final Map<Cdo, ObjectWrapper> reverseCdoIdMap;
 
-    public ObjectGraphBuilder(EntityManager entityManager, TypeMapper typeMapper) {
-        this.entityManager = entityManager;
+    public ObjectGraphBuilder(TypeMapper typeMapper) {
         this.reverseCdoIdMap = new HashMap<>();
         this.typeMapper = typeMapper;
     }
@@ -168,7 +167,7 @@ public class ObjectGraphBuilder {
 
     private ManagedClass getManagedCLass(Object cdo) {
         Validate.argumentIsNotNull(cdo);
-        return entityManager.getByClass(cdo.getClass());
+        return  typeMapper.getManagedClass(cdo.getClass());
     }
 
     private class OwnerContext {

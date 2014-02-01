@@ -1,7 +1,7 @@
 package org.javers.model.object.graph
 
-import org.javers.core.metamodel.property.BeanBasedPropertyScanner
-import org.javers.core.metamodel.property.ManagedClassFactory
+import org.javers.core.JaversTestBuilder
+import org.javers.core.MappingStyle
 
 /**
  * @author Pawel Cierpiatka
@@ -9,8 +9,6 @@ import org.javers.core.metamodel.property.ManagedClassFactory
 class ObjectGraphBeanBuilderTest extends ObjectGraphBuilderTest {
 
     def setup() {
-        def scanner = new BeanBasedPropertyScanner();
-        def managedClassFactory = new ManagedClassFactory(scanner);
-        buildEntityManager(managedClassFactory);
+        mapper = JaversTestBuilder.javersTestAssembly(MappingStyle.BEAN).typeMapper;
     }
 }

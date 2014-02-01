@@ -23,8 +23,8 @@ class TypeMapperTestBuilder {
 
     TypeMapperTestBuilder registerAllDummyTypes() {
         typeMapper.registerValueType(DummyAddress)
-        typeMapper.registerEntityReferenceType(DummyUser)
-        typeMapper.registerEntityReferenceType(DummyUserDetails)
+        typeMapper.registerEntityType(DummyUser)
+        typeMapper.registerEntityType(DummyUserDetails)
         typeMapper.registerValueType(DummyNetworkAddress)
         this
     }

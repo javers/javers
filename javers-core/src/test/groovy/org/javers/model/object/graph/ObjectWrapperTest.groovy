@@ -19,7 +19,7 @@ abstract class ObjectWrapperTest extends Specification {
     def "should hold Entity reference"() {
         given:
         DummyUser cdo = dummyUser().build()
-        Entity entity = managedClassFactory.create(DummyUser)
+        Entity entity = managedClassFactory.createEntity(DummyUser)
 
         when:
         ObjectWrapper wrapper = new ObjectWrapper(cdo, entity)
@@ -32,7 +32,7 @@ abstract class ObjectWrapperTest extends Specification {
     def "should hold GlobalCdoId"() {
         given:
         DummyUser cdo = dummyUser().withName("Mad Kaz").build()
-        Entity entity = managedClassFactory.create(DummyUser)
+        Entity entity = managedClassFactory.createEntity(DummyUser)
 
         when:
         ObjectWrapper wrapper = new ObjectWrapper(cdo, entity)
@@ -44,7 +44,7 @@ abstract class ObjectWrapperTest extends Specification {
     def "should hold Cdo reference"() {
         given:
         DummyUser cdo = dummyUser().build()
-        Entity entity = managedClassFactory.create(DummyUser)
+        Entity entity = managedClassFactory.createEntity(DummyUser)
 
         when:
         ObjectWrapper wrapper = new ObjectWrapper(cdo, entity)
@@ -57,7 +57,7 @@ abstract class ObjectWrapperTest extends Specification {
     def "should throw exceptin when Entity without id"() {
         given:
         DummyUser cdo = new DummyUser()
-        Entity entity = managedClassFactory.create(DummyUser)
+        Entity entity = managedClassFactory.createEntity(DummyUser)
 
         when:
         new ObjectWrapper(cdo, entity)
@@ -70,8 +70,8 @@ abstract class ObjectWrapperTest extends Specification {
     
     def "should be equal by id value and Entity class"() {
         when:
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser))
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser))
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
+        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
 
         then:
         first.hashCode() == second.hashCode()
@@ -81,8 +81,8 @@ abstract class ObjectWrapperTest extends Specification {
     
     def "should not be equal with different id value"() {
         when:
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("stach"), managedClassFactory.create(DummyUser))
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax 1"), managedClassFactory.create(DummyUser))
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("stach"), managedClassFactory.createEntity(DummyUser))
+        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax 1"), managedClassFactory.createEntity(DummyUser))
 
         then:
         first != second
@@ -91,7 +91,7 @@ abstract class ObjectWrapperTest extends Specification {
     
     def "should have reflexive equals method"() {
         when:
-        ObjectWrapper objectWrapper = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser))
+        ObjectWrapper objectWrapper = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
 
         then:
         objectWrapper == objectWrapper
@@ -100,9 +100,9 @@ abstract class ObjectWrapperTest extends Specification {
     
     def "should have symmetric and transitive equals method"() {
         when:
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser))
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser))
-        ObjectWrapper third = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser))
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
+        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
+        ObjectWrapper third = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
 
         then:
         first == second
@@ -113,7 +113,7 @@ abstract class ObjectWrapperTest extends Specification {
     
     def "should return false when equals method has null arg"() {
         when:
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.create(DummyUser))
+        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
 
         then:
         first != null

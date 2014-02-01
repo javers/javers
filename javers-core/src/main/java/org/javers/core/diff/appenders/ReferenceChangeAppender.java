@@ -5,7 +5,7 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.EntityReferenceType;
+import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.JaversType;
 
 import java.util.Collection;
@@ -19,7 +19,7 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
 
     @Override
     protected Class<? extends JaversType> getSupportedPropertyType() {
-        return EntityReferenceType.class;
+        return EntityType.class;
     }
 
     @Override
