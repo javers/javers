@@ -27,6 +27,4 @@ public class JaversSpringTest {
         assertThat(javers).isNotNull();
         assertThat(javers.isManaged(DummyUser.class)).isTrue();
     }
-
-
 }

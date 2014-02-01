@@ -1,12 +1,8 @@
 package org.javers.core.diff
 
 import groovy.transform.TypeChecked
-import org.javers.core.JaversTestBuilder
 import org.javers.core.model.DummyUser
 import org.javers.model.object.graph.ObjectNode
-import spock.lang.Shared;
-import spock.lang.Specification;
-import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**

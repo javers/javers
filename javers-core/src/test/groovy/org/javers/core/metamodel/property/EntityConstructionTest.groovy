@@ -5,7 +5,7 @@ import org.javers.core.model.DummyUser
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static org.javers.test.CustomAssert.assertThat
+import static org.javers.test.assertion.CustomAssert.assertThat
 
 /**
  * @author Pawel Cierpiatka

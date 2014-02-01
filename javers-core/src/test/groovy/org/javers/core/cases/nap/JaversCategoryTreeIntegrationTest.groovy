@@ -7,6 +7,7 @@ import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.model.Category
+import org.javers.test.builder.CategoryTestBuilder
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
