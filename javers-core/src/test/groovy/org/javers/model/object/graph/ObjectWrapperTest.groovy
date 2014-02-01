@@ -5,8 +5,8 @@ import org.javers.core.exceptions.JaversExceptionCode
 import org.javers.core.metamodel.property.Entity
 import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.model.DummyUser
-import org.javers.model.domain.Cdo
-import org.javers.model.domain.InstanceId
+import org.javers.core.metamodel.object.Cdo
+import org.javers.core.metamodel.object.InstanceId
 import spock.lang.Specification
 
 import static org.javers.test.builder.DummyUserBuilder.dummyUser

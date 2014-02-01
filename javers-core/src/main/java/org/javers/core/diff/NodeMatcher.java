@@ -1,7 +1,7 @@
 package org.javers.core.diff;
 
 import org.javers.common.validation.Validate;
-import org.javers.model.domain.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.model.object.graph.ObjectNode;
 
 import java.util.*;
@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class NodeMatcher {
     /**
-     * matching based on {@link org.javers.model.domain.GlobalCdoId}
+     * matching based on {@link org.javers.core.metamodel.object.GlobalCdoId}
      */
     public List<NodePair> match(GraphPair graphPair) {
         Validate.argumentIsNotNull(graphPair);

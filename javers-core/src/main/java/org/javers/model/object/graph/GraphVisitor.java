@@ -1,6 +1,5 @@
 package org.javers.model.object.graph;
 
-import org.javers.model.domain.GlobalCdoId;
 import org.javers.model.visitors.Visitor;
 import java.util.HashSet;
 import java.util.Set;

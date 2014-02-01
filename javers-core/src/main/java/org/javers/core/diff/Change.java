@@ -1,6 +1,6 @@
 package org.javers.core.diff;
 
-import org.javers.model.domain.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.model.visitors.ChangeVisitor;
 import org.javers.model.visitors.Visitable;

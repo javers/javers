@@ -2,8 +2,12 @@ package org.javers.model.object.graph;
 
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.UnboundedValueObjectId;
+import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.property.*;
-import org.javers.model.domain.*;
 import org.javers.model.mapping.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
