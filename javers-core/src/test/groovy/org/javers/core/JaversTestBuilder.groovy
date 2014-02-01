@@ -2,7 +2,7 @@ package org.javers.core
 
 import org.javers.core.model.DummyUserWithValues
 import org.javers.core.metamodel.property.ManagedClassFactory
-import org.javers.model.mapping.type.TypeMapper
+import org.javers.core.metamodel.type.TypeMapper
 import org.javers.model.object.graph.ObjectGraphBuilder
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress

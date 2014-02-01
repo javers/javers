@@ -5,8 +5,8 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.model.mapping.type.EntityReferenceType;
-import org.javers.model.mapping.type.JaversType;
+import org.javers.core.metamodel.type.EntityReferenceType;
+import org.javers.core.metamodel.type.JaversType;
 
 import java.util.Collection;
 import java.util.Collections;

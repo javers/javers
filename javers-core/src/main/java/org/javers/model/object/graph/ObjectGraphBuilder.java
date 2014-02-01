@@ -8,7 +8,7 @@ import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.property.*;
-import org.javers.model.mapping.type.*;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

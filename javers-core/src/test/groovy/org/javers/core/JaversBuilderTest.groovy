@@ -6,7 +6,7 @@ import org.javers.core.metamodel.property.EntityManager
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
 import org.javers.core.metamodel.property.PropertyScanner
 import org.javers.core.model.DummyNetworkAddress
-import org.javers.model.mapping.type.TypeMapper
+import org.javers.core.metamodel.type.TypeMapper
 import spock.lang.Specification
 import spock.lang.Unroll
 

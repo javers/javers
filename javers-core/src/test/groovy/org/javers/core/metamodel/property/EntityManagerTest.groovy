@@ -5,8 +5,6 @@ import org.javers.core.exceptions.JaversExceptionCode
 import org.javers.core.model.DummyManagedClass
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyNotManagedClass
-import org.javers.model.mapping.type.EntityReferenceType
-import org.javers.model.mapping.type.ValueObjectType
 import spock.lang.Specification
 
 class EntityManagerTest extends Specification{

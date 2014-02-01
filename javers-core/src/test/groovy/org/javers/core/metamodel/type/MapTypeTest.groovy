@@ -1,6 +1,7 @@
-package org.javers.model.mapping.type
+package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
+import org.javers.core.metamodel.type.MapType
 import spock.lang.Specification
 import spock.lang.Unroll
 

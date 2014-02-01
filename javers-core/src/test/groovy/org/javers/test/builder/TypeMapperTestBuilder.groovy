@@ -4,7 +4,7 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.javers.model.mapping.type.TypeMapper
+import org.javers.core.metamodel.type.TypeMapper
 
 /**
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>

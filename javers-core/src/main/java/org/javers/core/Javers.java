@@ -5,7 +5,7 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.diff.Diff;
 import org.javers.core.metamodel.property.EntityManager;
 import org.javers.core.metamodel.property.ManagedClass;
-import org.javers.model.mapping.type.TypeMapper;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 
 /**

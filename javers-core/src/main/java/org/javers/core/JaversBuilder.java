@@ -13,8 +13,8 @@ import org.javers.core.metamodel.property.ManagedClassDefinition;
 import org.javers.core.metamodel.property.ValueObjectDefinition;
 import org.javers.core.pico.CoreJaversModule;
 import org.javers.core.pico.ModelJaversModule;
-import org.javers.model.mapping.type.TypeMapper;
-import org.javers.model.mapping.type.ValueType;
+import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.ValueType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
