@@ -1,11 +1,6 @@
 package org.javers.model.mapping.type;
 
-import org.javers.common.validation.Validate;
-
 import java.lang.reflect.Type;
-import java.util.Collection;
-
-import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * @author bartosz walacik

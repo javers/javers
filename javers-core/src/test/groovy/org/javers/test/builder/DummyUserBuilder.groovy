@@ -118,4 +118,9 @@ class DummyUserBuilder {
         dummyUser.integerList = integers as List
         this
     }
+
+    DummyUserBuilder withIntArray(int... integers) {
+        dummyUser.intArray = integers
+        this
+    }
 }
