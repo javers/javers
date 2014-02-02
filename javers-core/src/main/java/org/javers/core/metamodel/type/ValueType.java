@@ -1,4 +1,4 @@
-package org.javers.model.mapping.type;
+package org.javers.core.metamodel.type;
 
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonTypeAdapter;

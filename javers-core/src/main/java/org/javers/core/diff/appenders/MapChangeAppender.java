@@ -5,9 +5,9 @@ import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.map.*;
 import org.javers.core.metamodel.property.Property;
-import org.javers.model.mapping.type.JaversType;
-import org.javers.model.mapping.type.MapType;
-import org.javers.model.mapping.type.TypeMapper;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.MapType;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,6 +1,12 @@
-package org.javers.model.mapping.type
+package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
+import org.javers.core.metamodel.type.ArrayType
+import org.javers.core.metamodel.type.CollectionType
+import org.javers.core.metamodel.type.JaversType
+import org.javers.core.metamodel.type.MapType
+import org.javers.core.metamodel.type.PrimitiveType
+import org.javers.core.metamodel.type.TypeMapper
 import spock.lang.Specification
 
 import java.lang.reflect.Type

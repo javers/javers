@@ -1,16 +1,14 @@
 package org.javers.model.object.graph
 
-import org.javers.core.metamodel.property.FieldBasedPropertyScanner
-import org.javers.core.metamodel.property.ManagedClassFactory
+import org.javers.core.JaversTestBuilder
+import org.javers.core.MappingStyle
 
 /**
  * @author Pawel Cierpiatka
  */
 class ObjectGraphFieldBuilderTest extends ObjectGraphBuilderTest {
 
-    def setup() {
-        def scanner = new FieldBasedPropertyScanner()
-        def ef = new ManagedClassFactory(scanner)
-        buildEntityManager(ef);
+    def setupSpec() {
+        mapper = JaversTestBuilder.javersTestAssembly(MappingStyle.FIELD).typeMapper;
     }
 }

@@ -39,8 +39,8 @@ public abstract class AbstractJaversBuilder {
     }
 
 
-    protected PicoContainer bootContainer(JaversModule modules, Object... beans) {
-        return bootContainer(modules, Arrays.asList(beans));
+    protected PicoContainer bootContainer(JaversModule module, Object... beans) {
+        return bootContainer(module, Arrays.asList(beans));
     }
 
     protected PicoContainer bootContainer(JaversModule module, List<?> beans) {

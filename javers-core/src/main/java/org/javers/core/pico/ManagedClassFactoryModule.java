@@ -2,12 +2,11 @@ package org.javers.core.pico;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
-import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.MappingStyle;
+import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner;
-import org.javers.core.metamodel.property.ManagedClassFactory;
-import org.javers.core.metamodel.property.EntityManager;
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner;
+import org.javers.core.metamodel.property.ManagedClassFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,10 +15,10 @@ import java.util.*;
 /**
  * @author Piotr Betkier
  */
-public class ModelJaversModule implements JaversModule {
-    private static final Logger logger = LoggerFactory.getLogger(ModelJaversModule.class);
+public class ManagedClassFactoryModule implements JaversModule {
+    private static final Logger logger = LoggerFactory.getLogger(ManagedClassFactoryModule.class);
 
-    private static Class[] moduleComponents = new Class[] {EntityManager.class, ManagedClassFactory.class};
+    private static Class[] moduleComponents = new Class[] {ManagedClassFactory.class};
 
     private static Map<MappingStyle, Class> propertyScannersMapping = new HashMap() {{
         put(MappingStyle.BEAN, BeanBasedPropertyScanner.class);
@@ -28,7 +27,7 @@ public class ModelJaversModule implements JaversModule {
 
     private JaversCoreConfiguration javersConfiguration;
 
-    public ModelJaversModule(JaversCoreConfiguration javersConfiguration) {
+    public ManagedClassFactoryModule(JaversCoreConfiguration javersConfiguration) {
         this.javersConfiguration = javersConfiguration;
     }
 

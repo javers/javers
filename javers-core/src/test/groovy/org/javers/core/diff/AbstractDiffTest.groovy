@@ -19,6 +19,6 @@ abstract class AbstractDiffTest extends Specification {
     }
 
     Entity getEntity(Class forClass) {
-        return (Entity)javersTestBuilder.entityManager.getByClass(forClass)
+        return (Entity)javersTestBuilder.typeMapper.getJaversType(forClass).managedClass
     }
 }

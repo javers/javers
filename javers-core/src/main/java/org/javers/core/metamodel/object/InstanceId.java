@@ -1,4 +1,4 @@
-package org.javers.model.domain;
+package org.javers.core.metamodel.object;
 
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.metamodel.property.Entity;

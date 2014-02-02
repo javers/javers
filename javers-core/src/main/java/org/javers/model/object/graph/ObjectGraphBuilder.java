@@ -2,12 +2,17 @@ package org.javers.model.object.graph;
 
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.UnboundedValueObjectId;
+import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.property.*;
-import org.javers.model.domain.*;
-import org.javers.model.mapping.type.*;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityManager;
 import java.util.*;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -21,13 +26,11 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class ObjectGraphBuilder {
     private static final Logger logger = LoggerFactory.getLogger(ObjectGraphBuilder.class);
 
-    private TypeMapper typeMapper;
-    private final EntityManager entityManager;
+    private final TypeMapper typeMapper;
     private boolean built;
-    private Map<Cdo, ObjectWrapper> reverseCdoIdMap;
+    private final Map<Cdo, ObjectWrapper> reverseCdoIdMap;
 
-    public ObjectGraphBuilder(EntityManager entityManager, TypeMapper typeMapper) {
-        this.entityManager = entityManager;
+    public ObjectGraphBuilder(TypeMapper typeMapper) {
         this.reverseCdoIdMap = new HashMap<>();
         this.typeMapper = typeMapper;
     }
@@ -164,7 +167,7 @@ public class ObjectGraphBuilder {
 
     private ManagedClass getManagedCLass(Object cdo) {
         Validate.argumentIsNotNull(cdo);
-        return entityManager.getByClass(cdo.getClass());
+        return  typeMapper.getManagedClass(cdo.getClass());
     }
 
     private class OwnerContext {

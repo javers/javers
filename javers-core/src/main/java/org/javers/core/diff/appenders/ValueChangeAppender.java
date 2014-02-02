@@ -4,8 +4,8 @@ import org.javers.common.collections.Objects;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.property.Property;
-import org.javers.model.mapping.type.JaversType;
-import org.javers.model.mapping.type.PrimitiveOrValueType;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.PrimitiveOrValueType;
 
 import java.util.Collection;
 import java.util.Collections;

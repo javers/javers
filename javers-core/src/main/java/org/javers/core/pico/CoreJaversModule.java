@@ -6,11 +6,11 @@ import java.util.Collection;
 import org.javers.common.pico.JaversModule;
 import org.javers.core.Javers;
 import org.javers.core.configuration.JaversCoreConfiguration;
-import org.javers.core.diff.DFSGraphToSetConverter;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.appenders.*;
 import org.javers.core.json.JsonConverterBuilder;
-import org.javers.model.mapping.type.TypeMapper;
+import org.javers.core.metamodel.property.ManagedClassFactory;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 
 /**

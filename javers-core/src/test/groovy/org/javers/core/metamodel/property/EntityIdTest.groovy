@@ -30,7 +30,7 @@ abstract class EntityIdTest extends Specification {
 
     def "should throw exception when entity without id"() {
         when:
-        entityFactory.create(DummyAddress.class)
+        entityFactory.createEntity(DummyAddress.class)
 
         then:
         JaversException e = thrown()

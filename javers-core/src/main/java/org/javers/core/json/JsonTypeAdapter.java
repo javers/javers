@@ -4,9 +4,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
-import org.javers.model.mapping.type.ValueType;
-
-import java.lang.reflect.Type;
+import org.javers.core.metamodel.type.ValueType;
 
 /**
  * Javers abstraction over native

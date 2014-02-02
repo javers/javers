@@ -1,9 +1,12 @@
-package org.javers.model.mapping.type;
+package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.core.metamodel.property.Entity;
+import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.property.ValueObject;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,13 +71,27 @@ public class TypeMapper {
         return spawnFromPrototype(javaType);
     }
 
+    /**
+     * if given javaClass is mapped to {@link ManagedType}
+     * returns {@link ManagedType#getManagedClass()}
+     * @throws java.lang.IllegalArgumentException if given javaClass is NOT mapped to {@link ManagedType}
+     */
+    public ManagedClass getManagedClass(Class javaClass) {
+        JaversType jType = getJaversType(javaClass);
+        if (jType instanceof ManagedType) {
+            return ((ManagedType)jType).getManagedClass();
+        }
+        throw new IllegalArgumentException("getManagedClass("+javaClass.getSimpleName()+") " +
+                  "given javaClass is mapped to "+jType.getClass().getSimpleName()+", ManagedType expected");
+    }
+
     public JaversType getPropertyType(Property property){
         return getJaversType(property.getGenericType());
     }
 
     public boolean isEntityReferenceOrValueObject(Property property){
         JaversType javersType = getPropertyType(property);
-        return (javersType instanceof EntityReferenceType ||
+        return (javersType instanceof EntityType ||
                 javersType instanceof ValueObjectType);
     }
 
@@ -95,7 +112,7 @@ public class TypeMapper {
 
         JaversType elementType = getJaversType(collectionType.getElementType());
 
-        return (elementType instanceof EntityReferenceType);
+        return (elementType instanceof EntityType);
     }
 
     public <T extends Collection> void registerCollectionType(Class<T> collectionType) {
@@ -106,13 +123,12 @@ public class TypeMapper {
         addType(new PrimitiveType(primitiveClass));
     }
 
-    @Deprecated
-    public void registerValueObjectType(Class<?> entityClass) {
-        addType(new ValueObjectType(entityClass));
+    public void registerValueObjectType(ValueObject valueObject) {
+        addType(new ValueObjectType(valueObject));
     }
 
-    public void registerEntityReferenceType(Class<?> entityClass) {
-        addType(new EntityReferenceType(entityClass));
+    public void registerEntityType(Entity entity) {
+        addType(new EntityType(entity));
     }
 
     public void registerValueType(Class<?> objectValue) {
