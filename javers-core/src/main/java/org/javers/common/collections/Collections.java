@@ -16,26 +16,13 @@ import static org.javers.common.collections.Arrays.asList;
 public class Collections {
 
     public static <E> Collection<E> difference(Collection<E> first, Collection<E> second) {
-        if (first == null){
-            return java.util.Collections.EMPTY_SET;
-        }
-
-        if (second == null){
-            return first;
-        }
-
-        Collection<E> difference;
-
         if (first instanceof List) {
-            difference = new ArrayList(first);
+            return Lists.difference((List) first,(List) second);
         } else if (first instanceof Set) {
-            difference = new HashSet(first);
+            return Sets.difference((Set) first,(Set) second);
         } else {
             throw new IllegalArgumentException("At this moment Javers don't support Queues");
         }
-
-        difference.removeAll(second);
-        return difference;
     }
 
     public static Collection<Object> asCollection(Object arrayOrCollection) {

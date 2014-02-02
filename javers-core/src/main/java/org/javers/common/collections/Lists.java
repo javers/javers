@@ -1,8 +1,13 @@
 package org.javers.common.collections;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import static java.util.Collections.EMPTY_LIST;
+import static java.util.Collections.EMPTY_SET;
 import static org.javers.common.validation.Validate.*;
 
 public class Lists {
@@ -46,5 +51,19 @@ public class Lists {
             result.add(transformation.apply(element));
         }
         return result;
+    }
+
+    public static <E> List<E> difference(List<E> first, List<E> second) {
+        if (first == null) {
+            return EMPTY_LIST;
+        }
+
+        if (second == null) {
+            return first;
+        }
+
+        List<E> difference = new ArrayList<>(first);
+        difference.removeAll(second);
+        return difference;
     }
 }

@@ -7,9 +7,9 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.model.mapping.type.CollectionType;
 import org.javers.model.mapping.type.JaversType;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import static org.javers.common.collections.Collections.difference;
 
@@ -30,7 +30,7 @@ public class ValueAddedAppender extends PropertyChangeAppender<ValueAdded> {
         Collection<Object> leftValues = Collections.asCollection(pair.getLeftPropertyValue(property));
         Collection<Object> rightValues = Collections.asCollection(pair.getRightPropertyValue(property));
 
-        Set<ValueAdded> added = new HashSet<>();
+        List<ValueAdded> added = new ArrayList<>();
 
         for (Object addedValue : difference(rightValues, leftValues)) {
             added.add(new ValueAdded(pair.getGlobalCdoId(), property, addedValue));
