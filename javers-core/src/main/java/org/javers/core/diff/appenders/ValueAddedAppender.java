@@ -1,5 +1,6 @@
 package org.javers.core.diff.appenders;
 
+import org.javers.common.collections.Collections;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueAdded;
 import org.javers.core.metamodel.property.Property;
@@ -10,7 +11,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.javers.common.collections.Arrays.asList;
 import static org.javers.common.collections.Collections.difference;
 
 /**
@@ -27,8 +27,8 @@ public class ValueAddedAppender extends PropertyChangeAppender<ValueAdded> {
 
     @Override
     public Collection<ValueAdded> calculateChanges(NodePair pair, Property property) {
-        Collection<Object> leftValues = getValues(pair.getLeftPropertyValue(property));
-        Collection<Object> rightValues = getValues(pair.getRightPropertyValue(property));
+        Collection<Object> leftValues = Collections.asCollection(pair.getLeftPropertyValue(property));
+        Collection<Object> rightValues = Collections.asCollection(pair.getRightPropertyValue(property));
 
         Set<ValueAdded> added = new HashSet<>();
 
@@ -37,13 +37,5 @@ public class ValueAddedAppender extends PropertyChangeAppender<ValueAdded> {
         }
 
         return added;
-    }
-
-    private Collection<Object> getValues(Object values) {
-        if (values.getClass().isArray()) {
-            return asList(values);
-        } else {
-            return (Collection<Object>) values;
-        }
     }
 }

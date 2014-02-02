@@ -1,10 +1,14 @@
 package org.javers.common.collections;
 
+import org.javers.common.validation.Validate;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.javers.common.collections.Arrays.asList;
 
 /**
  * @author pawel szymczyk
@@ -32,5 +36,17 @@ public class Collections {
 
         difference.removeAll(second);
         return difference;
+    }
+
+    public static Collection<Object> asCollection(Object arrayOrCollection) {
+        Validate.argumentIsNotNull(arrayOrCollection);
+
+        if (arrayOrCollection.getClass().isArray()) {
+            return asList(arrayOrCollection);
+        } else if (arrayOrCollection instanceof  Collection) {
+            return (Collection<Object>) arrayOrCollection;
+        } else {
+            throw new IllegalArgumentException("expected Array or Collection, got "+arrayOrCollection.getClass());
+        }
     }
 }
