@@ -44,7 +44,11 @@ public abstract class JaversType {
                 Constructor c = this.getClass().getConstructor(new Class<?>[]{Type.class});
                 return (JaversType)c.newInstance(new Object[]{baseJavaType});
             } catch (ReflectiveOperationException exception) {
-                throw new RuntimeException("error calling Constructor " + this.getClass().getSimpleName(), exception);
+                throw new RuntimeException("error calling Constructor for " +
+                                           this.getClass().getName()+
+                                           " or no public Constructor in "+
+                                           this.getClass().getName(),
+                                           exception);
             }
     }
 
