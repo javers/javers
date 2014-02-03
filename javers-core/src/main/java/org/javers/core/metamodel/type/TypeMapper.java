@@ -96,7 +96,11 @@ public class TypeMapper {
     }
 
     public boolean isSupportedMap(MapType propertyType){
-        return propertyType.isObjectToObjectMap() || isPrimitiveOrValue(propertyType.getEntryClass());
+        if (propertyType.getEntryClass() == null) {
+            return false;
+        }
+        return isPrimitiveOrValueOrObject(propertyType.getEntryClass().getKey()) &&
+               isPrimitiveOrValueOrObject(propertyType.getEntryClass().getValue());
     }
 
     public boolean isCollectionOfEntityReferences(Property property){
@@ -150,11 +154,13 @@ public class TypeMapper {
 
     //-- private
 
-    private boolean isPrimitiveOrValue(EntryClass entryClass) {
-        JaversType keyType  = getJaversType(entryClass.getKey());
-        JaversType valueType = getJaversType(entryClass.getValue());
+    private boolean isPrimitiveOrValueOrObject(Class clazz) {
+        if (clazz == Object.class) {
+            return true;
+        }
 
-        return  keyType instanceof PrimitiveOrValueType && valueType instanceof PrimitiveOrValueType;
+        JaversType jType  = getJaversType(clazz);
+        return  jType instanceof PrimitiveOrValueType || jType instanceof PrimitiveOrValueType;
     }
 
     private void addType(JaversType jType) {

@@ -28,8 +28,4 @@ public class MapType extends JaversType {
     public EntryClass getEntryClass() {
         return entryClass;
     }
-
-    public boolean isObjectToObjectMap() {
-        return entryClass.getKey() == Object.class && entryClass.getValue() == Object.class;
-    }
 }
