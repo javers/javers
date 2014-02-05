@@ -28,7 +28,7 @@ import java.math.BigDecimal;
  * @author bartosz walacik
  */
 public class ValueType extends PrimitiveOrValueType {
-    protected ValueType(Type baseJavaType) {
+    public ValueType(Type baseJavaType) {
         super(baseJavaType);
     }
 }
