@@ -20,7 +20,7 @@ abstract class AbstractDiffTest extends Specification {
     }
 
     Entity getEntity(Class forClass) {
-        javersTestBuilder.entityManager.getByClass(forClass)
+        return (Entity)javersTestBuilder.typeMapper.getJaversType(forClass).managedClass
     }
 
     Property getProperty(Class forClass, String propName) {

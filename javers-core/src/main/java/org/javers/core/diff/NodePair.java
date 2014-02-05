@@ -1,6 +1,6 @@
 package org.javers.core.diff;
 
-import org.javers.model.domain.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.model.object.graph.ObjectNode;
 

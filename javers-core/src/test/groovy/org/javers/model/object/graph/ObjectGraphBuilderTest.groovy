@@ -1,12 +1,14 @@
 package org.javers.model.object.graph
 
-import org.javers.core.metamodel.property.EntityManager
+import org.javers.core.JaversTestBuilder
+import org.javers.core.metamodel.property.Entity
 import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.javers.model.mapping.type.TypeMapper
+import org.javers.core.metamodel.type.TypeMapper
+import spock.lang.Shared
 import spock.lang.Specification
 
 import static org.javers.test.assertion.NodeAssert.assertThat
@@ -18,30 +20,11 @@ import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
  */
 abstract class ObjectGraphBuilderTest extends Specification {
 
-    protected TypeMapper mapper = new TypeMapper()
-    protected EntityManager entityManager
-
-    protected void buildEntityManager(ManagedClassFactory ef) {
-
-        //will be refactored ASAP
-        mapper.registerEntityReferenceType(DummyUser)
-        mapper.registerEntityReferenceType(DummyUserDetails)
-        mapper.registerEntityReferenceType(DummyAddress)
-        mapper.registerEntityReferenceType(DummyNetworkAddress)
-
-        //will be refactored ASAP
-        entityManager = new EntityManager(ef)
-        entityManager.registerEntity(DummyUser)
-        entityManager.registerEntity(DummyUserDetails)
-        entityManager.registerValueObject(DummyAddress)
-        entityManager.registerValueObject(DummyNetworkAddress)
-        entityManager.buildManagedClasses()
-    }
-
+    @Shared TypeMapper mapper
 
     def "should build one node graph from Entity"(){
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser user = dummyUser().withName("Mad Kaz").build()
 
         when:
@@ -56,7 +39,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph starting from root ValueObject"(){
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyAddress address = new DummyAddress("any","any")
 
         when:
@@ -71,7 +54,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph with ValueObject node"() {
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUserDetails user = dummyUserDetails(1).withAddress().build()
 
         when:
@@ -89,7 +72,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build two node graph for the same Entity"(){
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser user = dummyUser().withName("Mad Kaz").withSupervisor("Mad Stach").build()
 
         when:
@@ -105,7 +88,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build two node graph for different Entities"() {
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build()
 
         when:
@@ -123,7 +106,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
     def "shouldBuildThreeNodesLinearGraph"() {
         given:
         //kaz0 - kaz1 - kaz2
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper);
         DummyUser[] kaziki = new DummyUser[4];
         for (int i=0; i<3; i++){
             kaziki[i] = dummyUser().withName("Mad Kaz "+i).build();
@@ -154,7 +137,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //    \
         //      stach - stach.details
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).build()
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withDetails(1L).withSupervisor(stach).build()
 
@@ -183,7 +166,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //         /   |   \
         //      id    id    id
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).withDetailsList(3).build()
 
         when:
@@ -205,7 +188,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //         /   |   \
         //      id    id    id
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser stach = dummyUser().withName("Stach").withDetailsList(3).build()
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withSupervisor(stach).build()
 
@@ -231,7 +214,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //          Em1 Em2 Em3
         given:
         int numberOfElements = 3
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser rob = dummyUser().withName("rob").withEmployees(3).build()
         DummyUser stach = dummyUser().withName("stach")
                 .withEmployee(rob)
@@ -262,7 +245,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //    \     \
         //      microKaz
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
 
         DummyUser superKaz = dummyUser().withName("superKaz").build()
         DummyUser kaz   =    dummyUser().withName("kaz").withSupervisor(superKaz).build()
@@ -296,7 +279,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph with primitive types Set"() {
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser dummyUser = dummyUser().withName("name").withStringsSet("1", "2", "3").build()
 
         when:
@@ -309,7 +292,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph with primitive types List"(){
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(entityManager, mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser dummyUser = dummyUser().withName("name").withIntegerList(1, 2, 3, 4).build()
 
         when:

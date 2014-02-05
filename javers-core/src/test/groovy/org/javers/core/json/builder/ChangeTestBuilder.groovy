@@ -6,10 +6,10 @@ import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.map.EntryChange
 import org.javers.core.diff.changetype.map.MapChange
-import org.javers.model.domain.GlobalCdoId
-import org.javers.model.domain.InstanceId
-import org.javers.model.domain.UnboundedValueObjectId
-import org.javers.model.domain.ValueObjectId
+import org.javers.core.metamodel.object.GlobalCdoId
+import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.object.UnboundedValueObjectId
+import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.metamodel.property.Property
 
 import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*

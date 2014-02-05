@@ -2,8 +2,10 @@ package org.javers.common.collections;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.EMPTY_LIST;
@@ -11,6 +13,20 @@ import static java.util.Collections.EMPTY_SET;
 import static org.javers.common.validation.Validate.*;
 
 public class Lists {
+
+    public static <T> Map<Integer, T> asMap(List<T> input) {
+        argumentsAreNotNull(input);
+
+        Map<Integer, T> result = new HashMap<>();
+        int i = 0;
+
+        for (T element : input) {
+            result.put(i, element);
+            i++;
+        }
+
+        return result;
+    };
 
     /**
      * returns new list with elements from input that satisfies given filter condition

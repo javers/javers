@@ -3,10 +3,10 @@ package org.javers.core.diff.appenders;
 import org.javers.common.collections.Objects;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ReferenceChange;
-import org.javers.model.domain.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.model.mapping.type.EntityReferenceType;
-import org.javers.model.mapping.type.JaversType;
+import org.javers.core.metamodel.type.EntityType;
+import org.javers.core.metamodel.type.JaversType;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -19,7 +19,7 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
 
     @Override
     protected Class<? extends JaversType> getSupportedPropertyType() {
-        return EntityReferenceType.class;
+        return EntityType.class;
     }
 
     @Override

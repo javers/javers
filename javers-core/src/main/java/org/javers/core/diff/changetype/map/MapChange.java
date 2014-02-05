@@ -1,7 +1,7 @@
 package org.javers.core.diff.changetype.map;
 
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.model.domain.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;

@@ -2,15 +2,19 @@ package org.javers.core
 
 import org.javers.core.diff.DiffFactory
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
-import org.javers.core.metamodel.property.EntityManager
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
 import org.javers.core.metamodel.property.PropertyScanner
+import org.javers.core.metamodel.property.ValueObject
+import org.javers.core.metamodel.type.EntityType
+import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.model.DummyNetworkAddress
-import org.javers.model.mapping.type.TypeMapper
+import org.javers.core.metamodel.type.TypeMapper
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import javax.persistence.EntityManager
 import javax.persistence.Id
+import javax.swing.text.html.parser.Entity
 
 import static org.fest.assertions.api.Assertions.assertThat
 import static org.javers.core.JaversBuilder.*
@@ -31,25 +35,25 @@ class JaversBuilderTest extends Specification {
         javersBuilder.getContainerComponent(PropertyScanner) instanceof FieldBasedPropertyScanner
     }
 
-    
+
     def "should manage Entity"() {
         when:
         Javers javers = javers().registerEntity(DummyEntity).build()
 
         then:
-        javers.isManaged(DummyEntity)
+        javers.getForClass(DummyEntity) instanceof EntityType
     }
 
-    
+
     def "should manage ValueObject"() {
         when:
         Javers javers = javers().registerValueObject(DummyNetworkAddress).build()
 
         then:
-        javers.isManaged(DummyNetworkAddress)
+        javers.getForClass(DummyNetworkAddress) instanceof ValueObjectType
     }
 
-    
+
     def "should create Javers"() {
         when:
         Javers javers = javers().build()
@@ -58,7 +62,7 @@ class JaversBuilderTest extends Specification {
         javers != null
     }
 
-    
+
     def "should create multiple Javers instances"() {
         when:
         Javers javers1 = javers().build()
@@ -79,7 +83,7 @@ class JaversBuilderTest extends Specification {
         javersBuilder.getContainerComponent(PropertyScanner) instanceof FieldBasedPropertyScanner
     }
 
-    
+
     def "should contain BeanBasedPropertyScanner when Bean style"(){
         given:
         JaversBuilder javersBuilder = javers().withMappingStyle(MappingStyle.BEAN)
@@ -91,7 +95,7 @@ class JaversBuilderTest extends Specification {
         javersBuilder.getContainerComponent(PropertyScanner) instanceof BeanBasedPropertyScanner
     }
 
-    
+
     def "should not contain FieldBasedPropertyScanner when Bean style"() {
         given:
         JaversBuilder javersBuilder = javers().withMappingStyle(MappingStyle.BEAN)
@@ -103,7 +107,7 @@ class JaversBuilderTest extends Specification {
         javersBuilder.getContainerComponent(FieldBasedPropertyScanner) == null
     }
 
-    
+
     def "should not contain BeanBasedPropertyScanner when Field style"(){
         given:
         JaversBuilder javersBuilder = javers().withMappingStyle(MappingStyle.FIELD)
@@ -126,7 +130,7 @@ class JaversBuilderTest extends Specification {
         builder2.build()
 
         then:
-        builder1.getContainerComponent(EntityManager) != builder2.getContainerComponent(EntityManager)
+        builder1.getContainerComponent(Javers) != builder2.getContainerComponent(Javers)
     }
 
     @Unroll
@@ -141,7 +145,7 @@ class JaversBuilderTest extends Specification {
         assertThat(builder.getContainerComponent(clazz)) isInstanceOf(clazz)
 
         where:
-        clazz << [Javers, EntityManager, TypeMapper, DiffFactory]
+        clazz << [Javers, TypeMapper, DiffFactory]
     }
 
     def "should contain singletons"() {

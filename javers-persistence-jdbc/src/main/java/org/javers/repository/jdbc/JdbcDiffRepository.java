@@ -2,7 +2,7 @@ package org.javers.repository.jdbc;
 
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
-import org.javers.model.domain.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.repository.api.DiffRepository;
 
 import java.util.List;

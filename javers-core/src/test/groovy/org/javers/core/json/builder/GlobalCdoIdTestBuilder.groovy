@@ -1,9 +1,9 @@
 package org.javers.core.json.builder
 
-import org.javers.model.domain.GlobalCdoId
-import org.javers.model.domain.InstanceId
-import org.javers.model.domain.UnboundedValueObjectId
-import org.javers.model.domain.ValueObjectId
+import org.javers.core.metamodel.object.GlobalCdoId
+import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.object.UnboundedValueObjectId
+import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.metamodel.property.Entity
 
 import static EntityTestBuilder.entity

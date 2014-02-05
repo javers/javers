@@ -17,7 +17,7 @@ public class ManagedClassFactory {
         this.propertyScanner = propertyScanner;
     }
 
-    public <S> Entity create(Class<S> clazz) {
+    public <S> Entity createEntity(Class<S> clazz) {
        return create(new EntityDefinition(clazz));
     }
 

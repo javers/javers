@@ -3,7 +3,7 @@ package org.javers.core.diff.appenders;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.property.Property;
-import org.javers.model.mapping.type.*;
+import org.javers.core.metamodel.type.JaversType;
 
 import java.util.Collection;
 import java.util.Collections;

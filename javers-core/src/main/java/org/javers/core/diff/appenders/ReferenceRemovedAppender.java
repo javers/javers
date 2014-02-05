@@ -3,8 +3,8 @@ package org.javers.core.diff.appenders;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ReferenceRemoved;
 import org.javers.core.metamodel.property.Property;
-import org.javers.model.mapping.type.CollectionType;
-import org.javers.model.mapping.type.JaversType;
+import org.javers.core.metamodel.type.CollectionType;
+import org.javers.core.metamodel.type.JaversType;
 
 import java.util.Collection;
 
@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 public class ReferenceRemovedAppender extends PropertyChangeAppender<ReferenceRemoved> {
 
-    //TODO in fact it should be Collection<EntityReferenceType>
+    //TODO in fact it should be Collection<EntityType>
     @Override
     protected Class<? extends JaversType> getSupportedPropertyType() {
         return CollectionType.class;

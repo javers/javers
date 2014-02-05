@@ -22,9 +22,7 @@ public class JaversSpringTest {
 
     @Test
     public void shouldAutowiredJavers() {
-
         //then
         assertThat(javers).isNotNull();
-        assertThat(javers.isManaged(DummyUser.class)).isTrue();
     }
 }
