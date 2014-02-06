@@ -154,6 +154,7 @@ public class TypeMapper {
 
     //-- private
 
+    //TODO
     private boolean isPrimitiveOrValueOrObject(Class clazz) {
         if (clazz == Object.class) {
             return true;
@@ -208,4 +209,7 @@ public class TypeMapper {
         throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType);
     }
 
+    public boolean isSupportedContainer(ContainerType propertyType) {
+        return isPrimitiveOrValueOrObject(propertyType.getElementType());
+    }
 }

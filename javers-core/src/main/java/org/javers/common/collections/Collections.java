@@ -2,9 +2,7 @@ package org.javers.common.collections;
 
 import org.javers.common.validation.Validate;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
