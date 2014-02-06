@@ -1,0 +1,62 @@
+package org.javers.core.diff.appenders
+
+import org.javers.core.diff.AbstractDiffTest
+import org.javers.core.diff.RealNodePair
+import org.javers.core.model.DummyUser
+import spock.lang.Unroll
+
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.test.builder.DummyUserBuilder.dummyUser
+
+
+class ListChangeAppenderTest extends AbstractDiffTest {
+
+    @Unroll
+    def "should append #changesCount changes when left list is #leftList and right list is #rightList"() {
+        given:
+        def javers = javersTestAssembly()
+
+        when:
+        def leftNode = buildGraph(dummyUser().withIntegerList(leftList as List).build())
+        def rightNode = buildGraph(dummyUser().withIntegerList(rightList as List).build())
+
+        def changes = new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper).calculateChanges(
+                new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
+
+        then:
+        changes[0].changes.size() == changesCount
+
+        where:
+        leftList     | rightList    || changesCount
+        []           | [1, 2, 2, 2] || 4
+        [1, 2]       | [1, 2, 3, 4] || 2
+        [1, 2]       | [1, 2, 2, 2] || 2
+        [1, 2]       | [2, 1]       || 2
+        [1, 2]       | [2, 1, 2, 3] || 4
+        [1, 2, 2, 2] | []           || 4
+        [1, 2, 3, 4] | [1, 2]       || 2
+        [1, 2, 2, 2] | [1, 2]       || 2
+        [2, 1, 2, 3] | [1, 2]       || 4
+    }
+
+    @Unroll
+    def "should not append changes when left list #leftList and right list #rightList is equal"() {
+        given:
+        def javers = javersTestAssembly()
+
+        when:
+        def leftNode = buildGraph(dummyUser().withIntegerList(leftList as List).build())
+        def rightNode = buildGraph(dummyUser().withIntegerList(rightList as List).build())
+
+        def changes = new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper).calculateChanges(
+                new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
+
+        then:
+        changes.size() == 0
+
+        where:
+        leftList | rightList
+        []       | []
+        [1, 2]   | [1, 2]
+    }
+}

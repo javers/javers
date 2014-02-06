@@ -35,7 +35,7 @@ class JaversBuilderTest extends Specification {
         javersBuilder.getContainerComponent(PropertyScanner) instanceof FieldBasedPropertyScanner
     }
 
-    
+
     def "should manage Entity"() {
         when:
         Javers javers = javers().registerEntity(DummyEntity).build()
@@ -44,7 +44,7 @@ class JaversBuilderTest extends Specification {
         javers.getForClass(DummyEntity) instanceof EntityType
     }
 
-    
+
     def "should manage ValueObject"() {
         when:
         Javers javers = javers().registerValueObject(DummyNetworkAddress).build()
@@ -53,7 +53,7 @@ class JaversBuilderTest extends Specification {
         javers.getForClass(DummyNetworkAddress) instanceof ValueObjectType
     }
 
-    
+
     def "should create Javers"() {
         when:
         Javers javers = javers().build()
@@ -62,7 +62,7 @@ class JaversBuilderTest extends Specification {
         javers != null
     }
 
-    
+
     def "should create multiple Javers instances"() {
         when:
         Javers javers1 = javers().build()
@@ -83,7 +83,7 @@ class JaversBuilderTest extends Specification {
         javersBuilder.getContainerComponent(PropertyScanner) instanceof FieldBasedPropertyScanner
     }
 
-    
+
     def "should contain BeanBasedPropertyScanner when Bean style"(){
         given:
         JaversBuilder javersBuilder = javers().withMappingStyle(MappingStyle.BEAN)
@@ -95,7 +95,7 @@ class JaversBuilderTest extends Specification {
         javersBuilder.getContainerComponent(PropertyScanner) instanceof BeanBasedPropertyScanner
     }
 
-    
+
     def "should not contain FieldBasedPropertyScanner when Bean style"() {
         given:
         JaversBuilder javersBuilder = javers().withMappingStyle(MappingStyle.BEAN)
@@ -107,7 +107,7 @@ class JaversBuilderTest extends Specification {
         javersBuilder.getContainerComponent(FieldBasedPropertyScanner) == null
     }
 
-    
+
     def "should not contain BeanBasedPropertyScanner when Field style"(){
         given:
         JaversBuilder javersBuilder = javers().withMappingStyle(MappingStyle.FIELD)

@@ -114,8 +114,23 @@ class DummyUserBuilder {
         this
     }
 
+    DummyUserBuilder withStringsSet(Set<String> strings) {
+        dummyUser.stringSet = strings
+        this
+    }
+
     DummyUserBuilder withIntegerList(Integer... integers) {
         dummyUser.integerList = integers as List
+        this
+    }
+
+    DummyUserBuilder withIntegerList(List<Integer> integers) {
+        dummyUser.integerList = integers
+        this
+    }
+
+    DummyUserBuilder withIntArray(int... integers) {
+        dummyUser.intArray = integers
         this
     }
 }

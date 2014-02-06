@@ -9,7 +9,6 @@ import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.appenders.*;
 import org.javers.core.json.JsonConverterBuilder;
-import org.javers.core.metamodel.property.ManagedClassFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 
@@ -24,6 +23,9 @@ public class CoreJaversModule implements JaversModule {
             ObjectGraphBuilder.class,
             NewObjectAppender.class,
             MapChangeAppender.class,
+            ListChangeAppender.class,
+            SetChangeAppender.class,
+            ArrayChangeAppender.class,
             ObjectRemovedAppender.class,
             ReferenceChangeAppender.class,
             JsonConverterBuilder.class,

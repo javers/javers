@@ -4,6 +4,7 @@ import org.javers.common.collections.Maps;
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.map.*;
+import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.MapType;
@@ -53,6 +54,10 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
         Map leftMap =  (Map)pair.getLeftPropertyValue(property);
         Map rightMap = (Map)pair.getRightPropertyValue(property);
 
+        return calculateChanges(pair.getGlobalCdoId(), property, leftMap, rightMap);
+    }
+
+    protected Collection<MapChange> calculateChanges(GlobalCdoId id, Property property, Map leftMap, Map rightMap) {
         if (nullSafeEquals(leftMap, rightMap)) {
             return Collections.EMPTY_SET;
         }
@@ -79,10 +84,11 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
         }
 
         if (changes.size()>0) {
-            return Sets.asSet(new MapChange(pair.getGlobalCdoId(), property, changes));
+            return Sets.asSet(new MapChange(id, property, changes));
         }
         else {
             return Collections.EMPTY_SET;
         }
     }
+
 }
