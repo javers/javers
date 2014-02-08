@@ -14,8 +14,11 @@ import static org.javers.common.validation.Validate.*;
 
 public class Lists {
 
+    /**
+     * @return index -> value
+     */
     public static <T> Map<Integer, T> asMap(List<T> input) {
-        argumentsAreNotNull(input);
+        argumentIsNotNull(input);
 
         Map<Integer, T> result = new HashMap<>();
         int i = 0;
@@ -26,7 +29,7 @@ public class Lists {
         }
 
         return result;
-    };
+    }
 
     /**
      * returns new list with elements from input that satisfies given filter condition

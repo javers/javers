@@ -22,9 +22,7 @@ class ArrayChangeAppenderTest extends AbstractDiffTest {
         def leftNode = buildGraph(dummyUser().withIntArray(leftArray as int[]).build())
         def rightNode = buildGraph(dummyUser().withIntArray(rightArray as int[]).build())
 
-        def changes = new ArrayChangeAppender(
-                new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper),
-                javers.typeMapper)
+        def changes = new ArrayChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper)
                 .calculateChanges(new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "intArray"))
 
         then:
@@ -52,9 +50,7 @@ class ArrayChangeAppenderTest extends AbstractDiffTest {
         def leftNode = buildGraph(dummyUser().withIntArray(leftArray as int[]).build())
         def rightNode = buildGraph(dummyUser().withIntArray(rightArray as int[]).build())
 
-        def changes = new ArrayChangeAppender(
-                new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper),
-                javers.typeMapper)
+        def changes = new ArrayChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper)
                 .calculateChanges(new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "intArray"))
 
         then:

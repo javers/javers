@@ -47,7 +47,7 @@ public class ListChangeAppender extends PropertyChangeAppender<ListChange> {
         boolean isSupported = typeMapper.isSupportedContainer((ListType) propertyType);
 
         if (!isSupported) {
-            logger.warn("unsupported list content type [{}], skipping", propertyType.getBaseJavaType());
+            logger.warn("unsupported List content type [{}], skipping", propertyType.getBaseJavaType());
         }
 
         return isSupported;
@@ -58,10 +58,8 @@ public class ListChangeAppender extends PropertyChangeAppender<ListChange> {
         List leftList = (List) pair.getLeftPropertyValue(property);
         List rightList = (List) pair.getRightPropertyValue(property);
 
-        return calculateChanges(pair.getGlobalCdoId(), property, leftList, rightList);
-    }
+        GlobalCdoId id = pair.getGlobalCdoId();
 
-    protected Collection<ListChange> calculateChanges(final GlobalCdoId id, final Property property, List leftList, List rightList) {
         Collection<MapChange> mapChanges =
                 mapChangeAppender.calculateChanges(id, property, Lists.asMap(leftList), Lists.asMap(rightList));
 
