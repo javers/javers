@@ -3,8 +3,10 @@ package org.javers.core.diff.appenders;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
+import org.javers.core.diff.changetype.ArrayChange;
 import org.javers.core.diff.changetype.ContainerValueChange;
 import org.javers.core.diff.changetype.ListChange;
+import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
@@ -47,32 +49,27 @@ public class ListChangeAppender extends PropertyChangeAppender<ListChange> {
         boolean isSupported = typeMapper.isSupportedContainer((ListType) propertyType);
 
         if (!isSupported) {
-            logger.warn("unsupported list content type [{}], skipping", propertyType.getBaseJavaType());
+            logger.warn("unsupported List content type [{}], skipping", propertyType.getBaseJavaType());
         }
 
         return isSupported;
     }
 
     @Override
-    protected Collection<ListChange> calculateChanges(final NodePair pair, final Property property) {
+    protected ListChange calculateChanges(final NodePair pair, final Property property) {
         List leftList = (List) pair.getLeftPropertyValue(property);
         List rightList = (List) pair.getRightPropertyValue(property);
 
-        return calculateChanges(pair.getGlobalCdoId(), property, leftList, rightList);
-    }
+        List<EntryChange> entryChanges =
+                mapChangeAppender.calculateEntryChanges(Lists.asMap(leftList), Lists.asMap(rightList));
 
-    protected Collection<ListChange> calculateChanges(final GlobalCdoId id, final Property property, List leftList, List rightList) {
-        Collection<MapChange> mapChanges =
-                mapChangeAppender.calculateChanges(id, property, Lists.asMap(leftList), Lists.asMap(rightList));
+        if (!entryChanges.isEmpty()){
+            List<ContainerValueChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
 
-        if (mapChanges.isEmpty()) {
-            return java.util.Collections.EMPTY_SET;
+            return  new ListChange(pair.getGlobalCdoId(), property, elementChanges);
         }
-
-        List<ContainerValueChange> changes = Lists.transform(mapChanges.iterator().next().getEntryChanges(), new MapChangesToListChangesFunction());
-
-        ListChange listChange = new ListChange(id, property, changes);
-
-        return Sets.asSet(listChange);
+        else {
+            return null;
+        }
     }
 }

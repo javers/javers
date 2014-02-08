@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static org.javers.common.collections.Collections.difference;
 
@@ -54,9 +55,9 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
     }
 
     @Override
-    protected Collection<SetChange> calculateChanges(NodePair pair, Property property) {
-        Collection leftValues = (Collection) pair.getLeftPropertyValue(property);
-        Collection rightValues = (Collection) pair.getRightPropertyValue(property);
+    protected SetChange calculateChanges(NodePair pair, Property property) {
+        Set leftValues =  (Set) pair.getLeftPropertyValue(property);
+        Set rightValues = (Set) pair.getRightPropertyValue(property);
 
         List<ContainerValueChange> changes = new ArrayList<>();
 
@@ -69,9 +70,9 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
         }
 
         if (changes.isEmpty()) {
-            return java.util.Collections.EMPTY_SET;
+            return null;
         }
 
-        return Sets.asSet(new SetChange(pair.getGlobalCdoId(), property, changes));
+        return new SetChange(pair.getGlobalCdoId(), property, changes);
     }
 }

@@ -80,8 +80,8 @@ public class DiffFactory {
 
             JaversType javersType = typeMapper.getPropertyType(property);
             for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
-                Collection<Change> changes = appender.calculateChangesIfSupported(pair, property, javersType);
-                for (Change change : changes) {
+                Change change = appender.calculateChangesIfSupported(pair, property, javersType);
+                if (change != null) {
                     diff.addChange(change, pair.getRight().getCdo().getWrappedCdo());
                 }
             }
