@@ -48,8 +48,8 @@ public class TypeMapper {
         registerValueType(Date.class);
 
         //Collections
-        addType(new CollectionType(Set.class));
-        addType(new CollectionType(List.class));
+        addType(new SetType(Set.class));
+        addType(new ListType(List.class));
 
         //& Maps
         addType(new MapType(Map.class));

@@ -24,9 +24,6 @@ class TypeMapperTest extends Specification {
     class DummySet extends HashSet{}
 
     class Dummy <T,X> {
-        Set set
-        DummySet dummySet
-        HashMap<String , Integer> mapStringToInt
         DummyEnum dummyEnum
         int[] intArray
     }
@@ -59,33 +56,41 @@ class TypeMapperTest extends Specification {
         jType.class == PrimitiveType
     }
 
-    def "should map Set & List by default"() {
+    @Unroll
+    def "should map #expectedColType.simpleName by default"() {
         given:
         TypeMapper mapper = new TypeMapper();
-        Type set   = getFieldFromClass(Dummy, "set").genericType
 
         when:
-        JaversType jType = mapper.getJaversType(set)
+        JaversType jType = mapper.getJaversType(givenJavaType)
 
         then:
-        jType.baseJavaType == Set
-        mapper.getMappedTypes(CollectionType).size() == 2
+        jType.baseJavaType == givenJavaType
+        jType.class == expectedColType
+
+        where:
+        givenJavaType | expectedColType
+        Set  | SetType
+        List | ListType
     }
 
-
-    def "should spawn impl from interface"() {
+    @Unroll
+    def "should spawn concrete #expectedColType.simpleName from prototype interface for #givenJavaType.simpleName"() {
         given:
         TypeMapper mapper = new TypeMapper()
-        int colPrototypes  = mapper.getMappedTypes(CollectionType).size()
-        Type dummySet   = getFieldFromClass(Dummy, "dummySet").genericType
 
         when:
-        JaversType jType = mapper.getJaversType(dummySet)
+        JaversType jType = mapper.getJaversType(givenJavaType)
 
         then:
-        jType.baseJavaType == DummySet
-        jType.class == CollectionType
-        mapper.getMappedTypes(CollectionType).size() == colPrototypes + 1
+        jType.baseJavaType == givenJavaType
+        jType.class == expectedColType
+
+        where:
+        givenJavaType | expectedColType
+        HashSet  | SetType
+        ArrayList | ListType
+        HashMap | MapType
     }
 
     @Unroll
