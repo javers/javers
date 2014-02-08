@@ -24,7 +24,6 @@ class TypeMapperTest extends Specification {
     class DummySet extends HashSet{}
 
     class Dummy <T,X> {
-        DummyEnum dummyEnum
         int[] intArray
     }
 
@@ -40,16 +39,16 @@ class TypeMapperTest extends Specification {
         then:
         jType.baseJavaType == int[]
         jType.class == ArrayType
+        jType.elementType == int
         mapper.getMappedTypes(ArrayType).size() == arrayPrototypes + 1
     }
 
     def "should spawn concrete Enum type"() {
         given:
         TypeMapper mapper = new TypeMapper();
-        Type dummyEnum   = getFieldFromClass(Dummy, "dummyEnum").genericType
 
         when:
-        JaversType jType = mapper.getJaversType(dummyEnum)
+        JaversType jType = mapper.getJaversType(DummyEnum)
 
         then:
         jType.baseJavaType == DummyEnum
