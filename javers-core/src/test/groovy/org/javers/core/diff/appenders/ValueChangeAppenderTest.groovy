@@ -36,10 +36,10 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property sex = getEntity(DummyUser).getProperty("sex")
 
         when:
-        def changes = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
+        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
 
         then:
-        changes.size() == 0
+        change == null
     }
 
     def "should set ValueChange metadata"() {
@@ -49,11 +49,10 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property sex = getEntity(DummyUser).getProperty("sex")
 
         when:
-        Collection<ValueChange> changes =
-                new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
+        ValueChange change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
 
         then:
-        ChangeAssert.assertThat(changes[0])
+        ChangeAssert.assertThat(change)
                     .hasProperty(sex)
                     .hasInstanceId(DummyUser, "1")
                     .hasAffectedCdo(right)
@@ -66,12 +65,10 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property sex = getEntity(DummyUser).getProperty("sex")
 
         when:
-        Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
+        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
 
         then:
-        changes.size() == 1
-        assertThat(changes[0])
+        assertThat(change)
                   .hasProperty(sex)
                   .hasLeftValue(FEMALE)
                   .hasRightValue(OCCASIONALLY)
@@ -84,12 +81,10 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property age = getEntity(DummyUser).getProperty("age")
 
         when:
-        Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),age)
+        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),age)
 
         then:
-        changes.size() == 1
-        assertThat(changes[0])
+        assertThat(change)
                   .hasProperty(age)
                   .hasLeftValue(1)
                   .hasRightValue(2)
@@ -102,12 +97,10 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property largeInt = getEntity(DummyUser).getProperty("largeInt")
 
         when:
-        Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),largeInt)
+        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),largeInt)
 
         then:
-        changes.size() == 1
-        assertThat(changes[0])
+        assertThat(change)
                   .hasProperty(largeInt)
                   .haveLeftValueNull()
                   .hasRightValue(5)
@@ -120,12 +113,10 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property flag = getEntity(DummyUser).getProperty("flag")
 
         when:
-        Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
+        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
 
         then:
-        changes.size() == 1
-        assertThat(changes[0])
+        assertThat(change)
                   .hasProperty(flag)
                   .hasLeftValue(true)
                   .hasRightValue(false)
@@ -138,12 +129,10 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property flag = getEntity(DummyUser).getProperty("bigFlag")
 
         when:
-        Collection<ValueChange> changes =
-            new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
+        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
 
         then:
-        changes.size() == 1
-        assertThat(changes[0])
+        assertThat(change)
                   .hasProperty(flag)
                   .haveLeftValueNull()
                   .hasRightValue(Boolean.TRUE)
@@ -159,11 +148,10 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property dobProperty = getEntity(DummyUserWithValues).getProperty("dob")
 
         when:
-        def changes = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), dobProperty)
+        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), dobProperty)
 
         then:
-        changes.size() == 1
-        assertThat(changes[0])
+        assertThat(change)
                 .hasProperty(dobProperty)
                 .hasLeftValue(null)
                 .hasRightValue(dob)
@@ -179,11 +167,10 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property salaryProperty = getEntity(DummyUserWithValues).getProperty("salary")
 
         when:
-        def changes = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), salaryProperty)
+        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), salaryProperty)
 
         then:
-        changes.size() == 1
-        assertThat(changes[0])
+        assertThat(change)
                 .hasProperty(salaryProperty)
                 .hasLeftValue(null)
                 .hasRightValue(salary)
@@ -199,12 +186,11 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         Property street =  valueObject(DummyAddress).getProperty("street")
 
         when:
-        def changes = new ValueChangeAppender().calculateChanges(
+        def change = new ValueChangeAppender().calculateChanges(
                       new RealNodePair(followEdge(left,address), followEdge(right,address)),street)
 
         then:
-        changes.size() == 1
-        assertThat(changes[0])
+        assertThat(change)
                   .hasAffectedCdo(rightUser.dummyAddress)
                   .hasValueObjectId(DummyAddress, instanceId(rightUser), "dummyAddress")
                   .hasLeftValue("Washington Street")

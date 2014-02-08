@@ -1,5 +1,6 @@
 package org.javers.core.diff.appenders;
 
+import org.javers.common.collections.Lists;
 import org.javers.common.collections.Maps;
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
@@ -50,16 +51,26 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
     }
 
     @Override
-    protected Collection<MapChange> calculateChanges(NodePair pair, Property property) {
+    protected MapChange calculateChanges(NodePair pair, Property property) {
         Map leftMap =  (Map)pair.getLeftPropertyValue(property);
         Map rightMap = (Map)pair.getRightPropertyValue(property);
 
-        return calculateChanges(pair.getGlobalCdoId(), property, leftMap, rightMap);
+        List<EntryChange> changes = calculateEntryChanges(leftMap, rightMap);
+
+        if (!changes.isEmpty()){
+            return new MapChange(pair.getGlobalCdoId(), property, changes);
+        }
+        else {
+            return null;
+        }
     }
 
-    protected Collection<MapChange> calculateChanges(GlobalCdoId id, Property property, Map leftMap, Map rightMap) {
+    /**
+     * @return never returns null
+     */
+    protected List<EntryChange> calculateEntryChanges(Map leftMap, Map rightMap) {
         if (nullSafeEquals(leftMap, rightMap)) {
-            return Collections.EMPTY_SET;
+            return Collections.EMPTY_LIST;
         }
 
         List<EntryChange> changes = new ArrayList<>();
@@ -83,12 +94,7 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
             changes.add( new EntryRemoved(removedKey, removedValue));
         }
 
-        if (changes.size()>0) {
-            return Sets.asSet(new MapChange(id, property, changes));
-        }
-        else {
-            return Collections.EMPTY_SET;
-        }
+        return changes;
     }
 
 }

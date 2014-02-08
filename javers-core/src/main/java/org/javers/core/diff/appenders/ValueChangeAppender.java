@@ -24,15 +24,14 @@ public class ValueChangeAppender extends PropertyChangeAppender<ValueChange> {
      * @param property supported property (of PrimitiveType or ValueObjectType)
      */
     @Override
-    public Collection<ValueChange> calculateChanges(NodePair pair, Property property) {
+    public ValueChange calculateChanges(NodePair pair, Property property) {
         Object leftValue = pair.getLeftPropertyValue(property);
         Object rightValue = pair.getRightPropertyValue(property);
 
         if (Objects.nullSafeEquals(leftValue,rightValue)) {
-            return Collections.EMPTY_SET;
+            return null;
         }
 
-        ValueChange change = new ValueChange(pair.getGlobalCdoId(), property, leftValue, rightValue);
-        return  Collections.singleton(change);
+        return new ValueChange(pair.getGlobalCdoId(), property, leftValue, rightValue);
     }
 }

@@ -20,11 +20,11 @@ class ListChangeAppenderTest extends AbstractDiffTest {
         def leftNode = buildGraph(dummyUser().withIntegerList(leftList as List).build())
         def rightNode = buildGraph(dummyUser().withIntegerList(rightList as List).build())
 
-        def changes = new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper).calculateChanges(
+        def change = new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper).calculateChanges(
                 new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
-        changes[0].changes.size() == changesCount
+        change.changes.size() == changesCount
 
         where:
         leftList     | rightList    || changesCount
@@ -48,11 +48,11 @@ class ListChangeAppenderTest extends AbstractDiffTest {
         def leftNode = buildGraph(dummyUser().withIntegerList(leftList as List).build())
         def rightNode = buildGraph(dummyUser().withIntegerList(rightList as List).build())
 
-        def changes = new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper).calculateChanges(
+        def change = new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper).calculateChanges(
                 new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
-        changes.size() == 0
+        change == null
 
         where:
         leftList | rightList

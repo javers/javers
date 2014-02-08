@@ -7,6 +7,7 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ArrayChange;
 import org.javers.core.diff.changetype.ContainerValueChange;
 import org.javers.core.diff.changetype.ListChange;
+import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
@@ -59,24 +60,21 @@ public class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
     }
 
     @Override
-    protected Collection<ArrayChange> calculateChanges(NodePair pair, Property property) {
+    protected ArrayChange calculateChanges(NodePair pair, Property property) {
 
         Map leftMap =  Arrays.asMap(pair.getLeftPropertyValue(property));
         Map rightMap = Arrays.asMap(pair.getRightPropertyValue(property));
 
-        GlobalCdoId id = pair.getGlobalCdoId();
+        List<EntryChange> entryChanges =
+                mapChangeAppender.calculateEntryChanges(leftMap, rightMap);
 
-        Collection<MapChange> mapChanges =
-                mapChangeAppender.calculateChanges(id, property, leftMap, rightMap);
+        if (!entryChanges.isEmpty()){
+            List<ContainerValueChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
 
-        if (mapChanges.isEmpty()) {
-            return Collections.EMPTY_SET;
+            return new ArrayChange(pair.getGlobalCdoId(), property, elementChanges);
         }
-
-        List<ContainerValueChange> elementChanges = Lists.transform(mapChanges.iterator().next().getEntryChanges(), new MapChangesToListChangesFunction());
-
-        ArrayChange arrayChange = new ArrayChange(pair.getGlobalCdoId(), property, elementChanges);
-
-        return Sets.asSet(arrayChange);
+        else {
+            return null;
+        }
     }
 }

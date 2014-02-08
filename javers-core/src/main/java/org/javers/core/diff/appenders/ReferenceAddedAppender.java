@@ -20,7 +20,7 @@ public class ReferenceAddedAppender extends PropertyChangeAppender<ReferenceAdde
     }
 
     @Override
-    public Collection<ReferenceAdded> calculateChanges(NodePair pair, Property supportedProperty) {
+    public ReferenceAdded calculateChanges(NodePair pair, Property supportedProperty) {
         throw new IllegalStateException("not implemented");
     }
 }

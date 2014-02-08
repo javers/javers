@@ -23,18 +23,14 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
     }
 
     @Override
-    public Collection<ReferenceChange> calculateChanges(NodePair pair, Property property) {
+    public ReferenceChange calculateChanges(NodePair pair, Property property) {
         GlobalCdoId leftGlobalCdoId = pair.getLeftGlobalCdoId(property);
         GlobalCdoId rightGlobalCdoId = pair.getRightGlobalCdoId(property);
 
         if (Objects.nullSafeEquals(leftGlobalCdoId, rightGlobalCdoId)) {
-            return Collections.EMPTY_SET;
+            return null;
         }
 
-        return Collections.singleton(
-                        new ReferenceChange(pair.getGlobalCdoId(),
-                        property,
-                        leftGlobalCdoId,
-                        rightGlobalCdoId));
+        return new ReferenceChange(pair.getGlobalCdoId(), property, leftGlobalCdoId, rightGlobalCdoId);
     }
 }

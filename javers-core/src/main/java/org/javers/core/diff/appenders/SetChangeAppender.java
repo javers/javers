@@ -55,7 +55,7 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
     }
 
     @Override
-    protected Collection<SetChange> calculateChanges(NodePair pair, Property property) {
+    protected SetChange calculateChanges(NodePair pair, Property property) {
         Set leftValues =  (Set) pair.getLeftPropertyValue(property);
         Set rightValues = (Set) pair.getRightPropertyValue(property);
 
@@ -70,9 +70,9 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
         }
 
         if (changes.isEmpty()) {
-            return java.util.Collections.EMPTY_SET;
+            return null;
         }
 
-        return Sets.asSet(new SetChange(pair.getGlobalCdoId(), property, changes));
+        return new SetChange(pair.getGlobalCdoId(), property, changes);
     }
 }

@@ -3,6 +3,7 @@ package org.javers.core.diff.appenders
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.ChangeAssert
 import org.javers.core.diff.RealNodePair
+import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.diff.Change
@@ -23,11 +24,10 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
         Property property = getEntity(DummyUser).getProperty("dummyUserDetails")
 
         when:
-        Collection<Change> changes =
-            new ReferenceChangeAppender().calculateChanges(new RealNodePair(leftNode, rightNode), property)
+        def change = new ReferenceChangeAppender().calculateChanges(new RealNodePair(leftNode, rightNode), property)
 
         then:
-        changes.size() ==  0
+        change == null
     }
 
     def "should set ReferenceChange metadata"() {
@@ -37,11 +37,10 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
         Property property = getEntity(DummyUser).getProperty("dummyUserDetails")
 
         when:
-        Collection<Change> changes =
-                new ReferenceChangeAppender().calculateChanges(new RealNodePair(leftNode, rightNode), property)
+        ReferenceChange change = new ReferenceChangeAppender().calculateChanges(new RealNodePair(leftNode, rightNode), property)
 
         then:
-        ChangeAssert.assertThat(changes[0])
+        ChangeAssert.assertThat(change)
                     .hasInstanceId(DummyUser, "1")
                     .hasAffectedCdo(rightNode)
     }
@@ -53,12 +52,10 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
         Property property = getEntity(DummyUser).getProperty("dummyUserDetails")
 
         when:
-        Collection<Change> changes =
-            new ReferenceChangeAppender().calculateChanges(new RealNodePair(leftNode, rightNode), property)
+        ReferenceChange change = new ReferenceChangeAppender().calculateChanges(new RealNodePair(leftNode, rightNode), property)
 
         then:
-        changes.size() == 1
-        assertThat(changes[0])
+        assertThat(change)
                   .hasLeftReference(DummyUserDetails,2)
                   .hasRightReference(null)
                   .hasProperty(property)
@@ -71,12 +68,11 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
         Property property = getEntity(DummyUser).getProperty("dummyUserDetails")
 
         when:
-        Collection<Change> changes =
+        ReferenceChange change =
             new ReferenceChangeAppender().calculateChanges(new RealNodePair(leftNode, rightNode), property)
 
         then:
-        changes.size() == 1
-        assertThat(changes[0])
+        assertThat(change)
                   .hasLeftReference(DummyUserDetails,2)
                   .hasRightReference(DummyUserDetails,3)
                   .hasProperty(property)

@@ -20,7 +20,7 @@ public class ReferenceRemovedAppender extends PropertyChangeAppender<ReferenceRe
     }
 
     @Override
-    public Collection<ReferenceRemoved> calculateChanges(NodePair pair, Property supportedProperty) {
+    public ReferenceRemoved calculateChanges(NodePair pair, Property supportedProperty) {
         throw new IllegalStateException("not implemented");
     }
 }

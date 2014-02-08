@@ -18,10 +18,12 @@ public abstract class PropertyChangeAppender <T extends PropertyChange> {
     /**
      * checks if given property is supported and if so,
      * delegates calculation to concrete appender in calculateChanges()
+     *
+     * @return null if no changes
      */
-    public final Collection<T> calculateChangesIfSupported(NodePair pair, Property property, JaversType propertyType) {
+    public final T calculateChangesIfSupported(NodePair pair, Property property, JaversType propertyType) {
         if (!supports(propertyType)) {
-             return Collections.EMPTY_SET;
+             return null;
         }
         return calculateChanges(pair, property);
     }
@@ -32,5 +34,5 @@ public abstract class PropertyChangeAppender <T extends PropertyChange> {
 
     protected abstract Class<? extends JaversType> getSupportedPropertyType();
 
-    protected abstract Collection<T> calculateChanges(NodePair pair, Property supportedProperty);
+    protected abstract T calculateChanges(NodePair pair, Property supportedProperty);
 }

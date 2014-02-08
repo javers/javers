@@ -26,7 +26,7 @@ class SetChangeAppenderTest extends AbstractDiffTest {
                 new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "stringSet"))
 
         then:
-        change[0].changes.size() == changesCount
+        change.changes.size() == changesCount
 
         where:
         leftSet              | rightSet             || changesCount
@@ -51,7 +51,7 @@ class SetChangeAppenderTest extends AbstractDiffTest {
                 new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "stringSet"))
 
         then:
-        change.size() == 0
+        change == null
 
         where:
         leftSet | rightSet
