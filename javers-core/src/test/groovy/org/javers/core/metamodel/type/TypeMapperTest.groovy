@@ -56,7 +56,7 @@ class TypeMapperTest extends Specification {
     }
 
     @Unroll
-    def "should map #expectedColType.simpleName by default"() {
+    def "should map Container #expectedColType.simpleName by default"() {
         given:
         TypeMapper mapper = new TypeMapper();
 
@@ -71,10 +71,11 @@ class TypeMapperTest extends Specification {
         givenJavaType | expectedColType
         Set  | SetType
         List | ListType
+        Map  | MapType
     }
 
     @Unroll
-    def "should spawn concrete #expectedColType.simpleName from prototype interface for #givenJavaType.simpleName"() {
+    def "should spawn concrete Container #expectedColType.simpleName from prototype interface for #givenJavaType.simpleName"() {
         given:
         TypeMapper mapper = new TypeMapper()
 
@@ -93,7 +94,7 @@ class TypeMapperTest extends Specification {
     }
 
     @Unroll
-    def "should spawn generic Col #expectedJaversType.simpleName from non-generic prototype interface for #givenJavaType"() {
+    def "should spawn generic Collection #expectedJaversType.simpleName from non-generic prototype interface for #givenJavaType"() {
         given:
         TypeMapper mapper = new TypeMapper()
 
