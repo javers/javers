@@ -1,7 +1,8 @@
-package org.javers.common.reflection
+ package org.javers.common.reflection
 
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.lang.reflect.Field
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
@@ -13,6 +14,25 @@ class ReflectionUtilTest extends Specification {
     class ReflectionTestModel {
         List<DummyUser> dummyUserList
         Set noGenericSet
+    }
+
+    @Unroll
+    def "should calculate hierarchy distance from #child to #parent"() {
+        when:
+            int d = ReflectionUtil.calculateHierarchyDistance(child, parent)
+
+        then:
+            d == expectedDistance
+
+        where:
+        child   | parent      || expectedDistance
+        HashMap | Map         || 1
+        HashMap | HashMap     || 0
+        Map     | Map         || 0
+        HashMap | AbstractMap || 1
+        HashMap | Object      || 2
+        Map     | Set         || Integer.MAX_VALUE
+
     }
 
     def "should return actual class type argument from field"() {

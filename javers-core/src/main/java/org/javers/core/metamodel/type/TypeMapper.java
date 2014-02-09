@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.metamodel.property.*;
@@ -12,6 +13,8 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
 
+import static org.javers.common.reflection.ReflectionUtil.calculateHierarchyDistance;
+import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
@@ -194,11 +197,12 @@ public class TypeMapper {
      * @throws JaversExceptionCode TYPE_NOT_MAPPED
      */
     private JaversType spawnFromPrototype(Type javaType) {
-        JaversType prototype = findPrototypeAssignableFrom(javaType);
+        Class javaClass = extractClass(javaType);
+        JaversType prototype = findPrototypeAssignableFrom(javaClass);
 
         JaversType spawned;
         if (prototype instanceof ManagedType) {
-            spawned = ((ManagedType)prototype).spawn((Class)javaType, managedClassFactory);
+            spawned = ((ManagedType)prototype).spawn(javaClass, managedClassFactory);
         }
         else {
             spawned = prototype.spawn(javaType); //delegate to simple constructor
@@ -214,15 +218,43 @@ public class TypeMapper {
      *
      * @throws JaversExceptionCode TYPE_NOT_MAPPED
      */
-    private JaversType findPrototypeAssignableFrom(Type javaType) {
-        argumentIsNotNull(javaType);
+    private JaversType findPrototypeAssignableFrom(Class javaClass) {
+        argumentIsNotNull(javaClass);
+        List<DistancePair> distances = new ArrayList<>();
 
-        for (JaversType javersType : mappedTypes.values()){
-            if(javersType.mayBePrototypeFor(javaType)){
-                return javersType;
+        for (JaversType javersType : mappedTypes.values()) {
+            DistancePair distancePair = new DistancePair(calculateHierarchyDistance(javaClass, javersType.getBaseJavaClass()), javersType);
+
+            //this is due too spoiled Java Array reflection API
+            if (javaClass.isArray()) {
+                return getJaversType(Object[].class);
             }
+
+            //just to better speed
+            if (distancePair.distance == 1) {
+                return distancePair.javersType;
+            }
+
+            distances.add(distancePair);
         }
 
-        throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType);
+        Collections.sort(distances);
+
+        return distances.get(0).javersType;
+    }
+
+    private static class DistancePair implements Comparable<DistancePair> {
+        Integer distance;
+        JaversType javersType;
+
+        DistancePair(Integer distance, JaversType javersType) {
+            this.distance = distance;
+            this.javersType = javersType;
+        }
+
+        @Override
+        public int compareTo(DistancePair other) {
+            return distance.compareTo(other.distance);
+        }
     }
 }

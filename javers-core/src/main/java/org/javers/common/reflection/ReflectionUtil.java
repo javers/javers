@@ -147,6 +147,9 @@ public class ReflectionUtil {
         return Collections.unmodifiableList(result);
     }
 
+    /**
+     * for example: Map<String, String> -> Map
+     */
     public static Class extractClass(Type javaType) {
         if (javaType instanceof ParameterizedType &&
                 ((ParameterizedType)javaType).getRawType() instanceof Class){
@@ -156,5 +159,35 @@ public class ReflectionUtil {
         }
 
         throw new JaversException(JaversExceptionCode.CLASS_EXTRACTION_ERROR, javaType);
+    }
+
+    /**
+     *
+     */
+    public static int calculateHierarchyDistance(Class<?> clazz, Class<?> parent) {
+        Class<?> current = clazz;
+        int distance = 0;
+
+        //search in class hierarchy
+        while (current != null) {
+            //try class
+            if (parent == current) {
+                return distance;
+            }
+
+            //try interfaces
+            for (Class<?> interf : current.getInterfaces()) {
+                if (parent == interf) {
+                    return distance + 1;
+                }
+            }
+
+            //step up in class hierarchy
+            current = current.getSuperclass();
+
+            distance++;
+        }
+
+        return Integer.MAX_VALUE;
     }
 }

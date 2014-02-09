@@ -179,6 +179,26 @@ class TypeMapperTest extends Specification {
         jType.baseJavaClass == DummyUser
     }
 
+    class DummyGenericUser<T> extends AbstractDummyUser {}
+
+    @Unroll
+    def "should spawn #queryType from the nearest prototype"() {
+        given:
+        TypeMapper mapper = new TypeMapper(javersTestAssembly().managedClassFactory)
+        mapper.registerValueType(Object.class)
+        mapper.registerManagedClass(new ValueObjectDefinition(AbstractDummyUser))
+
+        when:
+        def jType = mapper.getJaversType(queryType)
+
+        then:
+        jType.class == ValueObjectType
+        jType.baseJavaClass == DummyGenericUser
+
+        where:
+        queryType << [DummyGenericUser, new TypeToken<DummyGenericUser<String>>(){}.type]
+    }
+
     def "should spawn generic types as distinct javers types"() {
         given:
         TypeMapper mapper = new TypeMapper(Mock(ManagedClassFactory))
