@@ -103,7 +103,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      */
     public JaversBuilder registerValue(Class<?> valueClass) {
         Validate.argumentIsNotNull(valueClass);
-        typeMapper().registerValueType(valueClass);
+        managedClassDefinitions.add(new ValueDefinition(valueClass));
         return this;
     }
 
@@ -164,29 +164,11 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-   /* @Deprecated
-    public JaversBuilder addModule(JaversModule javersModule) {
-        Validate.argumentIsNotNull(javersModule);
-        externalModules.add(javersModule);
-        return this;
-    }*/
-
-    private void registerManagedClasses() {
+    private void mapRegisteredClasses() {
         TypeMapper typeMapper = typeMapper();
         for (ManagedClassDefinition def : managedClassDefinitions) {
-            if (def instanceof ValueObjectDefinition) {
-                ValueObject valueObject = managedClassFactory().create((ValueObjectDefinition)def);
-                typeMapper.registerValueObjectType(valueObject);
-            }
-            if (def instanceof EntityDefinition) {
-                Entity entity = managedClassFactory().create((EntityDefinition)def);
-                typeMapper.registerEntityType(entity);
-            }
+            typeMapper.registerManagedClass(def);
         }
-    }
-
-    private ManagedClassFactory managedClassFactory() {
-        return getContainerComponent(ManagedClassFactory.class);
     }
 
     private TypeMapper typeMapper() {
@@ -203,7 +185,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private void bootManagedClasses() {
         addModule(new ManagedClassFactoryModule(coreConfiguration()));
-        registerManagedClasses();
+        mapRegisteredClasses();
     }
 
     private void bootJsonConverter() {

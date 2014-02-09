@@ -3,10 +3,7 @@ package org.javers.core.metamodel.type;
 import org.javers.common.collections.Primitives;
 import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
-import org.javers.core.metamodel.property.Entity;
-import org.javers.core.metamodel.property.ManagedClass;
-import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.property.ValueObject;
+import org.javers.core.metamodel.property.*;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +22,12 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class TypeMapper {
     private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
 
+    private ManagedClassFactory managedClassFactory;
     private Map<Type, JaversType> mappedTypes;
 
-    public TypeMapper() {
+    public TypeMapper(ManagedClassFactory managedClassFactory) {
+        this.managedClassFactory = managedClassFactory;
+
         mappedTypes = new HashMap<>();
 
         //primitives & boxes
@@ -119,19 +119,29 @@ public class TypeMapper {
         return (elementType instanceof EntityType);
     }
 
-    public <T extends Collection> void registerCollectionType(Class<T> collectionType) {
-        addType(new CollectionType(collectionType));
-    }
 
     public void registerPrimitiveType(Class<?> primitiveClass) {
         addType(new PrimitiveType(primitiveClass));
     }
 
-    public void registerValueObjectType(ValueObject valueObject) {
-        addType(new ValueObjectType(valueObject));
+    public void registerManagedClass(ManagedClassDefinition def) {
+        if (def instanceof ValueObjectDefinition) {
+            ValueObject valueObject = managedClassFactory.create((ValueObjectDefinition) def);
+            registerValueObjectType(valueObject);
+        }
+        if (def instanceof EntityDefinition) {
+            Entity entity = managedClassFactory.create((EntityDefinition)def);
+            registerEntityType(entity);
+        }
+        if (def instanceof  ValueDefinition) {
+            registerValueType(def.getClazz());
+        }
     }
 
-    public void registerEntityType(Entity entity) {
+    protected void registerValueObjectType(ValueObject valueObject) {
+        addType(new ValueObjectType(valueObject));
+    } 
+    protected void registerEntityType(Entity entity) {
         addType(new EntityType(entity));
     }
 
@@ -149,8 +159,9 @@ public class TypeMapper {
         return result;
     }
 
-    //-- protected
-
+    public boolean isSupportedContainer(ContainerType propertyType) {
+        return isPrimitiveOrValueOrObject(propertyType.getElementType());
+    }
 
     //-- private
 
@@ -185,7 +196,13 @@ public class TypeMapper {
     private JaversType spawnFromPrototype(Type javaType) {
         JaversType prototype = findPrototypeAssignableFrom(javaType);
 
-        JaversType spawned = prototype.spawn(javaType);
+        JaversType spawned;
+        if (prototype instanceof ManagedType) {
+            spawned = ((ManagedType)prototype).spawn((Class)javaType, managedClassFactory);
+        }
+        else {
+            spawned = prototype.spawn(javaType); //delegate to simple constructor
+        }
 
         addType(spawned);
 
@@ -207,9 +224,5 @@ public class TypeMapper {
         }
 
         throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED, javaType);
-    }
-
-    public boolean isSupportedContainer(ContainerType propertyType) {
-        return isPrimitiveOrValueOrObject(propertyType.getElementType());
     }
 }

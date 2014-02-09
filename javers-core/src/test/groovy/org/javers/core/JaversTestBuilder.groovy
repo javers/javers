@@ -47,7 +47,7 @@ class JaversTestBuilder {
         new JaversTestBuilder(MappingStyle.FIELD).javersBuilder.getContainerComponent(Javers)
     }
 
-    ManagedClassFactory getEntityFactory() {
+    ManagedClassFactory getManagedClassFactory() {
         javersBuilder.getContainerComponent(ManagedClassFactory)
     }
 

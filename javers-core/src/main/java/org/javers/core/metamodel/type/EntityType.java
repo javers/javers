@@ -1,6 +1,9 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.core.metamodel.property.Entity;
+import org.javers.core.metamodel.property.ManagedClassFactory;
+
+import java.lang.reflect.Type;
 
 /**
  * Reference to {@link Entity}
@@ -16,5 +19,10 @@ public class EntityType extends ManagedType {
     @Override
     Entity getManagedClass() {
         return (Entity)super.getManagedClass();
+    }
+
+    @Override
+    ManagedType spawn(Class javaType, ManagedClassFactory managedClassFactory) {
+        return new EntityType(managedClassFactory.createEntity(javaType));
     }
 }

@@ -21,6 +21,10 @@ public class ManagedClassFactory {
        return create(new EntityDefinition(clazz));
     }
 
+    public <S> ValueObject createValueObject(Class<S> clazz) {
+        return create(new ValueObjectDefinition(clazz));
+    }
+
     public Entity create(EntityDefinition entityDefinition) {
 
         List<Property> properties = propertyScanner.scan(entityDefinition.getClazz());
