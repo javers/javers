@@ -156,13 +156,6 @@ public class TypeMapper {
 
     //-- private
 
-    private void registerValueObjectType(ValueObject valueObject) {
-        addType(new ValueObjectType(valueObject));
-    }
-    private void registerEntityType(Entity entity) {
-        addType(new EntityType(entity));
-    }
-
     //TODO
     private boolean isPrimitiveOrValueOrObject(Class clazz) {
         if (clazz == Object.class) {
@@ -182,10 +175,6 @@ public class TypeMapper {
      */
     private JaversType getExactMatchingJaversType(Type javaType) {
         return mappedTypes.get(javaType);
-    }
-
-    private boolean isMapped(Type javaType) {
-        return mappedTypes.containsKey(javaType);
     }
 
     private JaversType spawnFromPrototype(Type javaType) {
