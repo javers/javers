@@ -1,5 +1,6 @@
 package org.javers.core
 
+import org.javers.core.metamodel.type.TypeSpawningFactory
 import org.javers.core.model.DummyUserWithValues
 import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.metamodel.type.TypeMapper
@@ -49,6 +50,10 @@ class JaversTestBuilder {
 
     ManagedClassFactory getManagedClassFactory() {
         javersBuilder.getContainerComponent(ManagedClassFactory)
+    }
+
+    TypeSpawningFactory getTypeSpawningFactory() {
+        javersBuilder.getContainerComponent(TypeSpawningFactory)
     }
 
     TypeMapper getTypeMapper(){

@@ -1,8 +1,6 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
-import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.metamodel.property.*;
 import org.joda.time.LocalDateTime;
@@ -25,11 +23,11 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class TypeMapper {
     private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
 
-    private ManagedClassFactory managedClassFactory;
+    private TypeSpawningFactory typeSpawningFactory;
     private Map<Type, JaversType> mappedTypes;
 
-    public TypeMapper(ManagedClassFactory managedClassFactory) {
-        this.managedClassFactory = managedClassFactory;
+    public TypeMapper(TypeSpawningFactory typeSpawningFactory) {
+        this.typeSpawningFactory = typeSpawningFactory;
 
         mappedTypes = new HashMap<>();
 
@@ -128,31 +126,25 @@ public class TypeMapper {
     }
 
     public void registerManagedClass(ManagedClassDefinition def) {
-        if (def instanceof ValueObjectDefinition) {
-            ValueObject valueObject = managedClassFactory.create((ValueObjectDefinition) def);
-            registerValueObjectType(valueObject);
-        }
-        if (def instanceof EntityDefinition) {
-            Entity entity = managedClassFactory.create((EntityDefinition)def);
-            registerEntityType(entity);
-        }
-        if (def instanceof  ValueDefinition) {
+        if (def instanceof ValueObjectDefinition || def instanceof EntityDefinition) {
+            ManagedType managedType = typeSpawningFactory.spawnFromDefinition(def);
+            addType(managedType);
+        } else  if (def instanceof  ValueDefinition) {
             registerValueType(def.getClazz());
+        } else {
+            throw new IllegalArgumentException("unsupported " + def);
         }
-    }
-
-    protected void registerValueObjectType(ValueObject valueObject) {
-        addType(new ValueObjectType(valueObject));
-    } 
-    protected void registerEntityType(Entity entity) {
-        addType(new EntityType(entity));
     }
 
     public void registerValueType(Class<?> objectValue) {
         addType(new ValueType(objectValue));
     }
 
-    public <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
+    public boolean isSupportedContainer(ContainerType propertyType) {
+        return isPrimitiveOrValueOrObject(propertyType.getElementType());
+    }
+
+    protected <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
         List<T> result = new ArrayList<>();
         for(JaversType jType : mappedTypes.values()) {
             if(ofType.isAssignableFrom(jType.getClass()) ) {
@@ -162,11 +154,14 @@ public class TypeMapper {
         return result;
     }
 
-    public boolean isSupportedContainer(ContainerType propertyType) {
-        return isPrimitiveOrValueOrObject(propertyType.getElementType());
-    }
-
     //-- private
+
+    private void registerValueObjectType(ValueObject valueObject) {
+        addType(new ValueObjectType(valueObject));
+    }
+    private void registerEntityType(Entity entity) {
+        addType(new EntityType(entity));
+    }
 
     //TODO
     private boolean isPrimitiveOrValueOrObject(Class clazz) {
@@ -193,32 +188,17 @@ public class TypeMapper {
         return mappedTypes.containsKey(javaType);
     }
 
-    /**
-     * @throws JaversExceptionCode TYPE_NOT_MAPPED
-     */
     private JaversType spawnFromPrototype(Type javaType) {
         Class javaClass = extractClass(javaType);
-        JaversType prototype = findPrototypeAssignableFrom(javaClass);
+        JaversType prototype = findNearestAncestor(javaClass);
 
-        JaversType spawned;
-        if (prototype instanceof ManagedType) {
-            spawned = ((ManagedType)prototype).spawn(javaClass, managedClassFactory);
-        }
-        else {
-            spawned = prototype.spawn(javaType); //delegate to simple constructor
-        }
+        JaversType spawned = typeSpawningFactory.spawnFromPrototype(prototype, javaType);
 
         addType(spawned);
-
         return spawned;
     }
 
-    /**
-     * prototypes are non-generic
-     *
-     * @throws JaversExceptionCode TYPE_NOT_MAPPED
-     */
-    private JaversType findPrototypeAssignableFrom(Class javaClass) {
+    private JaversType findNearestAncestor(Class javaClass) {
         argumentIsNotNull(javaClass);
         List<DistancePair> distances = new ArrayList<>();
 
