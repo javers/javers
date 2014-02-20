@@ -11,9 +11,7 @@ import static org.javers.core.exceptions.JaversException.*;
  */
 public enum  JaversExceptionCode {
 
-    /**
-     * Class is not defined in Javers configuration.
-     */
+    @Deprecated
     CLASS_NOT_MANAGED(RUNTIME_ERROR + "Class '%s' is not managed. Add this class to your JaVers configuration."),
 
     @Deprecated

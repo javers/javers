@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
+import org.javers.core.exceptions.JaversException;
 import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.metamodel.property.*;
 import org.joda.time.LocalDateTime;
@@ -11,7 +12,6 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static org.javers.common.reflection.ReflectionUtil.calculateHierarchyDistance;
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -181,6 +181,10 @@ public class TypeMapper {
         Class javaClass = extractClass(javaType);
         JaversType prototype = findNearestAncestor(javaClass);
 
+        if (prototype == null){
+            throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED,javaType);
+        }
+
         JaversType spawned = typeSpawningFactory.spawnFromPrototype(prototype, javaType);
 
         addType(spawned);
@@ -192,7 +196,8 @@ public class TypeMapper {
         List<DistancePair> distances = new ArrayList<>();
 
         for (JaversType javersType : mappedTypes.values()) {
-            DistancePair distancePair = new DistancePair(calculateHierarchyDistance(javaClass, javersType.getBaseJavaClass()), javersType);
+            DistancePair distancePair = new DistancePair(javaClass, javersType);
+            logger.info("distance from "+javersType + ": "+distancePair.distance);
 
             //this is due too spoiled Java Array reflection API
             if (javaClass.isArray()) {
@@ -209,21 +214,11 @@ public class TypeMapper {
 
         Collections.sort(distances);
 
+        if (distances.get(0).isMax()){
+            return null;
+        }
+
         return distances.get(0).javersType;
     }
 
-    private static class DistancePair implements Comparable<DistancePair> {
-        Integer distance;
-        JaversType javersType;
-
-        DistancePair(Integer distance, JaversType javersType) {
-            this.distance = distance;
-            this.javersType = javersType;
-        }
-
-        @Override
-        public int compareTo(DistancePair other) {
-            return distance.compareTo(other.distance);
-        }
-    }
 }

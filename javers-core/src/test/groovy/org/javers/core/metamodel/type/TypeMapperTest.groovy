@@ -1,9 +1,7 @@
 package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
-import org.javers.core.metamodel.property.EntityDefinition
 import org.javers.core.metamodel.property.ManagedClassFactory
-import org.javers.core.metamodel.property.ValueObjectDefinition
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
@@ -12,7 +10,6 @@ import spock.lang.Unroll
 import java.lang.reflect.Type
 
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
-import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
 /**
  * @author bartosz walacik
@@ -142,53 +139,6 @@ class TypeMapperTest extends Specification {
         then:
         jType.class == ValueType
         jType.baseJavaClass == DummyUser
-    }
-
-    def "should spawn EntityType from mapped superclass"() {
-        given:
-        TypeMapper mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
-        mapper.registerManagedClass(new EntityDefinition(AbstractDummyUser,"inheritedInt"))
-
-        when:
-        def jType = mapper.getJaversType(DummyUser)
-
-        then:
-        jType.class == EntityType
-        jType.baseJavaClass == DummyUser
-    }
-
-    def "should spawn ValueObjectType from mapped superclass"() {
-        given:
-        TypeMapper mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
-        mapper.registerManagedClass(new ValueObjectDefinition(AbstractDummyUser))
-
-        when:
-        def jType = mapper.getJaversType(DummyUser)
-
-        then:
-        jType.class == ValueObjectType
-        jType.baseJavaClass == DummyUser
-    }
-
-    class DummyGenericUser<T> extends AbstractDummyUser {}
-
-    @Unroll
-    def "should spawn #queryTypeAsString from the nearest prototype"() {
-        given:
-        TypeMapper mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
-        mapper.registerValueType(Object.class)
-        mapper.registerManagedClass(new ValueObjectDefinition(AbstractDummyUser))
-
-        when:
-        def jType = mapper.getJaversType(queryType)
-
-        then:
-        jType.class == ValueObjectType
-        jType.baseJavaClass == DummyGenericUser
-
-        where:
-        queryType << [DummyGenericUser, new TypeToken<DummyGenericUser<String>>(){}.type]
-        queryTypeAsString << ["DummyGenericUser","DummyGenericUser<String>"]
     }
 
     def "should spawn generic types as distinct javers types"() {
