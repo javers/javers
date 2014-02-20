@@ -1,8 +1,6 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.metamodel.property.*;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -23,11 +21,11 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class TypeMapper {
     private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
 
-    private TypeSpawningFactory typeSpawningFactory;
+    private TypeFactory typeFactory;
     private Map<Type, JaversType> mappedTypes;
 
-    public TypeMapper(TypeSpawningFactory typeSpawningFactory) {
-        this.typeSpawningFactory = typeSpawningFactory;
+    public TypeMapper(TypeFactory typeFactory) {
+        this.typeFactory = typeFactory;
 
         mappedTypes = new HashMap<>();
 
@@ -57,9 +55,8 @@ public class TypeMapper {
     }
 
     /**
-     * returns mapped type or spawn new one from prototype
-     *
-     * @throws JaversExceptionCode TYPE_NOT_MAPPED
+     * returns mapped type or spawns new one from prototype
+     * or infers new one using default mapping
      */
     public JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
@@ -69,7 +66,7 @@ public class TypeMapper {
             return jType;
         }
 
-        return spawnFromPrototype(javaType);
+        return createMapping(javaType);
     }
 
     /**
@@ -126,14 +123,7 @@ public class TypeMapper {
     }
 
     public void registerManagedClass(ManagedClassDefinition def) {
-        if (def instanceof ValueObjectDefinition || def instanceof EntityDefinition) {
-            ManagedType managedType = typeSpawningFactory.spawnFromDefinition(def);
-            addType(managedType);
-        } else  if (def instanceof  ValueDefinition) {
-            registerValueType(def.getClazz());
-        } else {
-            throw new IllegalArgumentException("unsupported " + def);
-        }
+        addType(typeFactory.createFromDefinition(def));
     }
 
     public void registerValueType(Class<?> objectValue) {
@@ -177,27 +167,29 @@ public class TypeMapper {
         return mappedTypes.get(javaType);
     }
 
-    private JaversType spawnFromPrototype(Type javaType) {
-        Class javaClass = extractClass(javaType);
-        JaversType prototype = findNearestAncestor(javaClass);
+    private JaversType createMapping(Type javaType) {
+        argumentIsNotNull(javaType);
+        JaversType prototype = findNearestAncestor(javaType);
+        JaversType newType;
 
-        if (prototype == null){
-            throw new JaversException(JaversExceptionCode.TYPE_NOT_MAPPED,javaType);
+        if (prototype == null) {
+            newType = typeFactory.infer(javaType);
+        }
+        else {
+            newType = typeFactory.spawnFromPrototype(javaType, prototype);
         }
 
-        JaversType spawned = typeSpawningFactory.spawnFromPrototype(prototype, javaType);
-
-        addType(spawned);
-        return spawned;
+        addType(newType);
+        return newType;
     }
 
-    private JaversType findNearestAncestor(Class javaClass) {
-        argumentIsNotNull(javaClass);
+    private JaversType findNearestAncestor(Type javaType) {
+        Class javaClass = extractClass(javaType);
         List<DistancePair> distances = new ArrayList<>();
 
         for (JaversType javersType : mappedTypes.values()) {
             DistancePair distancePair = new DistancePair(javaClass, javersType);
-            logger.info("distance from "+javersType + ": "+distancePair.distance);
+            // logger.info("distance from "+javersType + ": "+distancePair.distance);
 
             //this is due too spoiled Java Array reflection API
             if (javaClass.isArray()) {

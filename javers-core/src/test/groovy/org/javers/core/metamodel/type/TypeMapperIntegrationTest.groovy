@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import com.google.gson.reflect.TypeToken
+import org.javers.core.metamodel.property.Entity
 import org.javers.core.metamodel.property.EntityDefinition;
 import org.javers.core.metamodel.property.ValueObjectDefinition;
 import org.javers.core.model.AbstractDummyUser
@@ -28,6 +29,18 @@ public class TypeMapperIntegrationTest extends Specification {
         then:
         jType.class == ValueObjectType
         jType.baseJavaClass == DummyAddress
+    }
+
+    def "should map as Entity when class has id property"() {
+        given:
+        TypeMapper mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+
+        when:
+        def jType = mapper.getJaversType(DummyUser)
+
+        then:
+        jType.class == EntityType
+        jType.baseJavaClass == DummyUser
     }
 
     def "should spawn EntityType from mapped superclass"() {

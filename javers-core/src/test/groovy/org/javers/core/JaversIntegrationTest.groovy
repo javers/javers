@@ -112,7 +112,6 @@ class JaversIntegrationTest extends Specification {
     def "should support custom JsonTypeAdapter for ValueChange"() {
         given:
         Javers javers = javers()
-                       .registerValueObject(DummyUserWithPoint)
                        .registerValueTypeAdapter( new DummyPointJsonTypeAdapter() )
                        .build()
 
@@ -135,7 +134,6 @@ class JaversIntegrationTest extends Specification {
     def "should support custom native Gson TypeAdapter"() {
         given:
         Javers javers = javers()
-                .registerValueObject(DummyUserWithPoint)
                 .registerValueGsonTypeAdapter(DummyPoint, new DummyPointNativeTypeAdapter() )
                 .build()
 

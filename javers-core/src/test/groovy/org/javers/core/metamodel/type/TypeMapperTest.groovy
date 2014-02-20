@@ -26,7 +26,7 @@ class TypeMapperTest extends Specification {
 
     def "should spawn concrete Array type"() {
         given:
-        TypeMapper mapper = new TypeMapper(new TypeSpawningFactory(Mock(ManagedClassFactory)))
+        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
         int arrayPrototypes  = mapper.getMappedTypes(ArrayType).size()
         Type intArray   = getFieldFromClass(Dummy, "intArray").genericType
 
@@ -42,7 +42,7 @@ class TypeMapperTest extends Specification {
 
     def "should spawn concrete Enum type"() {
         given:
-        TypeMapper mapper = new TypeMapper(new TypeSpawningFactory(Mock(ManagedClassFactory)))
+        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
 
         when:
         JaversType jType = mapper.getJaversType(DummyEnum)
@@ -55,7 +55,7 @@ class TypeMapperTest extends Specification {
     @Unroll
     def "should map Container #expectedColType.simpleName by default"() {
         given:
-        TypeMapper mapper = new TypeMapper(new TypeSpawningFactory(Mock(ManagedClassFactory)))
+        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
 
         when:
         JaversType jType = mapper.getJaversType(givenJavaType)
@@ -74,7 +74,7 @@ class TypeMapperTest extends Specification {
     @Unroll
     def "should spawn concrete Container #expectedColType.simpleName from prototype interface for #givenJavaType.simpleName"() {
         given:
-        TypeMapper mapper = new TypeMapper(new TypeSpawningFactory(Mock(ManagedClassFactory)))
+        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
 
         when:
         JaversType jType = mapper.getJaversType(givenJavaType)
@@ -93,7 +93,7 @@ class TypeMapperTest extends Specification {
     @Unroll
     def "should spawn generic Collection #givenJavaType from non-generic prototype interface"() {
         given:
-        TypeMapper mapper = new TypeMapper(new TypeSpawningFactory(Mock(ManagedClassFactory)))
+        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
 
         when:
         def jType = mapper.getJaversType( givenJavaType )
@@ -114,7 +114,7 @@ class TypeMapperTest extends Specification {
     @Unroll
     def "should spawn generic Map #givenJavaType from non-generic prototype interface"() {
         given:
-        TypeMapper mapper = new TypeMapper(new TypeSpawningFactory(Mock(ManagedClassFactory)))
+        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
 
         when:
         MapType jType = mapper.getJaversType(givenJavaType)
@@ -130,7 +130,7 @@ class TypeMapperTest extends Specification {
 
     def "should spawn ValueType from mapped superclass"() {
         given:
-        TypeMapper mapper = new TypeMapper(new TypeSpawningFactory(Mock(ManagedClassFactory)))
+        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
         mapper.registerValueType(AbstractDummyUser)
 
         when:
@@ -143,7 +143,7 @@ class TypeMapperTest extends Specification {
 
     def "should spawn generic types as distinct javers types"() {
         given:
-        TypeMapper mapper = new TypeMapper(new TypeSpawningFactory(Mock(ManagedClassFactory)))
+        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
 
         when:
         JaversType setWithStringJaversType  = mapper.getJaversType(new TypeToken<Set<String>>(){}.type)

@@ -62,7 +62,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers {@link org.javers.core.metamodel.property.Entity} with id-property selected on the basis of @Id annotation
+     * registers {@link Entity} with id-property selected on the basis of @Id annotation
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
         Validate.argumentIsNotNull(entityClass);
@@ -70,7 +70,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers {@link org.javers.core.metamodel.property.Entity} with id-property selected explicitly by name
+     * registers {@link Entity} with id-property selected explicitly by name
      */
     public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName) {
         Validate.argumentsAreNotNull(entityClass, idPropertyName);

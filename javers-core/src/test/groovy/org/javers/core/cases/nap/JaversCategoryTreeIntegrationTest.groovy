@@ -24,7 +24,7 @@ class JaversCategoryTreeIntegrationTest extends Specification {
         given:
         Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(3, 3, "name").build()
         Category cat2 = CategoryTestBuilder.category().deepWithChildNumber(3, 3, "newName").build()
-        Javers javers = javers().registerEntity(Category).build()
+        Javers javers = javers().build()
 
         when:
         Diff diff = javers.compare("me", cat1, cat2)
@@ -37,7 +37,7 @@ class JaversCategoryTreeIntegrationTest extends Specification {
         given:
         Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
         Category cat2 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
-        Javers javers = javers().registerEntity(Category).build()
+        Javers javers = javers().build()
 
         when:
         Diff diff = javers.compare("me", cat1, cat2)
@@ -50,7 +50,7 @@ class JaversCategoryTreeIntegrationTest extends Specification {
         given:
         Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
         Category cat2 = CategoryTestBuilder.category(-1).deepWithChildNumber(5,5).build()
-        Javers javers = javers().registerEntity(Category).build()
+        Javers javers = javers().build()
 
         when:
         Diff diff = javers.compare("me", cat1, cat2)

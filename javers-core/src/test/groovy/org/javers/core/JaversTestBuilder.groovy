@@ -1,6 +1,6 @@
 package org.javers.core
 
-import org.javers.core.metamodel.type.TypeSpawningFactory
+import org.javers.core.metamodel.type.TypeFactory
 import org.javers.core.model.DummyUserWithValues
 import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.metamodel.type.TypeMapper
@@ -9,8 +9,6 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-
-import javax.persistence.EntityManager;
 
 /**
  * This is just a test builder,
@@ -27,13 +25,7 @@ class JaversTestBuilder {
     private JaversTestBuilder (MappingStyle mappingStyle) {
        javersBuilder = new JaversBuilder()
 
-       javersBuilder.withMappingStyle(mappingStyle)
-                    .registerEntity(DummyUser)
-                    .registerEntity(DummyUserDetails)
-                    .registerEntity(DummyUserWithValues)
-                    .registerValueObject(DummyAddress)
-                    .registerValueObject(DummyNetworkAddress)
-                    .build()
+       javersBuilder.withMappingStyle(mappingStyle).build()
     }
 
     static JaversTestBuilder javersTestAssembly(){
@@ -52,8 +44,8 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(ManagedClassFactory)
     }
 
-    TypeSpawningFactory getTypeSpawningFactory() {
-        javersBuilder.getContainerComponent(TypeSpawningFactory)
+    TypeFactory getTypeSpawningFactory() {
+        javersBuilder.getContainerComponent(TypeFactory)
     }
 
     TypeMapper getTypeMapper(){

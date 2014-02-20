@@ -6,8 +6,8 @@ import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.appenders.*;
 import org.javers.core.json.JsonConverterBuilder;
+import org.javers.core.metamodel.type.TypeFactory;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.metamodel.type.TypeSpawningFactory;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 
 import java.util.Arrays;
@@ -32,7 +32,7 @@ public class CoreJaversModule implements JaversModule {
             JsonConverterBuilder.class,
             ValueChangeAppender.class,
             TypeMapper.class,
-            TypeSpawningFactory.class,
+            TypeFactory.class,
             JaversCoreConfiguration.class};
 
     @Override
