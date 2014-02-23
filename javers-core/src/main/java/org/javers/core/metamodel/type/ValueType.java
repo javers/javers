@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 
 /**
- * Simple unwrap holder.
+ * Simple value holder.
  * Javers do not interact with internal properties of this type but treats its similarly to primitives.
  * <p/>
  *

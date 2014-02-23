@@ -3,22 +3,17 @@ package org.javers.core;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.model.object.graph.ObjectGraphBuilder;
 
 
 /**
- * Facade to JaVers instance.
- * Should be constructed by {@link JaversBuilder} provided with your domain model metadata and configuration.
- * <br/>
+ * Facade to JaVers instance.<br/>
+ * Should be constructed by {@link JaversBuilder} provided with your domain specific configuration.
+ * <br/><br/>
  *
- * Domain TODO: move to doc
- * <ul>
- *   <li>Entity - a class in client's domain model. List of those classes should be provided to JaversBuilder</li>
- *   <li>CDO - client's domain object, instance of an Entity</li>
- * </ul>
+ * See {@link MappingDocumentation} to find out how to map your domain model
  *
  * @author bartosz walacik
  */
