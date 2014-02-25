@@ -101,8 +101,4 @@ public abstract class JaversType {
         return baseJavaType.hashCode();
     }
 
-    @Deprecated
-    boolean mayBePrototypeFor(Type javaType) {
-        return !isGenericType() && isAssignableFrom(extractClass(javaType));
-    }
 }

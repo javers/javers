@@ -19,7 +19,6 @@ class JaversSmartparamIntegrationTest extends Specification{
     def "should serialize parameter entry"() {
         given:
         Javers javers = JaversBuilder.javers()
-                                     .registerValueObject(DummyParameterEntry)
                                      .typeSafeValues()
                                      .build()
 
