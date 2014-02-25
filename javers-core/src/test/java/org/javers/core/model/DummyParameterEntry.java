@@ -6,13 +6,13 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class DummyParameterEntry {
-    private Map<Object, Object> levels;
+    private Map<String, Object> levels;
 
-    public DummyParameterEntry(Map<Object, Object> levels) {
+    public DummyParameterEntry(Map<String, Object> levels) {
         this.levels = levels;
     }
 
-    public Map<Object, Object> getLevels() {
+    public Map<String, Object> getLevels() {
         return levels;
     }
 }

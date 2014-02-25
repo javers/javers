@@ -1,9 +1,6 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
-import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
 import org.javers.core.metamodel.property.*;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -13,7 +10,6 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static org.javers.common.reflection.ReflectionUtil.calculateHierarchyDistance;
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -25,11 +21,11 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class TypeMapper {
     private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
 
-    private ManagedClassFactory managedClassFactory;
+    private TypeFactory typeFactory;
     private Map<Type, JaversType> mappedTypes;
 
-    public TypeMapper(ManagedClassFactory managedClassFactory) {
-        this.managedClassFactory = managedClassFactory;
+    public TypeMapper(TypeFactory typeFactory) {
+        this.typeFactory = typeFactory;
 
         mappedTypes = new HashMap<>();
 
@@ -59,9 +55,8 @@ public class TypeMapper {
     }
 
     /**
-     * returns mapped type or spawn new one from prototype
-     *
-     * @throws JaversExceptionCode TYPE_NOT_MAPPED
+     * returns mapped type or spawns new one from prototype
+     * or infers new one using default mapping
      */
     public JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
@@ -71,7 +66,7 @@ public class TypeMapper {
             return jType;
         }
 
-        return spawnFromPrototype(javaType);
+        return createMapping(javaType);
     }
 
     /**
@@ -128,31 +123,18 @@ public class TypeMapper {
     }
 
     public void registerManagedClass(ManagedClassDefinition def) {
-        if (def instanceof ValueObjectDefinition) {
-            ValueObject valueObject = managedClassFactory.create((ValueObjectDefinition) def);
-            registerValueObjectType(valueObject);
-        }
-        if (def instanceof EntityDefinition) {
-            Entity entity = managedClassFactory.create((EntityDefinition)def);
-            registerEntityType(entity);
-        }
-        if (def instanceof  ValueDefinition) {
-            registerValueType(def.getClazz());
-        }
-    }
-
-    protected void registerValueObjectType(ValueObject valueObject) {
-        addType(new ValueObjectType(valueObject));
-    } 
-    protected void registerEntityType(Entity entity) {
-        addType(new EntityType(entity));
+        addType(typeFactory.createFromDefinition(def));
     }
 
     public void registerValueType(Class<?> objectValue) {
         addType(new ValueType(objectValue));
     }
 
-    public <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
+    public boolean isSupportedContainer(ContainerType propertyType) {
+        return isPrimitiveOrValueOrObject(propertyType.getElementType());
+    }
+
+    protected <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
         List<T> result = new ArrayList<>();
         for(JaversType jType : mappedTypes.values()) {
             if(ofType.isAssignableFrom(jType.getClass()) ) {
@@ -160,10 +142,6 @@ public class TypeMapper {
             }
         }
         return result;
-    }
-
-    public boolean isSupportedContainer(ContainerType propertyType) {
-        return isPrimitiveOrValueOrObject(propertyType.getElementType());
     }
 
     //-- private
@@ -189,41 +167,29 @@ public class TypeMapper {
         return mappedTypes.get(javaType);
     }
 
-    private boolean isMapped(Type javaType) {
-        return mappedTypes.containsKey(javaType);
-    }
+    private JaversType createMapping(Type javaType) {
+        argumentIsNotNull(javaType);
+        JaversType prototype = findNearestAncestor(javaType);
+        JaversType newType;
 
-    /**
-     * @throws JaversExceptionCode TYPE_NOT_MAPPED
-     */
-    private JaversType spawnFromPrototype(Type javaType) {
-        Class javaClass = extractClass(javaType);
-        JaversType prototype = findPrototypeAssignableFrom(javaClass);
-
-        JaversType spawned;
-        if (prototype instanceof ManagedType) {
-            spawned = ((ManagedType)prototype).spawn(javaClass, managedClassFactory);
+        if (prototype == null) {
+            newType = typeFactory.infer(javaType);
         }
         else {
-            spawned = prototype.spawn(javaType); //delegate to simple constructor
+            newType = typeFactory.spawnFromPrototype(javaType, prototype);
         }
 
-        addType(spawned);
-
-        return spawned;
+        addType(newType);
+        return newType;
     }
 
-    /**
-     * prototypes are non-generic
-     *
-     * @throws JaversExceptionCode TYPE_NOT_MAPPED
-     */
-    private JaversType findPrototypeAssignableFrom(Class javaClass) {
-        argumentIsNotNull(javaClass);
+    private JaversType findNearestAncestor(Type javaType) {
+        Class javaClass = extractClass(javaType);
         List<DistancePair> distances = new ArrayList<>();
 
         for (JaversType javersType : mappedTypes.values()) {
-            DistancePair distancePair = new DistancePair(calculateHierarchyDistance(javaClass, javersType.getBaseJavaClass()), javersType);
+            DistancePair distancePair = new DistancePair(javaClass, javersType);
+            // logger.info("distance from "+javersType + ": "+distancePair.distance);
 
             //this is due too spoiled Java Array reflection API
             if (javaClass.isArray()) {
@@ -240,21 +206,11 @@ public class TypeMapper {
 
         Collections.sort(distances);
 
+        if (distances.get(0).isMax()){
+            return null;
+        }
+
         return distances.get(0).javersType;
     }
 
-    private static class DistancePair implements Comparable<DistancePair> {
-        Integer distance;
-        JaversType javersType;
-
-        DistancePair(Integer distance, JaversType javersType) {
-            this.distance = distance;
-            this.javersType = javersType;
-        }
-
-        @Override
-        public int compareTo(DistancePair other) {
-            return distance.compareTo(other.distance);
-        }
-    }
 }
