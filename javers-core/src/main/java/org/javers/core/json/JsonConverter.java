@@ -18,7 +18,7 @@ import java.util.Collection;
  * <br/><br/>
  *
  * But sometimes Gson's default JSON representation isn't appropriate for your domain model.
- * This is often the case when dealing with Value Objects like Date or Money.
+ * This is often the case when dealing with Values like Date or Money.
  * <br/><br/>
  *
  * If so, you can easily customize Javers serialization/deserialization behaviour
@@ -34,7 +34,7 @@ import java.util.Collection;
  *     <li/> native Gson {@link JsonDeserializer}
  * </ul>
  *
- * Javers provides JsonTypeAdapter's for some well known Value Object like {@link LocalDateTime}.
+ * Javers provides JsonTypeAdapter's for some well known Value like {@link LocalDateTime}.
  * Those adapters are included by default in Javers setup, see {@link JsonConverterBuilder#BUILT_IN_ADAPTERS}
  * <br/>
  *
