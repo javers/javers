@@ -67,7 +67,7 @@ import org.javers.model.object.graph.ObjectGraphBuilder;
  * For example Value Objects are: Address, Point
  *
  * <h3>Value</h3>
- * JaVers {@link ValueType} is a simple value holder.
+ * JaVers {@link ValueType} is a simple (scalar) value holder.
  * Two Values are compared using equals() so
  * its highly important to implement it properly by comparing underlying state.
  * <p/>
