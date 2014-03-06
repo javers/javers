@@ -43,4 +43,9 @@ class DummyUserDetailsBuilder {
         dummyUserDetails.dummyAddress = new DummyAddress("street", "city")
         this
     }
+
+    DummyUserDetailsBuilder withAddresses(DummyAddress... dummyAddress) {
+        dummyUserDetails.addressList.addAll(dummyAddress)
+        this
+    }
 }
