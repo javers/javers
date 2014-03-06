@@ -301,4 +301,19 @@ abstract class ObjectGraphBuilderTest extends Specification {
         then:
         assertThat(node).hasNoEdges()
     }
+
+    def "should build graph with ValueObjects multi edge"() {
+        given:
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        DummyUserDetails dummyUserDetails = dummyUserDetails()
+                .withAddresses(new DummyAddress("warszawa", "mokotowska"))
+                .withAddresses(new DummyAddress("warszawa", "wolska"))
+                .build()
+
+        when:
+        ObjectNode node = graphBuilder.buildGraph(dummyUserDetails)
+
+        then:
+        assertThat(node).hasMultiEdge("addressList")
+    }
 }
