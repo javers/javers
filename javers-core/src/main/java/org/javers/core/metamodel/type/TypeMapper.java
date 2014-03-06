@@ -102,6 +102,14 @@ public class TypeMapper {
     }
 
     public boolean isCollectionOfEntityReferences(Property property){
+        return isCollectionOfType(property, EntityType.class);
+    }
+
+    public boolean isCollectionOfValueObjects(Property property) {
+        return isCollectionOfType(property, ValueObjectType.class);
+    }
+
+    private boolean isCollectionOfType(Property property, Class<? extends ManagedType> managedType) {
         JaversType javersType = getPropertyType(property);
         if (! (javersType instanceof CollectionType)) {
             return false;
@@ -114,7 +122,7 @@ public class TypeMapper {
 
         JaversType elementType = getJaversType(collectionType.getElementType());
 
-        return (elementType instanceof EntityType);
+        return managedType.isAssignableFrom(elementType.getClass());
     }
 
 
@@ -212,5 +220,4 @@ public class TypeMapper {
 
         return distances.get(0).getJaversType();
     }
-
 }

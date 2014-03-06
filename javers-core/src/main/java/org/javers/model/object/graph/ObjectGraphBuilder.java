@@ -101,6 +101,14 @@ public class ObjectGraphBuilder {
         });
     }
 
+    private List<Property> getCollectionsOfValueObjects(ManagedClass managedClass) {
+        return managedClass.getProperties(new Predicate<Property>() {
+            public boolean apply(Property property) {
+                return (typeMapper.isCollectionOfValueObjects(property));
+            }
+        });
+    }
+
     private void buildMultiEdges(ObjectWrapper node) {
         for (Property colProperty : getCollectionsOfEntityReferences(node.getManagedClass()))  {
             if (colProperty.isNull(node.unwrapCdo())) {
@@ -114,6 +122,21 @@ public class ObjectGraphBuilder {
             }
             MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences,
                                                   new OwnerContext(node, colProperty.getName()));
+            node.addEdge(multiEdge);
+        }
+
+        for (Property colProperty : getCollectionsOfValueObjects(node.getManagedClass()))  {
+            if (colProperty.isNull(node.unwrapCdo())) {
+                continue;
+            }
+
+            //looks like we have collection of Entity references
+            Collection collectionOfReferences = (Collection)colProperty.get(node.unwrapCdo());
+            if (collectionOfReferences.isEmpty()){
+                continue;
+            }
+            MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences,
+                    new OwnerContext(node, colProperty.getName()));
             node.addEdge(multiEdge);
         }
     }
