@@ -15,6 +15,7 @@ public class DummyUserDetails {
     private boolean isTrue;
     private DummyAddress dummyAddress;
     private List<DummyAddress> addressList = new ArrayList<>();
+    private List<Integer> integerList = new ArrayList<>();
 
     @Id
     public Long getId() {
@@ -55,5 +56,13 @@ public class DummyUserDetails {
 
     public void setAddressList(List<DummyAddress> addressList) {
         this.addressList = addressList;
+    }
+
+    public List<Integer> getIntegerList() {
+        return integerList;
+    }
+
+    public void setIntegerList(List<Integer> integerList) {
+        this.integerList = integerList;
     }
 }

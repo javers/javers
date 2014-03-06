@@ -1,9 +1,15 @@
 package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
+import org.javers.core.JaversTestBuilder
+import org.javers.core.metamodel.property.BeanBasedPropertyScanner
+import org.javers.core.metamodel.property.FieldBasedPropertyScanner
 import org.javers.core.metamodel.property.ManagedClassFactory
+import org.javers.core.metamodel.property.Property
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyUser
+import org.javers.core.model.DummyUserDetails
+import org.javers.test.builder.DummyUserBuilder
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -155,4 +161,59 @@ class TypeMapperTest extends Specification {
         hashSetWithIntJaversType.baseJavaType ==  new TypeToken<HashSet<Integer>>(){}.type
     }
 
+    def "should recognize Collection of Entity type"() {
+        given:
+        JaversTestBuilder javersTestBuilder = JaversTestBuilder.javersTestAssembly()
+        TypeMapper mapper = javersTestBuilder.typeMapper
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner()
+        List<Property> properties = scanner.scan(DummyUser)
+        Property property = properties.find {
+            it.name == "dummyUserDetailsList"
+        }
+
+        expect:
+        mapper.isCollectionOfEntityReferences(property)
+    }
+
+    def "should not recognize primitive type collection as collection of entity"() {
+        given:
+        JaversTestBuilder javersTestBuilder = JaversTestBuilder.javersTestAssembly()
+        TypeMapper mapper = javersTestBuilder.typeMapper
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner()
+        List<Property> properties = scanner.scan(DummyUser)
+        Property property = properties.find {
+            it.name == "integerList"
+        }
+
+        expect:
+        mapper.isCollectionOfEntityReferences(property) == false
+    }
+
+    def "should recognize Collection of ValueObject type"() {
+        given:
+        JaversTestBuilder javersTestBuilder = JaversTestBuilder.javersTestAssembly()
+        TypeMapper mapper = javersTestBuilder.typeMapper
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner()
+        List<Property> properties = scanner.scan(DummyUserDetails)
+        Property property = properties.find {
+            it.name == "addressList"
+        }
+
+        expect:
+        mapper.isCollectionOfValueObjects(property)
+    }
+
+    def "should not recognize primitive type collection as collection of ValueObject"() {
+        given:
+        JaversTestBuilder javersTestBuilder = JaversTestBuilder.javersTestAssembly()
+        TypeMapper mapper = javersTestBuilder.typeMapper
+        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner()
+        List<Property> properties = scanner.scan(DummyUserDetails)
+        Property property = properties.find {
+            it.name == "integerList"
+        }
+
+        expect:
+        mapper.isCollectionOfValueObjects(property) == false
+    }
 }
