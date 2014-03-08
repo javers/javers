@@ -35,7 +35,8 @@ import org.javers.model.object.graph.ObjectGraphBuilder;
  * should be compared property-by-property or using equals().
  *
  * <h2>Javers Types</h2>
- * We use <b>Entity</b> and <b>Value Objects</b> notions following Eric Evans DDD terminology.
+ * We use <b>Entity</b> and <b>Value Objects</b> notions following Eric Evans
+ * Domain Driven Design terminology.
  * Furthermore, we use <b>Values</b>, <b>Primitives</b> and <b>Containers</b>.
  * The last two types are internals and can't be mapped by user.
  * <p/>
