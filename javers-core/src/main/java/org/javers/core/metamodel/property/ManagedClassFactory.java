@@ -1,8 +1,8 @@
 package org.javers.core.metamodel.property;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

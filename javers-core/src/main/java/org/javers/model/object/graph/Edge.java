@@ -2,7 +2,7 @@ package org.javers.model.object.graph;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
-import org.javers.model.visitors.Visitable;
+import org.javers.common.patterns.visitors.Visitable;
 
 /**
  * Relation between (Entity) instances

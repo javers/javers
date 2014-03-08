@@ -1,6 +1,6 @@
 package org.javers.model.object.graph;
 
-import org.javers.model.visitors.Visitor;
+import org.javers.common.patterns.visitors.Visitor;
 import java.util.HashSet;
 import java.util.Set;
 

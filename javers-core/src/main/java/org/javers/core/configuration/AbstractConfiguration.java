@@ -1,7 +1,5 @@
 package org.javers.core.configuration;
 
-import org.javers.core.configuration.PropertyConfiguration;
-
 /**
  * @author bartosz walacik
  */

@@ -2,8 +2,7 @@ package org.javers.core.diff;
 
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.model.visitors.ChangeVisitor;
-import org.javers.model.visitors.Visitable;
+import org.javers.common.patterns.visitors.Visitable;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.conditionFulfilled;

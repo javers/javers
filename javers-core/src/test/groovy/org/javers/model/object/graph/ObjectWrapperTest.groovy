@@ -1,7 +1,7 @@
 package org.javers.model.object.graph
 
-import org.javers.core.exceptions.JaversException
-import org.javers.core.exceptions.JaversExceptionCode
+import org.javers.common.exception.exceptions.JaversException
+import org.javers.common.exception.exceptions.JaversExceptionCode
 import org.javers.core.metamodel.property.Entity
 import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.model.DummyUser

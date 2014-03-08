@@ -1,7 +1,7 @@
 package org.javers.common.reflection;
 
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
 
 import javax.persistence.Transient;
 import java.lang.reflect.*;

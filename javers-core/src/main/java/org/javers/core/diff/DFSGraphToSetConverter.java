@@ -1,10 +1,7 @@
 package org.javers.core.diff;
 
 import org.javers.model.object.graph.*;
-import org.javers.model.visitors.Visitable;
-import org.javers.model.visitors.Visitor;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**

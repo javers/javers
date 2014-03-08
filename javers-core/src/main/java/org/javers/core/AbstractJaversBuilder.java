@@ -1,8 +1,8 @@
 package org.javers.core;
 
 import org.javers.common.pico.JaversModule;
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.pico.JaversContainerFactory;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoContainer;

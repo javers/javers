@@ -1,8 +1,8 @@
 package org.javers.core.configuration;
 
 import java.util.Properties;
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.pico.PropertiesUtil;
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.properties.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
