@@ -10,22 +10,22 @@ import java.math.BigDecimal;
  */
 public class DummyUserWithValues {
     @Id
-    private String name;
+    private final String name;
 
     private BigDecimal    salary;
     private LocalDateTime dob;
 
-    public DummyUserWithValues(String name) {
+    private DummyUserWithValues(String name) {
         this.name = name;
         this.dob = new LocalDateTime();
     }
 
-    public DummyUserWithValues(String name, LocalDateTime dob) {
+    private DummyUserWithValues(String name, LocalDateTime dob) {
         this.name = name;
         this.dob = dob;
     }
 
-    public DummyUserWithValues(String name, BigDecimal salary) {
+    private DummyUserWithValues(String name, BigDecimal salary) {
         this.name = name;
         this.salary = salary;
     }

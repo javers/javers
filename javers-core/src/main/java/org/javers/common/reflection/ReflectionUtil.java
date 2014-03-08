@@ -58,11 +58,9 @@ public class ReflectionUtil {
             return false;
         }
 
-        return (
-                m.isAnnotationPresent(Transient.class) == false &&
-                Modifier.isAbstract(m.getModifiers()) == false &&
-                Modifier.isNative(m.getModifiers()) == false
-                );
+        return  !m.isAnnotationPresent(Transient.class) &&
+                !Modifier.isAbstract(m.getModifiers())  &&
+                !Modifier.isNative(m.getModifiers()) ;
     }
 
     public static boolean isGetter(Method m) {

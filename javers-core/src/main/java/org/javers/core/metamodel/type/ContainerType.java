@@ -7,9 +7,9 @@ import java.lang.reflect.Type;
  *
  * @author bartosz walacik
  */
-public abstract class ContainerType extends JaversType {
+abstract class ContainerType extends JaversType {
 
-    protected ContainerType(Type baseJavaType) {
+    ContainerType(Type baseJavaType) {
         super(baseJavaType);
     }
 

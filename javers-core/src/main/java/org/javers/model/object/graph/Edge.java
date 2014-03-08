@@ -12,9 +12,9 @@ import org.javers.common.patterns.visitors.Visitable;
  * @author bartosz walacik
  */
 public abstract class Edge implements Visitable<GraphVisitor> {
-    protected final Property property;
+    private final Property property;
 
-    protected Edge(Property property) {
+    Edge(Property property) {
         Validate.argumentIsNotNull(property);
         this.property = property;
     }

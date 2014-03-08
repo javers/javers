@@ -35,7 +35,7 @@ public enum  JaversExceptionCode {
 
     PROPERTY_NOT_FOUND(BOOTSTRAP_ERROR +"property '%s' not found in class '%s'");
 
-    private String message;
+    private final String message;
 
     private JaversExceptionCode(String message) {
         this.message = message;

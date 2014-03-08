@@ -27,7 +27,7 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
 
     private static final Logger logger = LoggerFactory.getLogger(SetChangeAppender.class);
 
-    private TypeMapper typeMapper;
+    private final TypeMapper typeMapper;
 
     public SetChangeAppender(TypeMapper typeMapper) {
         this.typeMapper = typeMapper;

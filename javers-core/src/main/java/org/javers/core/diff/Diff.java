@@ -114,7 +114,7 @@ public class Diff implements Visitable<ChangeVisitor>{
      * @return id == 0
      * @see #getId()
      */
-    public boolean isNew() {
+    private boolean isNew() {
         return id == 0;
     }
 
@@ -123,9 +123,8 @@ public class Diff implements Visitable<ChangeVisitor>{
         change.setAffectedCdo(affectedCdo);
     }
 
-    public void addChange(Change change) {
+    private void addChange(Change change) {
         changes.add(change);
-        //change.bind(this);
     }
 
     public boolean hasChanges() {

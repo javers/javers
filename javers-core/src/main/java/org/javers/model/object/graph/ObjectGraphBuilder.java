@@ -171,8 +171,8 @@ public class ObjectGraphBuilder {
     }
 
     private class OwnerContext {
-        ObjectWrapper owner;
-        String path;
+        final ObjectWrapper owner;
+        final String path;
 
         OwnerContext(ObjectWrapper owner, String path) {
             this.owner = owner;

@@ -42,12 +42,12 @@ public class Entity extends ManagedClass {
      * @throws JaversException ENTITY_WITHOUT_ID
      */
     private Property findDefaultIdProperty() {
-        for (Property p : properties) {
+        for (Property p : getProperties()) {
             if (p.looksLikeId()) {
                 return p;
             }
         }
-        throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID, sourceClass.getName());
+        throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID, getName());
     }
 
     /**
@@ -60,14 +60,14 @@ public class Entity extends ManagedClass {
         Validate.argumentIsNotNull(instance);
 
         if (!getSourceClass().isInstance(instance)) {
-            throw new JaversException(JaversExceptionCode.NOT_INSTANCE_OF, sourceClass.getName(), instance.getClass().getName());
+            throw new JaversException(JaversExceptionCode.NOT_INSTANCE_OF, getName(), instance.getClass().getName());
         }
         Validate.argumentCheck(getSourceClass().isInstance(instance),
                                "expected instance of "+getSourceClass().getName()+", got instance of "+ instance.getClass().getName());
 
         Object cdoId = getIdProperty().get(instance);
         if (cdoId == null) {
-            throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, sourceClass.getName());
+            throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, getName());
         }
         return cdoId;
     }

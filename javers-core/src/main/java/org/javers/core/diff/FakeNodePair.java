@@ -10,7 +10,7 @@ import java.util.List;
 
 public class FakeNodePair implements NodePair {
 
-    private ObjectNode right;
+    private final ObjectNode right;
 
     public FakeNodePair(ObjectNode right) {
         this.right = right;

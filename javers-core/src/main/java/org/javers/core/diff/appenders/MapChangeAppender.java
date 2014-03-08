@@ -23,7 +23,7 @@ import static org.javers.common.collections.Objects.nullSafeEquals;
 public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
     private static final Logger logger = LoggerFactory.getLogger(MapChangeAppender.class);
 
-    private TypeMapper typeMapper;
+    private final TypeMapper typeMapper;
 
     public MapChangeAppender(TypeMapper typeMapper) {
         this.typeMapper = typeMapper;
@@ -68,7 +68,7 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
     /**
      * @return never returns null
      */
-    protected List<EntryChange> calculateEntryChanges(Map leftMap, Map rightMap) {
+    List<EntryChange> calculateEntryChanges(Map leftMap, Map rightMap) {
         if (nullSafeEquals(leftMap, rightMap)) {
             return Collections.EMPTY_LIST;
         }

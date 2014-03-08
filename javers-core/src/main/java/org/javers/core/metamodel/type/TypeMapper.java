@@ -21,8 +21,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class TypeMapper {
     private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
 
-    private TypeFactory typeFactory;
-    private Map<Type, JaversType> mappedTypes;
+    private final TypeFactory typeFactory;
+    private final Map<Type, JaversType> mappedTypes;
 
     public TypeMapper(TypeFactory typeFactory) {
         this.typeFactory = typeFactory;
@@ -118,7 +118,7 @@ public class TypeMapper {
     }
 
 
-    public void registerPrimitiveType(Class<?> primitiveClass) {
+    private void registerPrimitiveType(Class<?> primitiveClass) {
         addType(new PrimitiveType(primitiveClass));
     }
 
@@ -197,8 +197,8 @@ public class TypeMapper {
             }
 
             //just to better speed
-            if (distancePair.distance == 1) {
-                return distancePair.javersType;
+            if (distancePair.getDistance() == 1) {
+                return distancePair.getJaversType();
             }
 
             distances.add(distancePair);
@@ -210,7 +210,7 @@ public class TypeMapper {
             return null;
         }
 
-        return distances.get(0).javersType;
+        return distances.get(0).getJaversType();
     }
 
 }

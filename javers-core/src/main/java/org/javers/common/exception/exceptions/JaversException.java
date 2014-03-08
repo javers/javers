@@ -10,7 +10,7 @@ public class JaversException extends RuntimeException {
     public static final String BOOTSTRAP_ERROR = "JaVers bootstrap error - ";
     public static final String RUNTIME_ERROR = "JaVers runtime error - ";
 
-    private JaversExceptionCode code;
+    private final JaversExceptionCode code;
 
     public JaversException(JaversExceptionCode code, Object... arguments) {
         super(code.name() + " " + String.format(code.getMessage(), arguments));

@@ -13,7 +13,7 @@ public abstract  class EntryAddOrRemove extends EntryChange {
 
     private final Value value;
 
-    protected EntryAddOrRemove(Object key, Object value) {
+    EntryAddOrRemove(Object key, Object value) {
         argumentIsNotNull(key);
 
         this.key = new Value(key);

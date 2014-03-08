@@ -3,7 +3,7 @@ package org.javers.core.model;
 /**
  * @author pawel szymczyk
  */
-public abstract class AbstractDummyAddress {
+abstract class AbstractDummyAddress {
 
     private int inheritedInt;
 

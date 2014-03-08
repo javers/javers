@@ -18,7 +18,7 @@ public class GraphPair {
     private final Set<ObjectNode> onlyOnLeft;
     private final Set<ObjectNode> onlyOnRight;
 
-    private DFSGraphToSetConverter graphToSetConverter = new DFSGraphToSetConverter();
+    private final DFSGraphToSetConverter graphToSetConverter = new DFSGraphToSetConverter();
 
     public GraphPair(ObjectNode leftRoot, ObjectNode rightRoot) {
         this.leftNodeSet =  flatten(leftRoot);

@@ -9,10 +9,10 @@ import java.lang.reflect.Type;
 /**
  * @author bartosz walacik
  */
-public abstract class ManagedType extends JaversType {
+abstract class ManagedType extends JaversType {
     private final ManagedClass managedClass;
 
-    protected ManagedType(ManagedClass managedClass) {
+    ManagedType(ManagedClass managedClass) {
         super(managedClass.getSourceClass());
         Validate.argumentIsNotNull(managedClass);
         this.managedClass = managedClass;

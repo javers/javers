@@ -10,7 +10,7 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public class CollectNodesVisitor extends GraphVisitor {
-    private Set<ObjectNode> nodes = new HashSet<>();
+    private final Set<ObjectNode> nodes = new HashSet<>();
 
     @Override
     public void visitOnce(ObjectNode node) {

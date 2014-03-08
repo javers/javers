@@ -3,15 +3,15 @@ package org.javers.core;
 import com.google.gson.TypeAdapter;
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
-import org.javers.core.configuration.JaversCoreConfiguration;
 import org.javers.core.diff.changetype.Value;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.property.*;
-import org.javers.core.pico.CoreJaversModule;
-import org.javers.core.pico.ManagedClassFactoryModule;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
+import org.javers.core.pico.CoreJaversModule;
+import org.javers.core.pico.ManagedClassFactoryModule;
+import org.picocontainer.PicoContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +34,7 @@ import java.util.Set;
 public class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
-    private Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
-    private List<JaversModule> externalModules = new ArrayList<>();
+    private final Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
 
     private JaversBuilder() {
         logger.debug("starting up javers ...");
@@ -96,6 +95,11 @@ public class JaversBuilder extends AbstractJaversBuilder {
             registerValueObject(clazz);
         }
         return this;
+    }
+
+    @Override
+    PicoContainer bootContainer(JaversModule module, Object... beans) {
+        return super.bootContainer(module, beans);
     }
 
     /**
@@ -184,7 +188,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private void bootManagedClasses() {
-        addModule(new ManagedClassFactoryModule(coreConfiguration()));
+        addModule(new ManagedClassFactoryModule( coreConfiguration()) );
         mapRegisteredClasses();
     }
 

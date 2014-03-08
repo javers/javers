@@ -6,7 +6,7 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class DummyParameterEntry {
-    private Map<String, Object> levels;
+    private final Map<String, Object> levels;
 
     public DummyParameterEntry(Map<String, Object> levels) {
         this.levels = levels;

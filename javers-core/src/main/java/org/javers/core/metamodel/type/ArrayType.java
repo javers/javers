@@ -6,7 +6,7 @@ import java.lang.reflect.Type;
  * @author bartosz walacik
  */
 public class ArrayType extends ContainerType {
-    private transient Class elementType;
+    private final transient Class elementType;
 
     public ArrayType(Type baseJavaType) {
         super(baseJavaType);

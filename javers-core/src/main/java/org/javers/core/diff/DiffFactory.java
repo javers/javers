@@ -16,11 +16,10 @@ import org.javers.model.object.graph.ObjectNode;
  */
 public class DiffFactory {
 
-    private NodeMatcher nodeMatcher;
-    private DFSGraphToSetConverter graphToSetConverter;
-    private TypeMapper typeMapper;
-    private List<NodeChangeAppender> nodeChangeAppenders;
-    private List<PropertyChangeAppender> propertyChangeAppender;
+    private final NodeMatcher nodeMatcher;
+    private final TypeMapper typeMapper;
+    private final List<NodeChangeAppender> nodeChangeAppenders;
+    private final List<PropertyChangeAppender> propertyChangeAppender;
 
     public DiffFactory(List<NodeChangeAppender> nodeChangeAppenders,
                        List<PropertyChangeAppender> propertyChangeAppender,

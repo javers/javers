@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class ManagedClassFactory {
     private static final Logger logger = LoggerFactory.getLogger(ManagedClassFactory.class);
-    private PropertyScanner propertyScanner;
+    private final PropertyScanner propertyScanner;
 
     public ManagedClassFactory(PropertyScanner propertyScanner) {
         Validate.argumentIsNotNull(propertyScanner);

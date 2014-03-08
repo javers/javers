@@ -18,7 +18,7 @@ public class BeanProperty implements Property {
     private transient final Method getter;
     private final String name;
 
-    protected BeanProperty(Method getter) {
+    BeanProperty(Method getter) {
         argumentIsNotNull(getter, "getter should not be null!");
 
         this.getter = getter;

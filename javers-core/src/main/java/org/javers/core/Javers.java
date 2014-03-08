@@ -18,11 +18,11 @@ import org.javers.model.object.graph.ObjectGraphBuilder;
  * @author bartosz walacik
  */
 public class Javers {
-    private DiffFactory diffFactory;
+    private final DiffFactory diffFactory;
 
-    private TypeMapper typeMapper;
+    private final TypeMapper typeMapper;
 
-    private JsonConverter jsonConverter;
+    private final JsonConverter jsonConverter;
 
     /**
      * JaVers instance should be constructed by {@link JaversBuilder}

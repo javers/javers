@@ -26,7 +26,7 @@ public abstract class JaversType {
     /**
      * @param baseJavaType Class or ParametrizedType
      */
-    protected JaversType(Type baseJavaType) {
+    JaversType(Type baseJavaType) {
         Validate .argumentIsNotNull(baseJavaType);
 
         this.baseJavaType = baseJavaType;
@@ -40,7 +40,7 @@ public abstract class JaversType {
     /**
      * delegates to proper constructor {@link #JaversType(java.lang.reflect.Type)}
      */
-    protected JaversType spawn(Type baseJavaType) {
+    JaversType spawn(Type baseJavaType) {
             try {
                 Constructor c = this.getClass().getConstructor(new Class<?>[]{Type.class});
                 return (JaversType)c.newInstance(new Object[]{baseJavaType});
@@ -66,7 +66,7 @@ public abstract class JaversType {
      *
      * @return Immutable List, never returns null
      */
-    protected List<Class> getActualClassTypeArguments() {
+    List<Class> getActualClassTypeArguments() {
         return actualClassTypeArguments;
     }
 

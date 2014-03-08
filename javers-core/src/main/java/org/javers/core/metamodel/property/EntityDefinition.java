@@ -25,12 +25,8 @@ public class EntityDefinition  extends ManagedClassDefinition {
         this.idPropertyName = idPropertyName;
     }
 
-    public boolean hasDefaultIdSelectionPolicy() {
-        return idPropertyName == null;
-    }
-
     public boolean hasCustomId() {
-        return !hasDefaultIdSelectionPolicy();
+        return idPropertyName != null;
     }
 
     public String getIdPropertyName() {

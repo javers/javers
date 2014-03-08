@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public abstract class AbstractJaversBuilder {
+abstract class AbstractJaversBuilder {
 
     private MutablePicoContainer container;
 
@@ -28,18 +28,18 @@ public abstract class AbstractJaversBuilder {
         }
     }
 
-    protected void checkIfBuilt() {
+    void checkIfBuilt() {
         if (!isBuilt()) {
             throw new JaversException(JaversExceptionCode.CONTAINER_NOT_READY);
         }
     }
 
-    protected boolean isBuilt() {
+    boolean isBuilt() {
         return container != null;
     }
 
 
-    protected PicoContainer bootContainer(JaversModule module, Object... beans) {
+    PicoContainer bootContainer(JaversModule module, Object... beans) {
         return bootContainer(module, Arrays.asList(beans));
     }
 
@@ -49,12 +49,12 @@ public abstract class AbstractJaversBuilder {
         return container;
     }
 
-    protected void addComponent(Object classOrInstance) {
+    void addComponent(Object classOrInstance) {
         checkIfBuilt();
         JaversContainerFactory.addComponent(container, classOrInstance);
     }
 
-    protected void addModule(JaversModule module) {
+    void addModule(JaversModule module) {
         checkIfBuilt();
         JaversContainerFactory.addModule(container, module);
     }
