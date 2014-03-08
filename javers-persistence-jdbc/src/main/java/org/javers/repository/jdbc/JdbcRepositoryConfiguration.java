@@ -1,7 +1,8 @@
 package org.javers.repository.jdbc;
 
+import org.javers.common.properties.AbstractConfiguration;
+import org.javers.common.properties.PropertyConfiguration;
 import org.javers.common.validation.Validate;
-import org.javers.core.configuration.AbstractConfiguration;
 import org.polyjdbc.core.dialect.Dialect;
 
 import javax.sql.DataSource;
@@ -23,7 +24,8 @@ public class JdbcRepositoryConfiguration extends AbstractConfiguration {
     private String password;
 
     public JdbcRepositoryConfiguration() {
-        readProperties("jdbc-default.properties");
+        super(new PropertyConfiguration("jdbc-default.properties"));
+        assemble();
     }
 
     public void withDialect(DialectName dialect) {
@@ -103,6 +105,4 @@ public class JdbcRepositoryConfiguration extends AbstractConfiguration {
             password = getStringProperty(PASSWORD_PROPERTY);
         }
     }
-
-
 }
