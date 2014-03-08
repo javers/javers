@@ -1,11 +1,9 @@
-package org.javers.core.pico;
+package org.javers.common.properties;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.MappingStyle;
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.common.exception.exceptions.JaversException;
 
-import static org.javers.core.exceptions.JaversExceptionCode.*;
+import static org.javers.common.exception.exceptions.JaversExceptionCode.*;
 
 import java.io.IOException;
 import java.io.InputStream;

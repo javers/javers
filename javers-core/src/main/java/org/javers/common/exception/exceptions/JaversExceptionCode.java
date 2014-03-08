@@ -1,8 +1,7 @@
-package org.javers.core.exceptions;
+package org.javers.common.exception.exceptions;
 
-import org.javers.core.JaversBuilder;
-
-import static org.javers.core.exceptions.JaversException.*;
+import static org.javers.common.exception.exceptions.JaversException.BOOTSTRAP_ERROR;
+import static org.javers.common.exception.exceptions.JaversException.RUNTIME_ERROR;
 
 /**
  * Enums with all Javers errors codes

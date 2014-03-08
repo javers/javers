@@ -1,4 +1,4 @@
-package org.javers.model.visitors;
+package org.javers.common.patterns.visitors;
 
 public interface Visitable<VISITOR> {
 
