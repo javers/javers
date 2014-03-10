@@ -2,7 +2,6 @@ package org.javers.core;
 
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.property.Entity;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.ValueObject;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -22,8 +21,8 @@ import org.javers.model.object.graph.ObjectGraphBuilder;
  * Mapping is also a case in JaVers but don't worry:
  * <ul>
  *     <li/>It's far more simple than JPA
- *     <li/>Javers uses reasonable defaults and take advantage of type inferring algorithm
- *          so for a quick start just let it do the mapping for You.
+ *     <li/>Javers uses reasonable defaults and take advantage of type inferring algorithm.
+ *          So for a quick start just let it do the mapping for You.
  *          Later on, it would be advisable to refine it to optimize diff semantics
  *     <li/>We believe that domain model classes should be framework agnostic,
  *          so we do not ask You to embrace another annotation set
@@ -36,7 +35,7 @@ import org.javers.model.object.graph.ObjectGraphBuilder;
  *
  * <h2>Javers Types</h2>
  * We use <b>Entity</b> and <b>Value Objects</b> notions following Eric Evans
- * Domain Driven Design terminology.
+ * Domain Driven Design terminology (DDD).
  * Furthermore, we use <b>Values</b>, <b>Primitives</b> and <b>Containers</b>.
  * The last two types are internals and can't be mapped by user.
  * <p/>
