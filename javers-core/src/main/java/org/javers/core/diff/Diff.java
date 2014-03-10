@@ -1,11 +1,12 @@
 package org.javers.core.diff;
 
-import org.javers.core.json.JsonConverter;
-import org.javers.model.visitors.ChangeVisitor;
-import org.javers.model.visitors.Visitable;
+import org.javers.common.patterns.visitors.Visitable;
 import org.joda.time.LocalDateTime;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import static org.javers.common.validation.Validate.*;
 
@@ -40,7 +41,7 @@ import static org.javers.common.validation.Validate.*;
  *    <li/>Essentially, object-oriented data are persisted as JSON.
  * </ul>
  *
- * @see JsonConverter
+ * @see org.javers.core.json.JsonConverter
  *
  * @author bartosz walacik
  */
@@ -113,7 +114,7 @@ public class Diff implements Visitable<ChangeVisitor>{
      * @return id == 0
      * @see #getId()
      */
-    public boolean isNew() {
+    private boolean isNew() {
         return id == 0;
     }
 
@@ -122,9 +123,8 @@ public class Diff implements Visitable<ChangeVisitor>{
         change.setAffectedCdo(affectedCdo);
     }
 
-    public void addChange(Change change) {
+    private void addChange(Change change) {
         changes.add(change);
-        //change.bind(this);
     }
 
     public boolean hasChanges() {

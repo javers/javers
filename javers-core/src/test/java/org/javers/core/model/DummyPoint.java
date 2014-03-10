@@ -8,8 +8,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class DummyPoint {
 
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
 
     public DummyPoint(int x, int y) {
         this.x = x;
@@ -18,11 +18,19 @@ public class DummyPoint {
 
     @Override
     public boolean equals(Object o) {
-        return EqualsBuilder.reflectionEquals(this, o);
+        return o instanceof DummyPoint && EqualsBuilder.reflectionEquals(this, o);
     }
 
     @Override
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    int getX() {
+        return x;
+    }
+
+    int getY() {
+        return y;
     }
 }

@@ -44,7 +44,7 @@ public class JsonConverter {
     public static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     private Gson gson;
-    private GsonBuilder gsonBuilder;
+    private final GsonBuilder gsonBuilder;
 
     JsonConverter() {
         gsonBuilder = new GsonBuilder();

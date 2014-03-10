@@ -1,7 +1,8 @@
-package org.javers.core.configuration;
+package org.javers.core;
 
+import org.javers.common.properties.AbstractConfiguration;
+import org.javers.common.properties.PropertyConfiguration;
 import org.javers.common.validation.Validate;
-import org.javers.core.MappingStyle;
 
 /**
  * @author bartosz walacik
@@ -16,7 +17,7 @@ public class JaversCoreConfiguration extends AbstractConfiguration {
      * loads javers-default.properties
      */
     public JaversCoreConfiguration() {
-        propertyConfiguration = new PropertyConfiguration("javers-default.properties");
+        super(new PropertyConfiguration("javers-default.properties"));
         assemble();
     }
 

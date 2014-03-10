@@ -10,7 +10,7 @@ import org.javers.core.json.JsonTypeAdapter;
  */
 public class ValueTypeAdapter implements JsonTypeAdapter<Value> {
 
-    private boolean typeSafety;
+    private final boolean typeSafety;
 
     public ValueTypeAdapter(boolean typeSafety) {
         this.typeSafety = typeSafety;

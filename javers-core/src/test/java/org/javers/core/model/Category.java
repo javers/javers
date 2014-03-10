@@ -13,11 +13,15 @@ public class Category {
     private Long id;
     private String name;
     private Category parent;
-    private List<Category> categories = new ArrayList<>();
+    private final List<Category> categories = new ArrayList<>();
 
     public Category(Long id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public Category getParent() {
+        return parent;
     }
 
     public Long getId() {

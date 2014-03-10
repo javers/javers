@@ -1,7 +1,7 @@
 package org.javers.common.reflection;
 
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
 
 import javax.persistence.Transient;
 import java.lang.reflect.*;
@@ -58,11 +58,9 @@ public class ReflectionUtil {
             return false;
         }
 
-        return (
-                m.isAnnotationPresent(Transient.class) == false &&
-                Modifier.isAbstract(m.getModifiers()) == false &&
-                Modifier.isNative(m.getModifiers()) == false
-                );
+        return  !m.isAnnotationPresent(Transient.class) &&
+                !Modifier.isAbstract(m.getModifiers())  &&
+                !Modifier.isNative(m.getModifiers()) ;
     }
 
     public static boolean isGetter(Method m) {

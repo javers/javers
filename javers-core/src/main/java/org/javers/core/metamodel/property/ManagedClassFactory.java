@@ -1,8 +1,8 @@
 package org.javers.core.metamodel.property;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.exceptions.JaversExceptionCode;
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class ManagedClassFactory {
     private static final Logger logger = LoggerFactory.getLogger(ManagedClassFactory.class);
-    private PropertyScanner propertyScanner;
+    private final PropertyScanner propertyScanner;
 
     public ManagedClassFactory(PropertyScanner propertyScanner) {
         Validate.argumentIsNotNull(propertyScanner);

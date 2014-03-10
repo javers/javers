@@ -11,7 +11,7 @@ import static org.javers.common.reflection.ReflectionUtil.extractClass;
  * @author bartosz walacik
  */
 public class TypeFactory {
-    private ManagedClassFactory managedClassFactory;
+    private final ManagedClassFactory managedClassFactory;
 
     public TypeFactory(ManagedClassFactory managedClassFactory) {
         this.managedClassFactory = managedClassFactory;

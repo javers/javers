@@ -1,8 +1,7 @@
-package org.javers.core.configuration;
+package org.javers.common.properties;
 
 import java.util.Properties;
-import org.javers.core.exceptions.JaversException;
-import org.javers.core.pico.PropertiesUtil;
+import org.javers.common.exception.exceptions.JaversException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +15,6 @@ public class PropertyConfiguration {
      * raw String properties bag, loaded from configuration file
      */
     private final Properties properties;
-
-    /**
-     * Empty Configuration
-     */
-    public PropertyConfiguration() {
-        properties = new Properties();
-    }
 
     /**
      * loads a properties file from classpath

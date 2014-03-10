@@ -9,8 +9,8 @@ public class DummyNetworkAddress {
 
     private enum Version {
         IPv4,
-        IPv6;
-    };
+        IPv6
+    }
 
     private String addres;
     private Version version;

@@ -6,12 +6,10 @@ import static org.javers.common.reflection.ReflectionUtil.calculateHierarchyDist
 * @author bartosz walacik
 */
 class DistancePair implements Comparable<DistancePair> {
-    Integer distance;
-    JaversType javersType;
-    Class javaClass;
+    private final Integer distance;
+    private final JaversType javersType;
 
     DistancePair(Class javaClass, JaversType javersType) {
-        this.javaClass = javaClass;
         this.javersType = javersType;
         distance = calculateHierarchyDistance(javaClass, javersType.getBaseJavaClass());
     }
@@ -21,7 +19,15 @@ class DistancePair implements Comparable<DistancePair> {
         return distance.compareTo(other.distance);
     }
 
+    Integer getDistance() {
+        return distance;
+    }
+
     boolean isMax() {
         return distance == Integer.MAX_VALUE;
+    }
+
+    JaversType getJaversType() {
+        return javersType;
     }
 }

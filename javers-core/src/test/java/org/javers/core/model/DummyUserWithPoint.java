@@ -4,13 +4,9 @@ package org.javers.core.model;
  * @author bartosz walacik
  */
 public class DummyUserWithPoint {
-    private DummyPoint point;
+    private final DummyPoint point;
 
-    public DummyUserWithPoint(DummyPoint point) {
-        this.point = point;
-    }
-
-    public DummyUserWithPoint(int x, int y) {
+    private DummyUserWithPoint(int x, int y) {
         this.point = new DummyPoint(x,y);
     }
 
@@ -18,7 +14,7 @@ public class DummyUserWithPoint {
         return new DummyUserWithPoint(x,y);
     }
 
-    public DummyPoint getPoint() {
+    DummyPoint getPoint() {
         return point;
     }
 }

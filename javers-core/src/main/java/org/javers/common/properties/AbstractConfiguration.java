@@ -1,12 +1,14 @@
-package org.javers.core.configuration;
-
-import org.javers.core.configuration.PropertyConfiguration;
+package org.javers.common.properties;
 
 /**
  * @author bartosz walacik
  */
 public abstract class AbstractConfiguration {
-    protected PropertyConfiguration propertyConfiguration;
+    private PropertyConfiguration propertyConfiguration;
+
+    public AbstractConfiguration(PropertyConfiguration propertyConfiguration) {
+        this.propertyConfiguration = propertyConfiguration;
+    }
 
     public void readProperties(String classpathName) {
         propertyConfiguration = new PropertyConfiguration(classpathName);

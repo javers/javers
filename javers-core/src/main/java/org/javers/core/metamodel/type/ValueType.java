@@ -1,7 +1,5 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.core.json.JsonConverter;
-import org.javers.core.json.JsonTypeAdapter;
 import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;
@@ -21,9 +19,9 @@ import java.math.BigDecimal;
  * <p/>
  *
  * Values are serialized to JSON using Gson defaults,
- * if it's not what you need, implement {@link JsonTypeAdapter} for custom serialization
+ * if it's not what you need, implement {@link org.javers.core.json.JsonTypeAdapter} for custom serialization
  *
- * @see JsonConverter
+ * @see org.javers.core.json.JsonConverter
  *
  * @author bartosz walacik
  */

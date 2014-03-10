@@ -23,7 +23,7 @@ public class JsonConverterBuilder {
 
     private boolean typeSafeValues = false;
 
-    private JsonConverter jsonConverter;
+    private final JsonConverter jsonConverter;
 
     /**
      * choose between new JsonConverterBuilder() or static jsonConverter()

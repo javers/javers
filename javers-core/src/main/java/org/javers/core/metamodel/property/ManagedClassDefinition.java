@@ -8,7 +8,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public abstract class ManagedClassDefinition {
     private final Class<?> clazz;
 
-    public ManagedClassDefinition(Class<?> clazz) {
+    ManagedClassDefinition(Class<?> clazz) {
         argumentIsNotNull(clazz);
         this.clazz = clazz;
     }

@@ -18,13 +18,15 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  */
 public abstract class ManagedClass {
 
-    protected final Class sourceClass;
-    protected final List<Property> properties;
+    private final Class sourceClass;
+    private final List<Property> properties;
+    private final List<Property> propertiesUnmodifiable;
 
-    public ManagedClass(Class sourceClass, List<Property> properties) {
+    ManagedClass(Class sourceClass, List<Property> properties) {
         argumentsAreNotNull(sourceClass, properties);
         this.sourceClass = sourceClass;
         this.properties = new ArrayList<>(properties);
+        this.propertiesUnmodifiable = Collections.unmodifiableList(properties);
     }
 
     public boolean isInstance(Object cdo) {
@@ -67,7 +69,7 @@ public abstract class ManagedClass {
     }
 
     public List<Property> getProperties() {
-        return Collections.unmodifiableList(properties);
+        return propertiesUnmodifiable;
     }
 
     public List<Property> getProperties(Predicate<Property> query) {

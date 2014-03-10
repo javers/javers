@@ -1,8 +1,7 @@
-package org.javers.core.exceptions;
+package org.javers.common.exception.exceptions;
 
-import org.javers.core.JaversBuilder;
-
-import static org.javers.core.exceptions.JaversException.*;
+import static org.javers.common.exception.exceptions.JaversException.BOOTSTRAP_ERROR;
+import static org.javers.common.exception.exceptions.JaversException.RUNTIME_ERROR;
 
 /**
  * Enums with all Javers errors codes
@@ -36,7 +35,7 @@ public enum  JaversExceptionCode {
 
     PROPERTY_NOT_FOUND(BOOTSTRAP_ERROR +"property '%s' not found in class '%s'");
 
-    private String message;
+    private final String message;
 
     private JaversExceptionCode(String message) {
         this.message = message;
