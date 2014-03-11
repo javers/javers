@@ -48,10 +48,11 @@ JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 
 ## Project team
 * Bartosz Walacik - owner, commiter
-* Pawel Cierpiatka - committer,
-* Paweł Szymczyk - committer.
+* Paweł Szymczyk - committer
+* Michał Szostakowski - committer
 
 ### Former commiters
+* Pawel Cierpiatka - committer,
 * Piotr Betkier
 * Maciej Zasada
 
