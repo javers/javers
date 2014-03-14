@@ -12,7 +12,6 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityManager;
 import java.util.*;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -93,50 +92,27 @@ public class ObjectGraphBuilder {
         });
     }
 
-    private List<Property> getCollectionsOfEntityReferences(ManagedClass managedClass) {
+    private List<Property> getCollectionsOfManagedClasses(ManagedClass managedClass) {
         return managedClass.getProperties(new Predicate<Property>() {
             public boolean apply(Property property) {
-                return (typeMapper.isCollectionOfEntityReferences(property));
-            }
-        });
-    }
-
-    private List<Property> getCollectionsOfValueObjects(ManagedClass managedClass) {
-        return managedClass.getProperties(new Predicate<Property>() {
-            public boolean apply(Property property) {
-                return (typeMapper.isCollectionOfValueObjects(property));
+                return (typeMapper.isCollectionOfManagedClasses(property));
             }
         });
     }
 
     private void buildMultiEdges(ObjectWrapper node) {
-        for (Property colProperty : getCollectionsOfEntityReferences(node.getManagedClass()))  {
+        for (Property colProperty : getCollectionsOfManagedClasses(node.getManagedClass()))  {
             if (colProperty.isNull(node.unwrapCdo())) {
                 continue;
             }
 
-            //looks like we have collection of Entity references
+            //looks like we have collection of Entity references or Value Objects
             Collection collectionOfReferences = (Collection)colProperty.get(node.unwrapCdo());
             if (collectionOfReferences.isEmpty()){
                 continue;
             }
             MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences,
                                                   new OwnerContext(node, colProperty.getName()));
-            node.addEdge(multiEdge);
-        }
-
-        for (Property colProperty : getCollectionsOfValueObjects(node.getManagedClass()))  {
-            if (colProperty.isNull(node.unwrapCdo())) {
-                continue;
-            }
-
-            //looks like we have collection of Entity references
-            Collection collectionOfReferences = (Collection)colProperty.get(node.unwrapCdo());
-            if (collectionOfReferences.isEmpty()){
-                continue;
-            }
-            MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences,
-                    new OwnerContext(node, colProperty.getName()));
             node.addEdge(multiEdge);
         }
     }

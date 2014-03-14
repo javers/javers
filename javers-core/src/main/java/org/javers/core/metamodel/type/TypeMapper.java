@@ -101,12 +101,9 @@ public class TypeMapper {
                isPrimitiveOrValueOrObject(propertyType.getEntryClass().getValue());
     }
 
-    public boolean isCollectionOfEntityReferences(Property property){
-        return isCollectionOfType(property, EntityType.class);
-    }
-
-    public boolean isCollectionOfValueObjects(Property property) {
-        return isCollectionOfType(property, ValueObjectType.class);
+    public boolean isCollectionOfManagedClasses(Property property){
+        return isCollectionOfType(property, EntityType.class) ||
+               isCollectionOfType(property, ValueObjectType.class);
     }
 
     private boolean isCollectionOfType(Property property, Class<? extends ManagedType> managedType) {
