@@ -43,7 +43,7 @@ public class ValueObjectId extends UnboundedValueObjectId {
 
     @Override
     public String toString() {
-        return super.toString()+"#"+fragment;
+        return getOwnerId().toString()+"#"+fragment;
     }
 
     @Override
@@ -52,14 +52,13 @@ public class ValueObjectId extends UnboundedValueObjectId {
         if (o == null || !(o instanceof ValueObjectId)) {return false;}
 
         ValueObjectId other = (ValueObjectId) o;
-        return super.equals(other)
-               && this.fragment.equals(other.fragment)
-               && this.ownerId.equals(other.ownerId);
+        return this.fragment.equals(other.fragment)
+            && this.ownerId.equals(other.ownerId);
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode() + fragment.hashCode() + ownerId.hashCode();
+        return fragment.hashCode() + ownerId.hashCode();
     }
 
 }

@@ -2,7 +2,6 @@ package org.javers.model.object.graph;
 
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.object.ValueObjectId;
@@ -100,14 +99,6 @@ public class ObjectGraphBuilder {
         });
     }
 
-    private List<Property> getCollectionsOfValueObjects(ManagedClass managedClass) {
-        return managedClass.getProperties(new Predicate<Property>() {
-            public boolean apply(Property property) {
-                return (typeMapper.isCollectionOfValueObjects(property));
-            }
-        });
-    }
-
     private void buildMultiEdges(ObjectWrapper node) {
         for (Property colProperty : getCollectionsOfManagedClasses(node.getManagedClass()))  {
             if (colProperty.isNull(node.unwrapCdo())) {
@@ -123,28 +114,15 @@ public class ObjectGraphBuilder {
                                                   new OwnerContext(node, colProperty.getName()));
             node.addEdge(multiEdge);
         }
-
-        for (Property colProperty : getCollectionsOfValueObjects(node.getManagedClass()))  {
-            if (colProperty.isNull(node.unwrapCdo())) {
-                continue;
-            }
-
-            //looks like we have collection of Entity references
-            Collection collectionOfReferences = (Collection)colProperty.get(node.unwrapCdo());
-            if (collectionOfReferences.isEmpty()){
-                continue;
-            }
-            MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences,
-                    new OwnerContext(node, colProperty.getName()));
-            node.addEdge(multiEdge);
-        }
     }
 
     private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences, OwnerContext owner) {
         MultiEdge multiEdge = new MultiEdge(multiRef);
+        owner.startListIndex();
         for(Object referencedRawCdo : collectionOfReferences) {
             ObjectNode objectNode = buildNodeOrReuse(asCdo(referencedRawCdo, owner));
             multiEdge.addReferenceNode(objectNode);
+            owner.incListIndex();
         }
         return multiEdge;
     }
@@ -175,7 +153,7 @@ public class ObjectGraphBuilder {
         }
         else if (targetManagedClass instanceof ValueObject && owner != null) {
             ValueObject valueObject = (ValueObject)targetManagedClass;
-            return new Cdo(targetCdo, new ValueObjectId(valueObject, owner.getGlobalCdoId(), owner.path));
+            return new Cdo(targetCdo, new ValueObjectId(valueObject, owner.getGlobalCdoId(), owner.getPath()));
         }
         else if (targetManagedClass instanceof ValueObject && owner == null) {
             ValueObject valueObject = (ValueObject)targetManagedClass;
@@ -192,17 +170,4 @@ public class ObjectGraphBuilder {
         return  typeMapper.getManagedClass(cdo.getClass());
     }
 
-    private class OwnerContext {
-        final ObjectWrapper owner;
-        final String path;
-
-        OwnerContext(ObjectWrapper owner, String path) {
-            this.owner = owner;
-            this.path = path;
-        }
-
-        GlobalCdoId getGlobalCdoId() {
-            return owner.getGlobalCdoId();
-        }
-    }
 }
