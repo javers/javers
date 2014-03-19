@@ -7,22 +7,17 @@ import java.util.List;
 /**
  * @author Pawel Cierpiatka
  */
-public class Category {
+public class Category extends AbstractCategory {
 
     @Id
     private Long id;
-    private String name;
-    private Category parent;
-    private final List<Category> categories = new ArrayList<>();
+
 
     public Category(Long id, String name) {
+        super(name);
         this.id = id;
-        this.name = name;
     }
 
-    public Category getParent() {
-        return parent;
-    }
 
     public Long getId() {
         return id;
@@ -32,24 +27,8 @@ public class Category {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Category> getCategories() {
-        return categories;
-    }
-
-    public void setParent(Category parent) {
-        this.parent = parent;
-    }
-
     public void addChild(Category child) {
         child.setParent(this);
-        categories.add(child);
+        getCategories().add(child);
     }
 }

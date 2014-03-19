@@ -18,7 +18,7 @@ import static org.javers.core.diff.DiffAssert.assertThat
  *
  * @author bartosz walacik
  */
-class JaversCategoryTreeIntegrationTest extends Specification {
+class JaversNapCategoryTreeIntegrationTest extends Specification {
 
     def "should check all nodes when calculating property changes"(){
         given:
