@@ -1,4 +1,5 @@
-# JaVers - domain objects VCS#
+﻿
+![JVlogo.png](JVlogo1.png)
 
 ## Abstract
 JaVers is a lightweight java library for **versioning** your object-oriented data.
