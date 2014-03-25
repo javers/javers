@@ -32,7 +32,7 @@ public interface DiffRepository {
      void save(Diff newDiff);
 
     /**
-     * Loads Diff from database, collection of {@link Diff#getChanges()} have to be initialized.
+     * Loads Diff from database, collection of {@link Diff#getChanges()} has to be initialized.
      *
      * @return null if not found
      */
@@ -43,10 +43,6 @@ public interface DiffRepository {
      * Outcome list has to be ordered chronologically by {@link Diff#getDiffDate()}.
      * <br/><br/>
      *
-     * All Diffs referenced through {@link Change#getParent()}
-     * have to be fully initialized.
-     *
-     * @param globalCdoId
      * @return never returns null
      */
      List<Change> findByGlobalCdoId(GlobalCdoId globalCdoId);

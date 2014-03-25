@@ -105,11 +105,11 @@ public class Diff implements Visitable<ChangeVisitor>{
     }
 
     /**
-     * Returns true if revision hasn't been persisted yet and has no id assigned.
+     * Returns true if diff hasn't been persisted yet and has no id assigned.
      * State <i>new</i> is similar to <i>transient</i> in Hibernate
      * <br/>
      *
-     * Returns false if revision was persisted
+     * Returns false if diff was persisted
      *
      * @return id == 0
      * @see #getId()
