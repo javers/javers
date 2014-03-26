@@ -101,27 +101,22 @@ public class TypeMapper {
                isPrimitiveOrValueOrObject(propertyType.getEntryClass().getValue());
     }
 
-    public boolean isCollectionOfManagedClasses(Property property){
-        return isCollectionOfType(property, EntityType.class) ||
-               isCollectionOfType(property, ValueObjectType.class);
+    public boolean isPrimitiveOrValue(Property property) {
+        JaversType javersType = getPropertyType(property);
+        return (javersType instanceof PrimitiveOrValueType);
     }
 
-    private boolean isCollectionOfType(Property property, Class<? extends ManagedType> managedType) {
+    public boolean isCollectionOfManagedClasses(Property property){
         JaversType javersType = getPropertyType(property);
         if (! (javersType instanceof CollectionType)) {
             return false;
         }
         CollectionType collectionType = (CollectionType)javersType;
 
-        if (collectionType.getElementType() == null) {
-            return false;
-        }
-
         JaversType elementType = getJaversType(collectionType.getElementType());
 
-        return managedType.isAssignableFrom(elementType.getClass());
+        return ManagedType.class.isAssignableFrom(elementType.getClass());
     }
-
 
     private void registerPrimitiveType(Class<?> primitiveClass) {
         addType(new PrimitiveType(primitiveClass));

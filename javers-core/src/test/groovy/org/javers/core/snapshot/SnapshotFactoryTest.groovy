@@ -8,7 +8,9 @@ import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
+import org.javers.core.model.DummyUserWithValues
 import org.javers.test.builder.DummyUserBuilder
+import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
 import static org.javers.core.json.builder.EntityTestBuilder.entity
@@ -33,7 +35,7 @@ class SnapshotFactoryTest extends Specification{
         snapshot.globalId == id
     }
 
-    def "should record int property"() {
+    def "should record Primitive property"() {
         given:
         SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
         def user = DummyUserBuilder.dummyUser("kaz").withAge(5).build()
@@ -43,5 +45,18 @@ class SnapshotFactoryTest extends Specification{
 
         then:
         snapshot.getPropertyValue("age") == 5
+    }
+
+    def "should record Value property"() {
+        given:
+        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def dob = new LocalDateTime()
+        def user = new DummyUserWithValues("kaz",dob)
+
+        when:
+        CdoSnapshot snapshot = snapshotFactory.create(user, instanceId(user))
+
+        then:
+        snapshot.getPropertyValue("dob") == dob
     }
 }
