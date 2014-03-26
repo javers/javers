@@ -6,7 +6,7 @@ import org.javers.core.metamodel.property.ManagedClassFactory
 /**
  * @author bartosz walacik
  */
-class ObjectWrapperBeanTest extends ObjectWrapperTest{
+class ObjectNodeBeanTest extends ObjectNodeTest{
 
     def setup() {
         def scanner = new BeanBasedPropertyScanner();

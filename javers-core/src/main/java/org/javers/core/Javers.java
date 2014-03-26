@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import org.javers.core.commit.Commit;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.json.JsonConverter;

@@ -12,7 +12,7 @@ import spock.lang.Specification
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 
-abstract class ObjectWrapperTest extends Specification {
+abstract class ObjectNodeTest extends Specification {
 
     protected ManagedClassFactory managedClassFactory
 
@@ -22,7 +22,7 @@ abstract class ObjectWrapperTest extends Specification {
         Entity entity = managedClassFactory.createEntity(DummyUser)
 
         when:
-        ObjectWrapper wrapper = new ObjectWrapper(cdo, entity)
+        ObjectNode wrapper = new ObjectNode(cdo, entity)
 
         then:
         wrapper.managedClass == entity
@@ -35,7 +35,7 @@ abstract class ObjectWrapperTest extends Specification {
         Entity entity = managedClassFactory.createEntity(DummyUser)
 
         when:
-        ObjectWrapper wrapper = new ObjectWrapper(cdo, entity)
+        ObjectNode wrapper = new ObjectNode(cdo, entity)
 
         then:
         wrapper.globalCdoId == new InstanceId(cdo, entity)
@@ -47,20 +47,20 @@ abstract class ObjectWrapperTest extends Specification {
         Entity entity = managedClassFactory.createEntity(DummyUser)
 
         when:
-        ObjectWrapper wrapper = new ObjectWrapper(cdo, entity)
+        ObjectNode wrapper = new ObjectNode(cdo, entity)
 
         then:
-        wrapper.unwrapCdo() == cdo
+        wrapper.wrappedCdo() == cdo
     }
 
     
-    def "should throw exceptin when Entity without id"() {
+    def "should throw exception when Entity without id"() {
         given:
         DummyUser cdo = new DummyUser()
         Entity entity = managedClassFactory.createEntity(DummyUser)
 
         when:
-        new ObjectWrapper(cdo, entity)
+        new ObjectNode(cdo, entity)
 
         then:
         JaversException exception = thrown(JaversException)
@@ -68,10 +68,10 @@ abstract class ObjectWrapperTest extends Specification {
     }
 
     
-    def "should be equal by id value and Entity class"() {
+    def "should delegate equals() and hashCode() to cdo"() {
         when:
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
+        ObjectNode first = new ObjectNode(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
+        ObjectNode second = new ObjectNode(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
 
         then:
         first.hashCode() == second.hashCode()
@@ -79,10 +79,10 @@ abstract class ObjectWrapperTest extends Specification {
     }
 
     
-    def "should not be equal with different id value"() {
+    def "should not be equal when different cdo ids"() {
         when:
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("stach"), managedClassFactory.createEntity(DummyUser))
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax 1"), managedClassFactory.createEntity(DummyUser))
+        ObjectNode first = new ObjectNode(new DummyUser("stach"), managedClassFactory.createEntity(DummyUser))
+        ObjectNode second = new ObjectNode(new DummyUser("Mad Kaz 1"), managedClassFactory.createEntity(DummyUser))
 
         then:
         first != second
@@ -91,18 +91,18 @@ abstract class ObjectWrapperTest extends Specification {
     
     def "should have reflexive equals method"() {
         when:
-        ObjectWrapper objectWrapper = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
+        ObjectNode ObjectNode = new ObjectNode(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
 
         then:
-        objectWrapper == objectWrapper
+        ObjectNode == ObjectNode
     }
 
     
     def "should have symmetric and transitive equals method"() {
         when:
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
-        ObjectWrapper second = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
-        ObjectWrapper third = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
+        ObjectNode first = new ObjectNode(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
+        ObjectNode second = new ObjectNode(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
+        ObjectNode third = new ObjectNode(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
 
         then:
         first == second
@@ -113,7 +113,7 @@ abstract class ObjectWrapperTest extends Specification {
     
     def "should return false when equals method has null arg"() {
         when:
-        ObjectWrapper first = new ObjectWrapper(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
+        ObjectNode first = new ObjectNode(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
 
         then:
         first != null
@@ -122,8 +122,8 @@ abstract class ObjectWrapperTest extends Specification {
     def "should delegate equals and hash code to Cdo"() {
         when:
         Cdo mockedCdo = Mock()
-        ObjectWrapper node1 = new ObjectWrapper(mockedCdo)
-        ObjectWrapper node2 = new ObjectWrapper(mockedCdo)
+        ObjectNode node1 = new ObjectNode(mockedCdo)
+        ObjectNode node2 = new ObjectNode(mockedCdo)
 
         then:
         node1.hashCode() == mockedCdo.hashCode()

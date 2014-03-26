@@ -3,6 +3,7 @@ package org.javers.core.pico;
 import org.javers.common.pico.JaversModule;
 import org.javers.core.Javers;
 import org.javers.core.JaversCoreConfiguration;
+import org.javers.core.commit.CommitFactory;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.appenders.*;
 import org.javers.core.json.JsonConverterBuilder;
@@ -33,7 +34,9 @@ public class CoreJaversModule implements JaversModule {
             ValueChangeAppender.class,
             TypeMapper.class,
             TypeFactory.class,
-            JaversCoreConfiguration.class};
+            JaversCoreConfiguration.class,
+            CommitFactory.class
+    };
 
     @Override
     public Collection<Class> getModuleComponents() {

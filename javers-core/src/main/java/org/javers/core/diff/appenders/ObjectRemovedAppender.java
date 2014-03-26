@@ -11,13 +11,13 @@ import org.javers.model.object.graph.ObjectNode;
 
 public class ObjectRemovedAppender implements NodeChangeAppender {
 
-  @Override
-  public Set<Change> getChangeSet(GraphPair graphPair) {
-    return Sets.transform(graphPair.getOnlyOnLeft(), new Function<ObjectNode, Change>() {
-      @Override
-      public ObjectRemoved apply(ObjectNode input) {
-        return new ObjectRemoved(input.getGlobalCdoId(), input.getCdo().getWrappedCdo());
-      }
-    });
-  }
+    @Override
+    public Set<Change> getChangeSet(GraphPair graphPair) {
+        return Sets.transform(graphPair.getOnlyOnLeft(), new Function<ObjectNode, Change>() {
+            @Override
+            public ObjectRemoved apply(ObjectNode input) {
+                return new ObjectRemoved(input.getGlobalCdoId(), input.wrappedCdo());
+            }
+        });
+    }
 }

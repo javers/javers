@@ -72,7 +72,7 @@ public class DiffFactory {
         List<Property> nodeProperties = pair.getProperties();
         for (Property property : nodeProperties) {
 
-            //optimization, skip all Appenders if null on both sides
+            //optimization, skip all appenders if null on both sides
             if (pair.isNullOnBothSides(property)) {
                 continue;
             }
@@ -81,7 +81,7 @@ public class DiffFactory {
             for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
                 Change change = appender.calculateChangesIfSupported(pair, property, javersType);
                 if (change != null) {
-                    diff.addChange(change, pair.getRight().getCdo().getWrappedCdo());
+                    diff.addChange(change, pair.getRight().wrappedCdo());
                 }
             }
         }

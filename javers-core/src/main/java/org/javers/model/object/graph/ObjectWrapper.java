@@ -3,8 +3,6 @@ package org.javers.model.object.graph;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.object.InstanceId;
-import org.javers.core.metamodel.property.Entity;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
 
@@ -20,7 +18,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  *
  * @author bartosz walacik
  */
-public class ObjectWrapper implements ObjectNode {
+@Deprecated
+public class ObjectWrapper{
     private final Cdo cdo;
     private final Map<Property, Edge> edges;
 
@@ -31,10 +30,6 @@ public class ObjectWrapper implements ObjectNode {
         this.edges = new HashMap<>();
     }
 
-    public ObjectWrapper(Object cdo, Entity entity) {
-        this(new Cdo(cdo, new InstanceId(cdo,entity)));
-    }
-
     /**
      * @return never returns null
      */
@@ -42,34 +37,28 @@ public class ObjectWrapper implements ObjectNode {
         return cdo.getWrappedCdo();
     }
 
-    @Override
     public Cdo getCdo() {
         return cdo;
     }
 
-    @Override
-    public Object getPropertyValue(Property property) {
+        public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
         return property.get(unwrapCdo());
     }
 
-    @Override
-    public GlobalCdoId getGlobalCdoId() {
+        public GlobalCdoId getGlobalCdoId() {
         return cdo.getGlobalId();
     }
 
-    @Override
-    public ManagedClass getManagedClass() {
+        public ManagedClass getManagedClass() {
         return cdo.getManagedClass();
     }
 
-    @Override
-    public List<Edge> getEdges() {
+        public List<Edge> getEdges() {
         return new ArrayList<>(edges.values());
     }
 
-    @Override
-    public Edge getEdge(Property property) {
+        public Edge getEdge(Property property) {
         return edges.get(property);
     }
 
@@ -77,8 +66,7 @@ public class ObjectWrapper implements ObjectNode {
         this.edges.put(edge.getProperty(), edge);
     }
 
-    @Override
-    public boolean equals(Object o) {
+        public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
@@ -87,21 +75,8 @@ public class ObjectWrapper implements ObjectNode {
         return cdo.equals(that.cdo);
     }
 
-    @Override
-    public int hashCode() {
+        public int hashCode() {
         return cdo.hashCode();
     }
 
-    @Override
-    public void accept(GraphVisitor visitor) {
-        if(visitor.wasVisited(this)){
-            return;
-        }
-
-        visitor.visit(this);
-
-        for(Edge edge : edges.values()) {
-            edge.accept(visitor);
-        }
-    }
 }

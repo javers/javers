@@ -10,13 +10,6 @@ import static org.javers.common.exception.exceptions.JaversException.RUNTIME_ERR
  */
 public enum  JaversExceptionCode {
 
-    @Deprecated
-    CLASS_NOT_MANAGED(RUNTIME_ERROR + "Class '%s' is not managed. Add this class to your JaVers configuration."),
-
-    @Deprecated
-    TYPE_NOT_MAPPED (BOOTSTRAP_ERROR + "Type '%s' is not mapped and not assignable from any of already mapped types.\n"+
-                                       "Register it via JaversBuilder.registerEntity() or JaversBuilder.registerValueObject()") ,
-
     CLASS_EXTRACTION_ERROR(BOOTSTRAP_ERROR + "Don't know how to extract Class from type '%s'.") ,
 
     ENTITY_WITHOUT_ID (BOOTSTRAP_ERROR + "Class '%s' has no Id property. Use @Id annotation to mark unique Entity identifier"),
@@ -32,6 +25,8 @@ public enum  JaversExceptionCode {
     ALREADY_BUILT(BOOTSTRAP_ERROR + "instance already built, each AbstractJaversBuilder may produce only one target instance"),
 
     CONTAINER_NOT_READY(BOOTSTRAP_ERROR +"pico container is not ready"),
+
+    NOT_IMPLEMENTED(RUNTIME_ERROR + "not implemented"),
 
     PROPERTY_NOT_FOUND(BOOTSTRAP_ERROR +"property '%s' not found in class '%s'");
 
