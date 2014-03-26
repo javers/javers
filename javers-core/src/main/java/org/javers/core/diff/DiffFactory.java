@@ -1,6 +1,5 @@
 package org.javers.core.diff;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.javers.common.validation.Validate;
@@ -8,7 +7,7 @@ import org.javers.core.diff.appenders.*;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.model.object.graph.ObjectNode;
+import org.javers.core.graph.ObjectNode;
 
 /**
  * @author Maciej Zasada

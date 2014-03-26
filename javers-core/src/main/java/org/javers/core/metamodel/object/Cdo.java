@@ -1,10 +1,13 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Entity;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.ValueObject;
 
+import static org.javers.common.exception.exceptions.JaversExceptionCode.PROPERTY_NOT_FOUND;
 import static org.javers.common.validation.Validate.*;
 
 /**
@@ -37,6 +40,15 @@ public abstract class Cdo {
     public abstract Object getWrappedCdo();
 
     public abstract Object getPropertyValue(Property property);
+
+    public Object getPropertyValue(String propertyName) {
+        Validate.argumentIsNotNull(propertyName);
+        Property property = getGlobalId().getCdoClass().getProperty(propertyName);
+        if (property == null){
+            throw new JaversException(PROPERTY_NOT_FOUND,propertyName,getGlobalId().getCdoClass().getName());
+        }
+        return getPropertyValue(property);
+    }
 
     @Override
     public String toString() {

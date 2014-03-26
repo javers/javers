@@ -7,7 +7,7 @@ import org.javers.common.collections.Sets;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.GraphPair;
 import org.javers.core.diff.changetype.ObjectRemoved;
-import org.javers.model.object.graph.ObjectNode;
+import org.javers.core.graph.ObjectNode;
 
 public class ObjectRemovedAppender implements NodeChangeAppender {
 

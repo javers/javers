@@ -6,7 +6,7 @@ import org.javers.core.metamodel.property.ValueObject;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
-import org.javers.model.object.graph.ObjectGraphBuilder;
+import org.javers.core.graph.ObjectGraphBuilder;
 
 /**
  * <h1>Why domain model mapping?</h1>

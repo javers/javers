@@ -1,12 +1,11 @@
 package org.javers.core;
 
-import org.javers.core.commit.Commit;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.model.object.graph.ObjectGraphBuilder;
+import org.javers.core.graph.ObjectGraphBuilder;
 
 
 /**

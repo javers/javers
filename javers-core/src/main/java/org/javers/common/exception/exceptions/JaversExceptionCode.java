@@ -28,7 +28,9 @@ public enum  JaversExceptionCode {
 
     NOT_IMPLEMENTED(RUNTIME_ERROR + "not implemented"),
 
-    PROPERTY_NOT_FOUND(BOOTSTRAP_ERROR +"property '%s' not found in class '%s'");
+    SNAPSHOT_STATE_VIOLATION(RUNTIME_ERROR + "snapshots are immutable"),
+
+    PROPERTY_NOT_FOUND(RUNTIME_ERROR +"property '%s' not found in class '%s'");
 
     private final String message;
 

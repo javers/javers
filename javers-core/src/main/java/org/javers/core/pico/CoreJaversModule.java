@@ -9,7 +9,8 @@ import org.javers.core.diff.appenders.*;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.metamodel.type.TypeFactory;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.model.object.graph.ObjectGraphBuilder;
+import org.javers.core.graph.ObjectGraphBuilder;
+import org.javers.core.snapshot.SnapshotFactory;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,7 +36,8 @@ public class CoreJaversModule implements JaversModule {
             TypeMapper.class,
             TypeFactory.class,
             JaversCoreConfiguration.class,
-            CommitFactory.class
+            CommitFactory.class,
+            SnapshotFactory.class
     };
 
     @Override

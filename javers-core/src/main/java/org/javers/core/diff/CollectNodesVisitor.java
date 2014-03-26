@@ -1,7 +1,7 @@
 package org.javers.core.diff;
 
-import org.javers.model.object.graph.GraphVisitor;
-import org.javers.model.object.graph.ObjectNode;
+import org.javers.core.graph.GraphVisitor;
+import org.javers.core.graph.ObjectNode;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,8 +1,8 @@
 package org.javers.test.assertion
 
-import org.javers.model.object.graph.Edge
-import org.javers.model.object.graph.MultiEdge
-import org.javers.model.object.graph.SingleEdge
+import org.javers.core.graph.Edge
+import org.javers.core.graph.MultiEdge
+import org.javers.core.graph.SingleEdge
 
 
 /**
