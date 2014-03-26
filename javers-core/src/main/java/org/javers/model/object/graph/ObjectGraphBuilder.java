@@ -17,7 +17,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * Creates graph based on ObjectWrappers.
- * This is stateful builder (not a Service)
+ * This is a stateful Builder (not a Service)
  *
  * @author bartosz walacik
  */

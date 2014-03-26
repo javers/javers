@@ -20,7 +20,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  *
  * @author bartosz walacik
  */
-public class ObjectWrapper extends ObjectNode {
+public class ObjectWrapper implements ObjectNode {
     private final Cdo cdo;
     private final Map<Property, Edge> edges;
 

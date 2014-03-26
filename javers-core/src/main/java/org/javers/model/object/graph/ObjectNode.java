@@ -18,31 +18,31 @@ import java.util.List;
  *
  * @author bartosz walacik
  */
-public abstract class ObjectNode implements Visitable<GraphVisitor> {
+public interface ObjectNode extends Visitable<GraphVisitor> {
 
     /**
      * @return never returns null
      */
-    public abstract Cdo getCdo();
+    Cdo getCdo();
 
     /**
      * shortcut to {@link Cdo#getManagedClass()}
      */
-    public abstract ManagedClass getManagedClass();
+   ManagedClass getManagedClass();
 
     /**
      * shortcut to {@link Cdo#getGlobalId()}
      */
-    public abstract GlobalCdoId getGlobalCdoId();
+    GlobalCdoId getGlobalCdoId();
 
-    public abstract Object getPropertyValue(Property property);
+    Object getPropertyValue(Property property);
 
     /**
-     * References to other Entities
+     * References to other Entities or ValueObjects
      *
      * @return never returns null
      */
-    public abstract List<Edge> getEdges();
+    List<Edge> getEdges();
 
-    public abstract Edge getEdge(Property property);
+    Edge getEdge(Property property);
 }

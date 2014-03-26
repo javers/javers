@@ -1,6 +1,7 @@
 package org.javers.core.diff;
 
 import org.javers.common.patterns.visitors.Visitable;
+import org.javers.core.diff.changetype.NewObject;
 import org.joda.time.LocalDateTime;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import static org.javers.common.validation.Validate.*;
  *
  * Diff holds following data:
  * <ul>
- *     <li>who did change the data - {@link #getUserId()}</li>
+ *     <li>who did change the data - {@link #getAuthor()}</li>
  *     <li>when the change was made - {@link #getDiffDate()}</li>
  *     <li>list of atomic changes between two graphs</li>
  * </ul>
@@ -48,13 +49,13 @@ import static org.javers.common.validation.Validate.*;
 public class Diff implements Visitable<ChangeVisitor>{
     private long id;
     private final List<Change> changes;
-    private final String userId;
+    private final String author;
     private final LocalDateTime diffDate;
 
-    public Diff(String userId) {
-        argumentIsNotNull(userId,"userId should not be null");
+    public Diff(String author) {
+        argumentIsNotNull(author, "author should not be null");
 
-        this.userId = userId;
+        this.author = author;
         this.diffDate = new LocalDateTime();
         this.changes = new ArrayList<>();
     }
@@ -83,11 +84,11 @@ public class Diff implements Visitable<ChangeVisitor>{
     }
 
     /**
-     * user identifier in clients data base,
+     * identifier of user who authored the change,
      * typically login or numeric id
      */
-    public String getUserId() {
-        return userId;
+    public String getAuthor() {
+        return author;
     }
 
     /**
@@ -142,5 +143,15 @@ public class Diff implements Visitable<ChangeVisitor>{
         for(Change change : changes) {
             change.accept(changeVisitor);
         }
+    }
+
+    private int count(Class<? extends Change> changeType){
+        int c = 0;
+        for(Change change : changes) {
+            if (change.getClass() == changeType) {
+                c++;
+            }
+        }
+        return c;
     }
 }

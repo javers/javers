@@ -22,9 +22,8 @@ public class Cdo {
         argumentsAreNotNull(wrappedCdo, globalId);
         argumentCheck(globalId.getCdoClass().isInstance(wrappedCdo), "wrappedCdo is not an instance of given managedClass");
 
-         this.globalId = globalId;
+        this.globalId = globalId;
         this.wrappedCdo = wrappedCdo;
-
     }
 
     /**
