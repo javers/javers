@@ -301,4 +301,36 @@ abstract class ObjectGraphBuilderTest extends Specification {
         then:
         assertThat(node).hasNoEdges()
     }
+
+    def "should build graph with ValueObjects multi edge"() {
+        given:
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        DummyUserDetails dummyUserDetails = dummyUserDetails()
+                .withAddresses(new DummyAddress("warszawa", "mokotowska"))
+                .withAddresses(new DummyAddress("warszawa", "wolska"))
+                .build()
+
+        when:
+        ObjectNode node = graphBuilder.buildGraph(dummyUserDetails)
+
+        then:
+        assertThat(node).hasMultiEdge("addressList").ofSize(2)
+    }
+
+    def "should assign proper ids to ValueObjects in multi edge"() {
+        given:
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        DummyUserDetails dummyUserDetails = dummyUserDetails(5)
+                .withAddresses(new DummyAddress("warszawa", "mokotowska"))
+                .withAddresses(new DummyAddress("warszawa", "wolska"))
+                .build()
+
+        when:
+        ObjectNode node = graphBuilder.buildGraph(dummyUserDetails)
+
+        then:
+        assertThat(node).hasMultiEdge("addressList").refersToGlobalCdoWithIds(
+                "org.javers.core.model.DummyUserDetails/5#addressList/0",
+                "org.javers.core.model.DummyUserDetails/5#addressList/1")
+    }
 }

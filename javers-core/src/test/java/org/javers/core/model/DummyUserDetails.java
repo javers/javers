@@ -1,6 +1,8 @@
 package org.javers.core.model;
 
 import javax.persistence.Id;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author bartosz walacik
@@ -12,6 +14,8 @@ public class DummyUserDetails {
     private String someValue;
     private boolean isTrue;
     private DummyAddress dummyAddress;
+    private List<DummyAddress> addressList = new ArrayList<>();
+    private List<Integer> integerList = new ArrayList<>();
 
     @Id
     public Long getId() {
@@ -46,5 +50,19 @@ public class DummyUserDetails {
         this.dummyAddress = dummyAddress;
     }
 
+    public List<DummyAddress> getAddressList() {
+        return addressList;
+    }
 
+    public void setAddressList(List<DummyAddress> addressList) {
+        this.addressList = addressList;
+    }
+
+    public List<Integer> getIntegerList() {
+        return integerList;
+    }
+
+    public void setIntegerList(List<Integer> integerList) {
+        this.integerList = integerList;
+    }
 }

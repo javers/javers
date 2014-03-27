@@ -26,6 +26,14 @@ class MultiEdgeAssert {
         this
     }
 
+    MultiEdgeAssert refersToGlobalCdoWithIds(def ... expectedRefCdoIds) {
+        actual.references.collect { it.globalCdoId.toString() }.with {
+            assert it.size() == expectedRefCdoIds.size()
+            assert it.containsAll(expectedRefCdoIds)
+        }
+        this
+    }
+
     NodeAssert andTargetNode(String expectedTargetCdoId) {
         NodeAssert.assertThat(actual.references.find { it.globalCdoId.cdoId == expectedTargetCdoId })
     }
