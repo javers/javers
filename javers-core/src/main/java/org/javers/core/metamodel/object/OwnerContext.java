@@ -5,18 +5,31 @@ package org.javers.core.metamodel.object;
 */
 public class OwnerContext {
     final GlobalCdoId owner;
-    final String path;
+    final String propertyName;
+    private Integer listIndex;
 
-    public OwnerContext(GlobalCdoId owner, String path) {
+    public OwnerContext(GlobalCdoId owner, String propertyName) {
         this.owner = owner;
-        this.path = path;
+        this.propertyName = propertyName;
     }
 
     public GlobalCdoId getGlobalCdoId() {
         return owner;
     }
 
-    public String getPath() {
-        return path;
+    String getPath() {
+        if (listIndex==null){
+            return propertyName;
+        } else {
+            return propertyName+"/"+listIndex;
+        }
+    }
+
+    public void incListIndex() {
+        listIndex++;
+    }
+
+    public void startListIndex() {
+        listIndex = 0;
     }
 }

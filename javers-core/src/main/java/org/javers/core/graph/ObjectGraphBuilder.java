@@ -101,12 +101,12 @@ public class ObjectGraphBuilder {
 
     private void buildMultiEdges(ObjectNode node) {
         for (Property colProperty : getCollectionsOfManagedClasses(node.getManagedClass()))  {
-            if (colProperty.isNull(node.unwrapCdo())) {
+            if (colProperty.isNull(node.wrappedCdo())) {
                 continue;
             }
 
             //looks like we have collection of Entity references or Value Objects
-            Collection collectionOfReferences = (Collection)colProperty.get(node.unwrapCdo());
+            Collection collectionOfReferences = (Collection)colProperty.get(node.wrappedCdo());
             if (collectionOfReferences.isEmpty()){
                 continue;
             }
@@ -154,17 +154,7 @@ public class ObjectGraphBuilder {
         return  typeMapper.getManagedClass(cdo.getClass());
     }
 
-    private class OwnerContext {
-        final ObjectNode owner;
-        final String path;
-
-        OwnerContext(ObjectNode owner, String path) {
-            this.owner = owner;
-            this.path = path;
-        }
-
-        GlobalCdoId getGlobalCdoId() {
-            return owner.getGlobalCdoId();
-        }
+    private OwnerContext createOwnerContext(ObjectNode node, String path) {
+        return new OwnerContext(node.getGlobalCdoId(), path);
     }
 }

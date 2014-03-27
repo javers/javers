@@ -102,11 +102,6 @@ public class TypeMapper {
                isPrimitiveOrValueOrObject(propertyType.getEntryClass().getValue());
     }
 
-    public boolean isPrimitiveOrValue(Property property) {
-        JaversType javersType = getPropertyType(property);
-        return (javersType instanceof PrimitiveOrValueType);
-    }
-
     public boolean isCollectionOfManagedClasses(Property property){
         JaversType javersType = getPropertyType(property);
         if (! (javersType instanceof CollectionType)) {
@@ -116,7 +111,7 @@ public class TypeMapper {
 
         JaversType elementType = getJaversType(collectionType.getElementType());
 
-        return ManagedType.class.isAssignableFrom(elementType.getClass());
+        return elementType instanceof ManagedType;
     }
 
     private void registerPrimitiveType(Class<?> primitiveClass) {
