@@ -32,4 +32,8 @@ public class OwnerContext {
     public void startListIndex() {
         listIndex = 0;
     }
+
+    public void setListIndex(Integer listIndex) {
+        this.listIndex = listIndex;
+    }
 }

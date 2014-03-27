@@ -73,6 +73,7 @@ public class SnapshotFactory {
 
         @Override
         public Object apply(Object input, int index) {
+            owner.setListIndex(index);
             return dehydrate(input, contentType, owner);
         }
     }

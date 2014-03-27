@@ -1,9 +1,11 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.validation.Validate;
+
 import java.lang.reflect.Type;
-import static org.javers.common.exception.exceptions.JaversExceptionCode.NOT_IMPLEMENTED;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ListType extends CollectionType{
 
@@ -12,7 +14,15 @@ public class ListType extends CollectionType{
     }
 
     @Override
-    public Object map(Object sourceEnumerable, EnumerableFunction mapFunction) {
-        throw new JaversException(NOT_IMPLEMENTED);
+    public Object map(Object sourceList_, EnumerableFunction mapFunction) {
+        Validate.argumentsAreNotNull(sourceList_, mapFunction);
+        List sourceList = (List)sourceList_;
+        List targetList = new ArrayList(sourceList.size());
+
+        int i = 0;
+        for (Object sourceVal : sourceList){
+            targetList.add(mapFunction.apply(sourceVal,i++));
+        }
+        return targetList;
     }
 }

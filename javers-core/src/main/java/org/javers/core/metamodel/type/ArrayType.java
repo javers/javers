@@ -33,8 +33,7 @@ public class ArrayType extends ContainerType {
         Validate.argumentsAreNotNull(sourceArray, mapFunction);
 
         int len = Array.getLength(sourceArray);
-        Object targetArray = Array.newInstance(getElementType(), len);
-
+        Object targetArray = new Object[len];
 
         for (int i=0; i<len; i++){
             Object sourceVal = Array.get(sourceArray,i);
