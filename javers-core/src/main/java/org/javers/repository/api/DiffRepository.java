@@ -1,6 +1,5 @@
 package org.javers.repository.api;
 
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.LocatorEx;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.metamodel.object.CdoSnapshot;
