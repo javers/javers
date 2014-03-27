@@ -1,21 +1,19 @@
 package org.javers.core.snapshot
 
 import org.javers.core.JaversTestBuilder
-import org.javers.core.json.builder.GlobalCdoIdTestBuilder
-import org.javers.core.metamodel.object.Cdo
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
-import org.javers.core.metamodel.property.Property
 import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyUser
+import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.DummyUserWithValues
-import org.javers.test.builder.DummyUserBuilder
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
+import spock.lang.Unroll
 
-import static org.javers.core.json.builder.EntityTestBuilder.entity
-import static org.javers.core.json.builder.EntityTestBuilder.valueObject
 import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.valueObjectId
+import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
 /**
  * @author bartosz walacik
@@ -25,7 +23,7 @@ class SnapshotFactoryTest extends Specification{
     def "should create snapshot with given GlobalId"() {
         given:
         SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
-        def user = DummyUserBuilder.dummyUser("kaz").build()
+        def user = dummyUser("kaz").build()
         InstanceId id = instanceId(user)
 
         when:
@@ -38,7 +36,7 @@ class SnapshotFactoryTest extends Specification{
     def "should record Primitive property"() {
         given:
         SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
-        def user = DummyUserBuilder.dummyUser("kaz").withAge(5).build()
+        def user = dummyUser("kaz").withAge(5).build()
 
         when:
         CdoSnapshot snapshot = snapshotFactory.create(user, instanceId(user))
@@ -58,5 +56,28 @@ class SnapshotFactoryTest extends Specification{
 
         then:
         snapshot.getPropertyValue("dob") == dob
+    }
+
+    @Unroll
+    def "should record #refType reference"() {
+        given:
+        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+
+        when:
+        CdoSnapshot snapshot = snapshotFactory.create(user, instanceId(user))
+
+        then:
+        snapshot.getPropertyValue(propertyName) == expectedId
+
+        where:
+        user << [dummyUser("kaz").withDetails(5).build(),
+                 dummyUserDetails(1).withAddress("street","city").build()]
+        propertyName <<  ["dummyUserDetails",
+                          "dummyAddress"]
+        refType << ["Entity",
+                    "ValueObject"]
+        expectedId << [instanceId(5L, DummyUserDetails),
+                       valueObjectId(instanceId(1L, DummyUserDetails),DummyAddress,"dummyAddress")]
+
     }
 }

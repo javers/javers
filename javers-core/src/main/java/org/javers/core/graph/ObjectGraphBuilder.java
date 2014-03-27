@@ -3,7 +3,10 @@ package org.javers.core.graph;
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.*;
-import org.javers.core.metamodel.property.*;
+import org.javers.core.metamodel.property.Entity;
+import org.javers.core.metamodel.property.ManagedClass;
+import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.property.ValueObject;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +76,7 @@ public class ObjectGraphBuilder {
 
             Object referencedRawCdo = singleRef.get(node.wrappedCdo());
             ObjectNode referencedNode = buildNodeOrReuse(asCdo(referencedRawCdo,
-                                                         new OwnerContext(node, singleRef.getName())));
+                                                         createOwnerContext(node, singleRef.getName())));
 
             Edge edge = new SingleEdge(singleRef, referencedNode);
             node.addEdge(edge);
@@ -108,7 +111,7 @@ public class ObjectGraphBuilder {
                 continue;
             }
             MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences,
-                                                  new OwnerContext(node, colProperty.getName()));
+                                                  createOwnerContext(node, colProperty.getName()));
             node.addEdge(multiEdge);
         }
     }
@@ -141,25 +144,9 @@ public class ObjectGraphBuilder {
     }
 
     private Cdo asCdo(Object targetCdo, OwnerContext owner){
-        ManagedClass targetManagedClass =  getManagedCLass(targetCdo);
+        GlobalCdoId globalId = GlobalIdFactory.create(targetCdo, getManagedCLass(targetCdo), owner);
 
-        //TODO refactor these IFs
-        if (targetManagedClass instanceof Entity) {
-            Entity entity = (Entity)targetManagedClass;
-            return new CdoWrapper(targetCdo, new InstanceId(targetCdo, entity));
-        }
-        else if (targetManagedClass instanceof ValueObject && owner != null) {
-            ValueObject valueObject = (ValueObject)targetManagedClass;
-            return new CdoWrapper(targetCdo, new ValueObjectId(valueObject, owner.getGlobalCdoId(), owner.path));
-        }
-        else if (targetManagedClass instanceof ValueObject && owner == null) {
-            ValueObject valueObject = (ValueObject)targetManagedClass;
-            return new CdoWrapper(targetCdo, new UnboundedValueObjectId(valueObject));
-        }
-        else {
-            throw new IllegalStateException("not implemented");
-        }
-
+        return new CdoWrapper(targetCdo, globalId);
     }
 
     private ManagedClass getManagedCLass(Object cdo) {
@@ -168,10 +155,10 @@ public class ObjectGraphBuilder {
     }
 
     private class OwnerContext {
-        final ObjectWrapper owner;
+        final ObjectNode owner;
         final String path;
 
-        OwnerContext(ObjectWrapper owner, String path) {
+        OwnerContext(ObjectNode owner, String path) {
             this.owner = owner;
             this.path = path;
         }

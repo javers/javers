@@ -1,8 +1,9 @@
 package org.javers.core.metamodel.property;
 
-import org.javers.common.validation.Validate;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.validation.Validate;
+
 import java.util.List;
 
 /**
@@ -76,4 +77,17 @@ public class Entity extends ManagedClass {
         return idProperty;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || !(o instanceof Entity)) {return false;}
+
+        Entity that = (Entity) o;
+        return super.equals(that) && idProperty.equals(that.idProperty);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() + idProperty.hashCode();
+    }
 }

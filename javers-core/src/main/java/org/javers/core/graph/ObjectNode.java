@@ -5,7 +5,6 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoWrapper;
 import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.property.Entity;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
+import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
 
 /**
  * Node in client's domain objects graph. Reflects one Cdo, {@link Entity} or {@link ValueObject}
@@ -38,7 +38,7 @@ public class ObjectNode implements Visitable<GraphVisitor> {
 
 
     ObjectNode(Object cdo, Entity entity) {
-        this(new CdoWrapper(cdo, new InstanceId(cdo,entity)));
+        this(new CdoWrapper(cdo, createFromInstance(cdo, entity)));
     }
 
     /**

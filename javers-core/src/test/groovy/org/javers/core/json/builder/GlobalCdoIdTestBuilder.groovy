@@ -4,7 +4,6 @@ import org.javers.core.metamodel.object.GlobalCdoId
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.core.metamodel.property.Entity
 
 import static EntityTestBuilder.entity
 import static EntityTestBuilder.valueObject
@@ -14,14 +13,16 @@ import static EntityTestBuilder.valueObject
  */
 class GlobalCdoIdTestBuilder {
 
+    static InstanceId instanceId(Object id, Class clazz) {
+        return InstanceId.createFromId(id, entity(clazz))
+    }
+
     static InstanceId instanceId(Object cdo) {
         if (cdo == null) {
             return null
         }
 
-        Entity entity = entity(cdo.class)
-
-        new InstanceId(cdo, entity)
+        return InstanceId.createFromInstance(cdo, entity(cdo.getClass()))
     }
 
     static UnboundedValueObjectId unboundedValueObjectId(Object cdoClass) {

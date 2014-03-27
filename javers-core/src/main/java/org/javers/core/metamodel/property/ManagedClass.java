@@ -1,10 +1,12 @@
 package org.javers.core.metamodel.property;
 
 import org.javers.common.collections.Predicate;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -36,21 +38,6 @@ public abstract class ManagedClass {
 
     public Class getSourceClass() {
         return sourceClass;
-    }
-
-    @Override
-    public int hashCode() {
-        return sourceClass.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null || obj.getClass() != getClass()) {
-            return false;
-        }
-
-        ManagedClass other = (ManagedClass)obj;
-        return sourceClass.equals(other.sourceClass);
     }
 
     /**
@@ -92,5 +79,19 @@ public abstract class ManagedClass {
             }
         }
         return found;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || !(o instanceof ManagedClass)) {return false;}
+
+        ManagedClass that = (ManagedClass) o;
+        return sourceClass.equals(that.sourceClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return sourceClass.hashCode();
     }
 }

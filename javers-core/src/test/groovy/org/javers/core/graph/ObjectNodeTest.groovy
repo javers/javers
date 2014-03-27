@@ -39,7 +39,7 @@ abstract class ObjectNodeTest extends Specification {
         ObjectNode wrapper = new ObjectNode(cdo, entity)
 
         then:
-        wrapper.globalCdoId == new InstanceId(cdo, entity)
+        wrapper.globalCdoId == InstanceId.createFromInstance(cdo, entity)
     }
     
     def "should hold Cdo reference"() {
