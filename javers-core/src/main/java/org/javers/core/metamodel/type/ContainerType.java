@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
  *
  * @author bartosz walacik
  */
-abstract class ContainerType extends JaversType {
+public abstract class ContainerType extends EnumerableType {
 
     ContainerType(Type baseJavaType) {
         super(baseJavaType);

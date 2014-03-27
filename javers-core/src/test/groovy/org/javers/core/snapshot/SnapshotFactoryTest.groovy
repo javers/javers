@@ -4,16 +4,13 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyUserDetails
-import org.javers.core.model.DummyUserWithValues
-import org.joda.time.LocalDateTime
+import org.javers.core.model.SnapshotEntity
+import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
 import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.valueObjectId
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
-import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
 /**
  * @author bartosz walacik
@@ -23,61 +20,74 @@ class SnapshotFactoryTest extends Specification{
     def "should create snapshot with given GlobalId"() {
         given:
         SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
-        def user = dummyUser("kaz").build()
-        InstanceId id = instanceId(user)
+        def cdo = new SnapshotEntity()
+        InstanceId id = instanceId(cdo)
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(user, id)
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, id)
 
         then:
         snapshot.globalId == id
     }
 
-    def "should record Primitive property"() {
+    @Unroll
+    def "should record #propertyType property value"() {
         given:
         SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
-        def user = dummyUser("kaz").withAge(5).build()
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(user, instanceId(user))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
 
         then:
-        snapshot.getPropertyValue("age") == 5
-    }
+        snapshot.getPropertyValue(propertyName) == cdo.getAt(propertyName)
 
-    def "should record Value property"() {
-        given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
-        def dob = new LocalDateTime()
-        def user = new DummyUserWithValues("kaz",dob)
-
-        when:
-        CdoSnapshot snapshot = snapshotFactory.create(user, instanceId(user))
-
-        then:
-        snapshot.getPropertyValue("dob") == dob
+        where:
+        propertyType << ["Primitive", "Value"]
+        propertyName << ["intProperty","dob"]
+        cdo <<          [new SnapshotEntity(intProperty: 5),
+                         new SnapshotEntity(dob: new LocalDate(2000,1,1))]
     }
 
     @Unroll
-    def "should record #refType reference"() {
+    def "should record #propertyType reference"() {
         given:
         SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(user, instanceId(user))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
 
         then:
-        snapshot.getPropertyValue(propertyName) == expectedId
+        snapshot.getPropertyValue(propertyName) == expectedVal
 
         where:
-        user << [dummyUser("kaz").withDetails(5).build(),
-                 dummyUserDetails(1).withAddress("street","city").build()]
-        propertyName <<  ["dummyUserDetails",
-                          "dummyAddress"]
-        refType << ["Entity",
-                    "ValueObject"]
-        expectedId << [instanceId(5L, DummyUserDetails),
-                       valueObjectId(instanceId(1L, DummyUserDetails),DummyAddress,"dummyAddress")]
+        propertyType << ["Entity","ValueObject"]
+        propertyName << ["entityRef", "valueObjectRef"]
+        cdo <<          [new SnapshotEntity(id:1, entityRef:new SnapshotEntity(id:5)),
+                         new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("street"))]
+        expectedVal <<  [instanceId(5, SnapshotEntity),
+                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"valueObjectRef")]
+    }
 
+
+    @Unroll
+    def "should record Array of #propertyType"() {
+        given:
+        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+
+        when:
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+
+        then:
+        snapshot.getPropertyValue(propertyName) == cdo.getAt(propertyName)
+        //we need shallow copy
+        snapshot.getPropertyValue(propertyName).hashCode() != cdo.getAt(propertyName).hashCode()
+
+        where:
+        propertyType << ["Primitive", "Value"]
+        propertyName << ["arrayOfIntegers", "arrayOfDates"]
+        cdo << [new SnapshotEntity(arrayOfIntegers: [1, 2]),
+                new SnapshotEntity(arrayOfDates: [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)])]
+        //expectedVal << [[1, 2],
+        //                [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]]
     }
 }

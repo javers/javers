@@ -13,7 +13,7 @@ public class ValueObjectType extends ManagedType{
     }
 
     @Override
-    ValueObject getManagedClass() {
+    public ValueObject getManagedClass() {
         return (ValueObject)super.getManagedClass();
     }
 

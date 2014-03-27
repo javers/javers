@@ -4,12 +4,10 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.ManagedClassFactory;
 
-import java.lang.reflect.Type;
-
 /**
  * @author bartosz walacik
  */
-abstract class ManagedType extends JaversType {
+public abstract class ManagedType extends JaversType {
     private final ManagedClass managedClass;
 
     ManagedType(ManagedClass managedClass) {
@@ -18,7 +16,7 @@ abstract class ManagedType extends JaversType {
         this.managedClass = managedClass;
     }
 
-    ManagedClass getManagedClass() {
+    public ManagedClass getManagedClass() {
         return managedClass;
     }
 

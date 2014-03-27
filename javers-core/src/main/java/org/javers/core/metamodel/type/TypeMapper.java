@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
 import org.javers.core.metamodel.property.*;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,7 @@ public class TypeMapper {
 
         //well known Value types
         registerValueType(LocalDateTime.class);
+        registerValueType(LocalDate.class);
         registerValueType(BigDecimal.class);
         registerValueType(Date.class);
 
@@ -89,8 +91,7 @@ public class TypeMapper {
 
     public boolean isEntityReferenceOrValueObject(Property property){
         JaversType javersType = getPropertyType(property);
-        return (javersType instanceof EntityType ||
-                javersType instanceof ValueObjectType);
+        return javersType instanceof ManagedType;
     }
 
     public boolean isSupportedMap(MapType propertyType){
