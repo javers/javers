@@ -18,7 +18,9 @@ public class Lists {
      * @return index -> value
      */
     public static <T> Map<Integer, T> asMap(List<T> input) {
-        argumentIsNotNull(input);
+        if (input == null){
+            return null;
+        }
 
         Map<Integer, T> result = new HashMap<>();
         int i = 0;
