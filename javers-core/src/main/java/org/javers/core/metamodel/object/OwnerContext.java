@@ -6,7 +6,7 @@ package org.javers.core.metamodel.object;
 public class OwnerContext {
     final GlobalCdoId owner;
     final String propertyName;
-    private Integer listIndex;
+    private String fragment;
 
     public OwnerContext(GlobalCdoId owner, String propertyName) {
         this.owner = owner;
@@ -17,23 +17,16 @@ public class OwnerContext {
         return owner;
     }
 
-    String getPath() {
-        if (listIndex==null){
+    public String getPath() {
+        if (fragment == null){
             return propertyName;
-        } else {
-            return propertyName+"/"+listIndex;
         }
+
+        return propertyName+"/"+fragment;
     }
 
-    public void incListIndex() {
-        listIndex++;
+    public void setFragment(String fragment) {
+        this.fragment = fragment;
     }
 
-    public void startListIndex() {
-        listIndex = 0;
-    }
-
-    public void setListIndex(Integer listIndex) {
-        this.listIndex = listIndex;
-    }
 }

@@ -118,11 +118,11 @@ public class ObjectGraphBuilder {
 
     private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences, OwnerContext owner) {
         MultiEdge multiEdge = new MultiEdge(multiRef);
-        owner.startListIndex();
+        int i = 0;
         for(Object referencedRawCdo : collectionOfReferences) {
+            owner.setFragment(""+i++);
             ObjectNode objectNode = buildNodeOrReuse(asCdo(referencedRawCdo, owner));
             multiEdge.addReferenceNode(objectNode);
-            owner.incListIndex();
         }
         return multiEdge;
     }

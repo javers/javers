@@ -28,6 +28,10 @@ public enum  JaversExceptionCode {
 
     NOT_IMPLEMENTED(RUNTIME_ERROR + "not implemented"),
 
+    GENERIC_TYPE_NOT_PARAMETRIZED(RUNTIME_ERROR + "expected actual Class arguments in type '%s'"),
+
+    VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY(RUNTIME_ERROR + "found Value Object '%s' on KEY position in Map property '%s'. Please change this class mapping to Value or Entity"),
+
     SNAPSHOT_STATE_VIOLATION(RUNTIME_ERROR + "snapshots are immutable"),
 
     PROPERTY_NOT_FOUND(RUNTIME_ERROR +"property '%s' not found in class '%s'");

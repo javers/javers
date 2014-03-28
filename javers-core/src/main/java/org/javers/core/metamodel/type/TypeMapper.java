@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Function;
+import org.javers.common.collections.Lists;
 import org.javers.common.collections.Primitives;
 import org.javers.core.metamodel.property.*;
 import org.joda.time.LocalDate;
@@ -71,6 +73,15 @@ public class TypeMapper {
         return createMapping(javaType);
     }
 
+  /*  public List<JaversType> getJaversTypes(List<Class> javaTypes) {
+        argumentIsNotNull(javaTypes);
+        return Lists.transform(javaTypes, new Function<Class, JaversType>() {
+            public JaversType apply(Class javaType) {
+                return getJaversType(javaType);
+            }
+        });
+    } */
+
     /**
      * if given javaClass is mapped to {@link ManagedType}
      * returns {@link ManagedType#getManagedClass()}
@@ -95,11 +106,11 @@ public class TypeMapper {
     }
 
     public boolean isSupportedMap(MapType propertyType){
-        if (propertyType.getEntryClass() == null) {
+        if (!propertyType.isFullyParameterized()) {
             return false;
         }
-        return isPrimitiveOrValueOrObject(propertyType.getEntryClass().getKey()) &&
-               isPrimitiveOrValueOrObject(propertyType.getEntryClass().getValue());
+        return isPrimitiveOrValueOrObject(propertyType.getKeyClass()) &&
+               isPrimitiveOrValueOrObject(propertyType.getValueClass());
     }
 
     public boolean isCollectionOfManagedClasses(Property property){
@@ -107,9 +118,13 @@ public class TypeMapper {
         if (! (javersType instanceof CollectionType)) {
             return false;
         }
-        CollectionType collectionType = (CollectionType)javersType;
 
-        JaversType elementType = getJaversType(collectionType.getElementType());
+        CollectionType collectionType = (CollectionType)javersType;
+        if (!collectionType.isFullyParameterized()){
+            return false;
+        }
+
+        JaversType elementType = getJaversType(collectionType.getItemClass());
 
         return elementType instanceof ManagedType;
     }
@@ -127,7 +142,10 @@ public class TypeMapper {
     }
 
     public boolean isSupportedContainer(ContainerType propertyType) {
-        return isPrimitiveOrValueOrObject(propertyType.getElementType());
+        if (!propertyType.isFullyParameterized()){
+            return false;
+        }
+        return isPrimitiveOrValueOrObject(propertyType.getItemClass());
     }
 
     protected <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {

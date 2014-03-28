@@ -4,6 +4,7 @@ import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.IdentityEnumerableFunction;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * Collection or Array or Map
@@ -14,7 +15,27 @@ public abstract class EnumerableType extends JaversType {
         super(baseJavaType);
     }
 
-    public abstract Class getElementType();
+
+    /**
+     * Collection/Array/Map content type.
+     * <p/>
+     * When Enumerable is generic Type with actual Class arguments, returns this arguments.
+     * For example, if baseJavaType = Set&lt;String&gt, returns List with String.class
+     * <p/>
+     *
+     * For no generic types like Set, or generic types with unbounded type parameter like
+     * Set&lt;V&gt;, Set&lt;?&gt; returns <b>empty List</b>.
+     * <p/>
+     *
+     * For array, returns List with {@link Class#getComponentType()}
+     * <p/>
+     */
+    public abstract List<Class> getElementTypes();
+
+    /**
+     * returns true if Enumerable is generic Type and all its arguments are actual Classes
+     */
+    public abstract boolean isFullyParameterized();
 
     /**
      * returns shallow copy of sourceEnumerable

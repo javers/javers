@@ -2,7 +2,9 @@ package org.javers.core.model;
 
 import org.joda.time.LocalDate;
 import javax.persistence.Id;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -34,6 +36,14 @@ public class SnapshotEntity {
     private Set<LocalDate> setOfDates;
     private Set<SnapshotEntity> setOfEntities;
     private Set<DummyAddress> setOfValueObjects;
+
+
+    private Map<String, Integer> mapOfPrimitives;
+    private Map<LocalDate,BigDecimal> mapOfValues;
+    private Map<String,DummyAddress> mapPrimitiveToVO;
+    private Map<SnapshotEntity, SnapshotEntity> mapOfEntities;
+    private Map<DummyAddress,String> mapVoToPrimitive;           //not supported
+    private Map nonParametrizedMap;                              //not supported
 
     public int getId() {
         return id;

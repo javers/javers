@@ -1,7 +1,6 @@
 package org.javers.core.metamodel.type
 
 import com.google.common.reflect.TypeToken
-import org.javers.core.metamodel.type.CollectionType
 import spock.lang.Specification
 
 import java.lang.reflect.Type
@@ -29,7 +28,7 @@ class CollectionTypeTest extends Specification{
         then:
         cType.baseJavaType == Set
         cType.genericType == false
-        cType.elementType == null
+        cType.elementTypes == null
     }
 
     def "should ignore unbounded type parameter" () {
@@ -41,7 +40,7 @@ class CollectionTypeTest extends Specification{
 
         then:
         cType.genericType == true
-        cType.elementType == null
+        cType.elementTypes == null
     }
 
     def "should hold actual elementType" () {
@@ -54,6 +53,6 @@ class CollectionTypeTest extends Specification{
         then:
         cType.baseJavaType == new TypeToken<Set<String>>(){}.type
         cType.genericType == true
-        cType.elementType == String
+        cType.elementTypes == String
     }
 }

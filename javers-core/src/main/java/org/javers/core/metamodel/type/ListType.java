@@ -21,7 +21,7 @@ public class ListType extends CollectionType{
 
         int i = 0;
         for (Object sourceVal : sourceList){
-            targetList.add(mapFunction.apply(sourceVal,i++));
+            targetList.add(mapFunction.apply(sourceVal,""+i++));
         }
         return targetList;
     }

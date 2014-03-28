@@ -84,9 +84,9 @@ class SnapshotFactoryTest extends Specification{
         where:
         propertyType << ["Primitive", "Value", "Entity", "ValueObject"]
         propertyName << ["arrayOfIntegers", "arrayOfDates", "arrayOfEntities", "arrayOfValueObjects"]
-        cdo << [new SnapshotEntity(arrayOfIntegers: [1, 2]),
-                new SnapshotEntity(arrayOfDates: [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
-                new SnapshotEntity(arrayOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
+        cdo << [new SnapshotEntity(arrayOfIntegers:     [1, 2]),
+                new SnapshotEntity(arrayOfDates:        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
+                new SnapshotEntity(arrayOfEntities:     [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
                 new SnapshotEntity(arrayOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")])
                ]
         expectedVal << [[1, 2],
@@ -113,15 +113,46 @@ class SnapshotFactoryTest extends Specification{
         where:
         propertyType << ["Primitive", "Value", "Entity", "ValueObject"]
         propertyName << ["setOfIntegers", "setOfDates", "setOfEntities", "setOfValueObjects"]
-        cdo << [new SnapshotEntity(setOfIntegers: [1, 2]),
-                new SnapshotEntity(setOfDates: [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
-                new SnapshotEntity(setOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
+        cdo << [new SnapshotEntity(setOfIntegers:     [1, 2]),
+                new SnapshotEntity(setOfDates:        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
+                new SnapshotEntity(setOfEntities:     [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
                 new SnapshotEntity(setOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")])
         ]
         expectedVal << [[1, 2] as Set,
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)] as Set,
                         [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)] as Set,
                          valueObjectSetId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects")
+                       ]
+    }
+
+    @Unroll
+    def "should record Map of #enrtyType"() {
+        given:
+        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+
+        when:
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+
+        then:
+        snapshot.getPropertyValue(propertyName) == expectedVal
+        //we need shallow copy
+        System.identityHashCode(snapshot.getPropertyValue(propertyName)) != System.identityHashCode(cdo.getAt(propertyName))
+
+        println(expectedVal)
+
+        where:
+        enrtyType <<    ["<Primitive,Primitive>", "<Value,Value>", "<Primitive,ValueObject>", "<Entity,Entity>"]
+        propertyName << ["mapOfPrimitives",       "mapOfValues",   "mapPrimitiveToVO",        "mapOfEntities"]
+        cdo << [new SnapshotEntity(mapOfPrimitives:  ["this":1,"that":2]),
+                new SnapshotEntity(mapOfValues:      [(new LocalDate(2000, 1, 1)):1.5]),
+                new SnapshotEntity(mapPrimitiveToVO: ["key1":new DummyAddress("London")]),
+                new SnapshotEntity(mapOfEntities:    [(new SnapshotEntity(id:2)):new SnapshotEntity(id:3)])
+        ]
+        expectedVal << [
+                        ["this":1,"that":2],
+                        [(new LocalDate(2000, 1, 1)):1.5],
+                        ["key1":valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"mapPrimitiveToVO/key1")],
+                        [(instanceId(2, SnapshotEntity)): instanceId(3, SnapshotEntity)]
                        ]
     }
 }

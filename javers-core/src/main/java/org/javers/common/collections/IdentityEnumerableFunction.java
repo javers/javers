@@ -5,7 +5,7 @@ package org.javers.common.collections;
  */
 public class IdentityEnumerableFunction<T> implements EnumerableFunction<T, T> {
     @Override
-    public T apply(T input, Integer index) {
+    public T apply(T input, String fragment) {
         return input;
     }
 }
