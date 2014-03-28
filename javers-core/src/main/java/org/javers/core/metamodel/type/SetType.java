@@ -1,9 +1,11 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.validation.Validate;
+
 import java.lang.reflect.Type;
-import static org.javers.common.exception.exceptions.JaversExceptionCode.NOT_IMPLEMENTED;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SetType extends CollectionType{
 
@@ -12,7 +14,14 @@ public class SetType extends CollectionType{
     }
 
     @Override
-    public Object map(Object sourceEnumerable, EnumerableFunction mapFunction) {
-        throw new JaversException(NOT_IMPLEMENTED);
+    public Object map(Object sourceSet_, EnumerableFunction mapFunction) {
+        Validate.argumentsAreNotNull(sourceSet_, mapFunction);
+        Set sourceSet = (Set)sourceSet_;
+        Set targetSet = new HashSet(sourceSet.size());
+
+        for (Object sourceVal : sourceSet){
+            targetSet.add(mapFunction.apply(sourceVal, null));
+        }
+        return targetSet;
     }
 }

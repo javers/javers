@@ -3,6 +3,7 @@ package org.javers.core.model;
 import org.joda.time.LocalDate;
 import javax.persistence.Id;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author bartosz walacik
@@ -29,19 +30,12 @@ public class SnapshotEntity {
     private List<SnapshotEntity> listOfEntities;
     private List<DummyAddress> listOfValueObjects;
 
+    private Set<Integer> setOfIntegers;
+    private Set<LocalDate> setOfDates;
+    private Set<SnapshotEntity> setOfEntities;
+    private Set<DummyAddress> setOfValueObjects;
+
     public int getId() {
         return id;
-    }
-
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public SnapshotEntity getEntityRef() {
-        return entityRef;
-    }
-
-    public DummyAddress getValueObjectRef() {
-        return valueObjectRef;
     }
 }

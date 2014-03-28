@@ -60,18 +60,4 @@ public class InstanceId extends GlobalCdoId {
 
         return cdoId.equals(entity.getIdOf(instance));
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || !(o instanceof InstanceId)) {return false;}
-
-        InstanceId other = (InstanceId) o;
-        return (entity.equals(other.entity) && cdoId.equals(other.cdoId));
-    }
-
-    @Override
-    public int hashCode() {
-        return entity.hashCode() + cdoId.hashCode();
-    }
 }

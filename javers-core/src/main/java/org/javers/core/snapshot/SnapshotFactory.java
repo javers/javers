@@ -1,15 +1,9 @@
 package org.javers.core.snapshot;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.EnumerableType;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.ManagedType;
-import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.*;
 
 /**
  * @author bartosz walacik
@@ -33,17 +27,33 @@ public class SnapshotFactory {
             JaversType propertyType = typeMapper.getPropertyType(property);
             OwnerContext owner = new OwnerContext(id, property.getName());
 
-            if (propertyType instanceof EnumerableType){
-                EnumerableType enumerablePropertyType = (EnumerableType)propertyType;
-                JaversType elementType = typeMapper.getJaversType(enumerablePropertyType.getElementType());
-                EnumerableFunction dehydrate = new DehydrateFunction(owner, elementType);
-                snapshot.addPropertyValue(property,  enumerablePropertyType.map(propertyVal, dehydrate));
-            } else{
-                snapshot.addPropertyValue(property,  dehydrate(propertyVal, propertyType, owner));
+            Object filteredPropertyVal;
+            if (propertyType instanceof EnumerableType) {
+                filteredPropertyVal = extractAndDehydrateEnumarable(propertyVal, (EnumerableType) propertyType, owner);
+            } else {
+                filteredPropertyVal = dehydrate(propertyVal, propertyType, owner);
             }
+
+            snapshot.addPropertyValue(property, filteredPropertyVal);
         }
 
         return snapshot;
+    }
+
+    private Object extractAndDehydrateEnumarable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
+        JaversType elementType = typeMapper.getJaversType(propertyType.getElementType());
+
+        //corner case for Set<ValueObject>
+        if (propertyType instanceof  SetType && elementType instanceof  ValueObjectType){
+            return createSetId((ValueObjectType)elementType,owner);
+        }
+
+        EnumerableFunction dehydrate = new DehydrateFunction(owner, elementType);
+        return  propertyType.map(propertyVal, dehydrate);
+    }
+
+    private ValueObjectSetId createSetId(ValueObjectType targetType, OwnerContext context) {
+        return new ValueObjectSetId(targetType.getManagedClass(), context);
     }
 
     private Object dehydrate(Object target, JaversType targetType, OwnerContext context){
@@ -72,7 +82,7 @@ public class SnapshotFactory {
         }
 
         @Override
-        public Object apply(Object input, int index) {
+        public Object apply(Object input, Integer index) {
             owner.setListIndex(index);
             return dehydrate(input, contentType, owner);
         }

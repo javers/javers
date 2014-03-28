@@ -5,11 +5,11 @@ import org.javers.core.metamodel.property.ValueObject;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
- * ValueObject placeholder identifier.
+ * ValueObject global unique identifier.
  * <br/><br/>
  *
  * Since ValueObjects doesn't have public Id,
- * they are identified in the context of owning Entity instance.
+ * they are identified by <i>fragment path</i> in the context of owning Entity instance.
  *
  * @author bartosz walacik
  */
@@ -25,8 +25,9 @@ public class ValueObjectId extends UnboundedValueObjectId {
     }
 
     /**
-     * Placeholder Identifier of (client's) ValueObject,
-     * should be unique in Entity <b>instance</b> scope
+     * Path to ValueObject, should be unique in the Entity <b>instance</b> scope.
+     * Usually, property name.
+     * It works like <i>fragment identifier</i> in URL
      */
     public String getFragment() {
         return fragment;
@@ -45,20 +46,4 @@ public class ValueObjectId extends UnboundedValueObjectId {
     public String toString() {
         return getOwnerId().toString()+"#"+fragment;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || !(o instanceof ValueObjectId)) {return false;}
-
-        ValueObjectId other = (ValueObjectId) o;
-        return this.fragment.equals(other.fragment)
-            && this.ownerId.equals(other.ownerId);
-    }
-
-    @Override
-    public int hashCode() {
-        return fragment.hashCode() + ownerId.hashCode();
-    }
-
 }

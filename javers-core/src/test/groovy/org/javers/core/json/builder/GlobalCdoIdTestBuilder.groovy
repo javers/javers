@@ -4,6 +4,7 @@ import org.javers.core.metamodel.object.GlobalCdoId
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
+import org.javers.core.metamodel.object.ValueObjectSetId
 
 import static EntityTestBuilder.entity
 import static EntityTestBuilder.valueObject
@@ -31,6 +32,10 @@ class GlobalCdoIdTestBuilder {
 
     static ValueObjectId valueObjectId(GlobalCdoId ownerId, Class valueObjectCdoClass, String fragment) {
         new ValueObjectId(valueObject(valueObjectCdoClass), ownerId, fragment)
+    }
+
+    static ValueObjectSetId valueObjectSetId(GlobalCdoId ownerId, Class valueObjectCdoClass, String fragment) {
+        new ValueObjectSetId(valueObject(valueObjectCdoClass), ownerId, fragment)
     }
 
 }

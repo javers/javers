@@ -36,20 +36,6 @@ public class UnboundedValueObjectId extends GlobalCdoId {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || !(o instanceof UnboundedValueObjectId)) {return false;}
-
-        UnboundedValueObjectId other = (UnboundedValueObjectId) o;
-        return valueObject.equals(other.valueObject);
-    }
-
-    @Override
-    public int hashCode() {
-        return valueObject.hashCode();
-    }
-
-    @Override
     public Object getCdoId() {
         return "/";
     }

@@ -10,7 +10,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.valueObjectId
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*
 
 /**
  * @author bartosz walacik
@@ -98,7 +98,7 @@ class SnapshotFactoryTest extends Specification{
     }
 
     @Unroll
-    def "should record List of #propertyType"() {
+    def "should record Set of #propertyType"() {
         given:
         SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
 
@@ -112,17 +112,16 @@ class SnapshotFactoryTest extends Specification{
 
         where:
         propertyType << ["Primitive", "Value", "Entity", "ValueObject"]
-        propertyName << ["listOfIntegers", "listOfDates", "listOfEntities", "listOfValueObjects"]
-        cdo << [new SnapshotEntity(listOfIntegers: [1, 2]),
-                new SnapshotEntity(listOfDates: [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
-                new SnapshotEntity(listOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
-                new SnapshotEntity(listOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")])
+        propertyName << ["setOfIntegers", "setOfDates", "setOfEntities", "setOfValueObjects"]
+        cdo << [new SnapshotEntity(setOfIntegers: [1, 2]),
+                new SnapshotEntity(setOfDates: [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
+                new SnapshotEntity(setOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
+                new SnapshotEntity(setOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")])
         ]
-        expectedVal << [[1, 2],
-                        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
-                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
-                        [valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"listOfValueObjects/0"),
-                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"listOfValueObjects/1")]
-        ]
+        expectedVal << [[1, 2] as Set,
+                        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)] as Set,
+                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)] as Set,
+                         valueObjectSetId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects")
+                       ]
     }
 }
