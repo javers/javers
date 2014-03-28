@@ -24,6 +24,6 @@ class ArrayTypeTest extends Specification{
         then:
         aType.baseJavaType == Integer[]
         aType.genericType == false
-        aType.elementTypes == Integer
+        aType.itemClass == Integer
     }
 }

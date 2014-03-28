@@ -1,5 +1,7 @@
 package org.javers.core.snapshot
 
+import org.javers.common.exception.exceptions.JaversException
+import org.javers.common.exception.exceptions.JaversExceptionCode
 import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
@@ -9,6 +11,7 @@ import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import static org.javers.common.exception.exceptions.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
 import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*
 
@@ -123,6 +126,32 @@ class SnapshotFactoryTest extends Specification{
                         [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)] as Set,
                          valueObjectSetId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects")
                        ]
+    }
+
+    def "should not support Map of <ValueObject,?>"() {
+        given:
+        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+
+        when:
+        def cdo = new SnapshotEntity(mapVoToPrimitive:  [(new DummyAddress("London")):"this"])
+        snapshotFactory.create(cdo, instanceId(cdo))
+
+        then:
+        def e = thrown(JaversException)
+        e.code == VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
+    }
+
+    def "should throw exception when property Type is not fully parametrized"() {
+        given:
+        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+
+        when:
+        def cdo = new SnapshotEntity(nonParametrizedMap:  ["a":1])
+        snapshotFactory.create(cdo, instanceId(cdo))
+
+        then:
+        def e = thrown(JaversException)
+        e.code == JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
     }
 
     @Unroll

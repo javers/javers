@@ -43,6 +43,7 @@ public class SnapshotEntity {
     private Map<String,DummyAddress> mapPrimitiveToVO;
     private Map<SnapshotEntity, SnapshotEntity> mapOfEntities;
     private Map<DummyAddress,String> mapVoToPrimitive;           //not supported
+
     private Map nonParametrizedMap;                              //not supported
 
     public int getId() {
