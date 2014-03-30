@@ -16,7 +16,7 @@ import java.util.*;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * Creates graph based on ObjectWrappers.
+ * Creates graph based on ObjectNodes.
  * This is a stateful Builder (not a Service)
  *
  * @author bartosz walacik
