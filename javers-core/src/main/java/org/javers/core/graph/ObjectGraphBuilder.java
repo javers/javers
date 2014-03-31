@@ -3,10 +3,8 @@ package org.javers.core.graph;
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.*;
-import org.javers.core.metamodel.property.Entity;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.property.ValueObject;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,16 +31,24 @@ public class ObjectGraphBuilder {
         this.typeMapper = typeMapper;
     }
 
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
     /**
-     * @param cdo Client's domain object, instance of Entity or ValueObject.
-     *            It should be root of an aggregate, tree root
-     *            or any node in objects graph from where all other nodes are navigable
+     * @param handle Client's domain object, instance of Entity or ValueObject.
+     *               It should be root of an aggregate, tree root
+     *               or any node in objects graph from where all other nodes are navigable
      * @return graph node
      */
-    public ObjectNode buildGraph(Object cdo) {
-        ObjectNode root = buildNode(asCdo(cdo, null));
-        logger.debug("done building objectGraph for root ["+root+"]");
-        logger.debug("object nodes: " + reverseCdoIdMap.size());
+    public ObjectNode buildGraph(Object handle) {
+        Cdo cdo = asCdo(handle, null);
+        logger.debug("building objectGraph for handle [{}] ...",cdo);
+
+        ObjectNode root = buildNode(cdo);
+
+        logger.debug("graph assembled, object nodes: {}",reverseCdoIdMap.size());
         switchToBuilt();
         return root;
     }
@@ -52,6 +58,8 @@ public class ObjectGraphBuilder {
      */
     private ObjectNode buildNode(Cdo cdo) {
         argumentIsNotNull(cdo);
+        logger.debug(".. creating node for: {}",cdo);
+
         ObjectNode node = buildNodeStubAndSaveForReuse(cdo);
         buildEdges(node);
         return node;
