@@ -41,7 +41,8 @@ public class ObjectGraphBuilder {
      */
     public ObjectNode buildGraph(Object cdo) {
         ObjectNode root = buildNode(asCdo(cdo, null));
-        logger.debug("done building objectGraph for root ["+root+"], nodes: " + reverseCdoIdMap.size());
+        logger.debug("done building objectGraph for root ["+root+"]");
+        logger.debug("object nodes: " + reverseCdoIdMap.size());
         switchToBuilt();
         return root;
     }

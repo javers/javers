@@ -21,10 +21,13 @@ public class Multimap<K,V> {
 
         if (isEmpty(key)){
             map.put(key,value);
+        }   else {
+            initSet(key).add(value);
         }
+    }
 
-        Set<V> values = initSet(key);
-        values.add(value);
+    public int size(){
+        return map.size();
     }
 
     public Set<K> keySet(){
@@ -32,7 +35,7 @@ public class Multimap<K,V> {
     }
 
     public boolean isMultivalue(K key){
-        if ( !isEmpty(key) ){
+        if (isEmpty(key) ){
             return false;
         }
         Object valueOrSet = map.get(key);
@@ -43,23 +46,40 @@ public class Multimap<K,V> {
         return false;
     }
 
+    /**
+     * @throws java.lang.IllegalArgumentException
+     */
+    public V getOne(K key) {
+         if (!isValue(key)) {
+             throw new IllegalArgumentException("more than one or no values at key "+key);
+         }
+        return (V) map.get(key);
+    }
+
     private Set<V> initSet(K key) {
-        Object valueOrSet = map.get(key);
-
-        if (valueOrSet instanceof Set) {
-            return (Set)valueOrSet;
+        Set<V> values;
+        if (isEmpty(key) ){
+            values = new HashSet<>();
+            map.put(key, values);
         }
-
-        Set<V> values = new HashSet<>();
-        V existing = (V) valueOrSet;
-        values.add(existing);
-
+        else if (isValue(key)){
+            values = new HashSet<>();
+            V existing = (V) map.get(key);
+            values.add(existing);
+            map.put(key, values);
+        } else {
+            values = (Set) map.get(key);
+        }
         return values;
     }
 
-
     private boolean isEmpty(K key) {
         return !map.containsKey(key);
+    }
+
+    private boolean isValue(K key) {
+        Object o = map.get(key);
+        return (o!=null && !(o instanceof Set));
     }
 
 }

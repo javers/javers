@@ -1,6 +1,8 @@
 package org.javers.core.snapshot;
 
 import org.javers.common.collections.Multimap;
+import org.javers.common.validation.Validate;
+import org.javers.core.graph.GraphVisitor;
 import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -17,11 +19,36 @@ import org.javers.core.metamodel.object.ValueObjectSetId;
  * @author bartosz walacik
  */
 public class GraphSnapshotFactory {
+
+    private final SnapshotFactory snapshotFactory;
+
+    public GraphSnapshotFactory(SnapshotFactory snapshotFactory) {
+        this.snapshotFactory = snapshotFactory;
+    }
+
     /**
      *
-     * @param objectNode graph 'root', outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
+     * @param node graph 'root', outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
      */
-    public Multimap<GlobalCdoId, CdoSnapshot> create(ObjectNode objectNode){
-        return null;
+    public Multimap<GlobalCdoId, CdoSnapshot> create(ObjectNode node){
+        Validate.argumentIsNotNull(node);
+        SnapshotVisitor visitor = new SnapshotVisitor();
+        node.accept(visitor);
+
+        return visitor.getOutput();
+    }
+
+    private class SnapshotVisitor extends GraphVisitor{
+        private final Multimap<GlobalCdoId, CdoSnapshot> output = new Multimap<>();
+
+        @Override
+        protected void visitOnce(ObjectNode node) {
+            CdoSnapshot thisNode = snapshotFactory.create(node);
+            output.put(node.getGlobalCdoId(), thisNode);
+        }
+
+        public Multimap<GlobalCdoId, CdoSnapshot> getOutput() {
+            return output;
+        }
     }
 }

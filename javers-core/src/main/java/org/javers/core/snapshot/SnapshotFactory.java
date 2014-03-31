@@ -2,6 +2,7 @@ package org.javers.core.snapshot;
 
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.exception.exceptions.JaversException;
+import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
@@ -46,6 +47,10 @@ public class SnapshotFactory {
         }
 
         return snapshot;
+    }
+
+    public CdoSnapshot create (ObjectNode objectNode) {
+        return create(objectNode.wrappedCdo(),objectNode.getGlobalCdoId());
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
