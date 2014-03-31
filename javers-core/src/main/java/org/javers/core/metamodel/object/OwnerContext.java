@@ -3,12 +3,11 @@ package org.javers.core.metamodel.object;
 /**
 * @author bartosz walacik
 */
-public class OwnerContext {
-    final GlobalCdoId owner;
-    final String propertyName;
-    private String fragment;
+public abstract class OwnerContext {
+    final   GlobalCdoId owner;
+    final   String propertyName;
 
-    public OwnerContext(GlobalCdoId owner, String propertyName) {
+    OwnerContext(GlobalCdoId owner, String propertyName) {
         this.owner = owner;
         this.propertyName = propertyName;
     }
@@ -18,15 +17,10 @@ public class OwnerContext {
     }
 
     public String getPath() {
-        if (fragment == null){
-            return propertyName;
-        }
-
-        return propertyName+"/"+fragment;
+        return propertyName;
     }
 
-    public void setFragment(String fragment) {
-        this.fragment = fragment;
+    String getPropertyName() {
+        return propertyName;
     }
-
 }

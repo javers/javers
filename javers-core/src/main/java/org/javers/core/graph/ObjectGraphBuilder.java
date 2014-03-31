@@ -1,10 +1,12 @@
 package org.javers.core.graph;
 
+import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,15 +127,30 @@ public class ObjectGraphBuilder {
         }
     }
 
-    private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences, OwnerContext owner) {
+    private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences, SimpleOwnerContext owner) {
         MultiEdge multiEdge = new MultiEdge(multiRef);
-        int i = 0;
-        for(Object referencedRawCdo : collectionOfReferences) {
-            owner.setFragment(""+i++);
-            ObjectNode objectNode = buildNodeOrReuse(asCdo(referencedRawCdo, owner));
-            multiEdge.addReferenceNode(objectNode);
-        }
+        EnumerableType multiRefType = typeMapper.getJaversType(multiRef);
+
+        EnumerableFunction edgeBuilder = new MultiEdgeBuilderFunction(multiEdge);
+
+        multiRefType.map(collectionOfReferences, edgeBuilder, owner);
+
         return multiEdge;
+    }
+
+    private class MultiEdgeBuilderFunction implements EnumerableFunction {
+        private MultiEdge multiEdge;
+
+        MultiEdgeBuilderFunction(MultiEdge multiEdge) {
+            this.multiEdge = multiEdge;
+        }
+
+        @Override
+        public Object apply(Object input, OwnerContext iterationAwareOwnerContext) {
+            ObjectNode objectNode = buildNodeOrReuse(asCdo(input, iterationAwareOwnerContext));
+            multiEdge.addReferenceNode(objectNode);
+            return null;
+        }
     }
 
     private ObjectNode buildNodeStubAndSaveForReuse(Cdo cdo) {
@@ -163,7 +180,7 @@ public class ObjectGraphBuilder {
         return  typeMapper.getManagedClass(cdo.getClass());
     }
 
-    private OwnerContext createOwnerContext(ObjectNode node, String path) {
-        return new OwnerContext(node.getGlobalCdoId(), path);
+    private SimpleOwnerContext createOwnerContext(ObjectNode node, String path) {
+        return new SimpleOwnerContext(node.getGlobalCdoId(), path);
     }
 }

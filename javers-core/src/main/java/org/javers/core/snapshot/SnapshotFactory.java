@@ -34,7 +34,7 @@ public class SnapshotFactory {
             }
 
             JaversType propertyType = typeMapper.getPropertyType(property);
-            OwnerContext owner = new OwnerContext(id, property.getName());
+            SimpleOwnerContext owner = new SimpleOwnerContext(id, property.getName());
 
             Object filteredPropertyVal;
             if (propertyType instanceof EnumerableType) {
@@ -53,8 +53,8 @@ public class SnapshotFactory {
         return create(objectNode.wrappedCdo(),objectNode.getGlobalCdoId());
     }
 
-    private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
-        if (!propertyType.isFullyParameterized()){
+    private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, SimpleOwnerContext owner) {
+        if (!propertyType.isFullyParametrized()){
             throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, propertyType.getBaseJavaType().toString());
         }
 
@@ -67,35 +67,32 @@ public class SnapshotFactory {
         throw new JaversException(NOT_IMPLEMENTED);
     }
 
-    private Object extractAndDehydrateMap(Object propertyVal, MapType propertyType, OwnerContext owner) {
+    private Object extractAndDehydrateMap(Object propertyVal, MapType propertyType, SimpleOwnerContext owner) {
         JaversType keyType =   typeMapper.getJaversType(propertyType.getKeyClass());
         JaversType valueType = typeMapper.getJaversType(propertyType.getValueClass());
 
+        //corner case for Map<ValueObject,?>
         if (keyType instanceof ValueObjectType) {
             throw new JaversException(VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY,
                                       propertyType.getKeyClass().getName(),
                                       propertyType.getBaseJavaType().toString());
         }
 
-        EnumerableFunction dehydrate = new DehydrateMapFunction(owner, keyType, valueType);
-        return  propertyType.map(propertyVal, dehydrate);
+        EnumerableFunction dehydrate = new DehydrateMapFunction(keyType, valueType);
+        return  propertyType.map(propertyVal, dehydrate, owner);
     }
 
-    private Object extractAndDehydrateContainer(Object propertyVal, ContainerType propertyType, OwnerContext owner) {
+    private Object extractAndDehydrateContainer(Object propertyVal, ContainerType propertyType, SimpleOwnerContext owner) {
         JaversType itemType = typeMapper.getJaversType(propertyType.getItemClass());
 
         //corner case for Set<ValueObject>
         if (propertyType instanceof  SetType && itemType instanceof  ValueObjectType){
-            return createSetId((ValueObjectType)itemType, owner);
+            return GlobalIdFactory.create(propertyVal, ((ValueObjectType)itemType).getManagedClass(),
+                                          new SetOwnerContext(owner));
         }
 
-        EnumerableFunction dehydrate = new DehydrateContainerFunction(owner, itemType);
-        return  propertyType.map(propertyVal, dehydrate);
-    }
-
-
-    private ValueObjectSetId createSetId(ValueObjectType targetType, OwnerContext context) {
-        return new ValueObjectSetId(targetType.getManagedClass(), context);
+        EnumerableFunction dehydrate = new DehydrateContainerFunction(itemType);
+        return  propertyType.map(propertyVal, dehydrate, owner);
     }
 
     /**
@@ -114,42 +111,43 @@ public class SnapshotFactory {
     }
 
     private class DehydrateContainerFunction implements EnumerableFunction{
-        private OwnerContext owner;
         private JaversType itemType;
 
-        private DehydrateContainerFunction(OwnerContext owner, JaversType itemType) {
-            this.owner = owner;
+        DehydrateContainerFunction(JaversType itemType) {
             this.itemType = itemType;
         }
 
         @Override
-        public Object apply(Object input, String fragment) {
-            owner.setFragment(fragment);
-            return dehydrate(input, itemType, owner);
+        public Object apply(Object input, OwnerContext iterationAwareOwnerContext) {
+            return dehydrate(input, itemType, iterationAwareOwnerContext);
         }
     }
 
     private class DehydrateMapFunction implements EnumerableFunction{
-        private OwnerContext owner;
         private JaversType keyType;
         private JaversType valueType;
 
-        private DehydrateMapFunction(OwnerContext owner, JaversType keyType, JaversType valueType) {
-            this.owner = owner;
+        DehydrateMapFunction(JaversType keyType, JaversType valueType) {
             this.keyType = keyType;
             this.valueType = valueType;
         }
 
         @Override
-        public Object apply(Object input, String fragment) {
-            //corner case for Map<?,ValueObject>
-            if (valueType instanceof ValueObjectType && fragment!=null){
-                owner.setFragment(fragment);
-                return dehydrate(input, valueType, owner);
+        public Object apply(Object input, OwnerContext iterationAwareOwnerContext) {
+            MapOwnerContext mapOwnerContext = (MapOwnerContext)iterationAwareOwnerContext;
+
+            if (mapOwnerContext.isKey()){
+                return dehydrate(input, keyType, mapOwnerContext);
+            }
+            else {
+                return dehydrate(input, valueType, mapOwnerContext);
             }
 
-            owner.setFragment(null);
-            return dehydrate(input, keyType, owner);
+            //corner case for Map<?,ValueObject>
+            //if (valueType instanceof ValueObjectType && key != null){
+            //    return dehydrate(input, valueType, owner);
+            //}
+
         }
     }
 }

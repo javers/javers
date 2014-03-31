@@ -29,7 +29,12 @@ public class GlobalIdFactory {
         }
 
         if (targetManagedClass instanceof ValueObject && hasOwner(context)) {
-            return new ValueObjectId((ValueObject)targetManagedClass, context.getGlobalCdoId(), context.getPath());
+            if (context instanceof SetOwnerContext){
+                return new ValueObjectSetId((ValueObject) targetManagedClass, context.getGlobalCdoId(), context.getPath());
+            }
+            else {
+                return new ValueObjectId((ValueObject) targetManagedClass, context.getGlobalCdoId(), context.getPath());
+            }
         }
 
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);

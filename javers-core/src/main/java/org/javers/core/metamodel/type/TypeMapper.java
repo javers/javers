@@ -1,9 +1,9 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Function;
-import org.javers.common.collections.Lists;
 import org.javers.common.collections.Primitives;
-import org.javers.core.metamodel.property.*;
+import org.javers.core.metamodel.property.ManagedClass;
+import org.javers.core.metamodel.property.ManagedClassDefinition;
+import org.javers.core.metamodel.property.Property;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -73,6 +73,13 @@ public class TypeMapper {
         return createMapping(javaType);
     }
 
+    public <T extends JaversType> T getJaversType(Property property) {
+        argumentIsNotNull(property);
+        return (T)getJaversType(property.getType());
+    }
+
+
+
   /*  public List<JaversType> getJaversTypes(List<Class> javaTypes) {
         argumentIsNotNull(javaTypes);
         return Lists.transform(javaTypes, new Function<Class, JaversType>() {
@@ -106,7 +113,7 @@ public class TypeMapper {
     }
 
     public boolean isSupportedMap(MapType propertyType){
-        if (!propertyType.isFullyParameterized()) {
+        if (!propertyType.isFullyParametrized()) {
             return false;
         }
         return isPrimitiveOrValueOrObject(propertyType.getKeyClass()) &&
@@ -120,7 +127,7 @@ public class TypeMapper {
         }
 
         CollectionType collectionType = (CollectionType)javersType;
-        if (!collectionType.isFullyParameterized()){
+        if (!collectionType.isFullyParametrized()){
             return false;
         }
 
@@ -142,7 +149,7 @@ public class TypeMapper {
     }
 
     public boolean isSupportedContainer(ContainerType propertyType) {
-        if (!propertyType.isFullyParameterized()){
+        if (!propertyType.isFullyParametrized()){
             return false;
         }
         return isPrimitiveOrValueOrObject(propertyType.getItemClass());

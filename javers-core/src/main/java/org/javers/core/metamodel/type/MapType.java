@@ -4,12 +4,13 @@ import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Lists;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.MapOwnerContext;
+import org.javers.core.metamodel.object.SimpleOwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.*;
 
 import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
-import static org.javers.common.exception.exceptions.JaversExceptionCode.NOT_IMPLEMENTED;
 
 /**
  * Map where both keys and values
@@ -34,19 +35,26 @@ public class MapType extends EnumerableType {
     }
 
     @Override
-    public boolean isFullyParameterized() {
+    public boolean isFullyParametrized() {
         return elementTypes.size() == 2;
     }
 
     @Override
-    public Object map(Object sourceMap_, EnumerableFunction mapFunction) {
+    public Object map(Object sourceMap_, EnumerableFunction mapFunction, SimpleOwnerContext owner) {
         Validate.argumentsAreNotNull(sourceMap_, mapFunction);
         Map<Object, Object> sourceMap = (Map) sourceMap_;
         Map<Object, Object> targetMap = new HashMap(sourceMap.size());
+        MapOwnerContext mapOwnerContext = new MapOwnerContext(owner);
 
         for (Map.Entry<?, ?> entry : sourceMap.entrySet()) {
-            Object mappedKey = mapFunction.apply(entry.getKey(), null);
-            Object mappedValue = mapFunction.apply(entry.getValue(), mappedKey.toString());
+            //key
+            mapOwnerContext.switchToKey();
+            Object mappedKey = mapFunction.apply(entry.getKey(), mapOwnerContext);
+
+            //value
+            mapOwnerContext.switchToValue(mappedKey.toString());
+            Object mappedValue = mapFunction.apply(entry.getValue(), mapOwnerContext);
+
             targetMap.put(mappedKey, mappedValue);
         }
 
@@ -68,7 +76,7 @@ public class MapType extends EnumerableType {
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     public Class getKeyClass() {
-        if (isFullyParameterized()) {
+        if (isFullyParametrized()) {
             return elementTypes.get(0);
         }
         throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED,getBaseJavaType().toString());
@@ -79,7 +87,7 @@ public class MapType extends EnumerableType {
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     public Class getValueClass() {
-        if (isFullyParameterized()) {
+        if (isFullyParametrized()) {
             return elementTypes.get(1);
         }
         throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());

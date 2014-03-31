@@ -2,10 +2,8 @@ package org.javers.common.collections;
 
 import org.javers.common.validation.Validate;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.Collections;
 
 /**
  * JaVers is designed as lightweight library so
@@ -27,7 +25,24 @@ public class Multimap<K,V> {
     }
 
     public int size(){
-        return map.size();
+        int size = 0;
+        for (K key : map.keySet()){
+            if (isValue(key)) {
+                size++;
+            }
+            else {
+                size += getSet(key).size();
+            }
+        }
+        return size;
+    }
+
+    public boolean containsKey(K key){
+        return map.containsKey(key);
+    }
+
+    public boolean isEmpty(K key) {
+        return !containsKey(key);
     }
 
     public Set<K> keySet(){
@@ -56,6 +71,18 @@ public class Multimap<K,V> {
         return (V) map.get(key);
     }
 
+    public Set<V> getSet(K key) {
+        if (isEmpty(key)) {
+            return Collections.EMPTY_SET;
+        }
+
+        if (isValue(key)){
+            initSet(key);
+        }
+
+        return (Set)map.get(key);
+    }
+
     private Set<V> initSet(K key) {
         Set<V> values;
         if (isEmpty(key) ){
@@ -71,10 +98,6 @@ public class Multimap<K,V> {
             values = (Set) map.get(key);
         }
         return values;
-    }
-
-    private boolean isEmpty(K key) {
-        return !map.containsKey(key);
     }
 
     private boolean isValue(K key) {

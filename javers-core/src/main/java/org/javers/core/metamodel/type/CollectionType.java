@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.exception.exceptions.JaversException;
+import org.javers.core.metamodel.object.SimpleOwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -27,7 +28,7 @@ public class CollectionType extends ContainerType {
     }
 
     @Override
-    public boolean isFullyParameterized() {
+    public boolean isFullyParametrized() {
         return elementTypes.size() == 1;
     }
 
@@ -40,7 +41,7 @@ public class CollectionType extends ContainerType {
      * implemented in subclasses
      */
     @Override
-    public Object map(Object sourceEnumerable, EnumerableFunction mapFunction) {
+    public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, SimpleOwnerContext owner) {
         throw new JaversException(NOT_IMPLEMENTED);
     }
 }
