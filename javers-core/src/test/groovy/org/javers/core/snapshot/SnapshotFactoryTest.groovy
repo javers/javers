@@ -167,8 +167,6 @@ class SnapshotFactoryTest extends Specification{
         //we need shallow copy
         System.identityHashCode(snapshot.getPropertyValue(propertyName)) != System.identityHashCode(cdo.getAt(propertyName))
 
-        println(expectedVal)
-
         where:
         enrtyType <<    ["<Primitive,Primitive>", "<Value,Value>", "<Primitive,ValueObject>", "<Entity,Entity>"]
         propertyName << ["mapOfPrimitives",       "mapOfValues",   "mapPrimitiveToVO",        "mapOfEntities"]

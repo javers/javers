@@ -87,7 +87,7 @@ public class ObjectGraphBuilder {
 
             Object referencedRawCdo = singleRef.get(node.wrappedCdo());
             ObjectNode referencedNode = buildNodeOrReuse(asCdo(referencedRawCdo,
-                                                         createOwnerContext(node, singleRef.getName())));
+                                                         createOwnerContext(node, singleRef)));
 
             Edge edge = new SingleEdge(singleRef, referencedNode);
             node.addEdge(edge);
@@ -122,12 +122,12 @@ public class ObjectGraphBuilder {
                 continue;
             }
             MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences,
-                                                  createOwnerContext(node, colProperty.getName()));
+                                                  createOwnerContext(node, colProperty));
             node.addEdge(multiEdge);
         }
     }
 
-    private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences, SimpleOwnerContext owner) {
+    private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences, OwnerContext owner) {
         MultiEdge multiEdge = new MultiEdge(multiRef);
         EnumerableType multiRefType = typeMapper.getJaversType(multiRef);
 
@@ -139,15 +139,15 @@ public class ObjectGraphBuilder {
     }
 
     private class MultiEdgeBuilderFunction implements EnumerableFunction {
-        private MultiEdge multiEdge;
+        MultiEdge multiEdge;
 
         MultiEdgeBuilderFunction(MultiEdge multiEdge) {
             this.multiEdge = multiEdge;
         }
 
         @Override
-        public Object apply(Object input, OwnerContext iterationAwareOwnerContext) {
-            ObjectNode objectNode = buildNodeOrReuse(asCdo(input, iterationAwareOwnerContext));
+        public Object apply(Object input, OwnerContext enumerationAwareOwnerContext) {
+            ObjectNode objectNode = buildNodeOrReuse(asCdo(input, enumerationAwareOwnerContext));
             multiEdge.addReferenceNode(objectNode);
             return null;
         }
@@ -170,8 +170,7 @@ public class ObjectGraphBuilder {
     }
 
     private Cdo asCdo(Object targetCdo, OwnerContext owner){
-        GlobalCdoId globalId = GlobalIdFactory.create(targetCdo, getManagedCLass(targetCdo), owner);
-
+        GlobalCdoId globalId = GlobalIdFactory.createId(targetCdo, getManagedCLass(targetCdo), owner);
         return new CdoWrapper(targetCdo, globalId);
     }
 
@@ -180,7 +179,7 @@ public class ObjectGraphBuilder {
         return  typeMapper.getManagedClass(cdo.getClass());
     }
 
-    private SimpleOwnerContext createOwnerContext(ObjectNode node, String path) {
-        return new SimpleOwnerContext(node.getGlobalCdoId(), path);
+    private OwnerContext createOwnerContext(ObjectNode node, Property property) {
+        return new OwnerContext(node.getGlobalCdoId(), property.getName());
     }
 }

@@ -9,6 +9,10 @@ import org.javers.core.metamodel.property.ValueObject;
  */
 public class ValueObjectSetId extends ValueObjectId{
 
+    public ValueObjectSetId(ValueObject valueObject, OwnerContext ownerContext) {
+        super(valueObject, ownerContext.getGlobalCdoId(), ownerContext.getPath());
+    }
+
     public ValueObjectSetId(ValueObject valueObject, GlobalCdoId ownerId, String fragment) {
         super(valueObject, ownerId, fragment);
     }

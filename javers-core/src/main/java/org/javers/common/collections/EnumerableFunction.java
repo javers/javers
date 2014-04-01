@@ -6,5 +6,5 @@ import org.javers.core.metamodel.object.OwnerContext;
  * @author bartosz walacik
  */
 public interface EnumerableFunction<F,T> {
-    public T apply(F input, OwnerContext iterationAwareOwnerContext);
+    public T apply(F input, OwnerContext enumerationAwareOwnerContext);
 }

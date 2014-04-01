@@ -4,8 +4,7 @@ import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Lists;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.MapOwnerContext;
-import org.javers.core.metamodel.object.SimpleOwnerContext;
+import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.*;
@@ -40,20 +39,22 @@ public class MapType extends EnumerableType {
     }
 
     @Override
-    public Object map(Object sourceMap_, EnumerableFunction mapFunction, SimpleOwnerContext owner) {
+    public Object map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentsAreNotNull(sourceMap_, mapFunction);
         Map<Object, Object> sourceMap = (Map) sourceMap_;
         Map<Object, Object> targetMap = new HashMap(sourceMap.size());
-        MapOwnerContext mapOwnerContext = new MapOwnerContext(owner);
+
+        MapEnumeratorContext enumeratorContext = new MapEnumeratorContext();
+        owner.setEnumeratorContext(enumeratorContext);
 
         for (Map.Entry<?, ?> entry : sourceMap.entrySet()) {
             //key
-            mapOwnerContext.switchToKey();
-            Object mappedKey = mapFunction.apply(entry.getKey(), mapOwnerContext);
+            enumeratorContext.switchToKey();
+            Object mappedKey = mapFunction.apply(entry.getKey(), owner);
 
             //value
-            mapOwnerContext.switchToValue(mappedKey.toString());
-            Object mappedValue = mapFunction.apply(entry.getValue(), mapOwnerContext);
+            enumeratorContext.switchToValue(mappedKey.toString());
+            Object mappedValue = mapFunction.apply(entry.getValue(), owner);
 
             targetMap.put(mappedKey, mappedValue);
         }
@@ -92,4 +93,5 @@ public class MapType extends EnumerableType {
         }
         throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
     }
+
 }

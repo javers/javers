@@ -34,7 +34,7 @@ public class SnapshotFactory {
             }
 
             JaversType propertyType = typeMapper.getPropertyType(property);
-            SimpleOwnerContext owner = new SimpleOwnerContext(id, property.getName());
+            OwnerContext owner = new OwnerContext(id, property.getName());
 
             Object filteredPropertyVal;
             if (propertyType instanceof EnumerableType) {
@@ -53,7 +53,7 @@ public class SnapshotFactory {
         return create(objectNode.wrappedCdo(),objectNode.getGlobalCdoId());
     }
 
-    private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, SimpleOwnerContext owner) {
+    private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
         if (!propertyType.isFullyParametrized()){
             throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, propertyType.getBaseJavaType().toString());
         }
@@ -67,7 +67,7 @@ public class SnapshotFactory {
         throw new JaversException(NOT_IMPLEMENTED);
     }
 
-    private Object extractAndDehydrateMap(Object propertyVal, MapType propertyType, SimpleOwnerContext owner) {
+    private Object extractAndDehydrateMap(Object propertyVal, MapType propertyType, OwnerContext owner) {
         JaversType keyType =   typeMapper.getJaversType(propertyType.getKeyClass());
         JaversType valueType = typeMapper.getJaversType(propertyType.getValueClass());
 
@@ -82,13 +82,12 @@ public class SnapshotFactory {
         return  propertyType.map(propertyVal, dehydrate, owner);
     }
 
-    private Object extractAndDehydrateContainer(Object propertyVal, ContainerType propertyType, SimpleOwnerContext owner) {
+    private Object extractAndDehydrateContainer(Object propertyVal, ContainerType propertyType, OwnerContext owner) {
         JaversType itemType = typeMapper.getJaversType(propertyType.getItemClass());
 
         //corner case for Set<ValueObject>
         if (propertyType instanceof  SetType && itemType instanceof  ValueObjectType){
-            return GlobalIdFactory.create(propertyVal, ((ValueObjectType)itemType).getManagedClass(),
-                                          new SetOwnerContext(owner));
+            return GlobalIdFactory.createSetId(((ValueObjectType) itemType).getManagedClass(), owner);
         }
 
         EnumerableFunction dehydrate = new DehydrateContainerFunction(itemType);
@@ -102,9 +101,9 @@ public class SnapshotFactory {
     private Object dehydrate(Object item, JaversType targetType, OwnerContext context){
         if (targetType instanceof ManagedType){
             ManagedType targetManagedType = (ManagedType)targetType;
-            return GlobalIdFactory.create(item,
-                                          targetManagedType.getManagedClass(),
-                                          context);
+            return GlobalIdFactory.createId(item,
+                    targetManagedType.getManagedClass(),
+                    context);
         }  else {
             return item;
         }
@@ -118,8 +117,8 @@ public class SnapshotFactory {
         }
 
         @Override
-        public Object apply(Object input, OwnerContext iterationAwareOwnerContext) {
-            return dehydrate(input, itemType, iterationAwareOwnerContext);
+        public Object apply(Object input, OwnerContext enumerationAwareOwnerContext) {
+            return dehydrate(input, itemType, enumerationAwareOwnerContext);
         }
     }
 
@@ -133,14 +132,13 @@ public class SnapshotFactory {
         }
 
         @Override
-        public Object apply(Object input, OwnerContext iterationAwareOwnerContext) {
-            MapOwnerContext mapOwnerContext = (MapOwnerContext)iterationAwareOwnerContext;
-
-            if (mapOwnerContext.isKey()){
-                return dehydrate(input, keyType, mapOwnerContext);
+        public Object apply(Object input, OwnerContext enumerationAwareOwnerContext) {
+            MapEnumeratorContext mapContext =  enumerationAwareOwnerContext.getEnumeratorContext();
+            if (mapContext.isKey()){
+                return dehydrate(input, keyType, enumerationAwareOwnerContext);
             }
             else {
-                return dehydrate(input, valueType, mapOwnerContext);
+                return dehydrate(input, valueType, enumerationAwareOwnerContext);
             }
 
             //corner case for Map<?,ValueObject>

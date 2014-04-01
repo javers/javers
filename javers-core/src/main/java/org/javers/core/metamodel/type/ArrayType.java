@@ -3,8 +3,7 @@ package org.javers.core.metamodel.type;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.IndexableOwnerContext;
-import org.javers.core.metamodel.object.SimpleOwnerContext;
+import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
@@ -38,18 +37,19 @@ public class ArrayType extends ContainerType {
     }
 
     @Override
-    public Object map(Object sourceArray, EnumerableFunction mapFunction, SimpleOwnerContext owner) {
+    public Object map(Object sourceArray, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentsAreNotNull(sourceArray, mapFunction, owner);
-
-        IndexableOwnerContext indexableOwnerContext = new IndexableOwnerContext(owner);
 
         int len = Array.getLength(sourceArray);
         Object targetArray = new Object[len];
 
+        IndexableContext indexableContext = new IndexableContext();
+        owner.setEnumeratorContext(indexableContext);
+
         for (int i=0; i<len; i++){
             Object sourceVal = Array.get(sourceArray,i);
-            indexableOwnerContext.setIndex(i);
-            Array.set(targetArray, i, mapFunction.apply(sourceVal, indexableOwnerContext));
+            Array.set(targetArray, i, mapFunction.apply(sourceVal, owner));
+            indexableContext.incIndex();
         }
         return targetArray;
     }

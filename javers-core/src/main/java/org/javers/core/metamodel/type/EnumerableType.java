@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.core.metamodel.object.SimpleOwnerContext;
+import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -40,5 +40,5 @@ public abstract class EnumerableType extends JaversType {
     /**
      * Returns new instance of Enumerable with items from sourceEnumerable mapped by mapFunction.
      */
-    public abstract Object map(Object sourceEnumerable, EnumerableFunction mapFunction, SimpleOwnerContext owner);
+    public abstract Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner);
 }
