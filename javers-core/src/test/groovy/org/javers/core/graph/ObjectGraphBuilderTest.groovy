@@ -1,13 +1,15 @@
 package org.javers.core.graph
 
-import org.javers.core.graph.ObjectNode
+import org.javers.core.metamodel.property.ValueObject
+import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.javers.core.metamodel.type.TypeMapper
+import org.javers.core.model.SnapshotEntity
 import org.javers.test.assertion.NodeAssert
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.javers.test.assertion.NodeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
@@ -22,7 +24,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build one node graph from Entity"(){
         given:
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser user = dummyUser().withName("Mad Kaz").build()
 
         when:
@@ -101,7 +103,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
 
 
-    def "shouldBuildThreeNodesLinearGraph"() {
+    def "should build three nodes linear graph"() {
         given:
         //kaz0 - kaz1 - kaz2
         org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper);
@@ -300,19 +302,50 @@ abstract class ObjectGraphBuilderTest extends Specification {
         NodeAssert.assertThat(node).hasNoEdges()
     }
 
-    def "should build graph with ValueObjects multi edge"() {
+    @Unroll
+    def "should build graph with #containerType<#managedClass> MultiEdge"() {
         given:
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
-        DummyUserDetails dummyUserDetails = dummyUserDetails()
-                .withAddresses(new DummyAddress("warszawa", "mokotowska"))
-                .withAddresses(new DummyAddress("warszawa", "wolska"))
-                .build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(dummyUserDetails)
+        ObjectNode node = graphBuilder.buildGraph(cdo)
 
         then:
-        assertThat(node).hasMultiEdge("addressList").ofSize(2)
+        assertThat(node).hasMultiEdge(propertyName).ofSize(2)
+
+        where:
+        managedClass  << ["ValueObject"] * 3 + ["Entity"] *3
+        containerType << ["Set","Array", "List"] * 2
+        propertyName <<  ["setOfValueObjects","arrayOfValueObjects","listOfValueObjects", "setOfEntities","arrayOfEntities", "listOfEntities"]
+        cdo << [
+                 new SnapshotEntity(setOfValueObjects:   [new DummyAddress("London"), new DummyAddress("City")]) ,
+                 new SnapshotEntity(arrayOfValueObjects: [new DummyAddress("London"), new DummyAddress("City")]) ,
+                 new SnapshotEntity(listOfValueObjects:  [new DummyAddress("London"), new DummyAddress("City")]) ,
+                 new SnapshotEntity(setOfEntities:       [new SnapshotEntity(id:2),   new SnapshotEntity(id:3)]) ,
+                 new SnapshotEntity(arrayOfEntities:     [new SnapshotEntity(id:2),   new SnapshotEntity(id:3)]) ,
+                 new SnapshotEntity(listOfEntities:      [new SnapshotEntity(id:2),   new SnapshotEntity(id:3)])
+               ]
+    }
+
+    @Unroll
+    def "should build graph with Map<#keyType, #valueType>  MultiEdge"() {
+        given:
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+
+        when:
+        ObjectNode node = graphBuilder.buildGraph(cdo)
+
+        then:
+        assertThat(node).hasMultiEdge(propertyName).ofSize(2)
+
+        where:
+        keyType <<   ["Entity", "Primitive"]
+        valueType << ["Entity", "ValueObject"]
+        propertyName <<  ["mapOfEntities","mapPrimitiveToVO"]
+        cdo << [
+                new SnapshotEntity(mapOfEntities:    [(new SnapshotEntity(id:2)): new SnapshotEntity(id:3)]),
+                new SnapshotEntity(mapPrimitiveToVO: ["key": new DummyAddress("London"), "key2": new DummyAddress("City")])
+               ]
     }
 
     def "should assign proper ids to ValueObjects in multi edge"() {

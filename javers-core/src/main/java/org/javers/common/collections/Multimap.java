@@ -11,6 +11,7 @@ import java.util.Collections;
  *
  * @author bartosz walacik
  */
+@Deprecated
 public class Multimap<K,V> {
     private final Map<K, Object> map = new HashMap<>();
 
