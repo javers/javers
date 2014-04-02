@@ -6,12 +6,14 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.EnumerableType;
+import org.javers.core.metamodel.type.ContainerType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -102,38 +104,40 @@ public class ObjectGraphBuilder {
         });
     }
 
-    private List<Property> getCollectionsOfManagedClasses(ManagedClass managedClass) {
-        return managedClass.getProperties(new Predicate<Property>() {
-            public boolean apply(Property property) {
-                return (typeMapper.isCollectionOfManagedClasses(property));
-            }
-        });
-    }
-
     private void buildMultiEdges(ObjectNode node) {
-        for (Property colProperty : getCollectionsOfManagedClasses(node.getManagedClass()))  {
-            if (colProperty.isNull(node.wrappedCdo())) {
+        for (Property containerProperty : getContainersOfManagedClasses(node))  {
+            if (containerProperty.isNull(node.wrappedCdo())) {
                 continue;
             }
 
-            //looks like we have collection of Entity references or Value Objects
-            Collection collectionOfReferences = (Collection)colProperty.get(node.wrappedCdo());
-            if (collectionOfReferences.isEmpty()){
+            ContainerType containerType = typeMapper.getJaversType(containerProperty);
+            Object container = containerProperty.get(node.wrappedCdo());
+            if (containerType.isEmpty(container)) {
                 continue;
             }
-            MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences,
-                                                  createOwnerContext(node, colProperty));
+
+            //looks like we have container of Entity references or Value Objects
+            MultiEdge multiEdge = createMultiEdge(containerProperty, containerType, node);
+
             node.addEdge(multiEdge);
         }
     }
 
-    private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences, OwnerContext owner) {
-        MultiEdge multiEdge = new MultiEdge(multiRef);
-        EnumerableType multiRefType = typeMapper.getJaversType(multiRef);
+    private List<Property> getContainersOfManagedClasses(ObjectNode node) {
+        return node.getManagedClass().getProperties(new Predicate<Property>() {
+            public boolean apply(Property property) {
+                return (typeMapper.isContainerOfManagedClasses(property));
+            }
+        });
+    }
+
+    private MultiEdge createMultiEdge(Property containerProperty, ContainerType containerType, ObjectNode node) {
+        MultiEdge multiEdge = new MultiEdge(containerProperty);
+        OwnerContext owner = createOwnerContext(node, containerProperty);
 
         EnumerableFunction edgeBuilder = new MultiEdgeBuilderFunction(multiEdge);
-
-        multiRefType.map(collectionOfReferences, edgeBuilder, owner);
+        Object container = containerProperty.get(node.wrappedCdo());
+        containerType.map(container, edgeBuilder, owner);
 
         return multiEdge;
     }

@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
+import org.javers.common.exception.exceptions.JaversException;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.ManagedClassDefinition;
 import org.javers.core.metamodel.property.Property;
@@ -120,18 +121,18 @@ public class TypeMapper {
                isPrimitiveOrValueOrObject(propertyType.getValueClass());
     }
 
-    public boolean isCollectionOfManagedClasses(Property property){
+    /**
+     * Set, List or Array of ManagedClasses
+     *
+     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
+     */
+    public boolean isContainerOfManagedClasses(Property property){
         JaversType javersType = getPropertyType(property);
-        if (! (javersType instanceof CollectionType)) {
+        if (! (javersType instanceof ContainerType)) {
             return false;
         }
 
-        CollectionType collectionType = (CollectionType)javersType;
-        if (!collectionType.isFullyParametrized()){
-            return false;
-        }
-
-        JaversType elementType = getJaversType(collectionType.getItemClass());
+        JaversType elementType = getJaversType(((ContainerType)javersType).getItemClass());
 
         return elementType instanceof ManagedType;
     }

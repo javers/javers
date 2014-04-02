@@ -7,7 +7,6 @@ import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyUser
-import org.javers.core.model.DummyUserDetails
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -170,7 +169,7 @@ class TypeMapperTest extends Specification {
         }
 
         expect:
-        mapper.isCollectionOfManagedClasses(property)
+        mapper.isContainerOfManagedClasses(property)
     }
 
     def "should not recognize primitive type collection as collection of entity"() {
@@ -184,7 +183,7 @@ class TypeMapperTest extends Specification {
         }
 
         expect:
-        mapper.isCollectionOfManagedClasses(property) == false
+        mapper.isContainerOfManagedClasses(property) == false
     }
 
 }

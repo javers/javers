@@ -19,7 +19,7 @@ public abstract class ContainerType extends EnumerableType {
 
     /**
      * never returns null
-     * @throws org.javers.common.exception.exceptions.JaversException GENERIC_TYPE_NOT_PARAMETRIZED
+     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     public Class getItemClass(){
         if (isFullyParametrized()) {
@@ -27,4 +27,6 @@ public abstract class ContainerType extends EnumerableType {
         }
         throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
     }
+
+    public abstract boolean isEmpty(Object container);
 }

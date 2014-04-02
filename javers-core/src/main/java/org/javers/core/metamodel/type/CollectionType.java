@@ -5,6 +5,7 @@ import org.javers.common.exception.exceptions.JaversException;
 import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,5 +44,10 @@ public class CollectionType extends ContainerType {
     @Override
     public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
         throw new JaversException(NOT_IMPLEMENTED);
+    }
+
+    @Override
+    public boolean isEmpty(Object collection) {
+        return collection == null || ((Collection)collection).isEmpty();
     }
 }

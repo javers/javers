@@ -53,4 +53,9 @@ public class ArrayType extends ContainerType {
         }
         return targetArray;
     }
+
+    @Override
+    public boolean isEmpty(Object array) {
+        return array == null ||  Array.getLength(array) == 0;
+    }
 }
