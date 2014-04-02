@@ -1,12 +1,12 @@
-package org.javers.model.object.graph;
+package org.javers.core.graph;
 
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.InstanceId;
-import org.javers.core.metamodel.object.UnboundedValueObjectId;
-import org.javers.core.metamodel.object.ValueObjectId;
-import org.javers.core.metamodel.object.Cdo;
-import org.javers.core.metamodel.property.*;
+import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.property.Entity;
+import org.javers.core.metamodel.property.ManagedClass;
+import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.property.ValueObject;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * Creates graph based on ObjectWrappers.
- * This is stateful builder (not a Service)
+ * This is a stateful Builder (not a Service)
  *
  * @author bartosz walacik
  */
@@ -26,7 +26,7 @@ public class ObjectGraphBuilder {
 
     private final TypeMapper typeMapper;
     private boolean built;
-    private final Map<Cdo, ObjectWrapper> reverseCdoIdMap;
+    private final Map<Cdo, ObjectNode> reverseCdoIdMap;
 
     public ObjectGraphBuilder(TypeMapper typeMapper) {
         this.reverseCdoIdMap = new HashMap<>();
@@ -51,7 +51,7 @@ public class ObjectGraphBuilder {
      */
     private ObjectNode buildNode(Cdo cdo) {
         argumentIsNotNull(cdo);
-        ObjectWrapper node = buildNodeStubAndSaveForReuse(cdo);
+        ObjectNode node = buildNodeStubAndSaveForReuse(cdo);
         buildEdges(node);
         return node;
     }
@@ -63,20 +63,20 @@ public class ObjectGraphBuilder {
         built = true;
     }
 
-    private void buildEdges(ObjectWrapper node) {
+    private void buildEdges(ObjectNode node) {
         buildSingleEdges(node);
         buildMultiEdges(node);
     }
 
-    private void buildSingleEdges(ObjectWrapper node) {
+    private void buildSingleEdges(ObjectNode node) {
         for (Property singleRef : getSingleReferences(node.getManagedClass())) {
-            if (singleRef.isNull(node.unwrapCdo())) {
+            if (singleRef.isNull(node.wrappedCdo())) {
                 continue;
             }
 
-            Object referencedRawCdo = singleRef.get(node.unwrapCdo());
+            Object referencedRawCdo = singleRef.get(node.wrappedCdo());
             ObjectNode referencedNode = buildNodeOrReuse(asCdo(referencedRawCdo,
-                                                         new OwnerContext(node, singleRef.getName())));
+                                                         createOwnerContext(node, singleRef.getName())));
 
             Edge edge = new SingleEdge(singleRef, referencedNode);
             node.addEdge(edge);
@@ -99,36 +99,36 @@ public class ObjectGraphBuilder {
         });
     }
 
-    private void buildMultiEdges(ObjectWrapper node) {
+    private void buildMultiEdges(ObjectNode node) {
         for (Property colProperty : getCollectionsOfManagedClasses(node.getManagedClass()))  {
-            if (colProperty.isNull(node.unwrapCdo())) {
+            if (colProperty.isNull(node.wrappedCdo())) {
                 continue;
             }
 
             //looks like we have collection of Entity references or Value Objects
-            Collection collectionOfReferences = (Collection)colProperty.get(node.unwrapCdo());
+            Collection collectionOfReferences = (Collection)colProperty.get(node.wrappedCdo());
             if (collectionOfReferences.isEmpty()){
                 continue;
             }
             MultiEdge multiEdge = createMultiEdge(colProperty, collectionOfReferences,
-                                                  new OwnerContext(node, colProperty.getName()));
+                                                  createOwnerContext(node, colProperty.getName()));
             node.addEdge(multiEdge);
         }
     }
 
     private MultiEdge createMultiEdge(Property multiRef, Collection collectionOfReferences, OwnerContext owner) {
         MultiEdge multiEdge = new MultiEdge(multiRef);
-        owner.startListIndex();
+        int i = 0;
         for(Object referencedRawCdo : collectionOfReferences) {
+            owner.setFragment(""+i++);
             ObjectNode objectNode = buildNodeOrReuse(asCdo(referencedRawCdo, owner));
             multiEdge.addReferenceNode(objectNode);
-            owner.incListIndex();
         }
         return multiEdge;
     }
 
-    private ObjectWrapper buildNodeStubAndSaveForReuse(Cdo cdo) {
-        ObjectWrapper nodeStub = new ObjectWrapper(cdo);
+    private ObjectNode buildNodeStubAndSaveForReuse(Cdo cdo) {
+        ObjectNode nodeStub = new ObjectNode(cdo);
         reverseCdoIdMap.put(cdo, nodeStub);
         return nodeStub;
     }
@@ -144,25 +144,9 @@ public class ObjectGraphBuilder {
     }
 
     private Cdo asCdo(Object targetCdo, OwnerContext owner){
-        ManagedClass targetManagedClass =  getManagedCLass(targetCdo);
+        GlobalCdoId globalId = GlobalIdFactory.create(targetCdo, getManagedCLass(targetCdo), owner);
 
-        //TODO refactor these IFs
-        if (targetManagedClass instanceof Entity) {
-            Entity entity = (Entity)targetManagedClass;
-            return new Cdo(targetCdo, new InstanceId(targetCdo, entity));
-        }
-        else if (targetManagedClass instanceof ValueObject && owner != null) {
-            ValueObject valueObject = (ValueObject)targetManagedClass;
-            return new Cdo(targetCdo, new ValueObjectId(valueObject, owner.getGlobalCdoId(), owner.getPath()));
-        }
-        else if (targetManagedClass instanceof ValueObject && owner == null) {
-            ValueObject valueObject = (ValueObject)targetManagedClass;
-            return new Cdo(targetCdo, new UnboundedValueObjectId(valueObject));
-        }
-        else {
-            throw new IllegalStateException("not implemented");
-        }
-
+        return new CdoWrapper(targetCdo, globalId);
     }
 
     private ManagedClass getManagedCLass(Object cdo) {
@@ -170,4 +154,7 @@ public class ObjectGraphBuilder {
         return  typeMapper.getManagedClass(cdo.getClass());
     }
 
+    private OwnerContext createOwnerContext(ObjectNode node, String path) {
+        return new OwnerContext(node.getGlobalCdoId(), path);
+    }
 }

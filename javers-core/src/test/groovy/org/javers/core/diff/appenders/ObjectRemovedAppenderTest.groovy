@@ -1,11 +1,8 @@
 package org.javers.core.diff.appenders
 
-import org.javers.common.collections.Sets
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.GraphPair
 import org.javers.core.model.DummyUser
-import org.javers.core.diff.Diff
-import org.javers.model.object.graph.ObjectNode
 
 import static org.javers.core.diff.ChangeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser

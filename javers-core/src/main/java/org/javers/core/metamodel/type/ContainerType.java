@@ -1,31 +1,31 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.exception.exceptions.JaversException;
+
 import java.lang.reflect.Type;
+import java.util.List;
+
+import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 
 /**
  * Collection or Array
  *
  * @author bartosz walacik
  */
-abstract class ContainerType extends JaversType {
+public abstract class ContainerType extends EnumerableType {
 
     ContainerType(Type baseJavaType) {
         super(baseJavaType);
     }
 
     /**
-     * Collection/Array content type.
-     * <p/>
-     * When Collection is generic Type with actual Class argument, returns this argument.
-     * For example, if baseJavaType = Set&lt;String&gt, returns String.class
-     * <p/>
-     *
-     * For no generic types like Set, or generic types with unbounded type parameter like
-     * Set&lt;V&gt;, Set&lt;?&gt; returns <b>null</b>.
-     * <p/>
-     *
-     * When Array, returns {@link Class#getComponentType()}
-     * <p/>
+     * never returns null
+     * @throws org.javers.common.exception.exceptions.JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
-    public abstract Class getElementType();
+    public Class getItemClass(){
+        if (isFullyParameterized()) {
+            return getElementTypes().get(0);
+        }
+        throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
+    }
 }

@@ -1,14 +1,10 @@
 package org.javers.core
 
 import org.javers.core.metamodel.type.TypeFactory
-import org.javers.core.model.DummyUserWithValues
 import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.metamodel.type.TypeMapper
-import org.javers.model.object.graph.ObjectGraphBuilder
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyNetworkAddress
-import org.javers.core.model.DummyUser
-import org.javers.core.model.DummyUserDetails
+import org.javers.core.graph.ObjectGraphBuilder
+import org.javers.core.snapshot.SnapshotFactory
 
 /**
  * This is just a test builder,
@@ -42,6 +38,10 @@ class JaversTestBuilder {
 
     ManagedClassFactory getManagedClassFactory() {
         javersBuilder.getContainerComponent(ManagedClassFactory)
+    }
+
+    SnapshotFactory getSnapshotFactory() {
+        javersBuilder.getContainerComponent(SnapshotFactory)
     }
 
     TypeFactory getTypeSpawningFactory() {

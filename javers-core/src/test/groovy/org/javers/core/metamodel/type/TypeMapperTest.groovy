@@ -40,7 +40,7 @@ class TypeMapperTest extends Specification {
         then:
         jType.baseJavaType == int[]
         jType.class == ArrayType
-        jType.elementType == int
+        jType.itemClass == int
         mapper.getMappedTypes(ArrayType).size() == arrayPrototypes + 1
     }
 
@@ -105,7 +105,7 @@ class TypeMapperTest extends Specification {
         then:
         jType.class == expectedJaversType
         jType.baseJavaType == givenJavaType
-        jType.elementType == String
+        jType.itemClass == String
 
         where:
         givenJavaType                        | expectedJaversType
@@ -125,8 +125,8 @@ class TypeMapperTest extends Specification {
 
         then:
         jType.baseJavaType == givenJavaType
-        jType.entryClass.key == String
-        jType.entryClass.value == Integer
+        jType.keyClass == String
+        jType.valueClass == Integer
 
         where:
         givenJavaType << [new TypeToken<Map<String, Integer>>(){}.type,new TypeToken<HashMap<String, Integer>>(){}.type]

@@ -2,7 +2,7 @@ package org.javers.core.diff
 
 import groovy.transform.TypeChecked
 import org.javers.core.model.DummyUser
-import org.javers.model.object.graph.ObjectNode
+import org.javers.core.graph.ObjectNode
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**

@@ -1,4 +1,4 @@
-package org.javers.model.object.graph
+package org.javers.core.graph
 
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
 import org.javers.core.metamodel.property.ManagedClassFactory
@@ -6,7 +6,7 @@ import org.javers.core.metamodel.property.ManagedClassFactory
 /**
  * @author bartosz walacik
  */
-class ObjectWrapperFieldTest extends ObjectWrapperTest{
+class ObjectNodeFieldTest extends ObjectNodeTest{
 
     def setup() {
         def scanner = new FieldBasedPropertyScanner();

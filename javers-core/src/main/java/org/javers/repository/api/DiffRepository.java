@@ -2,6 +2,7 @@ package org.javers.repository.api;
 
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
+import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
 
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.List;
  */
 public interface DiffRepository {
 
+    CdoSnapshot getLatest(GlobalCdoId objectId);
+
     /**
      * Persists given diff in database. <br/>
      * Implementation should:
@@ -29,25 +32,24 @@ public interface DiffRepository {
      * @param newDiff fresh Diff which hasn't been persisted yet
      * @see Diff#isNew()
      */
+     @Deprecated
      void save(Diff newDiff);
 
     /**
-     * Loads Diff from database, collection of {@link Diff#getChanges()} have to be initialized.
+     * Loads Diff from database, collection of {@link Diff#getChanges()} has to be initialized.
      *
      * @return null if not found
      */
+     @Deprecated
      Diff getById(long diffId);
 
     /**
      * Finds all changes made on single domain object.
      * Outcome list has to be ordered chronologically by {@link Diff#getDiffDate()}.
-     * <br/><br/>
      *
-     * All Diffs referenced through {@link Change#getParent()}
-     * have to be fully initialized.
-     *
-     * @param globalCdoId
      * @return never returns null
      */
+     @Deprecated
      List<Change> findByGlobalCdoId(GlobalCdoId globalCdoId);
+
 }

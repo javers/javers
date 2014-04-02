@@ -10,13 +10,6 @@ import static org.javers.common.exception.exceptions.JaversException.RUNTIME_ERR
  */
 public enum  JaversExceptionCode {
 
-    @Deprecated
-    CLASS_NOT_MANAGED(RUNTIME_ERROR + "Class '%s' is not managed. Add this class to your JaVers configuration."),
-
-    @Deprecated
-    TYPE_NOT_MAPPED (BOOTSTRAP_ERROR + "Type '%s' is not mapped and not assignable from any of already mapped types.\n"+
-                                       "Register it via JaversBuilder.registerEntity() or JaversBuilder.registerValueObject()") ,
-
     CLASS_EXTRACTION_ERROR(BOOTSTRAP_ERROR + "Don't know how to extract Class from type '%s'.") ,
 
     ENTITY_WITHOUT_ID (BOOTSTRAP_ERROR + "Class '%s' has no Id property. Use @Id annotation to mark unique Entity identifier"),
@@ -33,7 +26,15 @@ public enum  JaversExceptionCode {
 
     CONTAINER_NOT_READY(BOOTSTRAP_ERROR +"pico container is not ready"),
 
-    PROPERTY_NOT_FOUND(BOOTSTRAP_ERROR +"property '%s' not found in class '%s'");
+    NOT_IMPLEMENTED(RUNTIME_ERROR + "not implemented"),
+
+    GENERIC_TYPE_NOT_PARAMETRIZED(RUNTIME_ERROR + "expected actual Class arguments in type '%s'. Javers needs to know what kind of content is stored in your collections. Try at least <Object>"),
+
+    VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY(RUNTIME_ERROR + "found Value Object '%s' on KEY position in Map property '%s'. Please change this class mapping to Value or Entity"),
+
+    SNAPSHOT_STATE_VIOLATION(RUNTIME_ERROR + "snapshots are immutable"),
+
+    PROPERTY_NOT_FOUND(RUNTIME_ERROR +"property '%s' not found in class '%s'");
 
     private final String message;
 

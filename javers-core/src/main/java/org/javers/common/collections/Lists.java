@@ -1,18 +1,16 @@
 package org.javers.common.collections;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.EMPTY_SET;
 import static org.javers.common.validation.Validate.*;
 
 public class Lists {
+
+    public static <T> List<T> immutableListOf(T... elements){
+        return java.util.Collections.unmodifiableList(java.util.Arrays.asList(elements));
+    }
 
     /**
      * @return index -> value

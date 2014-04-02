@@ -1,7 +1,10 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Function;
+import org.javers.common.collections.Lists;
 import org.javers.common.collections.Primitives;
 import org.javers.core.metamodel.property.*;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +46,7 @@ public class TypeMapper {
 
         //well known Value types
         registerValueType(LocalDateTime.class);
+        registerValueType(LocalDate.class);
         registerValueType(BigDecimal.class);
         registerValueType(Date.class);
 
@@ -69,6 +73,15 @@ public class TypeMapper {
         return createMapping(javaType);
     }
 
+  /*  public List<JaversType> getJaversTypes(List<Class> javaTypes) {
+        argumentIsNotNull(javaTypes);
+        return Lists.transform(javaTypes, new Function<Class, JaversType>() {
+            public JaversType apply(Class javaType) {
+                return getJaversType(javaType);
+            }
+        });
+    } */
+
     /**
      * if given javaClass is mapped to {@link ManagedType}
      * returns {@link ManagedType#getManagedClass()}
@@ -89,39 +102,32 @@ public class TypeMapper {
 
     public boolean isEntityReferenceOrValueObject(Property property){
         JaversType javersType = getPropertyType(property);
-        return (javersType instanceof EntityType ||
-                javersType instanceof ValueObjectType);
+        return javersType instanceof ManagedType;
     }
 
     public boolean isSupportedMap(MapType propertyType){
-        if (propertyType.getEntryClass() == null) {
+        if (!propertyType.isFullyParameterized()) {
             return false;
         }
-        return isPrimitiveOrValueOrObject(propertyType.getEntryClass().getKey()) &&
-               isPrimitiveOrValueOrObject(propertyType.getEntryClass().getValue());
+        return isPrimitiveOrValueOrObject(propertyType.getKeyClass()) &&
+               isPrimitiveOrValueOrObject(propertyType.getValueClass());
     }
 
     public boolean isCollectionOfManagedClasses(Property property){
-        return isCollectionOfType(property, EntityType.class) ||
-               isCollectionOfType(property, ValueObjectType.class);
-    }
-
-    private boolean isCollectionOfType(Property property, Class<? extends ManagedType> managedType) {
         JaversType javersType = getPropertyType(property);
         if (! (javersType instanceof CollectionType)) {
             return false;
         }
-        CollectionType collectionType = (CollectionType)javersType;
 
-        if (collectionType.getElementType() == null) {
+        CollectionType collectionType = (CollectionType)javersType;
+        if (!collectionType.isFullyParameterized()){
             return false;
         }
 
-        JaversType elementType = getJaversType(collectionType.getElementType());
+        JaversType elementType = getJaversType(collectionType.getItemClass());
 
-        return managedType.isAssignableFrom(elementType.getClass());
+        return elementType instanceof ManagedType;
     }
-
 
     private void registerPrimitiveType(Class<?> primitiveClass) {
         addType(new PrimitiveType(primitiveClass));
@@ -136,7 +142,10 @@ public class TypeMapper {
     }
 
     public boolean isSupportedContainer(ContainerType propertyType) {
-        return isPrimitiveOrValueOrObject(propertyType.getElementType());
+        if (!propertyType.isFullyParameterized()){
+            return false;
+        }
+        return isPrimitiveOrValueOrObject(propertyType.getItemClass());
     }
 
     protected <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {

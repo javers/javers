@@ -19,4 +19,28 @@ public abstract class GlobalCdoId {
      *
      */
     public abstract Object getCdoId();
+
+    /**
+     * <pre>
+     * For ex.:
+     * org.javers.core.model.SnapshotEntity/1
+     * org.javers.core.model.SnapshotEntity/2#setOfValueObjects
+     * </pre>
+     */
+    public String value() {
+        return toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || this.getClass() != o.getClass() ) {return false;}
+
+        return value().equals(((GlobalCdoId)o).value());
+    }
+
+    @Override
+    public int hashCode() {
+        return value().hashCode();
+    }
 }

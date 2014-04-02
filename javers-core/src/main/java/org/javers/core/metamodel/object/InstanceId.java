@@ -14,14 +14,22 @@ public class InstanceId extends GlobalCdoId {
     private transient final Entity entity;
     private final Object cdoId;
 
+    private InstanceId(Object cdoId, Entity entity) {
+        argumentsAreNotNull(cdoId, entity);
+        this.entity = entity;
+        this.cdoId = cdoId;
+    }
+
     /**
      * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
      * @throws JaversException NOT_INSTANCE_OF
      */
-    public InstanceId(Object instance, Entity entity) {
-        argumentsAreNotNull(instance, entity);
-        this.entity = entity;
-        this.cdoId = entity.getIdOf(instance);
+    public static InstanceId createFromInstance(Object instance, Entity entity){
+        return new InstanceId(entity.getIdOf(instance), entity);
+    }
+
+    public static InstanceId createFromId(Object id, Entity entity){
+        return new InstanceId(id, entity);
     }
 
     @Override
@@ -51,19 +59,5 @@ public class InstanceId extends GlobalCdoId {
         }
 
         return cdoId.equals(entity.getIdOf(instance));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || !(o instanceof InstanceId)) {return false;}
-
-        InstanceId other = (InstanceId) o;
-        return (entity.equals(other.entity) && cdoId.equals(other.cdoId));
-    }
-
-    @Override
-    public int hashCode() {
-        return entity.hashCode() + cdoId.hashCode();
     }
 }

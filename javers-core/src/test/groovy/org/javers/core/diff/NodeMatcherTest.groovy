@@ -1,7 +1,6 @@
 package org.javers.core.diff
 
-import org.javers.common.collections.Sets
-import org.javers.model.object.graph.ObjectNode
+import org.javers.core.graph.ObjectNode
 
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 

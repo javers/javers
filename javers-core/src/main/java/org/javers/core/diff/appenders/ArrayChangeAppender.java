@@ -2,14 +2,10 @@ package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Arrays;
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ArrayChange;
 import org.javers.core.diff.changetype.ContainerValueChange;
-import org.javers.core.diff.changetype.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
-import org.javers.core.diff.changetype.map.MapChange;
-import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.ArrayType;
 import org.javers.core.metamodel.type.JaversType;
@@ -18,8 +14,6 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +37,7 @@ public class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
         return ArrayType.class;
     }
 
-    //TODO
+    //TODO  deal with unsupported Array content type
     @Override
     protected boolean supports(JaversType propertyType) {
         if (!super.supports(propertyType)) {

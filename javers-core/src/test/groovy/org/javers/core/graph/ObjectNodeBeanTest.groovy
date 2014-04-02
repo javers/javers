@@ -1,4 +1,4 @@
-package org.javers.model.object.graph
+package org.javers.core.graph
 
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.metamodel.property.ManagedClassFactory
@@ -6,7 +6,7 @@ import org.javers.core.metamodel.property.ManagedClassFactory
 /**
  * @author bartosz walacik
  */
-class ObjectWrapperBeanTest extends ObjectWrapperTest{
+class ObjectNodeBeanTest extends ObjectNodeTest{
 
     def setup() {
         def scanner = new BeanBasedPropertyScanner();

@@ -3,9 +3,9 @@ package org.javers.core.diff;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.model.object.graph.Edge;
-import org.javers.model.object.graph.ObjectNode;
-import org.javers.model.object.graph.SingleEdge;
+import org.javers.core.graph.Edge;
+import org.javers.core.graph.ObjectNode;
+import org.javers.core.graph.SingleEdge;
 
 import java.util.List;
 
