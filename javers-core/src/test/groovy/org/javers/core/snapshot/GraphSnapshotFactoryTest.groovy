@@ -21,12 +21,12 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createObjectGraphBuilder().buildGraph(cdo)
 
         when:
-        Multimap snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node)
 
         then:
         assertThat(snapshots).hasSize(2)
-                       .hasSnapshot(instanceId(1, SnapshotEntity))
-                       .hasSnapshot(instanceId(5, SnapshotEntity))
+                             .hasSnapshot(instanceId(1, SnapshotEntity))
+                             .hasSnapshot(instanceId(5, SnapshotEntity))
     }
 
     def "should flatten straight ValueObject relation"() {
@@ -36,12 +36,12 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createObjectGraphBuilder().buildGraph(cdo)
 
         when:
-        Multimap snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node)
 
         then:
         assertThat(snapshots).hasSize(2)
-                       .hasSnapshot(instanceId(1, SnapshotEntity))
-                       .hasSnapshot(valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"valueObjectRef"))
+                             .hasSnapshot(instanceId(1, SnapshotEntity))
+                             .hasSnapshot(valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"valueObjectRef"))
     }
 
     def "should flatten Set of ValueObject"() {
@@ -50,12 +50,13 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createObjectGraphBuilder().buildGraph(cdo)
 
         when:
-        Multimap snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node)
 
         then:
         assertThat(snapshots).hasSize(3)
                              .hasSnapshot(instanceId(1, SnapshotEntity))
-                             .hasSnapshotSet(valueObjectSetId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects"),2)
+                             .hasSnapshot(valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects/random_0"))
+                             .hasSnapshot(valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects/random_1"))
 
     }
 
@@ -66,13 +67,13 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createObjectGraphBuilder().buildGraph(cdo)
 
         when:
-        Multimap snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node)
 
         then:
         assertThat(snapshots).hasSize(3)
-                            .hasSnapshot(instanceId(1, SnapshotEntity))
-                            .hasSnapshot(expectedVoIds[0])
-                            .hasSnapshot(expectedVoIds[1])
+                             .hasSnapshot(instanceId(1, SnapshotEntity))
+                             .hasSnapshot(expectedVoIds[0])
+                             .hasSnapshot(expectedVoIds[1])
 
         where:
         listType << ["List", "Array"]
@@ -94,7 +95,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createObjectGraphBuilder().buildGraph(cdo)
 
         when:
-        Multimap snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node)
 
         then:
         assertThat(snapshots).hasSize(3)

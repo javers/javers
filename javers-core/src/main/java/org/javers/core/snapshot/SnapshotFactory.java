@@ -85,11 +85,7 @@ public class SnapshotFactory {
     private Object extractAndDehydrateContainer(Object propertyVal, ContainerType propertyType, OwnerContext owner) {
         JaversType itemType = typeMapper.getJaversType(propertyType.getItemClass());
 
-        //corner case for Set<ValueObject>
-        if (propertyType instanceof  SetType && itemType instanceof  ValueObjectType){
-            return GlobalIdFactory.createSetId(((ValueObjectType) itemType).getManagedClass(), owner);
-        }
-
+        //TODO corner case for Set<ValueObject>, now ignored
         EnumerableFunction dehydrate = new DehydrateContainerFunction(itemType);
         return  propertyType.map(propertyVal, dehydrate, owner);
     }

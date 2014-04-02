@@ -20,18 +20,26 @@ public class SetType extends CollectionType{
         Validate.argumentsAreNotNull(sourceSet_, mapFunction);
         Set sourceSet = (Set)sourceSet_;
         Set targetSet = new HashSet(sourceSet.size());
-        owner.setEnumeratorContext(new SetEnumeratorContext());
+
+        SetEnumeratorContext enumeratorContext = new SetEnumeratorContext();
+        owner.setEnumeratorContext(enumeratorContext);
 
         for (Object sourceVal : sourceSet) {
             targetSet.add(mapFunction.apply(sourceVal, owner));
+            enumeratorContext.nextId();
         }
         return targetSet;
     }
 
     private class SetEnumeratorContext implements EnumeratorContext {
+        int randomId = 0;
         @Override
         public String getPath() {
-            return "";
+            return "random_"+randomId;
+        }
+
+        void nextId(){
+            randomId++;
         }
     }
 }

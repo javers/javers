@@ -35,10 +35,6 @@ public class GlobalIdFactory {
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
     }
 
-    public static ValueObjectSetId createSetId(ValueObject targetManagedClass, OwnerContext owner) {
-        return new ValueObjectSetId(targetManagedClass, owner);
-    }
-
     private static boolean hasOwner(OwnerContext context) {
         return (context != null && context.getGlobalCdoId() != null);
     }
