@@ -53,13 +53,18 @@ public class MapType extends EnumerableType {
             Object mappedKey = mapFunction.apply(entry.getKey(), owner);
 
             //value
-            enumeratorContext.switchToValue(mappedKey.toString());
+            enumeratorContext.switchToValue(mappedKey);
             Object mappedValue = mapFunction.apply(entry.getValue(), owner);
 
             targetMap.put(mappedKey, mappedValue);
         }
 
         return targetMap;
+    }
+
+    @Override
+    public boolean isEmpty(Object map) {
+        return map == null || ((Map)map).isEmpty();
     }
 
     /**
@@ -80,7 +85,7 @@ public class MapType extends EnumerableType {
         if (isFullyParametrized()) {
             return elementTypes.get(0);
         }
-        throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED,getBaseJavaType().toString());
+        throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
     }
 
     /**

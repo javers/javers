@@ -6,13 +6,13 @@ import org.javers.core.metamodel.object.EnumeratorContext;
 * @author bartosz walacik
 */
 public class MapEnumeratorContext implements EnumeratorContext {
-    private String key;
+    private Object key;
     private boolean isKey;
 
     @Override
     public String getPath() {
         if (key != null) {
-            return key;
+            return key.toString();
         }
         return "";
     }
@@ -21,7 +21,7 @@ public class MapEnumeratorContext implements EnumeratorContext {
         return isKey;
     }
 
-    void switchToValue(String key) {
+    void switchToValue(Object key) {
         this.key = key;
         this.isKey = false;
     }

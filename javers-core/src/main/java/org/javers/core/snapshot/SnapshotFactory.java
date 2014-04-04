@@ -2,6 +2,7 @@ package org.javers.core.snapshot;
 
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.exception.exceptions.JaversException;
+import org.javers.core.graph.AbstractMapFunction;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
@@ -9,7 +10,6 @@ import org.javers.core.metamodel.type.*;
 
 import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 import static org.javers.common.exception.exceptions.JaversExceptionCode.NOT_IMPLEMENTED;
-import static org.javers.common.exception.exceptions.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
 
 /**
  * @author bartosz walacik
@@ -58,36 +58,18 @@ public class SnapshotFactory {
             throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, propertyType.getBaseJavaType().toString());
         }
 
+        EnumerableFunction dehydratorMapFunction;
         if (propertyType instanceof ContainerType) {
-            return extractAndDehydrateContainer(propertyVal, (ContainerType) propertyType, owner);
+            dehydratorMapFunction = new DehydrateContainerFunction((ContainerType) propertyType);
         }
-        if (propertyType instanceof MapType) {
-            return extractAndDehydrateMap(propertyVal, (MapType) propertyType, owner);
+        else if (propertyType instanceof MapType) {
+            dehydratorMapFunction = new DehydrateMapFunction((MapType) propertyType, typeMapper);
         }
-        throw new JaversException(NOT_IMPLEMENTED);
-    }
-
-    private Object extractAndDehydrateMap(Object propertyVal, MapType propertyType, OwnerContext owner) {
-        JaversType keyType =   typeMapper.getJaversType(propertyType.getKeyClass());
-        JaversType valueType = typeMapper.getJaversType(propertyType.getValueClass());
-
-        //corner case for Map<ValueObject,?>
-        if (keyType instanceof ValueObjectType) {
-            throw new JaversException(VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY,
-                                      propertyType.getKeyClass().getName(),
-                                      propertyType.getBaseJavaType().toString());
+        else {
+            throw new JaversException(NOT_IMPLEMENTED);
         }
 
-        EnumerableFunction dehydrate = new DehydrateMapFunction(keyType, valueType);
-        return  propertyType.map(propertyVal, dehydrate, owner);
-    }
-
-    private Object extractAndDehydrateContainer(Object propertyVal, ContainerType propertyType, OwnerContext owner) {
-        JaversType itemType = typeMapper.getJaversType(propertyType.getItemClass());
-
-        //TODO corner case for Set<ValueObject>, now ignored
-        EnumerableFunction dehydrate = new DehydrateContainerFunction(itemType);
-        return  propertyType.map(propertyVal, dehydrate, owner);
+        return  propertyType.map(propertyVal, dehydratorMapFunction, owner);
     }
 
     /**
@@ -98,18 +80,18 @@ public class SnapshotFactory {
         if (targetType instanceof ManagedType){
             ManagedType targetManagedType = (ManagedType)targetType;
             return GlobalIdFactory.createId(item,
-                    targetManagedType.getManagedClass(),
-                    context);
+                                            targetManagedType.getManagedClass(),
+                                            context);
         }  else {
             return item;
         }
     }
 
     private class DehydrateContainerFunction implements EnumerableFunction{
-        private JaversType itemType;
+        JaversType itemType;
 
-        DehydrateContainerFunction(JaversType itemType) {
-            this.itemType = itemType;
+        DehydrateContainerFunction(ContainerType containerType) {
+            this.itemType = typeMapper.getJaversType(containerType.getItemClass());
         }
 
         @Override
@@ -118,30 +100,21 @@ public class SnapshotFactory {
         }
     }
 
-    private class DehydrateMapFunction implements EnumerableFunction{
-        private JaversType keyType;
-        private JaversType valueType;
+    private class DehydrateMapFunction extends AbstractMapFunction {
 
-        DehydrateMapFunction(JaversType keyType, JaversType valueType) {
-            this.keyType = keyType;
-            this.valueType = valueType;
+        DehydrateMapFunction(MapType mapType, TypeMapper typeMapper) {
+            super(mapType,typeMapper);
         }
 
         @Override
         public Object apply(Object input, OwnerContext enumerationAwareOwnerContext) {
             MapEnumeratorContext mapContext =  enumerationAwareOwnerContext.getEnumeratorContext();
             if (mapContext.isKey()){
-                return dehydrate(input, keyType, enumerationAwareOwnerContext);
+                return dehydrate(input, getKeyType(), enumerationAwareOwnerContext);
             }
             else {
-                return dehydrate(input, valueType, enumerationAwareOwnerContext);
+                return dehydrate(input, getValueType(), enumerationAwareOwnerContext);
             }
-
-            //corner case for Map<?,ValueObject>
-            //if (valueType instanceof ValueObjectType && key != null){
-            //    return dehydrate(input, valueType, owner);
-            //}
-
         }
     }
 }

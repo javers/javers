@@ -1,15 +1,15 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Sets;
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ContainerValueChange;
 import org.javers.core.diff.changetype.ElementAdded;
 import org.javers.core.diff.changetype.ElementRemoved;
 import org.javers.core.diff.changetype.SetChange;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.SetType;
-import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,20 +38,15 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
         return SetType.class;
     }
 
-    //TODO
-    @Override
-    protected boolean supports(JaversType propertyType) {
-        if (!super.supports(propertyType)) {
+    //TODO add support for Entities & ValueObjects
+    public boolean isSupportedContainer(Property property) {
+        ContainerType propertyType = typeMapper.getPropertyType(property);
+
+        if (! typeMapper.isPrimitiveOrValueOrObject(propertyType.getItemClass())){
+            logger.error(JaversExceptionCode.DIFF_NOT_IMPLEMENTED.getMessage() +" on "+property);
             return false;
         }
-
-        boolean isSupported = typeMapper.isSupportedContainer((SetType) propertyType);
-
-        if (!isSupported) {
-            logger.warn("unsupported set content type [{}], skipping", propertyType.getBaseJavaType());
-        }
-
-        return isSupported;
+        return true;
     }
 
     @Override
@@ -71,6 +66,10 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
 
         if (changes.isEmpty()) {
             return null;
+        }
+
+        if (!isSupportedContainer(property)){
+            return null; //TODO ADD SUPPORT
         }
 
         return new SetChange(pair.getGlobalCdoId(), property, changes);

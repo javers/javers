@@ -25,4 +25,9 @@ class PropertyAssert {
         assert actual.looksLikeId()
         this
     }
+
+    PropertyAssert hasValue(Object target, Object expectedValue){
+        assert actual.get(target) == expectedValue
+        this
+    }
 }

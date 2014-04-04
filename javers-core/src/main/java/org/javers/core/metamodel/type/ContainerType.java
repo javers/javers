@@ -27,6 +27,4 @@ public abstract class ContainerType extends EnumerableType {
         }
         throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
     }
-
-    public abstract boolean isEmpty(Object container);
 }

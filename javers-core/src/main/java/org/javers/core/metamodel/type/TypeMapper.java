@@ -25,6 +25,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class TypeMapper {
     private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
 
+    private final ValueType OBJECT_TYPE = new ValueType(Object.class);
     private final TypeFactory typeFactory;
     private final Map<Type, JaversType> mappedTypes;
 
@@ -35,7 +36,7 @@ public class TypeMapper {
 
         //primitives & boxes
         for (Class primitiveOrBox : Primitives.getPrimitiveAndBoxTypes()) {
-            registerPrimitiveType(primitiveOrBox) ;
+            registerPrimitiveType(primitiveOrBox);
         }
 
         //String & Enum
@@ -66,6 +67,10 @@ public class TypeMapper {
     public JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
 
+        if (javaType == Object.class){
+            return OBJECT_TYPE;
+        }
+
         JaversType jType = getExactMatchingJaversType(javaType);
         if (jType != null) {
             return jType;
@@ -73,13 +78,6 @@ public class TypeMapper {
 
         return createMapping(javaType);
     }
-
-    public <T extends JaversType> T getJaversType(Property property) {
-        argumentIsNotNull(property);
-        return (T)getJaversType(property.getType());
-    }
-
-
 
   /*  public List<JaversType> getJaversTypes(List<Class> javaTypes) {
         argumentIsNotNull(javaTypes);
@@ -104,8 +102,9 @@ public class TypeMapper {
                   "given javaClass is mapped to "+jType.getClass().getSimpleName()+", ManagedType expected");
     }
 
-    public JaversType getPropertyType(Property property){
-        return getJaversType(property.getGenericType());
+    public <T extends JaversType> T getPropertyType(Property property){
+        argumentIsNotNull(property);
+        return (T) getJaversType(property.getGenericType());
     }
 
     public boolean isEntityReferenceOrValueObject(Property property){
@@ -113,28 +112,35 @@ public class TypeMapper {
         return javersType instanceof ManagedType;
     }
 
-    public boolean isSupportedMap(MapType propertyType){
-        if (!propertyType.isFullyParametrized()) {
-            return false;
-        }
-        return isPrimitiveOrValueOrObject(propertyType.getKeyClass()) &&
-               isPrimitiveOrValueOrObject(propertyType.getValueClass());
-    }
-
     /**
-     * Set, List or Array of ManagedClasses
+     * is Set, List or Array of ManagedClasses
      *
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
      */
-    public boolean isContainerOfManagedClasses(Property property){
-        JaversType javersType = getPropertyType(property);
-        if (! (javersType instanceof ContainerType)) {
+    public boolean isContainerOfManagedClasses(EnumerableType enumerableType){
+        if (! (enumerableType instanceof ContainerType)) {
             return false;
         }
 
-        JaversType elementType = getJaversType(((ContainerType)javersType).getItemClass());
+        return getJaversType(((ContainerType) enumerableType).getItemClass()) instanceof ManagedType;
+    }
 
-        return elementType instanceof ManagedType;
+    /**
+     * is Map with ManagedClass on Key or Value position
+     *
+     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
+     */
+    public boolean isMapWithManagedClass(EnumerableType enumerableType) {
+        if (! (enumerableType instanceof MapType)) {
+            return false;
+        }
+
+        MapType mapType = (MapType)enumerableType;
+
+        JaversType keyType = getJaversType(mapType.getKeyClass());
+        JaversType valueType = getJaversType(mapType.getValueClass());
+
+        return keyType instanceof ManagedType || valueType instanceof ManagedType;
     }
 
     private void registerPrimitiveType(Class<?> primitiveClass) {
@@ -149,13 +155,6 @@ public class TypeMapper {
         addType(new ValueType(objectValue));
     }
 
-    public boolean isSupportedContainer(ContainerType propertyType) {
-        if (!propertyType.isFullyParametrized()){
-            return false;
-        }
-        return isPrimitiveOrValueOrObject(propertyType.getItemClass());
-    }
-
     protected <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
         List<T> result = new ArrayList<>();
         for(JaversType jType : mappedTypes.values()) {
@@ -166,17 +165,12 @@ public class TypeMapper {
         return result;
     }
 
-    //-- private
-
-    //TODO
-    private boolean isPrimitiveOrValueOrObject(Class clazz) {
-        if (clazz == Object.class) {
-            return true;
-        }
-
+    public boolean isPrimitiveOrValueOrObject(Class clazz) {
         JaversType jType  = getJaversType(clazz);
-        return  jType instanceof PrimitiveOrValueType || jType instanceof PrimitiveOrValueType;
+        return  jType instanceof PrimitiveOrValueType;
     }
+
+    //-- private
 
     private void addType(JaversType jType) {
         mappedTypes.put(jType.getBaseJavaType(), jType);
@@ -234,4 +228,6 @@ public class TypeMapper {
 
         return distances.get(0).getJaversType();
     }
+
+
 }

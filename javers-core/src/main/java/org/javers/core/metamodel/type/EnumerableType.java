@@ -41,4 +41,6 @@ public abstract class EnumerableType extends JaversType {
      * Returns new instance of Enumerable with items from sourceEnumerable mapped by mapFunction.
      */
     public abstract Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner);
+
+    public abstract boolean isEmpty(Object container);
 }

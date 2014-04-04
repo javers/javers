@@ -1,16 +1,14 @@
 package org.javers.core.snapshot
 
-import org.javers.common.collections.Multimap
-import org.javers.core.graph.ObjectNode
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.valueObjectId
 import static org.javers.core.snapshot.SnapshotsAssert.getAssertThat
-import static org.javers.test.assertion.NodeAssert.getAssertThat
 
 /**
  * @author bartosz walacik
@@ -153,7 +151,7 @@ class GraphSnapshotFactoryTest extends Specification {
         propertyName <<  ["mapOfEntities","mapPrimitiveToVO"]
         cdo << [
                 new SnapshotEntity(mapOfEntities:    [(new SnapshotEntity(id:2)): new SnapshotEntity(id:3)]),
-                new SnapshotEntity(mapPrimitiveToVO: ["key": new DummyAddress("London"), "key2": new DummyAddress("City")])
+                new SnapshotEntity(mapPrimitiveToVO: ["key1": new DummyAddress("London"), "key2": new DummyAddress("City")])
         ]
         expectedVoIds << [ [instanceId(2, SnapshotEntity),instanceId(3, SnapshotEntity)],
                            [valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"mapPrimitiveToVO/key1"),

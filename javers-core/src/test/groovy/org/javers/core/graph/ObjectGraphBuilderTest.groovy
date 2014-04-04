@@ -39,7 +39,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph starting from root ValueObject"(){
         given:
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        def graphBuilder = new ObjectGraphBuilder(mapper)
         DummyAddress address = new DummyAddress("any","any")
 
         when:
@@ -54,7 +54,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph with ValueObject node"() {
         given:
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        def graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUserDetails user = dummyUserDetails(1).withAddress().build()
 
         when:
