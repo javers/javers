@@ -23,6 +23,11 @@ public abstract class AbstractTypeAdapter<T extends Change> implements JsonTypeA
     return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
   }
 
+  @Override
+  public JsonElement toJson(T change, JsonSerializationContext context) {
+    return createJsonObject(change, context);
+  }
+
   protected JsonObject createJsonObject(Change change, JsonSerializationContext context) {
     JsonObject jsonObject = new JsonObject();
     jsonObject.addProperty("changeType", change.getClass().getSimpleName());
