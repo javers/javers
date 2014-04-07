@@ -2,10 +2,10 @@
 ![JVlogo.png](JVlogo1.png)
 
 ## Abstract
-JaVers is a lightweight java library for **versioning** your object-oriented data.
+JaVers is a lightweight java library for **auditing** your object-oriented data.
 
 We all use Version Control Systems for source code,
-why not to use specialized VCS for our applications to provide versioning of mission-critical data?
+why not to use specialized framework to provide for our application an audit trail of domain objects?
 
 ## Story
 
