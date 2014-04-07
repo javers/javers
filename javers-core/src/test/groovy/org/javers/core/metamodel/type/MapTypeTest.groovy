@@ -1,12 +1,13 @@
 package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
-import org.javers.core.metamodel.type.MapType
+import org.javers.common.exception.exceptions.JaversException
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.lang.reflect.Type
 
+import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
 /**
@@ -22,19 +23,35 @@ class MapTypeTest extends Specification{
     }
 
     @Unroll
-    def "should return null EntryClass if baseJavaType is not #geneticKind"(){
+    def "should not be fully parametrized if baseJavaType is not #geneticKind"(){
         given:
         Type noGeneric = getFieldFromClass(Dummy, geneticKind).genericType
+
+        when:
         MapType mType = new MapType(noGeneric)
 
-        expect:
-        mType.entryClass == null
+        then:
+        mType.fullyParametrized == false
+
+        when:
+        mType.getKeyClass()
+
+        then:
+        def e = thrown(JaversException)
+        e.code == GENERIC_TYPE_NOT_PARAMETRIZED;
+
+        when:
+        mType.getValueClass()
+
+        then:
+        e = thrown(JaversException)
+        e.code == GENERIC_TYPE_NOT_PARAMETRIZED;
 
         where:
         geneticKind << ["noGeneric","wildcardGeneric","parametrizedGeneric"]
     }
 
-    def "should return EntryClass if baseJavaType is generic with actual Class argument"(){
+    def "should return key & value Class if baseJavaType is generic with actual Class argument"(){
         given:
         Type noGeneric = getFieldFromClass(Dummy, "genericWithArgument").genericType
 
@@ -43,7 +60,7 @@ class MapTypeTest extends Specification{
 
         then:
         mType.baseJavaType == new TypeToken<Map<String,Integer>>(){}.type
-        mType.entryClass.key == String
-        mType.entryClass.value == Integer
+        mType.keyClass == String
+        mType.valueClass == Integer
     }
 }

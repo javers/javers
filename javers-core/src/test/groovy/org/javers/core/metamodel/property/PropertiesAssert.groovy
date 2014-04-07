@@ -28,6 +28,7 @@ class PropertiesAssert {
 
     Property getProperty(String withName) {
         def found = actual.grep{it.name == withName}
+        assert found.size() <= 1
         found.size() == 1 ? found[0] : null
     }
 }

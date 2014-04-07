@@ -2,7 +2,7 @@ package org.javers.test.assertion
 
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.model.object.graph.ObjectNode
+import org.javers.core.graph.ObjectNode
 
 /**
  * @author bartosz walacik

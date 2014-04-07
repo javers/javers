@@ -1,4 +1,4 @@
-package org.javers.model.object.graph;
+package org.javers.core.graph;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;

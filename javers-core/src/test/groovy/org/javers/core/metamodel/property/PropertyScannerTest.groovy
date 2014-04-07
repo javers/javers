@@ -17,12 +17,20 @@ abstract class PropertyScannerTest extends Specification {
 
     @Shared PropertyScanner propertyScanner
 
-    def shouldScanPrivateProperty() {
+    def "should scan and get inherited property"() {
+        when:
+        def properties = propertyScanner.scan(DummyAddress)
+
+        then:
+        assertThat(properties).hasProperty("inheritedInt").hasValue(new DummyAddress(),0)
+    }
+
+    def "should scan and get private property"() {
         when:
         def properties = propertyScanner.scan(ManagedClass)
 
         then:
-        assertThat(properties).hasProperty("privateProperty")
+        assertThat(properties).hasProperty("privateProperty").hasValue(new ManagedClass(),0)
     }
 
     def shouldScanId() {

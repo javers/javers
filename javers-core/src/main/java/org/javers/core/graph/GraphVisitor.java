@@ -1,4 +1,4 @@
-package org.javers.model.object.graph;
+package org.javers.core.graph;
 
 import org.javers.common.patterns.visitors.Visitor;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * @author bartosz walacik
  */
-public class GraphVisitor implements Visitor<ObjectNode> {
+public abstract class GraphVisitor implements Visitor<ObjectNode> {
     private final Set<ObjectNode> visited = new HashSet<>();
 
     @Override

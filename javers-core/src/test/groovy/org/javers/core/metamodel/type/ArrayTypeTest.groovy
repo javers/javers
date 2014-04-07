@@ -1,6 +1,5 @@
 package org.javers.core.metamodel.type
 
-import org.javers.core.metamodel.type.ArrayType
 import spock.lang.Specification
 
 import java.lang.reflect.Type
@@ -25,6 +24,6 @@ class ArrayTypeTest extends Specification{
         then:
         aType.baseJavaType == Integer[]
         aType.genericType == false
-        aType.elementType == Integer
+        aType.itemClass == Integer
     }
 }

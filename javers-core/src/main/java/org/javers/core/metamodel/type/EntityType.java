@@ -17,7 +17,7 @@ public class EntityType extends ManagedType {
     }
 
     @Override
-    Entity getManagedClass() {
+    public Entity getManagedClass() {
         return (Entity)super.getManagedClass();
     }
 

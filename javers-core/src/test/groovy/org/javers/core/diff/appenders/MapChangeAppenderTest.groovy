@@ -8,7 +8,7 @@ import org.javers.core.diff.changetype.map.EntryRemoved
 import org.javers.core.diff.changetype.map.EntryValueChanged
 import org.javers.core.model.DummyUser
 import org.javers.core.metamodel.property.Property
-import org.javers.model.object.graph.ObjectNode
+import org.javers.core.graph.ObjectNode
 import org.joda.time.LocalDateTime
 import spock.lang.Unroll
 import static org.javers.core.diff.ChangeAssert.*

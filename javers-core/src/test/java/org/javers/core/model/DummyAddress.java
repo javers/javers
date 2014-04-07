@@ -19,6 +19,10 @@ public class DummyAddress extends AbstractDummyAddress{
     public DummyAddress() {
     }
 
+    public DummyAddress(String city) {
+        this.city = city;
+    }
+
     public DummyAddress(String city, String street) {
         this.city = city;
         this.street = street;

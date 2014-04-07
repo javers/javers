@@ -5,7 +5,7 @@ import org.javers.core.diff.DiffFactory;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.model.object.graph.ObjectGraphBuilder;
+import org.javers.core.graph.ObjectGraphBuilder;
 
 
 /**
@@ -33,17 +33,53 @@ public class Javers {
         this.jsonConverter = jsonConverter;
     }
 
-    public Diff initial(String user, Object root) {
-        ObjectGraphBuilder graph = new ObjectGraphBuilder(typeMapper);
-        return diffFactory.createInitial(user, graph.buildGraph(root));
+    /**
+     * <p>
+     * Persists current version of given domain objects graph in JaVers repository.
+     * All changes made on versioned objects are recorded,
+     * new objects become versioned and its initial state is recorded.
+     * </p>
+     *
+     * For any versioned object, you can:
+     * <ul>
+     *     <li/>  TODO
+     * </ul>
+     *
+     * @param currentVersion domain objects graph
+     */
+    public Diff commit(String user, Object currentVersion){
+        return null;
     }
 
-    public Diff compare(String user, Object left, Object right) {
+    /**
+     * <p>
+     * Easiest way to calculate diff, just provide two versions of the same object graph.
+     * Use it if you don't want to store domain objects history in JaVers repository.
+     * </p>
+     *
+     * <p>
+     * Diffs can be converted to JSON with {@link #toJson(Diff)} and stored in custom repository
+     * </p>
+     */
+    public Diff compare(String user, Object oldVersion, Object currentVersion) {
         ObjectGraphBuilder leftGraph = new ObjectGraphBuilder(typeMapper);
         ObjectGraphBuilder rightGraph = new ObjectGraphBuilder(typeMapper);
-        return diffFactory.create(user, leftGraph.buildGraph(left), rightGraph.buildGraph(right));
+        return diffFactory.create(user, leftGraph.buildGraph(oldVersion), rightGraph.buildGraph(currentVersion));
     }
 
+    /**
+     * Initial diff is a kind of snapshot of given domain objects.
+     * Use it alongside with {@link #compare(String, Object, Object)}
+     */
+    public Diff initial(String user, Object newDomainObject) {
+        ObjectGraphBuilder graph = new ObjectGraphBuilder(typeMapper);
+        return diffFactory.createInitial(user, graph.buildGraph(newDomainObject));
+    }
+
+
+    /**
+     * Use it alongside with {@link #compare(String, Object, Object)}
+     */
     public String toJson(Diff diff) {
         return jsonConverter.toJson(diff);
     }

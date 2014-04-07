@@ -1,6 +1,5 @@
 package org.javers.core.diff;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.javers.common.validation.Validate;
@@ -8,7 +7,7 @@ import org.javers.core.diff.appenders.*;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.model.object.graph.ObjectNode;
+import org.javers.core.graph.ObjectNode;
 
 /**
  * @author Maciej Zasada
@@ -72,7 +71,7 @@ public class DiffFactory {
         List<Property> nodeProperties = pair.getProperties();
         for (Property property : nodeProperties) {
 
-            //optimization, skip all Appenders if null on both sides
+            //optimization, skip all appenders if null on both sides
             if (pair.isNullOnBothSides(property)) {
                 continue;
             }
@@ -81,7 +80,7 @@ public class DiffFactory {
             for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
                 Change change = appender.calculateChangesIfSupported(pair, property, javersType);
                 if (change != null) {
-                    diff.addChange(change, pair.getRight().getCdo().getWrappedCdo());
+                    diff.addChange(change, pair.getRight().wrappedCdo());
                 }
             }
         }

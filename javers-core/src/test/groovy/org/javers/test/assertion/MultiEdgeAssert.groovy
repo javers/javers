@@ -1,6 +1,6 @@
 package org.javers.test.assertion
 
-import org.javers.model.object.graph.MultiEdge
+import org.javers.core.graph.MultiEdge
 
 /**
  * @author bartosz walacik

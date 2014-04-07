@@ -3,6 +3,8 @@ package org.javers.core.diff.appenders;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Maps;
 import org.javers.common.collections.Sets;
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.map.*;
 import org.javers.core.metamodel.object.GlobalCdoId;
@@ -30,25 +32,33 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
     }
 
     @Override
+    protected Class<? extends JaversType> getSupportedPropertyType() {
+        return MapType.class;
+    }
+
+    @Override
     protected boolean supports(JaversType propertyType) {
         if (!super.supports(propertyType)) {
             return false;
         }
 
         MapType mapType = (MapType)propertyType;
-        boolean isSupported = typeMapper.isSupportedMap(mapType);
-
-        if (!isSupported) {
-            logger.warn("unsupported map content type [{}], skipping", propertyType.getBaseJavaType());
+        if (!isSupportedMap(mapType)) {
+            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED,
+                                     "unsupported Map content type ["+propertyType.getBaseJavaType()+"], skipping");
         }
-
-        return isSupported;
+        return true;
     }
 
-    @Override
-    protected Class<? extends JaversType> getSupportedPropertyType() {
-        return MapType.class;
+    //TODO add support for Entities & ValueObjects
+    private boolean isSupportedMap(MapType propertyType){
+        if (!propertyType.isFullyParametrized()) {
+            return false;
+        }
+        return typeMapper.isPrimitiveOrValueOrObject(propertyType.getKeyClass()) &&
+               typeMapper.isPrimitiveOrValueOrObject(propertyType.getValueClass());
     }
+
 
     @Override
     protected MapChange calculateChanges(NodePair pair, Property property) {

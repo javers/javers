@@ -1,7 +1,7 @@
 package org.javers.test.assertion
 
 import org.fest.assertions.api.Assertions
-import org.javers.model.object.graph.SingleEdge
+import org.javers.core.graph.SingleEdge
 
 /**
  * @author bartosz walacik

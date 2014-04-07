@@ -1,15 +1,15 @@
-package org.javers.model.object.graph
+package org.javers.core.graph
 
-import org.javers.core.JaversTestBuilder
-import org.javers.core.metamodel.property.Entity
-import org.javers.core.metamodel.property.ManagedClassFactory
+import org.javers.core.metamodel.property.ValueObject
+import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.javers.core.metamodel.type.TypeMapper
+import org.javers.core.model.SnapshotEntity
+import org.javers.test.assertion.NodeAssert
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.javers.test.assertion.NodeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
@@ -31,7 +31,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ObjectNode node = graphBuilder.buildGraph(user)
 
         then:
-        assertThat(node).hasNoEdges()
+        NodeAssert.assertThat(node).hasNoEdges()
                 .hasCdo(user)
                 .hasInstanceId(DummyUser, "Mad Kaz")
     }
@@ -39,14 +39,14 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph starting from root ValueObject"(){
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        def graphBuilder = new ObjectGraphBuilder(mapper)
         DummyAddress address = new DummyAddress("any","any")
 
         when:
         ObjectNode node = graphBuilder.buildGraph(address)
 
         then:
-        assertThat(node).hasNoEdges()
+        NodeAssert.assertThat(node).hasNoEdges()
                 .hasCdo(address)
                 .hasUnboundedValueObjectId(DummyAddress)
     }
@@ -54,14 +54,14 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph with ValueObject node"() {
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        def graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUserDetails user = dummyUserDetails(1).withAddress().build()
 
         when:
         ObjectNode node = graphBuilder.buildGraph(user)
 
         then:
-        assertThat(node).hasCdo(user)
+        NodeAssert.assertThat(node).hasCdo(user)
                 .hasSingleEdge("dummyAddress")
                 .andTargetNode()
                 .hasNoEdges()
@@ -72,14 +72,14 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build two node graph for the same Entity"(){
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
         DummyUser user = dummyUser().withName("Mad Kaz").withSupervisor("Mad Stach").build()
 
         when:
         ObjectNode node = graphBuilder.buildGraph(user)
 
         then:
-        assertThat(node).hasEdges(1)
+        NodeAssert.assertThat(node).hasEdges(1)
                 .hasCdoId("Mad Kaz")
                 .hasEdge("supervisor") //jump to EdgeAssert
                 .isSingleEdgeTo("Mad Stach")
@@ -88,14 +88,14 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build two node graph for different Entities"() {
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
         DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build()
 
         when:
         ObjectNode node = graphBuilder.buildGraph(user)
 
         then:
-        assertThat(node).hasEdges(1)
+        NodeAssert.assertThat(node).hasEdges(1)
                 .hasCdoId("Mad Kaz")
                 .hasEdge("dummyUserDetails")//jump to EdgeAssert
                 .isSingleEdgeTo(1L)
@@ -103,10 +103,10 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
 
 
-    def "shouldBuildThreeNodesLinearGraph"() {
+    def "should build three nodes linear graph"() {
         given:
         //kaz0 - kaz1 - kaz2
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper);
+        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper);
         DummyUser[] kaziki = new DummyUser[4];
         for (int i=0; i<3; i++){
             kaziki[i] = dummyUser().withName("Mad Kaz "+i).build();
@@ -119,7 +119,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ObjectNode node = graphBuilder.buildGraph(kaziki[0]);
 
         then:
-        assertThat(node).hasEdges(1)
+        NodeAssert.assertThat(node).hasEdges(1)
                 .hasCdoId("Mad Kaz 0")
                 .hasSingleEdge("supervisor")
                 .andTargetNode()
@@ -137,7 +137,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //    \
         //      stach - stach.details
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).build()
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withDetails(1L).withSupervisor(stach).build()
 
@@ -145,7 +145,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ObjectNode node = graphBuilder.buildGraph(kaz)
 
         then:
-        assertThat(node).hasEdges(2)
+        NodeAssert.assertThat(node).hasEdges(2)
                 .hasCdoId("Mad Kaz")
                 .and().hasEdge("supervisor")
                 .isSingleEdge()
@@ -154,7 +154,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .hasEdge("dummyUserDetails")
                 .isSingleEdgeTo(2L)
 
-        assertThat(node).hasEdge("dummyUserDetails")
+        NodeAssert.assertThat(node).hasEdge("dummyUserDetails")
                 .isSingleEdgeTo(1L)
     }
 
@@ -166,16 +166,16 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //         /   |   \
         //      id    id    id
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).withDetailsList(3).build()
 
         when:
         ObjectNode node = graphBuilder.buildGraph(stach)
 
         then:
-        assertThat(node).hasEdges(2)
-        assertThat(node).hasSingleEdge("dummyUserDetails")
-        assertThat(node).hasMultiEdge("dummyUserDetailsList").ofSize(3)
+        NodeAssert.assertThat(node).hasEdges(2)
+        NodeAssert.assertThat(node).hasSingleEdge("dummyUserDetails")
+        NodeAssert.assertThat(node).hasMultiEdge("dummyUserDetailsList").ofSize(3)
     }
 
 
@@ -188,7 +188,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //         /   |   \
         //      id    id    id
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
         DummyUser stach = dummyUser().withName("Stach").withDetailsList(3).build()
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withSupervisor(stach).build()
 
@@ -196,7 +196,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ObjectNode node = graphBuilder.buildGraph(kaz)
 
         then:
-        assertThat(node).hasCdoId("Mad Kaz")
+        NodeAssert.assertThat(node).hasCdoId("Mad Kaz")
                 .hasEdge("supervisor")
                 .isSingleEdgeTo("Stach")
                 .andTargetNode()
@@ -214,7 +214,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //          Em1 Em2 Em3
         given:
         int numberOfElements = 3
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
         DummyUser rob = dummyUser().withName("rob").withEmployees(3).build()
         DummyUser stach = dummyUser().withName("stach")
                 .withEmployee(rob)
@@ -226,7 +226,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ObjectNode node = graphBuilder.buildGraph(kaz)
 
         then:
-        assertThat(node).hasCdoId("kaz")
+        NodeAssert.assertThat(node).hasCdoId("kaz")
                 .and().hasEdge("supervisor")
                 .isSingleEdgeTo("stach")
                 .andTargetNode()
@@ -245,7 +245,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //    \     \
         //      microKaz
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
 
         DummyUser superKaz = dummyUser().withName("superKaz").build()
         DummyUser kaz   =    dummyUser().withName("kaz").withSupervisor(superKaz).build()
@@ -258,7 +258,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         then:
 
         //small cycle
-        assertThat(node).hasCdoId("superKaz")
+        NodeAssert.assertThat(node).hasCdoId("superKaz")
                 .hasEdge("employeesList")
                 .isMultiEdge("kaz", "microKaz")
                 .andTargetNode("kaz")
@@ -266,7 +266,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .isSingleEdgeTo("superKaz")
 
         //large cycle
-        assertThat(node).hasCdoId("superKaz")
+        NodeAssert.assertThat(node).hasCdoId("superKaz")
                 .hasMultiEdge("employeesList")
                 .andTargetNode("microKaz")
                 .hasEdge("supervisor")
@@ -279,42 +279,73 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph with primitive types Set"() {
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
         DummyUser dummyUser = dummyUser().withName("name").withStringsSet("1", "2", "3").build()
 
         when:
         ObjectNode node = graphBuilder.buildGraph(dummyUser)
 
         then:
-        assertThat(node).hasNoEdges()
+        NodeAssert.assertThat(node).hasNoEdges()
     }
 
 
     def "should build graph with primitive types List"(){
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
         DummyUser dummyUser = dummyUser().withName("name").withIntegerList(1, 2, 3, 4).build()
 
         when:
         ObjectNode node = graphBuilder.buildGraph(dummyUser)
 
         then:
-        assertThat(node).hasNoEdges()
+        NodeAssert.assertThat(node).hasNoEdges()
     }
 
-    def "should build graph with ValueObjects multi edge"() {
+    @Unroll
+    def "should build graph with #containerType<#managedClass> MultiEdge"() {
         given:
         ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
-        DummyUserDetails dummyUserDetails = dummyUserDetails()
-                .withAddresses(new DummyAddress("warszawa", "mokotowska"))
-                .withAddresses(new DummyAddress("warszawa", "wolska"))
-                .build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(dummyUserDetails)
+        ObjectNode node = graphBuilder.buildGraph(cdo)
 
         then:
-        assertThat(node).hasMultiEdge("addressList").ofSize(2)
+        assertThat(node).hasMultiEdge(propertyName).ofSize(2)
+
+        where:
+        managedClass  << ["ValueObject"] * 3 + ["Entity"] *3
+        containerType << ["Set","Array", "List"] * 2
+        propertyName <<  ["setOfValueObjects","arrayOfValueObjects","listOfValueObjects", "setOfEntities","arrayOfEntities", "listOfEntities"]
+        cdo << [
+                 new SnapshotEntity(setOfValueObjects:   [new DummyAddress("London"), new DummyAddress("City")]) ,
+                 new SnapshotEntity(arrayOfValueObjects: [new DummyAddress("London"), new DummyAddress("City")]) ,
+                 new SnapshotEntity(listOfValueObjects:  [new DummyAddress("London"), new DummyAddress("City")]) ,
+                 new SnapshotEntity(setOfEntities:       [new SnapshotEntity(id:2),   new SnapshotEntity(id:3)]) ,
+                 new SnapshotEntity(arrayOfEntities:     [new SnapshotEntity(id:2),   new SnapshotEntity(id:3)]) ,
+                 new SnapshotEntity(listOfEntities:      [new SnapshotEntity(id:2),   new SnapshotEntity(id:3)])
+               ]
+    }
+
+    @Unroll
+    def "should build graph with Map<#keyType, #valueType>  MultiEdge"() {
+        given:
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+
+        when:
+        ObjectNode node = graphBuilder.buildGraph(cdo)
+
+        then:
+        assertThat(node).hasMultiEdge(propertyName).ofSize(2)
+
+        where:
+        keyType <<   ["Entity", "Primitive"]
+        valueType << ["Entity", "ValueObject"]
+        propertyName <<  ["mapOfEntities","mapPrimitiveToVO"]
+        cdo << [
+                new SnapshotEntity(mapOfEntities:    [(new SnapshotEntity(id:2)): new SnapshotEntity(id:3)]),
+                new SnapshotEntity(mapPrimitiveToVO: ["key": new DummyAddress("London"), "key2": new DummyAddress("City")])
+               ]
     }
 
     def "should assign proper ids to ValueObjects in multi edge"() {

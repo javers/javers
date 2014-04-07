@@ -1,6 +1,6 @@
 package org.javers.core.diff;
 
-import org.javers.model.object.graph.ObjectNode;
+import org.javers.core.graph.ObjectNode;
 
 import java.util.Collections;
 import java.util.Set;

@@ -71,6 +71,6 @@ public class BeanProperty implements Property {
 
     @Override
     public String toString() {
-        return getter.getDeclaringClass().getSimpleName()+"."+getter.getName()+"()";
+        return getter.getGenericReturnType()+" "+ getter.getDeclaringClass().getSimpleName()+"."+getter.getName()+"()";
     }
 }

@@ -6,9 +6,8 @@ import org.javers.core.diff.RealNodePair
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.javers.core.diff.Change
 import org.javers.core.metamodel.property.Property
-import org.javers.model.object.graph.ObjectNode
+import org.javers.core.graph.ObjectNode
 
 import static ReferenceChangeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser

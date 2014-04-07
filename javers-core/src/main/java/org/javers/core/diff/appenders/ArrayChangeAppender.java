@@ -2,24 +2,17 @@ package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Arrays;
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Sets;
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ArrayChange;
 import org.javers.core.diff.changetype.ContainerValueChange;
-import org.javers.core.diff.changetype.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
-import org.javers.core.diff.changetype.map.MapChange;
-import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.ArrayType;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.ListType;
-import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -43,20 +36,15 @@ public class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
         return ArrayType.class;
     }
 
-    //TODO
-    @Override
-    protected boolean supports(JaversType propertyType) {
-        if (!super.supports(propertyType)) {
+    //TODO add support for Entities & ValueObjects
+    public boolean isSupportedContainer(Property property) {
+        ContainerType propertyType = typeMapper.getPropertyType(property);
+
+        if (! typeMapper.isPrimitiveOrValueOrObject(propertyType.getItemClass())){
+            logger.error(JaversExceptionCode.DIFF_NOT_IMPLEMENTED.getMessage() +" on "+property);
             return false;
         }
-
-        boolean isSupported = typeMapper.isSupportedContainer((ListType) propertyType);
-
-        if (!isSupported) {
-            logger.warn("unsupported Array content type [{}], skipping", propertyType.getBaseJavaType());
-        }
-
-        return isSupported;
+        return true;
     }
 
     @Override
@@ -69,6 +57,10 @@ public class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
                 mapChangeAppender.calculateEntryChanges(leftMap, rightMap);
 
         if (!entryChanges.isEmpty()){
+            if (!isSupportedContainer(property)){
+                return null; //TODO ADD SUPPORT
+            }
+
             List<ContainerValueChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
 
             return new ArrayChange(pair.getGlobalCdoId(), property, elementChanges);
