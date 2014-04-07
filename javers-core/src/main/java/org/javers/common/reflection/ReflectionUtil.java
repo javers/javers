@@ -5,9 +5,7 @@ import org.javers.common.exception.exceptions.JaversExceptionCode;
 
 import javax.persistence.Transient;
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author bartosz walacik
@@ -23,20 +21,27 @@ public class ReflectionUtil {
                  result.add(m);
              }
         }
-
         return result;
     }
 
     /**
-     * list all class methods, including inherited and private
+     * list all class methods, including inherited and private,
+     * removes inheritance duplicates
      */
     public static List<Method> getAllMethods(Class methodSource){
         List<Method> methods = new ArrayList<>();
+        Set<Integer> added = new HashSet<>();
 
         Class clazz = methodSource;
         while (clazz != null) {
             for (Method m : clazz.getDeclaredMethods()) {
+                int methodKey = methodKey(m);
+                if (added.contains(methodKey)) {
+                    // System.out.println("filtered inheritance duplicate" +m);
+                    continue;
+                }
                 methods.add(m);
+                added.add(methodKey);
             }
             clazz = clazz.getSuperclass();
         }
@@ -44,6 +49,13 @@ public class ReflectionUtil {
         return methods;
     }
 
+    private static int methodKey(Method m){
+        int key = m.getName().hashCode();
+        for (Class c : m.getParameterTypes()) {
+            key += c.hashCode();
+        }
+        return key;
+    }
 
     /**
      * true if method is getter and

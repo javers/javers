@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -14,14 +15,17 @@ public class ListType extends CollectionType{
     }
 
     @Override
-    public Object map(Object sourceList_, EnumerableFunction mapFunction) {
-        Validate.argumentsAreNotNull(sourceList_, mapFunction);
+    public Object map(Object sourceList_, EnumerableFunction mapFunction, OwnerContext owner) {
+        Validate.argumentsAreNotNull(sourceList_, mapFunction, owner);
         List sourceList = (List)sourceList_;
         List targetList = new ArrayList(sourceList.size());
 
-        int i = 0;
+        IndexableContext indexableContext = new IndexableContext();
+        owner.setEnumeratorContext(indexableContext);
+
         for (Object sourceVal : sourceList){
-            targetList.add(mapFunction.apply(sourceVal,""+i++));
+            targetList.add(mapFunction.apply(sourceVal, owner));
+            indexableContext.incIndex();
         }
         return targetList;
     }

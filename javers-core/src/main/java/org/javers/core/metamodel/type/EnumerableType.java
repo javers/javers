@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.collections.IdentityEnumerableFunction;
+import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -35,17 +35,12 @@ public abstract class EnumerableType extends JaversType {
     /**
      * returns true if Enumerable is generic Type and all its arguments are actual Classes
      */
-    public abstract boolean isFullyParameterized();
-
-    /**
-     * returns shallow copy of sourceEnumerable
-     */
-    public Object copy(Object sourceEnumerable){
-        return map(sourceEnumerable, new IdentityEnumerableFunction());
-    }
+    public abstract boolean isFullyParametrized();
 
     /**
      * Returns new instance of Enumerable with items from sourceEnumerable mapped by mapFunction.
      */
-    public abstract Object map(Object sourceEnumerable, EnumerableFunction mapFunction);
+    public abstract Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner);
+
+    public abstract boolean isEmpty(Object container);
 }

@@ -28,9 +28,12 @@ public enum  JaversExceptionCode {
 
     NOT_IMPLEMENTED(RUNTIME_ERROR + "not implemented"),
 
+    DIFF_NOT_IMPLEMENTED(RUNTIME_ERROR + "not implemented Enumerable content type '%s'"),
+
     GENERIC_TYPE_NOT_PARAMETRIZED(RUNTIME_ERROR + "expected actual Class arguments in type '%s'. Javers needs to know what kind of content is stored in your collections. Try at least <Object>"),
 
-    VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY(RUNTIME_ERROR + "found Value Object '%s' on KEY position in Map property '%s'. Please change this class mapping to Value or Entity"),
+    //graph & snapshot
+    VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY(RUNTIME_ERROR + "found Value Object '%s' on KEY position in Map property of '%s'. Please change this class mapping to Value or Entity"),
 
     SNAPSHOT_STATE_VIOLATION(RUNTIME_ERROR + "snapshots are immutable"),
 

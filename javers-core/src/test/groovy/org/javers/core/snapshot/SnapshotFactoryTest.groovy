@@ -124,7 +124,8 @@ class SnapshotFactoryTest extends Specification{
         expectedVal << [[1, 2] as Set,
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)] as Set,
                         [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)] as Set,
-                         valueObjectSetId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects")
+                        [valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects/random_0"),
+                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects/random_1")] as Set
                        ]
     }
 
@@ -166,8 +167,6 @@ class SnapshotFactoryTest extends Specification{
         snapshot.getPropertyValue(propertyName) == expectedVal
         //we need shallow copy
         System.identityHashCode(snapshot.getPropertyValue(propertyName)) != System.identityHashCode(cdo.getAt(propertyName))
-
-        println(expectedVal)
 
         where:
         enrtyType <<    ["<Primitive,Primitive>", "<Value,Value>", "<Primitive,ValueObject>", "<Entity,Entity>"]

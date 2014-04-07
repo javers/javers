@@ -24,6 +24,10 @@ public class ValueObjectId extends UnboundedValueObjectId {
         this.fragment = fragment;
     }
 
+    public ValueObjectId(ValueObject valueObject, OwnerContext ownerContext) {
+        this(valueObject, ownerContext.getGlobalCdoId(), ownerContext.getPath());
+    }
+
     /**
      * Path to ValueObject, should be unique in the Entity <b>instance</b> scope.
      * Usually, property name.

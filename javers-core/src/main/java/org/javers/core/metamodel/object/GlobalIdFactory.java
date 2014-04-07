@@ -15,21 +15,21 @@ import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
 public class GlobalIdFactory {
 
     /**
-     * @param context for ValueObjects, optional
+     * @param owner for ValueObjects, optional
      */
-    public static GlobalCdoId create(Object targetCdo, ManagedClass targetManagedClass, OwnerContext context) {
+    public static GlobalCdoId createId(Object targetCdo, ManagedClass targetManagedClass, OwnerContext owner) {
         Validate.argumentsAreNotNull(targetCdo,targetManagedClass);
 
         if (targetManagedClass instanceof Entity) {
             return createFromInstance(targetCdo, (Entity) targetManagedClass);
         }
 
-        if (targetManagedClass instanceof ValueObject && hasNoOwner(context)) {
+        if (targetManagedClass instanceof ValueObject && hasNoOwner(owner)) {
             return new UnboundedValueObjectId((ValueObject)targetManagedClass);
         }
 
-        if (targetManagedClass instanceof ValueObject && hasOwner(context)) {
-            return new ValueObjectId((ValueObject)targetManagedClass, context.getGlobalCdoId(), context.getPath());
+        if (targetManagedClass instanceof ValueObject && hasOwner(owner)) {
+            return new ValueObjectId((ValueObject) targetManagedClass, owner);
         }
 
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);

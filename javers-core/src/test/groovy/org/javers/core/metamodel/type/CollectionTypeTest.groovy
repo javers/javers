@@ -30,7 +30,7 @@ class CollectionTypeTest extends Specification{
         then:
         cType.baseJavaType == Set
         cType.genericType == false
-        cType.fullyParameterized == false
+        cType.fullyParametrized == false
 
         when:
         cType.getItemClass()
@@ -49,7 +49,7 @@ class CollectionTypeTest extends Specification{
 
         then:
         cType.genericType == true
-        cType.fullyParameterized == false
+        cType.fullyParametrized == false
     }
 
     def "should hold actual elementType" () {
@@ -62,7 +62,7 @@ class CollectionTypeTest extends Specification{
         then:
         cType.baseJavaType == new TypeToken<Set<String>>(){}.type
         cType.genericType == true
-        cType.fullyParameterized == true
+        cType.fullyParametrized == true
         cType.itemClass == String
     }
 }

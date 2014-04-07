@@ -7,7 +7,6 @@ import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyUser
-import org.javers.core.model.DummyUserDetails
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -159,32 +158,14 @@ class TypeMapperTest extends Specification {
         hashSetWithIntJaversType.baseJavaType ==  new TypeToken<HashSet<Integer>>(){}.type
     }
 
-    def "should recognize Collection of Entity type"() {
+    def "should recognize Object.class as empty ValueType"() {
         given:
-        JaversTestBuilder javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        TypeMapper mapper = javersTestBuilder.typeMapper
-        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner()
-        List<Property> properties = scanner.scan(DummyUser)
-        Property property = properties.find {
-            it.name == "dummyUserDetailsList"
-        }
+        TypeMapper mapper = JaversTestBuilder.javersTestAssembly().typeMapper
 
-        expect:
-        mapper.isCollectionOfManagedClasses(property)
+        when:
+        def jType = mapper.getJaversType(Object)
+
+        then:
+        jType instanceof ValueType
     }
-
-    def "should not recognize primitive type collection as collection of entity"() {
-        given:
-        JaversTestBuilder javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        TypeMapper mapper = javersTestBuilder.typeMapper
-        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner()
-        List<Property> properties = scanner.scan(DummyUser)
-        Property property = properties.find {
-            it.name == "integerList"
-        }
-
-        expect:
-        mapper.isCollectionOfManagedClasses(property) == false
-    }
-
 }

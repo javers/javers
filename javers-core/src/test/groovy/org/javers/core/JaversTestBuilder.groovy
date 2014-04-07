@@ -4,6 +4,7 @@ import org.javers.core.metamodel.type.TypeFactory
 import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.graph.ObjectGraphBuilder
+import org.javers.core.snapshot.GraphSnapshotFactory
 import org.javers.core.snapshot.SnapshotFactory
 
 /**
@@ -42,6 +43,10 @@ class JaversTestBuilder {
 
     SnapshotFactory getSnapshotFactory() {
         javersBuilder.getContainerComponent(SnapshotFactory)
+    }
+
+    GraphSnapshotFactory getGraphSnapshotFactory() {
+        javersBuilder.getContainerComponent(GraphSnapshotFactory)
     }
 
     TypeFactory getTypeSpawningFactory() {
