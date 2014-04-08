@@ -10,9 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Decomposes given object graph into flat list of object Snapshots.
+ * Decomposes given live objects graph into a flat list of object Snapshots.
  * Resulting structure can be easily serialized and persisted.
- * <br/>
  *
  * @author bartosz walacik
  */
@@ -26,12 +25,12 @@ public class GraphSnapshotFactory {
 
     /**
      *
-     * @param node graph 'root', outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
+     * @param currentVersion graph 'root', outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
      */
-    public List<CdoSnapshot> create(ObjectNode node){
-        Validate.argumentIsNotNull(node);
+    public List<CdoSnapshot> create(ObjectNode currentVersion){
+        Validate.argumentIsNotNull(currentVersion);
         SnapshotVisitor visitor = new SnapshotVisitor();
-        node.accept(visitor);
+        currentVersion.accept(visitor);
 
         return visitor.output;
     }

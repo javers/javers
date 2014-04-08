@@ -18,7 +18,7 @@ class GraphSnapshotFactoryTest extends Specification {
         given:
         def javers = javersTestAssembly()
         def cdo = new SnapshotEntity(id: 1, entityRef: new SnapshotEntity(id: 5))
-        def node = javers.createObjectGraphBuilder().buildGraph(cdo)
+        def node = javers.createObjectGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
@@ -36,7 +36,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def ref2  = new SnapshotEntity(id:2,entityRef: ref3)
         //cdo -> ref2 -> ref3
         def cdo   = new SnapshotEntity(id:1,entityRef: ref2)
-        def node = javers.createObjectGraphBuilder().buildGraph(cdo)
+        def node = javers.createObjectGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
@@ -52,7 +52,7 @@ class GraphSnapshotFactoryTest extends Specification {
         given:
         def javers = javersTestAssembly()
         def cdo  = new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("street"))
-        def node = javers.createObjectGraphBuilder().buildGraph(cdo)
+        def node = javers.createObjectGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
@@ -66,7 +66,7 @@ class GraphSnapshotFactoryTest extends Specification {
     def "should flatten Set of ValueObject"() {
         def javers = javersTestAssembly()
         def cdo = new SnapshotEntity(setOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")])
-        def node = javers.createObjectGraphBuilder().buildGraph(cdo)
+        def node = javers.createObjectGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
@@ -83,7 +83,7 @@ class GraphSnapshotFactoryTest extends Specification {
     def "should flatten #listType of ValueObject"() {
         given:
         def javers = javersTestAssembly()
-        def node = javers.createObjectGraphBuilder().buildGraph(cdo)
+        def node = javers.createObjectGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
@@ -111,7 +111,7 @@ class GraphSnapshotFactoryTest extends Specification {
     def "should flatten #containerType of Entity"() {
         given:
         def javers = javersTestAssembly()
-        def node = javers.createObjectGraphBuilder().buildGraph(cdo)
+        def node = javers.createObjectGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
@@ -134,7 +134,7 @@ class GraphSnapshotFactoryTest extends Specification {
     def "should flatten Map of <#keyType, #valueType>"() {
         given:
         def javers = javersTestAssembly()
-        def node = javers.createObjectGraphBuilder().buildGraph(cdo)
+        def node = javers.createObjectGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)

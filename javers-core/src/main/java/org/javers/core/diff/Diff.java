@@ -1,7 +1,6 @@
 package org.javers.core.diff;
 
 import org.javers.common.patterns.visitors.Visitable;
-import org.javers.core.diff.changetype.NewObject;
 import org.joda.time.LocalDateTime;
 
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ import static org.javers.common.validation.Validate.*;
  * Diff is similar notion to <i>commit</i> in GIT or <i>revision</i> in SVN.
  * <br/><br/>
  *
- * <h2>Hints for DiffRepository implementation</h2>
+ * <h2>Hints for JaversRepository implementation</h2>
  * <ul>
  *    <li/>In Domain-driven design language, Diff is an <i>aggregate</i>, while Change is a <i>Value Object</i>.
  *    <li/>After persisting in database, Diff is considered immutable so it can not be updated.
@@ -61,7 +60,7 @@ public class Diff implements Visitable<ChangeVisitor>{
     }
 
     /**
-     * Unique revision identifier, assigned by {@link org.javers.repository.api.DiffRepository}
+     * Unique revision identifier, assigned by {@link org.javers.repository.api.JaversRepository}
      * @see  #assignId(long)
      */
     public long getId() {
@@ -69,7 +68,7 @@ public class Diff implements Visitable<ChangeVisitor>{
     }
 
     /**
-     * sets Diff.id, should be called by {@link org.javers.repository.api.DiffRepository}
+     * sets Diff.id, should be called by {@link org.javers.repository.api.JaversRepository}
      * before persisting
      *
      * @throws IllegalArgumentException if given id <= 0

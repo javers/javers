@@ -3,6 +3,7 @@ package org.javers.core.graph;
 import org.javers.common.patterns.visitors.Visitable;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
+import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoWrapper;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Entity;
@@ -19,9 +20,10 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
 
 /**
- * Node in client's domain objects graph. Reflects one Cdo, {@link Entity} or {@link ValueObject}
+ * Node in client's domain objects graph. Reflects one {@link Cdo} or {@link CdoSnapshot}.
  * <p/>
- *
+ * Cdo could be an {@link Entity} or a {@link ValueObject}
+ * <p/>
  * Implementation should delegate equals() and hashCode() to {@link Cdo}
  *
  * @author bartosz walacik

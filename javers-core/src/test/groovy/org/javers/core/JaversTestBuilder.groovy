@@ -1,9 +1,11 @@
 package org.javers.core
 
+import org.javers.core.graph.ObjectNode
 import org.javers.core.metamodel.type.TypeFactory
 import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.graph.ObjectGraphBuilder
+import org.javers.core.snapshot.GraphShadowFactory
 import org.javers.core.snapshot.GraphSnapshotFactory
 import org.javers.core.snapshot.SnapshotFactory
 
@@ -49,6 +51,10 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(GraphSnapshotFactory)
     }
 
+    GraphShadowFactory getGraphShadowFactory() {
+        javersBuilder.getContainerComponent(GraphShadowFactory)
+    }
+
     TypeFactory getTypeSpawningFactory() {
         javersBuilder.getContainerComponent(TypeFactory)
     }
@@ -59,6 +65,10 @@ class JaversTestBuilder {
 
     ObjectGraphBuilder createObjectGraphBuilder() {
         new ObjectGraphBuilder(getTypeMapper())
+    }
+
+    ObjectNode createObjectGraph(Object liveCdo) {
+        javers().buildGraph(liveCdo)
     }
 
 }

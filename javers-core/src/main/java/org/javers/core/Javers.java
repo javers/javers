@@ -1,7 +1,10 @@
 package org.javers.core;
 
+import org.javers.core.commit.Commit;
+import org.javers.core.commit.CommitFactory;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
+import org.javers.core.graph.ObjectNode;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -19,18 +22,18 @@ import org.javers.core.graph.ObjectGraphBuilder;
  */
 public class Javers {
     private final DiffFactory diffFactory;
-
     private final TypeMapper typeMapper;
-
     private final JsonConverter jsonConverter;
+    private final CommitFactory commitFactory;
 
     /**
      * JaVers instance should be constructed by {@link JaversBuilder}
      */
-    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter) {
+    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory) {
         this.diffFactory = diffFactory;
         this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;
+        this.commitFactory = commitFactory;
     }
 
     /**
@@ -47,8 +50,11 @@ public class Javers {
      *
      * @param currentVersion domain objects graph
      */
-    public Diff commit(String user, Object currentVersion){
-        return null;
+    public Commit commit(String author, Object currentVersion) {
+        Commit commit = commitFactory.create(author, buildGraph(currentVersion));
+
+        //TODO persist
+        return commit;
     }
 
     /**
@@ -62,9 +68,8 @@ public class Javers {
      * </p>
      */
     public Diff compare(String user, Object oldVersion, Object currentVersion) {
-        ObjectGraphBuilder leftGraph = new ObjectGraphBuilder(typeMapper);
-        ObjectGraphBuilder rightGraph = new ObjectGraphBuilder(typeMapper);
-        return diffFactory.create(user, leftGraph.buildGraph(oldVersion), rightGraph.buildGraph(currentVersion));
+        return diffFactory.create(user, buildGraph(oldVersion),
+                buildGraph(currentVersion));
     }
 
     /**
@@ -72,8 +77,7 @@ public class Javers {
      * Use it alongside with {@link #compare(String, Object, Object)}
      */
     public Diff initial(String user, Object newDomainObject) {
-        ObjectGraphBuilder graph = new ObjectGraphBuilder(typeMapper);
-        return diffFactory.createInitial(user, graph.buildGraph(newDomainObject));
+        return diffFactory.createInitial(user, buildGraph(newDomainObject));
     }
 
 
@@ -84,6 +88,9 @@ public class Javers {
         return jsonConverter.toJson(diff);
     }
 
+    ObjectNode buildGraph(Object currentVersion) {
+        return new ObjectGraphBuilder(typeMapper).buildGraph(currentVersion);
+    }
 
     JaversType getForClass(Class<?> clazz) {
         return typeMapper.getJaversType(clazz);
