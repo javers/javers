@@ -9,6 +9,7 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.graph.ObjectGraphBuilder;
+import org.javers.repository.api.JaversRepository;
 
 
 /**
@@ -25,15 +26,17 @@ public class Javers {
     private final TypeMapper typeMapper;
     private final JsonConverter jsonConverter;
     private final CommitFactory commitFactory;
+    private final JaversRepository repository;
 
     /**
      * JaVers instance should be constructed by {@link JaversBuilder}
      */
-    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory) {
+    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversRepository repository) {
         this.diffFactory = diffFactory;
         this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;
         this.commitFactory = commitFactory;
+        this.repository = repository;
     }
 
     /**
@@ -53,7 +56,8 @@ public class Javers {
     public Commit commit(String author, Object currentVersion) {
         Commit commit = commitFactory.create(author, buildGraph(currentVersion));
 
-        //TODO persist
+        repository.persist(commit);
+
         return commit;
     }
 

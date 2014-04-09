@@ -28,10 +28,12 @@ public class ObjectGraphBuilder {
     private final TypeMapper typeMapper;
     private boolean built;
     private final Map<Cdo, ObjectNode> reverseCdoIdMap;
+    private final EdgeBuilder edgeBuilder;
 
     public ObjectGraphBuilder(TypeMapper typeMapper) {
         this.reverseCdoIdMap = new HashMap<>();
         this.typeMapper = typeMapper;
+        this.edgeBuilder = new EdgeBuilder(typeMapper);
     }
 
     @Override
