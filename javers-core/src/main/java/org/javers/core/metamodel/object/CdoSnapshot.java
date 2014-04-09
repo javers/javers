@@ -49,4 +49,10 @@ public class CdoSnapshot extends Cdo {
         Validate.argumentIsNotNull(property);
         return state.get(property);
     }
+
+    @Override
+    public boolean isNull(Property property) {
+        Validate.argumentIsNotNull(property);
+        return !state.containsKey(property);
+    }
 }

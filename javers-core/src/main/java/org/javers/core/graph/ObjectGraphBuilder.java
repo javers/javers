@@ -1,6 +1,5 @@
 package org.javers.core.graph;
 
-import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.*;
@@ -10,9 +9,7 @@ import org.javers.core.metamodel.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -27,13 +24,22 @@ public class ObjectGraphBuilder {
 
     private final TypeMapper typeMapper;
     private boolean built;
-    private final Map<Cdo, ObjectNode> reverseCdoIdMap;
     private final EdgeBuilder edgeBuilder;
+    private final NodeReuser nodeReuser = new NodeReuser();
 
+    /**
+     * uses default LiveCdoFactory
+     */
     public ObjectGraphBuilder(TypeMapper typeMapper) {
-        this.reverseCdoIdMap = new HashMap<>();
+        Validate.argumentIsNotNull(typeMapper);
         this.typeMapper = typeMapper;
-        this.edgeBuilder = new EdgeBuilder(typeMapper);
+        this.edgeBuilder = new EdgeBuilder(typeMapper, nodeReuser, new LiveCdoFactory());
+    }
+
+    public ObjectGraphBuilder(TypeMapper typeMapper, CdoFactory cdoFactory) {
+        Validate.argumentsAreNotNull(typeMapper, cdoFactory);
+        this.typeMapper = typeMapper;
+        this.edgeBuilder = new EdgeBuilder(typeMapper, nodeReuser, cdoFactory);
     }
 
     @Override
@@ -48,12 +54,12 @@ public class ObjectGraphBuilder {
      * @return graph node
      */
     public ObjectNode buildGraph(Object handle) {
-        Cdo cdo = asCdo(handle, null);
+        Cdo cdo = edgeBuilder.asCdo(handle, null);
         logger.debug("building objectGraph for handle [{}] ...",cdo);
 
         ObjectNode root = buildNode(cdo);
 
-        logger.debug("graph assembled, object nodes: {}",reverseCdoIdMap.size());
+        logger.debug("graph assembled, object nodes: {}, reused: {}",nodeReuser.nodesCount(), nodeReuser.reusedNodesCount());
         switchToBuilt();
         return root;
     }
@@ -65,8 +71,9 @@ public class ObjectGraphBuilder {
         argumentIsNotNull(cdo);
         //logger.debug(".. creating node for: {}",cdo);
 
-        ObjectNode node = buildNodeStubAndSaveForReuse(cdo);
-        buildEdges(node);
+        ObjectNode node = edgeBuilder.buildNodeStub(cdo);
+        continueIfStub(node);
+
         return node;
     }
 
@@ -82,18 +89,41 @@ public class ObjectGraphBuilder {
         buildMultiEdges(node);
     }
 
+    //recursion here
+    private void continueIfStub(ObjectNode referencedNode) {
+        if (referencedNode.isStub()){
+            nodeReuser.saveForReuse(referencedNode);
+            referencedNode.unstub();
+            buildEdges(referencedNode); //recursion here
+        }
+    }
+
     private void buildSingleEdges(ObjectNode node) {
         for (Property singleRef : getSingleReferences(node.getManagedClass())) {
-            if (singleRef.isNull(node.wrappedCdo())) {
+            if (node.isNull(singleRef)) {
                 continue;
             }
 
-            Object referencedRawCdo = singleRef.get(node.wrappedCdo());
-            ObjectNode referencedNode = buildNodeOrReuse(asCdo(referencedRawCdo,
-                                                         createOwnerContext(node, singleRef)));
+            SingleEdge edge = edgeBuilder.buildSingleEdge(node, singleRef);
 
-            Edge edge = new SingleEdge(singleRef, referencedNode);
+            continueIfStub(edge.getReference());
+
             node.addEdge(edge);
+        }
+    }
+
+    private void buildMultiEdges(ObjectNode node) {
+        for (Property containerProperty : getNonEmptyEnumerablesWithManagedClasses(node))  {
+            EnumerableType enumerableType = typeMapper.getPropertyType(containerProperty);
+
+            //looks like we have Container or Map with Entity references or Value Objects
+            MultiEdge multiEdge = edgeBuilder.createMultiEdge(containerProperty, enumerableType, node, this);
+
+            for (ObjectNode referencedNode : multiEdge.getReferences()){
+                continueIfStub(referencedNode);
+            }
+
+            node.addEdge(multiEdge);
         }
     }
 
@@ -105,17 +135,6 @@ public class ObjectGraphBuilder {
         });
     }
 
-    private void buildMultiEdges(ObjectNode node) {
-        for (Property containerProperty : getNonEmptyEnumerablesWithManagedClasses(node))  {
-            EnumerableType enumerableType = typeMapper.getPropertyType(containerProperty);
-
-            //looks like we have Container or Map with Entity references or Value Objects
-            MultiEdge multiEdge = createMultiEdge(containerProperty, enumerableType, node);
-
-            node.addEdge(multiEdge);
-        }
-    }
-
     private List<Property> getNonEmptyEnumerablesWithManagedClasses(final ObjectNode node) {
         return node.getManagedClass().getProperties(new Predicate<Property>() {
             public boolean apply(Property property) {
@@ -125,12 +144,12 @@ public class ObjectGraphBuilder {
                 }
                 EnumerableType enumerableType = (EnumerableType)javersType;
 
-                Object container = property.get(node.wrappedCdo());
+                Object container = node.getPropertyValue(property);
                 if (enumerableType.isEmpty(container)) {
                     return false;
                 }
 
-                if (property.isNull(node.wrappedCdo())) {
+                if (node.isNull(property)) {
                     return false;
                 }
                 return (typeMapper.isContainerOfManagedClasses(enumerableType) ||
@@ -140,81 +159,4 @@ public class ObjectGraphBuilder {
         });
     }
 
-    private MultiEdge createMultiEdge(Property containerProperty, EnumerableType enumerableType, ObjectNode node) {
-        MultiEdge multiEdge = new MultiEdge(containerProperty);
-        OwnerContext owner = createOwnerContext(node, containerProperty);
-
-        EnumerableFunction edgeBuilder = new MultiEdgeBuilderFunction(multiEdge, enumerableType, typeMapper);
-        Object container = containerProperty.get(node.wrappedCdo());
-        enumerableType.map(container, edgeBuilder, owner);
-
-        return multiEdge;
-    }
-
-    /**
-     * @author bartosz walacik
-     */
-    private class MultiEdgeBuilderFunction extends AbstractMapFunction {
-        final MultiEdge multiEdge;
-
-        MultiEdgeBuilderFunction(MultiEdge multiEdge, EnumerableType enumerableType, TypeMapper typeMapper) {
-            super(enumerableType, typeMapper);
-            this.multiEdge = multiEdge;
-        }
-
-        @Override
-        public Object apply(Object input, OwnerContext enumerationAwareOwnerContext) {
-            if (!isManagedPosition(enumerationAwareOwnerContext)){
-                return input;
-            }
-
-            ObjectNode objectNode = buildNodeOrReuse(asCdo(input, enumerationAwareOwnerContext));
-            multiEdge.addReferenceNode(objectNode);
-            return null;
-        }
-
-        boolean isManagedPosition(OwnerContext enumerationAwareOwnerContext){
-            if (!isMap()){
-                return true;
-            }
-
-            MapEnumeratorContext mapContext =  enumerationAwareOwnerContext.getEnumeratorContext();
-            if (mapContext.isKey()){
-                return getKeyType() instanceof ManagedType;
-            }
-            else {
-                return getValueType() instanceof ManagedType;
-            }
-        }
-    }
-
-    private ObjectNode buildNodeStubAndSaveForReuse(Cdo cdo) {
-        ObjectNode nodeStub = new ObjectNode(cdo);
-        reverseCdoIdMap.put(cdo, nodeStub);
-        return nodeStub;
-    }
-
-    private ObjectNode buildNodeOrReuse(Cdo referencedCdo){
-        //reuse
-        if (reverseCdoIdMap.containsKey(referencedCdo)) {
-            return reverseCdoIdMap.get(referencedCdo);
-        }
-
-        //build
-        return buildNode(referencedCdo);//recursion here
-    }
-
-    private Cdo asCdo(Object targetCdo, OwnerContext owner){
-        GlobalCdoId globalId = GlobalIdFactory.createId(targetCdo, getManagedCLass(targetCdo), owner);
-        return new CdoWrapper(targetCdo, globalId);
-    }
-
-    private ManagedClass getManagedCLass(Object cdo) {
-        Validate.argumentIsNotNull(cdo);
-        return  typeMapper.getManagedClass(cdo.getClass());
-    }
-
-    private OwnerContext createOwnerContext(ObjectNode node, Property property) {
-        return new OwnerContext(node.getGlobalCdoId(), property.getName());
-    }
 }

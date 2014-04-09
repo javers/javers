@@ -33,4 +33,9 @@ public class CdoWrapper extends Cdo {
     public Object getPropertyValue(Property property) {
         return property.get(wrappedCdo);
     }
+
+    @Override
+    public boolean isNull(Property property) {
+        return property.isNull(wrappedCdo);
+    }
 }

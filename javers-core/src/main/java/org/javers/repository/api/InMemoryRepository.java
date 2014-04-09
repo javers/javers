@@ -25,10 +25,10 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public CdoSnapshot getLatest(GlobalCdoId objectId) {
-        Validate.argumentsAreNotNull(objectId);
+    public CdoSnapshot getLatest(GlobalCdoId globalId) {
+        Validate.argumentsAreNotNull(globalId);
 
-        return snapshots.get(objectId);
+        return snapshots.get(globalId);
     }
 
     @Override

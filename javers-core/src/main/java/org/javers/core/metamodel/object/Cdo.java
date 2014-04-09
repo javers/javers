@@ -41,6 +41,8 @@ public abstract class Cdo {
 
     public abstract Object getPropertyValue(Property property);
 
+    public abstract boolean isNull(Property property);
+
     public Object getPropertyValue(String propertyName) {
         Validate.argumentIsNotNull(propertyName);
         Property property = getGlobalId().getCdoClass().getProperty(propertyName);

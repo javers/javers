@@ -12,7 +12,7 @@ import org.javers.core.metamodel.property.Property;
  */
 public class SingleEdge extends Edge {
 
-    private final ObjectNode reference;
+    private ObjectNode reference;
 
     public SingleEdge(Property property, ObjectNode reference) {
         super(property);

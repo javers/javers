@@ -27,7 +27,7 @@ class JaversIntegrationTest extends Specification {
 
     def "should create NewObject for all nodes in initial diff"() {
         given:
-        Javers javers = JaversTestBuilder.javers()
+        Javers javers = JaversTestBuilder.newInstance()
         DummyUser left = dummyUser("kazik").withDetails().build()
 
         when:
@@ -39,7 +39,7 @@ class JaversIntegrationTest extends Specification {
 
     def "should create PropertyChanges for each NewObject"() {
         given:
-        Javers javers = JaversTestBuilder.javers()
+        Javers javers = JaversTestBuilder.newInstance()
         DummyUser left =  new DummyUser(name: "kazik")
         DummyUser right = new DummyUser(name: "kazik").with {
             dummyUserDetails = new DummyUserDetails().with {
@@ -72,7 +72,7 @@ class JaversIntegrationTest extends Specification {
         given:
         DummyUser user =  dummyUser("id").withSex(FEMALE).build();
         DummyUser user2 = dummyUser("id").withSex(MALE).build();
-        Javers javers = JaversTestBuilder.javers()
+        Javers javers = JaversTestBuilder.newInstance()
 
         when:
         Diff diff = javers.compare("user", user, user2)
@@ -88,7 +88,7 @@ class JaversIntegrationTest extends Specification {
         given:
         DummyUser user =  dummyUser("id").withSex(FEMALE).build();
         DummyUser user2 = dummyUser("id").withSex(MALE).withDetails(1).build();
-        Javers javers = JaversTestBuilder.javers()
+        Javers javers = JaversTestBuilder.newInstance()
 
         when:
         Diff diff = javers.compare("user", user, user2)

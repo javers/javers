@@ -1,5 +1,6 @@
 package org.javers.test.assertion
 
+import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.graph.ObjectNode
@@ -70,5 +71,10 @@ class NodeAssert {
 
     MultiEdgeAssert hasMultiEdge(String edgeName) {
         hasEdge(edgeName).isMultiEdge()
+    }
+
+    NodeAssert isSnapshot() {
+        assert actual.cdo.class == CdoSnapshot
+        this
     }
 }

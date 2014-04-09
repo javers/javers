@@ -31,11 +31,13 @@ import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
 public class ObjectNode implements Visitable<GraphVisitor> {
     private final Cdo cdo;
     private final Map<Property, Edge> edges;
+    private boolean stub;
 
     public ObjectNode(Cdo cdo) {
         argumentIsNotNull(cdo);
         this.cdo = cdo;
         this.edges = new HashMap<>();
+        this.stub = true;
     }
 
 
@@ -55,11 +57,26 @@ public class ObjectNode implements Visitable<GraphVisitor> {
         return cdo.getWrappedCdo();
     }
 
+
     /**
      * shortcut to {@link Cdo#getGlobalId()}
      */
     public GlobalCdoId getGlobalCdoId() {
         return cdo.getGlobalId();
+    }
+
+    public Object getPropertyValue(Property property) {
+        Validate.argumentIsNotNull(property);
+        return cdo.getPropertyValue(property);
+    }
+
+    public boolean isNull(Property property){
+        Validate.argumentIsNotNull(property);
+        return cdo.isNull(property);
+    }
+
+    public Edge getEdge(Property property) {
+        return edges.get(property);
     }
 
     /**
@@ -69,9 +86,17 @@ public class ObjectNode implements Visitable<GraphVisitor> {
         return cdo.getManagedClass();
     }
 
-    public Object getPropertyValue(Property property) {
-        Validate.argumentIsNotNull(property);
-        return cdo.getPropertyValue(property);
+
+    Cdo getCdo() {
+        return cdo;
+    }
+
+    boolean isStub() {
+        return stub;
+    }
+
+    void unstub() {
+        stub = false;
     }
 
     /**
@@ -79,12 +104,8 @@ public class ObjectNode implements Visitable<GraphVisitor> {
      *
      * @return never returns null
      */
-    public List<Edge> getEdges() {
+    List<Edge> getEdges() {
         return new ArrayList<>(edges.values());
-    }
-
-    public Edge getEdge(Property property) {
-        return edges.get(property);
     }
 
     void addEdge(Edge edge) {

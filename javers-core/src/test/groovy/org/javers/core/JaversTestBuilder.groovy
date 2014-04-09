@@ -35,8 +35,12 @@ class JaversTestBuilder {
         new JaversTestBuilder(mappingStyle)
     }
 
-    static Javers javers() {
-        new JaversTestBuilder(MappingStyle.FIELD).javersBuilder.getContainerComponent(Javers)
+    static Javers newInstance() {
+        javersTestAssembly().javers()
+    }
+
+    Javers javers() {
+        javersBuilder.getContainerComponent(Javers)
     }
 
     ManagedClassFactory getManagedClassFactory() {

@@ -1,6 +1,5 @@
 package org.javers.core.graph
 
-import org.javers.core.metamodel.property.ValueObject
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -24,7 +23,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build one node graph from Entity"(){
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        def graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser user = dummyUser().withName("Mad Kaz").build()
 
         when:
@@ -72,7 +71,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build two node graph for the same Entity"(){
         given:
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        def graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser user = dummyUser().withName("Mad Kaz").withSupervisor("Mad Stach").build()
 
         when:
@@ -88,7 +87,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build two node graph for different Entities"() {
         given:
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        def graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build()
 
         when:
@@ -106,7 +105,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
     def "should build three nodes linear graph"() {
         given:
         //kaz0 - kaz1 - kaz2
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper);
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper);
         DummyUser[] kaziki = new DummyUser[4];
         for (int i=0; i<3; i++){
             kaziki[i] = dummyUser().withName("Mad Kaz "+i).build();
@@ -137,7 +136,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //    \
         //      stach - stach.details
         given:
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).build()
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withDetails(1L).withSupervisor(stach).build()
 
@@ -166,7 +165,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //         /   |   \
         //      id    id    id
         given:
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).withDetailsList(3).build()
 
         when:
@@ -188,7 +187,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //         /   |   \
         //      id    id    id
         given:
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser stach = dummyUser().withName("Stach").withDetailsList(3).build()
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withSupervisor(stach).build()
 
@@ -214,7 +213,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //          Em1 Em2 Em3
         given:
         int numberOfElements = 3
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser rob = dummyUser().withName("rob").withEmployees(3).build()
         DummyUser stach = dummyUser().withName("stach")
                 .withEmployee(rob)
@@ -245,7 +244,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //    \     \
         //      microKaz
         given:
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
 
         DummyUser superKaz = dummyUser().withName("superKaz").build()
         DummyUser kaz   =    dummyUser().withName("kaz").withSupervisor(superKaz).build()
@@ -279,7 +278,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph with primitive types Set"() {
         given:
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser dummyUser = dummyUser().withName("name").withStringsSet("1", "2", "3").build()
 
         when:
@@ -292,7 +291,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph with primitive types List"(){
         given:
-        org.javers.core.graph.ObjectGraphBuilder graphBuilder = new org.javers.core.graph.ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
         DummyUser dummyUser = dummyUser().withName("name").withIntegerList(1, 2, 3, 4).build()
 
         when:

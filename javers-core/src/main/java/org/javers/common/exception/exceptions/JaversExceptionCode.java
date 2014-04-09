@@ -28,6 +28,8 @@ public enum  JaversExceptionCode {
 
     NOT_IMPLEMENTED(RUNTIME_ERROR + "not implemented"),
 
+    SNAPSHOT_NOT_FOUND(RUNTIME_ERROR + "snapshot '%s' not found in JaversRepository"),
+
     DIFF_NOT_IMPLEMENTED(RUNTIME_ERROR + "not implemented Enumerable content type '%s'"),
 
     GENERIC_TYPE_NOT_PARAMETRIZED(RUNTIME_ERROR + "expected actual Class arguments in type '%s'. Javers needs to know what kind of content is stored in your collections. Try at least <Object>"),

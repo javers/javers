@@ -19,7 +19,7 @@ import java.util.List;
  */
 public interface JaversRepository {
 
-    CdoSnapshot getLatest(GlobalCdoId objectId);
+    CdoSnapshot getLatest(GlobalCdoId globalId);
 
     void persist(Commit commit);
 
