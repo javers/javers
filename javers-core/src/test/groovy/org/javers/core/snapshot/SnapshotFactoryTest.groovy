@@ -13,7 +13,7 @@ import spock.lang.Unroll
 
 import static org.javers.common.exception.exceptions.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.valueObjectId
 
 /**
  * @author bartosz walacik
@@ -72,7 +72,7 @@ class SnapshotFactoryTest extends Specification{
     }
 
     @Unroll
-    def "should record Array of #propertyType"() {
+    def "should record #containerType of #propertyType"() {
         given:
         SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
 
@@ -82,21 +82,36 @@ class SnapshotFactoryTest extends Specification{
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
         //we need shallow copy
-        snapshot.getPropertyValue(propertyName).hashCode() != cdo.getAt(propertyName).hashCode()
+        System.identityHashCode(snapshot.getPropertyValue(propertyName)) !=
+        System.identityHashCode( cdo.getAt(propertyName) )
+
 
         where:
-        propertyType << ["Primitive", "Value", "Entity", "ValueObject"]
-        propertyName << ["arrayOfIntegers", "arrayOfDates", "arrayOfEntities", "arrayOfValueObjects"]
-        cdo << [new SnapshotEntity(arrayOfIntegers:     [1, 2]),
+        containerType << ["Array"]*4 +["List"]*4
+        propertyType <<  ["Primitive", "Value", "Entity", "ValueObject"]*2
+        propertyName <<  ["arrayOfIntegers", "arrayOfDates", "arrayOfEntities", "arrayOfValueObjects",
+                         "listOfIntegers",  "listOfDates",  "listOfEntities",  "listOfValueObjects"]
+        cdo << [
+                new SnapshotEntity(arrayOfIntegers:     [1, 2]),
                 new SnapshotEntity(arrayOfDates:        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
                 new SnapshotEntity(arrayOfEntities:     [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
-                new SnapshotEntity(arrayOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")])
+                new SnapshotEntity(arrayOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")]),
+                new SnapshotEntity(listOfIntegers:      [1, 2]),
+                new SnapshotEntity(listOfDates:         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
+                new SnapshotEntity(listOfEntities:      [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
+                new SnapshotEntity(listOfValueObjects:  [new DummyAddress("London"), new DummyAddress("London City")])
                ]
-        expectedVal << [[1, 2],
+        expectedVal << [
+                        [1, 2],
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
                         [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
                         [valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"arrayOfValueObjects/0"),
-                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"arrayOfValueObjects/1")]
+                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"arrayOfValueObjects/1")] ,
+                                [1, 2],
+                        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
+                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
+                        [valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"listOfValueObjects/0"),
+                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"listOfValueObjects/1")]
                        ]
     }
 
