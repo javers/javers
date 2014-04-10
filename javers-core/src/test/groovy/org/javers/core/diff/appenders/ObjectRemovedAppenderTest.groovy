@@ -26,7 +26,7 @@ class ObjectRemovedAppenderTest extends AbstractDiffTest {
                     .isObjectRemoved()
                     .hasCdoId("removed")
                     .hasEntityTypeOf(DummyUser)
-                    .hasAffectedCdo(left.cdo)
+                    .hasAffectedCdo(left.wrappedCdo().get())
     }
 
     def "should append 2 ObjectRemoved to diff"() {

@@ -50,7 +50,6 @@ class MapChangeAppenderTest extends AbstractDiffTest{
         assertThat(change)
                     .hasProperty(primitiveMap)
                     .hasInstanceId(DummyUser, "1")
-                    .hasAffectedCdo(right)
     }
 
     @Unroll

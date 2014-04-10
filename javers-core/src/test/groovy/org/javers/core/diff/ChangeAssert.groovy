@@ -49,7 +49,7 @@ class ChangeAssert {
     }
 
     ChangeAssert hasAffectedCdo(Object expectedAffectedCdo) {
-        actual.affectedCdo == expectedAffectedCdo
+        assert actual.affectedCdo == expectedAffectedCdo
         this
     }
 

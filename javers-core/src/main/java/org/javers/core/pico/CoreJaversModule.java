@@ -6,7 +6,10 @@ import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.commit.CommitFactory;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.appenders.*;
+import org.javers.core.graph.LiveCdoFactory;
+import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.json.JsonConverterBuilder;
+import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.graph.ObjectGraphBuilder;
@@ -43,7 +46,10 @@ public class CoreJaversModule implements JaversModule {
             SnapshotFactory.class,
             GraphSnapshotFactory.class,
             GraphShadowFactory.class,
-            CdoSnapshotRepoFactory.class
+            CdoSnapshotRepoFactory.class,
+            LiveCdoFactory.class,
+            LiveGraphFactory.class,
+            GlobalIdFactory.class
     };
 
     @Override

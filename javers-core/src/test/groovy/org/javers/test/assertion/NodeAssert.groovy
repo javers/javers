@@ -1,6 +1,7 @@
 package org.javers.test.assertion
 
 import org.javers.core.metamodel.object.CdoSnapshot
+import org.javers.core.metamodel.object.GlobalCdoId
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.graph.ObjectNode
@@ -19,6 +20,11 @@ class NodeAssert {
     NodeAssert hasCdoId(def expectedLocalCdoId) {
         assert actual.globalCdoId instanceof InstanceId
         assert actual.globalCdoId.cdoId == expectedLocalCdoId
+        this
+    }
+
+    NodeAssert hasGlobalId(GlobalCdoId expectedGlobalId) {
+        assert actual.globalCdoId == expectedGlobalId
         this
     }
 
@@ -57,7 +63,7 @@ class NodeAssert {
     }
 
     NodeAssert hasCdo(def cdo) {
-        cdo == actual.cdo.wrappedCdo
+        assert cdo == actual.wrappedCdo().get()
         this
     }
 

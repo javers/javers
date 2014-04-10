@@ -9,7 +9,7 @@ import org.javers.test.assertion.NodeAssert
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
-
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*
 import static org.javers.test.assertion.NodeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
@@ -20,10 +20,15 @@ import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 abstract class ObjectGraphBuilderTest extends Specification {
 
     @Shared TypeMapper mapper
+    @Shared LiveCdoFactory liveCdoFactory
+
+    ObjectGraphBuilder newBuilder(){
+        new ObjectGraphBuilder(mapper, liveCdoFactory)
+    }
 
     def "should build one node graph from Entity"(){
         given:
-        def graphBuilder = new ObjectGraphBuilder(mapper)
+        def graphBuilder = newBuilder()
         DummyUser user = dummyUser().withName("Mad Kaz").build()
 
         when:
@@ -38,7 +43,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph starting from root ValueObject"(){
         given:
-        def graphBuilder = new ObjectGraphBuilder(mapper)
+        def graphBuilder = newBuilder()
         DummyAddress address = new DummyAddress("any","any")
 
         when:
@@ -53,7 +58,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph with ValueObject node"() {
         given:
-        def graphBuilder = new ObjectGraphBuilder(mapper)
+        def graphBuilder = newBuilder()
         DummyUserDetails user = dummyUserDetails(1).withAddress().build()
 
         when:
@@ -71,7 +76,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build two node graph for the same Entity"(){
         given:
-        def graphBuilder = new ObjectGraphBuilder(mapper)
+        def graphBuilder = newBuilder()
         DummyUser user = dummyUser().withName("Mad Kaz").withSupervisor("Mad Stach").build()
 
         when:
@@ -87,7 +92,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build two node graph for different Entities"() {
         given:
-        def graphBuilder = new ObjectGraphBuilder(mapper)
+        def graphBuilder = newBuilder()
         DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build()
 
         when:
@@ -105,7 +110,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
     def "should build three nodes linear graph"() {
         given:
         //kaz0 - kaz1 - kaz2
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper);
+        ObjectGraphBuilder graphBuilder = newBuilder();
         DummyUser[] kaziki = new DummyUser[4];
         for (int i=0; i<3; i++){
             kaziki[i] = dummyUser().withName("Mad Kaz "+i).build();
@@ -136,7 +141,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //    \
         //      stach - stach.details
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = newBuilder()
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).build()
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withDetails(1L).withSupervisor(stach).build()
 
@@ -165,7 +170,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //         /   |   \
         //      id    id    id
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = newBuilder()
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).withDetailsList(3).build()
 
         when:
@@ -187,7 +192,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //         /   |   \
         //      id    id    id
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = newBuilder()
         DummyUser stach = dummyUser().withName("Stach").withDetailsList(3).build()
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withSupervisor(stach).build()
 
@@ -213,7 +218,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //          Em1 Em2 Em3
         given:
         int numberOfElements = 3
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = newBuilder()
         DummyUser rob = dummyUser().withName("rob").withEmployees(3).build()
         DummyUser stach = dummyUser().withName("stach")
                 .withEmployee(rob)
@@ -244,7 +249,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         //    \     \
         //      microKaz
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = newBuilder()
 
         DummyUser superKaz = dummyUser().withName("superKaz").build()
         DummyUser kaz   =    dummyUser().withName("kaz").withSupervisor(superKaz).build()
@@ -278,7 +283,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph with primitive types Set"() {
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = newBuilder()
         DummyUser dummyUser = dummyUser().withName("name").withStringsSet("1", "2", "3").build()
 
         when:
@@ -291,7 +296,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should build graph with primitive types List"(){
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = newBuilder()
         DummyUser dummyUser = dummyUser().withName("name").withIntegerList(1, 2, 3, 4).build()
 
         when:
@@ -304,7 +309,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
     @Unroll
     def "should build graph with #containerType<#managedClass> MultiEdge"() {
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = newBuilder()
 
         when:
         ObjectNode node = graphBuilder.buildGraph(cdo)
@@ -329,7 +334,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
     @Unroll
     def "should build graph with Map<#keyType, #valueType>  MultiEdge"() {
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = newBuilder()
 
         when:
         ObjectNode node = graphBuilder.buildGraph(cdo)
@@ -349,7 +354,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should assign proper ids to ValueObjects in multi edge"() {
         given:
-        ObjectGraphBuilder graphBuilder = new ObjectGraphBuilder(mapper)
+        ObjectGraphBuilder graphBuilder = newBuilder()
         DummyUserDetails dummyUserDetails = dummyUserDetails(5)
                 .withAddresses(new DummyAddress("warszawa", "mokotowska"))
                 .withAddresses(new DummyAddress("warszawa", "wolska"))
@@ -359,8 +364,9 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ObjectNode node = graphBuilder.buildGraph(dummyUserDetails)
 
         then:
-        assertThat(node).hasMultiEdge("addressList").refersToGlobalCdoWithIds(
-                "org.javers.core.model.DummyUserDetails/5#addressList/0",
-                "org.javers.core.model.DummyUserDetails/5#addressList/1")
+        assertThat(node).hasMultiEdge("addressList").refersToGlobalIds(
+                [valueObjectId(instanceId(5, DummyUserDetails),DummyAddress,"addressList/0"),
+                 valueObjectId(instanceId(5, DummyUserDetails),DummyAddress,"addressList/1")
+                ])
     }
 }

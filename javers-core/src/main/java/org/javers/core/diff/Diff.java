@@ -1,12 +1,10 @@
 package org.javers.core.diff;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.patterns.visitors.Visitable;
 import org.joda.time.LocalDateTime;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.javers.common.validation.Validate.*;
 
@@ -46,7 +44,7 @@ import static org.javers.common.validation.Validate.*;
  * @author bartosz walacik
  */
 public class Diff implements Visitable<ChangeVisitor>{
-    private long id;
+    private String id;
     private final List<Change> changes;
     private final String author;
     private final LocalDateTime diffDate;
@@ -60,10 +58,10 @@ public class Diff implements Visitable<ChangeVisitor>{
     }
 
     /**
+     * TODO id semantic needs clarification
      * Unique revision identifier, assigned by {@link org.javers.repository.api.JaversRepository}
-     * @see  #assignId(long)
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 
@@ -73,14 +71,14 @@ public class Diff implements Visitable<ChangeVisitor>{
      *
      * @throws IllegalArgumentException if given id <= 0
      * @throws IllegalAccessException if revision is not new
-     */
+     *
     void assignId(long id) {
         argumentCheck(id > 0, "id should be positive long");
 
         conditionFulfilled(isNew(),"id already assigned");
 
         this.id = id;
-    }
+    }*
 
     /**
      * identifier of user who authored the change,
@@ -115,10 +113,10 @@ public class Diff implements Visitable<ChangeVisitor>{
      * @see #getId()
      */
     private boolean isNew() {
-        return id == 0;
+        return id == null;
     }
 
-    public void addChange(Change change, Object affectedCdo) {
+    public void addChange(Change change, Optional<Object> affectedCdo) {
         addChange(change);
         change.setAffectedCdo(affectedCdo);
     }
@@ -144,13 +142,26 @@ public class Diff implements Visitable<ChangeVisitor>{
         }
     }
 
-    private int count(Class<? extends Change> changeType){
-        int c = 0;
+    public String shortDesc(){
+        StringBuilder b = new StringBuilder();
+
+        b.append("changes - ");
+        for (Map.Entry<Class<? extends Change>, Integer> e : countByType().entrySet()){
+            b.append(e.getKey().getSimpleName()+ ":"+e.getValue()+" ");
+        }
+        return b.toString().trim();
+    }
+
+    public Map<Class<? extends Change>, Integer> countByType(){
+        Map<Class<? extends Change>, Integer> result = new HashMap<>();
         for(Change change : changes) {
-            if (change.getClass() == changeType) {
-                c++;
+            Class<? extends Change> key = change.getClass();
+            if (result.containsKey(change.getClass())){
+                result.put(key, (result.get(key))+1);
+            }else{
+                result.put(key, 1);
             }
         }
-        return c;
+        return result;
     }
 }

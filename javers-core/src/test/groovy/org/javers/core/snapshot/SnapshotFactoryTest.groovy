@@ -8,23 +8,28 @@ import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.common.exception.exceptions.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.valueObjectId
 
 /**
  * @author bartosz walacik
  */
 class SnapshotFactoryTest extends Specification{
 
+    @Shared JaversTestBuilder javers
+
+    def setupSpec(){
+        javers = JaversTestBuilder.javersTestAssembly()
+    }
+
     def "should create snapshot with given GlobalId"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
         def cdo = new SnapshotEntity()
-        InstanceId id = instanceId(cdo)
+        InstanceId id = javers.instanceId(cdo)
 
         when:
         CdoSnapshot snapshot = snapshotFactory.create(cdo, id)
@@ -36,10 +41,10 @@ class SnapshotFactoryTest extends Specification{
     @Unroll
     def "should record #propertyType property value"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         snapshot.getPropertyValue(propertyName) == cdo.getAt(propertyName)
@@ -54,10 +59,10 @@ class SnapshotFactoryTest extends Specification{
     @Unroll
     def "should record #propertyType reference"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -67,17 +72,17 @@ class SnapshotFactoryTest extends Specification{
         propertyName << ["entityRef", "valueObjectRef"]
         cdo <<          [new SnapshotEntity(id:1, entityRef:new SnapshotEntity(id:5)),
                          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("street"))]
-        expectedVal <<  [instanceId(5, SnapshotEntity),
-                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"valueObjectRef")]
+        expectedVal <<  [javers.instanceId(5, SnapshotEntity),
+                         javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"valueObjectRef")]
     }
 
     @Unroll
     def "should record #containerType of #propertyType"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -104,24 +109,24 @@ class SnapshotFactoryTest extends Specification{
         expectedVal << [
                         [1, 2],
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
-                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
-                        [valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"arrayOfValueObjects/0"),
-                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"arrayOfValueObjects/1")] ,
-                                [1, 2],
+                        [javers.instanceId(2, SnapshotEntity), javers.instanceId(3, SnapshotEntity)],
+                        [javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"arrayOfValueObjects/0"),
+                         javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"arrayOfValueObjects/1")] ,
+                        [1, 2],
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
-                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
-                        [valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"listOfValueObjects/0"),
-                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"listOfValueObjects/1")]
+                        [javers.instanceId(2, SnapshotEntity), javers.instanceId(3, SnapshotEntity)],
+                        [javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"listOfValueObjects/0"),
+                         javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"listOfValueObjects/1")]
                        ]
     }
 
     @Unroll
     def "should record Set of #propertyType"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -138,19 +143,19 @@ class SnapshotFactoryTest extends Specification{
         ]
         expectedVal << [[1, 2] as Set,
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)] as Set,
-                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)] as Set,
-                        [valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects/random_0"),
-                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects/random_1")] as Set
+                        [javers.instanceId(2, SnapshotEntity), javers.instanceId(3, SnapshotEntity)] as Set,
+                        [javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"setOfValueObjects/random_0"),
+                         javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"setOfValueObjects/random_1")] as Set
                        ]
     }
 
     def "should not support Map of <ValueObject,?>"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
         def cdo = new SnapshotEntity(mapVoToPrimitive:  [(new DummyAddress("London")):"this"])
-        snapshotFactory.create(cdo, instanceId(cdo))
+        snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         def e = thrown(JaversException)
@@ -159,11 +164,11 @@ class SnapshotFactoryTest extends Specification{
 
     def "should throw exception when property Type is not fully parametrized"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
         def cdo = new SnapshotEntity(nonParametrizedMap:  ["a":1])
-        snapshotFactory.create(cdo, instanceId(cdo))
+        snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         def e = thrown(JaversException)
@@ -173,10 +178,10 @@ class SnapshotFactoryTest extends Specification{
     @Unroll
     def "should record Map of #enrtyType"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -194,8 +199,8 @@ class SnapshotFactoryTest extends Specification{
         expectedVal << [
                         ["this":1,"that":2],
                         [(new LocalDate(2000, 1, 1)):1.5],
-                        ["key1":valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"mapPrimitiveToVO/key1")],
-                        [(instanceId(2, SnapshotEntity)): instanceId(3, SnapshotEntity)]
+                        ["key1":javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"mapPrimitiveToVO/key1")],
+                        [(javers.instanceId(2, SnapshotEntity)): javers.instanceId(3, SnapshotEntity)]
                        ]
     }
 }

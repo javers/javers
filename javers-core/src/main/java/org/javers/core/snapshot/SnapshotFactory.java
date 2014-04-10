@@ -16,9 +16,11 @@ import static org.javers.common.exception.exceptions.JaversExceptionCode.NOT_IMP
  */
 public class SnapshotFactory {
     private final TypeMapper typeMapper;
+    private final GlobalIdFactory globalIdFactory;
 
-    public SnapshotFactory(TypeMapper typeMapper) {
+    public SnapshotFactory(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
         this.typeMapper = typeMapper;
+        this.globalIdFactory = globalIdFactory;
     }
 
     /**
@@ -50,7 +52,7 @@ public class SnapshotFactory {
     }
 
     public CdoSnapshot create (ObjectNode objectNode) {
-        return create(objectNode.wrappedCdo(),objectNode.getGlobalCdoId());
+        return create(objectNode.wrappedCdo().get(),objectNode.getGlobalCdoId());
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
@@ -78,10 +80,7 @@ public class SnapshotFactory {
      */
     private Object dehydrate(Object item, JaversType targetType, OwnerContext context){
         if (targetType instanceof ManagedType){
-            ManagedType targetManagedType = (ManagedType)targetType;
-            return GlobalIdFactory.createId(item,
-                                            targetManagedType.getManagedClass(),
-                                            context);
+            return globalIdFactory.createId(item, context);
         }  else {
             return item;
         }

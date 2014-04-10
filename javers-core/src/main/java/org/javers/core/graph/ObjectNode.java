@@ -1,5 +1,6 @@
 package org.javers.core.graph;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.patterns.visitors.Visitable;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
@@ -30,16 +31,14 @@ import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
  */
 public class ObjectNode implements Visitable<GraphVisitor> {
     private final Cdo cdo;
-    private final Map<Property, Edge> edges;
+    private final Map<Property, Edge> edges = new HashMap<>();
     private boolean stub;
 
     public ObjectNode(Cdo cdo) {
         argumentIsNotNull(cdo);
         this.cdo = cdo;
-        this.edges = new HashMap<>();
         this.stub = true;
     }
-
 
     ObjectNode(Object cdo, Entity entity) {
         this(new CdoWrapper(cdo, createFromInstance(cdo, entity)));
@@ -51,12 +50,11 @@ public class ObjectNode implements Visitable<GraphVisitor> {
     //Cdo getCdo();
 
     /**
-     * @return never returns null
+     * @return returns {@link Optional#EMPTY} for snapshots
      */
-    public Object wrappedCdo() {
+    public Optional<Object> wrappedCdo() {
         return cdo.getWrappedCdo();
     }
-
 
     /**
      * shortcut to {@link Cdo#getGlobalId()}

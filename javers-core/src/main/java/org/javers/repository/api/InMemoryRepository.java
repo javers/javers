@@ -1,5 +1,6 @@
 package org.javers.repository.api;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -25,10 +26,14 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public CdoSnapshot getLatest(GlobalCdoId globalId) {
+    public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
         Validate.argumentsAreNotNull(globalId);
 
-        return snapshots.get(globalId);
+        if (snapshots.containsKey(globalId)) {
+            return Optional.of(snapshots.get(globalId));
+        }
+
+        return Optional.empty();
     }
 
     @Override

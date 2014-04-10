@@ -26,7 +26,7 @@ class NewObjectAppenderTest extends AbstractDiffTest {
                         .isNewObject()
                         .hasCdoId("added")
                         .hasEntityTypeOf(DummyUser)
-                        .hasAffectedCdo(left.cdo)
+                        .hasAffectedCdo(right.wrappedCdo().get())
     }
 
     def "should append newObjects to diff"() {

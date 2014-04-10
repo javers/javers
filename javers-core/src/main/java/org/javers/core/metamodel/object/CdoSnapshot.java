@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
@@ -7,8 +8,6 @@ import org.javers.core.metamodel.property.Property;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.javers.common.exception.exceptions.JaversExceptionCode.NOT_IMPLEMENTED;
-import static org.javers.common.exception.exceptions.JaversExceptionCode.PROPERTY_NOT_FOUND;
 import static org.javers.common.exception.exceptions.JaversExceptionCode.SNAPSHOT_STATE_VIOLATION;
 
 /**
@@ -40,8 +39,8 @@ public class CdoSnapshot extends Cdo {
     }
 
     @Override
-    public Object getWrappedCdo() {
-        throw new JaversException(NOT_IMPLEMENTED);
+    public Optional<Object> getWrappedCdo() {
+        return Optional.empty();
     }
 
     @Override

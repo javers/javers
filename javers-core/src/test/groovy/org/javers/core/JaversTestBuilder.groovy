@@ -1,13 +1,16 @@
 package org.javers.core
 
-import org.javers.core.graph.ObjectNode
-import org.javers.core.metamodel.type.TypeFactory
-import org.javers.core.metamodel.property.ManagedClassFactory
-import org.javers.core.metamodel.type.TypeMapper
+import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.ObjectGraphBuilder
+import org.javers.core.graph.ObjectNode
+import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.property.ManagedClassFactory
+import org.javers.core.metamodel.type.TypeFactory
+import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.snapshot.GraphShadowFactory
 import org.javers.core.snapshot.GraphSnapshotFactory
 import org.javers.core.snapshot.SnapshotFactory
+import org.javers.repository.api.JaversRepository
 
 /**
  * This is just a test builder,
@@ -63,16 +66,39 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(TypeFactory)
     }
 
+    JaversRepository getJaversRepository(){
+        javersBuilder.getContainerComponent(JaversRepository)
+    }
+
     TypeMapper getTypeMapper(){
         javersBuilder.getContainerComponent(TypeMapper)
     }
 
+    LiveCdoFactory getLiveCdoFactory(){
+        javersBuilder.getContainerComponent(LiveCdoFactory)
+    }
+
     ObjectGraphBuilder createObjectGraphBuilder() {
-        new ObjectGraphBuilder(getTypeMapper())
+        new ObjectGraphBuilder(getTypeMapper(), getLiveCdoFactory())
     }
 
     ObjectNode createObjectGraph(Object liveCdo) {
-        javers().buildGraph(liveCdo)
+        createObjectGraphBuilder().buildGraph(liveCdo)
     }
 
+    IdBuilder idBuilder(){
+        javers().idBuilder()
+    }
+
+    IdBuilder voBuilder(Object localId, Class entityClass){
+        javers().idBuilder().withOwner(localId, entityClass)
+    }
+
+    InstanceId instanceId(Object localId, Class entityClass){
+        idBuilder().instanceId(localId, entityClass)
+    }
+
+    InstanceId instanceId(Object instance){
+        idBuilder().instanceId(instance)
+    }
 }

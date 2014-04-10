@@ -1,5 +1,6 @@
 package org.javers.repository.api;
 
+import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public interface JaversRepository {
 
-    CdoSnapshot getLatest(GlobalCdoId globalId);
+    Optional<CdoSnapshot> getLatest(GlobalCdoId globalId);
 
     void persist(Commit commit);
 

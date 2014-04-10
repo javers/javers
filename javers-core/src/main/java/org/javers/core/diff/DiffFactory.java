@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.appenders.*;
+import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -19,14 +20,38 @@ public class DiffFactory {
     private final TypeMapper typeMapper;
     private final List<NodeChangeAppender> nodeChangeAppenders;
     private final List<PropertyChangeAppender> propertyChangeAppender;
+    private final LiveGraphFactory liveGraphFactory;
 
     public DiffFactory(List<NodeChangeAppender> nodeChangeAppenders,
                        List<PropertyChangeAppender> propertyChangeAppender,
-                       TypeMapper typeMapper) {
+                       TypeMapper typeMapper,
+                       LiveGraphFactory liveGraphFactory) {
         this.nodeChangeAppenders = nodeChangeAppenders;
         this.propertyChangeAppender = propertyChangeAppender;
         this.nodeMatcher = new NodeMatcher();
         this.typeMapper = typeMapper;
+        this.liveGraphFactory = liveGraphFactory;
+    }
+
+    /**
+     * @see org.javers.core.Javers#initial(String, Object)
+     */
+    public Diff initial(String user, Object newDomainObject) {
+        return createInitial(user, buildGraph(newDomainObject));
+    }
+
+    /**
+     * @see org.javers.core.Javers#compare(String, Object, Object)
+     */
+    public Diff compare(String user, Object oldVersion, Object currentVersion) {
+        return create(user, buildGraph(oldVersion), buildGraph(currentVersion));
+    }
+
+    public Diff create(String userId, ObjectNode leftRoot, ObjectNode rightRoot) {
+        Validate.argumentsAreNotNull(leftRoot, rightRoot);
+
+        GraphPair graphPair = new GraphPair(leftRoot,rightRoot);
+        return createAndAppendChanges(userId, graphPair);
     }
 
     public Diff createInitial(String userId, ObjectNode root) {
@@ -36,11 +61,8 @@ public class DiffFactory {
         return createAndAppendChanges(userId, graphPair);
     }
 
-    public Diff create(String userId, ObjectNode leftRoot, ObjectNode rightRoot) {
-        Validate.argumentsAreNotNull(leftRoot, rightRoot);
-
-        GraphPair graphPair = new GraphPair(leftRoot,rightRoot);
-        return createAndAppendChanges(userId, graphPair);
+    private ObjectNode buildGraph(Object handle){
+        return liveGraphFactory.createLiveGraph(handle);
     }
 
     /** Graph scope appender */

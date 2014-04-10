@@ -98,7 +98,6 @@ class JaversIntegrationTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.size() == 4
-        json.id == 0
         json.author == "user"
         json.diffDate != null
         json.changes.size() == 5

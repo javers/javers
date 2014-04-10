@@ -88,20 +88,6 @@ public class TypeMapper {
         });
     } */
 
-    /**
-     * if given javaClass is mapped to {@link ManagedType}
-     * returns {@link ManagedType#getManagedClass()}
-     * @throws java.lang.IllegalArgumentException if given javaClass is NOT mapped to {@link ManagedType}
-     */
-    public ManagedClass getManagedClass(Class javaClass) {
-        JaversType jType = getJaversType(javaClass);
-        if (jType instanceof ManagedType) {
-            return ((ManagedType)jType).getManagedClass();
-        }
-        throw new IllegalArgumentException("getManagedClass("+javaClass.getSimpleName()+") " +
-                  "given javaClass is mapped to "+jType.getClass().getSimpleName()+", ManagedType expected");
-    }
-
     public <T extends JaversType> T getPropertyType(Property property){
         argumentIsNotNull(property);
         return (T) getJaversType(property.getGenericType());

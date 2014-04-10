@@ -55,7 +55,6 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         ChangeAssert.assertThat(change)
                     .hasProperty(sex)
                     .hasInstanceId(DummyUser, "1")
-                    .hasAffectedCdo(right)
     }
 
     def "should append Enum valueChange" () {
@@ -191,7 +190,6 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         then:
         assertThat(change)
-                  .hasAffectedCdo(rightUser.dummyAddress)
                   .hasValueObjectId(DummyAddress, instanceId(rightUser), "dummyAddress")
                   .hasLeftValue("Washington Street")
                   .hasRightValue("Wall Street")

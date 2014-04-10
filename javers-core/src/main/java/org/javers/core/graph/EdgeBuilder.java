@@ -1,9 +1,7 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.*;
-import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.ManagedType;
@@ -18,11 +16,14 @@ class EdgeBuilder {
     private final NodeReuser nodeReuser;
     private final CdoFactory cdoFactory;
 
-
     EdgeBuilder(TypeMapper typeMapper, NodeReuser nodeReuser, CdoFactory cdoFactory) {
         this.typeMapper = typeMapper;
         this.nodeReuser = nodeReuser;
         this.cdoFactory = cdoFactory;
+    }
+
+    String graphType(){
+        return cdoFactory.typeDesc();
     }
 
     /**
@@ -38,20 +39,7 @@ class EdgeBuilder {
     }
 
     Cdo asCdo(Object target, OwnerContext owner){
-        //TODO this if is nasty, how to refactor it?
-        if (target instanceof GlobalCdoId){
-            return cdoFactory.create(target, (GlobalCdoId)target);
-        }
-        else{
-            GlobalCdoId globalId = GlobalIdFactory.createId(target, getManagedCLass(target), owner);
-            return cdoFactory.create(target, globalId);
-        }
-
-    }
-
-    ManagedClass getManagedCLass(Object cdo) {
-        Validate.argumentIsNotNull(cdo);
-        return  typeMapper.getManagedClass(cdo.getClass());
+        return cdoFactory.create(target, owner);
     }
 
     private OwnerContext createOwnerContext(ObjectNode parentNode, Property property) {

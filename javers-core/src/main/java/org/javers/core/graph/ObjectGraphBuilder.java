@@ -27,39 +27,27 @@ public class ObjectGraphBuilder {
     private final EdgeBuilder edgeBuilder;
     private final NodeReuser nodeReuser = new NodeReuser();
 
-    /**
-     * uses default LiveCdoFactory
-     */
-    public ObjectGraphBuilder(TypeMapper typeMapper) {
-        Validate.argumentIsNotNull(typeMapper);
-        this.typeMapper = typeMapper;
-        this.edgeBuilder = new EdgeBuilder(typeMapper, nodeReuser, new LiveCdoFactory());
-    }
-
     public ObjectGraphBuilder(TypeMapper typeMapper, CdoFactory cdoFactory) {
         Validate.argumentsAreNotNull(typeMapper, cdoFactory);
         this.typeMapper = typeMapper;
         this.edgeBuilder = new EdgeBuilder(typeMapper, nodeReuser, cdoFactory);
     }
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
     /**
-     * @param handle Client's domain object, instance of Entity or ValueObject.
+     * @param handle domain object, instance of Entity or ValueObject.
      *               It should be root of an aggregate, tree root
      *               or any node in objects graph from where all other nodes are navigable
      * @return graph node
      */
     public ObjectNode buildGraph(Object handle) {
         Cdo cdo = edgeBuilder.asCdo(handle, null);
-        logger.debug("building objectGraph for handle [{}] ...",cdo);
+       // logger.debug("building objectGraph for handle [{}] ...",cdo);
 
         ObjectNode root = buildNode(cdo);
 
-        logger.debug("graph assembled, object nodes: {}, reused: {}",nodeReuser.nodesCount(), nodeReuser.reusedNodesCount());
+        logger.info("{} graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
+                     edgeBuilder.graphType(),
+                     nodeReuser.nodesCount(),  nodeReuser.entitiesCount(), nodeReuser.voCount());
         switchToBuilt();
         return root;
     }

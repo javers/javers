@@ -1,5 +1,6 @@
 package org.javers.repository.jdbc;
 
+import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public class JdbcDiffRepository implements JaversRepository {
     @Override
-    public CdoSnapshot getLatest(GlobalCdoId globalId) {
+    public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
         return null;
     }
 

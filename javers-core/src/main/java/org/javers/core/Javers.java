@@ -6,10 +6,13 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.repository.api.JaversRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -22,6 +25,8 @@ import org.javers.repository.api.JaversRepository;
  * @author bartosz walacik
  */
 public class Javers {
+    private static final Logger logger = LoggerFactory.getLogger(Javers.class);
+
     private final DiffFactory diffFactory;
     private final TypeMapper typeMapper;
     private final JsonConverter jsonConverter;
@@ -51,12 +56,17 @@ public class Javers {
      *     <li/>  TODO
      * </ul>
      *
-     * @param currentVersion domain objects graph
+     * @param currentVersion domain object, instance of Entity or ValueObject.
+     *        It should be root of an aggregate, tree root
+     *        or any node in objects graph from where all other nodes are navigable.
+     *        (Javadoc source: {@link ObjectGraphBuilder#buildGraph(Object)})
      */
     public Commit commit(String author, Object currentVersion) {
-        Commit commit = commitFactory.create(author, buildGraph(currentVersion));
+        Commit commit = commitFactory.create(author, currentVersion);
 
         repository.persist(commit);
+
+        logger.info(commit.shortDesc());
 
         return commit;
     }
@@ -72,16 +82,15 @@ public class Javers {
      * </p>
      */
     public Diff compare(String user, Object oldVersion, Object currentVersion) {
-        return diffFactory.create(user, buildGraph(oldVersion),
-                buildGraph(currentVersion));
+        return diffFactory.compare(user, oldVersion, currentVersion);
     }
 
     /**
-     * Initial diff is a kind of snapshot of given domain objects.
+     * Initial diff is a kind of snapshot of given domain objects graph.
      * Use it alongside with {@link #compare(String, Object, Object)}
      */
     public Diff initial(String user, Object newDomainObject) {
-        return diffFactory.createInitial(user, buildGraph(newDomainObject));
+        return diffFactory.initial(user, newDomainObject);
     }
 
 
@@ -92,8 +101,8 @@ public class Javers {
         return jsonConverter.toJson(diff);
     }
 
-    ObjectNode buildGraph(Object currentVersion) {
-        return new ObjectGraphBuilder(typeMapper).buildGraph(currentVersion);
+    public IdBuilder idBuilder() {
+        return new IdBuilder(new GlobalIdFactory(typeMapper));
     }
 
     JaversType getForClass(Class<?> clazz) {

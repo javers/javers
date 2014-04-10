@@ -1,5 +1,6 @@
 package org.javers.core.json.builder
 
+import org.javers.common.collections.Optional
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
@@ -22,13 +23,13 @@ class ChangeTestBuilder {
     static NewObject newObject(Object newObject) {
         InstanceId globalId = instanceId(newObject)
 
-        new NewObject(globalId, newObject)
+        new NewObject(globalId, Optional.of(newObject))
     }
 
     static ObjectRemoved objectRemoved(Object objectRemoved) {
         InstanceId globalId = instanceId(objectRemoved)
 
-        new ObjectRemoved(globalId, objectRemoved)
+        new ObjectRemoved(globalId, Optional.of(objectRemoved))
     }
 
     static MapChange mapChange(Object cdo, String propertyName, List<EntryChange> changes) {

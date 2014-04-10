@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Entity;
@@ -37,7 +38,7 @@ public abstract class Cdo {
         return globalId.getCdoClass();
     }
 
-    public abstract Object getWrappedCdo();
+    public abstract Optional<Object> getWrappedCdo();
 
     public abstract Object getPropertyValue(Property property);
 
