@@ -1,5 +1,6 @@
 package org.javers.core
 
+import org.javers.core.commit.CommitFactory
 import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.ObjectGraphBuilder
 import org.javers.core.graph.ObjectNode
@@ -76,6 +77,10 @@ class JaversTestBuilder {
 
     LiveCdoFactory getLiveCdoFactory(){
         javersBuilder.getContainerComponent(LiveCdoFactory)
+    }
+
+    CommitFactory getCommitFactory(){
+        javersBuilder.getContainerComponent(CommitFactory)
     }
 
     ObjectGraphBuilder createObjectGraphBuilder() {

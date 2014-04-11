@@ -159,4 +159,51 @@ class GraphSnapshotFactoryTest extends Specification {
                             javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"mapPrimitiveToVO/key2")]
                          ]
     }
+
+    def "should reuse existing snapshots when nothing changed"() {
+        given:
+        def cdo = new SnapshotEntity(listOfEntities:    [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
+        def firstCommit = javers.commitFactory.create("author",cdo)
+        javers.javersRepository.persist(firstCommit)
+
+        when:
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createObjectGraph(cdo))
+
+        then:
+        firstCommit.snapshots.size() == 3
+        !secondSnapshots
+    }
+
+    def "should reuse existing root snapshot when not changed"() {
+        given:
+        def cdo = new SnapshotEntity(listOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
+        def firstCommit = javers.commitFactory.create("author",cdo)
+        javers.javersRepository.persist(firstCommit)
+
+        when:
+        cdo.listOfEntities.get(0).intProperty = 1
+        cdo.listOfEntities.get(1).intProperty = 1
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createObjectGraph(cdo))
+
+        then:
+        assertThat(secondSnapshots).hasSize(2)
+                                   .hasSnapshot(javers.instanceId(2, SnapshotEntity))
+                                   .hasSnapshot(javers.instanceId(3, SnapshotEntity))
+    }
+
+    def "should reuse existing ref snapshots when not changed"() {
+        given:
+        def cdo = new SnapshotEntity(listOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
+        def firstCommit = javers.commitFactory.create("author",cdo)
+        javers.javersRepository.persist(firstCommit)
+
+        when:
+        cdo.intProperty = 1
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createObjectGraph(cdo))
+
+        then:
+        assertThat(secondSnapshots).hasSize(1)
+                                   .hasSnapshot(javers.instanceId(1, SnapshotEntity))
+    }
+
 }

@@ -1,10 +1,13 @@
 package org.javers.core.snapshot;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.GraphVisitor;
 import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
+import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.api.JaversRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +21,11 @@ import java.util.List;
 public class GraphSnapshotFactory {
 
     private final SnapshotFactory snapshotFactory;
+    private final JaversRepository javersRepository;
 
-    public GraphSnapshotFactory(SnapshotFactory snapshotFactory) {
+    public GraphSnapshotFactory(SnapshotFactory snapshotFactory, JaversRepository javersRepository) {
         this.snapshotFactory = snapshotFactory;
+        this.javersRepository = javersRepository;
     }
 
     /**
@@ -32,7 +37,25 @@ public class GraphSnapshotFactory {
         SnapshotVisitor visitor = new SnapshotVisitor();
         currentVersion.accept(visitor);
 
-        return visitor.output;
+        return reuse(visitor.output);
+    }
+
+    private List<CdoSnapshot> reuse(List<CdoSnapshot> freshSnapshots){
+        List<CdoSnapshot> reused = new ArrayList<>();
+        for (CdoSnapshot fresh : freshSnapshots){
+
+            Optional<CdoSnapshot> existing = javersRepository.getLatest(fresh.getGlobalId());
+            if (existing.isEmpty()){
+                reused.add(fresh);
+                continue;
+            }
+
+            if (!existing.get().stateEquals(fresh)){
+                reused.add(fresh);
+            }
+        }
+
+        return reused;
     }
 
     private class SnapshotVisitor extends GraphVisitor{

@@ -5,6 +5,7 @@ import org.javers.core.diff.changetype.NewObject
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
+import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
@@ -105,6 +106,22 @@ class JaversCommitIntegrationTest extends Specification {
 
         then:
         DiffAssert.assertThat(commit.diff)
-                   .hasObjectRemoved(javers.idBuilder().withOwner(1, DummyUserDetails).voId(DummyAddress, "addressList/1"))
+                  .hasObjectRemoved(javers.idBuilder().withOwner(1, DummyUserDetails).voId(DummyAddress, "addressList/1"))
     }
+
+    def "should create empty commit when nothing changed"() {
+        given:
+        def javers = javers().build()
+        def cdo = new SnapshotEntity(listOfEntities:    [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
+        def firstCommit = javers.commit("author",cdo)
+
+        when:
+        def secondCommit = javers.commit("author",cdo)
+
+        then:
+        firstCommit.snapshots.size() == 3
+        !secondCommit.snapshots
+        !secondCommit.diff.changes
+    }
+
 }

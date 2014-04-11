@@ -18,11 +18,10 @@ import static org.javers.common.exception.exceptions.JaversExceptionCode.SNAPSHO
  * @author bartosz walacik
  */
 public class CdoSnapshot extends Cdo {
-    private Map<Property, Object> state;
+    private Map<Property, Object> state = new HashMap<>();
 
     public CdoSnapshot(GlobalCdoId globalId) {
         super(globalId);
-        state = new HashMap<>();
     }
 
     public void addPropertyValue(Property property, Object value){
@@ -54,4 +53,15 @@ public class CdoSnapshot extends Cdo {
         Validate.argumentIsNotNull(property);
         return !state.containsKey(property);
     }
+
+    public boolean stateEquals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CdoSnapshot other = (CdoSnapshot) o;
+
+        return this.state.equals(other.state);
+    }
+
 }

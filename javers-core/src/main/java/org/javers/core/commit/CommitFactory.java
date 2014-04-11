@@ -9,6 +9,7 @@ import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.snapshot.GraphShadowFactory;
 import org.javers.core.snapshot.GraphSnapshotFactory;
+import org.javers.repository.api.JaversRepository;
 
 import java.util.List;
 
