@@ -1,42 +1,36 @@
 package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
 
-import java.util.HashMap;
 import java.util.Map;
-
-import static org.javers.common.exception.exceptions.JaversExceptionCode.SNAPSHOT_STATE_VIOLATION;
 
 /**
  * Captured state of client's domain object.
  * Values and primitives are stored 'by value',
  * Referenced Entities and ValueObjects are stored 'by reference' using {@link GlobalCdoId}
+ * <br/>
+ *
+ * Immutable
  *
  * @author bartosz walacik
  */
 public class CdoSnapshot extends Cdo {
-    private Map<Property, Object> state = new HashMap<>();
+    private final Map<Property, Object> state;
 
-    public CdoSnapshot(GlobalCdoId globalId) {
+    /**
+     * should be assembled by {@link CdoSnapshotBuilder}
+     */
+    CdoSnapshot(GlobalCdoId globalId, Map<Property, Object> state) {
         super(globalId);
+        Validate.argumentIsNotNull(state);
+        this.state = state;
     }
 
-    public void addPropertyValue(Property property, Object value){
-        Validate.argumentIsNotNull(property);
-        if (value == null){
-            return;
-        }
-
-        if (state.containsKey(property)){
-            throw new JaversException(SNAPSHOT_STATE_VIOLATION);
-        }
-
-        state.put(property, value);
-    }
-
+    /**
+     * @return {@link Optional#EMPTY}
+     */
     @Override
     public Optional<Object> getWrappedCdo() {
         return Optional.empty();
@@ -60,8 +54,6 @@ public class CdoSnapshot extends Cdo {
         }
 
         CdoSnapshot other = (CdoSnapshot) o;
-
         return this.state.equals(other.state);
     }
-
 }

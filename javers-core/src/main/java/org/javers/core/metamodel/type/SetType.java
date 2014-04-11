@@ -6,6 +6,7 @@ import org.javers.core.metamodel.object.EnumeratorContext;
 import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ public class SetType extends CollectionType{
             targetSet.add(mapFunction.apply(sourceVal, owner));
             enumeratorContext.nextId();
         }
-        return targetSet;
+        return Collections.unmodifiableSet(targetSet);
     }
 
     private class SetEnumeratorContext implements EnumeratorContext {

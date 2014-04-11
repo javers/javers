@@ -124,4 +124,12 @@ class JaversCommitIntegrationTest extends Specification {
         !secondCommit.diff.changes
     }
 
+    /*
+    def "should list all snapshots for given object"() {
+        given:
+
+        when:
+
+        then:
+    }*/
 }

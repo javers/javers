@@ -59,7 +59,7 @@ public class MapType extends EnumerableType {
             targetMap.put(mappedKey, mappedValue);
         }
 
-        return targetMap;
+        return Collections.unmodifiableMap(targetMap);
     }
 
     @Override

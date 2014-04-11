@@ -10,6 +10,7 @@ import org.javers.core.metamodel.type.*;
 
 import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 import static org.javers.common.exception.exceptions.JaversExceptionCode.NOT_IMPLEMENTED;
+import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 
 /**
  * @author bartosz walacik
@@ -27,7 +28,7 @@ public class SnapshotFactory {
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     public CdoSnapshot create (Object liveCdo, GlobalCdoId id) {
-        CdoSnapshot snapshot =  new CdoSnapshot(id);
+        CdoSnapshotBuilder snapshot =  cdoSnapshot(id);
 
         for (Property property : id.getCdoClass().getProperties()){
             Object propertyVal = property.get(liveCdo);
@@ -45,10 +46,10 @@ public class SnapshotFactory {
                 filteredPropertyVal = dehydrate(propertyVal, propertyType, owner);
             }
 
-            snapshot.addPropertyValue(property, filteredPropertyVal);
+            snapshot.withPropertyValue(property, filteredPropertyVal);
         }
 
-        return snapshot;
+        return snapshot.build();
     }
 
     public CdoSnapshot create (ObjectNode objectNode) {

@@ -9,7 +9,6 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.ValueObject;
 
 import static org.javers.common.exception.exceptions.JaversExceptionCode.PROPERTY_NOT_FOUND;
-import static org.javers.common.validation.Validate.*;
 
 /**
  * Abstract holder for client's domain object, {@link Entity} or {@link ValueObject}
@@ -20,6 +19,7 @@ public abstract class Cdo {
     private final GlobalCdoId globalId;
 
     protected Cdo(GlobalCdoId globalId) {
+        Validate.argumentIsNotNull(globalId);
         this.globalId = globalId;
     }
 

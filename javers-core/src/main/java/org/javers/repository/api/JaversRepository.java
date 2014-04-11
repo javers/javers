@@ -10,7 +10,7 @@ import org.javers.core.metamodel.object.GlobalCdoId;
 import java.util.List;
 
 /**
- * Diff repository is responsible for persisting diffs & commits calculated by javers core.
+ * JaVers repository is responsible for persisting diffs & commits calculated by javers core.
  * <br/><br/>
  *
  * It deals with {@link Diff} <i>aggregate</i>
@@ -20,6 +20,15 @@ import java.util.List;
  */
 public interface JaversRepository {
 
+    /**
+     * All snapshots (states) of given object, ordered chronologically
+     * or empty List if object is not versioned
+     */
+    List<CdoSnapshot> getStateHistory(GlobalCdoId globalId);
+
+    /**
+     * Latest snapshot or Optional#EMPTY if object is not versioned
+     */
     Optional<CdoSnapshot> getLatest(GlobalCdoId globalId);
 
     void persist(Commit commit);

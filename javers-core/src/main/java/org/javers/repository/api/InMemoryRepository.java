@@ -26,6 +26,11 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     @Override
+    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId) {
+        return null;
+    }
+
+    @Override
     public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
         Validate.argumentsAreNotNull(globalId);
 
