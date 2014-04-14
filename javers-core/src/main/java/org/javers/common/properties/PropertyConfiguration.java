@@ -53,4 +53,11 @@ public class PropertyConfiguration {
         return PropertiesUtil.getStringProperty(properties, propertyKey);
     }
 
+    /**
+     * @throws JaversException UNDEFINED_PROPERTY
+     */
+    public boolean getBooleanProperty(String propertyKey) {
+        return PropertiesUtil.getBooleanProperty(properties, propertyKey);
+    }
+
 }

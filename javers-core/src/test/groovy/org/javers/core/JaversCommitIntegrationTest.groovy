@@ -9,6 +9,7 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
@@ -24,28 +25,33 @@ class JaversCommitIntegrationTest extends Specification {
     def "should create initial commit when new objects"() {
         given:
         def javers = javers().build()
-        def newUser = dummyUser().withDetails().withAddress("London").build()
+        def newUser = new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("London"))
 
         when:
         def commit = javers.commit("some.login", newUser)
 
         then:
+        def cdoId = instanceId(1, SnapshotEntity)
+        def voId  = valueObjectId(1, SnapshotEntity, "valueObjectRef")
         commit.author == "some.login"
         commit.commitDate
         CommitAssert.assertThat(commit)
-                    .hasSnapshots(3)
                     .hasId("1.0")
-                    .hasChanges(3)
-                    .hasChanges(3, NewObject)
+                    .hasSnapshots(2)
+                    .hasSnapshot(cdoId,  [id:1, valueObjectRef:voId])
+                    .hasSnapshot(voId,   [city : "London"])
+                    .hasNewObject(cdoId, [id:1, valueObjectRef:voId])
+                    .hasNewObject(voId,  [city : "London"])
     }
 
-    def "should detect changes on ref node even if root is new"() {
+    def "should detect changes on referenced node even if root is new"() {
         given:
-        def oldRef = new SnapshotEntity(id: 2)
+        def oldRef = new SnapshotEntity(id: 2, intProperty:2)
         def javers = javers().build()
         javers.commit("user",oldRef)
 
         def cdo = new SnapshotEntity(id: 1, entityRef: oldRef)
+        oldRef.intProperty = 5
 
         when:
         def commit = javers.commit("user",cdo)
@@ -54,10 +60,11 @@ class JaversCommitIntegrationTest extends Specification {
         def cdoId    = instanceId(1, SnapshotEntity)
         def oldRefId = instanceId(2, SnapshotEntity)
         CommitAssert.assertThat(commit)
-                    .hasSnapshots(1)
-                    .hasChanges(1)
-                    .hasSnapshotWithValue(cdoId,"entityRef",oldRefId)
-                    .hasNewObject(cdoId)
+                    .hasSnapshots(2)
+                    .hasSnapshot(cdoId,    [id:1, entityRef:oldRefId ])
+                    .hasSnapshot(oldRefId, [id:2, intProperty:5])
+                    .hasNewObject(cdoId,   [id:1, entityRef:oldRefId, ])
+                    .hasValueChangeAt("intProperty", 2, 5)
     }
 
 
@@ -73,11 +80,12 @@ class JaversCommitIntegrationTest extends Specification {
         def commit = javers.commit("some.login", user)
 
         then:
+        def voId = valueObjectId(1, DummyUserDetails, "dummyAddress")
         CommitAssert.assertThat(commit)
-                    .hasChanges(2)
                     .hasSnapshots(2)
-                    .hasSnapshot(instanceId("John",DummyUser))
-                    .hasSnapshot(valueObjectId(1, DummyUserDetails, "dummyAddress"))
+                    .hasChanges(2)
+                    .hasSnapshot(instanceId("John",DummyUser), [name:"John", age:10, dummyUserDetails:instanceId(1,DummyUserDetails)])
+                    .hasSnapshot(voId,[city:"Paris"])
                     .hasValueChangeAt("city", "London", "Paris")
                     .hasValueChangeAt("age", 0, 10)
     }
@@ -93,13 +101,14 @@ class JaversCommitIntegrationTest extends Specification {
         def commit = javers.commit("some.login", user)
 
         then:
+        def voId = valueObjectId(1, DummyUserDetails, "dummyAddress")
         CommitAssert.assertThat(commit)
-                    .hasChanges(2)
                     .hasSnapshots(2)
-                    .hasSnapshot(instanceId(1, DummyUserDetails))
-                    .hasSnapshot(valueObjectId(1, DummyUserDetails, "dummyAddress"))
-                    .hasNewObject(valueObjectId(1, DummyUserDetails, "dummyAddress"))
-                    .hasChanges(1, ReferenceChange)
+                    .hasSnapshot(instanceId(1, DummyUserDetails),[id:1,dummyAddress:voId,addressList:[],integerList:[]])
+                    .hasSnapshot(voId,[city:"Tokyo"])
+                    .hasNewObject(voId,[city:"Tokyo"])
+                    .hasReferenceChangeAt("dummyAddress",null,voId)
+
     }
 
     def "should support removed reference, deep in the graph"() {
@@ -113,14 +122,16 @@ class JaversCommitIntegrationTest extends Specification {
         def commit = javers.commit("some.login", user)
 
         then:
+        def voId = valueObjectId(5, DummyUserDetails, "dummyAddress")
         CommitAssert.assertThat(commit)
-                    .hasChanges(2)
                     .hasSnapshots(1)
                     .hasSnapshot(instanceId(5, DummyUserDetails))
-                    .hasObjectRemoved(valueObjectId(1, DummyUserDetails, "dummyAddress"))
-                    .hasChanges(1,ReferenceChange)
+                    .hasChanges(2)
+                    .hasObjectRemoved(voId)
+                    .hasReferenceChangeAt("dummyAddress",voId,null)
     }
 
+    @Ignore //after https://github.com/javers/javers/issues/11
     def "should support new object added to List, deep in the graph"() {
         given:
         def javers = javers().build()
@@ -132,16 +143,16 @@ class JaversCommitIntegrationTest extends Specification {
         def commit = javers.commit("some.login", user)
 
         then:
-        def addedVoId = valueObjectId(1, DummyUserDetails, "addressList/2")
+        def addedVoId = valueObjectId(5, DummyUserDetails, "addressList/2")
         CommitAssert.assertThat(commit)
-                    .hasChanges(2)
-                    .hasChanges(1, ReferenceAdded)
-                    .hasNewObject(addedVoId)
                     .hasSnapshots(2)
                     .hasSnapshot(instanceId(5, DummyUserDetails))
                     .hasSnapshot(addedVoId)
+                    .hasReferenceChangeAt("addressList",null,addedVoId)
+                    .hasNewObject(addedVoId,[city:"Tokyo"])
     }
 
+    @Ignore //after https://github.com/javers/javers/issues/11
     def "should support object removed from List, deep in the graph"() {
         given:
         def javers = javers().build()
@@ -155,11 +166,11 @@ class JaversCommitIntegrationTest extends Specification {
         then:
         def removedVoId = valueObjectId(1, DummyUserDetails, "addressList/1")
         CommitAssert.assertThat(commit)
-                    .hasChanges(2)
-                    .hasChanges(1, ReferenceRemoved)
-                    .hasObjectRemoved(removedVoId)
                     .hasSnapshots(1)
                     .hasSnapshot(instanceId(5, DummyUserDetails))
+                    .hasChanges(2)
+                    .hasReferenceChangeAt("addressList",removedVoId,null)
+                    .hasObjectRemoved(removedVoId)
     }
 
     def "should create empty commit when nothing changed"() {
@@ -177,12 +188,4 @@ class JaversCommitIntegrationTest extends Specification {
         !secondCommit.diff.changes
     }
 
-    /*
-    def "should list all snapshots for given object"() {
-        given:
-
-        when:
-
-        then:
-    }*/
 }

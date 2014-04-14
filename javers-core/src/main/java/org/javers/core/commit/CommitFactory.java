@@ -44,7 +44,7 @@ public class CommitFactory {
         //do diff
         Diff diff;
         if (shadowGraph.isEmpty()) {
-            diff = empty();
+            diff = diffFactory.createInitial(currentGraph);
         }   else{
             diff = diffFactory.create(shadowGraph.get(), currentGraph);
         }

@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.common.collections.Defaults;
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
@@ -35,10 +36,18 @@ public final class CdoSnapshot extends Cdo {
         return Optional.empty();
     }
 
+    public int size() {
+        return state.size();
+    }
+
     @Override
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
-        return state.get(property);
+        Object val = state.get(property);
+        if (val == null){
+            return Defaults.defaultValue(property.getType());
+        }
+        return val;
     }
 
     @Override

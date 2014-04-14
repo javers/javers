@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.ManagedClassDefinition;
 import org.javers.core.metamodel.property.Property;

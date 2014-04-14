@@ -1,7 +1,10 @@
 package org.javers.core.diff.appenders
 
+import org.javers.core.diff.FakeNodePair
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserWithValues
+import org.javers.core.model.PrimitiveEntity
+import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDateTime
 
 import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat

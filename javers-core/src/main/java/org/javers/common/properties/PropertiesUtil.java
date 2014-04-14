@@ -29,6 +29,16 @@ public class PropertiesUtil {
 
     /**
      * @throws JaversException UNDEFINED_PROPERTY
+     */
+    public static boolean getBooleanProperty(Properties properties, String propertyKey) {
+        String val = getStringProperty(properties, propertyKey);
+
+        return Boolean.parseBoolean(val);
+    }
+
+
+    /**
+     * @throws JaversException UNDEFINED_PROPERTY
      * @throws JaversException MALFORMED_PROPERTY
      */
     public static <T extends Enum<T>> T getEnumProperty(Properties properties, String propertyKey, Class<T> enumType) {

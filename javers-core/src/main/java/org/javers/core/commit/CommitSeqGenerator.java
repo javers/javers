@@ -11,21 +11,21 @@ import org.javers.common.collections.Objects;
 public class CommitSeqGenerator {
 
     private int seq;
-    private CommitId lastHead;
+    private CommitId lastReturned;
 
     public synchronized CommitId nextId(CommitId head) {
         long major = getHeadMajorId(head) + 1;
-        int  minor = seq;
 
-        if (Objects.nullSafeEquals(head,lastHead)){
+        if (lastReturned!= null && major == lastReturned.getMajorId()){
             seq++;
         }
         else{
             seq = 0;
-            lastHead = head;
         }
 
-        return new CommitId(major, minor);
+        CommitId result = new CommitId(major, seq);
+        lastReturned = result;
+        return result;
     }
 
     long getHeadMajorId(CommitId head){

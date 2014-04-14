@@ -49,23 +49,28 @@ class CommitAssert {
         this
     }
 
-    CommitAssert hasNewObject(GlobalCdoId.GlobalCdoIdDTO expectedId){
-        diffAssert.hasNewObject(expectedId)
+    CommitAssert hasNewObject(def expectedId, Map<String, Object> expectedInitial){
+        diffAssert.hasNewObject(expectedId, expectedInitial)
         this
     }
 
-    CommitAssert hasObjectRemoved(GlobalCdoId.GlobalCdoIdDTO expectedId){
+    CommitAssert hasObjectRemoved(def expectedId){
         diffAssert.hasObjectRemoved(expectedId)
         this
     }
 
     CommitAssert hasValueChangeAt(String property, Object oldVal, Object newVal) {
-        diffAssert.hasValueChangeAt(property,oldVal, newVal)
+        diffAssert.hasValueChangeAt(property,oldVal,newVal)
         this
     }
 
-    CommitAssert hasSnapshotWithValue(def expectedSnapshotId, String onProperty, Object expectedValue){
-        snapshotsAssert.hasSnapshotWithValue(expectedSnapshotId,onProperty,expectedValue)
+    CommitAssert hasReferenceChangeAt(String property, def oldRef, def newRef) {
+        diffAssert.hasReferenceChangeAt(property,oldRef,newRef)
+        this
+    }
+
+    CommitAssert hasSnapshot(def expectedSnapshotId, Map<String, Object> expectedState){
+        snapshotsAssert.hasSnapshot(expectedSnapshotId, expectedState)
         this
     }
 }

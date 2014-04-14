@@ -1,6 +1,8 @@
 package org.javers.core.snapshot;
 
+import org.javers.common.collections.Defaults;
 import org.javers.common.collections.EnumerableFunction;
+import org.javers.common.collections.Objects;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.core.graph.AbstractMapFunction;
 import org.javers.core.graph.ObjectNode;
@@ -32,7 +34,7 @@ public class SnapshotFactory {
 
         for (Property property : id.getCdoClass().getProperties()){
             Object propertyVal = property.get(liveCdo);
-            if (propertyVal == null){
+            if (Objects.nullSafeEquals(propertyVal,Defaults.defaultValue(property.getType()))){
                 continue;
             }
 

@@ -53,6 +53,11 @@ public abstract class GlobalCdoId {
 
     abstract static class GlobalCdoIdDTO {
         public abstract String value();
+
+        @Override
+        public String toString() {
+            return "Dto("+value()+")";
+        }
     }
 
 }

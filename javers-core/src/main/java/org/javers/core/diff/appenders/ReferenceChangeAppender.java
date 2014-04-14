@@ -22,7 +22,7 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
     protected Class<? extends JaversType> getSupportedPropertyType() {
         return ManagedType.class;
     }
-    ????
+
     @Override
     public ReferenceChange calculateChanges(NodePair pair, Property property) {
         GlobalCdoId leftGlobalCdoId = pair.getLeftGlobalCdoId(property);

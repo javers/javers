@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.GraphFactory;
+import org.javers.core.Javers;
+import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.diff.appenders.*;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.metamodel.property.Property;
@@ -19,32 +21,30 @@ import static org.javers.core.diff.DiffBuilder.diff;
  */
 public class DiffFactory {
 
-    private final NodeMatcher nodeMatcher;
+    private final NodeMatcher nodeMatcher = new NodeMatcher();
     private final TypeMapper typeMapper;
     private final List<NodeChangeAppender> nodeChangeAppenders;
     private final List<PropertyChangeAppender> propertyChangeAppender;
     private final GraphFactory graphFactory;
+    private final JaversCoreConfiguration javersCoreConfiguration;
 
-    public DiffFactory(List<NodeChangeAppender> nodeChangeAppenders,
-                       List<PropertyChangeAppender> propertyChangeAppender,
-                       TypeMapper typeMapper,
-                       GraphFactory graphFactory) {
+    public DiffFactory(TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, GraphFactory graphFactory, JaversCoreConfiguration javersCoreConfiguration) {
+        this.typeMapper = typeMapper;
         this.nodeChangeAppenders = nodeChangeAppenders;
         this.propertyChangeAppender = propertyChangeAppender;
-        this.nodeMatcher = new NodeMatcher();
-        this.typeMapper = typeMapper;
         this.graphFactory = graphFactory;
+        this.javersCoreConfiguration = javersCoreConfiguration;
     }
 
     /**
-     * @see org.javers.core.Javers#initial(String, Object)
+     * @see Javers#initial(Object)
      */
     public Diff initial(Object newDomainObject) {
         return createInitial(buildGraph(newDomainObject));
     }
 
     /**
-     * @see org.javers.core.Javers#compare(String, Object, Object)
+     * @see Javers#compare(Object, Object)
      */
     public Diff compare(Object oldVersion, Object currentVersion) {
         return create(buildGraph(oldVersion), buildGraph(currentVersion));
@@ -57,7 +57,7 @@ public class DiffFactory {
         return createAndAppendChanges(graphPair);
     }
 
-    private Diff createInitial(ObjectNode root) {
+    public Diff createInitial(ObjectNode root) {
         Validate.argumentIsNotNull(root);
 
         GraphPair graphPair = new GraphPair(root);

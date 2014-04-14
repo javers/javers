@@ -1,5 +1,6 @@
 package org.javers.core.diff;
 
+import org.javers.common.collections.Defaults;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.graph.Edge;
@@ -38,7 +39,7 @@ public class FakeNodePair implements NodePair {
 
     @Override
     public Object getLeftPropertyValue(Property property) {
-        return null;
+        return Defaults.defaultValue(property.getType());
     }
 
     @Override

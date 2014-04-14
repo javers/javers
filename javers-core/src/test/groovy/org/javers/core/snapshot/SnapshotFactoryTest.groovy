@@ -6,6 +6,7 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
+import org.javers.core.model.PrimitiveEntity
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
 import spock.lang.Shared
@@ -30,14 +31,27 @@ class SnapshotFactoryTest extends Specification{
     def "should create snapshot with given GlobalId"() {
         given:
         def snapshotFactory = javers.snapshotFactory
-        def cdo = new SnapshotEntity()
-        InstanceId id = javers.instanceId(cdo)
+        def cdo = new SnapshotEntity(id:1)
+        def id = javers.instanceId(cdo)
 
         when:
         CdoSnapshot snapshot = snapshotFactory.create(cdo, id)
 
         then:
         snapshot.globalId == id
+    }
+
+    def "should skip primitives with default value"() {
+        given:
+        def snapshotFactory = javers.snapshotFactory
+        def cdo = new PrimitiveEntity()
+        def id = javers.instanceId(cdo)
+
+        when:
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, id)
+
+        then:
+        snapshot.size() == 0
     }
 
     @Unroll

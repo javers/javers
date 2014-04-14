@@ -105,7 +105,6 @@ class JaversTestBuilder {
         idBuilder().instanceId(localId, entityClass)
     }
 
-    @Deprecated
     InstanceId instanceId(Object instance){
         idBuilder().instanceId(instance)
     }

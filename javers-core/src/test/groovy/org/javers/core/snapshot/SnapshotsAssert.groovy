@@ -22,10 +22,15 @@ class SnapshotsAssert {
         this
     }
 
-    SnapshotsAssert hasSnapshotWithValue(def expectedId, String onProperty, Object expectedValue){
+    SnapshotsAssert hasSnapshot(def expectedId, Map<String, Object> expectedState){
         CdoSnapshot found = actual.find {it -> it.globalId == expectedId}
         assert found != null
-        assert found.getPropertyValue(onProperty) == expectedValue
+
+        assert expectedState.size() == found.size()
+
+        expectedState.entrySet().each{expected ->
+            assert found.getPropertyValue(expected.key) == expected.value
+        }
         this
     }
 }
