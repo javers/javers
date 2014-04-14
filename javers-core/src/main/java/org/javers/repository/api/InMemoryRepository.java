@@ -3,6 +3,7 @@ package org.javers.repository.api;
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
+import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId) {
+    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit) {
         return null;
     }
 
@@ -49,6 +50,11 @@ public class InMemoryRepository implements JaversRepository {
             persist(s);
         }
         logger.debug("{} snapshot(s) persisted",snapshots.size());
+    }
+
+    @Override
+    public CommitId getHeadId() {
+        return null;
     }
 
     private void persist(CdoSnapshot snapshot) {

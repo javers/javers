@@ -23,7 +23,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author bartosz walacik
  */
-class JaversIntegrationTest extends Specification {
+class JaversDiffIntegrationTest extends Specification {
 
     def "should create NewObject for all nodes in initial diff"() {
         given:
@@ -31,7 +31,7 @@ class JaversIntegrationTest extends Specification {
         DummyUser left = dummyUser("kazik").withDetails().build()
 
         when:
-        Diff diff = javers.initial("user",left)
+        Diff diff = javers.initial(left)
 
         then:
         DiffAssert.assertThat(diff).has(2, NewObject)
@@ -51,7 +51,7 @@ class JaversIntegrationTest extends Specification {
         }
 
         when:
-        Diff diff = javers.compare("user", left, right)
+        Diff diff = javers.compare(left, right)
 
         then:
         with(diff) {
@@ -75,7 +75,7 @@ class JaversIntegrationTest extends Specification {
         Javers javers = JaversTestBuilder.newInstance()
 
         when:
-        Diff diff = javers.compare("user", user, user2)
+        Diff diff = javers.compare(user, user2)
 
         then:
         diff.changes.size() == 1
@@ -98,8 +98,6 @@ class JaversIntegrationTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.size() == 4
-        json.author == "user"
-        json.diffDate != null
         json.changes.size() == 5
         json.changes[0].changeType == "NewObject"
         json.changes[1].changeType == "ValueChange"
@@ -115,7 +113,7 @@ class JaversIntegrationTest extends Specification {
                        .build()
 
         when:
-        Diff diff = javers.compare("user", userWithPoint(1,2), userWithPoint(1,3))
+        Diff diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
         String jsonText = javers.toJson(diff)
         //println("jsonText:\n"+jsonText)
 
@@ -137,7 +135,7 @@ class JaversIntegrationTest extends Specification {
                 .build()
 
         when:
-        Diff diff = javers.compare("user", userWithPoint(1,2), userWithPoint(1,3))
+        Diff diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
         String jsonText = javers.toJson(diff)
         //println("jsonText:\n"+jsonText)
 

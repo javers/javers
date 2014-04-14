@@ -95,14 +95,17 @@ class JaversTestBuilder {
         javers().idBuilder()
     }
 
+    @Deprecated
     IdBuilder voBuilder(Object localId, Class entityClass){
         javers().idBuilder().withOwner(localId, entityClass)
     }
 
+    @Deprecated
     InstanceId instanceId(Object localId, Class entityClass){
         idBuilder().instanceId(localId, entityClass)
     }
 
+    @Deprecated
     InstanceId instanceId(Object instance){
         idBuilder().instanceId(instance)
     }

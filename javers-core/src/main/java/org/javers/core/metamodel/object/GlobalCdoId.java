@@ -27,8 +27,11 @@ public abstract class GlobalCdoId {
      * org.javers.core.model.SnapshotEntity/2#setOfValueObjects
      * </pre>
      */
-    public String value() {
-        return toString();
+    public abstract String value();
+
+    @Override
+    public String toString(){
+        return this.value();
     }
 
     @Override
@@ -39,8 +42,17 @@ public abstract class GlobalCdoId {
         return value().equals(((GlobalCdoId)o).value());
     }
 
+    public boolean equals(GlobalCdoIdDTO o) {
+        return this.value().equals(o.value());
+    }
+
     @Override
     public int hashCode() {
         return value().hashCode();
     }
+
+    abstract static class GlobalCdoIdDTO {
+        public abstract String value();
+    }
+
 }

@@ -1,7 +1,6 @@
 package org.javers.core.snapshot
 
 import org.javers.core.metamodel.object.CdoSnapshot
-import org.javers.core.metamodel.object.GlobalCdoId
 
 /**
  * @author bartosz walacik
@@ -18,9 +17,15 @@ class SnapshotsAssert {
         this
     }
 
-    SnapshotsAssert hasSnapshot(GlobalCdoId cdoId) {
-        CdoSnapshot found = actual.find {it -> it.globalId == cdoId}
+    SnapshotsAssert hasSnapshot(def expectedId) {
+        assert actual.find {it -> it.globalId == expectedId}
+        this
+    }
+
+    SnapshotsAssert hasSnapshotWithValue(def expectedId, String onProperty, Object expectedValue){
+        CdoSnapshot found = actual.find {it -> it.globalId == expectedId}
         assert found != null
+        assert found.getPropertyValue(onProperty) == expectedValue
         this
     }
 }

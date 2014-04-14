@@ -3,7 +3,6 @@ package org.javers.core.diff
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.metamodel.object.GlobalCdoId
 
 /**
  * @author bartosz walacik
@@ -15,7 +14,7 @@ class DiffAssert {
         new DiffAssert(actual: actual)
     }
 
-    DiffAssert hasSize(int expectedSize) {
+    DiffAssert hasChanges(int expectedSize) {
         assert actual.changes.size() == expectedSize
         this
     }
@@ -38,13 +37,14 @@ class DiffAssert {
         this
     }
 
-    DiffAssert hasNewObject(GlobalCdoId globalCdoId){
-        assert actual.changes.find{it instanceof NewObject && it.globalCdoId == globalCdoId}
+    DiffAssert hasNewObject(def globalCdoId){
+        assert actual.changes.find{it instanceof NewObject && it.globalCdoId == globalCdoId}, "no NewObject change with expected globalId: "+globalCdoId
         this
     }
 
-    DiffAssert hasObjectRemoved(GlobalCdoId globalCdoId){
+    DiffAssert hasObjectRemoved(def globalCdoId){
         assert actual.changes.find{it instanceof ObjectRemoved && it.globalCdoId == globalCdoId}, "no ObjectRemoved change with expected globalId: "+globalCdoId
         this
     }
+
 }

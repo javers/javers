@@ -58,23 +58,11 @@ public abstract class Change implements Visitable<ChangeVisitor> {
         return affectedCdo.get();
     }
 
-    /**
-     * Owning aggregate
-     *
-    public Diff getParent() {
-        return parent;
-    }*/
-
     protected void setAffectedCdo(Optional<Object> affectedCdo) {
         argumentIsNotNull(affectedCdo);
         conditionFulfilled(this.affectedCdo == null, "affectedCdo already set");
         this.affectedCdo = affectedCdo;
     }
-
-    //protected void bind(Diff parent) {
-    //    conditionFulfilled(this.parent == null, "parent Diff already set");
-    //    this.parent = parent;
-    //}
 
     @Override
     public void accept(ChangeVisitor changeVisitor) {

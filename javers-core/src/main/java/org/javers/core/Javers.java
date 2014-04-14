@@ -4,7 +4,6 @@ import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactory;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
-import org.javers.core.graph.ObjectNode;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.JaversType;
@@ -66,7 +65,7 @@ public class Javers {
 
         repository.persist(commit);
 
-        logger.info(commit.shortDesc());
+        logger.info(commit.toString());
 
         return commit;
     }
@@ -81,21 +80,21 @@ public class Javers {
      * Diffs can be converted to JSON with {@link #toJson(Diff)} and stored in custom repository
      * </p>
      */
-    public Diff compare(String user, Object oldVersion, Object currentVersion) {
-        return diffFactory.compare(user, oldVersion, currentVersion);
+    public Diff compare(Object oldVersion, Object currentVersion) {
+        return diffFactory.compare(oldVersion, currentVersion);
     }
 
     /**
      * Initial diff is a kind of snapshot of given domain objects graph.
-     * Use it alongside with {@link #compare(String, Object, Object)}
+     * Use it alongside with {@link #compare(Object, Object)}
      */
-    public Diff initial(String user, Object newDomainObject) {
-        return diffFactory.initial(user, newDomainObject);
+    public Diff initial(Object newDomainObject) {
+        return diffFactory.initial(newDomainObject);
     }
 
 
     /**
-     * Use it alongside with {@link #compare(String, Object, Object)}
+     * Use it alongside with {@link #compare(Object, Object)}
      */
     public String toJson(Diff diff) {
         return jsonConverter.toJson(diff);

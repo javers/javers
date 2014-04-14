@@ -89,9 +89,9 @@ class GraphShadowFactoryTest extends Specification {
                           ]
     }
 
-    def "should return ObjectNode.EMPTY when root is new, so no snapshot in repository"() {
+    def "should return ObjectNode.EMPTY when root is new and ref is new"() {
         given:
-        def cdo = new SnapshotEntity(id: 1)
+        def cdo = new SnapshotEntity(id: 1, entityRef: new SnapshotEntity(id:2))
 
         when:
         def shadow = javers.graphShadowFactory.createLatestShadow(cdo)
@@ -99,5 +99,4 @@ class GraphShadowFactoryTest extends Specification {
         then:
         shadow.empty
     }
-
 }

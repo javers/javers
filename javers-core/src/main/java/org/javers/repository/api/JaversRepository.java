@@ -2,6 +2,7 @@ package org.javers.repository.api;
 
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
+import org.javers.core.commit.CommitId;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -21,10 +22,13 @@ import java.util.List;
 public interface JaversRepository {
 
     /**
-     * All snapshots (states) of given object, ordered chronologically
-     * or empty List if object is not versioned
+     * Snapshots (historical states) of given object
+     * in reverse chronological order
+     *
+     * @param limit choose reasonable limits, production database could contain more records than you expect
+     * @return empty List if object is not versioned
      */
-    List<CdoSnapshot> getStateHistory(GlobalCdoId globalId);
+    List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit);
 
     /**
      * Latest snapshot or Optional#EMPTY if object is not versioned
@@ -33,6 +37,7 @@ public interface JaversRepository {
 
     void persist(Commit commit);
 
+    CommitId getHeadId();
 
     /**
      * Persists given diff in database. <br/>

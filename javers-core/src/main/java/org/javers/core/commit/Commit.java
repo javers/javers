@@ -9,21 +9,34 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * JaVers commit is similar notion to <i>commit</i> in GIT or <i>revision</i> in SVN.
+ *
  * @author bartosz walacik
  */
-public class Commit {
-    private final String id = "";
+public final class Commit {
+    private final CommitId id;
     private final List<CdoSnapshot> snapshots;
     private final String author;
     private final LocalDateTime commitDate;
     private final Diff diff;
 
-    public Commit(String author, List<CdoSnapshot> snapshots, Diff diff) {
-        Validate.argumentsAreNotNull(author,snapshots, diff);
+    Commit(CommitId id, String author, List<CdoSnapshot> snapshots, Diff diff) {
+        Validate.argumentsAreNotNull(id, author, snapshots, diff);
         this.author = author;
         this.snapshots = snapshots;
         this.commitDate = new LocalDateTime();
         this.diff = diff;
+        this.id = id;
+        for (CdoSnapshot snapshot : snapshots){
+            snapshot.bindTo(id);
+        }
+    }
+
+    /**
+     * Monotonically increasing id
+     */
+    public CommitId getId() {
+        return id;
     }
 
     public String getAuthor() {
@@ -45,12 +58,29 @@ public class Commit {
         return Collections.unmodifiableList(snapshots);
     }
 
-    public String shortDesc() {
+    @Override
+    public String toString() {
         StringBuilder b = new StringBuilder();
-        b.append("Commit(");
-        b.append("snapshots:" + snapshots.size());
-        b.append(", " + diff.shortDesc());
+        b.append("Commit(id:" + id);
+        b.append(", snapshots:" + snapshots.size());
+        b.append(", " + diff.toString());
         b.append(")");
         return b.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Commit other = (Commit) o;
+
+        return this.id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

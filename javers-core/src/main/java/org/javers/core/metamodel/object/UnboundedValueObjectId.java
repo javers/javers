@@ -31,7 +31,7 @@ public class UnboundedValueObjectId extends GlobalCdoId {
     }
 
     @Override
-    public String toString() {
+    public String value() {
         return valueObject.getSourceClass().getName()+"/";
     }
 

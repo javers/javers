@@ -3,12 +3,15 @@ package org.javers.core.diff;
 import java.util.List;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.GraphFactory;
 import org.javers.core.diff.appenders.*;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.graph.ObjectNode;
+
+import static org.javers.core.diff.DiffBuilder.diff;
 
 /**
  * @author Maciej Zasada
@@ -20,54 +23,54 @@ public class DiffFactory {
     private final TypeMapper typeMapper;
     private final List<NodeChangeAppender> nodeChangeAppenders;
     private final List<PropertyChangeAppender> propertyChangeAppender;
-    private final LiveGraphFactory liveGraphFactory;
+    private final GraphFactory graphFactory;
 
     public DiffFactory(List<NodeChangeAppender> nodeChangeAppenders,
                        List<PropertyChangeAppender> propertyChangeAppender,
                        TypeMapper typeMapper,
-                       LiveGraphFactory liveGraphFactory) {
+                       GraphFactory graphFactory) {
         this.nodeChangeAppenders = nodeChangeAppenders;
         this.propertyChangeAppender = propertyChangeAppender;
         this.nodeMatcher = new NodeMatcher();
         this.typeMapper = typeMapper;
-        this.liveGraphFactory = liveGraphFactory;
+        this.graphFactory = graphFactory;
     }
 
     /**
      * @see org.javers.core.Javers#initial(String, Object)
      */
-    public Diff initial(String user, Object newDomainObject) {
-        return createInitial(user, buildGraph(newDomainObject));
+    public Diff initial(Object newDomainObject) {
+        return createInitial(buildGraph(newDomainObject));
     }
 
     /**
      * @see org.javers.core.Javers#compare(String, Object, Object)
      */
-    public Diff compare(String user, Object oldVersion, Object currentVersion) {
-        return create(user, buildGraph(oldVersion), buildGraph(currentVersion));
+    public Diff compare(Object oldVersion, Object currentVersion) {
+        return create(buildGraph(oldVersion), buildGraph(currentVersion));
     }
 
-    public Diff create(String userId, ObjectNode leftRoot, ObjectNode rightRoot) {
+    public Diff create(ObjectNode leftRoot, ObjectNode rightRoot) {
         Validate.argumentsAreNotNull(leftRoot, rightRoot);
 
         GraphPair graphPair = new GraphPair(leftRoot,rightRoot);
-        return createAndAppendChanges(userId, graphPair);
+        return createAndAppendChanges(graphPair);
     }
 
-    public Diff createInitial(String userId, ObjectNode root) {
+    private Diff createInitial(ObjectNode root) {
         Validate.argumentIsNotNull(root);
 
         GraphPair graphPair = new GraphPair(root);
-        return createAndAppendChanges(userId, graphPair);
+        return createAndAppendChanges(graphPair);
     }
 
     private ObjectNode buildGraph(Object handle){
-        return liveGraphFactory.createLiveGraph(handle);
+        return graphFactory.createLiveGraph(handle);
     }
 
     /** Graph scope appender */
-    private Diff createAndAppendChanges(String userId, GraphPair graphPair) {
-        Diff diff = new Diff(userId);
+    private Diff createAndAppendChanges(GraphPair graphPair) {
+        DiffBuilder diff = diff();
 
         //calculate node scope diff
         for (NodeChangeAppender appender : nodeChangeAppenders) {
@@ -85,11 +88,11 @@ public class DiffFactory {
             appendPropertyChanges(diff, pair);
         }
 
-        return diff;
+        return diff.build();
     }
 
     /* Node scope appender */
-    private void appendPropertyChanges(Diff diff, NodePair pair) {
+    private void appendPropertyChanges(DiffBuilder diff, NodePair pair) {
         List<Property> nodeProperties = pair.getProperties();
         for (Property property : nodeProperties) {
 

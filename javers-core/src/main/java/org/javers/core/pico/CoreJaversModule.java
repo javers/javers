@@ -1,9 +1,11 @@
 package org.javers.core.pico;
 
 import org.javers.common.pico.JaversModule;
+import org.javers.core.GraphFactory;
 import org.javers.core.Javers;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.commit.CommitFactory;
+import org.javers.core.commit.CommitSeqGenerator;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.appenders.*;
 import org.javers.core.graph.LiveCdoFactory;
@@ -49,7 +51,9 @@ public class CoreJaversModule implements JaversModule {
             CdoSnapshotRepoFactory.class,
             LiveCdoFactory.class,
             LiveGraphFactory.class,
-            GlobalIdFactory.class
+            GlobalIdFactory.class,
+            GraphFactory.class,
+            CommitSeqGenerator.class
     };
 
     @Override

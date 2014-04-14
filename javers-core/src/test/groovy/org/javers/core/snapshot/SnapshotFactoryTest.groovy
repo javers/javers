@@ -13,6 +13,8 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.common.exception.exceptions.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
+import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.ValueObjectId.ValueObjectIdDTO.valueObjectId
 
 /**
  * @author bartosz walacik
@@ -72,9 +74,10 @@ class SnapshotFactoryTest extends Specification{
         propertyName << ["entityRef", "valueObjectRef"]
         cdo <<          [new SnapshotEntity(id:1, entityRef:new SnapshotEntity(id:5)),
                          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("street"))]
-        expectedVal <<  [javers.instanceId(5, SnapshotEntity),
-                         javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"valueObjectRef")]
+        expectedVal <<  [instanceId(5, SnapshotEntity),
+                         valueObjectId(1, SnapshotEntity, "valueObjectRef")]
     }
+
 
     @Unroll
     def "should record #containerType of #propertyType"() {
@@ -109,14 +112,14 @@ class SnapshotFactoryTest extends Specification{
         expectedVal << [
                         [1, 2],
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
-                        [javers.instanceId(2, SnapshotEntity), javers.instanceId(3, SnapshotEntity)],
-                        [javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"arrayOfValueObjects/0"),
-                         javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"arrayOfValueObjects/1")] ,
+                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
+                        [valueObjectId(1, SnapshotEntity,"arrayOfValueObjects/0"),
+                         valueObjectId(1, SnapshotEntity,"arrayOfValueObjects/1")] ,
                         [1, 2],
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
-                        [javers.instanceId(2, SnapshotEntity), javers.instanceId(3, SnapshotEntity)],
-                        [javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"listOfValueObjects/0"),
-                         javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"listOfValueObjects/1")]
+                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
+                        [valueObjectId(1, SnapshotEntity,"listOfValueObjects/0"),
+                         valueObjectId(1, SnapshotEntity,"listOfValueObjects/1")]
                        ]
     }
 
@@ -143,9 +146,9 @@ class SnapshotFactoryTest extends Specification{
         ]
         expectedVal << [[1, 2] as Set,
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)] as Set,
-                        [javers.instanceId(2, SnapshotEntity), javers.instanceId(3, SnapshotEntity)] as Set,
-                        [javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"setOfValueObjects/random_0"),
-                         javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"setOfValueObjects/random_1")] as Set
+                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)] as Set,
+                        [valueObjectId(1, SnapshotEntity, "setOfValueObjects/random_0"),
+                         valueObjectId(1, SnapshotEntity, "setOfValueObjects/random_1")] as Set
                        ]
     }
 
@@ -196,11 +199,13 @@ class SnapshotFactoryTest extends Specification{
                 new SnapshotEntity(mapPrimitiveToVO: ["key1":new DummyAddress("London")]),
                 new SnapshotEntity(mapOfEntities:    [(new SnapshotEntity(id:2)):new SnapshotEntity(id:3)])
         ]
+
         expectedVal << [
                         ["this":1,"that":2],
                         [(new LocalDate(2000, 1, 1)):1.5],
-                        ["key1":javers.voBuilder(1, SnapshotEntity).voId(DummyAddress,"mapPrimitiveToVO/key1")],
-                        [(javers.instanceId(2, SnapshotEntity)): javers.instanceId(3, SnapshotEntity)]
+                        ["key1":valueObjectId(1, SnapshotEntity,"mapPrimitiveToVO/key1")],
+                        [(javers.idBuilder().instanceId(2,SnapshotEntity)):
+                          javers.idBuilder().instanceId(3,SnapshotEntity)]
                        ]
     }
 }

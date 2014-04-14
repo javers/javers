@@ -7,6 +7,7 @@ import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -19,9 +20,9 @@ public class ReferenceChangeAppender extends PropertyChangeAppender<ReferenceCha
 
     @Override
     protected Class<? extends JaversType> getSupportedPropertyType() {
-        return EntityType.class;
+        return ManagedType.class;
     }
-
+    ????
     @Override
     public ReferenceChange calculateChanges(NodePair pair, Property property) {
         GlobalCdoId leftGlobalCdoId = pair.getLeftGlobalCdoId(property);
