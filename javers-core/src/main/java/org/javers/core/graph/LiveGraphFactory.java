@@ -17,7 +17,8 @@ public class LiveGraphFactory {
     /**
      * delegates to {@link ObjectGraphBuilder#buildGraph(Object)}
      */
-    public ObjectNode createLiveGraph(Object handle){
-        return new ObjectGraphBuilder(typeMapper,liveCdoFactory).buildGraph(handle);
+    public LiveGraph createLiveGraph(Object handle) {
+        ObjectNode root = new ObjectGraphBuilder(typeMapper, liveCdoFactory).buildGraph(handle);
+        return new LiveGraph(root);
     }
 }

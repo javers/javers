@@ -12,29 +12,32 @@ import static org.javers.common.collections.Sets.difference;
  */
 public class GraphPair {
 
-    private final Set<ObjectNode> leftNodeSet;
-    private final Set<ObjectNode> rightNodeSet;
+    private final ObjectGraph leftGraph;
+    private final ObjectGraph rightGraph;
 
     private final Set<ObjectNode> onlyOnLeft;
     private final Set<ObjectNode> onlyOnRight;
 
-    private final DFSGraphToSetConverter graphToSetConverter = new DFSGraphToSetConverter();
+    public GraphPair(ObjectGraph leftGraph, ObjectGraph rightGraph) {
+        this.leftGraph = leftGraph;
+        this.rightGraph = rightGraph;
 
-    public GraphPair(ObjectNode leftRoot, ObjectNode rightRoot) {
-        this.leftNodeSet =  flatten(leftRoot);
-        this.rightNodeSet = flatten(rightRoot);
-
-        this.onlyOnLeft = difference(leftNodeSet, rightNodeSet);
-        this.onlyOnRight = difference(rightNodeSet, leftNodeSet);
+        this.onlyOnLeft = difference(leftGraph.flatten(), rightGraph.flatten());
+        this.onlyOnRight = difference(rightGraph.flatten(), leftGraph.flatten());
     }
 
     //for initial
-    public GraphPair(ObjectNode root) {
-        this.leftNodeSet = Collections.EMPTY_SET;
-        this.rightNodeSet = flatten(root);
+    public GraphPair(ObjectGraph currentGraph) {
+        this.leftGraph = new ObjectGraph(){
+            public Set<ObjectNode> flatten() {
+                return  Collections.EMPTY_SET;
+            }
+        };
+
+        this.rightGraph = currentGraph;
 
         this.onlyOnLeft = Collections.EMPTY_SET;
-        this.onlyOnRight = difference(rightNodeSet, leftNodeSet);
+        this.onlyOnRight = rightGraph.flatten();
     }
 
     public Set<ObjectNode> getOnlyOnLeft() {
@@ -46,14 +49,11 @@ public class GraphPair {
     }
 
     public Set<ObjectNode> getLeftNodeSet() {
-        return leftNodeSet;
+        return leftGraph.flatten();
     }
 
     public Set<ObjectNode> getRightNodeSet() {
-        return rightNodeSet;
+        return rightGraph.flatten();
     }
 
-    private Set<ObjectNode> flatten(ObjectNode leftRoot) {
-        return graphToSetConverter.convertFromGraph(leftRoot);
-    }
 }

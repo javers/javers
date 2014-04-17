@@ -10,6 +10,7 @@ import org.javers.repository.api.JaversRepository;
 /**
  * @author bartosz walacik
  */
+@Deprecated
 public class CdoSnapshotRepoFactory implements CdoFactory {
 
     private final JaversRepository javersRepository;
@@ -25,9 +26,9 @@ public class CdoSnapshotRepoFactory implements CdoFactory {
     @Override
     public Cdo create(Object target, OwnerContext owner) {
 
-        if (target instanceof CdoSnapshot){
-            return (CdoSnapshot) target;
-        }
+       // if (target instanceof CdoSnapshot){
+       //    return (CdoSnapshot) target;
+       // }
 
         GlobalCdoId globalId = (GlobalCdoId) target;
         Optional<CdoSnapshot> snapshot =  javersRepository.getLatest(globalId);

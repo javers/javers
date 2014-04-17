@@ -2,13 +2,20 @@ package org.javers.core.snapshot;
 
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
+import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
+import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.JaversRepository;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -17,34 +24,27 @@ import org.javers.repository.api.JaversRepository;
  * @author bartosz walacik
  */
 public class GraphShadowFactory {
-    private final CdoSnapshotRepoFactory cdoSnapshotRepoFactory ;
-    private final TypeMapper typeMapper;
     private final JaversRepository javersRepository;
-    private final GlobalIdFactory globalIdFactory;
 
-    public GraphShadowFactory(CdoSnapshotRepoFactory cdoSnapshotRepoFactory, TypeMapper typeMapper, JaversRepository javersRepository, GlobalIdFactory globalIdFactory) {
-        this.cdoSnapshotRepoFactory = cdoSnapshotRepoFactory;
-        this.typeMapper = typeMapper;
+    public GraphShadowFactory(JaversRepository javersRepository) {
         this.javersRepository = javersRepository;
-        this.globalIdFactory = globalIdFactory;
     }
 
-    /**
-     * @return shadow graph or {@link Optional#EMPTY} if currentVersion is new,
-     *         so absent in repository
-     */
-    public Optional<ObjectNode> createLatestShadow(Object currentVersion){
-        Validate.argumentIsNotNull(currentVersion);
+    public ShadowGraph createLatestShadow(LiveGraph liveGraph){
+        Validate.argumentIsNotNull(liveGraph);
 
-        GlobalCdoId rootId = globalIdFactory.createId(currentVersion);
 
-        Optional<CdoSnapshot> rootSnapshot = javersRepository.getLatest(rootId);
+        Set<ObjectNode> snapshotNodes = new HashSet<>();
+        for (ObjectNode liveNode : liveGraph.flatten()){
+            Optional<CdoSnapshot> snapshot =  javersRepository.getLatest(liveNode.getGlobalCdoId());
 
-        if (rootSnapshot.isEmpty()){
-            return Optional.empty();
+            if (snapshot.isEmpty()){
+                continue;
+            }
+
+            snapshotNodes.add(new ObjectNode(snapshot.get()));
         }
 
-        ObjectGraphBuilder builder = new ObjectGraphBuilder(typeMapper, cdoSnapshotRepoFactory);
-        return Optional.of(builder.buildGraph(rootSnapshot.get()));
+        return new ShadowGraph(snapshotNodes);
     }
 }

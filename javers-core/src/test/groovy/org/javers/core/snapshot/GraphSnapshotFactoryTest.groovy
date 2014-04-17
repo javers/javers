@@ -25,15 +25,15 @@ class GraphSnapshotFactoryTest extends Specification {
     def "should flatten straight Entity relation"() {
         given:
         def cdo = new SnapshotEntity(id: 1, entityRef: new SnapshotEntity(id: 5))
-        def node = javers.createObjectGraph(cdo)
+        def node = javers.createLiveGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
 
         then:
         assertThat(snapshots).hasSize(2)
-                             .hasSnapshot(javers.instanceId(1, SnapshotEntity))
-                             .hasSnapshot(javers.instanceId(5, SnapshotEntity))
+                             .hasSnapshot(instanceId(1, SnapshotEntity))
+                             .hasSnapshot(instanceId(5, SnapshotEntity))
     }
 
     def "should flatten graph with depth 2"(){
@@ -42,7 +42,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def ref2  = new SnapshotEntity(id:2,entityRef: ref3)
         //cdo -> ref2 -> ref3
         def cdo   = new SnapshotEntity(id:1,entityRef: ref2)
-        def node = javers.createObjectGraph(cdo)
+        def node = javers.createLiveGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
@@ -57,7 +57,7 @@ class GraphSnapshotFactoryTest extends Specification {
     def "should flatten straight ValueObject relation"() {
         given:
         def cdo  = new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("street"))
-        def node = javers.createObjectGraph(cdo)
+        def node = javers.createLiveGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
@@ -71,7 +71,7 @@ class GraphSnapshotFactoryTest extends Specification {
     def "should flatten Set of ValueObject"() {
         given:
         def cdo = new SnapshotEntity(setOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")])
-        def node = javers.createObjectGraph(cdo)
+        def node = javers.createLiveGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
@@ -87,14 +87,14 @@ class GraphSnapshotFactoryTest extends Specification {
     @Unroll
     def "should flatten #listType of ValueObject"() {
         given:
-        def node = javers.createObjectGraph(cdo)
+        def node = javers.createLiveGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
 
         then:
         assertThat(snapshots).hasSize(3)
-                             .hasSnapshot(javers.instanceId(1, SnapshotEntity))
+                             .hasSnapshot(instanceId(1, SnapshotEntity))
                              .hasSnapshot(expectedVoIds[0])
                              .hasSnapshot(expectedVoIds[1])
 
@@ -115,7 +115,7 @@ class GraphSnapshotFactoryTest extends Specification {
     @Unroll
     def "should flatten #containerType of Entity"() {
         given:
-        def node = javers.createObjectGraph(cdo)
+        def node = javers.createLiveGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
@@ -137,7 +137,7 @@ class GraphSnapshotFactoryTest extends Specification {
     @Unroll
     def "should flatten Map of <#keyType, #valueType>"() {
         given:
-        def node = javers.createObjectGraph(cdo)
+        def node = javers.createLiveGraph(cdo)
 
         when:
         List snapshots = javers.graphSnapshotFactory.create(node)
@@ -169,7 +169,7 @@ class GraphSnapshotFactoryTest extends Specification {
         javers.javersRepository.persist(firstCommit)
 
         when:
-        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createObjectGraph(cdo))
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo))
 
         then:
         firstCommit.snapshots.size() == 3
@@ -185,7 +185,7 @@ class GraphSnapshotFactoryTest extends Specification {
         when:
         cdo.listOfEntities.get(0).intProperty = 1
         cdo.listOfEntities.get(1).intProperty = 1
-        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createObjectGraph(cdo))
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo))
 
         then:
         assertThat(secondSnapshots).hasSize(2)
@@ -201,7 +201,7 @@ class GraphSnapshotFactoryTest extends Specification {
 
         when:
         cdo.intProperty = 1
-        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createObjectGraph(cdo))
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo))
 
         then:
         assertThat(secondSnapshots).hasSize(1)

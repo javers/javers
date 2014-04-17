@@ -7,6 +7,7 @@ import org.javers.core.GraphFactory;
 import org.javers.core.Javers;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.diff.appenders.*;
+import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
@@ -26,14 +27,12 @@ public class DiffFactory {
     private final List<NodeChangeAppender> nodeChangeAppenders;
     private final List<PropertyChangeAppender> propertyChangeAppender;
     private final GraphFactory graphFactory;
-    private final JaversCoreConfiguration javersCoreConfiguration;
 
-    public DiffFactory(TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, GraphFactory graphFactory, JaversCoreConfiguration javersCoreConfiguration) {
+    public DiffFactory(TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, GraphFactory graphFactory) {
         this.typeMapper = typeMapper;
         this.nodeChangeAppenders = nodeChangeAppenders;
         this.propertyChangeAppender = propertyChangeAppender;
         this.graphFactory = graphFactory;
-        this.javersCoreConfiguration = javersCoreConfiguration;
     }
 
     /**
@@ -50,21 +49,21 @@ public class DiffFactory {
         return create(buildGraph(oldVersion), buildGraph(currentVersion));
     }
 
-    public Diff create(ObjectNode leftRoot, ObjectNode rightRoot) {
-        Validate.argumentsAreNotNull(leftRoot, rightRoot);
+    public Diff create(ObjectGraph leftGraph, ObjectGraph rightGraph) {
+        Validate.argumentsAreNotNull(leftGraph, rightGraph);
 
-        GraphPair graphPair = new GraphPair(leftRoot,rightRoot);
+        GraphPair graphPair = new GraphPair(leftGraph, rightGraph);
         return createAndAppendChanges(graphPair);
     }
 
-    public Diff createInitial(ObjectNode root) {
-        Validate.argumentIsNotNull(root);
+    public Diff createInitial(ObjectGraph currentGraph) {
+        Validate.argumentIsNotNull(currentGraph);
 
-        GraphPair graphPair = new GraphPair(root);
+        GraphPair graphPair = new GraphPair(currentGraph);
         return createAndAppendChanges(graphPair);
     }
 
-    private ObjectNode buildGraph(Object handle){
+    private LiveGraph buildGraph(Object handle){
         return graphFactory.createLiveGraph(handle);
     }
 

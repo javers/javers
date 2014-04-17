@@ -19,16 +19,27 @@ class GraphShadowFactoryTest extends Specification {
         javers = JaversTestBuilder.javersTestAssembly()
     }
 
+
+    def "should create ShadowGraph with snapshots only for committed objects "() {
+        given:
+
+        when:
+
+        then:
+    }
+
+    do I nead edges?
+
     def "should create one node Shadow with primitive property"() {
         given:
         def cdo = new SnapshotEntity(id: 1, intProperty: 5)
         javers.javers().commit("user",cdo)
 
         when:
-        def shadow = javers.graphShadowFactory.createLatestShadow(cdo).get()
+        def shadow = javers.graphShadowFactory.createLatestShadow(cdo)
 
         then:
-        NodeAssert.assertThat(shadow).hasInstanceId(SnapshotEntity,1).hasNoEdges().isSnapshot()
+        NodeAssert.assertThat(shadow.flatten()).hasInstanceId(SnapshotEntity,1).hasNoEdges().isSnapshot()
         shadow.getCdo().getPropertyValue("intProperty") == 5
     }
 
@@ -38,7 +49,7 @@ class GraphShadowFactoryTest extends Specification {
         javers.javers().commit("user",cdo)
 
         when:
-        def shadow = javers.graphShadowFactory.createLatestShadow(cdo).get()
+        def shadow = javers.graphShadowFactory.createLatestShadow(cdo)
 
         then:
         NodeAssert.assertThat(shadow)

@@ -3,19 +3,13 @@ package org.javers.core
 import groovy.json.JsonSlurper
 import org.javers.core.diff.Diff
 import org.javers.core.diff.DiffAssert
-import org.javers.core.diff.FakeNodePair
-import org.javers.core.diff.RealNodePair
 import org.javers.core.diff.changetype.NewObject
-import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.graph.ObjectNode
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
-import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyPoint
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.javers.core.model.DummyUserWithPoint
 import org.javers.core.model.PrimitiveEntity
 import spock.lang.Specification
 

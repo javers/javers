@@ -1,11 +1,13 @@
 package org.javers.core;
 
 import org.javers.common.collections.Optional;
+import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.snapshot.GraphShadowFactory;
 import org.javers.core.snapshot.GraphSnapshotFactory;
+import org.javers.core.snapshot.ShadowGraph;
 
 import java.util.List;
 
@@ -25,16 +27,16 @@ public class GraphFactory {
         this.liveGraphFactory = liveGraphFactory;
     }
 
-    public ObjectNode createLiveGraph(Object currentVersion) {
+    public LiveGraph createLiveGraph(Object currentVersion) {
         return liveGraphFactory.createLiveGraph(currentVersion);
     }
 
-    public Optional<ObjectNode> createLatestShadow(Object currentVersion){
-        return graphShadowFactory.createLatestShadow(currentVersion);
+    public ShadowGraph createLatestShadow(LiveGraph liveGraph){
+        return graphShadowFactory.createLatestShadow(liveGraph);
     }
 
     //capture current state
-    public List<CdoSnapshot> createGraphSnapshot(ObjectNode currentVersion){
+    public List<CdoSnapshot> createGraphSnapshot(LiveGraph currentVersion){
         return graphSnapshotFactory.create(currentVersion);
     }
 }

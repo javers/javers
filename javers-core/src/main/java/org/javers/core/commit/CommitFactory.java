@@ -1,12 +1,15 @@
 package org.javers.core.commit;
 
+import javafx.scene.effect.Shadow;
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.GraphFactory;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
+import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.snapshot.ShadowGraph;
 import org.javers.repository.api.JaversRepository;
 
 import java.util.List;
@@ -35,19 +38,14 @@ public class CommitFactory {
         CommitId head = javersRepository.getHeadId();
         CommitId newId = commitSeqGenerator.nextId(head);
 
-        ObjectNode currentGraph = graphFactory.createLiveGraph(currentVersion);
-        Optional<ObjectNode> shadowGraph = graphFactory.createLatestShadow(currentVersion);
+        LiveGraph currentGraph = graphFactory.createLiveGraph(currentVersion);
+        ShadowGraph latestShadowGraph = graphFactory.createLatestShadow(currentGraph);
 
         //capture current state
         List<CdoSnapshot> snapshots = graphFactory.createGraphSnapshot(currentGraph);
 
         //do diff
-        Diff diff;
-        if (shadowGraph.isEmpty()) {
-            diff = diffFactory.createInitial(currentGraph);
-        }   else{
-            diff = diffFactory.create(shadowGraph.get(), currentGraph);
-        }
+        Diff diff = diffFactory.create(latestShadowGraph, currentGraph);
 
         return new Commit(newId, author, snapshots, diff);
     }

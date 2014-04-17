@@ -2,6 +2,7 @@ package org.javers.core
 
 import org.javers.core.commit.CommitFactory
 import org.javers.core.graph.LiveCdoFactory
+import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectGraphBuilder
 import org.javers.core.graph.ObjectNode
 import org.javers.core.metamodel.object.InstanceId
@@ -87,8 +88,8 @@ class JaversTestBuilder {
         new ObjectGraphBuilder(getTypeMapper(), getLiveCdoFactory())
     }
 
-    ObjectNode createObjectGraph(Object liveCdo) {
-        createObjectGraphBuilder().buildGraph(liveCdo)
+    LiveGraph createLiveGraph(Object liveCdo) {
+        new LiveGraph( createObjectGraphBuilder().buildGraph(liveCdo) )
     }
 
     IdBuilder idBuilder(){
