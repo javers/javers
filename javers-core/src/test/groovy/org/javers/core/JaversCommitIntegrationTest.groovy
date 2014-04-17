@@ -5,6 +5,7 @@ import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ReferenceAdded
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ReferenceRemoved
+import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -42,6 +43,29 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasSnapshot(voId,   [city : "London"])
                     .hasNewObject(cdoId, [id:1, valueObjectRef:voId])
                     .hasNewObject(voId,  [city : "London"])
+    }
+
+    def "should detect reference change"() {
+        given:
+        def oldRef = new SnapshotEntity(id: 2)
+        def cdo = new SnapshotEntity(id: 1, entityRef: oldRef)
+        def javers = javers().build()
+        javers.commit("user",cdo)
+
+        when:
+        def newRef = new SnapshotEntity(id: 5)
+        cdo.entityRef = newRef
+        def commit = javers.commit("user",cdo)
+
+        then:
+        CommitAssert.assertThat(commit)
+                    .hasSnapshots(2)
+                    .hasSnapshot(instanceId(5,SnapshotEntity),[id:5])
+                    .hasSnapshot(instanceId(1,SnapshotEntity),[id:1,entityRef: instanceId(5,SnapshotEntity)])
+                    .hasChanges(3)
+                    .hasNewObject(instanceId(5,SnapshotEntity),[id:5])
+                    .hasValueChangeAt("id",0,5)
+                    .hasReferenceChangeAt("entityRef", instanceId(2,SnapshotEntity), instanceId(5,SnapshotEntity))
     }
 
     def "should detect changes on referenced node even if root is new"() {
@@ -111,7 +135,10 @@ class JaversCommitIntegrationTest extends Specification {
 
     }
 
-    def "should support removed reference, deep in the graph"() {
+    //not sure about that.
+    // We know that object was removed when concerning the local context of LiveGraph and ShadowGraph
+    // but we don't know if it was removed 'globally'
+    def "should generate only ReferenceChange for removed objects"() {
         given:
         def javers = javers().build()
         DummyUser user = dummyUser().withDetails(5).withAddress("Tokyo").build()
@@ -126,8 +153,7 @@ class JaversCommitIntegrationTest extends Specification {
         CommitAssert.assertThat(commit)
                     .hasSnapshots(1)
                     .hasSnapshot(instanceId(5, DummyUserDetails))
-                    .hasChanges(2)
-                    .hasObjectRemoved(voId)
+                    .hasChanges(1)
                     .hasReferenceChangeAt("dummyAddress",voId,null)
     }
 

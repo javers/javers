@@ -27,10 +27,6 @@ public abstract class Cdo {
         return globalId;
     }
 
-    public Object getLocalId() {
-        return globalId.getCdoId();
-    }
-
     /**
      * shortcut to {@link GlobalCdoId#getCdoClass()}
      */

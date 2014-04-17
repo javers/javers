@@ -5,12 +5,11 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
-import org.javers.test.assertion.NodeAssert
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*
-import static org.javers.test.assertion.NodeAssert.assertThat
+import static NodeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 

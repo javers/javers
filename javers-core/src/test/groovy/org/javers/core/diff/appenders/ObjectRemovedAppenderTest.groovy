@@ -14,8 +14,10 @@ class ObjectRemovedAppenderTest extends AbstractDiffTest {
 
     def "should append ObjectRemoved to diff"() {
         given:
-        def left =  buildGraph(dummyUser().withName("removed").build())
-        def right = buildGraph(dummyUser().withName("1").build())
+        def cdoLeft = dummyUser().withName("removed").build()
+        def cdoRight = dummyUser().withName("1").build()
+        def left =  buildLiveGraph(cdoLeft)
+        def right = buildLiveGraph(cdoRight)
 
         when:
         def changes = new ObjectRemovedAppender().getChangeSet(new GraphPair(left, right))
@@ -26,13 +28,13 @@ class ObjectRemovedAppenderTest extends AbstractDiffTest {
                     .isObjectRemoved()
                     .hasCdoId("removed")
                     .hasEntityTypeOf(DummyUser)
-                    .hasAffectedCdo(left.wrappedCdo().get())
+                    .hasAffectedCdo(cdoLeft)
     }
 
     def "should append 2 ObjectRemoved to diff"() {
         given:
-        def left =  buildGraph(dummyUser().withName("removed").withDetails(5).build())
-        def right = buildGraph(dummyUser().withName("1").build())
+        def left =  buildLiveGraph(dummyUser().withName("removed").withDetails(5).build())
+        def right = buildLiveGraph(dummyUser().withName("1").build())
 
         when:
         def changes = new ObjectRemovedAppender().getChangeSet(new GraphPair(left, right))
@@ -45,8 +47,8 @@ class ObjectRemovedAppenderTest extends AbstractDiffTest {
 
     def "should do nothing when graph has same node set"() {
         given:
-        def left =  buildGraph(dummyUser().withName("1").build())
-        def right = buildGraph(dummyUser().withName("1").build())
+        def left =  buildLiveGraph(dummyUser().withName("1").build())
+        def right = buildLiveGraph(dummyUser().withName("1").build())
 
         when:
         def changes = new ObjectRemovedAppender().getChangeSet(new GraphPair(left, right))

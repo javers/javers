@@ -63,6 +63,21 @@ public class ObjectNode implements Visitable<GraphVisitor> {
         return cdo.getGlobalId();
     }
 
+    /**
+     * only for properties with return type: ManagedType
+     */
+    public GlobalCdoId getReference(Property property){
+        Edge edge = getEdge(property); //could be null for snapshots
+
+        //TODO this is ugly, how to move this logic to Cdo implementations?
+        if (edge != null && edge instanceof SingleEdge){
+            return ((SingleEdge)edge).getReference().getGlobalCdoId();
+        }
+        else {
+            return (GlobalCdoId)getPropertyValue(property);
+        }
+    }
+
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
         return cdo.getPropertyValue(property);
@@ -73,8 +88,12 @@ public class ObjectNode implements Visitable<GraphVisitor> {
         return cdo.isNull(property);
     }
 
-    public Edge getEdge(Property property) {
+    Edge getEdge(Property property) {
         return edges.get(property);
+    }
+
+    int edgesCount() {
+        return edges.size();
     }
 
     /**
@@ -95,15 +114,6 @@ public class ObjectNode implements Visitable<GraphVisitor> {
 
     void unstub() {
         stub = false;
-    }
-
-    /**
-     * References to other Entities or ValueObjects
-     *
-     * @return never returns null
-     */
-    List<Edge> getEdges() {
-        return new ArrayList<>(edges.values());
     }
 
     void addEdge(Edge edge) {

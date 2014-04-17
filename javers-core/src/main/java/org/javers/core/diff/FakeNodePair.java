@@ -50,7 +50,7 @@ public class FakeNodePair implements NodePair {
     @Override
     public GlobalCdoId getRightGlobalCdoId(Property property) {
         //TODO refactor
-        return getGlobalCdoId(right.getEdge(property));
+        return right.getReference(property);
     }
 
     @Override
@@ -58,8 +58,5 @@ public class FakeNodePair implements NodePair {
         return null;
     }
 
-    //TODO refactor <-> RealNodePair
-    private GlobalCdoId getGlobalCdoId(Edge edge) {
-        return edge != null ? ((SingleEdge) edge).getReference().getGlobalCdoId() : null;
-    }
+
 }

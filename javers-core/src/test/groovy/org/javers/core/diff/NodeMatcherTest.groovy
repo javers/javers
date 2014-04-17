@@ -11,9 +11,9 @@ class NodeMatcherTest extends AbstractDiffTest{
 
     def "should match nodes with the same GlobalCdoId"() {
         given:
-        ObjectNode previousGraph = buildGraph(dummyUser().withName("a").withDetails(2).build());
+        def previousGraph = buildLiveGraph(dummyUser().withName("a").withDetails(2).build());
 
-        ObjectNode currentGraph =   buildGraph(dummyUser().withName("b").withDetails(2).build());
+        def currentGraph =   buildLiveGraph(dummyUser().withName("b").withDetails(2).build());
 
         when:
         List<RealNodePair> pairs = new NodeMatcher().match(new GraphPair(previousGraph,currentGraph))

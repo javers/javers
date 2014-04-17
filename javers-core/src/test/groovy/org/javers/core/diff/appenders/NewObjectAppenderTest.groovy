@@ -14,8 +14,10 @@ class NewObjectAppenderTest extends AbstractDiffTest {
 
     def "should append newObject to diff"() {
         given:
-        def left =  buildGraph(dummyUser().withName("1").build())
-        def right = buildGraph(dummyUser().withName("added").build())
+        def cdoLeft = dummyUser().withName("1").build()
+        def cdoRight = dummyUser().withName("added").build()
+        def left =  buildLiveGraph(cdoLeft)
+        def right = buildLiveGraph(cdoRight)
 
         when:
         def changes = new NewObjectAppender().getChangeSet(new GraphPair(left, right))
@@ -26,13 +28,13 @@ class NewObjectAppenderTest extends AbstractDiffTest {
                         .isNewObject()
                         .hasCdoId("added")
                         .hasEntityTypeOf(DummyUser)
-                        .hasAffectedCdo(right.wrappedCdo().get())
+                        .hasAffectedCdo(cdoRight)
     }
 
     def "should append newObjects to diff"() {
         given:
-        def left =  buildGraph(dummyUser().withName("1").build())
-        def right = buildGraph(dummyUser().withName("added").withDetails(5).build())
+        def left =  buildLiveGraph(dummyUser().withName("1").build())
+        def right = buildLiveGraph(dummyUser().withName("added").withDetails(5).build())
 
         when:
         def changes = new NewObjectAppender().getChangeSet(new GraphPair(left, right))
@@ -45,8 +47,8 @@ class NewObjectAppenderTest extends AbstractDiffTest {
 
     def "should do nothing when graph has same node set"() {
         given:
-        def left =  buildGraph(dummyUser().withName("1").build())
-        def right = buildGraph(dummyUser().withName("1").build())
+        def left =  buildLiveGraph(dummyUser().withName("1").build())
+        def right = buildLiveGraph(dummyUser().withName("1").build())
 
         when:
         def changes = new NewObjectAppender().getChangeSet(new GraphPair(left, right))
