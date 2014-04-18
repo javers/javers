@@ -10,6 +10,7 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
+import org.javers.core.snapshot.SnapshotsAssert
 import spock.lang.Ignore
 import spock.lang.Specification
 
@@ -22,6 +23,27 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  * @author bartosz walacik
  */
 class JaversCommitIntegrationTest extends Specification {
+
+    def "should store state history in JaversRepository"() {
+        given:
+        def javers = javers().build()
+        def ref = new SnapshotEntity(id:2)
+        def cdo = new SnapshotEntity(id: 1, entityRef: ref)
+        javers.commit("author",cdo) //v. 1
+        ref.intProperty = 5
+        javers.commit("author",cdo) //v. 2
+
+        when:
+        def snapshots = javers.getStateHistory(2, SnapshotEntity, 10)
+
+        then:
+        def cdoId = instanceId(2,SnapshotEntity)
+        SnapshotsAssert.assertThat(snapshots)
+                       .hasSize(2)
+                       .hasSnapshot(cdoId, "1.0", [id:2])
+                       .hasSnapshot(cdoId, "2.0", [id:2, intProperty:5])
+    }
+
 
     def "should create initial commit when new objects"() {
         given:

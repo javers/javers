@@ -1,17 +1,21 @@
 package org.javers.core;
 
+import org.javers.common.exception.exceptions.JaversException;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactory;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.graph.ObjectGraphBuilder;
-import org.javers.repository.api.JaversRepository;
+import org.javers.repository.api.JaversExtendedRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 
 /**
@@ -30,12 +34,12 @@ public class Javers {
     private final TypeMapper typeMapper;
     private final JsonConverter jsonConverter;
     private final CommitFactory commitFactory;
-    private final JaversRepository repository;
+    private final JaversExtendedRepository repository;
 
     /**
      * JaVers instance should be constructed by {@link JaversBuilder}
      */
-    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversRepository repository) {
+    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository) {
         this.diffFactory = diffFactory;
         this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;
@@ -92,7 +96,6 @@ public class Javers {
         return diffFactory.initial(newDomainObject);
     }
 
-
     /**
      * Use it alongside with {@link #compare(Object, Object)}
      */
@@ -102,6 +105,20 @@ public class Javers {
 
     public IdBuilder idBuilder() {
         return new IdBuilder(new GlobalIdFactory(typeMapper));
+    }
+
+    /**
+     * Snapshots (historical states) of entity instance,
+     * in reverse chronological order
+     *
+     * @param localId id of required instance
+     * @param entityClass class of required instance
+     * @param limit choose reasonable limit
+     * @return empty List if object is not versioned
+     * @throws JaversException ENTITY_NOT_MAPPED if given javaClass is NOT mapped to Entity
+     */
+    public List<CdoSnapshot> getStateHistory(Object localId, Class entityClass, int limit){
+        return repository.getStateHistory(localId, entityClass, limit);
     }
 
     JaversType getForClass(Class<?> clazz) {

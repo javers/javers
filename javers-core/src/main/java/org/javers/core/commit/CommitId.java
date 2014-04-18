@@ -36,13 +36,18 @@ public final class CommitId {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null) {
             return false;
         }
 
-        CommitId other = (CommitId) o;
+        if (o instanceof CommitId) {
+            return this.value().equals(((CommitId)o).value());
+        }
+        if (o instanceof String) {
+            return this.value().equals(o);
+        }
 
-        return this.value().equals(other.value());
+        return false;
     }
 
     @Override

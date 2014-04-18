@@ -22,7 +22,7 @@ import java.util.List;
 public interface JaversRepository {
 
     /**
-     * Snapshots (historical states) of given object
+     * Snapshots (historical states) of object
      * in reverse chronological order
      *
      * @param limit choose reasonable limits, production database could contain more records than you expect

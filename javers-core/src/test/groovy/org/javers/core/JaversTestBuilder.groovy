@@ -12,6 +12,7 @@ import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.snapshot.GraphShadowFactory
 import org.javers.core.snapshot.GraphSnapshotFactory
 import org.javers.core.snapshot.SnapshotFactory
+import org.javers.repository.api.JaversExtendedRepository
 import org.javers.repository.api.JaversRepository
 
 /**
@@ -68,8 +69,8 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(TypeFactory)
     }
 
-    JaversRepository getJaversRepository(){
-        javersBuilder.getContainerComponent(JaversRepository)
+    JaversExtendedRepository getJaversRepository(){
+        javersBuilder.getContainerComponent(JaversExtendedRepository)
     }
 
     TypeMapper getTypeMapper(){

@@ -9,9 +9,7 @@ import org.javers.core.metamodel.object.GlobalCdoId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Fake impl of JaversRepository
@@ -21,14 +19,21 @@ import java.util.Map;
 public class InMemoryRepository implements JaversRepository {
     private static final Logger logger = LoggerFactory.getLogger(InMemoryRepository.class);
 
-    private Map<GlobalCdoId, CdoSnapshot> snapshots = new HashMap<>();
+    private Map<GlobalCdoId, LinkedList<CdoSnapshot>> snapshots = new HashMap<>();
+
+    private CommitId head;
 
     public InMemoryRepository() {
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit) {
-        return null;
+        Validate.argumentIsNotNull(globalId);
+
+        if (snapshots.containsKey(globalId)) {
+            return Collections.unmodifiableList(snapshots.get(globalId));
+        }
+        return Collections.EMPTY_LIST;
     }
 
     @Override
@@ -36,7 +41,8 @@ public class InMemoryRepository implements JaversRepository {
         Validate.argumentsAreNotNull(globalId);
 
         if (snapshots.containsKey(globalId)) {
-            return Optional.of(snapshots.get(globalId));
+            List<CdoSnapshot> states = snapshots.get(globalId);
+            return Optional.of(states.get(states.size() - 1));
         }
 
         return Optional.empty();
@@ -50,14 +56,22 @@ public class InMemoryRepository implements JaversRepository {
             persist(s);
         }
         logger.debug("{} snapshot(s) persisted",snapshots.size());
+        head = commit.getId();
     }
 
     @Override
     public CommitId getHeadId() {
-        return null;
+        return head;
     }
 
     private void persist(CdoSnapshot snapshot) {
-        snapshots.put(snapshot.getGlobalId(), snapshot);
+        LinkedList<CdoSnapshot> states = snapshots.get(snapshot.getGlobalId());
+        if (states == null){
+            states = new LinkedList<>();
+            snapshots.put(snapshot.getGlobalId(), states);
+        }
+
+        states.push(snapshot);
     }
+
 }

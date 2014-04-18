@@ -22,10 +22,18 @@ class SnapshotsAssert {
         this
     }
 
+    SnapshotsAssert hasSnapshot(def expectedId, String expectedCommitId, Map<String, Object> expectedState){
+        CdoSnapshot found = actual.find {it -> it.globalId == expectedId && it.commitId == expectedCommitId }
+        assertState(found, expectedState)
+    }
+
     SnapshotsAssert hasSnapshot(def expectedId, Map<String, Object> expectedState){
         CdoSnapshot found = actual.find {it -> it.globalId == expectedId}
-        assert found != null
+        assertState(found, expectedState)
+    }
 
+    private SnapshotsAssert assertState(CdoSnapshot found, Map<String, Object> expectedState) {
+        assert found != null
         assert expectedState.size() == found.size()
 
         expectedState.entrySet().each{expected ->

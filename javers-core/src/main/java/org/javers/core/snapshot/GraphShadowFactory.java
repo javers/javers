@@ -10,6 +10,7 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 
 import java.util.ArrayList;
@@ -24,9 +25,9 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public class GraphShadowFactory {
-    private final JaversRepository javersRepository;
+    private final JaversExtendedRepository javersRepository;
 
-    public GraphShadowFactory(JaversRepository javersRepository) {
+    public GraphShadowFactory(JaversExtendedRepository javersRepository) {
         this.javersRepository = javersRepository;
     }
 

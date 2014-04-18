@@ -15,10 +15,10 @@ import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.graph.ObjectGraphBuilder;
-import org.javers.core.snapshot.CdoSnapshotRepoFactory;
 import org.javers.core.snapshot.GraphShadowFactory;
 import org.javers.core.snapshot.GraphSnapshotFactory;
 import org.javers.core.snapshot.SnapshotFactory;
+import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,7 +48,7 @@ public class CoreJaversModule implements JaversModule {
             SnapshotFactory.class,
             GraphSnapshotFactory.class,
             GraphShadowFactory.class,
-            CdoSnapshotRepoFactory.class,
+            JaversExtendedRepository.class,
             LiveCdoFactory.class,
             LiveGraphFactory.class,
             GlobalIdFactory.class,

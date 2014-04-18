@@ -53,28 +53,36 @@ public class GlobalIdFactory {
         return new ValueObjectId((ValueObject) targetManagedClass, owner, path);
     }
 
+    /**
+     *  @throws JaversException ENTITY_NOT_MAPPED if given javaClass is NOT mapped to Entity
+     */
     public InstanceId createFromId(Object localId, Class entityClass){
-        ManagedClass targetManagedClass = getManagedClass(entityClass);
-        return InstanceId.createFromId(localId, (Entity)targetManagedClass);
+        ManagedClass managedClass = getManagedClass(entityClass);
+
+        if (!(managedClass instanceof Entity)){
+            throw new JaversException(JaversExceptionCode.ENTITY_NOT_MAPPED, entityClass, managedClass.getClass().getSimpleName());
+        }
+
+        return InstanceId.createFromId(localId, (Entity)managedClass);
     }
 
     private ManagedClass getManagedClassOf(Object cdo) {
         Validate.argumentIsNotNull(cdo);
-        return  getManagedClass(cdo.getClass());
+        return getManagedClass(cdo.getClass());
     }
 
     /**
-     * if given javaClass is mapped to {@link ManagedType}
-     * returns {@link ManagedType#getManagedClass()}
-     * @throws java.lang.IllegalArgumentException if given javaClass is NOT mapped to {@link ManagedType}
+     * if given javaClass is mapped to {@link ManagedType} returns {@link ManagedType#getManagedClass()}
+     *
+     * @throws JaversException CLASS_NOT_MANAGED if given javaClass is NOT mapped to {@link ManagedType}
      */
     public ManagedClass getManagedClass(Class javaClass) {
         JaversType jType = typeMapper.getJaversType(javaClass);
         if (jType instanceof ManagedType) {
             return ((ManagedType)jType).getManagedClass();
         }
-        throw new IllegalArgumentException("getManagedClass("+javaClass.getSimpleName()+") " +
-                "given javaClass is mapped to "+jType.getClass().getSimpleName()+", ManagedType expected");
+
+        throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, javaClass, jType.getClass().getSimpleName());
     }
 
     private boolean hasOwner(OwnerContext context) {

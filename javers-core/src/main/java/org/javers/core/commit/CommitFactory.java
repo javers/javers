@@ -1,31 +1,26 @@
 package org.javers.core.commit;
 
-import javafx.scene.effect.Shadow;
-import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.GraphFactory;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.graph.LiveGraph;
-import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.snapshot.ShadowGraph;
-import org.javers.repository.api.JaversRepository;
+import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.List;
-
-import static org.javers.core.diff.DiffBuilder.empty;
 
 /**
  * @author bartosz walacik
  */
 public class CommitFactory {
     private final DiffFactory diffFactory;
-    private final JaversRepository javersRepository;
+    private final JaversExtendedRepository javersRepository;
     private final GraphFactory graphFactory;
     private final CommitSeqGenerator commitSeqGenerator;
 
-    public CommitFactory(DiffFactory diffFactory, JaversRepository javersRepository, GraphFactory graphFactory, CommitSeqGenerator commitSeqGenerator) {
+    public CommitFactory(DiffFactory diffFactory, JaversExtendedRepository javersRepository, GraphFactory graphFactory, CommitSeqGenerator commitSeqGenerator) {
         this.diffFactory = diffFactory;
         this.javersRepository = javersRepository;
         this.graphFactory = graphFactory;

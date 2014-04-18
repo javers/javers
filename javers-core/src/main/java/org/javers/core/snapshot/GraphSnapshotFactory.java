@@ -6,6 +6,7 @@ import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 
 import java.util.ArrayList;
@@ -21,9 +22,9 @@ import java.util.Set;
 public class GraphSnapshotFactory {
 
     private final SnapshotFactory snapshotFactory;
-    private final JaversRepository javersRepository;
+    private final JaversExtendedRepository javersRepository;
 
-    public GraphSnapshotFactory(SnapshotFactory snapshotFactory, JaversRepository javersRepository) {
+    public GraphSnapshotFactory(SnapshotFactory snapshotFactory, JaversExtendedRepository javersRepository) {
         this.snapshotFactory = snapshotFactory;
         this.javersRepository = javersRepository;
     }
