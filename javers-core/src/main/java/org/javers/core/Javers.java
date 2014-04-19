@@ -124,4 +124,22 @@ public class Javers {
     JaversType getForClass(Class<?> clazz) {
         return typeMapper.getJaversType(clazz);
     }
+
+    /**
+     * @deprecated use {@link #initial(Object)}
+     * @param author ignored
+     */
+    @Deprecated
+    public Diff initial(String author, Object newDomainObject) {
+        return initial(newDomainObject);
+    }
+
+    /**
+     * @deprecated use {@link #compare(Object, Object)}
+     * @param author ignored
+     */
+    @Deprecated
+    public Diff compare(String author, Object oldVersion, Object currentVersion) {
+        return compare(oldVersion, currentVersion);
+    }
 }
