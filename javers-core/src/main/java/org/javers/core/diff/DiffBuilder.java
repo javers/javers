@@ -35,10 +35,11 @@ public class DiffBuilder {
         return this;
     }
 
-    public void addChanges(Collection<Change> changeSet) {
+    public DiffBuilder addChanges(Collection<Change> changeSet) {
         for (Change change : changeSet) {
             addChange(change);
         }
+        return this;
     }
 
     public Diff build() {
