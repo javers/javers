@@ -26,12 +26,4 @@ class ListAndArrayOfEntitiesChangeTest extends AbstractDiffTest {
         leftCdo <<  [new SnapshotEntity(id:1, listOfEntities:[new SnapshotEntity(id:2), new SnapshotEntity(id:3)])]
         rightCdo << [new SnapshotEntity(id:1, listOfEntities:[new SnapshotEntity(id:2), new SnapshotEntity(id:5)])]
     }
-
-    RealNodePair realNodePair(def leftCdo, def rightCdo){
-        new RealNodePair(buildGraph(leftCdo), buildGraph(rightCdo))
-    }
-
-    ListChangeAppender listChangeAppender() {
-        new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper)
-    }
 }

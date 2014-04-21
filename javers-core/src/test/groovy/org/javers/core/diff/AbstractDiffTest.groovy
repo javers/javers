@@ -1,6 +1,9 @@
 package org.javers.core.diff
 
 import org.javers.core.JaversTestBuilder
+import org.javers.core.diff.appenders.ArrayChangeAppender
+import org.javers.core.diff.appenders.ListChangeAppender
+import org.javers.core.diff.appenders.MapChangeAppender
 import org.javers.core.graph.LiveGraph
 import org.javers.core.metamodel.property.Entity
 import org.javers.core.metamodel.property.Property
@@ -30,5 +33,17 @@ abstract class AbstractDiffTest extends Specification {
 
     Property getProperty(Class forClass, String propName) {
         getEntity(forClass).getProperty(propName)
+    }
+
+    RealNodePair realNodePair(def leftCdo, def rightCdo){
+        new RealNodePair(buildGraph(leftCdo), buildGraph(rightCdo))
+    }
+
+    ListChangeAppender listChangeAppender() {
+        new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper)
+    }
+
+    ArrayChangeAppender arrayChangeAppender() {
+        new ArrayChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper)
     }
 }

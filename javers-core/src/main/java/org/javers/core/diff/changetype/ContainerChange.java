@@ -11,9 +11,9 @@ import java.util.List;
  * @author bartosz walacik
  */
 public abstract class ContainerChange extends PropertyChange {
-    private final List<ContainerValueChange> changes;
+    private final List<ContainerElementChange> changes;
 
-    ContainerChange(GlobalCdoId affectedCdoId, Property property, List<ContainerValueChange> changes) {
+    ContainerChange(GlobalCdoId affectedCdoId, Property property, List<ContainerElementChange> changes) {
         super(affectedCdoId, property);
         this.changes= Collections.unmodifiableList(new ArrayList<>(changes));
     }
@@ -21,7 +21,7 @@ public abstract class ContainerChange extends PropertyChange {
     /**
      * @return unmodifiable list
      */
-    public List<ContainerValueChange> getChanges() {
+    public List<ContainerElementChange> getChanges() {
         return changes;
     }
 }

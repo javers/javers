@@ -26,7 +26,7 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
 
 
         appendChangeType(change, jsonObject);
-        appendGlobalId(change.getGlobalCdoId(), jsonObject, context);
+        appendGlobalId(change.getAffectedCdoId(), jsonObject, context);
 
         if (change instanceof PropertyChange) {
             appendPropertyName((PropertyChange) change, jsonObject);

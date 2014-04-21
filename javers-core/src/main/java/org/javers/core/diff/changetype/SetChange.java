@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class SetChange extends ContainerChange{
 
-    public SetChange(GlobalCdoId affectedCdoId, Property property, List<ContainerValueChange> changes) {
+    public SetChange(GlobalCdoId affectedCdoId, Property property, List<ContainerElementChange> changes) {
         super(affectedCdoId, property, changes);
     }
 }

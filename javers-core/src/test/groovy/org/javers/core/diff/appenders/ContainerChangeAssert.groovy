@@ -17,4 +17,10 @@ class ContainerChangeAssert {
         assert actual.changes.size() == expected
         this
     }
+
+    ContainerChangeAssert hasIndexes(List expected){
+        assert actual.changes.collect {it.index} == expected
+        this
+    }
+
 }

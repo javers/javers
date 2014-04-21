@@ -22,6 +22,7 @@ public class EntryValueChanged extends EntryChange {
         this.rightValue = new Value(rightValue);
     }
 
+    @Override
     public Object getKey() {
         return key.unwrap();
     }

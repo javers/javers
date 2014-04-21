@@ -59,11 +59,11 @@ class DiffAssert {
     //}
 
     DiffAssert hasNewObject(def expectedId, Map<String, Object> expectedInitialState){
-        assert actual.changes.find{it instanceof NewObject && it.globalCdoId == expectedId}
+        assert actual.changes.find{it instanceof NewObject && it.affectedCdoId == expectedId}
 
         expectedInitialState.entrySet().each{ entry ->
             PropertyChange change = actual.changes.find{it instanceof PropertyChange &&
-                                                        it.globalCdoId == expectedId &&
+                                                        it.affectedCdoId == expectedId &&
                                                         it.property.name == entry.key}
             assert change, "no PropertyChange for "+ entry.key
             assert !left(change)

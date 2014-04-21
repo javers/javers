@@ -1,10 +1,8 @@
 package org.javers.core.diff.appenders;
 
-import org.javers.common.collections.Sets;
-import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.ContainerValueChange;
+import org.javers.core.diff.changetype.ContainerElementChange;
 import org.javers.core.diff.changetype.ElementAdded;
 import org.javers.core.diff.changetype.ElementRemoved;
 import org.javers.core.diff.changetype.SetChange;
@@ -14,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -54,7 +51,7 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
         Set leftValues =  (Set) pair.getLeftPropertyValue(property);
         Set rightValues = (Set) pair.getRightPropertyValue(property);
 
-        List<ContainerValueChange> changes = new ArrayList<>();
+        List<ContainerElementChange> changes = new ArrayList<>();
 
         for (Object addedValue : difference(rightValues, leftValues)) {
             changes.add(new ElementAdded(addedValue));

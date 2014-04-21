@@ -20,6 +20,7 @@ public abstract  class EntryAddOrRemove extends EntryChange {
         this.value = new Value(value);
     }
 
+    @Override
     public Object getKey() {
         return key.unwrap();
     }

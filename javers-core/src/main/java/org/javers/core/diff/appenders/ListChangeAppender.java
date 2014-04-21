@@ -1,10 +1,8 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Lists;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.ContainerValueChange;
+import org.javers.core.diff.changetype.ContainerElementChange;
 import org.javers.core.diff.changetype.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.metamodel.property.Property;
@@ -58,7 +56,7 @@ public class ListChangeAppender extends PropertyChangeAppender<ListChange> {
                 return null; //TODO ADD SUPPORT
             }
 
-            List<ContainerValueChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
+            List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
 
             return  new ListChange(pair.getGlobalCdoId(), property, elementChanges);
         }

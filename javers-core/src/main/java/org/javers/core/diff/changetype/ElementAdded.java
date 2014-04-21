@@ -7,6 +7,10 @@ package org.javers.core.diff.changetype;
  */
 public class ElementAdded extends ElementAddOrRemove {
 
+    public ElementAdded(int index, Object value) {
+        super(index, value);
+    }
+
     public ElementAdded(Object value) {
         super(value);
     }

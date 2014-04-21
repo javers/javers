@@ -11,15 +11,28 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 class ListChangeAppenderTest extends AbstractDiffTest {
 
+    def "should index List changes"() {
+        given:
+        def leftNode =  dummyUser().withIntegerList([]).build()
+        def rightNode = dummyUser().withIntegerList([1, 2]).build()
+
+        when:
+        def change = listChangeAppender().calculateChanges(
+                     realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
+
+        then:
+        ContainerChangeAssert.assertThat(change).hasSize(2).hasIndexes([0,1])
+    }
+
     @Unroll
     def "should append #changesCount changes when left list is #leftList and right list is #rightList"() {
 
         when:
-        def leftNode = buildGraph(dummyUser().withIntegerList(leftList as List).build())
-        def rightNode = buildGraph(dummyUser().withIntegerList(rightList as List).build())
+        def leftNode =  dummyUser().withIntegerList(leftList as List).build()
+        def rightNode = dummyUser().withIntegerList(rightList as List).build()
 
-        def change = new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper).calculateChanges(
-                new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
+        def change = listChangeAppender().calculateChanges(
+                     realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
         change.changes.size() == changesCount
@@ -41,11 +54,11 @@ class ListChangeAppenderTest extends AbstractDiffTest {
     def "should not append changes when left list #leftList and right list #rightList are equal"() {
 
         when:
-        def leftNode = buildGraph(dummyUser().withIntegerList(leftList as List).build())
-        def rightNode = buildGraph(dummyUser().withIntegerList(rightList as List).build())
+        def leftNode =  dummyUser().withIntegerList(leftList as List).build()
+        def rightNode = dummyUser().withIntegerList(rightList as List).build()
 
-        def change = new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper).calculateChanges(
-                new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
+        def change = listChangeAppender().calculateChanges(
+                     realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
         change == null
