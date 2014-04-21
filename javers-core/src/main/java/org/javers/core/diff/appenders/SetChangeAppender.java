@@ -3,8 +3,8 @@ package org.javers.core.diff.appenders;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ContainerElementChange;
-import org.javers.core.diff.changetype.ElementAdded;
-import org.javers.core.diff.changetype.ElementRemoved;
+import org.javers.core.diff.changetype.ValueAdded;
+import org.javers.core.diff.changetype.ValueRemoved;
 import org.javers.core.diff.changetype.SetChange;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
@@ -54,11 +54,11 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
         List<ContainerElementChange> changes = new ArrayList<>();
 
         for (Object addedValue : difference(rightValues, leftValues)) {
-            changes.add(new ElementAdded(addedValue));
+            changes.add(new ValueAdded(addedValue));
         }
 
         for (Object addedValue : difference(leftValues, rightValues)) {
-            changes.add(new ElementRemoved(addedValue));
+            changes.add(new ValueRemoved(addedValue));
         }
 
         if (changes.isEmpty()) {

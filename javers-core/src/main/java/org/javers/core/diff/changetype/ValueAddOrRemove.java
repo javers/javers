@@ -5,14 +5,14 @@ package org.javers.core.diff.changetype;
  *
  * @author bartosz walacik
  */
-abstract class ElementAddOrRemove extends ContainerElementChange {
+abstract class ValueAddOrRemove extends ContainerElementChange {
     final Value value;
 
-    ElementAddOrRemove(Object value) {
+    ValueAddOrRemove(Object value) {
         this.value = new Value(value);
     }
 
-    ElementAddOrRemove(Integer index, Object value) {
+    ValueAddOrRemove(Integer index, Object value) {
         super(index);
         this.value = new Value(value);
     }

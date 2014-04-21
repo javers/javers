@@ -5,13 +5,13 @@ package org.javers.core.diff.changetype;
  *
  * @author bartosz walacik
  */
-public class ElementAdded extends ElementAddOrRemove {
+public class ValueAdded extends ValueAddOrRemove {
 
-    public ElementAdded(int index, Object value) {
+    public ValueAdded(int index, Object value) {
         super(index, value);
     }
 
-    public ElementAdded(Object value) {
+    public ValueAdded(Object value) {
         super(value);
     }
 

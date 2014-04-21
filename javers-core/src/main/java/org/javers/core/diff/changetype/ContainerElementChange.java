@@ -1,7 +1,5 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.common.validation.Validate;
-
 /**
  * @author pawel szymczyk
  */
