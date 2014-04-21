@@ -11,6 +11,7 @@ import java.util.Collection;
 /**
  * @author bartosz walacik
  */
+@Deprecated
 public class ReferenceRemovedAppender extends PropertyChangeAppender<ReferenceRemoved> {
 
     //TODO in fact it should be Collection<EntityType>

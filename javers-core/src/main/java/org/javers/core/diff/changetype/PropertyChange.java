@@ -12,8 +12,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public abstract class PropertyChange extends Change {
     private final Property property;
 
-    protected PropertyChange(GlobalCdoId globalCdoId, Property property) {
-        super(globalCdoId);
+    protected PropertyChange(GlobalCdoId affectedCdoId, Property property) {
+        super(affectedCdoId);
         argumentIsNotNull(property);
         this.property = property;
     }

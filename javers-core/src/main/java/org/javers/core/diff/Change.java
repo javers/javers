@@ -26,20 +26,20 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
 public abstract class Change implements Visitable<ChangeVisitor> {
     //private Diff parent;
 
-    private final GlobalCdoId globalCdoId;
+    private final GlobalCdoId affectedCdoId;
 
     private transient Optional<Object> affectedCdo;
 
-    protected Change(GlobalCdoId globalCdoId) {
-        argumentIsNotNull(globalCdoId);
-        this.globalCdoId = globalCdoId;
+    protected Change(GlobalCdoId affectedCdoId) {
+        argumentIsNotNull(affectedCdoId);
+        this.affectedCdoId = affectedCdoId;
     }
 
     /**
      * Affected Cdo Id
      */
-    public GlobalCdoId getGlobalCdoId() {
-        return globalCdoId;
+    public GlobalCdoId getAffectedCdoId() {
+        return affectedCdoId;
     }
 
     /**

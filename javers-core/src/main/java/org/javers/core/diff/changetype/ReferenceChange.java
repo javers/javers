@@ -12,9 +12,9 @@ public class ReferenceChange extends PropertyChange {
     private final GlobalCdoId leftReference;
     private final GlobalCdoId rightReference;
 
-    public ReferenceChange(GlobalCdoId globalCdoId, Property property, GlobalCdoId leftReference,
+    public ReferenceChange(GlobalCdoId affectedCdoId, Property property, GlobalCdoId leftReference,
                            GlobalCdoId rightReference) {
-        super(globalCdoId, property);
+        super(affectedCdoId, property);
         this.leftReference = leftReference;
         this.rightReference = rightReference;
     }

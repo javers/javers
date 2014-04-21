@@ -21,11 +21,4 @@ public class ElementValueChange extends ContainerValueChange{
         return rightValue.unwrap();
     }
 
-    public Value getWrappedLeftValue() {
-        return leftValue;
-    }
-
-    public Value getWrappedRightValue() {
-        return rightValue;
-    }
 }

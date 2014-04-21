@@ -8,6 +8,7 @@ import org.javers.core.metamodel.property.Property;
  *
  * @author bartosz walacik
  */
+@Deprecated
 public class ReferenceAdded extends PropertyChange {
     private final GlobalCdoId reference;
 
