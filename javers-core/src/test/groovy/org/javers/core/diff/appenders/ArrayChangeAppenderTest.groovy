@@ -15,8 +15,6 @@ class ArrayChangeAppenderTest extends AbstractDiffTest {
 
     @Unroll
     def "should append #changesCount changes when left array is #leftArray and right array is #rightArray"() {
-        given:
-        def javers = javersTestAssembly()
 
         when:
         def leftNode = buildGraph(dummyUser().withIntArray(leftArray as int[]).build())
@@ -43,8 +41,6 @@ class ArrayChangeAppenderTest extends AbstractDiffTest {
 
     @Unroll
     def "should not append changes when left array #leftArray and right array #rightArray is equal"() {
-        given:
-        def javers = javersTestAssembly()
 
         when:
         def leftNode = buildGraph(dummyUser().withIntArray(leftArray as int[]).build())

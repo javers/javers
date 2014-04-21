@@ -13,8 +13,6 @@ class ListChangeAppenderTest extends AbstractDiffTest {
 
     @Unroll
     def "should append #changesCount changes when left list is #leftList and right list is #rightList"() {
-        given:
-        def javers = javersTestAssembly()
 
         when:
         def leftNode = buildGraph(dummyUser().withIntegerList(leftList as List).build())
@@ -40,9 +38,7 @@ class ListChangeAppenderTest extends AbstractDiffTest {
     }
 
     @Unroll
-    def "should not append changes when left list #leftList and right list #rightList is equal"() {
-        given:
-        def javers = javersTestAssembly()
+    def "should not append changes when left list #leftList and right list #rightList are equal"() {
 
         when:
         def leftNode = buildGraph(dummyUser().withIntegerList(leftList as List).build())

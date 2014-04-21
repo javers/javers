@@ -15,8 +15,6 @@ class SetChangeAppenderTest extends AbstractDiffTest {
 
     @Unroll
     def "should append #changesCount changes when left set is #leftSet and right set is #rightSet"() {
-        given:
-        def javers = javersTestAssembly()
 
         when:
         def leftNode = buildGraph(dummyUser().withStringsSet(leftSet as Set).build())
@@ -40,8 +38,6 @@ class SetChangeAppenderTest extends AbstractDiffTest {
 
     @Unroll
     def "should not append changes when left set #leftSet and right set #rightSet is equal"() {
-        given:
-        def javers = javersTestAssembly()
 
         when:
         def leftNode = buildGraph(dummyUser().withStringsSet(leftSet as Set).build())

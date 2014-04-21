@@ -14,18 +14,18 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  * @author bartosz walacik
  */
 abstract class AbstractDiffTest extends Specification {
-    @Shared JaversTestBuilder javersTestBuilder = javersTestAssembly()
+    @Shared JaversTestBuilder javers = javersTestAssembly()
 
     ObjectNode buildGraph(def any) {
-        javersTestBuilder.createObjectGraphBuilder().buildGraph(any)
+        javers.createObjectGraphBuilder().buildGraph(any)
     }
 
     LiveGraph buildLiveGraph(def any) {
-        new LiveGraph(javersTestBuilder.createObjectGraphBuilder().buildGraph(any))
+        new LiveGraph(javers.createObjectGraphBuilder().buildGraph(any))
     }
 
     Entity getEntity(Class forClass) {
-        return (Entity)javersTestBuilder.typeMapper.getJaversType(forClass).managedClass
+        return (Entity)javers.typeMapper.getJaversType(forClass).managedClass
     }
 
     Property getProperty(Class forClass, String propName) {
