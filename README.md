@@ -1,5 +1,5 @@
 ﻿
-![JVlogo.png](JVlogo1.png)
+![JVlogo.png](JVlogo2.png)
 
 ## Abstract
 JaVers is a lightweight java library for **auditing** your object-oriented data.
