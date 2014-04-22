@@ -1,48 +1,61 @@
 package org.javers.core.snapshot;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
-import org.javers.core.graph.GraphVisitor;
+import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.api.JaversExtendedRepository;
+import org.javers.repository.api.JaversRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
- * Decomposes given object graph into flat list of object Snapshots.
+ * Decomposes given live objects graph into a flat list of object Snapshots.
  * Resulting structure can be easily serialized and persisted.
- * <br/>
  *
  * @author bartosz walacik
  */
 public class GraphSnapshotFactory {
 
     private final SnapshotFactory snapshotFactory;
+    private final JaversExtendedRepository javersRepository;
 
-    public GraphSnapshotFactory(SnapshotFactory snapshotFactory) {
+    public GraphSnapshotFactory(SnapshotFactory snapshotFactory, JaversExtendedRepository javersRepository) {
         this.snapshotFactory = snapshotFactory;
+        this.javersRepository = javersRepository;
     }
 
     /**
      *
-     * @param node graph 'root', outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
+     * @param currentVersion outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
      */
-    public List<CdoSnapshot> create(ObjectNode node){
-        Validate.argumentIsNotNull(node);
-        SnapshotVisitor visitor = new SnapshotVisitor();
-        node.accept(visitor);
+    public List<CdoSnapshot> create(LiveGraph currentVersion){
+        Validate.argumentIsNotNull(currentVersion);
 
-        return visitor.output;
+        return doSnapshotsAndReuse(currentVersion.flatten());
     }
 
-    private class SnapshotVisitor extends GraphVisitor{
-        final List<CdoSnapshot> output = new ArrayList<>();
+    private List<CdoSnapshot> doSnapshotsAndReuse(Set<ObjectNode> currentVersion){
+        List<CdoSnapshot> reused = new ArrayList<>();
 
-        @Override
-        public void visitOnce(ObjectNode node) {
-            CdoSnapshot thisNode = snapshotFactory.create(node);
-            output.add(thisNode);
+        for (ObjectNode node : currentVersion) {
+            CdoSnapshot fresh = snapshotFactory.create(node);
+
+            Optional<CdoSnapshot> existing = javersRepository.getLatest(fresh.getGlobalId());
+            if (existing.isEmpty()) {
+                reused.add(fresh);
+                continue;
+            }
+
+            if (!existing.get().stateEquals(fresh)) {
+                reused.add(fresh);
+            }
         }
+
+        return reused;
     }
 }

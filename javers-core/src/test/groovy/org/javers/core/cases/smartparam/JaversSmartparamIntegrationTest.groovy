@@ -30,7 +30,7 @@ class JaversSmartparamIntegrationTest extends Specification{
                                               "enum":FEMALE])
 
         when:
-        Diff diff = javers.compare("user", entry1, entry2)
+        Diff diff = javers.compare(entry1, entry2)
         String jsonText = javers.toJson(diff)
         println("jsonText:\n"+jsonText)
 

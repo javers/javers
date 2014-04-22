@@ -21,7 +21,7 @@ public class PropertyConfiguration {
      * @param classpathName classpath resource name, ex. "resources/config.properties"
      */
     public PropertyConfiguration(String classpathName) {
-        logger.info("reading properties file - "+classpathName);
+        logger.debug("reading properties file - "+classpathName);
         properties = PropertiesUtil.getProperties(classpathName);
     }
 
@@ -51,6 +51,13 @@ public class PropertyConfiguration {
      */
     public String getStringProperty(String propertyKey) {
         return PropertiesUtil.getStringProperty(properties, propertyKey);
+    }
+
+    /**
+     * @throws JaversException UNDEFINED_PROPERTY
+     */
+    public boolean getBooleanProperty(String propertyKey) {
+        return PropertiesUtil.getBooleanProperty(properties, propertyKey);
     }
 
 }

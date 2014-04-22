@@ -4,17 +4,17 @@ import groovy.json.JsonSlurper
 import org.javers.core.diff.Diff
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
-import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.model.DummyPoint
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.javers.core.model.DummyUserWithPoint
+import org.javers.core.model.PrimitiveEntity
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
+import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
 import static org.javers.core.model.DummyUserWithPoint.userWithPoint
@@ -23,48 +23,33 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author bartosz walacik
  */
-class JaversIntegrationTest extends Specification {
+class JaversDiffIntegrationTest extends Specification {
 
     def "should create NewObject for all nodes in initial diff"() {
         given:
-        Javers javers = JaversTestBuilder.javers()
+        Javers javers = JaversTestBuilder.newInstance()
         DummyUser left = dummyUser("kazik").withDetails().build()
 
         when:
-        Diff diff = javers.initial("user",left)
+        Diff diff = javers.initial(left)
 
         then:
         DiffAssert.assertThat(diff).has(2, NewObject)
     }
 
-    def "should create PropertyChanges for each NewObject"() {
+    def "should create snapshot of NewObject"() {
         given:
-        Javers javers = JaversTestBuilder.javers()
+        Javers javers = JaversBuilder.javers().build()
         DummyUser left =  new DummyUser(name: "kazik")
-        DummyUser right = new DummyUser(name: "kazik").with {
-            dummyUserDetails = new DummyUserDetails().with {
-                id = 1
-                isTrue = false
-                it
-            }
-            it
-        }
+        DummyUser right = new DummyUser(name: "kazik", dummyUserDetails: new DummyUserDetails(id: 1, someValue: "some"))
 
         when:
-        Diff diff = javers.compare("user", left, right)
+        Diff diff = javers.compare(left, right)
 
         then:
-        with(diff) {
-            changes[0].class == NewObject
-            changes[0].globalCdoId.cdoId == 1
-            changes[1].class == ValueChange
-            changes[1].property.name == "id"
-            changes[2].class == ValueChange
-            changes[2].property.name == "isTrue"
-            changes[3].class == ReferenceChange
-            changes[3].rightReference.cdoId == 1
-
-        }
+        DiffAssert.assertThat(diff)
+                  .hasNewObject(instanceId(1,DummyUserDetails),[id:1, someValue: "some"])
+                  .hasReferenceChangeAt("dummyUserDetails",null,instanceId(1,DummyUserDetails))
     }
 
     //smoke test
@@ -72,10 +57,10 @@ class JaversIntegrationTest extends Specification {
         given:
         DummyUser user =  dummyUser("id").withSex(FEMALE).build();
         DummyUser user2 = dummyUser("id").withSex(MALE).build();
-        Javers javers = JaversTestBuilder.javers()
+        Javers javers = JaversTestBuilder.newInstance()
 
         when:
-        Diff diff = javers.compare("user", user, user2)
+        Diff diff = javers.compare(user, user2)
 
         then:
         diff.changes.size() == 1
@@ -88,25 +73,20 @@ class JaversIntegrationTest extends Specification {
         given:
         DummyUser user =  dummyUser("id").withSex(FEMALE).build();
         DummyUser user2 = dummyUser("id").withSex(MALE).withDetails(1).build();
-        Javers javers = JaversTestBuilder.javers()
+        Javers javers = JaversTestBuilder.newInstance()
 
         when:
-        Diff diff = javers.compare("user", user, user2)
+        Diff diff = javers.compare(user, user2)
         String jsonText = javers.toJson(diff)
-        println("jsonText:\n"+jsonText)
+        //println("jsonText:\n"+jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.size() == 4
-        json.id == 0
-        json.author == "user"
-        json.diffDate != null
-        json.changes.size() == 5
+        json.changes.size() == 4
         json.changes[0].changeType == "NewObject"
         json.changes[1].changeType == "ValueChange"
         json.changes[2].changeType == "ValueChange"
-        json.changes[3].changeType == "ValueChange"
-        json.changes[4].changeType == "ReferenceChange"
+        json.changes[3].changeType == "ReferenceChange"
     }
 
     def "should support custom JsonTypeAdapter for ValueChange"() {
@@ -116,7 +96,7 @@ class JaversIntegrationTest extends Specification {
                        .build()
 
         when:
-        Diff diff = javers.compare("user", userWithPoint(1,2), userWithPoint(1,3))
+        Diff diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
         String jsonText = javers.toJson(diff)
         //println("jsonText:\n"+jsonText)
 
@@ -138,13 +118,35 @@ class JaversIntegrationTest extends Specification {
                 .build()
 
         when:
-        Diff diff = javers.compare("user", userWithPoint(1,2), userWithPoint(1,3))
-        String jsonText = javers.toJson(diff)
+        def diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
+        def jsonText = javers.toJson(diff)
         //println("jsonText:\n"+jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.changes[0].leftValue == "1,2"
         json.changes[0].rightValue == "1,3"
+    }
+
+    def "should understand primitive default values when creating NewObject snapshot"() {
+        given:
+        Javers javers = javers().build()
+
+        when:
+        def diff = javers.initial(new PrimitiveEntity())
+
+        then:
+        DiffAssert.assertThat(diff).hasOnly(1, NewObject)
+    }
+
+    def "should understand primitive default values when creating ValueChange"() {
+        given:
+        Javers javers = javers().build()
+
+        when:
+        def diff = javers.compare(new PrimitiveEntity(), new PrimitiveEntity())
+
+        then:
+        DiffAssert.assertThat(diff).hasChanges(0)
     }
 }

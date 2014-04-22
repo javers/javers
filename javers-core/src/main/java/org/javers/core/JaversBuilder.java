@@ -11,6 +11,8 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
 import org.javers.core.pico.CoreJaversModule;
 import org.javers.core.pico.ManagedClassFactoryModule;
+import org.javers.repository.api.InMemoryRepository;
+import org.javers.repository.api.JaversRepository;
 import org.picocontainer.PicoContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private final Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
 
+    private JaversRepository repository;
+
     private JaversBuilder() {
         logger.debug("starting up javers ...");
 
@@ -56,8 +60,16 @@ public class JaversBuilder extends AbstractJaversBuilder {
         // ManagedClassFactory & managed classes registration
         bootManagedClasses();
 
+        // bootstrap phase 4: Repository
+        bootRepository();
+
         logger.info("javers instance is up & ready");
         return getContainerComponent(Javers.class);
+    }
+
+    public void registerJaversRepository(JaversRepository repository){
+        Validate.argumentsAreNotNull(repository);
+        this.repository = repository;
     }
 
     /**
@@ -194,5 +206,13 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private void bootJsonConverter() {
         addComponent(jsonConverterBuilder().build());
+    }
+
+    private void bootRepository(){
+        if (repository == null){
+            logger.info("using fake InMemoryRepository, register actual implementation via JaversBuilder.registerJaversRepository()");
+            repository = new InMemoryRepository();
+        }
+        addComponent(repository);
     }
 }

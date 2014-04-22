@@ -51,7 +51,7 @@ abstract class ObjectNodeTest extends Specification {
         ObjectNode wrapper = new ObjectNode(cdo, entity)
 
         then:
-        wrapper.wrappedCdo() == cdo
+        wrapper.wrappedCdo().get() == cdo
     }
 
     

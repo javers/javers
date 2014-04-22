@@ -6,25 +6,33 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
+import org.javers.core.model.PrimitiveEntity
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.common.exception.exceptions.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*
+import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.ValueObjectId.ValueObjectIdDTO.valueObjectId
 
 /**
  * @author bartosz walacik
  */
 class SnapshotFactoryTest extends Specification{
 
+    @Shared JaversTestBuilder javers
+
+    def setupSpec(){
+        javers = JaversTestBuilder.javersTestAssembly()
+    }
+
     def "should create snapshot with given GlobalId"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
-        def cdo = new SnapshotEntity()
-        InstanceId id = instanceId(cdo)
+        def snapshotFactory = javers.snapshotFactory
+        def cdo = new SnapshotEntity(id:1)
+        def id = javers.instanceId(cdo)
 
         when:
         CdoSnapshot snapshot = snapshotFactory.create(cdo, id)
@@ -33,13 +41,26 @@ class SnapshotFactoryTest extends Specification{
         snapshot.globalId == id
     }
 
+    def "should skip primitives with default value"() {
+        given:
+        def snapshotFactory = javers.snapshotFactory
+        def cdo = new PrimitiveEntity()
+        def id = javers.instanceId(cdo)
+
+        when:
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, id)
+
+        then:
+        snapshot.size() == 0
+    }
+
     @Unroll
     def "should record #propertyType property value"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         snapshot.getPropertyValue(propertyName) == cdo.getAt(propertyName)
@@ -54,10 +75,10 @@ class SnapshotFactoryTest extends Specification{
     @Unroll
     def "should record #propertyType reference"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -68,45 +89,61 @@ class SnapshotFactoryTest extends Specification{
         cdo <<          [new SnapshotEntity(id:1, entityRef:new SnapshotEntity(id:5)),
                          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("street"))]
         expectedVal <<  [instanceId(5, SnapshotEntity),
-                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"valueObjectRef")]
+                         valueObjectId(1, SnapshotEntity, "valueObjectRef")]
     }
 
+
     @Unroll
-    def "should record Array of #propertyType"() {
+    def "should record #containerType of #propertyType"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
         //we need shallow copy
-        snapshot.getPropertyValue(propertyName).hashCode() != cdo.getAt(propertyName).hashCode()
+        System.identityHashCode(snapshot.getPropertyValue(propertyName)) !=
+        System.identityHashCode( cdo.getAt(propertyName) )
+
 
         where:
-        propertyType << ["Primitive", "Value", "Entity", "ValueObject"]
-        propertyName << ["arrayOfIntegers", "arrayOfDates", "arrayOfEntities", "arrayOfValueObjects"]
-        cdo << [new SnapshotEntity(arrayOfIntegers:     [1, 2]),
+        containerType << ["Array"]*4 +["List"]*4
+        propertyType <<  ["Primitive", "Value", "Entity", "ValueObject"]*2
+        propertyName <<  ["arrayOfIntegers", "arrayOfDates", "arrayOfEntities", "arrayOfValueObjects",
+                         "listOfIntegers",  "listOfDates",  "listOfEntities",  "listOfValueObjects"]
+        cdo << [
+                new SnapshotEntity(arrayOfIntegers:     [1, 2]),
                 new SnapshotEntity(arrayOfDates:        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
                 new SnapshotEntity(arrayOfEntities:     [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
-                new SnapshotEntity(arrayOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")])
+                new SnapshotEntity(arrayOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")]),
+                new SnapshotEntity(listOfIntegers:      [1, 2]),
+                new SnapshotEntity(listOfDates:         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
+                new SnapshotEntity(listOfEntities:      [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
+                new SnapshotEntity(listOfValueObjects:  [new DummyAddress("London"), new DummyAddress("London City")])
                ]
-        expectedVal << [[1, 2],
+        expectedVal << [
+                        [1, 2],
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
                         [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
-                        [valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"arrayOfValueObjects/0"),
-                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"arrayOfValueObjects/1")]
+                        [valueObjectId(1, SnapshotEntity,"arrayOfValueObjects/0"),
+                         valueObjectId(1, SnapshotEntity,"arrayOfValueObjects/1")] ,
+                        [1, 2],
+                        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
+                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
+                        [valueObjectId(1, SnapshotEntity,"listOfValueObjects/0"),
+                         valueObjectId(1, SnapshotEntity,"listOfValueObjects/1")]
                        ]
     }
 
     @Unroll
     def "should record Set of #propertyType"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -124,18 +161,18 @@ class SnapshotFactoryTest extends Specification{
         expectedVal << [[1, 2] as Set,
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)] as Set,
                         [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)] as Set,
-                        [valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects/random_0"),
-                         valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"setOfValueObjects/random_1")] as Set
+                        [valueObjectId(1, SnapshotEntity, "setOfValueObjects/random_0"),
+                         valueObjectId(1, SnapshotEntity, "setOfValueObjects/random_1")] as Set
                        ]
     }
 
     def "should not support Map of <ValueObject,?>"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
         def cdo = new SnapshotEntity(mapVoToPrimitive:  [(new DummyAddress("London")):"this"])
-        snapshotFactory.create(cdo, instanceId(cdo))
+        snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         def e = thrown(JaversException)
@@ -144,11 +181,11 @@ class SnapshotFactoryTest extends Specification{
 
     def "should throw exception when property Type is not fully parametrized"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
         def cdo = new SnapshotEntity(nonParametrizedMap:  ["a":1])
-        snapshotFactory.create(cdo, instanceId(cdo))
+        snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         def e = thrown(JaversException)
@@ -158,10 +195,10 @@ class SnapshotFactoryTest extends Specification{
     @Unroll
     def "should record Map of #enrtyType"() {
         given:
-        SnapshotFactory snapshotFactory = JaversTestBuilder.javersTestAssembly().snapshotFactory
+        def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, instanceId(cdo))
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -176,11 +213,13 @@ class SnapshotFactoryTest extends Specification{
                 new SnapshotEntity(mapPrimitiveToVO: ["key1":new DummyAddress("London")]),
                 new SnapshotEntity(mapOfEntities:    [(new SnapshotEntity(id:2)):new SnapshotEntity(id:3)])
         ]
+
         expectedVal << [
                         ["this":1,"that":2],
                         [(new LocalDate(2000, 1, 1)):1.5],
-                        ["key1":valueObjectId(instanceId(1, SnapshotEntity),DummyAddress,"mapPrimitiveToVO/key1")],
-                        [(instanceId(2, SnapshotEntity)): instanceId(3, SnapshotEntity)]
+                        ["key1":valueObjectId(1, SnapshotEntity,"mapPrimitiveToVO/key1")],
+                        [(javers.idBuilder().instanceId(2,SnapshotEntity)):
+                          javers.idBuilder().instanceId(3,SnapshotEntity)]
                        ]
     }
 }

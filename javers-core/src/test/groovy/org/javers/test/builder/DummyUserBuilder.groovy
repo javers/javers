@@ -1,5 +1,6 @@
 package org.javers.test.builder
 
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
@@ -13,7 +14,7 @@ class DummyUserBuilder {
     private DummyUser dummyUser
 
     static DummyUserBuilder dummyUser() {
-        new DummyUserBuilder()
+        new DummyUserBuilder().withName("dummyUser")
     }
 
     static DummyUserBuilder dummyUser(String name) {
@@ -58,7 +59,7 @@ class DummyUserBuilder {
 
 
     DummyUserBuilder withDetails() {
-        dummyUser.dummyUserDetails = dummyUserDetails().build()
+        dummyUser.dummyUserDetails = dummyUserDetails().withId(1).build()
         this
     }
 
@@ -66,6 +67,17 @@ class DummyUserBuilder {
         dummyUser.dummyUserDetails = dummyUserDetails().withId(id).build()
         this
     }
+
+    DummyUserBuilder withAddress(String city) {
+        dummyUser.dummyUserDetails.dummyAddress = new DummyAddress(city)
+        this
+    }
+
+    DummyUserBuilder withAddresses(DummyAddress... addresses) {
+        dummyUser.dummyUserDetails.addressList = addresses.toList()
+        this
+    }
+
 
     DummyUserBuilder withDetailsList(int numberOfDetailsInList) {
         dummyUser.dummyUserDetailsList = (1 .. numberOfDetailsInList).collect({ dummyUserDetails().withId(it).build() })

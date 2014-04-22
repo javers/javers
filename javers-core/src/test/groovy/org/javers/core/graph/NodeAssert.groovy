@@ -1,8 +1,11 @@
-package org.javers.test.assertion
+package org.javers.core.graph
 
+import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.core.graph.ObjectNode
+import org.javers.test.assertion.EdgeAssert
+import org.javers.test.assertion.MultiEdgeAssert
+import org.javers.test.assertion.SingleEdgeAssert
 
 /**
  * @author bartosz walacik
@@ -18,6 +21,11 @@ class NodeAssert {
     NodeAssert hasCdoId(def expectedLocalCdoId) {
         assert actual.globalCdoId instanceof InstanceId
         assert actual.globalCdoId.cdoId == expectedLocalCdoId
+        this
+    }
+
+    NodeAssert hasGlobalId(def expectedGlobalId) {
+        assert actual.globalCdoId == expectedGlobalId
         this
     }
 
@@ -52,11 +60,14 @@ class NodeAssert {
     }
 
     EdgeAssert hasEdge(String edgeName) {
-        EdgeAssert.assertThat(actual.edges.find { it.property.name == edgeName })
+        def property = actual.cdo.managedClass.getProperty(edgeName)
+        def edge = actual.getEdge(property)
+        assert edge
+        EdgeAssert.assertThat(edge)
     }
 
     NodeAssert hasCdo(def cdo) {
-        cdo == actual.cdo.wrappedCdo
+        assert cdo == actual.wrappedCdo().get()
         this
     }
 
@@ -70,5 +81,10 @@ class NodeAssert {
 
     MultiEdgeAssert hasMultiEdge(String edgeName) {
         hasEdge(edgeName).isMultiEdge()
+    }
+
+    NodeAssert isSnapshot() {
+        assert actual.cdo.class == CdoSnapshot
+        this
     }
 }

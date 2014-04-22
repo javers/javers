@@ -23,6 +23,10 @@ public abstract class AbstractConfiguration {
         return propertyConfiguration.getStringProperty(propertyKey);
     }
 
+    protected boolean getBooleanProperty(String propertyKey) {
+        return propertyConfiguration.getBooleanProperty(propertyKey);
+    }
+
     public boolean containsPropertyKey(String propertyKey) {
         return propertyConfiguration.contains(propertyKey);
     }

@@ -39,7 +39,7 @@ public class ListChangeAppender extends PropertyChangeAppender<ListChange> {
         ContainerType propertyType = typeMapper.getPropertyType(property);
 
         if (! typeMapper.isPrimitiveOrValueOrObject(propertyType.getItemClass())){
-            logger.error(JaversExceptionCode.DIFF_NOT_IMPLEMENTED.getMessage() +" on "+property);
+            logger.error("not implemented Enumerable content type {} on {}", propertyType.getElementTypes(), property);
             return false;
         }
         return true;

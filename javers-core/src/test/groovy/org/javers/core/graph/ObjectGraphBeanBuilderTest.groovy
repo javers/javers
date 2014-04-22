@@ -8,7 +8,9 @@ import org.javers.core.MappingStyle
  */
 class ObjectGraphBeanBuilderTest extends ObjectGraphBuilderTest {
 
-    def setup() {
-        mapper = JaversTestBuilder.javersTestAssembly(MappingStyle.BEAN).typeMapper;
+    def setupSpec() {
+        def javers = JaversTestBuilder.javersTestAssembly(MappingStyle.BEAN)
+        mapper = javers.typeMapper
+        liveCdoFactory = javers.liveCdoFactory
     }
 }

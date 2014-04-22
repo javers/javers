@@ -1,17 +1,24 @@
 package org.javers.core.pico;
 
 import org.javers.common.pico.JaversModule;
+import org.javers.core.GraphFactory;
 import org.javers.core.Javers;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.commit.CommitFactory;
+import org.javers.core.commit.CommitSeqGenerator;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.appenders.*;
+import org.javers.core.graph.LiveCdoFactory;
+import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.json.JsonConverterBuilder;
+import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.graph.ObjectGraphBuilder;
+import org.javers.core.snapshot.GraphShadowFactory;
 import org.javers.core.snapshot.GraphSnapshotFactory;
 import org.javers.core.snapshot.SnapshotFactory;
+import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +46,14 @@ public class CoreJaversModule implements JaversModule {
             JaversCoreConfiguration.class,
             CommitFactory.class,
             SnapshotFactory.class,
-            GraphSnapshotFactory.class
+            GraphSnapshotFactory.class,
+            GraphShadowFactory.class,
+            JaversExtendedRepository.class,
+            LiveCdoFactory.class,
+            LiveGraphFactory.class,
+            GlobalIdFactory.class,
+            GraphFactory.class,
+            CommitSeqGenerator.class
     };
 
     @Override

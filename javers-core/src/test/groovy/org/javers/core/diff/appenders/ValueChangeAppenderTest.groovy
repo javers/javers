@@ -1,7 +1,10 @@
 package org.javers.core.diff.appenders
 
+import org.javers.core.diff.FakeNodePair
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserWithValues
+import org.javers.core.model.PrimitiveEntity
+import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDateTime
 
 import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat
@@ -55,7 +58,6 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         ChangeAssert.assertThat(change)
                     .hasProperty(sex)
                     .hasInstanceId(DummyUser, "1")
-                    .hasAffectedCdo(right)
     }
 
     def "should append Enum valueChange" () {
@@ -191,7 +193,6 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         then:
         assertThat(change)
-                  .hasAffectedCdo(rightUser.dummyAddress)
                   .hasValueObjectId(DummyAddress, instanceId(rightUser), "dummyAddress")
                   .hasLeftValue("Washington Street")
                   .hasRightValue("Wall Street")

@@ -9,6 +9,8 @@ import org.javers.core.MappingStyle
 class ObjectGraphFieldBuilderTest extends ObjectGraphBuilderTest {
 
     def setupSpec() {
-        mapper = JaversTestBuilder.javersTestAssembly(MappingStyle.FIELD).typeMapper;
+        def javers = JaversTestBuilder.javersTestAssembly(MappingStyle.FIELD)
+        mapper = javers.typeMapper
+        liveCdoFactory = javers.liveCdoFactory
     }
 }

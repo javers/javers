@@ -16,8 +16,8 @@ class EdgeAssert {
         new EdgeAssert(actual: actual)
     }
 
-    MultiEdgeAssert isMultiEdge(def ... expectedRefCdoId) {
-        isMultiEdge().refersToCdoWithIds(expectedRefCdoId)
+    MultiEdgeAssert isMultiEdge(def ... expectedLocalIds) {
+        isMultiEdge().refersToLocalIds(expectedLocalIds)
     }
 
     MultiEdgeAssert isMultiEdge() {

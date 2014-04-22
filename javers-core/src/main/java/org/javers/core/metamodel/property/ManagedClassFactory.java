@@ -34,11 +34,11 @@ public class ManagedClassFactory {
         Property foundIdProperty = findIdProperty(properties);
 
         if (foundIdProperty != null) {
-            logger.info("javersType type of {}(id:{}) inferred as Entity", javaClass.getSimpleName(), foundIdProperty.getName());
+            logger.debug("javersType type of {}(id:{}) inferred as Entity", javaClass.getSimpleName(), foundIdProperty.getName());
             return new Entity(javaClass, properties, foundIdProperty);
         }
         else {
-            logger.info("javersType of {} inferred as ValueObject", javaClass.getSimpleName());
+            logger.debug("javersType of {} inferred as ValueObject", javaClass.getSimpleName());
             return new ValueObject(javaClass, properties);
         }
     }

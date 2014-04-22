@@ -1,15 +1,12 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.collections.Defaults;
+import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
+import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.property.Property;
 
-import java.util.HashMap;
 import java.util.Map;
-
-import static org.javers.common.exception.exceptions.JaversExceptionCode.NOT_IMPLEMENTED;
-import static org.javers.common.exception.exceptions.JaversExceptionCode.PROPERTY_NOT_FOUND;
-import static org.javers.common.exception.exceptions.JaversExceptionCode.SNAPSHOT_STATE_VIOLATION;
 
 /**
  * Captured state of client's domain object.
@@ -18,35 +15,64 @@ import static org.javers.common.exception.exceptions.JaversExceptionCode.SNAPSHO
  *
  * @author bartosz walacik
  */
-public class CdoSnapshot extends Cdo {
-    private Map<Property, Object> state;
+public final class CdoSnapshot extends Cdo {
+    private CommitId commitId;
+    private final Map<Property, Object> state;
 
-    public CdoSnapshot(GlobalCdoId globalId) {
+    /**
+     * should be assembled by {@link CdoSnapshotBuilder}
+     */
+    CdoSnapshot(GlobalCdoId globalId, Map<Property, Object> state) {
         super(globalId);
-        state = new HashMap<>();
+        Validate.argumentIsNotNull(state);
+        this.state = state;
     }
 
-    public void addPropertyValue(Property property, Object value){
-        Validate.argumentIsNotNull(property);
-        if (value == null){
-            return;
-        }
-
-        if (state.containsKey(property)){
-            throw new JaversException(SNAPSHOT_STATE_VIOLATION);
-        }
-
-        state.put(property, value);
-    }
-
+    /**
+     * @return {@link Optional#EMPTY}
+     */
     @Override
-    public Object getWrappedCdo() {
-        throw new JaversException(NOT_IMPLEMENTED);
+    public Optional<Object> getWrappedCdo() {
+        return Optional.empty();
+    }
+
+    public int size() {
+        return state.size();
     }
 
     @Override
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
-        return state.get(property);
+        Object val = state.get(property);
+        if (val == null){
+            return Defaults.defaultValue(property.getType());
+        }
+        return val;
+    }
+
+    @Override
+    public boolean isNull(Property property) {
+        Validate.argumentIsNotNull(property);
+        return !state.containsKey(property);
+    }
+
+    public void bindTo(CommitId commitId){
+        if (this.commitId != null){
+            throw new IllegalStateException("snapshot already bound");
+        }
+        this.commitId = commitId;
+    }
+
+    public CommitId getCommitId() {
+        return commitId;
+    }
+
+    public boolean stateEquals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CdoSnapshot other = (CdoSnapshot) o;
+        return this.state.equals(other.state);
     }
 }

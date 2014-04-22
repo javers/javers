@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Entity;
@@ -8,7 +9,6 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.ValueObject;
 
 import static org.javers.common.exception.exceptions.JaversExceptionCode.PROPERTY_NOT_FOUND;
-import static org.javers.common.validation.Validate.*;
 
 /**
  * Abstract holder for client's domain object, {@link Entity} or {@link ValueObject}
@@ -19,15 +19,12 @@ public abstract class Cdo {
     private final GlobalCdoId globalId;
 
     protected Cdo(GlobalCdoId globalId) {
+        Validate.argumentIsNotNull(globalId);
         this.globalId = globalId;
     }
 
     public GlobalCdoId getGlobalId() {
         return globalId;
-    }
-
-    public Object getLocalId() {
-        return globalId.getCdoId();
     }
 
     /**
@@ -37,9 +34,11 @@ public abstract class Cdo {
         return globalId.getCdoClass();
     }
 
-    public abstract Object getWrappedCdo();
+    public abstract Optional<Object> getWrappedCdo();
 
     public abstract Object getPropertyValue(Property property);
+
+    public abstract boolean isNull(Property property);
 
     public Object getPropertyValue(String propertyName) {
         Validate.argumentIsNotNull(propertyName);

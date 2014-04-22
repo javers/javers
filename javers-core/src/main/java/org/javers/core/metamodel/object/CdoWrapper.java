@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.common.collections.Optional;
 import org.javers.core.metamodel.property.Property;
 
 import static org.javers.common.validation.Validate.argumentCheck;
@@ -22,15 +23,20 @@ public class CdoWrapper extends Cdo {
     }
 
     /**
-     * never returns null
+     * never returns empty
      */
     @Override
-    public Object getWrappedCdo() {
-        return wrappedCdo;
+    public Optional<Object> getWrappedCdo() {
+        return Optional.of(wrappedCdo);
     }
 
     @Override
     public Object getPropertyValue(Property property) {
         return property.get(wrappedCdo);
+    }
+
+    @Override
+    public boolean isNull(Property property) {
+        return property.isNull(wrappedCdo);
     }
 }

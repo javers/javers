@@ -6,6 +6,7 @@ import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ListType extends CollectionType{
@@ -27,6 +28,6 @@ public class ListType extends CollectionType{
             targetList.add(mapFunction.apply(sourceVal, owner));
             indexableContext.incIndex();
         }
-        return targetList;
+        return Collections.unmodifiableList(targetList);
     }
 }

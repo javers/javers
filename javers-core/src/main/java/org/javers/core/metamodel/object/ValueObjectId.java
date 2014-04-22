@@ -3,6 +3,7 @@ package org.javers.core.metamodel.object;
 import org.javers.core.metamodel.property.ValueObject;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
+import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId;
 
 /**
  * ValueObject global unique identifier.
@@ -47,7 +48,26 @@ public class ValueObjectId extends UnboundedValueObjectId {
     }
 
     @Override
-    public String toString() {
-        return getOwnerId().toString()+"#"+fragment;
+    public String value() {
+        return getOwnerId().value()+"#"+fragment;
+    }
+
+    public static class ValueObjectIdDTO extends GlobalCdoIdDTO{
+        private InstanceId.InstanceIdDTO ownerId;
+        private final String fragment;
+
+        private ValueObjectIdDTO(Class  ownerClass, Object ownerLocalId, String fragment) {
+            ownerId = instanceId(ownerLocalId, ownerClass);
+            this.fragment = fragment;
+        }
+
+        public static ValueObjectIdDTO valueObjectId(Object ownerLocalId, Class  ownerClass, String fragment){
+            return new ValueObjectIdDTO(ownerClass, ownerLocalId, fragment);
+        }
+
+        @Override
+        public String value() {
+            return ownerId.value()+"#"+fragment;
+        }
     }
 }

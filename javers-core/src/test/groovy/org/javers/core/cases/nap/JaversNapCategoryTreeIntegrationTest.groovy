@@ -27,10 +27,10 @@ class JaversNapCategoryTreeIntegrationTest extends Specification {
         Javers javers = javers().build()
 
         when:
-        Diff diff = javers.compare("me", cat1, cat2)
+        Diff diff = javers.compare(cat1, cat2)
 
         then:
-        assertThat(diff).hasSize(40).hasAllOfType(ValueChange)
+        assertThat(diff).hasChanges(40).hasAllOfType(ValueChange)
     }
 
     def "should manage empty diff on big graphs"() {
@@ -40,7 +40,7 @@ class JaversNapCategoryTreeIntegrationTest extends Specification {
         Javers javers = javers().build()
 
         when:
-        Diff diff = javers.compare("me", cat1, cat2)
+        Diff diff = javers.compare(cat1, cat2)
 
         then:
         diff.changes.size() == 0
@@ -53,7 +53,7 @@ class JaversNapCategoryTreeIntegrationTest extends Specification {
         Javers javers = javers().build()
 
         when:
-        Diff diff = javers.compare("me", cat1, cat2)
+        Diff diff = javers.compare(cat1, cat2)
 
         then:
         assertThat(diff).has(3906 , NewObject)

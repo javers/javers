@@ -1,6 +1,7 @@
 package org.javers.core.diff;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.graph.Edge;
@@ -44,14 +45,12 @@ public class RealNodePair implements NodePair {
 
     @Override
     public GlobalCdoId getRightGlobalCdoId(Property property) {
-        //TODO refactor
-        return getGlobalCdoId(right.getEdge(property));
+        return right.getReference(property);
     }
 
     @Override
     public GlobalCdoId getLeftGlobalCdoId(Property property) {
-        //TODO refactor
-        return getGlobalCdoId(left.getEdge(property));
+        return left.getReference(property);
     }
 
     public ObjectNode getLeft() {
@@ -73,8 +72,4 @@ public class RealNodePair implements NodePair {
         return left.getGlobalCdoId();
     }
 
-    //TODO refactor <-> FakeNodePair
-    private GlobalCdoId getGlobalCdoId(Edge edge) {
-        return edge != null ? ((SingleEdge) edge).getReference().getGlobalCdoId() : null;
-    }
 }

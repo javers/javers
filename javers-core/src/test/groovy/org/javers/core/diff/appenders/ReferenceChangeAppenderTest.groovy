@@ -41,7 +41,6 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
         then:
         ChangeAssert.assertThat(change)
                     .hasInstanceId(DummyUser, "1")
-                    .hasAffectedCdo(rightNode)
     }
 
     def "should compare refs null safely"() {

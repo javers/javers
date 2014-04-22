@@ -26,7 +26,11 @@ public enum  JaversExceptionCode {
 
     CONTAINER_NOT_READY(BOOTSTRAP_ERROR +"pico container is not ready"),
 
+    AFFECTED_CDO_IS_NOT_AVAILABLE(RUNTIME_ERROR +"affected cdo is not available, you can access it only for freshly generated diffs"),
+
     NOT_IMPLEMENTED(RUNTIME_ERROR + "not implemented"),
+
+    SNAPSHOT_NOT_FOUND(RUNTIME_ERROR + "snapshot '%s' not found in JaversRepository"),
 
     DIFF_NOT_IMPLEMENTED(RUNTIME_ERROR + "not implemented Enumerable content type '%s'"),
 
@@ -37,7 +41,11 @@ public enum  JaversExceptionCode {
 
     SNAPSHOT_STATE_VIOLATION(RUNTIME_ERROR + "snapshots are immutable"),
 
-    PROPERTY_NOT_FOUND(RUNTIME_ERROR +"property '%s' not found in class '%s'");
+    PROPERTY_NOT_FOUND(RUNTIME_ERROR +"property '%s' not found in class '%s'"),
+
+    ENTITY_NOT_MAPPED(RUNTIME_ERROR+"given javaClass '%s' is mapped to '%s', Entity expected"),
+
+    CLASS_NOT_MANAGED(RUNTIME_ERROR+"given javaClass '%s' is mapped to '%s', ManagedType expected");
 
     private final String message;
 

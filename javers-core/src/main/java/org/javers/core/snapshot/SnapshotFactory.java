@@ -1,6 +1,8 @@
 package org.javers.core.snapshot;
 
+import org.javers.common.collections.Defaults;
 import org.javers.common.collections.EnumerableFunction;
+import org.javers.common.collections.Objects;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.core.graph.AbstractMapFunction;
 import org.javers.core.graph.ObjectNode;
@@ -10,26 +12,29 @@ import org.javers.core.metamodel.type.*;
 
 import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 import static org.javers.common.exception.exceptions.JaversExceptionCode.NOT_IMPLEMENTED;
+import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 
 /**
  * @author bartosz walacik
  */
 public class SnapshotFactory {
     private final TypeMapper typeMapper;
+    private final GlobalIdFactory globalIdFactory;
 
-    public SnapshotFactory(TypeMapper typeMapper) {
+    public SnapshotFactory(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
         this.typeMapper = typeMapper;
+        this.globalIdFactory = globalIdFactory;
     }
 
     /**
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     public CdoSnapshot create (Object liveCdo, GlobalCdoId id) {
-        CdoSnapshot snapshot =  new CdoSnapshot(id);
+        CdoSnapshotBuilder snapshot =  cdoSnapshot(id);
 
         for (Property property : id.getCdoClass().getProperties()){
             Object propertyVal = property.get(liveCdo);
-            if (propertyVal == null){
+            if (Objects.nullSafeEquals(propertyVal,Defaults.defaultValue(property.getType()))){
                 continue;
             }
 
@@ -43,14 +48,14 @@ public class SnapshotFactory {
                 filteredPropertyVal = dehydrate(propertyVal, propertyType, owner);
             }
 
-            snapshot.addPropertyValue(property, filteredPropertyVal);
+            snapshot.withPropertyValue(property, filteredPropertyVal);
         }
 
-        return snapshot;
+        return snapshot.build();
     }
 
     public CdoSnapshot create (ObjectNode objectNode) {
-        return create(objectNode.wrappedCdo(),objectNode.getGlobalCdoId());
+        return create(objectNode.wrappedCdo().get(),objectNode.getGlobalCdoId());
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
@@ -78,10 +83,7 @@ public class SnapshotFactory {
      */
     private Object dehydrate(Object item, JaversType targetType, OwnerContext context){
         if (targetType instanceof ManagedType){
-            ManagedType targetManagedType = (ManagedType)targetType;
-            return GlobalIdFactory.createId(item,
-                                            targetManagedType.getManagedClass(),
-                                            context);
+            return globalIdFactory.createId(item, context);
         }  else {
             return item;
         }

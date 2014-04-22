@@ -1,6 +1,8 @@
 package org.javers.test.assertion
 
 import org.javers.core.graph.MultiEdge
+import org.javers.core.graph.NodeAssert
+import org.javers.core.metamodel.object.CdoSnapshot
 
 /**
  * @author bartosz walacik
@@ -18,18 +20,19 @@ class MultiEdgeAssert {
         this
     }
 
-    MultiEdgeAssert refersToCdoWithIds(def ... expectedRefCdoIds) {
-        actual.references.collect { it.globalCdoId.cdoId }.with {
-            assert it.size() == expectedRefCdoIds.size()
-            assert it.containsAll(expectedRefCdoIds)
-        }
+    MultiEdgeAssert refersToLocalIds(Object... localIds) {
+        assert actual.references.collect { it.globalCdoId.cdoId }.toSet() == localIds.toList().toSet()
         this
     }
 
-    MultiEdgeAssert refersToGlobalCdoWithIds(def ... expectedRefCdoIds) {
-        actual.references.collect { it.globalCdoId.toString() }.with {
-            assert it.size() == expectedRefCdoIds.size()
-            assert it.containsAll(expectedRefCdoIds)
+    MultiEdgeAssert refersToGlobalIds(def expectedRefCdoIds) {
+        assert actual.references.collect { it.globalCdoId } == expectedRefCdoIds
+        this
+    }
+
+    MultiEdgeAssert refersToSnapshots(){
+        assert actual.references.each {
+            assert it.cdo.class == CdoSnapshot
         }
         this
     }
@@ -37,4 +40,6 @@ class MultiEdgeAssert {
     NodeAssert andTargetNode(String expectedTargetCdoId) {
         NodeAssert.assertThat(actual.references.find { it.globalCdoId.cdoId == expectedTargetCdoId })
     }
+
+
 }

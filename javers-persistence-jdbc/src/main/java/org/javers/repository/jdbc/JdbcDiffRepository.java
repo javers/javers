@@ -1,34 +1,36 @@
 package org.javers.repository.jdbc;
 
-import org.javers.core.diff.Change;
-import org.javers.core.diff.Diff;
+import org.javers.common.collections.Optional;
+import org.javers.core.commit.Commit;
+import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.repository.api.DiffRepository;
+import org.javers.repository.api.JaversRepository;
 
 import java.util.List;
 
 /**
  * @author bartosz walacik
  */
-public class JdbcDiffRepository implements DiffRepository{
+public class JdbcDiffRepository implements JaversRepository {
+
     @Override
-    public void save(Diff newDiff) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit) {
+        return null;
     }
 
     @Override
-    public Diff getById(long diffId) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
+        return null;
     }
 
     @Override
-    public List<Change> findByGlobalCdoId(GlobalCdoId globalCdoId) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public void persist(Commit commit) {
+
     }
 
     @Override
-    public CdoSnapshot getLatest(GlobalCdoId objectId) {
+    public CommitId getHeadId() {
         return null;
     }
 }
