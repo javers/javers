@@ -1,7 +1,9 @@
 package org.javers.repository.mongo;
 
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
@@ -31,6 +33,15 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
+        DBCursor coursor = mongo.getCollection(COLLECTION_NAME).find().sort(BasicDBObjectBuilder.start().add("id.majorId", -1).get()).limit(1);
+
+        DBObject latestAsDBObject = null;
+
+        if (coursor.hasNext()) {
+             latestAsDBObject = coursor.next();
+        }
+
+        latestAsDBObject.isPartialObject();
         return Optional.empty();
     }
 
