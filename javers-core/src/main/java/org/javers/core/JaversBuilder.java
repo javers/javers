@@ -67,9 +67,10 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return getContainerComponent(Javers.class);
     }
 
-    public void registerJaversRepository(JaversRepository repository){
+    public JaversBuilder registerJaversRepository(JaversRepository repository){
         Validate.argumentsAreNotNull(repository);
         this.repository = repository;
+        return this;
     }
 
     /**
