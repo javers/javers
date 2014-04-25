@@ -2,6 +2,7 @@ package org.javers.core.diff.appenders
 
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.metamodel.object.ValueObjectId
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 
 import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
@@ -9,7 +10,7 @@ import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instance
 /**
  * @author bartosz walacik
  */
-class ArrayOfEntitiesChangeTest extends AbstractDiffTest {
+class ArrayOfManagedClassesChangeTest extends AbstractDiffTest {
     def "should append ReferenceChanged in Array of Entities"() {
         when:
         def leftCdo  = new SnapshotEntity(id:1,  arrayOfEntities:[new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
@@ -51,8 +52,8 @@ class ArrayOfEntitiesChangeTest extends AbstractDiffTest {
 
     def "should append ReferenceAdded in Array of ValueObject"() {
         when:
-        def leftCdo  = new SnapshotEntity(id:1,  arrayOfValueObjects:[new SnapshotEntity(id:2)])
-        def rightCdo = new SnapshotEntity(id:1,  arrayOfValueObjects:[new SnapshotEntity(id:2), new SnapshotEntity(id:5)])
+        def leftCdo  = new SnapshotEntity(id:1,  arrayOfValueObjects:[new DummyAddress("London")])
+        def rightCdo = new SnapshotEntity(id:1,  arrayOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
         def change = arrayChangeAppender()
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "arrayOfValueObjects"))
 
@@ -64,8 +65,8 @@ class ArrayOfEntitiesChangeTest extends AbstractDiffTest {
 
     def "should append ReferenceRemoved in Array of ValueObject"() {
         when:
-        def leftCdo  = new SnapshotEntity(id:1,  arrayOfValueObjects:[new SnapshotEntity(id:2), new SnapshotEntity(id:5)])
-        def rightCdo = new SnapshotEntity(id:1,  arrayOfValueObjects:[new SnapshotEntity(id:2)])
+        def leftCdo  = new SnapshotEntity(id:1,  arrayOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
+        def rightCdo = new SnapshotEntity(id:1,  arrayOfValueObjects:[new DummyAddress("London")])
         def change = arrayChangeAppender()
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "arrayOfValueObjects"))
 
@@ -73,5 +74,16 @@ class ArrayOfEntitiesChangeTest extends AbstractDiffTest {
         ContainerChangeAssert.assertThat(change)
                 .hasSize(1)
                 .hasReferenceRemoved(1, ValueObjectId.ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "arrayOfValueObjects/1"))
+    }
+
+    def "should not append ReferenceChanged in Array of ValueObject"() {
+        when:
+        def leftCdo  = new SnapshotEntity(id:1,  arrayOfValueObjects:[new DummyAddress("London")])
+        def rightCdo = new SnapshotEntity(id:1,  arrayOfValueObjects:[new DummyAddress("London","Street")])
+        def change = arrayChangeAppender()
+                .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "arrayOfValueObjects"))
+
+        then:
+        !change
     }
 }

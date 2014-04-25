@@ -2,6 +2,7 @@ package org.javers.core.diff.appenders
 
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.metamodel.object.ValueObjectId
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 
 import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
@@ -9,7 +10,7 @@ import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instance
 /**
  * @author bartosz walacik
  */
-class ListOfEntitiesChangeTest extends AbstractDiffTest {
+class ListOfManagedClassesChangeTest extends AbstractDiffTest {
 
     def "should append ReferenceChanged in List of Entities"() {
         when:
@@ -52,8 +53,8 @@ class ListOfEntitiesChangeTest extends AbstractDiffTest {
 
     def "should append ReferenceAdded in List of ValueObject"() {
         when:
-        def leftCdo  = new SnapshotEntity(id:1,  listOfValueObjects:[new SnapshotEntity(id:2)])
-        def rightCdo = new SnapshotEntity(id:1,  listOfValueObjects:[new SnapshotEntity(id:2), new SnapshotEntity(id:5)])
+        def leftCdo  = new SnapshotEntity(id:1,  listOfValueObjects:[new DummyAddress("London")])
+        def rightCdo = new SnapshotEntity(id:1,  listOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
         def change = listChangeAppender()
                     .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "listOfValueObjects"))
 
@@ -65,8 +66,8 @@ class ListOfEntitiesChangeTest extends AbstractDiffTest {
 
     def "should append ReferenceRemoved in List of ValueObject"() {
         when:
-        def leftCdo  = new SnapshotEntity(id:1,  listOfValueObjects:[new SnapshotEntity(id:2), new SnapshotEntity(id:5)])
-        def rightCdo = new SnapshotEntity(id:1,  listOfValueObjects:[new SnapshotEntity(id:2)])
+        def leftCdo  = new SnapshotEntity(id:1,  listOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
+        def rightCdo = new SnapshotEntity(id:1,  listOfValueObjects:[new DummyAddress("London")])
         def change = listChangeAppender()
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "listOfValueObjects"))
 
@@ -74,5 +75,16 @@ class ListOfEntitiesChangeTest extends AbstractDiffTest {
         ContainerChangeAssert.assertThat(change)
                 .hasSize(1)
                 .hasReferenceRemoved(1, ValueObjectId.ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "listOfValueObjects/1"))
+    }
+
+    def "should not append ReferenceChanged in List of ValueObject"() {
+        when:
+        def leftCdo  = new SnapshotEntity(id:1,  listOfValueObjects:[new DummyAddress("London")])
+        def rightCdo = new SnapshotEntity(id:1,  listOfValueObjects:[new DummyAddress("London","Street")])
+        def change = listChangeAppender()
+                .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "listOfValueObjects"))
+
+        then:
+        !change
     }
 }
