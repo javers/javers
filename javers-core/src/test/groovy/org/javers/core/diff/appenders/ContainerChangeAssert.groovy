@@ -1,9 +1,9 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.diff.changetype.ContainerChange
-import org.javers.core.diff.changetype.ElementReferenceChange
-import org.javers.core.diff.changetype.ReferenceAdded
-import org.javers.core.diff.changetype.ReferenceRemoved
+import org.javers.core.diff.changetype.container.ContainerChange
+import org.javers.core.diff.changetype.container.ElementValueChange
+import org.javers.core.diff.changetype.container.ValueAdded
+import org.javers.core.diff.changetype.container.ValueRemoved
 
 /**
  * @author bartosz walacik
@@ -27,17 +27,17 @@ class ContainerChangeAssert {
     }
 
     ContainerChangeAssert hasReferenceChange(int expectedIndex, def expectedLeftId, def expectedRightId){
-        assert actual.changes.find{it.index == expectedIndex && it instanceof ElementReferenceChange && it.leftReference == expectedLeftId && it.rightReference == expectedRightId}
+        assert actual.changes.find{it.index == expectedIndex && it instanceof ElementValueChange && it.leftValue == expectedLeftId && it.rightValue == expectedRightId}
         this
     }
 
     ContainerChangeAssert hasReferenceAdded(int expectedIndex, def expectedId) {
-        assert actual.changes.find{it.index == expectedIndex && it instanceof ReferenceAdded && it.addedReference == expectedId}
+        assert actual.changes.find{it.index == expectedIndex && it instanceof ValueAdded && it.addedValue== expectedId}
         this
     }
 
     ContainerChangeAssert hasReferenceRemoved(int expectedIndex, def expectedId) {
-        assert actual.changes.find{it.index == expectedIndex && it instanceof ReferenceRemoved && it.removedReference == expectedId}
+        assert actual.changes.find{it.index == expectedIndex && it instanceof ValueRemoved && it.removedValue == expectedId}
         this
     }
 }

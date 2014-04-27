@@ -1,5 +1,6 @@
 package org.javers.core.diff.appenders;
 
+import com.sun.xml.internal.bind.v2.TODO;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Maps;
 import org.javers.common.collections.Sets;
@@ -9,9 +10,11 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.map.*;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.property.ValueObject;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.MapType;
 import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.ValueObjectType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,33 +35,22 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
     }
 
     @Override
-    protected Class<? extends JaversType> getSupportedPropertyType() {
-        return MapType.class;
-    }
-
-    @Override
     protected boolean supports(JaversType propertyType) {
-        if (!super.supports(propertyType)) {
-            return false;
-        }
-
-        MapType mapType = (MapType)propertyType;
-        if (!isSupportedMap(mapType)) {
-            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED,
-                                     "unsupported Map content type ["+propertyType.getBaseJavaType()+"], skipping");
-        }
-        return true;
+        return propertyType instanceof MapType;
     }
 
-    //TODO add support for Entities & ValueObjects
-    private boolean isSupportedMap(MapType propertyType){
-        if (!propertyType.isFullyParametrized()) {
-            return false;
-        }
-        return typeMapper.isPrimitiveOrValueOrObject(propertyType.getKeyClass()) &&
-               typeMapper.isPrimitiveOrValueOrObject(propertyType.getValueClass());
-    }
+    private void isSupportedMap(Property property){
+        MapType mapType = typeMapper.getPropertyType(property);
 
+        JaversType keyType = typeMapper.getJaversType(mapType.getKeyClass());
+        if (keyType instanceof ValueObjectType){
+            /** TODO code repetition
+             *  see {@link org.javers.core.graph.AbstractMapFunction#getKeyType()} */
+            throw new JaversException(JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY,
+                    mapType.getKeyClass().getName(),
+                    mapType.getBaseJavaType().toString());
+        }
+    }
 
     @Override
     protected MapChange calculateChanges(NodePair pair, Property property) {
@@ -68,6 +60,8 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
         List<EntryChange> changes = calculateEntryChanges(leftMap, rightMap);
 
         if (!changes.isEmpty()){
+            isSupportedMap(property);
+
             return new MapChange(pair.getGlobalCdoId(), property, changes);
         }
         else {
@@ -90,7 +84,7 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
             Object rightVal = rightMap.get(commonKey);
 
             if (!nullSafeEquals(leftVal, rightVal)){
-                changes.add( new EntryValueChanged(commonKey, leftVal, rightVal));
+                changes.add( new EntryValueChange(commonKey, leftVal, rightVal));
             }
         }
 

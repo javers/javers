@@ -4,8 +4,8 @@ import org.javers.common.collections.Arrays;
 import org.javers.common.collections.Lists;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.ArrayChange;
-import org.javers.core.diff.changetype.ContainerElementChange;
+import org.javers.core.diff.changetype.container.ArrayChange;
+import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
@@ -31,15 +31,15 @@ public class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
     }
 
     @Override
-    protected Class<? extends JaversType> getSupportedPropertyType() {
-        return ArrayType.class;
+    protected boolean supports(JaversType propertyType) {
+        return  propertyType instanceof ArrayType;
     }
 
     //TODO add support for Entities & ValueObjects
     public boolean isSupportedContainer(Property property) {
         ContainerType propertyType = typeMapper.getPropertyType(property);
 
-        if (! typeMapper.isPrimitiveOrValueOrObject(propertyType.getItemClass())){
+        if (! typeMapper.isPrimitiveOrValue(propertyType.getItemClass())){
             logger.error(JaversExceptionCode.DIFF_NOT_IMPLEMENTED.getMessage() +" on "+property);
             return false;
         }

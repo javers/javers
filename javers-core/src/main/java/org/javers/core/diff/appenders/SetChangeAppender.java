@@ -2,10 +2,10 @@ package org.javers.core.diff.appenders;
 
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.ContainerElementChange;
-import org.javers.core.diff.changetype.ValueAdded;
-import org.javers.core.diff.changetype.ValueRemoved;
-import org.javers.core.diff.changetype.SetChange;
+import org.javers.core.diff.changetype.container.ContainerElementChange;
+import org.javers.core.diff.changetype.container.ValueAdded;
+import org.javers.core.diff.changetype.container.ValueRemoved;
+import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 import org.slf4j.Logger;
@@ -31,15 +31,15 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
     }
 
     @Override
-    protected Class<? extends JaversType> getSupportedPropertyType() {
-        return SetType.class;
+    protected boolean supports(JaversType propertyType) {
+        return  propertyType instanceof SetType;
     }
 
     //TODO add support for Entities & ValueObjects
     public boolean isSupportedContainer(Property property) {
         ContainerType propertyType = typeMapper.getPropertyType(property);
 
-        if (! typeMapper.isPrimitiveOrValueOrObject(propertyType.getItemClass())){
+        if (! typeMapper.isPrimitiveOrValue(propertyType.getItemClass())){
             logger.error(JaversExceptionCode.DIFF_NOT_IMPLEMENTED.getMessage() +" on "+property);
             return false;
         }

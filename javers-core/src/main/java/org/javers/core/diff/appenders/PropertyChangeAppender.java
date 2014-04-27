@@ -28,11 +28,7 @@ public abstract class PropertyChangeAppender <T extends PropertyChange> {
         return calculateChanges(pair, property);
     }
 
-    protected boolean supports(JaversType propertyType) {
-        return getSupportedPropertyType().isAssignableFrom( propertyType.getClass() );
-    }
-
-    protected abstract Class<? extends JaversType> getSupportedPropertyType();
+    protected abstract boolean supports(JaversType propertyType);
 
     protected abstract T calculateChanges(NodePair pair, Property supportedProperty);
 }

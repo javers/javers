@@ -2,7 +2,6 @@ package org.javers.core.diff
 
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
-import org.javers.core.diff.changetype.ReferenceAdded
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.property.Property
 

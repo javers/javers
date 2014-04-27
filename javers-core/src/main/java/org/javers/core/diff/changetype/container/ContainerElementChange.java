@@ -1,4 +1,4 @@
-package org.javers.core.diff.changetype;
+package org.javers.core.diff.changetype.container;
 
 /**
  * @author pawel szymczyk

@@ -1,4 +1,6 @@
-package org.javers.core.diff.changetype;
+package org.javers.core.diff.changetype.container;
+
+import org.javers.core.diff.changetype.container.ValueAddOrRemove;
 
 /**
  * element removed from collection

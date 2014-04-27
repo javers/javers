@@ -1,7 +1,5 @@
 package org.javers.core.diff.changetype.map;
 
-import static org.javers.common.validation.Validate.argumentIsNotNull;
-
 /**
  * @author bartosz walacik
  */

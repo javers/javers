@@ -5,9 +5,9 @@ import org.javers.core.diff.appenders.ArrayChangeAppender
 import org.javers.core.diff.appenders.ListChangeAppender
 import org.javers.core.diff.appenders.MapChangeAppender
 import org.javers.core.graph.LiveGraph
+import org.javers.core.graph.ObjectNode
 import org.javers.core.metamodel.property.Entity
 import org.javers.core.metamodel.property.Property
-import org.javers.core.graph.ObjectNode
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -41,6 +41,10 @@ abstract class AbstractDiffTest extends Specification {
 
     ListChangeAppender listChangeAppender() {
         new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper)
+    }
+
+    MapChangeAppender mapChangeAppender() {
+        new MapChangeAppender(javers.typeMapper)
     }
 
     ArrayChangeAppender arrayChangeAppender() {

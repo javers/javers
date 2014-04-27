@@ -1,5 +1,6 @@
-package org.javers.core.diff.changetype;
+package org.javers.core.diff.changetype.container;
 
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 

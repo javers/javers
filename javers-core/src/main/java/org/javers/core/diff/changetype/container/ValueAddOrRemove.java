@@ -1,4 +1,7 @@
-package org.javers.core.diff.changetype;
+package org.javers.core.diff.changetype.container;
+
+import org.javers.core.diff.changetype.Value;
+import org.javers.core.diff.changetype.container.ContainerElementChange;
 
 /**
  * Change on collection of values

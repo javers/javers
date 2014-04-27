@@ -49,8 +49,7 @@ public class FakeNodePair implements NodePair {
 
     @Override
     public GlobalCdoId getRightGlobalCdoId(Property property) {
-        //TODO refactor
-        return right.getReference(property);
+         return right.getReference(property);
     }
 
     @Override

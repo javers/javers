@@ -5,6 +5,7 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.PrimitiveOrValueType;
 import org.javers.core.metamodel.type.TypeMapper;
 
@@ -18,8 +19,8 @@ import java.util.Collections;
 public class ValueChangeAppender extends PropertyChangeAppender<ValueChange> {
 
     @Override
-    protected Class<? extends JaversType> getSupportedPropertyType() {
-        return PrimitiveOrValueType.class;
+    protected boolean supports(JaversType propertyType) {
+        return  propertyType instanceof PrimitiveOrValueType;
     }
 
     /**

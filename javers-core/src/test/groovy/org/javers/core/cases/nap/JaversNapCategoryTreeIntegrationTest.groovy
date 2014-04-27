@@ -43,7 +43,7 @@ class JaversNapCategoryTreeIntegrationTest extends Specification {
         Diff diff = javers.compare(cat1, cat2)
 
         then:
-        diff.changes.size() == 0
+        !diff.changes
     }
 
     def "should manage full diff on big graphs"() {

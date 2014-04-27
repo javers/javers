@@ -1,11 +1,6 @@
 package org.javers.core
 
 import org.javers.core.commit.CommitAssert
-import org.javers.core.diff.changetype.NewObject
-import org.javers.core.diff.changetype.ReferenceAdded
-import org.javers.core.diff.changetype.ReferenceChange
-import org.javers.core.diff.changetype.ReferenceRemoved
-import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails

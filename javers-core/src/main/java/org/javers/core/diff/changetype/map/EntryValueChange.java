@@ -5,26 +5,18 @@ import org.javers.core.diff.changetype.Value;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * entry unwrap changed
+ * entry value changed, when value is simple type
  *
  * @author bartosz walacik
  */
-public class EntryValueChanged extends EntryChange {
-    private final Value key;
+public class EntryValueChange extends EntryChange {
     private final Value leftValue;
     private final Value rightValue;
 
-    public EntryValueChanged(Object key, Object leftValue, Object rightValue) {
-        argumentIsNotNull(key);
-
-        this.key = new Value(key);
+    public EntryValueChange(Object key, Object leftValue, Object rightValue) {
+        super(key);
         this.leftValue = new Value(leftValue);
         this.rightValue = new Value(rightValue);
-    }
-
-    @Override
-    public Object getKey() {
-        return key.unwrap();
     }
 
     public Object getLeftValue() {
@@ -33,10 +25,6 @@ public class EntryValueChanged extends EntryChange {
 
     public Object getRightValue() {
         return rightValue.unwrap();
-    }
-
-    public Value getWrappedKey() {
-        return key;
     }
 
     public Value getWrappedLeftValue() {

@@ -99,6 +99,11 @@ public class TypeMapper {
         return javersType instanceof ManagedType;
     }
 
+    public boolean isEntityReferenceOrValueObject(Class javaClass){
+        JaversType javersType = getJaversType(javaClass);
+        return javersType instanceof ManagedType;
+    }
+
     /**
      * is Set, List or Array of ManagedClasses
      *
@@ -152,7 +157,7 @@ public class TypeMapper {
         return result;
     }
 
-    public boolean isPrimitiveOrValueOrObject(Class clazz) {
+    public boolean isPrimitiveOrValue(Class clazz) {
         JaversType jType  = getJaversType(clazz);
         return  jType instanceof PrimitiveOrValueType;
     }
