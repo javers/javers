@@ -59,8 +59,8 @@ class ArrayReferenceChangeAppenderTest extends AbstractDiffTest {
 
     def "should append ReferenceAdded in Array of ValueObject"() {
         given:
-        def leftCdo  = new SnapshotEntity(id:1,  arrayOfValueObjects:[new DummyAddress("London")])
-        def rightCdo = new SnapshotEntity(id:1,  arrayOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
+        def leftCdo  = new SnapshotEntity(id:5,  arrayOfValueObjects:[new DummyAddress("London")])
+        def rightCdo = new SnapshotEntity(id:5,  arrayOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
 
         when:
         def change = arrayChangeAppender()
@@ -74,8 +74,8 @@ class ArrayReferenceChangeAppenderTest extends AbstractDiffTest {
 
     def "should append ReferenceRemoved in Array of ValueObject"() {
         given:
-        def leftCdo  = new SnapshotEntity(id:1,  arrayOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
-        def rightCdo = new SnapshotEntity(id:1,  arrayOfValueObjects:[new DummyAddress("London")])
+        def leftCdo  = new SnapshotEntity(id:5,  arrayOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
+        def rightCdo = new SnapshotEntity(id:5,  arrayOfValueObjects:[new DummyAddress("London")])
 
         when:
         def change = arrayChangeAppender()

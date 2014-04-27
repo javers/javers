@@ -36,34 +36,19 @@ public class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
         return  propertyType instanceof ArrayType;
     }
 
-    //TODO add support for Entities & ValueObjects
-    public boolean isSupportedContainer(Property property) {
-        ContainerType propertyType = typeMapper.getPropertyType(property);
-
-        if (! typeMapper.isPrimitiveOrValue(propertyType.getItemClass())){
-            logger.error(JaversExceptionCode.DIFF_NOT_IMPLEMENTED.getMessage() +" on "+property);
-            return false;
-        }
-        return true;
-    }
-
     @Override
     protected ArrayChange calculateChanges(NodePair pair, Property property) {
 
         Map leftMap =  Arrays.asMap(pair.getLeftPropertyValue(property));
         Map rightMap = Arrays.asMap(pair.getRightPropertyValue(property));
 
+        ArrayType arrayType = typeMapper.getPropertyType(property);
         OwnerContext owner = new OwnerContext(pair.getGlobalCdoId(), property.getName());
         List<EntryChange> entryChanges =
-                mapChangeAppender.calculateEntryChanges(null, leftMap, rightMap, owner);
+                mapChangeAppender.calculateEntryChanges(new MapType(arrayType), leftMap, rightMap, owner);
 
         if (!entryChanges.isEmpty()){
-            if (!isSupportedContainer(property)){
-                return null; //TODO ADD SUPPORT
-            }
-
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
-
             return new ArrayChange(pair.getGlobalCdoId(), property, elementChanges);
         }
         else {
