@@ -6,9 +6,13 @@ import org.javers.common.collections.Maps;
 import org.javers.common.collections.Sets;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.validation.Validate;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.map.*;
+import org.javers.core.metamodel.object.DehydrateMapFunction;
 import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.ValueObject;
 import org.javers.core.metamodel.type.JaversType;
@@ -29,9 +33,12 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
     private static final Logger logger = LoggerFactory.getLogger(MapChangeAppender.class);
 
     private final TypeMapper typeMapper;
+    private final GlobalIdFactory globalIdFactory;
 
-    public MapChangeAppender(TypeMapper typeMapper) {
+    public MapChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
+        Validate.argumentsAreNotNull(typeMapper, globalIdFactory);
         this.typeMapper = typeMapper;
+        this.globalIdFactory = globalIdFactory;
     }
 
     @Override
@@ -39,29 +46,16 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
         return propertyType instanceof MapType;
     }
 
-    private void isSupportedMap(Property property){
-        MapType mapType = typeMapper.getPropertyType(property);
-
-        JaversType keyType = typeMapper.getJaversType(mapType.getKeyClass());
-        if (keyType instanceof ValueObjectType){
-            /** TODO code repetition
-             *  see {@link org.javers.core.graph.AbstractMapFunction#getKeyType()} */
-            throw new JaversException(JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY,
-                    mapType.getKeyClass().getName(),
-                    mapType.getBaseJavaType().toString());
-        }
-    }
-
     @Override
     protected MapChange calculateChanges(NodePair pair, Property property) {
-        Map leftMap =  (Map)pair.getLeftPropertyValue(property);
-        Map rightMap = (Map)pair.getRightPropertyValue(property);
+        Map leftRawMap =  (Map)pair.getLeftPropertyValue(property);
+        Map rightRawMap = (Map)pair.getRightPropertyValue(property);
 
-        List<EntryChange> changes = calculateEntryChanges(leftMap, rightMap);
+        MapType mapType = typeMapper.getPropertyType(property);
+        OwnerContext owner = new OwnerContext(pair.getGlobalCdoId(), property.getName());
+        List<EntryChange> changes = calculateEntryChanges(mapType, leftRawMap, rightRawMap, owner);
 
         if (!changes.isEmpty()){
-            isSupportedMap(property);
-
             return new MapChange(pair.getGlobalCdoId(), property, changes);
         }
         else {
@@ -72,7 +66,13 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
     /**
      * @return never returns null
      */
-    List<EntryChange> calculateEntryChanges(Map leftMap, Map rightMap) {
+    List<EntryChange> calculateEntryChanges(MapType mapType, Map leftRawMap, Map rightRawMap, OwnerContext owner) {
+
+        DehydrateMapFunction dehydrateFunction = new DehydrateMapFunction(mapType, typeMapper, globalIdFactory);
+
+        Map leftMap =  mapType.map(leftRawMap, dehydrateFunction, owner);
+        Map rightMap = mapType.map(rightRawMap, dehydrateFunction, owner);
+
         if (nullSafeEquals(leftMap, rightMap)) {
             return Collections.EMPTY_LIST;
         }

@@ -1,20 +1,19 @@
 package org.javers.core.diff.changetype.container;
 
-import org.javers.core.diff.changetype.Value;
-import org.javers.core.diff.changetype.container.ContainerElementChange;
+import org.javers.core.diff.changetype.Atomic;
 
 /**
  * @author pawel szymczyk
  */
 public class ElementValueChange extends ContainerElementChange {
 
-    private final Value leftValue;
-    private final Value rightValue;
+    private final Atomic leftValue;
+    private final Atomic rightValue;
 
     public ElementValueChange(int index, Object leftValue, Object rightValue) {
         super(index);
-        this.leftValue = new Value(leftValue);
-        this.rightValue = new Value(rightValue);
+        this.leftValue = new Atomic(leftValue);
+        this.rightValue = new Atomic(rightValue);
     }
 
     public Object getLeftValue() {

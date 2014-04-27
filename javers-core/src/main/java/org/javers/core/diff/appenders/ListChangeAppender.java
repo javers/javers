@@ -5,6 +5,7 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
+import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 import org.slf4j.Logger;
@@ -37,8 +38,10 @@ public class ListChangeAppender extends PropertyChangeAppender<ListChange> {
         List leftList = (List) pair.getLeftPropertyValue(property);
         List rightList = (List) pair.getRightPropertyValue(property);
 
+        ListType listType = typeMapper.getPropertyType(property);
+        OwnerContext owner = new OwnerContext(pair.getGlobalCdoId(), property.getName());
         List<EntryChange> entryChanges =
-                mapChangeAppender.calculateEntryChanges(Lists.asMap(leftList), Lists.asMap(rightList));
+                mapChangeAppender.calculateEntryChanges(new MapType(listType), Lists.asMap(leftList), Lists.asMap(rightList), owner);
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());

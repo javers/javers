@@ -3,7 +3,6 @@ package org.javers.core;
 import com.google.gson.TypeAdapter;
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
-import org.javers.core.diff.changetype.Value;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.property.*;
@@ -17,9 +16,7 @@ import org.picocontainer.PicoContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -154,7 +151,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * Switch on when you need type safe {@link Value}s
+     * Switch on when you need type safe {@link org.javers.core.diff.changetype.Atomic}s
      * serialization stored in polymorfic collections like List, List&lt;Object&gt;, Map&lt;Object,Object&gt;, etc.
      *
      * @see org.javers.core.json.JsonConverterBuilder#typeSafeValues(boolean)

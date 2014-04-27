@@ -1,6 +1,6 @@
 package org.javers.core.diff.changetype.map;
 
-import org.javers.core.diff.changetype.Value;
+import org.javers.core.diff.changetype.Atomic;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -10,13 +10,13 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class EntryValueChange extends EntryChange {
-    private final Value leftValue;
-    private final Value rightValue;
+    private final Atomic leftValue;
+    private final Atomic rightValue;
 
     public EntryValueChange(Object key, Object leftValue, Object rightValue) {
         super(key);
-        this.leftValue = new Value(leftValue);
-        this.rightValue = new Value(rightValue);
+        this.leftValue = new Atomic(leftValue);
+        this.rightValue = new Atomic(rightValue);
     }
 
     public Object getLeftValue() {
@@ -27,11 +27,11 @@ public class EntryValueChange extends EntryChange {
         return rightValue.unwrap();
     }
 
-    public Value getWrappedLeftValue() {
+    public Atomic getWrappedLeftValue() {
         return leftValue;
     }
 
-    public Value getWrappedRightValue() {
+    public Atomic getWrappedRightValue() {
         return rightValue;
     }
 }

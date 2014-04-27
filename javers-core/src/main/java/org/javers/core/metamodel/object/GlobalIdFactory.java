@@ -66,6 +66,18 @@ public class GlobalIdFactory {
         return InstanceId.createFromId(localId, (Entity)managedClass);
     }
 
+    /**
+     * If item is Primitive or Value - returns it,
+     * if item is Entity or ValueObject - returns its globalId
+     */
+    public Object dehydrate(Object item, JaversType targetType, OwnerContext context){
+        if (targetType instanceof ManagedType){
+            return createId(item, context);
+        }  else {
+            return item;
+        }
+    }
+
     private ManagedClass getManagedClassOf(Object cdo) {
         Validate.argumentIsNotNull(cdo);
         return getManagedClass(cdo.getClass());

@@ -7,13 +7,13 @@ import org.javers.core.metamodel.property.Property;
  * @author bartosz walacik
  */
 public class ValueChange extends PropertyChange {
-    private final Value leftValue;
-    private final Value rightValue;
+    private final Atomic leftValue;
+    private final Atomic rightValue;
 
     public ValueChange(GlobalCdoId affectedCdoId, Property property, Object leftValue, Object rightValue) {
         super(affectedCdoId, property);
-        this.leftValue = new Value(leftValue);
-        this.rightValue = new Value(rightValue);
+        this.leftValue = new Atomic(leftValue);
+        this.rightValue = new Atomic(rightValue);
     }
 
     public Object getLeftValue() {
@@ -24,11 +24,11 @@ public class ValueChange extends PropertyChange {
         return rightValue.unwrap();
     }
 
-    public Value getWrappedLeftValue() {
+    public Atomic getWrappedLeftValue() {
         return leftValue;
     }
 
-    public Value getWrappedRightValue() {
+    public Atomic getWrappedRightValue() {
         return rightValue;
     }
 }

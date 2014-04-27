@@ -45,9 +45,9 @@ public class ObjectGraphBuilder {
 
         ObjectNode root = buildNode(cdo);
 
-        logger.info("{} graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
-                     edgeBuilder.graphType(),
-                     nodeReuser.nodesCount(),  nodeReuser.entitiesCount(), nodeReuser.voCount());
+        logger.debug("{} graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
+                         edgeBuilder.graphType(),
+                         nodeReuser.nodesCount(),  nodeReuser.entitiesCount(), nodeReuser.voCount());
         switchToBuilt();
         return root;
     }

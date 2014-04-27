@@ -73,8 +73,8 @@ class ListReferenceChangeAppenderTest extends AbstractDiffTest {
 
     def "should append ReferenceAdded in List of ValueObject"() {
         given:
-        def leftCdo  = new SnapshotEntity(id:1,  listOfValueObjects:[new DummyAddress("London")])
-        def rightCdo = new SnapshotEntity(id:1,  listOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
+        def leftCdo  = new SnapshotEntity(id:5,  listOfValueObjects:[new DummyAddress("London")])
+        def rightCdo = new SnapshotEntity(id:5,  listOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
 
         when:
         def change = listChangeAppender()
@@ -88,8 +88,8 @@ class ListReferenceChangeAppenderTest extends AbstractDiffTest {
 
     def "should append ReferenceRemoved in List of ValueObject"() {
         given:
-        def leftCdo  = new SnapshotEntity(id:1,  listOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
-        def rightCdo = new SnapshotEntity(id:1,  listOfValueObjects:[new DummyAddress("London")])
+        def leftCdo  = new SnapshotEntity(id:5,  listOfValueObjects:[new DummyAddress("London"), new DummyAddress("London")])
+        def rightCdo = new SnapshotEntity(id:5,  listOfValueObjects:[new DummyAddress("London")])
 
         when:
         def change = listChangeAppender()

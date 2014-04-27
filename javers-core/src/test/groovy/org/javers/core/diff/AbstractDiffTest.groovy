@@ -40,14 +40,14 @@ abstract class AbstractDiffTest extends Specification {
     }
 
     ListChangeAppender listChangeAppender() {
-        new ListChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper)
+        new ListChangeAppender(mapChangeAppender(), javers.typeMapper)
     }
 
     MapChangeAppender mapChangeAppender() {
-        new MapChangeAppender(javers.typeMapper)
+        new MapChangeAppender(javers.typeMapper, javers.globalIdFactory)
     }
 
     ArrayChangeAppender arrayChangeAppender() {
-        new ArrayChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper)
+        new ArrayChangeAppender(mapChangeAppender(), javers.typeMapper)
     }
 }
