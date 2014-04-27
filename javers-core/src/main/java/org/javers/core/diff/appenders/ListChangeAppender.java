@@ -7,7 +7,10 @@ import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ListType;
+import org.javers.core.metamodel.type.MapType;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

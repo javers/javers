@@ -3,11 +3,14 @@ package org.javers.core.diff.appenders;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
+import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
 import org.javers.core.diff.changetype.container.ValueRemoved;
-import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.ContainerType;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.SetType;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

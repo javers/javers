@@ -3,9 +3,9 @@ package org.javers.core.diff;
 import org.javers.common.collections.Optional;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
-import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.diff.changetype.ValueChange;
 import org.javers.common.patterns.visitors.Visitable;
+import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.metamodel.object.GlobalCdoId;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.conditionFulfilled;

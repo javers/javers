@@ -2,9 +2,9 @@ package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Function;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
+import org.javers.core.diff.changetype.container.ElementValueChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
 import org.javers.core.diff.changetype.container.ValueRemoved;
-import org.javers.core.diff.changetype.container.ElementValueChange;
 import org.javers.core.diff.changetype.map.EntryAdded;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.EntryRemoved;

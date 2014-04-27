@@ -5,9 +5,6 @@ import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 
-import java.util.Collection;
-import java.util.Collections;
-
 /**
  * Property scope change appender,
  * follows Chain-of-responsibility pattern

@@ -1,7 +1,5 @@
 package org.javers.core.diff.changetype.container;
 
-import org.javers.core.diff.changetype.container.ValueAddOrRemove;
-
 /**
  * element added to collection
  *

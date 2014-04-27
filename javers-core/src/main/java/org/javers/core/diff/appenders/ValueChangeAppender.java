@@ -5,13 +5,7 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.PrimitiveOrValueType;
-import org.javers.core.metamodel.type.TypeMapper;
-
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author bartosz walacik

@@ -1,7 +1,6 @@
 package org.javers.core.diff.changetype;
 
 import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.property.Property;
 
 /**

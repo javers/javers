@@ -2,8 +2,6 @@ package org.javers.core.diff.changetype.map;
 
 import org.javers.core.diff.changetype.Atomic;
 
-import static org.javers.common.validation.Validate.argumentIsNotNull;
-
 /**
  * entry value changed, when value is simple type
  *

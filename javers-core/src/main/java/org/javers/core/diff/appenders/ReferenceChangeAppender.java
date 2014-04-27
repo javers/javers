@@ -4,15 +4,9 @@ import org.javers.common.collections.Objects;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.ArrayType;
-import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ManagedType;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author bartosz walacik

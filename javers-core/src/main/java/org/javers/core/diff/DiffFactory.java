@@ -1,18 +1,17 @@
 package org.javers.core.diff;
 
-import java.util.List;
-
 import org.javers.common.validation.Validate;
 import org.javers.core.GraphFactory;
 import org.javers.core.Javers;
-import org.javers.core.JaversCoreConfiguration;
-import org.javers.core.diff.appenders.*;
+import org.javers.core.diff.appenders.NodeChangeAppender;
+import org.javers.core.diff.appenders.PropertyChangeAppender;
 import org.javers.core.graph.LiveGraph;
-import org.javers.core.graph.LiveGraphFactory;
+import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.graph.ObjectNode;
+
+import java.util.List;
 
 import static org.javers.core.diff.DiffBuilder.diff;
 

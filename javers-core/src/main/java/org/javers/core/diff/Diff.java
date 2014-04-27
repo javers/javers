@@ -1,13 +1,12 @@
 package org.javers.core.diff;
 
-import org.javers.common.collections.Optional;
 import org.javers.common.patterns.visitors.Visitable;
 import org.javers.core.json.JsonConverter;
-import org.joda.time.LocalDateTime;
 
-import java.util.*;
-
-import static org.javers.common.validation.Validate.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Diff is a set of (atomic) changes between two graphs of objects.

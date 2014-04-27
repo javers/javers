@@ -1,28 +1,23 @@
 package org.javers.core.diff.appenders;
 
-import com.sun.xml.internal.bind.v2.TODO;
-import org.javers.common.collections.Lists;
 import org.javers.common.collections.Maps;
-import org.javers.common.collections.Sets;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.map.*;
 import org.javers.core.metamodel.object.DehydrateMapFunction;
-import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.property.ValueObject;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.MapType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.metamodel.type.ValueObjectType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static org.javers.common.collections.Objects.nullSafeEquals;
 
