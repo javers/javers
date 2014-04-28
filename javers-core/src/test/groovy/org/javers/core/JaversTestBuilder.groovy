@@ -5,6 +5,7 @@ import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectGraphBuilder
 import org.javers.core.graph.ObjectNode
+import org.javers.core.json.JsonConverter
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.metamodel.type.TypeFactory
@@ -27,6 +28,12 @@ import org.javers.repository.api.JaversRepository
 class JaversTestBuilder {
     JaversBuilder javersBuilder
 
+    private JaversTestBuilder (JaversRepository javersRepository) {
+        javersBuilder = new JaversBuilder()
+
+        javersBuilder.registerJaversRepository(javersRepository).build()
+    }
+
     private JaversTestBuilder (MappingStyle mappingStyle) {
        javersBuilder = new JaversBuilder()
 
@@ -41,12 +48,20 @@ class JaversTestBuilder {
         new JaversTestBuilder(mappingStyle)
     }
 
+    static JaversTestBuilder javersTestAssembly(JaversRepository javersRepository){
+        new JaversTestBuilder(javersRepository)
+    }
+
     static Javers newInstance() {
         javersTestAssembly().javers()
     }
 
     Javers javers() {
         javersBuilder.getContainerComponent(Javers)
+    }
+
+    JsonConverter getJsonConverter() {
+        javersBuilder.getContainerComponent(JsonConverter)
     }
 
     ManagedClassFactory getManagedClassFactory() {

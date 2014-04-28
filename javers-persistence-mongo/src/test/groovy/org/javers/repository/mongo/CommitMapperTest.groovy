@@ -22,11 +22,13 @@ class CommitMapperTest extends Specification{
         Commit commit = javers.commit("charlie", dummyProduct)
 
         when:
-        DBObject commitAsDBObject = commitMapper.map(commit)
+        DBObject commitAsDBObject = commitMapper.toCdoSnapshot(commit)
 
         then:
         ["id", "snapshots", "author", "commitDate", "diff"].every {
             commitAsDBObject.containsField(it)
         }
     }
+
+
 }

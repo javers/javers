@@ -1,7 +1,8 @@
 package org.javers.repository.mongo
 
+import com.mongodb.MongoClient
 import org.javers.core.Javers
-import org.javers.core.JaversBuilder
+import org.javers.core.JaversTestBuilder
 import spock.lang.Specification
 
 /**
@@ -12,10 +13,13 @@ class MongoRepositoryIntTest extends Specification {
     def "should save commit"() {
 
         given:
-        Javers javers = JaversBuilder.javers()
-                .registerEntity(DummyProduct)
-                .registerJaversRepository(new MongoRepository())
-                .build()
+        MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
+
+        MongoRepository mongoRepository = new MongoRepository(mongoClient.getDB("myDB"))
+        JaversTestBuilder javersTestBuilder = JaversTestBuilder.javersTestAssembly(mongoRepository)
+
+        mongoRepository.setJsonConverter(javersTestBuilder.jsonConverter);
+        Javers javers = javersTestBuilder.javers()
 
         DummyProduct dummyProduct = new DummyProduct(1, "Candy")
 

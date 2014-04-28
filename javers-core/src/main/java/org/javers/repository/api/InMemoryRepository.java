@@ -4,6 +4,7 @@ import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.slf4j.Logger;
@@ -62,6 +63,11 @@ public class InMemoryRepository implements JaversRepository {
     @Override
     public CommitId getHeadId() {
         return head;
+    }
+
+    @Override
+    public void setJsonConverter(JsonConverter jsonConverter) {
+
     }
 
     private void persist(CdoSnapshot snapshot) {

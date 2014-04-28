@@ -5,6 +5,7 @@ import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
@@ -54,5 +55,10 @@ public class JaversExtendedRepository implements JaversRepository {
     @Override
     public CommitId getHeadId() {
         return delegate.getHeadId();
+    }
+
+    @Override
+    public void setJsonConverter(JsonConverter jsonConverter) {
+
     }
 }

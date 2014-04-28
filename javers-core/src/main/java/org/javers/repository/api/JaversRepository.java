@@ -5,6 +5,7 @@ import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
 
@@ -38,6 +39,8 @@ public interface JaversRepository {
     void persist(Commit commit);
 
     CommitId getHeadId();
+
+    void setJsonConverter(JsonConverter jsonConverter);
 
     /**
      * Persists given diff in database. <br/>

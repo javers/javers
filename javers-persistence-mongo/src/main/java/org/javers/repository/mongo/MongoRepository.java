@@ -8,10 +8,12 @@ import com.mongodb.DBObject;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.repository.api.JaversRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MongoRepository implements JaversRepository {
@@ -28,20 +30,26 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit) {
-        return null;
+        DBCursor cursor = getSnapshots(globalId, limit);
+
+        List<CdoSnapshot> snapshots = new ArrayList<>();
+
+        while (cursor.hasNext()) {
+            snapshots.add(commitMapper.toCdoSnapshot(cursor.next()));
+        }
+
+        return snapshots;
     }
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
-        DBCursor coursor = mongo.getCollection(COLLECTION_NAME).find().sort(BasicDBObjectBuilder.start().add("id.majorId", -1).get()).limit(1);
+        DBCursor cursor = getSnapshots(globalId, 1);
 
-        DBObject latestAsDBObject = null;
-
-        if (coursor.hasNext()) {
-             latestAsDBObject = coursor.next();
+        if (cursor.hasNext()) {
+            CdoSnapshot cdoSnapshot = commitMapper.toCdoSnapshot(cursor.next());
+            return Optional.of(cdoSnapshot);
         }
 
-        latestAsDBObject.isPartialObject();
         return Optional.empty();
     }
 
@@ -49,7 +57,7 @@ public class MongoRepository implements JaversRepository {
     public void persist(Commit commit) {
         DBCollection commits = mongo.getCollection(COLLECTION_NAME);
 
-        DBObject commitAsDbObject = commitMapper.map(commit);
+        DBObject commitAsDbObject = commitMapper.toDBObject(commit);
 
         commits.insert(commitAsDbObject);
     }
@@ -57,5 +65,15 @@ public class MongoRepository implements JaversRepository {
     @Override
     public CommitId getHeadId() {
         return null;
+    }
+
+    @Override
+    public void setJsonConverter(JsonConverter jsonConverter) {
+        commitMapper.setJsonConverter(jsonConverter);
+    }
+
+    private DBCursor getSnapshots(GlobalCdoId globalCdoId, int limit) {
+        return mongo.getCollection(COLLECTION_NAME).find()
+                .sort(BasicDBObjectBuilder.start().add("id.majorId", -1).get()).limit(limit);
     }
 }

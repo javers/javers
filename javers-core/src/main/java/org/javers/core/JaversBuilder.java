@@ -197,7 +197,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private JsonConverterBuilder jsonConverterBuilder(){
-        return getContainerComponent(JsonConverterBuilder.class);
+        JsonConverterBuilder converterBuilder = getContainerComponent(JsonConverterBuilder.class);
+        return converterBuilder;
     }
 
     private void bootManagedClasses() {

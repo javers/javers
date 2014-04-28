@@ -6,22 +6,30 @@ import com.mongodb.Mongo
 import org.javers.common.collections.Optional
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
-import org.javers.core.commit.Commit
+import org.javers.core.JaversTestBuilder
 import org.javers.core.commit.CommitFactory
-import org.javers.core.diff.DiffFactory
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.GlobalCdoId
-import org.javers.core.metamodel.object.GlobalIdFactory
-import org.javers.core.metamodel.object.InstanceId
-import org.javers.core.metamodel.property.Entity
-import org.javers.core.metamodel.type.TypeFactory
-import org.javers.core.metamodel.type.TypeMapper
 import org.javers.repository.api.JaversRepository
-import spock.lang.Ignore
+import spock.lang.Shared
 import spock.lang.Specification
 
-
 class MongoRepositoryTest extends Specification {
+
+    @Shared JaversTestBuilder javersTestBuilder
+    @Shared MongoRepository mongoDiffRepository
+    @Shared CommitFactory commitFactory
+    @Shared DB db
+
+    def setupSpec() {
+        javersTestBuilder = JaversTestBuilder.javersTestAssembly()
+        commitFactory = javersTestBuilder.commitFactory
+
+        Mongo mongo = new Fongo("myDb").mongo
+        db = mongo.getDB("db")
+        mongoDiffRepository = new MongoRepository(db)
+    }
+
 
     def "should provide Mongo object"() {
 
@@ -32,24 +40,14 @@ class MongoRepositoryTest extends Specification {
         JaversRepository mongoDiffRepository = new MongoRepository(mongo.getDB("test"))
 
         then:
-        mongoDiffRepository.mongo
+        mongoDiffRepository.mongo.name == "test"
     }
 
     def "should persist commit"() {
 
         given:
         DummyProduct dummyProduct = new DummyProduct(1, "Candy")
-
-        Javers javers = JaversBuilder.javers()
-                .registerEntity(DummyProduct)
-                .build()
-
-        Mongo mongo = new Fongo("myDb").mongo
-        DB db = mongo.getDB("test")
-
-        Commit commit = javers.commit("charlie", dummyProduct)
-
-        def mongoDiffRepository = new MongoRepository(db)
+        def commit = commitFactory.create("charlie", dummyProduct)
 
         when:
         mongoDiffRepository.persist(commit)
@@ -61,9 +59,10 @@ class MongoRepositoryTest extends Specification {
     def "should return empty list for non empty Commit collection"() {
 
         given:
-        GlobalCdoId globalCdoId = Stub()
-        globalCdoId.getCdoId() >> 1
-        globalCdoId.getCdoClass() >> DummyProduct
+        GlobalCdoId globalCdoId = Stub() {
+            getCdoId() >> 1
+            getCdoClass() >> DummyProduct
+        }
 
         Mongo mongo = new Fongo("myDb").mongo
         def mongoDiffRepository = new MongoRepository(mongo.getDB("db"))
@@ -83,7 +82,6 @@ class MongoRepositoryTest extends Specification {
         Mongo mongo = new Fongo("myDb").mongo
         DB db = mongo.getDB("test")
 
-        def mongoDiffRepository = new MongoRepository(db)
 
         Javers javers = JaversBuilder.javers()
                 .registerEntity(DummyProduct)
@@ -97,11 +95,15 @@ class MongoRepositoryTest extends Specification {
             getCdoClass() >> DummyProduct
         }
 
+
         when:
         Optional<CdoSnapshot> latestSnapshot =  mongoDiffRepository.getLatest(id)
 
         then:
         latestSnapshot.isPresent()
+    }
+
+    def "should get state history"() {
 
     }
 }
