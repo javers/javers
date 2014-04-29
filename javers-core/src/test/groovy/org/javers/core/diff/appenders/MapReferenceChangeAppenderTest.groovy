@@ -2,6 +2,7 @@ package org.javers.core.diff.appenders
 
 import org.javers.common.exception.exceptions.JaversException
 import org.javers.core.diff.AbstractDiffTest
+import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
@@ -96,8 +97,8 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffTest {
             def leftCdo  = new SnapshotEntity(id:1,  mapVoToPrimitive: [(new DummyAddress("London")):1])
             def rightCdo = new SnapshotEntity(id:1,  mapVoToPrimitive: [(new DummyAddress("London")):2])
         when:
-            def change = mapChangeAppender()
-                        .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "mapVoToPrimitive"))
+            mapChangeAppender()
+           .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "mapVoToPrimitive"))
 
         then:
             def e = thrown(JaversException)
@@ -115,5 +116,21 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffTest {
 
         then:
             !change
+    }
+
+
+    def "should EntryAdded & EntryRemoved when key is changed"() {
+        given:
+            def leftCdo  =  new SnapshotEntity(id:1,  mapOfEntities: [(new SnapshotEntity(id:10)): new SnapshotEntity(id:5)])
+            def rightCdo  = new SnapshotEntity(id:1,  mapOfEntities: [(new SnapshotEntity(id:12)): new SnapshotEntity(id:5)])
+
+        when:
+          def change = mapChangeAppender()
+                      .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "mapOfEntities"))
+
+        then:
+            assertThat(change).hasSize(2)
+                              .hasEntryRemoved(instanceId(10,SnapshotEntity),instanceId(5,SnapshotEntity))
+                              .hasEntryAdded  (instanceId(12,SnapshotEntity),instanceId(5,SnapshotEntity))
     }
 }

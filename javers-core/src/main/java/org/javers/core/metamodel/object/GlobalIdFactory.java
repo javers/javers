@@ -69,13 +69,13 @@ public class GlobalIdFactory {
 
     /**
      * If item is Primitive or Value - returns it,
-     * if item is Entity or ValueObject - returns its globalId
+     * if item is Entity or ValueObject - returns its globalId,
+     * if item is already instance of GlobalCdoId - returns it.
      */
     public Object dehydrate(Object item, JaversType targetType, OwnerContext context){
         if (!(item instanceof GlobalCdoId) && targetType instanceof ManagedType) {
             return createId(item, context);
-        }
-        else {
+        } else {
             return item;
         }
     }
