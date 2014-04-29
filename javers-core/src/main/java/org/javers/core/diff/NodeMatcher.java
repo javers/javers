@@ -1,8 +1,8 @@
 package org.javers.core.diff;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.graph.ObjectNode;
+import org.javers.core.metamodel.object.GlobalCdoId;
 
 import java.util.*;
 

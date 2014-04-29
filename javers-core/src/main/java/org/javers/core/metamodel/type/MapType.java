@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Lists;
+import org.javers.common.collections.Maps;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
@@ -23,6 +24,17 @@ import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC
 public class MapType extends EnumerableType {
     private transient List<Class> elementTypes;
 
+
+    /**
+     * Fake MapType for List & Array ChangeAppenders
+     */
+    public MapType(ContainerType containerType){
+       super(containerType.getBaseJavaType());
+       elementTypes = new ArrayList<>();
+       elementTypes.add(Integer.class);//key
+       elementTypes.add(containerType.getItemClass());//key
+    }
+
     public MapType(Type baseJavaType) {
         super(baseJavaType);
 
@@ -39,8 +51,13 @@ public class MapType extends EnumerableType {
     }
 
     @Override
-    public Object map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
-        Validate.argumentsAreNotNull(sourceMap_, mapFunction);
+    public Map map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
+        Validate.argumentsAreNotNull(mapFunction);
+
+        if (sourceMap_ == null) {
+            return Collections.EMPTY_MAP;
+        }
+
         Map<Object, Object> sourceMap = (Map) sourceMap_;
         Map<Object, Object> targetMap = new HashMap(sourceMap.size());
 

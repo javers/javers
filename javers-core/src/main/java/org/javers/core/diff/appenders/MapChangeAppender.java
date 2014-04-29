@@ -1,13 +1,12 @@
 package org.javers.core.diff.appenders;
 
-import org.javers.common.collections.Lists;
 import org.javers.common.collections.Maps;
-import org.javers.common.collections.Sets;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.validation.Validate;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.map.*;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.DehydrateMapFunction;
+import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.MapType;
@@ -15,7 +14,10 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static org.javers.common.collections.Objects.nullSafeEquals;
 
@@ -26,46 +28,27 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
     private static final Logger logger = LoggerFactory.getLogger(MapChangeAppender.class);
 
     private final TypeMapper typeMapper;
+    private final GlobalIdFactory globalIdFactory;
 
-    public MapChangeAppender(TypeMapper typeMapper) {
+    public MapChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
+        Validate.argumentsAreNotNull(typeMapper, globalIdFactory);
         this.typeMapper = typeMapper;
-    }
-
-    @Override
-    protected Class<? extends JaversType> getSupportedPropertyType() {
-        return MapType.class;
+        this.globalIdFactory = globalIdFactory;
     }
 
     @Override
     protected boolean supports(JaversType propertyType) {
-        if (!super.supports(propertyType)) {
-            return false;
-        }
-
-        MapType mapType = (MapType)propertyType;
-        if (!isSupportedMap(mapType)) {
-            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED,
-                                     "unsupported Map content type ["+propertyType.getBaseJavaType()+"], skipping");
-        }
-        return true;
+        return propertyType instanceof MapType;
     }
-
-    //TODO add support for Entities & ValueObjects
-    private boolean isSupportedMap(MapType propertyType){
-        if (!propertyType.isFullyParametrized()) {
-            return false;
-        }
-        return typeMapper.isPrimitiveOrValueOrObject(propertyType.getKeyClass()) &&
-               typeMapper.isPrimitiveOrValueOrObject(propertyType.getValueClass());
-    }
-
 
     @Override
     protected MapChange calculateChanges(NodePair pair, Property property) {
-        Map leftMap =  (Map)pair.getLeftPropertyValue(property);
-        Map rightMap = (Map)pair.getRightPropertyValue(property);
+        Map leftRawMap =  (Map)pair.getLeftPropertyValue(property);
+        Map rightRawMap = (Map)pair.getRightPropertyValue(property);
 
-        List<EntryChange> changes = calculateEntryChanges(leftMap, rightMap);
+        MapType mapType = typeMapper.getPropertyType(property);
+        OwnerContext owner = new OwnerContext(pair.getGlobalCdoId(), property.getName());
+        List<EntryChange> changes = calculateEntryChanges(mapType, leftRawMap, rightRawMap, owner);
 
         if (!changes.isEmpty()){
             return new MapChange(pair.getGlobalCdoId(), property, changes);
@@ -78,7 +61,13 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
     /**
      * @return never returns null
      */
-    List<EntryChange> calculateEntryChanges(Map leftMap, Map rightMap) {
+    List<EntryChange> calculateEntryChanges(MapType mapType, Map leftRawMap, Map rightRawMap, OwnerContext owner) {
+
+        DehydrateMapFunction dehydrateFunction = new DehydrateMapFunction(mapType, typeMapper, globalIdFactory);
+
+        Map leftMap =  mapType.map(leftRawMap, dehydrateFunction, owner);
+        Map rightMap = mapType.map(rightRawMap, dehydrateFunction, owner);
+
         if (nullSafeEquals(leftMap, rightMap)) {
             return Collections.EMPTY_LIST;
         }
@@ -90,7 +79,7 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
             Object rightVal = rightMap.get(commonKey);
 
             if (!nullSafeEquals(leftVal, rightVal)){
-                changes.add( new EntryValueChanged(commonKey, leftVal, rightVal));
+                changes.add( new EntryValueChange(commonKey, leftVal, rightVal));
             }
         }
 

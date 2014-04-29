@@ -3,6 +3,7 @@ package org.javers.core.graph;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.type.*;
 
 /**
@@ -13,6 +14,7 @@ public abstract class AbstractMapFunction implements EnumerableFunction{
     private final TypeMapper typeMapper;
 
     protected AbstractMapFunction(EnumerableType enumerableType, TypeMapper typeMapper) {
+        Validate.argumentsAreNotNull(enumerableType, typeMapper);
         this.enumerableType = enumerableType;
         this.typeMapper = typeMapper;
     }

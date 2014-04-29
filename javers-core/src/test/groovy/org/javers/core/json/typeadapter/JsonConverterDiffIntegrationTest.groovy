@@ -4,7 +4,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.map.EntryAdded
 import org.javers.core.diff.changetype.map.EntryRemoved
-import org.javers.core.diff.changetype.map.EntryValueChanged
+import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
@@ -64,7 +64,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
         JsonConverter jsonConverter = jsonConverter().build()
         def entryChanges = [new EntryAdded("some",1),
                             new EntryRemoved("some",2),
-                            new EntryValueChanged("mod",3,4)]
+                            new EntryValueChange("mod",3,4)]
 
         MapChange change = mapChange(dummyUser("kaz").build(),"valueMap",entryChanges)
 
@@ -87,7 +87,7 @@ class JsonConverterDiffIntegrationTest extends Specification {
             value == 2
         }
         with(json.entryChanges[2]){
-            entryChangeType == "EntryValueChanged"
+            entryChangeType == "EntryValueChange"
             key == "mod"
             leftValue == 3
             rightValue == 4

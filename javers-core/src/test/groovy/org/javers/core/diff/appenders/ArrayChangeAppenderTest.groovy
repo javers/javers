@@ -13,17 +13,28 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class ArrayChangeAppenderTest extends AbstractDiffTest {
 
-    @Unroll
-    def "should append #changesCount changes when left array is #leftArray and right array is #rightArray"() {
+    def "should index Array changes"() {
         given:
-        def javers = javersTestAssembly()
+        def leftNode =  dummyUser().withIntArray([] as int[]).build()
+        def rightNode = dummyUser().withIntArray([1, 2] as int[]).build()
 
         when:
-        def leftNode = buildGraph(dummyUser().withIntArray(leftArray as int[]).build())
-        def rightNode = buildGraph(dummyUser().withIntArray(rightArray as int[]).build())
+        def change = arrayChangeAppender().calculateChanges(
+                     realNodePair(leftNode, rightNode), getProperty(DummyUser, "intArray"))
 
-        def change = new ArrayChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper)
-                .calculateChanges(new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "intArray"))
+        then:
+        ContainerChangeAssert.assertThat(change).hasSize(2).hasIndexes([0,1])
+    }
+
+    @Unroll
+    def "should append #changesCount changes when left array is #leftArray and right array is #rightArray"() {
+
+        when:
+        def leftNode = dummyUser().withIntArray(leftArray as int[]).build()
+        def rightNode = dummyUser().withIntArray(rightArray as int[]).build()
+
+        def change = arrayChangeAppender().calculateChanges(
+                     realNodePair(leftNode, rightNode), getProperty(DummyUser, "intArray"))
 
         then:
         change.changes.size() == changesCount
@@ -43,15 +54,13 @@ class ArrayChangeAppenderTest extends AbstractDiffTest {
 
     @Unroll
     def "should not append changes when left array #leftArray and right array #rightArray is equal"() {
-        given:
-        def javers = javersTestAssembly()
 
         when:
-        def leftNode = buildGraph(dummyUser().withIntArray(leftArray as int[]).build())
-        def rightNode = buildGraph(dummyUser().withIntArray(rightArray as int[]).build())
+        def leftNode = dummyUser().withIntArray(leftArray as int[]).build()
+        def rightNode = dummyUser().withIntArray(rightArray as int[]).build()
 
-        def change = new ArrayChangeAppender(new MapChangeAppender(javers.typeMapper), javers.typeMapper)
-                .calculateChanges(new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "intArray"))
+        def change = arrayChangeAppender().calculateChanges(
+                realNodePair(leftNode, rightNode), getProperty(DummyUser, "intArray"))
 
         then:
         change == null

@@ -26,7 +26,7 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
 
 
         appendChangeType(change, jsonObject);
-        appendGlobalId(change.getGlobalCdoId(), jsonObject, context);
+        appendGlobalId(change.getAffectedCdoId(), jsonObject, context);
 
         if (change instanceof PropertyChange) {
             appendPropertyName((PropertyChange) change, jsonObject);
@@ -80,8 +80,8 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
                 entryElement.add("value", context.serialize(entry.getWrappedValue()));
             }
 
-            if (entryChange instanceof EntryValueChanged) {
-                EntryValueChanged entry = (EntryValueChanged)entryChange;
+            if (entryChange instanceof EntryValueChange) {
+                EntryValueChange entry = (EntryValueChange)entryChange;
                 entryElement.add("key", context.serialize(entry.getWrappedKey()));
                 entryElement.add("leftValue", context.serialize(entry.getWrappedLeftValue()));
                 entryElement.add("rightValue", context.serialize(entry.getWrappedRightValue()));

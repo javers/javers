@@ -3,9 +3,9 @@ package org.javers.core.diff;
 import org.javers.common.collections.Optional;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
-import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.diff.changetype.ValueChange;
 import org.javers.common.patterns.visitors.Visitable;
+import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.metamodel.object.GlobalCdoId;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.conditionFulfilled;
@@ -26,20 +26,20 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
 public abstract class Change implements Visitable<ChangeVisitor> {
     //private Diff parent;
 
-    private final GlobalCdoId globalCdoId;
+    private final GlobalCdoId affectedCdoId;
 
     private transient Optional<Object> affectedCdo;
 
-    protected Change(GlobalCdoId globalCdoId) {
-        argumentIsNotNull(globalCdoId);
-        this.globalCdoId = globalCdoId;
+    protected Change(GlobalCdoId affectedCdoId) {
+        argumentIsNotNull(affectedCdoId);
+        this.affectedCdoId = affectedCdoId;
     }
 
     /**
      * Affected Cdo Id
      */
-    public GlobalCdoId getGlobalCdoId() {
-        return globalCdoId;
+    public GlobalCdoId getAffectedCdoId() {
+        return affectedCdoId;
     }
 
     /**

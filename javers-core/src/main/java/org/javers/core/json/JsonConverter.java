@@ -1,7 +1,6 @@
 package org.javers.core.json;
 
 import com.google.gson.*;
-import org.javers.core.diff.changetype.Value;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 import org.joda.time.LocalDateTime;
 

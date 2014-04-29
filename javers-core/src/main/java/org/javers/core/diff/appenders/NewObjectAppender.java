@@ -1,13 +1,13 @@
 package org.javers.core.diff.appenders;
 
-import java.util.Set;
-
 import org.javers.common.collections.Function;
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.GraphPair;
 import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.graph.ObjectNode;
+
+import java.util.Set;
 
 public class NewObjectAppender implements NodeChangeAppender {
 

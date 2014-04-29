@@ -52,7 +52,7 @@ class JaversSmartparamIntegrationTest extends Specification{
         }
 
         with(sortedEntryChanges[1]) {
-            entryChangeType == "EntryValueChanged"
+            entryChangeType == "EntryValueChange"
             key == "date"
             leftValue.typeAlias == "LocalDate"
             leftValue.value == "2014-01-10"

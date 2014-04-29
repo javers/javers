@@ -41,6 +41,7 @@ public class SnapshotEntity {
     private Map<String, Integer> mapOfPrimitives;
     private Map<LocalDate,BigDecimal> mapOfValues;
     private Map<String,DummyAddress> mapPrimitiveToVO;
+    private Map<String,SnapshotEntity> mapPrimitiveToEntity;
     private Map<SnapshotEntity, SnapshotEntity> mapOfEntities;
     private Map<DummyAddress,String> mapVoToPrimitive;           //not supported
 
@@ -229,5 +230,13 @@ public class SnapshotEntity {
 
     public void setNonParametrizedMap(Map nonParametrizedMap) {
         this.nonParametrizedMap = nonParametrizedMap;
+    }
+
+    public Map<String, SnapshotEntity> getMapPrimitiveToEntity() {
+        return mapPrimitiveToEntity;
+    }
+
+    public void setMapPrimitiveToEntity(Map<String, SnapshotEntity> mapPrimitiveToEntity) {
+        this.mapPrimitiveToEntity = mapPrimitiveToEntity;
     }
 }

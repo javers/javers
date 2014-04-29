@@ -2,10 +2,10 @@ package org.javers.core.json;
 
 import com.google.gson.*;
 import org.javers.common.validation.Validate;
+import org.javers.core.json.typeadapter.AtomicTypeAdapter;
 import org.javers.core.json.typeadapter.ChangeTypeAdapter;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 import org.javers.core.json.typeadapter.LocalDateTypeAdapter;
-import org.javers.core.json.typeadapter.ValueTypeAdapter;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -39,7 +39,7 @@ public class JsonConverterBuilder {
     }
 
     /**
-     * When switched to true, all {@link org.javers.core.diff.changetype.Value}s are serialized type safely as a pair, fo example:
+     * When switched to true, all {@link org.javers.core.diff.changetype.Atomic}s are serialized type safely as a pair, fo example:
      * <pre>
      * {
      *     "typeAlias": "LocalDate"
@@ -99,7 +99,7 @@ public class JsonConverterBuilder {
 
     public JsonConverter build() {
 
-        jsonConverter.registerJsonTypeAdapter(new ValueTypeAdapter(typeSafeValues));
+        jsonConverter.registerJsonTypeAdapter(new AtomicTypeAdapter(typeSafeValues));
 
         jsonConverter.initialize();
         return jsonConverter;

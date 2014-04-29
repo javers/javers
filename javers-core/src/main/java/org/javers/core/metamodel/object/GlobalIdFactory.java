@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.common.collections.Objects;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -63,7 +64,20 @@ public class GlobalIdFactory {
             throw new JaversException(JaversExceptionCode.ENTITY_NOT_MAPPED, entityClass, managedClass.getClass().getSimpleName());
         }
 
-        return InstanceId.createFromId(localId, (Entity)managedClass);
+        return InstanceId.createFromId(localId, (Entity) managedClass);
+    }
+
+    /**
+     * If item is Primitive or Value - returns it,
+     * if item is Entity or ValueObject - returns its globalId
+     */
+    public Object dehydrate(Object item, JaversType targetType, OwnerContext context){
+        if (!(item instanceof GlobalCdoId) && targetType instanceof ManagedType) {
+            return createId(item, context);
+        }
+        else {
+            return item;
+        }
     }
 
     private ManagedClass getManagedClassOf(Object cdo) {

@@ -4,19 +4,18 @@ import org.javers.common.collections.Objects;
 import org.javers.common.collections.Primitives;
 
 /**
- * Immutable wrapper for client's primitives and Value Objects.
+ * Immutable wrapper for client's Primitives, Values and Id's
  * <br/><br/>
  *
  * TODO refine dehydrate approach
- * Value needs to be dehydrated before persisting.
- * Dehydration is simply serialization to JSON.
+ * Value needs to be dehydrated before persisting. Dehydration is simply serialization to JSON.
  *
  * @author bartosz walacik
  */
-public class Value {
+public class Atomic {
     private final Object value;
 
-    public Value(Object value) {
+    public Atomic(Object value) {
         this.value = value;
     }
 
@@ -50,11 +49,11 @@ public class Value {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Value)) {
+        if (obj == null || !(obj instanceof Atomic)) {
             return false;
         }
 
-        Value other = (Value)obj;
+        Atomic other = (Atomic)obj;
         return Objects.nullSafeEquals(value, other.value);
     }
 

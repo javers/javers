@@ -14,8 +14,8 @@ import java.util.List;
 public class MapChange extends PropertyChange {
     private final List<EntryChange> changes;
 
-    public MapChange(GlobalCdoId globalCdoId, Property property, List<EntryChange> changes) {
-        super(globalCdoId, property);
+    public MapChange(GlobalCdoId affectedCdoId, Property property, List<EntryChange> changes) {
+        super(affectedCdoId, property);
         this.changes = new ArrayList<>(changes);
     }
 

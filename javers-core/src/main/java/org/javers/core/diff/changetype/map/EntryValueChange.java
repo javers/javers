@@ -1,17 +1,18 @@
-package org.javers.core.diff.changetype;
+package org.javers.core.diff.changetype.map;
 
-import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.diff.changetype.Atomic;
 
 /**
+ * entry value changed, when value is simple type
+ *
  * @author bartosz walacik
  */
-public class ValueChange extends PropertyChange {
+public class EntryValueChange extends EntryChange {
     private final Atomic leftValue;
     private final Atomic rightValue;
 
-    public ValueChange(GlobalCdoId affectedCdoId, Property property, Object leftValue, Object rightValue) {
-        super(affectedCdoId, property);
+    public EntryValueChange(Object key, Object leftValue, Object rightValue) {
+        super(key);
         this.leftValue = new Atomic(leftValue);
         this.rightValue = new Atomic(rightValue);
     }
