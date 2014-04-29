@@ -13,12 +13,6 @@ import java.util.*;
 import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 
 /**
- * Map where both keys and values
- * should be of {@link PrimitiveType} or {@link ValueType}.
- * <p/>
- *
- * Javers doesn't support complex maps with ValueObjects or Entities
- *
  * @author bartosz walacik
  */
 public class MapType extends EnumerableType {
@@ -32,7 +26,7 @@ public class MapType extends EnumerableType {
        super(containerType.getBaseJavaType());
        elementTypes = new ArrayList<>();
        elementTypes.add(Integer.class);//key
-       elementTypes.add(containerType.getItemClass());//key
+       elementTypes.add(containerType.getItemClass());//value
     }
 
     public MapType(Type baseJavaType) {
@@ -52,7 +46,7 @@ public class MapType extends EnumerableType {
 
     @Override
     public Map map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
-        Validate.argumentsAreNotNull(mapFunction);
+        Validate.argumentIsNotNull(mapFunction);
 
         if (sourceMap_ == null) {
             return Collections.EMPTY_MAP;

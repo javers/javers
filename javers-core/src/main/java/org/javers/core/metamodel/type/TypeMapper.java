@@ -99,11 +99,6 @@ public class TypeMapper {
         return javersType instanceof ManagedType;
     }
 
-    public boolean isEntityReferenceOrValueObject(Class javaClass){
-        JaversType javersType = getJaversType(javaClass);
-        return javersType instanceof ManagedType;
-    }
-
     /**
      * is Set, List or Array of ManagedClasses
      *
