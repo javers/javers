@@ -44,21 +44,6 @@ class JsonConverterDiffIntegrationTest extends Specification {
         assert json.contains('"change": null')
     }
 
-    def "should write property name, left & right values for ValueChange" () {
-        given:
-        JsonConverter jsonConverter = jsonConverter().build()
-        ValueChange change = valueChange(dummyUser("kaz").build(),"flag",true,false)
-
-        when:
-        String jsonText = jsonConverter.toJson(change)
-
-        then:
-        def json = new JsonSlurper().parseText(jsonText)
-        json.property == "flag"
-        json.leftValue == true
-        json.rightValue == false
-    }
-
     def "should write EntryChanges for map" () {
         given:
         JsonConverter jsonConverter = jsonConverter().build()
@@ -92,59 +77,6 @@ class JsonConverterDiffIntegrationTest extends Specification {
             leftValue == 3
             rightValue == 4
         }
-    }
-
-    def "should write property name, leftId & rightId for ReferenceChange" () {
-        given:
-        JsonConverter jsonConverter = jsonConverter().build()
-        ReferenceChange change = referenceChanged(dummyUser().build(),
-                                                   "dummyUserDetails",
-                                                   dummyUserDetails(1).build(),
-                                                   dummyUserDetails(2).build())
-
-        when:
-        String jsonText = jsonConverter.toJson(change)
-        println(jsonText)
-
-        then:
-        def json = new JsonSlurper().parseText(jsonText)
-        json.property == "dummyUserDetails"
-        json.leftReference.cdoId == 1
-        json.leftReference.entity == "org.javers.core.model.DummyUserDetails"
-        json.rightReference.cdoId == 2
-        json.rightReference.entity == "org.javers.core.model.DummyUserDetails"
-    }
-
-    def "should be nullSafe when writing leftId & rightId for ReferenceChange" () {
-        given:
-        JsonConverter jsonConverter = jsonConverter().build()
-        ReferenceChange change = referenceChanged(dummyUser().build(),
-                "dummyUserDetails",null, null)
-
-        when:
-        String jsonText = jsonConverter.toJson(change)
-        println(jsonText)
-
-        then:
-        def json = new JsonSlurper().parseText(jsonText)
-        json.rightReference == null
-        json.leftReference == null
-    }
-
-    def "should be nullSafe when writing left & right value for ValueChange" () {
-        given:
-        JsonConverter jsonConverter = jsonConverter().build()
-        ValueChange change = valueChange(dummyUser("kaz").build(),"bigFlag",null, null)
-
-        when:
-        String jsonText = jsonConverter.toJson(change)
-        println(jsonText)
-
-        then:
-        def json = new JsonSlurper().parseText(jsonText)
-        json.leftValue == null
-        json.rightValue == null
-
     }
 
     def "should use custom JsonTypeAdapter when writing Values like LocalDateTime for ValueChange" () {
