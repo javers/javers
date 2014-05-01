@@ -31,7 +31,7 @@ public abstract class AbstractTypeAdapter<T extends Change> implements JsonTypeA
   protected JsonObject createJsonObject(Change change, JsonSerializationContext context) {
     JsonObject jsonObject = new JsonObject();
     jsonObject.addProperty("changeType", change.getClass().getSimpleName());
-    jsonObject.add("globalCdoId", globalCdoId(change.getGlobalCdoId(), context));
+    jsonObject.add("globalCdoId", globalCdoId(change.getAffectedCdoId(), context));
 
     if (change instanceof PropertyChange) {
       jsonObject.addProperty("property", ((PropertyChange) change).getProperty().getName());
