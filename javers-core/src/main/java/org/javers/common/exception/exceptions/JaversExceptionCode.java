@@ -45,6 +45,8 @@ public enum  JaversExceptionCode {
 
     MANAGED_CLASS_MAPPING_ERROR(RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, expected %s"),
 
+    MALFORMED_CHANGE_TYPE_FIELD(RUNTIME_ERROR+"no such changeType - '%s'"),
+
     CLASS_NOT_MANAGED(RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, ManagedType expected"),
 
     CLASS_NOT_FOUND(RUNTIME_ERROR+"class not found - '%s'")

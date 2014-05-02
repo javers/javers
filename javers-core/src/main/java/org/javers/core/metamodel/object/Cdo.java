@@ -43,9 +43,6 @@ public abstract class Cdo {
     public Object getPropertyValue(String propertyName) {
         Validate.argumentIsNotNull(propertyName);
         Property property = getGlobalId().getCdoClass().getProperty(propertyName);
-        if (property == null){
-            throw new JaversException(PROPERTY_NOT_FOUND,propertyName,getGlobalId().getCdoClass().getName());
-        }
         return getPropertyValue(property);
     }
 
