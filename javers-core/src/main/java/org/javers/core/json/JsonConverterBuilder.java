@@ -23,8 +23,7 @@ public class JsonConverterBuilder {
             new NewObjectTypeAdapter(),
             new ObjectRemovedTypeAdapter(),
             new ReferenceChangeTypeAdapter(),
-            new ValueChangeTypeAdapter(),
-            new GlobalCdoIdTypeAdapter()
+            new ValueChangeTypeAdapter()
     };
 
     private boolean typeSafeValues = false;

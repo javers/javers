@@ -8,7 +8,7 @@ import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 
-public abstract class AbstractChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
+public abstract class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
 
     @Override
     public T fromJson(JsonElement json, JsonDeserializationContext jsonDeserializationContext) {

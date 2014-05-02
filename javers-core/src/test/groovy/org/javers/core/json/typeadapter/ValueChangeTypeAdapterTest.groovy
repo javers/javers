@@ -1,11 +1,13 @@
 package org.javers.core.json.typeadapter
 
 import groovy.json.JsonSlurper
+import org.javers.core.JaversTestBuilder
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
@@ -18,7 +20,7 @@ class ValueChangeTypeAdapterTest extends Specification {
 
     def "should serialize ValueChange" () {
         given:
-        JsonConverter jsonConverter = jsonConverter().build()
+        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
         ValueChange change = valueChange(dummyUser("kaz").build(),"flag",true,false)
 
         when:
@@ -36,7 +38,7 @@ class ValueChangeTypeAdapterTest extends Specification {
 
     def "should be nullSafe when writing ValueChange" () {
         given:
-        JsonConverter jsonConverter = jsonConverter().build()
+        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
         ValueChange change = valueChange(dummyUser("kaz").build(),"bigFlag",null, null)
 
         when:
@@ -50,7 +52,7 @@ class ValueChangeTypeAdapterTest extends Specification {
 
     def "should use custom JsonTypeAdapter when writing Values like LocalDateTime for ValueChange" () {
         given:
-        JsonConverter jsonConverter = jsonConverter().build()
+        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
         def dob = new LocalDateTime()
         ValueChange change = valueChange(dummyUserWithDate("kaz"),"dob",null, dob)
 

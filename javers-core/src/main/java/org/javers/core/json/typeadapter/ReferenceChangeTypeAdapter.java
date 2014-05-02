@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.diff.changetype.ReferenceChange;
 
-public class ReferenceChangeTypeAdapter extends AbstractChangeTypeAdapter<ReferenceChange> {
+public class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
 
     @Override
     public JsonElement toJson(ReferenceChange change, JsonSerializationContext context) {

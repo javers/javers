@@ -103,7 +103,17 @@ public class JsonConverter {
         return gson.toJson(value);
     }
 
+    public JsonElement toJsonElement(Object value) {
+        checkState();
+        return gson.toJsonTree(value);
+    }
+
     public <T> T fromJson(String json, Class<T> expectedType) {
+        checkState();
+        return gson.fromJson(json,expectedType);
+    }
+
+    public <T> T fromJsonTree(JsonElement json, Class<T> expectedType) {
         checkState();
         return gson.fromJson(json,expectedType);
     }

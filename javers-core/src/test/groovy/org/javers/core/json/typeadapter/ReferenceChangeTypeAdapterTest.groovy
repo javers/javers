@@ -1,10 +1,12 @@
 package org.javers.core.json.typeadapter
 
 import groovy.json.JsonSlurper
+import org.javers.core.JaversTestBuilder
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.json.JsonConverter
 import spock.lang.Specification
 
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 import static org.javers.core.json.builder.ChangeTestBuilder.referenceChanged
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
@@ -17,7 +19,7 @@ class ReferenceChangeTypeAdapterTest extends Specification {
 
     def "should serialize ReferenceChange" () {
         given:
-        JsonConverter jsonConverter = jsonConverter().build()
+        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
         ReferenceChange change = referenceChanged(dummyUser().build(),
                                                   "dummyUserDetails",
                                                   dummyUserDetails(1).build(),
@@ -40,7 +42,7 @@ class ReferenceChangeTypeAdapterTest extends Specification {
 
     def "should be nullSafe when writing leftId & rightId for ReferenceChange" () {
         given:
-        JsonConverter jsonConverter = jsonConverter().build()
+        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
         ReferenceChange change = referenceChanged(dummyUser().build(),
                                                   "dummyUserDetails",null, null)
 

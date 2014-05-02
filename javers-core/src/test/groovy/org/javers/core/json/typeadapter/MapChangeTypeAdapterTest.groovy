@@ -8,6 +8,7 @@ import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.json.JsonConverter
 import spock.lang.Specification
 
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 import static org.javers.core.json.builder.ChangeTestBuilder.mapChange
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
@@ -16,9 +17,10 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  * @author bartosz walacik
  */
 class MapChangeTypeAdapterTest extends Specification {
+    JsonConverter jsonConverter = javersTestAssembly().jsonConverter
+
     def "should serialize MapChange" () {
         given:
-        JsonConverter jsonConverter = jsonConverter().build()
         def entryChanges = [new EntryAdded("some",1),
                             new EntryRemoved("some",2),
                             new EntryValueChange("mod",3,4)]

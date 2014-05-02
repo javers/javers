@@ -5,6 +5,7 @@ import org.javers.core.json.JsonConverter
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
 
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 import static org.javers.core.json.builder.ChangeTestBuilder.newObject
 
@@ -14,7 +15,7 @@ import static org.javers.core.json.builder.ChangeTestBuilder.newObject
 class NewObjectTypeAdapterTest extends Specification {
     def "should serialize NewObject"() {
         given:
-        JsonConverter jsonConverter = jsonConverter().build()
+        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
         def change = newObject(new DummyUser(name:"kaz"))
 
         when:

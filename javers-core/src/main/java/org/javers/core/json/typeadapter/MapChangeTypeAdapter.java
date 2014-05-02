@@ -9,7 +9,7 @@ import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.EntryValueChange;
 import org.javers.core.diff.changetype.map.MapChange;
 
-public class MapChangeTypeAdapter extends AbstractChangeTypeAdapter<MapChange> {
+public class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
 
     @Override
     public JsonElement toJson(MapChange change, JsonSerializationContext context) {
