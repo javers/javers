@@ -1,8 +1,11 @@
 package org.javers.core.json.typeadapter;
 
 import com.google.gson.*;
+import org.javers.common.collections.Lists;
 import org.javers.core.diff.changetype.Atomic;
 import org.javers.core.json.JsonTypeAdapter;
+
+import java.util.List;
 
 /**
  * @author bartosz walacik
@@ -43,7 +46,7 @@ public class AtomicTypeAdapter implements JsonTypeAdapter<Atomic> {
     }
 
     @Override
-    public Class getValueType() {
-        return Atomic.class;
+    public List<Class> getValueTypes() {
+        return (List)Lists.immutableListOf(Atomic.class);
     }
 }

@@ -25,7 +25,6 @@ public class JsonConverterBuilder {
             new ReferenceChangeTypeAdapter(),
             new ValueChangeTypeAdapter(),
             new GlobalCdoIdTypeAdapter()
-
     };
 
     private boolean typeSafeValues = false;

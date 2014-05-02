@@ -25,14 +25,13 @@ class ReferenceChangeTypeAdapterTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        println(jsonText)
+        //println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.property == "dummyUserDetails"
-        json.globalCdoId.entity == "org.javers.core.model.DummyUser"
-        json.globalCdoId.cdoId == "dummyUser"
         json.changeType == "ReferenceChange"
+        json.globalCdoId
         json.leftReference.cdoId == 1
         json.leftReference.entity == "org.javers.core.model.DummyUserDetails"
         json.rightReference.cdoId == 2
@@ -47,7 +46,7 @@ class ReferenceChangeTypeAdapterTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        println(jsonText)
+        //println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)

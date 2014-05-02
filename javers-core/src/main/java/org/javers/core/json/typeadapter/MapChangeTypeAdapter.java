@@ -20,6 +20,11 @@ public class MapChangeTypeAdapter extends AbstractChangeTypeAdapter<MapChange> {
         return jsonObject;
     }
 
+    @Override
+    public Class getValueType() {
+        return MapChange.class;
+    }
+
     private void appendBody(MapChange change, JsonObject toJson, JsonSerializationContext context) {
         JsonArray jsonArray = new JsonArray();
 

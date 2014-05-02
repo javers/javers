@@ -16,4 +16,9 @@ public class ValueChangeTypeAdapter extends AbstractChangeTypeAdapter<ValueChang
 
         return jsonObject;
     }
+
+    @Override
+    public Class getValueType() {
+        return ValueChange.class;
+    }
 }

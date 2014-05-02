@@ -49,6 +49,11 @@ public class GlobalIdFactory {
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
     }
 
+    public UnboundedValueObjectId createFromClass(Class valueObjectClass){
+        ManagedClass managedClass = getManagedClass(valueObjectClass);
+        return new UnboundedValueObjectId((ValueObject)managedClass);
+    }
+
     public ValueObjectId createFromPath(InstanceId owner, Class valueObjectClass, String path){
         ManagedClass targetManagedClass = getManagedClass(valueObjectClass);
         return new ValueObjectId((ValueObject) targetManagedClass, owner, path);

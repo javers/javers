@@ -19,7 +19,7 @@ import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
  *
  * @author bartosz walacik
  */
-public abstract class BasicStringTypeAdapter<T> implements JsonTypeAdapter<T> {
+public abstract class BasicStringTypeAdapter<T> extends JsonTypeAdapterTemplate<T> {
 
     /**
      * Example serialization for LocalDateTime:

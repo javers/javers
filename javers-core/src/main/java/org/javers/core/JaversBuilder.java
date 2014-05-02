@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -127,10 +128,13 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * Useful for not trivial ValueTypes when Gson's default representation isn't appropriate
      *
      * @see JsonTypeAdapter
-     * @see JsonTypeAdapter#getValueType()
+     * @see JsonTypeAdapter#getValueTypes()
      */
     public JaversBuilder registerValueTypeAdapter(JsonTypeAdapter typeAdapter) {
-        registerValue(typeAdapter.getValueType());
+        for (Class c : (List<Class>)typeAdapter.getValueTypes()){
+            registerValue(c);
+        }
+
         jsonConverterBuilder().registerJsonTypeAdapter(typeAdapter);
         return this;
     }
