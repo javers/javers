@@ -8,7 +8,7 @@ import spock.lang.Specification
  */
 class JsonConverterCustomTypeAdapterTest extends Specification {
 
-    def "should use custom type adapter when converting to json"() {
+    def "should use custom typeAdapter when converting to json"() {
         given:
         JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
                                        registerJsonTypeAdapter(new DummyPointJsonTypeAdapter()).build()
@@ -20,7 +20,7 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
         json == '"1,2"'
     }
 
-    def  "should use custom type adapter when converting from json"() {
+    def  "should use custom typeAdapter when converting from json"() {
         given:
         JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
                                        registerJsonTypeAdapter(new DummyPointJsonTypeAdapter()).build()
@@ -31,7 +31,7 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
         person == new DummyPoint(1,2)
     }
 
-    def "should use custom native Gson type adapter when converting to json"() {
+    def "should use custom native Gson typeAdapter when converting to json"() {
         given:
         JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
                                        registerNativeTypeAdapter(DummyPoint, new DummyPointNativeTypeAdapter()).build()
@@ -43,7 +43,7 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
         json == '"1,2"'
     }
 
-    def  "should use custom native Gson type adapter when converting from json"() {
+    def  "should use custom native Gson typeAdapter when converting from json"() {
         given:
         JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
                                        registerNativeTypeAdapter(DummyPoint, new DummyPointNativeTypeAdapter()).build()

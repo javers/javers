@@ -32,7 +32,6 @@ class JaversTestBuilder {
 
     private JaversTestBuilder (MappingStyle mappingStyle) {
        javersBuilder = new JaversBuilder()
-
        javersBuilder.withMappingStyle(mappingStyle).build()
     }
 
@@ -43,6 +42,8 @@ class JaversTestBuilder {
     static JaversTestBuilder javersTestAssembly(MappingStyle mappingStyle){
         new JaversTestBuilder(mappingStyle)
     }
+
+
 
     static Javers newInstance() {
         javersTestAssembly().javers()

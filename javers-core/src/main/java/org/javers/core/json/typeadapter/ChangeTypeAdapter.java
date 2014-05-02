@@ -7,8 +7,7 @@ import com.google.gson.JsonSerializationContext;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.Change;
-import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.*;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
@@ -27,6 +26,9 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
     public ChangeTypeAdapter() {
         this.changeTypeMap = new HashMap<>();
         initEntry(ValueChange.class);
+        initEntry(ReferenceChange.class);
+        initEntry(NewObject.class);
+        initEntry(ObjectRemoved.class);
     }
 
     @Override
@@ -43,11 +45,18 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
         return createJsonObject(change, context);
     }
 
-    protected GlobalCdoId deserializeAffectedCdoId(JsonObject jsonObject, JsonDeserializationContext context){
+    protected PropertyChangeStub deserializeStub(JsonObject jsonObject, JsonDeserializationContext context) {
+        GlobalCdoId id = deserializeAffectedCdoId(jsonObject, context);
+        Property property = deserializeProperty(jsonObject, id);
+
+        return new PropertyChangeStub(id, property);
+    }
+
+    protected GlobalCdoId deserializeAffectedCdoId(JsonObject jsonObject, JsonDeserializationContext context) {
         return context.deserialize(jsonObject.get(AFFECTED_CDO_ID_FIELD), GlobalCdoId.class);
     }
 
-    protected Property deserializeProperty(JsonObject jsonObject, GlobalCdoId id){
+    private Property deserializeProperty(JsonObject jsonObject, GlobalCdoId id){
         String propertyName = jsonObject.get(PROPERTY_FIELD).getAsString();
 
         return id.getCdoClass().getProperty(propertyName);
@@ -67,6 +76,16 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
     @Override
     public Class getValueType() {
         return Change.class;
+    }
+
+    protected class PropertyChangeStub{
+        GlobalCdoId id;
+        Property property;
+
+        PropertyChangeStub(GlobalCdoId id, Property property) {
+            this.id = id;
+            this.property = property;
+        }
     }
 
     private void initEntry(Class<? extends Change> valueChangeClass) {

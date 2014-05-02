@@ -2,18 +2,15 @@ package org.javers.core.json.typeadapter
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import org.javers.core.JaversTestBuilder
 import org.javers.core.diff.Change
-import org.javers.core.diff.ChangeAssert
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
-import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyUser
+import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
 import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
@@ -31,7 +28,7 @@ class ValueChangeTypeAdapterTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        println jsonText
+        //println jsonText
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -56,7 +53,6 @@ class ValueChangeTypeAdapterTest extends Specification {
                     cdoId  "kaz"
                 }
             }
-            println json.toString()
 
         when:
             ValueChange change  = jsonConverter.fromJson(json.toString(),Change)
@@ -67,6 +63,30 @@ class ValueChangeTypeAdapterTest extends Specification {
             change.rightValue == true
             change.property.name == "bigFlag"
     }
+
+    def "should deserialize ValueChange using custom TypeAdapter"() {
+        given:
+        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
+        def json = new JsonBuilder()
+        json {
+            property  "dob"
+            changeType "ValueChange"
+            leftValue null
+            rightValue "2001-01-01"
+            globalCdoId {
+                entity "org.javers.core.model.SnapshotEntity"
+                cdoId  1
+            }
+        }
+
+        when:
+        ValueChange change  = jsonConverter.fromJson(json.toString(),Change)
+
+        then:
+        change.leftValue == null
+        change.rightValue == new LocalDate(2001,1,1)
+    }
+
 
     def "should be nullSafe when writing ValueChange" () {
         given:
