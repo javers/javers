@@ -27,7 +27,7 @@ class AtomicTypeAdapterTest extends Specification {
         json.value == "2000-01-01"
     }
 
-    def "should serialize Atomic without type safety by default"() {
+    def "should serialize Atomic without type-safety by default"() {
         given:
         JsonConverter jsonConverter = jsonConverter().build()
 

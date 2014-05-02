@@ -30,6 +30,11 @@ import org.javers.repository.api.JaversRepository
 class JaversTestBuilder {
     JaversBuilder javersBuilder
 
+    private JaversTestBuilder (JaversBuilder javersBuilder) {
+       this.javersBuilder = javersBuilder
+       this.javersBuilder.build()
+    }
+
     private JaversTestBuilder (MappingStyle mappingStyle) {
        javersBuilder = new JaversBuilder()
        javersBuilder.withMappingStyle(mappingStyle).build()
@@ -43,7 +48,9 @@ class JaversTestBuilder {
         new JaversTestBuilder(mappingStyle)
     }
 
-
+    static JaversTestBuilder javersTestAssemblyTypeSafe(){
+        new JaversTestBuilder(new JaversBuilder().typeSafeValues())
+    }
 
     static Javers newInstance() {
         javersTestAssembly().javers()
