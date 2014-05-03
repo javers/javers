@@ -3,6 +3,7 @@ package org.javers.core.commit;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.Diff;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.GlobalCdoId;
 import org.joda.time.LocalDateTime;
 
 import java.util.Collections;
@@ -37,6 +38,10 @@ public final class Commit {
      */
     public CommitId getId() {
         return id;
+    }
+
+    public GlobalCdoId getGlobalCdoId() {
+        return snapshots.get(0).getGlobalId();
     }
 
     public String getAuthor() {

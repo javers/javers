@@ -20,12 +20,6 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
     public static final Type[] SUPPORTED = {
             NewObject.class, ObjectRemoved.class, ValueChange.class, ReferenceChange.class, MapChange.class};
 
-    private GlobalCdoIdAdapter globalCdoIdAdapter;
-
-    public ChangeTypeAdapter(GlobalCdoIdAdapter globalCdoIdAdapter) {
-        this.globalCdoIdAdapter = globalCdoIdAdapter;
-    }
-
     @Override
     public JsonElement toJson(Change change, JsonSerializationContext context) {
         final JsonObject jsonObject = new JsonObject();
@@ -63,8 +57,8 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
     }
 
     private void appendBody(ReferenceChange change, JsonObject toJson, JsonSerializationContext context) {
-        toJson.add("leftReference",  globalCdoIdAdapter.toJson(change.getLeftReference(), context));
-        toJson.add("rightReference", globalCdoIdAdapter.toJson(change.getRightReference(), context));
+        toJson.add("leftReference",  globalCdoId(change.getLeftReference(), context));
+        toJson.add("rightReference", globalCdoId(change.getRightReference(), context));
     }
 
     private void appendBody(ValueChange change, JsonObject toJson, JsonSerializationContext context) {
@@ -99,7 +93,35 @@ public class ChangeTypeAdapter implements JsonTypeAdapter<Change> {
     }
 
     private void appendGlobalId(GlobalCdoId globalCdoId, JsonObject toJson, JsonSerializationContext context) {
-        toJson.add("globalCdoId", globalCdoIdAdapter.toJson(globalCdoId, context));
+        toJson.add("globalCdoId", globalCdoId(globalCdoId, context));
+    }
+
+    private JsonElement globalCdoId(GlobalCdoId globalCdoId, JsonSerializationContext context) {
+        if (globalCdoId == null) {
+            return JsonNull.INSTANCE;
+        }
+        JsonObject jsonObject = new JsonObject();
+
+        //managedClass
+        if (globalCdoId.getCdoClass() instanceof Entity) {
+            jsonObject.addProperty("entity", globalCdoId.getCdoClass().getName());
+        } else {
+            jsonObject.addProperty("valueObject", globalCdoId.getCdoClass().getName());
+        }
+
+        //cdoId
+        if (globalCdoId.getCdoId()!=null){
+            jsonObject.add("cdoId", context.serialize(globalCdoId.getCdoId()));
+        }
+
+        //owningId & fragment
+        if(globalCdoId instanceof ValueObjectId) {
+            ValueObjectId valueObjectId = (ValueObjectId)globalCdoId;
+            jsonObject.add("ownerId", globalCdoId(valueObjectId.getOwnerId(), context));
+            jsonObject.addProperty("fragment", valueObjectId.getFragment());
+        }
+
+        return jsonObject;
     }
 
     @Override

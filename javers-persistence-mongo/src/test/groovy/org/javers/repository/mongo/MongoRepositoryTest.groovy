@@ -2,105 +2,70 @@ package org.javers.repository.mongo
 
 import com.github.fakemongo.Fongo
 import com.mongodb.DB
-import com.mongodb.Mongo
+import com.mongodb.DBObject
 import org.javers.common.collections.Optional
-import org.javers.core.Javers
-import org.javers.core.JaversBuilder
-import org.javers.core.JaversTestBuilder
-import org.javers.core.commit.CommitFactory
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.GlobalCdoId
+import org.javers.model.DummyProduct
 import org.javers.repository.api.JaversRepository
-import spock.lang.Shared
 import spock.lang.Specification
 
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.repository.mongo.MongoRepositoryFactory.DEFAULT_COLLECTION_NAME
+
 class MongoRepositoryTest extends Specification {
-
-    @Shared JaversTestBuilder javersTestBuilder
-    @Shared MongoRepository mongoDiffRepository
-    @Shared CommitFactory commitFactory
-    @Shared DB db
-
-    def setupSpec() {
-        javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        commitFactory = javersTestBuilder.commitFactory
-
-        Mongo mongo = new Fongo("myDb").mongo
-        db = mongo.getDB("db")
-        mongoDiffRepository = new MongoRepository(db)
-    }
 
 
     def "should provide Mongo object"() {
 
         given:
-        Mongo mongo = new Fongo("myDb").mongo
+        DB mongo = new Fongo("myDb").mongo.getDB("test")
 
         when:
-        JaversRepository mongoDiffRepository = new MongoRepository(mongo.getDB("test"))
+        JaversRepository mongoDiffRepository = new MongoRepository(mongo)
 
         then:
         mongoDiffRepository.mongo.name == "test"
     }
 
+    //TODO move to int
     def "should persist commit"() {
 
         given:
-        DummyProduct dummyProduct = new DummyProduct(1, "Candy")
-        def commit = commitFactory.create("charlie", dummyProduct)
+        def mongo = new Fongo("myDb").mongo.getDB("test")
+        def commitFactory = javersTestAssembly().commitFactory
+        def commit = commitFactory.create("charlie", new DummyProduct(1, "Candy"))
+
+        MongoRepository mongoRepository = new MongoRepository(mongo, Stub(CommitMapper))
 
         when:
-        mongoDiffRepository.persist(commit)
+        mongoRepository.persist(commit)
 
         then:
-        db.getCollection("Commit").count() == 1
+        mongo.getCollection(DEFAULT_COLLECTION_NAME).count() == 1
     }
 
-    def "should return empty list for non empty Commit collection"() {
+    def "should get CdoSnapshot from all finded"() {
 
         given:
-        GlobalCdoId globalCdoId = Stub() {
-            getCdoId() >> 1
-            getCdoClass() >> DummyProduct
+        def commitMapper = Stub(CommitMapper) {
+            toCdoSnapshots(_ as DBObject) >> {[
+                    new CdoSnapshot(Stub(GlobalCdoId){
+                        getCdoId() >> 1
+                    }, [:]),
+                    new CdoSnapshot(Stub(GlobalCdoId){
+                        getCdoId() >> 2
+                    }, [:])
+            ]}
         }
 
-        Mongo mongo = new Fongo("myDb").mongo
-        def mongoDiffRepository = new MongoRepository(mongo.getDB("db"))
+        MongoRepository mongoRepository = new MongoRepository(Stub(DB), commitMapper)
 
         when:
-        def latestSnapshot = mongoDiffRepository.getLatest(globalCdoId)
+        Optional<CdoSnapshot> latestSnapshot =  mongoRepository.getLatest(Stub(GlobalCdoId))
 
         then:
-        latestSnapshot.empty
-    }
-
-    def "should get latest CdoSnapshot"() {
-
-        given:
-        DummyProduct dummyProduct = new DummyProduct(1, "Candy")
-
-        Mongo mongo = new Fongo("myDb").mongo
-        DB db = mongo.getDB("test")
-
-
-        Javers javers = JaversBuilder.javers()
-                .registerEntity(DummyProduct)
-                .registerJaversRepository(mongoDiffRepository)
-                .build()
-
-        javers.commit("charlie", dummyProduct)
-
-        GlobalCdoId id = Stub() {
-            getCdoId() >> 1
-            getCdoClass() >> DummyProduct
-        }
-
-
-        when:
-        Optional<CdoSnapshot> latestSnapshot =  mongoDiffRepository.getLatest(id)
-
-        then:
-        latestSnapshot.isPresent()
+        latestSnapshot.get().globalId.cdoId == 2
     }
 
     def "should get state history"() {

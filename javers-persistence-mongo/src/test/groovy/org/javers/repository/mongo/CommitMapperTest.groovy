@@ -1,34 +1,46 @@
 package org.javers.repository.mongo
 
 import com.mongodb.DBObject
-import org.javers.core.Javers
-import org.javers.core.JaversBuilder
 import org.javers.core.commit.Commit
+import org.javers.core.commit.CommitId
+import org.javers.core.diff.Diff
+import org.javers.core.json.JsonConverter
+import org.javers.core.metamodel.object.CdoSnapshot
+import org.javers.core.metamodel.object.GlobalCdoId
 import spock.lang.Specification
-
 
 class CommitMapperTest extends Specification{
 
-    def "should correctly map Commit"() {
+    def "should map Commit to DBObject"() {
+
+        given:
+        CommitMapper commitMapper = new CommitMapper()
+        commitMapper.setJsonConverter(Stub(JsonConverter))
+
+        Commit commit = new Commit(new CommitId(1, 0), "Kazik", [new CdoSnapshot(Stub(GlobalCdoId), [:])], Stub(Diff))
+
+        when:
+        DBObject commitAsDBObject = commitMapper.toDBObject(commit)
+
+        then:
+        println commitAsDBObject.toString()
+        commitAsDBObject.keySet().contains("globalCdoId")
+        commitAsDBObject.keySet().contains("snapshots")
+    }
+
+    def "should map DBObject to CdoSnapshot"() {
 
         given:
         CommitMapper commitMapper = new CommitMapper();
-        DummyProduct dummyProduct = new DummyProduct(1, "Candy")
 
-        Javers javers = JaversBuilder.javers()
-                .registerEntity(DummyProduct)
-                .build()
+        JsonConverter jsonConverter = Stub()
+        commitMapper.setJsonConverter(jsonConverter)
 
-        Commit commit = javers.commit("charlie", dummyProduct)
 
         when:
-        DBObject commitAsDBObject = commitMapper.toCdoSnapshot(commit)
+        List<CdoSnapshot> cdoSnapshot = commitMapper.toCdoSnapshots()
 
         then:
-        ["id", "snapshots", "author", "commitDate", "diff"].every {
-            commitAsDBObject.containsField(it)
-        }
+        cdoSnapshot
     }
-
-
 }

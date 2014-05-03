@@ -7,6 +7,7 @@ import java.math.RoundingMode
 
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 
+
 /**
  * @author bartosz walacik
  */

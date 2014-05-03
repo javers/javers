@@ -27,6 +27,14 @@ public class Optional<T> {
         return new Optional(reference);
     }
 
+    public static <T> Optional<T> fromNullable(T nullOrReference) {
+        if (nullOrReference == null) {
+            return empty();
+        }
+
+        return of(nullOrReference);
+    }
+
     public boolean isEmpty() {
         return this == EMPTY;
     }

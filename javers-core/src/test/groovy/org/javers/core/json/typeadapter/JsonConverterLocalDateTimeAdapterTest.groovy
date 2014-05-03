@@ -5,7 +5,6 @@ import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
-import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 
 /**
  * @author bartosz walacik

@@ -75,8 +75,4 @@ public final class CdoSnapshot extends Cdo {
         CdoSnapshot other = (CdoSnapshot) o;
         return this.state.equals(other.state);
     }
-
-    public Map<Property, Object> getState() {
-        return state;
-    }
 }

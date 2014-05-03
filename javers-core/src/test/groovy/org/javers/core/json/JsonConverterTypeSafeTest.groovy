@@ -8,6 +8,7 @@ import spock.lang.Unroll
 
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 
+
 /**
  * @author bartosz walacik
  */
