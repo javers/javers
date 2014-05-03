@@ -6,6 +6,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
+import org.javers.core.json.typeadapter.CdoSnapshotTypeAdapter;
 import org.javers.core.json.typeadapter.GlobalCdoIdTypeAdapter;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 import org.javers.core.json.typeadapter.MapChangeTypeAdapter;
@@ -40,7 +41,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private static final Class<? extends JsonTypeAdapter>[] DOMAIN_AWARE_ADAPTERS = new Class[]{
             GlobalCdoIdTypeAdapter.class,
-            MapChangeTypeAdapter.class
+            MapChangeTypeAdapter.class,
+            CdoSnapshotTypeAdapter.class
     };
 
     private final Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();

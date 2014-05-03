@@ -6,7 +6,9 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.property.Property;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Captured state of client's domain object.
@@ -74,5 +76,9 @@ public final class CdoSnapshot extends Cdo {
 
         CdoSnapshot other = (CdoSnapshot) o;
         return this.state.equals(other.state);
+    }
+
+    public Map<Property, Object> getState() {
+        return state;
     }
 }

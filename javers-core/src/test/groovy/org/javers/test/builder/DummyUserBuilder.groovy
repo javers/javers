@@ -69,6 +69,9 @@ class DummyUserBuilder {
     }
 
     DummyUserBuilder withAddress(String city) {
+        if (dummyUser.dummyUserDetails == null) {
+            withDetails()
+        }
         dummyUser.dummyUserDetails.dummyAddress = new DummyAddress(city)
         this
     }
@@ -143,6 +146,11 @@ class DummyUserBuilder {
 
     DummyUserBuilder withIntArray(int... integers) {
         dummyUser.intArray = integers
+        this
+    }
+
+    DummyUserBuilder withCharacter(char _char) {
+        dummyUser._char = _char
         this
     }
 }

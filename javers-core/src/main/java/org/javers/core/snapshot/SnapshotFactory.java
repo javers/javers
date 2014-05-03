@@ -27,7 +27,7 @@ public class SnapshotFactory {
     /**
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
-    public CdoSnapshot create (Object liveCdo, GlobalCdoId id) {
+    public CdoSnapshot create(Object liveCdo, GlobalCdoId id) {
         CdoSnapshotBuilder snapshot =  cdoSnapshot(id);
 
         for (Property property : id.getCdoClass().getProperties()){

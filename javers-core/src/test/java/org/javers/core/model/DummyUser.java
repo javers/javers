@@ -19,6 +19,7 @@ public class DummyUser extends AbstractDummyUser {
     private boolean flag;
     private Boolean bigFlag;
     private int age;
+    private char _char;
 
     //enum
     private Sex sex;
@@ -198,5 +199,13 @@ public class DummyUser extends AbstractDummyUser {
 
     public Map<String, LocalDateTime> getPrimitiveMap() {
         return primitiveMap;
+    }
+
+    public char getChar() {
+        return _char;
+    }
+
+    public void setChar(char _char) {
+        this._char = _char;
     }
 }
