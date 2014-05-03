@@ -30,7 +30,7 @@ class ReferenceChangeTypeAdapterTest extends Specification {
 
         when:
             String jsonText = jsonConverter.toJson(change)
-            println(jsonText)
+            //println(jsonText)
 
         then:
             def json = new JsonSlurper().parseText(jsonText)

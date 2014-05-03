@@ -64,7 +64,23 @@ class ValueChangeTypeAdapterTest extends Specification {
             change.property.name == "bigFlag"
     }
 
-    def "should deserialize ValueChange using custom TypeAdapter"() {
+    def "should serialize ValueChange with Values using custom TypeAdapter" () {
+        given:
+        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
+        def dob = new LocalDateTime()
+        ValueChange change = valueChange(dummyUserWithDate("kaz"),"dob",null, dob)
+
+        when:
+        String jsonText = jsonConverter.toJson(change)
+        //println(jsonText)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.leftValue ==  null
+        json.rightValue == LocalDateTimeTypeAdapter.ISO_FORMATTER.print(dob)
+    }
+
+    def "should deserialize ValueChange with Values using custom TypeAdapter"() {
         given:
         JsonConverter jsonConverter = javersTestAssembly().jsonConverter
         def json = new JsonBuilder()
@@ -100,21 +116,5 @@ class ValueChangeTypeAdapterTest extends Specification {
         def json = new JsonSlurper().parseText(jsonText)
         json.leftValue == null
         json.rightValue == null
-    }
-
-    def "should use custom JsonTypeAdapter when writing Values like LocalDateTime for ValueChange" () {
-        given:
-        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
-        def dob = new LocalDateTime()
-        ValueChange change = valueChange(dummyUserWithDate("kaz"),"dob",null, dob)
-
-        when:
-        String jsonText = jsonConverter.toJson(change)
-        //println(jsonText)
-
-        then:
-        def json = new JsonSlurper().parseText(jsonText)
-        json.leftValue ==  null
-        json.rightValue == LocalDateTimeTypeAdapter.ISO_FORMATTER.print(dob)
     }
 }

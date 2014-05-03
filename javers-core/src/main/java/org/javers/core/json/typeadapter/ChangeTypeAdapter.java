@@ -8,6 +8,7 @@ import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.*;
+import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
@@ -29,6 +30,7 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
         initEntry(ReferenceChange.class);
         initEntry(NewObject.class);
         initEntry(ObjectRemoved.class);
+        initEntry(MapChange.class);
     }
 
     @Override

@@ -1,7 +1,9 @@
 package org.javers.core.json.typeadapter
 
+import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import org.javers.core.JaversTestBuilder
+import org.javers.core.diff.Change
+import org.javers.core.diff.appenders.MapChangeAssert
 import org.javers.core.diff.changetype.map.EntryAdded
 import org.javers.core.diff.changetype.map.EntryRemoved
 import org.javers.core.diff.changetype.map.EntryValueChange
@@ -9,20 +11,25 @@ import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.json.JsonConverter
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
+import spock.lang.Ignore
 import spock.lang.Specification
-
-import javax.persistence.Id
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.JaversTestBuilder.javersTestAssemblyTypeSafe
-import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 import static org.javers.core.json.builder.ChangeTestBuilder.mapChange
+import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
  * @author bartosz walacik
  */
 class MapChangeTypeAdapterTest extends Specification {
+
+    @Ignore //not supported
+    def "should deserialize polymorfic MapChange type-safely when switched on" () {
+        expect:
+            true
+    }
 
     def "should serialize polymorfic MapChange type-safely when switched on" () {
         JsonConverter jsonConverter = javersTestAssemblyTypeSafe().jsonConverter
@@ -62,20 +69,77 @@ class MapChangeTypeAdapterTest extends Specification {
         }
     }
 
-    def "should serialize MapChange with references" () {
+    def "should serialize MapChange.EntryValueChange with Values using custom TypeAdapter" () {
+        given:
         def javers = javersTestAssembly()
         JsonConverter jsonConverter = javers.jsonConverter
 
-        def affectedId  =    javers.idBuilder().instanceId(1,SnapshotEntity)
+        def entryChanges = [new EntryValueChange(new LocalDate(2001,1,1),
+                                                 1.12,1.13)]
+        def change = mapChange(new SnapshotEntity(id:1),"mapOfValues",entryChanges)
+
+        when:
+            String jsonText = jsonConverter.toJson(change)
+           // println(jsonText)
+
+        then:
+            def json = new JsonSlurper().parseText(jsonText)
+            with(json.entryChanges[0]){
+                entryChangeType == "EntryValueChange"
+                key == "2001-01-01"
+                leftValue == 1.12
+                rightValue == 1.13
+            }
+
+    }
+
+    def "should deserialize MapChange.EntryValueChange with Values using custom TypeAdapter" () {
+        given:
+            def javers = javersTestAssembly()
+            JsonConverter jsonConverter = javers.jsonConverter
+
+            def json = new JsonBuilder()
+            json{
+                        changeType "MapChange"
+                        globalCdoId {
+                            entity "org.javers.core.model.SnapshotEntity"
+                            cdoId 1
+                        }
+                        property "mapOfValues"
+                        entryChanges ([
+                                {
+                                    entryChangeType "EntryValueChange"
+                                    key "2001-01-01"
+                                    leftValue 1.12
+                                    rightValue 1.13
+                                }
+                        ])
+
+                }
+
+        when:
+            print json.toPrettyString()
+            MapChange change  = jsonConverter.fromJson(json.toString(),Change)
+
+        then:
+            MapChangeAssert.assertThat(change)
+                           .hasEntryValueChange(new LocalDate(2001,1,1), 1.12, 1.13)
+    }
+    def "should serialize MapChange.EntryValueChange with references" () {
+        given:
+        def javers = javersTestAssembly()
+        JsonConverter jsonConverter = javers.jsonConverter
+
+        def keyId  =    javers.idBuilder().instanceId(1,SnapshotEntity)
         def leftReference  = javers.idBuilder().instanceId(2,SnapshotEntity)
         def rightReference = javers.idBuilder().instanceId(3,SnapshotEntity)
-        def entryChanges = [new EntryValueChange(affectedId, leftReference, rightReference)]
+        def entryChanges = [new EntryValueChange(keyId, leftReference, rightReference)]
 
-        MapChange change = mapChange(new SnapshotEntity(id:1),"mapOfEntities",entryChanges)
+        def change = mapChange(new SnapshotEntity(id:1),"mapOfEntities",entryChanges)
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        println(jsonText)
+        //println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -90,6 +154,97 @@ class MapChangeTypeAdapterTest extends Specification {
         }
     }
 
+    def "should deserialize MapChange.EntryValueChange with references" () {
+        given:
+        def javers = javersTestAssembly()
+        JsonConverter jsonConverter = javers.jsonConverter
+
+        def json = new JsonBuilder()
+        json  {
+                    changeType "MapChange"
+                    globalCdoId {
+                        entity "org.javers.core.model.SnapshotEntity"
+                        cdoId 1
+                    }
+                    property "mapOfEntities"
+                    entryChanges ([
+                            {
+                                entryChangeType "EntryValueChange"
+                                key{
+                                    entity "org.javers.core.model.SnapshotEntity"
+                                    cdoId 2
+                                }
+                                leftValue {
+                                    entity "org.javers.core.model.SnapshotEntity"
+                                    cdoId 3
+                                }
+                                rightValue {
+                                    entity "org.javers.core.model.SnapshotEntity"
+                                    cdoId 4
+                                }
+                            }
+                    ])
+
+                }
+
+        when:
+        //println json.toPrettyString()
+        MapChange change  = jsonConverter.fromJson(json.toString(),Change)
+
+        then:
+        def keyReference   = javers.idBuilder().instanceId(2,SnapshotEntity)
+        def leftReference  = javers.idBuilder().instanceId(3,SnapshotEntity)
+        def rightReference = javers.idBuilder().instanceId(4,SnapshotEntity)
+        MapChangeAssert.assertThat(change)
+                       .hasEntryValueChange(keyReference, leftReference, rightReference)
+    }
+
+    def "should deserialize MapChange with primitives" () {
+        given:
+        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
+        def json = new JsonBuilder()
+        json
+                {
+                    changeType "MapChange"
+                    globalCdoId {
+                        entity "org.javers.core.model.SnapshotEntity"
+                        cdoId 1
+                    }
+                    property "mapOfPrimitives"
+                    entryChanges ([
+                            {
+                                entryChangeType "EntryAdded"
+                                key "some1"
+                                value 1
+                            },
+                            {
+                                entryChangeType "EntryRemoved"
+                                key "some2"
+                                value 2
+                            },
+                            {
+                                entryChangeType "EntryValueChange"
+                                key "some3"
+                                leftValue 3
+                                rightValue 4
+                            }
+                    ])
+
+                }
+
+        when:
+        //println json.toPrettyString()
+        MapChange change  = jsonConverter.fromJson(json.toString(),Change)
+
+        then:
+        change.affectedCdoId == instanceId(1,SnapshotEntity)
+        change.property.name == "mapOfPrimitives"
+        MapChangeAssert.assertThat(change)
+                       .hasEntryAdded("some1",1)
+                       .hasEntryRemoved("some2",2)
+                       .hasEntryValueChange("some3",3,4)
+    }
+
     def "should serialize MapChange with primitives" () {
         given:
         JsonConverter jsonConverter = javersTestAssembly().jsonConverter
@@ -101,7 +256,7 @@ class MapChangeTypeAdapterTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        println(jsonText)
+        //println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)

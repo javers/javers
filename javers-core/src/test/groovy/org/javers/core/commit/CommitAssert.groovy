@@ -64,6 +64,16 @@ class CommitAssert {
         this
     }
 
+    CommitAssert hasListReferenceAddedAt(String property, def addedRef){
+        diffAssert.hasListReferenceAddedAt(property,addedRef)
+        this
+    }
+
+    CommitAssert hasListReferenceRemovedAt(String property, def removedRef){
+        diffAssert.hasListReferenceRemovedAt(property,removedRef)
+        this
+    }
+
     CommitAssert hasReferenceChangeAt(String property, def oldRef, def newRef) {
         diffAssert.hasReferenceChangeAt(property,oldRef,newRef)
         this

@@ -7,6 +7,8 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.GlobalCdoIdTypeAdapter;
+import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
+import org.javers.core.json.typeadapter.MapChangeTypeAdapter;
 import org.javers.core.metamodel.property.*;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
@@ -35,6 +37,11 @@ import java.util.Set;
  */
 public class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
+
+    private static final Class<? extends JsonTypeAdapter>[] DOMAIN_AWARE_ADAPTERS = new Class[]{
+            GlobalCdoIdTypeAdapter.class,
+            MapChangeTypeAdapter.class
+    };
 
     private final Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
 
@@ -211,11 +218,13 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * boots JsonConverter and registers domain aware typeAdapters
      */
     private void bootJsonConverter() {
-        JsonConverter jsonConverter = jsonConverterBuilder()
-                .registerJsonTypeAdapter(getContainerComponent(GlobalCdoIdTypeAdapter.class))
-                .build();
+        JsonConverterBuilder jsonConverterBuilder = jsonConverterBuilder();
 
-        addComponent(jsonConverter);
+        for (Class<? extends JsonTypeAdapter> adapter : DOMAIN_AWARE_ADAPTERS){
+            jsonConverterBuilder.registerJsonTypeAdapter(getContainerComponent(adapter));
+        }
+
+        addComponent(jsonConverterBuilder.build());
     }
 
     private void bootRepository(){
