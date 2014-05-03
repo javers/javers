@@ -1,4 +1,4 @@
-package org.javers.core.json.typeadapter;
+package org.javers.core.json.typeadapter.change;
 
 import com.google.gson.*;
 import org.javers.common.exception.exceptions.JaversException;
@@ -77,7 +77,7 @@ public class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
     }
 
     private EntryAdded parseEntryAdded(JsonObject entryChange, JsonDeserializationContext context, MapType mapType){
-        Object key =   decodeValue(entryChange, context, KEY_FIELD,   mapType.getKeyClass());
+        Object key =   decodeValue(entryChange, context, KEY_FIELD, mapType.getKeyClass());
         Object value = decodeValue(entryChange, context, VALUE_FIELD, mapType.getValueClass());
         return new EntryAdded(key, value);
     }
