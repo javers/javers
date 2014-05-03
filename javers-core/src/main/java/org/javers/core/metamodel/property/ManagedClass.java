@@ -47,6 +47,13 @@ public abstract class ManagedClass {
         return sourceClass.getName();
     }
 
+    /**
+     * 'Entity' or 'ValueObject'
+     */
+    public String getSimpleName() {
+        return this.getClass().getSimpleName();
+    }
+
     public List<Property> getCollectionTypeProperties() {
         return getProperties(new Predicate<Property>() {
             public boolean apply(Property property) {

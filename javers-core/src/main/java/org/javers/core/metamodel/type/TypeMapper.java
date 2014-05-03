@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.ManagedClassDefinition;
@@ -78,6 +79,21 @@ public class TypeMapper {
         }
 
         return createMapping(javaType);
+    }
+
+    /**
+     * @throws JaversException CLASS_NOT_MANAGED if given javaClass is NOT mapped to {@link ManagedType}
+     */
+    public ManagedType getJaversManagedType(Class javaType) {
+        JaversType javersType = getJaversType(javaType);
+
+        if (!(javersType instanceof  ManagedType)){
+            throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED,
+                                      javaType.getName(),
+                                      javersType.getClass().getSimpleName()) ;
+        }
+
+        return (ManagedType)javersType;
     }
 
   /*  public List<JaversType> getJaversTypes(List<Class> javaTypes) {

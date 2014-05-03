@@ -3,6 +3,7 @@ package org.javers.core;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.object.ValueObjectId;
 
 /**
@@ -31,6 +32,12 @@ public class IdBuilder {
         Validate.argumentsAreNotNull(instance);
 
         return (InstanceId)globalIdFactory.createId(instance, null);
+    }
+
+    public UnboundedValueObjectId unboundedValueObjectId(Class valueObjectClass){
+        Validate.argumentsAreNotNull(valueObjectClass);
+        return globalIdFactory.createFromClass(valueObjectClass);
+
     }
 
     public InstanceId instanceId(Object localId, Class entityClass){

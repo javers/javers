@@ -4,7 +4,6 @@ import org.javers.core.json.BasicStringTypeAdapter;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import java.lang.reflect.Type;
 
 
 /**

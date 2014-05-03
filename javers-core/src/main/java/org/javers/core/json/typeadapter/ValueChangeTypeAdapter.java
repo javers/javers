@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.diff.changetype.ValueChange;
 
-public class ValueChangeTypeAdapter extends AbstractTypeAdapter<ValueChange> {
+public class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
 
     @Override
     public JsonElement toJson(ValueChange change, JsonSerializationContext context) {
@@ -15,5 +15,10 @@ public class ValueChangeTypeAdapter extends AbstractTypeAdapter<ValueChange> {
         jsonObject.add("rightValue", context.serialize(change.getWrappedRightValue()));
 
         return jsonObject;
+    }
+
+    @Override
+    public Class getValueType() {
+        return ValueChange.class;
     }
 }

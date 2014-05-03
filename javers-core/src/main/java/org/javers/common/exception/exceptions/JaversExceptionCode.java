@@ -43,9 +43,13 @@ public enum  JaversExceptionCode {
 
     PROPERTY_NOT_FOUND(RUNTIME_ERROR +"property '%s' not found in class '%s'"),
 
-    ENTITY_NOT_MAPPED(RUNTIME_ERROR+"given javaClass '%s' is mapped to '%s', Entity expected"),
+    MANAGED_CLASS_MAPPING_ERROR(RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, expected %s"),
 
-    CLASS_NOT_MANAGED(RUNTIME_ERROR+"given javaClass '%s' is mapped to '%s', ManagedType expected");
+    CLASS_NOT_MANAGED(RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, ManagedType expected"),
+
+    CLASS_NOT_FOUND(RUNTIME_ERROR+"class not found - '%s'")
+
+    ;
 
     private final String message;
 

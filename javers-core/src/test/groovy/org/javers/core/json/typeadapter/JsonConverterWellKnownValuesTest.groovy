@@ -1,7 +1,6 @@
 package org.javers.core.json.typeadapter
 
 import org.javers.core.json.JsonConverter
-import org.joda.time.LocalDateTime
 import spock.lang.Shared
 import spock.lang.Specification
 

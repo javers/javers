@@ -6,6 +6,7 @@ import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Javers is meant to support various persistence stores for
@@ -91,17 +92,28 @@ public class JsonConverter {
      * into pair of {@link JsonDeserializer} and {@link JsonDeserializer}
      * and registers them with this.gsonBuilder
      */
-    void registerJsonTypeAdapter(final JsonTypeAdapter adapter) {
-        registerJsonTypeAdapter(adapter.getValueType(), adapter);
+    void registerJsonTypeAdapter(JsonTypeAdapter adapter) {
+        for (Class c : (List<Class>)adapter.getValueTypes()){
+            registerJsonTypeAdapter(c, adapter);
+        }
     }
-
 
     public String toJson(Object value) {
         checkState();
         return gson.toJson(value);
     }
 
+    public JsonElement toJsonElement(Object value) {
+        checkState();
+        return gson.toJsonTree(value);
+    }
+
     public <T> T fromJson(String json, Class<T> expectedType) {
+        checkState();
+        return gson.fromJson(json,expectedType);
+    }
+
+    public <T> T fromJsonTree(JsonElement json, Class<T> expectedType) {
         checkState();
         return gson.fromJson(json,expectedType);
     }

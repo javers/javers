@@ -3,8 +3,10 @@ package org.javers.core;
 import com.google.gson.TypeAdapter;
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
+import org.javers.core.json.typeadapter.GlobalCdoIdTypeAdapter;
 import org.javers.core.metamodel.property.*;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
@@ -17,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -50,12 +53,12 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     public Javers build() {
 
-        // bootstrap phase 2: JSON beans
-        bootJsonConverter();
-
-        // bootstrap phase 3:
+        // bootstrap phase 2:
         // ManagedClassFactory & managed classes registration
         bootManagedClasses();
+
+        // bootstrap phase 3: JSON beans & domain aware typeAdapters
+        bootJsonConverter();
 
         // bootstrap phase 4: Repository
         bootRepository();
@@ -127,10 +130,13 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * Useful for not trivial ValueTypes when Gson's default representation isn't appropriate
      *
      * @see JsonTypeAdapter
-     * @see JsonTypeAdapter#getValueType()
+     * @see JsonTypeAdapter#getValueTypes()
      */
     public JaversBuilder registerValueTypeAdapter(JsonTypeAdapter typeAdapter) {
-        registerValue(typeAdapter.getValueType());
+        for (Class c : (List<Class>)typeAdapter.getValueTypes()){
+            registerValue(c);
+        }
+
         jsonConverterBuilder().registerJsonTypeAdapter(typeAdapter);
         return this;
     }
@@ -201,8 +207,15 @@ public class JaversBuilder extends AbstractJaversBuilder {
         mapRegisteredClasses();
     }
 
+    /**
+     * boots JsonConverter and registers domain aware typeAdapters
+     */
     private void bootJsonConverter() {
-        addComponent(jsonConverterBuilder().build());
+        JsonConverter jsonConverter = jsonConverterBuilder()
+                .registerJsonTypeAdapter(getContainerComponent(GlobalCdoIdTypeAdapter.class))
+                .build();
+
+        addComponent(jsonConverter);
     }
 
     private void bootRepository(){

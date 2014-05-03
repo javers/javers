@@ -25,7 +25,7 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     /**
-     *  @throws JaversException ENTITY_NOT_MAPPED if given javaClass is NOT mapped to Entity
+     *  @throws JaversException ENTITY_EXPECTED if given javaClass is NOT mapped to Entity
      */
     public List<CdoSnapshot> getStateHistory(Object localId, Class entityClass, int limit){
         Validate.argumentsAreNotNull(localId, entityClass);

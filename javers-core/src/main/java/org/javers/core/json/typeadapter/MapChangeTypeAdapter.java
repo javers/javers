@@ -9,7 +9,7 @@ import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.EntryValueChange;
 import org.javers.core.diff.changetype.map.MapChange;
 
-public class MapChangeTypeAdapter extends AbstractTypeAdapter<MapChange> {
+public class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
 
     @Override
     public JsonElement toJson(MapChange change, JsonSerializationContext context) {
@@ -18,6 +18,11 @@ public class MapChangeTypeAdapter extends AbstractTypeAdapter<MapChange> {
         appendBody(change, jsonObject, context);
 
         return jsonObject;
+    }
+
+    @Override
+    public Class getValueType() {
+        return MapChange.class;
     }
 
     private void appendBody(MapChange change, JsonObject toJson, JsonSerializationContext context) {
