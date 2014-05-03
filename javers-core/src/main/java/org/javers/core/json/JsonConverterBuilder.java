@@ -19,11 +19,11 @@ public class JsonConverterBuilder {
     private static final JsonTypeAdapter[] BUILT_IN_ADAPTERS = new JsonTypeAdapter[]{
             new LocalDateTimeTypeAdapter(),
             new LocalDateTypeAdapter(),
-            new MapChangeTypeAdapter(),
             new NewObjectTypeAdapter(),
             new ObjectRemovedTypeAdapter(),
             new ReferenceChangeTypeAdapter(),
-            new ValueChangeTypeAdapter()
+            new ValueChangeTypeAdapter(),
+            new ChangeTypeAdapter()
     };
 
     private boolean typeSafeValues = false;

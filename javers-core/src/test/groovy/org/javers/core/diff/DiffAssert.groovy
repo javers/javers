@@ -1,10 +1,15 @@
 package org.javers.core.diff
 
+import org.javers.core.commit.CommitAssert
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.PropertyChange
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.container.ListChange
+import org.javers.core.diff.changetype.container.ValueAdded
+import org.javers.core.diff.changetype.container.ValueRemoved
+import org.javers.core.metamodel.object.GlobalCdoId
 
 /**
  * @author bartosz walacik
@@ -69,6 +74,30 @@ class DiffAssert {
             assert !left(change)
             assert right(change) ==  entry.value
         }
+        this
+    }
+
+    DiffAssert hasListReferenceAddedAt(String property, def addedRef){
+        ListChange change = actual.changes.find{it instanceof ListChange && it.property.name == property}
+        assert change
+
+        ValueAdded removed = change.changes.find{it instanceof ValueAdded}
+        assert removed
+        assert removed.addedValue instanceof GlobalCdoId
+        assert removed.addedValue == addedRef
+
+        this
+    }
+
+    DiffAssert hasListReferenceRemovedAt(String property, def removedRef){
+        ListChange change = actual.changes.find{it instanceof ListChange && it.property.name == property}
+        assert change
+
+        ValueRemoved removed = change.changes.find{it instanceof ValueRemoved}
+        assert removed
+        assert removed.removedValue instanceof GlobalCdoId
+        assert removed.removedValue == removedRef
+
         this
     }
 

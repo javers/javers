@@ -43,14 +43,24 @@ public class SnapshotEntity {
     private Map<String,DummyAddress> mapPrimitiveToVO;
     private Map<String,SnapshotEntity> mapPrimitiveToEntity;
     private Map<SnapshotEntity, SnapshotEntity> mapOfEntities;
-    private Map<DummyAddress,String> mapVoToPrimitive;           //not supported
-
-    private Map nonParametrizedMap;                              //not supported
+    private Map<Object,Object> polymorficMap;
 
     @Id
     public int getId() {
         return id;
     }
+
+    public Map<Object, Object> getPolymorficMap() {
+        return polymorficMap;
+    }
+
+    public void setPolymorficMap(Map<Object, Object> polymorficMap) {
+        this.polymorficMap = polymorficMap;
+    }
+
+    private Map<DummyAddress,String> mapVoToPrimitive;           //not supported
+
+    private Map nonParametrizedMap;                              //not supported
 
     public void setId(int id) {
         this.id = id;
