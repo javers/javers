@@ -27,7 +27,7 @@ class GlobalCdoIdTypeAdapterTest extends Specification {
     @Unroll
     def "should deserialize InstanceId with #type cdoId"() {
         when:
-        println givenJson
+        //println givenJson
         def idHolder = javersTestAssembly().jsonConverter.fromJson(givenJson, IdHolder)
 
         then:
