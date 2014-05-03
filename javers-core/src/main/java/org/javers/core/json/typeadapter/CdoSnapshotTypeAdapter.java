@@ -7,19 +7,31 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.CdoSnapshotBuilder;
+import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.property.PropertyScanner;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.Map;
 
+import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
+
 public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
+
+    public static final String GLOBAL_CDO_ID = "globalCdoId";
+    public static final String COMMIT_ID = "commitId";
+    public static final String STATE = "state";
+    private final PropertyScanner propertyScanner;
 
     private TypeMapper typeMapper;
 
-    public CdoSnapshotTypeAdapter(TypeMapper typeMapper) {
+    public CdoSnapshotTypeAdapter(TypeMapper typeMapper, PropertyScanner propertyScanner) {
         this.typeMapper = typeMapper;
+        this.propertyScanner = propertyScanner;
     }
 
     @Override
@@ -28,8 +40,37 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
     }
 
     @Override
-    public CdoSnapshot fromJson(JsonElement json, JsonDeserializationContext jsonDeserializationContext) {
-        return null;
+    public CdoSnapshot fromJson(JsonElement json, JsonDeserializationContext context) {
+        JsonObject jsonObject = (JsonObject) json;
+
+        CommitId commitId = parseCommitId(jsonObject);
+        GlobalCdoId cdoId = context.deserialize(jsonObject.get(GLOBAL_CDO_ID), GlobalCdoId.class);
+
+        CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId);
+        cdoSnapshotBuilder.withCommitId(commitId);
+
+        JsonObject state = jsonObject.get(STATE).getAsJsonObject();
+
+        for (Property property : propertyScanner.scan(cdoId.getCdoClass().getSourceClass())) {
+            cdoSnapshotBuilder.withPropertyValue(property, context.deserialize(state.get(property.getName()), property.getType()));
+        }
+
+        return cdoSnapshotBuilder.build();
+    }
+
+    private CommitId parseCommitId(JsonObject json) {
+        String majorDotMinor = json.get(COMMIT_ID).getAsString();
+
+        String[] strings = majorDotMinor.split("\\.");
+
+        if (strings.length != 2) {
+            throw new RuntimeException("cannot parse");
+        }
+
+        long major = Long.parseLong(strings[0]);
+        int minor = Integer.parseInt(strings[1]);
+
+        return new CommitId(major, minor);
     }
 
     @Override
@@ -37,9 +78,9 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
 
         JsonObject jsonObject = new JsonObject();
 
-        jsonObject.addProperty("commitId", snapshot.getCommitId().value());
-        jsonObject.add("globalCdoId", context.serialize(snapshot.getGlobalId()));
-        jsonObject.add("state", getState(snapshot, context));
+        jsonObject.addProperty(COMMIT_ID, snapshot.getCommitId().value());
+        jsonObject.add(GLOBAL_CDO_ID, context.serialize(snapshot.getGlobalId()));
+        jsonObject.add(STATE, getState(snapshot, context));
 
         return jsonObject;
     }

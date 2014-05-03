@@ -118,7 +118,7 @@ class MapChangeTypeAdapterTest extends Specification {
                 }
 
         when:
-            print json.toPrettyString()
+//            print json.toPrettyString()
             MapChange change  = jsonConverter.fromJson(json.toString(),Change)
 
         then:
