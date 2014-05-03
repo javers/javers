@@ -1,4 +1,4 @@
-package org.javers.core.json.typeadapter
+package org.javers.core.json.typeadapter.change
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
