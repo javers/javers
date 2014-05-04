@@ -9,6 +9,7 @@ import org.javers.core.diff.changetype.map.EntryRemoved
 import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.json.JsonConverter
+import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
 import spock.lang.Ignore
@@ -156,47 +157,46 @@ class MapChangeTypeAdapterTest extends Specification {
 
     def "should deserialize MapChange.EntryValueChange with references" () {
         given:
-        def javers = javersTestAssembly()
-        JsonConverter jsonConverter = javers.jsonConverter
+            def javers = javersTestAssembly()
+            JsonConverter jsonConverter = javers.jsonConverter
 
-        def json = new JsonBuilder()
-        json  {
-                    changeType "MapChange"
-                    globalCdoId {
-                        entity "org.javers.core.model.SnapshotEntity"
-                        cdoId 1
+            def json = new JsonBuilder()
+            json  {
+                        changeType "MapChange"
+                        globalCdoId {
+                            entity "org.javers.core.model.SnapshotEntity"
+                            cdoId 1
+                        }
+                        property "mapOfEntities"
+                        entryChanges ([
+                                {
+                                    entryChangeType "EntryValueChange"
+                                    key{
+                                        entity "org.javers.core.model.SnapshotEntity"
+                                        cdoId 2
+                                    }
+                                    leftValue {
+                                        entity "org.javers.core.model.SnapshotEntity"
+                                        cdoId 3
+                                    }
+                                    rightValue {
+                                        entity "org.javers.core.model.SnapshotEntity"
+                                        cdoId 4
+                                    }
+                                }
+                        ])
+
                     }
-                    property "mapOfEntities"
-                    entryChanges ([
-                            {
-                                entryChangeType "EntryValueChange"
-                                key{
-                                    entity "org.javers.core.model.SnapshotEntity"
-                                    cdoId 2
-                                }
-                                leftValue {
-                                    entity "org.javers.core.model.SnapshotEntity"
-                                    cdoId 3
-                                }
-                                rightValue {
-                                    entity "org.javers.core.model.SnapshotEntity"
-                                    cdoId 4
-                                }
-                            }
-                    ])
-
-                }
 
         when:
-        //println json.toPrettyString()
-        MapChange change  = jsonConverter.fromJson(json.toString(),Change)
+            //println json.toPrettyString()
+            MapChange change  = jsonConverter.fromJson(json.toString(),Change)
 
         then:
-        def keyReference   = javers.idBuilder().instanceId(2,SnapshotEntity)
-        def leftReference  = javers.idBuilder().instanceId(3,SnapshotEntity)
-        def rightReference = javers.idBuilder().instanceId(4,SnapshotEntity)
-        MapChangeAssert.assertThat(change)
-                       .hasEntryValueChange(keyReference, leftReference, rightReference)
+            MapChangeAssert.assertThat(change)
+                           .hasEntryValueChange(instanceId(2,SnapshotEntity),
+                                                instanceId(3,SnapshotEntity),
+                                                instanceId(4,SnapshotEntity))
     }
 
     def "should deserialize MapChange with primitives" () {
