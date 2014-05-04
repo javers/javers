@@ -51,7 +51,10 @@ public enum  JaversExceptionCode {
 
     CLASS_NOT_MANAGED(RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, ManagedType expected"),
 
-    CLASS_NOT_FOUND(RUNTIME_ERROR+"class not found - '%s'")
+    CLASS_NOT_FOUND(RUNTIME_ERROR+"class not found - '%s'") ,
+
+    CANNOT_PARSE_COMMIT_ID(RUNTIME_ERROR+"cannot parse given value {'$s'} to CommitId. " +
+            "CommitId should consists of two parts : majorId.minorId e.g. 1.0")
 
     ;
 

@@ -15,6 +15,9 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 
+/**
+ * @author pawel szymczyk
+ */
 class CdoSnapshotTypeAdapterTest extends Specification {
 
     def "should serialize CdoSnapshot to Json"() {
@@ -28,7 +31,6 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
-//        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -55,15 +57,16 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
-//        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
 
-        json.state.name == "kaz"
-        json.state.age == 1
-        json.state.flag == true
-        json.state._char == 'a' as char
+        with(json.state) {
+            name == "kaz"
+            age == 1
+            flag == true
+            _char == 'a' as char
+        }
     }
 
     def "should serialize state with entity in CdoSnapshot"() {
@@ -81,11 +84,9 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
-//        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-
         json.state.dummyUserDetails.entity == "org.javers.core.model.DummyUserDetails"
     }
 
@@ -102,11 +103,9 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
-//        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-
         json.state.dummyAddress.valueObject == "org.javers.core.model.DummyAddress"
     }
 
@@ -128,15 +127,16 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
-//        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
 
-        json.state.intArray == [1, 2]
-        json.state.integerList == [3, 4]
-        json.state.stringSet == ["5", "6"]
-        json.state.primitiveMap.time == "2000-01-01T12:00:00"
+        with (json.state) {
+            intArray == [1, 2]
+            integerList == [3, 4]
+            stringSet == ["5", "6"]
+            primitiveMap.time == "2000-01-01T12:00:00"
+        }
     }
 
     def "should deserialize CdoSnapshot"() {
@@ -154,13 +154,14 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
 
         when:
-//        println json.toPrettyString()
         CdoSnapshot snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
 
         then:
-        snapshot.commitId.value() == "1.0"
-        snapshot.globalId.getCdoId() == "kaz"
-        snapshot.globalId.getCdoClass().getSourceClass() == DummyUser
+        with (snapshot) {
+            commitId.value() == "1.0"
+            globalId.getCdoId() == "kaz"
+            globalId.getCdoClass().getSourceClass() == DummyUser
+        }
     }
 
     def "should deserialize state with primitive values in CdoSnapshot"() {
@@ -185,10 +186,12 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         CdoSnapshot snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
 
         then:
-        snapshot.getPropertyValue("_char") == 'a' as char
-        snapshot.getPropertyValue("name") == "kaz"
-        snapshot.getPropertyValue("age") == 1
-        snapshot.getPropertyValue("flag") == true
+        with (snapshot) {
+            getPropertyValue("_char") == 'a' as char
+            getPropertyValue("name") == "kaz"
+            getPropertyValue("age") == 1
+            getPropertyValue("flag") == true
+        }
     }
 
     def "should deserialize state with entity in CdoSnapshot"() {
@@ -253,6 +256,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         given:
         def json = new JsonBuilder()
+        def ids = [1, 2]
         json {
             commitId "1.0"
             globalCdoId {
@@ -266,18 +270,25 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 primitiveMap {
                     time "2000-01-01T12:00:00"
                 }
+                dummyUserDetailsList ids.collect {
+                        id -> [entity: "org.javers.core.model.DummyUserDetails", cdoId: id]
+                }
+                dateTimes "2000-01-01T12:00:00", "2000-01-01T12:00:00"
                 name "kaz"
             }
         }
 
         when:
-//        println json.toPrettyString()
         CdoSnapshot snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
 
         then:
-        snapshot.getPropertyValue("intArray") == [1, 2].toArray()
-        snapshot.getPropertyValue("integerList") == [3, 4]
-        snapshot.getPropertyValue("stringSet") == ["5", "6"] as Set
-        snapshot.getPropertyValue("primitiveMap") == [time : new LocalDateTime(2000, 1, 1, 12, 0)]
+        with (snapshot) {
+            getPropertyValue("intArray") == [1, 2].toArray()
+            getPropertyValue("integerList") == [3, 4]
+            getPropertyValue("stringSet") == ["5", "6"] as Set
+            getPropertyValue("primitiveMap") == [time: new LocalDateTime(2000, 1, 1, 12, 0)]
+            getPropertyValue("dummyUserDetailsList").size() == 2
+            getPropertyValue("dateTimes").size() == 2
+        }
     }
 }

@@ -37,6 +37,7 @@ public class DummyUser extends AbstractDummyUser {
 
     //arrays
     private int[] intArray;
+    private LocalDateTime[] dateTimes;
 
      //reference
     private DummyUser supervisor;
@@ -207,5 +208,13 @@ public class DummyUser extends AbstractDummyUser {
 
     public void setChar(char _char) {
         this._char = _char;
+    }
+
+    public LocalDateTime[] getDateTimes() {
+        return dateTimes;
+    }
+
+    public void setDateTimes(LocalDateTime[] dateTimes) {
+        this.dateTimes = dateTimes;
     }
 }
