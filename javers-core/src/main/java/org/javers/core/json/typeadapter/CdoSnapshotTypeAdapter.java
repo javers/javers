@@ -190,30 +190,27 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
     private JsonElement getState(CdoSnapshot snapshot, JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
 
-        for (Map.Entry<Property, Object> entry : snapshot.getState().entrySet()) {
+        for (Property property : snapshot.getProperties()) {
 
-            if (typeMapper.isPrimitiveOrValue(entry.getKey().getType())) {
-                appendPrimitiveOrValue(jsonObject, entry);
+            if (typeMapper.isPrimitiveOrValue(property.getType())) {
+                appendPrimitiveOrValue(jsonObject, property.getName(), snapshot.getPropertyValue(property));
             } else {// entity, value object, collection
-                jsonObject.add(entry.getKey().getName(), context.serialize(entry.getValue()));
+                jsonObject.add(property.getName(), context.serialize(snapshot.getPropertyValue(property)));
             }
         }
 
         return jsonObject;
     }
 
-    private void appendPrimitiveOrValue(JsonObject jsonObject, Map.Entry<Property, Object> entry) {
-        String keyName = entry.getKey().getName();
-        Object value = entry.getValue();
-
+    private void appendPrimitiveOrValue(JsonObject jsonObject, String propertyName, Object value) {
         if (value instanceof String) {
-            jsonObject.addProperty(keyName, (String) value);
+            jsonObject.addProperty(propertyName, (String) value);
         } else if (value instanceof Number) {
-            jsonObject.addProperty(keyName, (Number) value);
+            jsonObject.addProperty(propertyName, (Number) value);
         } else if (value instanceof Boolean) {
-            jsonObject.addProperty(keyName, (Boolean) value);
+            jsonObject.addProperty(propertyName, (Boolean) value);
         } else if (value instanceof Character) {
-            jsonObject.addProperty(keyName, (Character) value);
+            jsonObject.addProperty(propertyName, (Character) value);
         } else {
             throw new JaversException(JaversExceptionCode.CLASS_NOT_FOUND);
         }
