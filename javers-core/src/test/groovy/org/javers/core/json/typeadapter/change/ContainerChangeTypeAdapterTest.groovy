@@ -88,7 +88,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
         then:
             def json = new JsonSlurper().parseText(jsonText)
             json.property == propertyName
-            json.changeType == changeType.simpleName()
+            json.changeType == changeType.simpleName
             json.globalCdoId
             json.elementChanges.size() == 3
             with(json.elementChanges[0]){
@@ -137,7 +137,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
         then:
             def json = new JsonSlurper().parseText(jsonText)
             json.property == propertyName
-            json.changeType == changeType.simpleName()
+            json.changeType == changeType.simpleName
             json.globalCdoId
             json.elementChanges.size() == 3
             with(json.elementChanges[0]){
@@ -250,7 +250,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
         then:
             def json = new JsonSlurper().parseText(jsonText)
             json.property == propertyName
-            json.changeType == changeType.simpleName()
+            json.changeType == changeType.simpleName
             json.globalCdoId
             json.elementChanges.size() == 3
             with(json.elementChanges[0]){
