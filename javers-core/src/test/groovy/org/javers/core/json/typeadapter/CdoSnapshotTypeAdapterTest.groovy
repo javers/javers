@@ -4,6 +4,7 @@ import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.metamodel.object.CdoSnapshot
+import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -159,8 +160,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         then:
         with (snapshot) {
             commitId.value() == "1.0"
-            globalId.getCdoId() == "kaz"
-            globalId.getCdoClass().getSourceClass() == DummyUser
+            globalId == InstanceId.InstanceIdDTO.instanceId("kaz",DummyUser)
         }
     }
 

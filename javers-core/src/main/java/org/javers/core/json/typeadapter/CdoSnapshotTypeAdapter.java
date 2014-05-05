@@ -14,11 +14,7 @@ import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.PropertyScanner;
-import org.javers.core.metamodel.type.ArrayType;
-import org.javers.core.metamodel.type.CollectionType;
-import org.javers.core.metamodel.type.MapType;
-import org.javers.core.metamodel.type.SetType;
-import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.*;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -38,13 +34,11 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
     public static final String GLOBAL_CDO_ID = "globalCdoId";
     public static final String COMMIT_ID = "commitId";
     public static final String STATE = "state";
-    private final PropertyScanner propertyScanner;
 
     private TypeMapper typeMapper;
 
-    public CdoSnapshotTypeAdapter(TypeMapper typeMapper, PropertyScanner propertyScanner) {
+    public CdoSnapshotTypeAdapter(TypeMapper typeMapper) {
         this.typeMapper = typeMapper;
-        this.propertyScanner = propertyScanner;
     }
 
     @Override
@@ -64,7 +58,7 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
 
         JsonObject state = jsonObject.get(STATE).getAsJsonObject();
 
-        for (Property property : propertyScanner.scan(cdoId.getCdoClass().getSourceClass())) {
+        for (Property property : cdoId.getCdoClass().getProperties()) {
             cdoSnapshotBuilder.withPropertyValue(property, decodeValue(state, context, property));
         }
 
@@ -100,13 +94,13 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
     }
 
     private boolean isFullyParametrizedMap(Property property) {
-        return Map.class.isAssignableFrom(property.getType()) &&
-                ((MapType)typeMapper.getPropertyType(property)).isFullyParametrized();
+        JaversType javersType = typeMapper.getPropertyType(property);
+        return javersType instanceof MapType && ((MapType)javersType).isFullyParametrized();
     }
 
     private boolean isFullyParametrizedCollection(Property property) {
-        return Collection.class.isAssignableFrom(property.getType()) &&
-                ((CollectionType)typeMapper.getPropertyType(property)).isFullyParametrized();
+        JaversType javersType = typeMapper.getPropertyType(property);
+        return javersType instanceof CollectionType && ((CollectionType)javersType).isFullyParametrized();
     }
 
     private Collection decodeCollection(JsonObject state, JsonDeserializationContext context, Property property) {
@@ -191,28 +185,10 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
         JsonObject jsonObject = new JsonObject();
 
         for (Property property : snapshot.getProperties()) {
-
-            if (typeMapper.isPrimitiveOrValue(property.getType())) {
-                appendPrimitiveOrValue(jsonObject, property.getName(), snapshot.getPropertyValue(property));
-            } else {// entity, value object, collection
-                jsonObject.add(property.getName(), context.serialize(snapshot.getPropertyValue(property)));
-            }
+           jsonObject.add(property.getName(), context.serialize(snapshot.getPropertyValue(property)));
         }
 
         return jsonObject;
     }
 
-    private void appendPrimitiveOrValue(JsonObject jsonObject, String propertyName, Object value) {
-        if (value instanceof String) {
-            jsonObject.addProperty(propertyName, (String) value);
-        } else if (value instanceof Number) {
-            jsonObject.addProperty(propertyName, (Number) value);
-        } else if (value instanceof Boolean) {
-            jsonObject.addProperty(propertyName, (Boolean) value);
-        } else if (value instanceof Character) {
-            jsonObject.addProperty(propertyName, (Character) value);
-        } else {
-            throw new JaversException(JaversExceptionCode.CLASS_NOT_FOUND);
-        }
-    }
 }
