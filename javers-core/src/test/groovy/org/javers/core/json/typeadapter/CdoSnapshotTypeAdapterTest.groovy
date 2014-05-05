@@ -5,6 +5,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -13,6 +14,7 @@ import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 
@@ -160,7 +162,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         then:
         with (snapshot) {
             commitId.value() == "1.0"
-            globalId == InstanceId.InstanceIdDTO.instanceId("kaz",DummyUser)
+            globalId == instanceId("kaz",DummyUser)
         }
     }
 
@@ -217,8 +219,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         CdoSnapshot snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
 
         then:
-        def entity = snapshot.getPropertyValue("dummyUserDetails")
-        entity instanceof DummyUserDetails
+        def entityId = snapshot.getPropertyValue("dummyUserDetails")
+        entityId == instanceId(1, DummyUserDetails)
     }
 
     def "should deserialize state with value object in CdoSnapshot"() {
@@ -248,8 +250,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         CdoSnapshot snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
 
         then:
-        def valueObject = snapshot.getPropertyValue("dummyAddress")
-        valueObject instanceof DummyAddress
+        def valueObjectId = snapshot.getPropertyValue("dummyAddress")
+        valueObjectId == ValueObjectId.ValueObjectIdDTO.valueObjectId(1, DummyUserDetails, "dummyAddress")
     }
 
     def "should deserialize state with collections in CdoSnapshot"() {
