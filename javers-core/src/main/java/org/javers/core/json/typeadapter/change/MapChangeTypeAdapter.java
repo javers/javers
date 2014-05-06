@@ -96,14 +96,7 @@ public class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
     }
 
     private Object decodeValue(JsonObject entryChange, JsonDeserializationContext context, String fieldName, Class expectedType){
-        JaversType expectedJaversType = typeMapper.getJaversType(expectedType);
-
-        if (expectedJaversType instanceof ManagedType){
-            return context.deserialize(entryChange.get(fieldName), GlobalCdoId.class);
-        }
-        else {
-            return context.deserialize(entryChange.get(fieldName), expectedType);
-        }
+           return context.deserialize(entryChange.get(fieldName), typeMapper.getDehydratedType(expectedType));
     }
 
     private void appendBody(MapChange change, JsonObject toJson, JsonSerializationContext context) {
