@@ -7,7 +7,7 @@ import org.javers.core.diff.changetype.Atomic;
  *
  * @author bartosz walacik
  */
-abstract class ValueAddOrRemove extends ContainerElementChange {
+public abstract class ValueAddOrRemove extends ContainerElementChange {
     final Atomic value;
 
     ValueAddOrRemove(Object value) {
@@ -18,4 +18,9 @@ abstract class ValueAddOrRemove extends ContainerElementChange {
         super(index);
         this.value = new Atomic(value);
     }
+
+    public Object getValue() {
+        return value.unwrap();
+    }
+
 }

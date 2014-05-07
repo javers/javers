@@ -1,4 +1,4 @@
-package org.javers.core.json.typeadapter;
+package org.javers.core.json.typeadapter.change;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;

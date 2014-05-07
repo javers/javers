@@ -5,6 +5,7 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.TypeAdapter;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.*;
+import org.javers.core.json.typeadapter.change.*;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;

@@ -1,12 +1,9 @@
-package org.javers.core.json.typeadapter;
+package org.javers.core.json.typeadapter.change;
 
 import com.google.gson.*;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.changetype.map.*;
-import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.MapType;
 import org.javers.core.metamodel.type.TypeMapper;
 
@@ -77,7 +74,7 @@ public class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
     }
 
     private EntryAdded parseEntryAdded(JsonObject entryChange, JsonDeserializationContext context, MapType mapType){
-        Object key =   decodeValue(entryChange, context, KEY_FIELD,   mapType.getKeyClass());
+        Object key =   decodeValue(entryChange, context, KEY_FIELD, mapType.getKeyClass());
         Object value = decodeValue(entryChange, context, VALUE_FIELD, mapType.getValueClass());
         return new EntryAdded(key, value);
     }
@@ -103,23 +100,23 @@ public class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
         JsonArray jsonArray = new JsonArray();
 
         for (EntryChange entryChange : change.getEntryChanges()) {
-            JsonObject entryElement = new JsonObject();
-            entryElement.addProperty(ENTRY_CHANGE_TYPE_FIELD, entryChange.getClass().getSimpleName());
+            JsonObject jsonElement = new JsonObject();
+            jsonElement.addProperty(ENTRY_CHANGE_TYPE_FIELD, entryChange.getClass().getSimpleName());
 
             if (entryChange instanceof EntryAddOrRemove) {
                 EntryAddOrRemove entry = (EntryAddOrRemove) entryChange;
 
-                entryElement.add(KEY_FIELD, context.serialize(entry.getWrappedKey()));
-                entryElement.add(VALUE_FIELD, context.serialize(entry.getWrappedValue()));
+                jsonElement.add(KEY_FIELD, context.serialize(entry.getWrappedKey()));
+                jsonElement.add(VALUE_FIELD, context.serialize(entry.getWrappedValue()));
             }
 
             if (entryChange instanceof EntryValueChange) {
                 EntryValueChange entry = (EntryValueChange) entryChange;
-                entryElement.add(KEY_FIELD, context.serialize(entry.getWrappedKey()));
-                entryElement.add(LEFT_VALUE_FIELD, context.serialize(entry.getWrappedLeftValue()));
-                entryElement.add(RIGHT_VALUE_FIELD, context.serialize(entry.getWrappedRightValue()));
+                jsonElement.add(KEY_FIELD, context.serialize(entry.getWrappedKey()));
+                jsonElement.add(LEFT_VALUE_FIELD, context.serialize(entry.getWrappedLeftValue()));
+                jsonElement.add(RIGHT_VALUE_FIELD, context.serialize(entry.getWrappedRightValue()));
             }
-            jsonArray.add(entryElement);
+            jsonArray.add(jsonElement);
         }
         toJson.add(ENTRY_CHANGES_FIELD, jsonArray);
     }

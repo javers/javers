@@ -1,13 +1,11 @@
-package org.javers.core.json.typeadapter;
+package org.javers.core.json.typeadapter.change;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.diff.changetype.ReferenceChange;
-import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.property.Property;
 
 public class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
 
