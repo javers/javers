@@ -6,8 +6,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.GlobalCdoIdTypeAdapter;
-import org.javers.core.json.typeadapter.change.ContainerChangeTypeAdapter;
-import org.javers.core.json.typeadapter.change.MapChangeTypeAdapter;
+import org.javers.core.json.typeadapter.change.*;
 import org.javers.core.metamodel.property.*;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
@@ -40,7 +39,9 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private static final Class<? extends JsonTypeAdapter>[] DOMAIN_AWARE_ADAPTERS = new Class[]{
             GlobalCdoIdTypeAdapter.class,
             MapChangeTypeAdapter.class,
-            ContainerChangeTypeAdapter.class
+            ArrayChangeTypeAdapter.class,
+            ListChangeTypeAdapter.class,
+            SetChangeTypeAdapter.class,
     };
 
     private final Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();

@@ -31,10 +31,10 @@ class ContainerChangeTypeAdapterTest extends Specification{
                     entity "org.javers.core.model.SnapshotEntity"
                     cdoId 1
                 }
-                property "propertyName"
+                property propertyName
                 elementChanges ([
                         {
-                            changeType "ElementValueChange"
+                            elementChangeType "ElementValueChange"
                             index 1
                             leftValue {
                                 entity "org.javers.core.model.SnapshotEntity"
@@ -59,7 +59,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
             with((ElementValueChange)change.changes[0]) {
                 index == 1
                 leftValue  == instanceId(2, SnapshotEntity)
-                rightValue == instanceId(2, SnapshotEntity)
+                rightValue == instanceId(3, SnapshotEntity)
         }
 
         where:
@@ -175,23 +175,23 @@ class ContainerChangeTypeAdapterTest extends Specification{
                 entity "org.javers.core.model.SnapshotEntity"
                 cdoId 1
             }
-            property "propertyName"
+            property propertyName
             elementChanges ([
                     {
                         elementChangeType "ElementValueChange"
                         index 1
-                        leftValue val1
-                        rightValue val2
+                        leftValue val1given
+                        rightValue val2given
                     },
                     {
                         elementChangeType "ValueAdded"
                         index 2
-                        value val1
+                        value val1given
                     },
                     {
                         elementChangeType "ValueRemoved"
                         index 3
-                        value val2
+                        value val2given
                     }
             ])
         }
@@ -205,25 +205,27 @@ class ContainerChangeTypeAdapterTest extends Specification{
         change.property.name == propertyName
         change.getAffectedCdoId() == instanceId(1, SnapshotEntity)
         with(change.changes[0]) {
-            getClass() == ElementValueChange
+            it.class == ElementValueChange
             index == 1
-            leftValue  == val1
-            rightValue == val2
+            leftValue  == val1expected
+            rightValue == val2expected
         }
-        with(change.changes[0]) {
-            getClass() == ValueAdded
+        with(change.changes[1]) {
+            it.class == ValueAdded
             index == 2
-            value  == val1
+            value  == val1expected
         }
-        with(change.changes[0]) {
-            getClass() == ValueRemoved
+        with(change.changes[2]) {
+            it.class == ValueRemoved
             index == 3
-            value  == val2
+            value  == val2expected
         }
 
         where:
-        val1   << [10]*3 + [new LocalDate(2001,1,10)]*3
-        val2   << [11]*3 + [new LocalDate(2001,1,11)]*3
+        val1given   << [10]*3 + ["2001-01-10"]*3
+        val2given   << [11]*3 + ["2001-01-11"]*3
+        val1expected   << [10]*3 + [new LocalDate(2001,1,10)]*3
+        val2expected   << [11]*3 + [new LocalDate(2001,1,11)]*3
         javersType <<   ["Primitives"]*3 + ["Values"]*3
         changeType_ <<  [ListChange, ArrayChange, SetChange] * 2
         propertyName << ["listOfIntegers","arrayOfIntegers","setOfIntegers","listOfDates","arrayOfDates","setOfDates"]

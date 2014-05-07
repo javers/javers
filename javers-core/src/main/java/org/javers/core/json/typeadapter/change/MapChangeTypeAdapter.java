@@ -4,9 +4,6 @@ import com.google.gson.*;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.changetype.map.*;
-import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.MapType;
 import org.javers.core.metamodel.type.TypeMapper;
 

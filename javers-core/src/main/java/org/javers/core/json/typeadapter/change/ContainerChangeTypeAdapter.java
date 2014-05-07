@@ -1,20 +1,19 @@
 package org.javers.core.json.typeadapter.change;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import org.javers.common.collections.Lists;
+import com.google.gson.*;
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.changetype.container.*;
-import org.javers.core.diff.changetype.map.MapChange;
+import org.javers.core.metamodel.type.ContainerType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author bartosz walacik
  */
-public class ContainerChangeTypeAdapter extends ChangeTypeAdapter<ContainerChange>{
+public abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends ChangeTypeAdapter<T> {
     private static final String CHANGES_FIELD = "elementChanges";
     private static final String ELEMENT_CHANGE_TYPE_FIELD = "elementChangeType";
     private static final String INDEX_FIELD = "index";
@@ -29,7 +28,67 @@ public class ContainerChangeTypeAdapter extends ChangeTypeAdapter<ContainerChang
     }
 
     @Override
-    public JsonElement toJson(ContainerChange change, JsonSerializationContext context) {
+    public T fromJson(JsonElement json, JsonDeserializationContext context) {
+        JsonObject jsonObject = (JsonObject) json;
+        PropertyChangeStub stub = deserializeStub(jsonObject, context);
+
+        ContainerType containerType = typeMapper.getPropertyType(stub.property);
+        List<ContainerElementChange> changes = parseChanges(jsonObject, context, containerType);
+
+        return (T) newInstance(stub,changes);
+    }
+
+    protected abstract ContainerChange newInstance(PropertyChangeStub stub, List<ContainerElementChange> changes);
+
+    private List<ContainerElementChange> parseChanges(JsonObject jsonObject, JsonDeserializationContext context, ContainerType containerType) {
+        List<ContainerElementChange> result = new ArrayList<>();
+
+        JsonArray array = jsonObject.getAsJsonArray(CHANGES_FIELD);
+
+        for (JsonElement e : array){
+            JsonObject elementChange = (JsonObject)e;
+            String elementChangeType  = elementChange.get(ELEMENT_CHANGE_TYPE_FIELD).getAsString();
+
+            if (ValueAdded.class.getSimpleName().equals(elementChangeType)){
+                result.add(parseValueAdded(elementChange, context, containerType));
+            } else if (ValueRemoved.class.getSimpleName().equals(elementChangeType)) {
+                result.add(parseValueRemoved(elementChange, context, containerType));
+            } else if (ElementValueChange.class.getSimpleName().equals(elementChangeType)) {
+                result.add(parseElementValueChange(elementChange, context, containerType));
+            } else {
+                throw new JaversException(JaversExceptionCode.MALFORMED_ENTRY_CHANGE_TYPE_FIELD, containerType);
+            }
+        }
+
+        return result;
+    }
+
+    private ElementValueChange parseElementValueChange(JsonObject elementChange, JsonDeserializationContext context, ContainerType containerType){
+        Object lValue = decodeValue(elementChange, context, LEFT_VALUE_FIELD, containerType.getItemClass());
+        Object rValue = decodeValue(elementChange, context, RIGHT_VALUE_FIELD, containerType.getItemClass());
+        return new ElementValueChange(parseIndex(elementChange), lValue, rValue);
+    }
+
+    private ValueAdded parseValueAdded(JsonObject elementChange, JsonDeserializationContext context, ContainerType containerType){
+        Object value = decodeValue(elementChange, context, VALUE_FIELD, containerType.getItemClass());
+        return new ValueAdded(parseIndex(elementChange), value);
+    }
+
+    private ValueRemoved parseValueRemoved(JsonObject elementChange, JsonDeserializationContext context, ContainerType containerType){
+        Object value = decodeValue(elementChange, context, VALUE_FIELD, containerType.getItemClass());
+        return new ValueRemoved(parseIndex(elementChange), value);
+    }
+
+    private int parseIndex(JsonObject elementChange) {
+        return elementChange.get(INDEX_FIELD).getAsInt();
+    }
+
+    private Object decodeValue(JsonObject elementChange, JsonDeserializationContext context, String fieldName, Class expectedType){
+        return context.deserialize(elementChange.get(fieldName), typeMapper.getDehydratedType(expectedType));
+    }
+
+    @Override
+    public JsonElement toJson(T change, JsonSerializationContext context) {
         final JsonObject jsonObject = createJsonObject(change, context);
 
         appendBody(change, jsonObject, context);
@@ -63,8 +122,4 @@ public class ContainerChangeTypeAdapter extends ChangeTypeAdapter<ContainerChang
         toJson.add(CHANGES_FIELD, jsonArray);
     }
 
-    @Override
-    public List<Class> getValueTypes() {
-        return (List)Lists.immutableListOf(ArrayChange.class, ListChange.class, SetChange.class);
-    }
 }
