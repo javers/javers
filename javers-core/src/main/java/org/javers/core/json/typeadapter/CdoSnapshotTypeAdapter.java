@@ -81,7 +81,6 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
     }
 
     private Object decodeValue(JsonObject state, final JsonDeserializationContext context, Property property) {
-
         if (isFullyParametrizedCollection(property)) {
             return decodeCollection(state, context, property);
         } else if (property.getType().isArray()) {
@@ -90,7 +89,7 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
             return decodeMap(state, context, property);
         }
 
-        return context.deserialize(state.get(property.getName()), property.getType());
+        return contextDeserialize(context, state.get(property.getName()), property.getType());
     }
 
     private boolean isFullyParametrizedMap(Property property) {
@@ -116,7 +115,7 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
 
         Iterator<JsonElement> iterator = collectionAsJsonObject.iterator();
         while (iterator.hasNext()) {
-            result.add(context.deserialize(iterator.next(), collectionType.getItemClass()));
+            result.add(contextDeserialize(context, iterator.next(), collectionType.getItemClass()));
         }
 
         return result;
@@ -144,7 +143,7 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
         Iterator<JsonElement> iterator = mapAsJsonObject.iterator();
         int i = 0;
         while (iterator.hasNext()) {
-            Array.set(result, i, context.deserialize(iterator.next(), arrayType.getItemClass()));
+            Array.set(result, i, contextDeserialize(context, iterator.next(), arrayType.getItemClass()));
             i++;
         }
 
@@ -163,10 +162,14 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
         Map result = new HashMap();
 
         for (Map.Entry<String, JsonElement> entry : mapAsJsonObject.entrySet()) {
-            result.put(entry.getKey(), context.deserialize(entry.getValue(), mapType.getValueClass()));
+            result.put(entry.getKey(), contextDeserialize(context, entry.getValue(), mapType.getValueClass()));
         }
 
         return result;
+    }
+
+    private Object contextDeserialize(JsonDeserializationContext context, JsonElement element, Class clazz) {
+        return context.deserialize(element, typeMapper.getDehydratedType(clazz));
     }
 
     @Override

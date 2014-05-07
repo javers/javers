@@ -4,9 +4,8 @@ import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.metamodel.object.CdoSnapshot
-import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.object.GlobalCdoId
 import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.test.builder.DummyUserDetailsBuilder
@@ -16,7 +15,6 @@ import spock.lang.Specification
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
-
 
 /**
  * @author pawel szymczyk
@@ -289,8 +287,12 @@ class CdoSnapshotTypeAdapterTest extends Specification {
             getPropertyValue("integerList") == [3, 4]
             getPropertyValue("stringSet") == ["5", "6"] as Set
             getPropertyValue("primitiveMap") == [time: new LocalDateTime(2000, 1, 1, 12, 0)]
+
             getPropertyValue("dummyUserDetailsList").size() == 2
+            getPropertyValue("dummyUserDetailsList").get(0) instanceof GlobalCdoId
+
             getPropertyValue("dateTimes").size() == 2
+            getPropertyValue("dateTimes")[0] instanceof LocalDateTime
         }
     }
 }
