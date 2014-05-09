@@ -203,7 +203,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
         then:
         change.class == changeType_
         change.property.name == propertyName
-        change.getAffectedCdoId() == instanceId(1, SnapshotEntity)
+        change.affectedCdoId == instanceId(1, SnapshotEntity)
         with(change.changes[0]) {
             it.class == ElementValueChange
             index == 1
@@ -225,7 +225,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
         val1given    << [10]*3 + ["2001-01-10"]*3
         val2given    << [11]*3 + ["2001-01-11"]*3
         val1expected << [10]*3 + [new LocalDate(2001,1,10)]*3
-        val2expecte  << [11]*3 + [new LocalDate(2001,1,11)]*3
+        val2expected << [11]*3 + [new LocalDate(2001,1,11)]*3
         javersType   << ["Primitives"]*3 + ["Values"]*3
         changeType_  << [ListChange, ArrayChange, SetChange] * 2
         propertyName << ["listOfIntegers","arrayOfIntegers","setOfIntegers","listOfDates","arrayOfDates","setOfDates"]
