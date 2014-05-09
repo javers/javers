@@ -2,6 +2,7 @@ package org.javers.test.builder
 
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
+import org.joda.time.LocalDateTime
 
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
@@ -69,6 +70,9 @@ class DummyUserBuilder {
     }
 
     DummyUserBuilder withAddress(String city) {
+        if (dummyUser.dummyUserDetails == null) {
+            withDetails()
+        }
         dummyUser.dummyUserDetails.dummyAddress = new DummyAddress(city)
         this
     }
@@ -143,6 +147,19 @@ class DummyUserBuilder {
 
     DummyUserBuilder withIntArray(int... integers) {
         dummyUser.intArray = integers
+        this
+    }
+
+    DummyUserBuilder withCharacter(char _char) {
+        dummyUser._char = _char
+        this
+    }
+
+    DummyUserBuilder withDateTimeArray(int count) {
+        dummyUser.dateTimes = new LocalDateTime[count];
+        for (int i=0; i<count; i++) {
+            dummyUser.dateTimes[i] = new LocalDateTime();
+        }
         this
     }
 }

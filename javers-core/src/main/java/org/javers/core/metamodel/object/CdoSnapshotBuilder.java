@@ -4,6 +4,7 @@ import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
+import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class CdoSnapshotBuilder {
     private final GlobalCdoId globalCdoId;
     private final Map<Property, Object> state = new HashMap<>();
+    private CommitId commitId;
 
     private CdoSnapshotBuilder(GlobalCdoId globalCdoId) {
         this.globalCdoId = globalCdoId;
@@ -40,6 +42,17 @@ public class CdoSnapshotBuilder {
     }
 
     public CdoSnapshot build(){
-        return new CdoSnapshot(globalCdoId, state);
+        CdoSnapshot cdoSnapshot = new CdoSnapshot(globalCdoId, state);
+
+        if (commitId != null) {
+            cdoSnapshot.bindTo(commitId);
+        }
+
+        return cdoSnapshot;
+    }
+
+    public CdoSnapshotBuilder withCommitId(CommitId commitId) {
+        this.commitId = commitId;
+        return this;
     }
 }

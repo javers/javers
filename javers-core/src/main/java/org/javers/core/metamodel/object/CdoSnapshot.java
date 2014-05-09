@@ -2,11 +2,15 @@ package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.Defaults;
 import org.javers.common.collections.Optional;
+import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.property.Property;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Captured state of client's domain object.
@@ -75,4 +79,12 @@ public final class CdoSnapshot extends Cdo {
         CdoSnapshot other = (CdoSnapshot) o;
         return this.state.equals(other.state);
     }
+
+    /**
+     * returns non null properties
+     */
+    public Set<Property> getProperties() {
+        return Collections.unmodifiableSet(state.keySet());
+    }
+
 }
