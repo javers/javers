@@ -222,12 +222,12 @@ class ContainerChangeTypeAdapterTest extends Specification{
         }
 
         where:
-        val1given   << [10]*3 + ["2001-01-10"]*3
-        val2given   << [11]*3 + ["2001-01-11"]*3
-        val1expected   << [10]*3 + [new LocalDate(2001,1,10)]*3
-        val2expected   << [11]*3 + [new LocalDate(2001,1,11)]*3
-        javersType <<   ["Primitives"]*3 + ["Values"]*3
-        changeType_ <<  [ListChange, ArrayChange, SetChange] * 2
+        val1given    << [10]*3 + ["2001-01-10"]*3
+        val2given    << [11]*3 + ["2001-01-11"]*3
+        val1expected << [10]*3 + [new LocalDate(2001,1,10)]*3
+        val2expecte  << [11]*3 + [new LocalDate(2001,1,11)]*3
+        javersType   << ["Primitives"]*3 + ["Values"]*3
+        changeType_  << [ListChange, ArrayChange, SetChange] * 2
         propertyName << ["listOfIntegers","arrayOfIntegers","setOfIntegers","listOfDates","arrayOfDates","setOfDates"]
     }
 
