@@ -5,6 +5,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.GlobalCdoId
+import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -289,7 +290,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
             getPropertyValue("primitiveMap") == [time: new LocalDateTime(2000, 1, 1, 12, 0)]
 
             getPropertyValue("dummyUserDetailsList").size() == 2
-            getPropertyValue("dummyUserDetailsList").get(0) instanceof GlobalCdoId
+            getPropertyValue("dummyUserDetailsList").get(0) == instanceId(1, DummyUserDetails)
+            getPropertyValue("dummyUserDetailsList").get(1) == instanceId(2, DummyUserDetails)
 
             getPropertyValue("dateTimes").size() == 2
             getPropertyValue("dateTimes")[0] instanceof LocalDateTime
