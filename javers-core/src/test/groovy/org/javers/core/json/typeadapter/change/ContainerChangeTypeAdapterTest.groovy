@@ -44,7 +44,24 @@ class ContainerChangeTypeAdapterTest extends Specification{
                                 entity "org.javers.core.model.SnapshotEntity"
                                 cdoId 3
                             }
+                        },
+                        {
+                            elementChangeType "ValueAdded"
+                            index 2
+                            value{
+                                entity "org.javers.core.model.SnapshotEntity"
+                                cdoId 2
+                            }
+                        },
+                        {
+                            elementChangeType "ValueRemoved"
+                            index 3
+                            value{
+                                 entity "org.javers.core.model.SnapshotEntity"
+                                 cdoId 3
+                            }
                         }
+
                 ])
             }
 
@@ -60,7 +77,15 @@ class ContainerChangeTypeAdapterTest extends Specification{
                 index == 1
                 leftValue  == instanceId(2, SnapshotEntity)
                 rightValue == instanceId(3, SnapshotEntity)
-        }
+            }
+            with((ValueAdded)change.changes[1]) {
+                index == 2
+                value  == instanceId(2, SnapshotEntity)
+            }
+            with((ValueRemoved)change.changes[2]) {
+                index == 3
+                value  == instanceId(3, SnapshotEntity)
+            }
 
         where:
             changeType_ <<   [ListChange, ArrayChange, SetChange]
