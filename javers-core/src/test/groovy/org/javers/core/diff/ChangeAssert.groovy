@@ -2,7 +2,6 @@ package org.javers.core.diff
 
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
-import org.javers.core.diff.changetype.ReferenceAdded
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.property.Property
 
@@ -26,25 +25,20 @@ class ChangeAssert {
         this
     }
 
-    ChangeAssert isReferenceAdded() {
-        actual.class == ReferenceAdded
-        this
-    }
-
     ChangeAssert hasInstanceId(Class expected, Object expectedCdoId) {
-        assert actual.globalCdoId instanceof InstanceId
-        assert actual.globalCdoId.cdoClass.sourceClass == expected
-        assert actual.globalCdoId.cdoId == expectedCdoId
+        assert actual.affectedCdoId instanceof InstanceId
+        assert actual.affectedCdoId.cdoClass.sourceClass == expected
+        assert actual.affectedCdoId.cdoId == expectedCdoId
         this
     }
 
     ChangeAssert hasEntityTypeOf(Class<?> entityClass) {
-        actual.globalCdoId.cdoClass.sourceClass == entityClass
+        actual.affectedCdoId.cdoClass.sourceClass == entityClass
         this
     }
 
     ChangeAssert hasCdoId(Object expectedCdoId) {
-        actual.globalCdoId.cdoId == expectedCdoId
+        actual.affectedCdoId.cdoId == expectedCdoId
         this
     }
 

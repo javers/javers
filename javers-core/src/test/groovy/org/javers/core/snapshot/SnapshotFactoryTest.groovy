@@ -166,7 +166,7 @@ class SnapshotFactoryTest extends Specification{
                        ]
     }
 
-    def "should not support Map of <ValueObject,?>"() {
+    def "should not support Map of <ValueObject,?>, no good idea how to handle this"() {
         given:
         def snapshotFactory = javers.snapshotFactory
 
@@ -176,7 +176,7 @@ class SnapshotFactoryTest extends Specification{
 
         then:
         def e = thrown(JaversException)
-        e.code == VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
+        e.code == VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
     }
 
     def "should throw exception when property Type is not fully parametrized"() {

@@ -115,7 +115,7 @@ public class Javers {
      * @param entityClass class of required instance
      * @param limit choose reasonable limit
      * @return empty List if object is not versioned
-     * @throws JaversException ENTITY_NOT_MAPPED if given javaClass is NOT mapped to Entity
+     * @throws JaversException ENTITY_EXPECTED if given javaClass is NOT mapped to Entity
      */
     public List<CdoSnapshot> getStateHistory(Object localId, Class entityClass, int limit){
         return repository.getStateHistory(localId, entityClass, limit);

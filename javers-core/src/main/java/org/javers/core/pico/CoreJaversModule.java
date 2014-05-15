@@ -11,6 +11,8 @@ import org.javers.core.diff.appenders.*;
 import org.javers.core.graph.LiveCdoFactory;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.json.JsonConverterBuilder;
+import org.javers.core.json.typeadapter.GlobalCdoIdTypeAdapter;
+import org.javers.core.json.typeadapter.MapChangeTypeAdapter;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeFactory;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -53,7 +55,13 @@ public class CoreJaversModule implements JaversModule {
             LiveGraphFactory.class,
             GlobalIdFactory.class,
             GraphFactory.class,
-            CommitSeqGenerator.class
+            CommitSeqGenerator.class,
+            GlobalCdoIdTypeAdapter.class,
+            MapChangeTypeAdapter.class,
+            ArrayChangeTypeAdapter.class,
+            ListChangeTypeAdapter.class,
+            SetChangeTypeAdapter.class,
+            CdoSnapshotTypeAdapter.class
     };
 
     @Override

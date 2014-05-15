@@ -6,6 +6,8 @@ import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectGraphBuilder
 import org.javers.core.graph.ObjectNode
 import org.javers.core.json.JsonConverter
+import org.javers.core.metamodel.object.GlobalCdoId
+import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.property.ManagedClassFactory
 import org.javers.core.metamodel.type.TypeFactory
@@ -28,15 +30,13 @@ import org.javers.repository.api.JaversRepository
 class JaversTestBuilder {
     JaversBuilder javersBuilder
 
-    private JaversTestBuilder (JaversRepository javersRepository) {
-        javersBuilder = new JaversBuilder()
-
-        javersBuilder.registerJaversRepository(javersRepository).build()
+    private JaversTestBuilder (JaversBuilder javersBuilder) {
+       this.javersBuilder = javersBuilder
+       this.javersBuilder.build()
     }
 
     private JaversTestBuilder (MappingStyle mappingStyle) {
        javersBuilder = new JaversBuilder()
-
        javersBuilder.withMappingStyle(mappingStyle).build()
     }
 
@@ -48,8 +48,8 @@ class JaversTestBuilder {
         new JaversTestBuilder(mappingStyle)
     }
 
-    static JaversTestBuilder javersTestAssembly(JaversRepository javersRepository){
-        new JaversTestBuilder(javersRepository)
+    static JaversTestBuilder javersTestAssemblyTypeSafe(){
+        new JaversTestBuilder(new JaversBuilder().typeSafeValues())
     }
 
     static Javers newInstance() {
@@ -58,10 +58,6 @@ class JaversTestBuilder {
 
     Javers javers() {
         javersBuilder.getContainerComponent(Javers)
-    }
-
-    JsonConverter getJsonConverter() {
-        javersBuilder.getContainerComponent(JsonConverter)
     }
 
     ManagedClassFactory getManagedClassFactory() {
@@ -92,6 +88,10 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(TypeMapper)
     }
 
+    GlobalIdFactory getGlobalIdFactory(){
+        javersBuilder.getContainerComponent(GlobalIdFactory)
+    }
+
     LiveCdoFactory getLiveCdoFactory(){
         javersBuilder.getContainerComponent(LiveCdoFactory)
     }
@@ -100,9 +100,14 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(CommitFactory)
     }
 
+    JsonConverter getJsonConverter() {
+        javersBuilder.getContainerComponent(JsonConverter)
+    }
+
     ObjectGraphBuilder createObjectGraphBuilder() {
         new ObjectGraphBuilder(getTypeMapper(), getLiveCdoFactory())
     }
+
 
     LiveGraph createLiveGraph(Object liveCdo) {
         new LiveGraph( createObjectGraphBuilder().buildGraph(liveCdo) )
@@ -110,16 +115,6 @@ class JaversTestBuilder {
 
     IdBuilder idBuilder(){
         javers().idBuilder()
-    }
-
-    @Deprecated
-    IdBuilder voBuilder(Object localId, Class entityClass){
-        javers().idBuilder().withOwner(localId, entityClass)
-    }
-
-    @Deprecated
-    InstanceId instanceId(Object localId, Class entityClass){
-        idBuilder().instanceId(localId, entityClass)
     }
 
     InstanceId instanceId(Object instance){

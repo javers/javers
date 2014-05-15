@@ -43,9 +43,20 @@ public enum  JaversExceptionCode {
 
     PROPERTY_NOT_FOUND(RUNTIME_ERROR +"property '%s' not found in class '%s'"),
 
-    ENTITY_NOT_MAPPED(RUNTIME_ERROR+"given javaClass '%s' is mapped to '%s', Entity expected"),
+    MANAGED_CLASS_MAPPING_ERROR(RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, expected %s"),
 
-    CLASS_NOT_MANAGED(RUNTIME_ERROR+"given javaClass '%s' is mapped to '%s', ManagedType expected");
+    MALFORMED_CHANGE_TYPE_FIELD(RUNTIME_ERROR+"no such Change type - '%s'"),
+
+    MALFORMED_ENTRY_CHANGE_TYPE_FIELD(RUNTIME_ERROR+"no such EntryChange type - '%s'"),
+
+    CLASS_NOT_MANAGED(RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, ManagedType expected"),
+
+    CLASS_NOT_FOUND(RUNTIME_ERROR+"class not found - '%s'") ,
+
+    CANNOT_PARSE_COMMIT_ID(RUNTIME_ERROR+"cannot parse given value {'$s'} to CommitId. " +
+            "CommitId should consists of two parts : majorId.minorId e.g. 1.0")
+
+    ;
 
     private final String message;
 

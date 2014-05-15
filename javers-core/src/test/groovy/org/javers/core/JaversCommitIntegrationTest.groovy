@@ -1,11 +1,6 @@
 package org.javers.core
 
 import org.javers.core.commit.CommitAssert
-import org.javers.core.diff.changetype.NewObject
-import org.javers.core.diff.changetype.ReferenceAdded
-import org.javers.core.diff.changetype.ReferenceChange
-import org.javers.core.diff.changetype.ReferenceRemoved
-import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -179,7 +174,6 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasReferenceChangeAt("dummyAddress",voId,null)
     }
 
-    @Ignore //after https://github.com/javers/javers/issues/11
     def "should support new object added to List, deep in the graph"() {
         given:
         def javers = javers().build()
@@ -196,11 +190,10 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasSnapshots(2)
                     .hasSnapshot(instanceId(5, DummyUserDetails))
                     .hasSnapshot(addedVoId)
-                    .hasReferenceChangeAt("addressList",null,addedVoId)
+                    .hasListReferenceAddedAt("addressList",addedVoId)
                     .hasNewObject(addedVoId,[city:"Tokyo"])
     }
 
-    @Ignore //after https://github.com/javers/javers/issues/11
     def "should support object removed from List, deep in the graph"() {
         given:
         def javers = javers().build()
@@ -212,13 +205,11 @@ class JaversCommitIntegrationTest extends Specification {
         def commit = javers.commit("some.login", user)
 
         then:
-        def removedVoId = valueObjectId(1, DummyUserDetails, "addressList/1")
+        def removedVoId = valueObjectId(5, DummyUserDetails, "addressList/1")
         CommitAssert.assertThat(commit)
                     .hasSnapshots(1)
                     .hasSnapshot(instanceId(5, DummyUserDetails))
-                    .hasChanges(2)
-                    .hasReferenceChangeAt("addressList",removedVoId,null)
-                    .hasObjectRemoved(removedVoId)
+                    .hasListReferenceRemovedAt("addressList",removedVoId)
     }
 
     def "should create empty commit when nothing changed"() {

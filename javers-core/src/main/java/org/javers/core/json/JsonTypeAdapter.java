@@ -6,6 +6,8 @@ import com.google.gson.JsonSerializationContext;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
 import org.javers.core.metamodel.type.ValueType;
 
+import java.util.List;
+
 /**
  * Javers abstraction over native
  * <a href="http://code.google.com/p/google-gson/">Gson</a> TypeAdapter.
@@ -43,7 +45,9 @@ public interface JsonTypeAdapter<T> {
     JsonElement toJson(T sourceValue, JsonSerializationContext jsonSerializationContext);
 
     /**
-     * target class of {@link ValueType}, for ex. Money.class
+     * Target classes.
+     * If adapter is designed to handle single class, return List with one element.
+     * If adapter is polymorfic, return list captaining all supported classes
      */
-    Class getValueType();
+    List<Class> getValueTypes();
 }

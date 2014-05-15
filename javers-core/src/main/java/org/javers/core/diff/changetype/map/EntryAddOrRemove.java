@@ -1,38 +1,23 @@
 package org.javers.core.diff.changetype.map;
 
-import org.javers.core.diff.changetype.Value;
-
-import static org.javers.common.validation.Validate.argumentIsNotNull;
+import org.javers.core.diff.changetype.Atomic;
 
 /**
  * @author bartosz walacik
  */
 public abstract  class EntryAddOrRemove extends EntryChange {
-    //Value key; this looks stupid but in fact it makes sense
-    private final Value key;
-
-    private final Value value;
+    private final Atomic value;
 
     EntryAddOrRemove(Object key, Object value) {
-        argumentIsNotNull(key);
-
-        this.key = new Value(key);
-        this.value = new Value(value);
-    }
-
-    public Object getKey() {
-        return key.unwrap();
+        super(key);
+        this.value = new Atomic(value);
     }
 
     public Object getValue() {
         return value.unwrap();
     }
 
-    public Value getWrappedKey() {
-        return key;
-    }
-
-    public Value getWrappedValue(){
+    public Atomic getWrappedValue(){
         return value;
     }
 }

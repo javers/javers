@@ -2,8 +2,8 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.ManagedClass;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.ManagedClassDefinition;
 import org.javers.core.metamodel.property.Property;
 import org.joda.time.LocalDate;
@@ -80,6 +80,21 @@ public class TypeMapper {
         return createMapping(javaType);
     }
 
+    /**
+     * @throws JaversException CLASS_NOT_MANAGED if given javaClass is NOT mapped to {@link ManagedType}
+     */
+    public ManagedType getJaversManagedType(Class javaType) {
+        JaversType javersType = getJaversType(javaType);
+
+        if (!(javersType instanceof  ManagedType)){
+            throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED,
+                                      javaType.getName(),
+                                      javersType.getClass().getSimpleName()) ;
+        }
+
+        return (ManagedType)javersType;
+    }
+
   /*  public List<JaversType> getJaversTypes(List<Class> javaTypes) {
         argumentIsNotNull(javaTypes);
         return Lists.transform(javaTypes, new Function<Class, JaversType>() {
@@ -152,9 +167,20 @@ public class TypeMapper {
         return result;
     }
 
-    public boolean isPrimitiveOrValueOrObject(Class clazz) {
+    public boolean isPrimitiveOrValue(Class clazz) {
         JaversType jType  = getJaversType(clazz);
         return  jType instanceof PrimitiveOrValueType;
+    }
+
+    public Class getDehydratedType(Class expectedType){
+        JaversType expectedJaversType = getJaversType(expectedType);
+
+        if (expectedJaversType instanceof ManagedType){
+            return GlobalCdoId.class;
+        }
+        else {
+            return expectedType;
+        }
     }
 
     //-- private

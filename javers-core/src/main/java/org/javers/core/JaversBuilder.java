@@ -3,9 +3,14 @@ package org.javers.core;
 import com.google.gson.TypeAdapter;
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
-import org.javers.core.diff.changetype.Value;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
+import org.javers.core.json.typeadapter.GlobalCdoIdTypeAdapter;
+import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
+import org.javers.core.json.typeadapter.MapChangeTypeAdapter;
+import org.javers.core.json.typeadapter.change.ArrayChangeTypeAdapter;
+import org.javers.core.json.typeadapter.change.ListChangeTypeAdapter;
 import org.javers.core.metamodel.property.*;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
@@ -17,7 +22,6 @@ import org.picocontainer.PicoContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +40,15 @@ import java.util.Set;
 public class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
+    private static final Class<? extends JsonTypeAdapter>[] DOMAIN_AWARE_ADAPTERS = new Class[]{
+            GlobalCdoIdTypeAdapter.class,
+            MapChangeTypeAdapter.class,
+            ArrayChangeTypeAdapter.class,
+            ListChangeTypeAdapter.class,
+            SetChangeTypeAdapter.class,
+            CdoSnapshotTypeAdapter.class
+    };
+
     private final Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
 
     private JaversRepository repository;
@@ -53,12 +66,12 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     public Javers build() {
 
-        // bootstrap phase 2: JSON beans
-        bootJsonConverter();
-
-        // bootstrap phase 3:
+        // bootstrap phase 2:
         // ManagedClassFactory & managed classes registration
         bootManagedClasses();
+
+        // bootstrap phase 3: JSON beans & domain aware typeAdapters
+        bootJsonConverter();
 
         // bootstrap phase 4: Repository
         bootRepository();
@@ -131,10 +144,13 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * Useful for not trivial ValueTypes when Gson's default representation isn't appropriate
      *
      * @see JsonTypeAdapter
-     * @see JsonTypeAdapter#getValueType()
+     * @see JsonTypeAdapter#getValueTypes()
      */
     public JaversBuilder registerValueTypeAdapter(JsonTypeAdapter typeAdapter) {
-        registerValue(typeAdapter.getValueType());
+        for (Class c : (List<Class>)typeAdapter.getValueTypes()){
+            registerValue(c);
+        }
+
         jsonConverterBuilder().registerJsonTypeAdapter(typeAdapter);
         return this;
     }
@@ -155,7 +171,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * Switch on when you need type safe {@link Value}s
+     * Switch on when you need type safe {@link org.javers.core.diff.changetype.Atomic}s
      * serialization stored in polymorfic collections like List, List&lt;Object&gt;, Map&lt;Object,Object&gt;, etc.
      *
      * @see org.javers.core.json.JsonConverterBuilder#typeSafeValues(boolean)
@@ -205,8 +221,17 @@ public class JaversBuilder extends AbstractJaversBuilder {
         mapRegisteredClasses();
     }
 
+    /**
+     * boots JsonConverter and registers domain aware typeAdapters
+     */
     private void bootJsonConverter() {
-        addComponent(jsonConverterBuilder().build());
+        JsonConverterBuilder jsonConverterBuilder = jsonConverterBuilder();
+
+        for (Class<? extends JsonTypeAdapter> adapter : DOMAIN_AWARE_ADAPTERS){
+            jsonConverterBuilder.registerJsonTypeAdapter(getContainerComponent(adapter));
+        }
+
+        addComponent(jsonConverterBuilder.build());
     }
 
     private void bootRepository(){

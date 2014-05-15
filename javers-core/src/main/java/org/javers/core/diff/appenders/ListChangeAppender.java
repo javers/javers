@@ -1,14 +1,16 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Lists;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.ContainerValueChange;
-import org.javers.core.diff.changetype.ListChange;
+import org.javers.core.diff.changetype.container.ContainerElementChange;
+import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
+import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ListType;
+import org.javers.core.metamodel.type.MapType;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,19 +32,8 @@ public class ListChangeAppender extends PropertyChangeAppender<ListChange> {
     }
 
     @Override
-    protected Class<? extends JaversType> getSupportedPropertyType() {
-        return ListType.class;
-    }
-
-    //TODO add support for Entities & ValueObjects
-    public boolean isSupportedContainer(Property property) {
-        ContainerType propertyType = typeMapper.getPropertyType(property);
-
-        if (! typeMapper.isPrimitiveOrValueOrObject(propertyType.getItemClass())){
-            logger.error("not implemented Enumerable content type {} on {}", propertyType.getElementTypes(), property);
-            return false;
-        }
-        return true;
+    protected boolean supports(JaversType propertyType) {
+        return propertyType instanceof ListType;
     }
 
     @Override
@@ -50,16 +41,13 @@ public class ListChangeAppender extends PropertyChangeAppender<ListChange> {
         List leftList = (List) pair.getLeftPropertyValue(property);
         List rightList = (List) pair.getRightPropertyValue(property);
 
+        ListType listType = typeMapper.getPropertyType(property);
+        OwnerContext owner = new OwnerContext(pair.getGlobalCdoId(), property.getName());
         List<EntryChange> entryChanges =
-                mapChangeAppender.calculateEntryChanges(Lists.asMap(leftList), Lists.asMap(rightList));
+                mapChangeAppender.calculateEntryChanges(new MapType(listType), Lists.asMap(leftList), Lists.asMap(rightList), owner);
 
         if (!entryChanges.isEmpty()){
-            if (!isSupportedContainer(property)){
-                return null; //TODO ADD SUPPORT
-            }
-
-            List<ContainerValueChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
-
+            List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
             return  new ListChange(pair.getGlobalCdoId(), property, elementChanges);
         }
         else {

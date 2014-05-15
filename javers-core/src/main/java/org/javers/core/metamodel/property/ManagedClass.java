@@ -1,12 +1,15 @@
 package org.javers.core.metamodel.property;
 
 import org.javers.common.collections.Predicate;
+import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.exceptions.JaversExceptionCode;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static org.javers.common.exception.exceptions.JaversExceptionCode.PROPERTY_NOT_FOUND;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -47,12 +50,11 @@ public abstract class ManagedClass {
         return sourceClass.getName();
     }
 
-    public List<Property> getCollectionTypeProperties() {
-        return getProperties(new Predicate<Property>() {
-            public boolean apply(Property property) {
-                return (Collection.class.isAssignableFrom(property.getType()));
-            }
-        });
+    /**
+     * 'Entity' or 'ValueObject'
+     */
+    public String getSimpleName() {
+        return this.getClass().getSimpleName();
     }
 
     public List<Property> getProperties() {
@@ -71,14 +73,25 @@ public abstract class ManagedClass {
         return retProperties;
     }
 
+    /**
+     * @throws JaversException PROPERTY_NOT_FOUND
+     */
     public Property getProperty(String withName) {
-        Property found = null;
         for (Property property : properties) {
             if (property.getName().equals(withName)) {
-                found = property;
+                return property;
             }
         }
-        return found;
+        throw new JaversException(PROPERTY_NOT_FOUND, withName, getName());
+    }
+
+    public boolean hasProperty(String withName){
+        try{
+            getProperty(withName);
+            return true;
+        } catch (JaversException e){
+            return false;
+        }
     }
 
     @Override

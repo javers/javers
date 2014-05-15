@@ -18,10 +18,10 @@ class ValueChangeAssert {
     }
 
     def hasValueObjectId(Class expected, GlobalCdoId expectedOwnerId, String expectedFragment ){
-        assert actual.globalCdoId instanceof ValueObjectId
-        assert actual.globalCdoId.cdoClass.sourceClass == expected
-        assert actual.globalCdoId.ownerId == expectedOwnerId
-        assert actual.globalCdoId.fragment == expectedFragment
+        assert actual.affectedCdoId instanceof ValueObjectId
+        assert actual.affectedCdoId.cdoClass.sourceClass == expected
+        assert actual.affectedCdoId.ownerId == expectedOwnerId
+        assert actual.affectedCdoId.fragment == expectedFragment
         this
     }
 

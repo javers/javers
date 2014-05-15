@@ -2,14 +2,16 @@ package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Arrays;
 import org.javers.common.collections.Lists;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.ArrayChange;
-import org.javers.core.diff.changetype.ContainerValueChange;
+import org.javers.core.diff.changetype.container.ArrayChange;
+import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.map.EntryChange;
+import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.ArrayType;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.MapType;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,19 +34,8 @@ public class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
     }
 
     @Override
-    protected Class<? extends JaversType> getSupportedPropertyType() {
-        return ArrayType.class;
-    }
-
-    //TODO add support for Entities & ValueObjects
-    public boolean isSupportedContainer(Property property) {
-        ContainerType propertyType = typeMapper.getPropertyType(property);
-
-        if (! typeMapper.isPrimitiveOrValueOrObject(propertyType.getItemClass())){
-            logger.error(JaversExceptionCode.DIFF_NOT_IMPLEMENTED.getMessage() +" on "+property);
-            return false;
-        }
-        return true;
+    protected boolean supports(JaversType propertyType) {
+        return  propertyType instanceof ArrayType;
     }
 
     @Override
@@ -53,16 +44,13 @@ public class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
         Map leftMap =  Arrays.asMap(pair.getLeftPropertyValue(property));
         Map rightMap = Arrays.asMap(pair.getRightPropertyValue(property));
 
+        ArrayType arrayType = typeMapper.getPropertyType(property);
+        OwnerContext owner = new OwnerContext(pair.getGlobalCdoId(), property.getName());
         List<EntryChange> entryChanges =
-                mapChangeAppender.calculateEntryChanges(leftMap, rightMap);
+                mapChangeAppender.calculateEntryChanges(new MapType(arrayType), leftMap, rightMap, owner);
 
         if (!entryChanges.isEmpty()){
-            if (!isSupportedContainer(property)){
-                return null; //TODO ADD SUPPORT
-            }
-
-            List<ContainerValueChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
-
+            List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
             return new ArrayChange(pair.getGlobalCdoId(), property, elementChanges);
         }
         else {

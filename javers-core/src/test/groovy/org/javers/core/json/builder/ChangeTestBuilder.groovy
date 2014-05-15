@@ -44,22 +44,6 @@ class ChangeTestBuilder {
         new ValueChange(globalId, prop, oldVal, newVal)
     }
 
-    static ValueChange valueObjectPropertyChange(GlobalCdoId voOwnerId,
-                                                 Class valueObjectCdoClass,
-                                                 String voPropertyName, String fragment,
-                                                 Object oldVal, Object newVal) {
-        ValueObjectId valueObjectId = valueObjectId(voOwnerId,valueObjectCdoClass, fragment)
-        new ValueChange(valueObjectId, valueObjectId.cdoClass.getProperty(voPropertyName), oldVal, newVal)
-    }
-
-    static ValueChange unboundedValueObjectPropertyChange( Class valueObjectCdoClass,
-                                                           String voPropertyName,
-                                                           Object oldVal, Object newVal) {
-
-        UnboundedValueObjectId valueObjectId = unboundedValueObjectId(valueObjectCdoClass)
-        new ValueChange(valueObjectId, valueObjectId.cdoClass.getProperty(voPropertyName), oldVal, newVal)
-    }
-
     static ReferenceChange referenceChanged(Object cdo, String propertyName, Object oldRef , Object newRef) {
         InstanceId globalId = instanceId(cdo)
         Property prop = globalId.cdoClass.getProperty(propertyName)

@@ -48,41 +48,61 @@ public class GlobalIdFactory {
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
     }
 
+    public UnboundedValueObjectId createFromClass(Class valueObjectClass){
+        ValueObject valueObject = getManagedClass(valueObjectClass, ValueObject.class);
+        return new UnboundedValueObjectId(valueObject);
+    }
+
     public ValueObjectId createFromPath(InstanceId owner, Class valueObjectClass, String path){
-        ManagedClass targetManagedClass = getManagedClass(valueObjectClass);
-        return new ValueObjectId((ValueObject) targetManagedClass, owner, path);
+        ValueObject valueObject = getManagedClass(valueObjectClass, ValueObject.class);
+        return new ValueObjectId(valueObject, owner, path);
+    }
+
+    public InstanceId createFromId(Object localId, Class entityClass){
+        Entity entity = getManagedClass(entityClass, Entity.class);
+        return InstanceId.createFromId(localId, entity);
+    }
+
+    public InstanceId createFromId(Object localId, Entity entity){
+        return InstanceId.createFromId(localId, entity);
     }
 
     /**
-     *  @throws JaversException ENTITY_NOT_MAPPED if given javaClass is NOT mapped to Entity
+     * If item is Primitive or Value - returns it,
+     * if item is Entity or ValueObject - returns its globalId,
+     * if item is already instance of GlobalCdoId - returns it.
      */
-    public InstanceId createFromId(Object localId, Class entityClass){
-        ManagedClass managedClass = getManagedClass(entityClass);
-
-        if (!(managedClass instanceof Entity)){
-            throw new JaversException(JaversExceptionCode.ENTITY_NOT_MAPPED, entityClass, managedClass.getClass().getSimpleName());
+    public Object dehydrate(Object item, JaversType targetType, OwnerContext context){
+        if (!(item instanceof GlobalCdoId) && targetType instanceof ManagedType) {
+            return createId(item, context);
+        } else {
+            return item;
         }
+    }
 
-        return InstanceId.createFromId(localId, (Entity)managedClass);
+    /**
+     * if given javaClass is mapped to {@link ManagedType}
+     * returns {@link ManagedType#getManagedClass()}
+     *
+     * @throws JaversException MANAGED_CLASS_MAPPING_ERROR
+     */
+    public <T extends ManagedClass> T getManagedClass(Class javaClass, Class<T> expectedType) {
+        ManagedType mType = typeMapper.getJaversManagedType(javaClass);
+
+        if (mType.getManagedClass().getClass().equals( expectedType)) {
+            return (T)mType.getManagedClass();
+        }
+        else {
+            throw new JaversException(JaversExceptionCode.MANAGED_CLASS_MAPPING_ERROR,
+                                      javaClass,
+                                      mType.getManagedClass().getSimpleName(),
+                                      expectedType.getSimpleName());
+        }
     }
 
     private ManagedClass getManagedClassOf(Object cdo) {
         Validate.argumentIsNotNull(cdo);
-        return getManagedClass(cdo.getClass());
-    }
-
-    /**
-     * if given javaClass is mapped to {@link ManagedType} returns {@link ManagedType#getManagedClass()}
-     *
-     * @throws JaversException CLASS_NOT_MANAGED if given javaClass is NOT mapped to {@link ManagedType}
-     */
-    public ManagedClass getManagedClass(Class javaClass) {
-        JaversType jType = typeMapper.getJaversType(javaClass);
-        if (jType instanceof ManagedType) {
-            return ((ManagedType)jType).getManagedClass();
-        }
-
-        throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED, javaClass, jType.getClass().getSimpleName());
+        return typeMapper.getJaversManagedType(cdo.getClass()).getManagedClass();
     }
 
     private boolean hasOwner(OwnerContext context) {

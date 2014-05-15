@@ -1,20 +1,20 @@
 package org.javers.core.diff.appenders;
 
-import org.javers.common.collections.Sets;
-import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.ContainerValueChange;
-import org.javers.core.diff.changetype.ElementAdded;
-import org.javers.core.diff.changetype.ElementRemoved;
-import org.javers.core.diff.changetype.SetChange;
+import org.javers.core.diff.changetype.container.ContainerElementChange;
+import org.javers.core.diff.changetype.container.SetChange;
+import org.javers.core.diff.changetype.container.ValueAdded;
+import org.javers.core.diff.changetype.container.ValueRemoved;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.ContainerType;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.SetType;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -34,15 +34,15 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
     }
 
     @Override
-    protected Class<? extends JaversType> getSupportedPropertyType() {
-        return SetType.class;
+    protected boolean supports(JaversType propertyType) {
+        return  propertyType instanceof SetType;
     }
 
     //TODO add support for Entities & ValueObjects
     public boolean isSupportedContainer(Property property) {
         ContainerType propertyType = typeMapper.getPropertyType(property);
 
-        if (! typeMapper.isPrimitiveOrValueOrObject(propertyType.getItemClass())){
+        if (! typeMapper.isPrimitiveOrValue(propertyType.getItemClass())){
             logger.error(JaversExceptionCode.DIFF_NOT_IMPLEMENTED.getMessage() +" on "+property);
             return false;
         }
@@ -54,14 +54,14 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange>{
         Set leftValues =  (Set) pair.getLeftPropertyValue(property);
         Set rightValues = (Set) pair.getRightPropertyValue(property);
 
-        List<ContainerValueChange> changes = new ArrayList<>();
+        List<ContainerElementChange> changes = new ArrayList<>();
 
         for (Object addedValue : difference(rightValues, leftValues)) {
-            changes.add(new ElementAdded(addedValue));
+            changes.add(new ValueAdded(addedValue));
         }
 
         for (Object addedValue : difference(leftValues, rightValues)) {
-            changes.add(new ElementRemoved(addedValue));
+            changes.add(new ValueRemoved(addedValue));
         }
 
         if (changes.isEmpty()) {

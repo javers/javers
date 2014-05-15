@@ -61,7 +61,7 @@ public class ValueObjectId extends UnboundedValueObjectId {
             this.fragment = fragment;
         }
 
-        public static ValueObjectIdDTO valueObjectId(Object ownerLocalId, Class  ownerClass, String fragment){
+        public static ValueObjectIdDTO valueObjectId(Object ownerLocalId, Class ownerClass, String fragment){
             return new ValueObjectIdDTO(ownerClass, ownerLocalId, fragment);
         }
 

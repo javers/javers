@@ -5,9 +5,6 @@ import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 
-import java.util.Collection;
-import java.util.Collections;
-
 /**
  * Property scope change appender,
  * follows Chain-of-responsibility pattern
@@ -28,11 +25,7 @@ public abstract class PropertyChangeAppender <T extends PropertyChange> {
         return calculateChanges(pair, property);
     }
 
-    protected boolean supports(JaversType propertyType) {
-        return getSupportedPropertyType().isAssignableFrom( propertyType.getClass() );
-    }
-
-    protected abstract Class<? extends JaversType> getSupportedPropertyType();
+    protected abstract boolean supports(JaversType propertyType);
 
     protected abstract T calculateChanges(NodePair pair, Property supportedProperty);
 }
