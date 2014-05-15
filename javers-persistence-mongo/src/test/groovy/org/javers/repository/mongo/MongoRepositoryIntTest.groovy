@@ -2,6 +2,7 @@ package org.javers.repository.mongo
 
 import com.mongodb.MongoClient
 import org.javers.core.Javers
+import org.javers.model.DummyProduct
 import org.javers.core.JaversTestBuilder
 import spock.lang.Specification
 
