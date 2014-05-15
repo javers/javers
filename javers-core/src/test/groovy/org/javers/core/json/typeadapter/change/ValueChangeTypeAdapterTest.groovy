@@ -1,10 +1,11 @@
-package org.javers.core.json.typeadapter
+package org.javers.core.json.typeadapter.change
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
+import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter
 import org.javers.core.model.DummyUser
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime

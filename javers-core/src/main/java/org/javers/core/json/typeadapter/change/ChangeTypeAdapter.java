@@ -1,4 +1,4 @@
-package org.javers.core.json.typeadapter;
+package org.javers.core.json.typeadapter.change;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -8,6 +8,9 @@ import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.*;
+import org.javers.core.diff.changetype.container.ArrayChange;
+import org.javers.core.diff.changetype.container.ListChange;
+import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.GlobalCdoId;
@@ -31,6 +34,9 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
         initEntry(NewObject.class);
         initEntry(ObjectRemoved.class);
         initEntry(MapChange.class);
+        initEntry(ListChange.class);
+        initEntry(ArrayChange.class);
+        initEntry(SetChange.class);
     }
 
     @Override
