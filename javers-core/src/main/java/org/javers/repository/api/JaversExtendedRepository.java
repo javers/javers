@@ -42,8 +42,18 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     @Override
+    public List<CdoSnapshot> getStateHistory(InstanceId.InstanceIdDTO dtoId, int limit) {
+        return null;
+    }
+
+    @Override
     public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
         return delegate.getLatest(globalId);
+    }
+
+    @Override
+    public Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId) {
+        return null;
     }
 
     @Override

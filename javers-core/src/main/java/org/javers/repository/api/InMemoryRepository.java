@@ -7,6 +7,7 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.InstanceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,11 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     @Override
+    public List<CdoSnapshot> getStateHistory(InstanceId.InstanceIdDTO dtoId, int limit) {
+        return null;
+    }
+
+    @Override
     public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
         Validate.argumentsAreNotNull(globalId);
 
@@ -47,6 +53,11 @@ public class InMemoryRepository implements JaversRepository {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId) {
+        return null;
     }
 
     @Override

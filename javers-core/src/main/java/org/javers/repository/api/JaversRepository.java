@@ -8,6 +8,7 @@ import org.javers.core.diff.Diff;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.InstanceId;
 
 import java.util.List;
 
@@ -31,10 +32,14 @@ public interface JaversRepository {
      */
     List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit);
 
+    List<CdoSnapshot> getStateHistory(InstanceId.InstanceIdDTO dtoId, int limit);
+
     /**
      * Latest snapshot or Optional#EMPTY if object is not versioned
      */
     Optional<CdoSnapshot> getLatest(GlobalCdoId globalId);
+
+    Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId);
 
     void persist(Commit commit);
 

@@ -3,6 +3,7 @@ package org.javers.repository.mongo;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import org.javers.common.collections.Function;
@@ -11,6 +12,7 @@ import org.javers.core.commit.Commit;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.InstanceId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +20,15 @@ import java.util.List;
 /**
  * @author pawel szymczyk
  */
-public class CommitMapper {
+public class Mapper {
 
     public static final String GLOBAL_CDO_ID = "globalCdoId";
     public static final String SNAPSHOTS = "snapshots";
     private JsonConverter jsonConverter;
+
+    public Mapper(JsonConverter jsonConverter) {
+        this.jsonConverter = jsonConverter;
+    }
 
     public DBObject toDBObject(Commit commit) {
 
@@ -43,22 +49,30 @@ public class CommitMapper {
         return basicDBList;
     }
 
-    public List<CdoSnapshot> toCdoSnapshots(DBObject dbObject) {
-        return snapshotsFromJson((BasicDBList) dbObject.get(SNAPSHOTS));
+    public List<CdoSnapshot> toCdoSnapshots(DBCursor dbCursor) {
+        List<CdoSnapshot> result = new ArrayList<>();
+
+        while (dbCursor.hasNext()) {
+            result.add(toCdoSnapshot(dbCursor.next()));
+        }
+
+        return result;
     }
 
-    private List<CdoSnapshot> snapshotsFromJson(BasicDBList _snapshots) {
-
-        return Lists.transform(_snapshots, new Function<Object, CdoSnapshot>() {
-            @Override
-            public CdoSnapshot apply(Object input) {
-                return jsonConverter.fromJson(input.toString(), CdoSnapshot.class);
-            }
-        });
+    public CdoSnapshot toCdoSnapshot(DBObject _snapshot) {
+        return jsonConverter.fromJson(_snapshot.toString(), CdoSnapshot.class);
     }
 
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
+    }
+
+    public DBObject toDBObject(InstanceId.InstanceIdDTO dtoId) {
+
+        return new BasicDBObject("globalCdoId", BasicDBObjectBuilder.start()
+                .add("cdoId", dtoId.getCdoId())
+                .add("entity", dtoId.getEntity().getName())
+                .get());
     }
 
     public DBObject toDBObject(GlobalCdoId globalId) {

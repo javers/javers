@@ -77,5 +77,13 @@ public class InstanceId extends GlobalCdoId {
         public String value() {
             return javaClass.getName()+"/"+localId;
         }
+
+        public Class getEntity() {
+            return javaClass;
+        }
+
+        public Object getCdoId() {
+            return localId;
+        }
     }
 }

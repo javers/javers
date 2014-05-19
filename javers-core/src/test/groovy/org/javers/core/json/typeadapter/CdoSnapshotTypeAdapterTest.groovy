@@ -131,7 +131,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         String jsonText = javers.jsonConverter.toJson(snapshot)
 
         then:
-        def json = new JsonSlurper().parseText(jsonText)
+        def json = new JsonSlurper().parseText jsonText)
 
         with (json.state) {
             intArray == [1, 2]
