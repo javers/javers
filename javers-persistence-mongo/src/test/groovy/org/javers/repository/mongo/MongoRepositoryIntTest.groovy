@@ -12,6 +12,26 @@ import spock.lang.Specification
  */
 class MongoRepositoryIntTest extends Specification {
 
+    def "should persist commit"() {
+
+        given:
+        def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
+        def db = new Fongo("myDb").mongo.getDB("test")
+        def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
+        def commitFactory = javersTestBuilder.commitFactory
+
+        def kazik = new DummyUser("kazik")
+        def id = InstanceId.InstanceIdDTO.instanceId("kazik", DummyUser)
+
+        when:
+        mongoRepository.persist(commitFactory.create("andy", kazik))
+
+        then:
+        def latest = mongoRepository.getLatest(id)
+        latest.get().globalId == id
+        latest.get().size() == 1
+    }
+
     def "should get last commit by GlobalCdoId"() {
 
         given:
@@ -34,24 +54,26 @@ class MongoRepositoryIntTest extends Specification {
         latest.get().globalId.cdoClass.sourceClass == DummyUser
     }
 
-    def "should persist commit"() {
+    def "should get last commit by InstanceIdDTO"() {
 
         given:
+        //create components
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
         def db = new Fongo("myDb").mongo.getDB("test")
         def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
         def commitFactory = javersTestBuilder.commitFactory
-
-        def kazik = new DummyUser("kazik")
         def id = InstanceId.InstanceIdDTO.instanceId("kazik", DummyUser)
 
-        when:
+        //create entity & persist commit
+        def kazik = new DummyUser("kazik")
         mongoRepository.persist(commitFactory.create("andy", kazik))
 
-        then:
+        when:
         def latest = mongoRepository.getLatest(id)
-        latest.get().globalId == id
-        latest.get().size() == 1
+
+        then:
+        latest.get().globalId.cdoId == "kazik"
+        latest.get().globalId.cdoClass.sourceClass == DummyUser
     }
 
     def "should get state history"() {

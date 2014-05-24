@@ -77,10 +77,10 @@ public class Mapper {
 
     public DBObject toDBObject(InstanceId.InstanceIdDTO dtoId) {
 
-        return new BasicDBObject(GLOBAL_CDO_ID, BasicDBObjectBuilder.start()
+        return BasicDBObjectBuilder.start()
                 .add(CDO_ID, dtoId.getCdoId())
                 .add(ENTITY, dtoId.getEntity().getName())
-                .get());
+                .get();
     }
 
     public DBObject toDBObject(GlobalCdoId globalId) {

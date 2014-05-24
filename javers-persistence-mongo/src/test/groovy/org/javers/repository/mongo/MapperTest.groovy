@@ -71,8 +71,8 @@ class MapperTest extends Specification{
         def dtoIdAsDBObject = mapper.toDBObject(dtoId)
 
         then:
-        dtoIdAsDBObject.get("globalCdoId").cdoId == "kazik"
-        dtoIdAsDBObject.get("globalCdoId").entity == "org.javers.core.model.DummyUser"
+        dtoIdAsDBObject.get("cdoId") == "kazik"
+        dtoIdAsDBObject.get("entity") == "org.javers.core.model.DummyUser"
     }
 
     def "should map DBObject to CdoSnapshot"() {

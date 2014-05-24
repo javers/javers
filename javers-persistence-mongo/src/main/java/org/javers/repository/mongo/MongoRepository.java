@@ -68,9 +68,16 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId) {
-        DBObject dbObject = mapper.toDBObject(dtoId);
-        DBObject commit = mongo.getCollection(collectionName).findOne(dbObject);
-        CdoSnapshot snapshot = mapper.toCdoSnapshot(commit);
+        DBObject dbObject = new BasicDBObject(Mapper.GLOBAL_CDO_ID, mapper.toDBObject(dtoId));
+
+        DBCursor commit = mongo.getCollection(collectionName).find(dbObject)
+                .sort(new BasicDBObject("date", 1)).limit(1);
+
+        if (commit.length() != 1) {
+            throw new RuntimeException("Cos nie tak");
+        }
+
+        CdoSnapshot snapshot = mapper.toCdoSnapshot(commit.iterator().next());
 
         return Optional.fromNullable(snapshot);
     }
