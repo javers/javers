@@ -1,5 +1,6 @@
 package org.javers.core
 
+import org.javers.common.date.DateProvider
 import org.javers.core.commit.CommitFactory
 import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.LiveGraph
@@ -40,12 +41,30 @@ class JaversTestBuilder {
        javersBuilder.withMappingStyle(mappingStyle).build()
     }
 
+    private JaversTestBuilder (DateProvider dateProvider) {
+        javersBuilder = new JaversBuilder()
+        javersBuilder.withDateProvider(dateProvider).build()
+    }
+
+    private JaversTestBuilder (JaversRepository javersRepository) {
+        javersBuilder = new JaversBuilder()
+        javersBuilder.registerJaversRepository(javersRepository).build()
+    }
+
     static JaversTestBuilder javersTestAssembly(){
         new JaversTestBuilder(MappingStyle.FIELD)
     }
 
+    static JaversTestBuilder javersTestAssembly(JaversRepository javersRepository){
+        new JaversTestBuilder(javersRepository)
+    }
+
     static JaversTestBuilder javersTestAssembly(MappingStyle mappingStyle){
         new JaversTestBuilder(mappingStyle)
+    }
+
+    static JaversTestBuilder javersTestAssembly(DateProvider dateProvider){
+        new JaversTestBuilder(dateProvider)
     }
 
     static JaversTestBuilder javersTestAssemblyTypeSafe(){

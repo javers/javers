@@ -12,6 +12,28 @@ import spock.lang.Specification
  */
 class MongoRepositoryIntTest extends Specification {
 
+    def "should get last commit by GlobalCdoId"() {
+
+        given:
+        //create components
+        def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
+        def db = new Fongo("myDb").mongo.getDB("test")
+        def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
+        def commitFactory = javersTestBuilder.commitFactory
+        def id = javersTestBuilder.globalIdFactory.createFromId("kazik", DummyUser)
+
+        //create entity & persist commit
+        def kazik = new DummyUser("kazik")
+        mongoRepository.persist(commitFactory.create("andy", kazik))
+
+        when:
+        def latest = mongoRepository.getLatest(id)
+
+        then:
+        latest.get().globalId.cdoId == "kazik"
+        latest.get().globalId.cdoClass.sourceClass == DummyUser
+    }
+
     def "should persist commit"() {
 
         given:
@@ -35,16 +57,20 @@ class MongoRepositoryIntTest extends Specification {
     def "should get state history"() {
 
         given:
-        def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
         def db = new Fongo("myDb").mongo.getDB("test")
-        def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
-        def commitFactory = javersTestBuilder.commitFactory
+        def mongoRepository = new MongoRepository(db)
+
+        def javersTestBuilder = JaversTestBuilder.javersTestAssembly(mongoRepository)
+
+        mongoRepository.setJsonConverter(javersTestBuilder.jsonConverter)
+
+        def javers = javersTestBuilder.javers()
 
         def kazikV1 = DummyUserBuilder.dummyUser("kazik").withAge(12).build()
         def kazikV2 = DummyUserBuilder.dummyUser("kazik").withAge(13).build()
 
-        mongoRepository.persist(commitFactory.create("andy", kazikV1))
-        mongoRepository.persist(commitFactory.create("andy", kazikV2))
+        javers.commit("andy", kazikV1)
+        javers.commit("andy", kazikV2)
 
         def id = InstanceId.InstanceIdDTO.instanceId("kazik", DummyUser)
 

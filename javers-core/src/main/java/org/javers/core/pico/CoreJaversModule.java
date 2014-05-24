@@ -1,10 +1,12 @@
 package org.javers.core.pico;
 
+import org.javers.common.date.DefaultDateProvider;
 import org.javers.common.pico.JaversModule;
 import org.javers.core.GraphFactory;
 import org.javers.core.Javers;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.commit.CommitFactory;
+import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitSeqGenerator;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.appenders.ArrayChangeAppender;
@@ -20,6 +22,7 @@ import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.typeadapter.CdoSnapshotTypeAdapter;
+import org.javers.core.json.typeadapter.CommitIdTypeAdapter;
 import org.javers.core.json.typeadapter.GlobalCdoIdTypeAdapter;
 import org.javers.core.json.typeadapter.change.ArrayChangeTypeAdapter;
 import org.javers.core.json.typeadapter.change.ListChangeTypeAdapter;
@@ -72,7 +75,9 @@ public class CoreJaversModule implements JaversModule {
             ArrayChangeTypeAdapter.class,
             ListChangeTypeAdapter.class,
             SetChangeTypeAdapter.class,
-            CdoSnapshotTypeAdapter.class
+            CdoSnapshotTypeAdapter.class,
+            CommitIdTypeAdapter.class,
+            DefaultDateProvider.class
     };
 
     @Override

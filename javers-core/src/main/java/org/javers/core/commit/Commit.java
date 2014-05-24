@@ -21,11 +21,11 @@ public final class Commit {
     private final LocalDateTime commitDate;
     private final Diff diff;
 
-    Commit(CommitId id, String author, List<CdoSnapshot> snapshots, Diff diff) {
+    Commit(CommitId id, String author, LocalDateTime date, List<CdoSnapshot> snapshots, Diff diff) {
         Validate.argumentsAreNotNull(id, author, snapshots, diff);
         this.author = author;
         this.snapshots = snapshots;
-        this.commitDate = new LocalDateTime();
+        this.commitDate = date;
         this.diff = diff;
         this.id = id;
         for (CdoSnapshot snapshot : snapshots){

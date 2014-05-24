@@ -50,7 +50,7 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
     public CdoSnapshot fromJson(JsonElement json, JsonDeserializationContext context) {
         JsonObject jsonObject = (JsonObject) json;
 
-        CommitId commitId = parseCommitId(jsonObject);
+        CommitId commitId = context.deserialize(((JsonObject) json).get(COMMIT_ID), CommitId.class);
         GlobalCdoId cdoId = context.deserialize(jsonObject.get(GLOBAL_CDO_ID), GlobalCdoId.class);
 
         CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId);
@@ -63,21 +63,6 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
         }
 
         return cdoSnapshotBuilder.build();
-    }
-
-    private CommitId parseCommitId(JsonObject json) {
-        String majorDotMinor = json.get(COMMIT_ID).getAsString();
-
-        String[] strings = majorDotMinor.split("\\.");
-
-        if (strings.length != 2) {
-            throw new JaversException(JaversExceptionCode.CANNOT_PARSE_COMMIT_ID, majorDotMinor);
-        }
-
-        long major = Long.parseLong(strings[0]);
-        int minor = Integer.parseInt(strings[1]);
-
-        return new CommitId(major, minor);
     }
 
     private Object decodeValue(JsonObject state, final JsonDeserializationContext context, Property property) {
@@ -177,7 +162,7 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
 
         JsonObject jsonObject = new JsonObject();
 
-        jsonObject.addProperty(COMMIT_ID, snapshot.getCommitId().value());
+        jsonObject.add(COMMIT_ID, context.serialize(snapshot.getCommitId()));
         jsonObject.add(GLOBAL_CDO_ID, context.serialize(snapshot.getGlobalId()));
         jsonObject.add(STATE, getState(snapshot, context));
 

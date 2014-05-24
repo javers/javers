@@ -1,5 +1,6 @@
 package org.javers.repository.mongo;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -22,6 +23,10 @@ public class MongoRepository implements JaversRepository {
 
     private DB mongo;
     private Mapper mapper;
+
+    public MongoRepository(DB mongo) {
+        this.mongo = mongo;
+    }
 
     public MongoRepository(DB mongo, JsonConverter jsonConverter) {
         this.mongo = mongo;
@@ -47,7 +52,18 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
-        throw new UnsupportedOperationException("use: Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId)");
+        DBObject dbObject = new BasicDBObject(Mapper.GLOBAL_CDO_ID, mapper.toDBObject(globalId));
+
+        DBCursor commit = mongo.getCollection(collectionName).find(dbObject)
+                .sort(new BasicDBObject("date", 1)).limit(1);
+
+        if (commit.length() != 1) {
+            throw new RuntimeException("Cos nie tak");
+        }
+
+        CdoSnapshot snapshot = mapper.toCdoSnapshot(commit.iterator().next());
+
+        return Optional.fromNullable(snapshot);
     }
 
     @Override
@@ -75,6 +91,10 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
-        mapper.setJsonConverter(jsonConverter);
+        if (mapper == null) {
+            mapper = new Mapper(jsonConverter);
+        } else {
+            mapper.setJsonConverter(jsonConverter);
+        }
     }
 }
