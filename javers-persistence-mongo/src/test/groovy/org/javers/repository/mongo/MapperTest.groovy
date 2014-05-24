@@ -61,19 +61,6 @@ class MapperTest extends Specification{
         commitIdAsDBObject.toString() == "1.0"
     }
 
-    def "should map InstanceIdDTO to DBObject"() {
-
-        given:
-        def mapper = new Mapper()
-        def dtoId = instanceId("kazik", DummyUser)
-
-        when:
-        def dtoIdAsDBObject = mapper.toDBObject(dtoId)
-
-        then:
-        dtoIdAsDBObject.get("cdoId") == "kazik"
-        dtoIdAsDBObject.get("entity") == "org.javers.core.model.DummyUser"
-    }
 
     def "should map DBObject to CdoSnapshot"() {
 
@@ -91,6 +78,20 @@ class MapperTest extends Specification{
         cdoSnapshot
     }
 
+    def "should map InstanceIdDTO to DBObject"() {
+
+        given:
+        def mapper = new Mapper()
+        def dtoId = instanceId("kazik", DummyUser)
+
+        when:
+        def dtoIdAsDBObject = mapper.toDBObject(dtoId)
+
+        then:
+        dtoIdAsDBObject.get("cdoId") == "kazik"
+        dtoIdAsDBObject.get("entity") == "org.javers.core.model.DummyUser"
+    }
+
     def "should map InstanceId to DBObject"() {
 
         given:
@@ -104,42 +105,5 @@ class MapperTest extends Specification{
         then:
         dbObject.get("entity") == "org.javers.core.model.DummyUser"
         dbObject.get("cdoId") == 1
-    }
-
-    def "should map UnboundedValueObjectId to DBObject"() {
-
-        given:
-        def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def mapper = new Mapper(javersTestBuilder.jsonConverter)
-        def unboundedValueObjectId = javersTestBuilder.globalIdFactory.createFromClass(DummyAddress)
-
-        when:
-        def dbObject = mapper.toDBObject(unboundedValueObjectId)
-
-        then:
-        dbObject.get("valueObject") == "org.javers.core.model.DummyAddress"
-        dbObject.get("cdoId") == "/"
-    }
-
-    def "should map ValueObjectId to DBObject"() {
-
-        given:
-        def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def mapper = new Mapper(javersTestBuilder.jsonConverter)
-        def idFactory = javersTestBuilder.globalIdFactory
-        def unboundedValueObjectId = idFactory.createFromPath(idFactory.createFromId(1, DummyUser), DummyAddress, "path")
-
-        when:
-        def dbObject = mapper.toDBObject(unboundedValueObjectId)
-
-        then:
-        dbObject.get("valueObject") == "org.javers.core.model.DummyAddress"
-
-        with(dbObject.get("ownerId")) {
-            it.get("entity") == "org.javers.core.model.DummyUser"
-            it.get("cdoId") == 1
-        }
-
-        dbObject.get("fragment") == "path"
     }
 }
