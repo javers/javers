@@ -13,6 +13,8 @@ import org.joda.time.LocalDateTime
 import spock.lang.Ignore
 import spock.lang.Specification
 
+import static org.javers.test.builder.DummyUserBuilder.dummyUser
+
 /**
  * @author pawel szymczyk
  */
@@ -25,8 +27,11 @@ class MongoRepositoryIntTest extends Specification {
         def db = new Fongo("myDb").mongo.getDB("test")
         def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
 
-        def commit1 = new Commit(new CommitId(1, 0), "", new LocalDateTime(), Collections.EMPTY_LIST, Stub(Diff))
-        def commit2 = new Commit(new CommitId(2, 0), "", new LocalDateTime(), Collections.EMPTY_LIST, Stub(Diff))
+        def kazikV1 = dummyUser("Kazik").withAge(1).build()
+        def kazikV2 = dummyUser("Kazik").withAge(2).build()
+
+        def commit1 = javersTestBuilder.commitFactory.create("author", kazikV1)
+        def commit2 = javersTestBuilder.commitFactory.create("author", kazikV2)
 
         when:
         mongoRepository.persist(commit1)
@@ -39,8 +44,8 @@ class MongoRepositoryIntTest extends Specification {
         mongoRepository.persist(commit2)
 
         then:
-        mongoRepository.getHeadId().getMajorId() == 2
-        mongoRepository.getHeadId().getMinorId() == 0
+        mongoRepository.getHeadId().getMajorId() == 1
+        mongoRepository.getHeadId().getMinorId() == 1
     }
 
     def "should persist commit and get latest snapshot"() {
