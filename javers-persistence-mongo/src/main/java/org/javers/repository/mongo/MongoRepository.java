@@ -20,6 +20,7 @@ import java.util.List;
 public class MongoRepository implements JaversRepository {
 
     private String collectionName = "Commit";
+    private String headIdHolderName = "headIdHolder";
 
     private DB mongo;
     private Mapper mapper;
@@ -57,8 +58,8 @@ public class MongoRepository implements JaversRepository {
         DBCursor commit = mongo.getCollection(collectionName).find(dbObject)
                 .sort(new BasicDBObject("date", 1)).limit(1);
 
-        if (commit.length() != 1) {
-            throw new RuntimeException("Cos nie tak");
+        if (commit.length() == 0) {
+            return Optional.empty();
         }
 
         CdoSnapshot snapshot = mapper.toCdoSnapshot(commit.iterator().next());
@@ -89,11 +90,30 @@ public class MongoRepository implements JaversRepository {
         DBObject commitAsDbObject = mapper.toDBObject(commit);
 
         commits.insert(commitAsDbObject);
+
+        persistHeadId(commit);
+    }
+
+    private void persistHeadId(Commit commit) {
+        DBCollection headIdCollection = mongo.getCollection(headIdHolderName);
+        DBObject headId = headIdCollection.findOne();
+
+        if (headId != null) {
+            headIdCollection.findAndModify(headId, new BasicDBObject("commitId", mapper.toDBObject(commit.getId())));
+        } else {
+            headIdCollection.save(new BasicDBObject("commitId", mapper.toDBObject(commit.getId())));
+        }
     }
 
     @Override
     public CommitId getHeadId() {
-        return null;
+        DBObject headId = mongo.getCollection(headIdHolderName).findOne();
+
+        if (headId == null) {
+            return null;
+        }
+
+        return mapper.toCommitId(headId.get("commitId").toString());
     }
 
     @Override

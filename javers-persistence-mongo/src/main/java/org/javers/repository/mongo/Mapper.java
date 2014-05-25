@@ -1,7 +1,6 @@
 package org.javers.repository.mongo;
 
 import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -115,5 +114,9 @@ public class Mapper {
 
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
+    }
+
+    public CommitId toCommitId(String commitId) {
+        return jsonConverter.fromJson(commitId, CommitId.class);
     }
 }

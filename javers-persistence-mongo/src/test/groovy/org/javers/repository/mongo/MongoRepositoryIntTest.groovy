@@ -1,6 +1,7 @@
 package org.javers.repository.mongo
 
 import com.github.fakemongo.Fongo
+import org.javers.core.Javers
 import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyUser
@@ -11,6 +12,37 @@ import spock.lang.Specification
  * @author pawel szymczyk
  */
 class MongoRepositoryIntTest extends Specification {
+
+    def "should get headId"() {
+
+        given:
+        def mongoRepository = new MongoRepository(new Fongo("myDb").mongo.getDB("test"))
+        def javers = getJaversTestInstance(mongoRepository)
+        def kazik = new DummyUser("kazik")
+
+        when:
+        //first commit
+        javers.commit("author", kazik)
+
+        def headId = mongoRepository.getHeadId()
+
+        then:
+        headId.getMajorId() == 1
+        headId.getMinorId() == 0
+
+        when:
+        //change something
+        kazik.sex = DummyUser.Sex.FEMALE
+
+        //next commit
+        javers.commit("author", kazik)
+
+        headId = mongoRepository.getHeadId()
+
+        then:
+        headId.getMajorId() == 2
+        headId.getMinorId() == 0
+    }
 
     def "should persist commit"() {
 
@@ -101,5 +133,11 @@ class MongoRepositoryIntTest extends Specification {
 
         then:
         history
+    }
+
+    Javers getJaversTestInstance(MongoRepository mongoRepository) {
+        def javersTestBuilder = JaversTestBuilder.javersTestAssembly(mongoRepository)
+        mongoRepository.setJsonConverter(javersTestBuilder.jsonConverter)
+        javersTestBuilder.javers()
     }
 }
