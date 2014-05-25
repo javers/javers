@@ -13,6 +13,9 @@ import org.javers.repository.mongo.model.MongoSnapshot;
 
 import java.util.List;
 
+/**
+ * @author pawel szymczyk
+ */
 public class ModelMapper {
 
     private final JsonConverter jsonConverter;

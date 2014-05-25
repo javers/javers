@@ -9,6 +9,9 @@ import org.javers.common.validation.Validate;
 
 import java.util.List;
 
+/**
+ * @author pawel szymczyk
+ */
 public class MongoCdoSnapshots extends BasicDBObject {
 
     public static final String COLLECTION_NAME = "Snapshots";

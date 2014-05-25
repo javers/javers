@@ -3,6 +3,9 @@ package org.javers.repository.mongo.model;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+/**
+ * @author pawel szymczyk
+ */
 public class MongoSnapshot extends BasicDBObject {
 
     private static final String COMMIT_ID = "commitId";

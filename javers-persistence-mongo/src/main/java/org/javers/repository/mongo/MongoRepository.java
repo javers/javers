@@ -22,6 +22,9 @@ import org.javers.repository.mongo.model.MongoSnapshot;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author pawel szymczyk
+ */
 public class MongoRepository implements JaversRepository {
 
     private DB mongo;
@@ -120,8 +123,7 @@ public class MongoRepository implements JaversRepository {
 
     private Optional<CdoSnapshot> getLatest(DBObject id) {
 
-        DBObject mongoCdoSnapshots = mongo.getCollection(MongoCdoSnapshots.COLLECTION_NAME)
-                .findOne(id);
+        DBObject mongoCdoSnapshots = mongo.getCollection(MongoCdoSnapshots.COLLECTION_NAME).findOne(id);
 
         if (mongoCdoSnapshots == null) {
             return Optional.empty();
