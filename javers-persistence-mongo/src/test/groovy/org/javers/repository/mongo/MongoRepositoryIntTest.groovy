@@ -25,48 +25,25 @@ class MongoRepositoryIntTest extends Specification {
         def db = new Fongo("myDb").mongo.getDB("test")
         def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
 
-        def commit = new Commit(new CommitId(1, 0), "", new LocalDateTime(), Collections.EMPTY_LIST, Stub(Diff))
+        def commit1 = new Commit(new CommitId(1, 0), "", new LocalDateTime(), Collections.EMPTY_LIST, Stub(Diff))
+        def commit2 = new Commit(new CommitId(2, 0), "", new LocalDateTime(), Collections.EMPTY_LIST, Stub(Diff))
 
         when:
-        mongoRepository.persist(commit)
+        mongoRepository.persist(commit1)
 
         then:
         mongoRepository.getHeadId().getMajorId() == 1
         mongoRepository.getHeadId().getMinorId() == 0
-    }
-
-    def "should get headId"() {
-
-        given:
-        def mongoRepository = new MongoRepository(new Fongo("myDb").mongo.getDB("test"))
-        def javers = getJaversTestInstance(mongoRepository)
-        def kazik = new DummyUser("kazik")
 
         when:
-        //first commit
-        javers.commit("author", kazik)
-
-        def headId = mongoRepository.getHeadId()
+        mongoRepository.persist(commit2)
 
         then:
-        headId.getMajorId() == 1
-        headId.getMinorId() == 0
-
-        when:
-        //change something
-        kazik.sex = DummyUser.Sex.FEMALE
-
-        //next commit
-        javers.commit("author", kazik)
-
-        headId = mongoRepository.getHeadId()
-
-        then:
-        headId.getMajorId() == 2
-        headId.getMinorId() == 0
+        mongoRepository.getHeadId().getMajorId() == 2
+        mongoRepository.getHeadId().getMinorId() == 0
     }
 
-    def "should persist commit"() {
+    def "should persist commit and get latest snapshot"() {
 
         given:
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
@@ -78,10 +55,13 @@ class MongoRepositoryIntTest extends Specification {
         def id = InstanceId.InstanceIdDTO.instanceId("kazik", DummyUser)
 
         when:
+        //persist
         mongoRepository.persist(commitFactory.create("andy", kazik))
 
-        then:
+        //get last snapshot
         def latest = mongoRepository.getLatest(id)
+
+        then:
         latest.get().globalId == id
         latest.get().size() == 1
     }

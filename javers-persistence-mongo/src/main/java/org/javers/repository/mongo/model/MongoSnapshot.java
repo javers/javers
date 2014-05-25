@@ -1,16 +1,20 @@
 package org.javers.repository.mongo.model;
 
 import com.mongodb.BasicDBObject;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalCdoId;
-
-import java.util.List;
+import com.mongodb.DBObject;
 
 public class MongoSnapshot extends BasicDBObject {
 
-    public static final String COLLECTION_NAME = "Snapshots";
+    private static final String COMMIT_ID = "commitId";
+    private static final String STATE = "state";
 
-    private GlobalCdoId globalCdoId;
-    private List<CdoSnapshot> snapshots;
+    public MongoSnapshot(DBObject dbObject) {
+        append(COMMIT_ID, dbObject.get(COMMIT_ID));
+        append(STATE, dbObject.get(STATE));
+    }
 
+    public MongoSnapshot(String commitId, DBObject state) {
+        append(COMMIT_ID, commitId);
+        append(STATE, state);
+    }
 }

@@ -31,7 +31,7 @@ class MapperTest extends Specification{
 
         dBObject.get("commitId") == "1.0"
 
-        with (dBObject.get("globalCdoId")) {
+        with (dBObject.get("GLOBAL_CDO_ID")) {
             it.get("cdoId") == "kazik"
             it.get("entity") == "org.javers.core.model.DummyUser"
         }

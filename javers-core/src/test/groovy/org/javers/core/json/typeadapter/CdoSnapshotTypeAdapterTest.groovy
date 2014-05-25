@@ -61,6 +61,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
 
+        println json.toString()
+
         with(json.state) {
             name == "kaz"
             age == 1
