@@ -6,6 +6,7 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyUser
 import org.javers.test.builder.DummyUserBuilder
+import spock.lang.Ignore
 import spock.lang.Specification
 
 /**
@@ -108,6 +109,7 @@ class MongoRepositoryIntTest extends Specification {
         latest.get().globalId.cdoClass.sourceClass == DummyUser
     }
 
+    @Ignore
     def "should get state history"() {
 
         given:
