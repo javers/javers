@@ -62,28 +62,25 @@ public class MongoRepository implements JaversRepository {
 
         DBCollection collection = mongo.getCollection(MongoCdoSnapshots.COLLECTION_NAME);
 
-        BasicDBObject globalCdoId = new BasicDBObject(MongoCdoSnapshots.GLOBAL_CDO_ID,
-                BasicDBObjectBuilder.start()
-                        .add("entity", commit.getGlobalCdoId().getCdoClass().getName())
-                        .add("cdoId", commit.getGlobalCdoId().getCdoId())
-                        .get()
-        );
+        for (CdoSnapshot snapshot: commit.getSnapshots()) {
 
-        DBObject mongoCdoSnapshots = collection
-                .findOne(globalCdoId);
+            BasicDBObject globalCdoId = new BasicDBObject(MongoCdoSnapshots.GLOBAL_CDO_ID,
+                    BasicDBObjectBuilder.start()
+                            .add("entity", snapshot.getGlobalId().getCdoClass().getName())
+                            .add("cdoId", snapshot.getGlobalId().getCdoId())
+                            .get());
 
-        if (mongoCdoSnapshots == null) {
-            collection.save(mapper.toMongoSnaphot(commit));
-        } else {
-            MongoCdoSnapshots snapshots = new MongoCdoSnapshots(mongoCdoSnapshots);
+            DBObject mongoCdoSnapshots = collection
+                    .findOne(globalCdoId);
 
-            for (CdoSnapshot snapshot: commit.getSnapshots()) {
+            if (mongoCdoSnapshots == null) {
+                collection.save(mapper.toMongoSnaphot(snapshot));
+            } else {
+                MongoCdoSnapshots snapshots = new MongoCdoSnapshots(mongoCdoSnapshots);
                 snapshots.addSnapshot(new MongoSnapshot((DBObject) JSON.parse(jsonConverter.toJson(snapshot))));
+                collection.findAndModify(globalCdoId, snapshots);
             }
-
-            collection.findAndModify(globalCdoId, snapshots);
         }
-
     }
 
     private void persistChanges(Commit commit) {

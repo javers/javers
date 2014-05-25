@@ -61,4 +61,13 @@ public class ModelMapper2 {
         jsonObject.add("globalCdoId", jsonConverter.toJsonElement(jsonConverter.fromJson(globalCdoId, GlobalCdoId.class)));
         return jsonConverter.fromJson(jsonObject.toString(), CdoSnapshot.class);
     }
+
+    public MongoCdoSnapshots toMongoSnaphot(CdoSnapshot snapshot) {
+        DBObject globalCdoId = (DBObject) JSON.parse(jsonConverter.toJson(snapshot.getGlobalId()));
+        List<MongoSnapshot> snapshots = toSnapshots(Lists.immutableListOf(snapshot));
+
+        return new MongoCdoSnapshots(globalCdoId, snapshots);
+
+
+    }
 }
