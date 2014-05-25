@@ -22,7 +22,6 @@ import org.javers.repository.mongo.model.MongoChange;
 import org.javers.repository.mongo.model.MongoCommit;
 import org.javers.repository.mongo.model.MongoHeadId;
 import org.javers.repository.mongo.model.MongoSnapshot;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Collections;
 import java.util.List;
@@ -141,7 +140,7 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
-        return getLatest((DBObject) JSON.parse(jsonConverter.toJson(globalId)));
+        return getLatest(new BasicDBObject("globalCdoId", (DBObject) JSON.parse(jsonConverter.toJson(globalId))));
     }
 
     @Override
