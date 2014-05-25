@@ -5,7 +5,6 @@ import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
-import org.javers.core.commit.Commit;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
@@ -22,9 +21,17 @@ public class ModelMapper {
         this.jsonConverter = jsonConverter;
     }
 
-    public MongoCdoSnapshots toMongoSnaphot(Commit commit) {
-        DBObject globalCdoId = (DBObject) JSON.parse(jsonConverter.toJson(commit.getGlobalCdoId()));
-        List<MongoSnapshot> snapshots = toSnapshots(commit.getSnapshots());
+    public CdoSnapshot toCdoSnapshot(MongoSnapshot latest, String globalCdoId) {
+        JsonObject jsonObject = (JsonObject) jsonConverter.toJsonElement(latest);
+
+        //TODO refactor
+        jsonObject.add("globalCdoId", jsonConverter.toJsonElement(jsonConverter.fromJson(globalCdoId, GlobalCdoId.class)));
+        return jsonConverter.fromJson(jsonObject.toString(), CdoSnapshot.class);
+    }
+
+    public MongoCdoSnapshots toMongoCdoSnapshot(CdoSnapshot snapshot) {
+        DBObject globalCdoId = (DBObject) JSON.parse(jsonConverter.toJson(snapshot.getGlobalId()));
+        List<MongoSnapshot> snapshots = toSnapshots(Lists.immutableListOf(snapshot));
 
         return new MongoCdoSnapshots(globalCdoId, snapshots);
     }
@@ -39,23 +46,5 @@ public class ModelMapper {
                 );
             }
         });
-    }
-
-
-    public CdoSnapshot toCdoSnapshot(MongoSnapshot latest, String globalCdoId) {
-        JsonObject jsonObject = (JsonObject) jsonConverter.toJsonElement(latest);
-
-        //TODO refactor
-        jsonObject.add("globalCdoId", jsonConverter.toJsonElement(jsonConverter.fromJson(globalCdoId, GlobalCdoId.class)));
-        return jsonConverter.fromJson(jsonObject.toString(), CdoSnapshot.class);
-    }
-
-    public MongoCdoSnapshots toMongoSnaphot(CdoSnapshot snapshot) {
-        DBObject globalCdoId = (DBObject) JSON.parse(jsonConverter.toJson(snapshot.getGlobalId()));
-        List<MongoSnapshot> snapshots = toSnapshots(Lists.immutableListOf(snapshot));
-
-        return new MongoCdoSnapshots(globalCdoId, snapshots);
-
-
     }
 }

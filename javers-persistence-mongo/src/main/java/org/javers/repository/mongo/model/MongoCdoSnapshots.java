@@ -16,6 +16,26 @@ public class MongoCdoSnapshots extends BasicDBObject {
     public static final String GLOBAL_CDO_ID = "globalCdoId";
     private static final String SNAPSHOTS = "snapshots";
 
+    public MongoCdoSnapshots(DBObject cdoSnapshot) {
+        Validate.argumentIsNotNull(cdoSnapshot);
+
+        append(GLOBAL_CDO_ID, cdoSnapshot.get(GLOBAL_CDO_ID));
+        append(SNAPSHOTS, cdoSnapshot.get(SNAPSHOTS));
+    }
+
+    public MongoCdoSnapshots(DBObject globalCdoId, List<MongoSnapshot> snapshots) {
+        append(GLOBAL_CDO_ID, globalCdoId);
+        append(SNAPSHOTS, new BasicDBList());
+
+        for (MongoSnapshot snapshot: snapshots) {
+            addSnapshot(snapshot);
+        }
+    }
+
+    public void addSnapshot(MongoSnapshot snapshot) {
+        getSnapshots().add(snapshot);
+    }
+
     public String getGlobalCdoId() {
         return get(GLOBAL_CDO_ID).toString();
     }
@@ -46,30 +66,7 @@ public class MongoCdoSnapshots extends BasicDBObject {
         return new MongoSnapshot((DBObject) snapshots.get(snapshots.size() - 1));
     }
 
-    public void addSnapshot(MongoSnapshot snapshot) {
-        getSnapshots().add(snapshot);
-    }
-
     private BasicDBList getSnapshots() {
         return (BasicDBList) get(SNAPSHOTS);
-    }
-
-    /**
-    * cdoSnapshot - object from database
-    */
-    public MongoCdoSnapshots(DBObject cdoSnapshot) {
-        Validate.argumentIsNotNull(cdoSnapshot);
-
-        append(GLOBAL_CDO_ID, cdoSnapshot.get(GLOBAL_CDO_ID));
-        append(SNAPSHOTS, cdoSnapshot.get(SNAPSHOTS));
-    }
-
-    public MongoCdoSnapshots(DBObject globalCdoId, List<MongoSnapshot> snapshots) {
-        append(GLOBAL_CDO_ID, globalCdoId);
-        append(SNAPSHOTS, new BasicDBList());
-
-        for (MongoSnapshot snapshot: snapshots) {
-            addSnapshot(snapshot);
-        }
     }
 }

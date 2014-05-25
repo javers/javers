@@ -61,7 +61,7 @@ public class MongoRepository implements JaversRepository {
                     .findOne(globalCdoId);
 
             if (mongoCdoSnapshots == null) {
-                collection.save(mapper.toMongoSnaphot(snapshot));
+                collection.save(mapper.toMongoCdoSnapshot(snapshot));
             } else {
                 MongoCdoSnapshots snapshots = new MongoCdoSnapshots(mongoCdoSnapshots);
                 snapshots.addSnapshot(new MongoSnapshot((DBObject) JSON.parse(jsonConverter.toJson(snapshot))));
@@ -85,8 +85,7 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit) {
-        return getStateHistory(new BasicDBObject("globalCdoId",
-                (DBObject) JSON.parse(jsonConverter.toJson(globalId))), limit);
+        return getStateHistory(new BasicDBObject("globalCdoId", JSON.parse(jsonConverter.toJson(globalId))), limit);
     }
 
     @Override
@@ -120,7 +119,7 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
-        return getLatest(new BasicDBObject("globalCdoId", (DBObject) JSON.parse(jsonConverter.toJson(globalId))));
+        return getLatest(new BasicDBObject("globalCdoId", JSON.parse(jsonConverter.toJson(globalId))));
     }
 
     @Override

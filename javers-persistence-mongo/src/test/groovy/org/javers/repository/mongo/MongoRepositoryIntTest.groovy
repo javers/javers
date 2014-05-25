@@ -115,7 +115,6 @@ class MongoRepositoryIntTest extends Specification {
         latest.get().globalId.cdoClass.sourceClass == DummyUser
     }
 
-    @Ignore
     def "should get state history"() {
 
         given:
@@ -140,12 +139,6 @@ class MongoRepositoryIntTest extends Specification {
         def history = mongoRepository.getStateHistory(id, 2)
 
         then:
-        history
-    }
-
-    Javers getJaversTestInstance(MongoRepository mongoRepository) {
-        def javersTestBuilder = JaversTestBuilder.javersTestAssembly(mongoRepository)
-        mongoRepository.setJsonConverter(javersTestBuilder.jsonConverter)
-        javersTestBuilder.javers()
+        history.size() == 2
     }
 }
