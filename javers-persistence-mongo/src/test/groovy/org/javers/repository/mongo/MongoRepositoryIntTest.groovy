@@ -3,9 +3,13 @@ package org.javers.repository.mongo
 import com.github.fakemongo.Fongo
 import org.javers.core.Javers
 import org.javers.core.JaversTestBuilder
+import org.javers.core.commit.Commit
+import org.javers.core.commit.CommitId
+import org.javers.core.diff.Diff
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyUser
 import org.javers.test.builder.DummyUserBuilder
+import org.joda.time.LocalDateTime
 import spock.lang.Ignore
 import spock.lang.Specification
 
@@ -13,6 +17,23 @@ import spock.lang.Specification
  * @author pawel szymczyk
  */
 class MongoRepositoryIntTest extends Specification {
+
+    def "should persist head id"() {
+
+        given:
+        def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
+        def db = new Fongo("myDb").mongo.getDB("test")
+        def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
+
+        def commit = new Commit(new CommitId(1, 0), "", new LocalDateTime(), Collections.EMPTY_LIST, Stub(Diff))
+
+        when:
+        mongoRepository.persist(commit)
+
+        then:
+        mongoRepository.getHeadId().getMajorId() == 1
+        mongoRepository.getHeadId().getMinorId() == 0
+    }
 
     def "should get headId"() {
 

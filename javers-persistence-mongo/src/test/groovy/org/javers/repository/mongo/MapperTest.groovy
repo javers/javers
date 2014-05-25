@@ -6,7 +6,6 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.commit.CommitId
 import org.javers.core.json.JsonConverter
 import org.javers.core.metamodel.object.CdoSnapshot
-import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
 
@@ -20,7 +19,7 @@ class MapperTest extends Specification{
         given:
         def dateProvider = new FakeDateProvider(year: 2000, monthOfYear: 1, dayOfMonth: 1, hourOfDay: 12, minuteOfHour: 0)
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly(dateProvider)
-        def mapper = new Mapper(javersTestBuilder.jsonConverter)
+        def mapper = new ModelMapper(javersTestBuilder.jsonConverter)
         def kazik = new DummyUser("kazik")
         def commit = javersTestBuilder.commitFactory.create("andy", kazik)
 
@@ -48,7 +47,7 @@ class MapperTest extends Specification{
     def "should map CommitId to DBObject"() {
 
         given:
-        def mapper = new Mapper()
+        def mapper = new ModelMapper()
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
         mapper.setJsonConverter(javersTestBuilder.jsonConverter)
 
@@ -65,7 +64,7 @@ class MapperTest extends Specification{
     def "should map DBObject to CdoSnapshot"() {
 
         given:
-        Mapper mapper = new Mapper();
+        ModelMapper mapper = new ModelMapper();
 
         JsonConverter jsonConverter = Stub()
         mapper.setJsonConverter(jsonConverter)
@@ -81,7 +80,7 @@ class MapperTest extends Specification{
     def "should map InstanceIdDTO to DBObject"() {
 
         given:
-        def mapper = new Mapper()
+        def mapper = new ModelMapper()
         def dtoId = instanceId("kazik", DummyUser)
 
         when:
@@ -96,7 +95,7 @@ class MapperTest extends Specification{
 
         given:
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def mapper = new Mapper(javersTestBuilder.jsonConverter)
+        def mapper = new ModelMapper(javersTestBuilder.jsonConverter)
         def instanceId = javersTestBuilder.globalIdFactory.createFromId(1, DummyUser)
 
         when:

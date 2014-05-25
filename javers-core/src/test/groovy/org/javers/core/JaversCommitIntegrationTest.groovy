@@ -29,7 +29,7 @@ class JaversCommitIntegrationTest extends Specification {
         javers.commit("author",cdo) //v. 2
 
         when:
-        def snapshots = javers.getStateHistory(2, SnapshotEntity, 10)
+        def snapshots = javers.getStateHistory(1, SnapshotEntity, 10)
 
         then:
         def cdoId = instanceId(2,SnapshotEntity)

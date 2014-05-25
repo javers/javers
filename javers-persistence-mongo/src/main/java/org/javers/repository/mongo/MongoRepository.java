@@ -3,7 +3,6 @@ package org.javers.repository.mongo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
@@ -13,17 +12,19 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.repository.api.JaversRepository;
+import org.javers.repository.mongo.model.MongoChange;
+import org.javers.repository.mongo.model.MongoCommit;
+import org.javers.repository.mongo.model.MongoHeadId;
+import org.javers.repository.mongo.model.MongoSnapshot;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.Collections;
 import java.util.List;
 
 public class MongoRepository implements JaversRepository {
 
-    private String collectionName = "Commit";
-    private String headIdHolderName = "headIdHolder";
-
     private DB mongo;
-    private Mapper mapper;
+    private ModelMapper2 mapper;
+    private JsonConverter jsonConverter;
 
     public MongoRepository(DB mongo) {
         this.mongo = mongo;
@@ -31,97 +32,131 @@ public class MongoRepository implements JaversRepository {
 
     public MongoRepository(DB mongo, JsonConverter jsonConverter) {
         this.mongo = mongo;
-        this.mapper = new Mapper(jsonConverter);
-    }
-
-    @Override
-    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit) {
-        throw new UnsupportedOperationException("use: Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId)");
-    }
-
-    @Override
-    public List<CdoSnapshot> getStateHistory(InstanceId.InstanceIdDTO dtoId, int limit) {
-        DBObject globalIdAsDBObject = mapper.toDBObject(dtoId);
-        DBCursor commit = mongo.getCollection(collectionName).find(globalIdAsDBObject);
-
-        if (commit == null) {
-            return Collections.EMPTY_LIST;
-        }
-
-        return mapper.toCdoSnapshots(commit);
-    }
-
-    @Override
-    public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
-        DBObject dbObject = new BasicDBObject(Mapper.GLOBAL_CDO_ID, mapper.toDBObject(globalId));
-
-        DBCursor commit = mongo.getCollection(collectionName).find(dbObject)
-                .sort(new BasicDBObject("date", 1)).limit(1);
-
-        if (commit.length() == 0) {
-            return Optional.empty();
-        }
-
-        CdoSnapshot snapshot = mapper.toCdoSnapshot(commit.iterator().next());
-
-        return Optional.fromNullable(snapshot);
-    }
-
-    @Override
-    public Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId) {
-        DBObject dbObject = new BasicDBObject(Mapper.GLOBAL_CDO_ID, mapper.toDBObject(dtoId));
-
-        DBCursor commit = mongo.getCollection(collectionName).find(dbObject)
-                .sort(new BasicDBObject("date", 1)).limit(1);
-
-        if (commit.length() != 1) {
-            throw new RuntimeException("Cos nie tak");
-        }
-
-        CdoSnapshot snapshot = mapper.toCdoSnapshot(commit.iterator().next());
-
-        return Optional.fromNullable(snapshot);
+        this.mapper = new ModelMapper2(jsonConverter);
     }
 
     @Override
     public void persist(Commit commit) {
-        DBCollection commits = mongo.getCollection(collectionName);
-
-        DBObject commitAsDbObject = mapper.toDBObject(commit);
-
-        commits.insert(commitAsDbObject);
-
+        persistCommit(commit);
+        persistSnapshots(commit);
+        persistChanges(commit);
         persistHeadId(commit);
     }
 
-    private void persistHeadId(Commit commit) {
-        DBCollection headIdCollection = mongo.getCollection(headIdHolderName);
-        DBObject headId = headIdCollection.findOne();
+    private void persistCommit(Commit commit) {
+        MongoCommit mongoCommit = mapper.toMongoCommit(commit);
 
-        if (headId != null) {
-            headIdCollection.findAndModify(headId, new BasicDBObject("commitId", mapper.toDBObject(commit.getId())));
+        mongo.getCollection(MongoCommit.COLLECTION_NAME)
+                .save(mongoCommit);
+    }
+
+    private void persistSnapshots(Commit commit) {
+        MongoSnapshot mongoSnapshot = mapper.toMongoSnaphot(commit);
+
+        mongo.getCollection(MongoSnapshot.COLLECTION_NAME)
+                .save(mongoSnapshot);
+    }
+
+    private void persistChanges(Commit commit) {
+        MongoChange mongoChange = mapper.toMongoChange(commit);
+
+        mongo.getCollection(MongoChange.COLLECTION_NAME)
+                .save(mongoChange);
+
+    }
+
+    private void persistHeadId(Commit commit) {
+        DBCollection headIdCollection = mongo.getCollection(MongoHeadId.COLLECTION_NAME);
+
+        DBObject oldHeadId = headIdCollection.findOne();
+        MongoHeadId newHeadId = new MongoHeadId(jsonConverter.toJson(commit.getId()));
+
+        if (oldHeadId == null) {
+            headIdCollection.save(newHeadId);
         } else {
-            headIdCollection.save(new BasicDBObject("commitId", mapper.toDBObject(commit.getId())));
+            headIdCollection.findAndModify(oldHeadId, newHeadId);
         }
     }
 
     @Override
+    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit) {
+        throw new NotImplementedException();
+//        return getStateHistory(new BasicDBObject("globalCdoId", mapper.toDBObject(globalId)), limit);
+    }
+
+    @Override
+    public List<CdoSnapshot> getStateHistory(InstanceId.InstanceIdDTO dtoId, int limit) {
+        throw new NotImplementedException();
+//        return getStateHistory(new BasicDBObject("globalCdoId", mapper.toDBObject(dtoId)), limit);
+    }
+
+    public List<CdoSnapshot> getStateHistory(DBObject id, int limit) {
+//        DBCursor commit = mongo.getCollection(collectionName).find(id);
+//
+//        if (commit.length() == 0) {
+//            return Collections.EMPTY_LIST;
+//        }
+//
+//        List<CdoSnapshot> snapshots = new ArrayList<>();
+//        Iterator<DBObject> iterator = commit.iterator();
+//
+//        int i = 0;
+//        while (iterator.hasNext() && i<= limit) {
+//            snapshots.addAll(mapper.toCdoSnapshots((BasicDBList) iterator.next().get("snapshots")));
+//            i++;
+//        }
+//
+//        return snapshots;
+        return null;
+    }
+
+    @Override
+    public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
+        throw new NotImplementedException();
+//        return getLatest(new BasicDBObject(Mapper.GLOBAL_CDO_ID, mapper.toDBObject(globalId)));
+    }
+
+    @Override
+    public Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId) {
+        throw new NotImplementedException();
+//        return getLatest(new BasicDBObject(Mapper.GLOBAL_CDO_ID, mapper.toDBObject(dtoId)));
+    }
+
+    private Optional<CdoSnapshot> getLatest(DBObject id) {
+
+//        DBCursor commit = mongo.getCollection(collectionName).find(id)
+//                .sort(new BasicDBObject("date", 1)).limit(1);
+//
+//        if (commit.length() == 0) {
+//           return Optional.empty();
+//        }
+//
+//        if (commit.length() == 1) {
+//            BasicDBList snapshots = (BasicDBList) commit.iterator().next().get("snapshots");
+//
+//            snapshots.
+//
+//            CdoSnapshot snapshot = mapper.toCdoSnapshot(commit.iterator().next());
+//            return Optional.fromNullable(snapshot);
+//        }
+
+        throw new RuntimeException("cos sie zjebalo");
+    }
+
+
+    @Override
     public CommitId getHeadId() {
-        DBObject headId = mongo.getCollection(headIdHolderName).findOne();
+        DBObject headId = mongo.getCollection(MongoHeadId.COLLECTION_NAME).findOne();
 
         if (headId == null) {
             return null;
         }
 
-        return mapper.toCommitId(headId.get("commitId").toString());
+        return jsonConverter.fromJson(headId.get("headId").toString(), CommitId.class);
     }
 
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
-        if (mapper == null) {
-            mapper = new Mapper(jsonConverter);
-        } else {
-            mapper.setJsonConverter(jsonConverter);
-        }
+        this.jsonConverter = jsonConverter;
     }
 }

@@ -30,6 +30,24 @@ class JaversCommitIntegrationTest extends Specification {
         mongoRepository.setJsonConverter(javers.getJsonConverter());
     }
 
+    def "should store state history in JaversRepository1"() {
+        given:
+        def cdo = new SnapshotEntity(id: 1)
+        javers.commit("author",cdo) //v. 1
+        cdo.intProperty = 5
+        javers.commit("author",cdo) //v. 2
+
+        when:
+        def snapshots = javers.getStateHistory(1, SnapshotEntity, 10)
+
+        then:
+        def cdoId = instanceId(1,SnapshotEntity)
+        SnapshotsAssert.assertThat(snapshots)
+                .hasSize(2)
+                .hasSnapshot(cdoId, "1.0", [id:2])
+                .hasSnapshot(cdoId, "2.0", [id:2, intProperty:5])
+    }
+
     def "should store state history in JaversRepository"() {
         given:
         def ref = new SnapshotEntity(id:2)
@@ -39,7 +57,7 @@ class JaversCommitIntegrationTest extends Specification {
         javers.commit("author",cdo) //v. 2
 
         when:
-        def snapshots = javers.getStateHistory(2, SnapshotEntity, 10)
+        def snapshots = javers.getStateHistory(1, SnapshotEntity, 10)
 
         then:
         def cdoId = instanceId(2,SnapshotEntity)

@@ -16,12 +16,13 @@ import org.javers.core.metamodel.object.InstanceId;
 import org.joda.time.LocalDateTime;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author pawel szymczyk
  */
-public class Mapper {
+public class ModelMapper {
 
     public static final String GLOBAL_CDO_ID = "globalCdoId";
     public static final String SNAPSHOTS = "snapshots";
@@ -34,7 +35,7 @@ public class Mapper {
 
     private JsonConverter jsonConverter;
 
-    public Mapper(JsonConverter jsonConverter) {
+    public ModelMapper(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }
 
@@ -97,19 +98,20 @@ public class Mapper {
     /**
      * from DBObject
      */
-    public List<CdoSnapshot> toCdoSnapshots(DBCursor dbCursor) {
-        List<CdoSnapshot> result = new ArrayList<>();
+    public List<CdoSnapshot> toCdoSnapshots(BasicDBList dbObject) {
+        List<CdoSnapshot> snapshots = new ArrayList<>();
 
-        while (dbCursor.hasNext()) {
-            result.add(toCdoSnapshot(dbCursor.next()));
+        Iterator<Object> iterator = dbObject.iterator();
+
+        while (iterator.hasNext()) {
+            snapshots.add(toCdoSnapshot((DBObject) iterator.next()));
         }
 
-        return result;
+        return snapshots;
     }
 
-    public CdoSnapshot toCdoSnapshot(DBObject commit) {
-        BasicDBList snapshots = (BasicDBList) commit.get(SNAPSHOTS);
-        return jsonConverter.fromJson(snapshots.get(snapshots.size() - 1).toString(), CdoSnapshot.class);
+    public CdoSnapshot toCdoSnapshot(DBObject snapshot) {
+        return jsonConverter.fromJson(snapshot.toString(), CdoSnapshot.class);
     }
 
     public void setJsonConverter(JsonConverter jsonConverter) {
@@ -119,4 +121,5 @@ public class Mapper {
     public CommitId toCommitId(String commitId) {
         return jsonConverter.fromJson(commitId, CommitId.class);
     }
+
 }
