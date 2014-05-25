@@ -44,8 +44,8 @@ class JaversCommitIntegrationTest extends Specification {
         def cdoId = instanceId(1,SnapshotEntity)
         SnapshotsAssert.assertThat(snapshots)
                 .hasSize(2)
-                .hasSnapshot(cdoId, "1.0", [id:2])
-                .hasSnapshot(cdoId, "2.0", [id:2, intProperty:5])
+                .hasSnapshot(cdoId, "1.0", [id:1])
+                .hasSnapshot(cdoId, "2.0", [id:1, intProperty:5])
     }
 
     def "should store state history in JaversRepository"() {

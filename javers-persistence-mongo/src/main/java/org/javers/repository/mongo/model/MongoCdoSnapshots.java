@@ -3,6 +3,8 @@ package org.javers.repository.mongo.model;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import org.javers.common.collections.Function;
+import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 
 import java.util.List;
@@ -16,6 +18,26 @@ public class MongoCdoSnapshots extends BasicDBObject {
 
     public String getGlobalCdoId() {
         return get(GLOBAL_CDO_ID).toString();
+    }
+
+    public List<MongoSnapshot> getLatest(int limit) {
+        BasicDBList snapshots = getSnapshots();
+
+        int startIndex;
+
+        if (limit >= snapshots.size()) {
+            startIndex = 0;
+        } else {
+            startIndex = snapshots.size() - limit;
+        }
+
+        return Lists.transform(snapshots.subList(startIndex, snapshots.size()),
+                new Function<Object, MongoSnapshot>() {
+                    @Override
+                    public MongoSnapshot apply(Object input) {
+                        return new MongoSnapshot((DBObject) input);
+                    }
+                });
     }
 
     public MongoSnapshot getLatest() {
