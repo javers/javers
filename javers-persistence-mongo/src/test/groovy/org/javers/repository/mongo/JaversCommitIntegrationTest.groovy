@@ -32,7 +32,6 @@ class JaversCommitIntegrationTest extends Specification {
 
     def "should store state history in JaversRepository"() {
         given:
-        def javers = javers().build()
         def ref = new SnapshotEntity(id:2)
         def cdo = new SnapshotEntity(id: 1, entityRef: ref)
         javers.commit("author",cdo) //v. 1
@@ -53,7 +52,6 @@ class JaversCommitIntegrationTest extends Specification {
 
     def "should create initial commit when new objects"() {
         given:
-        def javers = javers().build()
         def newUser = new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("London"))
 
         when:
@@ -77,7 +75,6 @@ class JaversCommitIntegrationTest extends Specification {
         given:
         def oldRef = new SnapshotEntity(id: 2)
         def cdo = new SnapshotEntity(id: 1, entityRef: oldRef)
-        def javers = javers().build()
         javers.commit("user",cdo)
 
         when:
@@ -99,7 +96,6 @@ class JaversCommitIntegrationTest extends Specification {
     def "should detect changes on referenced node even if root is new"() {
         given:
         def oldRef = new SnapshotEntity(id: 2, intProperty:2)
-        def javers = javers().build()
         javers.commit("user",oldRef)
 
         def cdo = new SnapshotEntity(id: 1, entityRef: oldRef)
@@ -122,7 +118,6 @@ class JaversCommitIntegrationTest extends Specification {
 
     def "should compare property values with latest from repository"() {
         given:
-        def javers = javers().build()
         def user = dummyUser("John").withDetails(1).withAddress("London").build()
         javers.commit("some.login", user)
 
@@ -144,7 +139,6 @@ class JaversCommitIntegrationTest extends Specification {
 
     def "should support new object reference, deep in the graph"() {
         given:
-        def javers = javers().build()
         DummyUser user = dummyUser().withDetails(1).build()
         javers.commit("some.login", user)
 
@@ -168,7 +162,6 @@ class JaversCommitIntegrationTest extends Specification {
     // but we don't know if it was removed 'globally'
     def "should generate only ReferenceChange for removed objects"() {
         given:
-        def javers = javers().build()
         DummyUser user = dummyUser().withDetails(5).withAddress("Tokyo").build()
         javers.commit("some.login", user)
 
@@ -187,7 +180,6 @@ class JaversCommitIntegrationTest extends Specification {
 
     def "should support new object added to List, deep in the graph"() {
         given:
-        def javers = javers().build()
         DummyUser user = dummyUser().withDetails(5).withAddresses(new DummyAddress("London"),new DummyAddress("Paris")).build()
         javers.commit("some.login", user)
 
@@ -207,7 +199,6 @@ class JaversCommitIntegrationTest extends Specification {
 
     def "should support object removed from List, deep in the graph"() {
         given:
-        def javers = javers().build()
         DummyUser user = dummyUser().withDetails(5).withAddresses(new DummyAddress("London"),new DummyAddress("Paris")).build()
         javers.commit("some.login", user)
 
@@ -225,7 +216,6 @@ class JaversCommitIntegrationTest extends Specification {
 
     def "should create empty commit when nothing changed"() {
         given:
-        def javers = javers().build()
         def cdo = new SnapshotEntity(listOfEntities:    [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
         def firstCommit = javers.commit("author",cdo)
 
