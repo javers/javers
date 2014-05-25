@@ -8,13 +8,13 @@ import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
 
-class ModelMapper2Test extends Specification {
+class ModelMapperTest extends Specification {
 
     def "should map Commit to MongoCommit"() {
 
         given:
         def commit = new Commit(new CommitId(1, 0), "", new LocalDateTime(), Collections.EMPTY_LIST, Stub(Diff))
-        def modelMapper = new ModelMapper2(JaversTestBuilder.javersTestAssembly().jsonConverter)
+        def modelMapper = new ModelMapper(JaversTestBuilder.javersTestAssembly().jsonConverter)
 
         when:
         def mongoCommit = modelMapper.toMongoCommit(commit)
