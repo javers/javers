@@ -1,12 +1,12 @@
 package org.javers.repository.mongo;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
-import org.javers.common.collections.Function;
-import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -15,11 +15,10 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.repository.api.JaversRepository;
-import org.javers.repository.mongo.model.MongoCdoSnapshots;
 import org.javers.repository.mongo.model.MongoHeadId;
-import org.javers.repository.mongo.model.MongoSnapshot;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -49,22 +48,10 @@ public class MongoRepository implements JaversRepository {
 
     private void persistSnapshots(Commit commit) {
 
-        DBCollection collection = mongo.getCollection(MongoCdoSnapshots.COLLECTION_NAME);
+        DBCollection collection = mongo.getCollection("Snapshots");
 
         for (CdoSnapshot snapshot: commit.getSnapshots()) {
-
-            DBObject globalCdoId = toDBObject(snapshot.getGlobalId());
-
-            DBObject mongoCdoSnapshots = collection
-                    .findOne(globalCdoId);
-
-            if (mongoCdoSnapshots == null) {
-                collection.save(mapper.toMongoCdoSnapshot(snapshot));
-            } else {
-                MongoCdoSnapshots snapshots = new MongoCdoSnapshots(mongoCdoSnapshots);
-                snapshots.addSnapshot(new MongoSnapshot((DBObject) JSON.parse(jsonConverter.toJson(snapshot))));
-                collection.findAndModify(globalCdoId, snapshots);
-            }
+            collection.save((DBObject) JSON.parse(jsonConverter.toJson(snapshot)));
         }
     }
 
@@ -91,24 +78,19 @@ public class MongoRepository implements JaversRepository {
         return getStateHistory(toDBObject(dtoId), limit);
     }
 
-    private List<CdoSnapshot> getStateHistory(DBObject id, int limit) {
+    private List<CdoSnapshot> getStateHistory(BasicDBObject id, int limit) {
 
-        DBObject mongoCdoSnapshots = mongo.getCollection(MongoCdoSnapshots.COLLECTION_NAME)
-                .findOne(id);
+        DBCursor mongoSnapshots = mongo.getCollection("Snapshots")
+                .find(id).sort(new BasicDBObject("commitId", 1)).limit(limit);
 
-        if (mongoCdoSnapshots == null) {
-            return Collections.EMPTY_LIST;
+        Iterator<DBObject> iterator = mongoSnapshots.iterator();
+        List<CdoSnapshot> snapshots = new ArrayList<>();
+
+        while (iterator.hasNext()) {
+            snapshots.add(mapper.toCdoSnapshot(iterator.next()));
         }
 
-        final MongoCdoSnapshots cdoSnapshots = new MongoCdoSnapshots(mongoCdoSnapshots);
-
-        return Lists.transform(cdoSnapshots.getLatest(limit),
-                new Function<MongoSnapshot, CdoSnapshot>() {
-                    @Override
-                    public CdoSnapshot apply(MongoSnapshot input) {
-                        return mapper.toCdoSnapshot(input, cdoSnapshots.getGlobalCdoId());
-                    }
-                });
+        return snapshots;
     }
 
     @Override
@@ -123,17 +105,14 @@ public class MongoRepository implements JaversRepository {
 
     private Optional<CdoSnapshot> getLatest(DBObject id) {
 
-        DBObject mongoCdoSnapshots = mongo.getCollection(MongoCdoSnapshots.COLLECTION_NAME).findOne(id);
+        DBCursor mongoLatest = mongo.getCollection("Snapshots")
+                .find(id).sort(new BasicDBObject("commitId", 1)).limit(1);
 
-        if (mongoCdoSnapshots == null) {
+        if (mongoLatest.size() == 0) {
             return Optional.empty();
         }
 
-        MongoCdoSnapshots cdoSnapshots = new MongoCdoSnapshots(mongoCdoSnapshots);
-
-        MongoSnapshot latest = cdoSnapshots.getLatest();
-
-        return Optional.of(mapper.toCdoSnapshot(latest, cdoSnapshots.getGlobalCdoId()));
+        return Optional.of(mapper.toCdoSnapshot(mongoLatest.iterator().next()));
     }
 
 
@@ -154,11 +133,17 @@ public class MongoRepository implements JaversRepository {
         this.jsonConverter = jsonConverter;
     }
 
-    private DBObject toDBObject(GlobalCdoId id) {
-        return new BasicDBObject(MongoCdoSnapshots.GLOBAL_CDO_ID, JSON.parse(jsonConverter.toJson(id)));
+    private BasicDBObject toDBObject(GlobalCdoId id) {
+        return new BasicDBObject("globalCdoId", JSON.parse(jsonConverter.toJson(id)));
     }
 
-    private DBObject toDBObject(InstanceId.InstanceIdDTO id) {
-        return new BasicDBObject(MongoCdoSnapshots.GLOBAL_CDO_ID, JSON.parse(jsonConverter.toJson(id)));
+    private BasicDBObject toDBObject(InstanceId.InstanceIdDTO id) {
+
+        //TODO there is no InstanceIdDTO JSON type adapter
+        return new BasicDBObject("globalCdoId", BasicDBObjectBuilder.start()
+                .add("cdoId", id.getCdoId())
+                .add("entity", id.getEntity().getName())
+                .get()
+        );
     }
 }
