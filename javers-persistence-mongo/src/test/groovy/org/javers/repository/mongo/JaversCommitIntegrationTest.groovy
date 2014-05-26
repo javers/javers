@@ -1,6 +1,7 @@
 package org.javers.repository.mongo
 
 import com.github.fakemongo.Fongo
+import com.mongodb.Mongo
 import org.javers.core.Javers
 import org.javers.core.commit.CommitAssert
 import org.javers.core.model.DummyAddress
@@ -24,13 +25,17 @@ class JaversCommitIntegrationTest extends Specification {
 
     def setup() {
         def db = new Fongo("myDb").mongo.getDB("test")
+//        def db = new Mongo("localhost").getDB("test")
+//        db.getCollection("Snapshots").drop()
+//        db.getCollection("HeadId").drop()
+
         def mongoRepository = new MongoRepository(db)
         javers = javers().registerJaversRepository(mongoRepository).build()
 
         mongoRepository.setJsonConverter(javers.getJsonConverter());
     }
 
-    def "should store state history in JaversRepository1"() {
+    def "should store state history of one Cdo in JaversRepository"() {
         given:
         def cdo = new SnapshotEntity(id: 1)
         javers.commit("author",cdo) //v. 1
@@ -48,7 +53,7 @@ class JaversCommitIntegrationTest extends Specification {
                 .hasSnapshot(cdoId, "2.0", [id:1, intProperty:5])
     }
 
-    def "should store state history in JaversRepository"() {
+    def "should store state history of many Cdo's in JaversRepository"() {
         given:
         def ref = new SnapshotEntity(id:2)
         def cdo = new SnapshotEntity(id: 1, entityRef: ref)
