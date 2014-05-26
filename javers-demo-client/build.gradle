@@ -1,0 +1,29 @@
+apply plugin: 'java'
+apply plugin: "groovy"
+
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile(
+            'log4j:log4j:1.2.17',
+            'com.google.guava:guava:15.0',
+            'org.apache.commons:commons-lang3:3.3.2'
+    )
+
+    testCompile(
+            [group: "org.codehaus.groovy", name: "groovy-all", version: "2.2.1"],
+            [group: "org.spockframework",  name: "spock-core", version: "0.7-groovy-2.0"],
+    )
+}
+
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
