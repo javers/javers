@@ -24,10 +24,10 @@ class JaversCommitIntegrationTest extends Specification {
     Javers javers
 
     def setup() {
-//        def db = new Fongo("myDb").mongo.getDB("test")
-        def db = new Mongo("localhost").getDB("test")
-        db.getCollection("Snapshots").drop()
-        db.getCollection("HeadId").drop()
+        def db = new Fongo("myDb").mongo.getDB("test")
+//        def db = new Mongo("localhost").getDB("test")
+//        db.getCollection("Snapshots").drop()
+//        db.getCollection("HeadId").drop()
 
         def mongoRepository = new MongoRepository(db)
         javers = javers().registerJaversRepository(mongoRepository).build()
