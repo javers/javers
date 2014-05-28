@@ -1,0 +1,16 @@
+{
+    "globalCdoId": {
+        "cdoId": 1,
+        "cdoClass": "DummyProduct"
+    },
+
+    "snapshots": [
+        {
+            "commitId": "1.0",
+            "state": {
+                "name": "Kazik",
+                "surname": "Kowalski"
+            }
+        }
+    ]
+}

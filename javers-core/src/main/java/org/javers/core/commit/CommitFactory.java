@@ -1,5 +1,6 @@
 package org.javers.core.commit;
 
+import org.javers.common.date.DateProvider;
 import org.javers.common.validation.Validate;
 import org.javers.core.GraphFactory;
 import org.javers.core.diff.Diff;
@@ -19,12 +20,18 @@ public class CommitFactory {
     private final JaversExtendedRepository javersRepository;
     private final GraphFactory graphFactory;
     private final CommitSeqGenerator commitSeqGenerator;
+    private final DateProvider dateProvider;
 
-    public CommitFactory(DiffFactory diffFactory, JaversExtendedRepository javersRepository, GraphFactory graphFactory, CommitSeqGenerator commitSeqGenerator) {
+    public CommitFactory(DiffFactory diffFactory,
+                         JaversExtendedRepository javersRepository,
+                         GraphFactory graphFactory,
+                         CommitSeqGenerator commitSeqGenerator,
+                         DateProvider dateProvider) {
         this.diffFactory = diffFactory;
         this.javersRepository = javersRepository;
         this.graphFactory = graphFactory;
         this.commitSeqGenerator = commitSeqGenerator;
+        this.dateProvider = dateProvider;
     }
 
     public Commit create(String author, Object currentVersion){
@@ -42,7 +49,7 @@ public class CommitFactory {
         //do diff
         Diff diff = diffFactory.create(latestShadowGraph, currentGraph);
 
-        return new Commit(newId, author, snapshots, diff);
+        return new Commit(newId, author, dateProvider.now(), snapshots, diff);
     }
 
 }

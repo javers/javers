@@ -4,8 +4,6 @@ import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.metamodel.object.CdoSnapshot
-import org.javers.core.metamodel.object.GlobalCdoId
-import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -62,6 +60,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
+
+        println json.toString()
 
         with(json.state) {
             name == "kaz"
@@ -131,7 +131,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         String jsonText = javers.jsonConverter.toJson(snapshot)
 
         then:
-        def json = new JsonSlurper().parseText(jsonText)
+        def json = new JsonSlurper().parseText jsonText
 
         with (json.state) {
             intArray == [1, 2]

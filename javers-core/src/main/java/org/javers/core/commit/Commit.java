@@ -3,6 +3,7 @@ package org.javers.core.commit;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.Diff;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.GlobalCdoId;
 import org.joda.time.LocalDateTime;
 
 import java.util.Collections;
@@ -20,11 +21,11 @@ public final class Commit {
     private final LocalDateTime commitDate;
     private final Diff diff;
 
-    Commit(CommitId id, String author, List<CdoSnapshot> snapshots, Diff diff) {
+    Commit(CommitId id, String author, LocalDateTime date, List<CdoSnapshot> snapshots, Diff diff) {
         Validate.argumentsAreNotNull(id, author, snapshots, diff);
         this.author = author;
         this.snapshots = snapshots;
-        this.commitDate = new LocalDateTime();
+        this.commitDate = date;
         this.diff = diff;
         this.id = id;
         for (CdoSnapshot snapshot : snapshots){
@@ -37,6 +38,10 @@ public final class Commit {
      */
     public CommitId getId() {
         return id;
+    }
+
+    public GlobalCdoId getGlobalCdoId() {
+        return snapshots.get(0).getGlobalId();
     }
 
     public String getAuthor() {

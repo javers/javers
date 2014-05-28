@@ -53,7 +53,7 @@ class GlobalCdoIdTypeAdapterTest extends Specification {
 
         when:
         String jsonText = javers.jsonConverter.toJson(id)
-        //println(jsonText)
+        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)

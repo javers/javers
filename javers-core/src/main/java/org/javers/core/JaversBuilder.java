@@ -6,6 +6,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.CdoSnapshotTypeAdapter;
+import org.javers.core.json.typeadapter.CommitIdTypeAdapter;
 import org.javers.core.json.typeadapter.GlobalCdoIdTypeAdapter;
 import org.javers.core.json.typeadapter.change.ArrayChangeTypeAdapter;
 import org.javers.core.json.typeadapter.change.ListChangeTypeAdapter;
@@ -46,7 +47,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
             ArrayChangeTypeAdapter.class,
             ListChangeTypeAdapter.class,
             SetChangeTypeAdapter.class,
-            CdoSnapshotTypeAdapter.class
+            CdoSnapshotTypeAdapter.class,
+            CommitIdTypeAdapter.class
     };
 
     private final Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
@@ -80,9 +82,10 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return getContainerComponent(Javers.class);
     }
 
-    public void registerJaversRepository(JaversRepository repository){
+    public JaversBuilder registerJaversRepository(JaversRepository repository){
         Validate.argumentsAreNotNull(repository);
         this.repository = repository;
+        return this;
     }
 
     /**

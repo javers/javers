@@ -142,4 +142,8 @@ public class Javers {
     public Diff compare(String author, Object oldVersion, Object currentVersion) {
         return compare(oldVersion, currentVersion);
     }
+
+    public JsonConverter getJsonConverter() {
+        return jsonConverter;
+    }
 }
