@@ -1,15 +1,16 @@
 package org.javers.core.metamodel.property;
 
+import org.javers.common.reflection.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.persistence.Transient;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.javers.common.reflection.ReflectionUtil.TRANSIENT_ANN;
 
 /**
  * @author pawel szymczyk
@@ -47,7 +48,7 @@ public class FieldBasedPropertyScanner implements PropertyScanner {
 
     private boolean isPersistent(Field field) {
         return !Modifier.isTransient(field.getModifiers())
-            && field.getAnnotation(Transient.class) == null
+            && !ReflectionUtil.isAnnotationPresent(field, TRANSIENT_ANN)
             && !field.getName().equals("this$0"); //owner of inner class
     }
 }

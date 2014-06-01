@@ -6,7 +6,6 @@ import java.lang.reflect.Type;
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 public interface Property {
-
     String getName();
 
     Type getGenericType();

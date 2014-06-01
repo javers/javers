@@ -2,8 +2,9 @@ package org.javers.common.reflection;
 
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.validation.Validate;
 
-import javax.persistence.Transient;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -11,6 +12,8 @@ import java.util.*;
  * @author bartosz walacik
  */
 public class ReflectionUtil {
+    public static final String TRANSIENT_ANN = "Transient";
+    public static final String ID_ANN = "Id";
 
     private static final Object[] EMPTY_ARRAY = new Object[]{};
 
@@ -70,9 +73,38 @@ public class ReflectionUtil {
             return false;
         }
 
-        return  !m.isAnnotationPresent(Transient.class) &&
+        return  !isAnnotationPresent(m, TRANSIENT_ANN) &&
                 !Modifier.isAbstract(m.getModifiers())  &&
                 !Modifier.isNative(m.getModifiers()) ;
+    }
+
+    public static boolean isAnnotationPresent(Method method, String annotationName){
+        Validate.argumentsAreNotNull(method, annotationName);
+
+        if (contains(method.getAnnotations(), annotationName)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isAnnotationPresent(Field field, String annotationName){
+        Validate.argumentsAreNotNull(field, annotationName);
+
+        if (contains(field.getDeclaredAnnotations(), annotationName)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static boolean contains(Annotation[] annotations, String annotationName) {
+        for (Annotation a : annotations){
+            if (a.annotationType().getSimpleName().equals(annotationName)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isGetter(Method m) {

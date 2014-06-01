@@ -2,10 +2,10 @@ package org.javers.core.metamodel.property;
 
 import org.javers.common.reflection.ReflectionUtil;
 
-import javax.persistence.Id;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import static org.javers.common.reflection.ReflectionUtil.ID_ANN;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
@@ -52,7 +52,7 @@ public class BeanProperty implements Property {
 
     @Override
     public boolean looksLikeId() {
-        return getter.isAnnotationPresent(Id.class);
+        return ReflectionUtil.isAnnotationPresent(getter, ID_ANN);
     }
 
     @Override
