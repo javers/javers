@@ -16,7 +16,8 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 /**
  * Object type that can be managed by Javers,
  * reflects one class in clients domain model.
- * <p/>
+ * <br/>
+ *
  * ManagedClass instances are called here <b>Cdo</b> - client's domain objects
  *
  * @author bartosz walacik

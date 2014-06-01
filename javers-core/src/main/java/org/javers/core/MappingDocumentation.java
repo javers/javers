@@ -20,12 +20,12 @@ import org.javers.core.graph.ObjectGraphBuilder;
  * <p/>
  * Mapping is also a case in JaVers but don't worry:
  * <ul>
- *     <li/>It's far more simple than JPA
- *     <li/>Javers uses reasonable defaults and take advantage of type inferring algorithm.
+ *     <li>It's far more simple than JPA</li>
+ *     <li>Javers uses reasonable defaults and take advantage of type inferring algorithm.
  *          So for a quick start just let it do the mapping for You.
- *          Later on, it would be advisable to refine it to optimize diff semantics
- *     <li/>We believe that domain model classes should be framework agnostic,
- *          so we do not ask You to embrace another annotation set
+ *          Later on, it would be advisable to refine it to optimize diff semantics</li>
+ *     <li>We believe that domain model classes should be framework agnostic,
+ *          so we do not ask You to embrace another annotation set</li>
  * </ul>
  *
  * JaVers wants to know only a few basic facts about your domain model classes,
@@ -44,9 +44,9 @@ import org.javers.core.graph.ObjectGraphBuilder;
  * <p/>
  * Do achieve this, use {@link JaversBuilder} methods:
  * <ul>
- *     <li/>{@link JaversBuilder#registerEntity(Class)}
- *     <li/>{@link JaversBuilder#registerValueObject(Class)}
- *     <li/>{@link JaversBuilder#registerValue(Class)}
+ *     <li>{@link JaversBuilder#registerEntity(Class)}</li>
+ *     <li>{@link JaversBuilder#registerValueObject(Class)}</li>
+ *     <li>{@link JaversBuilder#registerValue(Class)}</li>
  * </ul>
  *
  * <h3>Entity</h3>
@@ -85,15 +85,15 @@ import org.javers.core.graph.ObjectGraphBuilder;
  *
  * {@link TypeMapper} does the following
  * <ul>
- *     <li/>If Person.class was spotted before in the graphs, TypeMapper has exact mapping for it and just returns already known JaversType
- *     <li/>If this is a first question about Person.class, TypeMapper checks if it was registered in {@link JaversBuilder}
- *          as one of Entitiy, Value Object or Value. If so, answer is easy.
- *     <li/>Then TypeMapper tries to find so called Prototype&mdash;nearest class or interface that is already mapped and is assignable from Person.class.
+ *     <li>If Person.class was spotted before in the graphs, TypeMapper has exact mapping for it and just returns already known JaversType</li>
+ *     <li>If this is a first question about Person.class, TypeMapper checks if it was registered in {@link JaversBuilder}
+ *          as one of Entitiy, Value Object or Value. If so, answer is easy.</li>
+ *     <li>Then TypeMapper tries to find so called Prototype&mdash;nearest class or interface that is already mapped and is assignable from Person.class.
  *          So as You can see, it's easy to map whole bunch of classes with common superclass or interface with one call to {@link JaversBuilder}.
- *          Just register those high level concepts.
- *     <li/>When Prototype is not found, Javers tries to infer Type by looking for well known JPA annotations: {@link javax.persistence.Entity}
+ *          Just register those high level concepts.</li>
+ *     <li>When Prototype is not found, Javers tries to infer Type by looking for well known JPA annotations: {@link javax.persistence.Entity}
  *          and {@link javax.persistence.Id}.
- *          If found, class would be mapped as {@link Entity}, otherwise as {@link ValueObject}.
+ *          If found, class would be mapped as {@link Entity}, otherwise as {@link ValueObject}.</li>
  * </ul>
  *
  * To summarize, identify Entities and Value Objects and Values in your domain model.

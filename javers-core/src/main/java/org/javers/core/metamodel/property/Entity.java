@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Entity class in client's domain model.
  * Has list of mutable properties and its own identity hold in idProperty.
- * <p/>
+ * <br/>
  *
  * Example:
  * <pre>
@@ -20,7 +20,7 @@ import java.util.List;
  *         ...
  *     }
  * </pre>
- * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
+ * @author Pawel Cierpiatka
  */
 public class Entity extends ManagedClass {
     private final Property idProperty;
