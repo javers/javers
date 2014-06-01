@@ -35,9 +35,6 @@
             <name>Bartosz Walacik</name>
         </developer>
         <developer>
-            <name>Michal Szostakowski</name>
-        </developer>
-        <developer>
             <name>Pawel Szymczyk</name>
         </developer>
     </developers>
@@ -247,6 +244,7 @@
                 </executions>
             </plugin>
 
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -262,7 +260,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
 
             <!-- Mandatory plugin for using Spock -->
             <plugin>
