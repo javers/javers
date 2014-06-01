@@ -74,6 +74,7 @@ public class ReflectionUtil {
         }
 
         return  !isAnnotationPresent(m, TRANSIENT_ANN) &&
+                !Modifier.isStatic(m.getModifiers())  &&
                 !Modifier.isAbstract(m.getModifiers())  &&
                 !Modifier.isNative(m.getModifiers()) ;
     }

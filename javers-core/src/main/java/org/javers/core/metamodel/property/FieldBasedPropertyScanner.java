@@ -48,6 +48,7 @@ public class FieldBasedPropertyScanner implements PropertyScanner {
 
     private boolean isPersistent(Field field) {
         return !Modifier.isTransient(field.getModifiers())
+            && !Modifier.isStatic(field.getModifiers())
             && !ReflectionUtil.isAnnotationPresent(field, TRANSIENT_ANN)
             && !field.getName().equals("this$0"); //owner of inner class
     }

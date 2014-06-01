@@ -25,6 +25,14 @@ abstract class PropertyScannerTest extends Specification {
         assertThat(properties).hasProperty("inheritedInt").hasValue(new DummyAddress(),0)
     }
 
+    def "should ignore static properties"() {
+        when:
+        def properties = propertyScanner.scan(DummyAddress)
+
+        then:
+        assertThat(properties).hasntGotProperty("staticInt");
+    }
+
     def "should scan and get private property"() {
         when:
         def properties = propertyScanner.scan(ManagedClass)

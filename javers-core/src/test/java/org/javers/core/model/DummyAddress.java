@@ -15,6 +15,7 @@ public class DummyAddress extends AbstractDummyAddress{
     private Kind kind;
     private DummyNetworkAddress networkAddress;
     private transient int someTransientField;
+    private static int staticInt;
 
     public DummyAddress() {
     }
@@ -26,6 +27,14 @@ public class DummyAddress extends AbstractDummyAddress{
     public DummyAddress(String city, String street) {
         this.city = city;
         this.street = street;
+    }
+
+    public static int getStaticInt() {
+        return staticInt;
+    }
+
+    public static void setStaticInt(int staticInt) {
+        DummyAddress.staticInt = staticInt;
     }
 
     public String getCity() {
