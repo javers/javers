@@ -62,6 +62,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- jpa API -->
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <version>1.0.1.Final</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Spock & groovy-->
         <dependency>
             <groupId>org.spockframework</groupId>
