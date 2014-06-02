@@ -3,6 +3,7 @@ package org.javers.core;
 import com.google.gson.TypeAdapter;
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.CdoSnapshotTypeAdapter;
@@ -242,5 +243,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
             repository = new InMemoryRepository();
         }
         addComponent(repository);
+        repository.setJsonConverter(getContainerComponent(JsonConverter.class));
     }
 }
