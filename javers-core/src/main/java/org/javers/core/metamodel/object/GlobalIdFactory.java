@@ -53,7 +53,7 @@ public class GlobalIdFactory {
         return new UnboundedValueObjectId(valueObject);
     }
 
-    public ValueObjectId createFromPath(InstanceId owner, Class valueObjectClass, String path){
+    public ValueObjectId createFromPath(GlobalCdoId owner, Class valueObjectClass, String path){
         ValueObject valueObject = getManagedClass(valueObjectClass, ValueObject.class);
         return new ValueObjectId(valueObject, owner, path);
     }
