@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class MongoRepository implements JaversRepository {
 
+    private static final int DESC = -1;
     private DB mongo;
     private ModelMapper mapper;
     private JsonConverter jsonConverter;
@@ -81,7 +82,7 @@ public class MongoRepository implements JaversRepository {
     private List<CdoSnapshot> getStateHistory(BasicDBObject id, int limit) {
 
         DBCursor mongoSnapshots = mongo.getCollection("Snapshots")
-                .find(id).sort(new BasicDBObject("commitId", 1)).limit(limit);
+                .find(id).sort(new BasicDBObject("commitId", DESC)).limit(limit);
 
         Iterator<DBObject> iterator = mongoSnapshots.iterator();
         List<CdoSnapshot> snapshots = new ArrayList<>();
@@ -106,7 +107,7 @@ public class MongoRepository implements JaversRepository {
     private Optional<CdoSnapshot> getLatest(DBObject id) {
 
         DBCursor mongoLatest = mongo.getCollection("Snapshots")
-                .find(id).sort(new BasicDBObject("commitId", 1)).limit(1);
+                .find(id).sort(new BasicDBObject("commitId", DESC)).limit(1);
 
         if (mongoLatest.size() == 0) {
             return Optional.empty();

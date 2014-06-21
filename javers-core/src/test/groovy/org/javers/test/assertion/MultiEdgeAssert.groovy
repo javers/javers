@@ -41,5 +41,8 @@ class MultiEdgeAssert {
         NodeAssert.assertThat(actual.references.find { it.globalCdoId.cdoId == expectedTargetCdoId })
     }
 
+    NodeAssert andFirstTargetNode (){
+        NodeAssert.assertThat(actual.references[0])
+    }
 
 }

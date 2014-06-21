@@ -1,15 +1,16 @@
 package org.javers.core.graph
 
+import org.javers.core.IdBuilder
 import org.javers.core.metamodel.type.TypeMapper
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyUser
-import org.javers.core.model.DummyUserDetails
-import org.javers.core.model.SnapshotEntity
+import org.javers.core.model.*
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*
+
 import static NodeAssert.assertThat
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
+import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
@@ -20,6 +21,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     @Shared TypeMapper mapper
     @Shared LiveCdoFactory liveCdoFactory
+    @Shared IdBuilder idBuilder = javersTestAssembly().idBuilder()
 
     ObjectGraphBuilder newBuilder(){
         new ObjectGraphBuilder(mapper, liveCdoFactory)
@@ -368,4 +370,28 @@ abstract class ObjectGraphBuilderTest extends Specification {
                  valueObjectId(instanceId(5, DummyUserDetails),DummyAddress,"addressList/1")
                 ])
     }
+
+    def "should support cycles on ValueObjects"() {
+        given:
+        ObjectGraphBuilder graphBuilder = newBuilder()
+
+        def child1 = new CategoryVo("child1")
+        def child2 = new CategoryVo("child2")
+        def root = new CategoryVo("root")
+        root.addChild(child1).addChild(child2)
+
+        when:
+        ObjectNode node = graphBuilder.buildGraph(root)
+
+        then:
+        assertThat(node).hasGlobalId(idBuilder.unboundedValueObjectId(CategoryVo))
+        assertThat(node).hasMultiEdge("children").refersToGlobalIds([
+                idBuilder.withUnboundedOwner(CategoryVo).voId(CategoryVo,"children/0"),
+                idBuilder.withUnboundedOwner(CategoryVo).voId(CategoryVo,"children/1")
+        ])
+        assertThat(node).hasMultiEdge("children")
+                        .andFirstTargetNode()
+                        .hasSingleEdge("parent").andTargetNode().hasGlobalId(idBuilder.unboundedValueObjectId(CategoryVo))
+    }
+
 }

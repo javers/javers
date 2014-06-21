@@ -1,10 +1,7 @@
 package org.javers.core;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.InstanceId;
-import org.javers.core.metamodel.object.UnboundedValueObjectId;
-import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.object.*;
 
 /**
  * @author bartosz walacik
@@ -12,16 +9,22 @@ import org.javers.core.metamodel.object.ValueObjectId;
 public class IdBuilder {
     private final GlobalIdFactory globalIdFactory;
 
-    private InstanceId owner;
+    private GlobalCdoId owner;
 
     public IdBuilder(GlobalIdFactory globalIdFactory) {
         this.globalIdFactory = globalIdFactory;
+    }
+
+    public IdBuilder withUnboundedOwner(Class ownerValueObjectClass) {
+        owner = unboundedValueObjectId(ownerValueObjectClass);
+        return this;
     }
 
     public IdBuilder withOwner(Object localId, Class ownerEntityClass) {
         owner = instanceId(localId, ownerEntityClass);
         return this;
     }
+
 
     public ValueObjectId voId(Class valueObjectClass, String path){
         Validate.conditionFulfilled(owner != null, "call withOwner() first");

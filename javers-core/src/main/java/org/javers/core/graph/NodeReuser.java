@@ -11,7 +11,7 @@ import java.util.Map;
  * @author bartosz walacik
  */
 class NodeReuser {
-    private final Map<Cdo, ObjectNode> reverseCdoIdMap;
+    private final Map<Object, ObjectNode> reverseCdoIdMap;
     private int reusedNodes;
     private int entities;
     private int valueObjects;
@@ -21,12 +21,12 @@ class NodeReuser {
     }
 
     boolean isReusable(Cdo cdo){
-        return reverseCdoIdMap.containsKey(cdo);
+        return reverseCdoIdMap.containsKey(reverseCdoIdMapKey(cdo));
     }
 
     ObjectNode getForReuse(Cdo cdo) {
         reusedNodes++;
-        return reverseCdoIdMap.get(cdo);
+        return reverseCdoIdMap.get(reverseCdoIdMapKey(cdo));
     }
 
     void saveForReuse(ObjectNode reference) {
@@ -36,7 +36,7 @@ class NodeReuser {
         if (reference.getGlobalCdoId() instanceof ValueObjectId){
             valueObjects++;
         }
-        reverseCdoIdMap.put(reference.getCdo(), reference);
+        reverseCdoIdMap.put(reverseCdoIdMapKey(reference.getCdo()), reference);
     }
 
     public int nodesCount() {
@@ -53,5 +53,16 @@ class NodeReuser {
 
     public int voCount() {
         return valueObjects;
+    }
+
+    /**
+     * InstanceId for Entities,
+     * System.identityHashCode for ValueObjects
+     */
+    private Object reverseCdoIdMapKey(Cdo cdo) {
+          if (cdo.getGlobalId() instanceof InstanceId){
+              return cdo.getGlobalId();
+          }
+          return System.identityHashCode(cdo.getWrappedCdo().get());
     }
 }
