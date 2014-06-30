@@ -1,6 +1,5 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 
@@ -8,28 +7,28 @@ import org.javers.core.metamodel.property.Property;
  * @author bartosz walacik
  */
 public class ValueChange extends PropertyChange {
-    private final Atomic leftValue;
-    private final Atomic rightValue;
+    private final Atomic left;
+    private final Atomic right;
 
     public ValueChange(GlobalCdoId affectedCdoId, Property property, Object leftValue, Object rightValue) {
         super(affectedCdoId, property);
-        this.leftValue = new Atomic(leftValue);
-        this.rightValue = new Atomic(rightValue);
+        this.left = new Atomic(leftValue);
+        this.right = new Atomic(rightValue);
     }
 
-    public Object getLeftValue() {
-        return leftValue.unwrap();
+    public Object getLeft() {
+        return left.unwrap();
     }
 
-    public Object getRightValue() {
-        return rightValue.unwrap();
+    public Object getRight() {
+        return right.unwrap();
     }
 
-    public Atomic getWrappedLeftValue() {
-        return leftValue;
+    public Atomic getWrappedLeft() {
+        return left;
     }
 
-    public Atomic getWrappedRightValue() {
-        return rightValue;
+    public Atomic getWrappedRight() {
+        return right;
     }
 }

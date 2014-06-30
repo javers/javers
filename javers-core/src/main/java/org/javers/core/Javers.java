@@ -3,6 +3,7 @@ package org.javers.core;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactory;
+import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.json.JsonConverter;
@@ -11,6 +12,7 @@ import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.graph.ObjectGraphBuilder;
+import org.javers.core.snapshot.SnapshotDiffer;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,16 +37,18 @@ public class Javers {
     private final JsonConverter jsonConverter;
     private final CommitFactory commitFactory;
     private final JaversExtendedRepository repository;
+    private final SnapshotDiffer snapshotDiffer;
 
     /**
      * JaVers instance should be constructed by {@link JaversBuilder}
      */
-    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository) {
+    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, SnapshotDiffer snapshotDiffer) {
         this.diffFactory = diffFactory;
         this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;
         this.commitFactory = commitFactory;
         this.repository = repository;
+        this.snapshotDiffer = snapshotDiffer;
     }
 
     /**
@@ -108,7 +112,7 @@ public class Javers {
     }
 
     /**
-     * Snapshots (historical states) of entity instance,
+     * Snapshots (historical states) of given entity instance,
      * in reverse chronological order
      *
      * @param localId id of required instance
@@ -119,6 +123,20 @@ public class Javers {
      */
     public List<CdoSnapshot> getStateHistory(Object localId, Class entityClass, int limit){
         return repository.getStateHistory(localId, entityClass, limit);
+    }
+
+    /**
+     * Changes (diff sequence) of given entity instance,
+     * in reverse chronological order
+     *
+     * @param localId id of required instance
+     * @param entityClass class of required instance
+     * @param limit choose reasonable limit
+     * @return empty List if object is not versioned or was committed only once
+     * @throws JaversException ENTITY_EXPECTED if given javaClass is NOT mapped to Entity
+     */
+    public List<Change> getChangeHistory(Object localId, Class entityClass, int limit){
+        return snapshotDiffer.getChangeHistory(localId, entityClass, limit);
     }
 
     JaversType getForClass(Class<?> clazz) {

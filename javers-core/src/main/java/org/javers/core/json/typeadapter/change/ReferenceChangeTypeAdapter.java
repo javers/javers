@@ -9,8 +9,8 @@ import org.javers.core.metamodel.object.GlobalCdoId;
 
 public class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
 
-    private static final String LEFT_REFERENCE_FIELD = "leftReference";
-    private static final String RIGHT_REFERENCE_FIELD = "rightReference";
+    private static final String LEFT_REFERENCE_FIELD = "left";
+    private static final String RIGHT_REFERENCE_FIELD = "right";
 
     @Override
     public ReferenceChange fromJson(JsonElement json, JsonDeserializationContext context) {
@@ -27,8 +27,8 @@ public class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChang
     public JsonElement toJson(ReferenceChange change, JsonSerializationContext context) {
         final JsonObject jsonObject = createJsonObject(change, context);
 
-        jsonObject.add(LEFT_REFERENCE_FIELD,  context.serialize(change.getLeftReference()));
-        jsonObject.add(RIGHT_REFERENCE_FIELD, context.serialize(change.getRightReference()));
+        jsonObject.add(LEFT_REFERENCE_FIELD,  context.serialize(change.getLeft()));
+        jsonObject.add(RIGHT_REFERENCE_FIELD, context.serialize(change.getRight()));
 
         return jsonObject;
     }

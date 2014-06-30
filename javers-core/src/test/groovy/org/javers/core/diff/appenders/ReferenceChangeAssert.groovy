@@ -21,24 +21,24 @@ class ReferenceChangeAssert {
     }
 
     ReferenceChangeAssert hasLeftReference(Class expectedClass, Object expectedCdoId) {
-        assert actual.leftReference.cdoId == expectedCdoId
-        assert actual.leftReference.cdoClass.sourceClass == expectedClass
+        assert actual.left.cdoId == expectedCdoId
+        assert actual.left.cdoClass.sourceClass == expectedClass
         this
     }
 
     ReferenceChangeAssert hasRightReference(Class expectedClass, Object expectedCdoId) {
-        assert actual.rightReference.cdoId == expectedCdoId
-        assert actual.rightReference.cdoClass.sourceClass == expectedClass
+        assert actual.right.cdoId == expectedCdoId
+        assert actual.right.cdoClass.sourceClass == expectedClass
         this
     }
 
     ReferenceChangeAssert hasLeftReference(GlobalCdoId expected) {
-        assert actual.leftReference == expected
+        assert actual.left == expected
         this
     }
 
     ReferenceChangeAssert hasRightReference(GlobalCdoId expected) {
-        assert actual.rightReference == expected
+        assert actual.right == expected
         this
     }
 }

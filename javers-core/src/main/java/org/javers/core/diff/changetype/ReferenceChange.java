@@ -9,21 +9,21 @@ import org.javers.core.metamodel.property.Property;
  * @author bartosz walacik
  */
 public class ReferenceChange extends PropertyChange {
-    private final GlobalCdoId leftReference;
-    private final GlobalCdoId rightReference;
+    private final GlobalCdoId left;
+    private final GlobalCdoId right;
 
     public ReferenceChange(GlobalCdoId affectedCdoId, Property property, GlobalCdoId leftReference,
                            GlobalCdoId rightReference) {
         super(affectedCdoId, property);
-        this.leftReference = leftReference;
-        this.rightReference = rightReference;
+        this.left = leftReference;
+        this.right = rightReference;
     }
 
-    public GlobalCdoId getLeftReference() {
-        return leftReference;
+    public GlobalCdoId getLeft() {
+        return left;
     }
 
-    public GlobalCdoId getRightReference() {
-        return rightReference;
+    public GlobalCdoId getRight() {
+        return right;
     }
 }

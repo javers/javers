@@ -65,8 +65,8 @@ class JaversDiffIntegrationTest extends Specification {
         then:
         diff.changes.size() == 1
         ValueChange change = diff.changes[0]
-        change.leftValue == FEMALE
-        change.rightValue == MALE
+        change.left == FEMALE
+        change.right == MALE
     }
 
     def "should serialize whole Diff"() {
@@ -107,8 +107,8 @@ class JaversDiffIntegrationTest extends Specification {
         change.globalCdoId.cdoId == "/"
         change.changeType == "ValueChange"
         change.property == "point"
-        change.leftValue == "1,2" //this is most important in this test
-        change.rightValue == "1,3" //this is most important in this test
+        change.left == "1,2" //this is most important in this test
+        change.right == "1,3" //this is most important in this test
     }
 
     def "should support custom native Gson TypeAdapter"() {
@@ -124,8 +124,8 @@ class JaversDiffIntegrationTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.changes[0].leftValue == "1,2"
-        json.changes[0].rightValue == "1,3"
+        json.changes[0].left == "1,2"
+        json.changes[0].right == "1,3"
     }
 
     def "should understand primitive default values when creating NewObject snapshot"() {
