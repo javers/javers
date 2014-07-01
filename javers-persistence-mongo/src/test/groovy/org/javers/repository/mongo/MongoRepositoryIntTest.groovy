@@ -6,6 +6,7 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.commit.Commit
 import org.javers.core.commit.CommitId
 import org.javers.core.diff.Diff
+import org.javers.core.json.JsonConverter
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyUser
 import org.javers.test.builder.DummyUserBuilder
@@ -119,7 +120,7 @@ class MongoRepositoryIntTest extends Specification {
 
         given:
         def db = new Fongo("myDb").mongo.getDB("test")
-        def mongoRepository = new MongoRepository(db)
+        def mongoRepository = new MongoRepository(db, Stub(JsonConverter))
 
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly(mongoRepository)
 

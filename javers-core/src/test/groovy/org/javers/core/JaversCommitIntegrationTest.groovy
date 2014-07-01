@@ -19,27 +19,6 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class JaversCommitIntegrationTest extends Specification {
 
-    def "should store state history in JaversRepository"() {
-        given:
-        def javers = javers().build()
-        def ref = new SnapshotEntity(id:2)
-        def cdo = new SnapshotEntity(id: 1, entityRef: ref)
-        javers.commit("author",cdo) //v. 1
-        ref.intProperty = 5
-        javers.commit("author",cdo) //v. 2
-
-        when:
-        def snapshots = javers.getStateHistory(2, SnapshotEntity, 10)
-
-        then:
-        def cdoId = instanceId(2,SnapshotEntity)
-        SnapshotsAssert.assertThat(snapshots)
-                       .hasSize(2)
-                       .hasSnapshot(cdoId, "1.0", [id:2])
-                       .hasSnapshot(cdoId, "2.0", [id:2, intProperty:5])
-    }
-
-
     def "should create initial commit when new objects"() {
         given:
         def javers = javers().build()
@@ -106,29 +85,6 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasSnapshot(oldRefId, [id:2, intProperty:5])
                     .hasNewObject(cdoId,   [id:1, entityRef:oldRefId, ])
                     .hasValueChangeAt("intProperty", 2, 5)
-    }
-
-
-    def "should compare property values with latest from repository"() {
-        given:
-        def javers = javers().build()
-        def user = dummyUser("John").withDetails(1).withAddress("London").build()
-        javers.commit("some.login", user)
-
-        when:
-        user.setAge(10)
-        user.dummyUserDetails.dummyAddress.city = "Paris"
-        def commit = javers.commit("some.login", user)
-
-        then:
-        def voId = valueObjectId(1, DummyUserDetails, "dummyAddress")
-        CommitAssert.assertThat(commit)
-                    .hasSnapshots(2)
-                    .hasChanges(2)
-                    .hasSnapshot(instanceId("John",DummyUser), [name:"John", age:10, dummyUserDetails:instanceId(1,DummyUserDetails)])
-                    .hasSnapshot(voId,[city:"Paris"])
-                    .hasValueChangeAt("city", "London", "Paris")
-                    .hasValueChangeAt("age", 0, 10)
     }
 
     def "should support new object reference, deep in the graph"() {
@@ -211,20 +167,4 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasSnapshot(instanceId(5, DummyUserDetails))
                     .hasListReferenceRemovedAt("addressList",removedVoId)
     }
-
-    def "should create empty commit when nothing changed"() {
-        given:
-        def javers = javers().build()
-        def cdo = new SnapshotEntity(listOfEntities:    [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
-        def firstCommit = javers.commit("author",cdo)
-
-        when:
-        def secondCommit = javers.commit("author",cdo)
-
-        then:
-        firstCommit.snapshots.size() == 3
-        !secondCommit.snapshots
-        !secondCommit.diff.changes
-    }
-
 }

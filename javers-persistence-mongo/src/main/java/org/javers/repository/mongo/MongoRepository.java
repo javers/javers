@@ -27,8 +27,10 @@ import java.util.List;
 public class MongoRepository implements JaversRepository {
 
     private static final int DESC = -1;
+    public static final String SNAPSHOTS = "snapshots";
+    public static final String GLOBAL_CDO_ID = "globalCdoId";
+    public static final String COMMIT_ID = "commitId";
     private DB mongo;
-    private ModelMapper mapper;
     private JsonConverter jsonConverter;
 
     public MongoRepository(DB mongo) {
@@ -37,7 +39,6 @@ public class MongoRepository implements JaversRepository {
 
     public MongoRepository(DB mongo, JsonConverter jsonConverter) {
         this.mongo = mongo;
-        this.mapper = new ModelMapper(jsonConverter);
         this.jsonConverter = jsonConverter;
     }
 
@@ -49,7 +50,7 @@ public class MongoRepository implements JaversRepository {
 
     private void persistSnapshots(Commit commit) {
 
-        DBCollection collection = mongo.getCollection("Snapshots");
+        DBCollection collection = mongo.getCollection(SNAPSHOTS);
 
         for (CdoSnapshot snapshot: commit.getSnapshots()) {
             collection.save((DBObject) JSON.parse(jsonConverter.toJson(snapshot)));
@@ -79,19 +80,24 @@ public class MongoRepository implements JaversRepository {
         return getStateHistory(toDBObject(dtoId), limit);
     }
 
-    private List<CdoSnapshot> getStateHistory(BasicDBObject id, int limit) {
+    private List<CdoSnapshot> getStateHistory(DBObject cdoId, int limit) {
 
-        DBCursor mongoSnapshots = mongo.getCollection("Snapshots")
-                .find(id).sort(new BasicDBObject("commitId", DESC)).limit(limit);
+        DBCursor mongoSnapshots = getMongoSnapshotsCoursor(cdoId, limit);
 
         Iterator<DBObject> iterator = mongoSnapshots.iterator();
         List<CdoSnapshot> snapshots = new ArrayList<>();
 
         while (iterator.hasNext()) {
-            snapshots.add(mapper.toCdoSnapshot(iterator.next()));
+            DBObject dbObject = iterator.next();
+            snapshots.add(fromDBObject(dbObject));
         }
 
         return snapshots;
+    }
+
+    private DBCursor getMongoSnapshotsCoursor(DBObject cdoId, int limit) {
+        return mongo.getCollection(SNAPSHOTS)
+                    .find(cdoId).sort(new BasicDBObject(COMMIT_ID, DESC)).limit(limit);
     }
 
     @Override
@@ -106,14 +112,14 @@ public class MongoRepository implements JaversRepository {
 
     private Optional<CdoSnapshot> getLatest(DBObject id) {
 
-        DBCursor mongoLatest = mongo.getCollection("Snapshots")
-                .find(id).sort(new BasicDBObject("commitId", DESC)).limit(1);
+        DBCursor mongoLatest = getMongoSnapshotsCoursor(id, 1);
 
         if (mongoLatest.size() == 0) {
             return Optional.empty();
         }
 
-        return Optional.of(mapper.toCdoSnapshot(mongoLatest.iterator().next()));
+        DBObject dbObject = mongoLatest.iterator().next();
+        return Optional.of(fromDBObject(dbObject));
     }
 
 
@@ -130,21 +136,18 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
-        this.mapper = new ModelMapper(jsonConverter);
         this.jsonConverter = jsonConverter;
     }
 
     private BasicDBObject toDBObject(GlobalCdoId id) {
-        return new BasicDBObject("globalCdoId", JSON.parse(jsonConverter.toJson(id)));
+        return new BasicDBObject(GLOBAL_CDO_ID, JSON.parse(jsonConverter.toJson(id)));
     }
 
     private BasicDBObject toDBObject(InstanceId.InstanceIdDTO id) {
+        return new BasicDBObject(GLOBAL_CDO_ID, JSON.parse(jsonConverter.toJson(id)));
+    }
 
-        //TODO there is no InstanceIdDTO JSON type adapter
-        return new BasicDBObject("globalCdoId", BasicDBObjectBuilder.start()
-                .add("cdoId", id.getCdoId())
-                .add("entity", id.getEntity().getName())
-                .get()
-        );
+    private CdoSnapshot fromDBObject(DBObject dbObject) {
+        return jsonConverter.fromJson(dbObject.toString(), CdoSnapshot.class);
     }
 }
