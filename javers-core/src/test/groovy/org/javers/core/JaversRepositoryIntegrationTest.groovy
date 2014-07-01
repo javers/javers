@@ -5,7 +5,6 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
 import org.javers.repository.api.InMemoryRepository
-import org.javers.repository.api.JaversRepository
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
@@ -14,15 +13,15 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 class JaversRepositoryIntegrationTest extends Specification {
 
-    JaversRepository repository
+    Javers javers
 
     def setup() {
-        repository = new InMemoryRepository()
+        def repo = new InMemoryRepository()
+        javers = javers().registerJaversRepository(repo).build()
     }
 
     def "should store state history in JaversRepository"() {
         given:
-        def javers = javers().build()
         def ref = new SnapshotEntity(id:2)
         def cdo = new SnapshotEntity(id: 1, entityRef: ref)
         javers.commit("author",cdo) //v. 1
@@ -45,7 +44,6 @@ class JaversRepositoryIntegrationTest extends Specification {
 
     def "should compare property values with latest from repository"() {
         given:
-        def javers = javers().build()
         def user = dummyUser("John").withAge(18).build()
         javers.commit("login", user)
 
@@ -65,7 +63,6 @@ class JaversRepositoryIntegrationTest extends Specification {
 
     def "should create empty commit when nothing changed"() {
         given:
-        def javers = javers().build()
         def cdo = new SnapshotEntity(listOfEntities:    [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
         def firstCommit = javers.commit("author",cdo)
 
