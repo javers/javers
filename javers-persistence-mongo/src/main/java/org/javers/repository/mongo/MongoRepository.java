@@ -29,8 +29,6 @@ public class MongoRepository implements JaversRepository {
     private static final int DESC = -1;
     public static final String SNAPSHOTS = "snapshots";
     public static final String GLOBAL_CDO_ID = "globalCdoId";
-    public static final String CDO_ID = "cdoId";
-    public static final String ENTITY = "entity";
     public static final String COMMIT_ID = "commitId";
     private DB mongo;
     private JsonConverter jsonConverter;
@@ -146,12 +144,7 @@ public class MongoRepository implements JaversRepository {
     }
 
     private BasicDBObject toDBObject(InstanceId.InstanceIdDTO id) {
-
-        return new BasicDBObject(GLOBAL_CDO_ID, BasicDBObjectBuilder.start()
-                .add(CDO_ID, id.getCdoId())
-                .add(ENTITY, id.getEntity().getName())
-                .get()
-        );
+        return new BasicDBObject(GLOBAL_CDO_ID, JSON.parse(jsonConverter.toJson(id)));
     }
 
     private CdoSnapshot fromDBObject(DBObject dbObject) {
