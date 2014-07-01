@@ -1,6 +1,7 @@
 package org.javers.core.snapshot;
 
 import org.javers.common.collections.Optional;
+import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.ObjectGraphBuilder;
@@ -20,7 +21,7 @@ import java.util.Set;
 
 
 /**
- * Restores objects graph snapshot
+ * Builds ShadowGraph from latest snapshots loaded from javersRepository
  *
  * @author bartosz walacik
  */
@@ -47,5 +48,9 @@ public class GraphShadowFactory {
         }
 
         return new ShadowGraph(snapshotNodes);
+    }
+
+    public ShadowGraph createFromSnapshot(CdoSnapshot cdoSnapshot){
+        return new ShadowGraph(Sets.asSet(new ObjectNode(cdoSnapshot)));
     }
 }

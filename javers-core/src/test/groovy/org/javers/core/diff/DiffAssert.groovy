@@ -45,16 +45,16 @@ class DiffAssert {
     DiffAssert hasValueChangeAt(String property, Object oldVal, Object newVal) {
         ValueChange change = actual.changes.find{it instanceof ValueChange && it.property.name == property}
         assert change
-        assert change.leftValue == oldVal
-        assert change.rightValue == newVal
+        assert change.left == oldVal
+        assert change.right == newVal
         this
     }
 
     DiffAssert hasReferenceChangeAt(String property, def oldRef, def newRef) {
         ReferenceChange change = actual.changes.find{it instanceof ReferenceChange && it.property.name == property}
         assert change
-        assert change.leftReference == oldRef
-        assert change.rightReference == newRef
+        assert change.left == oldRef
+        assert change.right == newRef
         this
     }
 
@@ -71,8 +71,8 @@ class DiffAssert {
                                                         it.affectedCdoId == expectedId &&
                                                         it.property.name == entry.key}
             assert change, "no PropertyChange for "+ entry.key
-            assert !left(change)
-            assert right(change) ==  entry.value
+            assert !change.left
+            assert change.right ==  entry.value
         }
         this
     }
@@ -104,23 +104,5 @@ class DiffAssert {
     DiffAssert hasObjectRemoved(def globalCdoId){
         assert actual.changes.find{it instanceof ObjectRemoved && it.globalCdoId == globalCdoId}, "no ObjectRemoved change with expected globalId: "+globalCdoId
         this
-    }
-
-    def left(PropertyChange change){
-        if (change instanceof ValueChange){
-            return change.leftValue
-        }
-        if (change instanceof ReferenceChange){
-            return change.leftReference
-        }
-    }
-
-    def right(PropertyChange change){
-        if (change instanceof ValueChange){
-            return change.rightValue
-        }
-        if (change instanceof ReferenceChange){
-            return change.rightReference
-        }
     }
 }

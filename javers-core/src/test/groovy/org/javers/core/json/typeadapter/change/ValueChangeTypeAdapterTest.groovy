@@ -36,8 +36,8 @@ class ValueChangeTypeAdapterTest extends Specification {
         json.property == "flag"
         json.changeType == "ValueChange"
         json.globalCdoId
-        json.leftValue == true
-        json.rightValue == false
+        json.left == true
+        json.right == false
     }
 
     def "should deserialize ValueChange"() {
@@ -47,8 +47,8 @@ class ValueChangeTypeAdapterTest extends Specification {
             json {
                 property  "bigFlag"
                 changeType "ValueChange"
-                leftValue null
-                rightValue true
+                left null
+                right true
                 globalCdoId {
                     entity "org.javers.core.model.DummyUser"
                     cdoId  "kaz"
@@ -60,8 +60,8 @@ class ValueChangeTypeAdapterTest extends Specification {
 
         then:
             change.affectedCdoId == instanceId("kaz",DummyUser)
-            change.leftValue == null
-            change.rightValue == true
+            change.left == null
+            change.right == true
             change.property.name == "bigFlag"
     }
 
@@ -77,8 +77,8 @@ class ValueChangeTypeAdapterTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.leftValue ==  null
-        json.rightValue == LocalDateTimeTypeAdapter.ISO_FORMATTER.print(dob)
+        json.left ==  null
+        json.right == LocalDateTimeTypeAdapter.ISO_FORMATTER.print(dob)
     }
 
     def "should deserialize ValueChange with Values using custom TypeAdapter"() {
@@ -88,8 +88,8 @@ class ValueChangeTypeAdapterTest extends Specification {
         json {
             property  "dob"
             changeType "ValueChange"
-            leftValue null
-            rightValue "2001-01-01"
+            left null
+            right "2001-01-01"
             globalCdoId {
                 entity "org.javers.core.model.SnapshotEntity"
                 cdoId  1
@@ -100,8 +100,8 @@ class ValueChangeTypeAdapterTest extends Specification {
         ValueChange change  = jsonConverter.fromJson(json.toString(),Change)
 
         then:
-        change.leftValue == null
-        change.rightValue == new LocalDate(2001,1,1)
+        change.left == null
+        change.right == new LocalDate(2001,1,1)
     }
 
 
@@ -115,7 +115,7 @@ class ValueChangeTypeAdapterTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.leftValue == null
-        json.rightValue == null
+        json.left == null
+        json.right == null
     }
 }

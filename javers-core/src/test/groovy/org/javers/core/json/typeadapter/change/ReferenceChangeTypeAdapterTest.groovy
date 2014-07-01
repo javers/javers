@@ -37,10 +37,10 @@ class ReferenceChangeTypeAdapterTest extends Specification {
             json.property == "dummyUserDetails"
             json.changeType == "ReferenceChange"
             json.globalCdoId
-            json.leftReference.cdoId == 1
-            json.leftReference.entity == "org.javers.core.model.DummyUserDetails"
-            json.rightReference.cdoId == 2
-            json.rightReference.entity == "org.javers.core.model.DummyUserDetails"
+            json.left.cdoId == 1
+            json.left.entity == "org.javers.core.model.DummyUserDetails"
+            json.right.cdoId == 2
+            json.right.entity == "org.javers.core.model.DummyUserDetails"
     }
 
     def "should deserialize ReferenceChange"() {
@@ -55,11 +55,11 @@ class ReferenceChangeTypeAdapterTest extends Specification {
                 cdoId "kaz"
                 }
                 property "dummyUserDetails"
-                leftReference {
+                left {
                 entity "org.javers.core.model.DummyUserDetails"
                 cdoId 1
                 }
-                rightReference {
+                right {
                 entity "org.javers.core.model.DummyUserDetails"
                 cdoId 2
                 }
@@ -70,8 +70,8 @@ class ReferenceChangeTypeAdapterTest extends Specification {
 
         then:
             change.affectedCdoId  == instanceId("kaz",DummyUser)
-            change.leftReference  == instanceId(1,DummyUserDetails)
-            change.rightReference == instanceId(2,DummyUserDetails)
+            change.left  == instanceId(1,DummyUserDetails)
+            change.right == instanceId(2,DummyUserDetails)
             change.property.name  == "dummyUserDetails"
     }
 
