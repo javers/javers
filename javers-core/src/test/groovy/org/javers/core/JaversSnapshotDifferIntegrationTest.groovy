@@ -49,7 +49,7 @@ class JaversSnapshotDifferIntegrationTest extends Specification {
     }
 
     @Unroll
-    def "should recreate ListChange.ElementValueChange for #propertyName"() {
+    def "should recreate ListChange ElementValueChange for #propertyName"() {
         given:
         def javers = javers().build()
         javers.commit("some.login", oldCdo)
