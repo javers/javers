@@ -8,6 +8,7 @@ import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
 import org.javers.repository.api.InMemoryRepository
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
@@ -23,7 +24,7 @@ class JaversRepositoryIntegrationTest extends Specification {
         javers = javers().build()
     }
 
-    def "should store state history in JaversRepository"() {
+    def "should store state history of Entity instance in JaversRepository and fetch snapshots in reverse order"() {
         given:
         def ref = new SnapshotEntity(id:2)
         def cdo = new SnapshotEntity(id: 1, entityRef: ref)
@@ -86,17 +87,23 @@ class JaversRepositoryIntegrationTest extends Specification {
         }
     }
 
-    def "should create empty commit when nothing changed"() {
+    @Unroll
+    def "should store snapshot of #what and find it by id"() {
         given:
-        def cdo = new SnapshotEntity(listOfEntities:    [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
-        def firstCommit = javers.commit("author",cdo)
+        def cdo = new SnapshotEntity(id: 1, listOfValueObjects: [new DummyAddress("London")])
+        javers.commit("login", cdo)
 
         when:
-        def secondCommit = javers.commit("author",cdo)
+        def snapshot = javers.getLatestSnapshot(givenId).get()
 
         then:
-        firstCommit.snapshots.size() == 3
-        !secondCommit.snapshots
-        !secondCommit.diff.changes
-    }
+        snapshot.globalId == givenId
+        snapshot.getPropertyValue(property) == expextedState
+
+        where:
+        what <<    ["Entity instance", "ValueObject"]
+        givenId << [instanceId(1, SnapshotEntity), valueObjectId(1, SnapshotEntity, "listOfValueObjects/0")]
+        property << ["id","city"]
+        expextedState << [1,"London"]
+     }
 }

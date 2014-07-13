@@ -165,4 +165,19 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasSnapshot(instanceId(5, DummyUserDetails))
                     .hasListReferenceRemovedAt("addressList",removedVoId)
     }
+
+    def "should create empty commit when nothing changed"() {
+        given:
+        def javers = javers().build()
+        def cdo = new SnapshotEntity(listOfEntities:    [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
+        def firstCommit = javers.commit("author",cdo)
+
+        when:
+        def secondCommit = javers.commit("author",cdo)
+
+        then:
+        firstCommit.snapshots.size() == 3
+        !secondCommit.snapshots
+        !secondCommit.diff.changes
+    }
 }

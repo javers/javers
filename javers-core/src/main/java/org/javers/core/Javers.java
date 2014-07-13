@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactory;
@@ -122,6 +123,14 @@ public class Javers {
      */
     public List<CdoSnapshot> getStateHistory(Object localId, Class entityClass, int limit){
         return repository.getStateHistory(InstanceIdDTO.instanceId(localId, entityClass), limit);
+    }
+
+    /**
+     * Latest snapshot of given object
+     * or Optional#EMPTY if object is not versioned
+     */
+    public Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalCdoId){
+        return repository.getLatest(globalCdoId);
     }
 
     /**
