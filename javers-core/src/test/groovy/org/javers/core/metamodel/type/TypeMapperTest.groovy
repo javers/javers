@@ -2,11 +2,13 @@ package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
 import org.javers.core.JaversTestBuilder
-import org.javers.core.metamodel.property.FieldBasedPropertyScanner
+import org.javers.core.metamodel.property.Entity
 import org.javers.core.metamodel.property.ManagedClassFactory
-import org.javers.core.metamodel.property.Property
+import org.javers.core.metamodel.property.ValueObject
 import org.javers.core.model.AbstractDummyUser
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
+import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -167,5 +169,29 @@ class TypeMapperTest extends Specification {
 
         then:
         jType instanceof ValueType
+    }
+
+    def "should return child ValueObject for ValueObjectType"() {
+        given:
+        TypeMapper mapper = JaversTestBuilder.javersTestAssembly().typeMapper
+        def snapshotEntity = mapper.getManagedClass(SnapshotEntity, Entity)
+
+        when:
+        ValueObject vo = mapper.getChildValueObject(snapshotEntity, "valueObjectRef")
+
+        then:
+        vo.sourceClass == DummyAddress
+    }
+
+    def "should return child ValueObject for List of ValueObjectType"() {
+        given:
+        TypeMapper mapper = JaversTestBuilder.javersTestAssembly().typeMapper
+        def snapshotEntity = mapper.getManagedClass(SnapshotEntity, Entity)
+
+        when:
+        ValueObject vo = mapper.getChildValueObject(snapshotEntity, "listOfValueObjects")
+
+        then:
+        vo.sourceClass == DummyAddress
     }
 }

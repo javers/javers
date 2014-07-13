@@ -5,7 +5,7 @@ import org.javers.core.model.DummyUser
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
 class InstanceIdDTOTypeAdapterTest extends Specification {
 

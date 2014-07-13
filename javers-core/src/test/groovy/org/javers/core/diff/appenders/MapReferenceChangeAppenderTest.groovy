@@ -9,8 +9,8 @@ import spock.lang.Unroll
 
 import static org.javers.common.exception.exceptions.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.diff.appenders.MapChangeAssert.getAssertThat
-import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
-import static org.javers.core.metamodel.object.ValueObjectId.ValueObjectIdDTO.valueObjectId
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
 
 /**
  * @author bartosz walacik

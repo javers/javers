@@ -1,7 +1,6 @@
 package org.javers.repository.mongo;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -13,9 +12,12 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.GlobalIdDTO;
+import org.javers.core.metamodel.object.InstanceIdDTO;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.mongo.model.MongoHeadId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,7 +27,6 @@ import java.util.List;
  * @author pawel szymczyk
  */
 public class MongoRepository implements JaversRepository {
-
     private static final int DESC = -1;
     public static final String SNAPSHOTS = "snapshots";
     public static final String GLOBAL_CDO_ID = "globalCdoId";
@@ -76,8 +77,8 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(InstanceId.InstanceIdDTO dtoId, int limit) {
-        return getStateHistory(toDBObject(dtoId), limit);
+    public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit) {
+        return getStateHistory(toDBObject(globalIdDTO), limit);
     }
 
     private List<CdoSnapshot> getStateHistory(DBObject cdoId, int limit) {
@@ -106,8 +107,8 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
-    public Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId) {
-        return getLatest(toDBObject(dtoId));
+    public Optional<CdoSnapshot> getLatest(GlobalIdDTO globalIdDTO) {
+        return getLatest(toDBObject(globalIdDTO));
     }
 
     private Optional<CdoSnapshot> getLatest(DBObject id) {
@@ -121,7 +122,6 @@ public class MongoRepository implements JaversRepository {
         DBObject dbObject = mongoLatest.iterator().next();
         return Optional.of(fromDBObject(dbObject));
     }
-
 
     @Override
     public CommitId getHeadId() {
@@ -140,10 +140,15 @@ public class MongoRepository implements JaversRepository {
     }
 
     private BasicDBObject toDBObject(GlobalCdoId id) {
+
+        System.out.println("toDBObject: "+ id.value()+ " : "+ jsonConverter.toJson(id));
+
         return new BasicDBObject(GLOBAL_CDO_ID, JSON.parse(jsonConverter.toJson(id)));
     }
 
-    private BasicDBObject toDBObject(InstanceId.InstanceIdDTO id) {
+    private BasicDBObject toDBObject(GlobalIdDTO id) {
+        System.out.println("toDBObject: "+ id.value()+ " : "+ jsonConverter.toJson(id));
+
         return new BasicDBObject(GLOBAL_CDO_ID, JSON.parse(jsonConverter.toJson(id)));
     }
 

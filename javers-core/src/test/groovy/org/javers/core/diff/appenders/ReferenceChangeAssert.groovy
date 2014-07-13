@@ -22,13 +22,13 @@ class ReferenceChangeAssert {
 
     ReferenceChangeAssert hasLeftReference(Class expectedClass, Object expectedCdoId) {
         assert actual.left.cdoId == expectedCdoId
-        assert actual.left.cdoClass.sourceClass == expectedClass
+        assert actual.left.entity.sourceClass == expectedClass
         this
     }
 
     ReferenceChangeAssert hasRightReference(Class expectedClass, Object expectedCdoId) {
         assert actual.right.cdoId == expectedCdoId
-        assert actual.right.cdoClass.sourceClass == expectedClass
+        assert actual.right.entity.sourceClass == expectedClass
         this
     }
 

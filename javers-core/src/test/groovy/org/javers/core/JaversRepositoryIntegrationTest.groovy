@@ -1,6 +1,8 @@
 package org.javers.core
 
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.metamodel.object.ValueObjectIdDTO
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
@@ -8,7 +10,8 @@ import org.javers.repository.api.InMemoryRepository
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 class JaversRepositoryIntegrationTest extends Specification {
@@ -16,8 +19,8 @@ class JaversRepositoryIntegrationTest extends Specification {
     Javers javers
 
     def setup() {
-        def repo = new InMemoryRepository()
-        javers = javers().registerJaversRepository(repo).build()
+        // InMemoryRepository is used by default
+        javers = javers().build()
     }
 
     def "should store state history in JaversRepository"() {
@@ -42,7 +45,7 @@ class JaversRepositoryIntegrationTest extends Specification {
         snapshots[1].commitId == "1.0"
     }
 
-    def "should compare property values with latest from repository"() {
+    def "should compare Entity property values with latest from repository"() {
         given:
         def user = dummyUser("John").withAge(18).build()
         javers.commit("login", user)
@@ -59,6 +62,28 @@ class JaversRepositoryIntegrationTest extends Specification {
         history[0].property.name == "age"
         history[0].left == 18
         history[0].right == 19
+    }
+
+    def "should compare ValueObject property values with latest from repository"() {
+        given:
+        def cdo = new SnapshotEntity(id: 1, listOfValueObjects: [new DummyAddress("London","street")])
+        javers.commit("login", cdo)
+
+        when:
+        cdo.listOfValueObjects[0].city = "Paris"
+        javers.commit("login", cdo)
+        def voId = valueObjectId(1, SnapshotEntity, "listOfValueObjects/0")
+        def history = javers.getChangeHistory(voId, 100)
+
+        then:
+        history.size() == 1
+        history[0] instanceof ValueChange
+        with(history[0]) {
+            affectedCdoId == voId
+            property.name == "city"
+            left == "London"
+            right == "Paris"
+        }
     }
 
     def "should create empty commit when nothing changed"() {

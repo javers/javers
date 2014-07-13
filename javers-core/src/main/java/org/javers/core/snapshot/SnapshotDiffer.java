@@ -5,8 +5,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.*;
 import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.ArrayList;
@@ -37,9 +36,16 @@ public class SnapshotDiffer {
      * @throws JaversException ENTITY_EXPECTED if given javaClass is NOT mapped to Entity
      */
     public List<Change> getChangeHistory(Object localId, Class entityClass, int limit){
-        Validate.argumentsAreNotNull(localId, entityClass);
+       return getChangeHistory(InstanceIdDTO.instanceId(localId,entityClass),limit);
+    }
 
-        List<CdoSnapshot> snapshots = javersExtendedRepository.getStateHistory(localId, entityClass, limit);
+    /**
+     * Changes (diff sequence) of given managed class instance, in reverse chronological order
+     */
+    public List<Change> getChangeHistory(GlobalIdDTO globalCdoId, int limit) {
+        Validate.argumentsAreNotNull(globalCdoId);
+
+        List<CdoSnapshot> snapshots = javersExtendedRepository.getStateHistory(globalCdoId, limit);
 
         if (snapshots.size() < 2){
             return Collections.EMPTY_LIST;

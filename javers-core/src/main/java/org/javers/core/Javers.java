@@ -7,8 +7,7 @@ import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.graph.ObjectGraphBuilder;
@@ -122,7 +121,7 @@ public class Javers {
      * @throws JaversException ENTITY_EXPECTED if given javaClass is NOT mapped to Entity
      */
     public List<CdoSnapshot> getStateHistory(Object localId, Class entityClass, int limit){
-        return repository.getStateHistory(localId, entityClass, limit);
+        return repository.getStateHistory(InstanceIdDTO.instanceId(localId, entityClass), limit);
     }
 
     /**
@@ -137,6 +136,14 @@ public class Javers {
      */
     public List<Change> getChangeHistory(Object localId, Class entityClass, int limit){
         return snapshotDiffer.getChangeHistory(localId, entityClass, limit);
+    }
+
+    /**
+     * Changes (diff sequence) of given managed class instance (entity or value object),
+     * in reverse chronological order
+     */
+    public List<Change> getChangeHistory(GlobalIdDTO globalCdoId, int limit) {
+        return snapshotDiffer.getChangeHistory(globalCdoId, limit);
     }
 
     JaversType getForClass(Class<?> clazz) {

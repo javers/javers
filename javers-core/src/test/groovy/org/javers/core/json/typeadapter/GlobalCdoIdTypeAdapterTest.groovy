@@ -6,6 +6,7 @@ import org.javers.core.metamodel.object.GlobalCdoId
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
+import org.javers.core.metamodel.object.ValueObjectIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -13,7 +14,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
 /**
  * @author bartosz walacik
@@ -123,7 +124,7 @@ class GlobalCdoIdTypeAdapterTest extends Specification {
 
         then:
         idHolder.id instanceof ValueObjectId
-        idHolder.id == ValueObjectId.ValueObjectIdDTO.valueObjectId("kaz",DummyUser,"somePath")
+        idHolder.id == ValueObjectIdDTO.valueObjectId("kaz",DummyUser,"somePath")
     }
 
 }

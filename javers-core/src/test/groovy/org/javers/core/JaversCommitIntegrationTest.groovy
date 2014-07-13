@@ -5,13 +5,11 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
-import org.javers.core.snapshot.SnapshotsAssert
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
-import static org.javers.core.metamodel.object.ValueObjectId.ValueObjectIdDTO.valueObjectId
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**

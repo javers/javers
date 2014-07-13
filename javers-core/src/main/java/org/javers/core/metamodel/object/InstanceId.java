@@ -59,31 +59,4 @@ public class InstanceId extends GlobalCdoId {
 
         return cdoId.equals(entity.getIdOf(instance));
     }
-
-    public static class InstanceIdDTO extends GlobalCdoIdDTO{
-        private final Class  javaClass;
-        private final Object localId;
-
-        private InstanceIdDTO(Class javaClass, Object localId) {
-            this.javaClass = javaClass;
-            this.localId = localId;
-        }
-
-        public static InstanceIdDTO instanceId(Object localId, Class javaClass){
-            return new InstanceIdDTO(javaClass,localId);
-        }
-
-        @Override
-        public String value() {
-            return javaClass.getName()+"/"+localId;
-        }
-
-        public Class getEntity() {
-            return javaClass;
-        }
-
-        public Object getCdoId() {
-            return localId;
-        }
-    }
 }

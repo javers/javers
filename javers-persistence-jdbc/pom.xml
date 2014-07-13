@@ -16,7 +16,7 @@
     <description>Polyjdbc-based impl of Javers repository</description>
 
     <properties>
-        <polyjdbc.version>0.2.1</polyjdbc.version>
+        <polyjdbc.version>0.3.0</polyjdbc.version>
     </properties>
 
     <dependencies>
