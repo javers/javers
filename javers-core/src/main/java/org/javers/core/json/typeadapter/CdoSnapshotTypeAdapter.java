@@ -5,15 +5,13 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.commit.CommitId;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.property.PropertyScanner;
 import org.javers.core.metamodel.type.*;
 import org.joda.time.LocalDateTime;
 
@@ -33,7 +31,7 @@ import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
     public static final String GLOBAL_CDO_ID = "globalCdoId";
-    public static final String COMMIT_ID = "commitId";
+    public static final String COMMIT_METADATA = "commitMetadata";
     public static final String STATE = "state";
 
     private TypeMapper typeMapper;
@@ -51,14 +49,14 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
     public CdoSnapshot fromJson(JsonElement json, JsonDeserializationContext context) {
         JsonObject jsonObject = (JsonObject) json;
 
-        CommitId commitId = context.deserialize(((JsonObject) json).get(COMMIT_ID), CommitId.class);
-        //TODO
+        CommitMetadata commitMetadata = context.deserialize(((JsonObject) json).get(COMMIT_METADATA), CommitMetadata.class);
+
         String author = "";
         LocalDateTime dateTime = new LocalDateTime();
         GlobalCdoId cdoId = context.deserialize(jsonObject.get(GLOBAL_CDO_ID), GlobalCdoId.class);
 
         CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId, author, dateTime);
-        cdoSnapshotBuilder.withCommitId(commitId);
+        cdoSnapshotBuilder.withCommitId(commitMetadata);
 
         JsonObject state = jsonObject.get(STATE).getAsJsonObject();
 
@@ -166,7 +164,7 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
 
         JsonObject jsonObject = new JsonObject();
 
-        jsonObject.add(COMMIT_ID, context.serialize(snapshot.getCommitId()));
+        jsonObject.add(COMMIT_METADATA, context.serialize(snapshot.getCommitMetadata()));
         jsonObject.add(GLOBAL_CDO_ID, context.serialize(snapshot.getGlobalId()));
         jsonObject.add(STATE, getState(snapshot, context));
 

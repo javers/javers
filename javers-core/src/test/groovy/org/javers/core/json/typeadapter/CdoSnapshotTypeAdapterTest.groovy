@@ -34,7 +34,10 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.commitId == "1.0"
+        json.commitMetadata.commitId == "1.0"
+        json.commitMetadata.author == "author"
+        //TODO
+        json.commitMetadata.commitDate
 
         json.globalCdoId.entity == "org.javers.core.model.DummyUser"
         json.globalCdoId.cdoId == "kaz"
@@ -60,8 +63,6 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-
-        println json.toString()
 
         with(json.state) {
             name == "kaz"
@@ -146,7 +147,11 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         given:
         def json = new JsonBuilder()
         json {
-            commitId "1.0"
+            commitMetadata {
+                commitId "1.0"
+                author "author"
+                dateTime "2000-01-01T12:00:00"
+            }
             globalCdoId {
                 entity "org.javers.core.model.DummyUser"
                 cdoId "kaz"
@@ -160,7 +165,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         with (snapshot) {
-            commitId.value() == "1.0"
+            commitMetadata.commitId.value() == "1.0"
             globalId == instanceId("kaz",DummyUser)
         }
     }
@@ -170,7 +175,11 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         given:
         def json = new JsonBuilder()
         json {
-            commitId "1.0"
+            commitMetadata {
+                commitId "1.0"
+                author "author"
+                dateTime "2000-01-01T12:00:00"
+            }
             globalCdoId {
                 entity "org.javers.core.model.DummyUser"
                 cdoId "kaz"
@@ -200,7 +209,11 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         given:
         def json = new JsonBuilder()
         json {
-            commitId "1.0"
+            commitMetadata {
+                commitId "1.0"
+                author "author"
+                dateTime "2000-01-01T12:00:00"
+            }
             globalCdoId {
                 entity "org.javers.core.model.DummyUser"
                 cdoId "kaz"
@@ -227,7 +240,11 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         given:
         def json = new JsonBuilder()
         json {
-            commitId "1.0"
+            commitMetadata {
+                commitId "1.0"
+                author "author"
+                dateTime "2000-01-01T12:00:00"
+            }
             globalCdoId {
                 entity "org.javers.core.model.DummyUserDetails"
                 cdoId 1
@@ -259,7 +276,11 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def json = new JsonBuilder()
         def ids = [1, 2]
         json {
-            commitId "1.0"
+            commitMetadata {
+                commitId "1.0"
+                author "author"
+                dateTime "2000-01-01T12:00:00"
+            }
             globalCdoId {
                 entity "org.javers.core.model.DummyUser"
                 cdoId "kaz"

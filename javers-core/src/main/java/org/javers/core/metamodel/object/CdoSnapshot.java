@@ -71,6 +71,10 @@ public final class CdoSnapshot extends Cdo {
         return commitMetadata.getCommitId();
     }
 
+    public CommitMetadata getCommitMetadata() {
+        return commitMetadata;
+    }
+
     public boolean stateEquals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
@@ -86,5 +90,4 @@ public final class CdoSnapshot extends Cdo {
     public Set<Property> getProperties() {
         return Collections.unmodifiableSet(state.keySet());
     }
-
 }

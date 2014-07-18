@@ -38,8 +38,8 @@ class JaversRepositoryIntegrationTest extends Specification {
                 .hasSnapshot(cdoId, "1.0", [id:2])
                 .hasSnapshot(cdoId, "2.0", [id:2, intProperty:5])
 
-        snapshots[0].commitId == "2.0"
-        snapshots[1].commitId == "1.0"
+        snapshots[0].commitMetadata.commitId == "2.0"
+        snapshots[1].commitMetadata.commitId == "1.0"
     }
 
     def "should compare property values with latest from repository"() {

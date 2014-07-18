@@ -19,14 +19,11 @@ import java.util.Map;
 public class CdoSnapshotBuilder {
     private final GlobalCdoId globalCdoId;
     private final Map<Property, Object> state = new HashMap<>();
-    private final LocalDateTime dateTime;
-    private final String author;
-    private CommitId commitId;
+    private CommitMetadata commitMetadata;
 
     private CdoSnapshotBuilder(GlobalCdoId globalCdoId, String author, LocalDateTime dateTime) {
         this.globalCdoId = globalCdoId;
-        this.author = author;
-        this.dateTime = dateTime;
+        this.commitMetadata = new CommitMetadata(author, dateTime);
     }
 
     public static CdoSnapshotBuilder cdoSnapshot(GlobalCdoId globalCdoId, String author, LocalDateTime dateTime){
@@ -49,18 +46,17 @@ public class CdoSnapshotBuilder {
     }
 
     public CdoSnapshot build(){
-        CommitMetadata commitMetadata = new CommitMetadata(author, dateTime);
         CdoSnapshot cdoSnapshot = new CdoSnapshot(globalCdoId, commitMetadata, state);
 
-        if (commitId != null) {
-            cdoSnapshot.bindTo(commitId);
-        }
+//        if (commitId != null) {
+//            cdoSnapshot.bindTo(commitId);
+//        }
 
         return cdoSnapshot;
     }
 
-    public CdoSnapshotBuilder withCommitId(CommitId commitId) {
-        this.commitId = commitId;
+    public CdoSnapshotBuilder withCommitId(CommitMetadata commitMetadata) {
+        this.commitMetadata = commitMetadata;
         return this;
     }
 }
