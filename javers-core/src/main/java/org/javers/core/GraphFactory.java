@@ -36,7 +36,7 @@ public class GraphFactory {
     }
 
     //capture current state
-    public List<CdoSnapshot> createGraphSnapshot(LiveGraph currentVersion){
-        return graphSnapshotFactory.create(currentVersion);
+    public List<CdoSnapshot> createGraphSnapshot(LiveGraph currentVersion, String author){
+        return graphSnapshotFactory.create(currentVersion, author);
     }
 }

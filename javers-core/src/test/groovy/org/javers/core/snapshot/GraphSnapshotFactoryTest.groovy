@@ -28,7 +28,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node, "author")
 
         then:
         assertThat(snapshots).hasSize(2)
@@ -45,7 +45,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node, "author")
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -60,7 +60,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node, "author")
 
         then:
         assertThat(snapshots).hasSize(2)
@@ -74,7 +74,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node, "author")
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -90,7 +90,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node, "author")
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -118,7 +118,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node, "author")
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -140,7 +140,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node)
+        List snapshots = javers.graphSnapshotFactory.create(node, "author")
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -169,7 +169,7 @@ class GraphSnapshotFactoryTest extends Specification {
         javers.javersRepository.persist(firstCommit)
 
         when:
-        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo))
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo), "author")
 
         then:
         firstCommit.snapshots.size() == 3
@@ -185,7 +185,7 @@ class GraphSnapshotFactoryTest extends Specification {
         when:
         cdo.listOfEntities.get(0).intProperty = 1
         cdo.listOfEntities.get(1).intProperty = 1
-        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo))
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo), "author")
 
         then:
         assertThat(secondSnapshots).hasSize(2)
@@ -201,7 +201,7 @@ class GraphSnapshotFactoryTest extends Specification {
 
         when:
         cdo.intProperty = 1
-        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo))
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo), "author")
 
         then:
         assertThat(secondSnapshots).hasSize(1)

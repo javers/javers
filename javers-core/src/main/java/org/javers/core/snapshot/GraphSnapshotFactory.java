@@ -33,17 +33,17 @@ public class GraphSnapshotFactory {
      *
      * @param currentVersion outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
      */
-    public List<CdoSnapshot> create(LiveGraph currentVersion){
-        Validate.argumentIsNotNull(currentVersion);
+    public List<CdoSnapshot> create(LiveGraph currentVersion, String author){
+        Validate.argumentIsNotNull(currentVersion, author);
 
-        return doSnapshotsAndReuse(currentVersion.flatten());
+        return doSnapshotsAndReuse(currentVersion.flatten(), author);
     }
 
-    private List<CdoSnapshot> doSnapshotsAndReuse(Set<ObjectNode> currentVersion){
+    private List<CdoSnapshot> doSnapshotsAndReuse(Set<ObjectNode> currentVersion, String author){
         List<CdoSnapshot> reused = new ArrayList<>();
 
         for (ObjectNode node : currentVersion) {
-            CdoSnapshot fresh = snapshotFactory.create(node);
+            CdoSnapshot fresh = snapshotFactory.create(node, author);
 
             Optional<CdoSnapshot> existing = javersRepository.getLatest(fresh.getGlobalId());
             if (existing.isEmpty()) {

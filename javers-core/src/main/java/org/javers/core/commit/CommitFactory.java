@@ -44,12 +44,13 @@ public class CommitFactory {
         ShadowGraph latestShadowGraph = graphFactory.createLatestShadow(currentGraph);
 
         //capture current state
-        List<CdoSnapshot> snapshots = graphFactory.createGraphSnapshot(currentGraph);
+        List<CdoSnapshot> snapshots = graphFactory.createGraphSnapshot(currentGraph, author);
 
         //do diff
         Diff diff = diffFactory.create(latestShadowGraph, currentGraph);
 
-        return new Commit(newId, author, dateProvider.now(), snapshots, diff);
+        CommitMetadata commitMetadata = new CommitMetadata(author, dateProvider.now(), newId);
+        return new Commit(commitMetadata, snapshots, diff);
     }
 
 }

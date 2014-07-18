@@ -15,6 +15,7 @@ import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.PropertyScanner;
 import org.javers.core.metamodel.type.*;
+import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -51,9 +52,12 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
         JsonObject jsonObject = (JsonObject) json;
 
         CommitId commitId = context.deserialize(((JsonObject) json).get(COMMIT_ID), CommitId.class);
+        //TODO
+        String author = "";
+        LocalDateTime dateTime = new LocalDateTime();
         GlobalCdoId cdoId = context.deserialize(jsonObject.get(GLOBAL_CDO_ID), GlobalCdoId.class);
 
-        CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId);
+        CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId, author, dateTime);
         cdoSnapshotBuilder.withCommitId(commitId);
 
         JsonObject state = jsonObject.get(STATE).getAsJsonObject();

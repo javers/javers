@@ -1,6 +1,8 @@
 package org.javers.core.diff;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.patterns.visitors.Visitable;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
 
 import java.util.Collections;
@@ -39,10 +41,17 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class Diff implements Visitable<ChangeVisitor>{
+    private final Optional<CommitMetadata> commitMetadata;
     private final List<Change> changes;
 
     Diff(List<Change> changes) {
         this.changes = changes;
+        this.commitMetadata = Optional.empty();
+    }
+
+    Diff(List<Change> changes, CommitMetadata commitMetadata) {
+        this.changes = changes;
+        this.commitMetadata = Optional.of(commitMetadata);
     }
 
     /**
@@ -50,6 +59,10 @@ public class Diff implements Visitable<ChangeVisitor>{
      */
     public List<Change> getChanges() {
         return Collections.unmodifiableList(changes);
+    }
+
+    public Optional<CommitMetadata> getCommitMetadata() {
+        return commitMetadata;
     }
 
     public boolean hasChanges() {

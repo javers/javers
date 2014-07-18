@@ -25,7 +25,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         given:
         def javers = javersTestAssembly()
         def id = javers.idBuilder().instanceId("kaz", DummyUser)
-        def snapshot = javers.snapshotFactory.create(dummyUser().build(), id)
+        def snapshot = javers.snapshotFactory.create(dummyUser().build(), id, "author")
 
         snapshot.bindTo(new CommitId(1, 0))
 
@@ -52,7 +52,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 .withCharacter('a' as char)
                 .build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUser, id)
+        def snapshot = javers.snapshotFactory.create(dummyUser, id, "author")
         snapshot.bindTo(new CommitId(1, 0))
 
         when:
@@ -81,7 +81,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 .withDetails()
                 .build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUser, id)
+        def snapshot = javers.snapshotFactory.create(dummyUser, id, "author")
         snapshot.bindTo(new CommitId(1, 0))
 
         when:
@@ -100,7 +100,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         def dummyUserDetails = DummyUserDetailsBuilder.dummyUserDetails(1).withAddress("London", "St John Street").build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUserDetails, id)
+        def snapshot = javers.snapshotFactory.create(dummyUserDetails, id, "author")
         snapshot.bindTo(new CommitId(1, 0))
 
         when:
@@ -124,7 +124,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 .withPrimitiveMap([time: new LocalDateTime(2000, 1, 1, 12, 0)])
                 .build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUser, id)
+        def snapshot = javers.snapshotFactory.create(dummyUser, id, "author")
         snapshot.bindTo(new CommitId(1, 0))
 
         when:

@@ -2,13 +2,12 @@ package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.Defaults;
 import org.javers.common.collections.Optional;
-import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,16 +19,17 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public final class CdoSnapshot extends Cdo {
-    private CommitId commitId;
+    private CommitMetadata commitMetadata;
     private final Map<Property, Object> state;
 
     /**
      * should be assembled by {@link CdoSnapshotBuilder}
      */
-    CdoSnapshot(GlobalCdoId globalId, Map<Property, Object> state) {
+    CdoSnapshot(GlobalCdoId globalId, CommitMetadata commitMetadata, Map<Property, Object> state) {
         super(globalId);
         Validate.argumentIsNotNull(state);
         this.state = state;
+        this.commitMetadata = commitMetadata;
     }
 
     /**
@@ -61,14 +61,14 @@ public final class CdoSnapshot extends Cdo {
     }
 
     public void bindTo(CommitId commitId){
-        if (this.commitId != null){
+        if (this.commitMetadata.getCommitId() != null){
             throw new IllegalStateException("snapshot already bound");
         }
-        this.commitId = commitId;
+        this.commitMetadata.setCommitId(commitId);
     }
 
     public CommitId getCommitId() {
-        return commitId;
+        return commitMetadata.getCommitId();
     }
 
     public boolean stateEquals(Object o) {

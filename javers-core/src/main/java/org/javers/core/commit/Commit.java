@@ -15,21 +15,18 @@ import java.util.List;
  * @author bartosz walacik
  */
 public final class Commit {
-    private final CommitId id;
+
+    private final CommitMetadata commitMetadata;
     private final List<CdoSnapshot> snapshots;
-    private final String author;
-    private final LocalDateTime commitDate;
     private final Diff diff;
 
-    Commit(CommitId id, String author, LocalDateTime date, List<CdoSnapshot> snapshots, Diff diff) {
-        Validate.argumentsAreNotNull(id, author, snapshots, diff);
-        this.author = author;
+    Commit(CommitMetadata commitMetadata, List<CdoSnapshot> snapshots, Diff diff) {
+        Validate.argumentsAreNotNull(commitMetadata, snapshots, diff);
+        this.commitMetadata = commitMetadata;
         this.snapshots = snapshots;
-        this.commitDate = date;
         this.diff = diff;
-        this.id = id;
         for (CdoSnapshot snapshot : snapshots){
-            snapshot.bindTo(id);
+            snapshot.bindTo(commitMetadata.getCommitId());
         }
     }
 
@@ -37,7 +34,7 @@ public final class Commit {
      * Monotonically increasing id
      */
     public CommitId getId() {
-        return id;
+        return commitMetadata.getCommitId();
     }
 
     public GlobalCdoId getGlobalCdoId() {
@@ -45,7 +42,7 @@ public final class Commit {
     }
 
     public String getAuthor() {
-        return author;
+        return commitMetadata.getAuthor();
     }
 
     public Diff getDiff() {
@@ -53,7 +50,7 @@ public final class Commit {
     }
 
     public LocalDateTime getCommitDate() {
-        return commitDate;
+        return commitMetadata.getCommitDate();
     }
 
     /**
@@ -66,7 +63,7 @@ public final class Commit {
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder();
-        b.append("Commit(id:" + id);
+        b.append("Commit(id:" + commitMetadata.getCommitId());
         b.append(", snapshots:" + snapshots.size());
         b.append(", " + diff.toString());
         b.append(")");
@@ -81,11 +78,11 @@ public final class Commit {
 
         Commit other = (Commit) o;
 
-        return this.id.equals(other.id);
+        return this.commitMetadata.getCommitId().equals(other.commitMetadata.getCommitId());
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return commitMetadata.getCommitId().hashCode();
     }
 }
