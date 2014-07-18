@@ -29,7 +29,7 @@ public class MongoRepository implements JaversRepository {
     private static final int DESC = -1;
     public static final String SNAPSHOTS = "snapshots";
     public static final String GLOBAL_CDO_ID = "globalCdoId";
-    public static final String COMMIT_ID = "commitId";
+    public static final String COMMIT_ID = "commitMetadata.commitId";
     private DB mongo;
     private JsonConverter jsonConverter;
 

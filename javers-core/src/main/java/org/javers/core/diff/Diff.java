@@ -41,7 +41,7 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class Diff implements Visitable<ChangeVisitor>{
-    private final Optional<CommitMetadata> commitMetadata;
+    private Optional<CommitMetadata> commitMetadata;
     private final List<Change> changes;
 
     Diff(List<Change> changes) {
@@ -98,6 +98,10 @@ public class Diff implements Visitable<ChangeVisitor>{
             }
         }
         return result;
+    }
+
+    public void setCommitMetadata(CommitMetadata commitMetadata) {
+        this.commitMetadata = Optional.of(commitMetadata);
     }
 
     /**

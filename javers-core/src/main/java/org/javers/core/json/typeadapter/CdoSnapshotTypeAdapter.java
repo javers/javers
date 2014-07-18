@@ -5,7 +5,6 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -13,7 +12,6 @@ import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
-import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -51,12 +49,10 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
 
         CommitMetadata commitMetadata = context.deserialize(((JsonObject) json).get(COMMIT_METADATA), CommitMetadata.class);
 
-        String author = "";
-        LocalDateTime dateTime = new LocalDateTime();
         GlobalCdoId cdoId = context.deserialize(jsonObject.get(GLOBAL_CDO_ID), GlobalCdoId.class);
 
-        CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId, author, dateTime);
-        cdoSnapshotBuilder.withCommitId(commitMetadata);
+        CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId, commitMetadata);
+        cdoSnapshotBuilder.withCommitMetadata(commitMetadata);
 
         JsonObject state = jsonObject.get(STATE).getAsJsonObject();
 

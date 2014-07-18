@@ -2,11 +2,11 @@ package org.javers.core.snapshot;
 
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.validation.Validate;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.InstanceId;
 import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.ArrayList;
@@ -58,6 +58,16 @@ public class SnapshotDiffer {
 
         Diff diff = diffFactory.create(oldGraph, newGraph);
         return diff.getChanges();
+    }
+
+    private Diff compare2(CdoSnapshot oldVer, CdoSnapshot newVer){
+        ShadowGraph oldGraph = graphShadowFactory.createFromSnapshot(oldVer);
+        ShadowGraph newGraph = graphShadowFactory.createFromSnapshot(newVer);
+
+        CommitMetadata commitMetadata = newVer.getCommitMetadata();
+        Diff diff = diffFactory.create(oldGraph, newGraph);
+        diff.setCommitMetadata(commitMetadata);
+        return diff;
     }
 
 }
