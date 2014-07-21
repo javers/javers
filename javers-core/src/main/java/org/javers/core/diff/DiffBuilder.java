@@ -1,5 +1,6 @@
 package org.javers.core.diff;
 
+import org.javers.common.collections.Consumer;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitMetadata;
 
@@ -36,19 +37,31 @@ public class DiffBuilder {
         return this;
     }
 
-    public DiffBuilder addChanges(Collection<Change> changeSet, Optional<CommitMetadata> commitMetadata) {
+    public DiffBuilder addChanges(Collection<Change> changeSet, final Optional<CommitMetadata> commitMetadata) {
         if (commitMetadata.isPresent()) {
-            for (Change change : changeSet) {
-                addChange(change);
-                change.bindToCommit(commitMetadata.get());
-            }
+            addChanges(changeSet, new Consumer<Change>() {
+                @Override
+                public void consume(Change change) {
+                    change.bindToCommit(commitMetadata.get());
+                }
+            });
         } else {
-            for (Change change : changeSet) {
-                addChange(change);
-            }
+            addChanges(changeSet, new Consumer<Change>() {
+                @Override
+                public void consume(Change change) {
+
+                }
+            });
         }
 
         return this;
+    }
+
+    private void addChanges(Collection<Change> changeSet, Consumer<Change> consumer) {
+        for (Change change : changeSet) {
+            addChange(change);
+            consumer.consume(change);
+        }
     }
 
     public Diff build() {

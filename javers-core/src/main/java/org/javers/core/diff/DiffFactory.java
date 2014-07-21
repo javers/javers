@@ -1,5 +1,6 @@
 package org.javers.core.diff;
 
+import org.javers.common.collections.Consumer;
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.GraphFactory;
@@ -94,7 +95,7 @@ public class DiffFactory {
     }
 
     /* Node scope appender */
-    private void appendPropertyChanges(DiffBuilder diff, NodePair pair, Optional<CommitMetadata> commitMetadata) {
+    private void appendPropertyChanges(DiffBuilder diff, NodePair pair, final Optional<CommitMetadata> commitMetadata) {
         List<Property> nodeProperties = pair.getProperties();
         for (Property property : nodeProperties) {
 
@@ -106,28 +107,29 @@ public class DiffFactory {
             JaversType javersType = typeMapper.getPropertyType(property);
 
             if (commitMetadata.isPresent()) {
-                appendChangesAndBindCommitMetadata(diff, pair, commitMetadata, property, javersType);
+                appendChanges(diff, pair, property, javersType, new Consumer<Change>() {
+                    @Override
+                    public void consume(Change change) {
+                        change.bindToCommit(commitMetadata.get());
+                    }
+                });
             } else {
-                appendChanges(diff, pair, property, javersType);
+                appendChanges(diff, pair, property, javersType, new Consumer<Change>() {
+                    @Override
+                    public void consume(Change o) {
+
+                    }
+                });
             }
         }
     }
 
-    private void appendChangesAndBindCommitMetadata(DiffBuilder diff, NodePair pair, Optional<CommitMetadata> commitMetadata, Property property, JaversType javersType) {
+    private void appendChanges(DiffBuilder diff, NodePair pair, Property property, JaversType javersType, Consumer<Change> consumer) {
         for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
             Change change = appender.calculateChangesIfSupported(pair, property, javersType);
             if (change != null) {
                 diff.addChange(change, pair.getRight().wrappedCdo());
-                change.bindToCommit(commitMetadata.get());
-            }
-        }
-    }
-
-    private void appendChanges(DiffBuilder diff, NodePair pair, Property property, JaversType javersType) {
-        for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
-            Change change = appender.calculateChangesIfSupported(pair, property, javersType);
-            if (change != null) {
-                diff.addChange(change, pair.getRight().wrappedCdo());
+                consumer.consume(change);
             }
         }
     }
