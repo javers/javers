@@ -23,19 +23,9 @@ public class CdoSnapshotBuilder {
         this.commitMetadata = commitMetadata;
     }
 
-    private CdoSnapshotBuilder(GlobalCdoId globalCdoId, String author, LocalDateTime dateTime) {
-        this.globalCdoId = globalCdoId;
-        this.commitMetadata = new CommitMetadata(author, dateTime);
-    }
-
     public static CdoSnapshotBuilder cdoSnapshot(GlobalCdoId globalCdoId, CommitMetadata commitMetadata){
         Validate.argumentIsNotNull(globalCdoId);
         return new CdoSnapshotBuilder(globalCdoId, commitMetadata);
-    }
-
-    public static CdoSnapshotBuilder cdoSnapshot(GlobalCdoId globalCdoId, String author, LocalDateTime dateTime){
-        Validate.argumentIsNotNull(globalCdoId);
-        return new CdoSnapshotBuilder(globalCdoId, author, dateTime);
     }
 
     public CdoSnapshotBuilder withPropertyValue(Property property, Object value){
@@ -54,11 +44,6 @@ public class CdoSnapshotBuilder {
 
     public CdoSnapshot build(){
         CdoSnapshot cdoSnapshot = new CdoSnapshot(globalCdoId, commitMetadata, state);
-
-//        if (commitId != null) {
-//            cdoSnapshot.bindTo(commitId);
-//        }
-
         return cdoSnapshot;
     }
 

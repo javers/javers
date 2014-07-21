@@ -1,7 +1,9 @@
 package org.javers.core.snapshot;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.validation.Validate;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
@@ -59,10 +61,12 @@ public class SnapshotDiffer {
     }
 
     private List<Change> compare(CdoSnapshot oldVer, CdoSnapshot newVer){
+        CommitMetadata commitMetadata = newVer.getCommitMetadata();
+
         ShadowGraph oldGraph = graphShadowFactory.createFromSnapshot(oldVer);
         ShadowGraph newGraph = graphShadowFactory.createFromSnapshot(newVer);
 
-        Diff diff = diffFactory.create(oldGraph, newGraph);
+        Diff diff = diffFactory.create(oldGraph, newGraph, Optional.of(commitMetadata));
         return diff.getChanges();
     }
 

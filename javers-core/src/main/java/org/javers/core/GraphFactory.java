@@ -1,9 +1,8 @@
 package org.javers.core;
 
-import org.javers.common.collections.Optional;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.LiveGraphFactory;
-import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.snapshot.GraphShadowFactory;
 import org.javers.core.snapshot.GraphSnapshotFactory;
@@ -36,7 +35,7 @@ public class GraphFactory {
     }
 
     //capture current state
-    public List<CdoSnapshot> createGraphSnapshot(LiveGraph currentVersion, String author){
-        return graphSnapshotFactory.create(currentVersion, author);
+    public List<CdoSnapshot> createGraphSnapshot(LiveGraph currentVersion, CommitMetadata commitMetadata){
+        return graphSnapshotFactory.create(currentVersion, commitMetadata);
     }
 }

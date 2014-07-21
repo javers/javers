@@ -3,12 +3,14 @@ package org.javers.core.snapshot
 import org.javers.common.exception.exceptions.JaversException
 import org.javers.common.exception.exceptions.JaversExceptionCode
 import org.javers.core.JaversTestBuilder
+import org.javers.core.commit.CommitId
+import org.javers.core.commit.CommitMetadata
 import org.javers.core.metamodel.object.CdoSnapshot
-import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.PrimitiveEntity
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -35,7 +37,7 @@ class SnapshotFactoryTest extends Specification{
         def id = javers.instanceId(cdo)
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, id, "author")
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, id, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         snapshot.globalId == id
@@ -48,7 +50,7 @@ class SnapshotFactoryTest extends Specification{
         def id = javers.instanceId(cdo)
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, id, "author")
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, id, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         snapshot.size() == 0
@@ -60,7 +62,8 @@ class SnapshotFactoryTest extends Specification{
         def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo), "author")
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo),
+                new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         snapshot.getPropertyValue(propertyName) == cdo.getAt(propertyName)
@@ -78,7 +81,8 @@ class SnapshotFactoryTest extends Specification{
         def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo), "author")
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo),
+                new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -99,7 +103,8 @@ class SnapshotFactoryTest extends Specification{
         def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo), "author")
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo),
+                new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -143,7 +148,8 @@ class SnapshotFactoryTest extends Specification{
         def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo), "author")
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo),
+                new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -172,7 +178,7 @@ class SnapshotFactoryTest extends Specification{
 
         when:
         def cdo = new SnapshotEntity(mapVoToPrimitive:  [(new DummyAddress("London")):"this"])
-        snapshotFactory.create(cdo, javers.instanceId(cdo), "author")
+        snapshotFactory.create(cdo, javers.instanceId(cdo), new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         def e = thrown(JaversException)
@@ -185,7 +191,7 @@ class SnapshotFactoryTest extends Specification{
 
         when:
         def cdo = new SnapshotEntity(nonParametrizedMap:  ["a":1])
-        snapshotFactory.create(cdo, javers.instanceId(cdo), "author")
+        snapshotFactory.create(cdo, javers.instanceId(cdo), new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         def e = thrown(JaversException)
@@ -198,7 +204,8 @@ class SnapshotFactoryTest extends Specification{
         def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo), "author")
+        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo),
+                new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal

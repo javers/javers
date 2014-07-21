@@ -1,8 +1,11 @@
 package org.javers.core.snapshot
 
 import org.javers.core.JaversTestBuilder
+import org.javers.core.commit.CommitId
+import org.javers.core.commit.CommitMetadata
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
+import org.joda.time.LocalDateTime
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -28,7 +31,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node, "author")
+        List snapshots = javers.graphSnapshotFactory.create(node, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         assertThat(snapshots).hasSize(2)
@@ -45,7 +48,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node, "author")
+        List snapshots = javers.graphSnapshotFactory.create(node, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -60,7 +63,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node, "author")
+        List snapshots = javers.graphSnapshotFactory.create(node, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         assertThat(snapshots).hasSize(2)
@@ -74,7 +77,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node, "author")
+        List snapshots = javers.graphSnapshotFactory.create(node, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -90,7 +93,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node, "author")
+        List snapshots = javers.graphSnapshotFactory.create(node, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -118,7 +121,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node, "author")
+        List snapshots = javers.graphSnapshotFactory.create(node, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -140,7 +143,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        List snapshots = javers.graphSnapshotFactory.create(node, "author")
+        List snapshots = javers.graphSnapshotFactory.create(node, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -169,7 +172,8 @@ class GraphSnapshotFactoryTest extends Specification {
         javers.javersRepository.persist(firstCommit)
 
         when:
-        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo), "author")
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo),
+                new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         firstCommit.snapshots.size() == 3
@@ -185,7 +189,8 @@ class GraphSnapshotFactoryTest extends Specification {
         when:
         cdo.listOfEntities.get(0).intProperty = 1
         cdo.listOfEntities.get(1).intProperty = 1
-        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo), "author")
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo),
+                new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         assertThat(secondSnapshots).hasSize(2)
@@ -201,7 +206,8 @@ class GraphSnapshotFactoryTest extends Specification {
 
         when:
         cdo.intProperty = 1
-        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo), "author")
+        def secondSnapshots = javers.graphSnapshotFactory.create(javers.createLiveGraph(cdo),
+                new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         then:
         assertThat(secondSnapshots).hasSize(1)

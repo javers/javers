@@ -5,6 +5,7 @@ import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Objects;
 import org.javers.common.date.DateProvider;
 import org.javers.common.exception.exceptions.JaversException;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
@@ -19,19 +20,17 @@ import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 public class SnapshotFactory {
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
-    private final DateProvider dateProvider;
 
-    public SnapshotFactory(TypeMapper typeMapper, GlobalIdFactory globalIdFactory, DateProvider dateProvider) {
+    public SnapshotFactory(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
         this.typeMapper = typeMapper;
         this.globalIdFactory = globalIdFactory;
-        this.dateProvider = dateProvider;
     }
 
     /**
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
-    public CdoSnapshot create(Object liveCdo, GlobalCdoId id, String author) {
-        CdoSnapshotBuilder snapshot =  cdoSnapshot(id, author, dateProvider.now());
+    public CdoSnapshot create(Object liveCdo, GlobalCdoId id, CommitMetadata commitMetadata) {
+        CdoSnapshotBuilder snapshot =  cdoSnapshot(id, commitMetadata);
 
         for (Property property : id.getCdoClass().getProperties()){
             Object propertyVal = property.get(liveCdo);
@@ -55,8 +54,8 @@ public class SnapshotFactory {
         return snapshot.build();
     }
 
-    public CdoSnapshot create (ObjectNode objectNode, String author) {
-        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalCdoId(), author);
+    public CdoSnapshot create(ObjectNode objectNode, CommitMetadata commitMetadata) {
+        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalCdoId(), commitMetadata);
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {

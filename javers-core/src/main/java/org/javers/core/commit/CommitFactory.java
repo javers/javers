@@ -1,5 +1,6 @@
 package org.javers.core.commit;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.date.DateProvider;
 import org.javers.common.validation.Validate;
 import org.javers.core.GraphFactory;
@@ -43,13 +44,14 @@ public class CommitFactory {
         LiveGraph currentGraph = graphFactory.createLiveGraph(currentVersion);
         ShadowGraph latestShadowGraph = graphFactory.createLatestShadow(currentGraph);
 
+        CommitMetadata commitMetadata = new CommitMetadata(author, dateProvider.now(), newId);
+
         //capture current state
-        List<CdoSnapshot> snapshots = graphFactory.createGraphSnapshot(currentGraph, author);
+        List<CdoSnapshot> snapshots = graphFactory.createGraphSnapshot(currentGraph, commitMetadata);
 
         //do diff
-        Diff diff = diffFactory.create(latestShadowGraph, currentGraph);
+        Diff diff = diffFactory.create(latestShadowGraph, currentGraph, Optional.of(commitMetadata));
 
-        CommitMetadata commitMetadata = new CommitMetadata(author, dateProvider.now(), newId);
         return new Commit(commitMetadata, snapshots, diff);
     }
 

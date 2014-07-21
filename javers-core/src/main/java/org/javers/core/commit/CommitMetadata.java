@@ -9,13 +9,6 @@ public class CommitMetadata {
     private final LocalDateTime commitDate;
     private CommitId commitId;
 
-    public CommitMetadata(String author, LocalDateTime commitDate) {
-        Validate.argumentsAreNotNull(author, commitDate);
-
-        this.author = author;
-        this.commitDate = commitDate;
-    }
-
     public CommitMetadata(String author, LocalDateTime commitDate, CommitId commitId) {
         Validate.argumentsAreNotNull(author, commitDate, commitId);
 
@@ -34,9 +27,5 @@ public class CommitMetadata {
 
     public CommitId getCommitId() {
         return commitId;
-    }
-
-    public void setCommitId(CommitId commitId) {
-        this.commitId = commitId;
     }
 }

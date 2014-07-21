@@ -66,13 +66,6 @@ public final class CdoSnapshot extends Cdo {
         return !state.containsKey(property);
     }
 
-    public void bindTo(CommitId commitId){
-        if (this.commitMetadata.getCommitId() != null){
-            throw new IllegalStateException("snapshot already bound");
-        }
-        this.commitMetadata.setCommitId(commitId);
-    }
-
     public CommitId getCommitId() {
         return commitMetadata.getCommitId();
     }

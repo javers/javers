@@ -1,6 +1,7 @@
 package org.javers.core.diff;
 
 import org.javers.common.collections.Optional;
+import org.javers.core.commit.CommitMetadata;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,9 +36,12 @@ public class DiffBuilder {
         return this;
     }
 
-    public DiffBuilder addChanges(Collection<Change> changeSet) {
+    public DiffBuilder addChanges(Collection<Change> changeSet, Optional<CommitMetadata> commitMetadata) {
         for (Change change : changeSet) {
             addChange(change);
+            if (commitMetadata.isPresent()) {
+                change.bindToCommit(commitMetadata.get());
+            }
         }
         return this;
     }

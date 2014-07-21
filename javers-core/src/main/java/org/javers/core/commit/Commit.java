@@ -25,9 +25,6 @@ public final class Commit {
         this.commitMetadata = commitMetadata;
         this.snapshots = snapshots;
         this.diff = diff;
-        for (CdoSnapshot snapshot : snapshots){
-            snapshot.bindTo(commitMetadata.getCommitId());
-        }
     }
 
     /**

@@ -3,6 +3,7 @@ package org.javers.core.json.typeadapter
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
+import org.javers.core.commit.CommitMetadata
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.metamodel.object.ValueObjectIdDTO
@@ -26,9 +27,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         given:
         def javers = javersTestAssembly()
         def id = javers.idBuilder().instanceId("kaz", DummyUser)
-        def snapshot = javers.snapshotFactory.create(dummyUser().build(), id, "author")
-
-        snapshot.bindTo(new CommitId(1, 0))
+        def snapshot = javers.snapshotFactory.create(dummyUser().build(), id,
+                new CommitMetadata("author", LocalDateTime.now(), new CommitId(1, 0)))
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -56,8 +56,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 .withCharacter('a' as char)
                 .build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUser, id, "author")
-        snapshot.bindTo(new CommitId(1, 0))
+        def snapshot = javers.snapshotFactory.create(dummyUser, id, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -83,8 +82,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 .withDetails()
                 .build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUser, id, "author")
-        snapshot.bindTo(new CommitId(1, 0))
+        def snapshot = javers.snapshotFactory.create(dummyUser, id, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -102,8 +100,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         def dummyUserDetails = DummyUserDetailsBuilder.dummyUserDetails(1).withAddress("London", "St John Street").build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUserDetails, id, "author")
-        snapshot.bindTo(new CommitId(1, 0))
+        def snapshot = javers.snapshotFactory.create(dummyUserDetails, id,
+                new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -126,8 +124,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 .withPrimitiveMap([time: new LocalDateTime(2000, 1, 1, 12, 0)])
                 .build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUser, id, "author")
-        snapshot.bindTo(new CommitId(1, 0))
+        def snapshot = javers.snapshotFactory.create(dummyUser, id, new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
