@@ -18,11 +18,11 @@ public class DiffBuilder {
     private DiffBuilder() {
     }
 
-    public static DiffBuilder diff(){
+    public static DiffBuilder diff() {
         return new DiffBuilder();
     }
 
-    public static Diff empty(){
+    public static Diff empty() {
         return new Diff(Collections.EMPTY_LIST);
     }
 
@@ -49,7 +49,6 @@ public class DiffBuilder {
             addChanges(changeSet, new Consumer<Change>() {
                 @Override
                 public void consume(Change change) {
-
                 }
             });
         }
