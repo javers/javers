@@ -4,9 +4,7 @@ import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.*;
 import org.javers.repository.api.JaversRepository;
 
 import java.util.List;
@@ -14,25 +12,26 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
+@Deprecated
 public class JdbcDiffRepository implements JaversRepository {
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit) {
+    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalCdoId, int limit) {
         return null;
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(InstanceId.InstanceIdDTO dtoId, int limit) {
+    public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit) {
         return null;
     }
 
     @Override
-    public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
+    public Optional<CdoSnapshot> getLatest(GlobalCdoId globalCdoId) {
         return null;
     }
 
     @Override
-    public Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId) {
+    public Optional<CdoSnapshot> getLatest(GlobalIdDTO globalIdDTO) {
         return null;
     }
 

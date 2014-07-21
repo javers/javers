@@ -55,6 +55,12 @@ public final class CdoSnapshot extends Cdo {
     }
 
     @Override
+    public Object getPropertyValue(String withName) {
+        Property property = this.getGlobalId().getCdoClass().getProperty(withName);
+        return getPropertyValue(property);
+    }
+
+    @Override
     public boolean isNull(Property property) {
         Validate.argumentIsNotNull(property);
         return !state.containsKey(property);

@@ -7,8 +7,7 @@ import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Entity;
-import org.javers.core.metamodel.property.ManagedClass;
-import org.javers.core.metamodel.property.ValueObject;
+import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.List;
 
@@ -24,9 +23,11 @@ public class GlobalCdoIdTypeAdapter implements JsonTypeAdapter<GlobalCdoId> {
     private static final String FRAGMENT_FIELD = "fragment";
 
     private final GlobalIdFactory globalIdFactory;
+    private final TypeMapper typeMapper;
 
-    public GlobalCdoIdTypeAdapter(GlobalIdFactory globalIdFactory) {
+    public GlobalCdoIdTypeAdapter(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
         this.globalIdFactory = globalIdFactory;
+        this.typeMapper = typeMapper;
     }
 
     @Override
@@ -56,7 +57,7 @@ public class GlobalCdoIdTypeAdapter implements JsonTypeAdapter<GlobalCdoId> {
     }
 
     private InstanceId parseInstanceId(JsonObject jsonObject, JsonDeserializationContext context) {
-        Entity entity = parseManagedClass(jsonObject, ENTITY_FIELD, Entity.class);
+        Entity entity = parseEntity(jsonObject, ENTITY_FIELD);
 
         JsonElement cdoIdElement = jsonObject.get(CDO_ID_FIELD);
         Object cdoId = context.deserialize(cdoIdElement, entity.getIdProperty().getType());
@@ -104,8 +105,8 @@ public class GlobalCdoIdTypeAdapter implements JsonTypeAdapter<GlobalCdoId> {
                                             ValueObjectId.class);
     }
 
-    private <T extends ManagedClass> T parseManagedClass(JsonObject object, String fieldName, Class<T> expectedType){
-        return globalIdFactory.getManagedClass(parseClass(object,fieldName),expectedType);
+    private Entity parseEntity(JsonObject object, String fieldName){
+        return typeMapper.getManagedClass(parseClass(object,fieldName), Entity.class);
     }
 
     private Class parseClass(JsonObject object, String fieldName){

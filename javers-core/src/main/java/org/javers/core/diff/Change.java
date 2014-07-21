@@ -4,10 +4,12 @@ import org.javers.common.collections.Optional;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.patterns.visitors.Visitable;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalCdoId;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 import static org.javers.common.validation.Validate.conditionFulfilled;
 
 /**
@@ -26,13 +28,27 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
 public abstract class Change implements Visitable<ChangeVisitor> {
     //private Diff parent;
 
+    private Optional<CommitMetadata> commitMetadata;
     private final GlobalCdoId affectedCdoId;
 
     private transient Optional<Object> affectedCdo;
 
     protected Change(GlobalCdoId affectedCdoId) {
-        argumentIsNotNull(affectedCdoId);
+        argumentsAreNotNull(affectedCdoId);
         this.affectedCdoId = affectedCdoId;
+        this.commitMetadata = Optional.empty();
+    }
+
+    protected Change(GlobalCdoId affectedCdoId, CommitMetadata commitMetadata) {
+        argumentsAreNotNull(affectedCdoId, commitMetadata);
+        this.affectedCdoId = affectedCdoId;
+        this.commitMetadata = Optional.of(commitMetadata);
+    }
+
+    protected void bindToCommit(CommitMetadata commitMetadata) {
+        argumentIsNotNull(commitMetadata);
+
+        this.commitMetadata = Optional.of(commitMetadata);
     }
 
     /**

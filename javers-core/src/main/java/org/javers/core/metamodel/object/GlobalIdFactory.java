@@ -49,22 +49,27 @@ public class GlobalIdFactory {
     }
 
     public UnboundedValueObjectId createFromClass(Class valueObjectClass){
-        ValueObject valueObject = getManagedClass(valueObjectClass, ValueObject.class);
+        ValueObject valueObject = typeMapper.getManagedClass(valueObjectClass, ValueObject.class);
         return new UnboundedValueObjectId(valueObject);
     }
 
     public ValueObjectId createFromPath(GlobalCdoId owner, Class valueObjectClass, String path){
-        ValueObject valueObject = getManagedClass(valueObjectClass, ValueObject.class);
+        ValueObject valueObject = typeMapper.getManagedClass(valueObjectClass, ValueObject.class);
         return new ValueObjectId(valueObject, owner, path);
     }
 
-    public InstanceId createFromId(Object localId, Class entityClass){
-        Entity entity = getManagedClass(entityClass, Entity.class);
-        return InstanceId.createFromId(localId, entity);
-    }
 
     public InstanceId createFromId(Object localId, Entity entity){
         return InstanceId.createFromId(localId, entity);
+    }
+
+    public InstanceId createFromId(Object localId, Class entityClass){
+        Entity entity = typeMapper.getManagedClass(entityClass, Entity.class);
+        return InstanceId.createFromId(localId, entity);
+    }
+
+    public GlobalCdoId createFromDto(GlobalIdDTO idDto){
+        return idDto.create(typeMapper);
     }
 
     /**
@@ -77,26 +82,6 @@ public class GlobalIdFactory {
             return createId(item, context);
         } else {
             return item;
-        }
-    }
-
-    /**
-     * if given javaClass is mapped to {@link ManagedType}
-     * returns {@link ManagedType#getManagedClass()}
-     *
-     * @throws JaversException MANAGED_CLASS_MAPPING_ERROR
-     */
-    public <T extends ManagedClass> T getManagedClass(Class javaClass, Class<T> expectedType) {
-        ManagedType mType = typeMapper.getJaversManagedType(javaClass);
-
-        if (mType.getManagedClass().getClass().equals( expectedType)) {
-            return (T)mType.getManagedClass();
-        }
-        else {
-            throw new JaversException(JaversExceptionCode.MANAGED_CLASS_MAPPING_ERROR,
-                                      javaClass,
-                                      mType.getManagedClass().getSimpleName(),
-                                      expectedType.getSimpleName());
         }
     }
 

@@ -11,7 +11,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
 /**
  * @author bartosz walacik

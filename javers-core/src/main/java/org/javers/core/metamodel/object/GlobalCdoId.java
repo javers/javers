@@ -42,7 +42,7 @@ public abstract class GlobalCdoId {
         return value().equals(((GlobalCdoId)o).value());
     }
 
-    public boolean equals(GlobalCdoIdDTO o) {
+    public boolean equals(GlobalIdDTO o) {
         return this.value().equals(o.value());
     }
 
@@ -50,14 +50,4 @@ public abstract class GlobalCdoId {
     public int hashCode() {
         return value().hashCode();
     }
-
-    abstract static class GlobalCdoIdDTO {
-        public abstract String value();
-
-        @Override
-        public String toString() {
-            return "Dto("+value()+")";
-        }
-    }
-
 }

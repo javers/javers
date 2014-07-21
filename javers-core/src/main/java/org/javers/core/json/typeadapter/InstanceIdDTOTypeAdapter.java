@@ -7,11 +7,11 @@ import com.google.gson.JsonSerializationContext;
 import org.javers.common.collections.Lists;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.InstanceIdDTO;
 
 import java.util.List;
 
-public class InstanceIdDTOTypeAdapter implements JsonTypeAdapter<InstanceId.InstanceIdDTO>  {
+public class InstanceIdDTOTypeAdapter implements JsonTypeAdapter<InstanceIdDTO>  {
 
     private GlobalIdFactory globalIdFactory;
 
@@ -20,12 +20,12 @@ public class InstanceIdDTOTypeAdapter implements JsonTypeAdapter<InstanceId.Inst
     }
 
     @Override
-    public InstanceId.InstanceIdDTO fromJson(JsonElement json, JsonDeserializationContext jsonDeserializationContext) {
+    public InstanceIdDTO fromJson(JsonElement json, JsonDeserializationContext jsonDeserializationContext) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public JsonElement toJson(InstanceId.InstanceIdDTO dtoId, JsonSerializationContext context) {
+    public JsonElement toJson(InstanceIdDTO dtoId, JsonSerializationContext context) {
         if (dtoId == null) {
             return JsonNull.INSTANCE;
         }
@@ -35,6 +35,6 @@ public class InstanceIdDTOTypeAdapter implements JsonTypeAdapter<InstanceId.Inst
 
     @Override
     public List<Class> getValueTypes() {
-        return (List) Lists.immutableListOf(InstanceId.InstanceIdDTO.class);
+        return (List) Lists.immutableListOf(InstanceIdDTO.class);
     }
 }

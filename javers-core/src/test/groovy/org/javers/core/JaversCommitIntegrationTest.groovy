@@ -5,13 +5,11 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
-import org.javers.core.snapshot.SnapshotsAssert
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
-import static org.javers.core.metamodel.object.ValueObjectId.ValueObjectIdDTO.valueObjectId
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
@@ -166,5 +164,20 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasSnapshots(1)
                     .hasSnapshot(instanceId(5, DummyUserDetails))
                     .hasListReferenceRemovedAt("addressList",removedVoId)
+    }
+
+    def "should create empty commit when nothing changed"() {
+        given:
+        def javers = javers().build()
+        def cdo = new SnapshotEntity(listOfEntities:    [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
+        def firstCommit = javers.commit("author",cdo)
+
+        when:
+        def secondCommit = javers.commit("author",cdo)
+
+        then:
+        firstCommit.snapshots.size() == 3
+        !secondCommit.snapshots
+        !secondCommit.diff.changes
     }
 }

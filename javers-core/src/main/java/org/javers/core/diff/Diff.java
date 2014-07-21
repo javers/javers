@@ -41,17 +41,10 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class Diff implements Visitable<ChangeVisitor>{
-    private Optional<CommitMetadata> commitMetadata;
     private final List<Change> changes;
 
     Diff(List<Change> changes) {
         this.changes = changes;
-        this.commitMetadata = Optional.empty();
-    }
-
-    Diff(List<Change> changes, CommitMetadata commitMetadata) {
-        this.changes = changes;
-        this.commitMetadata = Optional.of(commitMetadata);
     }
 
     /**
@@ -59,10 +52,6 @@ public class Diff implements Visitable<ChangeVisitor>{
      */
     public List<Change> getChanges() {
         return Collections.unmodifiableList(changes);
-    }
-
-    public Optional<CommitMetadata> getCommitMetadata() {
-        return commitMetadata;
     }
 
     public boolean hasChanges() {
@@ -98,10 +87,6 @@ public class Diff implements Visitable<ChangeVisitor>{
             }
         }
         return result;
-    }
-
-    public void setCommitMetadata(CommitMetadata commitMetadata) {
-        this.commitMetadata = Optional.of(commitMetadata);
     }
 
     /**

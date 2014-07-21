@@ -14,6 +14,7 @@ import org.javers.core.json.typeadapter.change.ArrayChangeTypeAdapter;
 import org.javers.core.json.typeadapter.change.ListChangeTypeAdapter;
 import org.javers.core.json.typeadapter.change.MapChangeTypeAdapter;
 import org.javers.core.json.typeadapter.change.SetChangeTypeAdapter;
+import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.property.*;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
@@ -242,7 +243,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private void bootRepository(){
         if (repository == null){
             logger.info("using fake InMemoryRepository, register actual implementation via JaversBuilder.registerJaversRepository()");
-            repository = new InMemoryRepository();
+            repository = new InMemoryRepository(getContainerComponent(GlobalIdFactory.class));
         }
         addComponent(repository);
         repository.setJsonConverter(getContainerComponent(JsonConverter.class));
