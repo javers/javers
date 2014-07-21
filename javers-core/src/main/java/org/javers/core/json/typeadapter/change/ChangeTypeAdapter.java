@@ -41,7 +41,7 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
         initEntry(SetChange.class);
     }
 
-    protected T appendCommitMetadata(JsonObject jsonObject, JsonDeserializationContext context, T change) {
+    public T appendCommitMetadata(JsonObject jsonObject, JsonDeserializationContext context, T change) {
         if (jsonObject.has(COMMIT_METADATA)) {
             CommitMetadata commitMetadata = context.deserialize(jsonObject.get(COMMIT_METADATA), CommitMetadata.class);
             change.bindToCommit(commitMetadata);

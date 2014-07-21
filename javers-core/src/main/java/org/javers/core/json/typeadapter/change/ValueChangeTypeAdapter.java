@@ -22,8 +22,6 @@ public class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
         return appendCommitMetadata(jsonObject, context, new ValueChange(stub.id, stub.property, leftValue, rightValue));
     }
 
-
-
     @Override
     public JsonElement toJson(ValueChange change, JsonSerializationContext context) {
         JsonObject jsonObject = createJsonObject(change, context);
