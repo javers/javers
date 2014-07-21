@@ -4,6 +4,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ValueChange;
 
 public class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
@@ -18,8 +19,10 @@ public class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
         Object leftValue  = context.deserialize(jsonObject.get(LEFT_VALUE_FIELD),  stub.property.getType());
         Object rightValue = context.deserialize(jsonObject.get(RIGHT_VALUE_FIELD), stub.property.getType());
 
-        return new ValueChange(stub.id, stub.property, leftValue, rightValue);
+        return appendCommitMetadata(jsonObject, context, new ValueChange(stub.id, stub.property, leftValue, rightValue));
     }
+
+
 
     @Override
     public JsonElement toJson(ValueChange change, JsonSerializationContext context) {

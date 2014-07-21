@@ -45,7 +45,9 @@ public abstract class Change implements Visitable<ChangeVisitor> {
         this.commitMetadata = Optional.of(commitMetadata);
     }
 
-    protected void bindToCommit(CommitMetadata commitMetadata) {
+
+    //TODO protected
+    public void bindToCommit(CommitMetadata commitMetadata) {
         argumentIsNotNull(commitMetadata);
 
         this.commitMetadata = Optional.of(commitMetadata);
@@ -83,5 +85,9 @@ public abstract class Change implements Visitable<ChangeVisitor> {
     @Override
     public void accept(ChangeVisitor changeVisitor) {
         changeVisitor.visit(this);
+    }
+
+    public Optional<CommitMetadata> getCommitMetadata() {
+        return commitMetadata;
     }
 }

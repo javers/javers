@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.*;
 import org.javers.core.diff.changetype.container.ArrayChange;
@@ -24,6 +25,7 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
     private static final String CHANGE_TYPE_FIELD = "changeType";
     private static final String AFFECTED_CDO_ID_FIELD = "globalCdoId";
     private static final String PROPERTY_FIELD = "property";
+    private static final String COMMIT_METADATA = "commitMetadata";
 
     private Map<String, Class<? extends Change>> changeTypeMap;
 
@@ -37,6 +39,15 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
         initEntry(ListChange.class);
         initEntry(ArrayChange.class);
         initEntry(SetChange.class);
+    }
+
+    protected T appendCommitMetadata(JsonObject jsonObject, JsonDeserializationContext context, T change) {
+        if (jsonObject.has(COMMIT_METADATA)) {
+            CommitMetadata commitMetadata = context.deserialize(jsonObject.get(COMMIT_METADATA), CommitMetadata.class);
+            change.bindToCommit(commitMetadata);
+        }
+
+        return change;
     }
 
     @Override
@@ -74,6 +85,10 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty(CHANGE_TYPE_FIELD, encode(change.getClass()));
         jsonObject.add(AFFECTED_CDO_ID_FIELD, context.serialize(change.getAffectedCdoId()));
+
+        if (change.getCommitMetadata().isPresent()) {
+            jsonObject.add(COMMIT_METADATA, context.serialize(change.getCommitMetadata().get()));
+        }
 
         if (change instanceof PropertyChange) {
             jsonObject.addProperty(PROPERTY_FIELD, ((PropertyChange) change).getProperty().getName());

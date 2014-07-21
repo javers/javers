@@ -3,6 +3,7 @@ package org.javers.core.json.typeadapter.change;
 import com.google.gson.*;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.container.*;
 import org.javers.core.metamodel.type.ContainerType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -35,7 +36,7 @@ public abstract class ContainerChangeTypeAdapter<T extends ContainerChange> exte
         ContainerType containerType = typeMapper.getPropertyType(stub.property);
         List<ContainerElementChange> changes = parseChanges(jsonObject, context, containerType);
 
-        return (T) newInstance(stub,changes);
+        return appendCommitMetadata(jsonObject, context, (T) newInstance(stub, changes));
     }
 
     protected abstract ContainerChange newInstance(PropertyChangeStub stub, List<ContainerElementChange> changes);
