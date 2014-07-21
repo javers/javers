@@ -31,7 +31,7 @@ public final class Commit {
      * Monotonically increasing id
      */
     public CommitId getId() {
-        return commitMetadata.getCommitId();
+        return commitMetadata.getId();
     }
 
     public GlobalCdoId getGlobalCdoId() {
@@ -60,7 +60,7 @@ public final class Commit {
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder();
-        b.append("Commit(id:" + commitMetadata.getCommitId());
+        b.append("Commit(id:" + commitMetadata.getId());
         b.append(", snapshots:" + snapshots.size());
         b.append(", " + diff.toString());
         b.append(")");
@@ -75,11 +75,11 @@ public final class Commit {
 
         Commit other = (Commit) o;
 
-        return this.commitMetadata.getCommitId().equals(other.commitMetadata.getCommitId());
+        return this.getId().equals(other.getId());
     }
 
     @Override
     public int hashCode() {
-        return commitMetadata.getCommitId().hashCode();
+        return getId().hashCode();
     }
 }

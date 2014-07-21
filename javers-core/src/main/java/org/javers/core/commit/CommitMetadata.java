@@ -7,14 +7,14 @@ public class CommitMetadata {
 
     private final String author;
     private final LocalDateTime commitDate;
-    private CommitId commitId;
+    private CommitId id;
 
-    public CommitMetadata(String author, LocalDateTime commitDate, CommitId commitId) {
-        Validate.argumentsAreNotNull(author, commitDate, commitId);
+    public CommitMetadata(String author, LocalDateTime commitDate, CommitId id) {
+        Validate.argumentsAreNotNull(author, commitDate, id);
 
         this.author = author;
         this.commitDate = commitDate;
-        this.commitId = commitId;
+        this.id = id;
     }
 
     public String getAuthor() {
@@ -25,7 +25,7 @@ public class CommitMetadata {
         return commitDate;
     }
 
-    public CommitId getCommitId() {
-        return commitId;
+    public CommitId getId() {
+        return id;
     }
 }

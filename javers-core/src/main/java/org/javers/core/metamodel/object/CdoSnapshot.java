@@ -27,7 +27,7 @@ public final class CdoSnapshot extends Cdo {
      */
     CdoSnapshot(GlobalCdoId globalId, CommitMetadata commitMetadata, Map<Property, Object> state) {
         super(globalId);
-        Validate.argumentIsNotNull(state);
+        Validate.argumentsAreNotNull(state, commitMetadata);
         this.state = state;
         this.commitMetadata = commitMetadata;
     }
@@ -67,7 +67,7 @@ public final class CdoSnapshot extends Cdo {
     }
 
     public CommitId getCommitId() {
-        return commitMetadata.getCommitId();
+        return commitMetadata.getId();
     }
 
     public CommitMetadata getCommitMetadata() {

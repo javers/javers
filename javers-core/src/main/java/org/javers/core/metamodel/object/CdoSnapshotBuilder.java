@@ -43,8 +43,7 @@ public class CdoSnapshotBuilder {
     }
 
     public CdoSnapshot build(){
-        CdoSnapshot cdoSnapshot = new CdoSnapshot(globalCdoId, commitMetadata, state);
-        return cdoSnapshot;
+        return new CdoSnapshot(globalCdoId, commitMetadata, state);
     }
 
     public CdoSnapshotBuilder withCommitMetadata(CommitMetadata commitMetadata) {

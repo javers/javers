@@ -1,12 +1,10 @@
 package org.javers.core
 
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.metamodel.object.ValueObjectIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
-import org.javers.repository.api.InMemoryRepository
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -42,8 +40,8 @@ class JaversRepositoryIntegrationTest extends Specification {
                 .hasSnapshot(cdoId, "1.0", [id:2])
                 .hasSnapshot(cdoId, "2.0", [id:2, intProperty:5])
 
-        snapshots[0].commitMetadata.commitId == "2.0"
-        snapshots[1].commitMetadata.commitId == "1.0"
+        snapshots[0].commitMetadata.id == "2.0"
+        snapshots[1].commitMetadata.id == "1.0"
     }
 
     def "should compare Entity property values with latest from repository"() {

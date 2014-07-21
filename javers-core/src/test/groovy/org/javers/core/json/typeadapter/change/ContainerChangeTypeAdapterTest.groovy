@@ -2,7 +2,6 @@ package org.javers.core.json.typeadapter.change
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import org.javers.core.commit.CommitId
 import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.container.*
 import org.javers.core.json.JsonConverter
@@ -36,7 +35,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
                 commitMetadata {
                     author "author"
                     commitDate "2001-12-01T22:23:03"
-                    commitId "1.0"
+                    id "1.0"
                 }
                 property propertyName
                 elementChanges ([
@@ -84,7 +83,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
             with(change.commitMetadata.get()) {
                 author == "author"
                 commitDate == new LocalDateTime("2001-12-01T22:23:03")
-                commitId == "1.0"
+                id == "1.0"
 
             }
             with((ElementValueChange)change.changes[0]) {

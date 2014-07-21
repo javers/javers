@@ -5,7 +5,6 @@ import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.metamodel.object.CdoSnapshot
-import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.metamodel.object.ValueObjectIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -35,7 +34,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.commitMetadata.commitId == "1.0"
+        json.commitMetadata.id == "1.0"
         json.commitMetadata.author == "author"
         //TODO
         json.commitMetadata.commitDate
@@ -146,7 +145,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def json = new JsonBuilder()
         json {
             commitMetadata {
-                commitId "1.0"
+                id "1.0"
                 author "author"
                 dateTime "2000-01-01T12:00:00"
             }
@@ -163,7 +162,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         with (snapshot) {
-            commitMetadata.commitId.value() == "1.0"
+            commitMetadata.id.value() == "1.0"
             globalId == instanceId("kaz",DummyUser)
         }
     }

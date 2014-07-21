@@ -2,9 +2,6 @@ package org.javers.core.json.typeadapter.change
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import org.javers.common.collections.Optional
-import org.javers.core.commit.CommitId
-import org.javers.core.commit.CommitMetadata
 import org.javers.core.diff.Change
 import org.javers.core.diff.appenders.MapChangeAssert
 import org.javers.core.diff.changetype.map.EntryAdded
@@ -175,7 +172,7 @@ class MapChangeTypeAdapterTest extends Specification {
                         commitMetadata {
                             author "kazik"
                             commitDate "2001-12-01T22:23:03"
-                            commitId "1.0"
+                            id "1.0"
                         }
                         property "mapOfEntities"
                         entryChanges ([
@@ -223,7 +220,7 @@ class MapChangeTypeAdapterTest extends Specification {
                     commitMetadata {
                         author "kazik"
                         commitDate "2001-12-01T22:23:03"
-                        commitId "1.0"
+                        id "1.0"
                     }
                     property "mapOfPrimitives"
                     entryChanges ([
@@ -254,7 +251,7 @@ class MapChangeTypeAdapterTest extends Specification {
         then:
         change.affectedCdoId == instanceId(1,SnapshotEntity)
         change.commitMetadata.get().author == "kazik"
-        change.commitMetadata.get().commitId == "1.0"
+        change.commitMetadata.get().id == "1.0"
         change.commitMetadata.get().commitDate == new LocalDateTime("2001-12-01T22:23:03")
         change.property.name == "mapOfPrimitives"
         MapChangeAssert.assertThat(change)
