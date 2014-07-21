@@ -1,12 +1,12 @@
 package org.javers.core.diff.appenders
 
 import org.javers.core.diff.AbstractDiffTest
-import org.javers.core.metamodel.object.ValueObjectId
+import org.javers.core.metamodel.object.ValueObjectIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 
 import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
-import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
 /**
  * @author bartosz walacik
@@ -69,7 +69,7 @@ class ArrayReferenceChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceAdded(1, ValueObjectId.ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "arrayOfValueObjects/1"))
+                .hasReferenceAdded(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "arrayOfValueObjects/1"))
     }
 
     def "should append ReferenceRemoved in Array of ValueObject"() {
@@ -84,7 +84,7 @@ class ArrayReferenceChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceRemoved(1, ValueObjectId.ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "arrayOfValueObjects/1"))
+                .hasReferenceRemoved(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "arrayOfValueObjects/1"))
     }
 
     def "should not append ReferenceChanged in Array of ValueObject"() {

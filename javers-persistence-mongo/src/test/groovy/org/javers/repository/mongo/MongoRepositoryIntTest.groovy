@@ -1,17 +1,11 @@
 package org.javers.repository.mongo
 
 import com.github.fakemongo.Fongo
-import org.javers.core.Javers
 import org.javers.core.JaversTestBuilder
-import org.javers.core.commit.Commit
-import org.javers.core.commit.CommitId
-import org.javers.core.diff.Diff
 import org.javers.core.json.JsonConverter
-import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.object.InstanceIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.test.builder.DummyUserBuilder
-import org.joda.time.LocalDateTime
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
@@ -58,7 +52,7 @@ class MongoRepositoryIntTest extends Specification {
         def commitFactory = javersTestBuilder.commitFactory
 
         def kazik = new DummyUser("kazik")
-        def id = InstanceId.InstanceIdDTO.instanceId("kazik", DummyUser)
+        def id = InstanceIdDTO.instanceId("kazik", DummyUser)
 
         when:
         //persist
@@ -102,7 +96,7 @@ class MongoRepositoryIntTest extends Specification {
         def db = new Fongo("myDb").mongo.getDB("test")
         def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
         def commitFactory = javersTestBuilder.commitFactory
-        def id = InstanceId.InstanceIdDTO.instanceId("kazik", DummyUser)
+        def id = InstanceIdDTO.instanceId("kazik", DummyUser)
 
         //create entity & persist commit
         def kazik = new DummyUser("kazik")
@@ -134,7 +128,7 @@ class MongoRepositoryIntTest extends Specification {
         javers.commit("andy", kazikV1)
         javers.commit("andy", kazikV2)
 
-        def id = InstanceId.InstanceIdDTO.instanceId("kazik", DummyUser)
+        def id = InstanceIdDTO.instanceId("kazik", DummyUser)
 
         when:
         def history = mongoRepository.getStateHistory(id, 2)

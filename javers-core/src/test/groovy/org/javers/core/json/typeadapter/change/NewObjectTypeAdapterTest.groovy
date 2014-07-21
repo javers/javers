@@ -13,7 +13,7 @@ import sun.security.jca.GetInstance
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 import static org.javers.core.json.builder.ChangeTestBuilder.newObject
-import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
 /**
  * @author bartosz walacik

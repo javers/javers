@@ -5,9 +5,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +23,11 @@ public class InMemoryRepository implements JaversRepository {
 
     private CommitId head;
 
-    public InMemoryRepository() {
+    private final GlobalIdFactory globalIdFactory;
+
+    public InMemoryRepository(GlobalIdFactory globalIdFactory) {
+        Validate.argumentIsNotNull(globalIdFactory);
+        this.globalIdFactory = globalIdFactory;
     }
 
     @Override
@@ -39,11 +41,6 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(InstanceId.InstanceIdDTO dtoId, int limit) {
-        return null;
-    }
-
-    @Override
     public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
         Validate.argumentsAreNotNull(globalId);
 
@@ -53,11 +50,6 @@ public class InMemoryRepository implements JaversRepository {
         }
 
         return Optional.empty();
-    }
-
-    @Override
-    public Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId) {
-        return null;
     }
 
     @Override
@@ -81,6 +73,20 @@ public class InMemoryRepository implements JaversRepository {
 
     }
 
+    @Override
+    public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit) {
+        Validate.argumentsAreNotNull(globalIdDTO);
+
+        return getStateHistory(globalIdFactory.createFromDto(globalIdDTO),limit);
+    }
+
+    @Override
+    public Optional<CdoSnapshot> getLatest(GlobalIdDTO globalIdDTO) {
+        Validate.argumentsAreNotNull(globalIdDTO);
+
+        return getLatest(globalIdFactory.createFromDto(globalIdDTO));
+    }
+
     private void persist(CdoSnapshot snapshot) {
         LinkedList<CdoSnapshot> states = snapshots.get(snapshot.getGlobalId());
         if (states == null){
@@ -90,5 +96,4 @@ public class InMemoryRepository implements JaversRepository {
 
         states.push(snapshot);
     }
-
 }

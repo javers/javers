@@ -4,8 +4,8 @@ import org.javers.common.collections.Primitives;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.property.ManagedClassDefinition;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.property.*;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -119,12 +119,12 @@ public class TypeMapper {
      *
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
      */
-    public boolean isContainerOfManagedClasses(EnumerableType enumerableType){
-        if (! (enumerableType instanceof ContainerType)) {
+    public boolean isContainerOfManagedClasses(JaversType javersType){
+        if (! (javersType instanceof ContainerType)) {
             return false;
         }
 
-        return getJaversType(((ContainerType) enumerableType).getItemClass()) instanceof ManagedType;
+        return getJaversType(((ContainerType) javersType).getItemClass()) instanceof ManagedType;
     }
 
     /**
@@ -183,7 +183,59 @@ public class TypeMapper {
         }
     }
 
+    /**
+     * if given javaClass is mapped to {@link ManagedType}
+     * returns {@link ManagedType#getManagedClass()}
+     *
+     * @throws JaversException MANAGED_CLASS_MAPPING_ERROR
+     */
+    public <T extends ManagedClass> T getManagedClass(Class javaClass, Class<T> expectedType) {
+        ManagedType mType = getJaversManagedType(javaClass);
+
+        if (mType.getManagedClass().getClass().equals( expectedType)) {
+            return (T)mType.getManagedClass();
+        }
+        else {
+            throw new JaversException(JaversExceptionCode.MANAGED_CLASS_MAPPING_ERROR,
+                    javaClass,
+                    mType.getManagedClass().getSimpleName(),
+                    expectedType.getSimpleName());
+        }
+    }
+
+    public ValueObject getChildValueObject(Entity owner, String voPropertyName) {
+        JaversType javersType = getJaversType( owner.getProperty(voPropertyName).getGenericType() );
+
+        if (javersType instanceof ValueObjectType) {
+            return ((ValueObjectType) javersType).getManagedClass();
+        }
+
+        if (javersType instanceof ContainerType) {
+            JaversType contentType  = getJaversType(((ContainerType) javersType).getItemClass());
+            if (contentType instanceof ValueObjectType){
+                return ((ValueObjectType)contentType).getManagedClass();
+            }
+        }
+
+        throw new JaversException(JaversExceptionCode.CANNOT_EXTRACT_CHILD_VALUE_OBJECT,
+                  owner.getName()+"."+voPropertyName,
+                  javersType);
+
+    }
+
     //-- private
+
+    /**
+     * is ContainerType (Set, List or Array) of ManagedClasses
+     *
+     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
+     */
+    private boolean isContainerOfValueObjects(JaversType javersType){
+        if (! (javersType instanceof ContainerType)) {
+            return false;
+        }
+        return getJaversType(((ContainerType) javersType).getItemClass()) instanceof ValueObjectType;
+    }
 
     private void addType(JaversType jType) {
         mappedTypes.put(jType.getBaseJavaType(), jType);

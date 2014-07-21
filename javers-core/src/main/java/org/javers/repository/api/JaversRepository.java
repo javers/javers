@@ -6,9 +6,7 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.*;
 
 import java.util.List;
 
@@ -24,22 +22,29 @@ import java.util.List;
 public interface JaversRepository {
 
     /**
-     * Snapshots (historical states) of object
+     * Snapshots (historical states) of given object
      * in reverse chronological order
      *
      * @param limit choose reasonable limits, production database could contain more records than you expect
      * @return empty List if object is not versioned
      */
-    List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit);
-
-    List<CdoSnapshot> getStateHistory(InstanceId.InstanceIdDTO dtoId, int limit);
+    List<CdoSnapshot> getStateHistory(GlobalCdoId globalCdoId, int limit);
 
     /**
-     * Latest snapshot or Optional#EMPTY if object is not versioned
+     * Convenient method to query by DTO, see {@link #getStateHistory(GlobalCdoId, int)}
      */
-    Optional<CdoSnapshot> getLatest(GlobalCdoId globalId);
+    List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit);
 
-    Optional<CdoSnapshot> getLatest(InstanceId.InstanceIdDTO dtoId);
+    /**
+     * Latest snapshot of given object,
+     * Optional#EMPTY if object is not versioned
+     */
+    Optional<CdoSnapshot> getLatest(GlobalCdoId globalCdoId);
+
+    /**
+     * Convenient method to query by DTO, see {@link #getLatest(GlobalCdoId)}
+     */
+    Optional<CdoSnapshot> getLatest(GlobalIdDTO globalIdDTO);
 
     void persist(Commit commit);
 
@@ -47,38 +52,4 @@ public interface JaversRepository {
 
     void setJsonConverter(JsonConverter jsonConverter);
 
-    /**
-     * Persists given diff in database. <br/>
-     * Implementation should:
-     * <ol>
-     *     <li/>generate next Diff.id and assign it by calling {@link Diff#assignId(long)}
-     *     <li/>save Diff and all its Changes into database,
-     *          since Diffs are logically immutable, implementation should use only inserts
-     * </ol>
-     *
-     * @param newDiff fresh Diff which hasn't been persisted yet
-     * @see Diff#isNew()
-     *
-     @Deprecated
-     void save(Diff newDiff);
-     */
-
-    /**
-     * Loads Diff from database, collection of {@link Diff#getChanges()} has to be initialized.
-     *
-     * @return null if not found
-     *
-     @Deprecated
-     Diff getById(long diffId);
-     */
-
-    /**
-     * Finds all changes made on single domain object.
-     * Outcome list has to be ordered chronologically by {@link Diff#getDiffDate()}.
-     *
-     * @return never returns null
-     *
-     @Deprecated
-     List<Change> findByGlobalCdoId(GlobalCdoId globalCdoId);
-      */
 }

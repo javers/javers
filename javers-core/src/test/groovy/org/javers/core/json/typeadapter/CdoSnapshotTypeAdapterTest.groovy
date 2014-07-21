@@ -5,6 +5,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.ValueObjectId
+import org.javers.core.metamodel.object.ValueObjectIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.test.builder.DummyUserDetailsBuilder
@@ -12,7 +13,7 @@ import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
@@ -250,7 +251,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         def valueObjectId = snapshot.getPropertyValue("dummyAddress")
-        valueObjectId == ValueObjectId.ValueObjectIdDTO.valueObjectId(1, DummyUserDetails, "dummyAddress")
+        valueObjectId == ValueObjectIdDTO.valueObjectId(1, DummyUserDetails, "dummyAddress")
     }
 
     def "should deserialize state with collections in CdoSnapshot"() {

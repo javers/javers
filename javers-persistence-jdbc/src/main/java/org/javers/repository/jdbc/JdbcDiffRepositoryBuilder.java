@@ -16,6 +16,7 @@ import java.util.Arrays;
  * </ul>
  * @author bartosz walacik
  */
+@Deprecated
 public class JdbcDiffRepositoryBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JdbcDiffRepositoryBuilder.class);
 
