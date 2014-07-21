@@ -104,16 +104,31 @@ public class DiffFactory {
             }
 
             JaversType javersType = typeMapper.getPropertyType(property);
-            for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
-                Change change = appender.calculateChangesIfSupported(pair, property, javersType);
-                if (change != null) {
-                    diff.addChange(change, pair.getRight().wrappedCdo());
-                    if (commitMetadata.isPresent()) {
-                        change.bindToCommit(commitMetadata.get());
-                    }
-                }
-            }
 
+            if (commitMetadata.isPresent()) {
+                appendChangesAndBindCommitMetadata(diff, pair, commitMetadata, property, javersType);
+            } else {
+                appendChanges(diff, pair, property, javersType);
+            }
+        }
+    }
+
+    private void appendChangesAndBindCommitMetadata(DiffBuilder diff, NodePair pair, Optional<CommitMetadata> commitMetadata, Property property, JaversType javersType) {
+        for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
+            Change change = appender.calculateChangesIfSupported(pair, property, javersType);
+            if (change != null) {
+                diff.addChange(change, pair.getRight().wrappedCdo());
+                change.bindToCommit(commitMetadata.get());
+            }
+        }
+    }
+
+    private void appendChanges(DiffBuilder diff, NodePair pair, Property property, JaversType javersType) {
+        for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
+            Change change = appender.calculateChangesIfSupported(pair, property, javersType);
+            if (change != null) {
+                diff.addChange(change, pair.getRight().wrappedCdo());
+            }
         }
     }
 }
