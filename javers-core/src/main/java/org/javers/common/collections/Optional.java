@@ -54,4 +54,8 @@ public class Optional<T> {
         return reference;
     }
 
+    public void ifPresent(Consumer<T> consumer) {
+        if (reference != null) consumer.consume(reference);
+    }
+
 }

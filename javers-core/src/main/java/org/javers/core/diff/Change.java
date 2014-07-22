@@ -15,11 +15,11 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
 /**
  * Change represents <b>atomic</b> difference between two objects.
  * <br/><br/>
- *
+ * <p/>
  * There are several change types: {@link ValueChange}, {@link org.javers.core.diff.changetype.ReferenceChange}, ...
  * For complete list see inheritance hierarchy.
  * <br/><br/>
- *
+ * <p/>
  * Change is a <i>Value Object</i> and typically can not exists without
  * owning {@link org.javers.core.diff.Diff}. For more information see {@link org.javers.core.diff.Diff} javadoc.
  *
@@ -45,10 +45,12 @@ public abstract class Change implements Visitable<ChangeVisitor> {
         this.commitMetadata = Optional.of(commitMetadata);
     }
 
-
-    //TODO protected
     public void bindToCommit(CommitMetadata commitMetadata) {
         argumentIsNotNull(commitMetadata);
+
+        if (this.commitMetadata.isPresent()) {
+            throw new IllegalStateException("Change should be efectively immutable");
+        }
 
         this.commitMetadata = Optional.of(commitMetadata);
     }
@@ -64,13 +66,13 @@ public abstract class Change implements Visitable<ChangeVisitor> {
      * Affected Cdo, depending on concrete Change type,
      * it could be new Object, removed Object or new version of changed Object
      * <br/>
-     *
+     * <p/>
      * <b>Transient</b> reference - available only for freshly generated diff
      *
      * @throws JaversException AFFECTED_CDO_IS_NOT_AVAILABLE
      */
     public Object getAffectedCdo() {
-        if (affectedCdo == null || affectedCdo.isEmpty()){
+        if (affectedCdo == null || affectedCdo.isEmpty()) {
             throw new JaversException(JaversExceptionCode.AFFECTED_CDO_IS_NOT_AVAILABLE);
         }
         return affectedCdo.get();

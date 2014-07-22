@@ -38,29 +38,18 @@ public class DiffBuilder {
     }
 
     public DiffBuilder addChanges(Collection<Change> changeSet, final Optional<CommitMetadata> commitMetadata) {
-        if (commitMetadata.isPresent()) {
-            addChanges(changeSet, new Consumer<Change>() {
+
+        for (final Change change : changeSet) {
+            addChange(change);
+            commitMetadata.ifPresent(new Consumer<CommitMetadata>() {
                 @Override
-                public void consume(Change change) {
-                    change.bindToCommit(commitMetadata.get());
-                }
-            });
-        } else {
-            addChanges(changeSet, new Consumer<Change>() {
-                @Override
-                public void consume(Change change) {
+                public void consume(CommitMetadata commitMetadata) {
+                    change.bindToCommit(commitMetadata);
                 }
             });
         }
 
         return this;
-    }
-
-    private void addChanges(Collection<Change> changeSet, Consumer<Change> consumer) {
-        for (Change change : changeSet) {
-            addChange(change);
-            consumer.consume(change);
-        }
     }
 
     public Diff build() {

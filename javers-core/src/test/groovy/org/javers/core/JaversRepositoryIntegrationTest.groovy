@@ -40,8 +40,14 @@ class JaversRepositoryIntegrationTest extends Specification {
                 .hasSnapshot(cdoId, "1.0", [id:2])
                 .hasSnapshot(cdoId, "2.0", [id:2, intProperty:5])
 
-        snapshots[0].commitMetadata.id == "2.0"
-        snapshots[1].commitMetadata.id == "1.0"
+        snapshots[0].commitId == "2.0"
+        snapshots[0].commitMetadata.author == "author"
+        //TODO
+        snapshots[0].commitMetadata.commitDate
+        snapshots[1].commitId == "1.0"
+        snapshots[1].commitMetadata.author == "author"
+        //TODO
+        snapshots[1].commitMetadata.commitDate
     }
 
     def "should compare Entity property values with latest from repository"() {
