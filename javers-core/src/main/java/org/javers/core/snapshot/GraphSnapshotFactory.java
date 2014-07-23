@@ -2,6 +2,7 @@ package org.javers.core.snapshot;
 
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
@@ -33,17 +34,17 @@ public class GraphSnapshotFactory {
      *
      * @param currentVersion outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
      */
-    public List<CdoSnapshot> create(LiveGraph currentVersion){
-        Validate.argumentIsNotNull(currentVersion);
+    public List<CdoSnapshot> create(LiveGraph currentVersion, CommitMetadata commitMetadata){
+        Validate.argumentsAreNotNull(currentVersion, commitMetadata);
 
-        return doSnapshotsAndReuse(currentVersion.flatten());
+        return doSnapshotsAndReuse(currentVersion.flatten(), commitMetadata);
     }
 
-    private List<CdoSnapshot> doSnapshotsAndReuse(Set<ObjectNode> currentVersion){
+    private List<CdoSnapshot> doSnapshotsAndReuse(Set<ObjectNode> currentVersion, CommitMetadata commitMetadata){
         List<CdoSnapshot> reused = new ArrayList<>();
 
         for (ObjectNode node : currentVersion) {
-            CdoSnapshot fresh = snapshotFactory.create(node);
+            CdoSnapshot fresh = snapshotFactory.create(node, commitMetadata);
 
             Optional<CdoSnapshot> existing = javersRepository.getLatest(fresh.getGlobalId());
             if (existing.isEmpty()) {

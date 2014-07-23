@@ -7,6 +7,7 @@ import org.javers.core.diff.changetype.container.*
 import org.javers.core.json.JsonConverter
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -30,6 +31,11 @@ class ContainerChangeTypeAdapterTest extends Specification{
                 globalCdoId {
                     entity "org.javers.core.model.SnapshotEntity"
                     cdoId 1
+                }
+                commitMetadata {
+                    author "author"
+                    commitDate "2001-12-01T22:23:03"
+                    id "1.0"
                 }
                 property propertyName
                 elementChanges ([
@@ -73,6 +79,13 @@ class ContainerChangeTypeAdapterTest extends Specification{
             change.class == changeType_
             change.property.name == propertyName
             change.getAffectedCdoId() == instanceId(1, SnapshotEntity)
+
+            with(change.commitMetadata.get()) {
+                author == "author"
+                commitDate == new LocalDateTime("2001-12-01T22:23:03")
+                id == "1.0"
+
+            }
             with((ElementValueChange)change.changes[0]) {
                 index == 1
                 leftValue  == instanceId(2, SnapshotEntity)

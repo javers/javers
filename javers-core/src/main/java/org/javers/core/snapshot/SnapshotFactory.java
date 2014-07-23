@@ -3,7 +3,9 @@ package org.javers.core.snapshot;
 import org.javers.common.collections.Defaults;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Objects;
+import org.javers.common.date.DateProvider;
 import org.javers.common.exception.exceptions.JaversException;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
@@ -27,8 +29,8 @@ public class SnapshotFactory {
     /**
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
-    public CdoSnapshot create(Object liveCdo, GlobalCdoId id) {
-        CdoSnapshotBuilder snapshot =  cdoSnapshot(id);
+    public CdoSnapshot create(Object liveCdo, GlobalCdoId id, CommitMetadata commitMetadata) {
+        CdoSnapshotBuilder snapshot =  cdoSnapshot(id, commitMetadata);
 
         for (Property property : id.getCdoClass().getProperties()){
             Object propertyVal = property.get(liveCdo);
@@ -52,8 +54,8 @@ public class SnapshotFactory {
         return snapshot.build();
     }
 
-    public CdoSnapshot create (ObjectNode objectNode) {
-        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalCdoId());
+    public CdoSnapshot create(ObjectNode objectNode, CommitMetadata commitMetadata) {
+        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalCdoId(), commitMetadata);
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {

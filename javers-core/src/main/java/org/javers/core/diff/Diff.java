@@ -1,6 +1,8 @@
 package org.javers.core.diff;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.patterns.visitors.Visitable;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
 
 import java.util.Collections;

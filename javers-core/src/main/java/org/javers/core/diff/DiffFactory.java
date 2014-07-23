@@ -1,8 +1,11 @@
 package org.javers.core.diff;
 
+import org.javers.common.collections.Consumer;
+import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.GraphFactory;
 import org.javers.core.Javers;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.appenders.NodeChangeAppender;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
 import org.javers.core.graph.LiveGraph;
@@ -45,52 +48,54 @@ public class DiffFactory {
      * @see Javers#compare(Object, Object)
      */
     public Diff compare(Object oldVersion, Object currentVersion) {
-        return create(buildGraph(oldVersion), buildGraph(currentVersion));
+        return create(buildGraph(oldVersion), buildGraph(currentVersion), Optional.<CommitMetadata>empty());
     }
 
-    public Diff create(ObjectGraph leftGraph, ObjectGraph rightGraph) {
+    public Diff create(ObjectGraph leftGraph, ObjectGraph rightGraph, Optional<CommitMetadata> commitMetadata) {
         Validate.argumentsAreNotNull(leftGraph, rightGraph);
 
         GraphPair graphPair = new GraphPair(leftGraph, rightGraph);
-        return createAndAppendChanges(graphPair);
+        return createAndAppendChanges(graphPair, commitMetadata);
     }
 
     public Diff createInitial(ObjectGraph currentGraph) {
         Validate.argumentIsNotNull(currentGraph);
 
         GraphPair graphPair = new GraphPair(currentGraph);
-        return createAndAppendChanges(graphPair);
+        return createAndAppendChanges(graphPair, Optional.<CommitMetadata>empty());
     }
 
-    private LiveGraph buildGraph(Object handle){
+    private LiveGraph buildGraph(Object handle) {
         return graphFactory.createLiveGraph(handle);
     }
 
-    /** Graph scope appender */
-    private Diff createAndAppendChanges(GraphPair graphPair) {
+    /**
+     * Graph scope appender
+     */
+    private Diff createAndAppendChanges(GraphPair graphPair, Optional<CommitMetadata> commitMetadata) {
         DiffBuilder diff = diff();
 
         //calculate node scope diff
         for (NodeChangeAppender appender : nodeChangeAppenders) {
-            diff.addChanges(appender.getChangeSet(graphPair));
+            diff.addChanges(appender.getChangeSet(graphPair), commitMetadata);
         }
 
         //calculate snapshot of NewObjects
         for (ObjectNode node : graphPair.getOnlyOnRight()) {
             FakeNodePair pair = new FakeNodePair(node);
-            appendPropertyChanges(diff, pair);
+            appendPropertyChanges(diff, pair, commitMetadata);
         }
 
         //calculate property-to-property diff
         for (NodePair pair : nodeMatcher.match(graphPair)) {
-            appendPropertyChanges(diff, pair);
+            appendPropertyChanges(diff, pair, commitMetadata);
         }
 
         return diff.build();
     }
 
     /* Node scope appender */
-    private void appendPropertyChanges(DiffBuilder diff, NodePair pair) {
+    private void appendPropertyChanges(DiffBuilder diff, NodePair pair, final Optional<CommitMetadata> commitMetadata) {
         List<Property> nodeProperties = pair.getProperties();
         for (Property property : nodeProperties) {
 
@@ -100,11 +105,31 @@ public class DiffFactory {
             }
 
             JaversType javersType = typeMapper.getPropertyType(property);
-            for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
-                Change change = appender.calculateChangesIfSupported(pair, property, javersType);
-                if (change != null) {
-                    diff.addChange(change, pair.getRight().wrappedCdo());
-                }
+
+            if (commitMetadata.isPresent()) {
+                appendChanges(diff, pair, property, javersType, new Consumer<Change>() {
+                    @Override
+                    public void consume(Change change) {
+                        change.bindToCommit(commitMetadata.get());
+                    }
+                });
+            } else {
+                appendChanges(diff, pair, property, javersType, new Consumer<Change>() {
+                    @Override
+                    public void consume(Change o) {
+
+                    }
+                });
+            }
+        }
+    }
+
+    private void appendChanges(DiffBuilder diff, NodePair pair, Property property, JaversType javersType, Consumer<Change> consumer) {
+        for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
+            Change change = appender.calculateChangesIfSupported(pair, property, javersType);
+            if (change != null) {
+                diff.addChange(change, pair.getRight().wrappedCdo());
+                consumer.consume(change);
             }
         }
     }

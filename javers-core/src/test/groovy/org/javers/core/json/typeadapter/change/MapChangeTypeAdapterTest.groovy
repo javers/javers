@@ -9,9 +9,9 @@ import org.javers.core.diff.changetype.map.EntryRemoved
 import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.json.JsonConverter
-import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 import spock.lang.Ignore
 import spock.lang.Specification
 
@@ -42,7 +42,6 @@ class MapChangeTypeAdapterTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -81,7 +80,6 @@ class MapChangeTypeAdapterTest extends Specification {
 
         when:
             String jsonText = jsonConverter.toJson(change)
-           // println(jsonText)
 
         then:
             def json = new JsonSlurper().parseText(jsonText)
@@ -106,6 +104,11 @@ class MapChangeTypeAdapterTest extends Specification {
                             entity "org.javers.core.model.SnapshotEntity"
                             cdoId 1
                         }
+                        commitMetadata {
+                            author "kazik"
+                            commitDate "2001-12-01T22:23:03"
+                            commitId "1.0"
+                        }
                         property "mapOfValues"
                         entryChanges ([
                                 {
@@ -119,7 +122,6 @@ class MapChangeTypeAdapterTest extends Specification {
                 }
 
         when:
-//            print json.toPrettyString()
             MapChange change  = jsonConverter.fromJson(json.toString(),Change)
 
         then:
@@ -167,6 +169,11 @@ class MapChangeTypeAdapterTest extends Specification {
                             entity "org.javers.core.model.SnapshotEntity"
                             cdoId 1
                         }
+                        commitMetadata {
+                            author "kazik"
+                            commitDate "2001-12-01T22:23:03"
+                            id "1.0"
+                        }
                         property "mapOfEntities"
                         entryChanges ([
                                 {
@@ -210,6 +217,11 @@ class MapChangeTypeAdapterTest extends Specification {
                         entity "org.javers.core.model.SnapshotEntity"
                         cdoId 1
                     }
+                    commitMetadata {
+                        author "kazik"
+                        commitDate "2001-12-01T22:23:03"
+                        id "1.0"
+                    }
                     property "mapOfPrimitives"
                     entryChanges ([
                             {
@@ -238,6 +250,9 @@ class MapChangeTypeAdapterTest extends Specification {
 
         then:
         change.affectedCdoId == instanceId(1,SnapshotEntity)
+        change.commitMetadata.get().author == "kazik"
+        change.commitMetadata.get().id == "1.0"
+        change.commitMetadata.get().commitDate == new LocalDateTime("2001-12-01T22:23:03")
         change.property.name == "mapOfPrimitives"
         MapChangeAssert.assertThat(change)
                        .hasEntryAdded("some1",1)
@@ -256,7 +271,6 @@ class MapChangeTypeAdapterTest extends Specification {
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        //println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)

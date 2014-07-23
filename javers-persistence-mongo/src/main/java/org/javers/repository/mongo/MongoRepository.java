@@ -24,10 +24,11 @@ import java.util.List;
  * @author pawel szymczyk
  */
 public class MongoRepository implements JaversRepository {
+
     private static final int DESC = -1;
     private static final int ASC = 1;
     public static final String SNAPSHOTS = "jv_snapshots";
-    public static final String COMMIT_ID = "commitId";
+    public static final String COMMIT_ID = "commitMetadata.id";
     public static final String GLOBAL_ID_KEY = "globalId_key";
 
 
@@ -44,7 +45,7 @@ public class MongoRepository implements JaversRepository {
     }
 
     public MongoRepository(DB mongo, JsonConverter jsonConverter) {
-        this(mongo);
+        this.mongo = mongo;
         this.jsonConverter = jsonConverter;
     }
 
@@ -131,6 +132,7 @@ public class MongoRepository implements JaversRepository {
         DBObject dbObject = mongoLatest.iterator().next();
         return Optional.of(readFromDBObject(dbObject));
     }
+
 
     @Override
     public CommitId getHeadId() {

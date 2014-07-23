@@ -25,8 +25,6 @@ import static org.javers.common.collections.Objects.nullSafeEquals;
  * @author bartosz walacik
  */
 public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
-    private static final Logger logger = LoggerFactory.getLogger(MapChangeAppender.class);
-
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
 

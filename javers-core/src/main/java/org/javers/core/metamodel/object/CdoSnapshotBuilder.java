@@ -3,9 +3,9 @@ package org.javers.core.metamodel.object;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.validation.Validate;
-import org.javers.core.Javers;
-import org.javers.core.commit.CommitId;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
+import org.joda.time.LocalDateTime;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,15 +16,16 @@ import java.util.Map;
 public class CdoSnapshotBuilder {
     private final GlobalCdoId globalCdoId;
     private final Map<Property, Object> state = new HashMap<>();
-    private CommitId commitId;
+    private CommitMetadata commitMetadata;
 
-    private CdoSnapshotBuilder(GlobalCdoId globalCdoId) {
+    private CdoSnapshotBuilder(GlobalCdoId globalCdoId, CommitMetadata commitMetadata) {
         this.globalCdoId = globalCdoId;
+        this.commitMetadata = commitMetadata;
     }
 
-    public static CdoSnapshotBuilder cdoSnapshot(GlobalCdoId globalCdoId){
+    public static CdoSnapshotBuilder cdoSnapshot(GlobalCdoId globalCdoId, CommitMetadata commitMetadata){
         Validate.argumentIsNotNull(globalCdoId);
-        return new CdoSnapshotBuilder(globalCdoId);
+        return new CdoSnapshotBuilder(globalCdoId, commitMetadata);
     }
 
     public CdoSnapshotBuilder withPropertyValue(Property property, Object value){
@@ -42,17 +43,11 @@ public class CdoSnapshotBuilder {
     }
 
     public CdoSnapshot build(){
-        CdoSnapshot cdoSnapshot = new CdoSnapshot(globalCdoId, state);
-
-        if (commitId != null) {
-            cdoSnapshot.bindTo(commitId);
-        }
-
-        return cdoSnapshot;
+        return new CdoSnapshot(globalCdoId, commitMetadata, state);
     }
 
-    public CdoSnapshotBuilder withCommitId(CommitId commitId) {
-        this.commitId = commitId;
+    public CdoSnapshotBuilder withCommitMetadata(CommitMetadata commitMetadata) {
+        this.commitMetadata = commitMetadata;
         return this;
     }
 }

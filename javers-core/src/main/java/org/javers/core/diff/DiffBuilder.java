@@ -1,6 +1,8 @@
 package org.javers.core.diff;
 
+import org.javers.common.collections.Consumer;
 import org.javers.common.collections.Optional;
+import org.javers.core.commit.CommitMetadata;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,11 +18,11 @@ public class DiffBuilder {
     private DiffBuilder() {
     }
 
-    public static DiffBuilder diff(){
+    public static DiffBuilder diff() {
         return new DiffBuilder();
     }
 
-    public static Diff empty(){
+    public static Diff empty() {
         return new Diff(Collections.EMPTY_LIST);
     }
 
@@ -35,10 +37,18 @@ public class DiffBuilder {
         return this;
     }
 
-    public DiffBuilder addChanges(Collection<Change> changeSet) {
-        for (Change change : changeSet) {
+    public DiffBuilder addChanges(Collection<Change> changeSet, final Optional<CommitMetadata> commitMetadata) {
+
+        for (final Change change : changeSet) {
             addChange(change);
+            commitMetadata.ifPresent(new Consumer<CommitMetadata>() {
+                @Override
+                public void consume(CommitMetadata commitMetadata) {
+                    change.bindToCommit(commitMetadata);
+                }
+            });
         }
+
         return this;
     }
 
