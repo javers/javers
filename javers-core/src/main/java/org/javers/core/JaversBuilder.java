@@ -32,7 +32,7 @@ import java.util.Set;
 
 /**
  * Creates JaVers instance based on your domain model metadata and custom configuration.
- * <br/>
+ * <br>
  * Supports two configuring methods:
  * <ul>
  *     <li/>by properties file, see {TBA ...}
@@ -145,7 +145,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     /**
      * Registers {@link ValueType} and its custom JSON adapter.
-     * <p/>
+     * <br><br>
      *
      * Useful for not trivial ValueTypes when Gson's default representation isn't appropriate
      *
@@ -164,7 +164,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     /**
      * Registers {@link ValueType} and its custom native
      *  <a href="http://code.google.com/p/google-gson/">Gson</a> adapter.
-     * <p/>
+     * <br><br>
      *
      * Useful when you already have Gson {@link TypeAdapter}s implemented.
      *

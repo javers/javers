@@ -13,11 +13,12 @@ import org.javers.core.graph.ObjectGraphBuilder;
  * Many frameworks which deal with user domain model (aka data model) use some kind of <b>mapping</b>.
  * For example JPA uses annotations in order to map user classes into relational database.
  * Plenty of XML and JSON serializers uses various approaches to mapping, usually based on annotations.
- * <p/>
+ * <br><br>
+ *
  * When combined together, all of those framework-specific annotations could be a pain and
  * pollution in Your business domain code.
+ * <br><br>
  *
- * <p/>
  * Mapping is also a case in JaVers but don't worry:
  * <ul>
  *     <li>It's far more simple than JPA</li>
@@ -38,10 +39,12 @@ import org.javers.core.graph.ObjectGraphBuilder;
  * Domain Driven Design terminology (DDD).
  * Furthermore, we use <b>Values</b>, <b>Primitives</b> and <b>Containers</b>.
  * The last two types are internals and can't be mapped by user.
- * <p/>
+ * <br><br>
+ *
  * To make long story short, You as a user are asked to label your domain model classes as
  * Entities, Value Objects or Values.
- * <p/>
+ * <br><br>
+ *
  * Do achieve this, use {@link JaversBuilder} methods:
  * <ul>
  *     <li>{@link JaversBuilder#registerEntity(Class)}</li>
@@ -51,37 +54,44 @@ import org.javers.core.graph.ObjectGraphBuilder;
  *
  * <h3>Entity</h3>
  * JaVers {@link Entity} has exactly the same semantic like DDD Entity or JPA Entity.
- * <p/>
+ * <br><br>
+ *
  * Usually, each entity instance represents concrete physical object.
  * Entity has a list of mutable properties and its own identity hold in id property.
- * <p/>
+ * <br><br>
+ *
  * For example Entities are: Person, Company.
  *
  * <h3>Value Object</h3>
  * JaVers {@link ValueObject} is similar to DDD ValueObject and JPA Embeddable.
  * It's a complex value holder with a list of mutable properties but no unique identifier.
- * <p/>
+ * <br><br>
+ *
  * In strict DDD approach, Value Objects can't exists independently and have to be bound do Entity instances
  * (as a part of an Aggregate). Javers is not such radical and supports both embedded and dangling Value Objects.
- * <p/>
+ * <br><br>
+ *
  * For example Value Objects are: Address, Point
  *
  * <h3>Value</h3>
  * JaVers {@link ValueType} is a simple (scalar) value holder.
  * Two Values are compared using equals() so
  * its highly important to implement it properly by comparing underlying state.
- * <p/>
+ * <br><br>
+ *
  * For example Values are: BigDecimal, LocalDate
- * <p/>
+ * <br><br>
+ *
  * For Values it's advisable to customize JSON serialization by implementing Type Adapters, see {@link JsonConverter}.
  *
  * <h1>TypeMapper and type inferring policy</h1>
  * Javers use lazy approach to type mapping so types are resolved only for classes spotted in runtime.
- * <p/>
+ * <br><br>
+ *
  * To show You how it works, assume that Javers is calculating diff on two graphs of objects
  * and currently two Person.class instances are compared.
  * {@link ObjectGraphBuilder} asks {@link TypeMapper} about {@link JaversType} of Person.class.
- * <p/>
+ * <br><br>
  *
  * {@link TypeMapper} does the following
  * <ul>

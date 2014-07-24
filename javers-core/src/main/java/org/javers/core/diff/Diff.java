@@ -12,11 +12,11 @@ import java.util.Map;
 
 /**
  * Diff is a set of (atomic) changes between two graphs of objects.
- * <br/><br/>
+ * <br><br>
  *
  * Typically it is used to capture and trace changes made by user on his domain data.
  * In this case diff is done between previous and current state of a bunch of domain objects.
- * <br/><br/>
+ * <br><br>
  *
  * Diff holds following data:
  * <ul>

@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Entity class in client's domain model.
  * Has list of mutable properties and its own identity hold in idProperty.
- * <br/>
+ * <br>
  *
  * Example:
  * <pre>

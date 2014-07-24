@@ -21,9 +21,9 @@ import java.util.List;
 
 
 /**
- * Facade to JaVers instance.<br/>
+ * Facade to JaVers instance.<br>
  * Should be constructed by {@link JaversBuilder} provided with your domain specific configuration.
- * <br/><br/>
+ * <br><br>
  *
  * See {@link MappingDocumentation} to find out how to map your domain model
  *
@@ -57,11 +57,6 @@ public class Javers {
      * All changes made on versioned objects are recorded,
      * new objects become versioned and its initial state is recorded.
      * </p>
-     *
-     * For any versioned object, you can:
-     * <ul>
-     *     <li/>  TODO
-     * </ul>
      *
      * @param currentVersion domain object, instance of Entity or ValueObject.
      *        It should be root of an aggregate, tree root

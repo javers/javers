@@ -1,9 +1,9 @@
 package org.javers.core.commit;
 
 /**
- * Consists of two parts : <br/>
- * majorId = PREVIOUS.majorId + 1  <br/>
- * minorId = shortSequence <br/>
+ * Consists of two parts : <br>
+ * majorId = PREVIOUS.majorId + 1  <br>
+ * minorId = shortSequence <br>
  *
  * @see CommitSeqGenerator
  * @author bartosz walacik

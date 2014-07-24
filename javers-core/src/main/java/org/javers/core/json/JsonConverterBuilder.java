@@ -52,8 +52,8 @@ public class JsonConverterBuilder {
      * }
      * </pre>
      * TypeAlias is defaulted to value.class.simpleName.
-     * <p/>
-     * <p/>
+     * <br/>
+     * <br/>
      * Useful when serializing polymorfic collections like List or List&lt;Object&gt;
      *
      * @param typeSafeValues default false

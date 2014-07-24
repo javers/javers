@@ -5,7 +5,7 @@ import org.javers.common.collections.Primitives;
 
 /**
  * Immutable wrapper for client's Primitives, Values and Id's
- * <br/><br/>
+ * <br><br>
  *
  * TODO refine dehydrate approach
  * Value needs to be dehydrated before persisting. Dehydration is simply serialization to JSON.

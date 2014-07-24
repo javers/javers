@@ -6,7 +6,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * ValueObject global unique identifier.
- * <br/><br/>
+ * <br> <br>
  *
  * Since ValueObjects doesn't have public Id,
  * they are identified by <i>fragment path</i> in the context of owning Entity instance.

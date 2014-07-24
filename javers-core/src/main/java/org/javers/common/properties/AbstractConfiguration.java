@@ -34,7 +34,7 @@ public abstract class AbstractConfiguration {
     /**
      * Called after reading properties file,
      * override to read configuration from it.
-     * <br/>
+     * <br>
      * Should not override property to null if propertyKey is not found in file
      */
     protected abstract void assemble();

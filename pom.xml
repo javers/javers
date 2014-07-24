@@ -11,7 +11,7 @@
     <groupId>org.javers</groupId>
     <artifactId>javers-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.8.0</version>
 
     <name>JaVers - domain objects VCS - parent pom - ${project.version}</name>
     <description>Parent pom and reactor for all JaVers modules</description>
@@ -244,7 +244,6 @@
                 </executions>
             </plugin>
 
-            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -260,7 +259,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
 
             <!-- Mandatory plugin for using Spock -->
             <plugin>

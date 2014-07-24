@@ -6,7 +6,7 @@ import org.javers.common.patterns.visitors.Visitable;
 
 /**
  * Relation between (Entity) instances
- * <br/>
+ * <br>
  * Immutable
  *
  * @author bartosz walacik

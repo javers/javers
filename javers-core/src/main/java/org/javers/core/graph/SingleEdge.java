@@ -5,7 +5,7 @@ import org.javers.core.metamodel.property.Property;
 
 /**
  * OneToOne or ManyToOne relation
- * <br/>
+ * <br>
  * Immutable
  *
  * @author bartosz walacik

@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * JaVers repository is responsible for persisting diffs & commits calculated by javers core.
- * <br/><br/>
+ * <br><br>
  *
  * It deals with {@link Diff} <i>aggregate</i>
  * and {@link Change} <i>unwrap object</i>.

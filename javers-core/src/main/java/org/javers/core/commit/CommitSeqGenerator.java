@@ -3,7 +3,7 @@ package org.javers.core.commit;
 import org.javers.common.collections.Objects;
 
 /**
- * Generates unique and monotonically increasing commit identifiers. <br/>
+ * Generates unique and monotonically increasing commit identifiers. <br>
  * Thread safe
  *
  * @author bartosz walacik

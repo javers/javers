@@ -11,32 +11,32 @@ import java.util.List;
 /**
  * Javers is meant to support various persistence stores for
  * any kind of client's data, hence we use JSON format to serialize/deserialize client's domain objects.
- * <br/><br/>
+ * <br><br>
  *
  * Javers uses <a href='http://sites.google.com/site/gson/'>Gson</a>
  * library which provides neat and pretty JSON representation for well known Java types.
- * <br/><br/>
+ * <br><br>
  *
  * But sometimes Gson's default JSON representation isn't appropriate for your domain model.
  * This is often the case when dealing with Values like Date or Money.
- * <br/><br/>
+ * <br><br>
  *
  * If so, you can easily customize Javers serialization/deserialization behaviour
  * by providing plugins for each of your custom type.
  * Javers accepts several kind of plugins:
  * <ul>
- *     <li/> {@link BasicStringTypeAdapter} -
+ *     <li> {@link BasicStringTypeAdapter} -
  *           extend it if you need to represent unwrap as single String and don't want to deal with JSON API.
  *           For concrete class example see {@link LocalDateTimeTypeAdapter}.
- *     <li/> {@link JsonTypeAdapter} - use it if you need full control over JSON conversion
- *     <li/> native Gson {@link TypeAdapter}
- *     <li/> native Gson {@link JsonSerializer}
- *     <li/> native Gson {@link JsonDeserializer}
+ *     <li> {@link JsonTypeAdapter} - use it if you need full control over JSON conversion
+ *     <li> native Gson {@link TypeAdapter}
+ *     <li> native Gson {@link JsonSerializer}
+ *     <li> native Gson {@link JsonDeserializer}
  * </ul>
  *
  * Javers provides JsonTypeAdapter's for some well known Value like {@link LocalDateTime}.
  * Those adapters are included by default in Javers setup, see {@link JsonConverterBuilder#BUILT_IN_ADAPTERS}
- * <br/>
+ * <br>
  *
  * @author bartosz walacik
  */
