@@ -3,6 +3,7 @@ package org.javers.repository.api;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.json.JsonConverter;
@@ -11,11 +12,24 @@ import org.javers.core.metamodel.object.*;
 import java.util.List;
 
 /**
- * JaVers repository is responsible for persisting diffs & commits calculated by javers core.
+ * JaversRepository is responsible for persisting {@link Commit}s calculated by Javers core.
  * <br><br>
  *
- * It deals with {@link Diff} <i>aggregate</i>
- * and {@link Change} <i>unwrap object</i>.
+ * It should persist {@link CommitMetadata} and Snapshots,
+ * {@link Change}s should not be persisted as they are recalculated by Javers core as diff between relevant snapshots.
+ * <br><br>
+ *
+ *
+ * <h2>Hints for JaversRepository implementation</h2>
+ * <ul>
+ *    <li/>After persisting in database, Commit is considered immutable so it can not be updated.
+ *    <li/>Persisting Commit in any kind of database is easy. Javers provides flexible
+ *         JSON serialization/deserialization engine,
+ *         designed as abstraction layer between Java types and specific database types.
+ *    <li/>Essentially, object-oriented data are persisted as JSON.
+ *    <li/>Repository impl should leverage {@link JsonConverter}.
+ * </ul>
+ *
  *
  * @author bartosz walacik
  */

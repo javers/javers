@@ -5,6 +5,7 @@ import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.patterns.visitors.Visitable;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalCdoId;
 
@@ -15,18 +16,17 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
 /**
  * Change represents <b>atomic</b> difference between two objects.
  * <br><br>
- * <p/>
- * There are several change types: {@link ValueChange}, {@link org.javers.core.diff.changetype.ReferenceChange}, ...
+ *
+ * There are several change types: {@link ValueChange}, {@link ReferenceChange}, ...
  * For complete list see inheritance hierarchy.
  * <br><br>
- * <p/>
+ *
  * Change is a <i>Value Object</i> and typically can not exists without
- * owning {@link org.javers.core.diff.Diff}. For more information see {@link org.javers.core.diff.Diff} javadoc.
+ * owning {@link Diff}. For more information see {@link Diff} javadoc.
  *
  * @author bartosz walacik
  */
 public abstract class Change implements Visitable<ChangeVisitor> {
-    //private Diff parent;
 
     private Optional<CommitMetadata> commitMetadata;
     private final GlobalCdoId affectedCdoId;
@@ -49,7 +49,7 @@ public abstract class Change implements Visitable<ChangeVisitor> {
         argumentIsNotNull(commitMetadata);
 
         if (this.commitMetadata.isPresent()) {
-            throw new IllegalStateException("Change should be efectively immutable");
+            throw new IllegalStateException("Change should be effectively immutable");
         }
 
         this.commitMetadata = Optional.of(commitMetadata);
@@ -65,8 +65,8 @@ public abstract class Change implements Visitable<ChangeVisitor> {
     /**
      * Affected Cdo, depending on concrete Change type,
      * it could be new Object, removed Object or new version of changed Object
-     * <br>
-     * <p/>
+     * <br> <br>
+     *
      * <b>Transient</b> reference - available only for freshly generated diff
      *
      * @throws JaversException AFFECTED_CDO_IS_NOT_AVAILABLE

@@ -1,7 +1,9 @@
 package org.javers.core.commit;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
+import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalCdoId;
 import org.joda.time.LocalDateTime;
@@ -10,7 +12,20 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * JaVers commit is similar notion to <i>commit</i> in GIT or <i>revision</i> in SVN.
+ * JaVers commit is similar notion to GIT <i>commit</i> or SVN <i>revision</i>.
+ * It records <b>change</b> done by user on application data.
+ * <br><br>
+ *
+ * Commit can affect one or more domain objects ({@link Cdo}).
+ * <br><br>
+ *
+ * Commit holds following data:
+ * <ul>
+ *     <li>who did change the data - {@link CommitMetadata#getAuthor()} </li>
+ *     <li>when the change was made - {@link CommitMetadata#getCommitDate()} </li>
+ *     <li>list of atomic changes between two domain objects graphs - {@link #getChanges()}</li>
+ *     <li>list of Snapshots of <b>affected</b> objects - {@link #getSnapshots()}</li>
+ * </ul>
  *
  * @author bartosz walacik
  */
@@ -42,7 +57,7 @@ public final class Commit {
         return commitMetadata.getAuthor();
     }
 
-    public Diff getDiff() {
+    Diff getDiff() {
         return diff;
     }
 
@@ -55,6 +70,13 @@ public final class Commit {
      */
     public List<CdoSnapshot> getSnapshots() {
         return Collections.unmodifiableList(snapshots);
+    }
+
+    /**
+     * @return unmodifiableList
+     */
+    public List<Change> getChanges() {
+        return diff.getChanges();
     }
 
     @Override

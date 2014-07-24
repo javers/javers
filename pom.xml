@@ -47,6 +47,8 @@
         <groovy.version>2.1.7</groovy.version>
         <spock.version>0.7-groovy-2.0</spock.version>
         <gmaven.version>1.2</gmaven.version>
+
+        <additionalparam>-Xdoclint:none</additionalparam>
     </properties>
 
     <modules>

@@ -28,7 +28,7 @@ class JaversRepositoryIntegrationTest extends Specification {
         def cdo = new SnapshotEntity(id: 1, entityRef: ref)
         javers.commit("author",cdo) //v. 1
         ref.intProperty = 5
-        javers.commit("author",cdo) //v. 2
+        javers.commit("author2",cdo) //v. 2
 
         when:
         def snapshots = javers.getStateHistory(2, SnapshotEntity, 10)
@@ -41,12 +41,10 @@ class JaversRepositoryIntegrationTest extends Specification {
                 .hasSnapshot(cdoId, "2.0", [id:2, intProperty:5])
 
         snapshots[0].commitId == "2.0"
-        snapshots[0].commitMetadata.author == "author"
-        //TODO
+        snapshots[0].commitMetadata.author == "author2"
         snapshots[0].commitMetadata.commitDate
         snapshots[1].commitId == "1.0"
         snapshots[1].commitMetadata.author == "author"
-        //TODO
         snapshots[1].commitMetadata.commitDate
     }
 

@@ -38,6 +38,9 @@ class JaversSnapshotDifferIntegrationTest extends Specification {
         change.property.name == expectedChangedProperty
         change.left == expectedLeftValue
         change.right == expectedRightValue
+        change.commitMetadata.get().commitDate
+        change.commitMetadata.get().author == "some.login"
+        change.commitMetadata.get().id  == "2.0"
 
         where:
         oldCdo <<  [dummyUser("kaz").withAge(5).build(), dummyUser("kaz").withDetails(1)]
