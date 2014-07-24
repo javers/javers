@@ -49,10 +49,6 @@ public final class Commit {
         return commitMetadata.getId();
     }
 
-    public GlobalCdoId getGlobalCdoId() {
-        return snapshots.get(0).getGlobalId();
-    }
-
     public String getAuthor() {
         return commitMetadata.getAuthor();
     }
