@@ -20,7 +20,7 @@ class SetChangeAppenderTest extends AbstractDiffTest {
         def leftNode = buildGraph(dummyUser().withStringsSet(leftSet as Set).build())
         def rightNode = buildGraph(dummyUser().withStringsSet(rightSet as Set).build())
 
-        def change = new SetChangeAppender(javers.typeMapper).calculateChanges(
+        def change = setChangeAppender().calculateChanges(
                 new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "stringSet"))
 
         then:
@@ -43,7 +43,7 @@ class SetChangeAppenderTest extends AbstractDiffTest {
         def leftNode = buildGraph(dummyUser().withStringsSet(leftSet as Set).build())
         def rightNode = buildGraph(dummyUser().withStringsSet(rightSet as Set).build())
 
-        def change = new SetChangeAppender(javers.typeMapper).calculateChanges(
+        def change = setChangeAppender().calculateChanges(
                 new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "stringSet"))
 
         then:

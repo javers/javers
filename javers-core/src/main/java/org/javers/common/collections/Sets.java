@@ -6,6 +6,7 @@ import org.javers.common.validation.Validate;
 
 import static java.util.Collections.EMPTY_SET;
 import static java.util.Arrays.asList;
+import static org.javers.common.collections.Objects.nullSafeEquals;
 
 /**
  * @author Maciej Zasada
@@ -74,5 +75,24 @@ public class Sets {
             return EMPTY_SET;
         }
         return set;
+    }
+
+    /**
+     * @return index -> value
+     */
+    public static <T> Map<Integer, T> asMap(Set<T> input) {
+        if (input == null){
+            return null;
+        }
+
+        Map<Integer, T> result = new HashMap<>();
+        int i = 0;
+
+        for (T element : input) {
+            result.put(i, element);
+            i++;
+        }
+
+        return result;
     }
 }

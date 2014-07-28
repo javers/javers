@@ -4,6 +4,7 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.diff.appenders.ArrayChangeAppender
 import org.javers.core.diff.appenders.ListChangeAppender
 import org.javers.core.diff.appenders.MapChangeAppender
+import org.javers.core.diff.appenders.SetChangeAppender
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectNode
 import org.javers.core.metamodel.property.Entity
@@ -49,5 +50,9 @@ abstract class AbstractDiffTest extends Specification {
 
     ArrayChangeAppender arrayChangeAppender() {
         new ArrayChangeAppender(mapChangeAppender(), javers.typeMapper)
+    }
+
+    SetChangeAppender setChangeAppender() {
+        new SetChangeAppender(mapChangeAppender(), javers.typeMapper, javers.globalIdFactory)
     }
 }
