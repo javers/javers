@@ -167,9 +167,9 @@ public class TypeMapper {
         return result;
     }
 
-    public boolean isPrimitiveOrValue(Class clazz) {
+    public boolean isValue(Class clazz) {
         JaversType jType  = getJaversType(clazz);
-        return  jType instanceof PrimitiveOrValueType;
+        return  jType instanceof ValueType;
     }
 
     public Class getDehydratedType(Class expectedType){

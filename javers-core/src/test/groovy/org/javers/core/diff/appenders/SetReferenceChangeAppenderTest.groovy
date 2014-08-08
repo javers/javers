@@ -2,12 +2,14 @@ package org.javers.core.diff.appenders
 
 import org.javers.core.diff.AbstractDiffTest;
 import org.javers.core.model.SnapshotEntity
-import spock.lang.Ignore
-import spock.lang.Unroll;
 
 import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId;
 
 import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
+
+/**
+ * @author wioleta.gozdzik
+ */
 
 public class SetReferenceChangeAppenderTest extends AbstractDiffTest {
 
@@ -23,7 +25,7 @@ public class SetReferenceChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceAdded(1, instanceId(5, SnapshotEntity))
+                .hasReferenceAdded(instanceId(5, SnapshotEntity))
     }
 
     def "should append ReferenceRemoved in Set of Entities"() {
@@ -38,7 +40,7 @@ public class SetReferenceChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceRemoved(1, instanceId(5, SnapshotEntity))
+                .hasReferenceRemoved(instanceId(5, SnapshotEntity))
     }
 
     def "should NOT append ElementReferenceChange in Set of Entities"() {
