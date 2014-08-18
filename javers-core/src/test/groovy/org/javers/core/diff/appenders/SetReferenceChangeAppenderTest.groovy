@@ -13,7 +13,7 @@ import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
 
 public class SetReferenceChangeAppenderTest extends AbstractDiffTest {
 
-    def "should append ReferenceAdded in Set of Entities"() {
+    def "should append ValueAdded in Set of Entities"() {
         given:
         def leftCdo = new SnapshotEntity(id: 1, setOfEntities: [new SnapshotEntity(id: 2)])
         def rightCdo = new SnapshotEntity(id: 1, setOfEntities: [new SnapshotEntity(id: 2), new SnapshotEntity(id: 5)])
@@ -25,10 +25,10 @@ public class SetReferenceChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceAdded(instanceId(5, SnapshotEntity))
+                .hasValueAdded(instanceId(5, SnapshotEntity))
     }
 
-    def "should append ReferenceRemoved in Set of Entities"() {
+    def "should append ValueRemoved in Set of Entities"() {
         given:
         def leftCdo = new SnapshotEntity(id: 1, setOfEntities: [new SnapshotEntity(id: 2), new SnapshotEntity(id: 5)])
         def rightCdo = new SnapshotEntity(id: 1, setOfEntities: [new SnapshotEntity(id: 2)])
@@ -40,10 +40,10 @@ public class SetReferenceChangeAppenderTest extends AbstractDiffTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceRemoved(instanceId(5, SnapshotEntity))
+                .hasValueRemoved(instanceId(5, SnapshotEntity))
     }
 
-    def "should NOT append ElementReferenceChange in Set of Entities"() {
+    def "should NOT append ElementValueChange in Set of Entities"() {
         given:
         def leftCdo = new SnapshotEntity(id: 1, setOfEntities: [new SnapshotEntity(id: 2), new SnapshotEntity(id: 3)])
         def rightCdo = new SnapshotEntity(id: 1, setOfEntities: [new SnapshotEntity(id: 3), new SnapshotEntity(id: 2)])

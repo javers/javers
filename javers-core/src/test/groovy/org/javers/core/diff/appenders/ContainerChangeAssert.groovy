@@ -36,7 +36,7 @@ class ContainerChangeAssert {
         this
     }
 
-    ContainerChangeAssert hasReferenceAdded(def expectedId) {
+    ContainerChangeAssert hasValueAdded(def expectedId) {
         assert actual.changes.find{it instanceof ValueAdded && it.addedValue== expectedId}
         this
     }
@@ -46,7 +46,7 @@ class ContainerChangeAssert {
         this
     }
 
-    ContainerChangeAssert hasReferenceRemoved(def expectedId) {
+    ContainerChangeAssert hasValueRemoved(def expectedId) {
         assert actual.changes.find{it instanceof ValueRemoved && it.removedValue == expectedId}
         this
     }
