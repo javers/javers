@@ -3,7 +3,7 @@ package org.javers.core.diff.appenders
 import org.javers.core.diff.AbstractDiffTest;
 import org.javers.core.model.SnapshotEntity
 
-import static org.javers.core.metamodel.object.InstanceId.InstanceIdDTO.instanceId;
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;
 
 import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
 
