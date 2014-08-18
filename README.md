@@ -48,14 +48,13 @@ This is the niche JaVers fulfills. In JaVers, *version* and *change* are **first
 JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 
 ## Project team
-* Bartosz Walacik - owner, commiter
-* Paweł Szymczyk - committer
-* Michał Szostakowski - committer
+* Bartosz Walacik - owner, commiter - bartek@javers.org
+* Paweł Szymczyk - committer - pawel@javers.org
+* Wiola Goździk - committer - wiola@javers.org
+
 
 ### Former commiters
-* Pawel Cierpiatka - committer,
-* Piotr Betkier
-* Maciej Zasada
+* Pawel Cierpiatka - committer
 
 ## CI status
 [![Build Status](https://travis-ci.org/javers/javers.png?branch=master)](https://travis-ci.org/javers/javers)
