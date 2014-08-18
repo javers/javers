@@ -3,9 +3,11 @@ package org.javers.core.diff.appenders
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.RealNodePair
 import org.javers.core.model.DummyUser
+import org.javers.core.model.SnapshotEntity
+import org.joda.time.LocalDate
 import spock.lang.Unroll
 
-import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
@@ -55,4 +57,37 @@ class SetChangeAppenderTest extends AbstractDiffTest {
         ["1", "2"]     | ["1", "2"]
         ["1", "2"]     | ["2", "1"]
     }
+
+    def "should append ValueAdded in Set of Values"() {
+        given:
+        def leftCdo =  new SnapshotEntity(setOfDates: [new LocalDate(2001,1,1)])
+        def rightCdo = new SnapshotEntity(setOfDates: [new LocalDate(2001,5,5), new LocalDate(2001,1,1)])
+
+        when:
+        def change = setChangeAppender()
+                .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "setOfDates"))
+
+        then:
+        assertThat(change)
+                .hasSize(1)
+                .hasValueAdded(new LocalDate(2001,5,5))
+
+    }
+
+    def "should append ValueRemoved in Set of Values"() {
+        given:
+        def leftCdo =  new SnapshotEntity(setOfDates: [new LocalDate(2001,5,5), new LocalDate(2001,1,1)])
+        def rightCdo = new SnapshotEntity(setOfDates: [new LocalDate(2001,1,1)])
+
+        when:
+        def change = setChangeAppender()
+                .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "setOfDates"))
+
+        then:
+        assertThat(change)
+                .hasSize(1)
+                .hasValueRemoved(new LocalDate(2001,5,5))
+
+    }
+
 }

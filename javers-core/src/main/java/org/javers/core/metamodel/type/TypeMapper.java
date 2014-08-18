@@ -167,9 +167,9 @@ public class TypeMapper {
         return result;
     }
 
-    public boolean isValue(Class clazz) {
+    public boolean isValueObject(Class clazz) {
         JaversType jType  = getJaversType(clazz);
-        return  jType instanceof ValueType;
+        return  jType instanceof ValueObjectType;
     }
 
     public Class getDehydratedType(Class expectedType){

@@ -1,11 +1,11 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.diff.AbstractDiffTest;
+import org.javers.core.diff.AbstractDiffTest
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;
-
 import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
 /**
  * @author wioleta.gozdzik
@@ -51,6 +51,19 @@ public class SetReferenceChangeAppenderTest extends AbstractDiffTest {
         when:
         def change = setChangeAppender()
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "setOfEntities"))
+
+        then:
+        !change
+    }
+
+    def "should NOT support Set of ValueObjects"() {
+        given:
+        def leftCdo =  new SnapshotEntity(setOfValueObjects: [new DummyAddress("London")])
+        def rightCdo = new SnapshotEntity(setOfValueObjects: [new DummyAddress("Paris"), new DummyAddress("London")])
+
+        when:
+        def change = setChangeAppender()
+                .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "setOfValueObjects"))
 
         then:
         !change

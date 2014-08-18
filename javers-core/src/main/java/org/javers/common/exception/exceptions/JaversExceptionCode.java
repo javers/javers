@@ -32,7 +32,7 @@ public enum  JaversExceptionCode {
 
     SNAPSHOT_NOT_FOUND(RUNTIME_ERROR + "snapshot '%s' not found in JaversRepository"),
 
-    DIFF_NOT_IMPLEMENTED(RUNTIME_ERROR + "not implemented Enumerable content type '%s'"),
+    SET_OF_VO_DIFF_NOT_IMPLEMENTED(RUNTIME_ERROR + "diff for Set of ValueObjects is not supported"),
 
     GENERIC_TYPE_NOT_PARAMETRIZED(RUNTIME_ERROR + "expected actual Class arguments in type '%s'. Javers needs to know what kind of content is stored in your collections. Try at least <Object>"),
 

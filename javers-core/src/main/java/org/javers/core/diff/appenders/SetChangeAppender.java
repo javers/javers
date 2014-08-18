@@ -42,8 +42,9 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange> {
     public boolean isSupportedContainer(Property property) {
         ContainerType propertyType = typeMapper.getPropertyType(property);
 
-        if (typeMapper.isValue(propertyType.getItemClass())) {
-            logger.error(JaversExceptionCode.DIFF_NOT_IMPLEMENTED.getMessage() + " on " + property);
+        if (typeMapper.isValueObject(propertyType.getItemClass())) {
+            logger.error("could not diff " + property +", "+
+                         JaversExceptionCode.SET_OF_VO_DIFF_NOT_IMPLEMENTED.getMessage() );
             return false;
         }
         return true;
