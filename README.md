@@ -203,4 +203,154 @@ Output:
         Changed property: User.name
         Value before change: Johny
         Value after change: Charlie
+        
+##4. Persist Snapshots
+        
+###4.1 Create and register Javers MongoDB repository
+ 
+Firstly yo have to add dependency to javers-persistence-mongo module:
+ 
+maven:
+    <code><dependency>
+              <groupId>org.javers</groupId>
+              <artifactId>javers-persistence-mongo</artifactId>
+              <version>0.8.0</version>
+          </dependency></code>
+
+gradle: <code>compile 'org.javers:javers-persistence-mongo:0.8.0'</code>
+ 
+To create Javers MongoDB repository you have to provide implementation of 
+<a href="http://api.mongodb.org/java/2.0/com/mongodb/DB.html">com.mongodb.DB</a> abstract class. It's class from standard 
+<a href="http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-java-driver">Java MongoDB driver</a>:
+ 
+        import com.mongodb.DB;
+        import com.mongodb.MongoClient;
+        import org.javers.core.Javers;
+        import org.javers.core.JaversBuilder;
+        import java.net.UnknownHostException;
+ 
+        public static void main(String[] args) throws UnknownHostException {
+            MongoClient mongoClient = new MongoClient("localhost" , 27017);
+            DB db = mongoClient.getDB("myDb");
+                
+            MongoRepository mongoRepository = new MongoRepository(db);
+        
+            Javers javers = JaversBuilder.javers()
+                .registerJaversRepository(mongoRepository)
+                .build();
+        } 
+                   
+###4.2 Commit
+                   
+Now when you have registered Javers repository you can persist snapshots of your domain object entities in database. You don't have to 
+create any collections or indexes - Javers do it for you! Only thing you have to do it's provide Javers instance and call commit method 
+on it:
+
+        import org.javers.core.Javers;
+        import javax.persistence.Id;
+        import java.net.UnknownHostException;
+                    
+        public static void main(String[] args) throws UnknownHostException {
+                Javers javers; //provide javers with registered repository
+                String author = "Pawel";
+        
+                MyEntity myEntity = new MyEntity(1, "Some test value");
+        
+                //initial commit
+                javers.commit(author, myEntity);
+                
+                //change something and commit again
+                myEntity.setValue("Another test value");
+                javers.commit(author, myEntity);
+            }
+        
+            private static class MyEntity {
+        
+                @Id
+                private int id;
+                private String value;
+        
+                private MyEntity(int id, String value) {
+                    this.id = id;
+                    this.value = value;
+                }
+        
+                public void setValue(String value) {
+                    this.value = value;
+                }
+            } 
+            
+After run this code you can find two new collections in your database:
+####1) jv_head_id
+Contains last commit id. Javers use it to generate commit id value to snapshots. In our example this collection contains:
+            
+            {
+                "_id" : ObjectId("53f3b77a9386d3f1e3515849"),
+                "id" : "\"2.0\""
+            }
+            
+####2) jv_snapshots
+Contains commited snapshots. After run code from example you can find two objects in jv_snapshots collection: <br>
+<br>
+      1.
+                
+            {
+                "_id" : ObjectId("53f3b77a9386d3f1e3515848"),
+                "commitMetadata" : {
+                    "author" : "Pawel",
+                    "commitDate" : "2014-08-19T22:45:46",
+                    "id" : "1.0"
+                },
+                "globalCdoId" : {
+                    "entity" : "org.javers.repository.mongo.Test$MyEntity",
+                    "cdoId" : 1
+                },
+                "state" : {
+                    "value" : "Some test value",
+                    "id" : 1
+                },
+                "globalId_key" : "org.javers.repository.mongo.Test$MyEntity/1"
+            }
+            
+Snapshot contains four sections:
+<ul>
+    <li>Commit metadata - contains all information about commit - author, date, id</li>
+    <li>Global Client Domain Object Id - contains business id and object class</li>
+    <li>State - contains map of all persisted object properties as keys and properties values as values</li>
+    <li>globalId_key - ??? </li>
+</ul>           
+<br>   
+        2.        
+    
+             {
+                 "_id" : ObjectId("53f3b77a9386d3f1e351584a"),
+                 "commitMetadata" : {
+                     "author" : "Pawel",
+                     "commitDate" : "2014-08-19T22:45:46",
+                     "id" : "2.0"
+                 },
+                 "globalCdoId" : {
+                     "entity" : "org.javers.repository.mongo.Test$MyEntity",
+                     "cdoId" : 1
+                 },
+                 "state" : {
+                     "value" : "Another test value",
+                     "id" : 1
+                 },
+                 "globalId_key" : "org.javers.repository.mongo.Test$MyEntity/1"
+             }
+
+Second object contains object state after second commit. You can see that <code>globalCdoId</code> is the same but 
+<code>commitMetadata.commitDate</code>, <code>commitMetadata.id</code>, and <code>state</code> has been changed.             
+
+            
+            
+                                                     
+                                                     
+
+
+            
+            
+        
+        
 
