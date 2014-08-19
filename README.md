@@ -58,3 +58,149 @@ JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 
 ## CI status
 [![Build Status](https://travis-ci.org/javers/javers.png?branch=master)](https://travis-ci.org/javers/javers)
+
+#How to start
+
+##1. Add javers-core to your dependencies
+
+maven: 
+        <code><dependency>
+            <groupId>org.javers</groupId>
+            <artifactId>javers-parent</artifactId>
+            <version>0.8.0</version>
+        </dependency></code>
+
+gradle: 
+        <code>compile 'org.javers:javers-parent:0.8.0'</code>
+
+##2. Create Javers instance:
+
+    import org.javers.core.Javers;
+    import org.javers.core.JaversBuilder;
+
+    Javers javers = JaversBuilder.javers().build();
+
+###2.1. Choose mapping style:
+Mapping style is property that defining access strategies for accessing entity values. If mapping style is set to BEAN then entity values 
+will be get from getters. With mapping style BEAN you have to put <code>@Id</code> annotation under the getId() method:
+
+    import org.javers.core.MappingStyle;
+    ...
+
+    Javers javers = JaversBuilder
+                .javers()
+                .withMappingStyle(MappingStyle.FIELD)
+                .build();
+
+      @Id
+      public void getId() {
+        ...
+      }
+
+Property access modificator is not important, it can be private ;)
+
+If you choose mapping style FIELD, entity values will be get directly from property, javers use reflection mechanism to do this. Similary to 
+BEAN property <code>@Id</code> annotation has to be set under the id property:
+
+      @Id
+      private String id
+
+Property access modificator is not important. 
+
+<code>MappingStyle.BEAN</code> is used by default.
+
+##3. Find diff betwen two graphs of objects
+
+###3.1. Compare Entities
+
+To find diff between two entities you don't have to register entity class in Javers building process. In 1.0 version was developed 
+automatically discover type of object. If Javers find @Id annotation in proper place then it will be recognize as Entity, in other way it 
+will be recognized as ValueObject.
+
+The object has to be the same class and has to be object of custom class (you can't compare standart java objects)
+
+    private static class User {
+
+        @Id
+        private int id;
+        private String name;
+
+        public User(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    public static void main(String[] args) {
+        Javers javers = JaversBuilder
+                            .javers()
+                            .registerEntities(User.class)
+                            .build();
+
+        User johny = new User(25, "Johny");
+        User tommy = new User(25, "Tommy");
+
+        Diff diff = javers.compare(johny, tommy);
+        List<Change> changes = diff.getChanges();
+        ValueChange change = (ValueChange) changes.get(0);
+
+        System.out.println("Changes size: " + changes.size());
+        System.out.println("Entity id: " + change.getAffectedCdoId().getCdoId());
+        System.out.println("Property changed: "  + change.getProperty());
+        System.out.println("Property value before changed: " + change.getLeft());
+        System.out.println("Property value after changed: "  + change.getRight());
+    }
+
+Output of running this program is:
+
+        Changes size: 1
+        Entity id: 25
+        Property: User.name
+        Property value before change: Johny
+        Property value after change: Tommy
+
+###3.2. Compare Value Object
+
+If you don't put @Id annotation in the class definition Javers recognize object as Value Object. Javers compare property by propert and 
+returns ValueObject changes:
+
+     public static void main(String[] args) {
+        Javers javers = JaversBuilder
+                            .javers()
+                            .build();
+
+        User johny = new User(25, "Johny");
+        User tommy = new User(26, "Charlie");
+
+        Diff diff = javers.compare(johny, tommy);
+        List<Change> changes = diff.getChanges();
+        ValueChange change1 = (ValueChange) changes.get(0);
+        ValueChange change2 = (ValueChange) changes.get(1);
+
+        System.out.println("Changes size: " + changes.size());
+        System.out.println("Changed property: " + change1.getProperty());
+        System.out.println("Value before change: " + change1.getLeft());
+        System.out.println("Value after change: " + change1.getRight());
+        System.out.println("Changed property: " + change2.getProperty());
+        System.out.println("Value before change: " + change2.getLeft());
+        System.out.println("Value after change: " + change2.getRight());
+    }
+
+Output:
+
+        Changes size: 2
+        Changed property: User.id
+        Value before change: 25
+        Value after change: 26
+        Changed property: User.name
+        Value before change: Johny
+        Value after change: Charlie
+
