@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Captured state of client's domain object.
  * Values and primitives are stored 'by value',
- * Referenced Entities and ValueObjects are stored 'by reference' using {@link GlobalCdoId}
+ * Referenced Entities and ValueObjects are stored 'by reference' using {@link GlobalId}
  *
  * @author bartosz walacik
  */
@@ -25,7 +25,7 @@ public final class CdoSnapshot extends Cdo {
     /**
      * should be assembled by {@link CdoSnapshotBuilder}
      */
-    CdoSnapshot(GlobalCdoId globalId, CommitMetadata commitMetadata, Map<Property, Object> state) {
+    CdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata, Map<Property, Object> state) {
         super(globalId);
         Validate.argumentsAreNotNull(state, commitMetadata);
         this.state = state;

@@ -1,6 +1,6 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
 /**
@@ -9,21 +9,21 @@ import org.javers.core.metamodel.property.Property;
  * @author bartosz walacik
  */
 public class ReferenceChange extends PropertyChange {
-    private final GlobalCdoId left;
-    private final GlobalCdoId right;
+    private final GlobalId left;
+    private final GlobalId right;
 
-    public ReferenceChange(GlobalCdoId affectedCdoId, Property property, GlobalCdoId leftReference,
-                           GlobalCdoId rightReference) {
+    public ReferenceChange(GlobalId affectedCdoId, Property property, GlobalId leftReference,
+                           GlobalId rightReference) {
         super(affectedCdoId, property);
         this.left = leftReference;
         this.right = rightReference;
     }
 
-    public GlobalCdoId getLeft() {
+    public GlobalId getLeft() {
         return left;
     }
 
-    public GlobalCdoId getRight() {
+    public GlobalId getRight() {
         return right;
     }
 }

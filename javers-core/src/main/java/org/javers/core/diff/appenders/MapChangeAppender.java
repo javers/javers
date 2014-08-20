@@ -45,11 +45,11 @@ public class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
         Map rightRawMap = (Map)pair.getRightPropertyValue(property);
 
         MapType mapType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new OwnerContext(pair.getGlobalCdoId(), property.getName());
+        OwnerContext owner = new OwnerContext(pair.getGlobalId(), property.getName());
         List<EntryChange> changes = calculateEntryChanges(mapType, leftRawMap, rightRawMap, owner);
 
         if (!changes.isEmpty()){
-            return new MapChange(pair.getGlobalCdoId(), property, changes);
+            return new MapChange(pair.getGlobalId(), property, changes);
         }
         else {
             return null;

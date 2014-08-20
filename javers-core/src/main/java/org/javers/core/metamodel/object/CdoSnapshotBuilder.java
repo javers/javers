@@ -5,7 +5,6 @@ import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
-import org.joda.time.LocalDateTime;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,18 +13,18 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class CdoSnapshotBuilder {
-    private final GlobalCdoId globalCdoId;
+    private final GlobalId globalId;
     private final Map<Property, Object> state = new HashMap<>();
     private CommitMetadata commitMetadata;
 
-    private CdoSnapshotBuilder(GlobalCdoId globalCdoId, CommitMetadata commitMetadata) {
-        this.globalCdoId = globalCdoId;
+    private CdoSnapshotBuilder(GlobalId globalId, CommitMetadata commitMetadata) {
+        this.globalId = globalId;
         this.commitMetadata = commitMetadata;
     }
 
-    public static CdoSnapshotBuilder cdoSnapshot(GlobalCdoId globalCdoId, CommitMetadata commitMetadata){
-        Validate.argumentIsNotNull(globalCdoId);
-        return new CdoSnapshotBuilder(globalCdoId, commitMetadata);
+    public static CdoSnapshotBuilder cdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata){
+        Validate.argumentIsNotNull(globalId);
+        return new CdoSnapshotBuilder(globalId, commitMetadata);
     }
 
     public CdoSnapshotBuilder withPropertyValue(Property property, Object value){
@@ -43,7 +42,7 @@ public class CdoSnapshotBuilder {
     }
 
     public CdoSnapshot build(){
-        return new CdoSnapshot(globalCdoId, commitMetadata, state);
+        return new CdoSnapshot(globalId, commitMetadata, state);
     }
 
     public CdoSnapshotBuilder withCommitMetadata(CommitMetadata commitMetadata) {

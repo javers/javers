@@ -30,8 +30,8 @@ class ObjectRemovedTypeAdapterTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.changeType == "ObjectRemoved"
-        json.globalCdoId.entity == "org.javers.core.model.DummyUser"
-        json.globalCdoId.cdoId == "kaz"
+        json.globalId.entity == "org.javers.core.model.DummyUser"
+        json.globalId.cdoId == "kaz"
     }
 
     def "should deserialize ObjectRemoved"() {
@@ -40,7 +40,7 @@ class ObjectRemovedTypeAdapterTest extends Specification {
         def json = new JsonBuilder()
         json {
             changeType "ObjectRemoved"
-            globalCdoId {
+            globalId {
                 entity "org.javers.core.model.DummyUser"
                 cdoId  "kaz"
             }

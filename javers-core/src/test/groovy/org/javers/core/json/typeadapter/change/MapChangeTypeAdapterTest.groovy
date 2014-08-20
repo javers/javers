@@ -100,7 +100,7 @@ class MapChangeTypeAdapterTest extends Specification {
             def json = new JsonBuilder()
             json{
                         changeType "MapChange"
-                        globalCdoId {
+                        globalId {
                             entity "org.javers.core.model.SnapshotEntity"
                             cdoId 1
                         }
@@ -165,7 +165,7 @@ class MapChangeTypeAdapterTest extends Specification {
             def json = new JsonBuilder()
             json  {
                         changeType "MapChange"
-                        globalCdoId {
+                        globalId {
                             entity "org.javers.core.model.SnapshotEntity"
                             cdoId 1
                         }
@@ -213,7 +213,7 @@ class MapChangeTypeAdapterTest extends Specification {
         json
                 {
                     changeType "MapChange"
-                    globalCdoId {
+                    globalId {
                         entity "org.javers.core.model.SnapshotEntity"
                         cdoId 1
                     }
@@ -276,7 +276,7 @@ class MapChangeTypeAdapterTest extends Specification {
         def json = new JsonSlurper().parseText(jsonText)
         json.property == "valueMap"
         json.changeType == "MapChange"
-        json.globalCdoId
+        json.globalId
         json.entryChanges.size() == 3
         with(json.entryChanges[0]){
             entryChangeType == "EntryAdded"

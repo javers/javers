@@ -7,7 +7,7 @@ import org.javers.common.patterns.visitors.Visitable;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -29,17 +29,17 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
 public abstract class Change implements Visitable<ChangeVisitor> {
 
     private Optional<CommitMetadata> commitMetadata;
-    private final GlobalCdoId affectedCdoId;
+    private final GlobalId affectedCdoId;
 
     private transient Optional<Object> affectedCdo;
 
-    protected Change(GlobalCdoId affectedCdoId) {
+    protected Change(GlobalId affectedCdoId) {
         argumentsAreNotNull(affectedCdoId);
         this.affectedCdoId = affectedCdoId;
         this.commitMetadata = Optional.empty();
     }
 
-    protected Change(GlobalCdoId affectedCdoId, CommitMetadata commitMetadata) {
+    protected Change(GlobalId affectedCdoId, CommitMetadata commitMetadata) {
         argumentsAreNotNull(affectedCdoId, commitMetadata);
         this.affectedCdoId = affectedCdoId;
         this.commitMetadata = Optional.of(commitMetadata);
@@ -58,7 +58,7 @@ public abstract class Change implements Visitable<ChangeVisitor> {
     /**
      * Affected Cdo Id
      */
-    public GlobalCdoId getAffectedCdoId() {
+    public GlobalId getAffectedCdoId() {
         return affectedCdoId;
     }
 

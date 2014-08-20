@@ -22,7 +22,7 @@ import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.typeadapter.CdoSnapshotTypeAdapter;
 import org.javers.core.json.typeadapter.CommitIdTypeAdapter;
-import org.javers.core.json.typeadapter.GlobalCdoIdTypeAdapter;
+import org.javers.core.json.typeadapter.GlobalIdTypeAdapter;
 import org.javers.core.json.typeadapter.InstanceIdDTOTypeAdapter;
 import org.javers.core.json.typeadapter.change.ArrayChangeTypeAdapter;
 import org.javers.core.json.typeadapter.change.ListChangeTypeAdapter;
@@ -71,7 +71,7 @@ public class CoreJaversModule implements JaversModule {
             GlobalIdFactory.class,
             GraphFactory.class,
             CommitSeqGenerator.class,
-            GlobalCdoIdTypeAdapter.class,
+            GlobalIdTypeAdapter.class,
             InstanceIdDTOTypeAdapter.class,
             MapChangeTypeAdapter.class,
             ArrayChangeTypeAdapter.class,

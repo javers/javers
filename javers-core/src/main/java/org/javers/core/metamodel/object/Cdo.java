@@ -16,19 +16,19 @@ import static org.javers.common.exception.exceptions.JaversExceptionCode.PROPERT
  * @author bartosz walacik
  */
 public abstract class Cdo {
-    private final GlobalCdoId globalId;
+    private final GlobalId globalId;
 
-    protected Cdo(GlobalCdoId globalId) {
+    protected Cdo(GlobalId globalId) {
         Validate.argumentIsNotNull(globalId);
         this.globalId = globalId;
     }
 
-    public GlobalCdoId getGlobalId() {
+    public GlobalId getGlobalId() {
         return globalId;
     }
 
     /**
-     * shortcut to {@link GlobalCdoId#getCdoClass()}
+     * shortcut to {@link GlobalId#getCdoClass()}
      */
     public ManagedClass getManagedClass() {
         return globalId.getCdoClass();

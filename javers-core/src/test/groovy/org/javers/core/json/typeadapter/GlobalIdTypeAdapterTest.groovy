@@ -2,7 +2,7 @@ package org.javers.core.json.typeadapter
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import org.javers.core.metamodel.object.GlobalCdoId
+import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
@@ -19,10 +19,10 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 /**
  * @author bartosz walacik
  */
-class GlobalCdoIdTypeAdapterTest extends Specification {
+class GlobalIdTypeAdapterTest extends Specification {
 
     def class IdHolder{
-        GlobalCdoId id
+        GlobalId id
     }
 
     @Unroll

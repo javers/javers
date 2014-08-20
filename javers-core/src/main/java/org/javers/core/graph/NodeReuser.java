@@ -30,10 +30,10 @@ class NodeReuser {
     }
 
     void saveForReuse(ObjectNode reference) {
-        if (reference.getGlobalCdoId() instanceof InstanceId){
+        if (reference.getGlobalId() instanceof InstanceId){
             entities++;
         }
-        if (reference.getGlobalCdoId() instanceof ValueObjectId){
+        if (reference.getGlobalId() instanceof ValueObjectId){
             valueObjects++;
         }
         reverseCdoIdMap.put(reverseCdoIdMapKey(reference.getCdo()), reference);

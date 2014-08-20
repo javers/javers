@@ -4,9 +4,9 @@ import org.javers.core.metamodel.property.Entity;
 import org.javers.core.metamodel.property.ManagedClass;
 
 /**
- * Client's domain object global ID
+ * Global ID of Client's domain object (CDO)
  */
-public abstract class GlobalCdoId {
+public abstract class GlobalId {
 
     /**
      * Class of client's domain object, preferably {@link Entity}
@@ -39,7 +39,7 @@ public abstract class GlobalCdoId {
         if (this == o) { return true; }
         if (o == null || this.getClass() != o.getClass() ) {return false;}
 
-        return value().equals(((GlobalCdoId)o).value());
+        return value().equals(((GlobalId) o).value());
     }
 
     public boolean equals(GlobalIdDTO o) {

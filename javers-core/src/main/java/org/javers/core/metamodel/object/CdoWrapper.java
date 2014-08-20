@@ -14,7 +14,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class CdoWrapper extends Cdo {
     private final Object wrappedCdo;
 
-    public CdoWrapper(Object wrappedCdo, GlobalCdoId globalId) {
+    public CdoWrapper(Object wrappedCdo, GlobalId globalId) {
         super(globalId);
         argumentsAreNotNull(wrappedCdo);
         argumentCheck(globalId.getCdoClass().isInstance(wrappedCdo), "wrappedCdo is not an instance of given managedClass");

@@ -28,7 +28,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
             def json = new JsonBuilder()
             json  {
                 changeType changeType_.simpleName
-                globalCdoId {
+                globalId {
                     entity "org.javers.core.model.SnapshotEntity"
                     cdoId 1
                 }
@@ -127,7 +127,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
             def json = new JsonSlurper().parseText(jsonText)
             json.property == propertyName
             json.changeType == changeType.simpleName
-            json.globalCdoId
+            json.globalId
             json.elementChanges.size() == 3
             with(json.elementChanges[0]){
                 elementChangeType == "ElementValueChange"
@@ -176,7 +176,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
             def json = new JsonSlurper().parseText(jsonText)
             json.property == propertyName
             json.changeType == changeType.simpleName
-            json.globalCdoId
+            json.globalId
             json.elementChanges.size() == 3
             with(json.elementChanges[0]){
                 elementChangeType == "ElementValueChange"
@@ -209,7 +209,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
         def json = new JsonBuilder()
         json  {
             changeType changeType_.simpleName
-            globalCdoId {
+            globalId {
                 entity "org.javers.core.model.SnapshotEntity"
                 cdoId 1
             }
@@ -291,7 +291,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
             def json = new JsonSlurper().parseText(jsonText)
             json.property == propertyName
             json.changeType == changeType.simpleName
-            json.globalCdoId
+            json.globalId
             json.elementChanges.size() == 3
             with(json.elementChanges[0]){
                 elementChangeType == "ElementValueChange"

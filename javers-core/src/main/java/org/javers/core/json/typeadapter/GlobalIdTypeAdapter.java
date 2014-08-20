@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public class GlobalCdoIdTypeAdapter implements JsonTypeAdapter<GlobalCdoId> {
+public class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
 
     private static final String ENTITY_FIELD = "entity";
     private static final String CDO_ID_FIELD = "cdoId";
@@ -25,13 +25,13 @@ public class GlobalCdoIdTypeAdapter implements JsonTypeAdapter<GlobalCdoId> {
     private final GlobalIdFactory globalIdFactory;
     private final TypeMapper typeMapper;
 
-    public GlobalCdoIdTypeAdapter(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
+    public GlobalIdTypeAdapter(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
         this.globalIdFactory = globalIdFactory;
         this.typeMapper = typeMapper;
     }
 
     @Override
-    public GlobalCdoId fromJson(JsonElement json, JsonDeserializationContext context) {
+    public GlobalId fromJson(JsonElement json, JsonDeserializationContext context) {
         JsonObject jsonObject = (JsonObject) json;
 
         if (jsonObject.get(ENTITY_FIELD) != null) {
@@ -68,27 +68,27 @@ public class GlobalCdoIdTypeAdapter implements JsonTypeAdapter<GlobalCdoId> {
     }
 
     @Override
-    public JsonElement toJson(GlobalCdoId globalCdoId, JsonSerializationContext context) {
-        if (globalCdoId == null) {
+    public JsonElement toJson(GlobalId globalId, JsonSerializationContext context) {
+        if (globalId == null) {
             return JsonNull.INSTANCE;
         }
         JsonObject jsonObject = new JsonObject();
 
         //managedClass
-        if (globalCdoId.getCdoClass() instanceof Entity) {
-            jsonObject.addProperty(ENTITY_FIELD, globalCdoId.getCdoClass().getName());
+        if (globalId.getCdoClass() instanceof Entity) {
+            jsonObject.addProperty(ENTITY_FIELD, globalId.getCdoClass().getName());
         } else {
-            jsonObject.addProperty(VALUE_OBJECT_FIELD, globalCdoId.getCdoClass().getName());
+            jsonObject.addProperty(VALUE_OBJECT_FIELD, globalId.getCdoClass().getName());
         }
 
         //cdoId
-        if (globalCdoId.getCdoId() != null) {
-            jsonObject.add(CDO_ID_FIELD, context.serialize(globalCdoId.getCdoId()));
+        if (globalId.getCdoId() != null) {
+            jsonObject.add(CDO_ID_FIELD, context.serialize(globalId.getCdoId()));
         }
 
         //owningId & fragment
-        if (globalCdoId instanceof ValueObjectId) {
-            ValueObjectId valueObjectId = (ValueObjectId) globalCdoId;
+        if (globalId instanceof ValueObjectId) {
+            ValueObjectId valueObjectId = (ValueObjectId) globalId;
 
             jsonObject.add(OWNER_ID_FIELD, context.serialize(valueObjectId.getOwnerId()));
             jsonObject.addProperty(FRAGMENT_FIELD, valueObjectId.getFragment());
@@ -99,7 +99,7 @@ public class GlobalCdoIdTypeAdapter implements JsonTypeAdapter<GlobalCdoId> {
 
     @Override
     public List<Class> getValueTypes() {
-        return (List) Lists.immutableListOf(GlobalCdoId.class,
+        return (List) Lists.immutableListOf(GlobalId.class,
                                             InstanceId.class,
                                             UnboundedValueObjectId.class,
                                             ValueObjectId.class);

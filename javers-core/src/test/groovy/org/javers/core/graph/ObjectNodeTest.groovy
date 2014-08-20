@@ -30,7 +30,7 @@ abstract class ObjectNodeTest extends Specification {
     }
 
     
-    def "should hold GlobalCdoId"() {
+    def "should hold GlobalId"() {
         given:
         DummyUser cdo = dummyUser().withName("Mad Kaz").build()
         Entity entity = managedClassFactory.createEntity(DummyUser)
@@ -39,7 +39,7 @@ abstract class ObjectNodeTest extends Specification {
         ObjectNode wrapper = new ObjectNode(cdo, entity)
 
         then:
-        wrapper.globalCdoId == InstanceId.createFromInstance(cdo, entity)
+        wrapper.globalId == InstanceId.createFromInstance(cdo, entity)
     }
     
     def "should hold Cdo reference"() {

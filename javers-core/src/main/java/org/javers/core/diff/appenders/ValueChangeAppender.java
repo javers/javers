@@ -29,6 +29,6 @@ public class ValueChangeAppender extends PropertyChangeAppender<ValueChange> {
             return null;
         }
 
-        return new ValueChange(pair.getGlobalCdoId(), property, leftValue, rightValue);
+        return new ValueChange(pair.getGlobalId(), property, leftValue, rightValue);
     }
 }

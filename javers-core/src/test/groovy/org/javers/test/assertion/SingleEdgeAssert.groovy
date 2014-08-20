@@ -17,7 +17,7 @@ class SingleEdgeAssert {
 
      SingleEdgeAssert refersToCdoWithId(Object expectedCdoId) {
         Assertions.assertThat(actual.getReference()).isNotNull()
-        Assertions.assertThat(actual.getReference().getGlobalCdoId().getCdoId())
+        Assertions.assertThat(actual.getReference().getGlobalId().getCdoId())
                 .isEqualTo(expectedCdoId)
         return this
     }

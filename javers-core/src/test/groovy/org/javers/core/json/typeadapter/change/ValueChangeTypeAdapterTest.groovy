@@ -35,7 +35,7 @@ class ValueChangeTypeAdapterTest extends Specification {
         def json = new JsonSlurper().parseText(jsonText)
         json.property == "flag"
         json.changeType == "ValueChange"
-        json.globalCdoId
+        json.globalId
         json.left == true
         json.right == false
     }
@@ -49,7 +49,7 @@ class ValueChangeTypeAdapterTest extends Specification {
                 changeType "ValueChange"
                 left null
                 right true
-                globalCdoId {
+                globalId {
                     entity "org.javers.core.model.DummyUser"
                     cdoId  "kaz"
                 }
@@ -90,7 +90,7 @@ class ValueChangeTypeAdapterTest extends Specification {
             changeType "ValueChange"
             left null
             right "2001-01-01"
-            globalCdoId {
+            globalId {
                 entity "org.javers.core.model.SnapshotEntity"
                 cdoId  1
             }

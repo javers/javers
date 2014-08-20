@@ -2,7 +2,7 @@ package org.javers.core.diff;
 
 import org.javers.common.collections.Defaults;
 import org.javers.core.graph.ObjectNode;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.List;
@@ -21,8 +21,8 @@ public class FakeNodePair implements NodePair {
     }
 
     @Override
-    public GlobalCdoId getGlobalCdoId() {
-        return right.getGlobalCdoId();
+    public GlobalId getGlobalId() {
+        return right.getGlobalId();
     }
 
     @Override
@@ -46,12 +46,12 @@ public class FakeNodePair implements NodePair {
     }
 
     @Override
-    public GlobalCdoId getRightGlobalCdoId(Property property) {
+    public GlobalId getRightGlobalId(Property property) {
          return right.getReference(property);
     }
 
     @Override
-    public GlobalCdoId getLeftGlobalCdoId(Property property) {
+    public GlobalId getLeftGlobalId(Property property) {
         return null;
     }
 

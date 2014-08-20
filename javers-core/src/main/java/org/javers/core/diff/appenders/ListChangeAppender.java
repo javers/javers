@@ -42,13 +42,13 @@ public class ListChangeAppender extends PropertyChangeAppender<ListChange> {
         List rightList = (List) pair.getRightPropertyValue(property);
 
         ListType listType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new OwnerContext(pair.getGlobalCdoId(), property.getName());
+        OwnerContext owner = new OwnerContext(pair.getGlobalId(), property.getName());
         List<EntryChange> entryChanges =
                 mapChangeAppender.calculateEntryChanges(new MapType(listType), Lists.asMap(leftList), Lists.asMap(rightList), owner);
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
-            return  new ListChange(pair.getGlobalCdoId(), property, elementChanges);
+            return  new ListChange(pair.getGlobalId(), property, elementChanges);
         }
         else {
             return null;

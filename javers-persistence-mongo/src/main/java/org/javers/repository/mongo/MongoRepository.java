@@ -11,7 +11,7 @@ import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdDTO;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.mongo.model.MongoHeadId;
@@ -82,7 +82,7 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit) {
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
         return getStateHistory(createIdQuery(globalId), limit);
     }
 
@@ -112,7 +112,7 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
-    public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
+    public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         return getLatest(createIdQuery(globalId));
     }
 
@@ -150,7 +150,7 @@ public class MongoRepository implements JaversRepository {
         this.jsonConverter = jsonConverter;
     }
 
-    private BasicDBObject createIdQuery(GlobalCdoId id) {
+    private BasicDBObject createIdQuery(GlobalId id) {
         return new BasicDBObject(GLOBAL_ID_KEY, id.value());
     }
 

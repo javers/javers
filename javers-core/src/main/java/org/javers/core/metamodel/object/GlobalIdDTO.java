@@ -13,5 +13,5 @@ public abstract class GlobalIdDTO {
         return "Dto("+value()+")";
     }
 
-    public abstract GlobalCdoId create(TypeMapper typeMapper);
+    public abstract GlobalId create(TypeMapper typeMapper);
 }

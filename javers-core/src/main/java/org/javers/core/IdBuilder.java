@@ -9,7 +9,7 @@ import org.javers.core.metamodel.object.*;
 public class IdBuilder {
     private final GlobalIdFactory globalIdFactory;
 
-    private GlobalCdoId owner;
+    private GlobalId owner;
 
     public IdBuilder(GlobalIdFactory globalIdFactory) {
         this.globalIdFactory = globalIdFactory;

@@ -3,8 +3,7 @@ package org.javers.core.metamodel.type;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
-import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.*;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
@@ -176,7 +175,7 @@ public class TypeMapper {
         JaversType expectedJaversType = getJaversType(expectedType);
 
         if (expectedJaversType instanceof ManagedType){
-            return GlobalCdoId.class;
+            return GlobalId.class;
         }
         else {
             return expectedType;

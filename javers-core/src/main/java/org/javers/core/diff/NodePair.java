@@ -1,7 +1,7 @@
 package org.javers.core.diff;
 
 import org.javers.core.graph.ObjectNode;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 public interface NodePair {
     boolean isNullOnBothSides(Property property);
 
-    GlobalCdoId getGlobalCdoId();
+    GlobalId getGlobalId();
 
     ObjectNode getRight();
 
@@ -19,7 +19,7 @@ public interface NodePair {
 
     Object getRightPropertyValue(Property property);
 
-    GlobalCdoId getRightGlobalCdoId(Property property);
+    GlobalId getRightGlobalId(Property property);
 
-    GlobalCdoId getLeftGlobalCdoId(Property property);
+    GlobalId getLeftGlobalId(Property property);
 }

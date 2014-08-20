@@ -39,8 +39,8 @@ class JaversSmartparamIntegrationTest extends Specification{
         def mapChange = json.changes[0]
 
         mapChange.changeType == "MapChange"
-        mapChange.globalCdoId.valueObject == "org.javers.core.model.DummyParameterEntry"
-        mapChange.globalCdoId.cdoId == "/"
+        mapChange.globalId.valueObject == "org.javers.core.model.DummyParameterEntry"
+        mapChange.globalId.cdoId == "/"
         mapChange.property == "levels"
         mapChange.entryChanges.size() == 5
         List sortedEntryChanges = mapChange.entryChanges.sort{it.key}
