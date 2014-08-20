@@ -1,6 +1,7 @@
 package org.javers.core.diff.appenders
 
 import org.javers.core.diff.FakeNodePair
+import org.javers.core.metamodel.object.InstanceIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserWithValues
 import org.javers.core.model.PrimitiveEntity
@@ -19,7 +20,6 @@ import org.javers.core.graph.ObjectNode
 
 import static org.javers.core.json.builder.EntityTestBuilder.entity
 import static org.javers.core.json.builder.EntityTestBuilder.valueObject
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
 import static DummyUserWithValues.dummyUserWithDate
@@ -193,7 +193,7 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
         then:
         assertThat(change)
-                  .hasValueObjectId(DummyAddress, instanceId(rightUser), "dummyAddress")
+                  .hasValueObjectId(DummyAddress, new InstanceIdDTO(DummyUserDetails,1), "dummyAddress")
                   .hasLeftValue("Washington Street")
                   .hasRightValue("Wall Street")
                   .hasProperty(street)
