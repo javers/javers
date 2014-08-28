@@ -1,11 +1,11 @@
-﻿
+﻿﻿
 ![JVlogo.png](JVlogo2.png)
 
 ## Abstract
-JaVers is a lightweight java library for **auditing** changes in your data.
+JaVers is a lightweight java library for **auditing** your object-oriented data.
 
 We all use Version Control Systems for source code,
-why not to use specialized framework to provide an audit trail of domain objects?
+why not to use specialized framework to provide for our application an audit trail of domain objects?
 
 ## Story
 
@@ -20,12 +20,29 @@ Java language nor in the mainstream databases (although NoSQL document databases
 
 This is the niche JaVers fulfills. In JaVers, *version* and *change* are **first class citizens**.
 
+## Vision
+  With JaVers 1.0 you would be able to perform following operations:
+
+* Commit changes performed on your objects graph with single commit() call.
+* Browse detailed diffs, scoped on object graph level,
+  to easily track changes of object field values as well as changes of relations between objects.
+* Browse *shadows* - historical versions of object graph loaded directly into your data model classes.
+
 ## Basic facts about JaVers
-* It's lightweight and versatile. We don't take any assumptions about your data model, bean container or underlying data storage.
-* Configuration is easy. Since we use JSON for objects serialization, we don't want you to provide detailed ORM-like mapping. JaVers needs to know only some high-level facts about your data model.
-* JaVers is meant to keep its data versioning records (snapshots) in application primary database alongside with main data.
-* We use some basic notions following Eric Evans DDD terminology like Entity or Value Objects, pretty much the same like JPA does. We believe that this is right way of describing data.
-* JaVers is written in Java7 it can be run on JDK 6 or higher.
+* It's lightweight and versatile. We don't take any assumptions about your data model, bean container or
+  underlying data storage.
+* Configuration is easy. Since we use JSON for objects serialization, we don't want you to
+  provide detailed ORM-like mapping.
+  JaVers needs to know only some high-level facts about your data model.
+* JaVers is meant to keep its versioning records (diffs and snapshots) in
+  application primary database alongside with main data.
+  Obviously there is no direct linking between these two data sets.
+* We use some basic notions following Eric Evans DDD terminology like *Entity* or *Value Objects*,
+  pretty much the same like JPA does. We believe that this is right way of describing data.
+
+## Core
+* The core functionality is calculating a diff between two graphs of objects.
+* TBA
 
 ## License
 JaVers is licensed under Apache License Version 2.0, see LICENSE file.
@@ -35,62 +52,37 @@ JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 * Paweł Szymczyk - committer - pawel@javers.org
 * Wiola Goździk - committer - wiola@javers.org
 
+
 ### Former commiters
 * Pawel Cierpiatka - committer
 
+## CI status
+[![Build Status](https://travis-ci.org/javers/javers.png?branch=master)](https://travis-ci.org/javers/javers)
+
 #How to start
 
-##1. Add javers-core to your project dependencies
-For maven: 
+##1. Add javers-core to your dependencies
 
-    <dependency>
-        <groupId>org.javers</groupId>
-        <artifactId>javers-core</artifactId>
-        <version>0.8.0</version>
-    </dependency>
+maven: 
+        <code><dependency>
+            <groupId>org.javers</groupId>
+            <artifactId>javers-parent</artifactId>
+            <version>0.8.0</version>
+        </dependency></code>
 
-For gradle: 
+gradle: 
+        <code>compile 'org.javers:javers-parent:0.8.0'</code>
 
-    compile 'org.javers:javers-core:0.8.0'
-    
-If you are going to use JaVers as object diff tool, this is only dependency you need.
-        
-##1. Add javers repository to your project dependencies
-If you are going to use JaVers as data audit framework, choose proper repository implementation.
-For example, if you are using MongoDb add:
-
-For maven: 
-
-    <dependency>
-        <groupId>org.javers</groupId>
-        <artifactId>javers-persistence-mongo</artifactId>
-        <version>0.8.0</version>
-    </dependency>
-
-For gradle: 
-
-    compile 'org.javers:javers-persistence-mongo:0.8.0'
-
-##2. Create JaVers instance:
-
-Use JaversBuilder to create JaVers instance:
+##2. Create Javers instance:
 
     import org.javers.core.Javers;
     import org.javers.core.JaversBuilder;
-    //...
+
     Javers javers = JaversBuilder.javers().build();
 
-Now, JaVers instance is up & ready, configured with reasonable defaults. 
-Good enough to start.
-
-Later on, you would probably need to refine the configuration, 
-introducing to JaVers some basic facts about your domain model.
-
-#3. Configuration
-
-##3.1. Choose mapping style
+###2.1. Choose mapping style:
 Mapping style is property that defining access strategies for accessing entity values. If mapping style is set to BEAN then entity values 
-will be get from getters. With mapping style BEAN you have to put <code>@Id</code> annotation under the getId() method:
+will be get from getters. With mapping style BEAN you have to put <code>@Id</code> annotation under the <code>getId()</code> method:
 
     import org.javers.core.MappingStyle;
     ...
@@ -107,8 +99,8 @@ will be get from getters. With mapping style BEAN you have to put <code>@Id</cod
 
 Property access modificator is not important, it can be private ;)
 
-If you choose mapping style FIELD, entity values will be get directly from property, javers use reflection mechanism to do this. Similary to 
-BEAN property <code>@Id</code> annotation has to be set under the id property:
+If you choose mapping style FIELD, entity values will be get directly from property, javers use reflection mechanism to do this. In 
+this case the <code>@Id</code> annotation has to be set under the id property:
 
       @Id
       private String id
@@ -117,34 +109,7 @@ Property access modificator is not important.
 
 <code>MappingStyle.BEAN</code> is used by default.
 
-##3.2 Domain model mapping
-  ...
-##3.3 Repository setup
-If you are going to use JaVers as data audit framework you are supposed to configure JaversRepository.
- 
-JaversRepository is simply a class which purpose is to store Javers Commits in your database,
-alongside with your domain data. 
-
-JaVers comes by default with in-memory repository implementation. It's perfect for testing but
-for production enviroment you will need something real.
-
-First, choose proper JaversRepository implementation.
-If you are using <code>MongoDB</code>, choose <code>org.javers.repository.mongo.MongoRepository</code>.
-(Support for <code>SQL</code> databases, is scheduled for releasing with JaVers 1.1)
- 
-The idea of configuring the JaversRepository is simple, 
-just provide working database connection. 
-
-For <code>MongoDB</code>:
-
-        Db database = ... //autowired or configured here,
-                          //preferably, use the same database connection as you are using for your main (domain) database 
-        MongoRepository mongoRepo =  new MongoRepository(database)
-        JaversBuilder.javers().registerJaversRepository(mongoRepo).build()
-
-
-
-##3. Find diff betwen two graphs of objects
+##3. Find diff between two graphs of objects
 
 ###3.1. Compare Entities
 
@@ -152,7 +117,7 @@ To find diff between two entities you don't have to register entity class in Jav
 automatically discover type of object. If Javers find @Id annotation in proper place then it will be recognize as Entity, in other way it 
 will be recognized as ValueObject.
 
-The object has to be the same class and has to be object of custom class (you can't compare standart java objects)
+The object has to be the same class and has to be object of custom class (you can't compare standard Java objects)
 
     private static class User {
 
@@ -204,8 +169,8 @@ Output of running this program is:
 
 ###3.2. Compare Value Object
 
-If you don't put @Id annotation in the class definition Javers recognize object as Value Object. Javers compare property by propert and 
-returns ValueObject changes:
+If you don't put @Id annotation in the class definition Javers recognize object as Value Object. Javers compare property by property and 
+returns <code>ValueObject</code> changes:
 
      public static void main(String[] args) {
         Javers javers = JaversBuilder
@@ -243,7 +208,7 @@ Output:
         
 ###4.1 Create and register Javers MongoDB repository
  
-Firstly yo have to add dependency to javers-persistence-mongo module:
+To persist your changes in database firstly you have to add dependency to javers-persistence-mongo module:
  
 maven:
     <code><dependency>
@@ -254,7 +219,7 @@ maven:
 
 gradle: <code>compile 'org.javers:javers-persistence-mongo:0.8.0'</code>
  
-To create Javers MongoDB repository you have to provide implementation of 
+Next you have to create Javers MongoDB repository. To do this you have to provide implementation of 
 <a href="http://api.mongodb.org/java/2.0/com/mongodb/DB.html">com.mongodb.DB</a> abstract class. It's class from standard 
 <a href="http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-java-driver">Java MongoDB driver</a>:
  
@@ -316,8 +281,9 @@ on it:
             } 
             
 After run this code you can find two new collections in your database:
+
 ####1) jv_head_id
-Contains last commit id. Javers use it to generate commit id value to snapshots. In our example this collection contains:
+The <code>jv_head_id</code> collection contains last commit id. Javers use it to generate commit id value to snapshots. In our example this collection contains:
             
             {
                 "_id" : ObjectId("53f3b77a9386d3f1e3515849"),
@@ -325,7 +291,7 @@ Contains last commit id. Javers use it to generate commit id value to snapshots.
             }
             
 ####2) jv_snapshots
-Contains commited snapshots. After run code from example you can find two objects in jv_snapshots collection: <br>
+The <code>jv_snapshots</code> contains commited snapshots. After run code from example you can find two objects in jv_snapshots collection: <br>
 <br>
       1.
                 
@@ -376,17 +342,115 @@ Snapshot contains four sections:
              }
 
 Second object contains object state after second commit. You can see that <code>globalCdoId</code> is the same but 
-<code>commitMetadata.commitDate</code>, <code>commitMetadata.id</code>, and <code>state</code> has been changed.             
+<code>commitMetadata.commitDate</code>, <code>commitMetadata.id</code>, and <code>state</code> has been changed.
+             
+### 4.3 Read snapshots history
 
-            
-            
-## CI status
-[![Build Status](https://travis-ci.org/javers/javers.png?branch=master)](https://travis-ci.org/javers/javers)                                                     
-                                                     
-
-
-            
-            
+After taking some commits you can read persisted snapshots from repository. 
+To read snapshots you have to provide:
+    <ul>
+        <li>entity id</li>
+        <li>entity class</li>
+        <li>maximum number of snapshots to download</li>
+    </ul>    
+    
+Javers read snapshots in reverse chronological order, so for example if you set limit to 10 Javers returns 10 newest snapshots.
         
-        
+        public static void main(String[] args) {
+            Javers javers = JaversBuilder.javers().build();
+            MyEntity entity = new MyEntity(1, "some value");
+            javers.commit("author", entity);
+            entity.setValue("another value");
+            javers.commit("author", entity);
 
+            //get state history
+            List<CdoSnapshot> stateHistory = javers.getStateHistory(1, MyEntity.class, 100);
+            System.out.println("Snapshots count: " + stateHistory.size());
+
+            //snapshot after initial commit
+            CdoSnapshot v1 = stateHistory.get(1);
+            System.out.println("Property value after first commit: " + v1.getPropertyValue("value"));
+
+            //second snapshot
+            CdoSnapshot v2 = stateHistory.get(0);
+            System.out.println("Property value after second commit: " + v2.getPropertyValue("value"));
+        }
+
+    private static class MyEntity {
+
+        @Id
+        private int id;
+        private String value;
+
+        private MyEntity(int id, String value) {
+            this.id = id;
+            this.value = value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+    }
+    
+output:
+    
+    Changes count: 2
+    Property value after first commit: some value
+    Property value after second commit: another value
+    
+### 4.3 Read changes history 
+     
+If you want to read changes of given entity Javers can calculate diffs from persisted snapshots.
+To read changes you have to provide:
+     <ul>
+         <li>entity id</li>
+         <li>entity class</li>
+         <li>maximum number of snapshots to download</li>
+     </ul>    
+Javers read changes in reverse chronological order, so for example if you set limit to 10 Javers returns 10 newest changes.
+
+    public static void main(String[] args) {
+            Javers javers = JaversBuilder.javers().build();
+            MyEntity entity = new MyEntity(1, "some value");
+
+            //initial commit
+            javers.commit("author", entity);
+
+            //some change
+            entity.setValue("another value");
+
+            //commit after change
+            javers.commit("author", entity);
+
+            //get state history
+            List<Change> stateHistory = javers.getChangeHistory(1, MyEntity.class, 100);
+            System.out.println("Changes count: " + stateHistory.size());
+
+            //snapshot after initial commit
+            ValueChange change = (ValueChange) stateHistory.get(0);
+            System.out.println("Property value before change: " + change.getLeft());
+            System.out.println("Property value after change: " + change.getRight());
+        }
+
+
+        private static class MyEntity {
+
+            @Id
+            private int id;
+            private String value;
+
+            private MyEntity(int id, String value) {
+                this.id = id;
+                this.value = value;
+            }
+
+            public void setValue(String value) {
+                this.value = value;
+            }
+        }
+        
+output:
+
+        Changes count: 1
+        Property value before change: some value
+        Property value after change: another value
