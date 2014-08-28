@@ -2,10 +2,10 @@
 ![JVlogo.png](JVlogo2.png)
 
 ## Abstract
-JaVers is a lightweight java library for **auditing** your object-oriented data.
+JaVers is a lightweight java library for **auditing** changes in your data.
 
 We all use Version Control Systems for source code,
-why not to use specialized framework to provide for our application an audit trail of domain objects?
+why not to use specialized framework to provide an audit trail of domain objects?
 
 ## Story
 
@@ -20,29 +20,12 @@ Java language nor in the mainstream databases (although NoSQL document databases
 
 This is the niche JaVers fulfills. In JaVers, *version* and *change* are **first class citizens**.
 
-## Vision
-  With JaVers 1.0 you would be able to perform following operations:
-
-* Commit changes performed on your objects graph with single commit() call.
-* Browse detailed diffs, scoped on object graph level,
-  to easily track changes of object field values as well as changes of relations between objects.
-* Browse *shadows* - historical versions of object graph loaded directly into your data model classes.
-
 ## Basic facts about JaVers
-* It's lightweight and versatile. We don't take any assumptions about your data model, bean container or
-  underlying data storage.
-* Configuration is easy. Since we use JSON for objects serialization, we don't want you to
-  provide detailed ORM-like mapping.
-  JaVers needs to know only some high-level facts about your data model.
-* JaVers is meant to keep its versioning records (diffs and snapshots) in
-  application primary database alongside with main data.
-  Obviously there is no direct linking between these two data sets.
-* We use some basic notions following Eric Evans DDD terminology like *Entity* or *Value Objects*,
-  pretty much the same like JPA does. We believe that this is right way of describing data.
-
-## Core
-* The core functionality is calculating a diff between two graphs of objects.
-* TBA
+* It's lightweight and versatile. We don't take any assumptions about your data model, bean container or underlying data storage.
+* Configuration is easy. Since we use JSON for objects serialization, we don't want you to provide detailed ORM-like mapping. JaVers needs to know only some high-level facts about your data model.
+* JaVers is meant to keep its data versioning records (snapshots) in application primary database alongside with main data.
+* We use some basic notions following Eric Evans DDD terminology like Entity or Value Objects, pretty much the same like JPA does. We believe that this is right way of describing data.
+* JaVers is written in Java7 it can be run on JDK 6 or higher.
 
 ## License
 JaVers is licensed under Apache License Version 2.0, see LICENSE file.
@@ -52,51 +35,79 @@ JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 * Paweł Szymczyk - committer - pawel@javers.org
 * Wiola Goździk - committer - wiola@javers.org
 
-
 ### Former commiters
 * Pawel Cierpiatka - committer
 
-## CI status
-[![Build Status](https://travis-ci.org/javers/javers.png?branch=master)](https://travis-ci.org/javers/javers)
-
 #How to start
 
-##1. Add javers-core to your dependencies
+##1. Add javers-core to your project dependencies
+For maven: 
 
-maven: 
-        <code><dependency>
-            <groupId>org.javers</groupId>
-            <artifactId>javers-parent</artifactId>
-            <version>0.8.0</version>
-        </dependency></code>
+```
+<dependency>
+    <groupId>org.javers</groupId>
+    <artifactId>javers-core</artifactId>
+    <version>0.8.0</version>
+</dependency>
+```
 
-gradle: 
-        <code>compile 'org.javers:javers-parent:0.8.0'</code>
+For gradle: 
+```
+compile 'org.javers:javers-core:0.8.0'
+```
+    
+If you are going to use JaVers as object diff tool, this is only dependency you need.
+        
+##1. Add javers repository to your project dependencies
+If you are going to use JaVers as data audit framework, choose proper repository implementation.
+For example, if you are using MongoDb add:
 
-##2. Create Javers instance:
+For maven: 
+```
+<dependency>
+    <groupId>org.javers</groupId>
+    <artifactId>javers-persistence-mongo</artifactId>
+    <version>0.8.0</version>
+</dependency>
+```
+For gradle: 
+```
+compile 'org.javers:javers-persistence-mongo:0.8.0'
+```
+##2. Create JaVers instance:
 
-    import org.javers.core.Javers;
-    import org.javers.core.JaversBuilder;
+Use JaversBuilder to create JaVers instance:
+```
+import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
+//...
+Javers javers = JaversBuilder.javers().build();
+```
+Now, JaVers instance is up & ready, configured with reasonable defaults. 
+Good enough to start.
 
-    Javers javers = JaversBuilder.javers().build();
+Later on, you would probably need to refine the configuration, 
+introducing to JaVers some basic facts about your domain model.
 
-###2.1. Choose mapping style:
+#3. Configuration
+
+##3.1. Choose mapping style
 Mapping style is property that defining access strategies for accessing entity values. If mapping style is set to BEAN then entity values 
 will be get from getters. With mapping style BEAN you have to put <code>@Id</code> annotation under the <code>getId()</code> method:
-
-    import org.javers.core.MappingStyle;
-    ...
-
-    Javers javers = JaversBuilder
-                .javers()
-                .withMappingStyle(MappingStyle.FIELD)
-                .build();
-
-      @Id
-      public void getId() {
-        ...
-      }
-
+```
+import org.javers.core.MappingStyle;
+//...
+   
+Javers javers = JaversBuilder
+               .javers()
+               .withMappingStyle(MappingStyle.FIELD)
+               .build();
+   
+@Id
+public void getId() {
+    //...
+}
+```
 Property access modificator is not important, it can be private ;)
 
 If you choose mapping style FIELD, entity values will be get directly from property, javers use reflection mechanism to do this. In 
@@ -109,7 +120,34 @@ Property access modificator is not important.
 
 <code>MappingStyle.BEAN</code> is used by default.
 
-##3. Find diff between two graphs of objects
+##3.2 Domain model mapping
+  ...
+##3.3 Repository setup
+If you are going to use JaVers as data audit framework you are supposed to configure JaversRepository.
+ 
+JaversRepository is simply a class which purpose is to store Javers Commits in your database,
+alongside with your domain data. 
+
+JaVers comes by default with in-memory repository implementation. It's perfect for testing but
+for production enviroment you will need something real.
+
+First, choose proper JaversRepository implementation.
+If you are using <code>MongoDB</code>, choose <code>org.javers.repository.mongo.MongoRepository</code>.
+(Support for <code>SQL</code> databases, is scheduled for releasing with JaVers 1.1)
+ 
+The idea of configuring the JaversRepository is simple, 
+just provide working database connection. 
+
+For <code>MongoDB</code>:
+
+        Db database = ... //autowired or configured here,
+                          //preferably, use the same database connection as you are using for your main (domain) database 
+        MongoRepository mongoRepo =  new MongoRepository(database)
+        JaversBuilder.javers().registerJaversRepository(mongoRepo).build()
+
+
+
+##3. Find diff betwen two graphs of objects
 
 ###3.1. Compare Entities
 
