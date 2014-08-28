@@ -1,7 +1,6 @@
 package org.javers.core.diff.appenders
 
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.metamodel.object.GlobalCdoId
 import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.metamodel.property.Property
 
@@ -17,7 +16,7 @@ class ValueChangeAssert {
         return new ValueChangeAssert(actual)
     }
 
-    def hasValueObjectId(Class expected, GlobalCdoId expectedOwnerId, String expectedFragment ){
+    def hasValueObjectId(Class expected, def expectedOwnerId, String expectedFragment ){
         assert actual.affectedCdoId instanceof ValueObjectId
         assert actual.affectedCdoId.cdoClass.sourceClass == expected
         assert actual.affectedCdoId.ownerId == expectedOwnerId

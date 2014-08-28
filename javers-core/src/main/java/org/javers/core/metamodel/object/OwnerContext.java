@@ -4,16 +4,16 @@ package org.javers.core.metamodel.object;
  * @author bartosz walacik
  */
 public class OwnerContext {
-    final   GlobalCdoId owner;
+    final   GlobalId owner;
     final   String propertyName;
     private EnumeratorContext enumeratorContext;
 
-    public OwnerContext(GlobalCdoId owner, String propertyName) {
+    public OwnerContext(GlobalId owner, String propertyName) {
         this.owner = owner;
         this.propertyName = propertyName;
     }
 
-    public GlobalCdoId getGlobalCdoId() {
+    public GlobalId getGlobalId() {
         return owner;
     }
 

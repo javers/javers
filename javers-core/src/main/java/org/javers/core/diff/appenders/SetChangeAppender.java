@@ -59,8 +59,8 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange> {
             return Collections.EMPTY_LIST;
         }
 
-        Set<GlobalCdoId> leftSet = (Set<GlobalCdoId>) setType.map(leftRawSet, dehydrateFunction, owner);
-        Set<GlobalCdoId> rightSet = (Set<GlobalCdoId>) setType.map(rightRawSet, dehydrateFunction, owner);
+        Set<GlobalId> leftSet = (Set<GlobalId>) setType.map(leftRawSet, dehydrateFunction, owner);
+        Set<GlobalId> rightSet = (Set<GlobalId>) setType.map(rightRawSet, dehydrateFunction, owner);
 
         List<ContainerElementChange> changes = new ArrayList<>();
 
@@ -84,12 +84,12 @@ public class SetChangeAppender extends PropertyChangeAppender<SetChange> {
         }
 
         SetType setType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new OwnerContext(pair.getGlobalCdoId(), property.getName());
+        OwnerContext owner = new OwnerContext(pair.getGlobalId(), property.getName());
         List<ContainerElementChange> entryChanges =
                 calculateEntryChanges(setType, leftValues, rightValues, owner);
 
         if (!entryChanges.isEmpty()) {
-            return new SetChange(pair.getGlobalCdoId(), property, entryChanges);
+            return new SetChange(pair.getGlobalId(), property, entryChanges);
         } else {
             return null;
         }

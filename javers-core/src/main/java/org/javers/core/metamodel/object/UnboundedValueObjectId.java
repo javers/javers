@@ -17,7 +17,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  *
  * @author bartosz walacik
  */
-public class UnboundedValueObjectId extends GlobalCdoId {
+public class UnboundedValueObjectId extends GlobalId {
     private transient final ValueObject valueObject;
 
     public UnboundedValueObjectId(ValueObject valueObject) {

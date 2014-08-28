@@ -4,19 +4,11 @@ import org.javers.common.collections.Optional;
 import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.LiveGraph;
-import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
-import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalCdoId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.JaversExtendedRepository;
-import org.javers.repository.api.JaversRepository;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -38,7 +30,7 @@ public class GraphShadowFactory {
 
         Set<ObjectNode> snapshotNodes = new HashSet<>();
         for (ObjectNode liveNode : liveGraph.flatten()){
-            Optional<CdoSnapshot> snapshot =  javersRepository.getLatest(liveNode.getGlobalCdoId());
+            Optional<CdoSnapshot> snapshot =  javersRepository.getLatest(liveNode.getGlobalId());
 
             if (snapshot.isEmpty()){
                 continue;

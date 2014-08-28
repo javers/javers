@@ -21,14 +21,14 @@ public class GlobalIdFactory {
         this.typeMapper = typeMapper;
     }
 
-    public GlobalCdoId createId(Object targetCdo) {
+    public GlobalId createId(Object targetCdo) {
         return createId(targetCdo, null);
     }
 
     /**
      * @param owner for bounded ValueObjects, optional
      */
-    public GlobalCdoId createId(Object targetCdo, OwnerContext owner) {
+    public GlobalId createId(Object targetCdo, OwnerContext owner) {
         Validate.argumentsAreNotNull(targetCdo);
 
         ManagedClass targetManagedClass = getManagedClassOf(targetCdo);
@@ -53,7 +53,7 @@ public class GlobalIdFactory {
         return new UnboundedValueObjectId(valueObject);
     }
 
-    public ValueObjectId createFromPath(GlobalCdoId owner, Class valueObjectClass, String path){
+    public ValueObjectId createFromPath(GlobalId owner, Class valueObjectClass, String path){
         ValueObject valueObject = typeMapper.getManagedClass(valueObjectClass, ValueObject.class);
         return new ValueObjectId(valueObject, owner, path);
     }
@@ -68,17 +68,17 @@ public class GlobalIdFactory {
         return InstanceId.createFromId(localId, entity);
     }
 
-    public GlobalCdoId createFromDto(GlobalIdDTO idDto){
+    public GlobalId createFromDto(GlobalIdDTO idDto){
         return idDto.create(typeMapper);
     }
 
     /**
      * If item is Primitive or Value - returns it,
      * if item is Entity or ValueObject - returns its globalId,
-     * if item is already instance of GlobalCdoId - returns it.
+     * if item is already instance of GlobalId - returns it.
      */
     public Object dehydrate(Object item, JaversType targetType, OwnerContext context){
-        if (!(item instanceof GlobalCdoId) && targetType instanceof ManagedType) {
+        if (!(item instanceof GlobalId) && targetType instanceof ManagedType) {
             return createId(item, context);
         } else {
             return item;
@@ -91,10 +91,10 @@ public class GlobalIdFactory {
     }
 
     private boolean hasOwner(OwnerContext context) {
-        return (context != null && context.getGlobalCdoId() != null);
+        return (context != null && context.getGlobalId() != null);
     }
 
     private boolean hasNoOwner(OwnerContext context) {
-        return (context == null || context.getGlobalCdoId() == null);
+        return (context == null || context.getGlobalId() == null);
     }
 }

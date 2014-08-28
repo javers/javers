@@ -1,6 +1,6 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
 /**
@@ -10,7 +10,7 @@ public class ValueChange extends PropertyChange {
     private final Atomic left;
     private final Atomic right;
 
-    public ValueChange(GlobalCdoId affectedCdoId, Property property, Object leftValue, Object rightValue) {
+    public ValueChange(GlobalId affectedCdoId, Property property, Object leftValue, Object rightValue) {
         super(affectedCdoId, property);
         this.left = new Atomic(leftValue);
         this.right = new Atomic(rightValue);

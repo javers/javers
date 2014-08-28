@@ -1,7 +1,7 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.metamodel.object.GlobalCdoId
 import org.javers.core.diff.changetype.ReferenceChange
+import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.property.Property
 
 /**
@@ -32,12 +32,12 @@ class ReferenceChangeAssert {
         this
     }
 
-    ReferenceChangeAssert hasLeftReference(GlobalCdoId expected) {
+    ReferenceChangeAssert hasLeftReference(GlobalId expected) {
         assert actual.left == expected
         this
     }
 
-    ReferenceChangeAssert hasRightReference(GlobalCdoId expected) {
+    ReferenceChangeAssert hasRightReference(GlobalId expected) {
         assert actual.right == expected
         this
     }

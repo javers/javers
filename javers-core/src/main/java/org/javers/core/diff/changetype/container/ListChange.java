@@ -1,6 +1,6 @@
 package org.javers.core.diff.changetype.container;
 
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class ListChange extends ContainerChange {
 
-    public ListChange(GlobalCdoId affectedCdoId, Property property, List<ContainerElementChange> changes) {
+    public ListChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
         super(affectedCdoId, property, changes);
     }
 }

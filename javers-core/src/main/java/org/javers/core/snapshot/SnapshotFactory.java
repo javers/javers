@@ -3,7 +3,6 @@ package org.javers.core.snapshot;
 import org.javers.common.collections.Defaults;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Objects;
-import org.javers.common.date.DateProvider;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.ObjectNode;
@@ -29,7 +28,7 @@ public class SnapshotFactory {
     /**
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
-    public CdoSnapshot create(Object liveCdo, GlobalCdoId id, CommitMetadata commitMetadata) {
+    public CdoSnapshot create(Object liveCdo, GlobalId id, CommitMetadata commitMetadata) {
         CdoSnapshotBuilder snapshot =  cdoSnapshot(id, commitMetadata);
 
         for (Property property : id.getCdoClass().getProperties()){
@@ -55,7 +54,7 @@ public class SnapshotFactory {
     }
 
     public CdoSnapshot create(ObjectNode objectNode, CommitMetadata commitMetadata) {
-        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalCdoId(), commitMetadata);
+        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalId(), commitMetadata);
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {

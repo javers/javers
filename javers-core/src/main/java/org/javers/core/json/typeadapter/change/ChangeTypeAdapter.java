@@ -14,7 +14,7 @@ import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.json.JsonTypeAdapterTemplate;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.HashMap;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
 
     private static final String CHANGE_TYPE_FIELD = "changeType";
-    private static final String AFFECTED_CDO_ID_FIELD = "globalCdoId";
+    private static final String AFFECTED_CDO_ID_FIELD = "globalId";
     private static final String PROPERTY_FIELD = "property";
     private static final String COMMIT_METADATA = "commitMetadata";
 
@@ -65,17 +65,17 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
     }
 
     protected PropertyChangeStub deserializeStub(JsonObject jsonObject, JsonDeserializationContext context) {
-        GlobalCdoId id = deserializeAffectedCdoId(jsonObject, context);
+        GlobalId id = deserializeAffectedCdoId(jsonObject, context);
         Property property = deserializeProperty(jsonObject, id);
 
         return new PropertyChangeStub(id, property);
     }
 
-    protected GlobalCdoId deserializeAffectedCdoId(JsonObject jsonObject, JsonDeserializationContext context) {
-        return context.deserialize(jsonObject.get(AFFECTED_CDO_ID_FIELD), GlobalCdoId.class);
+    protected GlobalId deserializeAffectedCdoId(JsonObject jsonObject, JsonDeserializationContext context) {
+        return context.deserialize(jsonObject.get(AFFECTED_CDO_ID_FIELD), GlobalId.class);
     }
 
-    private Property deserializeProperty(JsonObject jsonObject, GlobalCdoId id){
+    private Property deserializeProperty(JsonObject jsonObject, GlobalId id){
         String propertyName = jsonObject.get(PROPERTY_FIELD).getAsString();
 
         return id.getCdoClass().getProperty(propertyName);
@@ -102,10 +102,10 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
     }
 
     protected class PropertyChangeStub{
-        GlobalCdoId id;
+        GlobalId id;
         Property property;
 
-        PropertyChangeStub(GlobalCdoId id, Property property) {
+        PropertyChangeStub(GlobalId id, Property property) {
             this.id = id;
             this.property = property;
         }

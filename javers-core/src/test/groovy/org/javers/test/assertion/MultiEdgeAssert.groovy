@@ -21,12 +21,12 @@ class MultiEdgeAssert {
     }
 
     MultiEdgeAssert refersToLocalIds(Object... localIds) {
-        assert actual.references.collect { it.globalCdoId.cdoId }.toSet() == localIds.toList().toSet()
+        assert actual.references.collect { it.globalId.cdoId }.toSet() == localIds.toList().toSet()
         this
     }
 
     MultiEdgeAssert refersToGlobalIds(def expectedRefCdoIds) {
-        assert actual.references.collect { it.globalCdoId } == expectedRefCdoIds
+        assert actual.references.collect { it.globalId } == expectedRefCdoIds
         this
     }
 
@@ -38,7 +38,7 @@ class MultiEdgeAssert {
     }
 
     NodeAssert andTargetNode(String expectedTargetCdoId) {
-        NodeAssert.assertThat(actual.references.find { it.globalCdoId.cdoId == expectedTargetCdoId })
+        NodeAssert.assertThat(actual.references.find { it.globalId.cdoId == expectedTargetCdoId })
     }
 
     NodeAssert andFirstTargetNode (){

@@ -5,7 +5,7 @@ import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdDTO;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 
@@ -32,7 +32,7 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit) {
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
         argumentIsNotNull(globalId);
         return delegate.getStateHistory(globalId, limit);
     }
@@ -44,7 +44,7 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     @Override
-    public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
+    public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         argumentIsNotNull(globalId);
         return delegate.getLatest(globalId);
     }

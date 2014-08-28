@@ -5,7 +5,6 @@ import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
-import org.javers.core.diff.Diff;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.*;
 
@@ -42,10 +41,10 @@ public interface JaversRepository {
      * @param limit choose reasonable limits, production database could contain more records than you expect
      * @return empty List if object is not versioned
      */
-    List<CdoSnapshot> getStateHistory(GlobalCdoId globalCdoId, int limit);
+    List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit);
 
     /**
-     * Convenient method to query by DTO, see {@link #getStateHistory(GlobalCdoId, int)}
+     * Convenient method to query by DTO, see {@link #getStateHistory(org.javers.core.metamodel.object.GlobalId, int)}
      */
     List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit);
 
@@ -53,10 +52,10 @@ public interface JaversRepository {
      * Latest snapshot of given object,
      * Optional#EMPTY if object is not versioned
      */
-    Optional<CdoSnapshot> getLatest(GlobalCdoId globalCdoId);
+    Optional<CdoSnapshot> getLatest(GlobalId globalId);
 
     /**
-     * Convenient method to query by DTO, see {@link #getLatest(GlobalCdoId)}
+     * Convenient method to query by DTO, see {@link #getLatest(org.javers.core.metamodel.object.GlobalId)}
      */
     Optional<CdoSnapshot> getLatest(GlobalIdDTO globalIdDTO);
 

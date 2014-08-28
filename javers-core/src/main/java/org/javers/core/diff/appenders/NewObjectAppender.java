@@ -16,7 +16,7 @@ public class NewObjectAppender implements NodeChangeAppender {
         return Sets.transform(graphPair.getOnlyOnRight(), new Function<ObjectNode, Change>() {
             @Override
             public NewObject apply(ObjectNode input) {
-                return new NewObject(input.getGlobalCdoId(),input.wrappedCdo());
+                return new NewObject(input.getGlobalId(),input.wrappedCdo());
             }
         });
     }

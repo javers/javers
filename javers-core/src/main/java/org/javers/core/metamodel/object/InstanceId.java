@@ -10,7 +10,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  *
  * @author bartosz walacik
  */
-public class InstanceId extends GlobalCdoId {
+public class InstanceId extends GlobalId {
     private transient final Entity entity;
     private final Object cdoId;
 

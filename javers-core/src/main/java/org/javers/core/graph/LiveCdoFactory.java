@@ -1,7 +1,6 @@
 package org.javers.core.graph;
 
 import org.javers.core.metamodel.object.*;
-import org.javers.core.metamodel.property.ManagedClass;
 
 /**
  * @author bartosz walacik
@@ -16,7 +15,7 @@ public class LiveCdoFactory implements CdoFactory {
 
     @Override
     public Cdo create (Object wrappedCdo, OwnerContext owner){
-        GlobalCdoId globalId = globalIdFactory.createId(wrappedCdo, owner);
+        GlobalId globalId = globalIdFactory.createId(wrappedCdo, owner);
         return new CdoWrapper(wrappedCdo, globalId);
     }
 

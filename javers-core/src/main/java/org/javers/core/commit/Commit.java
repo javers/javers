@@ -5,7 +5,6 @@ import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalCdoId;
 import org.joda.time.LocalDateTime;
 
 import java.util.Collections;

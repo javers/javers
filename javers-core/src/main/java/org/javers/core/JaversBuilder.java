@@ -8,7 +8,7 @@ import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.CdoSnapshotTypeAdapter;
 import org.javers.core.json.typeadapter.CommitIdTypeAdapter;
-import org.javers.core.json.typeadapter.GlobalCdoIdTypeAdapter;
+import org.javers.core.json.typeadapter.GlobalIdTypeAdapter;
 import org.javers.core.json.typeadapter.InstanceIdDTOTypeAdapter;
 import org.javers.core.json.typeadapter.change.ArrayChangeTypeAdapter;
 import org.javers.core.json.typeadapter.change.ListChangeTypeAdapter;
@@ -45,7 +45,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
     private static final Class<? extends JsonTypeAdapter>[] DOMAIN_AWARE_ADAPTERS = new Class[]{
-            GlobalCdoIdTypeAdapter.class,
+            GlobalIdTypeAdapter.class,
             MapChangeTypeAdapter.class,
             ArrayChangeTypeAdapter.class,
             ListChangeTypeAdapter.class,

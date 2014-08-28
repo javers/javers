@@ -7,7 +7,7 @@ import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectGraphBuilder
 import org.javers.core.graph.ObjectNode
 import org.javers.core.json.JsonConverter
-import org.javers.core.metamodel.object.GlobalCdoId
+import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.property.ManagedClassFactory

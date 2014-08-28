@@ -9,7 +9,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class NodeMatcherTest extends AbstractDiffTest{
 
-    def "should match nodes with the same GlobalCdoId"() {
+    def "should match nodes with the same GlobalId"() {
         given:
         def previousGraph = buildLiveGraph(dummyUser().withName("a").withDetails(2).build());
 
@@ -21,7 +21,7 @@ class NodeMatcherTest extends AbstractDiffTest{
         then:
         pairs.size() == 1
         RealNodePair pair = pairs.get(0)
-        pair.left.globalCdoId.cdoId == 2
-        pair.right.globalCdoId.cdoId == 2
+        pair.left.globalId.cdoId == 2
+        pair.right.globalId.cdoId == 2
     }
 }
