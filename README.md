@@ -43,7 +43,7 @@ JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 ##1. Add javers-core to your project dependencies
 For maven: 
 
-```
+```xml
 <dependency>
     <groupId>org.javers</groupId>
     <artifactId>javers-core</artifactId>
@@ -63,7 +63,7 @@ If you are going to use JaVers as data audit framework, choose proper repository
 For example, if you are using MongoDb add:
 
 For maven: 
-```
+```xml
 <dependency>
     <groupId>org.javers</groupId>
     <artifactId>javers-persistence-mongo</artifactId>
@@ -77,7 +77,7 @@ compile 'org.javers:javers-persistence-mongo:0.8.0'
 ##2. Create JaVers instance:
 
 Use JaversBuilder to create JaVers instance:
-```
+```java
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 //...
@@ -94,7 +94,7 @@ introducing to JaVers some basic facts about your domain model.
 ##3.1. Choose mapping style
 Mapping style is property that defining access strategies for accessing entity values. If mapping style is set to BEAN then entity values 
 will be get from getters. With mapping style BEAN you have to put <code>@Id</code> annotation under the <code>getId()</code> method:
-```
+```java
 import org.javers.core.MappingStyle;
 //...
    
