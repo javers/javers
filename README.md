@@ -92,33 +92,49 @@ introducing to JaVers some basic facts about your domain model.
 #3. Configuration
 
 ##3.1. Choose mapping style
-Mapping style is property that defining access strategies for accessing entity values. If mapping style is set to BEAN then entity values 
-will be get from getters. With mapping style BEAN you have to put <code>@Id</code> annotation under the <code>getId()</code> method:
+There are two mapping styles in JaVers:
+
+* <code>FIELD</code>, used by **default** and recommended in most cases, 
+* <code>BEAN</code>, useful for domain models compliant with <code>Java Bean</code> convention.
+ 
+When using <code>FIELD</code> style, JaVers is accessing objects state directly from fields.
+In this case, <code>@Id</code> annotation should be placed at field level. For example:
+
 ```java
-import org.javers.core.MappingStyle;
-//...
-   
+public class User {
+    @Id
+    private String login;
+    private String name;
+    //...
+}
+```
+
+When using <code>BEAN</code> style, JaVers is accessing objects state by calling **getters**, annotations should be placed at method level. 
+For example:
+
+```java
+public class User {
+    @Id
+    public String getLogin(){
+        //...
+    }
+    
+    public String getName(){
+        //...
+    }
+    //...
+}
+```
+
+<code>BEAN</code> mapping style is selected in <code>JaversBuilder</code> as follows:
+```java
 Javers javers = JaversBuilder
                .javers()
                .withMappingStyle(MappingStyle.FIELD)
                .build();
-   
-@Id
-public void getId() {
-    //...
-}
 ```
-Property access modificator is not important, it can be private ;)
 
-If you choose mapping style FIELD, entity values will be get directly from property, javers use reflection mechanism to do this. In 
-this case the <code>@Id</code> annotation has to be set under the id property:
-
-      @Id
-      private String id
-
-Property access modificator is not important. 
-
-<code>MappingStyle.BEAN</code> is used by default.
+In both styles, access modifiers are not important, it could be private ;)
 
 ##3.2 Domain model mapping
   ...
