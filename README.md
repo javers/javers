@@ -1,14 +1,14 @@
 ﻿﻿
 ![JVlogo.png](JVlogo2.png)
 
-## Abstract
+## Introduction
+##1. Abstract
 JaVers is a lightweight java library for **auditing** changes in your data.
 
 We all use Version Control Systems for source code,
 why not to use specialized framework to provide an audit trail of domain objects?
 
-## Story
-
+##2. Story
 When developing an application, we usually concentrate on the current state of domain objects.
 So we simply instantiate them, apply some changes and eventually, delete them, not paying much attention to previous states.
 
@@ -20,27 +20,88 @@ Java language nor in the mainstream databases (although NoSQL document databases
 
 This is the niche JaVers fulfills. In JaVers, *version* and *change* are **first class citizens**.
 
-## Basic facts about JaVers
+##3. Features Overview
+JaVers is designed as a framework for **auditing changes** in your object-oriented data.
+
+With JaVers you can easily commit changes performed on domain objects graph to specialized repository
+(called <a href="http://javers.org/javadoc_0.8.0/org/javers/repository/api/JaversRepository.html">JaversRepository</a>).
+Then you can browse detailed change history of given object in two forms - diffs and snapshots. 
+
+Data auditing framework is built on the top of **object diff** engine, which could be use as standalone object diff tool for ad-hoc
+comparing of two objects graphs.
+
+All JaVers functions are exposed via single Facade -
+<a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/Javers.html">JaVers</a> instance.
+As you can see, JaVers api is concise and simple.
+
+##4. Features Details
+
+###1. Object diff
+JaVers Object <a href="http://javers.org/javadoc_0.8.0/org/javers/core/Javers.html#compare-java.lang.Object-java.lang.Object-">
+diff</a> is the easiest way to deeply compare two graphs of objects.
+   
+As the result you get list of atomic <a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/diff/Change.html">Changes</a>.
+There are several types of Changes: *ValueChange*, *ReferenceChange*, *ListChange* and so on (see inheritance hierarchy of 
+<a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/diff/Change.html">Change</a> class, to get complete list).      
+
+###2. JaVers Repository
+<a href="http://javers.org/javadoc_0.8.0/org/javers/repository/api/JaversRepository.html">JaversRepository</a>
+is a central part of our data auditing engine. 
+
+It tracks every change made on your data (both values and relations) so you can easily identify when the change was made, who did it and
+what was the value before and after.
+
+How it works? 
+* configure (//TODO link to config) JaVers and build 
+  <a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/Javers.html">JaVers</a> instance 
+
+* integrate JaVers with your system by applying javers.commit() (//TODO citation)
+  function in every place where 
+  important data (domain objects) are being created and modified by your users
+  
+* You don't need to commit every object. JaVers navigates through objects graph, starting from
+  the object provided in javers.commit()(//TODO add href)
+  and deeply comparing whole structure with previous version stored in repository.
+  Thanks to that approach you can commit large structures, like trees, graphs, DDD aggregates withe a single
+  javers.commit() call.
+  
+* Once your domain objects are managed by JaVers, you can query JaVers about change history. 
+  Use unified GlobalId (//TODO add href)
+  to identify both Entity instances and Value Objects.
+  
+* JaVers provides two views on object change history: diffs and snapshots.
+  Use javers.getChangeHistory() (//TODO and href)
+  and javers.getStateHistory()(//TODO and href)
+  functions to browse detailed history of given object.
+  
+JaVers has well designed and customizable <code>JSON</code> serialization & deserialization module, based on 
+GSON (//TODO citation needed) and Java reflection. 
+Your data are splitted into chunks (atomic changes) and persisted in database as <code>JSON</code>
+with minimal mapping configuration effort.
+
+JaversRepository is designed to be easily implemented for any kind of database,
+for now we provide <code>MongoDB</code> implementation. <code>SQL</code> implementation will be provided soon.
+If you are using another database, for example <code>Cassandra</code>, you are encouraged to implement 
+ JaversRepository interface and contribute it to JaVers project.  
+
+##5. Basic facts about JaVers
 * It's lightweight and versatile. We don't take any assumptions about your data model, bean container or underlying data storage.
 * Configuration is easy. Since we use JSON for objects serialization, we don't want you to provide detailed ORM-like mapping. JaVers needs to know only some high-level facts about your data model.
 * JaVers is meant to keep its data versioning records (snapshots) in application primary database alongside with main data.
 * We use some basic notions following Eric Evans DDD terminology like Entity or Value Objects, pretty much the same like JPA does. We believe that this is right way of describing data.
 * JaVers is written in Java7 it can be run on JDK 6 or higher.
 
-## License
+##6. License
 JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 
-## Project team
+##7. Project team
 * Bartosz Walacik - owner, commiter - bartek@javers.org
 * Paweł Szymczyk - committer - pawel@javers.org
 * Wiola Goździk - committer - wiola@javers.org
 
-### Former commiters
-* Pawel Cierpiatka - committer
+# How to start
 
-#How to start
-
-##1. Add javers-core to your project dependencies
+## 1. Add javers-core to your project dependencies
 For maven: 
 
 ```xml
@@ -58,7 +119,7 @@ compile 'org.javers:javers-core:0.8.0'
     
 If you are going to use JaVers as object diff tool, this is only dependency you need.
         
-##1. Add javers repository to your project dependencies
+## 2. Add javers repository to your project dependencies
 If you are going to use JaVers as data audit framework, choose proper repository implementation.
 For example, if you are using MongoDb add:
 
@@ -74,7 +135,7 @@ For gradle:
 ```
 compile 'org.javers:javers-persistence-mongo:0.8.0'
 ```
-##2. Create JaVers instance:
+## 3. Create JaVers instance:
 
 Use JaversBuilder to create JaVers instance:
 ```java
@@ -89,9 +150,9 @@ Good enough to start.
 Later on, you would probably need to refine the configuration, 
 introducing to JaVers some basic facts about your domain model.
 
-#3. Configuration
+## Configuration
 
-##3.1. Choose mapping style
+##1. Choose mapping style
 There are two mapping styles in JaVers:
 
 * <code>FIELD</code>, used by **default** and recommended in most cases, 
@@ -136,9 +197,11 @@ Javers javers = JaversBuilder
 
 In both styles, access modifiers are not important, it could be private ;)
 
-##3.2 Domain model mapping
-  ...
-##3.3 Repository setup
+##2. Domain model mapping
+
+//TODO
+  
+##3. Repository setup
 If you are going to use JaVers as data audit framework you are supposed to configure JaversRepository.
  
 JaversRepository is simply a class which purpose is to store Javers Commits in your database,
@@ -162,10 +225,10 @@ For <code>MongoDB</code>:
         JaversBuilder.javers().registerJaversRepository(mongoRepo).build()
 
 
+## Using Object Diff
+##1. Find diff betwen two graphs of objects
 
-##3. Find diff betwen two graphs of objects
-
-###3.1. Compare Entities
+###1.1. Compare Entities
 
 To find diff between two entities you don't have to register entity class in Javers building process. In 1.0 version was developed 
 automatically discover type of object. If Javers find @Id annotation in proper place then it will be recognize as Entity, in other way it 
@@ -221,7 +284,7 @@ Output of running this program is:
         Property value before change: Johny
         Property value after change: Tommy
 
-###3.2. Compare Value Object
+###1.1. Compare Value Object
 
 If you don't put @Id annotation in the class definition Javers recognize object as Value Object. Javers compare property by property and 
 returns <code>ValueObject</code> changes:
@@ -258,9 +321,11 @@ Output:
         Value before change: Johny
         Value after change: Charlie
         
-##4. Persist Snapshots
+## Using Data Auditing Framework
+
+##1. Persist Snapshots
         
-###4.1 Create and register Javers MongoDB repository
+###1.1 Create and register Javers MongoDB repository
  
 To persist your changes in database firstly you have to add dependency to javers-persistence-mongo module:
  
@@ -398,7 +463,7 @@ Snapshot contains four sections:
 Second object contains object state after second commit. You can see that <code>globalCdoId</code> is the same but 
 <code>commitMetadata.commitDate</code>, <code>commitMetadata.id</code>, and <code>state</code> has been changed.
              
-### 4.3 Read snapshots history
+###4.3 Read snapshots history
 
 After taking some commits you can read persisted snapshots from repository. 
 To read snapshots you have to provide:
@@ -452,7 +517,7 @@ output:
     Property value after first commit: some value
     Property value after second commit: another value
     
-### 4.3 Read changes history 
+###4.3 Read changes history 
      
 If you want to read changes of given entity Javers can calculate diffs from persisted snapshots.
 To read changes you have to provide:
