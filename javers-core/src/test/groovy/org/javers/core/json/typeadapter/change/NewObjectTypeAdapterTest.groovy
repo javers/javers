@@ -31,8 +31,8 @@ class NewObjectTypeAdapterTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.changeType == "NewObject"
-        json.globalCdoId.entity == "org.javers.core.model.DummyUser"
-        json.globalCdoId.cdoId == "kaz"
+        json.globalId.entity == "org.javers.core.model.DummyUser"
+        json.globalId.cdoId == "kaz"
     }
 
     def "should deserialize NewObject"() {
@@ -41,7 +41,7 @@ class NewObjectTypeAdapterTest extends Specification {
         def json = new JsonBuilder()
         json {
             changeType "NewObject"
-            globalCdoId {
+            globalId {
                 entity "org.javers.core.model.DummyUser"
                 cdoId  "kaz"
             }

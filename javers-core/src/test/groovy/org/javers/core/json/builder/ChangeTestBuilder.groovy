@@ -7,13 +7,8 @@ import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.map.EntryChange
 import org.javers.core.diff.changetype.map.MapChange
-import org.javers.core.metamodel.object.GlobalCdoId
 import org.javers.core.metamodel.object.InstanceId
-import org.javers.core.metamodel.object.UnboundedValueObjectId
-import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.metamodel.property.Property
-
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.*
 
 /**
  * @author bartosz walacik
@@ -52,5 +47,13 @@ class ChangeTestBuilder {
         InstanceId newRefId = instanceId(newRef)
 
         new ReferenceChange(globalId,prop, oldRefId, newRefId)
+    }
+
+    private static InstanceId instanceId(Object cdo) {
+        if (cdo == null) {
+            return null
+        }
+
+        return InstanceId.createFromInstance(cdo, EntityTestBuilder.entity(cdo.getClass()))
     }
 }

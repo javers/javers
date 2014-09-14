@@ -103,8 +103,8 @@ class JaversDiffIntegrationTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
         def change = json.changes[0];
-        change.globalCdoId.valueObject == "org.javers.core.model.DummyUserWithPoint"
-        change.globalCdoId.cdoId == "/"
+        change.globalId.valueObject == "org.javers.core.model.DummyUserWithPoint"
+        change.globalId.cdoId == "/"
         change.changeType == "ValueChange"
         change.property == "point"
         change.left == "1,2" //this is most important in this test

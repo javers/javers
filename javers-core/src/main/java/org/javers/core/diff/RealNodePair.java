@@ -2,7 +2,7 @@ package org.javers.core.diff;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectNode;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class RealNodePair implements NodePair {
 
     public RealNodePair(ObjectNode left, ObjectNode right) {
         Validate.argumentsAreNotNull(left, right);
-        Validate.argumentCheck(left.getGlobalCdoId().equals(right.getGlobalCdoId()),"left & right should refer to the same Cdo");
+        Validate.argumentCheck(left.getGlobalId().equals(right.getGlobalId()),"left & right should refer to the same Cdo");
         this.left = left;
         this.right = right;
     }
@@ -41,12 +41,12 @@ public class RealNodePair implements NodePair {
     }
 
     @Override
-    public GlobalCdoId getRightGlobalCdoId(Property property) {
+    public GlobalId getRightGlobalId(Property property) {
         return right.getReference(property);
     }
 
     @Override
-    public GlobalCdoId getLeftGlobalCdoId(Property property) {
+    public GlobalId getLeftGlobalId(Property property) {
         return left.getReference(property);
     }
 
@@ -65,8 +65,8 @@ public class RealNodePair implements NodePair {
     }
 
     @Override
-    public GlobalCdoId getGlobalCdoId() {
-        return left.getGlobalCdoId();
+    public GlobalId getGlobalId() {
+        return left.getGlobalId();
     }
 
 }

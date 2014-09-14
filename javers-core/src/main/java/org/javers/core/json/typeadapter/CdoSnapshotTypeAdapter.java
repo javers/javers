@@ -9,7 +9,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoSnapshotBuilder;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
@@ -28,7 +28,7 @@ import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
  */
 public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
-    public static final String GLOBAL_CDO_ID = "globalCdoId";
+    public static final String GLOBAL_CDO_ID = "globalId";
     public static final String COMMIT_METADATA = "commitMetadata";
     public static final String STATE = "state";
 
@@ -49,7 +49,7 @@ public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot>
 
         CommitMetadata commitMetadata = context.deserialize(((JsonObject) json).get(COMMIT_METADATA), CommitMetadata.class);
 
-        GlobalCdoId cdoId = context.deserialize(jsonObject.get(GLOBAL_CDO_ID), GlobalCdoId.class);
+        GlobalId cdoId = context.deserialize(jsonObject.get(GLOBAL_CDO_ID), GlobalId.class);
 
         CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId, commitMetadata);
         cdoSnapshotBuilder.withCommitMetadata(commitMetadata);

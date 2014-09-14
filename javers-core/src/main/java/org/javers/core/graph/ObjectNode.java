@@ -6,7 +6,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoWrapper;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Entity;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
@@ -59,22 +59,22 @@ public class ObjectNode implements Visitable<GraphVisitor> {
     /**
      * shortcut to {@link Cdo#getGlobalId()}
      */
-    public GlobalCdoId getGlobalCdoId() {
+    public GlobalId getGlobalId() {
         return cdo.getGlobalId();
     }
 
     /**
      * only for properties with return type: ManagedType
      */
-    public GlobalCdoId getReference(Property property){
+    public GlobalId getReference(Property property){
         Edge edge = getEdge(property); //could be null for snapshots
 
         //TODO this is ugly, how to move this logic to Cdo implementations?
         if (edge != null && edge instanceof SingleEdge){
-            return ((SingleEdge)edge).getReference().getGlobalCdoId();
+            return ((SingleEdge)edge).getReference().getGlobalId();
         }
         else {
-            return (GlobalCdoId)getPropertyValue(property);
+            return (GlobalId)getPropertyValue(property);
         }
     }
 

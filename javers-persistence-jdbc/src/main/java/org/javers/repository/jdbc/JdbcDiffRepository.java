@@ -16,7 +16,7 @@ import java.util.List;
 public class JdbcDiffRepository implements JaversRepository {
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalCdoId, int limit) {
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
         return null;
     }
 
@@ -26,7 +26,7 @@ public class JdbcDiffRepository implements JaversRepository {
     }
 
     @Override
-    public Optional<CdoSnapshot> getLatest(GlobalCdoId globalCdoId) {
+    public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         return null;
     }
 

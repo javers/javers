@@ -45,13 +45,13 @@ public class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
         Map rightMap = Arrays.asMap(pair.getRightPropertyValue(property));
 
         ArrayType arrayType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new OwnerContext(pair.getGlobalCdoId(), property.getName());
+        OwnerContext owner = new OwnerContext(pair.getGlobalId(), property.getName());
         List<EntryChange> entryChanges =
                 mapChangeAppender.calculateEntryChanges(new MapType(arrayType), leftMap, rightMap, owner);
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
-            return new ArrayChange(pair.getGlobalCdoId(), property, elementChanges);
+            return new ArrayChange(pair.getGlobalId(), property, elementChanges);
         }
         else {
             return null;

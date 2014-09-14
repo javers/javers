@@ -43,7 +43,7 @@ class EdgeBuilder {
     }
 
     private OwnerContext createOwnerContext(ObjectNode parentNode, Property property) {
-        return new OwnerContext(parentNode.getGlobalCdoId(), property.getName());
+        return new OwnerContext(parentNode.getGlobalId(), property.getName());
     }
 
     MultiEdge createMultiEdge(Property containerProperty, EnumerableType enumerableType, ObjectNode node, ObjectGraphBuilder objectGraphBuilder) {

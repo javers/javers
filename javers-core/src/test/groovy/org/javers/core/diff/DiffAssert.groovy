@@ -1,6 +1,5 @@
 package org.javers.core.diff
 
-import org.javers.core.commit.CommitAssert
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.PropertyChange
@@ -9,7 +8,7 @@ import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.container.ValueAdded
 import org.javers.core.diff.changetype.container.ValueRemoved
-import org.javers.core.metamodel.object.GlobalCdoId
+import org.javers.core.metamodel.object.GlobalId
 
 /**
  * @author bartosz walacik
@@ -58,8 +57,8 @@ class DiffAssert {
         this
     }
 
-    //DiffAssert hasNewObject(def globalCdoId){
-    //    assert actual.changes.find{it instanceof NewObject && it.globalCdoId == globalCdoId}, "no NewObject change with expected globalId: "+globalCdoId
+    //DiffAssert hasNewObject(def globalId){
+    //    assert actual.changes.find{it instanceof NewObject && it.globalId == globalId}, "no NewObject change with expected globalId: "+globalId
     //    this
     //}
 
@@ -83,7 +82,7 @@ class DiffAssert {
 
         ValueAdded removed = change.changes.find{it instanceof ValueAdded}
         assert removed
-        assert removed.addedValue instanceof GlobalCdoId
+        assert removed.addedValue instanceof GlobalId
         assert removed.addedValue == addedRef
 
         this
@@ -95,14 +94,14 @@ class DiffAssert {
 
         ValueRemoved removed = change.changes.find{it instanceof ValueRemoved}
         assert removed
-        assert removed.removedValue instanceof GlobalCdoId
+        assert removed.removedValue instanceof GlobalId
         assert removed.removedValue == removedRef
 
         this
     }
 
-    DiffAssert hasObjectRemoved(def globalCdoId){
-        assert actual.changes.find{it instanceof ObjectRemoved && it.globalCdoId == globalCdoId}, "no ObjectRemoved change with expected globalId: "+globalCdoId
+    DiffAssert hasObjectRemoved(def globalId){
+        assert actual.changes.find{it instanceof ObjectRemoved && it.globalId == globalId}, "no ObjectRemoved change with expected globalId: "+globalId
         this
     }
 }

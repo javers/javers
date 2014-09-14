@@ -14,10 +14,10 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 public class ValueObjectId extends UnboundedValueObjectId {
-    private final GlobalCdoId ownerId;
+    private final GlobalId ownerId;
     private final String fragment;
 
-    public ValueObjectId(ValueObject valueObject, GlobalCdoId ownerId, String fragment) {
+    public ValueObjectId(ValueObject valueObject, GlobalId ownerId, String fragment) {
         super(valueObject);
         argumentsAreNotNull(ownerId, fragment);
         this.ownerId = ownerId;
@@ -25,7 +25,7 @@ public class ValueObjectId extends UnboundedValueObjectId {
     }
 
     public ValueObjectId(ValueObject valueObject, OwnerContext ownerContext) {
-        this(valueObject, ownerContext.getGlobalCdoId(), ownerContext.getPath());
+        this(valueObject, ownerContext.getGlobalId(), ownerContext.getPath());
     }
 
     /**
@@ -42,7 +42,7 @@ public class ValueObjectId extends UnboundedValueObjectId {
         return null;
     }
 
-    public GlobalCdoId getOwnerId() {
+    public GlobalId getOwnerId() {
         return ownerId;
     }
 

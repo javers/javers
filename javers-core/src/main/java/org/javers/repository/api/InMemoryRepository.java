@@ -19,7 +19,7 @@ import java.util.*;
 public class InMemoryRepository implements JaversRepository {
     private static final Logger logger = LoggerFactory.getLogger(InMemoryRepository.class);
 
-    private Map<GlobalCdoId, LinkedList<CdoSnapshot>> snapshots = new HashMap<>();
+    private Map<GlobalId, LinkedList<CdoSnapshot>> snapshots = new HashMap<>();
 
     private CommitId head;
 
@@ -31,7 +31,7 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalCdoId globalId, int limit) {
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
         Validate.argumentIsNotNull(globalId);
 
         if (snapshots.containsKey(globalId)) {
@@ -41,7 +41,7 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public Optional<CdoSnapshot> getLatest(GlobalCdoId globalId) {
+    public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         Validate.argumentsAreNotNull(globalId);
 
         if (snapshots.containsKey(globalId)) {

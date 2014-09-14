@@ -1,6 +1,8 @@
 package org.javers.core.graph
 
 import org.javers.core.IdBuilder
+import org.javers.core.metamodel.object.InstanceIdDTO
+import org.javers.core.metamodel.object.ValueObjectIdDTO
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.model.*
 import spock.lang.Shared
@@ -9,8 +11,6 @@ import spock.lang.Unroll
 
 import static NodeAssert.assertThat
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.instanceId
-import static org.javers.core.json.builder.GlobalCdoIdTestBuilder.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
@@ -366,8 +366,8 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
         then:
         assertThat(node).hasMultiEdge("addressList").refersToGlobalIds(
-                [valueObjectId(instanceId(5, DummyUserDetails),DummyAddress,"addressList/0"),
-                 valueObjectId(instanceId(5, DummyUserDetails),DummyAddress,"addressList/1")
+                [new ValueObjectIdDTO(DummyUserDetails,5,"addressList/0"),
+                 new ValueObjectIdDTO(DummyUserDetails, 5,"addressList/1")
                 ])
     }
 

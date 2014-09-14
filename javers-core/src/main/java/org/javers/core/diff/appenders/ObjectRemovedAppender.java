@@ -16,7 +16,7 @@ public class ObjectRemovedAppender implements NodeChangeAppender {
         return Sets.transform(graphPair.getOnlyOnLeft(), new Function<ObjectNode, Change>() {
             @Override
             public ObjectRemoved apply(ObjectNode input) {
-                return new ObjectRemoved(input.getGlobalCdoId(), input.wrappedCdo());
+                return new ObjectRemoved(input.getGlobalId(), input.wrappedCdo());
             }
         });
     }

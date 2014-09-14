@@ -2,7 +2,7 @@ package org.javers.core.diff;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectNode;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.*;
 
@@ -11,16 +11,16 @@ import java.util.*;
  */
 public class NodeMatcher {
     /**
-     * matching based on {@link org.javers.core.metamodel.object.GlobalCdoId}
+     * matching based on {@link org.javers.core.metamodel.object.GlobalId}
      */
     public List<NodePair> match(GraphPair graphPair) {
         Validate.argumentIsNotNull(graphPair);
 
         List<NodePair> pairs = new ArrayList<>();
-        Map<GlobalCdoId, ObjectNode> rightMap = asMap(graphPair.getRightNodeSet());
+        Map<GlobalId, ObjectNode> rightMap = asMap(graphPair.getRightNodeSet());
 
         for (ObjectNode left : graphPair.getLeftNodeSet()) {
-            GlobalCdoId key = left.getGlobalCdoId();
+            GlobalId key = left.getGlobalId();
             if (rightMap.containsKey(key)) {
                 pairs.add(new RealNodePair(left,rightMap.get(key)));
             }
@@ -29,11 +29,11 @@ public class NodeMatcher {
         return pairs;
     }
 
-    private Map<GlobalCdoId, ObjectNode> asMap(Set<ObjectNode> nodes) {
-        Map<GlobalCdoId, ObjectNode> map = new HashMap<>();
+    private Map<GlobalId, ObjectNode> asMap(Set<ObjectNode> nodes) {
+        Map<GlobalId, ObjectNode> map = new HashMap<>();
 
         for (ObjectNode node : nodes) {
-            map.put(node.getGlobalCdoId(),node);
+            map.put(node.getGlobalId(),node);
         }
 
         return map;

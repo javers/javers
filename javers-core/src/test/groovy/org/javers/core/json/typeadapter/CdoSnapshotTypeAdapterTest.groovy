@@ -39,8 +39,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         //TODO
         json.commitMetadata.commitDate
 
-        json.globalCdoId.entity == "org.javers.core.model.DummyUser"
-        json.globalCdoId.cdoId == "kaz"
+        json.globalId.entity == "org.javers.core.model.DummyUser"
+        json.globalId.cdoId == "kaz"
     }
 
     def "should serialize state with primitive values in CdoSnapshot"() {
@@ -149,7 +149,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 author "author"
                 dateTime "2000-01-01T12:00:00"
             }
-            globalCdoId {
+            globalId {
                 entity "org.javers.core.model.DummyUser"
                 cdoId "kaz"
             }
@@ -177,7 +177,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 author "author"
                 dateTime "2000-01-01T12:00:00"
             }
-            globalCdoId {
+            globalId {
                 entity "org.javers.core.model.DummyUser"
                 cdoId "kaz"
             }
@@ -211,7 +211,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 author "author"
                 dateTime "2000-01-01T12:00:00"
             }
-            globalCdoId {
+            globalId {
                 entity "org.javers.core.model.DummyUser"
                 cdoId "kaz"
             }
@@ -242,7 +242,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 author "author"
                 dateTime "2000-01-01T12:00:00"
             }
-            globalCdoId {
+            globalId {
                 entity "org.javers.core.model.DummyUserDetails"
                 cdoId 1
             }
@@ -278,7 +278,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 author "author"
                 dateTime "2000-01-01T12:00:00"
             }
-            globalCdoId {
+            globalId {
                 entity "org.javers.core.model.DummyUser"
                 cdoId "kaz"
             }

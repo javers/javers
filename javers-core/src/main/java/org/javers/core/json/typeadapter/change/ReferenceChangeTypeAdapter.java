@@ -4,9 +4,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ReferenceChange;
-import org.javers.core.metamodel.object.GlobalCdoId;
+import org.javers.core.metamodel.object.GlobalId;
 
 public class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
 
@@ -18,8 +17,8 @@ public class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChang
         JsonObject jsonObject = (JsonObject) json;
         PropertyChangeStub stub = deserializeStub(jsonObject, context);
 
-        GlobalCdoId leftRef  = context.deserialize(jsonObject.get(LEFT_REFERENCE_FIELD),  GlobalCdoId.class);
-        GlobalCdoId rightRef = context.deserialize(jsonObject.get(RIGHT_REFERENCE_FIELD), GlobalCdoId.class);
+        GlobalId leftRef  = context.deserialize(jsonObject.get(LEFT_REFERENCE_FIELD),  GlobalId.class);
+        GlobalId rightRef = context.deserialize(jsonObject.get(RIGHT_REFERENCE_FIELD), GlobalId.class);
 
         return appendCommitMetadata(jsonObject, context, new ReferenceChange(stub.id, stub.property, leftRef, rightRef));
     }

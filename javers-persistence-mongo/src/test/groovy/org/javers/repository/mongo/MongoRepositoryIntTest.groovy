@@ -66,7 +66,7 @@ class MongoRepositoryIntTest extends Specification {
         latest.get().size() == 1
     }
 
-    def "should get last commit by GlobalCdoId"() {
+    def "should get last commit by GlobalId"() {
 
         given:
         //create components

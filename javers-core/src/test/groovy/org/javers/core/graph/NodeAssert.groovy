@@ -19,18 +19,18 @@ class NodeAssert {
     }
 
     NodeAssert hasCdoId(def expectedLocalCdoId) {
-        assert actual.globalCdoId instanceof InstanceId
-        assert actual.globalCdoId.cdoId == expectedLocalCdoId
+        assert actual.globalId instanceof InstanceId
+        assert actual.globalId.cdoId == expectedLocalCdoId
         this
     }
 
     NodeAssert hasGlobalId(def expectedGlobalId) {
-        assert actual.globalCdoId == expectedGlobalId
+        assert actual.globalId == expectedGlobalId
         this
     }
 
     NodeAssert hasInstanceId(Class expectedSourceClass, def expectedLocalCdoId) {
-        actual.globalCdoId.with {
+        actual.globalId.with {
             assert it instanceof InstanceId
             assert it.cdoClass.sourceClass == expectedSourceClass
             assert it.cdoId == expectedLocalCdoId
@@ -40,7 +40,7 @@ class NodeAssert {
     }
 
     public NodeAssert hasValueObjectId(Class expectedManagedClass, Object owner, String expectedFragment) {
-        ValueObjectId valueObjectId = actual.globalCdoId
+        ValueObjectId valueObjectId = actual.globalId
 
         assert valueObjectId.cdoClass.sourceClass == expectedManagedClass
         assert valueObjectId.cdoId == null
@@ -50,7 +50,7 @@ class NodeAssert {
     }
 
     NodeAssert hasUnboundedValueObjectId(Class expectedSourceClass) {
-        assert actual.globalCdoId.cdoClass.sourceClass == expectedSourceClass
+        assert actual.globalId.cdoClass.sourceClass == expectedSourceClass
         this
     }
 
