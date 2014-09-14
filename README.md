@@ -52,7 +52,7 @@ It tracks every change made on your data (both values and relations) so you can 
 what was the value before and after.
 
 How it works? 
-* configure (//TODO link to config) JaVers and build 
+* configure (//TODO link to config) JaVers and build a
   <a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/Javers.html">JaVers</a> instance 
 
 * integrate JaVers with your system by applying javers.commit() (//TODO citation)
@@ -70,17 +70,19 @@ How it works?
   to identify both Entity instances and Value Objects.
   
 * JaVers provides two views on object change history: diffs and snapshots.
-  Use javers.getChangeHistory() (//TODO and href)
-  and javers.getStateHistory()(//TODO and href)
+  Use <a href="http://javers.org/javadoc_0.8.0/org/javers/core/Javers.html#getChangeHistory-java.lang.Object-java.lang.Class-int-">
+  <code>javers.getChangeHistory()</code></a>
+  and <a href="http://javers.org/javadoc_0.8.0/org/javers/core/Javers.html#getStateHistory-java.lang.Object-java.lang.Class-int-">
+  <code>javers.getStateHistory()</code></a>
   functions to browse detailed history of given object.
   
-JaVers has well designed and customizable <code>JSON</code> serialization & deserialization module, based on 
-GSON (//TODO citation needed) and Java reflection. 
-Your data are splitted into chunks (atomic changes) and persisted in database as <code>JSON</code>
+JaVers has well designed and customizable JSON serialization & deserialization module, based on 
+<a href="https://code.google.com/p/google-gson/"><code>GSON</code></a>  and Java reflection. 
+Your data are splited into chunks (atomic changes) and persisted in database as JSON
 with minimal mapping configuration effort.
 
 JaversRepository is designed to be easily implemented for any kind of database,
-for now we provide <code>MongoDB</code> implementation. <code>SQL</code> implementation will be provided soon.
+for now we provide <code>MongoDB</code> implementation. SQL implementation will be provided soon.
 If you are using another database, for example <code>Cassandra</code>, you are encouraged to implement 
  JaversRepository interface and contribute it to JaVers project.  
 
