@@ -66,7 +66,8 @@ How it works?
   javers.commit() call.
   
 * Once your domain objects are managed by JaVers, you can query JaVers about change history. 
-  Use unified GlobalId (//TODO add href)
+  Use unified 
+  <a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/metamodel/object/GlobalId.html"><code>GlobalId</code></a> 
   to identify both Entity instances and Value Objects.
   
 * JaVers provides two views on object change history: diffs and snapshots.
