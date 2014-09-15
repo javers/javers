@@ -1,104 +1,26 @@
 ﻿﻿
 ![JVlogo.png](JVlogo2.png)
 
-## Introduction
-##1. Abstract
+## What is JaVers
 JaVers is a lightweight java library for **auditing** changes in your data.
 
 We all use Version Control Systems for source code,
 why not to use specialized framework to provide an audit trail of your Java objects (entities, POJO, data objects)?
 
-##2. Story
-When developing an application, we usually concentrate on the current state of domain objects.
-So we simply instantiate them, apply some changes and eventually, delete them, not paying much attention to previous states.
+## Check our site
+You can find latest information about JaVers project at <a href="http://javers.org">javers.org</a>.
+Check our 
+<a href="http://javers.org/documentation">documentation</a> pages.
 
-The challenge arises when a new requirement is discovered:
+## Project Team
+Check our site to find <a href="http://javers.org/#team">the team</a> and contact us.
 
-> As a User, I want to know who changed this status, <br/>
-> when the change was performed and what was the previous status.
+## CI status
+[![Build Status](https://travis-ci.org/javers/javers.png?branch=master)](https://travis-ci.org/javers/javers)
 
-The problem is, that both *version* and *change* notions are not easily expressible neither in the
-Java language nor in the mainstream databases (although NoSQL document databases have advantage here over relational ones).
-
-This is the niche JaVers fulfills. In JaVers, *version* and *change* are **first class citizens**.
-
-##3. Features Overview
-JaVers is designed as a framework for **auditing changes** in your object-oriented data.
-
-With JaVers you can easily commit changes performed on your objects graph to specialized repository
-(called <a href="http://javers.org/javadoc_0.8.0/org/javers/repository/api/JaversRepository.html">JaversRepository</a>).
-Then you can browse detailed change history of given object in two forms - diffs and snapshots. 
-
-Data auditing framework is built on the top of **object diff** engine, which could be use as standalone object diff tool for ad-hoc
-comparing of two objects graphs.
-
-All JaVers functions are exposed via single Facade -
-<a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/Javers.html">JaVers</a> instance.
-As you can see, JaVers api is concise and simple.
-
-###1. Object diff
-JaVers Object <a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/diff/Diff.html">
-<code>Diff</code></a> is the easiest way to deeply compare two graphs of objects.
-   
-As the result you get list of atomic <a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/diff/Change.html"><code>Changes</code></a>.
-There are several types of Changes: *ValueChange*, *ReferenceChange*, *ListChange* and so on (see inheritance hierarchy of 
-<a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/diff/Change.html"><code>Change</code></a> class, to get complete list).      
-
-###2. JaVers Repository
-<a href="http://javers.org/javadoc_0.8.0/org/javers/repository/api/JaversRepository.html">JaversRepository</a>
-is a central part of our data auditing engine. 
-
-It tracks every change made on your data (both values and relations) so you can easily identify when the change was made, who did it and
-what was the value before and after.
-
-How to use it?
-* Configure (//TODO link to config) JaVers and build a
-  <a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/Javers.html">JaVers</a> instance. 
-
-* Integrate JaVers with your system by applying 
-  <a href="http://javers.org/javadoc_0.8.0/org/javers/core/Javers.html#commit-java.lang.String-java.lang.Object-"><code>javers.commit()</code></a>
-  function in every place where 
-  important data (domain objects) are being created and modified by application users.
-  
-* You don't need to commit every object. JaVers navigates through objects graph, starting from
-  the object provided for <a href="http://javers.org/javadoc_0.8.0/org/javers/core/Javers.html#commit-java.lang.String-java.lang.Object-"><code>javers.commit()</code></a>
-  and deeply comparing whole structure with previous version stored in repository.
-  Thanks to that approach you can commit large structures, like trees, graphs, DDD aggregates withe a single
-  javers.commit() call.
-  
-* Once your domain objects are managed by JaVers, you can query JaVers about change history. 
-  Use unified 
-  <a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/metamodel/object/GlobalId.html"><code>GlobalId</code></a> 
-  to identify both Entity instances and Value Objects.
-  
-* JaVers provides two views on object change history: diffs and snapshots.
-  Use <a href="http://javers.org/javadoc_0.8.0/org/javers/core/Javers.html#getChangeHistory-java.lang.Object-java.lang.Class-int-">
-  <code>javers.getChangeHistory()</code></a>
-  and <a href="http://javers.org/javadoc_0.8.0/org/javers/core/Javers.html#getStateHistory-java.lang.Object-java.lang.Class-int-">
-  <code>javers.getStateHistory()</code></a>
-  functions to browse detailed history of given object.
-  
-JaversRepository is designed to be easily implemented for any kind of database,
-for now we provide <code>MongoDB</code> implementation. SQL implementation will be provided soon.
-If you are using another database, for example <code>Cassandra</code>, you are encouraged to implement 
- JaversRepository interface and contribute it to JaVers project.  
-  
-###3. JSON serialization & deserialization
-JaVers has well designed and customizable JSON serialization & deserialization module, based on 
-<a href="https://code.google.com/p/google-gson/"><code>GSON</code></a>  and Java reflection. 
-Your data are splited into chunks (atomic changes) and persisted in database as JSON
-with minimal mapping configuration effort. (//TODO link to JSON TypeAdapters)
-
-
-##5. Basic facts about JaVers
-* It's lightweight and versatile. We don't take any assumptions about your data model, bean container or underlying data storage.
-* Configuration is easy. Since we use JSON for objects serialization, we don't want you to provide detailed ORM-like mapping. JaVers needs to know only some high-level facts about your data model.
-* JaVers is meant to keep its data versioning records (snapshots) in application primary database alongside with main data.
-* We use some basic notions following Eric Evans DDD terminology like Entity or Value Objects, pretty much the same like JPA does. We believe that this is right way of describing data.
-* JaVers is written in Java7 it can be run on JDK 6 or higher.
-
-##6. License
+## License
 JaVers is licensed under Apache License Version 2.0, see LICENSE file.
+
 
 # Getting started
 
@@ -148,7 +70,7 @@ Javers javers = JaversBuilder.javers().build();
 Now, JaVers instance is up & ready, configured with reasonable defaults. 
 Good enough to start.
 
-Later on, you would probably need to refine the configuration, 
+Later on, you would probably need to refine the configuration (//TODO link to Configuration), 
 introducing to JaVers some basic facts about your domain model.
 
 ## Configuration
