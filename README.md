@@ -55,12 +55,13 @@ How it works?
 * configure (//TODO link to config) JaVers and build a
   <a href="http://javers.org/javadoc_0.8.0/index.html?org/javers/core/Javers.html">JaVers</a> instance 
 
-* integrate JaVers with your system by applying javers.commit() (//TODO citation)
+* integrate JaVers with your system by applying 
+  <a href="http://javers.org/javadoc_0.8.0/org/javers/core/Javers.html#commit-java.lang.String-java.lang.Object-"><code>javers.commit()</code></a>
   function in every place where 
   important data (domain objects) are being created and modified by your users
   
 * You don't need to commit every object. JaVers navigates through objects graph, starting from
-  the object provided in javers.commit()(//TODO add href)
+  the object provided for <a href="http://javers.org/javadoc_0.8.0/org/javers/core/Javers.html#commit-java.lang.String-java.lang.Object-"><code>javers.commit()</code></a>
   and deeply comparing whole structure with previous version stored in repository.
   Thanks to that approach you can commit large structures, like trees, graphs, DDD aggregates withe a single
   javers.commit() call.
@@ -322,7 +323,7 @@ For <code>MongoDB</code>:
 
 
 ## Using Object Diff
-##1. Find diff betwen two graphs of objects
+##1. Find diff between two graphs of objects
 
 ###1.1. Compare Entities
 
