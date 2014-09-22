@@ -52,12 +52,15 @@ import org.javers.core.graph.ObjectGraphBuilder;
  *     <li>{@link JaversBuilder#registerValue(Class)}</li>
  * </ul>
  *
+ * Let's examine these three fundamental types more closely.
+ *
  * <h3>Entity</h3>
  * JaVers {@link Entity} has exactly the same semantic like DDD Entity or JPA Entity.
  * <br><br>
  *
  * Usually, each entity instance represents concrete physical object.
- * Entity has a list of mutable properties and its own identity hold in id property.
+ * Entity has a list of mutable properties and its own <i>identity</i> hold in <i>id property</i>.
+ * Entity can contain ValueObjects, References (to entity instances), Containers, Values & Primitives.
  * <br><br>
  *
  * For example Entities are: Person, Company.
@@ -69,6 +72,7 @@ import org.javers.core.graph.ObjectGraphBuilder;
  *
  * In strict DDD approach, Value Objects can't exists independently and have to be bound do Entity instances
  * (as a part of an Aggregate). Javers is not such radical and supports both embedded and dangling Value Objects.
+ * So in JaVers, ValueObject is just Entity without identity.
  * <br><br>
  *
  * For example Value Objects are: Address, Point
@@ -97,13 +101,14 @@ import org.javers.core.graph.ObjectGraphBuilder;
  * <ul>
  *     <li>If Person.class was spotted before in the graphs, TypeMapper has exact mapping for it and just returns already known JaversType</li>
  *     <li>If this is a first question about Person.class, TypeMapper checks if it was registered in {@link JaversBuilder}
- *          as one of Entitiy, Value Object or Value. If so, answer is easy.</li>
+ *          as one of Entity, Value Object or Value. If so, answer is easy.</li>
  *     <li>Then TypeMapper tries to find so called Prototype&mdash;nearest class or interface that is already mapped and is assignable from Person.class.
  *          So as You can see, it's easy to map whole bunch of classes with common superclass or interface with one call to {@link JaversBuilder}.
  *          Just register those high level concepts.</li>
- *     <li>When Prototype is not found, Javers tries to infer Type by looking for well known JPA annotations: {@link javax.persistence.Entity}
- *          and {@link javax.persistence.Id}.
- *          If found, class would be mapped as {@link Entity}, otherwise as {@link ValueObject}.</li>
+ *     <li>When Prototype is not found, Javers tries to infer Type by looking for Id annotation at property level
+ *         (only the annotation class name is important, package is not checked,
+ *          so you can use well known javax.persistence.Id or custom annotation).
+ *         If @Id is found, class would be mapped as an Entity, otherwise as a ValueObject.
  * </ul>
  *
  * To summarize, identify Entities and Value Objects and Values in your domain model.
