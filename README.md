@@ -21,7 +21,7 @@ Check our site to find <a href="http://javers.org/#team">the team</a> and contac
 ## License
 JaVers is licensed under Apache License Version 2.0, see LICENSE file.
 
-
+# Examples
 ## Using Object Diff
 ##1. Find diff between two graphs of objects
 
