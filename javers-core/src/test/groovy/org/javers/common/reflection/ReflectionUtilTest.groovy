@@ -57,5 +57,17 @@ class ReflectionUtilTest extends Specification {
             args == []
     }
 
+    def "should return distinct method keys"() {
+        given:
 
+        when:
+        def aKey = ReflectionUtil.methodKey(ReflectionTestClass.class.getMethod("Aa", String.class))
+        def bKey = ReflectionUtil.methodKey(ReflectionTestClass.class.getMethod("BB", String.class))
+
+        println("aKey $aKey")
+        println("bKey $bKey")
+
+        then:
+        aKey != bKey
+    }
 }

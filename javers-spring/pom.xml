@@ -3,7 +3,7 @@
     <parent>
         <artifactId>javers-parent</artifactId>
         <groupId>org.javers</groupId>
-        <version>0.8.0</version>
+        <version>0.8.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

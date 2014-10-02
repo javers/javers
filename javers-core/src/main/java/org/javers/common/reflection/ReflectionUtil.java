@@ -4,8 +4,11 @@ import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -53,7 +56,7 @@ public class ReflectionUtil {
     }
 
     private static int methodKey(Method m){
-        int key = m.getName().hashCode();
+        int key = shaDigest(m.getName());
         for (Class c : m.getParameterTypes()) {
             key += c.hashCode();
         }
@@ -232,5 +235,21 @@ public class ReflectionUtil {
         }
 
         return Integer.MAX_VALUE;
+    }
+
+    private static int shaDigest(String text){
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(text.getBytes("UTF-8"));
+            byte[] hashBytes = digest.digest();
+
+            int result = 0;
+            for (int i=0; i<hashBytes.length; i++){
+                result += Math.abs(hashBytes[i]) * (i+1);
+            }
+            return result;
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
