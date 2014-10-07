@@ -1,7 +1,28 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'pl.allegro.tech.build:axion-release-plugin:0.9.2'
+    }
+}
+
+apply plugin: 'axion-release'
+
+scmVersion {
+    tag {
+        prefix = 'javers'
+    }
+}
+
 subprojects {
     apply plugin: 'application'
     apply plugin: 'java'
-    apply plugin: "groovy"
+    apply plugin: 'groovy'
+
+    project.group = 'org.javers'
+    project.version = scmVersion.version
 
     repositories {
         mavenCentral()
