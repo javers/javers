@@ -20,6 +20,7 @@ subprojects {
     apply plugin: 'application'
     apply plugin: 'java'
     apply plugin: 'groovy'
+    apply plugin: 'maven-publish'
 
     project.group = 'org.javers'
     project.version = scmVersion.version
@@ -38,6 +39,38 @@ subprojects {
         testCompile 'org.objenesis:objenesis:2.1'
         testCompile 'org.easytesting:fest-assert-core:2.0M10'
     }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact sourcesJar
+
+                pom.withXml {
+                    def root = asNode()
+                    root.appendNode('name', 'JaVers - domain objects VCS - parent pom - ${project.version}')
+                    root.appendNode('description', 'Parent pom and reactor for all JaVers modules')
+                    root.appendNode('url', 'http://javers.org')
+
+                    def license = root.appendNode('licenses').appendNode('license')
+                    license.appendNode('name', 'The Apache Software License, Version 2.0')
+                    license.appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.txt')
+
+                    def scm = root.appendNode('scm')
+                    scm.appendNode('url', 'https://bitbucket.org/javers/javers')
+                    scm.appendNode('connection', 'scm:git:https://bitbucket.org/javers/javers.git')
+
+                    def developers = root.appendNode('developers')
+                    def bwalacik = developers.appendNode('developer')
+                    bwalacik.appendNode('name', 'Bartosz Walacik')
+
+                    def pszymczyk = developers.appendNode('developer')
+                    pszymczyk.appendNode('name', 'Pawel Szymczyk')
+                }
+            }
+        }
+    }
+
 }
 
 task wrapper(type: Wrapper) {
