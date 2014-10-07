@@ -1,9 +1,3 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-}
-
 subprojects {
     apply plugin: 'application'
     apply plugin: 'java'
