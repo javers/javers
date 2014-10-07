@@ -1,0 +1,3 @@
+rootProject.name = 'javers'
+
+include 'javers-core', 'javers-persistence-jdbc', 'javers-persistence-mongo', 'javers-spring'

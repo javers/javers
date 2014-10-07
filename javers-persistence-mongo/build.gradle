@@ -1,0 +1,7 @@
+dependencies {
+    compile project(':javers-core')
+    compile 'org.mongodb:mongo-java-driver:2.11.4'
+
+    testCompile project(path: ":javers-core", configuration: "testArtifacts")
+    testCompile 'com.github.fakemongo:fongo:1.4.4'
+}

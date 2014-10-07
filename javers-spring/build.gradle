@@ -1,0 +1,9 @@
+dependencies {
+    compile project(':javers-core')
+    compile 'org.springframework:spring-context:3.2.2.RELEASE'
+
+    testCompile project(path: ":javers-core", configuration: "testArtifacts")
+    testCompile 'ch.qos.logback:logback-classic:1.1.2'
+    testCompile 'org.springframework:spring-test:3.2.2.RELEASE'
+    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
+}
