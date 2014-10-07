@@ -40,6 +40,11 @@ subprojects {
         testCompile 'org.easytesting:fest-assert-core:2.0M10'
     }
 
+    task sourcesJar(type: Jar) {
+        classifier 'sources'
+        from sourceSets.main.allSource
+    }
+
     publishing {
         publications {
             mavenJava(MavenPublication) {
