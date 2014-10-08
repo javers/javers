@@ -12,9 +12,7 @@ import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.ValueObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -32,12 +30,10 @@ import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
 public class ObjectNode implements Visitable<GraphVisitor> {
     private final Cdo cdo;
     private final Map<Property, Edge> edges = new HashMap<>();
-    private boolean stub;
 
     public ObjectNode(Cdo cdo) {
         argumentIsNotNull(cdo);
         this.cdo = cdo;
-        this.stub = true;
     }
 
     ObjectNode(Object cdo, Entity entity) {
@@ -92,6 +88,19 @@ public class ObjectNode implements Visitable<GraphVisitor> {
         return edges.get(property);
     }
 
+    Edge getEdge(String propertyName) {
+        for (Property p :  edges.keySet()){
+            if (p.getName().equals(propertyName)){
+                return getEdge(p);
+            }
+        }
+        return null;
+    }
+
+    void addEdge(Edge edge) {
+        this.edges.put(edge.getProperty(), edge);
+    }
+
     int edgesCount() {
         return edges.size();
     }
@@ -106,18 +115,6 @@ public class ObjectNode implements Visitable<GraphVisitor> {
 
     Cdo getCdo() {
         return cdo;
-    }
-
-    boolean isStub() {
-        return stub;
-    }
-
-    void unstub() {
-        stub = false;
-    }
-
-    void addEdge(Edge edge) {
-        this.edges.put(edge.getProperty(), edge);
     }
 
     public boolean equals(Object o) {
