@@ -16,6 +16,9 @@ public abstract class AbstractConfiguration {
     }
 
     protected <T extends Enum<T>> T getEnumProperty(String propertyKey, Class<T> enumType) {
+        if (!containsPropertyKey(propertyKey)) {
+            return null;
+        }
         return propertyConfiguration.getEnumProperty(propertyKey, enumType);
     }
 
@@ -24,6 +27,9 @@ public abstract class AbstractConfiguration {
     }
 
     protected boolean getBooleanProperty(String propertyKey) {
+        if (!containsPropertyKey(propertyKey)) {
+            return false;
+        }
         return propertyConfiguration.getBooleanProperty(propertyKey);
     }
 

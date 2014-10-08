@@ -17,7 +17,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class JaversCommitIntegrationTest extends Specification {
 
-    def "should create initial commit when new objects"() {
+    def "should create initial commit for new objects"() {
         given:
         def javers = javers().build()
         def newUser = new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("London"))
@@ -35,8 +35,8 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasSnapshots(2)
                     .hasSnapshot(cdoId,  [id:1, valueObjectRef:voId])
                     .hasSnapshot(voId,   [city : "London"])
-                    .hasNewObject(cdoId, [id:1, valueObjectRef:voId])
-                    .hasNewObject(voId,  [city : "London"])
+                    .hasNewObject(cdoId)
+                    .hasNewObject(voId)
     }
 
     def "should detect reference change"() {
@@ -56,9 +56,8 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasSnapshots(2)
                     .hasSnapshot(instanceId(5,SnapshotEntity),[id:5])
                     .hasSnapshot(instanceId(1,SnapshotEntity),[id:1,entityRef: instanceId(5,SnapshotEntity)])
-                    .hasChanges(3)
-                    .hasNewObject(instanceId(5,SnapshotEntity),[id:5])
-                    .hasValueChangeAt("id",0,5)
+                    .hasChanges(2)
+                    .hasNewObject(instanceId(5,SnapshotEntity))
                     .hasReferenceChangeAt("entityRef", instanceId(2,SnapshotEntity), instanceId(5,SnapshotEntity))
     }
 
@@ -81,7 +80,7 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasSnapshots(2)
                     .hasSnapshot(cdoId,    [id:1, entityRef:oldRefId ])
                     .hasSnapshot(oldRefId, [id:2, intProperty:5])
-                    .hasNewObject(cdoId,   [id:1, entityRef:oldRefId, ])
+                    .hasNewObject(cdoId)
                     .hasValueChangeAt("intProperty", 2, 5)
     }
 
@@ -101,7 +100,7 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasSnapshots(2)
                     .hasSnapshot(instanceId(1, DummyUserDetails),[id:1,dummyAddress:voId,addressList:[],integerList:[]])
                     .hasSnapshot(voId,[city:"Tokyo"])
-                    .hasNewObject(voId,[city:"Tokyo"])
+                    .hasNewObject(voId)
                     .hasReferenceChangeAt("dummyAddress",null,voId)
 
     }
@@ -145,7 +144,7 @@ class JaversCommitIntegrationTest extends Specification {
                     .hasSnapshot(instanceId(5, DummyUserDetails))
                     .hasSnapshot(addedVoId)
                     .hasListReferenceAddedAt("addressList",addedVoId)
-                    .hasNewObject(addedVoId,[city:"Tokyo"])
+                    .hasNewObject(addedVoId)
     }
 
     def "should support object removed from List, deep in the graph"() {

@@ -8,10 +8,11 @@ import org.javers.common.validation.Validate;
  * @author bartosz walacik
  */
 public class JaversCoreConfiguration extends AbstractConfiguration {
-    public static final String MAPPING_STYLE_PROPERTY_NAME = "core.mappingStyle";
 
     //enum properties
     private MappingStyle mappingStyle;
+
+    private boolean newObjectsSnapshot;
 
     /**
      * loads javers-default.properties
@@ -28,16 +29,25 @@ public class JaversCoreConfiguration extends AbstractConfiguration {
         return mappingStyle;
     }
 
+    public boolean isNewObjectsSnapshot() {
+        return newObjectsSnapshot;
+    }
+
     public JaversCoreConfiguration withMappingStyle(MappingStyle mappingStyle) {
         Validate.argumentIsNotNull(mappingStyle);
         this.mappingStyle = mappingStyle;
         return this;
     }
 
+    public JaversCoreConfiguration withNewObjectsSnapshot(boolean newObjectsSnapshot) {
+        this.newObjectsSnapshot = newObjectsSnapshot;
+        return this;
+    }
+
     @Override
     protected void assemble() {
-        if (containsPropertyKey(MAPPING_STYLE_PROPERTY_NAME)) {
-            mappingStyle = getEnumProperty(MAPPING_STYLE_PROPERTY_NAME, MappingStyle.class);
-        }
+        mappingStyle = getEnumProperty("core.mappingStyle", MappingStyle.class);
+
+        newObjectsSnapshot = getBooleanProperty("core.diff.newObjectsSnapshot");
     }
 }

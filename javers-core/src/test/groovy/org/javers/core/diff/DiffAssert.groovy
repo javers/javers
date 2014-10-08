@@ -57,11 +57,12 @@ class DiffAssert {
         this
     }
 
-    //DiffAssert hasNewObject(def globalId){
-    //    assert actual.changes.find{it instanceof NewObject && it.globalId == globalId}, "no NewObject change with expected globalId: "+globalId
-    //    this
-    //}
+    DiffAssert hasNewObject(def expectedId) {
+        assert actual.changes.find { it instanceof NewObject && it.affectedCdoId == expectedId }
+        this
+    }
 
+    /*
     DiffAssert hasNewObject(def expectedId, Map<String, Object> expectedInitialState){
         assert actual.changes.find{it instanceof NewObject && it.affectedCdoId == expectedId}
 
@@ -74,7 +75,7 @@ class DiffAssert {
             assert change.right ==  entry.value
         }
         this
-    }
+    }*/
 
     DiffAssert hasListReferenceAddedAt(String property, def addedRef){
         ListChange change = actual.changes.find{it instanceof ListChange && it.property.name == property}
