@@ -5,6 +5,7 @@ import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.GraphFactory;
 import org.javers.core.Javers;
+import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.appenders.NodeChangeAppender;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
@@ -29,12 +30,14 @@ public class DiffFactory {
     private final List<NodeChangeAppender> nodeChangeAppenders;
     private final List<PropertyChangeAppender> propertyChangeAppender;
     private final GraphFactory graphFactory;
+    private final JaversCoreConfiguration javersCoreConfiguration;
 
-    public DiffFactory(TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, GraphFactory graphFactory) {
+    public DiffFactory(JaversCoreConfiguration javersCoreConfiguration, TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, GraphFactory graphFactory) {
         this.typeMapper = typeMapper;
         this.nodeChangeAppenders = nodeChangeAppenders;
         this.propertyChangeAppender = propertyChangeAppender;
         this.graphFactory = graphFactory;
+        this.javersCoreConfiguration = javersCoreConfiguration;
     }
 
     /**
@@ -81,9 +84,11 @@ public class DiffFactory {
         }
 
         //calculate snapshot of NewObjects
-        for (ObjectNode node : graphPair.getOnlyOnRight()) {
-            FakeNodePair pair = new FakeNodePair(node);
-            appendPropertyChanges(diff, pair, commitMetadata);
+        if (javersCoreConfiguration.isNewObjectsSnapshot()) {
+            for (ObjectNode node : graphPair.getOnlyOnRight()) {
+                FakeNodePair pair = new FakeNodePair(node);
+                appendPropertyChanges(diff, pair, commitMetadata);
+            }
         }
 
         //calculate property-to-property diff

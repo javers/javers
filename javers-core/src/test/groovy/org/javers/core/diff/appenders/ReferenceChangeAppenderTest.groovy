@@ -30,7 +30,7 @@ class ReferenceChangeAppenderTest extends AbstractDiffTest{
         !change
     }
 
-    def "should compare refs null safely"() {
+    def "should compare null refs safely"() {
         given:
         def leftCdo =   new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
         def rightCdo =  new SnapshotEntity(id:1, entityRef: null)

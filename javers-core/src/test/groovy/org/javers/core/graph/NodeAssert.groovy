@@ -60,8 +60,7 @@ class NodeAssert {
     }
 
     EdgeAssert hasEdge(String edgeName) {
-        def property = actual.cdo.managedClass.getProperty(edgeName)
-        def edge = actual.getEdge(property)
+        def edge = actual.getEdge(edgeName)
         assert edge
         EdgeAssert.assertThat(edge)
     }

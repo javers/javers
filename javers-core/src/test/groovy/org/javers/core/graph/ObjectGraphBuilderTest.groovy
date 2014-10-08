@@ -394,4 +394,27 @@ abstract class ObjectGraphBuilderTest extends Specification {
                         .hasSingleEdge("parent").andTargetNode().hasGlobalId(idBuilder.unboundedValueObjectId(CategoryVo))
     }
 
+    def "should support large graphs (more than 10000 edges)"() {
+        given:
+        def root = new Category(0);
+        def parent = root
+        10000.times {
+            def child = new Category(parent.id+1)
+            parent.addChild(child)
+            parent = child
+        }
+
+        def graphBuilder = newBuilder()
+
+        when:
+        ObjectNode node = graphBuilder.buildGraph(root)
+
+        then:
+        (10000-1).times {
+            node = node.getEdge("categories").references[0]
+            assertThat(node).hasMultiEdge("categories")
+            assertThat(node).hasSingleEdge("parent")
+        }
+    }
+
 }

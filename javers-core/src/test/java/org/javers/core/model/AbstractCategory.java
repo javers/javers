@@ -9,8 +9,8 @@ import java.util.List;
 public class AbstractCategory {
 
     private String name;
-    private Category parent;
-    private final List<Category> categories = new ArrayList<>();
+    private AbstractCategory parent;
+    private final List<AbstractCategory> categories = new ArrayList<>();
 
     public AbstractCategory(String name) {
         this.name = name;
@@ -24,7 +24,7 @@ public class AbstractCategory {
         this.name = name;
     }
 
-    public Category getParent() {
+    public AbstractCategory getParent() {
         return parent;
     }
 
@@ -32,8 +32,13 @@ public class AbstractCategory {
         this.parent = parent;
     }
 
-    public List<Category> getCategories() {
+    public List<AbstractCategory> getCategories() {
         return categories;
+    }
+
+    public void addChild(AbstractCategory child) {
+        child.parent = this;
+        getCategories().add(child);
     }
 
 }

@@ -12,7 +12,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class NewObjectAppenderTest extends AbstractDiffTest {
 
-    def "should append newObject to diff"() {
+    def "should append one newObject to diff"() {
         given:
         def cdoLeft = dummyUser().withName("1").build()
         def cdoRight = dummyUser().withName("added").build()
@@ -31,7 +31,7 @@ class NewObjectAppenderTest extends AbstractDiffTest {
                         .hasAffectedCdo(cdoRight)
     }
 
-    def "should append newObjects to diff"() {
+    def "should append two newObjects to diff"() {
         given:
         def left =  buildLiveGraph(dummyUser().withName("1").build())
         def right = buildLiveGraph(dummyUser().withName("added").withDetails(5).build())

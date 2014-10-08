@@ -57,8 +57,7 @@ class JaversNapCategoryTreeIntegrationTest extends Specification {
 
         then:
         assertThat(diff).has(3906 , NewObject)
-        assertThat(diff).has(3906*2 , ValueChange)
-        assertThat(diff).has(3905 , ReferenceChange)
-        assertThat(diff).has(3906 , ObjectRemoved)
+                        .has(3906 , ObjectRemoved)
+                        .hasChanges(3906 * 2)
     }
 }
