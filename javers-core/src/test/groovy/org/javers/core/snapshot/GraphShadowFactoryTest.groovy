@@ -31,8 +31,8 @@ class GraphShadowFactoryTest extends Specification {
         def shadow = javers.graphShadowFactory.createLatestShadow(liveGraph)
 
         then:
-        shadow.flatten().size() == 1
-        NodeAssert.assertThat(shadow.flatten()[0]).hasGlobalId(instanceId(2,SnapshotEntity))
+        shadow.nodes().size() == 1
+        NodeAssert.assertThat(shadow.nodes()[0]).hasGlobalId(instanceId(2,SnapshotEntity))
                                                   .isSnapshot()
     }
 }

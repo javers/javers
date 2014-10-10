@@ -2,6 +2,8 @@ package org.javers.core.graph;
 
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.util.Set;
+
 /**
  * @author bartosz walacik
  */
@@ -18,7 +20,6 @@ public class LiveGraphFactory {
      * delegates to {@link ObjectGraphBuilder#buildGraph(Object)}
      */
     public LiveGraph createLiveGraph(Object handle) {
-        ObjectNode root = new ObjectGraphBuilder(typeMapper, liveCdoFactory).buildGraph(handle);
-        return new LiveGraph(root);
+        return new ObjectGraphBuilder(typeMapper, liveCdoFactory).buildGraph(handle);
     }
 }

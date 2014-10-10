@@ -2,10 +2,13 @@ package org.javers.core.graph;
 
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.diff.ObjectGraph;
+import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.EnumerableType;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +40,9 @@ public class ObjectGraphBuilder {
      * @param handle domain object, instance of Entity or ValueObject.
      *               It should be root of an aggregate, tree root
      *               or any node in objects graph from where all other nodes are navigable
-     * @return graph node
+     * @return graph nodes set
      */
-    public ObjectNode buildGraph(Object handle) {
+    public LiveGraph buildGraph(Object handle) {
         argumentIsNotNull(handle);
 
         Cdo cdo = edgeBuilder.asCdo(handle, null);
@@ -57,7 +60,7 @@ public class ObjectGraphBuilder {
                          edgeBuilder.graphType(),
                          nodeReuser.nodesCount(),  nodeReuser.entitiesCount(), nodeReuser.voCount());
         switchToBuilt();
-        return root;
+        return new LiveGraph(root, nodeReuser.nodes());
     }
 
     private void buildEdges(ObjectNode nodeStub) {

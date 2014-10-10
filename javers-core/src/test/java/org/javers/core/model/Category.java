@@ -22,6 +22,7 @@ public class Category extends AbstractCategory {
         this.id = id;
     }
 
+    @Id
     public Long getId() {
         return id;
     }

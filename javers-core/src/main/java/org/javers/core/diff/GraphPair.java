@@ -22,22 +22,27 @@ public class GraphPair {
         this.leftGraph = leftGraph;
         this.rightGraph = rightGraph;
 
-        this.onlyOnLeft = difference(leftGraph.flatten(), rightGraph.flatten());
-        this.onlyOnRight = difference(rightGraph.flatten(), leftGraph.flatten());
+        this.onlyOnLeft = difference(leftGraph.nodes(), rightGraph.nodes());
+        this.onlyOnRight = difference(rightGraph.nodes(), leftGraph.nodes());
     }
 
     //for initial
     public GraphPair(ObjectGraph currentGraph) {
-        this.leftGraph = new ObjectGraph(){
-            public Set<ObjectNode> flatten() {
-                return  Collections.EMPTY_SET;
-            }
-        };
+        this.leftGraph = new EmptyGraph();
 
         this.rightGraph = currentGraph;
 
         this.onlyOnLeft = Collections.EMPTY_SET;
-        this.onlyOnRight = rightGraph.flatten();
+        this.onlyOnRight = rightGraph.nodes();
+    }
+
+    private class EmptyGraph implements ObjectGraph {
+        public Set<ObjectNode> nodes() {
+            return  Collections.EMPTY_SET;
+        }
+        public ObjectNode root() {
+            throw new RuntimeException("not implemented");
+        }
     }
 
     public Set<ObjectNode> getOnlyOnLeft() {
@@ -49,11 +54,11 @@ public class GraphPair {
     }
 
     public Set<ObjectNode> getLeftNodeSet() {
-        return leftGraph.flatten();
+        return leftGraph.nodes();
     }
 
     public Set<ObjectNode> getRightNodeSet() {
-        return rightGraph.flatten();
+        return rightGraph.nodes();
     }
 
 }

@@ -12,6 +12,10 @@ public class Lists {
         return java.util.Collections.unmodifiableList(java.util.Arrays.asList(elements));
     }
 
+    public static <E> List<E> asList(E... elements) {
+        return (List)Arrays.asList(elements);
+    }
+
     /**
      * @return index -> value
      */

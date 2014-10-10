@@ -11,7 +11,7 @@ import org.javers.common.patterns.visitors.Visitable;
  *
  * @author bartosz walacik
  */
-public abstract class Edge implements Visitable<GraphVisitor> {
+public abstract class Edge {
     private final Property property;
 
     Edge(Property property) {
@@ -37,7 +37,4 @@ public abstract class Edge implements Visitable<GraphVisitor> {
     public int hashCode() {
         return property.hashCode();
     }
-
-    //not sure if it is useful
-    //public abstract Entity getReferencedEntity();
 }

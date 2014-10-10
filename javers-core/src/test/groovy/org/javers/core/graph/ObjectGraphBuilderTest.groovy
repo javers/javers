@@ -1,7 +1,6 @@
 package org.javers.core.graph
 
 import org.javers.core.IdBuilder
-import org.javers.core.metamodel.object.InstanceIdDTO
 import org.javers.core.metamodel.object.ValueObjectIdDTO
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.model.*
@@ -33,7 +32,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         DummyUser user = dummyUser().withName("Mad Kaz").build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(user)
+        def node = graphBuilder.buildGraph(user).root()
 
         then:
         NodeAssert.assertThat(node).hasNoEdges()
@@ -48,7 +47,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         DummyAddress address = new DummyAddress("any","any")
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(address)
+        def node = graphBuilder.buildGraph(address).root()
 
         then:
         NodeAssert.assertThat(node).hasNoEdges()
@@ -63,7 +62,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         DummyUserDetails user = dummyUserDetails(1).withAddress().build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(user)
+        def node = graphBuilder.buildGraph(user).root()
 
         then:
         NodeAssert.assertThat(node).hasCdo(user)
@@ -81,7 +80,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         DummyUser user = dummyUser().withName("Mad Kaz").withSupervisor("Mad Stach").build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(user)
+        def node = graphBuilder.buildGraph(user).root()
 
         then:
         NodeAssert.assertThat(node).hasEdges(1)
@@ -97,7 +96,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(user)
+        def node = graphBuilder.buildGraph(user).root()
 
         then:
         NodeAssert.assertThat(node).hasEdges(1)
@@ -121,7 +120,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         }
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(kaziki[0]);
+        def node = graphBuilder.buildGraph(kaziki[0]).root()
 
         then:
         NodeAssert.assertThat(node).hasEdges(1)
@@ -147,7 +146,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withDetails(1L).withSupervisor(stach).build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(kaz)
+        def node = graphBuilder.buildGraph(kaz).root()
 
         then:
         NodeAssert.assertThat(node).hasEdges(2)
@@ -175,7 +174,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         DummyUser stach = dummyUser().withName("Mad Stach").withDetails(2L).withDetailsList(3).build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(stach)
+        def node = graphBuilder.buildGraph(stach).root()
 
         then:
         NodeAssert.assertThat(node).hasEdges(2)
@@ -198,7 +197,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         DummyUser kaz   = dummyUser().withName("Mad Kaz").withSupervisor(stach).build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(kaz)
+        def node = graphBuilder.buildGraph(kaz).root()
 
         then:
         NodeAssert.assertThat(node).hasCdoId("Mad Kaz")
@@ -228,7 +227,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         DummyUser kaz   = dummyUser().withName("kaz").withSupervisor(stach).build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(kaz)
+        def node = graphBuilder.buildGraph(kaz).root()
 
         then:
         NodeAssert.assertThat(node).hasCdoId("kaz")
@@ -258,7 +257,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         superKaz.setEmployeesList(kaz, microKaz)
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(superKaz)
+        def node = graphBuilder.buildGraph(superKaz).root()
 
         then:
 
@@ -288,7 +287,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         DummyUser dummyUser = dummyUser().withName("name").withStringsSet("1", "2", "3").build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(dummyUser)
+        def node = graphBuilder.buildGraph(dummyUser).root()
 
         then:
         NodeAssert.assertThat(node).hasNoEdges()
@@ -301,7 +300,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         DummyUser dummyUser = dummyUser().withName("name").withIntegerList(1, 2, 3, 4).build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(dummyUser)
+        def node = graphBuilder.buildGraph(dummyUser).root()
 
         then:
         NodeAssert.assertThat(node).hasNoEdges()
@@ -313,7 +312,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ObjectGraphBuilder graphBuilder = newBuilder()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(cdo)
+        def node = graphBuilder.buildGraph(cdo).root()
 
         then:
         assertThat(node).hasMultiEdge(propertyName).ofSize(2)
@@ -338,7 +337,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ObjectGraphBuilder graphBuilder = newBuilder()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(cdo)
+        def node = graphBuilder.buildGraph(cdo).root()
 
         then:
         assertThat(node).hasMultiEdge(propertyName).ofSize(2)
@@ -362,7 +361,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .build()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(dummyUserDetails)
+        def node = graphBuilder.buildGraph(dummyUserDetails).root()
 
         then:
         assertThat(node).hasMultiEdge("addressList").refersToGlobalIds(
@@ -381,7 +380,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         root.addChild(child1).addChild(child2)
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(root)
+        def node = graphBuilder.buildGraph(root).root()
 
         then:
         assertThat(node).hasGlobalId(idBuilder.unboundedValueObjectId(CategoryVo))
@@ -407,7 +406,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def graphBuilder = newBuilder()
 
         when:
-        ObjectNode node = graphBuilder.buildGraph(root)
+        def node = graphBuilder.buildGraph(root).root()
 
         then:
         (10000-1).times {

@@ -27,7 +27,7 @@ import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
  *
  * @author bartosz walacik
  */
-public class ObjectNode implements Visitable<GraphVisitor> {
+public class ObjectNode {
     private final Cdo cdo;
     private final Map<Property, Edge> edges = new HashMap<>();
 
@@ -130,16 +130,4 @@ public class ObjectNode implements Visitable<GraphVisitor> {
         return cdo.hashCode();
     }
 
-    @Override
-    public void accept(GraphVisitor visitor) {
-        if(visitor.wasVisited(this)){
-            return;
-        }
-
-        visitor.visit(this);
-
-        for(Edge edge : edges.values()) {
-            edge.accept(visitor);
-        }
-    }
 }

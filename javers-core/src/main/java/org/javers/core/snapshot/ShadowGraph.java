@@ -3,7 +3,6 @@ package org.javers.core.snapshot;
 import org.javers.core.diff.ObjectGraph;
 import org.javers.core.graph.ObjectNode;
 
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -17,7 +16,12 @@ public class ShadowGraph implements ObjectGraph {
     }
 
     @Override
-    public Set<ObjectNode> flatten() {
-        return Collections.unmodifiableSet(snapshots);
+    public Set<ObjectNode> nodes() {
+        return snapshots;
+    }
+
+    @Override
+    public ObjectNode root() {
+        throw new RuntimeException("not implemented");
     }
 }

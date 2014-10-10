@@ -29,7 +29,7 @@ public class GraphShadowFactory {
 
 
         Set<ObjectNode> snapshotNodes = new HashSet<>();
-        for (ObjectNode liveNode : liveGraph.flatten()){
+        for (ObjectNode liveNode : liveGraph.nodes()){
             Optional<CdoSnapshot> snapshot =  javersRepository.getLatest(liveNode.getGlobalId());
 
             if (snapshot.isEmpty()){
