@@ -40,6 +40,16 @@ subprojects {
         testCompile 'org.easytesting:fest-assert-core:2.0M10'
     }
 
+    task groovydocJar(type: Jar) {
+        classifier = 'groovydoc'
+        from groovydoc
+    }
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
     task sourcesJar(type: Jar) {
         classifier 'sources'
         from sourceSets.main.allSource

@@ -1,13 +1,10 @@
 dependencies {
     compile 'joda-time:joda-time:2.3'
-    compile 'commons-lang:commons-lang:2.6'
-    compile 'commons-collections:commons-collections:3.2.1'
-    compile 'com.google.guava:guava:14.0.1'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.1.4'
-    compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'org.slf4j:slf4j-api:1.7.2'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'org.picocontainer:picocontainer:2.14.3'
-    compile 'javax.persistence:persistence-api:1.0.2'
+
+    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
 }
 
 configurations {
