@@ -203,6 +203,11 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
+    public JaversBuilder withNewObjectsSnapshot(boolean newObjectsSnapshot){
+        coreConfiguration().withNewObjectsSnapshot(newObjectsSnapshot);
+        return this;
+    }
+
     private void mapRegisteredClasses() {
         TypeMapper typeMapper = typeMapper();
         for (ManagedClassDefinition def : managedClassDefinitions) {

@@ -8,7 +8,6 @@ import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.JaversExtendedRepository;
-import org.javers.repository.api.JaversRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +36,7 @@ public class GraphSnapshotFactory {
     public List<CdoSnapshot> create(LiveGraph currentVersion, CommitMetadata commitMetadata){
         Validate.argumentsAreNotNull(currentVersion, commitMetadata);
 
-        return doSnapshotsAndReuse(currentVersion.flatten(), commitMetadata);
+        return doSnapshotsAndReuse(currentVersion.nodes(), commitMetadata);
     }
 
     private List<CdoSnapshot> doSnapshotsAndReuse(Set<ObjectNode> currentVersion, CommitMetadata commitMetadata){

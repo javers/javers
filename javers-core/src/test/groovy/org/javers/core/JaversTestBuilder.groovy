@@ -129,7 +129,7 @@ class JaversTestBuilder {
 
 
     LiveGraph createLiveGraph(Object liveCdo) {
-        new LiveGraph( createObjectGraphBuilder().buildGraph(liveCdo) )
+        createObjectGraphBuilder().buildGraph(liveCdo)
     }
 
     IdBuilder idBuilder(){

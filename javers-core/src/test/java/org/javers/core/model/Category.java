@@ -12,23 +12,22 @@ public class Category extends AbstractCategory {
     @Id
     private Long id;
 
+    public Category(Long id) {
+        super("name "+id);
+        this.id = id;
+    }
 
     public Category(Long id, String name) {
         super(name);
         this.id = id;
     }
 
-
+    @Id
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void addChild(Category child) {
-        child.setParent(this);
-        getCategories().add(child);
     }
 }

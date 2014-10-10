@@ -24,11 +24,4 @@ public class MultiEdge extends Edge {
     public void addReferenceNode(ObjectNode objectNode) {
         references.add(objectNode);
     }
-
-    @Override
-    public void accept(GraphVisitor visitor) {
-        for(ObjectNode objectNode : references) {
-            objectNode.accept(visitor);
-        }
-    }
 }

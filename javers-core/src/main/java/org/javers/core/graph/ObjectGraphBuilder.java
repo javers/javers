@@ -2,10 +2,13 @@ package org.javers.core.graph;
 
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.diff.ObjectGraph;
+import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.property.ManagedClass;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.EnumerableType;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,53 +40,33 @@ public class ObjectGraphBuilder {
      * @param handle domain object, instance of Entity or ValueObject.
      *               It should be root of an aggregate, tree root
      *               or any node in objects graph from where all other nodes are navigable
-     * @return graph node
+     * @return graph nodes set
      */
-    public ObjectNode buildGraph(Object handle) {
+    public LiveGraph buildGraph(Object handle) {
+        argumentIsNotNull(handle);
+
         Cdo cdo = edgeBuilder.asCdo(handle, null);
        // logger.debug("building objectGraph for handle [{}] ...",cdo);
 
-        ObjectNode root = buildNode(cdo);
+        ObjectNode root = edgeBuilder.buildNodeStub(cdo);
+
+        //we can't use recursion here, it could cause StackOverflow for large graphs
+        while(nodeReuser.hasMoreStubs()){
+            ObjectNode stub = nodeReuser.pollStub();
+            buildEdges(stub); //edgeBuilder should append new stubs to queue
+        }
 
         logger.debug("{} graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
                          edgeBuilder.graphType(),
                          nodeReuser.nodesCount(),  nodeReuser.entitiesCount(), nodeReuser.voCount());
         switchToBuilt();
-        return root;
+        return new LiveGraph(root, nodeReuser.nodes());
     }
 
-    /**
-     * recursive
-     */
-    private ObjectNode buildNode(Cdo cdo) {
-        argumentIsNotNull(cdo);
-        //logger.debug(".. creating node for: {}",cdo);
-
-        ObjectNode node = edgeBuilder.buildNodeStub(cdo);
-        continueIfStub(node);
-
-        return node;
-    }
-
-    private void switchToBuilt() {
-        if (built){
-            throw new IllegalStateException("ObjectGraphBuilder is stateful builder (not a Service)");
-        }
-        built = true;
-    }
-
-    private void buildEdges(ObjectNode node) {
-        buildSingleEdges(node);
-        buildMultiEdges(node);
-    }
-
-    //recursion here
-    private void continueIfStub(ObjectNode referencedNode) {
-        if (referencedNode.isStub()){
-            nodeReuser.saveForReuse(referencedNode);
-            referencedNode.unstub();
-            buildEdges(referencedNode); //recursion here
-        }
+    private void buildEdges(ObjectNode nodeStub) {
+        nodeReuser.saveForReuse(nodeStub);
+        buildSingleEdges(nodeStub);
+        buildMultiEdges(nodeStub);
     }
 
     private void buildSingleEdges(ObjectNode node) {
@@ -93,8 +76,6 @@ public class ObjectGraphBuilder {
             }
 
             SingleEdge edge = edgeBuilder.buildSingleEdge(node, singleRef);
-
-            continueIfStub(edge.getReference());
 
             node.addEdge(edge);
         }
@@ -107,12 +88,15 @@ public class ObjectGraphBuilder {
             //looks like we have Container or Map with Entity references or Value Objects
             MultiEdge multiEdge = edgeBuilder.createMultiEdge(containerProperty, enumerableType, node, this);
 
-            for (ObjectNode referencedNode : multiEdge.getReferences()){
-                continueIfStub(referencedNode);
-            }
-
             node.addEdge(multiEdge);
         }
+    }
+
+    private void switchToBuilt() {
+        if (built){
+            throw new IllegalStateException("ObjectGraphBuilder is stateful builder (not a Service)");
+        }
+        built = true;
     }
 
     private List<Property> getSingleReferences(ManagedClass managedClass) {

@@ -25,8 +25,4 @@ public class SingleEdge extends Edge {
         return reference;
     }
 
-    @Override
-    public void accept(GraphVisitor visitor) {
-        reference.accept(visitor);
-    }
 }

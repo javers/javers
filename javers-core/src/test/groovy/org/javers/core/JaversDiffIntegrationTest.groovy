@@ -37,9 +37,24 @@ class JaversDiffIntegrationTest extends Specification {
         DiffAssert.assertThat(diff).has(2, NewObject)
     }
 
-    def "should create snapshot of NewObject"() {
+    def "should not create properties snapshot of NewObject by default"() {
         given:
         Javers javers = JaversBuilder.javers().build()
+        DummyUser left =  new DummyUser(name: "kazik")
+        DummyUser right = new DummyUser(name: "kazik", dummyUserDetails: new DummyUserDetails(id: 1, someValue: "some"))
+
+        when:
+        def diff = javers.compare(left, right)
+
+        then:
+        DiffAssert.assertThat(diff).hasChanges(2)
+                  .hasNewObject(instanceId(1,DummyUserDetails))
+                  .hasReferenceChangeAt("dummyUserDetails",null,instanceId(1,DummyUserDetails))
+    }
+
+    def "should create properties snapshot of NewObject only when configured"() {
+        given:
+        Javers javers = JaversBuilder.javers().withNewObjectsSnapshot(true).build()
         DummyUser left =  new DummyUser(name: "kazik")
         DummyUser right = new DummyUser(name: "kazik", dummyUserDetails: new DummyUserDetails(id: 1, someValue: "some"))
 
@@ -48,11 +63,11 @@ class JaversDiffIntegrationTest extends Specification {
 
         then:
         DiffAssert.assertThat(diff)
-                  .hasNewObject(instanceId(1,DummyUserDetails),[id:1, someValue: "some"])
-                  .hasReferenceChangeAt("dummyUserDetails",null,instanceId(1,DummyUserDetails))
+                .hasNewObject(instanceId(1,DummyUserDetails))
+                .hasValueChangeAt("id",null,1)
+                .hasValueChangeAt("someValue",null,"some")
     }
 
-    //smoke test
     def "should create valueChange with Enum" () {
         given:
         DummyUser user =  dummyUser("id").withSex(FEMALE).build();
@@ -82,11 +97,10 @@ class JaversDiffIntegrationTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.changes.size() == 4
+        json.changes.size() == 3
         json.changes[0].changeType == "NewObject"
         json.changes[1].changeType == "ValueChange"
-        json.changes[2].changeType == "ValueChange"
-        json.changes[3].changeType == "ReferenceChange"
+        json.changes[2].changeType == "ReferenceChange"
     }
 
     def "should support custom JsonTypeAdapter for ValueChange"() {

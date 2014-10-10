@@ -8,5 +8,6 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public interface ObjectGraph {
-    Set<ObjectNode> flatten();
+    Set<ObjectNode> nodes();
+    ObjectNode root();
 }

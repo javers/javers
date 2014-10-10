@@ -4,23 +4,23 @@ import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.ValueObjectId;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author bartosz walacik
  */
 class NodeReuser {
-    private final Map<Object, ObjectNode> reverseCdoIdMap;
+    private final Map<Object, ObjectNode> reverseCdoIdMap = new HashMap<>();
+    private final Set<ObjectNode> nodes = new HashSet<>();
+    private final Queue<ObjectNode> stubs = new LinkedList<>();
     private int reusedNodes;
     private int entities;
     private int valueObjects;
 
     NodeReuser() {
-        this.reverseCdoIdMap = new HashMap<>();
     }
 
-    boolean isReusable(Cdo cdo){
+    boolean isReusable(Cdo cdo) {
         return reverseCdoIdMap.containsKey(reverseCdoIdMapKey(cdo));
     }
 
@@ -29,29 +29,46 @@ class NodeReuser {
         return reverseCdoIdMap.get(reverseCdoIdMapKey(cdo));
     }
 
+    Set<ObjectNode> nodes() {
+        return nodes;
+    }
+
     void saveForReuse(ObjectNode reference) {
-        if (reference.getGlobalId() instanceof InstanceId){
+        if (reference.getGlobalId() instanceof InstanceId) {
             entities++;
         }
-        if (reference.getGlobalId() instanceof ValueObjectId){
+        if (reference.getGlobalId() instanceof ValueObjectId) {
             valueObjects++;
         }
         reverseCdoIdMap.put(reverseCdoIdMapKey(reference.getCdo()), reference);
+        nodes.add(reference);
     }
 
-    public int nodesCount() {
+    void enqueueStub(ObjectNode nodeStub) {
+        stubs.offer(nodeStub);
+    }
+
+    ObjectNode pollStub(){
+       return stubs.poll();
+    }
+
+    boolean hasMoreStubs(){
+        return !stubs.isEmpty();
+    }
+
+    int nodesCount() {
         return reverseCdoIdMap.size();
     }
 
-    public int reusedNodesCount() {
+    int reusedNodesCount() {
         return reusedNodes;
     }
 
-    public int entitiesCount() {
+    int entitiesCount() {
         return entities;
     }
 
-    public int voCount() {
+    int voCount() {
         return valueObjects;
     }
 
@@ -60,9 +77,9 @@ class NodeReuser {
      * System.identityHashCode for ValueObjects
      */
     private Object reverseCdoIdMapKey(Cdo cdo) {
-          if (cdo.getGlobalId() instanceof InstanceId){
-              return cdo.getGlobalId();
-          }
-          return System.identityHashCode(cdo.getWrappedCdo().get());
+        if (cdo.getGlobalId() instanceof InstanceId) {
+            return cdo.getGlobalId();
+        }
+        return System.identityHashCode(cdo.getWrappedCdo().get());
     }
 }

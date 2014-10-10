@@ -49,8 +49,8 @@ class CommitAssert {
         this
     }
 
-    CommitAssert hasNewObject(def expectedId, Map<String, Object> expectedInitial){
-        diffAssert.hasNewObject(expectedId, expectedInitial)
+    CommitAssert hasNewObject(def expectedId){
+        diffAssert.hasNewObject(expectedId)
         this
     }
 

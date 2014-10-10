@@ -104,6 +104,8 @@ class EdgeBuilder {
     }
 
     ObjectNode buildNodeStub(Cdo cdo){
-        return new ObjectNode(cdo);
+        ObjectNode newStub = new ObjectNode(cdo);
+        nodeReuser.enqueueStub(newStub);
+        return newStub;
     }
 }
