@@ -26,7 +26,7 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
  *
  * @author bartosz walacik
  */
-public abstract class Change implements Visitable<ChangeVisitor> {
+public abstract class Change {
 
     private Optional<CommitMetadata> commitMetadata;
     private final GlobalId affectedCdoId;
@@ -82,11 +82,6 @@ public abstract class Change implements Visitable<ChangeVisitor> {
         argumentIsNotNull(affectedCdo);
         conditionFulfilled(this.affectedCdo == null, "affectedCdo already set");
         this.affectedCdo = affectedCdo;
-    }
-
-    @Override
-    public void accept(ChangeVisitor changeVisitor) {
-        changeVisitor.visit(this);
     }
 
     public Optional<CommitMetadata> getCommitMetadata() {
