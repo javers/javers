@@ -11,6 +11,8 @@ buildscript {
 apply plugin: 'axion-release'
 
 scmVersion {
+    remote = 'github' // 'origin' by default
+
     tag {
         prefix = 'javers'
     }
