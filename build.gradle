@@ -17,10 +17,9 @@ scmVersion {
 }
 
 subprojects {
-    apply plugin: 'application'
+    apply plugin: 'maven'
     apply plugin: 'java'
     apply plugin: 'groovy'
-    apply plugin: 'maven-publish'
 
     project.group = 'org.javers'
     project.version = scmVersion.version
@@ -40,9 +39,8 @@ subprojects {
         testCompile 'org.easytesting:fest-assert-core:2.0M10'
     }
 
-    task groovydocJar(type: Jar) {
-        classifier = 'groovydoc'
-        from groovydoc
+    task wrapper(type: Wrapper) {
+        gradleVersion = '2.1'
     }
 
     task javadocJar(type: Jar) {
@@ -50,44 +48,87 @@ subprojects {
         from javadoc
     }
 
-    task sourcesJar(type: Jar) {
-        classifier 'sources'
+    task sourceJar(type: Jar) {
+        classifier = 'sources'
         from sourceSets.main.allSource
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
-                artifact sourcesJar
+    artifacts {
+        archives javadocJar, sourceJar
+    }
 
-                pom.withXml {
-                    def root = asNode()
-                    root.appendNode('name', 'JaVers - domain objects VCS - parent pom - ${project.version}')
-                    root.appendNode('description', 'Parent pom and reactor for all JaVers modules')
-                    root.appendNode('url', 'http://javers.org')
+    //disable javadoc doclint for Java8
+    if (JavaVersion.current().isJava8Compatible()) {
+        allprojects {
+            tasks.withType(Javadoc) {
+                options.addStringOption('Xdoclint:none', '-quiet')
+            }
+        }
+    }
 
-                    def license = root.appendNode('licenses').appendNode('license')
-                    license.appendNode('name', 'The Apache Software License, Version 2.0')
-                    license.appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.txt')
+   // signing {
+   //     sign configurations.archives
+   // }
 
-                    def scm = root.appendNode('scm')
-                    scm.appendNode('url', 'https://bitbucket.org/javers/javers')
-                    scm.appendNode('connection', 'scm:git:https://bitbucket.org/javers/javers.git')
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                //beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-                    def developers = root.appendNode('developers')
-                    def bwalacik = developers.appendNode('developer')
-                    bwalacik.appendNode('name', 'Bartosz Walacik')
+                //def username = project.ext.has('nexusUser') ? project.ext.nexusUser : ''
+                //def password = project.ext.has('nexusPassword') ? project.ext.nexusPassword : ''
 
-                    def pszymczyk = developers.appendNode('developer')
-                    pszymczyk.appendNode('name', 'Pawel Szymczyk')
+                repository(url: 'https://oss.sonatype.org/content/repositories/releases') {
+                    authentication(userName: 'username', password: 'password')
+                }
+
+                snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+                    authentication(userName: 'username', password: 'password')
+                }
+
+                /*addFilter('javers-core') {artifact, file ->
+                    artifact.name == 'javers-core'
+                }
+                addFilter('javers-persistence-mongo') {artifact, file ->
+                    artifact.name == 'javers-persistence-mongo'
+                }
+                addFilter('javers-spring') {artifact, file ->
+                    artifact.name == 'javers-spring'
+                }*/
+
+                pom.project {
+                    name 'javers-parent'
+
+                    packaging 'jar'
+
+                    description 'JaVers object auditing and diff framework'
+                    url 'http://javers.org'
+                    inceptionYear '2013'
+
+                    scm {
+                        connection 'scm:git:https://github.com/javers/javers.git'
+                        url 'https://github.com/javers/javers'
+                    }
+
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            name 'Bartosz Walacik'
+                        }
+                        developer {
+                            name 'Pawel Szymczyk'
+                        }
+                    }
+
                 }
             }
         }
     }
 
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.1'
 }
