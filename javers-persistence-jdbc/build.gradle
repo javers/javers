@@ -1,0 +1,10 @@
+dependencies {
+    compile project(':javers-core')
+    compile 'org.polyjdbc:polyjdbc:0.3.0'
+    compile 'commons-dbcp:commons-dbcp:1.4'
+
+    testCompile 'ch.qos.logback:logback-classic:1.1.2'
+    testCompile 'com.h2database:h2:1.3.172'
+    testCompile 'org.postgresql:postgresql:9.2-1003-jdbc4'
+    testCompile 'org.polyjdbc:polyjdbc:0.3.0'
+}

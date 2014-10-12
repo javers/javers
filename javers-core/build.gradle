@@ -1,0 +1,20 @@
+dependencies {
+    compile 'joda-time:joda-time:2.3'
+    compile 'org.slf4j:slf4j-api:1.7.2'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'org.picocontainer:picocontainer:2.14.3'
+
+    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
+    testCompile 'com.google.guava:guava:14.0.1'
+}
+
+configurations {
+    testArtifacts
+}
+task testJar (type: Jar) {
+    baseName = "${project.name}-test"
+    from sourceSets.test.output
+}
+artifacts {
+    testArtifacts testJar
+}
