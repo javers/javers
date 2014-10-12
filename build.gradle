@@ -81,11 +81,11 @@ subprojects {
                 def password = project.ext.has('sonatypePassword') ? project.ext.sonatypePassword : ''
 
                 repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-                    authentication(userName: 'username', password: 'password')
+                    authentication(userName: username, password: password)
                 }
 
                 snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-                    authentication(userName: 'username', password: 'password')
+                    authentication(userName: username, password: password)
                 }
 
                 /*addFilter('javers-core') {artifact, file ->
