@@ -20,6 +20,7 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'java'
     apply plugin: 'groovy'
+    apply plugin: 'signing'
 
     project.group = 'org.javers'
     project.version = scmVersion.version
@@ -66,17 +67,18 @@ subprojects {
         }
     }
 
-   // signing {
-   //     sign configurations.archives
-   // }
+    signing {
+        required { gradle.taskGraph.hasTask("uploadArchives") }
+        sign configurations.archives
+    }
 
     uploadArchives {
         repositories {
             mavenDeployer {
-                //beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-                //def username = project.ext.has('nexusUser') ? project.ext.nexusUser : ''
-                //def password = project.ext.has('nexusPassword') ? project.ext.nexusPassword : ''
+                def username = project.ext.has('sonatypeUser') ? project.ext.sonatypeUser : ''
+                def password = project.ext.has('sonatypePassword') ? project.ext.sonatypePassword : ''
 
                 repository(url: 'https://oss.sonatype.org/content/repositories/releases') {
                     authentication(userName: 'username', password: 'password')
@@ -130,5 +132,4 @@ subprojects {
             }
         }
     }
-
 }
