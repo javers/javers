@@ -80,7 +80,7 @@ subprojects {
                 def username = project.ext.has('sonatypeUser') ? project.ext.sonatypeUser : ''
                 def password = project.ext.has('sonatypePassword') ? project.ext.sonatypePassword : ''
 
-                repository(url: 'https://oss.sonatype.org/content/repositories/releases') {
+                repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
                     authentication(userName: 'username', password: 'password')
                 }
 

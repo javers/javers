@@ -1,1 +1,0 @@
-mvn clean deploy -Dgpg.homedir=%APPDATA%/gnupg -Psign-artifacts
