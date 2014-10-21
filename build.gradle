@@ -22,6 +22,9 @@ subprojects {
     apply plugin: 'groovy'
     apply plugin: 'signing'
 
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+
     project.group = 'org.javers'
     project.version = scmVersion.version
 
