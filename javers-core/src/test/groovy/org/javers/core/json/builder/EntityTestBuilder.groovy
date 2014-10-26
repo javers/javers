@@ -1,11 +1,11 @@
 package org.javers.core.json.builder
 
 import org.javers.core.JaversTestBuilder
-import org.javers.core.metamodel.property.Entity
-import org.javers.core.metamodel.property.EntityDefinition
-import org.javers.core.metamodel.property.ManagedClassFactory
-import org.javers.core.metamodel.property.ValueObject
-import org.javers.core.metamodel.property.ValueObjectDefinition
+import org.javers.core.metamodel.clazz.Entity
+import org.javers.core.metamodel.clazz.EntityDefinition
+import org.javers.core.metamodel.clazz.ManagedClassFactory
+import org.javers.core.metamodel.clazz.ValueObject
+import org.javers.core.metamodel.clazz.ValueObjectDefinition
 
 /**
  * @author bartosz walacik

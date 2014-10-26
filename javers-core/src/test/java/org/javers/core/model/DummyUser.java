@@ -15,6 +15,9 @@ public class DummyUser extends AbstractDummyUser {
 
     private transient int someTransientField;
 
+    @Transient
+    private int propertyWithTransientAnn;
+
     //primitives and primitive boxes
     private boolean flag;
     private Boolean bigFlag;
@@ -63,7 +66,6 @@ public class DummyUser extends AbstractDummyUser {
         return valueMap;
     }
 
-    @Transient
     public int getSomeTransientField() {
         return someTransientField;
     }
@@ -216,5 +218,14 @@ public class DummyUser extends AbstractDummyUser {
 
     public void setDateTimes(LocalDateTime[] dateTimes) {
         this.dateTimes = dateTimes;
+    }
+
+    @Transient
+    public int getPropertyWithTransientAnn() {
+        return propertyWithTransientAnn;
+    }
+
+    public void setPropertyWithTransientAnn(int propertyWithTransientAnn) {
+        this.propertyWithTransientAnn = propertyWithTransientAnn;
     }
 }

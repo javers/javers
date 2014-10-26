@@ -1,4 +1,7 @@
 package org.javers.core.metamodel.property
+
+import org.javers.core.metamodel.clazz.Entity
+
 /**
  * @author bartosz walacik
  */

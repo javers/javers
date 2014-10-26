@@ -4,7 +4,6 @@ import org.javers.core.diff.DiffFactory
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
 import org.javers.core.metamodel.property.PropertyScanner
-import org.javers.core.metamodel.property.ValueObject
 import org.javers.core.metamodel.type.EntityType
 import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.model.DummyNetworkAddress
@@ -12,9 +11,7 @@ import org.javers.core.metamodel.type.TypeMapper
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import javax.persistence.EntityManager
 import javax.persistence.Id
-import javax.swing.text.html.parser.Entity
 
 import static org.fest.assertions.api.Assertions.assertThat
 import static org.javers.core.JaversBuilder.*

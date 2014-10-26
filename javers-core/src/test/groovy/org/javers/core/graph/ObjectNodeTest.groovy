@@ -2,9 +2,8 @@ package org.javers.core.graph
 
 import org.javers.common.exception.exceptions.JaversException
 import org.javers.common.exception.exceptions.JaversExceptionCode
-import org.javers.core.graph.ObjectNode
-import org.javers.core.metamodel.property.Entity
-import org.javers.core.metamodel.property.ManagedClassFactory
+import org.javers.core.metamodel.clazz.Entity
+import org.javers.core.metamodel.clazz.ManagedClassFactory
 import org.javers.core.model.DummyUser
 import org.javers.core.metamodel.object.Cdo
 import org.javers.core.metamodel.object.InstanceId

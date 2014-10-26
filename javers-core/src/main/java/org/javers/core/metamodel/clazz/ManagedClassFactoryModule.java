@@ -1,4 +1,4 @@
-package org.javers.core.pico;
+package org.javers.core.metamodel.clazz;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
@@ -6,7 +6,6 @@ import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.MappingStyle;
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner;
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner;
-import org.javers.core.metamodel.property.ManagedClassFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,8 @@ import java.util.*;
 public class ManagedClassFactoryModule implements JaversModule {
     private static final Logger logger = LoggerFactory.getLogger(ManagedClassFactoryModule.class);
 
-    private static final Class[] moduleComponents = new Class[] {ManagedClassFactory.class};
+    private static final Class[] moduleComponents = new Class[] {ManagedClassFactory.class,
+                                                                 ClassAnnotationsScanner.class};
 
     private static final Map<MappingStyle, Class> propertyScannersMapping = new HashMap() {{
         put(MappingStyle.BEAN, BeanBasedPropertyScanner.class);

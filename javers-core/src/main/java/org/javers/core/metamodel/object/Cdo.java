@@ -1,14 +1,11 @@
 package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.Entity;
-import org.javers.core.metamodel.property.ManagedClass;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.property.ValueObject;
-
-import static org.javers.common.exception.exceptions.JaversExceptionCode.PROPERTY_NOT_FOUND;
+import org.javers.core.metamodel.clazz.ValueObject;
 
 /**
  * Abstract holder for client's domain object, {@link Entity} or {@link ValueObject}

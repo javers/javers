@@ -1,25 +1,13 @@
-package org.javers.core.metamodel.property;
+package org.javers.core.metamodel.clazz;
 
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.property.Property;
 
 import java.util.List;
 
 /**
- * Entity class in client's domain model.
- * Has list of mutable properties and its own identity hold in idProperty.
- * <br>
- *
- * Example:
- * <pre>
- *     class Person {
- *         private int    personId;
- *         private String firstName;
- *         private String lastName;
- *         ...
- *     }
- * </pre>
  * @author Pawel Cierpiatka
  */
 public class Entity extends ManagedClass {
@@ -28,7 +16,7 @@ public class Entity extends ManagedClass {
     /**
      * @param idProperty null means - give me defaults
      */
-    public Entity(Class sourceClass, List<Property> properties, Property idProperty) {
+    Entity(Class sourceClass, List<Property> properties, Property idProperty) {
         super(sourceClass, properties);
 
         if (idProperty == null) {
@@ -51,8 +39,13 @@ public class Entity extends ManagedClass {
         throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID, getName());
     }
 
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
     /**
-     * @param instance instance of {@link #getSourceClass()}
+     * @param instance instance of {@link #getClientsClass()}
      * @return returns ID of given instance so unwrap of idProperty
      * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
      * @throws JaversException NOT_INSTANCE_OF
@@ -60,11 +53,11 @@ public class Entity extends ManagedClass {
     public Object getIdOf(Object instance) {
         Validate.argumentIsNotNull(instance);
 
-        if (!getSourceClass().isInstance(instance)) {
+        if (!getClientsClass().isInstance(instance)) {
             throw new JaversException(JaversExceptionCode.NOT_INSTANCE_OF, getName(), instance.getClass().getName());
         }
-        Validate.argumentCheck(getSourceClass().isInstance(instance),
-                               "expected instance of "+getSourceClass().getName()+", got instance of "+ instance.getClass().getName());
+        Validate.argumentCheck(getClientsClass().isInstance(instance),
+                               "expected instance of "+ getClientsClass().getName()+", got instance of "+ instance.getClass().getName());
 
         Object cdoId = getIdProperty().get(instance);
         if (cdoId == null) {

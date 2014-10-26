@@ -4,13 +4,10 @@ import org.javers.common.reflection.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.javers.common.reflection.ReflectionUtil.TRANSIENT_ANN;
 
 /**
  * @author pawel szymczyk
@@ -25,7 +22,7 @@ public class FieldBasedPropertyScanner implements PropertyScanner {
         List<Property> propertyList = new ArrayList<>(declaredFields.size());
 
         for (Field field : declaredFields) {
-            if(isPersistent(field)) {
+            if(ReflectionUtil.isPersistentField(field)) {
                 Property fieldProperty = new FieldProperty(field);
                 propertyList.add(fieldProperty);
             }
@@ -44,12 +41,5 @@ public class FieldBasedPropertyScanner implements PropertyScanner {
 
         superFields.addAll( Arrays.asList(clazz.getDeclaredFields()) );
         return superFields;
-    }
-
-    private boolean isPersistent(Field field) {
-        return !Modifier.isTransient(field.getModifiers())
-            && !Modifier.isStatic(field.getModifiers())
-            && !ReflectionUtil.isAnnotationPresent(field, TRANSIENT_ANN)
-            && !field.getName().equals("this$0"); //owner of inner class
     }
 }

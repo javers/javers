@@ -3,6 +3,10 @@ package org.javers.core.metamodel.type;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ManagedClass;
+import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.*;
 import org.joda.time.LocalDate;
@@ -76,7 +80,7 @@ public class TypeMapper {
             return jType;
         }
 
-        return createMapping(javaType);
+        return infer(javaType);
     }
 
     /**
@@ -148,7 +152,7 @@ public class TypeMapper {
         addType(new PrimitiveType(primitiveClass));
     }
 
-    public void registerManagedClass(ManagedClassDefinition def) {
+    public void registerManagedClass(ClientsClassDefinition def) {
         addType(typeFactory.createFromDefinition(def));
     }
 
@@ -247,17 +251,19 @@ public class TypeMapper {
         return mappedTypes.get(javaType);
     }
 
-    private JaversType createMapping(Type javaType) {
+    private JaversType infer(Type javaType) {
         argumentIsNotNull(javaType);
         JaversType prototype = findNearestAncestor(javaType);
         JaversType newType;
 
-        if (prototype == null) {
-            newType = typeFactory.infer(javaType);
-        }
-        else {
+        if (prototype != null) {
             newType = typeFactory.spawnFromPrototype(javaType, prototype);
         }
+        else {
+            newType = typeFactory.inferFromAnnotations(javaType);
+        }
+
+        logger.debug("javersType of {} inferred as {}", javaType, newType.getClass().getSimpleName());
 
         addType(newType);
         return newType;

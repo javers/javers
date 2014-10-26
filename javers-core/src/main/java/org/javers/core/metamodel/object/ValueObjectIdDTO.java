@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.object;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.ValueObject;
+import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;

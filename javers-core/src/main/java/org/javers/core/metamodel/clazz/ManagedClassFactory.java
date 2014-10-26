@@ -1,8 +1,10 @@
-package org.javers.core.metamodel.property;
+package org.javers.core.metamodel.clazz;
 
 import org.javers.common.validation.Validate;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.property.PropertyScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,10 +16,13 @@ import java.util.List;
 public class ManagedClassFactory {
     private static final Logger logger = LoggerFactory.getLogger(ManagedClassFactory.class);
     private final PropertyScanner propertyScanner;
+    private final ClassAnnotationsScanner classAnnotationsScanner;
 
-    public ManagedClassFactory(PropertyScanner propertyScanner) {
-        Validate.argumentIsNotNull(propertyScanner);
+    public ManagedClassFactory(PropertyScanner propertyScanner,
+                               ClassAnnotationsScanner classAnnotationsScanner) {
+        Validate.argumentsAreNotNull(propertyScanner);
         this.propertyScanner = propertyScanner;
+        this.classAnnotationsScanner = classAnnotationsScanner;
     }
 
     public <S> Entity createEntity(Class<S> clazz) {
@@ -28,19 +33,16 @@ public class ManagedClassFactory {
         return create(new ValueObjectDefinition(clazz));
     }
 
-    public ManagedClass infer(Class javaClass) {
+    public ClientsDomainClass inferFromAnnotations(Class javaClass) {
         List<Property> properties = propertyScanner.scan(javaClass);
 
         Property foundIdProperty = findIdProperty(properties);
 
         if (foundIdProperty != null) {
-            logger.debug("javersType type of {}(id:{}) inferred as Entity", javaClass.getSimpleName(), foundIdProperty.getName());
             return new Entity(javaClass, properties, foundIdProperty);
         }
-        else {
-            logger.debug("javersType of {} inferred as ValueObject", javaClass.getSimpleName());
-            return new ValueObject(javaClass, properties);
-        }
+
+        return create(classAnnotationsScanner.scanAndInfer(javaClass));
     }
 
     private Property findIdProperty(List<Property> properties) {
@@ -52,14 +54,21 @@ public class ManagedClassFactory {
         return null;
     }
 
-    public ManagedClass create(ManagedClassDefinition managedClassDefinition){
-        if (managedClassDefinition instanceof ValueObjectDefinition) {
-            return create((ValueObjectDefinition)managedClassDefinition);
+    public ClientsDomainClass create(ClientsClassDefinition clientsClassDefinition){
+        if (clientsClassDefinition instanceof ValueDefinition) {
+            return create((ValueDefinition) clientsClassDefinition);
         }
-        if (managedClassDefinition instanceof EntityDefinition) {
-            return create((EntityDefinition)managedClassDefinition);
+        if (clientsClassDefinition instanceof ValueObjectDefinition) {
+            return create((ValueObjectDefinition) clientsClassDefinition);
         }
-        throw new IllegalArgumentException("unsupported "+managedClassDefinition);
+        if (clientsClassDefinition instanceof EntityDefinition) {
+            return create((EntityDefinition) clientsClassDefinition);
+        }
+        throw new IllegalArgumentException("unsupported "+ clientsClassDefinition);
+    }
+
+    public Value create(ValueDefinition valueDefinition) {
+         return new Value(valueDefinition.getClazz());
     }
 
     public Entity create(EntityDefinition entityDefinition) {

@@ -7,7 +7,7 @@ import org.javers.core.diff.appenders.MapChangeAppender
 import org.javers.core.diff.appenders.SetChangeAppender
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectNode
-import org.javers.core.metamodel.property.Entity
+import org.javers.core.metamodel.clazz.Entity
 import org.javers.core.metamodel.property.Property
 import spock.lang.Shared
 import spock.lang.Specification

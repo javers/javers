@@ -2,9 +2,9 @@ package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
 import org.javers.core.JaversTestBuilder
-import org.javers.core.metamodel.property.Entity
-import org.javers.core.metamodel.property.ManagedClassFactory
-import org.javers.core.metamodel.property.ValueObject
+import org.javers.core.metamodel.clazz.Entity
+import org.javers.core.metamodel.clazz.ManagedClassFactory
+import org.javers.core.metamodel.clazz.ValueObject
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -180,7 +180,7 @@ class TypeMapperTest extends Specification {
         ValueObject vo = mapper.getChildValueObject(snapshotEntity, "valueObjectRef")
 
         then:
-        vo.sourceClass == DummyAddress
+        vo.clientsClass == DummyAddress
     }
 
     def "should return child ValueObject for List of ValueObjectType"() {
@@ -192,6 +192,6 @@ class TypeMapperTest extends Specification {
         ValueObject vo = mapper.getChildValueObject(snapshotEntity, "listOfValueObjects")
 
         then:
-        vo.sourceClass == DummyAddress
+        vo.clientsClass == DummyAddress
     }
 }

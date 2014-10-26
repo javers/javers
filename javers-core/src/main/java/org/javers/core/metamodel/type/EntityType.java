@@ -1,12 +1,29 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.core.metamodel.property.Entity;
-import org.javers.core.metamodel.property.ManagedClassFactory;
-
-import java.lang.reflect.Type;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ManagedClassFactory;
+import org.javers.core.metamodel.object.InstanceId;
 
 /**
- * Reference to {@link Entity}
+ * Entity class in client's domain model.
+ * <br/><br/>
+ *
+ * Has list of mutable properties and its own identity hold in idProperty.
+ * <br/><br/>
+
+ * Two Entity instances are compared using idProperty, see {@link InstanceId}
+ * <br/><br/>
+ *
+ * Example:
+ * <pre>
+ *     class Person {
+ *         @Id
+ *         private int    personId;
+ *         private String firstName;
+ *         private String lastName;
+ *         ...
+ *     }
+ * </pre>
  *
  * @author bartosz walacik
  */

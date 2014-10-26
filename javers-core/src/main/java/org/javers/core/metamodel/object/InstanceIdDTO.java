@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.object;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.Entity;
+import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.type.TypeMapper;
 
 /**

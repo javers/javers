@@ -5,12 +5,10 @@ import org.javers.core.commit.CommitFactory
 import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectGraphBuilder
-import org.javers.core.graph.ObjectNode
 import org.javers.core.json.JsonConverter
-import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
-import org.javers.core.metamodel.property.ManagedClassFactory
+import org.javers.core.metamodel.clazz.ManagedClassFactory
 import org.javers.core.metamodel.type.TypeFactory
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.snapshot.GraphShadowFactory

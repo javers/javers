@@ -27,13 +27,13 @@ class ChangeAssert {
 
     ChangeAssert hasInstanceId(Class expected, Object expectedCdoId) {
         assert actual.affectedCdoId instanceof InstanceId
-        assert actual.affectedCdoId.cdoClass.sourceClass == expected
+        assert actual.affectedCdoId.cdoClass.clientsClass == expected
         assert actual.affectedCdoId.cdoId == expectedCdoId
         this
     }
 
     ChangeAssert hasEntityTypeOf(Class<?> entityClass) {
-        actual.affectedCdoId.cdoClass.sourceClass == entityClass
+        actual.affectedCdoId.cdoClass.clientsClass == entityClass
         this
     }
 

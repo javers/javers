@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.*;
+import org.javers.core.metamodel.clazz.*;
 
 import java.lang.reflect.Type;
 
@@ -17,14 +17,8 @@ public class TypeFactory {
         this.managedClassFactory = managedClassFactory;
     }
 
-    JaversType createFromDefinition(ManagedClassDefinition def){
-        if (def instanceof  ValueDefinition){
-            return new ValueType(def.getClazz());
-        }
-        else {
-            ManagedClass managedClass = managedClassFactory.create(def);
-            return createFromManagedClass(managedClass);
-        }
+    JaversType createFromDefinition(ClientsClassDefinition def){
+        return createFromClientsClass(managedClassFactory.create(def));
     }
 
     JaversType spawnFromPrototype(Type javaType, JaversType prototype) {
@@ -39,21 +33,22 @@ public class TypeFactory {
         }
     }
 
-    public JaversType infer(Type javaType) {
+    public JaversType inferFromAnnotations(Type javaType) {
         Class javaClass = extractClass(javaType);
 
-        ManagedClass managedClass = managedClassFactory.infer(javaClass);
-
-        return createFromManagedClass(managedClass);
+        return createFromClientsClass(managedClassFactory.inferFromAnnotations(javaClass));
     }
 
-    private JaversType createFromManagedClass(ManagedClass managedClass) {
-        if (managedClass instanceof ValueObject) {
-            return new ValueObjectType((ValueObject)managedClass);
+    private JaversType createFromClientsClass(ClientsDomainClass clientsClass) {
+        if (clientsClass instanceof Value) {
+            return new ValueType(clientsClass.getClientsClass());
         }
-        if (managedClass instanceof Entity) {
-            return new EntityType((Entity)managedClass);
+        if (clientsClass instanceof ValueObject) {
+            return new ValueObjectType((ValueObject)clientsClass);
         }
-        throw new IllegalArgumentException("unsupported "+managedClass);
+        if (clientsClass instanceof Entity) {
+            return new EntityType((Entity)clientsClass);
+        }
+        throw new IllegalArgumentException("unsupported "+clientsClass.getName());
     }
 }

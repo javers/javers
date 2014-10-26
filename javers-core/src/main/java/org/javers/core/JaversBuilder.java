@@ -14,12 +14,15 @@ import org.javers.core.json.typeadapter.change.ArrayChangeTypeAdapter;
 import org.javers.core.json.typeadapter.change.ListChangeTypeAdapter;
 import org.javers.core.json.typeadapter.change.MapChangeTypeAdapter;
 import org.javers.core.json.typeadapter.change.SetChangeTypeAdapter;
+import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.ValueDefinition;
+import org.javers.core.metamodel.clazz.ValueObjectDefinition;
 import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.property.*;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
 import org.javers.core.pico.CoreJaversModule;
-import org.javers.core.pico.ManagedClassFactoryModule;
+import org.javers.core.metamodel.clazz.ManagedClassFactoryModule;
 import org.javers.repository.api.InMemoryRepository;
 import org.javers.repository.api.JaversRepository;
 import org.picocontainer.PicoContainer;
@@ -55,7 +58,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
             InstanceIdDTOTypeAdapter.class
     };
 
-    private final Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
+    private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
 
     private JaversRepository repository;
 
@@ -73,7 +76,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     public Javers build() {
 
         // bootstrap phase 2:
-        // ManagedClassFactory & managed classes registration
+        // ManagedClassFactory & managed clazz registration
         bootManagedClasses();
 
         // bootstrap phase 3: JSON beans & domain aware typeAdapters
@@ -93,7 +96,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers {@link Entity} with id-property selected on the basis of @Id annotation
+     * registers {@link org.javers.core.metamodel.clazz.Entity} with id-property selected on the basis of @Id annotation
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
         Validate.argumentIsNotNull(entityClass);
@@ -101,7 +104,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers {@link Entity} with id-property selected explicitly by name
+     * registers {@link org.javers.core.metamodel.clazz.Entity} with id-property selected explicitly by name
      */
     public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName) {
         Validate.argumentsAreNotNull(entityClass, idPropertyName);
@@ -109,16 +112,16 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private JaversBuilder registerEntity(EntityDefinition entityDefinition) {
-        managedClassDefinitions.add(entityDefinition);
+        clientsClassDefinitions.add(entityDefinition);
         return this;
     }
 
     /**
-     * registers {@link org.javers.core.metamodel.property.ValueObject}
+     * registers {@link org.javers.core.metamodel.clazz.ValueObject}
      */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         Validate.argumentIsNotNull(valueObjectClass);
-        managedClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
+        clientsClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
         return this;
     }
 
@@ -139,7 +142,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      */
     public JaversBuilder registerValue(Class<?> valueClass) {
         Validate.argumentIsNotNull(valueClass);
-        managedClassDefinitions.add(new ValueDefinition(valueClass));
+        clientsClassDefinitions.add(new ValueDefinition(valueClass));
         return this;
     }
 
@@ -210,7 +213,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private void mapRegisteredClasses() {
         TypeMapper typeMapper = typeMapper();
-        for (ManagedClassDefinition def : managedClassDefinitions) {
+        for (ClientsClassDefinition def : clientsClassDefinitions) {
             typeMapper.registerManagedClass(def);
         }
     }

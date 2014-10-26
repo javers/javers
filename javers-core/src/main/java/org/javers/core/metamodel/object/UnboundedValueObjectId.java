@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.core.metamodel.property.ValueObject;
+import org.javers.core.metamodel.clazz.ValueObject;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -32,7 +32,7 @@ public class UnboundedValueObjectId extends GlobalId {
 
     @Override
     public String value() {
-        return valueObject.getSourceClass().getName()+"/";
+        return valueObject.getClientsClass().getName()+"/";
     }
 
     @Override

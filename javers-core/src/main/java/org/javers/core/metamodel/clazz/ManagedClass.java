@@ -1,11 +1,10 @@
-package org.javers.core.metamodel.property;
+package org.javers.core.metamodel.clazz;
 
 import org.javers.common.collections.Predicate;
 import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,48 +13,20 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
- * Object type that can be managed by Javers,
- * reflects one class in clients domain model.
- * <br>
- *
- * ManagedClass instances are called here <b>Cdo</b> - client's domain objects
- *
+ * Decomposes a class into list of properties.
+ * 
  * @author bartosz walacik
  */
-public abstract class ManagedClass {
-
-    private final Class sourceClass;
+public abstract class ManagedClass extends ClientsDomainClass {
+    
     private final List<Property> properties;
     private final List<Property> propertiesUnmodifiable;
 
-    ManagedClass(Class sourceClass, List<Property> properties) {
-        argumentsAreNotNull(sourceClass, properties);
-        this.sourceClass = sourceClass;
+    ManagedClass(Class clientsClass, List<Property> properties) {
+        super(clientsClass);
+        argumentsAreNotNull(properties);
         this.properties = new ArrayList<>(properties);
         this.propertiesUnmodifiable = Collections.unmodifiableList(properties);
-    }
-
-    public boolean isInstance(Object cdo) {
-        argumentIsNotNull(cdo);
-        return (sourceClass.isAssignableFrom(cdo.getClass()));
-    }
-
-    public Class getSourceClass() {
-        return sourceClass;
-    }
-
-    /**
-     * shortcut to {@link Class#getName()}
-     */
-    public String getName() {
-        return sourceClass.getName();
-    }
-
-    /**
-     * 'Entity' or 'ValueObject'
-     */
-    public String getSimpleName() {
-        return this.getClass().getSimpleName();
     }
 
     public List<Property> getProperties() {
@@ -93,19 +64,5 @@ public abstract class ManagedClass {
         } catch (JaversException e){
             return false;
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || !(o instanceof ManagedClass)) {return false;}
-
-        ManagedClass that = (ManagedClass) o;
-        return sourceClass.equals(that.sourceClass);
-    }
-
-    @Override
-    public int hashCode() {
-        return sourceClass.hashCode();
     }
 }

@@ -1,16 +1,13 @@
 package org.javers.core.metamodel.type;
 
 import com.google.gson.reflect.TypeToken
-import org.javers.core.metamodel.property.Entity
-import org.javers.core.metamodel.property.EntityDefinition;
-import org.javers.core.metamodel.property.ValueObjectDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.javers.core.metamodel.clazz.ValueObjectDefinition;
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser;
 import spock.lang.Specification;
-import spock.lang.Unroll;
-
-import java.util.Calendar;
+import spock.lang.Unroll
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly;
 

@@ -1,11 +1,11 @@
-package org.javers.core.metamodel.property;
+package org.javers.core.metamodel.clazz;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * @author bartosz walacik
  */
-public class EntityDefinition  extends ManagedClassDefinition {
+public class EntityDefinition  extends ClientsClassDefinition {
     private final String idPropertyName;
 
     /**

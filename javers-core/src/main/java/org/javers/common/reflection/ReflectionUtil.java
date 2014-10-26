@@ -77,9 +77,16 @@ public class ReflectionUtil {
         }
 
         return  !isAnnotationPresent(m, TRANSIENT_ANN) &&
-                !Modifier.isStatic(m.getModifiers())  &&
-                !Modifier.isAbstract(m.getModifiers())  &&
+                !Modifier.isStatic(m.getModifiers()) &&
+                !Modifier.isAbstract(m.getModifiers()) &&
                 !Modifier.isNative(m.getModifiers()) ;
+    }
+
+    public static boolean isPersistentField(Field field) {
+        return !Modifier.isTransient(field.getModifiers()) &&
+               !Modifier.isStatic(field.getModifiers()) &&
+               !isAnnotationPresent(field, TRANSIENT_ANN) &&
+               !field.getName().equals("this$0"); //owner of inner class
     }
 
     public static boolean isAnnotationPresent(Method method, String annotationName){

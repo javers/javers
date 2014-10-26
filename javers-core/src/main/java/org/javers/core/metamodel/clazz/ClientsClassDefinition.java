@@ -1,14 +1,16 @@
-package org.javers.core.metamodel.property;
+package org.javers.core.metamodel.clazz;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
+ * Recipe for ClientsDomainClass
+ *
  * @author bartosz walacik
  */
-public abstract class ManagedClassDefinition {
+public abstract class ClientsClassDefinition {
     private final Class<?> clazz;
 
-    ManagedClassDefinition(Class<?> clazz) {
+    ClientsClassDefinition(Class<?> clazz) {
         argumentIsNotNull(clazz);
         this.clazz = clazz;
     }
@@ -23,7 +25,7 @@ public abstract class ManagedClassDefinition {
             return false;
         }
 
-        ManagedClassDefinition that = (ManagedClassDefinition) o;
+        ClientsClassDefinition that = (ClientsClassDefinition) o;
 
         return clazz.equals(that.clazz);
     }

@@ -1,7 +1,6 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.ManagedClassFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;

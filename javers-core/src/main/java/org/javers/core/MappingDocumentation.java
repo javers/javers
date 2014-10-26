@@ -1,8 +1,8 @@
 package org.javers.core;
 
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.property.Entity;
-import org.javers.core.metamodel.property.ValueObject;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
@@ -11,7 +11,7 @@ import org.javers.core.graph.ObjectGraphBuilder;
 /**
  * <h1>Why domain model mapping?</h1>
  * Many frameworks which deal with user domain model (aka data model) use some kind of <b>mapping</b>.
- * For example JPA uses annotations in order to map user classes into relational database.
+ * For example JPA uses annotations in order to map user clazz into relational database.
  * Plenty of XML and JSON serializers uses various approaches to mapping, usually based on annotations.
  * <br><br>
  *
@@ -25,11 +25,11 @@ import org.javers.core.graph.ObjectGraphBuilder;
  *     <li>Javers uses reasonable defaults and take advantage of type inferring algorithm.
  *          So for a quick start just let it do the mapping for You.
  *          Later on, it would be advisable to refine it to optimize diff semantics</li>
- *     <li>We believe that domain model classes should be framework agnostic,
+ *     <li>We believe that domain model clazz should be framework agnostic,
  *          so we do not ask You to embrace another annotation set</li>
  * </ul>
  *
- * JaVers wants to know only a few basic facts about your domain model classes,
+ * JaVers wants to know only a few basic facts about your domain model clazz,
  * particularly Javers Type of each class spotted in runtime.
  * Proper mapping is essential for diff algorithm, for example we need to know if objects of given class
  * should be compared property-by-property or using equals().
@@ -41,7 +41,7 @@ import org.javers.core.graph.ObjectGraphBuilder;
  * The last two types are internals and can't be mapped by user.
  * <br><br>
  *
- * To make long story short, You as a user are asked to label your domain model classes as
+ * To make long story short, You as a user are asked to label your domain model clazz as
  * Entities, Value Objects or Values.
  * <br><br>
  *
@@ -85,7 +85,7 @@ import org.javers.core.graph.ObjectGraphBuilder;
  * For Values it's advisable to customize JSON serialization by implementing Type Adapters, see {@link JsonConverter}.
  *
  * <h1>TypeMapper and type inferring policy</h1>
- * Javers use lazy approach to type mapping so types are resolved only for classes spotted in runtime.
+ * Javers use lazy approach to type mapping so types are resolved only for clazz spotted in runtime.
  * <br><br>
  *
  * To show You how it works, assume that Javers is calculating diff on two graphs of objects
@@ -99,15 +99,15 @@ import org.javers.core.graph.ObjectGraphBuilder;
  *     <li>If this is a first question about Person.class, TypeMapper checks if it was registered in {@link JaversBuilder}
  *          as one of Entitiy, Value Object or Value. If so, answer is easy.</li>
  *     <li>Then TypeMapper tries to find so called Prototype&mdash;nearest class or interface that is already mapped and is assignable from Person.class.
- *          So as You can see, it's easy to map whole bunch of classes with common superclass or interface with one call to {@link JaversBuilder}.
+ *          So as You can see, it's easy to map whole bunch of clazz with common superclass or interface with one call to {@link JaversBuilder}.
  *          Just register those high level concepts.</li>
- *     <li>When Prototype is not found, Javers tries to infer Type by looking for well known JPA annotations: {@link javax.persistence.Entity}
+ *     <li>When Prototype is not found, Javers tries to inferFromAnnotations Type by looking for well known JPA annotations: {@link javax.persistence.Entity}
  *          and {@link javax.persistence.Id}.
  *          If found, class would be mapped as {@link Entity}, otherwise as {@link ValueObject}.</li>
  * </ul>
  *
  * To summarize, identify Entities and Value Objects and Values in your domain model.
- * Try to distinct them by high level abstract classes, interfaces or JPA annotations.
+ * Try to distinct them by high level abstract clazz, interfaces or JPA annotations.
  * Minimize your {@link JaversBuilder} configuration by taking advantage of type inferring policy.
  * For Values, remember about implementing equals() and consider implementing JSON type adapters.
  *
