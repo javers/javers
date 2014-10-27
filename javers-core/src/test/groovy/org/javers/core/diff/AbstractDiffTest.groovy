@@ -8,6 +8,7 @@ import org.javers.core.diff.appenders.SetChangeAppender
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectNode
 import org.javers.core.metamodel.clazz.Entity
+import org.javers.core.metamodel.clazz.ManagedClass
 import org.javers.core.metamodel.property.Property
 import spock.lang.Shared
 import spock.lang.Specification
@@ -29,7 +30,12 @@ abstract class AbstractDiffTest extends Specification {
     }
 
     Entity getEntity(Class forClass) {
-        return (Entity)javers.typeMapper.getJaversType(forClass).managedClass
+        (Entity)javers.typeMapper.getJaversType(forClass).managedClass
+    }
+
+    Property getManagedProperty(Class forClass, String propertyName) {
+        ManagedClass clazz = javers.typeMapper.getJaversType(forClass).managedClass;
+        clazz.getProperty(propertyName)
     }
 
     Property getProperty(Class forClass, String propName) {

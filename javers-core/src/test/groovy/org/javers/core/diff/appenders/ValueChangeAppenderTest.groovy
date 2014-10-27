@@ -1,28 +1,21 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.diff.FakeNodePair
-import org.javers.core.metamodel.object.InstanceIdDTO
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyUserWithValues
-import org.javers.core.model.PrimitiveEntity
-import org.javers.core.model.SnapshotEntity
-import org.joda.time.LocalDateTime
-
-import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.ChangeAssert
 import org.javers.core.diff.RealNodePair
+import org.javers.core.graph.ObjectNode
+import org.javers.core.metamodel.object.InstanceIdDTO
+import org.javers.core.metamodel.property.Property
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.metamodel.property.Property
-import org.javers.core.graph.ObjectNode
+import org.javers.core.model.DummyUserWithValues
+import org.joda.time.LocalDateTime
 
-import static org.javers.core.json.builder.EntityTestBuilder.entity
-import static org.javers.core.json.builder.EntityTestBuilder.valueObject
+import static DummyUserWithValues.dummyUserWithDate
+import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
-import static DummyUserWithValues.dummyUserWithDate
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithSalary
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
@@ -32,27 +25,41 @@ import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
  */
 class ValueChangeAppenderTest extends AbstractDiffTest {
 
-    def "should not append valueChange when values are equal" () {
+    def "should not append ValueChange when two Values are .equals()"() {
         given:
-        ObjectNode left =  buildGraph(dummyUser("1").withSex(FEMALE).build())
-        ObjectNode right = buildGraph(dummyUser("1").withSex(FEMALE).build())
-        Property sex = getEntity(DummyUser).getProperty("sex")
+        def left = buildGraph(new ValuesHolder())
+        def right = buildGraph(new ValuesHolder())
+        def alwaysEquals = getManagedProperty(ValuesHolder, 'alwaysEquals')
 
         when:
-        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
+        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), alwaysEquals)
 
         then:
-        change == null
+        !change
+    }
+
+    def "should append ValueChange when two Values are not .equals()"() {
+        given:
+        def left = buildGraph(new ValuesHolder())
+        def right = buildGraph(new ValuesHolder())
+        def neverEquals = getManagedProperty(ValuesHolder, 'neverEquals')
+
+        when:
+        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), neverEquals)
+
+        then:
+        ChangeAssert.assertThat(change)
+                    .hasProperty(neverEquals)
     }
 
     def "should set ValueChange metadata"() {
         given:
-        ObjectNode left =  buildGraph(dummyUser("1").withSex(FEMALE).build())
-        ObjectNode right = buildGraph(dummyUser("1").withSex(OCCASIONALLY).build())
-        Property sex = getEntity(DummyUser).getProperty("sex")
+        def left =  buildGraph(dummyUser("1").withSex(FEMALE).build())
+        def right = buildGraph(dummyUser("1").withSex(OCCASIONALLY).build())
+        def sex = getManagedProperty(DummyUser,"sex")
 
         when:
-        ValueChange change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
+        def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
 
         then:
         ChangeAssert.assertThat(change)
@@ -62,9 +69,9 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append Enum valueChange" () {
         given:
-        ObjectNode left =  buildGraph(dummyUser("1").withSex(FEMALE).build())
-        ObjectNode right = buildGraph(dummyUser("1").withSex(OCCASIONALLY).build())
-        Property sex = getEntity(DummyUser).getProperty("sex")
+        def left =  buildGraph(dummyUser("1").withSex(FEMALE).build())
+        def right = buildGraph(dummyUser("1").withSex(OCCASIONALLY).build())
+        def sex = getManagedProperty(DummyUser,"sex")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
@@ -78,9 +85,9 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append int valueChange" () {
         given:
-        ObjectNode left =  buildGraph(dummyUser("1").withAge(1).build())
-        ObjectNode right = buildGraph(dummyUser("1").withAge(2).build())
-        Property age = getEntity(DummyUser).getProperty("age")
+        def left =  buildGraph(dummyUser("1").withAge(1).build())
+        def right = buildGraph(dummyUser("1").withAge(2).build())
+        def age = getManagedProperty(DummyUser,"age")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),age)
@@ -94,9 +101,9 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append Integer valueChange" () {
         given:
-        ObjectNode left =  buildGraph(dummyUser("1").build())
-        ObjectNode right = buildGraph(dummyUser("1").withInteger(5).build())
-        Property largeInt = getEntity(DummyUser).getProperty("largeInt")
+        def left =  buildGraph(dummyUser("1").build())
+        def right = buildGraph(dummyUser("1").withInteger(5).build())
+        def largeInt = getManagedProperty(DummyUser,"largeInt")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),largeInt)
@@ -110,9 +117,9 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append boolean valueChange" () {
         given:
-        ObjectNode left =  buildGraph(dummyUser("1").withFlag(true).build())
-        ObjectNode right = buildGraph(dummyUser("1").withFlag(false).build())
-        Property flag = getEntity(DummyUser).getProperty("flag")
+        def left =  buildGraph(dummyUser("1").withFlag(true).build())
+        def right = buildGraph(dummyUser("1").withFlag(false).build())
+        def flag = getManagedProperty(DummyUser, "flag")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
@@ -126,9 +133,9 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append Boolean valueChange" () {
         given:
-        ObjectNode left =  buildGraph(dummyUser("1").build())
-        ObjectNode right = buildGraph(dummyUser("1").withBoxedFlag(true).build())
-        Property flag = getEntity(DummyUser).getProperty("bigFlag")
+        def left =  buildGraph(dummyUser("1").build())
+        def right = buildGraph(dummyUser("1").withBoxedFlag(true).build())
+        def flag = getManagedProperty(DummyUser,"bigFlag")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
@@ -142,12 +149,12 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append LocalDateTime Value change" () {
         given:
-        LocalDateTime dob = new LocalDateTime()
+        def dob = new LocalDateTime()
         def leftUser =  dummyUserWithDate("kaz", null)
         def rightUser = dummyUserWithDate("kaz", dob)
-        ObjectNode left = buildGraph(leftUser)
-        ObjectNode right = buildGraph(rightUser)
-        Property dobProperty = getEntity(DummyUserWithValues).getProperty("dob")
+        def left = buildGraph(leftUser)
+        def right = buildGraph(rightUser)
+        def dobProperty = getManagedProperty(DummyUserWithValues,"dob")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), dobProperty)
@@ -161,12 +168,12 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
 
     def "should append BigDecimal Value change" () {
         given:
-        BigDecimal salary = new BigDecimal(2.5)
+        def salary = new BigDecimal(2.5)
         def leftUser =  dummyUserWithSalary("kaz", null)
         def rightUser = dummyUserWithSalary("kaz", salary)
-        ObjectNode left = buildGraph(leftUser)
-        ObjectNode right = buildGraph(rightUser)
-        Property salaryProperty = getEntity(DummyUserWithValues).getProperty("salary")
+        def left = buildGraph(leftUser)
+        def right = buildGraph(rightUser)
+        def salaryProperty = getManagedProperty(DummyUserWithValues,"salary")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), salaryProperty)
@@ -182,10 +189,10 @@ class ValueChangeAppenderTest extends AbstractDiffTest {
         given:
         def leftUser =  dummyUserDetails(1).withAddress("Boston","Washington Street").build();
         def rightUser = dummyUserDetails(1).withAddress("Boston","Wall Street").build();
-        ObjectNode left = buildGraph(leftUser)
-        ObjectNode right = buildGraph(rightUser)
-        Property address = entity(DummyUserDetails).getProperty("dummyAddress")
-        Property street =  valueObject(DummyAddress).getProperty("street")
+        def left = buildGraph(leftUser)
+        def right = buildGraph(rightUser)
+        def address = getManagedProperty(DummyUserDetails,"dummyAddress")
+        def street =  getManagedProperty(DummyAddress,"street")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(
