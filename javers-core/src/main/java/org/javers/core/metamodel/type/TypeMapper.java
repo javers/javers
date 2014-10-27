@@ -152,12 +152,12 @@ public class TypeMapper {
         addType(new PrimitiveType(primitiveClass));
     }
 
-    public void registerManagedClass(ClientsClassDefinition def) {
+    public void registerClientsClass(ClientsClassDefinition def) {
         addType(typeFactory.createFromDefinition(def));
     }
 
-    public void registerValueType(Class<?> objectValue) {
-        addType(new ValueType(objectValue));
+    public void registerValueType(Class<?> valueCLass) {
+        addType(new ValueType(valueCLass));
     }
 
     protected <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {

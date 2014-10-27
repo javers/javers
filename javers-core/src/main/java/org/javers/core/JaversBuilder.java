@@ -214,7 +214,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private void mapRegisteredClasses() {
         TypeMapper typeMapper = typeMapper();
         for (ClientsClassDefinition def : clientsClassDefinitions) {
-            typeMapper.registerManagedClass(def);
+            typeMapper.registerClientsClass(def);
         }
     }
 

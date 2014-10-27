@@ -3,6 +3,7 @@ package org.javers.common.reflection;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
@@ -11,11 +12,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import static org.javers.common.collections.Lists.immutableListOf;
+
 /**
  * @author bartosz walacik
  */
 public class ReflectionUtil {
-    public static final String TRANSIENT_ANN = "Transient";
+    public static final List<String> TRANSIENT_ANNS = immutableListOf("Transient", DiffIgnore.class.getSimpleName());
     public static final String ID_ANN = "Id";
 
     private static final Object[] EMPTY_ARRAY = new Object[]{};
@@ -76,36 +79,35 @@ public class ReflectionUtil {
             return false;
         }
 
-        return  !isAnnotationPresent(m, TRANSIENT_ANN) &&
+        return  !hasTransientAnnotation(m) &&
                 !Modifier.isStatic(m.getModifiers()) &&
                 !Modifier.isAbstract(m.getModifiers()) &&
                 !Modifier.isNative(m.getModifiers()) ;
     }
 
     public static boolean isPersistentField(Field field) {
-        return !Modifier.isTransient(field.getModifiers()) &&
+
+        return !hasTransientAnnotation(field) &&
+               !Modifier.isTransient(field.getModifiers()) &&
                !Modifier.isStatic(field.getModifiers()) &&
-               !isAnnotationPresent(field, TRANSIENT_ANN) &&
                !field.getName().equals("this$0"); //owner of inner class
     }
 
-    public static boolean isAnnotationPresent(Method method, String annotationName){
-        Validate.argumentsAreNotNull(method, annotationName);
+    public static boolean isAnnotationPresent(AccessibleObject methodOrField, String annotationName){
+        Validate.argumentsAreNotNull(methodOrField, annotationName);
 
-        if (contains(method.getAnnotations(), annotationName)) {
+        if (contains(methodOrField.getAnnotations(), annotationName)) {
             return true;
         }
 
         return false;
     }
-
-    public static boolean isAnnotationPresent(Field field, String annotationName){
-        Validate.argumentsAreNotNull(field, annotationName);
-
-        if (contains(field.getDeclaredAnnotations(), annotationName)) {
-            return true;
+    private static boolean hasTransientAnnotation(AccessibleObject methodOrField){
+        for (String annotationName : TRANSIENT_ANNS){
+            if (isAnnotationPresent(methodOrField, annotationName)) {
+                return true;
+            }
         }
-
         return false;
     }
 

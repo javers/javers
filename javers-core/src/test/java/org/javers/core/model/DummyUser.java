@@ -1,5 +1,6 @@
 package org.javers.core.model;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.joda.time.LocalDateTime;
 
 import javax.persistence.Id;
@@ -17,6 +18,9 @@ public class DummyUser extends AbstractDummyUser {
 
     @Transient
     private int propertyWithTransientAnn;
+
+    @DiffIgnore
+    private int propertyWithDiffIgnoreAnn;
 
     //primitives and primitive boxes
     private boolean flag;
@@ -227,5 +231,14 @@ public class DummyUser extends AbstractDummyUser {
 
     public void setPropertyWithTransientAnn(int propertyWithTransientAnn) {
         this.propertyWithTransientAnn = propertyWithTransientAnn;
+    }
+
+    @DiffIgnore
+    public int getPropertyWithDiffIgnoreAnn() {
+        return propertyWithDiffIgnoreAnn;
+    }
+
+    public void setPropertyWithDiffIgnoreAnn(int propertyWithDiffIgnoreAnn) {
+        this.propertyWithDiffIgnoreAnn = propertyWithDiffIgnoreAnn;
     }
 }

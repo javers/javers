@@ -1,8 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import com.google.gson.reflect.TypeToken
-import org.javers.core.metamodel.clazz.EntityDefinition;
-import org.javers.core.metamodel.clazz.ValueObjectDefinition;
+import org.javers.core.metamodel.clazz.*
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser;
@@ -40,51 +39,81 @@ public class TypeMapperIntegrationTest extends Specification {
         jType.baseJavaClass == DummyUser
     }
 
-    def "should spawn EntityType from mapped superclass"() {
-        given:
-        TypeMapper mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
-        mapper.registerManagedClass(new EntityDefinition(AbstractDummyUser,"inheritedInt"))
-
-        when:
-        def jType = mapper.getJaversType(DummyUser)
-
-        then:
-        jType.class == EntityType
-        jType.baseJavaClass == DummyUser
-    }
-
-    class DummyGenericUser<T> extends AbstractDummyUser {}
-
     @Unroll
-    def "should spawn #expectedJaversType.simpleName for #queryTypeAsString from the nearest prototype"() {
+    def "should map as #expectedJaversType.simpleName for annotated class #queryClass.simpleName"() {
         given:
-        TypeMapper mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
-        mapper.registerValueType(Object.class)
-        mapper.registerManagedClass(new ValueObjectDefinition(AbstractDummyUser))
+        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
 
         when:
-        def jType = mapper.getJaversType(queryType)
+        def jType = mapper.getJaversType(queryClass)
 
         then:
         jType.class == expectedJaversType
+        jType.baseJavaClass == queryClass
 
         where:
-        queryType        | queryTypeAsString  || expectedJaversType
-        Calendar         | "Calendar"         || ValueType
-        DummyGenericUser | "DummyGenericUser" || ValueObjectType
-        new TypeToken<DummyGenericUser<String>>(){}.type | "DummyGenericUser<String>" || ValueObjectType
+        queryClass << [JaversEntity,
+                       JaversValueObject,
+                       JaversValue,
+                       JpaEntity,
+                       JpaEmbeddable]
+        expectedJaversType << [EntityType, ValueObjectType, ValueType, EntityType, ValueObjectType]
+
     }
 
-    def "should spawn ValueObjectType from mapped superclass"() {
+    @Unroll
+    def "should map as #expectedJaversType.simpleName for explicitly registered class"() {
         given:
-        TypeMapper mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
-        mapper.registerManagedClass(new ValueObjectDefinition(AbstractDummyUser))
+        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        mapper.registerClientsClass(givenDefinition)
 
         when:
         def jType = mapper.getJaversType(DummyUser)
 
         then:
-        jType.class == ValueObjectType
+        jType.class == expectedJaversType
         jType.baseJavaClass == DummyUser
+
+        where:
+        givenDefinition << [
+                new EntityDefinition(DummyUser,"inheritedInt"),
+                new ValueObjectDefinition(DummyUser),
+                new ValueDefinition(DummyUser)]
+        expectedJaversType << [EntityType, ValueObjectType, ValueType]
     }
+
+    @Unroll
+    def "should spawn #expectedJaversType.simpleName from mapped superclass"() {
+        given:
+        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        mapper.registerClientsClass(givenDefinitionOfSuperclass)
+
+        when:
+        def jType = mapper.getJaversType(DummyUser)
+
+        then:
+        jType.class == expectedJaversType
+        jType.baseJavaClass == DummyUser
+
+        where:
+        givenDefinitionOfSuperclass << [
+                new EntityDefinition(AbstractDummyUser,"inheritedInt"),
+                new ValueObjectDefinition(AbstractDummyUser),
+                new ValueDefinition(AbstractDummyUser)]
+        expectedJaversType << [EntityType, ValueObjectType, ValueType]
+    }
+
+    def "should spawn from mapped superclass when querying for generic class"() {
+        given:
+        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        mapper.registerClientsClass(new ValueDefinition(AbstractDummyUser))
+
+        when:
+        def jType = mapper.getJaversType(new TypeToken<DummyGenericUser<String>>(){}.type)
+
+        then:
+        jType.class == ValueType
+        jType.baseJavaClass == DummyGenericUser
+    }
+    class DummyGenericUser<T> extends AbstractDummyUser {}
 }
