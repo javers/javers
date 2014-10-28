@@ -1,31 +1,38 @@
 package org.javers.spring;
 
-import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
+import org.javers.spring.aspect.DynamicPointcat;
+import org.javers.spring.aspect.JaversAdvice;
+import org.springframework.aop.Advisor;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+
+import java.lang.reflect.Method;
 
 public class JaversPostProcessor implements BeanPostProcessor {
 
-    private AspectFactory factory;
-
-    public JaversPostProcessor(AspectFactory factory) {
-        this.factory = factory;
-    }
-
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        if (bean.getClass().isAnnotationPresent(JaversAudit.class)) {
-            AspectJProxyFactory proxyFactory = new AspectJProxyFactory(bean);
 
-            for (Object aspect : factory.create()) {
-                proxyFactory.addAspect(aspect);
+        ProxyFactory pf = new ProxyFactory();
+
+        boolean found = false;
+
+        for (final Method m : bean.getClass().getDeclaredMethods()) {
+            if (m.isAnnotationPresent(JaversAudit.class)) {
+                found = true;
+                Advisor advisor = new DefaultPointcutAdvisor(new DynamicPointcat(m), new JaversAdvice());
+                pf.setTarget(bean);
+                pf.addAdvisor(advisor);
             }
-
-            return proxyFactory.getProxy();
         }
 
-        return bean;
+        if (found) {
+            return pf.getProxy();
+        } else {
+            return bean;
+        }
     }
 
     @Override

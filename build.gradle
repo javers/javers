@@ -22,6 +22,8 @@ subprojects {
     apply plugin: 'groovy'
     apply plugin: 'signing'
 
+    apply plugin: 'maven-publish'
+
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
 
