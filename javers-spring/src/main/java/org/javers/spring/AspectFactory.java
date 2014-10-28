@@ -6,15 +6,17 @@ import org.javers.spring.aspect.DeleteAspect;
 import org.javers.spring.aspect.SaveAspect;
 import org.javers.spring.aspect.UpdateAscpect;
 
+import java.util.List;
+
 public class AspectFactory {
 
-    private Javers javers;
+    private List<Object> aspects;
 
     public AspectFactory(Javers javers) {
-        this.javers = javers;
+        aspects = Lists.immutableListOf(new SaveAspect(javers), new DeleteAspect(javers), new UpdateAscpect(javers));
     }
 
     public Iterable<? extends Object> create() {
-        return Lists.immutableListOf(new SaveAspect(javers), new DeleteAspect(javers), new UpdateAscpect(javers));
+        return aspects;
     }
 }
