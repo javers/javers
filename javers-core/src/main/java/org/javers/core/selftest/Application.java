@@ -1,8 +1,11 @@
 package org.javers.core.selftest;
 
+import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
+
+import static org.javers.common.validation.Validate.conditionFulfilled;
 
 /**
  * @author bartosz walacik
@@ -22,18 +25,25 @@ public class Application {
 
 
         System.out.println(".. building JaVers instance ...");
-        Javers javers = JaversBuilder.javers().build();
 
-        SampleValueObject left = new SampleValueObject("red");
-        SampleValueObject right = new SampleValueObject("green");
+        try {
+            Javers javers = JaversBuilder.javers().build();
 
-        System.out.println(".. calculating diff for two simple ValueObjects...");
-        Diff diff = javers.compare(left, right);
+            SampleValueObject left = new SampleValueObject("red");
+            SampleValueObject right = new SampleValueObject("green");
 
-        assert diff.getChanges().size() == 1;
-        assert diff.getPropertyChanges("color").size() == 1;
+            System.out.println(".. calculating diff for two simple ValueObjects...");
+            Diff diff = javers.compare(left, right);
 
-        System.out.println(".. self test PASSED ..");
+            conditionFulfilled(diff.getChanges().size() == 1, "assertion failed");
+            conditionFulfilled(diff.getPropertyChanges("color").size() == 1, "assertion failed");
+
+            System.out.println(".. self test PASSED ..");
+        }catch(Throwable e) {
+            System.out.println(e);
+            e.printStackTrace();
+            System.out.println(".. self test FAILED! ..");
+        }
     }
 
     private static class SampleValueObject {
