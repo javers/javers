@@ -7,19 +7,12 @@ import org.javers.common.validation.Validate;
 /**
  * @author bartosz walacik
  */
-public class JaversCoreConfiguration extends AbstractConfiguration {
+public class JaversCoreConfiguration  {
 
-    //enum properties
-    private MappingStyle mappingStyle;
+    private MappingStyle mappingStyle = MappingStyle.FIELD;
+    private boolean newObjectsSnapshot = false;
 
-    private boolean newObjectsSnapshot;
-
-    /**
-     * loads javers-default.properties
-     */
     public JaversCoreConfiguration() {
-        super(new PropertyConfiguration("javers-default.properties"));
-        assemble();
     }
 
     /**
@@ -42,12 +35,5 @@ public class JaversCoreConfiguration extends AbstractConfiguration {
     public JaversCoreConfiguration withNewObjectsSnapshot(boolean newObjectsSnapshot) {
         this.newObjectsSnapshot = newObjectsSnapshot;
         return this;
-    }
-
-    @Override
-    protected void assemble() {
-        mappingStyle = getEnumProperty("core.mappingStyle", MappingStyle.class);
-
-        newObjectsSnapshot = getBooleanProperty("core.diff.newObjectsSnapshot");
     }
 }
