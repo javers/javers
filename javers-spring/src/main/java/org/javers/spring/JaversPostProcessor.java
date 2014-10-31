@@ -1,6 +1,7 @@
 package org.javers.spring;
 
-import org.javers.spring.aspect.DynamicPointcat;
+import org.javers.core.Javers;
+import org.javers.spring.aspect.SimpleDynamicPointcat;
 import org.javers.spring.aspect.JaversAdvice;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.ProxyFactory;
@@ -12,17 +13,23 @@ import java.lang.reflect.Method;
 
 public class JaversPostProcessor implements BeanPostProcessor {
 
+    Javers javers;
+
+    public JaversPostProcessor(Javers javers) {
+        this.javers = javers;
+    }
+
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessBeforeInitialization(Object bean, String beanName) {
 
         ProxyFactory pf = new ProxyFactory();
 
         boolean found = false;
 
-        for (final Method m : bean.getClass().getDeclaredMethods()) {
-            if (m.isAnnotationPresent(JaversAudit.class)) {
+        for (Method method : bean.getClass().getDeclaredMethods()) {
+            if (method.isAnnotationPresent(JaversAudit.class)) {
                 found = true;
-                Advisor advisor = new DefaultPointcutAdvisor(new DynamicPointcat(m), new JaversAdvice());
+                Advisor advisor = new DefaultPointcutAdvisor(new SimpleDynamicPointcat(method), new JaversAdvice(javers));
                 pf.setTarget(bean);
                 pf.addAdvisor(advisor);
             }

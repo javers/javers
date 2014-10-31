@@ -4,15 +4,15 @@ import org.springframework.aop.support.DynamicMethodMatcherPointcut;
 
 import java.lang.reflect.Method;
 
-public class DynamicPointcat extends DynamicMethodMatcherPointcut {
-    private final Method m;
+public class SimpleDynamicPointcat extends DynamicMethodMatcherPointcut {
+    private final Method method;
 
-    public DynamicPointcat(Method m) {
-        this.m = m;
+    public SimpleDynamicPointcat(Method method) {
+        this.method = method;
     }
 
     @Override
     public boolean matches(Method method, Class<?> targetClass, Object[] args) {
-        return m.equals(method);
+        return this.method.equals(method);
     }
 }
