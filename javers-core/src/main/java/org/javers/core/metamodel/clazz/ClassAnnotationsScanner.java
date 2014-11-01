@@ -3,6 +3,8 @@ package org.javers.core.metamodel.clazz;
 import org.javers.common.validation.Validate;
 
 import java.lang.annotation.Annotation;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Collections.unmodifiableSet;
@@ -15,14 +17,21 @@ import static org.javers.common.collections.Sets.asSet;
  */
 public class ClassAnnotationsScanner {
 
-    private final Set<String> entityAliases =
-            unmodifiableSet(asSet("Entity", "MappedSuperclass"));
+    private final List<AnnotationNamesProvider> namesProviders;
 
-    private final Set<String> valueObjectAliases =
-            unmodifiableSet(asSet("ValueObject", "Embeddable"));
+    private final Set<String> entityAliases = new HashSet<>();
+    private final Set<String> valueObjectAliases = new HashSet<>();
+    private final Set<String> valueAliases = new HashSet<>();
 
-    private final Set<String> valueAliases =
-            unmodifiableSet(asSet("Value"));
+    public ClassAnnotationsScanner(List<AnnotationNamesProvider> namesProviders) {
+        this.namesProviders = namesProviders;
+
+        for (AnnotationNamesProvider provider : namesProviders){
+            entityAliases.addAll(provider.getEntityAlias());
+            valueObjectAliases.addAll(provider.getValueObjectAlias());
+            valueAliases.addAll(provider.getValueAlias());
+        }
+    }
 
     ClientsClassDefinition scanAndInfer(Class javaClass){
         Validate.argumentIsNotNull(javaClass);

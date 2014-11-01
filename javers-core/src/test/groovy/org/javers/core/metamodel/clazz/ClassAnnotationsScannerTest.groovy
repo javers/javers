@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.clazz
 
+import org.javers.core.JaversTestBuilder
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -8,7 +9,7 @@ import spock.lang.Unroll
  */
 class ClassAnnotationsScannerTest extends Specification {
 
-    def scanner = new ClassAnnotationsScanner()
+    def scanner = JaversTestBuilder.javersTestAssembly().classAnnotationsScanner
 
     @Unroll
     def "should map to ValueObject when no annotation found"() {
