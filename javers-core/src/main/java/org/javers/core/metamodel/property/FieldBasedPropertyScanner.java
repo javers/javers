@@ -1,6 +1,8 @@
 package org.javers.core.metamodel.property;
 
 import org.javers.common.reflection.ReflectionUtil;
+import org.javers.core.metamodel.clazz.AnnotationNamesProvider;
+import org.javers.core.metamodel.clazz.ClassAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
@@ -13,33 +15,27 @@ import java.util.List;
  * @author pawel szymczyk
  */
 public class FieldBasedPropertyScanner implements PropertyScanner {
-    private static final Logger logger = LoggerFactory.getLogger(FieldBasedPropertyScanner.class);
+
+    private final AnnotationNamesProvider annotationNamesProvider;
+
+    public FieldBasedPropertyScanner(AnnotationNamesProvider annotationNamesProvider) {
+        this.annotationNamesProvider = annotationNamesProvider;
+    }
 
     @Override
     public  List<Property> scan(Class<?> managedClass) {
-        List<Field> declaredFields = new LinkedList<>();
-        declaredFields.addAll(getFields(managedClass));
-        List<Property> propertyList = new ArrayList<>(declaredFields.size());
+        List<Field> fields = ReflectionUtil.getAllPersistentFields(managedClass);
+        List<Property> propertyList = new ArrayList<>(fields.size());
 
-        for (Field field : declaredFields) {
-            if(ReflectionUtil.isPersistentField(field)) {
-                Property fieldProperty = new FieldProperty(field);
-                propertyList.add(fieldProperty);
+        for (Field field : fields) {
+
+            if (ReflectionUtil.hasAnyAnnotation(field, annotationNamesProvider.getTransientAliases())){
+                continue;
             }
+
+            Property fieldProperty = new FieldProperty(field);
+            propertyList.add(fieldProperty);
         }
         return propertyList;
-    }
-
-    private List<Field> getFields(Class<?> clazz) {
-        List<Field> superFields;
-        if (clazz.getSuperclass() == Object.class) { //recursion stop condition
-            superFields = new ArrayList<>();
-        }
-        else {
-            superFields = getFields(clazz.getSuperclass());
-        }
-
-        superFields.addAll( Arrays.asList(clazz.getDeclaredFields()) );
-        return superFields;
     }
 }

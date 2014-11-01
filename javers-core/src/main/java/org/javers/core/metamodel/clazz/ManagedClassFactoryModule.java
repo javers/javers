@@ -2,7 +2,6 @@ package org.javers.core.metamodel.clazz;
 
 import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
-import org.javers.core.Javers;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.MappingStyle;
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner;
@@ -20,9 +19,10 @@ public class ManagedClassFactoryModule implements JaversModule {
 
     private static final Class[] moduleComponents = new Class[] {
         ManagedClassFactory.class,
+        AnnotationNamesProvider.class,
         ClassAnnotationsScanner.class,
-        JaversAnnotationNamesProvider.class,
-        JPAAnnotationNamesProvider.class
+        JaversAnnotationsNamesSpace.class,
+        JPAAnnotationsNameSpace.class
     };
 
     private static final Map<MappingStyle, Class> propertyScannersMapping = new HashMap() {{

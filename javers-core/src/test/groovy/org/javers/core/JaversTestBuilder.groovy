@@ -10,6 +10,7 @@ import org.javers.core.metamodel.clazz.ClassAnnotationsScanner
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.clazz.ManagedClassFactory
+import org.javers.core.metamodel.property.PropertyScanner
 import org.javers.core.metamodel.type.TypeFactory
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.snapshot.GraphShadowFactory
@@ -76,6 +77,10 @@ class JaversTestBuilder {
 
     Javers javers() {
         javersBuilder.getContainerComponent(Javers)
+    }
+
+    PropertyScanner getPropertyScanner(){
+        javersBuilder.getContainerComponent(PropertyScanner)
     }
 
     ClassAnnotationsScanner getClassAnnotationsScanner(){

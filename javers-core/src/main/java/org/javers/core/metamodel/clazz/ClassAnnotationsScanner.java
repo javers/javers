@@ -17,35 +17,25 @@ import static org.javers.common.collections.Sets.asSet;
  */
 public class ClassAnnotationsScanner {
 
-    private final List<AnnotationNamesProvider> namesProviders;
+    private final AnnotationNamesProvider annotationNamesProvider;
 
-    private final Set<String> entityAliases = new HashSet<>();
-    private final Set<String> valueObjectAliases = new HashSet<>();
-    private final Set<String> valueAliases = new HashSet<>();
-
-    public ClassAnnotationsScanner(List<AnnotationNamesProvider> namesProviders) {
-        this.namesProviders = namesProviders;
-
-        for (AnnotationNamesProvider provider : namesProviders){
-            entityAliases.addAll(provider.getEntityAlias());
-            valueObjectAliases.addAll(provider.getValueObjectAlias());
-            valueAliases.addAll(provider.getValueAlias());
-        }
+    public ClassAnnotationsScanner(AnnotationNamesProvider annotationNamesProvider) {
+        this.annotationNamesProvider = annotationNamesProvider;
     }
 
     ClientsClassDefinition scanAndInfer(Class javaClass){
         Validate.argumentIsNotNull(javaClass);
 
         for (Annotation ann : javaClass.getAnnotations()){
-            if (entityAliases.contains( ann.annotationType().getSimpleName() )) {
+            if (annotationNamesProvider.isEntityAlias(ann)) {
                 return new EntityDefinition(javaClass);
             }
 
-            if (valueObjectAliases.contains( ann.annotationType().getSimpleName() )) {
+            if (annotationNamesProvider.isValueObjectAlias(ann)) {
                 return new ValueObjectDefinition(javaClass);
             }
 
-            if (valueAliases.contains( ann.annotationType().getSimpleName() )) {
+            if (annotationNamesProvider.isValueAlias(ann)) {
                 return new ValueDefinition(javaClass);
             }
         }

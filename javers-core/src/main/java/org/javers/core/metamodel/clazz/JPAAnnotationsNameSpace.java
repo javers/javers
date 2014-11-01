@@ -7,19 +7,24 @@ import java.util.Set;
 /**
  * @author bartosz walacik
  */
-public class JPAAnnotationNamesProvider implements AnnotationNamesProvider {
+public class JPAAnnotationsNameSpace implements AnnotationsNameSpace {
     @Override
-    public Set<String> getEntityAlias() {
+    public Set<String> getEntityAliases() {
         return Sets.asSet("Entity", "MappedSuperclass");
     }
 
     @Override
-    public Set<String> getValueObjectAlias() {
+    public Set<String> getValueObjectAliases() {
         return Sets.asSet("Embeddable");
     }
 
     @Override
-    public Set<String> getValueAlias() {
+    public Set<String> getValueAliases() {
         return Sets.asSet("Value");
+    }
+
+    @Override
+    public Set<String> getTransientPropertyAliases() {
+        return Sets.asSet("Transient");
     }
 }

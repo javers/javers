@@ -1,10 +1,14 @@
 package org.javers.core.metamodel.clazz
 
+import org.javers.core.JaversTestBuilder
+import org.javers.core.MappingStyle
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import spock.lang.Shared
 import spock.lang.Specification
+
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
 /**
  * @author Pawel Cierpiatka
@@ -13,8 +17,7 @@ import spock.lang.Specification
 class ManagedClassFactoryTest extends Specification {
 
     def setupSpec() {
-        BeanBasedPropertyScanner scanner = new BeanBasedPropertyScanner();
-        managedClassFactory = new ManagedClassFactory(scanner, new ClassAnnotationsScanner());
+        managedClassFactory = javersTestAssembly(MappingStyle.BEAN).managedClassFactory
     }
 
     @Shared

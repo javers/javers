@@ -1,5 +1,6 @@
 package org.javers.common.reflection;
 
+import org.javers.common.collections.Lists;
 import org.javers.common.exception.exceptions.JaversException;
 import org.javers.common.exception.exceptions.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -18,10 +19,19 @@ import static org.javers.common.collections.Lists.immutableListOf;
  * @author bartosz walacik
  */
 public class ReflectionUtil {
-    public static final List<String> TRANSIENT_ANNS = immutableListOf("Transient", DiffIgnore.class.getSimpleName());
     public static final String ID_ANN = "Id";
 
     private static final Object[] EMPTY_ARRAY = new Object[]{};
+
+    public static List<Field> getAllPersistentFields(Class methodSource) {
+        List<Field> result = new ArrayList<>();
+        for(Field field : getAllFields(methodSource)) {
+            if (isPersistentField(field)) {
+                result.add(field);
+            }
+        }
+        return result;
+    }
 
     public static List<Method> findAllPersistentGetters(Class methodSource) {
         List<Method> result = new ArrayList<>();
@@ -58,6 +68,16 @@ public class ReflectionUtil {
         return methods;
     }
 
+    public static List<Field> getAllFields(Class<?> methodSource) {
+        List<Field> fields =  Lists.asList(methodSource.getDeclaredFields());
+
+        if (methodSource.getSuperclass() != Object.class) { //recursion stop condition
+            fields.addAll( getAllFields(methodSource.getSuperclass()) );
+        }
+        return fields;
+    }
+
+
     private static int methodKey(Method m){
         int key = shaDigest(m.getName());
         for (Class c : m.getParameterTypes()) {
@@ -71,7 +91,6 @@ public class ReflectionUtil {
      * <ul>
      *     <li/>is not abstract
      *     <li/>is not native
-     *     <li/>doesn't have @Transient
      * </ul>
      */
     public static boolean isPersistentGetter(Method m) {
@@ -79,16 +98,14 @@ public class ReflectionUtil {
             return false;
         }
 
-        return  !hasTransientAnnotation(m) &&
-                !Modifier.isStatic(m.getModifiers()) &&
+        return  !Modifier.isStatic(m.getModifiers()) &&
                 !Modifier.isAbstract(m.getModifiers()) &&
                 !Modifier.isNative(m.getModifiers()) ;
     }
 
     public static boolean isPersistentField(Field field) {
 
-        return !hasTransientAnnotation(field) &&
-               !Modifier.isTransient(field.getModifiers()) &&
+        return !Modifier.isTransient(field.getModifiers()) &&
                !Modifier.isStatic(field.getModifiers()) &&
                !field.getName().equals("this$0"); //owner of inner class
     }
@@ -102,8 +119,9 @@ public class ReflectionUtil {
 
         return false;
     }
-    private static boolean hasTransientAnnotation(AccessibleObject methodOrField){
-        for (String annotationName : TRANSIENT_ANNS){
+
+    public static boolean hasAnyAnnotation(AccessibleObject methodOrField, Set<String> annotationNames){
+        for (String annotationName : annotationNames){
             if (isAnnotationPresent(methodOrField, annotationName)) {
                 return true;
             }

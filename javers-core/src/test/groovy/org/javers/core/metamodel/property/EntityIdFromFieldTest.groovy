@@ -1,7 +1,9 @@
 package org.javers.core.metamodel.property
 
-import org.javers.core.metamodel.clazz.ClassAnnotationsScanner
-import org.javers.core.metamodel.clazz.ManagedClassFactory
+import org.javers.core.JaversTestBuilder
+import org.javers.core.MappingStyle
+
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
 /**
  * @author bartosz walacik
@@ -9,7 +11,6 @@ import org.javers.core.metamodel.clazz.ManagedClassFactory
 class EntityIdFromFieldTest extends EntityIdTest {
 
     def setup() {
-        FieldBasedPropertyScanner scanner = new FieldBasedPropertyScanner()
-        entityFactory = new ManagedClassFactory(scanner, new ClassAnnotationsScanner())
+        entityFactory = javersTestAssembly(MappingStyle.FIELD).managedClassFactory
     }
 }

@@ -1,8 +1,8 @@
 package org.javers.core.graph
 
-import org.javers.core.metamodel.clazz.ClassAnnotationsScanner
-import org.javers.core.metamodel.property.BeanBasedPropertyScanner
-import org.javers.core.metamodel.clazz.ManagedClassFactory
+import org.javers.core.MappingStyle
+
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
 /**
  * @author bartosz walacik
@@ -10,7 +10,6 @@ import org.javers.core.metamodel.clazz.ManagedClassFactory
 class ObjectNodeBeanTest extends ObjectNodeTest{
 
     def setup() {
-        def scanner = new BeanBasedPropertyScanner();
-        managedClassFactory = new ManagedClassFactory(scanner, new ClassAnnotationsScanner());
+        managedClassFactory = javersTestAssembly(MappingStyle.BEAN).managedClassFactory
     }
 }

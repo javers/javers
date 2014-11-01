@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.property
 
+import org.javers.core.JaversTestBuilder
+import org.javers.core.MappingStyle
 import org.javers.core.model.DummyUser
 
 import static org.javers.core.metamodel.property.PropertiesAssert.assertThat
@@ -10,7 +12,9 @@ import static org.javers.core.metamodel.property.PropertiesAssert.assertThat
 class FieldBasedScannerTest extends PropertyScannerTest {
 
     def setupSpec() {
-        propertyScanner = new FieldBasedPropertyScanner()
+        propertyScanner = JaversTestBuilder.javersTestAssembly(MappingStyle.FIELD).propertyScanner
+        assert propertyScanner instanceof FieldBasedPropertyScanner
+        propertyScanner
     }
 
     def "should ignore transient field"() {
