@@ -1,3 +1,6 @@
+apply plugin:'application'
+mainClassName = "org.javers.core.selftest.Application"
+
 dependencies {
     compile 'joda-time:joda-time:2.3'
     compile 'org.slf4j:slf4j-api:1.7.2'

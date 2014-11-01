@@ -11,6 +11,28 @@ why not to use specialized framework to provide an audit trail of your Java obje
 You can find latest information about JaVers project at [javers.org](http://javers.org).
 Check out our [documentation](http://javers.org/documentation)</a> pages.
 
+## Build & test JaVers
+Clone our github repository
+
+```
+git clone https://github.com/javers/javers.git
+cd javers
+```
+
+Build JaVers and run unit tests
+
+```
+gradlew build
+```
+
+Run environment self-test, to check if JaVers is compatible with your JDK version
+
+```
+gradlew javers-core:run
+```
+
+
+
 ## Project Team
 Check out our site to find [the team](http://javers.org/#team) and contact us.
 
