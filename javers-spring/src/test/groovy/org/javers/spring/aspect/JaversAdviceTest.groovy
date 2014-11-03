@@ -18,7 +18,7 @@ class JaversAdviceTest extends Specification {
 
     def setup() {
         javers = JaversBuilder.javers().build()
-        javersAdvice = new JaversAdvice(javers)
+        javersAdvice = new JaversAdvice(javers, "author")
     }
 
     def "should commit single entity"() {
@@ -52,10 +52,7 @@ class JaversAdviceTest extends Specification {
     def "should commit data after proceed"() {
         given:
         def methodInvocation = Stub(MethodInvocation) {
-            getArguments() >> [new DummyUser("kazik")]
-            p() >> [new DummyUser("kazik")]
-
-
+            getArguments() >> [new DummyUser("kazik"), new DummyUser("romek")]
         }
 
         when:
@@ -64,6 +61,5 @@ class JaversAdviceTest extends Specification {
         then:
         javers.getStateHistory("kazik", DummyUser, 100).size() == 1
         javers.getStateHistory("romek", DummyUser, 100).size() == 1
-        javers.getStateHistory("waldek", DummyUser, 100).size() == 1
     }
 }
