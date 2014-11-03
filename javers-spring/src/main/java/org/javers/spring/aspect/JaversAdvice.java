@@ -7,9 +7,11 @@ import org.javers.core.Javers;
 public class JaversAdvice implements MethodInterceptor {
 
     private final Javers javers;
+    private final String author;
 
-    public JaversAdvice(Javers javers) {
+    public JaversAdvice(Javers javers, String author) {
         this.javers = javers;
+        this.author = author;
     }
 
     @Override
@@ -18,9 +20,7 @@ public class JaversAdvice implements MethodInterceptor {
         Object retVal = invocation.proceed();
 
         for (Object arg: invocation.getArguments()) {
-
-            //TODO author
-            javers.commit("author", arg);
+            javers.commit(author, arg);
         }
 
         return retVal;

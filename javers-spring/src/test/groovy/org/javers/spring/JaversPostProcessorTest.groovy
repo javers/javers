@@ -2,28 +2,27 @@ package org.javers.spring
 
 import org.javers.core.Javers
 import org.javers.spring.integration.AllMethodsAuditable
-import org.javers.spring.integration.NonAuditableRepository
+import org.javers.spring.integration.SelectedMethodsAuditable
 import spock.lang.Specification
-
-import static org.fest.assertions.api.Assertions.assertThat
 
 class JaversPostProcessorTest extends Specification {
 
+    def "should proxy methods with annotation"() {
+        given:
+        Javers javers = Mock()
+        def ob1 = new Object()
+        def ob2 = new Object()
+        def javersPostProcessor = new JaversPostProcessor(javers)
+        SelectedMethodsAuditable auditable = new SelectedMethodsAuditable()
 
-    def "shouldn't proxy when bean don't have annotation"() {
         when:
-        def bean = javersPostProcessor.postProcessBeforeInitialization(new NonAuditableRepository(), "name")
+        SelectedMethodsAuditable bean = javersPostProcessor.postProcessBeforeInitialization(auditable, "name")
+        bean.auditableMethod(ob1)
+        bean.nonAuditableMethod(ob2)
 
         then:
-        bean.class == NonAuditableRepository
-    }
-
-    def "should proxy when class have annotation over method"() {
-        when:
-        def bean = javersPostProcessor.postProcessBeforeInitialization(new AllMethodsAuditable(), "name")
-
-        then:
-        assertThat(bean.class.toString()).contains("CGLIB")
+        1 * javers.commit(_ as String, ob1)
+        0 * javers.commit(_ as String, ob2)
     }
 
     def "should proxy all methods when class have annotation over class"() {
@@ -40,6 +39,7 @@ class JaversPostProcessorTest extends Specification {
         bean.auditableMethod2(ob2)
 
         then:
-        2 * javers.commit(_ as String, _ as Object)
+        1 * javers.commit(_ as String, ob1)
+        1 * javers.commit(_ as String, ob2)
     }
 }
