@@ -1,0 +1,13 @@
+package org.javers.spring.integration;
+
+import org.javers.spring.JaversAudit;
+
+@JaversAudit
+public class AllMethodsAuditable {
+
+    public void auditableMethod(Object arg) {
+    }
+
+    public void auditableMethod2(Object arg) {
+    }
+}

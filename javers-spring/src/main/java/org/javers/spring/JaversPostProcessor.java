@@ -1,5 +1,7 @@
 package org.javers.spring;
 
+import org.javers.common.collections.Lists;
+import org.javers.common.collections.Sets;
 import org.javers.core.Javers;
 import org.javers.spring.aspect.SimpleDynamicPointcat;
 import org.javers.spring.aspect.JaversAdvice;
@@ -10,6 +12,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class JaversPostProcessor implements BeanPostProcessor {
 
@@ -22,24 +28,38 @@ public class JaversPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) {
 
-        ProxyFactory pf = new ProxyFactory();
+        Set<Method> methods = new HashSet<>();
 
-        boolean found = false;
-
-        for (Method method : bean.getClass().getDeclaredMethods()) {
-            if (method.isAnnotationPresent(JaversAudit.class)) {
-                found = true;
-                Advisor advisor = new DefaultPointcutAdvisor(new SimpleDynamicPointcat(method), new JaversAdvice(javers));
-                pf.setTarget(bean);
-                pf.addAdvisor(advisor);
+        if (annotationOverClass(bean)) {
+            methods.addAll(Sets.asSet(bean.getClass().getDeclaredMethods()));
+        } else {
+            for (Method method : bean.getClass().getMethods()) {
+                if (method.isAnnotationPresent(JaversAudit.class)) {
+                    methods.add(method);
+                }
             }
         }
 
-        if (found) {
-            return pf.getProxy();
-        } else {
-            return bean;
+        ProxyFactory proxyFactory = proxyFactoryWithAdvisors(bean, methods);
+
+        return proxyFactory.getAdvisors().length > 0 ? proxyFactory.getProxy() : bean;
+    }
+
+    private ProxyFactory proxyFactoryWithAdvisors(Object bean, Set<Method> methods) {
+        ProxyFactory proxyFactory = new ProxyFactory();
+        proxyFactory.setTarget(bean);
+        addAdvisors(proxyFactory, methods);
+        return proxyFactory;
+    }
+
+    private void addAdvisors(ProxyFactory proxyFactory, Set<Method> methods) {
+        for (Method method : methods) {
+            proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new SimpleDynamicPointcat(method), new JaversAdvice(javers)));
         }
+    }
+
+    private boolean annotationOverClass(Object bean) {
+        return bean.getClass().isAnnotationPresent(JaversAudit.class);
     }
 
     @Override
