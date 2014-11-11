@@ -112,7 +112,7 @@ public class Javers {
     }
 
     /**
-     * Use it if you want to store objects history without using {@link JaversRepository}
+     * Diff serialized to pretty JSON, useful if you are not using {@link JaversRepository}
      */
     public String toJson(Diff diff) {
         return jsonConverter.toJson(diff);
