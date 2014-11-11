@@ -5,9 +5,11 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.InstanceIdDTO;
 import org.junit.Test;
 import java.util.List;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;
 
 /**
  * @author bartosz walacik
@@ -35,7 +37,7 @@ public class BasicCommitExample {
 
         //when:
         //5. list change history - diffs
-        List<Change> changes = javers.getChangeHistory("bob", Person.class, 5);
+        List<Change> changes = javers.getChangeHistory(InstanceIdDTO.instanceId("bob", Person.class), 5);
 
         //then:
         //6. there should be one ValueChange on Bob's firstName, stored in JaversRepository
@@ -48,7 +50,7 @@ public class BasicCommitExample {
 
         //when:
         //7. list state history - snapshots
-        List<CdoSnapshot> snapshots = javers.getStateHistory("bob", Person.class, 5);
+        List<CdoSnapshot> snapshots = javers.getStateHistory(instanceId("bob", Person.class), 5);
 
         //then:
         //8. there should be two Snapshots of Bob state, stored in JaversRepository

@@ -4,6 +4,7 @@ import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ElementValueChange
 import org.javers.core.diff.changetype.container.ListChange
+import org.javers.core.metamodel.object.InstanceIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
@@ -28,7 +29,7 @@ class JaversSnapshotDifferIntegrationTest extends Specification {
         javers.commit("some.login", newCdo)
 
         when:
-        def changes = javers.getChangeHistory("kaz",DummyUser,10)
+        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),10)
 
         then:
         changes.size() == 1
@@ -59,7 +60,7 @@ class JaversSnapshotDifferIntegrationTest extends Specification {
         javers.commit("some.login", newCdo)
 
         when:
-        def changes = javers.getChangeHistory(1,SnapshotEntity,10)
+        def changes = javers.getChangeHistory(instanceId(1,SnapshotEntity),10)
 
         then:
         changes.size() == 1
@@ -98,7 +99,7 @@ class JaversSnapshotDifferIntegrationTest extends Specification {
         }
 
         when:
-        def changes = javers.getChangeHistory("kaz",DummyUser,10)
+        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),10)
 
         then:
         changes.size() == 3

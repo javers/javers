@@ -1,6 +1,7 @@
 package org.javers.core
 
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.metamodel.object.InstanceIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
@@ -9,6 +10,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
@@ -31,7 +33,7 @@ class JaversRepositoryIntegrationTest extends Specification {
         javers.commit("author2",cdo) //v. 2
 
         when:
-        def snapshots = javers.getStateHistory(2, SnapshotEntity, 10)
+        def snapshots = javers.getStateHistory(instanceId(2, SnapshotEntity), 10)
 
         then:
         def cdoId = instanceId(2,SnapshotEntity)
@@ -56,7 +58,7 @@ class JaversRepositoryIntegrationTest extends Specification {
         when:
         user.age = 19
         javers.commit("login", user)
-        def history = javers.getChangeHistory("John", DummyUser, 100)
+        def history = javers.getChangeHistory(instanceId("John", DummyUser), 100)
 
         then:
         history.size() == 1
