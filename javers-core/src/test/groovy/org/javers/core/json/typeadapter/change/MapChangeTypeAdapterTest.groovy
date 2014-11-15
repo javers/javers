@@ -26,11 +26,11 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class MapChangeTypeAdapterTest extends Specification {
 
-    @Ignore //not supported
-    def "should deserialize polymorfic MapChange type-safely when switched on" () {
-        expect:
-            true
-    }
+    //@Ignore //not supported
+    //def "should deserialize polymorfic MapChange type-safely when switched on" () {
+    //    expect:
+    //        true
+    //}
 
     def "should serialize polymorfic MapChange type-safely when switched on" () {
         JsonConverter jsonConverter = javersTestAssemblyTypeSafe().jsonConverter

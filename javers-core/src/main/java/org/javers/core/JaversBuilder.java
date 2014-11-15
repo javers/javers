@@ -96,7 +96,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers {@link org.javers.core.metamodel.clazz.Entity} with id-property selected on the basis of @Id annotation
+     * registers {@link org.javers.core.metamodel.clazz.Entity} with id-property pointed by @Id annotation
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
         Validate.argumentIsNotNull(entityClass);
