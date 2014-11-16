@@ -19,7 +19,7 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;
 /**
  * @author bartosz walacik
  */
-public class BasicDiffExample {
+public class BasicValueObjectDiffExample {
 
     @Test
     public void shouldCompareTwoObjects() {

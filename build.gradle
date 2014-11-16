@@ -47,6 +47,14 @@ subprojects {
         gradleVersion = '2.1'
     }
 
+    task example (dependsOn: 'cleanTest') << {
+        tasks.test.testLogging {
+            events 'failed', 'passed'
+            showStandardStreams = true
+        }
+        tasks.test.execute()
+    }
+
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
         from javadoc
