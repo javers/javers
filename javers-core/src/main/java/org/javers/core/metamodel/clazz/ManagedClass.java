@@ -1,14 +1,14 @@
 package org.javers.core.metamodel.clazz;
 
 import org.javers.common.collections.Predicate;
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.JaversException;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.javers.common.exception.exceptions.JaversExceptionCode.PROPERTY_NOT_FOUND;
+import static org.javers.common.exception.JaversExceptionCode.PROPERTY_NOT_FOUND;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 

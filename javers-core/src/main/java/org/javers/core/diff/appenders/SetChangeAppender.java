@@ -1,7 +1,7 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Sets;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.*;
 import org.javers.core.metamodel.object.*;

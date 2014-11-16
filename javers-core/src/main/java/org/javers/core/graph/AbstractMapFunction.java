@@ -1,8 +1,8 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.type.*;
 

@@ -2,15 +2,14 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Maps;
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.*;
 
-import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
+import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 
 /**
  * @author bartosz walacik

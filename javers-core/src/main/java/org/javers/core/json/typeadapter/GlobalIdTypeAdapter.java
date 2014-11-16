@@ -2,8 +2,8 @@ package org.javers.core.json.typeadapter;
 
 import com.google.gson.*;
 import org.javers.common.collections.Lists;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.clazz.Entity;

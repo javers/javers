@@ -1,10 +1,9 @@
 package org.javers.common.reflection;
 
 import org.javers.common.collections.Lists;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.annotation.DiffIgnore;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
@@ -12,8 +11,6 @@ import java.lang.reflect.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-
-import static org.javers.common.collections.Lists.immutableListOf;
 
 /**
  * @author bartosz walacik

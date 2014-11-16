@@ -1,9 +1,8 @@
 package org.javers.core.diff;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
-import org.javers.common.patterns.visitors.Visitable;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;

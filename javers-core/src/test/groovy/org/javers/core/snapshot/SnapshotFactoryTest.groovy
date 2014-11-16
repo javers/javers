@@ -1,7 +1,7 @@
 package org.javers.core.snapshot
 
-import org.javers.common.exception.exceptions.JaversException
-import org.javers.common.exception.exceptions.JaversExceptionCode
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.JaversTestBuilder
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
@@ -15,7 +15,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static org.javers.common.exception.exceptions.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
+import static JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
 

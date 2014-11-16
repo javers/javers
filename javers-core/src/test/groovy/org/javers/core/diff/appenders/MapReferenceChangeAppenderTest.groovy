@@ -1,13 +1,12 @@
 package org.javers.core.diff.appenders
 
-import org.javers.common.exception.exceptions.JaversException
+import org.javers.common.exception.JaversException
 import org.javers.core.diff.AbstractDiffTest
-import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
 
-import static org.javers.common.exception.exceptions.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
+import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.diff.appenders.MapChangeAssert.getAssertThat
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId

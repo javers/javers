@@ -1,7 +1,7 @@
 package org.javers.core.snapshot;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;

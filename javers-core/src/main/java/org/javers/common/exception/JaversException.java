@@ -1,4 +1,4 @@
-package org.javers.common.exception.exceptions;
+package org.javers.common.exception;
 
 /**
  * Basic javers exception.

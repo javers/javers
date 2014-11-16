@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.JaversException;
 import org.javers.core.metamodel.clazz.Entity;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;

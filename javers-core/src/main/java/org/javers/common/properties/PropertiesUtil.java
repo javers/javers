@@ -1,9 +1,9 @@
 package org.javers.common.properties;
 
 import org.javers.common.validation.Validate;
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.JaversException;
 
-import static org.javers.common.exception.exceptions.JaversExceptionCode.*;
+import static org.javers.common.exception.JaversExceptionCode.*;
 
 import java.io.IOException;
 import java.io.InputStream;
