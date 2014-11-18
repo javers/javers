@@ -1,11 +1,11 @@
-package org.javers.core.examples;
+package org.javers.core.examples.model;
 
 /**
  * @author bartosz walacik
  */
 public class Address {
-    private String city;
-    private String street;
+    private final String city;
+    private final String street;
 
     public Address(String city, String street) {
         this.city = city;
@@ -16,15 +16,7 @@ public class Address {
         return city;
     }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
-
     public String getStreet() {
         return street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
     }
 }

@@ -24,17 +24,15 @@ public class BasicEntityDiffExample {
         Diff diff = javers.compare(tommyOld, tommyNew);
 
         //then
-        ValueChange change = (ValueChange)  diff.getChanges().get(0);
+        //there should be one change of type {@link ValueChange}
+        ValueChange change = (ValueChange) diff.getChanges().get(0);
 
         assertThat(diff.getChanges()).hasSize(1);
         assertThat(change.getProperty().getName()).isEqualTo("name");
+        assertThat(change.getAffectedCdoId().value()).isEqualTo("org.javers.core.examples.model.Person/tommy");
         assertThat(change.getLeft()).isEqualTo("Tommy Smart");
         assertThat(change.getRight()).isEqualTo("Tommy C. Smart");
 
-        System.out.println("changes count:       " + diff.getChanges().size());
-        System.out.println("entity id:           " + change.getAffectedCdoId().getCdoId());
-        System.out.println("changed property:    " + change.getProperty().getName());
-        System.out.println("value before change: " + change.getLeft());
-        System.out.println("value after change : " + change.getRight());
+        System.out.println("diff: " + javers.toJson(diff));
     }
 }
