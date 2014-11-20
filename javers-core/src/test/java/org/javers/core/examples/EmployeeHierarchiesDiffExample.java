@@ -111,9 +111,8 @@ public class EmployeeHierarchiesDiffExample {
         Employee oldBoss = new Employee("Big Boss");
         Employee boss = oldBoss;
         for (int i=0; i<1000; i++){
-            Employee emp = new Employee("Emp no."+i);
-            boss.addSubordinate(emp);
-            boss = emp;
+            boss.addSubordinate(new Employee("Emp no."+i));
+            boss = boss.getSubordinates().get(0);
         }
 
         Employee newBoss = new Employee("Big Boss");
