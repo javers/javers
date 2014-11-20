@@ -3,6 +3,8 @@ package org.javers.core.examples;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.NewObject;
+import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.examples.model.Employee;
 import org.junit.Test;
@@ -16,26 +18,84 @@ public class EmployeeHierarchiesDiffExample {
 
     @Test
     public void shouldDetectSalaryChange(){
-        //given:
+        //given
         Javers javers = JaversBuilder.javers().build();
 
         Employee oldStructure = new Employee("Big Boss")
-                .addSubordinates(new Employee("Noisy Manager"), new Employee("Great Developer", 10000));
+            .addSubordinates(
+                    new Employee("Noisy Manager"),
+                    new Employee("Great Developer", 10000));
+
         Employee newStructure = new Employee("Big Boss")
-                .addSubordinates(new Employee("Noisy Manager"), new Employee("Great Developer", 20000));
+            .addSubordinates(
+                    new Employee("Noisy Manager"),
+                    new Employee("Great Developer", 20000));
 
         //when
         Diff diff = javers.compare(oldStructure, newStructure);
 
         //then
-        //there should be one change of type {@link ValueChange}
-        ValueChange change =  (ValueChange) diff.getChanges().get(0);
+        ValueChange change =  diff.getChangesByType(ValueChange.class).get(0);
 
         assertThat(change.getAffectedLocalId()).isEqualTo("Great Developer");
         assertThat(change.getProperty().getName()).isEqualTo("salary");
         assertThat(change.getLeft()).isEqualTo(10000);
         assertThat(change.getRight()).isEqualTo(20000);
 
+        System.out.println("diff: " + javers.toJson(diff));
+    }
+
+    @Test
+    public void shouldDetectHired() {
+        //given
+        Javers javers = JaversBuilder.javers().build();
+
+        Employee oldStructure = new Employee("Big Boss")
+                .addSubordinates(
+                        new Employee("Great Developer"));
+
+        Employee newStructure = new Employee("Big Boss")
+                .addSubordinates(
+                        new Employee("Great Developer"),
+                        new Employee("Hired One"),
+                        new Employee("Hired Second"));
+
+        //when
+        Diff diff = javers.compare(oldStructure, newStructure);
+
+        //then
+        assertThat(diff.getObjectsByChangeType(NewObject.class))
+                .hasSize(2)
+                .containsOnly(new Employee("Hired One"),
+                              new Employee("Hired Second"));
+
+        System.out.println("diff: " + javers.toJson(diff));
+    }
+
+    @Test
+    public void shouldDetectBossChange() {
+        //given
+        Javers javers = JaversBuilder.javers().build();
+
+        Employee oldStructure = new Employee("Big Boss")
+                .addSubordinates(new Employee("Manager One")
+                        .addSubordinate(new Employee("Great Developer")))
+                .addSubordinates(new Employee("Manager Second"));
+
+        Employee newStructure = new Employee("Big Boss")
+                .addSubordinates(new Employee("Manager One"),
+                                 new Employee("Manager Second")
+                        .addSubordinate(new Employee("Great Developer")));
+
+        //when
+        Diff diff = javers.compare(oldStructure, newStructure);
+
+        //then
+        ReferenceChange change = diff.getChangesByType(ReferenceChange.class).get(0);
+
+        assertThat(change.getAffectedLocalId()).isEqualTo("Great Developer");
+        assertThat(change.getLeft().getCdoId()).isEqualTo("Manager One");
+        assertThat(change.getRight().getCdoId()).isEqualTo("Manager Second");
 
         System.out.println("diff: " + javers.toJson(diff));
     }

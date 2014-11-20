@@ -25,7 +25,7 @@ public class BasicEntityDiffExample {
 
         //then
         //there should be one change of type {@link ValueChange}
-        ValueChange change = (ValueChange) diff.getChanges().get(0);
+        ValueChange change = diff.getChangesByType(ValueChange.class).get(0);
 
         assertThat(diff.getChanges()).hasSize(1);
         assertThat(change.getProperty().getName()).isEqualTo("name");

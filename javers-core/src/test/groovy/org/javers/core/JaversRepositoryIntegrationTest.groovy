@@ -82,7 +82,7 @@ class JaversRepositoryIntegrationTest extends Specification {
         history.size() == 1
         history[0] instanceof ValueChange
         with(history[0]) {
-            getAffectedGlobalId == voId
+            affectedGlobalId == voId
             property.name == "city"
             left == "London"
             right == "Paris"
