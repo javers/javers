@@ -26,19 +26,19 @@ class ChangeAssert {
     }
 
     ChangeAssert hasInstanceId(Class expected, Object expectedCdoId) {
-        assert actual.affectedCdoId instanceof InstanceId
-        assert actual.affectedCdoId.cdoClass.clientsClass == expected
-        assert actual.affectedCdoId.cdoId == expectedCdoId
+        assert actual.affectedGlobalId instanceof InstanceId
+        assert actual.affectedGlobalId.cdoClass.clientsClass == expected
+        assert actual.affectedGlobalId.cdoId == expectedCdoId
         this
     }
 
     ChangeAssert hasEntityTypeOf(Class<?> entityClass) {
-        actual.affectedCdoId.cdoClass.clientsClass == entityClass
+        actual.affectedGlobalId.cdoClass.clientsClass == entityClass
         this
     }
 
     ChangeAssert hasCdoId(Object expectedCdoId) {
-        actual.affectedCdoId.cdoId == expectedCdoId
+        actual.affectedGlobalId.cdoId == expectedCdoId
         this
     }
 

@@ -1,7 +1,6 @@
 package org.javers.core
 
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.metamodel.object.InstanceIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
@@ -10,7 +9,6 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
@@ -63,7 +61,7 @@ class JaversRepositoryIntegrationTest extends Specification {
         then:
         history.size() == 1
         history[0] instanceof ValueChange
-        history[0].affectedCdoId == instanceId("John", DummyUser)
+        history[0].affectedGlobalId == instanceId("John", DummyUser)
         history[0].property.name == "age"
         history[0].left == 18
         history[0].right == 19
@@ -84,7 +82,7 @@ class JaversRepositoryIntegrationTest extends Specification {
         history.size() == 1
         history[0] instanceof ValueChange
         with(history[0]) {
-            affectedCdoId == voId
+            getAffectedGlobalId == voId
             property.name == "city"
             left == "London"
             right == "Paris"

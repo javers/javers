@@ -4,14 +4,11 @@ import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.NewObject
-import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
-import sun.security.jca.GetInstance
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 import static org.javers.core.json.builder.ChangeTestBuilder.newObject
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
@@ -52,6 +49,6 @@ class NewObjectTypeAdapterTest extends Specification {
 
         then:
         change instanceof NewObject
-        change.affectedCdoId == instanceId("kaz",DummyUser)
+        change.affectedGlobalId == instanceId("kaz",DummyUser)
     }
 }

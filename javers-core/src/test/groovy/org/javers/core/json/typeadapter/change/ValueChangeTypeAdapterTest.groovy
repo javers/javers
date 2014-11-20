@@ -59,7 +59,7 @@ class ValueChangeTypeAdapterTest extends Specification {
             ValueChange change  = jsonConverter.fromJson(json.toString(),Change)
 
         then:
-            change.affectedCdoId == instanceId("kaz",DummyUser)
+            change.affectedGlobalId == instanceId("kaz",DummyUser)
             change.left == null
             change.right == true
             change.property.name == "bigFlag"

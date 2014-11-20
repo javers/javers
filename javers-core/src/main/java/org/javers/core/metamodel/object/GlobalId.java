@@ -16,7 +16,6 @@ public abstract class GlobalId {
     /**
      * ID of Client's domain object, should be unique in Class scope,
      * for example database primary key or any domain identifier like user.login
-     *
      */
     public abstract Object getCdoId();
 

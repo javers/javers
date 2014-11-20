@@ -69,7 +69,7 @@ class ReferenceChangeTypeAdapterTest extends Specification {
             ReferenceChange change  = jsonConverter.fromJson(json.toString(),Change)
 
         then:
-            change.affectedCdoId  == instanceId("kaz",DummyUser)
+            change.affectedGlobalId  == instanceId("kaz",DummyUser)
             change.left  == instanceId(1,DummyUserDetails)
             change.right == instanceId(2,DummyUserDetails)
             change.property.name  == "dummyUserDetails"

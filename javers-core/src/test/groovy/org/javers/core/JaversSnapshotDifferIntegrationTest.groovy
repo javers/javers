@@ -4,7 +4,6 @@ import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ElementValueChange
 import org.javers.core.diff.changetype.container.ListChange
-import org.javers.core.metamodel.object.InstanceIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
@@ -35,7 +34,7 @@ class JaversSnapshotDifferIntegrationTest extends Specification {
         changes.size() == 1
         changes[0].class == expectedChangeType
         def change = changes[0]
-        change.affectedCdoId == instanceId("kaz",DummyUser)
+        change.affectedGlobalId == instanceId("kaz",DummyUser)
         change.property.name == expectedChangedProperty
         change.left == expectedLeftValue
         change.right == expectedRightValue
@@ -65,7 +64,7 @@ class JaversSnapshotDifferIntegrationTest extends Specification {
         then:
         changes.size() == 1
         ListChange change = changes[0]
-        change.affectedCdoId == instanceId(1,SnapshotEntity)
+        change.affectedGlobalId == instanceId(1,SnapshotEntity)
         change.property.name == propertyName
         change.changes.size() == 1
         ElementValueChange elementChange = change.changes[0]

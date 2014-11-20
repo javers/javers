@@ -55,14 +55,31 @@ public abstract class Change {
     }
 
     /**
-     * Affected Cdo Id
+     * Affected domain object GlobalId
      */
+    public GlobalId getAffectedGlobalId() {
+        return affectedCdoId;
+    }
+
+    /**
+     * old name of {@link #getAffectedGlobalId()},
+     * left for backward compatibility
+     */
+    @Deprecated
     public GlobalId getAffectedCdoId() {
         return affectedCdoId;
     }
 
     /**
-     * Affected Cdo, depending on concrete Change type,
+     * Affected domain object local Id (value under @Id property)
+     */
+    public Object getAffectedLocalId() {
+        return affectedCdoId.getCdoId();
+    }
+
+    /**
+     * Affected Cdo (domain object).
+     * Depending on concrete Change type,
      * it could be new Object, removed Object or new version of changed Object
      * <br> <br>
      *

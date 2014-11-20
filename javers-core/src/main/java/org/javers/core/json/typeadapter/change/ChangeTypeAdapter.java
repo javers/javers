@@ -84,7 +84,7 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
     protected JsonObject createJsonObject(T change, JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty(CHANGE_TYPE_FIELD, encode(change.getClass()));
-        jsonObject.add(AFFECTED_CDO_ID_FIELD, context.serialize(change.getAffectedCdoId()));
+        jsonObject.add(AFFECTED_CDO_ID_FIELD, context.serialize(change.getAffectedGlobalId()));
 
         if (change.getCommitMetadata().isPresent()) {
             jsonObject.add(COMMIT_METADATA, context.serialize(change.getCommitMetadata().get()));

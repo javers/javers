@@ -2,7 +2,6 @@ package org.javers.core.diff
 
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
-import org.javers.core.diff.changetype.PropertyChange
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
@@ -58,7 +57,7 @@ class DiffAssert {
     }
 
     DiffAssert hasNewObject(def expectedId) {
-        assert actual.changes.find { it instanceof NewObject && it.affectedCdoId == expectedId }
+        assert actual.changes.find { it instanceof NewObject && it.affectedGlobalId == expectedId }
         this
     }
 

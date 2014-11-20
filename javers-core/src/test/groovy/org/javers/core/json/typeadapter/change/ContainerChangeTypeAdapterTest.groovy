@@ -78,7 +78,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
         then:
             change.class == changeType_
             change.property.name == propertyName
-            change.getAffectedCdoId() == instanceId(1, SnapshotEntity)
+            change.getAffectedGlobalId() == instanceId(1, SnapshotEntity)
 
             with(change.commitMetadata.get()) {
                 author == "author"
@@ -241,7 +241,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
         then:
         change.class == changeType_
         change.property.name == propertyName
-        change.affectedCdoId == instanceId(1, SnapshotEntity)
+        change.affectedGlobalId == instanceId(1, SnapshotEntity)
         with(change.changes[0]) {
             it.class == ElementValueChange
             index == 1

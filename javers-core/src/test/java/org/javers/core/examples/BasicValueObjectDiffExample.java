@@ -30,7 +30,7 @@ public class BasicValueObjectDiffExample {
         ValueChange change =  (ValueChange) diff.getChanges().get(0);
 
         assertThat(diff.getChanges()).hasSize(1);
-        assertThat(change.getAffectedCdoId().value()).isEqualTo("org.javers.core.examples.model.Address/");
+        assertThat(change.getAffectedGlobalId().value()).isEqualTo("org.javers.core.examples.model.Address/");
         assertThat(change.getProperty().getName()).isEqualTo("street");
         assertThat(change.getLeft()).isEqualTo("5th Avenue");
         assertThat(change.getRight()).isEqualTo("6th Avenue");

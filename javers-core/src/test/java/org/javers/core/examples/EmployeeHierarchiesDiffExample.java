@@ -1,6 +1,5 @@
 package org.javers.core.examples;
 
-import org.fest.assertions.api.Assertions;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
@@ -32,7 +31,7 @@ public class EmployeeHierarchiesDiffExample {
         //there should be one change of type {@link ValueChange}
         ValueChange change =  (ValueChange) diff.getChanges().get(0);
 
-        assertThat(change.getAffectedCdoLocalId()).isEqualTo("Great Developer");
+        assertThat(change.getAffectedLocalId()).isEqualTo("Great Developer");
         assertThat(change.getProperty().getName()).isEqualTo("salary");
         assertThat(change.getLeft()).isEqualTo(10000);
         assertThat(change.getRight()).isEqualTo(20000);
