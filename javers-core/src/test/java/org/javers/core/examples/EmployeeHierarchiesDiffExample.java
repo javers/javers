@@ -4,6 +4,7 @@ import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.NewObject;
+import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.examples.model.Employee;
@@ -21,18 +22,18 @@ public class EmployeeHierarchiesDiffExample {
         //given
         Javers javers = JaversBuilder.javers().build();
 
-        Employee oldStructure = new Employee("Big Boss")
+        Employee oldBoss = new Employee("Big Boss")
             .addSubordinates(
                     new Employee("Noisy Manager"),
                     new Employee("Great Developer", 10000));
 
-        Employee newStructure = new Employee("Big Boss")
+        Employee newBoss = new Employee("Big Boss")
             .addSubordinates(
                     new Employee("Noisy Manager"),
                     new Employee("Great Developer", 20000));
 
         //when
-        Diff diff = javers.compare(oldStructure, newStructure);
+        Diff diff = javers.compare(oldBoss, newBoss);
 
         //then
         ValueChange change =  diff.getChangesByType(ValueChange.class).get(0);
@@ -50,18 +51,18 @@ public class EmployeeHierarchiesDiffExample {
         //given
         Javers javers = JaversBuilder.javers().build();
 
-        Employee oldStructure = new Employee("Big Boss")
+        Employee oldBoss = new Employee("Big Boss")
                 .addSubordinates(
                         new Employee("Great Developer"));
 
-        Employee newStructure = new Employee("Big Boss")
+        Employee newBoss = new Employee("Big Boss")
                 .addSubordinates(
                         new Employee("Great Developer"),
                         new Employee("Hired One"),
                         new Employee("Hired Second"));
 
         //when
-        Diff diff = javers.compare(oldStructure, newStructure);
+        Diff diff = javers.compare(oldBoss, newBoss);
 
         //then
         assertThat(diff.getObjectsByChangeType(NewObject.class))
@@ -77,18 +78,20 @@ public class EmployeeHierarchiesDiffExample {
         //given
         Javers javers = JaversBuilder.javers().build();
 
-        Employee oldStructure = new Employee("Big Boss")
-                .addSubordinates(new Employee("Manager One")
-                        .addSubordinate(new Employee("Great Developer")))
-                .addSubordinates(new Employee("Manager Second"));
+        Employee oldBoss = new Employee("Big Boss")
+                .addSubordinates(
+                        new Employee("Manager One")
+                                .addSubordinate(new Employee("Great Developer")),
+                        new Employee("Manager Second"));
 
-        Employee newStructure = new Employee("Big Boss")
-                .addSubordinates(new Employee("Manager One"),
-                                 new Employee("Manager Second")
-                        .addSubordinate(new Employee("Great Developer")));
+        Employee newBoss = new Employee("Big Boss")
+                .addSubordinates(
+                        new Employee("Manager One"),
+                        new Employee("Manager Second")
+                                .addSubordinate(new Employee("Great Developer")));
 
         //when
-        Diff diff = javers.compare(oldStructure, newStructure);
+        Diff diff = javers.compare(oldBoss, newBoss);
 
         //then
         ReferenceChange change = diff.getChangesByType(ReferenceChange.class).get(0);
@@ -98,5 +101,27 @@ public class EmployeeHierarchiesDiffExample {
         assertThat(change.getRight().getCdoId()).isEqualTo("Manager Second");
 
         System.out.println("diff: " + javers.toJson(diff));
+    }
+
+    @Test
+    public void shouldDetectFiredForLargeDepthStructure() {
+        //given
+        Javers javers = JaversBuilder.javers().build();
+
+        Employee oldBoss = new Employee("Big Boss");
+        Employee boss = oldBoss;
+        for (int i=0; i<1000; i++){
+            Employee emp = new Employee("Emp no."+i);
+            boss.addSubordinate(emp);
+            boss = emp;
+        }
+
+        Employee newBoss = new Employee("Big Boss");
+
+        //when
+        Diff diff = javers.compare(oldBoss, newBoss);
+
+        //then
+        assertThat(diff.getChangesByType(ObjectRemoved.class)).hasSize(1000);
     }
 }
