@@ -17,6 +17,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
  */
 public class EmployeeHierarchiesDiffExample {
 
+    /** {@link ValueChange} example */
     @Test
     public void shouldDetectSalaryChange(){
         //given
@@ -46,6 +47,7 @@ public class EmployeeHierarchiesDiffExample {
         System.out.println("diff: " + javers.toJson(diff));
     }
 
+    /** {@link NewObject} example */
     @Test
     public void shouldDetectHired() {
         //given
@@ -73,6 +75,7 @@ public class EmployeeHierarchiesDiffExample {
         System.out.println("diff: " + javers.toJson(diff));
     }
 
+    /** {@link ReferenceChange} example */
     @Test
     public void shouldDetectBossChange() {
         //given
@@ -103,6 +106,7 @@ public class EmployeeHierarchiesDiffExample {
         System.out.println("diff: " + javers.toJson(diff));
     }
 
+    /** {@link NewObject} example, large structure */
     @Test
     public void shouldDetectFiredForLargeDepthStructure() {
         //given

@@ -15,9 +15,40 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly;
  */
 public class TypeMapperIntegrationTest extends Specification {
 
+    @Unroll
+    def "should override Entity type inferred form annotations when ValueObject is explicitly registered for #queryClass.simpleName"() {
+        given:
+        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        mapper.registerClientsClass(new ValueObjectDefinition(queryClass))
+
+        when:
+        def jType = mapper.getJaversType(queryClass)
+
+        then:
+        jType.class == ValueObjectType
+        jType.baseJavaClass == queryClass
+
+        where:
+        queryClass <<  [JpaEntity,
+                        ClassWithEntityAnn,
+                        ClassWithIdAnn]
+    }
+
+    def "should override ValueObject type inferred form annotations when Entity is explicitly registered"() {
+        given:
+        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        mapper.registerClientsClass(new EntityDefinition(JpaEmbeddable,"some"))
+
+        when:
+        EntityType jType = mapper.getJaversType(JpaEmbeddable)
+
+        then:
+        jType.managedClass.idProperty.name == "some"
+    }
+
     def "should map as ValueObject by default"() {
         given:
-        TypeMapper mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
 
         when:
         def jType = mapper.getJaversType(DummyAddress)
@@ -29,7 +60,7 @@ public class TypeMapperIntegrationTest extends Specification {
 
     def "should map as Entity when class has id property"() {
         given:
-        TypeMapper mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
 
         when:
         def jType = mapper.getJaversType(DummyUser)
