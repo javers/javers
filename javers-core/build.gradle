@@ -9,6 +9,7 @@ dependencies {
 
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
     testCompile 'com.google.guava:guava:14.0.1'
+    testCompile 'org.mongodb.morphia:morphia:0.108'
 }
 
 configurations {
