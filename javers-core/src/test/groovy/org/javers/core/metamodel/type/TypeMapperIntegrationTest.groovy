@@ -1,6 +1,8 @@
 package org.javers.core.metamodel.type;
 
 import com.google.gson.reflect.TypeToken
+import org.bson.types.ObjectId
+import org.javers.core.cases.morphia.TopLevelEntity
 import org.javers.core.metamodel.clazz.*
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
@@ -58,7 +60,26 @@ public class TypeMapperIntegrationTest extends Specification {
         jType.baseJavaClass == DummyAddress
     }
 
-    def "should map as Entity when class has id property"() {
+    def "should map as Value if the class is used as @Id in another class"(){
+        given:
+        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+
+        when:
+        entityRegisterAction.call(mapper)
+        def jType = mapper.getJaversType(ObjectId)
+
+        then:
+        jType.class == ValueType
+        jType.baseJavaClass == ObjectId
+
+        where:
+        entityRegisterAction << [
+            { m -> m.registerClientsClass(new EntityDefinition(TopLevelEntity)) },
+            { m -> m.getJaversType(TopLevelEntity) }
+        ]
+    }
+
+    def "should map as Entity when class has @Id property annotation"() {
         given:
         def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
 
