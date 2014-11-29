@@ -167,12 +167,12 @@ public class ReflectionUtil {
     }
 
     public static Object invokeGetterEvenIfPrivate(Method getter, Object onObject) {
-            setAccessibleIfPrivateOrProtected(getter);
-            return invokeGetter(getter, onObject);
+        setAccessibleIfNecessary(getter);
+        return invokeGetter(getter, onObject);
     }
 
     public static Object invokeFieldEvenIfPrivate(Field field, Object onObject) {
-        setAccessibleIfPrivateOrProtected(field);
+        setAccessibleIfNecessary(field);
         return invokeField(field, onObject);
     }
 
@@ -181,20 +181,19 @@ public class ReflectionUtil {
         try {
             return field.get(onObject);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("error getting unwrap from field '"+ field.getName() +"'");
+            throw new RuntimeException("error getting value from field '"+ field.getName() +"'",e);
         }
     }
-
-    private static boolean isPrivateOrProtected(int modifiersCode) {
-        return Modifier.isPrivate(modifiersCode) ||
-                Modifier.isProtected(modifiersCode);
-    }
-
-    private static <T extends AccessibleObject & Member> void setAccessibleIfPrivateOrProtected(T object) {
-        if(isPrivateOrProtected(object.getModifiers()))
+    
+    private static void setAccessibleIfNecessary(Member member) {
+        if(!isPublic(member))
         {
-            object.setAccessible(true);
+            ((AccessibleObject)member).setAccessible(true); //that's Java Reflection API ...
         }
+    }
+
+    private static boolean isPublic(Member member){
+        return Modifier.isPublic(member.getModifiers());
     }
 
     /**

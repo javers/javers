@@ -5,10 +5,12 @@ import org.javers.core.JaversBuilder
 import spock.lang.Specification
 
 /**
+ * https://github.com/javers/javers/issues/64
+ *
  * @author bartosz walacik
  */
 class JaversMorphiaObjectIdTest extends Specification {
-    def "should ..."() {
+    def "should compare Entities with ObjectId as @Id"() {
         given:
         def javers = JaversBuilder.javers().build();
 
@@ -23,6 +25,6 @@ class JaversMorphiaObjectIdTest extends Specification {
         println("diff: " + javers.toJson(diff))
 
         then:
-        diff.getPropertyChanges("description").size() == 1
+        diff.getPropertyChanges("_description").size() == 1
     }
 }
