@@ -68,7 +68,7 @@ abstract class ObjectNodeTest extends Specification {
     }
 
     
-    def "should delegate equals() and hashCode() to cdo"() {
+    def "should delegate equals() and hashCode() to CDO"() {
         when:
         ObjectNode first = new ObjectNode(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
         ObjectNode second = new ObjectNode(new DummyUser("Mad Kax"), managedClassFactory.createEntity(DummyUser))
@@ -79,7 +79,7 @@ abstract class ObjectNodeTest extends Specification {
     }
 
     
-    def "should not be equal when different cdo ids"() {
+    def "should not be equal when different CDO ids"() {
         when:
         ObjectNode first = new ObjectNode(new DummyUser("stach"), managedClassFactory.createEntity(DummyUser))
         ObjectNode second = new ObjectNode(new DummyUser("Mad Kaz 1"), managedClassFactory.createEntity(DummyUser))

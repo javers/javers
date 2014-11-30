@@ -1,8 +1,7 @@
 package org.javers.core.metamodel.clazz
 
-import org.javers.core.JaversTestBuilder
 import org.javers.core.MappingStyle
-import org.javers.core.metamodel.property.BeanBasedPropertyScanner
+import org.javers.core.cases.morphia.TopLevelEntity
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import spock.lang.Shared
@@ -13,7 +12,6 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 /**
  * @author Pawel Cierpiatka
  */
-
 class ManagedClassFactoryTest extends Specification {
 
     def setupSpec() {
@@ -25,7 +23,7 @@ class ManagedClassFactoryTest extends Specification {
 
     def "should create Entity with properties, ID property and reference to client's class"() {
         when:
-        def entity = managedClassFactory.createEntity(DummyUser);
+        def entity = managedClassFactory.createEntity(DummyUser)
 
         then:
         entity instanceof Entity
@@ -36,7 +34,7 @@ class ManagedClassFactoryTest extends Specification {
 
     def "should create ValueObject with properties and reference to client's class"() {
         when:
-        def vo = managedClassFactory.createValueObject(DummyAddress);
+        def vo = managedClassFactory.createValueObject(DummyAddress)
 
         then:
         vo instanceof ValueObject

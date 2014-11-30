@@ -7,6 +7,7 @@ import org.javers.core.model.DummyUserDetails
 import org.joda.time.LocalDateTime
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.javers.core.metamodel.property.PropertiesAssert.assertThat
 
@@ -33,13 +34,18 @@ abstract class PropertyScannerTest extends Specification {
         assertThat(properties).hasntGotProperty("staticInt");
     }
 
-    def "should scan and get private property"() {
+    @Unroll
+    def "should scan and get #scopedProperty"() {
         when:
-        def properties = propertyScanner.scan(ManagedClass)
+        def properties = propertyScanner.scan(PropertyScannerEntity)
 
         then:
-        assertThat(properties).hasProperty("privateProperty").hasValue(new ManagedClass(),0)
+        assertThat(properties).hasProperty(scopedProperty).hasValue(new PropertyScannerEntity(),1)
+
+        where:
+        scopedProperty << ["privateProperty","protectedProperty","packagePrivateProperty","publicProperty"]
     }
+
 
     def "should scan Id"() {
         when:
@@ -182,10 +188,4 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(DummyAddress)
     }
 
-    class ManagedClass {
-        int privateProperty
-        int getPrivateProperty() {
-            privateProperty
-        }
-    }
 }

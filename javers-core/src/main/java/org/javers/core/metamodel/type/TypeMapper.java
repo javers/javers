@@ -3,10 +3,7 @@ package org.javers.core.metamodel.type;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.ManagedClass;
-import org.javers.core.metamodel.clazz.ClientsClassDefinition;
-import org.javers.core.metamodel.clazz.ValueObject;
+import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.*;
 import org.joda.time.LocalDate;
@@ -97,15 +94,6 @@ public class TypeMapper {
 
         return (ManagedType)javersType;
     }
-
-  /*  public List<JaversType> getJaversTypes(List<Class> javaTypes) {
-        argumentIsNotNull(javaTypes);
-        return Lists.transform(javaTypes, new Function<Class, JaversType>() {
-            public JaversType apply(Class javaType) {
-                return getJaversType(javaType);
-            }
-        });
-    } */
 
     public <T extends JaversType> T getPropertyType(Property property){
         argumentIsNotNull(property);
@@ -242,6 +230,10 @@ public class TypeMapper {
 
     private void addType(JaversType jType) {
         mappedTypes.put(jType.getBaseJavaType(), jType);
+
+        if (jType instanceof EntityType){
+            inferIdPropertyTypeAsValue((EntityType) jType);
+        }
     }
 
     /**
@@ -263,10 +255,29 @@ public class TypeMapper {
             newType = typeFactory.inferFromAnnotations(javaType);
         }
 
-        logger.debug("javersType of {} inferred as {}", javaType, newType.getClass().getSimpleName());
-
+        logger.info("javersType of {} inferred as {}", javaType, newType.getClass().getSimpleName());
         addType(newType);
+
         return newType;
+    }
+
+    /**
+     * if type of id-property is not already mapped, maps it as ValueType
+     */
+    private void inferIdPropertyTypeAsValue(EntityType eType) {
+        argumentIsNotNull(eType);
+
+        Type idPropertyType = eType.getManagedClass().getIdProperty().getGenericType();
+        if (isMapped(idPropertyType)) {
+            return;
+        }
+
+        logger.info("javersType of {} inferred as ValueType", idPropertyType);
+        addType(new ValueType(idPropertyType));
+    }
+
+    private boolean isMapped(Type javaType) {
+        return mappedTypes.containsKey(javaType);
     }
 
     private JaversType findNearestAncestor(Type javaType) {
