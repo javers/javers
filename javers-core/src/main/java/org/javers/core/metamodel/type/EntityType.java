@@ -4,6 +4,8 @@ import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.clazz.ManagedClassFactory;
 import org.javers.core.metamodel.object.InstanceId;
 
+import java.lang.reflect.Type;
+
 /**
  * Entity class in client's domain model.
  * <br/><br/>
@@ -41,5 +43,9 @@ public class EntityType extends ManagedType {
     @Override
     ManagedType spawn(Class javaType, ManagedClassFactory managedClassFactory) {
         return new EntityType(managedClassFactory.createEntity(javaType));
+    }
+
+    public Type getIdPropertyGenericType() {
+        return getManagedClass().getIdProperty().getGenericType();
     }
 }

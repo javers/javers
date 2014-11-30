@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
@@ -246,18 +247,9 @@ public class TypeMapper {
     private JaversType infer(Type javaType) {
         argumentIsNotNull(javaType);
         JaversType prototype = findNearestAncestor(javaType);
-        JaversType newType;
+        JaversType newType = typeFactory.infer(javaType, Optional.fromNullable(prototype));
 
-        if (prototype != null) {
-            newType = typeFactory.spawnFromPrototype(javaType, prototype);
-        }
-        else {
-            newType = typeFactory.inferFromAnnotations(javaType);
-        }
-
-        logger.info("javersType of {} inferred as {}", javaType, newType.getClass().getSimpleName());
         addType(newType);
-
         return newType;
     }
 
@@ -267,13 +259,9 @@ public class TypeMapper {
     private void inferIdPropertyTypeAsValue(EntityType eType) {
         argumentIsNotNull(eType);
 
-        Type idPropertyType = eType.getManagedClass().getIdProperty().getGenericType();
-        if (isMapped(idPropertyType)) {
-            return;
+        if (!isMapped(eType.getIdPropertyGenericType())) {
+            addType(typeFactory.inferIdPropertyTypeAsValue(eType));;
         }
-
-        logger.info("javersType of {} inferred as ValueType", idPropertyType);
-        addType(new ValueType(idPropertyType));
     }
 
     private boolean isMapped(Type javaType) {
@@ -286,7 +274,6 @@ public class TypeMapper {
 
         for (JaversType javersType : mappedTypes.values()) {
             DistancePair distancePair = new DistancePair(javaClass, javersType);
-            // logger.info("distance from "+javersType + ": "+distancePair.distance);
 
             //this is due too spoiled Java Array reflection API
             if (javaClass.isArray()) {
@@ -309,6 +296,5 @@ public class TypeMapper {
 
         return distances.get(0).getJaversType();
     }
-
 
 }

@@ -1,16 +1,21 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.*;
+import org.slf4j.Logger;
 
 import java.lang.reflect.Type;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author bartosz walacik
  */
 public class TypeFactory {
+    private static final Logger logger = getLogger(TypeFactory.class);
+
     private final ManagedClassFactory managedClassFactory;
 
     public TypeFactory(ManagedClassFactory managedClassFactory) {
@@ -21,7 +26,33 @@ public class TypeFactory {
         return createFromClientsClass(managedClassFactory.create(def));
     }
 
-    JaversType spawnFromPrototype(Type javaType, JaversType prototype) {
+    JaversType infer(Type javaType, Optional<JaversType> prototype){
+        JaversType jType;
+
+        if (prototype.isPresent()) {
+            jType = spawnFromPrototype(javaType, prototype.get());
+            logger.info("javersType of [{}] inferred as {} from prototype {}",
+                        javaType, jType.getClass().getSimpleName(), prototype.get());
+        }
+        else {
+            jType = inferFromAnnotations(javaType);
+            logger.info("javersType of [{}] inferred as {} from annotations",
+                        javaType, jType.getClass().getSimpleName());
+        }
+
+        return jType;
+    }
+
+    JaversType inferIdPropertyTypeAsValue(EntityType eType) {
+        Type idPropertyType = eType.getIdPropertyGenericType();
+
+        logger.info("javersType of [{}] inferred as ValueType, it's used as id-property type in {}",
+                idPropertyType, eType);
+
+        return new ValueType(idPropertyType);
+    }
+
+    private JaversType spawnFromPrototype(Type javaType, JaversType prototype) {
         Validate.argumentsAreNotNull(javaType, prototype);
         Class javaClass = extractClass(javaType);
 
@@ -33,7 +64,7 @@ public class TypeFactory {
         }
     }
 
-    public JaversType inferFromAnnotations(Type javaType) {
+    private JaversType inferFromAnnotations(Type javaType) {
         Class javaClass = extractClass(javaType);
 
         return createFromClientsClass(managedClassFactory.inferFromAnnotations(javaClass));
