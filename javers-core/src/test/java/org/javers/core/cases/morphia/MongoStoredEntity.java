@@ -3,12 +3,10 @@ package org.javers.core.cases.morphia;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Property;
+import org.mongodb.morphia.annotations.Entity;
 
-
-/**
- * @author bartosz walacik
- */
-public class TopLevelEntity {
+@Entity
+public class MongoStoredEntity {
     @Id
     private ObjectId _id;
     @Property("algorithm")
@@ -20,10 +18,10 @@ public class TopLevelEntity {
     @Property("description")
     private String _description;
 
-    public TopLevelEntity() {
+    public MongoStoredEntity() {
     }
 
-    public TopLevelEntity(ObjectId id, String algorithm, String version, String name) {
+    public MongoStoredEntity(ObjectId id, String algorithm, String version, String name) {
         _id = id;
         _algorithm = algorithm;
         _version = version;

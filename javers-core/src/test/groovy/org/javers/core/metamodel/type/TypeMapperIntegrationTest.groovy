@@ -2,7 +2,7 @@ package org.javers.core.metamodel.type;
 
 import com.google.gson.reflect.TypeToken
 import org.bson.types.ObjectId
-import org.javers.core.cases.morphia.TopLevelEntity
+import org.javers.core.cases.morphia.MongoStoredEntity
 import org.javers.core.metamodel.clazz.*
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
@@ -74,8 +74,8 @@ public class TypeMapperIntegrationTest extends Specification {
 
         where:
         entityRegisterAction << [
-            { m -> m.registerClientsClass(new EntityDefinition(TopLevelEntity)) },
-            { m -> m.getJaversType(TopLevelEntity) }
+            { m -> m.registerClientsClass(new EntityDefinition(MongoStoredEntity)) },
+            { m -> m.getJaversType(MongoStoredEntity) }
         ]
     }
 
