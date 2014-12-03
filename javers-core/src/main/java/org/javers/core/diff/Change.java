@@ -3,11 +3,13 @@ package org.javers.core.diff;
 import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalId;
 
+import static org.javers.common.string.ToStringBuilder.addFirstField;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 import static org.javers.common.validation.Validate.conditionFulfilled;
@@ -110,15 +112,6 @@ public abstract class Change {
     }
 
     protected String fieldsToString(){
-        return "globalId:"+getAffectedGlobalId();
+        return addFirstField("globalId", getAffectedGlobalId());
     }
-
-    protected String formatField(String fieldName, Object value) {
-        return ", "+fieldName+":'"+ (value != null ? value.toString() : "")+"'";
-    }
-
-    protected String formatEnumField(String fieldName, Object value) {
-        return ", "+fieldName+":["+ (value != null ? value.toString() : "")+"]";
-    }
-
 }

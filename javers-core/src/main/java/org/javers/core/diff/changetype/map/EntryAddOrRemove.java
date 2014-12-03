@@ -24,6 +24,6 @@ public abstract  class EntryAddOrRemove extends EntryChange {
 
     @Override
     public String toString() {
-        return ToStringBuilder.toString(this, "key", getKey(), "value", getValue());
+        return ToStringBuilder.toString(this, getKey(), getValue());
     }
 }

@@ -36,6 +36,6 @@ public class EntryValueChange extends EntryChange {
 
     @Override
     public String toString() {
-        return ToStringBuilder.toString(this, "key", getKey(), "oldValue", getLeftValue(), "newValue", getRightValue());
+        return ToStringBuilder.toString(this, getKey(), getLeftValue()+"'>>'"+ getRightValue());
     }
 }

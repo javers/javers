@@ -12,10 +12,12 @@ public class ToStringBuilder {
 
         StringBuilder out = new StringBuilder();
         for (int i=0; i<fieldsMap.length; i+=2){
-            if (i>0){
-                out.append(", ");
+            if (i==0){
+                out.append( addFirstField(fieldsMap[i]+"",fieldsMap[i+1]) );
             }
-            out.append(fieldsMap[i]+":'"+(fieldsMap[i+1]==null?"":fieldsMap[i+1])+"'");
+            else{
+                out.append( addField(fieldsMap[i]+"",fieldsMap[i+1]) );
+            }
         }
 
         return out.toString();
@@ -26,4 +28,16 @@ public class ToStringBuilder {
 
          return instance.getClass().getSimpleName()+"{"+toStringSimple(fieldsMap)+"}";
      }
+
+    public static String addField(String fieldName, Object value) {
+        return ", "+addFirstField(fieldName, value);
+    }
+
+    public static String addFirstField(String fieldName, Object value) {
+        return fieldName+":'"+ (value != null ? value.toString() : "")+"'";
+    }
+
+    public static String addEnumField(String fieldName, Object value) {
+        return ", "+fieldName+":["+ (value != null ? value.toString() : "")+"]";
+    }
 }
