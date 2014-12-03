@@ -25,4 +25,15 @@ public class MapChange extends PropertyChange {
     public List<EntryChange> getEntryChanges() {
         return Collections.unmodifiableList(changes);
     }
+
+    @Override
+    protected String fieldsToString() {
+        StringBuilder changesAsString = new StringBuilder();
+
+        for (EntryChange c : changes){
+            if (changesAsString.length() > 0) { changesAsString.append(", "); }
+            changesAsString.append(c);
+        }
+        return super.fieldsToString() + formatEnumField("entryChanges", changesAsString);
+    }
 }

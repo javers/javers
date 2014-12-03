@@ -103,4 +103,22 @@ public abstract class Change {
     public Optional<CommitMetadata> getCommitMetadata() {
         return commitMetadata;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{" +fieldsToString() +"}";
+    }
+
+    protected String fieldsToString(){
+        return "globalId:"+getAffectedGlobalId();
+    }
+
+    protected String formatField(String fieldName, Object value) {
+        return ", "+fieldName+":'"+ (value != null ? value.toString() : "")+"'";
+    }
+
+    protected String formatEnumField(String fieldName, Object value) {
+        return ", "+fieldName+":["+ (value != null ? value.toString() : "")+"]";
+    }
+
 }

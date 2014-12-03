@@ -25,4 +25,9 @@ public abstract class PropertyChange extends Change {
     public Property getProperty() {
         return property;
     }
+
+    @Override
+    protected String fieldsToString() {
+        return super.fieldsToString() + formatField("property",property.getName());
+    }
 }

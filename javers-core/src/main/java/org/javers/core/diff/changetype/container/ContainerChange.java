@@ -1,6 +1,7 @@
 package org.javers.core.diff.changetype.container;
 
 import org.javers.core.diff.changetype.PropertyChange;
+import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
@@ -24,5 +25,16 @@ public abstract class ContainerChange extends PropertyChange {
      */
     public List<ContainerElementChange> getChanges() {
         return changes;
+    }
+
+    @Override
+    protected String fieldsToString() {
+        StringBuilder changesAsString = new StringBuilder();
+
+        for (ContainerElementChange c : changes){
+            if (changesAsString.length() > 0) { changesAsString.append(", "); }
+            changesAsString.append(c);
+        }
+        return super.fieldsToString() + formatEnumField("containerChanges", changesAsString);
     }
 }

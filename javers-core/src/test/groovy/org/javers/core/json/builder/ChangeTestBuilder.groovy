@@ -5,6 +5,9 @@ import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.container.ContainerElementChange
+import org.javers.core.diff.changetype.container.ListChange
+import org.javers.core.diff.changetype.container.SetChange
 import org.javers.core.diff.changetype.map.EntryChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.metamodel.object.InstanceId
@@ -31,6 +34,18 @@ class ChangeTestBuilder {
         InstanceId globalId = instanceId(cdo)
         Property prop = globalId.cdoClass.getProperty(propertyName)
         new MapChange(globalId, prop, changes)
+    }
+
+    static ListChange listChange(Object cdo, String propertyName, List<ContainerElementChange> changes) {
+        InstanceId globalId = instanceId(cdo)
+        Property prop = globalId.cdoClass.getProperty(propertyName)
+        new ListChange(globalId, prop, changes)
+    }
+
+    static SetChange setChange(Object cdo, String propertyName, List<ContainerElementChange> changes) {
+        InstanceId globalId = instanceId(cdo)
+        Property prop = globalId.cdoClass.getProperty(propertyName)
+        new SetChange(globalId, prop, changes)
     }
 
     static ValueChange valueChange(Object cdo, String propertyName, oldVal=null, newVal=null) {

@@ -26,4 +26,9 @@ public class ReferenceChange extends PropertyChange {
     public GlobalId getRight() {
         return right;
     }
+
+    @Override
+    protected String fieldsToString() {
+        return super.fieldsToString() + formatField("oldRef",left) + formatField("newRef",right);
+    }
 }

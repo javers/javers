@@ -31,4 +31,9 @@ public class ValueChange extends PropertyChange {
     public Atomic getWrappedRight() {
         return right;
     }
+
+    @Override
+    protected String fieldsToString() {
+        return super.fieldsToString() + formatField("oldVal",getLeft()) + formatField("newVal",getRight());
+    }
 }
