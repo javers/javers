@@ -35,9 +35,12 @@ class ChangeToStringDemo extends Specification {
         where:
             change <<[
                 ChangeTestBuilder.valueChange(cdo, "age", 10, 12),
+                ChangeTestBuilder.newObject(new DummyUser(name:2)),
+                ChangeTestBuilder.objectRemoved(new DummyUser(name:2)),
                 ChangeTestBuilder.referenceChanged(cdo, "supervisor", new DummyUser(name:2), new DummyUser(name:3)),
                 ChangeTestBuilder.setChange(cdo,"stringSet",[new ValueAdded("addedStr"), new ValueRemoved("removedStr")]),
                 ChangeTestBuilder.listChange(cdo,"integerList",[new ValueAdded(0,45), new ValueRemoved(1,45), new ElementValueChange(5, 44, 46)]),
+                ChangeTestBuilder.arrayChange(cdo,"intArray",[new ValueAdded(0,45), new ValueRemoved(1,45), new ElementValueChange(5, 44, 46)]),
                 ChangeTestBuilder.mapChange(cdo,"valueMap",[new EntryAdded("key1","val1"),
                                                             new EntryRemoved("key2","val2"),
                                                             new EntryValueChange("key3","old1","new1")])

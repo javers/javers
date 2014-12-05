@@ -15,8 +15,8 @@ public class SetChange extends ContainerChange {
     public SetChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
         super(affectedCdoId, property, changes);
         for (ContainerElementChange change: changes){
-            conditionFulfilled(change.getIndex() == null, "SetChange constructor failed, expected empty change.index");
             conditionFulfilled(change instanceof ValueAddOrRemove, "SetChange constructor failed, expected ValueAddOrRemove");
+            conditionFulfilled(change.getIndex() == null, "SetChange constructor failed, expected empty change.index");
         }
     }
 }

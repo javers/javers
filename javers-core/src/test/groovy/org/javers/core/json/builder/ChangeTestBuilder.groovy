@@ -5,6 +5,7 @@ import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.container.ArrayChange
 import org.javers.core.diff.changetype.container.ContainerElementChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.container.SetChange
@@ -40,6 +41,12 @@ class ChangeTestBuilder {
         InstanceId globalId = instanceId(cdo)
         Property prop = globalId.cdoClass.getProperty(propertyName)
         new ListChange(globalId, prop, changes)
+    }
+
+    static ArrayChange arrayChange(Object cdo, String propertyName, List<ContainerElementChange> changes) {
+        InstanceId globalId = instanceId(cdo)
+        Property prop = globalId.cdoClass.getProperty(propertyName)
+        new ArrayChange(globalId, prop, changes)
     }
 
     static SetChange setChange(Object cdo, String propertyName, List<ContainerElementChange> changes) {
