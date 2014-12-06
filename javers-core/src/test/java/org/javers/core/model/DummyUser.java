@@ -27,6 +27,7 @@ public class DummyUser extends AbstractDummyUser {
     private Boolean bigFlag;
     private int age;
     private char _char;
+    private String surname;
 
     //enum
     private Sex sex;
@@ -57,6 +58,11 @@ public class DummyUser extends AbstractDummyUser {
 
     public DummyUser(String name) {
         this.name = name;
+    }
+
+    public DummyUser(String name, String surname) {
+        this(name);
+        this.surname = surname;
     }
 
     public void addEmployee(DummyUser dummyUser) {
@@ -222,6 +228,14 @@ public class DummyUser extends AbstractDummyUser {
 
     public void setDateTimes(LocalDateTime[] dateTimes) {
         this.dateTimes = dateTimes;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
     @Transient

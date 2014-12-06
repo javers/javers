@@ -1,6 +1,5 @@
 package org.javers.core.prettyprint
 
-import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ElementValueChange
 import org.javers.core.diff.changetype.container.ValueAdded
 import org.javers.core.diff.changetype.container.ValueRemoved
@@ -27,10 +26,10 @@ class ChangeToStringDemo extends Specification {
 
         when:
             def str = change.toString()
-            println str
 
         then:
-            str.length()>0 //it's a demo, not a real test
+            println str
+            str.length() > 0 //it's a demo, not a real test
 
         where:
             change <<[
