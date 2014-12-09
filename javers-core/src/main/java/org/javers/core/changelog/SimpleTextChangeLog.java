@@ -29,14 +29,23 @@ import org.joda.time.format.DateTimeFormatter;
  *
  * @author bartosz walacik
  */
-public class SampleTextChangeLog extends AbstractTextChangeLog {
-    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.mediumDateTime();
+public class SimpleTextChangeLog extends AbstractTextChangeLog {
+    public static final DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormat.mediumDateTime();
 
+    private final DateTimeFormatter dateTimeFormatter;
+
+    public SimpleTextChangeLog() {
+        this(DEFAULT_DATE_FORMATTER);
+    }
+
+    public SimpleTextChangeLog(DateTimeFormatter dateTimeFormatter) {
+        this.dateTimeFormatter = dateTimeFormatter;
+    }
 
     @Override
     public void onCommit(CommitMetadata commitMetadata) {
         appendln("commit " + commitMetadata.getId() + ", author:" + commitMetadata.getAuthor() +
-                ", " + DATE_FORMATTER.print(commitMetadata.getCommitDate()));
+                ", " + DEFAULT_DATE_FORMATTER.print(commitMetadata.getCommitDate()));
     }
 
     @Override

@@ -205,11 +205,11 @@ public class Javers {
      * For example, to get pretty change log, call:
      * <pre>
      * List&lt;Change&gt; changes = javers.getChangeHistory(...);
-     * String changeLog = javers.processChangeList(changes, new SampleTextChangeLog());
+     * String changeLog = javers.processChangeList(changes, new SimpleTextChangeLog());
      * System.out.println( changeLog );
      * </pre>
      *
-     * @see org.javers.core.changelog.SampleTextChangeLog
+     * @see org.javers.core.changelog.SimpleTextChangeLog
      */
     public <T> T processChangeList(List<Change> changes, ChangeProcessor<T> changeProcessor){
         ChangeListTraverser.traverse(changes, changeProcessor);
