@@ -204,8 +204,9 @@ public class Javers {
      * <br/><br/>
      * For example, to get pretty change log, call:
      * <pre>
-     * List&lt;Change&gt; changes = javers.getChangeHistory(changes, new SampleTextChangeLog());
-     * System.out.println( changes );
+     * List&lt;Change&gt; changes = javers.getChangeHistory(...);
+     * String changeLog = javers.processChangeList(changes, new SampleTextChangeLog());
+     * System.out.println( changeLog );
      * </pre>
      *
      * @see org.javers.core.changelog.SampleTextChangeLog

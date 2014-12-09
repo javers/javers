@@ -11,7 +11,7 @@ import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.metamodel.object.GlobalId;
 
 /**
- * For convenient change processing, for example, rendering a change log
+ * For convenient change processing, e.g. rendering a change log
  *
  * @author bartosz walacik
  */
