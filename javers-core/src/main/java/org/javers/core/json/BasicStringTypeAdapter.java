@@ -5,10 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
+import org.javers.core.metamodel.type.ValueType;
 
 /**
  * Convenient abstract implementation of {@link JsonTypeAdapter}.
- * Extend it if you need to represent unwrap (T) as single String and don't want to deal with Gson API.
+ * Extend it if you need to represent your {@link ValueType} as single String and don't want to deal with Gson API.
  * <br><br>
  *
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
