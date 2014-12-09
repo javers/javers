@@ -8,9 +8,6 @@ import org.javers.core.examples.model.Address;
 import org.junit.Test;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-/**
- * @author bartosz walacik
- */
 public class BasicValueObjectDiffExample {
 
     @Test

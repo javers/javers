@@ -8,9 +8,6 @@ import org.javers.core.examples.model.Person;
 import org.junit.Test;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-/**
- * @author bartosz walacik
- */
 public class BasicEntityDiffExample {
     @Test
     public void shouldCompareTwoEntityObjects() {
