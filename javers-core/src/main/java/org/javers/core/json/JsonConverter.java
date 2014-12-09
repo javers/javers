@@ -34,7 +34,7 @@ import java.util.List;
  *     <li> native Gson {@link JsonDeserializer}
  * </ul>
  *
- * Javers provides JsonTypeAdapters for some well known Value like {@link LocalDateTime}.
+ * Javers provides JsonTypeAdapters for some well known Values like {@link LocalDateTime}.
  * Those adapters are included by default in Javers setup, see {@link JsonConverterBuilder#BUILT_IN_ADAPTERS}
  * <br>
  *
