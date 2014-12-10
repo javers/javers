@@ -105,7 +105,19 @@ public class Diff {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
+        StringBuilder b = new StringBuilder();
+
+        b.append("Diff:\n");
+
+        int i=1;
+        for (Change change : changes){
+            b.append((i++)+". "+change+"\n");
+        }
+        return b.toString();
+    }
+
+    public String changesSummary(){
         StringBuilder b = new StringBuilder();
 
         b.append("changes - ");

@@ -58,4 +58,27 @@ public class Optional<T> {
         if (reference != null) consumer.consume(reference);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Optional other = (Optional) o;
+
+        if (this.isEmpty() && other.isEmpty()){
+            return true;
+        }
+
+        if (this.isPresent() && other.isPresent()){
+            return reference.equals(other.reference);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return reference != null ? reference.hashCode() : 0;
+    }
 }

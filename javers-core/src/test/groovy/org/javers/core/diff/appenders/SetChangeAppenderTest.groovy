@@ -27,6 +27,9 @@ class SetChangeAppenderTest extends AbstractDiffTest {
 
         then:
         change.changes.size() == changesCount
+        change.changes.each {
+            assert it.index == null
+        }
 
         where:
         leftSet              | rightSet             || changesCount

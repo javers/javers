@@ -1,4 +1,4 @@
-package org.javers.common.pico;
+package org.javers.core.pico;
 
 import java.util.Collection;
 

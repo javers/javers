@@ -1,6 +1,9 @@
 package org.javers.core;
 
 import org.javers.common.collections.Optional;
+import org.javers.core.changelog.ChangeProcessor;
+import org.javers.core.changelog.ChangeListTraverser;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactory;
 import org.javers.core.diff.Change;
@@ -17,6 +20,7 @@ import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.List;
 
@@ -29,10 +33,11 @@ import java.util.List;
  * For example, to deeply compare two objects
  * or two arbitrary complex graphs of objects, call:
  * <pre>
- * javers.compare(oldVersion, currentVersion);
+ * Javers javers = JaversBuilder.javers().build();
+ * Diff diff = javers.compare(oldVersion, currentVersion);
  * </pre>
  *
- *
+ * @see <a href="http://javers.org/documentation"/>http://javers.org/documentation</a>
  * @author bartosz walacik
  */
 public class Javers {
@@ -86,18 +91,20 @@ public class Javers {
      * To calculate diff, just provide two versions of the
      * same object or handles to two versions of the same objects graph.
      * <br/>
-     * Handle could be a root of an aggregate, tree root
-     * or any node in objects graph from where all other nodes are navigable.
+     * The handle could be a root of an aggregate, tree root
+     * or any node in an objects graph from where all other nodes are navigable.
      * </p>
      *
      * <p>
      * This function is used for ad-hoc objects comparing.
-     * In order to use changes auditing feature, call {@link #commit(String, Object)}.
+     * In order to use data auditing feature, call {@link #commit(String, Object)}.
      * </p>
      *
      * <p>
      * Diffs can be converted to JSON with {@link #toJson(Diff)}.
      * </p>
+     *
+     * @see <a href="http://javers.org/documentation/diff-examples/">http://javers.org/documentation/diff-examples</a>
      */
     public Diff compare(Object oldVersion, Object currentVersion) {
         return diffFactory.compare(oldVersion, currentVersion);
@@ -177,5 +184,35 @@ public class Javers {
 
     public JsonConverter getJsonConverter() {
         return jsonConverter;
+    }
+
+    /**
+     * Generic purpose method for processing a changes list.
+     * After iterating over given list, returns data computed by
+     * {@link org.javers.core.changelog.ChangeProcessor#result()}.
+     * <br/>
+     * It's more convenient than iterating over changes on your own.
+     * ChangeProcessor frees you from <tt>if + inctanceof</tt> boilerplate.
+     *
+     * <br/><br/>
+     * Additional features: <br/>
+     *  - when several changes in a row refers to the same Commit, {@link ChangeProcessor#onCommit(CommitMetadata)}
+     *  is called only for first occurrence <br/>
+     *  - similarly, when several changes in a row affects the same object, {@link ChangeProcessor#onAffectedObject(GlobalId)}
+     *  is called only for first occurrence
+     *
+     * <br/><br/>
+     * For example, to get pretty change log, call:
+     * <pre>
+     * List&lt;Change&gt; changes = javers.getChangeHistory(...);
+     * String changeLog = javers.processChangeList(changes, new SimpleTextChangeLog());
+     * System.out.println( changeLog );
+     * </pre>
+     *
+     * @see org.javers.core.changelog.SimpleTextChangeLog
+     */
+    public <T> T processChangeList(List<Change> changes, ChangeProcessor<T> changeProcessor){
+        ChangeListTraverser.traverse(changes, changeProcessor);
+        return changeProcessor.result();
     }
 }

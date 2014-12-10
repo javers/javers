@@ -26,7 +26,7 @@ import java.util.List;
  * Javers accepts several kind of plugins:
  * <ul>
  *     <li> {@link BasicStringTypeAdapter} -
- *           extend it if you need to represent unwrap as single String and don't want to deal with JSON API.
+ *           extend it if you need to represent Value as single String and don't want to deal with JSON API.
  *           For concrete class example see {@link LocalDateTimeTypeAdapter}.
  *     <li> {@link JsonTypeAdapter} - use it if you need full control over JSON conversion
  *     <li> native Gson {@link TypeAdapter}
@@ -34,7 +34,7 @@ import java.util.List;
  *     <li> native Gson {@link JsonDeserializer}
  * </ul>
  *
- * Javers provides JsonTypeAdapter's for some well known Value like {@link LocalDateTime}.
+ * Javers provides JsonTypeAdapters for some well known Values like {@link LocalDateTime}.
  * Those adapters are included by default in Javers setup, see {@link JsonConverterBuilder#BUILT_IN_ADAPTERS}
  * <br>
  *

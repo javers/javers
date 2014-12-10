@@ -1,7 +1,6 @@
 package org.javers.core.pico;
 
 import org.javers.common.date.DefaultDateProvider;
-import org.javers.common.pico.JaversModule;
 import org.javers.core.GraphFactory;
 import org.javers.core.Javers;
 import org.javers.core.JaversCoreConfiguration;

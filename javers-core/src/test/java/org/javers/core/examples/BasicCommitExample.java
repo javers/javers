@@ -12,9 +12,6 @@ import java.util.List;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;
 
-/**
- * @author bartosz walacik
- */
 public class BasicCommitExample {
     /**
      * JaVers by default uses InMemoryRepository, it's useful for testing

@@ -8,4 +8,5 @@ public class EntryRemoved extends EntryAddOrRemove {
     public EntryRemoved(Object key, Object value) {
         super(key, value);
     }
+
 }

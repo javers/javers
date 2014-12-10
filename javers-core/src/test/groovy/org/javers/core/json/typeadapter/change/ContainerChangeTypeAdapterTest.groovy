@@ -72,7 +72,6 @@ class ContainerChangeTypeAdapterTest extends Specification{
             }
 
         when:
-            //println json.toPrettyString()
             ContainerChange change  = jsonConverter.fromJson(json.toString(), Change)
 
         then:
@@ -101,15 +100,14 @@ class ContainerChangeTypeAdapterTest extends Specification{
             }
 
         where:
-            changeType_ <<   [ListChange, ArrayChange, SetChange]
-            propertyName << ["listOfEntities","arrayOfEntities","setOfEntities"]
+            changeType_ <<  [ListChange, ArrayChange]
+            propertyName << ["listOfEntities","arrayOfEntities"]
     }
 
     @Unroll
     def "should serialize #changeType.simpleName with references"()  {
         given:
             def javers = javersTestAssembly()
-            JsonConverter jsonConverter = javers.jsonConverter
             def affectedId = javers.instanceId(new SnapshotEntity(id:1))
             def ref2  = javers.idBuilder().instanceId(2,SnapshotEntity)
             def ref3 =  javers.idBuilder().instanceId(3,SnapshotEntity)
@@ -118,10 +116,10 @@ class ContainerChangeTypeAdapterTest extends Specification{
                                   new ValueRemoved(3, ref3)]
 
             def property =  affectedId.cdoClass.getProperty(propertyName)
-            ContainerChange change = changeType.newInstance(affectedId, property, elementChanges)
+            def change = changeType.newInstance(affectedId, property, elementChanges)
 
         when:
-            String jsonText = jsonConverter.toJson(change)
+            def jsonText = javers.jsonConverter.toJson(change)
 
         then:
             def json = new JsonSlurper().parseText(jsonText)
@@ -151,15 +149,14 @@ class ContainerChangeTypeAdapterTest extends Specification{
             }
 
         where:
-            changeType <<   [ListChange, ArrayChange, SetChange]
-            propertyName << ["listOfEntities","arrayOfEntities","setOfEntities"]
+            changeType <<   [ListChange, ArrayChange]
+            propertyName << ["listOfEntities","arrayOfEntities"]
     }
 
     @Unroll
     def "should serialize #changeType.simpleName with Values using custom TypeAdapter"()  {
         given:
             def javers = javersTestAssembly()
-            JsonConverter jsonConverter = javers.jsonConverter
             def affectedId = javers.instanceId(new SnapshotEntity(id:1))
 
             def elementChanges = [new ElementValueChange(1, new LocalDate(2001,1,1), new LocalDate(2001,1,2)),
@@ -167,10 +164,10 @@ class ContainerChangeTypeAdapterTest extends Specification{
                                   new ValueRemoved(3,new LocalDate(2001,1,4))]
 
             def property =  affectedId.cdoClass.getProperty(propertyName)
-            ContainerChange change = changeType.newInstance(affectedId, property, elementChanges)
+            def change = changeType.newInstance(affectedId, property, elementChanges)
 
         when:
-            String jsonText = jsonConverter.toJson(change)
+            def jsonText = javers.jsonConverter.toJson(change)
 
         then:
             def json = new JsonSlurper().parseText(jsonText)
@@ -196,15 +193,14 @@ class ContainerChangeTypeAdapterTest extends Specification{
             }
 
         where:
-            changeType <<   [ListChange, ArrayChange, SetChange]
-            propertyName << ["listOfDates","arrayOfDates","setOfDates"]
+            changeType <<   [ListChange, ArrayChange]
+            propertyName << ["listOfDates","arrayOfDates"]
     }
 
     @Unroll
     def "should deserialize #changeType_.simpleName with #javersType"()  {
         given:
-        def javers = javersTestAssembly()
-        JsonConverter jsonConverter = javers.jsonConverter
+        def jsonConverter = javersTestAssembly().jsonConverter
 
         def json = new JsonBuilder()
         json  {
@@ -235,8 +231,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
         }
 
         when:
-        //println json.toPrettyString()
-        ContainerChange change  = jsonConverter.fromJson(json.toString(), Change)
+        def change  = jsonConverter.fromJson(json.toString(), Change)
 
         then:
         change.class == changeType_
@@ -260,20 +255,19 @@ class ContainerChangeTypeAdapterTest extends Specification{
         }
 
         where:
-        val1given    << [10]*3 + ["2001-01-10"]*3
-        val2given    << [11]*3 + ["2001-01-11"]*3
-        val1expected << [10]*3 + [new LocalDate(2001,1,10)]*3
-        val2expected << [11]*3 + [new LocalDate(2001,1,11)]*3
-        javersType   << ["Primitives"]*3 + ["Values"]*3
-        changeType_  << [ListChange, ArrayChange, SetChange] * 2
-        propertyName << ["listOfIntegers","arrayOfIntegers","setOfIntegers","listOfDates","arrayOfDates","setOfDates"]
+        val1given    << [10]*2 + ["2001-01-10"]*2
+        val2given    << [11]*2 + ["2001-01-11"]*2
+        val1expected << [10]*2 + [new LocalDate(2001,1,10)]*2
+        val2expected << [11]*2 + [new LocalDate(2001,1,11)]*2
+        javersType   << ["Primitives"]*2 + ["Values"]*2
+        changeType_  << [ListChange, ArrayChange] * 2
+        propertyName << ["listOfIntegers","arrayOfIntegers","listOfDates","arrayOfDates",]
     }
 
     @Unroll
     def "should serialize #changeType.simpleName with Primitives" () {
         given:
             def javers = javersTestAssembly()
-            JsonConverter jsonConverter = javers.jsonConverter
             def affectedId = javers.instanceId(new SnapshotEntity(id:1))
 
             def elementChanges = [new ElementValueChange(1, 11, 12),
@@ -281,11 +275,10 @@ class ContainerChangeTypeAdapterTest extends Specification{
                                   new ValueRemoved(3,30)]
 
             def property =  affectedId.cdoClass.getProperty(propertyName)
-            ContainerChange change = changeType.newInstance(affectedId, property, elementChanges)
+            def change = changeType.newInstance(affectedId, property, elementChanges)
 
         when:
-            String jsonText = jsonConverter.toJson(change)
-            //println(jsonText)
+            def jsonText = javers.jsonConverter.toJson(change)
 
         then:
             def json = new JsonSlurper().parseText(jsonText)
@@ -311,7 +304,92 @@ class ContainerChangeTypeAdapterTest extends Specification{
             }
 
         where:
-            changeType <<   [ListChange, ArrayChange, SetChange]
-            propertyName << ["listOfIntegers","arrayOfIntegers","setOfIntegers"]
+            changeType <<   [ListChange, ArrayChange]
+            propertyName << ["listOfIntegers","arrayOfIntegers"]
+    }
+
+    def "should serialize SetChange with Primitives" () {
+        given:
+        def javers = javersTestAssembly()
+        def affectedId = javers.instanceId(new SnapshotEntity(id:1))
+
+        def elementChanges = [new ValueAdded  (20), new ValueRemoved(30)]
+
+        def property =  affectedId.cdoClass.getProperty("setOfIntegers")
+        def change = new SetChange(affectedId, property, elementChanges)
+
+        when:
+        def jsonText = javers.jsonConverter.toJson(change)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.property == "setOfIntegers"
+        json.changeType == SetChange.simpleName
+        json.globalId
+        json.elementChanges.size() == 2
+        with(json.elementChanges[0]){
+            elementChangeType == "ValueAdded"
+            value == 20
+            !index
+        }
+        with(json.elementChanges[1]){
+            elementChangeType == "ValueRemoved"
+            value == 30
+            !index
+        }
+    }
+
+    def "should deserialize SetChange with Primitives"()  {
+        given:
+        def jsonConverter = javersTestAssembly().jsonConverter
+
+        def json = new JsonBuilder()
+        json  {
+            changeType "SetChange"
+            globalId {
+                entity "org.javers.core.model.SnapshotEntity"
+                cdoId 1
+            }
+            property "setOfIntegers"
+            elementChanges ([
+                    {
+                        elementChangeType "ValueAdded"
+                        value 11
+                    },
+                    {
+                        elementChangeType "ValueAdded"
+                        index null
+                        value 12
+                    },
+                    {
+                        elementChangeType "ValueRemoved"
+                        index null
+                        value 13
+                    }
+            ])
+        }
+
+        when:
+        def change  = jsonConverter.fromJson(json.toString(), Change)
+
+        then:
+        change.class == SetChange
+        change.property.name == "setOfIntegers"
+        change.affectedGlobalId == instanceId(1, SnapshotEntity)
+        with(change.changes[0]) {
+            it.class == ValueAdded
+            !index
+            value  == 11
+        }
+        with(change.changes[1]) {
+            it.class == ValueAdded
+            !index
+            value  == 12
+        }
+        with(change.changes[2]) {
+            it.class == ValueRemoved
+            !index
+            value  == 13
+        }
     }
 }

@@ -1,7 +1,6 @@
 package org.javers.core.metamodel.clazz
 
 import org.javers.core.MappingStyle
-import org.javers.core.cases.morphia.TopLevelEntity
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import spock.lang.Shared

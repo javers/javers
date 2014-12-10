@@ -17,13 +17,13 @@ class JaversMorphiaObjectIdTest extends Specification {
 
         def id = ObjectId.get();
 
-        def entity1 = new TopLevelEntity(id, "alg1", "1.0", "name1");
-        def entity2 = new TopLevelEntity(id, "alg1", "1.0", "name1");
+        def entity1 = new MongoStoredEntity(id, "alg1", "1.0", "name1");
+        def entity2 = new MongoStoredEntity(id, "alg1", "1.0", "name1");
         entity2.setDescription("A new description");
 
         when:
         def diff = javers.compare(entity1, entity2)
-        //println("diff: " + javers.toJson(diff))
+        println("diff: " + javers.toJson(diff))
 
         then:
         diff.getPropertyChanges("_description").size() == 1
@@ -33,17 +33,17 @@ class JaversMorphiaObjectIdTest extends Specification {
         given:
         def javers = JaversBuilder.javers().build();
         def id1 = ObjectId.get();
-        def entity1 = new TopLevelEntity(id1, "alg1", "1.0", "name1");
+        def entity1 = new MongoStoredEntity(id1, "alg1", "1.0", "name1");
 
         def id2 = ObjectId.get();
-        def entity2 = new TopLevelEntity(id2, "alg1", "1.0", "name2");
+        def entity2 = new MongoStoredEntity(id2, "alg1", "1.0", "name2");
 
         javers.commit("author",entity1)
         def commit = javers.commit("author",entity2)
         //println (javers.jsonConverter.toJson(commit.snapshots))
 
         when:
-        def list = javers.getStateHistory(InstanceIdDTO.instanceId(id2, TopLevelEntity),2)
+        def list = javers.getStateHistory(InstanceIdDTO.instanceId(id2, MongoStoredEntity),2)
 
         then:
         commit.snapshots.size() == 1

@@ -71,15 +71,29 @@ public abstract class ContainerChangeTypeAdapter<T extends ContainerChange> exte
 
     private ValueAdded parseValueAdded(JsonObject elementChange, JsonDeserializationContext context, ContainerType containerType){
         Object value = decodeValue(elementChange, context, VALUE_FIELD, containerType.getItemClass());
-        return new ValueAdded(parseIndex(elementChange), value);
+
+        Integer idx = parseIndex(elementChange);
+        if (idx != null) {
+            return new ValueAdded(idx, value);
+        } else {
+            return new ValueAdded(value);
+        }
     }
 
     private ValueRemoved parseValueRemoved(JsonObject elementChange, JsonDeserializationContext context, ContainerType containerType){
         Object value = decodeValue(elementChange, context, VALUE_FIELD, containerType.getItemClass());
-        return new ValueRemoved(parseIndex(elementChange), value);
+        Integer idx = parseIndex(elementChange);
+        if (idx != null) {
+            return new ValueRemoved(idx, value);
+        } else {
+            return new ValueRemoved(value);
+        }
     }
 
-    private int parseIndex(JsonObject elementChange) {
+    private Integer parseIndex(JsonObject elementChange) {
+        if (!elementChange.has(INDEX_FIELD) || elementChange.get(INDEX_FIELD).isJsonNull()){
+            return null;
+        }
         return elementChange.get(INDEX_FIELD).getAsInt();
     }
 

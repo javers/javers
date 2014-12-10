@@ -1,7 +1,7 @@
 package org.javers.core;
 
 import com.google.gson.TypeAdapter;
-import org.javers.common.pico.JaversModule;
+import org.javers.core.pico.JaversModule;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;

@@ -46,7 +46,7 @@ public class Entity extends ManagedClass {
 
     /**
      * @param instance instance of {@link #getClientsClass()}
-     * @return returns ID of given instance so unwrap of idProperty
+     * @return returns ID of given instance so value of idProperty
      * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
      * @throws JaversException NOT_INSTANCE_OF
      */
