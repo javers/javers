@@ -1,28 +1,18 @@
 package org.javers.core;
 
 import com.google.gson.TypeAdapter;
-import org.javers.core.pico.JaversModule;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
-import org.javers.core.json.typeadapter.CdoSnapshotTypeAdapter;
-import org.javers.core.json.typeadapter.CommitIdTypeAdapter;
-import org.javers.core.json.typeadapter.GlobalIdTypeAdapter;
-import org.javers.core.json.typeadapter.InstanceIdDTOTypeAdapter;
-import org.javers.core.json.typeadapter.change.ArrayChangeTypeAdapter;
-import org.javers.core.json.typeadapter.change.ListChangeTypeAdapter;
-import org.javers.core.json.typeadapter.change.MapChangeTypeAdapter;
-import org.javers.core.json.typeadapter.change.SetChangeTypeAdapter;
-import org.javers.core.metamodel.clazz.EntityDefinition;
-import org.javers.core.metamodel.clazz.ClientsClassDefinition;
-import org.javers.core.metamodel.clazz.ValueDefinition;
-import org.javers.core.metamodel.clazz.ValueObjectDefinition;
+import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
+import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
+import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
 import org.javers.core.pico.CoreJaversModule;
-import org.javers.core.metamodel.clazz.ManagedClassFactoryModule;
+import org.javers.core.pico.JaversModule;
 import org.javers.repository.api.InMemoryRepository;
 import org.javers.repository.api.JaversRepository;
 import org.picocontainer.PicoContainer;
@@ -44,19 +34,8 @@ import java.util.Set;
  *
  * @author bartosz walacik
  */
-public class JaversBuilder extends AbstractJaversBuilder {
+public final class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
-
-    private static final Class<? extends JsonTypeAdapter>[] DOMAIN_AWARE_ADAPTERS = new Class[]{
-            GlobalIdTypeAdapter.class,
-            MapChangeTypeAdapter.class,
-            ArrayChangeTypeAdapter.class,
-            ListChangeTypeAdapter.class,
-            SetChangeTypeAdapter.class,
-            CdoSnapshotTypeAdapter.class,
-            CommitIdTypeAdapter.class,
-            InstanceIdDTOTypeAdapter.class
-    };
 
     private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
 
@@ -241,9 +220,9 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private void bootJsonConverter() {
         JsonConverterBuilder jsonConverterBuilder = jsonConverterBuilder();
 
-        for (Class<? extends JsonTypeAdapter> adapter : DOMAIN_AWARE_ADAPTERS){
-            jsonConverterBuilder.registerJsonTypeAdapter(getContainerComponent(adapter));
-        }
+        addModule(new ChangeTypeAdaptersModule(getContainer()));
+        addModule(new CommitTypeAdaptersModule(getContainer()));
+        jsonConverterBuilder.registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
 
         addComponent(jsonConverterBuilder.build());
     }

@@ -10,7 +10,7 @@ import org.javers.core.metamodel.type.TypeMapper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
+class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
 
     private final TypeMapper typeMapper;
 

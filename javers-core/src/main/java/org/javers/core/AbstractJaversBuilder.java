@@ -1,9 +1,10 @@
 package org.javers.core;
 
+import org.javers.core.pico.InstantiatingModule;
 import org.javers.core.pico.JaversModule;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.core.pico.JaversContainerFactory;
+import org.javers.core.pico.JaversContainerUtil;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoContainer;
 
@@ -45,17 +46,29 @@ public abstract class AbstractJaversBuilder {
 
     protected PicoContainer bootContainer(JaversModule module, List<?> beans) {
         checkIfNotBuilt();
-        container = JaversContainerFactory.create(Arrays.asList(module), beans);
+        container = JaversContainerUtil.create(Arrays.asList(module), beans);
         return container;
     }
 
     void addComponent(Object classOrInstance) {
         checkIfBuilt();
-        JaversContainerFactory.addComponent(container, classOrInstance);
+        JaversContainerUtil.addComponent(container, classOrInstance);
+    }
+
+    void addModule(InstantiatingModule module) {
+        module.instantiateAndBindComponents();
     }
 
     void addModule(JaversModule module) {
         checkIfBuilt();
-        JaversContainerFactory.addModule(container, module);
+        JaversContainerUtil.addModule(container, module);
+    }
+
+    <T> List<T> getComponents(Class<T> ofType){
+        return container.getComponents(ofType);
+    }
+
+    MutablePicoContainer getContainer() {
+        return container;
     }
 }

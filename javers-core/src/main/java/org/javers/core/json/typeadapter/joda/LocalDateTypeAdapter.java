@@ -1,4 +1,4 @@
-package org.javers.core.json.typeadapter;
+package org.javers.core.json.typeadapter.joda;
 
 import org.javers.core.json.BasicStringTypeAdapter;
 import org.joda.time.LocalDate;

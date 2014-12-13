@@ -11,7 +11,7 @@ import java.util.*;
  * @author Piotr Betkier
  * @author bartosz walacik
  */
-public class JaversContainerFactory {
+public class JaversContainerUtil {
 
     public static MutablePicoContainer create(List<JaversModule> modules, List<?> beans) {
         Validate.argumentIsNotNull(modules);
@@ -27,7 +27,6 @@ public class JaversContainerFactory {
                 addComponent(container, bean);
             }
         }
-
         return container;
     }
 
@@ -39,6 +38,10 @@ public class JaversContainerFactory {
 
     public static void addComponent(MutablePicoContainer container, Object classOrInstance) {
         container.as(Characteristics.CACHE).addComponent(classOrInstance);
+    }
+
+    public static void bindComponent(MutablePicoContainer container, Class bindToInterface, Object implementationOrInstance) {
+        container.as(Characteristics.CACHE).addComponent(bindToInterface, implementationOrInstance);
     }
 
 }

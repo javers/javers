@@ -1,4 +1,4 @@
-package org.javers.core.json.typeadapter;
+package org.javers.core.json.typeadapter.commit;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -26,7 +26,7 @@ import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 /**
  * @author pawel szymczyk
  */
-public class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
+class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
     public static final String GLOBAL_CDO_ID = "globalId";
     public static final String COMMIT_METADATA = "commitMetadata";

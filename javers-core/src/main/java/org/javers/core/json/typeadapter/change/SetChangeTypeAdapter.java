@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public class SetChangeTypeAdapter extends ContainerChangeTypeAdapter<SetChange> {
+class SetChangeTypeAdapter extends ContainerChangeTypeAdapter<SetChange> {
 
     public SetChangeTypeAdapter(TypeMapper typeMapper) {
         super(typeMapper);

@@ -4,8 +4,8 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;
 import com.google.gson.TypeAdapter;
 import org.javers.common.validation.Validate;
-import org.javers.core.json.typeadapter.*;
-import org.javers.core.json.typeadapter.change.*;
+import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
+import org.javers.core.json.typeadapter.joda.LocalDateTypeAdapter;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -19,12 +19,7 @@ public class JsonConverterBuilder {
 
     private static final JsonTypeAdapter[] BUILT_IN_ADAPTERS = new JsonTypeAdapter[]{
             new LocalDateTimeTypeAdapter(),
-            new LocalDateTypeAdapter(),
-            new NewObjectTypeAdapter(),
-            new ObjectRemovedTypeAdapter(),
-            new ReferenceChangeTypeAdapter(),
-            new ValueChangeTypeAdapter(),
-            new ChangeTypeAdapter()
+            new LocalDateTypeAdapter()
     };
 
     private boolean typeSafeValues = false;

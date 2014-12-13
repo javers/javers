@@ -7,7 +7,7 @@ import com.google.gson.JsonSerializationContext;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ValueChange;
 
-public class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
+class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
     private static final String LEFT_VALUE_FIELD = "left";
     private static final String RIGHT_VALUE_FIELD = "right";
 

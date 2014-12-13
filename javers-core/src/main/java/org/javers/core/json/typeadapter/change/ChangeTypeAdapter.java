@@ -20,7 +20,7 @@ import org.javers.core.metamodel.property.Property;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
+class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
 
     private static final String CHANGE_TYPE_FIELD = "changeType";
     private static final String AFFECTED_CDO_ID_FIELD = "globalId";

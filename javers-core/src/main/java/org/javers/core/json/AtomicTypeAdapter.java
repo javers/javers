@@ -1,4 +1,4 @@
-package org.javers.core.json.typeadapter;
+package org.javers.core.json;
 
 import com.google.gson.*;
 import org.javers.core.diff.changetype.Atomic;
@@ -7,7 +7,7 @@ import org.javers.core.json.JsonTypeAdapterTemplate;
 /**
  * @author bartosz walacik
  */
-public class AtomicTypeAdapter extends JsonTypeAdapterTemplate<Atomic> {
+class AtomicTypeAdapter extends JsonTypeAdapterTemplate<Atomic> {
 
     private final boolean typeSafety;
 

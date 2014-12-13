@@ -1,7 +1,7 @@
 package org.javers.core.json;
 
 import com.google.gson.*;
-import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
+import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
 import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;

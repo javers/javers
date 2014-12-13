@@ -1,4 +1,4 @@
-package org.javers.core.json.typeadapter;
+package org.javers.core.json.typeadapter.commit;
 
 import com.google.gson.*;
 import org.javers.common.collections.Lists;
@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
+class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
 
     private static final String ENTITY_FIELD = "entity";
     private static final String CDO_ID_FIELD = "cdoId";
