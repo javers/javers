@@ -11,7 +11,7 @@ import org.javers.common.patterns.visitors.Visitable;
  *
  * @author bartosz walacik
  */
-public abstract class Edge {
+abstract class Edge {
     private final Property property;
 
     Edge(Property property) {

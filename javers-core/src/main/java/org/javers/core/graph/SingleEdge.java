@@ -10,7 +10,7 @@ import org.javers.core.metamodel.property.Property;
  *
  * @author bartosz walacik
  */
-public class SingleEdge extends Edge {
+class SingleEdge extends Edge {
 
     private ObjectNode reference;
 

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public class DiffBuilder {
+class DiffBuilder {
     private final List<Change> changes = new ArrayList<>();
 
     private DiffBuilder() {

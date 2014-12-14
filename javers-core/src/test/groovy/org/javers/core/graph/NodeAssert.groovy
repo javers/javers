@@ -3,7 +3,6 @@ package org.javers.core.graph
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.test.assertion.EdgeAssert
 import org.javers.test.assertion.MultiEdgeAssert
 import org.javers.test.assertion.SingleEdgeAssert
 

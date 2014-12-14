@@ -4,10 +4,7 @@ import org.javers.common.date.DefaultDateProvider;
 import org.javers.core.GraphFactory;
 import org.javers.core.Javers;
 import org.javers.core.JaversCoreConfiguration;
-import org.javers.core.commit.CommitFactory;
-import org.javers.core.commit.CommitSeqGenerator;
 import org.javers.core.diff.DiffFactory;
-import org.javers.core.diff.appenders.*;
 import org.javers.core.graph.LiveCdoFactory;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectGraphBuilder;
@@ -37,7 +34,6 @@ public class CoreJaversModule implements JaversModule {
             TypeMapper.class,
             TypeFactory.class,
             JaversCoreConfiguration.class,
-            CommitFactory.class,
             SnapshotFactory.class,
             GraphSnapshotFactory.class,
             GraphShadowFactory.class,
@@ -46,7 +42,6 @@ public class CoreJaversModule implements JaversModule {
             LiveGraphFactory.class,
             GlobalIdFactory.class,
             GraphFactory.class,
-            CommitSeqGenerator.class,
             DefaultDateProvider.class,
             SnapshotDiffer.class
     };

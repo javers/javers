@@ -2,6 +2,7 @@ package org.javers.core;
 
 import com.google.gson.TypeAdapter;
 import org.javers.common.validation.Validate;
+import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
@@ -48,6 +49,7 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         // bootstrap phase 1: core beans
         bootContainer(new CoreJaversModule());
         addModule(new DiffAppendersModule(getContainer()));
+        addModule(new CommitFactoryModule(getContainer()));
     }
 
     public static JaversBuilder javers() {

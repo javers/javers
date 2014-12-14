@@ -7,7 +7,7 @@ import org.javers.core.metamodel.property.Property;
 
 import java.util.List;
 
-public class FakeNodePair implements NodePair {
+class FakeNodePair implements NodePair {
 
     private final ObjectNode right;
 

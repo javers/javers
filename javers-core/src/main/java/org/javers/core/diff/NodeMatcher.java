@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * @author bartosz walacik
  */
-public class NodeMatcher {
+class NodeMatcher {
     /**
      * matching based on {@link org.javers.core.metamodel.object.GlobalId}
      */
