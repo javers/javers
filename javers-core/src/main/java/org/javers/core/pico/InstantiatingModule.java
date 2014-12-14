@@ -8,7 +8,10 @@ package org.javers.core.pico;
 
 import org.javers.common.reflection.ReflectionUtil;
 import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.PicoContainer;
+import org.picocontainer.adapters.AbstractAdapter;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
 
 public abstract class InstantiatingModule {
@@ -21,13 +24,36 @@ public abstract class InstantiatingModule {
         this.argumentResolver = new ContainerArgumentResolver(container);
     }
 
-    public void instantiateAndBindComponents(){
+    public final void instantiateAndBindComponents(){
         for (Class<?> implementation : getImplementations()){
-            Object component = ReflectionUtil.newInstance(implementation,argumentResolver);
-            container.addComponent(component);
+            ConstructorInjector constructorInjector = new ConstructorInjector(implementation);
+            container.addAdapter(constructorInjector);
         }
     }
 
     protected abstract Collection<Class> getImplementations();
+
+    private class ConstructorInjector extends AbstractAdapter {
+
+        public ConstructorInjector(Class componentImplementation) {
+            this(componentImplementation, componentImplementation);
+        }
+
+        public ConstructorInjector(Object componentKey, Class componentImplementation) {
+            super(componentKey, componentImplementation);
+        }
+
+        @Override
+        public Object getComponentInstance(PicoContainer pico, Type into) {
+            return ReflectionUtil.newInstance(getComponentImplementation(), argumentResolver);
+        }
+        public void verify(PicoContainer container) {
+        }
+
+        @Override
+        public String getDescriptor() {
+            return getComponentKey().toString();
+        }
+    }
 
 }

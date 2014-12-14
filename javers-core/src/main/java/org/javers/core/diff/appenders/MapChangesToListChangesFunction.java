@@ -13,7 +13,7 @@ import org.javers.core.diff.changetype.map.EntryValueChange;
 /**
  * @author pawel szymczyk
  */
-public class MapChangesToListChangesFunction implements Function<EntryChange, ContainerElementChange> {
+class MapChangesToListChangesFunction implements Function<EntryChange, ContainerElementChange> {
 
     @Override
     public ContainerElementChange apply(EntryChange input) {

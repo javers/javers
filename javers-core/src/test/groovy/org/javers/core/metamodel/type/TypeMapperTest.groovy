@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
+import org.javers.common.reflection.ReflectionUtilTest
 import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.clazz.Entity
 import org.javers.core.metamodel.clazz.ManagedClassFactory
@@ -12,6 +13,7 @@ import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
 import spock.lang.Unroll
 import java.lang.reflect.Type
+import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
 /**
  * @author bartosz walacik

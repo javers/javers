@@ -14,7 +14,7 @@ import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
 /**
  * @author bartosz walacik
  */
-public class MapReferenceChangeAppenderTest extends AbstractDiffTest {
+public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
 
     @Unroll
     def "should append EntryAdded for #what"() {

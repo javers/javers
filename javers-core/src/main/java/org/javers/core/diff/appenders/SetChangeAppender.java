@@ -17,7 +17,7 @@ import static org.javers.common.collections.Objects.nullSafeEquals;
 /**
  * @author pawel szymczyk
  */
-public class SetChangeAppender extends PropertyChangeAppender<SetChange> {
+class SetChangeAppender extends PropertyChangeAppender<SetChange> {
 
     private static final Logger logger = LoggerFactory.getLogger(SetChangeAppender.class);
 

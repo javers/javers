@@ -23,7 +23,7 @@ import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 /**
  * @author bartosz walacik
  */
-class ValueChangeAppenderTest extends AbstractDiffTest {
+class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should not append ValueChange when two Values are .equals()"() {
         given:

@@ -10,7 +10,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author Maciej Zasada
  */
-class ObjectRemovedAppenderTest extends AbstractDiffTest {
+class ObjectRemovedAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append ObjectRemoved to diff"() {
         given:

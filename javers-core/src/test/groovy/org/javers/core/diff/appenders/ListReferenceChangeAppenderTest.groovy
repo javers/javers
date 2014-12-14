@@ -12,7 +12,7 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 /**
  * @author bartosz walacik
  */
-class ListReferenceChangeAppenderTest extends AbstractDiffTest {
+class ListReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append ElementReferenceChange in List of Entities"() {
         given:
