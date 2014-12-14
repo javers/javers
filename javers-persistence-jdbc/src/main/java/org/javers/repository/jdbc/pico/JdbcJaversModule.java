@@ -23,7 +23,7 @@ public class JdbcJaversModule implements JaversModule{
                                                            QueryRunnerFactory.class};
 
     @Override
-    public Collection<Class> getModuleComponents() {
+    public Collection<Class> getComponents() {
         return Arrays.asList(moduleComponents);
     }
 }

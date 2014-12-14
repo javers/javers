@@ -111,11 +111,6 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    @Override
-    PicoContainer bootContainer(JaversModule module, Object... beans) {
-        return super.bootContainer(module, beans);
-    }
-
     /**
      * registers {@link ValueType}
      */

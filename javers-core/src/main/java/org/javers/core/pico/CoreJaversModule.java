@@ -60,7 +60,7 @@ public class CoreJaversModule implements JaversModule {
     };
 
     @Override
-    public Collection<Class> getModuleComponents() {
+    public Collection<Class> getComponents() {
         return Arrays.asList(moduleComponents);
     }
 }

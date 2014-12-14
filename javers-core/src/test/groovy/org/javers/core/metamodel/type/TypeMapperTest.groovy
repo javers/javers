@@ -11,10 +11,7 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
 import spock.lang.Unroll
-
 import java.lang.reflect.Type
-
-import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
 /**
  * @author bartosz walacik

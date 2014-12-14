@@ -1,13 +1,12 @@
  package org.javers.common.reflection
 
-import org.javers.core.model.DummyUser
-import spock.lang.Specification
-import spock.lang.Unroll
+ import org.javers.core.model.DummyUser
+ import spock.lang.Specification
+ import spock.lang.Unroll
+ import java.lang.reflect.Field
+ import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
-import java.lang.reflect.Field
-import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
-
-/**
+ /**
  * @author Pawel Cierpiatka
  */
 class ReflectionUtilTest extends Specification {
@@ -16,13 +15,34 @@ class ReflectionUtilTest extends Specification {
         Set noGenericSet
     }
 
+    def "should instantiate via public constructor with ArgumentsResolver"() {
+        given:
+        ArgumentResolver argumentResolver = Mock()
+        argumentResolver.resolve(_) >> "zonk"
+
+        when:
+        def instance = ReflectionUtil.newInstance(ReflectionConstructorTestClass, argumentResolver)
+
+        then:
+        instance instanceof ReflectionConstructorTestClass
+        instance.someString == "zonk"
+    }
+
+    def "should instantiate via public zero.arg constructor"() {
+        when:
+        def instance = ReflectionUtil.newInstance(ReflectionTestClass, null)
+
+        then:
+        instance instanceof ReflectionTestClass
+    }
+
     @Unroll
     def "should calculate hierarchy distance from #child to #parent"() {
         when:
-            int d = ReflectionUtil.calculateHierarchyDistance(child, parent)
+        int d = ReflectionUtil.calculateHierarchyDistance(child, parent)
 
         then:
-            d == expectedDistance
+        d == expectedDistance
 
         where:
         child   | parent      || expectedDistance
@@ -36,25 +56,25 @@ class ReflectionUtilTest extends Specification {
     }
 
     def "should return actual class type argument from field"() {
-        given :
-            Field dummyUsersList = getFieldFromClass(ReflectionTestModel.class, "dummyUserList")
+        given:
+        Field dummyUsersList = getFieldFromClass(ReflectionTestModel.class, "dummyUserList")
 
-        when :
-            Class[] args = ReflectionUtil.extractActualClassTypeArguments(dummyUsersList.genericType)
+        when:
+        Class[] args = ReflectionUtil.extractActualClassTypeArguments(dummyUsersList.genericType)
 
         then:
-            args[0] == DummyUser
+        args[0] == DummyUser
     }
 
     def "should return empty list when type is not generic"() {
-        given :
-            Field noGenericSet = getFieldFromClass(ReflectionTestModel.class, "noGenericSet")
+        given:
+        Field noGenericSet = getFieldFromClass(ReflectionTestModel.class, "noGenericSet")
 
-        when :
-            Class[] args = ReflectionUtil.extractActualClassTypeArguments(noGenericSet.genericType)
+        when:
+        Class[] args = ReflectionUtil.extractActualClassTypeArguments(noGenericSet.genericType)
 
         then:
-            args == []
+        args == []
     }
 
     def "should return distinct method keys"() {
