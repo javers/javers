@@ -9,7 +9,7 @@ import java.util.List;
  * OneToMany or ManyToMany relation
  * @author bartosz walacik
  */
-public class MultiEdge extends Edge {
+class MultiEdge extends Edge {
     private final List<ObjectNode> references; //should not be empty
 
     public MultiEdge(Property property) {

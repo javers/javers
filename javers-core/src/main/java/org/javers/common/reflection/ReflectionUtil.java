@@ -20,6 +20,32 @@ public class ReflectionUtil {
 
     private static final Object[] EMPTY_ARRAY = new Object[]{};
 
+    /**
+     * Creates new instance of public or package-private class.
+     * Calls first, not-private constructor
+     */
+    public static Object newInstance(Class clazz, ArgumentResolver resolver){
+        Validate.argumentIsNotNull(clazz);
+        for (Constructor constructor : clazz.getDeclaredConstructors()) {
+            if (isPrivate(constructor)) {
+                continue;
+            }
+
+            Class [] types = constructor.getParameterTypes();
+            Object[] params = new Object[types.length];
+            for (int i=0; i<types.length; i++){
+                params[i] = resolver.resolve(types[i]);
+            }
+            try {
+                constructor.setAccessible(true);
+                return constructor.newInstance(params);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        throw new JaversException(JaversExceptionCode.NO_PUBLIC_CONSTRUCTOR,clazz.getName());
+    }
+
     public static List<Field> getAllPersistentFields(Class methodSource) {
         List<Field> result = new ArrayList<>();
         for(Field field : getAllFields(methodSource)) {
@@ -194,6 +220,10 @@ public class ReflectionUtil {
 
     private static boolean isPublic(Member member){
         return Modifier.isPublic(member.getModifiers());
+    }
+
+    private static boolean isPrivate(Member member){
+        return Modifier.isPrivate(member.getModifiers());
     }
 
     /**

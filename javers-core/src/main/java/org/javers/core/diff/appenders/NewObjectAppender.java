@@ -9,7 +9,7 @@ import org.javers.core.graph.ObjectNode;
 
 import java.util.Set;
 
-public class NewObjectAppender implements NodeChangeAppender {
+class NewObjectAppender implements NodeChangeAppender {
 
     @Override
     public Set<Change> getChangeSet(GraphPair graphPair) {

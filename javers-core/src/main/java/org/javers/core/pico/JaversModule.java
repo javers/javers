@@ -7,6 +7,6 @@ import java.util.Collection;
  */
 public interface JaversModule {
 
-    public Collection<Class> getModuleComponents();
+    public Collection<Class> getComponents();
 
 }

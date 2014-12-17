@@ -1,14 +1,12 @@
 package org.javers.core.commit;
 
-import org.javers.common.collections.Objects;
-
 /**
  * Generates unique and monotonically increasing commit identifiers. <br>
  * Thread safe
  *
  * @author bartosz walacik
  */
-public class CommitSeqGenerator {
+class CommitSeqGenerator {
 
     private int seq;
     private CommitId lastReturned;

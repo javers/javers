@@ -48,6 +48,10 @@ public enum  JaversExceptionCode {
 
     CLASS_NOT_MANAGED(JaversException.RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, ManagedType expected"),
 
+    COMPONENT_NOT_FOUND(JaversException.BOOTSTRAP_ERROR+"component of type '%s' not found in container") ,
+
+    NO_PUBLIC_CONSTRUCTOR(JaversException.BOOTSTRAP_ERROR+"no public constructor in class '%s'"),
+
     CLASS_NOT_FOUND(JaversException.RUNTIME_ERROR+"class not found - '%s'") ,
 
     CANNOT_EXTRACT_CHILD_VALUE_OBJECT (JaversException.RUNTIME_ERROR+"error while extracting child ValueObject from '%s'" +

@@ -37,7 +37,7 @@ public class ManagedClassFactoryModule implements JaversModule {
     }
 
     @Override
-    public Collection<Class> getModuleComponents() {
+    public Collection<Class> getComponents() {
         Collection<Class> components = new ArrayList<>();
         Collections.addAll(components, moduleComponents);
 

@@ -1,4 +1,4 @@
-package org.javers.core.json.typeadapter;
+package org.javers.core.json.typeadapter.commit;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -9,7 +9,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 
-public class CommitIdTypeAdapter extends JsonTypeAdapterTemplate<CommitId> {
+class CommitIdTypeAdapter extends JsonTypeAdapterTemplate<CommitId> {
 
     @Override
     public Class getValueType() {

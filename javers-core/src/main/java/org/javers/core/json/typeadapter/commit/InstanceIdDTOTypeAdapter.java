@@ -1,4 +1,4 @@
-package org.javers.core.json.typeadapter;
+package org.javers.core.json.typeadapter.commit;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -11,7 +11,7 @@ import org.javers.core.metamodel.object.InstanceIdDTO;
 
 import java.util.List;
 
-public class InstanceIdDTOTypeAdapter implements JsonTypeAdapter<InstanceIdDTO>  {
+class InstanceIdDTOTypeAdapter implements JsonTypeAdapter<InstanceIdDTO>  {
 
     private GlobalIdFactory globalIdFactory;
 

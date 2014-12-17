@@ -7,7 +7,7 @@ import com.google.gson.JsonSerializationContext;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.metamodel.object.GlobalId;
 
-public class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
+class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
 
     private static final String LEFT_REFERENCE_FIELD = "left";
     private static final String RIGHT_REFERENCE_FIELD = "right";

@@ -18,7 +18,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author bartosz walacik
  */
-class MapChangeAppenderTest extends AbstractDiffTest{
+class MapChangeAppenderTest extends AbstractDiffAppendersTest {
 
     @Unroll
     def "should not append mapChanges when maps are #what" () {

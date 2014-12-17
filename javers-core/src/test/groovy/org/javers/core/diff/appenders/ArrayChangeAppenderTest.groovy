@@ -1,17 +1,14 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.diff.AbstractDiffTest
-import org.javers.core.diff.RealNodePair
 import org.javers.core.model.DummyUser
 import spock.lang.Unroll
 
-import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
  * @author pawel szymczyk
  */
-class ArrayChangeAppenderTest extends AbstractDiffTest {
+class ArrayChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should index Array changes"() {
         given:

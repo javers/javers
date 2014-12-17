@@ -11,7 +11,7 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
  * @author wioleta.gozdzik
  */
 
-public class SetReferenceChangeAppenderTest extends AbstractDiffTest {
+public class SetReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append ValueAdded in Set of Entities"() {
         given:

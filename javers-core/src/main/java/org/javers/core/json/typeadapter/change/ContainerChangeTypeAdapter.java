@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends ChangeTypeAdapter<T> {
+abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends ChangeTypeAdapter<T> {
     private static final String CHANGES_FIELD = "elementChanges";
     private static final String ELEMENT_CHANGE_TYPE_FIELD = "elementChangeType";
     private static final String INDEX_FIELD = "index";

@@ -19,7 +19,7 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  * @author bartosz walacik
  */
 abstract class AbstractDiffTest extends Specification {
-    @Shared JaversTestBuilder javers = javersTestAssembly()
+    @Shared protected JaversTestBuilder javers = javersTestAssembly()
 
     ObjectNode buildGraph(def any) {
         javers.createObjectGraphBuilder().buildGraph(any).root()
@@ -44,21 +44,5 @@ abstract class AbstractDiffTest extends Specification {
 
     RealNodePair realNodePair(def leftCdo, def rightCdo){
         new RealNodePair(buildGraph(leftCdo), buildGraph(rightCdo))
-    }
-
-    ListChangeAppender listChangeAppender() {
-        new ListChangeAppender(mapChangeAppender(), javers.typeMapper)
-    }
-
-    MapChangeAppender mapChangeAppender() {
-        new MapChangeAppender(javers.typeMapper, javers.globalIdFactory)
-    }
-
-    ArrayChangeAppender arrayChangeAppender() {
-        new ArrayChangeAppender(mapChangeAppender(), javers.typeMapper)
-    }
-
-    SetChangeAppender setChangeAppender() {
-        new SetChangeAppender(mapChangeAppender(), javers.typeMapper, javers.globalIdFactory)
     }
 }
