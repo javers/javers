@@ -33,6 +33,7 @@ public class ChangeListTraverser {
         for (Change change : changes){
             if (change.getCommitMetadata().isPresent() && !change.getCommitMetadata().equals(lastCommit)) {
                 renderer.onCommit(change.getCommitMetadata().get());
+                lastGlobalId = null;
             }
 
             if (!change.getAffectedGlobalId().equals(lastGlobalId)) {
