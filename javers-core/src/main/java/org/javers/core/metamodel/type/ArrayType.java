@@ -27,11 +27,6 @@ public class ArrayType extends ContainerType {
     }
 
     @Override
-    public boolean isAssignableFrom(Class givenType) {
-        return givenType.isArray();
-    }
-
-    @Override
     public List<Class> getElementTypes() {
         return elementTypes;
     }

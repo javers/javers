@@ -52,10 +52,6 @@ public abstract class JaversType {
             }
     }
 
-    public boolean isAssignableFrom(Class javaClass) {
-        return baseJavaClass.isAssignableFrom(javaClass);
-    }
-
     protected boolean isGenericType() {
         return (baseJavaType instanceof ParameterizedType);
     }

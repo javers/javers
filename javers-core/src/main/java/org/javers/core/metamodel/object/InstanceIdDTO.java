@@ -7,11 +7,11 @@ import org.javers.core.metamodel.type.TypeMapper;
 /**
 * @author bartosz walacik
 */
-public class InstanceIdDTO extends GlobalIdDTO {
+public final class InstanceIdDTO extends GlobalIdDTO {
     private final Class  javaClass;
     private final Object localId;
 
-    InstanceIdDTO(Class javaClass, Object localId) {
+    public InstanceIdDTO(Class javaClass, Object localId) {
         Validate.argumentsAreNotNull(javaClass, localId);
         this.javaClass = javaClass;
         this.localId = localId;
@@ -22,7 +22,7 @@ public class InstanceIdDTO extends GlobalIdDTO {
     }
 
     @Override
-    public InstanceId create(TypeMapper typeMapper) {
+    InstanceId create(TypeMapper typeMapper) {
         return InstanceId.createFromId(localId, typeMapper.getManagedClass(javaClass, Entity.class));
     }
 
