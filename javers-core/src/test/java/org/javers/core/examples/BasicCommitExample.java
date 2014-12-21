@@ -13,45 +13,76 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;
 
 public class BasicCommitExample {
-    /**
-     * JaVers by default uses InMemoryRepository, it's useful for testing
-     */
     @Test
-    public void shouldListChangeHistory() {
-
+    public void shouldCommitToJaversRepository() {
         //given:
-        //0. prepare JaVers instance
+
+        // prepare JaVers instance. By default, JaVers uses InMemoryRepository,
+        // it's useful for testing
         Javers javers = JaversBuilder.javers().build();
 
-        //1. init your data
+        // init your data
         Person robert = new Person("bob", "Robert Martin");
-        //2. persist initial commit
+        // and persist initial commit
         javers.commit("user", robert);
 
-        //3. do some changes
+        // do some changes
         robert.setName("Robert C.");
-        //4. and commit
+        // and persist another commit
         javers.commit("user", robert);
 
-        //when:
-        //5. list change history - diffs
-        List<Change> changes = javers.getChangeHistory(InstanceIdDTO.instanceId("bob", Person.class), 5);
+        // when:
+        List<CdoSnapshot> snapshots =
+            javers.getStateHistory(InstanceIdDTO.instanceId("bob", Person.class),10);
 
-        //then:
-        //6. there should be one ValueChange on Bob's firstName, stored in JaversRepository
+        // then:
+        // there should be two Snapshots with Bob's state
+        assertThat(snapshots).hasSize(2);
+    }
+
+    @Test
+    public void shouldListChangeHistory() {
+        // given:
+        // commit some changes
+        Javers javers = JaversBuilder.javers().build();
+        Person robert = new Person("bob", "Robert Martin");
+        javers.commit("user", robert);
+
+        robert.setName("Robert C.");
+        javers.commit("user", robert);
+
+        // when:
+        // list change history
+        List<Change> changes =
+            javers.getChangeHistory(InstanceIdDTO.instanceId("bob", Person.class), 5);
+
+        // then:
+        // there should be one ValueChange with Bob's firstName
         assertThat(changes).hasSize(1);
-        assertThat(changes.get(0)).isInstanceOf(ValueChange.class);
-        ValueChange change = (ValueChange)changes.get(0);
+        ValueChange change = (ValueChange) changes.get(0);
         assertThat(change.getProperty().getName()).isEqualTo("name");
-        assertThat(change.getLeft() ).isEqualTo("Robert Martin");
+        assertThat(change.getLeft()).isEqualTo("Robert Martin");
         assertThat(change.getRight()).isEqualTo("Robert C.");
+    }
 
-        //when:
-        //7. list state history - snapshots
-        List<CdoSnapshot> snapshots = javers.getStateHistory(instanceId("bob", Person.class), 5);
+    @Test
+    public void shouldListStateHistory() {
+        // given:
+        // commit some changes
+        Javers javers = JaversBuilder.javers().build();
+        Person robert = new Person("bob", "Robert Martin");
+        javers.commit("user", robert);
 
-        //then:
-        //8. there should be two Snapshots of Bob state, stored in JaversRepository
+        robert.setName("Robert C.");
+        javers.commit("user", robert);
+
+        // when:
+        // list state history - snapshots
+        List<CdoSnapshot> snapshots =
+            javers.getStateHistory(instanceId("bob", Person.class), 5);
+
+        // then:
+        // there should be two Snapshots with Bob's state
         assertThat(snapshots).hasSize(2);
         CdoSnapshot newState = snapshots.get(0);
         CdoSnapshot oldState = snapshots.get(1);
