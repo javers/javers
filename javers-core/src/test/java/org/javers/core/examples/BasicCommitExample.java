@@ -88,7 +88,5 @@ public class BasicCommitExample {
         CdoSnapshot oldState = snapshots.get(1);
         assertThat(oldState.getPropertyValue("name")).isEqualTo("Robert Martin");
         assertThat(newState.getPropertyValue("name")).isEqualTo("Robert C.");
-        assertThat(oldState.getPropertyValue("login")).isEqualTo("bob");
-        assertThat(newState.getPropertyValue("login")).isEqualTo("bob");
     }
 }
