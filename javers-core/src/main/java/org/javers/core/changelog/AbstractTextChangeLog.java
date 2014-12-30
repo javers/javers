@@ -11,7 +11,7 @@ import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.metamodel.object.GlobalId;
 
 /**
- * Convenient base class for text changeLog rendering
+ * Convenient scaffolding class for text changeLog rendering
  *
  * @author bartosz walacik
  */

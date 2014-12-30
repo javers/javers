@@ -15,9 +15,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Employee {
 
     @Id
-    private final String name;
+    private String name;
 
-    private final int salary;
+    private String position;
+
+    private int salary;
 
     private Employee boss;
 
@@ -31,6 +33,14 @@ public class Employee {
         checkNotNull(name);
         this.name = name;
         this.salary = salary;
+    }
+
+    public Employee(String name, int salary, String position) {
+        checkNotNull(name);
+        checkNotNull(position);
+        this.name = name;
+        this.salary = salary;
+        this.position = position;
     }
 
     public Employee addSubordinate(Employee employee) {
@@ -52,6 +62,10 @@ public class Employee {
         return name;
     }
 
+    public String getPosition() {
+        return position;
+    }
+
     public Employee getBoss() {
         return boss;
     }
@@ -60,8 +74,21 @@ public class Employee {
         return salary;
     }
 
+
     public List<Employee> getSubordinates() {
         return Collections.unmodifiableList(subordinates);
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSalary(int salary) {
+        this.salary = salary;
     }
 
     @Override
