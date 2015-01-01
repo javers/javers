@@ -152,9 +152,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 entity "org.javers.core.model.DummyUser"
                 cdoId "kaz"
             }
-            initial {
-                true
-            }
+            initial true
             state {
             }
         }
