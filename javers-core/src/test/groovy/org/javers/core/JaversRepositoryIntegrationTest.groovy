@@ -63,12 +63,10 @@ class JaversRepositoryIntegrationTest extends Specification {
 
         then:
         history[0] instanceof ValueChange
-        with(history[0]){
-            affectedGlobalId == instanceId("John", DummyUser)
-            property.name == "age"
-            left == 18
-            right == 19
-        }
+        history[0].affectedGlobalId == instanceId("John", DummyUser)
+        history[0].property.name == "age"
+        history[0].left == 18
+        history[0].right == 19
         history[1] instanceof NewObject
     }
 
@@ -86,12 +84,10 @@ class JaversRepositoryIntegrationTest extends Specification {
         then:
         history.size() == 2
         history[0] instanceof ValueChange
-        with(history[0]) {
-            affectedGlobalId == voId
-            property.name == "city"
-            left == "London"
-            right == "Paris"
-        }
+        history[0].affectedGlobalId == voId
+        history[0].property.name == "city"
+        history[0].left == "London"
+        history[0].right == "Paris"
         history[1] instanceof NewObject
     }
 
