@@ -7,6 +7,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
+import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.metamodel.object.*;
 import org.javers.repository.api.JaversExtendedRepository;
 
@@ -49,25 +50,37 @@ public class SnapshotDiffer {
 
         List<CdoSnapshot> snapshots = javersExtendedRepository.getStateHistory(globalCdoId, limit);
 
-        if (snapshots.size() < 2){
-            return Collections.EMPTY_LIST;
+        List<Change> result = new ArrayList<>();
+
+        //compare pair-by-pair
+        if (snapshots.size() > 1){
+            for (int i = 0; i<snapshots.size()-1; i++){
+                result.addAll(compare(snapshots.get(i+1), snapshots.get(i)));
+            }
         }
 
-        List<Change> result = new ArrayList<>();
-        for (int i = 0; i<snapshots.size()-1; i++){
-            result.addAll(compare(snapshots.get(i+1), snapshots.get(i)));
-        }
+        addNewObjectIfInitial(result, snapshots.get(snapshots.size() - 1));
+
         return result;
+    }
+
+    private void addNewObjectIfInitial(List<Change> changes, CdoSnapshot first) {
+        if (first.isInitial()){
+            Diff diff = diffFactory.create(ShadowGraph.EMPTY,
+                    fromSnapshot(first), Optional.of(first.getCommitMetadata()));
+            changes.add(diff.getChangesByType(NewObject.class).get(0));
+        }
     }
 
     private List<Change> compare(CdoSnapshot oldVer, CdoSnapshot newVer){
         CommitMetadata commitMetadata = newVer.getCommitMetadata();
 
-        ShadowGraph oldGraph = graphShadowFactory.createFromSnapshot(oldVer);
-        ShadowGraph newGraph = graphShadowFactory.createFromSnapshot(newVer);
-
-        Diff diff = diffFactory.create(oldGraph, newGraph, Optional.of(commitMetadata));
+        Diff diff = diffFactory.create(fromSnapshot(oldVer),
+                fromSnapshot(newVer), Optional.of(commitMetadata));
         return diff.getChanges();
     }
 
+    private ShadowGraph fromSnapshot(CdoSnapshot snapshot){
+        return graphShadowFactory.createFromSnapshot(snapshot);
+    }
 }

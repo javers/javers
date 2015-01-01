@@ -44,7 +44,8 @@ public interface JaversRepository {
     List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit);
 
     /**
-     * Convenient method to query by DTO, see {@link #getStateHistory(org.javers.core.metamodel.object.GlobalId, int)}
+     * Convenient method to query by DTO,
+     * see {@link #getStateHistory(org.javers.core.metamodel.object.GlobalId, int)}
      */
     List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit);
 

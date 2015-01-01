@@ -35,7 +35,12 @@ public class InMemoryRepository implements JaversRepository {
         Validate.argumentIsNotNull(globalId);
 
         if (snapshots.containsKey(globalId)) {
-            return Collections.unmodifiableList(snapshots.get(globalId));
+            int size = snapshots.get(globalId).size();
+            if (size <= limit){
+                return Collections.unmodifiableList(snapshots.get(globalId));
+            } else {
+                return Collections.unmodifiableList(snapshots.get(globalId).subList(size - limit, size));
+            }
         }
         return Collections.EMPTY_LIST;
     }

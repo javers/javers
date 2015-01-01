@@ -1,5 +1,6 @@
 package org.javers.core
 
+import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -43,9 +44,11 @@ class JaversRepositoryIntegrationTest extends Specification {
         snapshots[0].commitId == "2.0"
         snapshots[0].commitMetadata.author == "author2"
         snapshots[0].commitMetadata.commitDate
+       !snapshots[0].initial
         snapshots[1].commitId == "1.0"
         snapshots[1].commitMetadata.author == "author"
         snapshots[1].commitMetadata.commitDate
+        snapshots[1].initial
     }
 
     def "should compare Entity property values with latest from repository"() {
@@ -59,12 +62,14 @@ class JaversRepositoryIntegrationTest extends Specification {
         def history = javers.getChangeHistory(instanceId("John", DummyUser), 100)
 
         then:
-        history.size() == 1
         history[0] instanceof ValueChange
-        history[0].affectedGlobalId == instanceId("John", DummyUser)
-        history[0].property.name == "age"
-        history[0].left == 18
-        history[0].right == 19
+        with(history[0]){
+            affectedGlobalId == instanceId("John", DummyUser)
+            property.name == "age"
+            left == 18
+            right == 19
+        }
+        history[1] instanceof NewObject
     }
 
     def "should compare ValueObject property values with latest from repository"() {
@@ -79,7 +84,7 @@ class JaversRepositoryIntegrationTest extends Specification {
         def history = javers.getChangeHistory(voId, 100)
 
         then:
-        history.size() == 1
+        history.size() == 2
         history[0] instanceof ValueChange
         with(history[0]) {
             affectedGlobalId == voId
@@ -87,6 +92,7 @@ class JaversRepositoryIntegrationTest extends Specification {
             left == "London"
             right == "Paris"
         }
+        history[1] instanceof NewObject
     }
 
     @Unroll

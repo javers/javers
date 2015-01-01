@@ -25,7 +25,7 @@ class TopLevelContainerTest extends Specification {
         then:
         diff.changes.size() == 1
         diff.changes[0].property.name == colType
-        println diff
+        //println diff
 
         where:
         colType << ["map","list","set"]
@@ -46,8 +46,8 @@ class TopLevelContainerTest extends Specification {
         def changes = javers.getChangeHistory(voId,2)
 
         then:
-        changes.size() == 1
-        println changes[0]
+        changes.size() == 2
+        //println changes[0]
 
         where:
         colType << ["map","list","set"]
