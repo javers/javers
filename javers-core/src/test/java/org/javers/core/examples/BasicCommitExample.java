@@ -3,6 +3,7 @@ package org.javers.core.examples;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Change;
+import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.examples.model.Person;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -58,11 +59,13 @@ public class BasicCommitExample {
 
         // then:
         // there should be one ValueChange with Bob's firstName
-        assertThat(changes).hasSize(1);
+        // and one NewObject change for Bob's initial commit
+        assertThat(changes).hasSize(2);
         ValueChange change = (ValueChange) changes.get(0);
         assertThat(change.getProperty().getName()).isEqualTo("name");
         assertThat(change.getLeft()).isEqualTo("Robert Martin");
         assertThat(change.getRight()).isEqualTo("Robert C.");
+        assertThat(changes.get(1)).isInstanceOf(NewObject.class);
     }
 
     @Test
