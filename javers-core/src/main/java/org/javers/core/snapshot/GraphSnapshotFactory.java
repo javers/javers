@@ -34,7 +34,7 @@ public class GraphSnapshotFactory {
      * @param currentVersion outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
      */
     public List<CdoSnapshot> create(LiveGraph currentVersion, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata){
-        Validate.argumentsAreNotNull(currentVersion, commitMetadata);
+        Validate.argumentsAreNotNull(currentVersion, commitMetadata, latestShadowGraph);
 
         List<CdoSnapshot> reused = new ArrayList<>();
 
