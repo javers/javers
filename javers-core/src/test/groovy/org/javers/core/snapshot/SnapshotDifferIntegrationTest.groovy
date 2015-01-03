@@ -1,9 +1,8 @@
-package org.javers.core
+package org.javers.core.snapshot
 
+import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.diff.changetype.container.ElementValueChange
-import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
@@ -18,7 +17,52 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author bartosz walacik
  */
-class JaversSnapshotDifferIntegrationTest extends Specification {
+class SnapshotDifferIntegrationTest extends Specification {
+
+    def "should not include NewObject in change history for ordinary commit"() {
+        given:
+        def javers = javers().build()
+        def user = new DummyUser("kaz")
+        javers.commit("some.login", user) //initial commit
+
+        (1..2).each {
+            user.setAge(it)
+            javers.commit("some.login", user) //change commit
+        }
+
+        when:
+        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),2)
+
+        then:
+        changes.size() == 2
+        changes.each {
+            it instanceof ValueChange
+        }
+    }
+
+    def "should include NewObject in change history for initial commit"() {
+        given:
+        def javers = javers().build()
+        def user = new DummyUser("kaz")
+        javers.commit("some.login", user) //initial commit
+
+        when:
+        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
+
+        then:
+        changes.size() == 1
+        changes[0] instanceof NewObject
+
+        when:
+        user.setAge(18)
+        javers.commit("some.login",user) //change commit
+        changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
+
+        then:
+        changes.size() == 2
+        changes[0] instanceof ValueChange
+        changes[1] instanceof NewObject
+    }
 
     @Unroll
     def "should recreate #expectedChangeType.simpleName from two persisted snapshots"() {
@@ -31,9 +75,9 @@ class JaversSnapshotDifferIntegrationTest extends Specification {
         def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),10)
 
         then:
-        changes.size() == 1
-        changes[0].class == expectedChangeType
+        changes.size() == 2
         def change = changes[0]
+        change.class == expectedChangeType
         change.affectedGlobalId == instanceId("kaz",DummyUser)
         change.property.name == expectedChangedProperty
         change.left == expectedLeftValue
@@ -62,12 +106,12 @@ class JaversSnapshotDifferIntegrationTest extends Specification {
         def changes = javers.getChangeHistory(instanceId(1,SnapshotEntity),10)
 
         then:
-        changes.size() == 1
-        ListChange change = changes[0]
+        changes.size() == 2
+        def change = changes[0]
         change.affectedGlobalId == instanceId(1,SnapshotEntity)
         change.property.name == propertyName
         change.changes.size() == 1
-        ElementValueChange elementChange = change.changes[0]
+        def elementChange = change.changes[0]
         elementChange.leftValue == expectedLeftValue
         elementChange.rightValue == expectedRightValue
         elementChange.index == 0
@@ -87,10 +131,10 @@ class JaversSnapshotDifferIntegrationTest extends Specification {
         expectedRightValue << [5, new LocalDate(2002, 2, 2), instanceId(5,SnapshotEntity)]
     }
 
-    def "should return changes in reverse chrono order"() {
+    def "should return changes in reverse chronological order"() {
         given:
         def javers = javers().build()
-        def user = dummyUser("kaz").build();
+        def user = new DummyUser("kaz")
 
         (1..4).each {
             user.setAge(it)
@@ -98,14 +142,15 @@ class JaversSnapshotDifferIntegrationTest extends Specification {
         }
 
         when:
-        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),10)
+        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
 
         then:
-        changes.size() == 3
+        changes.size() == 4
         (0..2).each {
             ValueChange change = changes[it]
             assert change.left  == 4-it-1
             assert change.right == 4-it
         }
+        changes[3] instanceof NewObject
     }
 }

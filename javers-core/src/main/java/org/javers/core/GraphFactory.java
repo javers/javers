@@ -35,7 +35,7 @@ public class GraphFactory {
     }
 
     //capture current state
-    public List<CdoSnapshot> createGraphSnapshot(LiveGraph currentVersion, CommitMetadata commitMetadata){
-        return graphSnapshotFactory.create(currentVersion, commitMetadata);
+    public List<CdoSnapshot> createGraphSnapshot(LiveGraph currentVersion, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata){
+        return graphSnapshotFactory.create(currentVersion, latestShadowGraph, commitMetadata);
     }
 }

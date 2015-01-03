@@ -30,7 +30,8 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
     public static final String GLOBAL_CDO_ID = "globalId";
     public static final String COMMIT_METADATA = "commitMetadata";
-    public static final String STATE = "state";
+    public static final String STATE_NAME = "state";
+    public static final String INITIAL_NAME = "initial";
 
     private TypeMapper typeMapper;
 
@@ -54,7 +55,12 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId, commitMetadata);
         cdoSnapshotBuilder.withCommitMetadata(commitMetadata);
 
-        JsonObject state = jsonObject.get(STATE).getAsJsonObject();
+        JsonElement initial = jsonObject.get(INITIAL_NAME);
+        if (initial != null){
+            cdoSnapshotBuilder.withInitial(initial.getAsBoolean());
+        }
+
+        JsonObject state = jsonObject.get(STATE_NAME).getAsJsonObject();
 
         for (Property property : cdoId.getCdoClass().getProperties()) {
             cdoSnapshotBuilder.withPropertyValue(property, decodeValue(state, context, property));
@@ -162,7 +168,8 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
         jsonObject.add(COMMIT_METADATA, context.serialize(snapshot.getCommitMetadata()));
         jsonObject.add(GLOBAL_CDO_ID, context.serialize(snapshot.getGlobalId()));
-        jsonObject.add(STATE, getState(snapshot, context));
+        jsonObject.add(STATE_NAME, getState(snapshot, context));
+        jsonObject.add(INITIAL_NAME, context.serialize(snapshot.isInitial()));
 
         return jsonObject;
     }

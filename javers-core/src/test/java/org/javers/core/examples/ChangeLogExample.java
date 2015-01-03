@@ -10,9 +10,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-/**
- * @author bartosz walacik
- */
 public class ChangeLogExample {
 
     @Test
@@ -36,6 +33,5 @@ public class ChangeLogExample {
 
         // then:
         System.out.println(changeLog);
-
     }
 }

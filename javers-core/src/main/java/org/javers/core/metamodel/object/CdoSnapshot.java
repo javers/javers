@@ -21,15 +21,17 @@ import java.util.Set;
 public final class CdoSnapshot extends Cdo {
     private CommitMetadata commitMetadata;
     private final Map<Property, Object> state;
+    private final boolean initial;
 
     /**
      * should be assembled by {@link CdoSnapshotBuilder}
      */
-    CdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata, Map<Property, Object> state) {
+    CdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata, Map<Property, Object> state, boolean initial) {
         super(globalId);
         Validate.argumentsAreNotNull(state, commitMetadata);
         this.state = state;
         this.commitMetadata = commitMetadata;
+        this.initial = initial;
     }
 
     /**
@@ -88,5 +90,9 @@ public final class CdoSnapshot extends Cdo {
      */
     public Set<Property> getProperties() {
         return Collections.unmodifiableSet(state.keySet());
+    }
+
+    public boolean isInitial() {
+        return initial;
     }
 }

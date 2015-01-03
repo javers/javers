@@ -36,7 +36,8 @@ public class ChangeListTraverser {
                 lastGlobalId = null;
             }
 
-            if (!change.getAffectedGlobalId().equals(lastGlobalId)) {
+            if (!change.getAffectedGlobalId().equals(lastGlobalId) &&
+                !(change instanceof NewObject)) {
                 renderer.onAffectedObject(change.getAffectedGlobalId());
             }
 
@@ -90,10 +91,4 @@ public class ChangeListTraverser {
 
         renderer.afterChangeList();
     }
-
-
-    public static void traverse(Diff diff, ChangeProcessor renderer) {
-        throw new RuntimeException("not implemented");
-    }
-
 }
