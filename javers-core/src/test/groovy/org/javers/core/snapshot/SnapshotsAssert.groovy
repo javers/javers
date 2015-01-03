@@ -17,6 +17,16 @@ class SnapshotsAssert {
         this
     }
 
+    SnapshotsAssert hasInitialSnapshot(def expectedId) {
+        assert actual.find {it -> it.globalId == expectedId}.initial == true
+        this
+    }
+
+    SnapshotsAssert hasOrdinarySnapshot(def expectedId) {
+        assert actual.find {it -> it.globalId == expectedId}.initial == false
+        this
+    }
+
     SnapshotsAssert hasSnapshot(def expectedId) {
         assert actual.find {it -> it.globalId == expectedId}
         this

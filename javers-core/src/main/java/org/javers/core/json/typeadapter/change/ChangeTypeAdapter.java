@@ -4,8 +4,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.*;
@@ -20,7 +20,7 @@ import org.javers.core.metamodel.property.Property;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
+class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
 
     private static final String CHANGE_TYPE_FIELD = "changeType";
     private static final String AFFECTED_CDO_ID_FIELD = "globalId";
@@ -84,7 +84,7 @@ public class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate
     protected JsonObject createJsonObject(T change, JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty(CHANGE_TYPE_FIELD, encode(change.getClass()));
-        jsonObject.add(AFFECTED_CDO_ID_FIELD, context.serialize(change.getAffectedCdoId()));
+        jsonObject.add(AFFECTED_CDO_ID_FIELD, context.serialize(change.getAffectedGlobalId()));
 
         if (change.getCommitMetadata().isPresent()) {
             jsonObject.add(COMMIT_METADATA, context.serialize(change.getCommitMetadata().get()));

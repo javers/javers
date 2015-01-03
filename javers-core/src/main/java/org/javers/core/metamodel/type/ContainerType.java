@@ -1,10 +1,10 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.JaversException;
 
 import java.lang.reflect.Type;
 
-import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
+import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 
 /**
  * Collection or Array

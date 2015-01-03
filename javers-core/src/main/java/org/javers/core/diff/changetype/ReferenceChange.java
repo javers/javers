@@ -3,6 +3,8 @@ package org.javers.core.diff.changetype;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
+import static org.javers.common.string.ToStringBuilder.addField;
+
 /**
  * changed reference (in *ToOne relation)
  *
@@ -25,5 +27,10 @@ public class ReferenceChange extends PropertyChange {
 
     public GlobalId getRight() {
         return right;
+    }
+
+    @Override
+    protected String fieldsToString() {
+        return super.fieldsToString() + addField("oldRef", left) + addField("newRef", right);
     }
 }

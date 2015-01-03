@@ -7,7 +7,7 @@ import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.NewObject;
 
-public class NewObjectTypeAdapter extends ChangeTypeAdapter<NewObject> {
+class NewObjectTypeAdapter extends ChangeTypeAdapter<NewObject> {
 
     @Override
     public NewObject fromJson(JsonElement json, JsonDeserializationContext context) {

@@ -1,9 +1,8 @@
 package org.javers.core.json.typeadapter.change;
 
 import com.google.gson.*;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
-import org.javers.core.commit.CommitMetadata;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.changetype.map.*;
 import org.javers.core.metamodel.type.MapType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -11,7 +10,7 @@ import org.javers.core.metamodel.type.TypeMapper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
+class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
 
     private final TypeMapper typeMapper;
 

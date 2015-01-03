@@ -4,12 +4,13 @@ import java.util.*;
 
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.EMPTY_SET;
+import static java.util.Collections.unmodifiableList;
 import static org.javers.common.validation.Validate.*;
 
 public class Lists {
 
     public static <T> List<T> immutableListOf(T... elements){
-        return java.util.Collections.unmodifiableList(java.util.Arrays.asList(elements));
+        return unmodifiableList(java.util.Arrays.asList(elements));
     }
 
     public static <E> List<E> asList(E... elements) {

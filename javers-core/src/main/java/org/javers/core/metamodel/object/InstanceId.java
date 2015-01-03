@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.core.metamodel.property.Entity;
+import org.javers.common.exception.JaversException;
+import org.javers.core.metamodel.clazz.Entity;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -46,14 +46,14 @@ public class InstanceId extends GlobalId {
     }
 
     public String value() {
-        return entity.getSourceClass().getName()+"/"+cdoId;
+        return entity.getClientsClass().getName()+"/"+cdoId;
     }
 
     public boolean idEquals(Object instance) {
         if (instance == null) {
             return false;
         }
-        if (!entity.getSourceClass().isAssignableFrom(instance.getClass())){
+        if (!entity.getClientsClass().isAssignableFrom(instance.getClass())){
             return false;
         }
 

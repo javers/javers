@@ -79,7 +79,7 @@ public final class Commit {
         StringBuilder b = new StringBuilder();
         b.append("Commit(id:" + commitMetadata.getId());
         b.append(", snapshots:" + snapshots.size());
-        b.append(", " + diff.toString());
+        b.append(", " + diff.changesSummary());
         b.append(")");
         return b.toString();
     }

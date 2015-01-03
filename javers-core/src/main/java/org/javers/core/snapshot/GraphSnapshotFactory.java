@@ -33,17 +33,14 @@ public class GraphSnapshotFactory {
      *
      * @param currentVersion outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
      */
-    public List<CdoSnapshot> create(LiveGraph currentVersion, CommitMetadata commitMetadata){
-        Validate.argumentsAreNotNull(currentVersion, commitMetadata);
+    public List<CdoSnapshot> create(LiveGraph currentVersion, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata){
+        Validate.argumentsAreNotNull(currentVersion, commitMetadata, latestShadowGraph);
 
-        return doSnapshotsAndReuse(currentVersion.nodes(), commitMetadata);
-    }
-
-    private List<CdoSnapshot> doSnapshotsAndReuse(Set<ObjectNode> currentVersion, CommitMetadata commitMetadata){
         List<CdoSnapshot> reused = new ArrayList<>();
 
-        for (ObjectNode node : currentVersion) {
-            CdoSnapshot fresh = snapshotFactory.create(node, commitMetadata);
+        for (ObjectNode node : currentVersion.nodes()) {
+            boolean initial = isInitial(node, latestShadowGraph);
+            CdoSnapshot fresh = snapshotFactory.create(node, commitMetadata, initial);
 
             Optional<CdoSnapshot> existing = javersRepository.getLatest(fresh.getGlobalId());
             if (existing.isEmpty()) {
@@ -57,5 +54,13 @@ public class GraphSnapshotFactory {
         }
 
         return reused;
+    }
+
+    List<CdoSnapshot> create(LiveGraph currentVersion, CommitMetadata commitMetadata) {
+        return create(currentVersion, ShadowGraph.EMPTY, commitMetadata);
+    }
+
+    private boolean isInitial(ObjectNode node, ShadowGraph latestShadowGraph){
+        return !latestShadowGraph.nodes().contains(node);
     }
 }

@@ -1,33 +1,58 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.*;
+import org.javers.core.metamodel.clazz.*;
+import org.slf4j.Logger;
 
 import java.lang.reflect.Type;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author bartosz walacik
  */
 public class TypeFactory {
+    private static final Logger logger = getLogger(TypeFactory.class);
+
     private final ManagedClassFactory managedClassFactory;
 
     public TypeFactory(ManagedClassFactory managedClassFactory) {
         this.managedClassFactory = managedClassFactory;
     }
 
-    JaversType createFromDefinition(ManagedClassDefinition def){
-        if (def instanceof  ValueDefinition){
-            return new ValueType(def.getClazz());
-        }
-        else {
-            ManagedClass managedClass = managedClassFactory.create(def);
-            return createFromManagedClass(managedClass);
-        }
+    JaversType createFromDefinition(ClientsClassDefinition def){
+        return createFromClientsClass(managedClassFactory.create(def));
     }
 
-    JaversType spawnFromPrototype(Type javaType, JaversType prototype) {
+    JaversType infer(Type javaType, Optional<JaversType> prototype){
+        JaversType jType;
+
+        if (prototype.isPresent()) {
+            jType = spawnFromPrototype(javaType, prototype.get());
+            logger.info("javersType of [{}] inferred as {} from prototype {}",
+                        javaType, jType.getClass().getSimpleName(), prototype.get());
+        }
+        else {
+            jType = inferFromAnnotations(javaType);
+            logger.info("javersType of [{}] inferred as {} from annotations",
+                        javaType, jType.getClass().getSimpleName());
+        }
+
+        return jType;
+    }
+
+    JaversType inferIdPropertyTypeAsValue(EntityType eType) {
+        Type idPropertyType = eType.getIdPropertyGenericType();
+
+        logger.info("javersType of [{}] inferred as ValueType, it's used as id-property type in {}",
+                idPropertyType, eType);
+
+        return new ValueType(idPropertyType);
+    }
+
+    private JaversType spawnFromPrototype(Type javaType, JaversType prototype) {
         Validate.argumentsAreNotNull(javaType, prototype);
         Class javaClass = extractClass(javaType);
 
@@ -39,21 +64,22 @@ public class TypeFactory {
         }
     }
 
-    public JaversType infer(Type javaType) {
+    private JaversType inferFromAnnotations(Type javaType) {
         Class javaClass = extractClass(javaType);
 
-        ManagedClass managedClass = managedClassFactory.infer(javaClass);
-
-        return createFromManagedClass(managedClass);
+        return createFromClientsClass(managedClassFactory.inferFromAnnotations(javaClass));
     }
 
-    private JaversType createFromManagedClass(ManagedClass managedClass) {
-        if (managedClass instanceof ValueObject) {
-            return new ValueObjectType((ValueObject)managedClass);
+    private JaversType createFromClientsClass(ClientsDomainClass clientsClass) {
+        if (clientsClass instanceof Value) {
+            return new ValueType(clientsClass.getClientsClass());
         }
-        if (managedClass instanceof Entity) {
-            return new EntityType((Entity)managedClass);
+        if (clientsClass instanceof ValueObject) {
+            return new ValueObjectType((ValueObject)clientsClass);
         }
-        throw new IllegalArgumentException("unsupported "+managedClass);
+        if (clientsClass instanceof Entity) {
+            return new EntityType((Entity)clientsClass);
+        }
+        throw new IllegalArgumentException("unsupported "+clientsClass.getName());
     }
 }

@@ -47,7 +47,8 @@ public class CommitFactory {
         CommitMetadata commitMetadata = new CommitMetadata(author, dateProvider.now(), newId);
 
         //capture current state
-        List<CdoSnapshot> snapshots = graphFactory.createGraphSnapshot(currentGraph, commitMetadata);
+        List<CdoSnapshot> snapshots =
+                graphFactory.createGraphSnapshot(currentGraph, latestShadowGraph, commitMetadata);
 
         //do diff
         Diff diff = diffFactory.create(latestShadowGraph, currentGraph, Optional.of(commitMetadata));

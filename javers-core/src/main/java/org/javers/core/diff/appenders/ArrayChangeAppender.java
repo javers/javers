@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * @author pawel szymczyk
  */
-public class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
+class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
 
     private static final Logger logger = LoggerFactory.getLogger(ArrayChangeAppender.class);
 

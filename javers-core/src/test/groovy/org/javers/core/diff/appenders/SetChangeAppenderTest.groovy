@@ -13,7 +13,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author pawel szymczyk
  */
-class SetChangeAppenderTest extends AbstractDiffTest {
+class SetChangeAppenderTest extends AbstractDiffAppendersTest {
 
     @Unroll
     def "should append #changesCount changes when left set is #leftSet and right set is #rightSet"() {
@@ -27,6 +27,9 @@ class SetChangeAppenderTest extends AbstractDiffTest {
 
         then:
         change.changes.size() == changesCount
+        change.changes.each {
+            assert it.index == null
+        }
 
         where:
         leftSet              | rightSet             || changesCount

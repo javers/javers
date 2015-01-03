@@ -1,14 +1,15 @@
 package org.javers.core.diff;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
-import org.javers.common.patterns.visitors.Visitable;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalId;
 
+import static org.javers.common.string.ToStringBuilder.addFirstField;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 import static org.javers.common.validation.Validate.conditionFulfilled;
@@ -56,14 +57,31 @@ public abstract class Change {
     }
 
     /**
-     * Affected Cdo Id
+     * Affected domain object GlobalId
      */
+    public GlobalId getAffectedGlobalId() {
+        return affectedCdoId;
+    }
+
+    /**
+     * old name of {@link #getAffectedGlobalId()},
+     * left for backward compatibility
+     */
+    @Deprecated
     public GlobalId getAffectedCdoId() {
         return affectedCdoId;
     }
 
     /**
-     * Affected Cdo, depending on concrete Change type,
+     * Affected domain object local Id (value under @Id property)
+     */
+    public Object getAffectedLocalId() {
+        return affectedCdoId.getCdoId();
+    }
+
+    /**
+     * Affected Cdo (domain object).
+     * Depending on concrete Change type,
      * it could be new Object, removed Object or new version of changed Object
      * <br> <br>
      *
@@ -86,5 +104,14 @@ public abstract class Change {
 
     public Optional<CommitMetadata> getCommitMetadata() {
         return commitMetadata;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{" +fieldsToString() +"}";
+    }
+
+    protected String fieldsToString(){
+        return addFirstField("globalId", getAffectedGlobalId());
     }
 }

@@ -24,4 +24,9 @@ public class ElementValueChange extends ContainerElementChange {
         return rightValue.unwrap();
     }
 
+    @Override
+    public String toString() {
+        return "("+ getIndex() + ").'"+getLeftValue()+"'>>'"+getRightValue()+"'";
+    }
+
 }

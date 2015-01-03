@@ -11,7 +11,7 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 /**
  * @author bartosz walacik
  */
-class ArrayReferenceChangeAppenderTest extends AbstractDiffTest {
+class ArrayReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
     def "should append ReferenceChanged in Array of Entities"() {
         given:
         def leftCdo  = new SnapshotEntity(id:1,  arrayOfEntities:[new SnapshotEntity(id:2), new SnapshotEntity(id:3)])

@@ -3,6 +3,7 @@ package org.javers.core.snapshot;
 import org.javers.core.diff.ObjectGraph;
 import org.javers.core.graph.ObjectNode;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -11,8 +12,10 @@ import java.util.Set;
 public class ShadowGraph implements ObjectGraph {
     private final Set<ObjectNode> snapshots;
 
+    public static ShadowGraph EMPTY = new ShadowGraph(Collections.EMPTY_SET);
+
     ShadowGraph(Set<ObjectNode> snapshots) {
-        this.snapshots = snapshots;
+        this.snapshots = Collections.unmodifiableSet(snapshots);
     }
 
     @Override

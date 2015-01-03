@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.core.metamodel.property.Entity;
-import org.javers.core.metamodel.property.ManagedClass;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ManagedClass;
 
 /**
  * Global ID of Client's domain object (CDO)
@@ -16,7 +16,6 @@ public abstract class GlobalId {
     /**
      * ID of Client's domain object, should be unique in Class scope,
      * for example database primary key or any domain identifier like user.login
-     *
      */
     public abstract Object getCdoId();
 

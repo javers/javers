@@ -1,9 +1,8 @@
 package org.javers.core.json.typeadapter.change;
 
 import com.google.gson.*;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
-import org.javers.core.commit.CommitMetadata;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.changetype.container.*;
 import org.javers.core.metamodel.type.ContainerType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -14,7 +13,7 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends ChangeTypeAdapter<T> {
+abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends ChangeTypeAdapter<T> {
     private static final String CHANGES_FIELD = "elementChanges";
     private static final String ELEMENT_CHANGE_TYPE_FIELD = "elementChangeType";
     private static final String INDEX_FIELD = "index";
@@ -72,15 +71,29 @@ public abstract class ContainerChangeTypeAdapter<T extends ContainerChange> exte
 
     private ValueAdded parseValueAdded(JsonObject elementChange, JsonDeserializationContext context, ContainerType containerType){
         Object value = decodeValue(elementChange, context, VALUE_FIELD, containerType.getItemClass());
-        return new ValueAdded(parseIndex(elementChange), value);
+
+        Integer idx = parseIndex(elementChange);
+        if (idx != null) {
+            return new ValueAdded(idx, value);
+        } else {
+            return new ValueAdded(value);
+        }
     }
 
     private ValueRemoved parseValueRemoved(JsonObject elementChange, JsonDeserializationContext context, ContainerType containerType){
         Object value = decodeValue(elementChange, context, VALUE_FIELD, containerType.getItemClass());
-        return new ValueRemoved(parseIndex(elementChange), value);
+        Integer idx = parseIndex(elementChange);
+        if (idx != null) {
+            return new ValueRemoved(idx, value);
+        } else {
+            return new ValueRemoved(value);
+        }
     }
 
-    private int parseIndex(JsonObject elementChange) {
+    private Integer parseIndex(JsonObject elementChange) {
+        if (!elementChange.has(INDEX_FIELD) || elementChange.get(INDEX_FIELD).isJsonNull()){
+            return null;
+        }
         return elementChange.get(INDEX_FIELD).getAsInt();
     }
 

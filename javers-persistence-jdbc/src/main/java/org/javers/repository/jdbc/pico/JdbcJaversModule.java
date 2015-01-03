@@ -1,7 +1,6 @@
 package org.javers.repository.jdbc.pico;
 
-import org.javers.common.pico.JaversModule;
-import org.javers.core.Javers;
+import org.javers.core.pico.JaversModule;
 import org.javers.repository.jdbc.JdbcDiffRepository;
 import org.javers.repository.jdbc.schema.FixedSchemaFactory;
 import org.javers.repository.jdbc.schema.JaversSchemaManager;
@@ -24,7 +23,7 @@ public class JdbcJaversModule implements JaversModule{
                                                            QueryRunnerFactory.class};
 
     @Override
-    public Collection<Class> getModuleComponents() {
+    public Collection<Class> getComponents() {
         return Arrays.asList(moduleComponents);
     }
 }

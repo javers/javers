@@ -1,13 +1,14 @@
 package org.javers.core;
 
-import org.javers.common.pico.JaversModule;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
-import org.javers.core.pico.JaversContainerFactory;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.validation.Validate;
+import org.javers.core.pico.InstantiatingModule;
+import org.javers.core.pico.JaversModule;
+import org.picocontainer.DefaultPicoContainer;
 import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.PicoContainer;
+import org.picocontainer.behaviors.Caching;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,40 +23,57 @@ public abstract class AbstractJaversBuilder {
         return container.getComponent(ofClass);
     }
 
+    protected void bootContainer(JaversModule coreModule) {
+        Validate.argumentIsNotNull(coreModule);
+
+        container = new DefaultPicoContainer(new Caching());
+
+        addModule(coreModule);
+    }
+
+    protected void addModule(InstantiatingModule module) {
+        checkIfBuilt();
+        module.instantiateAndBindComponents();
+    }
+
+    protected void addModule(JaversModule module) {
+        checkIfBuilt();
+        for (Class component : module.getComponents()) {
+            addComponent(component);
+        }
+    }
+
+    protected <T> List<T> getComponents(Class<T> ofType){
+        return container.getComponents(ofType);
+    }
+
+    protected MutablePicoContainer getContainer() {
+        return container;
+    }
+
+    protected void addComponent(Object classOrInstance) {
+        checkIfBuilt();
+        container.addComponent(classOrInstance);
+    }
+
+    protected void bindComponent(Class bindToInterface, Object implementationOrInstance) {
+        checkIfBuilt();
+        container.addComponent(bindToInterface, implementationOrInstance);
+    }
+
     private void checkIfNotBuilt() {
         if (isBuilt()) {
             throw new JaversException(JaversExceptionCode.ALREADY_BUILT);
         }
     }
 
-    void checkIfBuilt() {
+    private void checkIfBuilt() {
         if (!isBuilt()) {
             throw new JaversException(JaversExceptionCode.CONTAINER_NOT_READY);
         }
     }
 
-    boolean isBuilt() {
+    private boolean isBuilt() {
         return container != null;
-    }
-
-
-    PicoContainer bootContainer(JaversModule module, Object... beans) {
-        return bootContainer(module, Arrays.asList(beans));
-    }
-
-    protected PicoContainer bootContainer(JaversModule module, List<?> beans) {
-        checkIfNotBuilt();
-        container = JaversContainerFactory.create(Arrays.asList(module), beans);
-        return container;
-    }
-
-    void addComponent(Object classOrInstance) {
-        checkIfBuilt();
-        JaversContainerFactory.addComponent(container, classOrInstance);
-    }
-
-    void addModule(JaversModule module) {
-        checkIfBuilt();
-        JaversContainerFactory.addModule(container, module);
     }
 }

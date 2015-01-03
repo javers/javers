@@ -85,7 +85,7 @@ class MongoRepositoryIntTest extends Specification {
 
         then:
         latest.get().globalId.cdoId == "kazik"
-        latest.get().globalId.cdoClass.sourceClass == DummyUser
+        latest.get().globalId.cdoClass.clientsClass == DummyUser
     }
 
     def "should get last commit by InstanceIdDTO"() {
@@ -107,7 +107,7 @@ class MongoRepositoryIntTest extends Specification {
 
         then:
         latest.get().globalId.cdoId == "kazik"
-        latest.get().globalId.cdoClass.sourceClass == DummyUser
+        latest.get().globalId.cdoClass.clientsClass == DummyUser
     }
 
     def "should get state history"() {

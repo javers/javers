@@ -7,7 +7,8 @@ import org.javers.core.diff.appenders.MapChangeAppender
 import org.javers.core.diff.appenders.SetChangeAppender
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectNode
-import org.javers.core.metamodel.property.Entity
+import org.javers.core.metamodel.clazz.Entity
+import org.javers.core.metamodel.clazz.ManagedClass
 import org.javers.core.metamodel.property.Property
 import spock.lang.Shared
 import spock.lang.Specification
@@ -18,7 +19,7 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  * @author bartosz walacik
  */
 abstract class AbstractDiffTest extends Specification {
-    @Shared JaversTestBuilder javers = javersTestAssembly()
+    @Shared protected JaversTestBuilder javers = javersTestAssembly()
 
     ObjectNode buildGraph(def any) {
         javers.createObjectGraphBuilder().buildGraph(any).root()
@@ -29,7 +30,12 @@ abstract class AbstractDiffTest extends Specification {
     }
 
     Entity getEntity(Class forClass) {
-        return (Entity)javers.typeMapper.getJaversType(forClass).managedClass
+        (Entity)javers.typeMapper.getJaversType(forClass).managedClass
+    }
+
+    Property getManagedProperty(Class forClass, String propertyName) {
+        ManagedClass clazz = javers.typeMapper.getJaversType(forClass).managedClass;
+        clazz.getProperty(propertyName)
     }
 
     Property getProperty(Class forClass, String propName) {
@@ -38,21 +44,5 @@ abstract class AbstractDiffTest extends Specification {
 
     RealNodePair realNodePair(def leftCdo, def rightCdo){
         new RealNodePair(buildGraph(leftCdo), buildGraph(rightCdo))
-    }
-
-    ListChangeAppender listChangeAppender() {
-        new ListChangeAppender(mapChangeAppender(), javers.typeMapper)
-    }
-
-    MapChangeAppender mapChangeAppender() {
-        new MapChangeAppender(javers.typeMapper, javers.globalIdFactory)
-    }
-
-    ArrayChangeAppender arrayChangeAppender() {
-        new ArrayChangeAppender(mapChangeAppender(), javers.typeMapper)
-    }
-
-    SetChangeAppender setChangeAppender() {
-        new SetChangeAppender(mapChangeAppender(), javers.typeMapper, javers.globalIdFactory)
     }
 }

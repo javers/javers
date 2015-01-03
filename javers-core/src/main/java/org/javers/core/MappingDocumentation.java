@@ -1,8 +1,8 @@
 package org.javers.core;
 
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.property.Entity;
-import org.javers.core.metamodel.property.ValueObject;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;

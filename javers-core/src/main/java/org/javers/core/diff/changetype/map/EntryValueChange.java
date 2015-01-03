@@ -1,5 +1,6 @@
 package org.javers.core.diff.changetype.map;
 
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.diff.changetype.Atomic;
 
 /**
@@ -31,5 +32,10 @@ public class EntryValueChange extends EntryChange {
 
     public Atomic getWrappedRightValue() {
         return rightValue;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.toString(this, getKey(), getLeftValue()+"'>>'"+ getRightValue());
     }
 }

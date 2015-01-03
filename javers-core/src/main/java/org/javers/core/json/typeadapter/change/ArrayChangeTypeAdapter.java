@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public class ArrayChangeTypeAdapter extends ContainerChangeTypeAdapter<ArrayChange> {
+class ArrayChangeTypeAdapter extends ContainerChangeTypeAdapter<ArrayChange> {
 
     public ArrayChangeTypeAdapter(TypeMapper typeMapper) {
         super(typeMapper);

@@ -3,7 +3,7 @@ package org.javers.core.json;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
-import org.javers.core.json.typeadapter.LocalDateTimeTypeAdapter;
+import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
 import org.javers.core.metamodel.type.ValueType;
 
 import java.util.List;
@@ -45,9 +45,9 @@ public interface JsonTypeAdapter<T> {
     JsonElement toJson(T sourceValue, JsonSerializationContext jsonSerializationContext);
 
     /**
-     * Target classes.
+     * Target clazz.
      * If adapter is designed to handle single class, return List with one element.
-     * If adapter is polymorfic, return list captaining all supported classes
+     * If adapter is polymorfic, return list captaining all supported clazz
      */
     List<Class> getValueTypes();
 }

@@ -1,7 +1,7 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Sets;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.*;
 import org.javers.core.metamodel.object.*;
@@ -17,7 +17,7 @@ import static org.javers.common.collections.Objects.nullSafeEquals;
 /**
  * @author pawel szymczyk
  */
-public class SetChangeAppender extends PropertyChangeAppender<SetChange> {
+class SetChangeAppender extends PropertyChangeAppender<SetChange> {
 
     private static final Logger logger = LoggerFactory.getLogger(SetChangeAppender.class);
 

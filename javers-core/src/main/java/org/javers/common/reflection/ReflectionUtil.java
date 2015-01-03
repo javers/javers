@@ -1,7 +1,8 @@
 package org.javers.common.reflection;
 
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.collections.Lists;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 
 import java.io.UnsupportedEncodingException;
@@ -15,10 +16,45 @@ import java.util.*;
  * @author bartosz walacik
  */
 public class ReflectionUtil {
-    public static final String TRANSIENT_ANN = "Transient";
     public static final String ID_ANN = "Id";
 
     private static final Object[] EMPTY_ARRAY = new Object[]{};
+
+    /**
+     * Creates new instance of public or package-private class.
+     * Calls first, not-private constructor
+     */
+    public static Object newInstance(Class clazz, ArgumentResolver resolver){
+        Validate.argumentIsNotNull(clazz);
+        for (Constructor constructor : clazz.getDeclaredConstructors()) {
+            if (isPrivate(constructor)) {
+                continue;
+            }
+
+            Class [] types = constructor.getParameterTypes();
+            Object[] params = new Object[types.length];
+            for (int i=0; i<types.length; i++){
+                params[i] = resolver.resolve(types[i]);
+            }
+            try {
+                constructor.setAccessible(true);
+                return constructor.newInstance(params);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        throw new JaversException(JaversExceptionCode.NO_PUBLIC_CONSTRUCTOR,clazz.getName());
+    }
+
+    public static List<Field> getAllPersistentFields(Class methodSource) {
+        List<Field> result = new ArrayList<>();
+        for(Field field : getAllFields(methodSource)) {
+            if (isPersistentField(field)) {
+                result.add(field);
+            }
+        }
+        return result;
+    }
 
     public static List<Method> findAllPersistentGetters(Class methodSource) {
         List<Method> result = new ArrayList<>();
@@ -55,6 +91,16 @@ public class ReflectionUtil {
         return methods;
     }
 
+    public static List<Field> getAllFields(Class<?> methodSource) {
+        List<Field> fields =  Lists.asList(methodSource.getDeclaredFields());
+
+        if (methodSource.getSuperclass() != Object.class) { //recursion stop condition
+            fields.addAll( getAllFields(methodSource.getSuperclass()) );
+        }
+        return fields;
+    }
+
+
     private static int methodKey(Method m){
         int key = shaDigest(m.getName());
         for (Class c : m.getParameterTypes()) {
@@ -68,7 +114,6 @@ public class ReflectionUtil {
      * <ul>
      *     <li/>is not abstract
      *     <li/>is not native
-     *     <li/>doesn't have @Transient
      * </ul>
      */
     public static boolean isPersistentGetter(Method m) {
@@ -76,29 +121,34 @@ public class ReflectionUtil {
             return false;
         }
 
-        return  !isAnnotationPresent(m, TRANSIENT_ANN) &&
-                !Modifier.isStatic(m.getModifiers())  &&
-                !Modifier.isAbstract(m.getModifiers())  &&
+        return  !Modifier.isStatic(m.getModifiers()) &&
+                !Modifier.isAbstract(m.getModifiers()) &&
                 !Modifier.isNative(m.getModifiers()) ;
     }
 
-    public static boolean isAnnotationPresent(Method method, String annotationName){
-        Validate.argumentsAreNotNull(method, annotationName);
+    public static boolean isPersistentField(Field field) {
 
-        if (contains(method.getAnnotations(), annotationName)) {
+        return !Modifier.isTransient(field.getModifiers()) &&
+               !Modifier.isStatic(field.getModifiers()) &&
+               !field.getName().equals("this$0"); //owner of inner class
+    }
+
+    public static boolean isAnnotationPresent(AccessibleObject methodOrField, String annotationName){
+        Validate.argumentsAreNotNull(methodOrField, annotationName);
+
+        if (contains(methodOrField.getAnnotations(), annotationName)) {
             return true;
         }
 
         return false;
     }
 
-    public static boolean isAnnotationPresent(Field field, String annotationName){
-        Validate.argumentsAreNotNull(field, annotationName);
-
-        if (contains(field.getDeclaredAnnotations(), annotationName)) {
-            return true;
+    public static boolean hasAnyAnnotation(AccessibleObject methodOrField, Set<String> annotationNames){
+        for (String annotationName : annotationNames){
+            if (isAnnotationPresent(methodOrField, annotationName)) {
+                return true;
+            }
         }
-
         return false;
     }
 
@@ -143,12 +193,12 @@ public class ReflectionUtil {
     }
 
     public static Object invokeGetterEvenIfPrivate(Method getter, Object onObject) {
-            setAccessibleIfPrivateOrProtected(getter);
-            return invokeGetter(getter, onObject);
+        setAccessibleIfNecessary(getter);
+        return invokeGetter(getter, onObject);
     }
 
     public static Object invokeFieldEvenIfPrivate(Field field, Object onObject) {
-        setAccessibleIfPrivateOrProtected(field);
+        setAccessibleIfNecessary(field);
         return invokeField(field, onObject);
     }
 
@@ -157,20 +207,23 @@ public class ReflectionUtil {
         try {
             return field.get(onObject);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("error getting unwrap from field '"+ field.getName() +"'");
+            throw new RuntimeException("error getting value from field '"+ field.getName() +"'",e);
         }
     }
-
-    private static boolean isPrivateOrProtected(int modifiersCode) {
-        return Modifier.isPrivate(modifiersCode) ||
-                Modifier.isProtected(modifiersCode);
-    }
-
-    private static <T extends AccessibleObject & Member> void setAccessibleIfPrivateOrProtected(T object) {
-        if(isPrivateOrProtected(object.getModifiers()))
+    
+    private static void setAccessibleIfNecessary(Member member) {
+        if(!isPublic(member))
         {
-            object.setAccessible(true);
+            ((AccessibleObject)member).setAccessible(true); //that's Java Reflection API ...
         }
+    }
+
+    private static boolean isPublic(Member member){
+        return Modifier.isPublic(member.getModifiers());
+    }
+
+    private static boolean isPrivate(Member member){
+        return Modifier.isPrivate(member.getModifiers());
     }
 
     /**

@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.object;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.ValueObject;
+import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;
@@ -9,11 +9,11 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;
 /**
 * @author bartosz walacik
 */
-public class ValueObjectIdDTO extends GlobalIdDTO {
+public final class ValueObjectIdDTO extends GlobalIdDTO {
     private InstanceIdDTO ownerIdDTO;
     private final String fragment;
 
-    ValueObjectIdDTO(Class ownerClass, Object ownerLocalId, String fragment) {
+    public ValueObjectIdDTO(Class ownerClass, Object ownerLocalId, String fragment) {
         Validate.argumentsAreNotNull(ownerClass, ownerLocalId, fragment);
         ownerIdDTO = instanceId(ownerLocalId, ownerClass);
         this.fragment = fragment;
@@ -24,7 +24,7 @@ public class ValueObjectIdDTO extends GlobalIdDTO {
     }
 
     @Override
-    public ValueObjectId create(TypeMapper typeMapper) {
+    ValueObjectId create(TypeMapper typeMapper) {
         String voProperty = decodePropertyName();
 
         InstanceId ownerId = ownerIdDTO.create(typeMapper);

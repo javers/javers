@@ -1,13 +1,13 @@
 package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
-import org.javers.common.exception.exceptions.JaversException
+import org.javers.common.exception.JaversException
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.lang.reflect.Type
 
-import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED
+import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
 /**

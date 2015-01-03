@@ -10,7 +10,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author Maciej Zasada
  */
-class NewObjectAppenderTest extends AbstractDiffTest {
+class NewObjectAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append one newObject to diff"() {
         given:

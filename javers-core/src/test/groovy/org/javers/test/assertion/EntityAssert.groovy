@@ -1,7 +1,7 @@
 package org.javers.test.assertion
 
 import org.javers.core.metamodel.property.PropertyAssert
-import org.javers.core.metamodel.property.Entity
+import org.javers.core.metamodel.clazz.Entity
 
 /**
  * @author Pawel Cierpiatka

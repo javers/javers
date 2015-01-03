@@ -1,7 +1,7 @@
 package org.javers.common.properties;
 
 import java.util.Properties;
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.JaversException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

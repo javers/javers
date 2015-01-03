@@ -7,6 +7,7 @@ import org.javers.core.model.DummyUserDetails
 import org.joda.time.LocalDateTime
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.javers.core.metamodel.property.PropertiesAssert.assertThat
 
@@ -33,15 +34,20 @@ abstract class PropertyScannerTest extends Specification {
         assertThat(properties).hasntGotProperty("staticInt");
     }
 
-    def "should scan and get private property"() {
+    @Unroll
+    def "should scan and get #scopedProperty"() {
         when:
-        def properties = propertyScanner.scan(ManagedClass)
+        def properties = propertyScanner.scan(PropertyScannerEntity)
 
         then:
-        assertThat(properties).hasProperty("privateProperty").hasValue(new ManagedClass(),0)
+        assertThat(properties).hasProperty(scopedProperty).hasValue(new PropertyScannerEntity(),1)
+
+        where:
+        scopedProperty << ["privateProperty","protectedProperty","packagePrivateProperty","publicProperty"]
     }
 
-    def shouldScanId() {
+
+    def "should scan Id"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
@@ -49,7 +55,7 @@ abstract class PropertyScannerTest extends Specification {
         assertThat(properties).hasProperty("name").looksLikeId()
     }
 
-    def shouldScanValueMapProperty() {
+    def "should scan value map property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
@@ -58,16 +64,7 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(new TypeToken<Map<String, LocalDateTime>>(){}.getType())
     }
 
-    def shouldScanEntityReferenceProperty() {
-        when:
-        def properties = propertyScanner.scan(DummyUser)
-
-        then:
-        assertThat(properties).hasProperty("supervisor")
-                              .hasJavaType(DummyUser)
-    }
-
-    def shouldScanInheritedProperty() {
+    def "should scan inherited property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
@@ -76,34 +73,41 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(int)
     }
 
-    def shouldNotScanTransientProperty() {
+    def "should ignore @Transient property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
         then:
-        assertThat(properties).hasntGotProperty("someTransientField")
+        assertThat(properties).hasntGotProperty("propertyWithTransientAnn")
     }
 
+    def "should ignore @DiffIgnore property"() {
+        when:
+        def properties = propertyScanner.scan(DummyUser)
 
-    def shouldScanSetProperty() {
+        then:
+        assertThat(properties).hasntGotProperty("propertyWithDiffIgnoreAnn")
+    }
+
+    def "should scan set property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
         then:
         assertThat(properties).hasProperty("stringSet")
-                              .hasJavaType(new TypeToken<Set<String>>(){}.getType())
+                              .hasJavaType(new TypeToken<Set<String>>(){}.type)
     }
 
-    def shouldScanListProperty() {
+    def "should scan list property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
         then:
         assertThat(properties).hasProperty("integerList")
-                              .hasJavaType(new TypeToken<List<Integer>>(){}.getType())
+                              .hasJavaType(new TypeToken<List<Integer>>(){}.type)
     }
 
-    def shouldScanArrayProperty() {
+    def "should scan array property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
@@ -112,7 +116,7 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(int[])
     }
 
-    def shouldScanIntProperty() {
+    def "should scan int property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
@@ -121,7 +125,7 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(Integer.TYPE)
     }
 
-    def shouldScanEnumProperty() {
+    def "should scan Enum property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
@@ -130,7 +134,7 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(DummyUser.Sex)
     }
 
-    def shouldScanIntegerProperty() {
+    def "should scan Integer property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
@@ -139,7 +143,7 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(Integer)
     }
 
-    def shouldScanBooleanProperty() {
+    def "should scan boolean property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
@@ -148,7 +152,7 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(Boolean.TYPE)
     }
 
-    def shouldScanBigBooleanProperty() {
+    def "should scan big Boolean property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
@@ -157,7 +161,7 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(Boolean)
     }
 
-    def shouldScanStringProperty() {
+    def "should scan String property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
@@ -166,7 +170,16 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(String)
     }
 
-    def shouldScanValueObjectProperty() {
+    def "should scan Entity reference property"() {
+        when:
+        def properties = propertyScanner.scan(DummyUser)
+
+        then:
+        assertThat(properties).hasProperty("supervisor")
+                              .hasJavaType(DummyUser)
+    }
+
+    def "should scan ValueObject property"() {
         when:
         def properties = propertyScanner.scan(DummyUserDetails)
 
@@ -175,10 +188,4 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(DummyAddress)
     }
 
-    class ManagedClass {
-        int privateProperty
-        int getPrivateProperty() {
-            privateProperty
-        }
-    }
 }

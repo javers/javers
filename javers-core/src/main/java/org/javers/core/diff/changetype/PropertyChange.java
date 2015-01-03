@@ -1,9 +1,11 @@
 package org.javers.core.diff.changetype;
 
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
+import static org.javers.common.string.ToStringBuilder.addField;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
@@ -24,5 +26,10 @@ public abstract class PropertyChange extends Change {
      */
     public Property getProperty() {
         return property;
+    }
+
+    @Override
+    protected String fieldsToString() {
+        return super.fieldsToString() + addField("property", property.getName());
     }
 }

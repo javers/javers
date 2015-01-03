@@ -1,5 +1,6 @@
 package org.javers.core.model;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.joda.time.LocalDateTime;
 
 import javax.persistence.Id;
@@ -15,11 +16,18 @@ public class DummyUser extends AbstractDummyUser {
 
     private transient int someTransientField;
 
+    @Transient
+    private int propertyWithTransientAnn;
+
+    @DiffIgnore
+    private int propertyWithDiffIgnoreAnn;
+
     //primitives and primitive boxes
     private boolean flag;
     private Boolean bigFlag;
     private int age;
     private char _char;
+    private String surname;
 
     //enum
     private Sex sex;
@@ -52,6 +60,11 @@ public class DummyUser extends AbstractDummyUser {
         this.name = name;
     }
 
+    public DummyUser(String name, String surname) {
+        this(name);
+        this.surname = surname;
+    }
+
     public void addEmployee(DummyUser dummyUser) {
         if (employeesList == null) {
             employeesList = new ArrayList<>();
@@ -63,7 +76,6 @@ public class DummyUser extends AbstractDummyUser {
         return valueMap;
     }
 
-    @Transient
     public int getSomeTransientField() {
         return someTransientField;
     }
@@ -216,5 +228,31 @@ public class DummyUser extends AbstractDummyUser {
 
     public void setDateTimes(LocalDateTime[] dateTimes) {
         this.dateTimes = dateTimes;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    @Transient
+    public int getPropertyWithTransientAnn() {
+        return propertyWithTransientAnn;
+    }
+
+    public void setPropertyWithTransientAnn(int propertyWithTransientAnn) {
+        this.propertyWithTransientAnn = propertyWithTransientAnn;
+    }
+
+    @DiffIgnore
+    public int getPropertyWithDiffIgnoreAnn() {
+        return propertyWithDiffIgnoreAnn;
+    }
+
+    public void setPropertyWithDiffIgnoreAnn(int propertyWithDiffIgnoreAnn) {
+        this.propertyWithDiffIgnoreAnn = propertyWithDiffIgnoreAnn;
     }
 }

@@ -1,16 +1,15 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.patterns.visitors.Visitable;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoWrapper;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Entity;
-import org.javers.core.metamodel.property.ManagedClass;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.property.ValueObject;
+import org.javers.core.metamodel.clazz.ValueObject;
 
 import java.util.HashMap;
 import java.util.Map;

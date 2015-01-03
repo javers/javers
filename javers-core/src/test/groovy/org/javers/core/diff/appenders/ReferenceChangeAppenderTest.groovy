@@ -14,7 +14,7 @@ import org.javers.core.model.SnapshotEntity
 import static ReferenceChangeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
-class ReferenceChangeAppenderTest extends AbstractDiffTest{
+class ReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should not append change when the same references"() {
         given:

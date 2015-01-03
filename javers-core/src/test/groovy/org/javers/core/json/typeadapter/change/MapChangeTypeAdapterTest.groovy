@@ -12,7 +12,6 @@ import org.javers.core.json.JsonConverter
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
@@ -26,11 +25,11 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class MapChangeTypeAdapterTest extends Specification {
 
-    @Ignore //not supported
-    def "should deserialize polymorfic MapChange type-safely when switched on" () {
-        expect:
-            true
-    }
+    //@Ignore //not supported
+    //def "should deserialize polymorfic MapChange type-safely when switched on" () {
+    //    expect:
+    //        true
+    //}
 
     def "should serialize polymorfic MapChange type-safely when switched on" () {
         JsonConverter jsonConverter = javersTestAssemblyTypeSafe().jsonConverter
@@ -249,7 +248,7 @@ class MapChangeTypeAdapterTest extends Specification {
         MapChange change  = jsonConverter.fromJson(json.toString(),Change)
 
         then:
-        change.affectedCdoId == instanceId(1,SnapshotEntity)
+        change.affectedGlobalId == instanceId(1,SnapshotEntity)
         change.commitMetadata.get().author == "kazik"
         change.commitMetadata.get().id == "1.0"
         change.commitMetadata.get().commitDate == new LocalDateTime("2001-12-01T22:23:03")

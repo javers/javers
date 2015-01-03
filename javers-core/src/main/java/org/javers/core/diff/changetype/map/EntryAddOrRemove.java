@@ -1,5 +1,6 @@
 package org.javers.core.diff.changetype.map;
 
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.diff.changetype.Atomic;
 
 /**
@@ -19,5 +20,10 @@ public abstract  class EntryAddOrRemove extends EntryChange {
 
     public Atomic getWrappedValue(){
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.toString(this, getKey(), getValue());
     }
 }

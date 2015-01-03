@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
@@ -16,6 +16,7 @@ public class CdoSnapshotBuilder {
     private final GlobalId globalId;
     private final Map<Property, Object> state = new HashMap<>();
     private CommitMetadata commitMetadata;
+    private boolean initial = false;
 
     private CdoSnapshotBuilder(GlobalId globalId, CommitMetadata commitMetadata) {
         this.globalId = globalId;
@@ -42,7 +43,12 @@ public class CdoSnapshotBuilder {
     }
 
     public CdoSnapshot build(){
-        return new CdoSnapshot(globalId, commitMetadata, state);
+        return new CdoSnapshot(globalId, commitMetadata, state, initial);
+    }
+
+    public CdoSnapshotBuilder withInitial(boolean initial){
+        this.initial = initial;
+        return this;
     }
 
     public CdoSnapshotBuilder withCommitMetadata(CommitMetadata commitMetadata) {

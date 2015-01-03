@@ -1,7 +1,10 @@
 package org.javers.core.diff.changetype;
 
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
+
+import static org.javers.common.string.ToStringBuilder.addField;
 
 /**
  * @author bartosz walacik
@@ -30,5 +33,10 @@ public class ValueChange extends PropertyChange {
 
     public Atomic getWrappedRight() {
         return right;
+    }
+
+    @Override
+    protected String fieldsToString() {
+        return super.fieldsToString() + addField("oldVal", getLeft()) + addField("newVal", getRight());
     }
 }

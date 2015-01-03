@@ -2,9 +2,8 @@ package org.javers.core.graph;
 
 import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
-import org.javers.core.diff.ObjectGraph;
 import org.javers.core.metamodel.object.Cdo;
-import org.javers.core.metamodel.property.ManagedClass;
+import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversType;

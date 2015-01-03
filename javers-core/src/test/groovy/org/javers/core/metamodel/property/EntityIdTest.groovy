@@ -1,7 +1,10 @@
 package org.javers.core.metamodel.property
 
-import org.javers.common.exception.exceptions.JaversException
-import org.javers.common.exception.exceptions.JaversExceptionCode
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
+import org.javers.core.metamodel.clazz.Entity
+import org.javers.core.metamodel.clazz.EntityDefinition
+import org.javers.core.metamodel.clazz.ManagedClassFactory
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
@@ -28,7 +31,7 @@ abstract class EntityIdTest extends Specification {
         EntityAssert.assertThat(entity).hasIdProperty("bigFlag")
     }
 
-    def "should throw exception when entity without id"() {
+    def "should fail for Entity without Id property"() {
         when:
         entityFactory.createEntity(DummyAddress.class)
 

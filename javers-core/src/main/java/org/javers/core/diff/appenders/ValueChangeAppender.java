@@ -10,7 +10,7 @@ import org.javers.core.metamodel.type.PrimitiveOrValueType;
 /**
  * @author bartosz walacik
  */
-public class ValueChangeAppender extends PropertyChangeAppender<ValueChange> {
+class ValueChangeAppender extends PropertyChangeAppender<ValueChange> {
 
     @Override
     protected boolean supports(JaversType propertyType) {

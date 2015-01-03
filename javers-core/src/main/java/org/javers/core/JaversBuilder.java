@@ -1,25 +1,20 @@
 package org.javers.core;
 
 import com.google.gson.TypeAdapter;
-import org.javers.common.pico.JaversModule;
 import org.javers.common.validation.Validate;
+import org.javers.core.commit.CommitFactoryModule;
+import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
-import org.javers.core.json.typeadapter.CdoSnapshotTypeAdapter;
-import org.javers.core.json.typeadapter.CommitIdTypeAdapter;
-import org.javers.core.json.typeadapter.GlobalIdTypeAdapter;
-import org.javers.core.json.typeadapter.InstanceIdDTOTypeAdapter;
-import org.javers.core.json.typeadapter.change.ArrayChangeTypeAdapter;
-import org.javers.core.json.typeadapter.change.ListChangeTypeAdapter;
-import org.javers.core.json.typeadapter.change.MapChangeTypeAdapter;
-import org.javers.core.json.typeadapter.change.SetChangeTypeAdapter;
+import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
+import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
+import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.property.*;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
 import org.javers.core.pico.CoreJaversModule;
-import org.javers.core.pico.ManagedClassFactoryModule;
+import org.javers.core.pico.JaversModule;
 import org.javers.repository.api.InMemoryRepository;
 import org.javers.repository.api.JaversRepository;
 import org.picocontainer.PicoContainer;
@@ -41,21 +36,10 @@ import java.util.Set;
  *
  * @author bartosz walacik
  */
-public class JaversBuilder extends AbstractJaversBuilder {
+public final class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
-    private static final Class<? extends JsonTypeAdapter>[] DOMAIN_AWARE_ADAPTERS = new Class[]{
-            GlobalIdTypeAdapter.class,
-            MapChangeTypeAdapter.class,
-            ArrayChangeTypeAdapter.class,
-            ListChangeTypeAdapter.class,
-            SetChangeTypeAdapter.class,
-            CdoSnapshotTypeAdapter.class,
-            CommitIdTypeAdapter.class,
-            InstanceIdDTOTypeAdapter.class
-    };
-
-    private final Set<ManagedClassDefinition> managedClassDefinitions = new HashSet<>();
+    private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
 
     private JaversRepository repository;
 
@@ -64,6 +48,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
         // bootstrap phase 1: core beans
         bootContainer(new CoreJaversModule());
+        addModule(new DiffAppendersModule(getContainer()));
+        addModule(new CommitFactoryModule(getContainer()));
     }
 
     public static JaversBuilder javers() {
@@ -73,7 +59,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     public Javers build() {
 
         // bootstrap phase 2:
-        // ManagedClassFactory & managed classes registration
+        // ManagedClassFactory & managed clazz registration
         bootManagedClasses();
 
         // bootstrap phase 3: JSON beans & domain aware typeAdapters
@@ -93,7 +79,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers {@link Entity} with id-property selected on the basis of @Id annotation
+     * registers {@link org.javers.core.metamodel.clazz.Entity} with id-property pointed by @Id annotation
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
         Validate.argumentIsNotNull(entityClass);
@@ -101,7 +87,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers {@link Entity} with id-property selected explicitly by name
+     * registers {@link org.javers.core.metamodel.clazz.Entity} with id-property selected explicitly by name
      */
     public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName) {
         Validate.argumentsAreNotNull(entityClass, idPropertyName);
@@ -109,16 +95,16 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private JaversBuilder registerEntity(EntityDefinition entityDefinition) {
-        managedClassDefinitions.add(entityDefinition);
+        clientsClassDefinitions.add(entityDefinition);
         return this;
     }
 
     /**
-     * registers {@link org.javers.core.metamodel.property.ValueObject}
+     * registers {@link org.javers.core.metamodel.clazz.ValueObject}
      */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         Validate.argumentIsNotNull(valueObjectClass);
-        managedClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
+        clientsClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
         return this;
     }
 
@@ -129,17 +115,12 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    @Override
-    PicoContainer bootContainer(JaversModule module, Object... beans) {
-        return super.bootContainer(module, beans);
-    }
-
     /**
      * registers {@link ValueType}
      */
     public JaversBuilder registerValue(Class<?> valueClass) {
         Validate.argumentIsNotNull(valueClass);
-        managedClassDefinitions.add(new ValueDefinition(valueClass));
+        clientsClassDefinitions.add(new ValueDefinition(valueClass));
         return this;
     }
 
@@ -210,8 +191,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private void mapRegisteredClasses() {
         TypeMapper typeMapper = typeMapper();
-        for (ManagedClassDefinition def : managedClassDefinitions) {
-            typeMapper.registerManagedClass(def);
+        for (ClientsClassDefinition def : clientsClassDefinitions) {
+            typeMapper.registerClientsClass(def);
         }
     }
 
@@ -238,9 +219,9 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private void bootJsonConverter() {
         JsonConverterBuilder jsonConverterBuilder = jsonConverterBuilder();
 
-        for (Class<? extends JsonTypeAdapter> adapter : DOMAIN_AWARE_ADAPTERS){
-            jsonConverterBuilder.registerJsonTypeAdapter(getContainerComponent(adapter));
-        }
+        addModule(new ChangeTypeAdaptersModule(getContainer()));
+        addModule(new CommitTypeAdaptersModule(getContainer()));
+        jsonConverterBuilder.registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
 
         addComponent(jsonConverterBuilder.build());
     }

@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'pl.allegro.tech.build:axion-release-plugin:0.9.2'
+        classpath 'pl.allegro.tech.build:axion-release-plugin:0.9.5'
     }
 }
 
@@ -38,7 +38,7 @@ subprojects {
         testCompile 'junit:junit:4.11'
         testCompile 'org.codehaus.groovy:groovy-all:2.3.3'
         testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-        testCompile 'org.apache.commons:commons-lang3:3.2'
+        testCompile 'org.apache.commons:commons-lang3:3.3.2'
         testCompile 'ch.qos.logback:logback-classic:1.1.2'
         testCompile 'cglib:cglib-nodep:3.1'
         testCompile 'org.objenesis:objenesis:2.1'
@@ -47,6 +47,14 @@ subprojects {
 
     task wrapper(type: Wrapper) {
         gradleVersion = '2.1'
+    }
+
+    task example (dependsOn: 'cleanTest') << {
+        tasks.test.testLogging {
+            events 'failed', 'passed'
+            showStandardStreams = true
+        }
+        tasks.test.execute()
     }
 
     task javadocJar(type: Jar) {

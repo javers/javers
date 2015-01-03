@@ -3,7 +3,7 @@ package org.javers.core.diff;
 import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Predicate;
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.JaversException;
 import org.javers.core.diff.changetype.PropertyChange;
 
 import java.util.Collections;
@@ -105,7 +105,19 @@ public class Diff {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
+        StringBuilder b = new StringBuilder();
+
+        b.append("Diff:\n");
+
+        int i=1;
+        for (Change change : changes){
+            b.append((i++)+". "+change+"\n");
+        }
+        return b.toString();
+    }
+
+    public String changesSummary(){
         StringBuilder b = new StringBuilder();
 
         b.append("changes - ");

@@ -3,14 +3,14 @@ package org.javers.core.snapshot;
 import org.javers.common.collections.Defaults;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Objects;
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.JaversException;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
-import static org.javers.common.exception.exceptions.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
-import static org.javers.common.exception.exceptions.JaversExceptionCode.NOT_IMPLEMENTED;
+import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
+import static org.javers.common.exception.JaversExceptionCode.NOT_IMPLEMENTED;
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 
 /**
@@ -25,11 +25,16 @@ public class SnapshotFactory {
         this.globalIdFactory = globalIdFactory;
     }
 
+    CdoSnapshot create(Object liveCdo, GlobalId id, CommitMetadata commitMetadata) {
+        return create(liveCdo, id, commitMetadata, false);
+    }
+
     /**
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
-    public CdoSnapshot create(Object liveCdo, GlobalId id, CommitMetadata commitMetadata) {
-        CdoSnapshotBuilder snapshot =  cdoSnapshot(id, commitMetadata);
+    CdoSnapshot create(Object liveCdo, GlobalId id, CommitMetadata commitMetadata, boolean initial) {
+        CdoSnapshotBuilder snapshot =
+                cdoSnapshot(id, commitMetadata).withInitial(initial);
 
         for (Property property : id.getCdoClass().getProperties()){
             Object propertyVal = property.get(liveCdo);
@@ -53,8 +58,8 @@ public class SnapshotFactory {
         return snapshot.build();
     }
 
-    public CdoSnapshot create(ObjectNode objectNode, CommitMetadata commitMetadata) {
-        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalId(), commitMetadata);
+    public CdoSnapshot create(ObjectNode objectNode, CommitMetadata commitMetadata, boolean initial) {
+        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalId(), commitMetadata, initial);
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {

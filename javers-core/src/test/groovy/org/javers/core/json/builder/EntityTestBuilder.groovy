@@ -1,34 +1,36 @@
 package org.javers.core.json.builder
 
 import org.javers.core.JaversTestBuilder
-import org.javers.core.metamodel.property.Entity
-import org.javers.core.metamodel.property.EntityDefinition
-import org.javers.core.metamodel.property.ManagedClassFactory
-import org.javers.core.metamodel.property.ValueObject
-import org.javers.core.metamodel.property.ValueObjectDefinition
+import org.javers.core.metamodel.clazz.Entity
+import org.javers.core.metamodel.clazz.EntityDefinition
+import org.javers.core.metamodel.clazz.ManagedClassFactory
+import org.javers.core.metamodel.clazz.ValueObject
+import org.javers.core.metamodel.clazz.ValueObjectDefinition
 
 /**
  * @author bartosz walacik
  */
 class EntityTestBuilder {
-    ManagedClassFactory managedClassFactory;
+    static ManagedClassFactory managedClassFactory;
 
-    private EntityTestBuilder() {
-        managedClassFactory = JaversTestBuilder.javersTestAssembly().managedClassFactory
+    static iniManagedClassFactorySingleton() {
+        if (managedClassFactory == null){
+            managedClassFactory = JaversTestBuilder.javersTestAssembly().managedClassFactory
+        }
     }
 
     static Entity entity(Class forClass, String idPropertyName) {
-        EntityTestBuilder entityTestBuilder = new EntityTestBuilder()
-        entityTestBuilder.managedClassFactory.create(new EntityDefinition(forClass, idPropertyName))
+        iniManagedClassFactorySingleton();
+        managedClassFactory.create(new EntityDefinition(forClass, idPropertyName))
     }
 
     static Entity entity(Class forClass) {
-        EntityTestBuilder entityTestBuilder = new EntityTestBuilder()
-        entityTestBuilder.managedClassFactory.createEntity(forClass)
+        iniManagedClassFactorySingleton();
+        managedClassFactory.createEntity(forClass)
     }
 
     static ValueObject valueObject(Class forClass) {
-        EntityTestBuilder entityTestBuilder = new EntityTestBuilder()
-        entityTestBuilder.managedClassFactory.create(new ValueObjectDefinition(forClass))
+        iniManagedClassFactorySingleton();
+        managedClassFactory.create(new ValueObjectDefinition(forClass))
     }
 }

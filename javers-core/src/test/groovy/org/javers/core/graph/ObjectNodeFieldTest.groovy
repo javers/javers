@@ -1,7 +1,8 @@
 package org.javers.core.graph
 
-import org.javers.core.metamodel.property.FieldBasedPropertyScanner
-import org.javers.core.metamodel.property.ManagedClassFactory
+import org.javers.core.MappingStyle
+
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
 /**
  * @author bartosz walacik
@@ -9,8 +10,7 @@ import org.javers.core.metamodel.property.ManagedClassFactory
 class ObjectNodeFieldTest extends ObjectNodeTest{
 
     def setup() {
-        def scanner = new FieldBasedPropertyScanner();
-        managedClassFactory = new ManagedClassFactory(scanner);
+        managedClassFactory = javersTestAssembly(MappingStyle.FIELD).managedClassFactory
     }
 }
 

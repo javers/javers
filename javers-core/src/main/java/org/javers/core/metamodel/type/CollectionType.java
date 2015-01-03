@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.exception.exceptions.JaversException;
+import org.javers.common.exception.JaversException;
 import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.javers.common.collections.Lists.immutableListOf;
-import static org.javers.common.exception.exceptions.JaversExceptionCode.NOT_IMPLEMENTED;
+import static org.javers.common.exception.JaversExceptionCode.NOT_IMPLEMENTED;
 
 /**
  * @author bartosz walacik

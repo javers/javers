@@ -1,8 +1,10 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
-import org.javers.common.exception.exceptions.JaversException;
-import org.javers.common.exception.exceptions.JaversExceptionCode;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.*;
 import org.joda.time.LocalDate;
@@ -76,7 +78,7 @@ public class TypeMapper {
             return jType;
         }
 
-        return createMapping(javaType);
+        return infer(javaType);
     }
 
     /**
@@ -93,15 +95,6 @@ public class TypeMapper {
 
         return (ManagedType)javersType;
     }
-
-  /*  public List<JaversType> getJaversTypes(List<Class> javaTypes) {
-        argumentIsNotNull(javaTypes);
-        return Lists.transform(javaTypes, new Function<Class, JaversType>() {
-            public JaversType apply(Class javaType) {
-                return getJaversType(javaType);
-            }
-        });
-    } */
 
     public <T extends JaversType> T getPropertyType(Property property){
         argumentIsNotNull(property);
@@ -148,12 +141,12 @@ public class TypeMapper {
         addType(new PrimitiveType(primitiveClass));
     }
 
-    public void registerManagedClass(ManagedClassDefinition def) {
+    public void registerClientsClass(ClientsClassDefinition def) {
         addType(typeFactory.createFromDefinition(def));
     }
 
-    public void registerValueType(Class<?> objectValue) {
-        addType(new ValueType(objectValue));
+    public void registerValueType(Class<?> valueCLass) {
+        addType(new ValueType(valueCLass));
     }
 
     protected <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
@@ -238,6 +231,10 @@ public class TypeMapper {
 
     private void addType(JaversType jType) {
         mappedTypes.put(jType.getBaseJavaType(), jType);
+
+        if (jType instanceof EntityType){
+            inferIdPropertyTypeAsValue((EntityType) jType);
+        }
     }
 
     /**
@@ -247,20 +244,28 @@ public class TypeMapper {
         return mappedTypes.get(javaType);
     }
 
-    private JaversType createMapping(Type javaType) {
+    private JaversType infer(Type javaType) {
         argumentIsNotNull(javaType);
         JaversType prototype = findNearestAncestor(javaType);
-        JaversType newType;
-
-        if (prototype == null) {
-            newType = typeFactory.infer(javaType);
-        }
-        else {
-            newType = typeFactory.spawnFromPrototype(javaType, prototype);
-        }
+        JaversType newType = typeFactory.infer(javaType, Optional.fromNullable(prototype));
 
         addType(newType);
         return newType;
+    }
+
+    /**
+     * if type of id-property is not already mapped, maps it as ValueType
+     */
+    private void inferIdPropertyTypeAsValue(EntityType eType) {
+        argumentIsNotNull(eType);
+
+        if (!isMapped(eType.getIdPropertyGenericType())) {
+            addType(typeFactory.inferIdPropertyTypeAsValue(eType));;
+        }
+    }
+
+    private boolean isMapped(Type javaType) {
+        return mappedTypes.containsKey(javaType);
     }
 
     private JaversType findNearestAncestor(Type javaType) {
@@ -269,7 +274,6 @@ public class TypeMapper {
 
         for (JaversType javersType : mappedTypes.values()) {
             DistancePair distancePair = new DistancePair(javaClass, javersType);
-            // logger.info("distance from "+javersType + ": "+distancePair.distance);
 
             //this is due too spoiled Java Array reflection API
             if (javaClass.isArray()) {
@@ -292,6 +296,5 @@ public class TypeMapper {
 
         return distances.get(0).getJaversType();
     }
-
 
 }

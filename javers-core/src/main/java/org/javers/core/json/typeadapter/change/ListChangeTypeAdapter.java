@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public class ListChangeTypeAdapter extends ContainerChangeTypeAdapter<ListChange> {
+class ListChangeTypeAdapter extends ContainerChangeTypeAdapter<ListChange> {
 
     public ListChangeTypeAdapter(TypeMapper typeMapper) {
         super(typeMapper);
