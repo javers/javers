@@ -94,7 +94,8 @@ public class ReflectionUtil {
     public static List<Field> getAllFields(Class<?> methodSource) {
         List<Field> fields =  Lists.asList(methodSource.getDeclaredFields());
 
-        if (methodSource.getSuperclass() != Object.class) { //recursion stop condition
+        Class superclass = methodSource.getSuperclass();
+        if (superclass != null && superclass != Object.class) { //recursion stop condition
             fields.addAll( getAllFields(methodSource.getSuperclass()) );
         }
         return fields;
