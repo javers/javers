@@ -15,7 +15,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author bartosz walacik
  */
-class JaversCommitIntegrationTest extends Specification {
+class JaversCommitE2ETest extends Specification {
 
     def "should create initial commit for new objects"() {
         given:

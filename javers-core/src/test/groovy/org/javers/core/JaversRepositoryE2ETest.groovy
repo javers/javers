@@ -14,7 +14,7 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
-class JaversRepositoryIntegrationTest extends Specification {
+class JaversRepositoryE2ETest extends Specification {
 
     Javers javers
 

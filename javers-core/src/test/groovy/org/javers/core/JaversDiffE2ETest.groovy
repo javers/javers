@@ -23,7 +23,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author bartosz walacik
  */
-class JaversDiffIntegrationTest extends Specification {
+class JaversDiffE2ETest extends Specification {
 
     def "should create NewObject for all nodes in initial diff"() {
         given:
