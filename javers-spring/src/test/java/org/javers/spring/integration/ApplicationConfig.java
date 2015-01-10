@@ -4,8 +4,6 @@ import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.spring.AuthorProvider;
 import org.javers.spring.JaversPostProcessor;
-import org.javers.spring.integration.repositories.ProjectRepository;
-import org.javers.spring.integration.repositories.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

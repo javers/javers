@@ -1,11 +1,11 @@
-package org.javers.spring.integration.domain;
+package org.javers.spring.integration;
 
 import javax.persistence.Id;
 
 /**
  * @author Pawel Szymczyk
  */
-public class User {
+class User {
 
     @Id
     private int id;

@@ -7,10 +7,10 @@ import java.lang.reflect.Method;
 /**
  * @author Pawel Szymczyk
  */
-public class SimpleDynamicPointcut extends DynamicMethodMatcherPointcut {
+public class MethodEqualsBasedMatcher extends DynamicMethodMatcherPointcut {
     private final Method method;
 
-    public SimpleDynamicPointcut(Method method) {
+    public MethodEqualsBasedMatcher(Method method) {
         this.method = method;
     }
 

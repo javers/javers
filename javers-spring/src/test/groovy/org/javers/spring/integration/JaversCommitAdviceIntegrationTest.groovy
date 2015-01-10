@@ -2,10 +2,6 @@ package org.javers.spring.integration
 
 import org.javers.core.Javers
 import org.javers.core.metamodel.object.InstanceIdDTO
-import org.javers.spring.integration.domain.Project
-import org.javers.spring.integration.domain.User
-import org.javers.spring.integration.repositories.ProjectRepository
-import org.javers.spring.integration.repositories.UserRepository
 import org.junit.Test
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
@@ -16,7 +12,7 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 /**
  * @author Pawel Szymczyk
  */
-class JaversSpringIntegrationTest extends Specification {
+class JaversCommitAdviceIntegrationTest extends Specification {
 
     @Shared
     AnnotationConfigApplicationContext context
@@ -30,7 +26,7 @@ class JaversSpringIntegrationTest extends Specification {
     }
 
     @Test
-    def "should follow only annotated methods"() {
+    def "should advice selected methods from a bean when annotation over method is present"() {
         given:
         def project = new Project(1, "Angular-js");
         def repository = context.getBean(ProjectRepository)
@@ -46,11 +42,12 @@ class JaversSpringIntegrationTest extends Specification {
         repository.update(project)
 
         then:
+        "there should be still only one snapshot, because update() method is not annotated"
         javers.getStateHistory(instanceId("1", Project), 100).size() == 1
     }
 
     @Test
-    def "should follow all methods from repository"() {
+    def "should advice all methods from a bean when class-level annotation is present"() {
         given:
         def user = new User(1, "John");
         def repository = context.getBean(UserRepository)

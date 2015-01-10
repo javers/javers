@@ -2,11 +2,10 @@ package org.javers.spring;
 
 import org.javers.common.collections.Sets;
 import org.javers.core.Javers;
-import org.javers.spring.aspect.JaversAdvice;
-import org.javers.spring.aspect.SimpleDynamicPointcut;
+import org.javers.spring.aspect.JaversCommitAdvice;
+import org.javers.spring.aspect.MethodEqualsBasedMatcher;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 import java.lang.reflect.Method;
@@ -43,19 +42,19 @@ public class JaversPostProcessor implements BeanPostProcessor {
     private Object proxy(Object bean) {
         Class<? extends Object> beanClazz = bean.getClass();
 
-        Set<Method> methods = new HashSet<>();
+        Set<Method> advicedMethods = new HashSet<>();
 
-        if (isAnnotationOverClass(beanClazz)) {
-            methods.addAll(Sets.asSet(beanClazz.getDeclaredMethods()));
+        if (isAuditableClass(beanClazz)) {
+            advicedMethods.addAll(Sets.asSet(beanClazz.getDeclaredMethods()));
         } else {
             for (Method method : beanClazz.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(JaversAuditable.class)) {
-                    methods.add(method);
+                if (isAuditableMethod(method)) {
+                    advicedMethods.add(method);
                 }
             }
         }
 
-        ProxyFactory proxyFactory = proxyFactoryWithAdvisors(bean, methods);
+        ProxyFactory proxyFactory = proxyFactoryWithAdvisors(bean, advicedMethods);
 
         return proxyFactory.getAdvisors().length > 0 ? proxyFactory.getProxy() : bean;
     }
@@ -69,12 +68,16 @@ public class JaversPostProcessor implements BeanPostProcessor {
 
     private void addAdvisors(ProxyFactory proxyFactory, Set<Method> methods) {
         for (Method method : methods) {
-            proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new SimpleDynamicPointcut(method),
-                    new JaversAdvice(javers, authorProvider.provide())));
+            proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MethodEqualsBasedMatcher(method),
+                    new JaversCommitAdvice(javers, authorProvider.provide())));
         }
     }
 
-    private boolean isAnnotationOverClass(Class bean) {
+    private boolean isAuditableClass(Class bean) {
         return bean.isAnnotationPresent(JaversAuditable.class);
+    }
+
+    private boolean isAuditableMethod(Method method) {
+        return method.isAnnotationPresent(JaversAuditable.class);
     }
 }

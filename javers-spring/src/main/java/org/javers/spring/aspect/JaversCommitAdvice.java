@@ -7,12 +7,12 @@ import org.javers.core.Javers;
 /**
  * @author Pawel Szymczyk
  */
-public class JaversAdvice implements MethodInterceptor {
+public class JaversCommitAdvice implements MethodInterceptor {
 
     private final Javers javers;
     private final String author;
 
-    public JaversAdvice(Javers javers, String author) {
+    public JaversCommitAdvice(Javers javers, String author) {
         this.javers = javers;
         this.author = author;
     }

@@ -1,13 +1,12 @@
-package org.javers.spring.integration.repositories;
+package org.javers.spring.integration;
 
 import org.javers.spring.JaversAuditable;
-import org.javers.spring.integration.domain.User;
 
 /**
  * @author Pawel Szymczyk
  */
 @JaversAuditable
-public class UserRepository {
+class UserRepository {
 
     public void save(User user) { }
 

@@ -12,17 +12,17 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 /**
  * @author Pawel Szymczyk
  */
-class JaversAdviceTest extends Specification {
+class JaversCommitAdviceTest extends Specification {
 
     @Shared
     Javers javers
 
     @Shared
-    JaversAdvice javersAdvice;
+    JaversCommitAdvice javersAdvice;
 
     def setup() {
         javers = JaversBuilder.javers().build()
-        javersAdvice = new JaversAdvice(javers, "author")
+        javersAdvice = new JaversCommitAdvice(javers, "author")
     }
 
     def "should commit single entity"() {
@@ -38,7 +38,7 @@ class JaversAdviceTest extends Specification {
         javers.getStateHistory(instanceId("kazik", DummyUser), 100).size() == 1
     }
 
-    def "should commit array of entities"() {
+    def "should commit list of entities"() {
         given:
         def methodInvocation = Stub(MethodInvocation) {
             getArguments() >> [[new DummyUser("kazik"), new DummyUser("romek"), new DummyUser("waldek")]]

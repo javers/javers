@@ -15,7 +15,7 @@ class JaversSpringFactoryTest extends Specification {
 
     def "should registered entity and VO"() {
         given:
-        JaversSpringFactory javersSpringFactory = new JaversSpringFactory()
+        def javersSpringFactory = new JaversSpringFactory()
 
         when:
         javersSpringFactory.entityClasses = [DummyUser, DummyUserDetails]
@@ -28,13 +28,13 @@ class JaversSpringFactoryTest extends Specification {
 
     def "should registered described class with custom id"() {
         given:
-        JaversSpringFactory javersSpringFactory = new JaversSpringFactory()
+        def javersSpringFactory = new JaversSpringFactory()
 
         when:
         javersSpringFactory.describedEntityClasses = [(DummyUser): "age"]
 
         then:
-        EntityType entityType = javersSpringFactory.object.getForClass(DummyUser)
+        def entityType = javersSpringFactory.object.getForClass(DummyUser)
         entityType.managedClass.idProperty.name == "age"
     }
 
