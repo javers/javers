@@ -1,6 +1,7 @@
 package org.javers.core
 
 import org.javers.core.commit.CommitAssert
+import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -17,13 +18,28 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class JaversCommitE2ETest extends Specification {
 
+    def "should create terminal commit for removed objects"() {
+        given:
+        def javers = javers().build()
+        def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
+        javers.commit(anEntity)
+
+        when:
+        def commit = javers.markAsRemoved(anEntity)
+
+        CommitAssert.assertThat(commit)
+                .hasChanges(2, ObjectRemoved)
+                .hasTerminalSnapshot(instanceId(1,SnapshotEntity))
+                .hasTerminalSnapshot(instanceId(2,SnapshotEntity))
+    }
+
     def "should create initial commit for new objects"() {
         given:
         def javers = javers().build()
-        def newUser = new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("London"))
+        def anEntity = new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("London"))
 
         when:
-        def commit = javers.commit("some.login", newUser)
+        def commit = javers.commit("some.login", anEntity)
 
         then:
         def cdoId = instanceId(1, SnapshotEntity)

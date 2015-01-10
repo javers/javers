@@ -83,4 +83,9 @@ class CommitAssert {
         snapshotsAssert.hasSnapshot(expectedSnapshotId, expectedState)
         this
     }
+
+    CommitAssert hasTerminalSnapshot(def expectedSnapshotId){
+        snapshotsAssert.hasTerminalSnapshot(expectedSnapshotId)
+        this
+    }
 }
