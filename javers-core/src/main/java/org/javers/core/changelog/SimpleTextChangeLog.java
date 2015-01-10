@@ -67,7 +67,7 @@ public class SimpleTextChangeLog extends AbstractTextChangeLog {
 
     @Override
     public void onNewObject(NewObject newObject) {
-        appendln("    new object: '" + newObject.getAffectedGlobalId());
+        appendln("    new object: " + newObject.getAffectedGlobalId());
     }
 
     @Override

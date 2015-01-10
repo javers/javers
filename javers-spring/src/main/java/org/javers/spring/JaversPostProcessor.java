@@ -2,8 +2,8 @@ package org.javers.spring;
 
 import org.javers.common.collections.Sets;
 import org.javers.core.Javers;
-import org.javers.spring.aspect.SimpleDynamicPointcut;
 import org.javers.spring.aspect.JaversAdvice;
+import org.javers.spring.aspect.SimpleDynamicPointcut;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.BeansException;
@@ -13,6 +13,9 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author Pawel Szymczyk
+ */
 public class JaversPostProcessor implements BeanPostProcessor {
 
     private final Javers javers;
@@ -29,13 +32,23 @@ public class JaversPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) {
+        return proxy(bean);
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) {
+        return bean;
+    }
+
+    private Object proxy(Object bean) {
+        Class<? extends Object> beanClazz = bean.getClass();
 
         Set<Method> methods = new HashSet<>();
 
-        if (isAnnotationOverClass(bean)) {
-            methods.addAll(Sets.asSet(bean.getClass().getDeclaredMethods()));
+        if (isAnnotationOverClass(beanClazz)) {
+            methods.addAll(Sets.asSet(beanClazz.getDeclaredMethods()));
         } else {
-            for (Method method : bean.getClass().getMethods()) {
+            for (Method method : beanClazz.getDeclaredMethods()) {
                 if (method.isAnnotationPresent(JaversAuditable.class)) {
                     methods.add(method);
                 }
@@ -61,12 +74,7 @@ public class JaversPostProcessor implements BeanPostProcessor {
         }
     }
 
-    private boolean isAnnotationOverClass(Object bean) {
-        return bean.getClass().isAnnotationPresent(JaversAuditable.class);
-    }
-
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
+    private boolean isAnnotationOverClass(Class bean) {
+        return bean.isAnnotationPresent(JaversAuditable.class);
     }
 }

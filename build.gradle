@@ -22,13 +22,11 @@ subprojects {
     apply plugin: 'groovy'
     apply plugin: 'signing'
 
-    apply plugin: 'maven-publish'
-
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
 
     project.group = 'org.javers'
-    project.version = '0.8.8-SNAPSHOT'
+    project.version = scmVersion.version
 
     repositories {
         mavenCentral()

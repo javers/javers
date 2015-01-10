@@ -8,8 +8,6 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import spock.lang.Specification
 
-import javax.swing.text.html.parser.Entity
-
 /**
  * @author Pawel Cierpiatka
  */
@@ -33,7 +31,7 @@ class JaversSpringFactoryTest extends Specification {
         JaversSpringFactory javersSpringFactory = new JaversSpringFactory()
 
         when:
-        javersSpringFactory.describedEntityClasses = [(DummyUser) : "age"]
+        javersSpringFactory.describedEntityClasses = [(DummyUser): "age"]
 
         then:
         EntityType entityType = javersSpringFactory.object.getForClass(DummyUser)

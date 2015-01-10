@@ -4,6 +4,9 @@ import org.springframework.aop.support.DynamicMethodMatcherPointcut;
 
 import java.lang.reflect.Method;
 
+/**
+ * @author Pawel Szymczyk
+ */
 public class SimpleDynamicPointcut extends DynamicMethodMatcherPointcut {
     private final Method method;
 
