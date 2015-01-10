@@ -9,6 +9,8 @@ import org.javers.core.metamodel.property.Property;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.javers.core.metamodel.object.SnapshotType.*;
+
 /**
  * @author bartosz walacik
  */
@@ -16,7 +18,7 @@ public class CdoSnapshotBuilder {
     private final GlobalId globalId;
     private final Map<Property, Object> state = new HashMap<>();
     private CommitMetadata commitMetadata;
-    private boolean initial = false;
+    private SnapshotType type = UPDATE;
 
     private CdoSnapshotBuilder(GlobalId globalId, CommitMetadata commitMetadata) {
         this.globalId = globalId;
@@ -43,11 +45,22 @@ public class CdoSnapshotBuilder {
     }
 
     public CdoSnapshot build(){
-        return new CdoSnapshot(globalId, commitMetadata, state, initial);
+        return new CdoSnapshot(globalId, commitMetadata, state, type);
     }
 
+    public CdoSnapshotBuilder withType(SnapshotType type){
+        this.type = type;
+        return this;
+    }
+
+    @Deprecated
     public CdoSnapshotBuilder withInitial(boolean initial){
-        this.initial = initial;
+        if (initial){
+            this.type = INITIAL;
+        }
+        else{
+            this.type = UPDATE;
+        }
         return this;
     }
 

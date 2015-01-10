@@ -15,7 +15,7 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.snapshot.GraphShadowFactory;
 import org.javers.core.snapshot.GraphSnapshotFactory;
 import org.javers.core.snapshot.SnapshotDiffer;
-import org.javers.core.snapshot.SnapshotFactory;
+import org.javers.core.metamodel.object.SnapshotFactory;
 import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.Arrays;

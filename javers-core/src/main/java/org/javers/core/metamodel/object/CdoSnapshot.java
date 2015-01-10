@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import static org.javers.core.metamodel.object.SnapshotType.*;
+
 /**
  * Captured state of client's domain object.
  * Values and primitives are stored 'by value',
@@ -21,17 +23,17 @@ import java.util.Set;
 public final class CdoSnapshot extends Cdo {
     private CommitMetadata commitMetadata;
     private final Map<Property, Object> state;
-    private final boolean initial;
+    private final SnapshotType type;
 
     /**
      * should be assembled by {@link CdoSnapshotBuilder}
      */
-    CdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata, Map<Property, Object> state, boolean initial) {
+    CdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata, Map<Property, Object> state, SnapshotType type) {
         super(globalId);
-        Validate.argumentsAreNotNull(state, commitMetadata);
+        Validate.argumentsAreNotNull(state, commitMetadata, type);
         this.state = state;
         this.commitMetadata = commitMetadata;
-        this.initial = initial;
+        this.type = type;
     }
 
     /**
@@ -93,6 +95,14 @@ public final class CdoSnapshot extends Cdo {
     }
 
     public boolean isInitial() {
-        return initial;
+        return type == INITIAL;
+    }
+
+    public boolean isTerminal() {
+        return type == TERMINAL;
+    }
+
+    public SnapshotType getType() {
+        return type;
     }
 }

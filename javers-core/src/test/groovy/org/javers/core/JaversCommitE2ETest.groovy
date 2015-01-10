@@ -25,8 +25,9 @@ class JaversCommitE2ETest extends Specification {
         javers.commit(anEntity)
 
         when:
-        def commit = javers.markAsRemoved(anEntity)
+        def commit = javers.commitDelete(anEntity)
 
+        then:
         CommitAssert.assertThat(commit)
                 .hasChanges(2, ObjectRemoved)
                 .hasTerminalSnapshot(instanceId(1,SnapshotEntity))

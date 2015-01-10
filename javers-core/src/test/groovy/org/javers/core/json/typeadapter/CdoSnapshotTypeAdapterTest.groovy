@@ -5,6 +5,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.metamodel.object.CdoSnapshot
+import org.javers.core.metamodel.object.SnapshotType
 import org.javers.core.metamodel.object.ValueObjectIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -14,6 +15,7 @@ import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.core.metamodel.object.SnapshotType.*
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
@@ -26,7 +28,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def javers = javersTestAssembly()
         def id = javers.idBuilder().instanceId("kaz", DummyUser)
         def snapshot = javers.snapshotFactory.create(dummyUser().build(), id,
-                new CommitMetadata("author", LocalDateTime.now(), new CommitId(1, 0)), true)
+                new CommitMetadata("author", LocalDateTime.now(), new CommitId(1, 0)), INITIAL)
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -40,7 +42,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         json.globalId.entity == "org.javers.core.model.DummyUser"
         json.globalId.cdoId == "kaz"
-        json.initial == true
+        json.type == "INITIAL"
     }
 
     def "should serialize state with primitive values in CdoSnapshot"() {
@@ -152,7 +154,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 entity "org.javers.core.model.DummyUser"
                 cdoId "kaz"
             }
-            initial true
+            type "INITIAL"
             state {
             }
         }

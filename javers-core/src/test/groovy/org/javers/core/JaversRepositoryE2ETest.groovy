@@ -28,7 +28,7 @@ class JaversRepositoryE2ETest extends Specification {
         given:
         def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
         javers.commit(anEntity)
-        javers.markAsRemoved(anEntity)
+        javers.commitDelete(anEntity)
 
         when:
         def topSnapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 10)

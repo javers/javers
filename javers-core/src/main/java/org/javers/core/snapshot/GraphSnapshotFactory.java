@@ -7,11 +7,12 @@ import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.SnapshotFactory;
+import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Decomposes given live objects graph into a flat list of object Snapshots.
@@ -30,7 +31,6 @@ public class GraphSnapshotFactory {
     }
 
     /**
-     *
      * @param currentVersion outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
      */
     public List<CdoSnapshot> create(LiveGraph currentVersion, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata){
@@ -40,7 +40,7 @@ public class GraphSnapshotFactory {
 
         for (ObjectNode node : currentVersion.nodes()) {
             boolean initial = isInitial(node, latestShadowGraph);
-            CdoSnapshot fresh = snapshotFactory.create(node, commitMetadata, initial);
+            CdoSnapshot fresh = snapshotFactory.create(node, commitMetadata, toType(initial));
 
             Optional<CdoSnapshot> existing = javersRepository.getLatest(fresh.getGlobalId());
             if (existing.isEmpty()) {
@@ -58,6 +58,10 @@ public class GraphSnapshotFactory {
 
     List<CdoSnapshot> create(LiveGraph currentVersion, CommitMetadata commitMetadata) {
         return create(currentVersion, ShadowGraph.EMPTY, commitMetadata);
+    }
+
+    private SnapshotType toType(boolean initial){
+        return initial ? SnapshotType.INITIAL : SnapshotType.UPDATE;
     }
 
     private boolean isInitial(ObjectNode node, ShadowGraph latestShadowGraph){

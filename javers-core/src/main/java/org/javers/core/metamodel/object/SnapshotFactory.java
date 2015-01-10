@@ -1,4 +1,4 @@
-package org.javers.core.snapshot;
+package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.Defaults;
 import org.javers.common.collections.EnumerableFunction;
@@ -26,19 +26,19 @@ public class SnapshotFactory {
     }
 
     CdoSnapshot create(Object liveCdo, GlobalId id, CommitMetadata commitMetadata) {
-        return create(liveCdo, id, commitMetadata, false);
+        return create(liveCdo, id, commitMetadata, SnapshotType.UPDATE);
     }
 
     /**
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
-    CdoSnapshot create(Object liveCdo, GlobalId id, CommitMetadata commitMetadata, boolean initial) {
+    CdoSnapshot create(Object liveCdo, GlobalId id, CommitMetadata commitMetadata, SnapshotType type) {
         CdoSnapshotBuilder snapshot =
-                cdoSnapshot(id, commitMetadata).withInitial(initial);
+                cdoSnapshot(id, commitMetadata).withType(type);
 
-        for (Property property : id.getCdoClass().getProperties()){
+        for (Property property : id.getCdoClass().getProperties()) {
             Object propertyVal = property.get(liveCdo);
-            if (Objects.nullSafeEquals(propertyVal,Defaults.defaultValue(property.getType()))){
+            if (Objects.nullSafeEquals(propertyVal, Defaults.defaultValue(property.getType()))) {
                 continue;
             }
 
@@ -58,8 +58,8 @@ public class SnapshotFactory {
         return snapshot.build();
     }
 
-    public CdoSnapshot create(ObjectNode objectNode, CommitMetadata commitMetadata, boolean initial) {
-        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalId(), commitMetadata, initial);
+    public CdoSnapshot create(ObjectNode objectNode, CommitMetadata commitMetadata, SnapshotType type) {
+        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalId(), commitMetadata, type);
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
