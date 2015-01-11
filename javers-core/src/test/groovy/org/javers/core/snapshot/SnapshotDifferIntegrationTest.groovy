@@ -72,7 +72,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         def javers = javers().build()
         def user = new DummyUser("kaz")
         javers.commit("some.login", user)
-        javers.commitDelete("some.login", user)
+        javers.commitShallowDelete("some.login", user)
 
         when:
         def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)

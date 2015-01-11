@@ -22,7 +22,7 @@ class ChangeListTraverserIntegrationTest extends Specification {
         user.setSex(DummyUser.Sex.MALE)
         javers.commit('some author', user)
 
-        javers.commitDelete('some author', user)
+        javers.commitShallowDelete('some author', user)
         def callbackMock = Mock(ChangeProcessor)
 
         when:

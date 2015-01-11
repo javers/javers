@@ -29,7 +29,7 @@ class ChangeLogDemo extends Specification {
             user.setStringSet(['java','scala'] as Set)
             javers.commit('another author', user)
 
-            javers.commitDelete('another author', user)
+            javers.commitShallowDelete('another author', user)
 
 
         when:

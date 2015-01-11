@@ -63,7 +63,10 @@ public class Javers {
     }
 
     /**
-     * Persists current version of a given domain object in JaVers repository.
+     * Persists a current state of a given domain objects graph
+     * in JaVers repository.
+     * <br/><br/>
+     * 
      * JaVers applies commit() to given object and all objects navigable from it.
      * You can capture a state of an arbitrary complex objects graph with a single commit() call.
      *
@@ -80,13 +83,17 @@ public class Javers {
     /**
      * Marks given object as deleted.
      * <br/><br/>
+     * 
+     * Unlike {@link Javers#commit(String, Object)}, this method is shallow
+     * and affects only given object.
+     * <br/><br/>
      *
      * This method doesn't delete anything from JaVers repository.
      * It just persists 'terminal snapshot' of given object.
      *
      * @param deleted object to be marked as deleted
      */
-    public Commit commitDelete(String author, Object deleted) {
+    public Commit commitShallowDelete(String author, Object deleted) {
         Commit commit = commitFactory.createTerminal(author, deleted);
 
         repository.persist(commit);

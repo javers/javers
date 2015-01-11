@@ -19,14 +19,14 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class JaversCommitE2ETest extends Specification {
 
-    def "should create terminal commit for removed objects"() {
+    def "should create terminal commit for removed object"() {
         given:
         def javers = javers().build()
         def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
         javers.commit("some.login", anEntity)
 
         when:
-        def commit = javers.commitDelete("some.login", anEntity)
+        def commit = javers.commitShallowDelete("some.login", anEntity)
 
         then:
         CommitAssert.assertThat(commit)
@@ -43,7 +43,7 @@ class JaversCommitE2ETest extends Specification {
         def anEntity = new SnapshotEntity(id:1)
 
         when:
-        javers.commitDelete("some.login", anEntity)
+        javers.commitShallowDelete("some.login", anEntity)
 
         then:
         JaversException exception = thrown()

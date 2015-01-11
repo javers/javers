@@ -27,7 +27,7 @@ class JaversRepositoryE2ETest extends Specification {
         given:
         def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
         javers.commit("author", anEntity)
-        javers.commitDelete("author", anEntity)
+        javers.commitShallowDelete("author", anEntity)
 
         when:
         def snapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 10)
