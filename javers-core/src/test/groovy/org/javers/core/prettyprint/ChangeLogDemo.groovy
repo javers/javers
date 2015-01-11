@@ -25,7 +25,7 @@ class ChangeLogDemo extends Specification {
             javers.commit('some author', user)
 
             user.setIntegerList([22,23])
-            user.setSex(DummyUser.Sex.FEMALE)
+            user.setSex(DummyUser.Sex.MALE)
             user.setStringSet(['java','scala'] as Set)
             javers.commit('another author', user)
 
@@ -34,7 +34,6 @@ class ChangeLogDemo extends Specification {
 
         when:
             def changes = javers.getChangeHistory(InstanceIdDTO.instanceId('bob',DummyUser),20)
-
             def textChangeLog = javers.processChangeList(changes, new SimpleTextChangeLog())
 
         then:
