@@ -79,6 +79,7 @@ public class Javers {
 
     /**
      * Marks given object as deleted.
+     * <br/><br/>
      *
      * This method doesn't delete anything from JaVers repository.
      * It just persists 'terminal snapshot' of given object.
