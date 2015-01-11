@@ -44,7 +44,7 @@ public class SimpleTextChangeLog extends AbstractTextChangeLog {
 
     @Override
     public void onCommit(CommitMetadata commitMetadata) {
-        appendln("commit " + commitMetadata.getId() + ", author:" + commitMetadata.getAuthor() +
+        appendln("commit " + commitMetadata.getId() + ", author: " + commitMetadata.getAuthor() +
                 ", " + DEFAULT_DATE_FORMATTER.print(commitMetadata.getCommitDate()));
     }
 

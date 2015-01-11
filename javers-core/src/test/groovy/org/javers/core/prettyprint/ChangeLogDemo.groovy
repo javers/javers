@@ -17,17 +17,19 @@ class ChangeLogDemo extends Specification {
 
             def user = new DummyUser('bob', 'Dijk')
             user.setStringSet(['groovy'] as Set)
-            javers.commit("some author",user)
+            javers.commit("some author", user)
 
             user.setAge(18)
             user.setSurname('van Dijk')
             user.setSupervisor(new DummyUser('New Supervisor'))
-            javers.commit('some author',user)
+            javers.commit('some author', user)
 
             user.setIntegerList([22,23])
             user.setSex(DummyUser.Sex.FEMALE)
             user.setStringSet(['java','scala'] as Set)
-            javers.commit('another author',user)
+            javers.commit('another author', user)
+
+            javers.commitDelete('another author', user)
 
 
         when:

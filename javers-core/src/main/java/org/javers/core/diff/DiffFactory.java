@@ -3,14 +3,18 @@ package org.javers.core.diff;
 import org.javers.common.collections.Consumer;
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
-import org.javers.core.GraphFactory;
 import org.javers.core.Javers;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.appenders.NodeChangeAppender;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
+import org.javers.core.diff.changetype.NewObject;
+import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.graph.LiveGraph;
+import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectNode;
+import org.javers.core.metamodel.object.Cdo;
+import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -29,22 +33,15 @@ public class DiffFactory {
     private final TypeMapper typeMapper;
     private final List<NodeChangeAppender> nodeChangeAppenders;
     private final List<PropertyChangeAppender> propertyChangeAppender;
-    private final GraphFactory graphFactory;
+    private final LiveGraphFactory graphFactory;
     private final JaversCoreConfiguration javersCoreConfiguration;
 
-    public DiffFactory(JaversCoreConfiguration javersCoreConfiguration, TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, GraphFactory graphFactory) {
+    public DiffFactory(TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, LiveGraphFactory graphFactory, JaversCoreConfiguration javersCoreConfiguration) {
         this.typeMapper = typeMapper;
         this.nodeChangeAppenders = nodeChangeAppenders;
         this.propertyChangeAppender = propertyChangeAppender;
         this.graphFactory = graphFactory;
         this.javersCoreConfiguration = javersCoreConfiguration;
-    }
-
-    /**
-     * @see Javers#initial(Object)
-     */
-    public Diff initial(Object newDomainObject) {
-        return createInitial(buildGraph(newDomainObject));
     }
 
     /**
@@ -61,8 +58,22 @@ public class DiffFactory {
         return createAndAppendChanges(graphPair, commitMetadata);
     }
 
-    public Diff createInitial(ObjectGraph currentGraph) {
-        Validate.argumentIsNotNull(currentGraph);
+    public Diff singleTerminal(Cdo removedCdo, CommitMetadata commitMetadata){
+        Validate.argumentIsNotNull(removedCdo);
+
+        DiffBuilder diff = diff();
+        diff.addChange(new ObjectRemoved(removedCdo.getGlobalId(), removedCdo.getWrappedCdo(), commitMetadata));
+
+        return diff.build();
+    }
+
+    /**
+     * @param newDomainObject object or handle to objects graph
+     */
+    public Diff initial(Object newDomainObject) {
+        Validate.argumentIsNotNull(newDomainObject);
+
+        ObjectGraph currentGraph = buildGraph(newDomainObject);
 
         GraphPair graphPair = new GraphPair(currentGraph);
         return createAndAppendChanges(graphPair, Optional.<CommitMetadata>empty());

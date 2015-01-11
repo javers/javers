@@ -3,7 +3,6 @@ package org.javers.core.changelog;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
-import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.*;
 import org.javers.core.diff.changetype.container.ArrayChange;
 import org.javers.core.diff.changetype.container.ContainerChange;
@@ -37,7 +36,7 @@ public class ChangeListTraverser {
             }
 
             if (!change.getAffectedGlobalId().equals(lastGlobalId) &&
-                !(change instanceof NewObject)) {
+                !(change instanceof NewObject || change instanceof ObjectRemoved)) {
                 renderer.onAffectedObject(change.getAffectedGlobalId());
             }
 

@@ -54,8 +54,8 @@ class CommitAssert {
         this
     }
 
-    CommitAssert hasObjectRemoved(def expectedId){
-        diffAssert.hasObjectRemoved(expectedId)
+    CommitAssert hasObjectRemoved(def expectedId, def expectedObject){
+        diffAssert.hasObjectRemoved(expectedId, expectedObject)
         this
     }
 

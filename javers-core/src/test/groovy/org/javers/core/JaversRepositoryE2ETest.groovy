@@ -1,7 +1,6 @@
 package org.javers.core
 
 import org.javers.core.diff.changetype.NewObject
-import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -24,33 +23,21 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
-    def "should fetch terminal snapshots and changed from the repository"() {
+    def "should fetch terminal snapshots from the repository"() {
         given:
         def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
-        javers.commit(anEntity)
-        javers.commitDelete(anEntity)
+        javers.commit("author", anEntity)
+        javers.commitDelete("author", anEntity)
 
         when:
-        def topSnapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 10)
-        def bottomSnapshots = javers.getStateHistory(instanceId(2, SnapshotEntity), 10)
+        def snapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 10)
 
         then:
-        SnapshotsAssert.assertThat(topSnapshots)
+        SnapshotsAssert.assertThat(snapshots)
                        .hasSize(2)
                        .hasOrdinarySnapshot(instanceId(1,SnapshotEntity))
                        .hasTerminalSnapshot(instanceId(1,SnapshotEntity), "2.0")
-        SnapshotsAssert.assertThat(bottomSnapshots)
-                .hasSize(2)
-                .hasOrdinarySnapshot(instanceId(2,SnapshotEntity))
-                .hasTerminalSnapshot(instanceId(2,SnapshotEntity), "2.0")
 
-        when:
-        def topChanges = javers.getChangeHistory(instanceId(1, SnapshotEntity), 10)
-
-        then:
-        topChanges.size() == 2
-        topChanges[0] instanceof ObjectRemoved
-        topChanges[0] instanceof NewObject
     }
 
     def "should store state history of Entity instance in JaversRepository and fetch snapshots in reverse order"() {

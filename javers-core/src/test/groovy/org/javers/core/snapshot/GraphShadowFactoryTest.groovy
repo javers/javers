@@ -14,11 +14,12 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 class GraphShadowFactoryTest extends Specification {
 
     @Shared JaversTestBuilder javers
+    @Shared GraphShadowFactory graphShadowFactory
 
     def setup(){
         javers = JaversTestBuilder.javersTestAssembly()
+        graphShadowFactory = javers.getContainerComponent(GraphShadowFactory)
     }
-
 
     def "should create ShadowGraph with snapshots of committed objects "() {
         given:
@@ -28,11 +29,11 @@ class GraphShadowFactoryTest extends Specification {
         def liveGraph = javers.createLiveGraph(cdo)
 
         when:
-        def shadow = javers.graphShadowFactory.createLatestShadow(liveGraph)
+        def shadow = graphShadowFactory.createLatestShadow(liveGraph)
 
         then:
         shadow.nodes().size() == 1
         NodeAssert.assertThat(shadow.nodes()[0]).hasGlobalId(instanceId(2,SnapshotEntity))
-                                                  .isSnapshot()
+                  .isSnapshot()
     }
 }

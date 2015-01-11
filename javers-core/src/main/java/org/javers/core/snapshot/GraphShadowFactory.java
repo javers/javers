@@ -17,16 +17,15 @@ import java.util.Set;
  *
  * @author bartosz walacik
  */
-public class GraphShadowFactory {
+class GraphShadowFactory {
     private final JaversExtendedRepository javersRepository;
 
-    public GraphShadowFactory(JaversExtendedRepository javersRepository) {
+    GraphShadowFactory(JaversExtendedRepository javersRepository) {
         this.javersRepository = javersRepository;
     }
 
-    public ShadowGraph createLatestShadow(LiveGraph liveGraph){
+    ShadowGraph createLatestShadow(LiveGraph liveGraph){
         Validate.argumentIsNotNull(liveGraph);
-
 
         Set<ObjectNode> snapshotNodes = new HashSet<>();
         for (ObjectNode liveNode : liveGraph.nodes()){
@@ -42,7 +41,7 @@ public class GraphShadowFactory {
         return new ShadowGraph(snapshotNodes);
     }
 
-    public ShadowGraph createFromSnapshot(CdoSnapshot cdoSnapshot){
+    ShadowGraph createFromSnapshot(CdoSnapshot cdoSnapshot){
         return new ShadowGraph(Sets.asSet(new ObjectNode(cdoSnapshot)));
     }
 }

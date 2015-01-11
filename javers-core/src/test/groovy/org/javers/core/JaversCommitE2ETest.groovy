@@ -1,7 +1,8 @@
 package org.javers.core
 
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.commit.CommitAssert
-import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -22,16 +23,31 @@ class JaversCommitE2ETest extends Specification {
         given:
         def javers = javers().build()
         def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
-        javers.commit(anEntity)
+        javers.commit("some.login", anEntity)
 
         when:
-        def commit = javers.commitDelete(anEntity)
+        def commit = javers.commitDelete("some.login", anEntity)
 
         then:
         CommitAssert.assertThat(commit)
-                .hasChanges(2, ObjectRemoved)
+                .hasId("2.0")
+                .hasChanges(1)
+                .hasObjectRemoved(instanceId(1,SnapshotEntity), anEntity)
+                .hasSnapshots(1)
                 .hasTerminalSnapshot(instanceId(1,SnapshotEntity))
-                .hasTerminalSnapshot(instanceId(2,SnapshotEntity))
+    }
+
+    def "should fail when deleting non existing object"() {
+        given:
+        def javers = javers().build()
+        def anEntity = new SnapshotEntity(id:1)
+
+        when:
+        javers.commitDelete("some.login", anEntity)
+
+        then:
+        JaversException exception = thrown()
+        exception.code == JaversExceptionCode.CANT_DELETE_OBJECT_NOT_FOUND
     }
 
     def "should create initial commit for new objects"() {

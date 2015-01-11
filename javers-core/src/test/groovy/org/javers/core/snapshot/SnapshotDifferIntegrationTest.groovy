@@ -1,6 +1,7 @@
 package org.javers.core.snapshot
 
 import org.javers.core.diff.changetype.NewObject
+import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.model.DummyUser
@@ -19,7 +20,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class SnapshotDifferIntegrationTest extends Specification {
 
-    def "should not include NewObject in change history for ordinary commit"() {
+    def "shouldn't add NewObject to change history for ordinary commit"() {
         given:
         def javers = javers().build()
         def user = new DummyUser("kaz")
@@ -40,7 +41,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         }
     }
 
-    def "should include NewObject in change history for initial commit"() {
+    def "should add NewObject to change history for initial commit"() {
         given:
         def javers = javers().build()
         def user = new DummyUser("kaz")
@@ -61,6 +62,26 @@ class SnapshotDifferIntegrationTest extends Specification {
         then:
         changes.size() == 2
         changes[0] instanceof ValueChange
+        changes[1] instanceof NewObject
+        changes[1].affectedGlobalId == instanceId("kaz",DummyUser)
+        changes[1].commitMetadata.get().id.majorId == 1
+    }
+
+    def "should add ObjectRemoved to change history for terminal commit"() {
+        given:
+        def javers = javers().build()
+        def user = new DummyUser("kaz")
+        javers.commit("some.login", user)
+        javers.commitDelete("some.login", user)
+
+        when:
+        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
+
+        then:
+        changes.size() == 2
+        changes[0] instanceof ObjectRemoved
+        changes[0].affectedGlobalId == instanceId("kaz",DummyUser)
+        changes[0].commitMetadata.get().id.majorId == 2
         changes[1] instanceof NewObject
     }
 

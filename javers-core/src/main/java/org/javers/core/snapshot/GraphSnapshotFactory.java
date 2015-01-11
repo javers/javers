@@ -20,12 +20,12 @@ import java.util.List;
  *
  * @author bartosz walacik
  */
-public class GraphSnapshotFactory {
+class GraphSnapshotFactory {
 
     private final SnapshotFactory snapshotFactory;
     private final JaversExtendedRepository javersRepository;
 
-    public GraphSnapshotFactory(SnapshotFactory snapshotFactory, JaversExtendedRepository javersRepository) {
+    GraphSnapshotFactory(SnapshotFactory snapshotFactory, JaversExtendedRepository javersRepository) {
         this.snapshotFactory = snapshotFactory;
         this.javersRepository = javersRepository;
     }
@@ -33,14 +33,21 @@ public class GraphSnapshotFactory {
     /**
      * @param currentVersion outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
      */
-    public List<CdoSnapshot> create(LiveGraph currentVersion, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata){
+    List<CdoSnapshot> create(LiveGraph currentVersion, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata){
         Validate.argumentsAreNotNull(currentVersion, commitMetadata, latestShadowGraph);
 
         List<CdoSnapshot> reused = new ArrayList<>();
 
         for (ObjectNode node : currentVersion.nodes()) {
             boolean initial = isInitial(node, latestShadowGraph);
-            CdoSnapshot fresh = snapshotFactory.create(node, commitMetadata, toType(initial));
+
+            CdoSnapshot fresh;
+            if (initial){
+                fresh = snapshotFactory.createInitial(node, commitMetadata);
+            }
+            else{
+                fresh = snapshotFactory.create(node, commitMetadata);
+            }
 
             Optional<CdoSnapshot> existing = javersRepository.getLatest(fresh.getGlobalId());
             if (existing.isEmpty()) {
@@ -58,10 +65,6 @@ public class GraphSnapshotFactory {
 
     List<CdoSnapshot> create(LiveGraph currentVersion, CommitMetadata commitMetadata) {
         return create(currentVersion, ShadowGraph.EMPTY, commitMetadata);
-    }
-
-    private SnapshotType toType(boolean initial){
-        return initial ? SnapshotType.INITIAL : SnapshotType.UPDATE;
     }
 
     private boolean isInitial(ObjectNode node, ShadowGraph latestShadowGraph){
