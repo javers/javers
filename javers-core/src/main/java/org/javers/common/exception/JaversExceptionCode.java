@@ -32,7 +32,7 @@ public enum JaversExceptionCode {
     SET_OF_VO_DIFF_NOT_IMPLEMENTED(JaversException.RUNTIME_ERROR + "diff for Set of ValueObjects is not supported"),
 
     GENERIC_TYPE_NOT_PARAMETRIZED(JaversException.RUNTIME_ERROR + "expected actual Class arguments in type '%s'. "+
-            "JaVers is strongly-typed and needs to know actual Class of elements stored in your collections."+
+            "JaVers is strongly-typed and needs to know actual Class of elements stored in your collections. "+
             "Try at least <Object>, unbounded wildcards like <?> are not supported"),
 
     //graph & snapshot
