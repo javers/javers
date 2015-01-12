@@ -19,25 +19,25 @@ import java.util.List;
 /**
  * @author pawel szymczyk
  */
-class ListChangeAppender extends PropertyChangeAppender<ListChange> {
+class ListChangeAppender implements PropertyChangeAppender<ListChange> {
 
     private static final Logger logger = LoggerFactory.getLogger(ListChangeAppender.class);
 
     private final MapChangeAppender mapChangeAppender;
     private final TypeMapper typeMapper;
 
-    public ListChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper) {
+    ListChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper) {
         this.mapChangeAppender = mapChangeAppender;
         this.typeMapper = typeMapper;
     }
 
     @Override
-    protected boolean supports(JaversType propertyType) {
+    public boolean supports(JaversType propertyType) {
         return propertyType instanceof ListType;
     }
 
     @Override
-    protected ListChange calculateChanges(final NodePair pair, final Property property) {
+    public ListChange calculateChanges(final NodePair pair, final Property property) {
         List leftList = (List) pair.getLeftPropertyValue(property);
         List rightList = (List) pair.getRightPropertyValue(property);
 

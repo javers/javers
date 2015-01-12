@@ -125,8 +125,13 @@ public class DiffFactory {
     }
 
     private void appendChanges(DiffBuilder diff, NodePair pair, Property property, JaversType javersType, Optional<CommitMetadata> commitMetadata) {
-        for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
-            final Change change = appender.calculateChangesIfSupported(pair, property, javersType);
+        for (PropertyChangeAppender appender : propertyChangeAppender) {
+            if (! appender.supports(javersType)){
+                continue;
+            }
+
+            final Change change = appender.calculateChanges(pair, property);
+
             if (change != null) {
                 diff.addChange(change, pair.getRight().wrappedCdo());
 

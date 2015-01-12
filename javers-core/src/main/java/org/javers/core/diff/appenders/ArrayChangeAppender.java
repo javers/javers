@@ -21,25 +21,25 @@ import java.util.Map;
 /**
  * @author pawel szymczyk
  */
-class ArrayChangeAppender extends PropertyChangeAppender<ArrayChange>{
+class ArrayChangeAppender implements PropertyChangeAppender<ArrayChange>{
 
     private static final Logger logger = LoggerFactory.getLogger(ArrayChangeAppender.class);
 
     private final MapChangeAppender mapChangeAppender;
     private final TypeMapper typeMapper;
 
-    public ArrayChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper) {
+    ArrayChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper) {
         this.mapChangeAppender = mapChangeAppender;
         this.typeMapper = typeMapper;
     }
 
     @Override
-    protected boolean supports(JaversType propertyType) {
+    public boolean supports(JaversType propertyType) {
         return  propertyType instanceof ArrayType;
     }
 
     @Override
-    protected ArrayChange calculateChanges(NodePair pair, Property property) {
+    public ArrayChange calculateChanges(NodePair pair, Property property) {
 
         Map leftMap =  Arrays.asMap(pair.getLeftPropertyValue(property));
         Map rightMap = Arrays.asMap(pair.getRightPropertyValue(property));

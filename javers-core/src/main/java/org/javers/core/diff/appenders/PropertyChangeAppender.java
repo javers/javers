@@ -11,21 +11,11 @@ import org.javers.core.metamodel.type.JaversType;
  *
  * @author bartosz walacik
  */
-public abstract class PropertyChangeAppender <T extends PropertyChange> {
+public interface PropertyChangeAppender <T extends PropertyChange> {
     /**
-     * checks if given property is supported and if so,
-     * delegates calculation to concrete appender in calculateChanges()
-     *
-     * @return null if no changes
+     * checks if given property is supported and
      */
-    public final T calculateChangesIfSupported(NodePair pair, Property property, JaversType propertyType) {
-        if (!supports(propertyType)) {
-             return null;
-        }
-        return calculateChanges(pair, property);
-    }
+    boolean supports(JaversType propertyType);
 
-    protected abstract boolean supports(JaversType propertyType);
-
-    protected abstract T calculateChanges(NodePair pair, Property supportedProperty);
+    T calculateChanges(NodePair pair, Property supportedProperty);
 }

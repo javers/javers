@@ -17,7 +17,7 @@ import static org.javers.common.collections.Objects.nullSafeEquals;
 /**
  * @author pawel szymczyk
  */
-class SetChangeAppender extends PropertyChangeAppender<SetChange> {
+class SetChangeAppender implements PropertyChangeAppender<SetChange> {
 
     private static final Logger logger = LoggerFactory.getLogger(SetChangeAppender.class);
 
@@ -27,19 +27,19 @@ class SetChangeAppender extends PropertyChangeAppender<SetChange> {
 
     private final GlobalIdFactory globalIdFactory;
 
-    public SetChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
+    SetChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
         this.typeMapper = typeMapper;
         this.mapChangeAppender = mapChangeAppender;
         this.globalIdFactory = globalIdFactory;
     }
 
     @Override
-    protected boolean supports(JaversType propertyType) {
+    public boolean supports(JaversType propertyType) {
         return propertyType instanceof SetType;
     }
 
     //TODO add support for ValueObjects
-    public boolean isSupportedContainer(Property property) {
+    private boolean isSupportedContainer(Property property) {
         ContainerType propertyType = typeMapper.getPropertyType(property);
 
         if (typeMapper.isValueObject(propertyType.getItemClass())) {
@@ -50,7 +50,7 @@ class SetChangeAppender extends PropertyChangeAppender<SetChange> {
         return true;
     }
 
-    protected List<ContainerElementChange> calculateEntryChanges(SetType setType, Set leftRawSet, Set rightRawSet, OwnerContext owner) {
+    private List<ContainerElementChange> calculateEntryChanges(SetType setType, Set leftRawSet, Set rightRawSet, OwnerContext owner) {
 
         JaversType itemType = typeMapper.getJaversType(setType.getItemClass());
         DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
@@ -75,7 +75,7 @@ class SetChangeAppender extends PropertyChangeAppender<SetChange> {
     }
 
     @Override
-    protected SetChange calculateChanges(NodePair pair, Property property) {
+    public SetChange calculateChanges(NodePair pair, Property property) {
         Set leftValues = (Set) pair.getLeftPropertyValue(property);
         Set rightValues = (Set) pair.getRightPropertyValue(property);
 
