@@ -1,26 +1,26 @@
 package org.javers.core;
 
 import org.javers.common.collections.Optional;
-import org.javers.core.changelog.ChangeProcessor;
 import org.javers.core.changelog.ChangeListTraverser;
-import org.javers.core.commit.CommitMetadata;
+import org.javers.core.changelog.ChangeProcessor;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactory;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdDTO;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.snapshot.SnapshotDiffer;
+import org.javers.core.snapshot.GraphSnapshotFacade;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.List;
 
@@ -48,36 +48,56 @@ public class Javers {
     private final JsonConverter jsonConverter;
     private final CommitFactory commitFactory;
     private final JaversExtendedRepository repository;
-    private final SnapshotDiffer snapshotDiffer;
+    private final GraphSnapshotFacade graphSnapshotFacade;
 
     /**
      * JaVers instance should be constructed by {@link JaversBuilder}
      */
-    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, SnapshotDiffer snapshotDiffer) {
+    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, GraphSnapshotFacade graphSnapshotFacade) {
         this.diffFactory = diffFactory;
         this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;
         this.commitFactory = commitFactory;
         this.repository = repository;
-        this.snapshotDiffer = snapshotDiffer;
+        this.graphSnapshotFacade = graphSnapshotFacade;
     }
 
     /**
-     * <p>
-     * Persists current version of given domain object in JaVers repository.
+     * Persists a current state of a given domain objects graph
+     * in JaVers repository.
+     * <br/><br/>
+     * 
      * JaVers applies commit() to given object and all objects navigable from it.
-     * You can capture state of arbitrary complex objects graph with single commit() call.
-     * </p>
+     * You can capture a state of an arbitrary complex objects graph with a single commit() call.
      *
-     * @param currentVersion Standalone object or handle to objects graph
+     * @param currentVersion Standalone object or handle to an objects graph
      */
     public Commit commit(String author, Object currentVersion) {
         Commit commit = commitFactory.create(author, currentVersion);
 
         repository.persist(commit);
-
         logger.info(commit.toString());
+        return commit;
+    }
 
+    /**
+     * Marks given object as deleted.
+     * <br/><br/>
+     * 
+     * Unlike {@link Javers#commit(String, Object)}, this method is shallow
+     * and affects only given object.
+     * <br/><br/>
+     *
+     * This method doesn't delete anything from JaVers repository.
+     * It just persists 'terminal snapshot' of given object.
+     *
+     * @param deleted object to be marked as deleted
+     */
+    public Commit commitShallowDelete(String author, Object deleted) {
+        Commit commit = commitFactory.createTerminal(author, deleted);
+
+        repository.persist(commit);
+        logger.info(commit.toString());
         return commit;
     }
 
@@ -175,7 +195,7 @@ public class Javers {
      * @return empty List, if object is not versioned or was committed only once
      */
     public List<Change> getChangeHistory(GlobalIdDTO globalId, int limit) {
-        return snapshotDiffer.getChangeHistory(globalId, limit);
+        return graphSnapshotFacade.getChangeHistory(globalId, limit);
     }
 
     JaversType getForClass(Class<?> clazz) {

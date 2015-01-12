@@ -1,5 +1,7 @@
 package org.javers.core
 
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.commit.CommitAssert
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -15,15 +17,46 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author bartosz walacik
  */
-class JaversCommitIntegrationTest extends Specification {
+class JaversCommitE2ETest extends Specification {
+
+    def "should create terminal commit for removed object"() {
+        given:
+        def javers = javers().build()
+        def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
+        javers.commit("some.login", anEntity)
+
+        when:
+        def commit = javers.commitShallowDelete("some.login", anEntity)
+
+        then:
+        CommitAssert.assertThat(commit)
+                .hasId("2.0")
+                .hasChanges(1)
+                .hasObjectRemoved(instanceId(1,SnapshotEntity), anEntity)
+                .hasSnapshots(1)
+                .hasTerminalSnapshot(instanceId(1,SnapshotEntity))
+    }
+
+    def "should fail when deleting non existing object"() {
+        given:
+        def javers = javers().build()
+        def anEntity = new SnapshotEntity(id:1)
+
+        when:
+        javers.commitShallowDelete("some.login", anEntity)
+
+        then:
+        JaversException exception = thrown()
+        exception.code == JaversExceptionCode.CANT_DELETE_OBJECT_NOT_FOUND
+    }
 
     def "should create initial commit for new objects"() {
         given:
         def javers = javers().build()
-        def newUser = new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("London"))
+        def anEntity = new SnapshotEntity(id:1, valueObjectRef: new DummyAddress("London"))
 
         when:
-        def commit = javers.commit("some.login", newUser)
+        def commit = javers.commit("some.login", anEntity)
 
         then:
         def cdoId = instanceId(1, SnapshotEntity)

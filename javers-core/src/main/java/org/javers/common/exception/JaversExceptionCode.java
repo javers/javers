@@ -5,7 +5,7 @@ package org.javers.common.exception;
  *
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
-public enum  JaversExceptionCode {
+public enum JaversExceptionCode {
 
     CLASS_EXTRACTION_ERROR(JaversException.BOOTSTRAP_ERROR + "Don't know how to extract Class from type '%s'.") ,
 
@@ -54,11 +54,14 @@ public enum  JaversExceptionCode {
 
     CLASS_NOT_FOUND(JaversException.RUNTIME_ERROR+"class not found - '%s'") ,
 
-    CANNOT_EXTRACT_CHILD_VALUE_OBJECT (JaversException.RUNTIME_ERROR+"error while extracting child ValueObject from '%s'" +
+    CANT_EXTRACT_CHILD_VALUE_OBJECT(JaversException.RUNTIME_ERROR+"error while extracting child ValueObject from '%s'" +
             ", invalid property type, expected ValueObjectType or ContainerType<ValueObjectType>, got '%s'"),
 
-    CANNOT_PARSE_COMMIT_ID(JaversException.RUNTIME_ERROR+"cannot parse given value {'$s'} to CommitId. " +
-            "CommitId should consists of two parts : majorId.minorId e.g. 1.0")
+    CANT_PARSE_COMMIT_ID(JaversException.RUNTIME_ERROR+"can't parse given value {'%s'} to CommitId. " +
+            "CommitId should consists of two parts : majorId.minorId e.g. 1.0"),
+
+    CANT_DELETE_OBJECT_NOT_FOUND(JaversException.RUNTIME_ERROR+"failed to delete object {'%s'}, "+
+            "it doesn't exists in JaversRepository")
 
     ;
 

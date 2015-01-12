@@ -15,6 +15,7 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
 import org.javers.core.pico.CoreJaversModule;
 import org.javers.core.pico.JaversModule;
+import org.javers.core.snapshot.GraphSnapshotModule;
 import org.javers.repository.api.InMemoryRepository;
 import org.javers.repository.api.JaversRepository;
 import org.picocontainer.PicoContainer;
@@ -50,6 +51,7 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         bootContainer(new CoreJaversModule());
         addModule(new DiffAppendersModule(getContainer()));
         addModule(new CommitFactoryModule(getContainer()));
+        addModule(new GraphSnapshotModule(getContainer()));
     }
 
     public static JaversBuilder javers() {

@@ -42,6 +42,16 @@ class SnapshotsAssert {
         assertState(found, expectedState)
     }
 
+    SnapshotsAssert hasTerminalSnapshot(def expectedId, String expectedCommitId = null){
+        def found = actual.find {
+            it -> it.globalId == expectedId && (it.commitId == expectedCommitId || expectedCommitId == null)
+        }
+
+        assert found.size() == 0 //terminal snapshot should be empty
+        assert found.terminal
+        this
+    }
+
     private SnapshotsAssert assertState(CdoSnapshot found, Map<String, Object> expectedState) {
         assert found != null
         assert expectedState.size() == found.size()

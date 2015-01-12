@@ -14,13 +14,30 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
-class JaversRepositoryIntegrationTest extends Specification {
+class JaversRepositoryE2ETest extends Specification {
 
     Javers javers
 
     def setup() {
         // InMemoryRepository is used by default
         javers = javers().build()
+    }
+
+    def "should fetch terminal snapshots from the repository"() {
+        given:
+        def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
+        javers.commit("author", anEntity)
+        javers.commitShallowDelete("author", anEntity)
+
+        when:
+        def snapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 10)
+
+        then:
+        SnapshotsAssert.assertThat(snapshots)
+                       .hasSize(2)
+                       .hasOrdinarySnapshot(instanceId(1,SnapshotEntity))
+                       .hasTerminalSnapshot(instanceId(1,SnapshotEntity), "2.0")
+
     }
 
     def "should store state history of Entity instance in JaversRepository and fetch snapshots in reverse order"() {

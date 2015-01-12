@@ -54,8 +54,8 @@ class CommitAssert {
         this
     }
 
-    CommitAssert hasObjectRemoved(def expectedId){
-        diffAssert.hasObjectRemoved(expectedId)
+    CommitAssert hasObjectRemoved(def expectedId, def expectedObject){
+        diffAssert.hasObjectRemoved(expectedId, expectedObject)
         this
     }
 
@@ -81,6 +81,11 @@ class CommitAssert {
 
     CommitAssert hasSnapshot(def expectedSnapshotId, Map<String, Object> expectedState){
         snapshotsAssert.hasSnapshot(expectedSnapshotId, expectedState)
+        this
+    }
+
+    CommitAssert hasTerminalSnapshot(def expectedSnapshotId){
+        snapshotsAssert.hasTerminalSnapshot(expectedSnapshotId)
         this
     }
 }

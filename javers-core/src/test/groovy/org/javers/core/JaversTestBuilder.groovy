@@ -7,15 +7,14 @@ import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectGraphBuilder
 import org.javers.core.json.JsonConverter
 import org.javers.core.metamodel.clazz.ClassAnnotationsScanner
+import org.javers.core.metamodel.clazz.ManagedClassFactory
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
-import org.javers.core.metamodel.clazz.ManagedClassFactory
+import org.javers.core.metamodel.object.SnapshotFactory
 import org.javers.core.metamodel.property.PropertyScanner
 import org.javers.core.metamodel.type.TypeFactory
 import org.javers.core.metamodel.type.TypeMapper
-import org.javers.core.snapshot.GraphShadowFactory
-import org.javers.core.snapshot.GraphSnapshotFactory
-import org.javers.core.snapshot.SnapshotFactory
+import org.javers.core.snapshot.GraphSnapshotFacade
 import org.javers.repository.api.JaversExtendedRepository
 import org.javers.repository.api.JaversRepository
 
@@ -95,12 +94,8 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(SnapshotFactory)
     }
 
-    GraphSnapshotFactory getGraphSnapshotFactory() {
-        javersBuilder.getContainerComponent(GraphSnapshotFactory)
-    }
-
-    GraphShadowFactory getGraphShadowFactory() {
-        javersBuilder.getContainerComponent(GraphShadowFactory)
+    GraphSnapshotFacade getGraphSnapshotFacade() {
+        javersBuilder.getContainerComponent(GraphSnapshotFacade)
     }
 
     TypeFactory getTypeSpawningFactory() {
@@ -129,6 +124,10 @@ class JaversTestBuilder {
 
     JsonConverter getJsonConverter() {
         javersBuilder.getContainerComponent(JsonConverter)
+    }
+
+    def getContainerComponent(Class type) {
+        javersBuilder.getContainerComponent(type)
     }
 
     ObjectGraphBuilder createObjectGraphBuilder() {

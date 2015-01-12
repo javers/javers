@@ -10,6 +10,7 @@ import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
@@ -31,7 +32,8 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
     public static final String GLOBAL_CDO_ID = "globalId";
     public static final String COMMIT_METADATA = "commitMetadata";
     public static final String STATE_NAME = "state";
-    public static final String INITIAL_NAME = "initial";
+    public static final String INITIAL_NAME_LEGACY = "initial";
+    public static final String TYPE_NAME = "type";
 
     private TypeMapper typeMapper;
 
@@ -55,10 +57,7 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId, commitMetadata);
         cdoSnapshotBuilder.withCommitMetadata(commitMetadata);
 
-        JsonElement initial = jsonObject.get(INITIAL_NAME);
-        if (initial != null){
-            cdoSnapshotBuilder.withInitial(initial.getAsBoolean());
-        }
+        deserializeType(jsonObject,cdoSnapshotBuilder);
 
         JsonObject state = jsonObject.get(STATE_NAME).getAsJsonObject();
 
@@ -67,6 +66,19 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         }
 
         return cdoSnapshotBuilder.build();
+    }
+
+    private void deserializeType(JsonObject jsonObject, CdoSnapshotBuilder cdoSnapshotBuilder){
+        JsonElement initial = jsonObject.get(INITIAL_NAME_LEGACY);
+        if (initial != null){ //for legacy JSON's
+            cdoSnapshotBuilder.withInitial(initial.getAsBoolean());
+            return;
+        }
+
+        JsonElement type = jsonObject.get(TYPE_NAME);
+        if (type != null) {
+            cdoSnapshotBuilder.withType(SnapshotType.valueOf(type.getAsString()));
+        }
     }
 
     private Object decodeValue(JsonObject state, final JsonDeserializationContext context, Property property) {
@@ -169,7 +181,7 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         jsonObject.add(COMMIT_METADATA, context.serialize(snapshot.getCommitMetadata()));
         jsonObject.add(GLOBAL_CDO_ID, context.serialize(snapshot.getGlobalId()));
         jsonObject.add(STATE_NAME, getState(snapshot, context));
-        jsonObject.add(INITIAL_NAME, context.serialize(snapshot.isInitial()));
+        jsonObject.add(TYPE_NAME, context.serialize(snapshot.getType().name()));
 
         return jsonObject;
     }

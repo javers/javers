@@ -23,7 +23,7 @@ class CommitIdTypeAdapter extends JsonTypeAdapterTemplate<CommitId> {
         String[] strings = majorDotMinor.split("\\.");
 
         if (strings.length != 2) {
-            throw new JaversException(JaversExceptionCode.CANNOT_PARSE_COMMIT_ID, majorDotMinor);
+            throw new JaversException(JaversExceptionCode.CANT_PARSE_COMMIT_ID, majorDotMinor);
         }
 
         long major = Long.parseLong(strings[0]);

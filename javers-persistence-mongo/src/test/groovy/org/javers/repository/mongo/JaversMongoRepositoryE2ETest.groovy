@@ -1,15 +1,14 @@
 package org.javers.repository.mongo
 
 import com.github.fakemongo.Fongo
-import com.mongodb.MongoClient
-import org.javers.core.JaversRepositoryIntegrationTest
+import org.javers.core.JaversRepositoryE2ETest
 
 import static org.javers.core.JaversBuilder.javers
 
 /**
  * @author bartosz walacik
  */
-class JaversMongoRepositoryIntegrationTest extends JaversRepositoryIntegrationTest {
+class JaversMongoRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     @Override
     def setup() {

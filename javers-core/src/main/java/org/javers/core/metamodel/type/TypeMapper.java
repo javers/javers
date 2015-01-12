@@ -209,7 +209,7 @@ public class TypeMapper {
             }
         }
 
-        throw new JaversException(JaversExceptionCode.CANNOT_EXTRACT_CHILD_VALUE_OBJECT,
+        throw new JaversException(JaversExceptionCode.CANT_EXTRACT_CHILD_VALUE_OBJECT,
                   owner.getName()+"."+voPropertyName,
                   javersType);
 

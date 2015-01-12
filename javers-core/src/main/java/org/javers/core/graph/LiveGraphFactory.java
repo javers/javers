@@ -1,5 +1,6 @@
 package org.javers.core.graph;
 
+import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.List;
@@ -25,6 +26,10 @@ public class LiveGraphFactory {
         Object wrappedHandle = wrapTopLevelContainer(handle);
 
         return new ObjectGraphBuilder(typeMapper, liveCdoFactory).buildGraph(wrappedHandle);
+    }
+
+    public Cdo createCdo(Object cdo){
+        return liveCdoFactory.create(cdo, null);
     }
 
     private Object wrapTopLevelContainer(Object handle){
