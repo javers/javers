@@ -22,7 +22,8 @@ public class JaversField extends JaversMember<Field> {
         return getRawMember().getType();
     }
 
-    public Object invokeFieldEvenIfPrivate(Object onObject) {
+    @Override
+    public Object invokeEvenIfPrivate(Object onObject) {
         setAccessibleIfNecessary();
 
         try {

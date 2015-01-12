@@ -21,7 +21,7 @@ import java.util.Set;
  *
  * @author bartosz walacik
  */
-abstract class JaversMember<T extends Member> {
+public abstract class JaversMember<T extends Member> {
     private final T rawMember; //delegate
     private final Optional<Type> resolvedReturnType;
 
@@ -57,6 +57,10 @@ abstract class JaversMember<T extends Member> {
         return rawMember.getName();
     }
 
+    public String propertyName(){
+        return rawMember.getName();
+    }
+
     public boolean hasAnyAnnotation(Set<String> annotationNames){
         for (String annotationName : annotationNames){
             if (isAnnotationPresent(annotationName)) {
@@ -75,6 +79,8 @@ abstract class JaversMember<T extends Member> {
 
         return false;
     }
+
+    public abstract Object invokeEvenIfPrivate(Object target);
 
     protected void setAccessibleIfNecessary() {
         if(!isPublic(rawMember))

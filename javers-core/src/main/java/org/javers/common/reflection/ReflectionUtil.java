@@ -13,8 +13,6 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class ReflectionUtil {
-    public static final String ID_ANN = "Id";
-
     /**
      * Creates new instance of public or package-private class.
      * Calls first, not-private constructor
@@ -102,23 +100,6 @@ public class ReflectionUtil {
         return (m.getName().substring(0,3).equals("get")  ||
                 m.getName().substring(0,2).equals("is") ) &&
                 m.getParameterTypes().length == 0;
-    }
-
-    /**
-     * ex: getCode() -> code,
-     *     isTrue()  -> true
-     */
-    public static String getterToField(String getterName) {
-
-        if (getterName.substring(0, 3).equals("get")) {
-            return getterName.substring(3, 4).toLowerCase()+getterName.substring(4);
-        }
-
-        if (getterName.substring(0, 2).equals("is")) {
-            return getterName.substring(2, 3).toLowerCase()+getterName.substring(3);
-        }
-
-        throw new IllegalArgumentException("Name {"+getterName+"} is not a getter name");
     }
 
     private static boolean isPrivate(Member member){

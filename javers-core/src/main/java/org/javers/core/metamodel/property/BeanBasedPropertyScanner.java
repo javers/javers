@@ -29,8 +29,7 @@ public class BeanBasedPropertyScanner implements PropertyScanner {
                 continue;
             }
 
-            Property beanProperty = new BeanProperty(getter);
-            beanProperties.add(beanProperty);
+            beanProperties.add(new Property(getter));
         }
         return beanProperties;
     }

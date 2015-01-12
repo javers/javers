@@ -29,8 +29,7 @@ public class FieldBasedPropertyScanner implements PropertyScanner {
                 continue;
             }
 
-            Property fieldProperty = new FieldProperty(field);
-            propertyList.add(fieldProperty);
+            propertyList.add(new Property(field));
         }
         return propertyList;
     }
