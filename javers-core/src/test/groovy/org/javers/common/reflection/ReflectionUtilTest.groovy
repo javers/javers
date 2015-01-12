@@ -1,9 +1,12 @@
  package org.javers.common.reflection
 
+ import com.google.common.reflect.TypeToken
  import org.javers.core.model.DummyUser
  import spock.lang.Specification
  import spock.lang.Unroll
+
  import java.lang.reflect.Field
+
  import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
  /**
@@ -55,39 +58,41 @@ class ReflectionUtilTest extends Specification {
 
     }
 
-    def "should return actual class type argument from field"() {
+    def "should return actual type argument from field"() {
         given:
-        Field dummyUsersList = getFieldFromClass(ReflectionTestModel.class, "dummyUserList")
+        def dummyUsersList = getFieldFromClass(ReflectionTestModel.class, "dummyUserList")
 
         when:
-        Class[] args = ReflectionUtil.extractActualClassTypeArguments(dummyUsersList.genericType)
+        def args = ReflectionUtil.extractActualClassTypeArguments(dummyUsersList.genericType)
 
         then:
         args[0] == DummyUser
     }
 
+    @Unroll
+    def "should replace formal type parameter with actual type argument for inherited #memberType"() {
+        when:
+        def member = action.call()
+
+        then:
+        member.genericType == new TypeToken<List<String>>(){}.type
+
+        println member
+
+        where:
+        memberType | action
+        "Method"   | { ReflectionUtil.getAllMethods(ConcreteWithActualType)[0] }
+        "Field"    | { ReflectionUtil.getAllFields(ConcreteWithActualType)[0] }
+    }
+
     def "should return empty list when type is not generic"() {
         given:
-        Field noGenericSet = getFieldFromClass(ReflectionTestModel.class, "noGenericSet")
+        def noGenericSet = getFieldFromClass(ReflectionTestModel.class, "noGenericSet")
 
         when:
-        Class[] args = ReflectionUtil.extractActualClassTypeArguments(noGenericSet.genericType)
+        def args = ReflectionUtil.extractActualClassTypeArguments(noGenericSet.genericType)
 
         then:
         args == []
-    }
-
-    def "should return distinct method keys"() {
-        given:
-
-        when:
-        def aKey = ReflectionUtil.methodKey(ReflectionTestClass.class.getMethod("Aa", String.class))
-        def bKey = ReflectionUtil.methodKey(ReflectionTestClass.class.getMethod("BB", String.class))
-
-        println("aKey $aKey")
-        println("bKey $bKey")
-
-        then:
-        aKey != bKey
     }
 }

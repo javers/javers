@@ -1,8 +1,8 @@
 package org.javers.core.metamodel.property;
 
+import org.javers.common.reflection.JaversMethod;
 import org.javers.common.reflection.ReflectionUtil;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import static org.javers.common.reflection.ReflectionUtil.ID_ANN;
@@ -15,24 +15,24 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public class BeanProperty implements Property {
 
-    private transient final Method getter;
+    private transient final JaversMethod getter;
     private final String name;
 
-    BeanProperty(Method getter) {
+    BeanProperty(JaversMethod getter) {
         argumentIsNotNull(getter, "getter should not be null!");
 
         this.getter = getter;
-        this.name = ReflectionUtil.getterToField(getter);
+        this.name = ReflectionUtil.getterToField(getter.name());
     }
 
     @Override
     public Type getGenericType() {
-        return getter.getGenericReturnType();
+        return getter.getGenericType();
     }
 
     @Override
     public Class<?> getType() {
-        return getter.getReturnType();
+        return getter.getType();
     }
 
     @Override
@@ -42,7 +42,7 @@ public class BeanProperty implements Property {
 
     @Override
     public Object get(Object target) {
-        return ReflectionUtil.invokeGetterEvenIfPrivate(getter, target);
+        return getter.invokeGetterEvenIfPrivate(target);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class BeanProperty implements Property {
 
     @Override
     public boolean looksLikeId() {
-        return ReflectionUtil.isAnnotationPresent(getter, ID_ANN);
+        return getter.isAnnotationPresent(ID_ANN);
     }
 
     @Override
@@ -71,6 +71,6 @@ public class BeanProperty implements Property {
 
     @Override
     public String toString() {
-        return getter.getGenericReturnType()+" "+ getter.getDeclaringClass().getSimpleName()+"."+getter.getName()+"()";
+        return getter.toString();
     }
 }

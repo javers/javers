@@ -1,4 +1,4 @@
-package org.javers.core.cases.nap
+package org.javers.core.cases
 
 import org.javers.core.Javers
 import org.javers.core.diff.Diff

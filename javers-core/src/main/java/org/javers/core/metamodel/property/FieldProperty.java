@@ -1,8 +1,7 @@
 package org.javers.core.metamodel.property;
 
-import org.javers.common.reflection.ReflectionUtil;
+import org.javers.common.reflection.JaversField;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 import static org.javers.common.reflection.ReflectionUtil.ID_ANN;
@@ -15,9 +14,9 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public class FieldProperty implements Property {
 
-    private transient final Field field;
+    private transient final JaversField field;
 
-    public FieldProperty(Field field) {
+    FieldProperty(JaversField field) {
 
         argumentIsNotNull(field, "field should not be null!");
 
@@ -36,12 +35,12 @@ public class FieldProperty implements Property {
 
     @Override
     public boolean looksLikeId() {
-        return ReflectionUtil.isAnnotationPresent(field, ID_ANN);
+        return field.isAnnotationPresent(ID_ANN);
     }
 
     @Override
     public Object get(Object target) {
-        return ReflectionUtil.invokeFieldEvenIfPrivate(field, target);
+        return field.invokeFieldEvenIfPrivate(target);
     }
 
     @Override
@@ -51,7 +50,7 @@ public class FieldProperty implements Property {
 
     @Override
     public String getName() {
-        return field.getName();
+        return field.name();
     }
 
     @Override
@@ -70,6 +69,6 @@ public class FieldProperty implements Property {
 
     @Override
     public String toString() {
-        return field.getDeclaringClass().getSimpleName()+"."+field.getName();
+        return field.toString();
     }
 }

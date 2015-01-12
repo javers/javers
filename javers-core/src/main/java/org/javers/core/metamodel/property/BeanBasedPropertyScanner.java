@@ -1,9 +1,9 @@
 package org.javers.core.metamodel.property;
 
+import org.javers.common.reflection.JaversMethod;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.clazz.AnnotationNamesProvider;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +20,12 @@ public class BeanBasedPropertyScanner implements PropertyScanner {
 
     @Override
     public List<Property> scan(Class<?> managedClass) {
-        List<Method> getters = ReflectionUtil.findAllPersistentGetters(managedClass);
+        List<JaversMethod> getters = ReflectionUtil.findAllPersistentGetters(managedClass);
         List<Property> beanProperties = new ArrayList<>();
 
-        for (Method getter : getters) {
+        for (JaversMethod getter : getters) {
 
-            if (ReflectionUtil.hasAnyAnnotation(getter, annotationNamesProvider.getTransientAliases())){
+            if (getter.hasAnyAnnotation(annotationNamesProvider.getTransientAliases())){
                 continue;
             }
 

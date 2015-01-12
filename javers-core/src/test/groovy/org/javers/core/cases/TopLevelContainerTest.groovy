@@ -1,4 +1,4 @@
-package org.javers.core.cases.toplevelcontainer
+package org.javers.core.cases
 
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.container.ListChange
