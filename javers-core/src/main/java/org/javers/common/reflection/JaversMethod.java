@@ -41,7 +41,7 @@ public class JaversMethod extends JaversMember<Method> {
 
     @Override
     public String toString() {
-        return "Method " + getGenericType()+" " + name() +"(); //declaring class: " +getDeclaringClass().getName();
+        return "Method " + getGenericType()+" " + getDeclaringClass().getSimpleName()+"."+name() +"()";
     }
 
     /**
