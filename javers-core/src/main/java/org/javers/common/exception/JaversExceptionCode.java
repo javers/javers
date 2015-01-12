@@ -31,7 +31,9 @@ public enum JaversExceptionCode {
 
     SET_OF_VO_DIFF_NOT_IMPLEMENTED(JaversException.RUNTIME_ERROR + "diff for Set of ValueObjects is not supported"),
 
-    GENERIC_TYPE_NOT_PARAMETRIZED(JaversException.RUNTIME_ERROR + "expected actual Class arguments in type '%s'. Javers needs to know what kind of content is stored in your collections. Try at least <Object>"),
+    GENERIC_TYPE_NOT_PARAMETRIZED(JaversException.RUNTIME_ERROR + "expected actual Class arguments in type '%s'. "+
+            "JaVers is strongly-typed and needs to know actual Class of elements stored in your collections."+
+            "Try at least <Object>, unbounded wildcards like <?> are not supported"),
 
     //graph & snapshot
     VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY(JaversException.RUNTIME_ERROR + "found Value Object '%s' on KEY position in Map property of '%s'. Please change this class mapping to Value or Entity"),
