@@ -1,14 +1,10 @@
 package org.javers.core.metamodel.property;
 
+import org.javers.common.reflection.JaversField;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.clazz.AnnotationNamesProvider;
-import org.javers.core.metamodel.clazz.ClassAnnotationsScanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.lang.reflect.Field;
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -24,17 +20,16 @@ public class FieldBasedPropertyScanner implements PropertyScanner {
 
     @Override
     public  List<Property> scan(Class<?> managedClass) {
-        List<Field> fields = ReflectionUtil.getAllPersistentFields(managedClass);
+        List<JaversField> fields = ReflectionUtil.getAllPersistentFields(managedClass);
         List<Property> propertyList = new ArrayList<>(fields.size());
 
-        for (Field field : fields) {
+        for (JaversField field : fields) {
 
-            if (ReflectionUtil.hasAnyAnnotation(field, annotationNamesProvider.getTransientAliases())){
+            if (field.hasAnyAnnotation(annotationNamesProvider.getTransientAliases())){
                 continue;
             }
 
-            Property fieldProperty = new FieldProperty(field);
-            propertyList.add(fieldProperty);
+            propertyList.add(new Property(field));
         }
         return propertyList;
     }

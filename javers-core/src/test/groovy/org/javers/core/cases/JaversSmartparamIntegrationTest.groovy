@@ -1,4 +1,4 @@
-package org.javers.core.cases.smartparam
+package org.javers.core.cases
 
 import groovy.json.JsonSlurper
 import org.javers.core.Javers
