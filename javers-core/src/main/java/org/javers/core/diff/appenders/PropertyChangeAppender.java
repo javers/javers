@@ -6,7 +6,7 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 
 /**
- * Property scope change appender,
+ * Property-scope change appender,
  * follows Chain-of-responsibility pattern
  *
  * @author bartosz walacik

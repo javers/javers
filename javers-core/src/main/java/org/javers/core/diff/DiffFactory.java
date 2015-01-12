@@ -8,13 +8,11 @@ import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.appenders.NodeChangeAppender;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
-import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.Cdo;
-import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -122,30 +120,21 @@ public class DiffFactory {
 
             JaversType javersType = typeMapper.getPropertyType(property);
 
-            if (commitMetadata.isPresent()) {
-                appendChanges(diff, pair, property, javersType, new Consumer<Change>() {
-                    @Override
-                    public void consume(Change change) {
-                        change.bindToCommit(commitMetadata.get());
-                    }
-                });
-            } else {
-                appendChanges(diff, pair, property, javersType, new Consumer<Change>() {
-                    @Override
-                    public void consume(Change o) {
-
-                    }
-                });
-            }
+            appendChanges(diff, pair, property, javersType, commitMetadata);
         }
     }
 
-    private void appendChanges(DiffBuilder diff, NodePair pair, Property property, JaversType javersType, Consumer<Change> consumer) {
+    private void appendChanges(DiffBuilder diff, NodePair pair, Property property, JaversType javersType, Optional<CommitMetadata> commitMetadata) {
         for (PropertyChangeAppender appender : propertyChangeAppender) { //this nested loops doesn't look good but unfortunately it is necessary
-            Change change = appender.calculateChangesIfSupported(pair, property, javersType);
+            final Change change = appender.calculateChangesIfSupported(pair, property, javersType);
             if (change != null) {
                 diff.addChange(change, pair.getRight().wrappedCdo());
-                consumer.consume(change);
+
+                commitMetadata.ifPresent(new Consumer<CommitMetadata>() {
+                    public void consume(CommitMetadata cm) {
+                        change.bindToCommit(cm);
+                    }
+                });
             }
         }
     }
