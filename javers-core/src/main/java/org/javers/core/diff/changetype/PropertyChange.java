@@ -1,6 +1,5 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.common.string.ToStringBuilder;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;

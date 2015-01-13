@@ -11,9 +11,11 @@ import static org.javers.common.reflection.ReflectionUtil.extractActualClassType
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 
 /**
- * Property type that can be managed by Javers, so int, String, Date, Reference, etc.
- * <p/>
- * Immutable
+ * Managed property type
+ * <br/><br/>
+ *
+ * This is convenient abstraction layer over raw and awkward
+ * java.lang.reflect.Type and java.lang.Class
  *
  * @author bartosz walacik
  */
@@ -29,30 +31,23 @@ public abstract class JaversType {
         Validate .argumentIsNotNull(baseJavaType);
 
         this.baseJavaType = baseJavaType;
-
         this.baseJavaClass = extractClass(baseJavaType);
-
         this.actualClassTypeArguments = extractActualClassTypeArguments(baseJavaType);
-
     }
 
     /**
-     * delegates to proper constructor {@link #JaversType(java.lang.reflect.Type)}
+     * Factory method, delegates to self constructor
      */
     JaversType spawn(Type baseJavaType) {
-            try {
-                Constructor c = this.getClass().getConstructor(new Class<?>[]{Type.class});
-                return (JaversType)c.newInstance(new Object[]{baseJavaType});
-            } catch (ReflectiveOperationException exception) {
-                throw new RuntimeException("error calling Constructor for " +
-                                           this.getClass().getName()+
-                                           " or no public Constructor in "+
-                                           this.getClass().getName(),
-                                           exception);
-            }
+        try {
+            Constructor c = this.getClass().getConstructor(new Class<?>[]{Type.class});
+            return (JaversType)c.newInstance(new Object[]{baseJavaType});
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException("error calling Constructor for " + this.getClass().getName(), exception);
+        }
     }
 
-    protected boolean isGenericType() {
+    public boolean isGenericType() {
         return (baseJavaType instanceof ParameterizedType);
     }
 
@@ -61,7 +56,7 @@ public abstract class JaversType {
      *
      * @return Immutable List, never returns null
      */
-    List<Class> getActualClassTypeArguments() {
+    public List<Class> getActualClassTypeArguments() {
         return actualClassTypeArguments;
     }
 
@@ -69,18 +64,14 @@ public abstract class JaversType {
         return baseJavaType;
     }
 
-    protected Class getBaseJavaClass() {
+    public Class getBaseJavaClass() {
         return baseJavaClass;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         JaversType that = (JaversType) o;
         return baseJavaType.equals(that.baseJavaType);
@@ -95,5 +86,4 @@ public abstract class JaversType {
     public int hashCode() {
         return baseJavaType.hashCode();
     }
-
 }

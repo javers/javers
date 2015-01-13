@@ -6,14 +6,17 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 
 /**
- * Property-scope change appender,
- * follows Chain-of-responsibility pattern
+ * Property-scope comparator,
+ * follows Chain-of-responsibility pattern.
+ * <br/><br/>
+ *
+ * Implementation should calculate diff between two property values
  *
  * @author bartosz walacik
  */
 public interface PropertyChangeAppender <T extends PropertyChange> {
     /**
-     * checks if given property is supported and
+     * Checks if given property type is supported
      */
     boolean supports(JaversType propertyType);
 
