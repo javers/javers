@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author pawel szymczyk
  */
-public class ArrayChange extends ContainerChange {
+public final class ArrayChange extends ContainerChange {
 
     public ArrayChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
         super(affectedCdoId, property, changes);

@@ -11,6 +11,8 @@ import java.util.List;
 import static org.javers.common.string.ToStringBuilder.addEnumField;
 
 /**
+ * Collection or Array change
+ *
  * @author bartosz walacik
  */
 public abstract class ContainerChange extends PropertyChange {

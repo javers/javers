@@ -10,7 +10,7 @@ import static org.javers.common.string.ToStringBuilder.addField;
  *
  * @author bartosz walacik
  */
-public class ReferenceChange extends PropertyChange {
+public final class ReferenceChange extends PropertyChange {
     private final GlobalId left;
     private final GlobalId right;
 

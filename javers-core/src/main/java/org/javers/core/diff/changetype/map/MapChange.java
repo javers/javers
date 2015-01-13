@@ -13,7 +13,7 @@ import static org.javers.common.string.ToStringBuilder.addEnumField;
 /**
  * @author bartosz walacik
  */
-public class MapChange extends PropertyChange {
+public final class MapChange extends PropertyChange {
     private final List<EntryChange> changes;
 
     public MapChange(GlobalId affectedCdoId, Property property, List<EntryChange> changes) {

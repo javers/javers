@@ -8,10 +8,8 @@ import org.javers.core.diff.changetype.PropertyChange;
  *
  * Implementation should calculate diff between two property values of type T.
  *
- *
  * @author bartosz walacik
  */
 public interface CustomPropertyComparator<T, C extends PropertyChange> {
-
     C compare(T left, T right);
 }
