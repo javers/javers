@@ -23,12 +23,8 @@ public abstract class AbstractJaversBuilder {
         return container.getComponent(ofClass);
     }
 
-    protected void bootContainer(JaversModule coreModule) {
-        Validate.argumentIsNotNull(coreModule);
-
+    protected void bootContainer() {
         container = new DefaultPicoContainer(new Caching());
-
-        addModule(coreModule);
     }
 
     protected void addModule(InstantiatingModule module) {

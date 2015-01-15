@@ -1,32 +1,25 @@
 package org.javers.core;
 
-import org.javers.core.diff.appenders.CustomCollectionComparator;
-import org.javers.core.diff.changetype.Atomic;
 import com.google.gson.TypeAdapter;
-import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitFactoryModule;
+import org.javers.core.diff.DiffFactoryModule;
+import org.javers.core.diff.appenders.CustomCollectionComparator;
 import org.javers.core.diff.appenders.CustomMapComparator;
-import org.javers.core.diff.appenders.CustomPropertyComparator;
 import org.javers.core.diff.appenders.DiffAppendersModule;
-import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
 import org.javers.core.metamodel.clazz.*;
-import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
-import org.javers.core.pico.CoreJaversModule;
-import org.javers.core.pico.JaversModule;
 import org.javers.core.snapshot.GraphSnapshotModule;
-import org.javers.repository.api.InMemoryRepository;
+import org.javers.repository.api.InMemoryRepositoryModule;
+import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
-import org.picocontainer.PicoContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.java2d.loops.CustomComponent;
 
 import java.util.HashSet;
 import java.util.List;
@@ -58,18 +51,20 @@ public final class JaversBuilder extends AbstractJaversBuilder {
 
     private JaversRepository repository;
 
+    public static JaversBuilder javers() {
+        return new JaversBuilder();
+    }
+
     private JaversBuilder() {
         logger.debug("starting up javers ...");
 
         // bootstrap phase 1: core beans
-        bootContainer(new CoreJaversModule());
+        bootContainer();
+        addModule(new CoreJaversModule(getContainer()));
         addModule(new DiffAppendersModule(getContainer()));
+        addModule(new DiffFactoryModule());
         addModule(new CommitFactoryModule(getContainer()));
         addModule(new GraphSnapshotModule(getContainer()));
-    }
-
-    public static JaversBuilder javers() {
-        return new JaversBuilder();
     }
 
     public Javers build() {
@@ -84,8 +79,9 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         // bootstrap phase 4: Repository
         bootRepository();
 
+        Javers javers = getContainerComponent(Javers.class);
         logger.info("javers instance is up & ready");
-        return getContainerComponent(Javers.class);
+        return javers;
     }
 
     /**
@@ -267,14 +263,16 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     private void bootRepository(){
         if (repository == null){
             logger.info("using fake InMemoryRepository, register actual implementation via JaversBuilder.registerJaversRepository()");
-            repository = new InMemoryRepository(getContainerComponent(GlobalIdFactory.class));
+            addModule(new InMemoryRepositoryModule(getContainer()));
         }
-        addComponent(repository);
-        repository.setJsonConverter(getContainerComponent(JsonConverter.class));
+
+       //JaversExtendedRepository can be created after users calls JaversBuilder.registerJaversRepository()
+        addComponent(JaversExtendedRepository.class);
     }
 
     private JaversBuilder registerEntity(EntityDefinition entityDefinition) {
         clientsClassDefinitions.add(entityDefinition);
         return this;
     }
+
 }

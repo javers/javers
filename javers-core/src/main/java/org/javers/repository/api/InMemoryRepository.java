@@ -16,7 +16,7 @@ import java.util.*;
  *
  * @author bartosz walacik
  */
-public class InMemoryRepository implements JaversRepository {
+class InMemoryRepository implements JaversRepository {
     private static final Logger logger = LoggerFactory.getLogger(InMemoryRepository.class);
 
     private Map<GlobalId, LinkedList<CdoSnapshot>> snapshots = new HashMap<>();
@@ -75,7 +75,6 @@ public class InMemoryRepository implements JaversRepository {
 
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
-
     }
 
     @Override
