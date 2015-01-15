@@ -1,8 +1,13 @@
 package org.javers.core;
 
+import org.javers.core.diff.appenders.CustomCollectionComparator;
+import org.javers.core.diff.changetype.Atomic;
 import com.google.gson.TypeAdapter;
+import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitFactoryModule;
+import org.javers.core.diff.appenders.CustomMapComparator;
+import org.javers.core.diff.appenders.CustomPropertyComparator;
 import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
@@ -21,20 +26,29 @@ import org.javers.repository.api.JaversRepository;
 import org.picocontainer.PicoContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.java2d.loops.CustomComponent;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Creates JaVers instance based on your domain model metadata and custom configuration.
- * <br>
- * Supports two configuring methods:
- * <ul>
- *     <li/>by properties file, see {TBA ...}
- *     <li/>programmatically using builder style methods
- * </ul>
+ * Creates a JaVers instance based on your domain model metadata and custom configuration.
+ * <br/><br/>
  *
+ * For example, to build a JaVers instance configured with reasonable defaults:
+ * <pre>
+ * Javers javers = JaversBuilder.javers().build();
+ * </pre>
+ *
+ * To build a JaVers instance with Entity type registered:
+ * <pre>
+ * Javers javers = JaversBuilder.javers()
+ *                              .registerEntity(MyEntity.class)
+ *                              .build();
+ * </pre>
+ *
+ * @see <a href="http://javers.org/documentation/configuration/">http://javers.org/documentation/configuration</a>
  * @author bartosz walacik
  */
 public final class JaversBuilder extends AbstractJaversBuilder {
@@ -74,6 +88,9 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         return getContainerComponent(Javers.class);
     }
 
+    /**
+     * @see <a href="http://javers.org/documentation/configuration/#repository-setup">http://javers.org/documentation/configuration/#repository-setup</a>
+     */
     public JaversBuilder registerJaversRepository(JaversRepository repository){
         Validate.argumentsAreNotNull(repository);
         this.repository = repository;
@@ -81,7 +98,9 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers {@link org.javers.core.metamodel.clazz.Entity} with id-property pointed by @Id annotation
+     * registers an {@link Entity} with id-property pointed by @Id annotation
+     *
+     * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
         Validate.argumentIsNotNull(entityClass);
@@ -89,20 +108,19 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers {@link org.javers.core.metamodel.clazz.Entity} with id-property selected explicitly by name
+     * registers an {@link Entity} with id-property selected explicitly by name
+     *
+     * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName) {
         Validate.argumentsAreNotNull(entityClass, idPropertyName);
         return registerEntity( new EntityDefinition(entityClass, idPropertyName) );
     }
 
-    private JaversBuilder registerEntity(EntityDefinition entityDefinition) {
-        clientsClassDefinitions.add(entityDefinition);
-        return this;
-    }
-
     /**
-     * registers {@link org.javers.core.metamodel.clazz.ValueObject}
+     * registers a {@link ValueObject}
+     *
+     * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         Validate.argumentIsNotNull(valueObjectClass);
@@ -110,15 +128,10 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    public JaversBuilder registerValueObjects(Class<?>...valueObjectClasses) {
-        for(Class clazz : valueObjectClasses) {
-            registerValueObject(clazz);
-        }
-        return this;
-    }
-
     /**
-     * registers {@link ValueType}
+     * registers a {@link ValueType}
+     *
+     * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValue(Class<?> valueClass) {
         Validate.argumentIsNotNull(valueClass);
@@ -127,13 +140,13 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * Registers {@link ValueType} and its custom JSON adapter.
+     * Registers a {@link ValueType} and its custom JSON adapter.
      * <br><br>
      *
      * Useful for not trivial ValueTypes when Gson's default representation isn't appropriate
      *
+     * @see <a href="http://javers.org/documentation/configuration/#json-type-adapters">http://javers.org/documentation/configuration/#json-type-adapters</a>
      * @see JsonTypeAdapter
-     * @see JsonTypeAdapter#getValueTypes()
      */
     public JaversBuilder registerValueTypeAdapter(JsonTypeAdapter typeAdapter) {
         for (Class c : (List<Class>)typeAdapter.getValueTypes()){
@@ -160,8 +173,16 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * Switch on when you need type safe {@link org.javers.core.diff.changetype.Atomic}s
-     * serialization stored in polymorfic collections like List, List&lt;Object&gt;, Map&lt;Object,Object&gt;, etc.
+     * Switch on when you need a type safe serialization for
+     * polymorfic collections like List, List&lt;Object&gt;.
+     * <br/><br/>
+     *
+     * Polymorfic collections are collections which contains items of different types
+     * ot types unknown at compile time.
+     * <br/><br/>
+     *
+     * This approach is generally discouraged, prefer statically typed collections
+     * with exactly one type of items like List&lt;String&gt;.
      *
      * @see org.javers.core.json.JsonConverterBuilder#typeSafeValues(boolean)
      */
@@ -177,8 +198,15 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
+    public JaversBuilder registerValueObjects(Class<?>...valueObjectClasses) {
+        for(Class clazz : valueObjectClasses) {
+            registerValueObject(clazz);
+        }
+        return this;
+    }
+
     /**
-     * {@link MappingStyle#FIELD} by default
+     * Default style is {@link MappingStyle#FIELD}.
      */
     public JaversBuilder withMappingStyle(MappingStyle mappingStyle) {
         Validate.argumentIsNotNull(mappingStyle);
@@ -189,6 +217,14 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     public JaversBuilder withNewObjectsSnapshot(boolean newObjectsSnapshot){
         coreConfiguration().withNewObjectsSnapshot(newObjectsSnapshot);
         return this;
+    }
+
+    public <T> void registerCustomMapComparator(CustomMapComparator<T> comparator, Class<T> mapClass){
+
+    }
+
+    public <T> void registerCustomCollectionComparator(CustomCollectionComparator<T> comparator, Class<T> collectionClass){
+
     }
 
     private void mapRegisteredClasses() {
@@ -235,5 +271,10 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         }
         addComponent(repository);
         repository.setJsonConverter(getContainerComponent(JsonConverter.class));
+    }
+
+    private JaversBuilder registerEntity(EntityDefinition entityDefinition) {
+        clientsClassDefinitions.add(entityDefinition);
+        return this;
     }
 }

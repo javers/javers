@@ -6,7 +6,7 @@ import com.google.gson.TypeAdapter;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
 import org.javers.core.json.typeadapter.joda.LocalDateTypeAdapter;
-
+import org.javers.core.diff.changetype.Atomic;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +39,8 @@ public class JsonConverterBuilder {
     }
 
     /**
-     * When switched to true, all {@link org.javers.core.diff.changetype.Atomic}s are serialized type safely as a pair, fo example:
+     * When switched to true, all {@link org.javers.core.diff.changetype.Atomic}s
+     * are serialized type safely as a type + value pair, for example:
      * <pre>
      * {
      *     "typeAlias": "LocalDate"
@@ -47,8 +48,8 @@ public class JsonConverterBuilder {
      * }
      * </pre>
      * TypeAlias is defaulted to value.class.simpleName.
-     * <br/>
-     * <br/>
+     * <br/><br/>
+     *
      * Useful when serializing polymorfic collections like List or List&lt;Object&gt;
      *
      * @param typeSafeValues default false

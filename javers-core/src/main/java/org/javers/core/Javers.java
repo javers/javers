@@ -53,7 +53,7 @@ public class Javers {
     /**
      * JaVers instance should be constructed by {@link JaversBuilder}
      */
-    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, GraphSnapshotFacade graphSnapshotFacade) {
+    Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, GraphSnapshotFacade graphSnapshotFacade) {
         this.diffFactory = diffFactory;
         this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;
@@ -70,7 +70,8 @@ public class Javers {
      * JaVers applies commit() to given object and all objects navigable from it.
      * You can capture a state of an arbitrary complex objects graph with a single commit() call.
      *
-     * @param currentVersion Standalone object or handle to an objects graph
+     * @see <a href="http://javers.org/documentation/repository-examples/">http://javers.org/documentation/repository-examples</a>
+     * @param currentVersion standalone object or handle to an objects graph
      */
     public Commit commit(String author, Object currentVersion) {
         Commit commit = commitFactory.create(author, currentVersion);
@@ -108,7 +109,7 @@ public class Javers {
      * </p>
      *
      * <p>
-     * To calculate diff, just provide two versions of the
+     * To calculate a diff, just provide two versions of the
      * same object or handles to two versions of the same objects graph.
      * <br/>
      * The handle could be a root of an aggregate, tree root
@@ -198,10 +199,6 @@ public class Javers {
         return graphSnapshotFacade.getChangeHistory(globalId, limit);
     }
 
-    JaversType getForClass(Class<?> clazz) {
-        return typeMapper.getJaversType(clazz);
-    }
-
     public JsonConverter getJsonConverter() {
         return jsonConverter;
     }
@@ -234,5 +231,9 @@ public class Javers {
     public <T> T processChangeList(List<Change> changes, ChangeProcessor<T> changeProcessor){
         ChangeListTraverser.traverse(changes, changeProcessor);
         return changeProcessor.result();
+    }
+
+    JaversType getForClass(Class<?> clazz) {
+        return typeMapper.getJaversType(clazz);
     }
 }
