@@ -12,7 +12,7 @@ import org.javers.core.metamodel.type.ManagedType;
  * @author bartosz walacik
  * @author pawel szymczyk
  */
-class ReferenceChangeAppender implements PropertyChangeAppender<ReferenceChange> {
+class ReferenceChangeAppender extends CorePropertyChangeAppender<ReferenceChange> {
 
     @Override
     public boolean supports(JaversType propertyType) {

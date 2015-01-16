@@ -31,4 +31,9 @@ public class CustomToNativeAppenderAdapter<T, C extends PropertyChange> implemen
         return delegate.compare(leftValue, rightValue, pair.getGlobalId(), property);
     }
 
+
+    @Override
+    public int priority() {
+        return HIGH_PRIORITY;
+    }
 }

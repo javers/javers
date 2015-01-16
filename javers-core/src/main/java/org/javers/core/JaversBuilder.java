@@ -214,14 +214,14 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    public <T> void registerCustomMapComparator(CustomMapComparator<T> comparator, Class<T> mapClass){
+    public <T> JaversBuilder registerCustomMapComparator(CustomMapComparator<T> comparator, Class<T> mapClass){
     //    typeMapper().registerValueType(...);
         addComponent(new CustomToNativeAppenderAdapter(comparator, mapClass));
-
+        return this;
     }
 
-    public <T> void registerCustomCollectionComparator(CustomCollectionComparator<T> comparator, Class<T> collectionClass){
-
+    public <T> JaversBuilder registerCustomCollectionComparator(CustomCollectionComparator<T> comparator, Class<T> collectionClass){
+        return this;
     }
 
     private void mapRegisteredClasses() {

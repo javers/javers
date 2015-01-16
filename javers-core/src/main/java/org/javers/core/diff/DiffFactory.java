@@ -17,6 +17,8 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.javers.core.diff.DiffBuilder.diff;
@@ -37,9 +39,16 @@ public class DiffFactory {
     public DiffFactory(TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, LiveGraphFactory graphFactory, JaversCoreConfiguration javersCoreConfiguration) {
         this.typeMapper = typeMapper;
         this.nodeChangeAppenders = nodeChangeAppenders;
-        this.propertyChangeAppender = propertyChangeAppender;
         this.graphFactory = graphFactory;
         this.javersCoreConfiguration = javersCoreConfiguration;
+
+        //sort by priority
+        Collections.sort(propertyChangeAppender, new Comparator<PropertyChangeAppender>() {
+            public int compare(PropertyChangeAppender p1, PropertyChangeAppender p2) {
+                return ((Integer)p1.priority()).compareTo(p2.priority());
+            }
+        });
+        this.propertyChangeAppender = propertyChangeAppender;
     }
 
     /**
@@ -131,7 +140,6 @@ public class DiffFactory {
             }
 
             final Change change = appender.calculateChanges(pair, property);
-
             if (change != null) {
                 diff.addChange(change, pair.getRight().wrappedCdo());
 
@@ -141,6 +149,7 @@ public class DiffFactory {
                     }
                 });
             }
+            break;
         }
     }
 }

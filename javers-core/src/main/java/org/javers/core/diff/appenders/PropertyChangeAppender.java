@@ -15,10 +15,15 @@ import org.javers.core.metamodel.type.JaversType;
  * @author bartosz walacik
  */
 public interface PropertyChangeAppender <T extends PropertyChange> {
+    static final int HIGH_PRIORITY = 1;
+    static final int LOW_PRIORITY = 2;
+
     /**
      * Checks if given property type is supported
      */
     boolean supports(JaversType propertyType);
 
     T calculateChanges(NodePair pair, Property supportedProperty);
+
+    int priority();
 }

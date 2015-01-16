@@ -24,7 +24,7 @@ import static org.javers.common.collections.Objects.nullSafeEquals;
 /**
  * @author bartosz walacik
  */
-class MapChangeAppender implements PropertyChangeAppender<MapChange> {
+class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
 

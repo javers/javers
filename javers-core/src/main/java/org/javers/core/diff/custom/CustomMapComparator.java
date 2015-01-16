@@ -1,6 +1,8 @@
 package org.javers.core.diff.custom;
 
 import org.javers.core.diff.changetype.map.MapChange;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.property.Property;
 
 /**
  * Useful for classes that are logically maps but do not implement a java.util.Map interface.
@@ -15,5 +17,6 @@ import org.javers.core.diff.changetype.map.MapChange;
  */
 public interface CustomMapComparator<T> extends CustomPropertyComparator<T, MapChange>{
 
-    MapChange compare(T leftMap, T rightMap);
+    @Override
+    MapChange compare(T left, T right, GlobalId affectedId, Property property);
 }

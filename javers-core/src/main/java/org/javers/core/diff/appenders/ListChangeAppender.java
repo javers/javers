@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * @author pawel szymczyk
  */
-class ListChangeAppender implements PropertyChangeAppender<ListChange> {
+class ListChangeAppender extends CorePropertyChangeAppender<ListChange> {
 
     private static final Logger logger = LoggerFactory.getLogger(ListChangeAppender.class);
 
