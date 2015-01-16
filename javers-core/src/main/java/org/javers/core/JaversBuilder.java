@@ -4,9 +4,10 @@ import com.google.gson.TypeAdapter;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
-import org.javers.core.diff.appenders.CustomCollectionComparator;
-import org.javers.core.diff.appenders.CustomMapComparator;
-import org.javers.core.diff.appenders.DiffAppendersModule;
+import org.javers.core.diff.appenders.*;
+import org.javers.core.diff.custom.CustomCollectionComparator;
+import org.javers.core.diff.custom.CustomMapComparator;
+import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
@@ -21,9 +22,7 @@ import org.javers.repository.api.JaversRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Creates a JaVers instance based on your domain model metadata and custom configuration.
@@ -216,6 +215,8 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     }
 
     public <T> void registerCustomMapComparator(CustomMapComparator<T> comparator, Class<T> mapClass){
+    //    typeMapper().registerValueType(...);
+        addComponent(new CustomToNativeAppenderAdapter(comparator, mapClass));
 
     }
 
@@ -264,6 +265,8 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         if (repository == null){
             logger.info("using fake InMemoryRepository, register actual implementation via JaversBuilder.registerJaversRepository()");
             addModule(new InMemoryRepositoryModule(getContainer()));
+        } else {
+            addComponent(repository);
         }
 
        //JaversExtendedRepository can be created after users calls JaversBuilder.registerJaversRepository()

@@ -1,5 +1,6 @@
 package org.javers.core.diff.changetype.container;
 
+import org.javers.common.validation.Validate;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
@@ -20,7 +21,9 @@ public abstract class ContainerChange extends PropertyChange {
 
     ContainerChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
         super(affectedCdoId, property);
-        this.changes= Collections.unmodifiableList(new ArrayList<>(changes));
+        Validate.argumentIsNotNull(changes);
+        Validate.argumentCheck(!changes.isEmpty(),"changes list should not be empty");
+        this.changes = Collections.unmodifiableList(new ArrayList<>(changes));
     }
 
     /**

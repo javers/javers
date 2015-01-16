@@ -1,4 +1,4 @@
-package org.javers.core.diff.appenders;
+package org.javers.core.diff.custom;
 
 import org.javers.core.diff.changetype.map.MapChange;
 

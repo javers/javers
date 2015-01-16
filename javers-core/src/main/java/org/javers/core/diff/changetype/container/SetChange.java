@@ -10,7 +10,7 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
 /**
  * @author pawel szymczyk
  */
-public final class SetChange extends CollectionChange {
+public class SetChange extends CollectionChange {
 
     public SetChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
         super(affectedCdoId, property, changes);

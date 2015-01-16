@@ -2,7 +2,8 @@ package org.javers.repository.jdbc;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.javers.repository.jdbc.schema.FixedSchemaFactory
-import org.polyjdbc.core.dialect.Dialect;
+import org.polyjdbc.core.dialect.Dialect
+import spock.lang.Ignore;
 import spock.lang.Specification;
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -16,6 +17,7 @@ import static org.javers.repository.jdbc.JdbcDiffRepositoryBuilder.*;
  */
 class JdbcDiffRepositoryBuilderTest extends Specification{
 
+    @Ignore
     def "should build jdbcDiffRepository with default H2 config"(){
         when:
         JdbcDiffRepositoryBuilder builder = jdbcDiffRepository()
@@ -27,7 +29,7 @@ class JdbcDiffRepositoryBuilderTest extends Specification{
         builder.getContainerComponent(BasicDataSource.class).getUrl() == "jdbc:h2:mem:test"
     }
 
-
+    @Ignore
     def "should create schema if not exists"() {
         when:
         JdbcDiffRepositoryBuilder builder = jdbcDiffRepository()
