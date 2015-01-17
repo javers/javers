@@ -1,5 +1,6 @@
 package org.javers.core
 
+import org.fest.assertions.error.ShouldBe
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.commit.CommitAssert

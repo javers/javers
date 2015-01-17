@@ -2,9 +2,10 @@ package org.javers.core.metamodel.type;
 
 import org.javers.core.json.JsonTypeAdapter;
 import org.joda.time.LocalDateTime;
-
+import org.javers.core.json.JsonTypeAdapter;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import org.javers.core.JaversBuilder;
 
 /**
  * Value class in client's domain model. Simple value holder.
@@ -23,8 +24,7 @@ import java.math.BigDecimal;
  *
  * Values are serialized to JSON using Gson defaults,
  * if it's not what you need, implement {@link JsonTypeAdapter} for custom serialization
- *
- * @see org.javers.core.json.JsonConverter
+ * and register it with {@link JaversBuilder#registerValueTypeAdapter(JsonTypeAdapter)}
  *
  * @author bartosz walacik
  */

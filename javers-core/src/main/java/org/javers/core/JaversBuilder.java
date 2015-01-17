@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import org.javers.core.metamodel.type.*;
 import com.google.gson.TypeAdapter;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitFactoryModule;
@@ -115,7 +116,8 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers a {@link ValueObject}
+     * Registers a ValueObject type (see {@link ValueObjectType}). <br/>
+     * For example, values are: Address, Point
      *
      * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
@@ -126,7 +128,8 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * registers a {@link ValueType}
+     * Registers a simple value type (see {@link ValueType}). <br/>
+     * For example, values are: BigDecimal, LocalDateTime
      *
      * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */

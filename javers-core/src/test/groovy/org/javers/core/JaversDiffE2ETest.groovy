@@ -28,18 +28,12 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class JaversDiffE2ETest extends Specification {
 
-    def "should support custom Map comparator"() {
+    def "should support custom comparator"() {
         given:
-        def comparator = new CustomPropertyComparator() {
-            MapChange compare(def left, def right, GlobalId affectedId, Property property) {
-
-                //this is a Fake comparator
-                return new MapChange(affectedId, property, [new EntryValueChange("a", left.get("a")[0], right.get("a")[0])])
-            }
-        }
         def left =  new GuavaObject(multimap: Multimaps.forMap(["a":1]))
         def right = new GuavaObject(multimap: Multimaps.forMap(["a":2]))
-        def javers = JaversBuilder.javers().registerCustomComparator(comparator, Multimap).build()
+        def javers = JaversBuilder.javers()
+                .registerCustomComparator(new CustomMultimapFakeComparator(), Multimap).build()
 
         when:
         def diff = javers.compare(left,right)
