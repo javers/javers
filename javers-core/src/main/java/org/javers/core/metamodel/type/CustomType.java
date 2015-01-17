@@ -1,9 +1,8 @@
 package org.javers.core.metamodel.type;
 
-import java.lang.reflect.Type;
-import org.javers.core.json.JsonTypeAdapter;
-import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.JaversBuilder;
+import org.javers.core.diff.custom.CustomPropertyComparator;
+import java.lang.reflect.Type;
 
 /**
  * Custom type in client's domain model.
@@ -19,10 +18,7 @@ import org.javers.core.JaversBuilder;
  * is the only way to map a custom type.
  * <br/><br/>
  *
- * Custom types are serialized to JSON using Gson defaults,
- * if it's not what you need, implement {@link JsonTypeAdapter} for custom serialization
- * and register it with {@link JaversBuilder#registerValueTypeAdapter(JsonTypeAdapter)}
- *
+ * Custom types are serialized to JSON using Gson defaults.
  * @author bartosz walacik
  */
 public class CustomType extends JaversType {
