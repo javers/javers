@@ -7,11 +7,10 @@ import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.map.MapChange
-import org.javers.core.diff.custom.CustomMapComparator
+import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.metamodel.object.GlobalId
-import org.javers.core.metamodel.object.InstanceIdDTO
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
@@ -31,7 +30,7 @@ class JaversDiffE2ETest extends Specification {
 
     def "should support custom Map comparator"() {
         given:
-        def comparator = new CustomMapComparator() {
+        def comparator = new CustomPropertyComparator() {
             MapChange compare(def left, def right, GlobalId affectedId, Property property) {
 
                 //this is a Fake comparator
@@ -40,7 +39,7 @@ class JaversDiffE2ETest extends Specification {
         }
         def left =  new GuavaObject(multimap: Multimaps.forMap(["a":1]))
         def right = new GuavaObject(multimap: Multimaps.forMap(["a":2]))
-        def javers = JaversBuilder.javers().registerCustomMapComparator(comparator, Multimap).build()
+        def javers = JaversBuilder.javers().registerCustomComparator(comparator, Multimap).build()
 
         when:
         def diff = javers.compare(left,right)

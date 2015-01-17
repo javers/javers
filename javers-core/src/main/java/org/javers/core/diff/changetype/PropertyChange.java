@@ -8,7 +8,8 @@ import static org.javers.common.string.ToStringBuilder.addField;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * Property change, like {@link ValueChange} or {@link ReferenceChange}
+ * Property change like {@link ValueChange} or {@link ReferenceChange}
+ *
  * @author bartosz walacik
  */
 public abstract class PropertyChange extends Change {

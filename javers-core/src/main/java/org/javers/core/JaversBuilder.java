@@ -4,15 +4,16 @@ import com.google.gson.TypeAdapter;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
-import org.javers.core.diff.appenders.*;
-import org.javers.core.diff.custom.CustomCollectionComparator;
-import org.javers.core.diff.custom.CustomMapComparator;
+import org.javers.core.diff.appenders.DiffAppendersModule;
+import org.javers.core.diff.changetype.PropertyChange;
+import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
 import org.javers.core.metamodel.clazz.*;
+import org.javers.core.metamodel.type.CustomType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
 import org.javers.core.snapshot.GraphSnapshotModule;
@@ -22,7 +23,9 @@ import org.javers.repository.api.JaversRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Creates a JaVers instance based on your domain model metadata and custom configuration.
@@ -153,8 +156,8 @@ public final class JaversBuilder extends AbstractJaversBuilder {
 
     /**
      * Registers {@link ValueType} and its custom native
-     *  <a href="http://code.google.com/p/google-gson/">Gson</a> adapter.
-     * <br><br>
+     * <a href="http://code.google.com/p/google-gson/">Gson</a> adapter.
+     * <br/><br/>
      *
      * Useful when you already have Gson {@link TypeAdapter}s implemented.
      *
@@ -168,11 +171,11 @@ public final class JaversBuilder extends AbstractJaversBuilder {
 
     /**
      * Switch on when you need a type safe serialization for
-     * polymorfic collections like List, List&lt;Object&gt;.
+     * heterogeneous collections like List, List&lt;Object&gt;.
      * <br/><br/>
      *
-     * Polymorfic collections are collections which contains items of different types
-     * ot types unknown at compile time.
+     * Heterogeneous collections are collections which contains items of different types
+     * (or types unknown at compile time).
      * <br/><br/>
      *
      * This approach is generally discouraged, prefer statically typed collections
@@ -213,13 +216,26 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    public <T> JaversBuilder registerCustomMapComparator(CustomMapComparator<T> comparator, Class<T> mapClass){
-        clientsClassDefinitions.add(new CustomDefinition(mapClass));
-        addComponent(new CustomToNativeAppenderAdapter(comparator, mapClass));
-        return this;
-    }
-
-    public <T> JaversBuilder registerCustomCollectionComparator(CustomCollectionComparator<T> comparator, Class<T> collectionClass){
+    /**
+     * Registers a custom comparator for given custom type.
+     * <br/><br/>
+     *
+     * Comparator has to calculate and return a subtype of {@link PropertyChange}.
+     * <br/><br/>
+     *
+     * Additionally, maps given type and all of its subtypes as {@link CustomType}.
+     * <br/><br/>
+     *
+     * Custom classes are serialized using GSON defaults so the resulting JSON might be verbose.
+     * Consider implementing a {@link JsonTypeAdapter} to make it neat.
+     *
+     * @param <T> custom type
+     * @param customType class literal to define a custom type
+     * @see CustomPropertyComparator
+     */
+    public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
+        clientsClassDefinitions.add(new CustomDefinition(customType));
+        addComponent(new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
     }
 
@@ -243,7 +259,7 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private void bootManagedClasses() {
-        addModule(new ManagedClassFactoryModule( coreConfiguration()) );
+        addModule(new ManagedClassFactoryModule(coreConfiguration()));
         mapRegisteredClasses();
     }
 
