@@ -19,6 +19,7 @@ import java.lang.reflect.Type;
  * <br/><br/>
  *
  * Custom types are serialized to JSON using Gson defaults.
+ *
  * @author bartosz walacik
  */
 public class CustomType extends JaversType {

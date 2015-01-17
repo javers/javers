@@ -226,11 +226,10 @@ public final class JaversBuilder extends AbstractJaversBuilder {
      * Comparator has to calculate and return a subtype of {@link PropertyChange}.
      * <br/><br/>
      *
-     * Additionally, maps given type and all of its subtypes as {@link CustomType}.
+     * Internally, given type is mapped as {@link CustomType}.
      * <br/><br/>
      *
-     * Custom classes are serialized using GSON defaults so the resulting JSON might be verbose.
-     * Consider implementing a {@link JsonTypeAdapter} to make it neat.
+     * Custom types are serialized to JSON using Gson defaults.
      *
      * @param <T> custom type
      * @param customType class literal to define a custom type
