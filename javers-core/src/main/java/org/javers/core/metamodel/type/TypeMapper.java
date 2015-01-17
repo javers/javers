@@ -149,6 +149,10 @@ public class TypeMapper {
         addType(new ValueType(valueCLass));
     }
 
+    public void registerCustomType(Class<?> customCLass) {
+        addType(new CustomType(customCLass));
+    }
+
     protected <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
         List<T> result = new ArrayList<>();
         for(JaversType jType : mappedTypes.values()) {

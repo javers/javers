@@ -23,6 +23,9 @@ public class TypeFactory {
     }
 
     JaversType createFromDefinition(ClientsClassDefinition def){
+        if (def instanceof ClientsClassDefinition){
+            return new CustomType(def.getClazz());
+        }
         return createFromClientsClass(managedClassFactory.create(def));
     }
 
@@ -36,7 +39,7 @@ public class TypeFactory {
         }
         else {
             jType = inferFromAnnotations(javaType);
-            logger.info("javersType of [{}] inferred as {} from annotations",
+            logger.info("javersType of [{}] inferred as {}",
                         javaType, jType.getClass().getSimpleName());
         }
 

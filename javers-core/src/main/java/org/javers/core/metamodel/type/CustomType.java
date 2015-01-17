@@ -5,8 +5,8 @@ import java.lang.reflect.Type;
 /**
  * @author bartosz walacik
  */
-public abstract class PrimitiveOrValueType extends JaversType{
-    public PrimitiveOrValueType(Type baseJavaType) {
+public class CustomType extends JaversType {
+    public CustomType(Type baseJavaType) {
         super(baseJavaType);
     }
 }

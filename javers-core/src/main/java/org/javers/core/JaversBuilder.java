@@ -68,14 +68,13 @@ public final class JaversBuilder extends AbstractJaversBuilder {
 
     public Javers build() {
 
-        // bootstrap phase 2:
         // ManagedClassFactory & managed clazz registration
         bootManagedClasses();
 
-        // bootstrap phase 3: JSON beans & domain aware typeAdapters
+        // JSON beans & domain aware typeAdapters
         bootJsonConverter();
 
-        // bootstrap phase 4: Repository
+        // Repository
         bootRepository();
 
         Javers javers = getContainerComponent(Javers.class);
@@ -215,7 +214,7 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     }
 
     public <T> JaversBuilder registerCustomMapComparator(CustomMapComparator<T> comparator, Class<T> mapClass){
-    //    typeMapper().registerValueType(...);
+        clientsClassDefinitions.add(new CustomDefinition(mapClass));
         addComponent(new CustomToNativeAppenderAdapter(comparator, mapClass));
         return this;
     }

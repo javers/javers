@@ -1,11 +1,10 @@
 package org.javers.core
 
+import com.google.common.collect.Multimap
+import com.google.common.collect.Multimaps
 import groovy.json.JsonSlurper
-import org.javers.core.diff.Diff
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
-import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.diff.changetype.map.EntryChange
 import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.diff.custom.CustomMapComparator
@@ -13,13 +12,9 @@ import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceIdDTO
+import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.property.Property
-import org.javers.core.model.DummyPoint
-import org.javers.core.model.DummyUser
-import org.javers.core.model.DummyUserDetails
-import org.javers.core.model.PrimitiveEntity
-import org.javers.core.model.SnapshotEntity
-import org.joda.time.LocalDateTime
+import org.javers.core.model.*
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
@@ -38,13 +33,14 @@ class JaversDiffE2ETest extends Specification {
         given:
         def comparator = new CustomMapComparator() {
             MapChange compare(def left, def right, GlobalId affectedId, Property property) {
-                //this Fake comparator impl changes key to "b" and lefts values untouched
-                return new MapChange(affectedId, property, [new EntryValueChange("b", left.a, right.a)])
+
+                //this is a Fake comparator
+                return new MapChange(affectedId, property, [new EntryValueChange("a", left.get("a")[0], right.get("a")[0])])
             }
         }
-        def left = new SnapshotEntity(id:1, mapOfPrimitives:["a":1])
-        def right = new SnapshotEntity(id:1, mapOfPrimitives:["a":2])
-        def javers = JaversBuilder.javers().registerCustomMapComparator(comparator, Map).build()
+        def left =  new GuavaObject(multimap: Multimaps.forMap(["a":1]))
+        def right = new GuavaObject(multimap: Multimaps.forMap(["a":2]))
+        def javers = JaversBuilder.javers().registerCustomMapComparator(comparator, Multimap).build()
 
         when:
         def diff = javers.compare(left,right)
@@ -53,9 +49,9 @@ class JaversDiffE2ETest extends Specification {
         true
         diff.changes.size() == 1
         with(diff.changes[0]) {
-            affectedCdoId == InstanceIdDTO.instanceId(1, SnapshotEntity)
-            property.name == "mapOfPrimitives"
-            changes[0].key == "b"
+            affectedCdoId instanceof UnboundedValueObjectId
+            property.name == "multimap"
+            changes[0].key == "a"
             changes[0].leftValue == 1
             changes[0].rightValue == 2
         }

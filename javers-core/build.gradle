@@ -8,7 +8,7 @@ dependencies {
     compile 'org.picocontainer:picocontainer:2.14.3'
 
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
-    testCompile 'com.google.guava:guava:14.0.1'
+    testCompile 'com.google.guava:guava:18.0'
     testCompile 'org.mongodb.morphia:morphia:0.108'
 }
 
