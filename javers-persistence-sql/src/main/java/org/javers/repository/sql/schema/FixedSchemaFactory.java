@@ -16,6 +16,7 @@ public class FixedSchemaFactory {
 
     public static final String CDO_CLASS_TABLE_NAME = "jv_cdo_class";
     public static final String CDO_CLASS_PK =         "cdo_class_pk";
+    public static final String CDO_CLASS_QUALIFIED_NAME = "qualified_name";
 
     public static final String GLOBAL_ID_TABLE_NAME = "jv_global_id";
     public static final String GLOBAL_ID_PK =         "global_id_pk";
@@ -32,7 +33,7 @@ public class FixedSchemaFactory {
     private Schema snapshotTableSchema(Dialect dialect, String tableName){
         Schema schema = new Schema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName);
-        primaryKey(tableName, SNAPSHOT_TABLE_PK, schema,relationBuilder);
+        primaryKey(tableName, SNAPSHOT_TABLE_PK, schema, relationBuilder);
         foreignKey(tableName, SNAPSHOT_TABLE_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);
         foreignKey(tableName, SNAPSHOT_TABLE_COMMIT_FK, SNAPSHOT_TABLE_NAME, SNAPSHOT_TABLE_PK, relationBuilder, schema);
         relationBuilder.build();
@@ -56,7 +57,7 @@ public class FixedSchemaFactory {
         Schema schema = new Schema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         primaryKey(tableName, CDO_CLASS_PK, schema,relationBuilder);
-        relationBuilder.withAttribute().string("qualified_name").withMaxLength(100).and()
+        relationBuilder.withAttribute().string(CDO_CLASS_QUALIFIED_NAME).withMaxLength(100).and()
                 .build();
         return schema;
     }
@@ -77,7 +78,6 @@ public class FixedSchemaFactory {
         relationBuilder
                 .withAttribute().longAttr(fkColName).notNull().and()
                 .foreignKey(tableName + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName);
-
         schema.addIndex(tableName+"_"+ fkColName +"_idx").indexing(fkColName).on(tableName).build();
     }
 
