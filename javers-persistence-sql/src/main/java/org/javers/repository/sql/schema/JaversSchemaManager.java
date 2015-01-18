@@ -8,37 +8,40 @@ import org.polyjdbc.core.util.TheCloser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 /**
  * @author bartosz walacik
  */
 public class JaversSchemaManager {
     private static final Logger logger = LoggerFactory.getLogger(JaversSchemaManager.class);
 
-    private Schema schema;
     private FixedSchemaFactory schemaFactory;
     private TransactionManager transactionManager;
+    private Dialect dialect;
 
     public JaversSchemaManager(Dialect dialect, FixedSchemaFactory schemaFactory, TransactionManager transactionManager) {
-        this.schema = schemaFactory.getSchema(dialect);
         this.transactionManager = transactionManager;
         this.schemaFactory = schemaFactory;
+        this.dialect = dialect;
     }
 
-    public void ensureSchema(){
-        SchemaManagerFactory schemaManagerFactory = new SchemaManagerFactory(transactionManager);
+    public void ensureSchema() {
+        for (Map.Entry<String, Schema> e : schemaFactory.allTablesSchema(dialect).entrySet()){
+            ensureTable(e.getKey(), e.getValue());
+        }
+    }
 
+    private void ensureTable(String tableName, Schema schema){
+        SchemaManagerFactory schemaManagerFactory = new SchemaManagerFactory(transactionManager);
         SchemaManager schemaManager = null;
         SchemaInspector schemaInspector = null;
         try {
             schemaInspector = schemaManagerFactory.createInspector();
-
-            if (schemaExists(schemaInspector)) {
-                logger.info("javers schema exists");
+            if (schemaInspector.relationExists(tableName)) {
                 return;
             }
-
-            logger.info("creating javers schema ...");
-
+            logger.info("creating javers table {} ...", tableName);
             schemaManager = schemaManagerFactory.createManager();
             schemaManager.create(schema);
         } finally {
@@ -46,11 +49,7 @@ public class JaversSchemaManager {
         }
     }
 
-    public boolean schemaExists(SchemaInspector schemaInspector ) {
-        return schemaInspector.relationExists(schemaFactory.getDiffTableName());
-    }
-
     public void dropSchema(){
-
+        throw new RuntimeException("not implemented");
     }
 }
