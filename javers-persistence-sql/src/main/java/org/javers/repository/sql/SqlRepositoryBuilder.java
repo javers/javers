@@ -1,6 +1,7 @@
 package org.javers.repository.sql;
 
 import org.javers.core.AbstractJaversBuilder;
+import org.javers.core.json.JsonConverter;
 import org.javers.repository.sql.pico.JaversSqlModule;
 import org.javers.repository.sql.schema.JaversSchemaManager;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
 
     private DialectName dialectName;
     private ConnectionProvider connectionProvider;
+    private JsonConverter jsonConverter;
 
     private SqlRepositoryBuilder() {
     }
@@ -53,6 +55,7 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
         addComponent(dialectName.getPolyDialect());
         addComponent(dialectName);
         addComponent(connectionProvider);
+        addComponent(jsonConverter);
 
         ensureSchema();
         return getContainerComponent(JaversSqlRepository.class);
@@ -68,5 +71,10 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
     @Override
     protected <T> T getContainerComponent(Class<T> ofClass) {
         return super.getContainerComponent(ofClass);
+    }
+
+    public SqlRepositoryBuilder withJSONConverter(JsonConverter jsonConverter) {
+        this.jsonConverter = jsonConverter;
+        return this;
     }
 }

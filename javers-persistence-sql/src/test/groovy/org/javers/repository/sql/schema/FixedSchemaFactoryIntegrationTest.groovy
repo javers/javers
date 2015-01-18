@@ -1,5 +1,6 @@
 package org.javers.repository.sql.schema
 
+import org.javers.core.json.JsonConverterBuilder
 import org.javers.repository.sql.ConnectionProvider
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.SqlRepositoryBuilder
@@ -20,16 +21,17 @@ class FixedSchemaFactoryIntegrationTest extends Specification {
         when:
         Class.forName("org.postgresql.Driver");
         def connection = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/javers","javers", "javers");
+                "jdbc:postgresql://localhost:5432/bartosz.galek", "bartosz.galek", "");
 
         def repo = SqlRepositoryBuilder
                 .sqlRepository()
+                .withJSONConverter(JsonConverterBuilder.jsonConverter().build())
                 .withConnectionProvider(new ConnectionProvider() {
-                    @Override
-                    Connection getConnection() {
-                        return connection
-                    }
-                })
+            @Override
+            Connection getConnection() {
+                return connection
+            }
+        })
                 .withDialect(DialectName.H2).build()
 
         //TODO ...

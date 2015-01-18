@@ -2,6 +2,7 @@ package org.javers.repository.sql.pico;
 
 import org.javers.core.pico.JaversModule;
 import org.javers.repository.sql.JaversSqlRepository;
+import org.javers.repository.sql.domain.GlobalIdRepository;
 import org.javers.repository.sql.poly.JaversPolyJDBC;
 import org.javers.repository.sql.schema.FixedSchemaFactory;
 import org.javers.repository.sql.schema.JaversSchemaManager;
@@ -22,7 +23,8 @@ public class JaversSqlModule implements JaversModule{
                                                            FixedSchemaFactory.class,
                                                            JaversSchemaManager.class,
                                                            ProvidedConnectionTransactionManager.class,
-                                                           QueryRunnerFactory.class};
+                                                           QueryRunnerFactory.class,
+                                                           GlobalIdRepository.class};
 
     @Override
     public Collection<Class> getComponents() {
