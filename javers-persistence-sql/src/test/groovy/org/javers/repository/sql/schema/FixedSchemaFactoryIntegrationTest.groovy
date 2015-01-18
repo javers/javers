@@ -1,8 +1,11 @@
 package org.javers.repository.sql.schema
 
+import org.javers.repository.sql.ConnectionProvider
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.SqlRepositoryBuilder
 import spock.lang.Specification
+
+import java.sql.Connection
 
 /**
  * Integration Test, requires PostgreSQL
@@ -14,7 +17,15 @@ class FixedSchemaFactoryIntegrationTest extends Specification {
 
     def "should create schema"() {
         when:
-        def repo = SqlRepositoryBuilder.sqlRepository().withDialect(DialectName.H2)
+        def repo = SqlRepositoryBuilder
+                .sqlRepository()
+                .withConnectionProvider(new ConnectionProvider() {
+                    @Override
+                    Connection getConnection() {
+                        return null
+                    }
+                })
+                .withDialect(DialectName.H2).build()
 
         //TODO ...
 

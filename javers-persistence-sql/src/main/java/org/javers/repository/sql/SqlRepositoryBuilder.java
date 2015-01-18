@@ -13,6 +13,7 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(SqlRepositoryBuilder.class);
 
     private DialectName dialectName;
+    private ConnectionProvider connectionProvider;
 
     private SqlRepositoryBuilder() {
     }
@@ -23,6 +24,11 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
 
     public SqlRepositoryBuilder withDialect(DialectName dialect) {
         dialectName = dialect;
+        return this;
+    }
+
+    public SqlRepositoryBuilder withConnectionProvider(ConnectionProvider connectionProvider){
+        this.connectionProvider = connectionProvider;
         return this;
     }
 
@@ -44,7 +50,8 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
         logger.info("starting up SQL repository module ...");
         bootContainer();
         addModule(new JaversSqlModule());
-        addComponent(dialectName);
+        addComponent(dialectName.getPolyDialect());
+        addComponent(connectionProvider);
 
         ensureSchema();
         return getContainerComponent(JaversSqlRepository.class);
