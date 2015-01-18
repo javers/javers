@@ -17,12 +17,13 @@ class FixedSchemaFactoryIntegrationTest extends Specification {
 
     def "should create schema"() {
         when:
+        Connection conn = Stub()
         def repo = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(new ConnectionProvider() {
                     @Override
                     Connection getConnection() {
-                        return null
+                        return conn
                     }
                 })
                 .withDialect(DialectName.H2).build()

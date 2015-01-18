@@ -1,6 +1,6 @@
 dependencies {
     compile project(':javers-core')
-    compile 'org.polyjdbc:polyjdbc:0.4.0'
+    compile project(':javers-polyjdbc')
 
     testCompile 'commons-dbcp:commons-dbcp:1.4'
     testCompile 'ch.qos.logback:logback-classic:1.1.2'
