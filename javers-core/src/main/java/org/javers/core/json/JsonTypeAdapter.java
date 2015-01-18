@@ -4,7 +4,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
-import org.javers.core.metamodel.type.ValueType;
+import org.javers.core.metamodel.type.*;
 
 import java.util.List;
 
@@ -17,7 +17,8 @@ import java.util.List;
  * depending on your domain model.
  * <p/>
  *
- * {@link ValueType} eligible for deserialization should have a no-argument constructor (public or private).
+ * {@link ValueType} or {@link CustomType} eligible for deserialization
+ * should have a no-argument constructor (public or private).
  * <p/>
  *
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
@@ -26,7 +27,7 @@ import java.util.List;
  * For implementation example see {@link LocalDateTimeTypeAdapter}.
  * <p/>
  *
- * @see LocalDateTimeTypeAdapter
+ * @param <T> user type, mapped to {@link ValueType} or {@link CustomType}
  * @see JsonConverter
  * @author bartosz walacik
  */

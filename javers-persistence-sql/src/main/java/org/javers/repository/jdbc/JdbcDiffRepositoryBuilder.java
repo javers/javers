@@ -68,7 +68,7 @@ public class JdbcDiffRepositoryBuilder extends AbstractJaversBuilder {
 
     public JdbcDiffRepository build() {
         logger.info("starting up JDBC repository module ...");
-        bootContainer(new JdbcJaversModule());
+        bootContainer();
         addComponent(jdbcConfiguration.createConnectionPool());
         addComponent(jdbcConfiguration.getPollyDialect());
 

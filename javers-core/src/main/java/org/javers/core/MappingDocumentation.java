@@ -113,5 +113,5 @@ import org.javers.core.graph.ObjectGraphBuilder;
  *
  * @author bartosz walacik
  */
-public abstract class MappingDocumentation {
+public interface MappingDocumentation {
 }

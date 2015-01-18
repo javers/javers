@@ -6,11 +6,10 @@ import org.javers.core.metamodel.property.Property;
 import java.util.List;
 
 /**
- * @author pawel szymczyk
+ * @author bartosz walacik
  */
-public class ListChange extends CollectionChange {
-
-    public ListChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
+public abstract class CollectionChange extends ContainerChange {
+    public CollectionChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
         super(affectedCdoId, property, changes);
     }
 }

@@ -1,6 +1,6 @@
 package org.javers.core.diff.changetype.map;
 
-import org.javers.common.string.ToStringBuilder;
+import org.javers.common.validation.Validate;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
@@ -19,14 +19,16 @@ public class MapChange extends PropertyChange {
 
     public MapChange(GlobalId affectedCdoId, Property property, List<EntryChange> changes) {
         super(affectedCdoId, property);
-        this.changes = new ArrayList<>(changes);
+        Validate.argumentIsNotNull(changes);
+        Validate.argumentCheck(!changes.isEmpty(),"changes list should not be empty");
+        this.changes = Collections.unmodifiableList(new ArrayList<>(changes));
     }
 
     /**
      * @return unmodifiable list
      */
     public List<EntryChange> getEntryChanges() {
-        return Collections.unmodifiableList(changes);
+        return changes;
     }
 
     @Override

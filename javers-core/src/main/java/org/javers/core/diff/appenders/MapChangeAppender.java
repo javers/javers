@@ -24,23 +24,23 @@ import static org.javers.common.collections.Objects.nullSafeEquals;
 /**
  * @author bartosz walacik
  */
-class MapChangeAppender  extends PropertyChangeAppender<MapChange> {
+class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
 
-    public MapChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
+    MapChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
         Validate.argumentsAreNotNull(typeMapper, globalIdFactory);
         this.typeMapper = typeMapper;
         this.globalIdFactory = globalIdFactory;
     }
 
     @Override
-    protected boolean supports(JaversType propertyType) {
+    public boolean supports(JaversType propertyType) {
         return propertyType instanceof MapType;
     }
 
     @Override
-    protected MapChange calculateChanges(NodePair pair, Property property) {
+    public MapChange calculateChanges(NodePair pair, Property property) {
         Map leftRawMap =  (Map)pair.getLeftPropertyValue(property);
         Map rightRawMap = (Map)pair.getRightPropertyValue(property);
 

@@ -1,16 +1,19 @@
 package org.javers.core
 
+import com.google.common.collect.Multimap
+import com.google.common.collect.Multimaps
 import groovy.json.JsonSlurper
-import org.javers.core.diff.Diff
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
-import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.map.EntryValueChange
+import org.javers.core.diff.changetype.map.MapChange
+import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
-import org.javers.core.model.DummyPoint
-import org.javers.core.model.DummyUser
-import org.javers.core.model.DummyUserDetails
-import org.javers.core.model.PrimitiveEntity
+import org.javers.core.metamodel.object.GlobalId
+import org.javers.core.metamodel.object.UnboundedValueObjectId
+import org.javers.core.metamodel.property.Property
+import org.javers.core.model.*
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
@@ -25,13 +28,34 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class JaversDiffE2ETest extends Specification {
 
+    def "should support custom comparator"() {
+        given:
+        def left =  new GuavaObject(multimap: Multimaps.forMap(["a":1]))
+        def right = new GuavaObject(multimap: Multimaps.forMap(["a":2]))
+        def javers = JaversBuilder.javers()
+                .registerCustomComparator(new CustomMultimapFakeComparator(), Multimap).build()
+
+        when:
+        def diff = javers.compare(left,right)
+
+        then:
+        diff.changes.size() == 1
+        with(diff.changes[0]) {
+            affectedCdoId instanceof UnboundedValueObjectId
+            property.name == "multimap"
+            changes[0].key == "a"
+            changes[0].leftValue == 1
+            changes[0].rightValue == 2
+        }
+    }
+
     def "should create NewObject for all nodes in initial diff"() {
         given:
-        Javers javers = JaversTestBuilder.newInstance()
+        def javers = JaversTestBuilder.newInstance()
         DummyUser left = dummyUser("kazik").withDetails().build()
 
         when:
-        Diff diff = javers.initial(left)
+        def diff = javers.initial(left)
 
         then:
         DiffAssert.assertThat(diff).has(2, NewObject)
@@ -39,9 +63,9 @@ class JaversDiffE2ETest extends Specification {
 
     def "should not create properties snapshot of NewObject by default"() {
         given:
-        Javers javers = JaversBuilder.javers().build()
-        DummyUser left =  new DummyUser(name: "kazik")
-        DummyUser right = new DummyUser(name: "kazik", dummyUserDetails: new DummyUserDetails(id: 1, someValue: "some"))
+        def javers = JaversBuilder.javers().build()
+        def left =  new DummyUser(name: "kazik")
+        def right = new DummyUser(name: "kazik", dummyUserDetails: new DummyUserDetails(id: 1, someValue: "some"))
 
         when:
         def diff = javers.compare(left, right)
@@ -54,12 +78,12 @@ class JaversDiffE2ETest extends Specification {
 
     def "should create properties snapshot of NewObject only when configured"() {
         given:
-        Javers javers = JaversBuilder.javers().withNewObjectsSnapshot(true).build()
-        DummyUser left =  new DummyUser(name: "kazik")
-        DummyUser right = new DummyUser(name: "kazik", dummyUserDetails: new DummyUserDetails(id: 1, someValue: "some"))
+        def javers = JaversBuilder.javers().withNewObjectsSnapshot(true).build()
+        def left =  new DummyUser(name: "kazik")
+        def right = new DummyUser(name: "kazik", dummyUserDetails: new DummyUserDetails(id: 1, someValue: "some"))
 
         when:
-        Diff diff = javers.compare(left, right)
+        def diff = javers.compare(left, right)
 
         then:
         DiffAssert.assertThat(diff)
@@ -70,29 +94,29 @@ class JaversDiffE2ETest extends Specification {
 
     def "should create valueChange with Enum" () {
         given:
-        DummyUser user =  dummyUser("id").withSex(FEMALE).build();
-        DummyUser user2 = dummyUser("id").withSex(MALE).build();
-        Javers javers = JaversTestBuilder.newInstance()
+        def user =  dummyUser("id").withSex(FEMALE).build();
+        def user2 = dummyUser("id").withSex(MALE).build();
+        def javers = JaversTestBuilder.newInstance()
 
         when:
-        Diff diff = javers.compare(user, user2)
+        def diff = javers.compare(user, user2)
 
         then:
         diff.changes.size() == 1
-        ValueChange change = diff.changes[0]
+        def change = diff.changes[0]
         change.left == FEMALE
         change.right == MALE
     }
 
     def "should serialize whole Diff"() {
         given:
-        DummyUser user =  dummyUser("id").withSex(FEMALE).build();
-        DummyUser user2 = dummyUser("id").withSex(MALE).withDetails(1).build();
-        Javers javers = JaversTestBuilder.newInstance()
+        def user =  dummyUser("id").withSex(FEMALE).build();
+        def user2 = dummyUser("id").withSex(MALE).withDetails(1).build();
+        def javers = JaversTestBuilder.newInstance()
 
         when:
-        Diff diff = javers.compare(user, user2)
-        String jsonText = javers.toJson(diff)
+        def diff = javers.compare(user, user2)
+        def jsonText = javers.toJson(diff)
         //println("jsonText:\n"+jsonText)
 
         then:
@@ -105,13 +129,13 @@ class JaversDiffE2ETest extends Specification {
 
     def "should support custom JsonTypeAdapter for ValueChange"() {
         given:
-        Javers javers = javers()
+        def javers = javers()
                        .registerValueTypeAdapter( new DummyPointJsonTypeAdapter() )
                        .build()
 
         when:
-        Diff diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
-        String jsonText = javers.toJson(diff)
+        def diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
+        def jsonText = javers.toJson(diff)
         //println("jsonText:\n"+jsonText)
 
         then:
@@ -127,7 +151,7 @@ class JaversDiffE2ETest extends Specification {
 
     def "should support custom native Gson TypeAdapter"() {
         given:
-        Javers javers = javers()
+        def javers = javers()
                 .registerValueGsonTypeAdapter(DummyPoint, new DummyPointNativeTypeAdapter() )
                 .build()
 
@@ -144,7 +168,7 @@ class JaversDiffE2ETest extends Specification {
 
     def "should understand primitive default values when creating NewObject snapshot"() {
         given:
-        Javers javers = javers().build()
+        def javers = javers().build()
 
         when:
         def diff = javers.initial(new PrimitiveEntity())
@@ -155,7 +179,7 @@ class JaversDiffE2ETest extends Specification {
 
     def "should understand primitive default values when creating ValueChange"() {
         given:
-        Javers javers = javers().build()
+        def javers = javers().build()
 
         when:
         def diff = javers.compare(new PrimitiveEntity(), new PrimitiveEntity())

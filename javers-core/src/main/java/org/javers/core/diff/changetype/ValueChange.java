@@ -1,6 +1,5 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.common.string.ToStringBuilder;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
@@ -9,7 +8,7 @@ import static org.javers.common.string.ToStringBuilder.addField;
 /**
  * @author bartosz walacik
  */
-public class ValueChange extends PropertyChange {
+public final class ValueChange extends PropertyChange {
     private final Atomic left;
     private final Atomic right;
 
@@ -25,14 +24,6 @@ public class ValueChange extends PropertyChange {
 
     public Object getRight() {
         return right.unwrap();
-    }
-
-    public Atomic getWrappedLeft() {
-        return left;
-    }
-
-    public Atomic getWrappedRight() {
-        return right;
     }
 
     @Override
