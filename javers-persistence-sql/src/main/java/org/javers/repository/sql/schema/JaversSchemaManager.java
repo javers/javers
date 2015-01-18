@@ -1,22 +1,12 @@
-package org.javers.repository.jdbc.schema;
+package org.javers.repository.sql.schema;
 
-import org.javers.common.validation.Validate;
-import org.javers.common.validation.Validate;
 import org.polyjdbc.core.dialect.Dialect;
 import org.polyjdbc.core.schema.*;
 import org.polyjdbc.core.schema.model.Schema;
-import org.polyjdbc.core.transaction.DataSourceTransactionManager;
 import org.polyjdbc.core.transaction.TransactionManager;
 import org.polyjdbc.core.util.TheCloser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
-
-import static org.javers.common.validation.Validate.*;
-
-
-import static org.javers.common.validation.Validate.*;
 
 /**
  * @author bartosz walacik

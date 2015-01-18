@@ -1,4 +1,4 @@
-package org.javers.repository.jdbc;
+package org.javers.repository.sql;
 
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
@@ -9,11 +9,13 @@ import org.javers.repository.api.JaversRepository;
 
 import java.util.List;
 
-/**
- * @author bartosz walacik
- */
-@Deprecated
-public class JdbcDiffRepository implements JaversRepository {
+public class JaversSqlRepository implements JaversRepository {
+
+    private ConnectionProvider connectionProvider;
+
+    public JaversSqlRepository(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
+    }
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {

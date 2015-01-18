@@ -1,9 +1,9 @@
-package org.javers.repository.jdbc.pico;
+package org.javers.repository.sql.pico;
 
 import org.javers.core.pico.JaversModule;
-import org.javers.repository.jdbc.JdbcDiffRepository;
-import org.javers.repository.jdbc.schema.FixedSchemaFactory;
-import org.javers.repository.jdbc.schema.JaversSchemaManager;
+import org.javers.repository.sql.JaversSqlRepository;
+import org.javers.repository.sql.schema.FixedSchemaFactory;
+import org.javers.repository.sql.schema.JaversSchemaManager;
 import org.polyjdbc.core.query.QueryRunnerFactory;
 import org.polyjdbc.core.transaction.DataSourceTransactionManager;
 
@@ -15,8 +15,8 @@ import java.util.Collection;
  *
  * @author bartosz walacik
  */
-public class JdbcJaversModule implements JaversModule{
-    private static Class[] moduleComponents = new Class[] {JdbcDiffRepository.class,
+public class SqlJaversModule implements JaversModule{
+    private static Class[] moduleComponents = new Class[] {JaversSqlRepository.class,
                                                            FixedSchemaFactory.class,
                                                            JaversSchemaManager.class,
                                                            DataSourceTransactionManager.class,
