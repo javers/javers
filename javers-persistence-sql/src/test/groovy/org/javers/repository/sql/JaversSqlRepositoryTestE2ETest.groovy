@@ -8,7 +8,6 @@ import java.sql.Connection
 
 import static org.javers.core.JaversBuilder.javers
 
-
 class JaversSqlRepositoryTestE2ETest extends JaversRepositoryE2ETest {
 
     @Override
