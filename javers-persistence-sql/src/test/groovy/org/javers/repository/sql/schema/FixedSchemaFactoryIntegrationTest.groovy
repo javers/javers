@@ -6,6 +6,7 @@ import org.javers.repository.sql.SqlRepositoryBuilder
 import spock.lang.Specification
 
 import java.sql.Connection
+import java.sql.DriverManager
 
 /**
  * Integration Test, requires PostgreSQL
@@ -17,13 +18,16 @@ class FixedSchemaFactoryIntegrationTest extends Specification {
 
     def "should create schema"() {
         when:
-        Connection conn = Stub()
+        Class.forName("org.postgresql.Driver");
+        def connection = DriverManager.getConnection(
+                "jdbc:postgresql://localhost:5432/javers","javers", "javers");
+
         def repo = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(new ConnectionProvider() {
                     @Override
                     Connection getConnection() {
-                        return conn
+                        return connection
                     }
                 })
                 .withDialect(DialectName.H2).build()
@@ -31,6 +35,6 @@ class FixedSchemaFactoryIntegrationTest extends Specification {
         //TODO ...
 
         then:
-        true
+        connection.close()
     }
 }

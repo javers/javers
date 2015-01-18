@@ -30,10 +30,10 @@ public class JaversPolyJDBC {
 
     private final SchemaManagerFactory schemaManagerFactory;
 
-    public JaversPolyJDBC(ConnectionProvider connectionProvider, Dialect dialect) {
+    public JaversPolyJDBC(ProvidedConnectionTransactionManager transactionManager, Dialect dialect) {
         this.dialect = dialect;
         this.queryFactory = new DialectQueryFactory(dialect);
-        this.transactionManager = new ProvidedConnectionTransactionManager(connectionProvider);
+        this.transactionManager = transactionManager;
         this.queryRunnerFactory = new QueryRunnerFactory(dialect, transactionManager);
         this.simpleQueryRunner = new SimpleQueryRunner(queryRunnerFactory);
         this.transactionRunner = new TransactionRunner(queryRunnerFactory);

@@ -51,6 +51,7 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
         bootContainer();
         addModule(new JaversSqlModule());
         addComponent(dialectName.getPolyDialect());
+        addComponent(dialectName);
         addComponent(connectionProvider);
 
         ensureSchema();

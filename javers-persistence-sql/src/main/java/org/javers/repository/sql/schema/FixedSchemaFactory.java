@@ -14,9 +14,37 @@ import java.util.Map;
  */
 public class FixedSchemaFactory {
 
-    public static final String SNAPSHOT_TABLE_NAME = "jv_snapshot";
-    public static final String COMMIT_TABLE_NAME = "jv_commit";
+    //public static final String SNAPSHOT_TABLE_NAME = "jv_snapshot";
+
+    public static final String CDO_CLASS_TABLE_NAME = "jv_cdo_class";
     public static final String GLOBAL_ID_TABLE_NAME = "jv_global_id";
+
+    //public static final String COMMIT_TABLE_NAME = "jv_commit";
+
+    private Schema cdoClassTableSchema(Dialect dialect, String tableName) {
+        Schema schema = new Schema(dialect);
+        RelationBuilder relationBuilder = schema.addRelation(tableName);
+        primaryKey(tableName,"cdo_class_pk",schema,relationBuilder);
+        relationBuilder.withAttribute().string("qualified_name").withMaxLength(100).and()
+                .build();
+        return schema;
+    }
+
+    private Schema globalIdTableSchema(Dialect dialect, String tableName){
+        Schema schema = new Schema(dialect);
+
+       // schema.addIndex(tableName+"_owner_fk_idx").indexing("owner_fk").on(tableName).build();
+
+        RelationBuilder relationBuilder = schema.addRelation(tableName);
+        primaryKey(tableName,"global_id_pk",schema,relationBuilder);
+        relationBuilder
+                .withAttribute().text("local_id").notNull().and()
+                .withAttribute().longAttr("cdo_class_fk").notNull().and()
+                .foreignKey(tableName+"_cdo_class_fk").on("cdo_class_fk").references(CDO_CLASS_TABLE_NAME,"cdo_class_pk").and()
+                .build();
+
+        return schema;
+    }
 
     private Schema commitTableSchema(Dialect dialect, String tableName) {
         Schema schema = new Schema(dialect);
@@ -30,27 +58,11 @@ public class FixedSchemaFactory {
         return schema;
     }
 
-    private Schema globalIdTableSchema(Dialect dialect, String tableName){
-        Schema schema = new Schema(dialect);
-        RelationBuilder relationBuilder = schema.addRelation(tableName);
-        primaryKey(tableName,"global_id_pk",schema,relationBuilder);
-        relationBuilder.withAttribute().string("dtype").withMaxLength(20).notNull().and()
-                .withAttribute().text("managed_class").notNull().and()
-                .withAttribute().text("cdo_id").notNull().and()
-                .withAttribute().text("fragment").notNull().and()
-                .withAttribute().integer("minor_id").notNull().and()
-                .withAttribute().longAttr("owner_fk").notNull().and()
-                .foreignKey(tableName+"_owner_fk").on("owner_fk").references(GLOBAL_ID_TABLE_NAME,"global_id_pk").and()
-                .build();
-        schema.addIndex(tableName+"_owner_fk_idx").indexing("owner_fk").on(tableName).build();
-        return schema;
-    }
-
     private void primaryKey(String tableName, String pkColName, Schema schema, RelationBuilder relationBuilder) {
         relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
                 .primaryKey("jv_"+pkColName).using(pkColName).and();
         schema.addSequence("jv_"+pkColName+"_seq").build();
-        schema.addIndex(tableName+"_pk_idx").indexing(pkColName).on(tableName).build();
+        //schema.addIndex(tableName+"_pk_idx").indexing(pkColName).on(tableName).build();
     }
 
     private Schema snapshotTableSchema(Dialect dialect, String tableName){
@@ -59,9 +71,12 @@ public class FixedSchemaFactory {
 
     public Map<String, Schema> allTablesSchema(Dialect dialect) {
         Map<String, Schema> schema = new HashMap<>();
-        schema.put(COMMIT_TABLE_NAME, commitTableSchema(dialect, COMMIT_TABLE_NAME));
+        //schema.put(COMMIT_TABLE_NAME, commitTableSchema(dialect, COMMIT_TABLE_NAME));
         //schema.put(SNAPSHOT_TABLE_NAME, snapshotTableSchema(dialect, SNAPSHOT_TABLE_NAME));
+
+        schema.put(CDO_CLASS_TABLE_NAME, cdoClassTableSchema(dialect, CDO_CLASS_TABLE_NAME));
         schema.put(GLOBAL_ID_TABLE_NAME, globalIdTableSchema(dialect, GLOBAL_ID_TABLE_NAME));
+
         return schema;
     }
 }
