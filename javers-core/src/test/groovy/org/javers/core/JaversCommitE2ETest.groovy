@@ -1,12 +1,16 @@
 package org.javers.core
 
+import com.google.common.collect.Multimap
+import com.google.common.collect.Multimaps
 import org.fest.assertions.error.ShouldBe
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.commit.CommitAssert
+import org.javers.core.metamodel.object.UnboundedValueObjectIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
+import org.javers.core.model.GuavaObject
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
 
@@ -20,6 +24,23 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class JaversCommitE2ETest extends Specification {
 
+    def "should store history for custom types"() {
+        given:
+        def javers = JaversBuilder.javers()
+                .registerCustomComparator(new CustomMultimapFakeComparator(), Multimap).build()
+        def cdo =  new GuavaObject(multimap: Multimaps.forMap(["a":1]))
+        javers.commit("author", cdo)
+        cdo.setMultimap(Multimaps.forMap(["a":2]))
+        javers.commit("author", cdo)
+
+        when:
+        def snapshots = javers.getStateHistory(UnboundedValueObjectIdDTO.unboundedValueObjectId(GuavaObject), 10)
+
+        then:
+        snapshots[1].getPropertyValue("multimap") == Multimaps.forMap(["a":1])
+        snapshots[0].getPropertyValue("multimap") == Multimaps.forMap(["a":2])
+    }
+    
     def "should create terminal commit for removed object"() {
         given:
         def javers = javers().build()

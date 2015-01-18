@@ -12,9 +12,11 @@ import java.util.List;
 public class JaversSqlRepository implements JaversRepository {
 
     private ConnectionProvider connectionProvider;
+    private final DialectName dialectName;
 
-    public JaversSqlRepository(ConnectionProvider connectionProvider) {
+    public JaversSqlRepository(ConnectionProvider connectionProvider, DialectName dialectName) {
         this.connectionProvider = connectionProvider;
+        this.dialectName = dialectName;
     }
 
     @Override

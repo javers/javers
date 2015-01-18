@@ -27,24 +27,6 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
-    def "should store history for custom types"() {
-        given:
-        def javers = JaversBuilder.javers()
-                .registerCustomComparator(new CustomMultimapFakeComparator(), Multimap).build()
-        def cdo =  new GuavaObject(multimap: Multimaps.forMap(["a":1]))
-        javers.commit("author", cdo)
-        cdo.setMultimap(Multimaps.forMap(["a":2]))
-        javers.commit("author", cdo)
-
-        when:
-        def snapshots = javers.getStateHistory(UnboundedValueObjectIdDTO.unboundedValueObjectId(GuavaObject), 10)
-
-        then:
-        snapshots[1].getPropertyValue("multimap") == Multimaps.forMap(["a":1])
-        snapshots[0].getPropertyValue("multimap") == Multimaps.forMap(["a":2])
-    }
-
-
     def "should fetch terminal snapshots from the repository"() {
         given:
         def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
