@@ -23,11 +23,13 @@ public class FixedSchemaFactory {
     public static final String CDO_CLASS_TABLE_NAME = "jv_cdo_class";
     public static final String CDO_CLASS_PK =         "cdo_class_pk";
     public static final String CDO_CLASS_QUALIFIED_NAME = "qualified_name";
+    public static final String CDO_PK_SEQ_NAME = "jv_cdo_class_pk_seq";
 
     public static final String GLOBAL_ID_TABLE_NAME = "jv_global_id";
     public static final String GLOBAL_ID_PK =         "global_id_pk";
     public static final String GLOBAL_ID_CLASS_FK =   "cdo_class_fk";
     public static final String GLOBAL_ID_LOCAL_ID =   "local_id";
+    public static final String GLOBAL_ID_PK_SEQ = "jv_global_id_pk_seq";
 
     public static final String COMMIT_TABLE_NAME =    "jv_commit";
     public static final String COMMIT_TABLE_PK =      "commit_pk";
