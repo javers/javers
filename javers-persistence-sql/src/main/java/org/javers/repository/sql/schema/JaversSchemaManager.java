@@ -24,7 +24,7 @@ public class JaversSchemaManager {
         this.schemaFactory = schemaFactory;
     }
 
-    public void createSchemaIfNotExists(){
+    public void ensureSchema(){
         SchemaManagerFactory schemaManagerFactory = new SchemaManagerFactory(transactionManager);
 
         SchemaManager schemaManager = null;

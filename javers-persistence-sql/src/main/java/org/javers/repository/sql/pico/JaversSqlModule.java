@@ -11,11 +11,11 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Provides Pico beans setup for jdbc repositories
+ * Provides Pico beans setup for sql repositories
  *
  * @author bartosz walacik
  */
-public class SqlJaversModule implements JaversModule{
+public class JaversSqlModule implements JaversModule{
     private static Class[] moduleComponents = new Class[] {JaversSqlRepository.class,
                                                            FixedSchemaFactory.class,
                                                            JaversSchemaManager.class,
