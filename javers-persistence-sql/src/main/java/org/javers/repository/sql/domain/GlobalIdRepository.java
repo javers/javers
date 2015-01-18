@@ -15,6 +15,8 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class GlobalIdRepository {
 
+    public static final String NATIVE_QUERY = GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_CLASS_FK + " = " + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_PK
+            + " AND " + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_LOCAL_ID + " = '%s'";
     private JaversPolyJDBC javersPolyjdbc;
     private JsonConverter jsonConverter;
 
@@ -24,34 +26,25 @@ public class GlobalIdRepository {
     }
 
     public Long save(GlobalId globalId) {
-
         Long lookup = getIfExists(globalId);
-
-        if (lookup != null) {
-            return lookup;
-        }
-
-        return insert(globalId);
+        return lookup != null ? lookup : insert(globalId);
     }
 
     private Long getIfExists(GlobalId globalId) {
-
-        //todo: z tym coś trzeba wymyślić!
         SelectQuery selectQuery = javersPolyjdbc.query()
                 .select(GLOBAL_ID_PK)
                 .from(GLOBAL_ID_TABLE_NAME + "," + CDO_CLASS_TABLE_NAME)
-                .where(GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_CLASS_FK + " = " + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_PK
-                        + " AND " + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_LOCAL_ID + " = '" + jsonConverter.toJson(globalId.getCdoId()) + "'");
+                .where(String.format(NATIVE_QUERY, jsonConverter.toJson(globalId.getCdoId())));
 
-        List<Long> global_id_pks = javersPolyjdbc.queryRunner().queryList(selectQuery, new ObjectMapper<Long>() {
+        List<Long> globalIds = javersPolyjdbc.queryRunner().queryList(selectQuery, new ObjectMapper<Long>() {
             @Override
             public Long createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getLong("global_id_pk");
+                return resultSet.getLong(GLOBAL_ID_PK);
             }
         });
 
         if (javersPolyjdbc.queryRunner().queryExistence(selectQuery)) {
-            return global_id_pks.get(0);
+            return globalIds.get(0);
         }
         return null;
     }
