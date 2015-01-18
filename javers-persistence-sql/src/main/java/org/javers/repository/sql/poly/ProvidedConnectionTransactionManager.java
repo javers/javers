@@ -1,4 +1,4 @@
-package org.javers.repository.sql.schema;
+package org.javers.repository.sql.poly;
 
 import org.javers.common.validation.Validate;
 import org.javers.repository.sql.ConnectionProvider;
@@ -24,6 +24,6 @@ public class ProvidedConnectionTransactionManager implements TransactionManager 
     @Override
     public Transaction openTransaction(boolean autoCommit) {
         Validate.argumentCheck(autoCommit == false, "autoCommit is not supported");
-        return new Transaction(connectionProvider.getConnection());
+        return new UnmanagedTransaction(connectionProvider.getConnection());
     }
 }

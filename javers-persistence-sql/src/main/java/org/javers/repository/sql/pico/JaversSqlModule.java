@@ -4,7 +4,7 @@ import org.javers.core.pico.JaversModule;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.schema.FixedSchemaFactory;
 import org.javers.repository.sql.schema.JaversSchemaManager;
-import org.javers.repository.sql.schema.ProvidedConnectionTransactionManager;
+import org.javers.repository.sql.poly.ProvidedConnectionTransactionManager;
 import org.polyjdbc.core.query.QueryRunnerFactory;
 
 import java.util.Arrays;
