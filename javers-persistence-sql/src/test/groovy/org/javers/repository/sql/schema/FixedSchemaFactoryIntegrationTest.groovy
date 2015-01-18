@@ -21,7 +21,7 @@ class FixedSchemaFactoryIntegrationTest extends Specification {
         when:
         Class.forName("org.postgresql.Driver");
         def connection = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/bartosz.galek", "bartosz.galek", "");
+                "jdbc:postgresql://localhost:5432/pawel.szymczyk", "pawel.szymczyk", "");
 
         def repo = SqlRepositoryBuilder
                 .sqlRepository()

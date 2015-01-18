@@ -17,7 +17,6 @@ public class GlobalIdRepository {
     private JsonConverter jsonConverter;
 
     public GlobalIdRepository(JaversPolyJDBC javersPolyjdbc, JsonConverter jsonConverter) {
-
         this.javersPolyjdbc = javersPolyjdbc;
         this.jsonConverter = jsonConverter;
     }

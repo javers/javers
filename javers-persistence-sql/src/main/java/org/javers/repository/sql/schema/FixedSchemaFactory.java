@@ -79,7 +79,11 @@ public class FixedSchemaFactory {
                 .withAttribute().timestamp(COMMIT_TABLE_COMMIT_DATE).and()
                 .withAttribute().string(COMMIT_TABLE_COMMIT_ID).withMaxLength(10).and()
                 .build();
-        return schema;
+//        return schema;
+        
+        return schema != null ? schema : new Schema(null);
+        
+        
     }
 
     private Schema cdoClassTableSchema(Dialect dialect, String tableName) {
