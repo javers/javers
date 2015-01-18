@@ -15,17 +15,18 @@
  */
 package org.polyjdbc.core.schema;
 
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.polyjdbc.core.exception.SchemaManagerException;
 import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.schema.model.SchemaEntity;
 import org.polyjdbc.core.transaction.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *

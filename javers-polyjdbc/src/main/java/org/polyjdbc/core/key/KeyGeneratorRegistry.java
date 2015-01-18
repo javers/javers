@@ -15,10 +15,11 @@
  */
 package org.polyjdbc.core.key;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.polyjdbc.core.dialect.Dialect;
 import org.polyjdbc.core.dialect.DialectRegistry;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *

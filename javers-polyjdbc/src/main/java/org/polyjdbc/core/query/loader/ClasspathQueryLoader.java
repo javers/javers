@@ -15,12 +15,9 @@
  */
 package org.polyjdbc.core.query.loader;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import org.polyjdbc.core.exception.QueryLoaderException;
+
+import java.io.*;
 
 /**
  *

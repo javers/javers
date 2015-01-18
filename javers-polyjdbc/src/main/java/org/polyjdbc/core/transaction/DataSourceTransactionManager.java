@@ -15,10 +15,11 @@
  */
 package org.polyjdbc.core.transaction;
 
+import org.polyjdbc.core.exception.PolyJdbcException;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import javax.sql.DataSource;
-import org.polyjdbc.core.exception.PolyJdbcException;
 
 /**
  *

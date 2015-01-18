@@ -15,9 +15,10 @@
  */
 package org.polyjdbc.core.schema;
 
-import java.io.Closeable;
 import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.schema.model.SchemaEntity;
+
+import java.io.Closeable;
 
 /**
  * Performs schema alteration. Should use one transaction per instance.

@@ -1,12 +1,9 @@
 package org.javers.repository.sql.poly;
 
-import org.polyjdbc.core.exception.PolyJdbcException;
 import org.polyjdbc.core.transaction.Transaction;
 import org.slf4j.Logger;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

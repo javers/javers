@@ -15,8 +15,9 @@
  */
 package org.polyjdbc.core.key;
 
-import java.sql.SQLException;
 import org.polyjdbc.core.transaction.Transaction;
+
+import java.sql.SQLException;
 
 /**
  *

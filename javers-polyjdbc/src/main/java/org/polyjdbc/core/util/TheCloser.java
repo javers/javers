@@ -15,11 +15,12 @@
  */
 package org.polyjdbc.core.util;
 
-import java.io.Closeable;
-import java.io.IOException;
 import org.polyjdbc.core.query.QueryRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 /**
  *

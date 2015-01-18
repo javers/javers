@@ -15,10 +15,11 @@
  */
 package org.polyjdbc.core.schema.model;
 
-import java.util.Arrays;
 import org.polyjdbc.core.dialect.Dialect;
 import org.polyjdbc.core.type.ColumnType;
 import org.polyjdbc.core.util.TypeUtil;
+
+import java.util.Arrays;
 
 /**
  *

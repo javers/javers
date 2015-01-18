@@ -15,8 +15,9 @@
  */
 package org.polyjdbc.core.schema.model;
 
-import java.util.Arrays;
 import org.polyjdbc.core.dialect.Dialect;
+
+import java.util.Arrays;
 
 /**
  *

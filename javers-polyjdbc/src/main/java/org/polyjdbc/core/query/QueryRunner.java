@@ -15,10 +15,11 @@
  */
 package org.polyjdbc.core.query;
 
+import org.polyjdbc.core.query.mapper.ObjectMapper;
+
 import java.io.Closeable;
 import java.util.List;
 import java.util.Set;
-import org.polyjdbc.core.query.mapper.ObjectMapper;
 
 /**
  * Runs queries and processes the results inside single transaction. QueryRunner

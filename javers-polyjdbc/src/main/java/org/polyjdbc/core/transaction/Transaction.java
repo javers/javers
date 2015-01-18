@@ -15,15 +15,12 @@
  */
 package org.polyjdbc.core.transaction;
 
+import org.polyjdbc.core.exception.PolyJdbcException;
+
 import java.io.Closeable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.polyjdbc.core.exception.PolyJdbcException;
 
 /**
  *

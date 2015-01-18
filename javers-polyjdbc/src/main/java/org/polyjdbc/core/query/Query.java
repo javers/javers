@@ -15,20 +15,16 @@
  */
 package org.polyjdbc.core.query;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.polyjdbc.core.transaction.Transaction;
 import org.polyjdbc.core.type.ColumnType;
 import org.polyjdbc.core.type.TypeWrapper;
 import org.polyjdbc.core.util.StringBuilderUtil;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *

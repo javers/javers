@@ -15,13 +15,14 @@
  */
 package org.polyjdbc.core.schema;
 
+import org.polyjdbc.core.exception.SchemaInspectionException;
+import org.polyjdbc.core.transaction.Transaction;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Locale;
-import org.polyjdbc.core.exception.SchemaInspectionException;
-import org.polyjdbc.core.transaction.Transaction;
 
 class SchemaInspectorImpl implements SchemaInspector {
 

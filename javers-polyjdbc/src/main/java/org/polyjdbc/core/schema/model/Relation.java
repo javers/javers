@@ -15,11 +15,12 @@
  */
 package org.polyjdbc.core.schema.model;
 
+import org.polyjdbc.core.dialect.Dialect;
+import org.polyjdbc.core.util.StringUtils;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
-import org.polyjdbc.core.dialect.Dialect;
-import org.polyjdbc.core.util.StringUtils;
 
 /**
  *

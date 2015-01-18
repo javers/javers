@@ -15,10 +15,11 @@
  */
 package org.polyjdbc.core.type;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.sql.Types;
 import org.polyjdbc.core.exception.UnknownColumnTypeException;
+
+import java.math.BigDecimal;
+import java.sql.Types;
+import java.util.Date;
 
 /**
  *

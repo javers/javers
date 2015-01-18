@@ -15,10 +15,11 @@
  */
 package org.polyjdbc.core.key;
 
+import org.polyjdbc.core.transaction.Transaction;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.polyjdbc.core.transaction.Transaction;
 
 /**
  *

@@ -15,20 +15,17 @@
  */
 package org.polyjdbc.core.query;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import org.polyjdbc.core.exception.NonUniqueException;
 import org.polyjdbc.core.exception.QueryExecutionException;
 import org.polyjdbc.core.key.KeyGenerator;
 import org.polyjdbc.core.query.mapper.EmptyMapper;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
 import org.polyjdbc.core.transaction.Transaction;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  *

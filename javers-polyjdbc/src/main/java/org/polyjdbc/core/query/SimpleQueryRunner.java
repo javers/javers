@@ -15,9 +15,10 @@
  */
 package org.polyjdbc.core.query;
 
+import org.polyjdbc.core.query.mapper.ObjectMapper;
+
 import java.util.List;
 import java.util.Set;
-import org.polyjdbc.core.query.mapper.ObjectMapper;
 
 /**
  * Runs simple query in one-time transaction, can be used multiple times, resources are always freed.
