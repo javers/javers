@@ -25,7 +25,7 @@ class GlobalIdRepositoryTest extends Specification {
         def jsonConverter = JsonConverterBuilder.jsonConverter().build()
 
         def connection = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/bartosz.galek", "bartosz.galek", "");
+                "jdbc:postgresql://localhost:5432/javers", "javers", "javers");
         connection.setAutoCommit(false);
 
         def builder = SqlRepositoryTestBuilder.sqlRepository().withConnectionProvider(new ConnectionProvider() {
@@ -37,21 +37,18 @@ class GlobalIdRepositoryTest extends Specification {
 
         builder.build()
 
-        def globalIdRepository = builder.getComponent(GlobalIdRepository)
+        GlobalIdRepository globalIdRepository = builder.getComponent(GlobalIdRepository)
 
         when:
         def id = globalIdRepository.save(instanceId)
         connection.commit()
 
         then:
-        true
-
-        then:
-        globalIdRepository.get(id).id == "kazik"
-        globalIdRepository.get(id).class == DummyUser
+        id != null
 
         when:
-        def nextId = globalIdRepository.save(globalId)
+        def nextId = globalIdRepository.save(instanceId)
+        connection.commit()
 
         then:
         nextId == id
