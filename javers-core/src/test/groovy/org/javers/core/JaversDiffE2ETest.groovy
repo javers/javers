@@ -39,7 +39,6 @@ class JaversDiffE2ETest extends Specification {
         def diff = javers.compare(left,right)
 
         then:
-        true
         diff.changes.size() == 1
         with(diff.changes[0]) {
             affectedCdoId instanceof UnboundedValueObjectId
