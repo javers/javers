@@ -22,7 +22,7 @@ import java.util.List;
  * <ul>
  *     <li>who did change the data - {@link CommitMetadata#getAuthor()} </li>
  *     <li>when the change was made - {@link CommitMetadata#getCommitDate()} </li>
- *     <li>list of atomic changes between two domain objects graphs - {@link #getChanges()}</li>
+ *     <li>list of atomic changes between two domain object graphs - {@link #getChanges()}</li>
  *     <li>list of Snapshots of <b>affected</b> objects - {@link #getSnapshots()}</li>
  * </ul>
  *

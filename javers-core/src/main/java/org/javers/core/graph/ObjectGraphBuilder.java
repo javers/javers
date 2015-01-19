@@ -38,7 +38,7 @@ public class ObjectGraphBuilder {
     /**
      * @param handle domain object, instance of Entity or ValueObject.
      *               It should be root of an aggregate, tree root
-     *               or any node in objects graph from where all other nodes are navigable
+     *               or any node in object graph from where all other nodes are navigable
      * @return graph nodes set
      */
     public LiveGraph buildGraph(Object handle) {

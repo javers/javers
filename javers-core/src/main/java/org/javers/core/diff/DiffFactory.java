@@ -75,7 +75,7 @@ public class DiffFactory {
     }
 
     /**
-     * @param newDomainObject object or handle to objects graph
+     * @param newDomainObject object or handle to object graph
      */
     public Diff initial(Object newDomainObject) {
         Validate.argumentIsNotNull(newDomainObject);
