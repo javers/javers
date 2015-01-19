@@ -34,6 +34,7 @@ public class FixedSchemaFactory {
     public static final String COMMIT_TABLE_AUTHOR =  "author";
     public static final String COMMIT_TABLE_COMMIT_DATE = "commit_date";
     public static final String COMMIT_TABLE_COMMIT_ID =   "commit_id";
+    public static final String COMMIT_TABLE_PK_SEQ = "jv_commit_pk_seq";
 
     public static final String SNAPSHOT_TABLE_NAME = "jv_snapshot";
     public static final String SNAPSHOT_TABLE_PK =   "snapshot_pk";
@@ -79,11 +80,7 @@ public class FixedSchemaFactory {
                 .withAttribute().timestamp(COMMIT_TABLE_COMMIT_DATE).and()
                 .withAttribute().string(COMMIT_TABLE_COMMIT_ID).withMaxLength(10).and()
                 .build();
-//        return schema;
-        
-        return schema != null ? schema : new Schema(null);
-        
-        
+        return schema;
     }
 
     private Schema cdoClassTableSchema(Dialect dialect, String tableName) {
