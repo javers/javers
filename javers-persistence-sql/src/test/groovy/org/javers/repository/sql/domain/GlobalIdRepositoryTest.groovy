@@ -7,6 +7,7 @@ import org.javers.core.model.DummyUser
 import org.javers.repository.sql.ConnectionProvider
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.SqlRepositoryTestBuilder
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.sql.Connection
@@ -14,6 +15,7 @@ import java.sql.DriverManager
 
 class GlobalIdRepositoryTest extends Specification {
 
+    @Ignore
     def "should select or insert"() {
         given:
 

@@ -34,6 +34,7 @@ public class FixedSchemaFactory {
     public static final String COMMIT_TABLE_AUTHOR =  "author";
     public static final String COMMIT_TABLE_COMMIT_DATE = "commit_date";
     public static final String COMMIT_TABLE_COMMIT_ID =   "commit_id";
+    public static final String COMMIT_TABLE_PK_SEQ = "jv_commit_pk_seq";
 
     public static final String SNAPSHOT_TABLE_NAME = "jv_snapshot";
     public static final String SNAPSHOT_TABLE_PK =   "snapshot_pk";

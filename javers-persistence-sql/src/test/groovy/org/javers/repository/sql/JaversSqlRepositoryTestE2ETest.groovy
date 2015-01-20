@@ -3,12 +3,13 @@ package org.javers.repository.sql
 import org.h2.jdbcx.JdbcConnectionPool
 import org.h2.tools.Server
 import org.javers.core.JaversRepositoryE2ETest
+import spock.lang.Ignore
 
 import java.sql.Connection
 
 import static org.javers.core.JaversBuilder.javers
 
-
+@Ignore
 class JaversSqlRepositoryTestE2ETest extends JaversRepositoryE2ETest {
 
     @Override
