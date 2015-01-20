@@ -26,7 +26,6 @@ class BaseRepositoryTest extends Specification {
         dbConnection.setAutoCommit(false)
 
         connectionProvider = new ConnectionProvider() {
-            @Override
             Connection getConnection() {
                 return dbConnection
             }

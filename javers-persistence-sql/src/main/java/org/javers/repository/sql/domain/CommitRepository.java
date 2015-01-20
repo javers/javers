@@ -12,6 +12,7 @@ import org.polyjdbc.core.type.Timestamp;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_AUTHOR;
 
 /**
@@ -19,25 +20,25 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_A
  */
 public class CommitRepository {
 
-    private JaversPolyJDBC javersPolyjdbc;
+    private final JaversPolyJDBC javersPolyjdbc;
 
     public CommitRepository(JaversPolyJDBC javersPolyjdbc) {
         this.javersPolyjdbc = javersPolyjdbc;
     }
 
     public long save(CommitMetadata commitMetadata) {
-        Long primaryKey = findCommitMetadata(commitMetadata);
+        Long primaryKey = findCommitMetadataPrimaryKey(commitMetadata);
         
         return primaryKey != null ? primaryKey : insert(commitMetadata);
     }
 
-    private Long findCommitMetadata(CommitMetadata commitMetadata) {
+    private Long findCommitMetadataPrimaryKey(CommitMetadata commitMetadata) {
         SelectQuery selectQuery = javersPolyjdbc.query()
-                .select(FixedSchemaFactory.COMMIT_TABLE_PK)
-                .from(FixedSchemaFactory.COMMIT_TABLE_NAME)
-                .where(FixedSchemaFactory.COMMIT_TABLE_AUTHOR + " = :author " +
-                        "AND " + FixedSchemaFactory.COMMIT_TABLE_COMMIT_DATE + " = :date " +
-                        "AND " + FixedSchemaFactory.COMMIT_TABLE_COMMIT_ID + " = :id")
+                .select(COMMIT_TABLE_PK)
+                .from(COMMIT_TABLE_NAME)
+                .where(COMMIT_TABLE_AUTHOR + " = :author " +
+                        "AND " + COMMIT_TABLE_COMMIT_DATE + " = :date " +
+                        "AND " + COMMIT_TABLE_COMMIT_ID + " = :id")
                 .withArgument("author", commitMetadata.getAuthor())
                 .withArgument("date", toTimestamp(commitMetadata.getCommitDate()))
                 .withArgument("id", commitMetadata.getId().value());
@@ -45,17 +46,17 @@ public class CommitRepository {
         return javersPolyjdbc.queryRunner().queryUnique(selectQuery, new ObjectMapper<Long>() {
             @Override
             public Long createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getLong(FixedSchemaFactory.COMMIT_TABLE_PK);
+                return resultSet.getLong(COMMIT_TABLE_PK);
             }
         }, false);
     }
 
     private Long insert(CommitMetadata commitMetadata) {
-        InsertQuery query = javersPolyjdbc.query().insert().into(FixedSchemaFactory.COMMIT_TABLE_NAME)
+        InsertQuery query = javersPolyjdbc.query().insert().into(COMMIT_TABLE_NAME)
                 .value(COMMIT_TABLE_AUTHOR, commitMetadata.getAuthor())
-                .value(FixedSchemaFactory.COMMIT_TABLE_COMMIT_DATE, toTimestamp(commitMetadata.getCommitDate()))
-                .value(FixedSchemaFactory.COMMIT_TABLE_COMMIT_ID, commitMetadata.getId().value())
-                .sequence(FixedSchemaFactory.COMMIT_TABLE_PK, FixedSchemaFactory.COMMIT_TABLE_PK_SEQ);
+                .value(COMMIT_TABLE_COMMIT_DATE, toTimestamp(commitMetadata.getCommitDate()))
+                .value(COMMIT_TABLE_COMMIT_ID, commitMetadata.getId().value())
+                .sequence(COMMIT_TABLE_PK, COMMIT_TABLE_PK_SEQ);
 
         return javersPolyjdbc.queryRunner().insert(query);
     }
