@@ -1,8 +1,8 @@
 package org.javers.repository.sql.domain;
 
+import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.repository.sql.poly.JaversPolyJDBC;
-import org.javers.repository.sql.schema.FixedSchemaFactory;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
@@ -12,8 +12,12 @@ import org.polyjdbc.core.type.Timestamp;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_AUTHOR;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_COMMIT_DATE;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_COMMIT_ID;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_NAME;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_PK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_PK_SEQ;
 
 /**
  * @author pawel szymczyk
@@ -27,12 +31,12 @@ public class CommitRepository {
     }
 
     public long save(CommitMetadata commitMetadata) {
-        Long primaryKey = findCommitMetadataPrimaryKey(commitMetadata);
-        
-        return primaryKey != null ? primaryKey : insert(commitMetadata);
+        Optional<Long> primaryKey = findCommitMetadataPrimaryKey(commitMetadata);
+
+        return primaryKey.isPresent() ? primaryKey.get() : insert(commitMetadata);
     }
 
-    private Long findCommitMetadataPrimaryKey(CommitMetadata commitMetadata) {
+    private Optional<Long> findCommitMetadataPrimaryKey(CommitMetadata commitMetadata) {
         SelectQuery selectQuery = javersPolyjdbc.query()
                 .select(COMMIT_TABLE_PK)
                 .from(COMMIT_TABLE_NAME)
@@ -43,12 +47,12 @@ public class CommitRepository {
                 .withArgument("date", toTimestamp(commitMetadata.getCommitDate()))
                 .withArgument("id", commitMetadata.getId().value());
 
-        return javersPolyjdbc.queryRunner().queryUnique(selectQuery, new ObjectMapper<Long>() {
+        return Optional.fromNullable(javersPolyjdbc.queryRunner().queryUnique(selectQuery, new ObjectMapper<Long>() {
             @Override
             public Long createObject(ResultSet resultSet) throws SQLException {
                 return resultSet.getLong(COMMIT_TABLE_PK);
             }
-        }, false);
+        }, false));
     }
 
     private Long insert(CommitMetadata commitMetadata) {

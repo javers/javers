@@ -1,6 +1,5 @@
 package org.javers.repository.sql.domain;
 
-import org.javers.common.collections.Consumer;
 import org.javers.common.collections.Optional;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.GlobalId;
@@ -11,14 +10,22 @@ import org.polyjdbc.core.query.mapper.ObjectMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.CDO_CLASS_PK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.CDO_CLASS_QUALIFIED_NAME;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.CDO_CLASS_TABLE_NAME;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.CDO_PK_SEQ_NAME;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_CLASS_FK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_LOCAL_ID;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_PK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_PK_SEQ;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_TABLE_NAME;
 
 public class GlobalIdRepository {
 
-    public static final String NATIVE_QUERY = GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_CLASS_FK + " = " + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_PK
+    private static final String NATIVE_QUERY = GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_CLASS_FK + " = " + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_PK
             + " AND " + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_LOCAL_ID + " = '%s'";
+
     private JaversPolyJDBC javersPolyjdbc;
     private JsonConverter jsonConverter;
 
@@ -29,10 +36,8 @@ public class GlobalIdRepository {
 
     public long save(GlobalId globalId) {
         Optional<Long> lookup = getIfExists(globalId);
-        if(lookup.isEmpty()){
-            return insert(globalId);
-        }
-        return lookup.get();
+
+        return lookup.isPresent() ? lookup.get() : insert(globalId);
     }
 
     private Optional<Long> getIfExists(GlobalId globalId) {
@@ -41,17 +46,12 @@ public class GlobalIdRepository {
                 .from(GLOBAL_ID_TABLE_NAME + "," + CDO_CLASS_TABLE_NAME)
                 .where(String.format(NATIVE_QUERY, jsonConverter.toJson(globalId.getCdoId())));
 
-        List<Long> globalIds = javersPolyjdbc.queryRunner().queryList(selectQuery, new ObjectMapper<Long>() {
+        return Optional.fromNullable(javersPolyjdbc.queryRunner().queryUnique(selectQuery, new ObjectMapper<Long>() {
             @Override
             public Long createObject(ResultSet resultSet) throws SQLException {
                 return resultSet.getLong(GLOBAL_ID_PK);
             }
-        });
-
-        if (javersPolyjdbc.queryRunner().queryExistence(selectQuery)) {
-            return Optional.of(globalIds.get(0));
-        }
-        return Optional.empty();
+        }, false));
     }
 
     private Long insert(GlobalId globalId) {
