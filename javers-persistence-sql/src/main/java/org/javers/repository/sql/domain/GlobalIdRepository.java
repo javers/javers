@@ -1,5 +1,7 @@
 package org.javers.repository.sql.domain;
 
+import org.javers.common.collections.Consumer;
+import org.javers.common.collections.Optional;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.repository.sql.poly.JaversPolyJDBC;
@@ -25,12 +27,15 @@ public class GlobalIdRepository {
         this.jsonConverter = jsonConverter;
     }
 
-    public Long save(GlobalId globalId) {
-        Long lookup = getIfExists(globalId);
-        return lookup != null ? lookup : insert(globalId);
+    public long save(GlobalId globalId) {
+        Optional<Long> lookup = getIfExists(globalId);
+        if(lookup.isEmpty()){
+            return insert(globalId);
+        }
+        return lookup.get();
     }
 
-    private Long getIfExists(GlobalId globalId) {
+    private Optional<Long> getIfExists(GlobalId globalId) {
         SelectQuery selectQuery = javersPolyjdbc.query()
                 .select(GLOBAL_ID_PK)
                 .from(GLOBAL_ID_TABLE_NAME + "," + CDO_CLASS_TABLE_NAME)
@@ -44,9 +49,9 @@ public class GlobalIdRepository {
         });
 
         if (javersPolyjdbc.queryRunner().queryExistence(selectQuery)) {
-            return globalIds.get(0);
+            return Optional.of(globalIds.get(0));
         }
-        return null;
+        return Optional.empty();
     }
 
     private Long insert(GlobalId globalId) {
