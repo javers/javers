@@ -1,4 +1,4 @@
-package org.javers.repository.sql.poly;
+package org.javers.repository.sql.infrastructure.poly;
 
 import org.polyjdbc.core.transaction.Transaction;
 import org.slf4j.Logger;

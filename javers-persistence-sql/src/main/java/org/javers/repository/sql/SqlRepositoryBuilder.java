@@ -2,8 +2,8 @@ package org.javers.repository.sql;
 
 import org.javers.core.AbstractJaversBuilder;
 import org.javers.core.json.JsonConverter;
-import org.javers.repository.sql.pico.JaversSqlModule;
-import org.javers.repository.sql.schema.JaversSchemaManager;
+import org.javers.repository.sql.infrastructure.pico.JaversSqlModule;
+import org.javers.repository.sql.domain.JaversSchemaManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

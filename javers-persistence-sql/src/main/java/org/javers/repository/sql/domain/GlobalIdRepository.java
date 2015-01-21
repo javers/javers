@@ -3,7 +3,7 @@ package org.javers.repository.sql.domain;
 import org.javers.common.collections.Optional;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.repository.sql.poly.JaversPolyJDBC;
+import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
@@ -11,15 +11,15 @@ import org.polyjdbc.core.query.mapper.ObjectMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.CDO_CLASS_PK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.CDO_CLASS_QUALIFIED_NAME;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.CDO_CLASS_TABLE_NAME;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.CDO_PK_SEQ_NAME;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_CLASS_FK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_LOCAL_ID;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_PK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_PK_SEQ;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_TABLE_NAME;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_PK;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_QUALIFIED_NAME;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_TABLE_NAME;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_PK_SEQ_NAME;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_CLASS_FK;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_LOCAL_ID;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_PK;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_PK_SEQ;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_TABLE_NAME;
 
 public class GlobalIdRepository {
 

@@ -1,4 +1,4 @@
-package org.javers.repository.sql.schema;
+package org.javers.repository.sql.domain;
 
 import org.polyjdbc.core.dialect.Dialect;
 import org.polyjdbc.core.schema.model.RelationBuilder;

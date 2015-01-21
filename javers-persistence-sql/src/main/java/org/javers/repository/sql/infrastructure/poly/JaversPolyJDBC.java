@@ -1,6 +1,5 @@
-package org.javers.repository.sql.poly;
+package org.javers.repository.sql.infrastructure.poly;
 
-import org.javers.repository.sql.ConnectionProvider;
 import org.polyjdbc.core.dialect.Dialect;
 import org.polyjdbc.core.query.*;
 import org.polyjdbc.core.schema.SchemaInspector;

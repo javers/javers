@@ -1,4 +1,4 @@
-package org.javers.repository.sql.poly;
+package org.javers.repository.sql.infrastructure.poly;
 
 import org.javers.common.validation.Validate;
 import org.javers.repository.sql.ConnectionProvider;

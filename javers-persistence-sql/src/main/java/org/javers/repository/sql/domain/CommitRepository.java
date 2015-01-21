@@ -2,7 +2,7 @@ package org.javers.repository.sql.domain;
 
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitMetadata;
-import org.javers.repository.sql.poly.JaversPolyJDBC;
+import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
@@ -12,12 +12,12 @@ import org.polyjdbc.core.type.Timestamp;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_AUTHOR;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_COMMIT_DATE;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_COMMIT_ID;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_NAME;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_PK;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_TABLE_PK_SEQ;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_AUTHOR;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_COMMIT_DATE;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_COMMIT_ID;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_NAME;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_PK;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_PK_SEQ;
 
 /**
  * @author pawel szymczyk

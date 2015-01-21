@@ -1,13 +1,13 @@
-package org.javers.repository.sql.pico;
+package org.javers.repository.sql.infrastructure.pico;
 
 import org.javers.core.pico.JaversModule;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.domain.CommitRepository;
 import org.javers.repository.sql.domain.GlobalIdRepository;
-import org.javers.repository.sql.poly.JaversPolyJDBC;
-import org.javers.repository.sql.schema.FixedSchemaFactory;
-import org.javers.repository.sql.schema.JaversSchemaManager;
-import org.javers.repository.sql.poly.ProvidedConnectionTransactionManager;
+import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
+import org.javers.repository.sql.domain.FixedSchemaFactory;
+import org.javers.repository.sql.domain.JaversSchemaManager;
+import org.javers.repository.sql.infrastructure.poly.ProvidedConnectionTransactionManager;
 import org.polyjdbc.core.query.QueryRunnerFactory;
 
 import java.util.Arrays;
