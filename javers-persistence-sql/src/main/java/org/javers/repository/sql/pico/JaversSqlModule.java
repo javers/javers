@@ -2,6 +2,7 @@ package org.javers.repository.sql.pico;
 
 import org.javers.core.pico.JaversModule;
 import org.javers.repository.sql.JaversSqlRepository;
+import org.javers.repository.sql.domain.CommitRepository;
 import org.javers.repository.sql.domain.GlobalIdRepository;
 import org.javers.repository.sql.poly.JaversPolyJDBC;
 import org.javers.repository.sql.schema.FixedSchemaFactory;
@@ -17,14 +18,15 @@ import java.util.Collection;
  *
  * @author bartosz walacik
  */
-public class JaversSqlModule implements JaversModule{
-    private static Class[] moduleComponents = new Class[] {JaversPolyJDBC.class,
-                                                           JaversSqlRepository.class,
-                                                           FixedSchemaFactory.class,
-                                                           JaversSchemaManager.class,
-                                                           ProvidedConnectionTransactionManager.class,
-                                                           QueryRunnerFactory.class,
-                                                           GlobalIdRepository.class};
+public class JaversSqlModule implements JaversModule {
+    private static Class[] moduleComponents = new Class[]{JaversPolyJDBC.class,
+                                                          JaversSqlRepository.class,
+                                                          FixedSchemaFactory.class,
+                                                          JaversSchemaManager.class,
+                                                          ProvidedConnectionTransactionManager.class,
+                                                          QueryRunnerFactory.class,
+                                                          GlobalIdRepository.class,
+                                                          CommitRepository.class};
 
     @Override
     public Collection<Class> getComponents() {

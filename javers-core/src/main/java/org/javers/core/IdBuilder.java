@@ -26,25 +26,25 @@ public class IdBuilder {
     }
 
 
-    public ValueObjectId voId(Class valueObjectClass, String path){
+    public ValueObjectId voId(Class valueObjectClass, String path) {
         Validate.conditionFulfilled(owner != null, "call withOwner() first");
         return globalIdFactory.createFromPath(owner, valueObjectClass, path);
     }
 
-    public InstanceId instanceId(Object instance){
+    public InstanceId instanceId(Object instance) {
         Validate.argumentsAreNotNull(instance);
 
-        return (InstanceId)globalIdFactory.createId(instance, null);
+        return (InstanceId) globalIdFactory.createId(instance, null);
     }
 
-    public UnboundedValueObjectId unboundedValueObjectId(Class valueObjectClass){
+    public UnboundedValueObjectId unboundedValueObjectId(Class valueObjectClass) {
         Validate.argumentsAreNotNull(valueObjectClass);
         return globalIdFactory.createFromClass(valueObjectClass);
 
     }
 
-    public InstanceId instanceId(Object localId, Class entityClass){
+    public InstanceId instanceId(Object localId, Class entityClass) {
         Validate.argumentsAreNotNull(localId, entityClass);
-        return  globalIdFactory.createFromId(localId, entityClass);
+        return globalIdFactory.createFromId(localId, entityClass);
     }
 }

@@ -34,20 +34,6 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    /*
-    public SqlRepositoryBuilder withDatabaseUrl(String databaseUrl) {
-        jdbcConfiguration.withDatabaseUrl(databaseUrl);
-        return this;
-    }
-    public SqlRepositoryBuilder withUsername(String username) {
-        jdbcConfiguration.withUsername(username);
-        return this;
-    }
-    public SqlRepositoryBuilder withPassword(String password) {
-        jdbcConfiguration.withPassword(password);
-        return this;
-    }*/
-
     public JaversSqlRepository build() {
         logger.info("starting up SQL repository module ...");
         bootContainer();
