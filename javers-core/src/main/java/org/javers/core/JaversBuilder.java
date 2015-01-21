@@ -117,7 +117,7 @@ public final class JaversBuilder extends AbstractJaversBuilder {
 
     /**
      * Registers a ValueObject type (see {@link ValueObjectType}). <br/>
-     * For example, values are: Address, Point
+     * For example, ValueObjects are: Address, Point
      *
      * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
