@@ -9,7 +9,6 @@ import java.sql.Connection
 
 import static org.javers.core.JaversBuilder.javers
 
-//todo: JaversRepositoryE2ETest is shared, make it better!
 @Ignore
 class JaversSqlRepositoryTestE2ETest extends JaversRepositoryE2ETest {
 
