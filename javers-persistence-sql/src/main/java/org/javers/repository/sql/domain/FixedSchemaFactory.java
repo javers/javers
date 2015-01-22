@@ -19,6 +19,7 @@ public class FixedSchemaFactory {
     public static final String SNAP_PROPERTY_SNAPSHOT_FK = "snapshot_fk";
     public static final String SNAP_PROPERTY_NAME =         "name";
     public static final String SNAP_PROPERTY_VALUE =        "value";
+    public static final String SNAP_PROPERTY_PK_SEQ = "jv_snapshot_property_pk_seq";
 
     public static final String CDO_CLASS_TABLE_NAME = "jv_cdo_class";
     public static final String CDO_CLASS_PK =         "cdo_class_pk";
@@ -42,6 +43,7 @@ public class FixedSchemaFactory {
     public static final String SNAPSHOT_TABLE_PK =   "snapshot_pk";
     public static final String SNAPSHOT_TABLE_COMMIT_FK = "commit_fk";
     public static final String SNAPSHOT_TABLE_GLOBAL_ID_FK = "global_id_fk";
+    public static final String SNAPSHOT_TABLE_PK_SEQ = "jv_snapshot_pk_seq";
 
 
     private Schema snapshotPropertyTableSchema(Dialect dialect, String tableName){

@@ -22,7 +22,9 @@ class JaversSqlRepositoryTestE2ETest extends JaversRepositoryE2ETest {
                 connectionPool.getConnection()
             }
         }
-        def sqlRepository = new JaversSqlRepository(connectionProvider, DialectName.H2)
+        
+        def sqlRepository = SqlRepositoryBuilder.sqlRepository().withConnectionProvider(connectionProvider).withDialect(DialectName.H2).build()
         javers = javers().registerJaversRepository(sqlRepository).build()
+        sqlRepository.setJsonConverter(javers.jsonConverter)
     }
 }

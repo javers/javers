@@ -34,6 +34,11 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
         return this;
     }
 
+    public SqlRepositoryBuilder withJSONConverter(JsonConverter jsonConverter) {
+        this.jsonConverter = jsonConverter;
+        return this;
+    }
+
     public JaversSqlRepository build() {
         logger.info("starting up SQL repository module ...");
         bootContainer();
@@ -41,7 +46,6 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
         addComponent(dialectName.getPolyDialect());
         addComponent(dialectName);
         addComponent(connectionProvider);
-        addComponent(jsonConverter);
 
         ensureSchema();
         return getContainerComponent(JaversSqlRepository.class);
@@ -57,10 +61,5 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
     @Override
     protected <T> T getContainerComponent(Class<T> ofClass) {
         return super.getContainerComponent(ofClass);
-    }
-
-    public SqlRepositoryBuilder withJSONConverter(JsonConverter jsonConverter) {
-        this.jsonConverter = jsonConverter;
-        return this;
     }
 }

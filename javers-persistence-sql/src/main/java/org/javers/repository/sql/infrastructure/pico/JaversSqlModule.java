@@ -2,7 +2,8 @@ package org.javers.repository.sql.infrastructure.pico;
 
 import org.javers.core.pico.JaversModule;
 import org.javers.repository.sql.JaversSqlRepository;
-import org.javers.repository.sql.domain.CommitRepository;
+import org.javers.repository.sql.domain.CdoSnapshotRepository;
+import org.javers.repository.sql.domain.CommitMetadataRepository;
 import org.javers.repository.sql.domain.GlobalIdRepository;
 import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
 import org.javers.repository.sql.domain.FixedSchemaFactory;
@@ -26,7 +27,8 @@ public class JaversSqlModule implements JaversModule {
                                                           ProvidedConnectionTransactionManager.class,
                                                           QueryRunnerFactory.class,
                                                           GlobalIdRepository.class,
-                                                          CommitRepository.class};
+                                                          CommitMetadataRepository.class,
+                                                          CdoSnapshotRepository.class};
 
     @Override
     public Collection<Class> getComponents() {

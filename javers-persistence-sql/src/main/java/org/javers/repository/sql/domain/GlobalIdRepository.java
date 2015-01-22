@@ -29,9 +29,8 @@ public class GlobalIdRepository {
     private JaversPolyJDBC javersPolyjdbc;
     private JsonConverter jsonConverter;
 
-    public GlobalIdRepository(JaversPolyJDBC javersPolyjdbc, JsonConverter jsonConverter) {
+    public GlobalIdRepository(JaversPolyJDBC javersPolyjdbc) {
         this.javersPolyjdbc = javersPolyjdbc;
-        this.jsonConverter = jsonConverter;
     }
 
     public long save(GlobalId globalId) {
@@ -71,5 +70,9 @@ public class GlobalIdRepository {
                 .sequence(GLOBAL_ID_PK, GLOBAL_ID_PK_SEQ);
 
         return javersPolyjdbc.queryRunner().insert(insertGlobalIdQuery);
+    }
+
+    public void setJSONConverter(JsonConverter JSONConverter) {
+        this.jsonConverter = JSONConverter;
     }
 }

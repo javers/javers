@@ -7,25 +7,19 @@ import org.joda.time.LocalDateTime
 /**
  * @author pawel szymczyk
  */
-class CommitRepositoryTest extends BaseRepositoryTest {
+class CommitMetadataRepositoryTest extends BaseRepositoryTest {
 
-    def "should save and next find persisted commit metadata"() {
+    def "should save commit metadata"() {
 
         given:
         def commitMetadata = new CommitMetadata("author", LocalDateTime.now(), new CommitId(1L, 0))
-        def commitRepository = sqlRepoBuilder.getComponent(CommitRepository)
+        def commitMetadataRepository = sqlRepoBuilder.getComponent(CommitMetadataRepository)
 
         when:
-        def primaryKey = commitRepository.save(commitMetadata)
+        def primaryKey = commitMetadataRepository.save(commitMetadata.author, commitMetadata.commitDate, commitMetadata.id)
         dbConnection.commit()
 
         then:
         primaryKey != null
-
-        when:
-        def persistedPrimaryKey = commitRepository.save(commitMetadata)
-
-        then:
-        persistedPrimaryKey == primaryKey
     }
 }

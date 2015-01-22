@@ -1,13 +1,9 @@
 package org.javers.core
 
-import com.google.common.collect.Multimap
-import com.google.common.collect.Multimaps
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.metamodel.object.UnboundedValueObjectIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
-import org.javers.core.model.GuavaObject
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
 import spock.lang.Specification
