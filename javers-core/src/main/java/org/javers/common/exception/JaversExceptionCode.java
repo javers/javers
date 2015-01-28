@@ -38,7 +38,7 @@ public enum JaversExceptionCode {
             " and raw types (e.g. List) are not supported."),
 
     //graph & snapshot
-    VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY(JaversException.RUNTIME_ERROR + "found Value Object '%s' on KEY position in Map property of '%s'. Please change this class mapping to Value or Entity"),
+    VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY(JaversException.RUNTIME_ERROR + "found ValueObject on KEY position in Map property '%s'. Please change the key class mapping to Value or Entity"),
 
     SNAPSHOT_STATE_VIOLATION(JaversException.RUNTIME_ERROR + "snapshots are immutable"),
 
