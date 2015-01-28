@@ -53,6 +53,7 @@ public class TypeMapper {
         registerValueType(LocalDate.class);
         registerValueType(BigDecimal.class);
         registerValueType(Date.class);
+        registerValueType(ThreadLocal.class);
 
         //Collections
         addType(new SetType(Set.class));

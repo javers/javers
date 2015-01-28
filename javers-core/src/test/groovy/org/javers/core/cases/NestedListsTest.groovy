@@ -1,10 +1,8 @@
 package org.javers.core.cases
 
 import org.javers.core.JaversBuilder
-import org.javers.core.changelog.SimpleTextChangeLog
-import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.metamodel.object.InstanceIdDTO
-import spock.lang.Ignore
 import spock.lang.Specification
 
 /**
@@ -16,7 +14,7 @@ import spock.lang.Specification
  */
 class NestedListsTest extends Specification{
 
-    def "should support collections with generic item type"() {
+    def "should support lists with generic item type"() {
         given:
         def javers = JaversBuilder.javers().build()
         def cdo = new EntityWithNestedList(id:1,listWithGenericItem: [threadLocal("a")])
@@ -29,12 +27,14 @@ class NestedListsTest extends Specification{
 
         then:
         def changes = javers.getChangeHistory(InstanceIdDTO.instanceId(1, EntityWithNestedList.class), 5)
-        changes[0] instanceof ValueChange
-        changes[0].left  == threadLocal("a")
-        changes[0].right == threadLocal("b")
+        ListChange change = changes[0]
+        with(change.changes[0]) {
+            index == 0
+            leftValue.get() == "a"
+            rightValue.get() == "b"
+        }
     }
 
-    @Ignore
     def "should support nested lists"() {
         given:
         def javers = JaversBuilder.javers().build()
@@ -48,9 +48,13 @@ class NestedListsTest extends Specification{
 
         then:
         def changes = javers.getChangeHistory(InstanceIdDTO.instanceId(1, EntityWithNestedList.class), 5)
-        def log = new SimpleTextChangeLog()
-        javers.processChangeList(changes, log)
-        println log.result()
+
+        ListChange change = changes[0]
+        with(change.changes[0]){
+            index == 1
+            leftValue == ["D", ".", "F"]
+            rightValue == ["D", "E", "F"]
+        }
     }
 
     def threadLocal(def what) {
