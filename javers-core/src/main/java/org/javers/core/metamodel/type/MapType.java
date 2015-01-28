@@ -1,13 +1,14 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.collections.Lists;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 
@@ -15,36 +16,22 @@ import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_P
  * @author bartosz walacik
  */
 public class MapType extends EnumerableType {
-    private transient List<Class> elementTypes;
-
-
-    /**
-     * Fake MapType for List & Array ChangeAppenders
-     */
-    public MapType(ContainerType containerType){
-       super(containerType.getBaseJavaType());
-       elementTypes = new ArrayList<>();
-       elementTypes.add(Integer.class);//key
-       elementTypes.add(containerType.getItemClass());//value
-    }
 
     public MapType(Type baseJavaType) {
         super(baseJavaType);
-
-        if (getActualClassTypeArguments().size() == 2) {
-            elementTypes = Lists.immutableListOf(getActualClassTypeArguments().get(0), getActualClassTypeArguments().get(1));
-        } else {
-            elementTypes = Collections.EMPTY_LIST;
-        }
     }
 
     @Override
     public boolean isFullyParametrized() {
-        return elementTypes.size() == 2;
+        return getActualTypeArguments().size() == 2;
     }
 
     @Override
     public Map map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
+        return mapStatic(sourceMap_, mapFunction, owner);
+    }
+
+    public static Map mapStatic(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentIsNotNull(mapFunction);
 
         if (sourceMap_ == null) {
@@ -78,22 +65,12 @@ public class MapType extends EnumerableType {
     }
 
     /**
-     * If both Key and Value type arguments are actual Classes,
-     * returns List with key Class and value Class.
-     * Otherwise returns empty List
-     */
-    @Override
-    public List<Class> getElementTypes() {
-        return elementTypes;
-    }
-
-    /**
      * never returns null
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
-    public Class getKeyClass() {
+    public Type getKeyType() {
         if (isFullyParametrized()) {
-            return elementTypes.get(0);
+            return getActualTypeArguments().get(0);
         }
         throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
     }
@@ -102,9 +79,9 @@ public class MapType extends EnumerableType {
      * never returns null
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
-    public Class getValueClass() {
+    public Type getValueType() {
         if (isFullyParametrized()) {
-            return elementTypes.get(1);
+            return getActualTypeArguments().get(1);
         }
         throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
     }

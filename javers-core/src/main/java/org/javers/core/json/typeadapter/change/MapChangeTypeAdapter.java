@@ -7,6 +7,7 @@ import org.javers.core.diff.changetype.map.*;
 import org.javers.core.metamodel.type.MapType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,25 +75,25 @@ class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
     }
 
     private EntryAdded parseEntryAdded(JsonObject entryChange, JsonDeserializationContext context, MapType mapType){
-        Object key =   decodeValue(entryChange, context, KEY_FIELD, mapType.getKeyClass());
-        Object value = decodeValue(entryChange, context, VALUE_FIELD, mapType.getValueClass());
+        Object key =   decodeValue(entryChange, context, KEY_FIELD, mapType.getKeyType());
+        Object value = decodeValue(entryChange, context, VALUE_FIELD, mapType.getValueType());
         return new EntryAdded(key, value);
     }
 
     private EntryRemoved parseEntryRemoved(JsonObject entryChange, JsonDeserializationContext context, MapType mapType){
-        Object key =   decodeValue(entryChange, context, KEY_FIELD,   mapType.getKeyClass());
-        Object value = decodeValue(entryChange, context, VALUE_FIELD, mapType.getValueClass());
+        Object key =   decodeValue(entryChange, context, KEY_FIELD,   mapType.getKeyType());
+        Object value = decodeValue(entryChange, context, VALUE_FIELD, mapType.getValueType());
         return new EntryRemoved(key, value);
     }
 
     private EntryValueChange parseEntryValueChange(JsonObject entryChange, JsonDeserializationContext context, MapType mapType){
-        Object key =        decodeValue(entryChange, context, KEY_FIELD , mapType.getKeyClass());
-        Object leftValue =  decodeValue(entryChange, context, LEFT_VALUE_FIELD, mapType.getValueClass());
-        Object rightValue = decodeValue(entryChange, context, RIGHT_VALUE_FIELD, mapType.getValueClass());
+        Object key =        decodeValue(entryChange, context, KEY_FIELD , mapType.getKeyType());
+        Object leftValue =  decodeValue(entryChange, context, LEFT_VALUE_FIELD, mapType.getValueType());
+        Object rightValue = decodeValue(entryChange, context, RIGHT_VALUE_FIELD, mapType.getValueType());
         return new EntryValueChange(key, leftValue, rightValue);
     }
 
-    private Object decodeValue(JsonObject entryChange, JsonDeserializationContext context, String fieldName, Class expectedType){
+    private Object decodeValue(JsonObject entryChange, JsonDeserializationContext context, String fieldName, Type expectedType){
            return context.deserialize(entryChange.get(fieldName), typeMapper.getDehydratedType(expectedType));
     }
 

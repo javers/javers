@@ -13,12 +13,9 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class ArrayType extends ContainerType {
-    private transient List<Class> elementTypes;
 
     public ArrayType(Type baseJavaType) {
         super(baseJavaType);
-        elementTypes = Lists.immutableListOf(getBaseJavaClass().getComponentType());
-
     }
 
     @Override
@@ -27,8 +24,8 @@ public class ArrayType extends ContainerType {
     }
 
     @Override
-    public List<Class> getElementTypes() {
-        return elementTypes;
+    public List<Type> getActualTypeArguments() {
+        return (List)Lists.immutableListOf( getBaseJavaClass().getComponentType() );
     }
 
     @Override

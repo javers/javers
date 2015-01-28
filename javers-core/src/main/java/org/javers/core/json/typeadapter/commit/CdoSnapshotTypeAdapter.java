@@ -15,6 +15,7 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -163,14 +164,14 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         Map result = new HashMap();
 
         for (Map.Entry<String, JsonElement> entry : mapAsJsonObject.entrySet()) {
-            result.put(entry.getKey(), contextDeserialize(context, entry.getValue(), mapType.getValueClass()));
+            result.put(entry.getKey(), contextDeserialize(context, entry.getValue(), mapType.getValueType()));
         }
 
         return result;
     }
 
-    private Object contextDeserialize(JsonDeserializationContext context, JsonElement element, Class clazz) {
-        return context.deserialize(element, typeMapper.getDehydratedType(clazz));
+    private Object contextDeserialize(JsonDeserializationContext context, JsonElement element, Type type) {
+        return context.deserialize(element, typeMapper.getDehydratedType(type));
     }
 
     @Override

@@ -109,17 +109,18 @@ public class ReflectionUtil {
     /**
      * Makes sense only for {@link ParameterizedType}
      */
-    public static List<Class> extractActualClassTypeArguments(Type javaType) {
+    public static List<Type> extractActualClassTypeArguments(Type javaType) {
         if (!(javaType instanceof ParameterizedType)) {
             return Collections.emptyList();
         }
 
         ParameterizedType parameterizedType = (ParameterizedType)javaType;
 
-        List<Class> result = new ArrayList<>();
+        List<Type> result = new ArrayList<>();
         for (Type t : parameterizedType.getActualTypeArguments() ) {
-            if (t instanceof Class) {
-                result.add((Class)t);
+
+            if (t instanceof Class || t instanceof ParameterizedType) {
+                result.add(t);
             }
         }
 

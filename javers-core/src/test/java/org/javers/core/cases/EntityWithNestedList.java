@@ -12,6 +12,7 @@ public class EntityWithNestedList {
     private Integer id;
     private List<String> tags;
     private List<List<String>> nestedList;
+    private List<ThreadLocal<String>> listWithGenericItem;
 
     public List<List<String>> getNestedList() {
         return nestedList;
@@ -19,5 +20,13 @@ public class EntityWithNestedList {
 
     public void setNestedList(List<List<String>> nestedList) {
         this.nestedList = nestedList;
+    }
+
+    public List<ThreadLocal<String>> getListWithGenericItem() {
+        return listWithGenericItem;
+    }
+
+    public void setListWithGenericItem(List<ThreadLocal<String>> listWithGenericItem) {
+        this.listWithGenericItem = listWithGenericItem;
     }
 }

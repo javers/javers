@@ -9,10 +9,9 @@ import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.MapContentType;
 import org.javers.core.metamodel.type.MapType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,8 +44,10 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
         Map rightRawMap = (Map)pair.getRightPropertyValue(property);
 
         MapType mapType = typeMapper.getPropertyType(property);
+        MapContentType mapContentType = typeMapper.getMapContentType(mapType);
+
         OwnerContext owner = new OwnerContext(pair.getGlobalId(), property.getName());
-        List<EntryChange> changes = calculateEntryChanges(mapType, leftRawMap, rightRawMap, owner);
+        List<EntryChange> changes = calculateEntryChanges(leftRawMap, rightRawMap, owner, mapContentType);
 
         if (!changes.isEmpty()){
             return new MapChange(pair.getGlobalId(), property, changes);
@@ -59,12 +60,12 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
     /**
      * @return never returns null
      */
-    List<EntryChange> calculateEntryChanges(MapType mapType, Map leftRawMap, Map rightRawMap, OwnerContext owner) {
+    List<EntryChange> calculateEntryChanges(Map leftRawMap, Map rightRawMap, OwnerContext owner, MapContentType mapContentType) {
 
-        DehydrateMapFunction dehydrateFunction = new DehydrateMapFunction(mapType, typeMapper, globalIdFactory);
+        DehydrateMapFunction dehydrateFunction = new DehydrateMapFunction(globalIdFactory, mapContentType);
 
-        Map leftMap =  mapType.map(leftRawMap, dehydrateFunction, owner);
-        Map rightMap = mapType.map(rightRawMap, dehydrateFunction, owner);
+        Map leftMap =  MapType.mapStatic(leftRawMap, dehydrateFunction, owner);
+        Map rightMap = MapType.mapStatic(rightRawMap, dehydrateFunction, owner);
 
         if (nullSafeEquals(leftMap, rightMap)) {
             return Collections.EMPTY_LIST;
