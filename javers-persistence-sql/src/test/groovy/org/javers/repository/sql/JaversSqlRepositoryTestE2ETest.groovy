@@ -6,20 +6,20 @@ import org.javers.core.JaversRepositoryE2ETest
 import spock.lang.Ignore
 
 import java.sql.Connection
+import java.sql.DriverManager
 
 import static org.javers.core.JaversBuilder.javers
 
-@Ignore
 class JaversSqlRepositoryTestE2ETest extends JaversRepositoryE2ETest {
 
     @Override
     def setup() {
         Server.createTcpServer().start()
-        def connectionPool = JdbcConnectionPool.create("jdbc:h2:tcp://localhost/~/test", "sa", "sa")
+        def dbConnection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test")
         def connectionProvider = new ConnectionProvider() {
             @Override
             Connection getConnection() {
-                connectionPool.getConnection()
+               return dbConnection
             }
         }
         

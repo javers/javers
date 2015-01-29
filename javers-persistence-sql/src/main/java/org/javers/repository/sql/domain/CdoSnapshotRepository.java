@@ -11,6 +11,7 @@ import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE
 import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_NAME;
 import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_PK;
 import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_PK_SEQ;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_TYPE;
 import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAP_PROPERTY_NAME;
 import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAP_PROPERTY_PK;
 import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAP_PROPERTY_PK_SEQ;
@@ -29,6 +30,7 @@ public class CdoSnapshotRepository {
 
     public long save(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot) {
         InsertQuery query = javersPolyJDBC.query().insert().into(SNAPSHOT_TABLE_NAME)
+                .value(SNAPSHOT_TABLE_TYPE, cdoSnapshot.getType().toString())
                 .value(SNAPSHOT_TABLE_GLOBAL_ID_FK, globalIdPk)
                 .value(SNAPSHOT_TABLE_COMMIT_FK, commitIdPk)
                 .sequence(SNAPSHOT_TABLE_PK, SNAPSHOT_TABLE_PK_SEQ);

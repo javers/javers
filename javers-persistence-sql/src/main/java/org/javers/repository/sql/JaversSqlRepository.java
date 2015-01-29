@@ -9,6 +9,7 @@ import org.javers.repository.api.JaversRepository;
 import org.javers.repository.sql.domain.CommitMetadataRepository;
 import org.javers.repository.sql.domain.GlobalIdRepository;
 import org.javers.repository.sql.domain.CdoSnapshotRepository;
+import org.javers.repository.sql.finders.CdoSnapshotFinder;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -22,13 +23,15 @@ public class JaversSqlRepository implements JaversRepository {
     private final CommitMetadataRepository commitRepository;
     private final GlobalIdRepository globalIdRepository;
     private final CdoSnapshotRepository cdoSnapshotRepository;
+    private final CdoSnapshotFinder finder;
 
-    public JaversSqlRepository(CommitMetadataRepository commitRepository, 
-                               GlobalIdRepository globalIdRepository, 
-                               CdoSnapshotRepository cdoSnapshotRepository) {
+    public JaversSqlRepository(CommitMetadataRepository commitRepository,
+                               GlobalIdRepository globalIdRepository,
+                               CdoSnapshotRepository cdoSnapshotRepository, CdoSnapshotFinder finder) {
         this.commitRepository = commitRepository;
         this.globalIdRepository = globalIdRepository;
         this.cdoSnapshotRepository = cdoSnapshotRepository;
+        this.finder = finder;
     }
 
     @Override
@@ -43,7 +46,7 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        return null;
+        return finder.getLatest(globalId);
     }
 
     @Override

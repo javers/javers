@@ -43,6 +43,7 @@ public class FixedSchemaFactory {
     public static final String SNAPSHOT_TABLE_PK =   "snapshot_pk";
     public static final String SNAPSHOT_TABLE_COMMIT_FK = "commit_fk";
     public static final String SNAPSHOT_TABLE_GLOBAL_ID_FK = "global_id_fk";
+    public static final String SNAPSHOT_TABLE_TYPE = "type";
     public static final String SNAPSHOT_TABLE_PK_SEQ = "jv_snapshot_pk_seq";
 
 
@@ -65,6 +66,7 @@ public class FixedSchemaFactory {
         Schema schema = new Schema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         primaryKey(tableName, SNAPSHOT_TABLE_PK, schema, relationBuilder);
+        relationBuilder.withAttribute().string(SNAPSHOT_TABLE_TYPE).withMaxLength(200).and();
         foreignKey(tableName, SNAPSHOT_TABLE_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);
         foreignKey(tableName, SNAPSHOT_TABLE_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_TABLE_PK, relationBuilder, schema);
         relationBuilder.build();

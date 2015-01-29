@@ -17,6 +17,12 @@ public final class CommitId {
         this.minorId = minorId;
     }
 
+    public static CommitId valueOf(String commitId) {
+        String[] splited = commitId.split("\\.");
+        
+        return new CommitId(Long.valueOf(splited[0]), Integer.valueOf(splited[1]));
+    } 
+    
     @Override
     public String toString() {
         return value();

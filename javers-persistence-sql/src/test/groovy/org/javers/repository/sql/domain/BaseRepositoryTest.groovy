@@ -20,9 +20,11 @@ class BaseRepositoryTest extends Specification {
     @Shared def dbConnection
     @Shared def sqlRepoBuilder
     
+    
     def setupSpec() {
         Server.createTcpServer().start()
-        dbConnection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test")
+//        dbConnection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test")
+        dbConnection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/pawel.szymczyk", "pawel.szymczyk", "")
         dbConnection.setAutoCommit(false)
 
         connectionProvider = new ConnectionProvider() {
@@ -33,7 +35,7 @@ class BaseRepositoryTest extends Specification {
 
         sqlRepoBuilder = SqlRepositoryTestBuilder.sqlRepository()
                 .withConnectionProvider(connectionProvider)
-                .withDialect(DialectName.H2)
+                .withDialect(DialectName.POSTGRES)
                 .withJSONConverter(JsonConverterBuilder.jsonConverter()
                 .build())
         
