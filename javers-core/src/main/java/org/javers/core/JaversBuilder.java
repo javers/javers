@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.type.*;
 import com.google.gson.TypeAdapter;
 import org.javers.common.validation.Validate;
@@ -283,6 +284,7 @@ public final class JaversBuilder extends AbstractJaversBuilder {
             logger.info("using fake InMemoryRepository, register actual implementation via JaversBuilder.registerJaversRepository()");
             addModule(new InMemoryRepositoryModule(getContainer()));
         } else {
+            repository.setJsonConverter( getContainerComponent(JsonConverter.class));
             addComponent(repository);
         }
 

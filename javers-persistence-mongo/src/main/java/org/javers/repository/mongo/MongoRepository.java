@@ -1,10 +1,6 @@
 package org.javers.repository.mongo;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import com.mongodb.*;
 import com.mongodb.util.JSON;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
@@ -19,6 +15,8 @@ import org.javers.repository.mongo.model.MongoHeadId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.javers.common.validation.Validate.conditionFulfilled;
 
 /**
  * @author pawel szymczyk
@@ -44,7 +42,7 @@ public class MongoRepository implements JaversRepository {
         headCollection();
     }
 
-    public MongoRepository(DB mongo, JsonConverter jsonConverter) {
+    MongoRepository(DB mongo, JsonConverter jsonConverter) {
         this.mongo = mongo;
         this.jsonConverter = jsonConverter;
     }
@@ -163,6 +161,7 @@ public class MongoRepository implements JaversRepository {
     }
 
     private DBObject writeToDBObject(CdoSnapshot snapshot){
+        conditionFulfilled(jsonConverter != null, "MongoRepository: jsonConverter is null");
         BasicDBObject dbObject = (BasicDBObject) JSON.parse(jsonConverter.toJson(snapshot));
         dbObject.append(GLOBAL_ID_KEY,snapshot.getGlobalId().value());
         return dbObject;
