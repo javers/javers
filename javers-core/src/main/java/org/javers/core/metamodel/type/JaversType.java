@@ -5,6 +5,7 @@ import org.javers.common.validation.Validate;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 
 import static org.javers.common.reflection.ReflectionUtil.extractActualClassTypeArguments;
@@ -22,7 +23,7 @@ import static org.javers.common.reflection.ReflectionUtil.extractClass;
 public abstract class JaversType {
     private final Type  baseJavaType;
     private final Class baseJavaClass;
-    private final List<Class> actualClassTypeArguments;
+    private final List<Type> actualTypeArguments;
 
     /**
      * @param baseJavaType Class or ParametrizedType
@@ -32,7 +33,7 @@ public abstract class JaversType {
 
         this.baseJavaType = baseJavaType;
         this.baseJavaClass = extractClass(baseJavaType);
-        this.actualClassTypeArguments = extractActualClassTypeArguments(baseJavaType);
+        this.actualTypeArguments = extractActualClassTypeArguments(baseJavaType);
     }
 
     /**
@@ -49,15 +50,6 @@ public abstract class JaversType {
 
     public boolean isGenericType() {
         return (baseJavaType instanceof ParameterizedType);
-    }
-
-    /**
-     * For generics, returns actual Class (type) argument
-     *
-     * @return Immutable List, never returns null
-     */
-    public List<Class> getActualClassTypeArguments() {
-        return actualClassTypeArguments;
     }
 
     public Type getBaseJavaType() {
@@ -86,4 +78,23 @@ public abstract class JaversType {
     public int hashCode() {
         return baseJavaType.hashCode();
     }
+
+    /**
+     * For generic types, returns a list of actual Class (or generic Class) arguments.
+     * For example, for Set&lt;String&gt, returns [String.class].
+     * <p/>
+     *
+     * For raw types like Set, returns empty List.
+     * <p/>
+     *
+     * Skips unbounded type parameters like
+     * &lt;E&gt;, &lt;?&gt;.
+     * <p/>
+     *
+     * For array, returns List with {@link Class#getComponentType()}
+     * <p/>
+     */
+     public List<Type> getActualTypeArguments(){
+         return Collections.unmodifiableList(actualTypeArguments);
+     }
 }

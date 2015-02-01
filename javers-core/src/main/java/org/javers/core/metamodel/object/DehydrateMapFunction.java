@@ -1,31 +1,32 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.validation.Validate;
-import org.javers.core.graph.AbstractMapFunction;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.MapContentType;
 import org.javers.core.metamodel.type.MapEnumeratorContext;
-import org.javers.core.metamodel.type.MapType;
-import org.javers.core.metamodel.type.TypeMapper;
 
 /**
 * @author bartosz walacik
 */
-public class DehydrateMapFunction extends AbstractMapFunction {
+public class DehydrateMapFunction implements EnumerableFunction {
     private final GlobalIdFactory globalIdFactory;
+    private final MapContentType mapContentType;
 
-    public DehydrateMapFunction(MapType mapType, TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
-        super(mapType,typeMapper);
-        Validate.argumentIsNotNull(globalIdFactory);
+    public DehydrateMapFunction(GlobalIdFactory globalIdFactory, MapContentType mapContentType) {
+        Validate.argumentsAreNotNull(globalIdFactory, mapContentType);
         this.globalIdFactory = globalIdFactory;
+        this.mapContentType = mapContentType;
     }
 
     @Override
     public Object apply(Object input, OwnerContext enumerationAwareOwnerContext) {
         MapEnumeratorContext mapContext =  enumerationAwareOwnerContext.getEnumeratorContext();
         if (mapContext.isKey()){
-            return globalIdFactory.dehydrate(input, getKeyType(), enumerationAwareOwnerContext);
+            return globalIdFactory.dehydrate(input, mapContentType.getKeyType(), enumerationAwareOwnerContext);
         }
         else {
-            return globalIdFactory.dehydrate(input, getValueType(), enumerationAwareOwnerContext);
+            return globalIdFactory.dehydrate(input, mapContentType.getValueType(), enumerationAwareOwnerContext);
         }
     }
 }

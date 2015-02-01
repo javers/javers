@@ -3,10 +3,7 @@ package org.javers.core.graph;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.EnumerableType;
-import org.javers.core.metamodel.type.ManagedType;
-import org.javers.core.metamodel.type.MapEnumeratorContext;
-import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.*;
 
 /**
  * @author bartosz walacik
@@ -46,51 +43,52 @@ class EdgeBuilder {
         return new OwnerContext(parentNode.getGlobalId(), property.getName());
     }
 
-    MultiEdge createMultiEdge(Property containerProperty, EnumerableType enumerableType, ObjectNode node, ObjectGraphBuilder objectGraphBuilder) {
+    MultiEdge createMultiEdge(Property containerProperty, EnumerableType enumerableType, ObjectNode node) {
         MultiEdge multiEdge = new MultiEdge(containerProperty);
         OwnerContext owner = createOwnerContext(node, containerProperty);
 
-        EnumerableFunction edgeBuilder = new MultiEdgeBuilderFunction(multiEdge, enumerableType);
         Object container = node.getPropertyValue(containerProperty);
+
+        EnumerableFunction edgeBuilder = null;
+        if (enumerableType instanceof MapType){
+            edgeBuilder = new MultiEdgeMapBuilderFunction(multiEdge);
+        } else if (enumerableType instanceof ContainerType){
+            edgeBuilder = new MultiEdgeContainerBuilderFunction(multiEdge);
+        }
         enumerableType.map(container, edgeBuilder, owner);
 
         return multiEdge;
     }
 
-    /**
-     * @author bartosz walacik
-     */
-    private class MultiEdgeBuilderFunction extends AbstractMapFunction {
+    private class MultiEdgeContainerBuilderFunction implements EnumerableFunction {
         final MultiEdge multiEdge;
 
-        MultiEdgeBuilderFunction(MultiEdge multiEdge, EnumerableType enumerableType) {
-            super(enumerableType, typeMapper);
+        public MultiEdgeContainerBuilderFunction(MultiEdge multiEdge) {
             this.multiEdge = multiEdge;
         }
 
         @Override
         public Object apply(Object input, OwnerContext enumerationAwareOwnerContext) {
-            if (!isManagedPosition(enumerationAwareOwnerContext)){
+            if (!isManagedPosition(input)){
                 return input;
             }
-
             ObjectNode objectNode = buildNodeStubOrReuse(asCdo(input, enumerationAwareOwnerContext));
             multiEdge.addReferenceNode(objectNode);
             return null;
         }
 
-        boolean isManagedPosition(OwnerContext enumerationAwareOwnerContext){
-            if (!isMap()){
-                return true;
-            }
+        boolean isManagedPosition(Object input){
+            return true;
+        }
+    }
 
-            MapEnumeratorContext mapContext =  enumerationAwareOwnerContext.getEnumeratorContext();
-            if (mapContext.isKey()){
-                return getKeyType() instanceof ManagedType;
-            }
-            else {
-                return getValueType() instanceof ManagedType;
-            }
+    private class MultiEdgeMapBuilderFunction extends MultiEdgeContainerBuilderFunction {
+        public MultiEdgeMapBuilderFunction(MultiEdge multiEdge) {
+            super(multiEdge);
+        }
+
+        boolean isManagedPosition(Object input){
+            return typeMapper.getJaversType(input.getClass()) instanceof ManagedType;
         }
     }
 

@@ -2,7 +2,7 @@ package org.javers.core.metamodel.type;
 
 import com.google.gson.reflect.TypeToken
 import org.bson.types.ObjectId
-import org.javers.core.cases.morphia.MongoStoredEntity
+import org.javers.core.cases.MongoStoredEntity
 import org.javers.core.metamodel.clazz.*
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress

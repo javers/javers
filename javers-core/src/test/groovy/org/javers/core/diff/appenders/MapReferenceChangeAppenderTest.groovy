@@ -1,7 +1,7 @@
 package org.javers.core.diff.appenders
 
+import com.google.gson.reflect.TypeToken
 import org.javers.common.exception.JaversException
-import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
@@ -92,12 +92,8 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
     }
 
     def "should not support Map<ValueObject,?>, no good idea how to handle this"() {
-        given:
-            def leftCdo  = new SnapshotEntity(id:1,  mapVoToPrimitive: [(new DummyAddress("London")):1])
-            def rightCdo = new SnapshotEntity(id:1,  mapVoToPrimitive: [(new DummyAddress("London")):2])
         when:
-            mapChangeAppender()
-           .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "mapVoToPrimitive"))
+            mapChangeAppender().supports(getJaversType(new TypeToken<Map<DummyAddress, String>>(){}.getType()))
 
         then:
             def e = thrown(JaversException)

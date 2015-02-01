@@ -1,15 +1,12 @@
 package org.javers.core.diff
 
 import org.javers.core.JaversTestBuilder
-import org.javers.core.diff.appenders.ArrayChangeAppender
-import org.javers.core.diff.appenders.ListChangeAppender
-import org.javers.core.diff.appenders.MapChangeAppender
-import org.javers.core.diff.appenders.SetChangeAppender
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectNode
 import org.javers.core.metamodel.clazz.Entity
 import org.javers.core.metamodel.clazz.ManagedClass
 import org.javers.core.metamodel.property.Property
+import org.javers.core.metamodel.type.JaversType
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -44,5 +41,9 @@ abstract class AbstractDiffTest extends Specification {
 
     RealNodePair realNodePair(def leftCdo, def rightCdo){
         new RealNodePair(buildGraph(leftCdo), buildGraph(rightCdo))
+    }
+
+    JaversType getJaversType(def javaType){
+        javers.typeMapper.getJaversType(javaType)
     }
 }
