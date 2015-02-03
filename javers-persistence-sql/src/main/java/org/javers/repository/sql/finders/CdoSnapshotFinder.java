@@ -17,14 +17,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_QUALIFIED_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_PK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAP_PROPERTY_SNAPSHOT_FK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAP_PROPERTY_TABLE_NAME;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.*;
 
 public class CdoSnapshotFinder {
 
@@ -34,55 +27,56 @@ public class CdoSnapshotFinder {
         this.javersPolyJDBC = javersPolyJDBC;
     }
 
-
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
 
         SelectQuery selectQuery = javersPolyJDBC.query()
-                .select("MAX(" + SNAPSHOT_TABLE_PK + ")")
-                .from(SNAPSHOT_TABLE_NAME + ", " + GLOBAL_ID_TABLE_NAME + ", " + CDO_CLASS_TABLE_NAME)
-                .where(CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName")
+                .select("MAX(" + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_PK + ") AS " + SNAPSHOT_TABLE_PK)
+                .from(SNAPSHOT_TABLE_NAME +
+                        " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " ON " + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_GLOBAL_ID_FK + "=" + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_PK +
+                        " INNER JOIN " + CDO_CLASS_TABLE_NAME + " ON " + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_CLASS_FK + "=" + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_PK)
+                .where(CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName")
                 .withArgument("qualifiedName", globalId.getCdoClass().getName());
 
-        Integer jvSnaphotDtoPk = javersPolyJDBC.queryRunner().queryUnique(selectQuery, new ObjectMapper<Integer>() {
+
+        List<Integer> snapshotPk = javersPolyJDBC.queryRunner().queryList(selectQuery, new ObjectMapper<Integer>() {
             @Override
             public Integer createObject(ResultSet resultSet) throws SQLException {
-                return Integer.valueOf(resultSet.getString("MAX(" + SNAPSHOT_TABLE_PK + ")"));
-
+                return resultSet.getInt(SNAPSHOT_TABLE_PK);
             }
-        }, false);
+        });
         
-        if (jvSnaphotDtoPk == null) {
+        if (snapshotPk.size() != 1 ) {
             return Optional.empty();
         }
 
         SelectQuery selectQuery2 = javersPolyJDBC.query()
-                .select("author, commit_date, commit_id")
-                .from(SNAPSHOT_TABLE_NAME + ", " + COMMIT_TABLE_NAME)
-                .where("\"commit_pk\" = \"commit_fk\" AND \"snapshot_pk\" = :snapshotPk")
-                .withArgument("snapshotPk", jvSnaphotDtoPk);
+                .select(SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_TYPE + ", " + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_AUTHOR + ", " + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_COMMIT_DATE + ", " + COMMIT_TABLE_COMMIT_ID)
+                .from(SNAPSHOT_TABLE_NAME +
+                        " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_PK + "=" + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_COMMIT_FK)
+                .where(SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_PK + " = :snapshotPk")
+                .withArgument("snapshotPk", snapshotPk.get(0));
 
         JvCommitDto jvCommitDto = javersPolyJDBC.queryRunner().queryUnique(selectQuery2, new ObjectMapper<JvCommitDto>() {
             @Override
             public JvCommitDto createObject(ResultSet resultSet) throws SQLException {
-                return new JvCommitDto(resultSet.getString("author"), resultSet.getTimestamp("commit_date"), resultSet.getString("commit_id"));
+                return new JvCommitDto(resultSet.getString(SNAPSHOT_TABLE_TYPE), resultSet.getString(COMMIT_TABLE_AUTHOR), resultSet.getTimestamp(COMMIT_TABLE_COMMIT_DATE), resultSet.getString(COMMIT_TABLE_COMMIT_ID));
             }
         }, false);
 
         SelectQuery selectQuery3 = javersPolyJDBC.query()
-                .select("name, value")
-                .from(SNAP_PROPERTY_TABLE_NAME)
-                .where(SNAP_PROPERTY_SNAPSHOT_FK + " = :snapshot_fk")
-                .withArgument("snapshot_fk", jvSnaphotDtoPk);
+                .select(SNAP_PROPERTY_NAME + ", " + SNAP_PROPERTY_VALUE)
+                        .from(SNAP_PROPERTY_TABLE_NAME)
+                        .where(SNAP_PROPERTY_SNAPSHOT_FK + " = :snapshot_fk")
+                        .withArgument("snapshot_fk", snapshotPk);
 
         List<JvSnapshotProperty> properties = javersPolyJDBC.queryRunner().queryList(selectQuery3, new ObjectMapper<JvSnapshotProperty>() {
             @Override
             public JvSnapshotProperty createObject(ResultSet resultSet) throws SQLException {
-                return new JvSnapshotProperty(resultSet.getString("name"), resultSet.getObject("value"));
+                return new JvSnapshotProperty(resultSet.getString(SNAP_PROPERTY_NAME), resultSet.getObject(SNAP_PROPERTY_VALUE));
             }
         });
 
-        CommitMetadata commitMetadata = 
-                new CommitMetadata(jvCommitDto.author, jvCommitDto.date, CommitId.valueOf(jvCommitDto.commmitId));
+        CommitMetadata commitMetadata = new CommitMetadata(jvCommitDto.author, jvCommitDto.date, CommitId.valueOf(jvCommitDto.commitId));
 
         CdoSnapshotBuilder snapshotBuilder = CdoSnapshotBuilder.cdoSnapshot(globalId, commitMetadata).withType(SnapshotType.TERMINAL);
         
@@ -93,25 +87,17 @@ public class CdoSnapshotFinder {
         return Optional.of(snapshotBuilder.build());
     }
 
-    private static class JvSnapshotDto {
-        int pk;
-        SnapshotType type;
-
-        public JvSnapshotDto(Integer pk, SnapshotType type) {
-            this.pk = pk;
-            this.type = type;
-        }
-    }
-    
     private static class JvCommitDto {
+        SnapshotType snapshotType;
         String author;
         LocalDateTime date;
-        String commmitId;
+        String commitId;
 
-        public JvCommitDto(String author, Timestamp date, String commmitId) {
+        private JvCommitDto(String snapshotType, String author, Timestamp date, String commmitId) {
+            this.snapshotType = SnapshotType.valueOf(snapshotType);
             this.author = author;
             this.date = new LocalDateTime(date.getTime());
-            this.commmitId = commmitId;
+            this.commitId = commmitId;
         }
     }
     
@@ -119,7 +105,7 @@ public class CdoSnapshotFinder {
         String name;
         Object value;
 
-        public JvSnapshotProperty(String name, Object value) {
+        private JvSnapshotProperty(String name, Object value) {
             this.name = name;
             this.value = value;
         }

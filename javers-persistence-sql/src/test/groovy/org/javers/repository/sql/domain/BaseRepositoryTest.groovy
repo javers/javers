@@ -35,7 +35,7 @@ class BaseRepositoryTest extends Specification {
 
         sqlRepoBuilder = SqlRepositoryTestBuilder.sqlRepository()
                 .withConnectionProvider(connectionProvider)
-                .withDialect(DialectName.POSTGRES)
+                .withDialect(DialectName.H2)
                 .withJSONConverter(JsonConverterBuilder.jsonConverter()
                 .build())
         
