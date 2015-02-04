@@ -31,31 +31,12 @@ public class CdoSnapshotRepository {
                     .value(SNAP_PROPERTY_SNAPSHOT_FK, cdoSnapshotPrimaryKey)
                     .value(SNAP_PROPERTY_NAME, property.getName())
                     .value(SNAP_PROPERTY_VALUE, jsonConverter.toJson(cdoSnapshot.getPropertyValue(property)))
-                    .value(SNAP_PROPERTY_CLASS, getQualifiedName((property.getType().getName())))
                             .sequence(SNAP_PROPERTY_PK, SNAP_PROPERTY_PK_SEQ);
             
             javersPolyJDBC.queryRunner().insert(propertyQuery);
         }
 
         return cdoSnapshotPrimaryKey;
-    }
-
-    private String getQualifiedName(String name) {
-        String result;
-        
-        switch (name) {
-            case "byte": result = Byte.class.getName(); break;
-            case "short": result = Short.class.getName(); break;
-            case "int": result = Integer.class.getName(); break;
-            case "long": result = Long.class.getName(); break;
-            case "float": result = Float.class.getName(); break;
-            case "double": result = Double.class.getName(); break;
-            case "boolean": result = Boolean.class.getName(); break;
-            case "char": result = Character.class.getName(); break;
-            default: result = name;    
-        }
-        
-        return result;
     }
 
     public void setJSONConverter(JsonConverter jsonConverter) {

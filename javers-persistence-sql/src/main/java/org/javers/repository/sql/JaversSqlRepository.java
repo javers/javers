@@ -10,7 +10,6 @@ import org.javers.repository.sql.domain.CommitMetadataRepository;
 import org.javers.repository.sql.domain.GlobalIdRepository;
 import org.javers.repository.sql.domain.CdoSnapshotRepository;
 import org.javers.repository.sql.finders.CdoSnapshotFinder;
-import org.javers.repository.sql.finders.PropertiesFinder;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -25,18 +24,15 @@ public class JaversSqlRepository implements JaversRepository {
     private final GlobalIdRepository globalIdRepository;
     private final CdoSnapshotRepository cdoSnapshotRepository;
     private final CdoSnapshotFinder finder;
-    private final PropertiesFinder propertiesFinder;
 
     public JaversSqlRepository(CommitMetadataRepository commitRepository,
                                GlobalIdRepository globalIdRepository,
                                CdoSnapshotRepository cdoSnapshotRepository, 
-                               CdoSnapshotFinder finder,
-                               PropertiesFinder propertiesFinder) {
+                               CdoSnapshotFinder finder) {
         this.commitRepository = commitRepository;
         this.globalIdRepository = globalIdRepository;
         this.cdoSnapshotRepository = cdoSnapshotRepository;
         this.finder = finder;
-        this.propertiesFinder = propertiesFinder;
     }
 
     @Override
@@ -75,7 +71,6 @@ public class JaversSqlRepository implements JaversRepository {
     public void setJsonConverter(JsonConverter jsonConverter) {
         globalIdRepository.setJSONConverter(jsonConverter);
         cdoSnapshotRepository.setJSONConverter(jsonConverter);
-        finder.setJSONConverter(jsonConverter);
-        propertiesFinder.setJSONConverter(jsonConverter);
+        finder.setJsonConverter(jsonConverter);
     }
 }

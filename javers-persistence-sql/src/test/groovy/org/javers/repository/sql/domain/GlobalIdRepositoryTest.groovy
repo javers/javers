@@ -10,7 +10,7 @@ class GlobalIdRepositoryTest extends BaseRepositoryTest {
         def javers = JaversBuilder.javers().build();
         def instanceId = javers.idBuilder().instanceId(new DummyUser("kazik"))
         def globalIdRepository = sqlRepoBuilder.getComponent(GlobalIdRepository)
-        globalIdRepository.setJSONConverter(javers.getJsonConverter())
+        globalIdRepository.setJsonConverter(javers.getJsonConverter())
 
         when:
         def id = globalIdRepository.save(instanceId)

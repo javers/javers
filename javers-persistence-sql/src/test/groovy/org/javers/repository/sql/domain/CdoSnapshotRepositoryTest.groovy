@@ -16,9 +16,9 @@ class CdoSnapshotRepositoryTest extends BaseRepositoryTest {
         def javers = JaversBuilder.javers().build();
         def commitMetadataRepository = sqlRepoBuilder.getComponent(CommitMetadataRepository)
         def globalIdRepository = sqlRepoBuilder.getComponent(GlobalIdRepository)
-        globalIdRepository.setJSONConverter(javers.jsonConverter)
+        globalIdRepository.setJsonConverter(javers.jsonConverter)
         def cdoSnapshotRepository = sqlRepoBuilder.getComponent(CdoSnapshotRepository)
-        cdoSnapshotRepository.setJSONConverter(javers.jsonConverter)
+        cdoSnapshotRepository.setJsonConverter(javers.jsonConverter)
 
         def dummyUser = new DummyUser("kazik", "kazikowski")
         def commit = javers.commit("author", dummyUser)

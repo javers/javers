@@ -25,7 +25,7 @@ public class CdoSnapshotFinder {
 
     private final JaversPolyJDBC javersPolyJDBC;
     private final PropertiesFinder propertiesFinder;
-    private JsonConverter JSONConverter;
+    private JsonConverter jsonConverter;
 
     public CdoSnapshotFinder(JaversPolyJDBC javersPolyJDBC, PropertiesFinder propertiesFinder) {
         this.javersPolyJDBC = javersPolyJDBC;
@@ -40,7 +40,7 @@ public class CdoSnapshotFinder {
                         " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " ON " + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_GLOBAL_ID_FK + "=" + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_PK +
                         " INNER JOIN " + CDO_CLASS_TABLE_NAME + " ON " + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_CLASS_FK + "=" + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_PK)
                 .where(GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_LOCAL_ID + " = :localId AND " + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName")
-                .withArgument("localId", JSONConverter.toJson(globalId.getCdoId()))
+                .withArgument("localId", jsonConverter.toJson(globalId.getCdoId()))
                 .withArgument("qualifiedName", globalId.getCdoClass().getName());
 
         List<String> snapshotPk = javersPolyJDBC.queryRunner().queryList(selectQuery, new ObjectMapper<String>() {
@@ -75,7 +75,7 @@ public class CdoSnapshotFinder {
         CdoSnapshotBuilder snapshotBuilder = CdoSnapshotBuilder.cdoSnapshot(globalId, commitMetadata).withType(jvCommitDto.get(0).snapshotType);
         
         for (PropertiesFinder.JvSnapshotProperty property: properties) {
-            snapshotBuilder.withPropertyValue(globalId.getCdoClass().getProperty(property.name), property.value);
+            snapshotBuilder.withPropertyValue(globalId.getCdoClass().getProperty(property.name), jsonConverter.fromJson(property.value, globalId.getCdoClass().getProperty(property.name).getType()));
         }
         
         return Optional.of(snapshotBuilder.build());
@@ -92,7 +92,7 @@ public class CdoSnapshotFinder {
                     .where(GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_LOCAL_ID + " = :localId AND " + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName")
                     .orderBy(SNAPSHOT_TABLE_PK, Order.DESC)
                     .limit(limit)
-                    .withArgument("localId", JSONConverter.toJson(cdoId))
+                    .withArgument("localId", jsonConverter.toJson(cdoId))
                     .withArgument("qualifiedName", className);
 
         List<JvCommitDto> jvCommitDtos = javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<JvCommitDto>() {
@@ -105,12 +105,12 @@ public class CdoSnapshotFinder {
         return null;
     }
 
-    public void setJSONConverter(JsonConverter JSONConverter) {
-        this.JSONConverter = JSONConverter;
+    public void setJsonConverter(JsonConverter jsonConverter) {
+        this.jsonConverter = jsonConverter;
     }
 
-    public JsonConverter getJSONConverter() {
-        return JSONConverter;
+    public JsonConverter getJsonConverter() {
+        return jsonConverter;
     }
 
     private static class JvCommitDto {

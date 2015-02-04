@@ -19,7 +19,6 @@ public class FixedSchemaFactory {
     public static final String SNAP_PROPERTY_SNAPSHOT_FK = "snapshot_fk";
     public static final String SNAP_PROPERTY_NAME =         "name";
     public static final String SNAP_PROPERTY_VALUE =        "value";
-    public static final String SNAP_PROPERTY_CLASS =        "class";
     public static final String SNAP_PROPERTY_PK_SEQ = "jv_snapshot_property_pk_seq";
 
     public static final String CDO_CLASS_TABLE_NAME = "jv_cdo_class";
@@ -54,8 +53,7 @@ public class FixedSchemaFactory {
         primaryKey(tableName, SNAP_PROPERTY_PK, schema, relationBuilder);
         relationBuilder
                 .withAttribute().string(SNAP_PROPERTY_NAME).withMaxLength(200).and()
-                .withAttribute().text(SNAP_PROPERTY_VALUE).and()
-                .withAttribute().string(SNAP_PROPERTY_CLASS).withMaxLength(200).and();
+                .withAttribute().text(SNAP_PROPERTY_VALUE).and();
         foreignKey(tableName, SNAP_PROPERTY_SNAPSHOT_FK, SNAPSHOT_TABLE_NAME, SNAPSHOT_TABLE_PK, relationBuilder, schema);
         relationBuilder.build();
 
