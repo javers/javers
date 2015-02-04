@@ -25,10 +25,9 @@ public class JaversExtendedRepository implements JaversRepository {
         this.globalIdFactory = globalIdFactory;
     }
 
-    @Override
     public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit){
         argumentIsNotNull(globalIdDTO);
-        return delegate.getStateHistory(globalIdDTO, limit);
+        return delegate.getStateHistory(globalIdFactory.createFromDto(globalIdDTO), limit);
     }
 
     @Override
@@ -37,10 +36,9 @@ public class JaversExtendedRepository implements JaversRepository {
         return delegate.getStateHistory(globalId, limit);
     }
 
-    @Override
     public Optional<CdoSnapshot> getLatest(GlobalIdDTO globalCdoIdDTO) {
         argumentIsNotNull(globalCdoIdDTO);
-        return delegate.getLatest(globalCdoIdDTO);
+        return delegate.getLatest(globalIdFactory.createFromDto(globalCdoIdDTO));
     }
 
     @Override

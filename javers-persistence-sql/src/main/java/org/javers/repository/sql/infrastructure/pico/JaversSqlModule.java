@@ -6,6 +6,7 @@ import org.javers.repository.sql.domain.CdoSnapshotRepository;
 import org.javers.repository.sql.domain.CommitMetadataRepository;
 import org.javers.repository.sql.domain.GlobalIdRepository;
 import org.javers.repository.sql.finders.CdoSnapshotFinder;
+import org.javers.repository.sql.finders.PropertiesFinder;
 import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
 import org.javers.repository.sql.domain.FixedSchemaFactory;
 import org.javers.repository.sql.domain.JaversSchemaManager;
@@ -30,7 +31,8 @@ public class JaversSqlModule implements JaversModule {
                                                           GlobalIdRepository.class,
                                                           CommitMetadataRepository.class,
                                                           CdoSnapshotRepository.class,
-                                                          CdoSnapshotFinder.class};
+                                                          CdoSnapshotFinder.class,
+                                                          PropertiesFinder.class};
 
     @Override
     public Collection<Class> getComponents() {

@@ -39,7 +39,6 @@ public final class ValueObjectIdDTO extends GlobalIdDTO {
         return ownerIdDTO.value()+"#"+fragment;
     }
 
-
     private String decodePropertyName() {
         String[] parts = fragment.split("/");
 

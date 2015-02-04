@@ -23,8 +23,8 @@ class BaseRepositoryTest extends Specification {
     
     def setupSpec() {
         Server.createTcpServer().start()
-//        dbConnection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test")
-        dbConnection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/pawel.szymczyk", "pawel.szymczyk", "")
+        dbConnection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test")
+//        dbConnection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/pawel.szymczyk", "pawel.szymczyk", "")
         dbConnection.setAutoCommit(false)
 
         connectionProvider = new ConnectionProvider() {
