@@ -102,7 +102,7 @@ public final class JaversBuilder extends AbstractJaversBuilder {
 
     /**
      * Registers an {@link Entity}.
-     * Use @Id annotation to mark exactly one property as the Entity Id.
+     * Use @Id annotation to mark exactly one Id-property.
      * <br/><br/>
      *
      * Optionally, use @Transient or @{@link DiffIgnore} to mark ignored properties.
@@ -118,7 +118,7 @@ public final class JaversBuilder extends AbstractJaversBuilder {
      * Registers an {@link Entity}. <br/>
      * Use this method if you are not willing to use annotations.
      *
-     * @param idPropertyName mandatory, name of Entity Id property
+     * @param idPropertyName mandatory, name of Id-property
      * @param ignoredProperties optional, list of property names to be ignore by JaVers
      * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
