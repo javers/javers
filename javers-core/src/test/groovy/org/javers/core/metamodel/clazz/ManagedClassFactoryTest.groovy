@@ -1,10 +1,13 @@
 package org.javers.core.metamodel.clazz
 
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.MappingStyle
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
@@ -56,4 +59,29 @@ class ManagedClassFactoryTest extends Specification {
         then:
         vo instanceof Entity
     }
+
+    @Unroll
+    def "should ignore given #managedClassType properties"() {
+        when:
+        def managedClass = managedClassFactory.create(managedClassRecipe)
+
+        then:
+        !managedClass.hasProperty("city")
+        !managedClass.hasProperty("kind")
+
+        where:
+        managedClassType <<   ["Entity", "ValueObject"]
+        managedClassRecipe << [ new EntityDefinition(DummyAddress, "street", ["city","kind"]),
+                                new ValueObjectDefinition(DummyAddress, ["city","kind"]) ]
+    }
+
+    def "should fail if given ignored Entity property not exists"() {
+        when:
+        managedClassFactory.create(new EntityDefinition(DummyAddress, "street",["city__"]))
+
+        then:
+        JaversException e = thrown()
+        e.code == JaversExceptionCode.PROPERTY_NOT_FOUND
+    }
+
 }

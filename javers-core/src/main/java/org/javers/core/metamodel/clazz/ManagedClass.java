@@ -54,7 +54,7 @@ public abstract class ManagedClass extends ClientsDomainClass {
                 return property;
             }
         }
-        throw new JaversException(PROPERTY_NOT_FOUND, withName, getName());
+        throw new JaversException(PROPERTY_NOT_FOUND, withName, this.getName());
     }
 
     public boolean hasProperty(String withName){

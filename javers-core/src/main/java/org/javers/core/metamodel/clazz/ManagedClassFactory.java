@@ -8,6 +8,8 @@ import org.javers.core.metamodel.property.PropertyScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -80,12 +82,38 @@ public class ManagedClassFactory {
             idProperty = findIdPropertyByName(properties, entityDefinition);
         }
 
-        return new Entity(entityDefinition.getClazz(), properties, idProperty);
+        List<Property> filteredProperties = filterIgnored(properties, entityDefinition);
+        return new Entity(entityDefinition.getClazz(), filteredProperties, idProperty);
     }
 
-    public ValueObject create(ValueObjectDefinition valueObjectDefinition) {
-        List<Property> properties = propertyScanner.scan(valueObjectDefinition.getClazz());
-        return new ValueObject(valueObjectDefinition.getClazz(), properties);
+    public ValueObject create(ValueObjectDefinition voDefinition) {
+        List<Property> properties = propertyScanner.scan(voDefinition.getClazz());
+        List<Property> filteredProperties = filterIgnored(properties, voDefinition);
+        return new ValueObject(voDefinition.getClazz(), filteredProperties);
+    }
+
+    private List<Property> filterIgnored(List<Property> properties, ClientsClassDefinition definition){
+        if (definition.getIgnoredProperties().isEmpty()){
+            return properties;
+        }
+
+        List<Property> filtered = new ArrayList<>(properties);
+        for (String ignored : definition.getIgnoredProperties()){
+            filterOneProperty(filtered, ignored, definition.getClazz());
+        }
+        return filtered;
+    }
+
+    private void filterOneProperty(List<Property> properties, String ignoredName, Class<?> clientsClass){
+        Iterator<Property> it = properties.iterator();
+        while(it.hasNext()){
+            Property property = it.next();
+            if (property.getName().equals(ignoredName)){
+                it.remove();
+                return;
+            }
+        }
+        throw new JaversException(JaversExceptionCode.PROPERTY_NOT_FOUND, ignoredName, clientsClass.getName());
     }
 
     private Property findIdPropertyByName(List<Property> beanProperties, EntityDefinition entityDefinition) {

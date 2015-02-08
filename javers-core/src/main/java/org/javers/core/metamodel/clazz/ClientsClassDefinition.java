@@ -1,6 +1,11 @@
 package org.javers.core.metamodel.clazz;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import static org.javers.common.validation.Validate.argumentIsNotNull;
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * Recipe for ClientsDomainClass
@@ -9,10 +14,19 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public abstract class ClientsClassDefinition {
     private final Class<?> clazz;
+    private final List<String> ignoredProperties;
+
 
     ClientsClassDefinition(Class<?> clazz) {
         argumentIsNotNull(clazz);
         this.clazz = clazz;
+        this.ignoredProperties = Collections.emptyList();
+    }
+
+    ClientsClassDefinition(Class<?> clazz, List<String> ignoredProperties) {
+        argumentsAreNotNull(clazz, ignoredProperties);
+        this.clazz = clazz;
+        this.ignoredProperties = new ArrayList<>(ignoredProperties);
     }
 
     public Class<?> getClazz() {
@@ -33,5 +47,9 @@ public abstract class ClientsClassDefinition {
     @Override
     public int hashCode() {
         return clazz.hashCode();
+    }
+
+    public List<String> getIgnoredProperties() {
+        return Collections.unmodifiableList(ignoredProperties);
     }
 }
