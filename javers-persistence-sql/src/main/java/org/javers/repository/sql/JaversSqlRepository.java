@@ -37,7 +37,7 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
-        return finder.getStateHistory(globalId.getCdoId(), globalId.getCdoClass().getName(), limit);
+        return finder.getStateHistory(globalId, globalId.getCdoClass().getName(), limit);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public CommitId getHeadId() {
-        return null;
+        return commitRepository.getHeadId();
     }
 
     @Override
@@ -72,5 +72,6 @@ public class JaversSqlRepository implements JaversRepository {
         globalIdRepository.setJSONConverter(jsonConverter);
         cdoSnapshotRepository.setJSONConverter(jsonConverter);
         finder.setJsonConverter(jsonConverter);
+        commitRepository.setJsonConverter(jsonConverter);
     }
 }
