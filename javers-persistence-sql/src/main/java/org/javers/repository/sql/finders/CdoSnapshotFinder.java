@@ -1,13 +1,16 @@
 package org.javers.repository.sql.finders;
 
+import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.SnapshotType;
+import org.javers.core.metamodel.property.Property;
 import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.Order;
@@ -17,7 +20,9 @@ import org.polyjdbc.core.query.mapper.ObjectMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.javers.repository.sql.domain.FixedSchemaFactory.*;
 
@@ -69,16 +74,24 @@ public class CdoSnapshotFinder {
         });
 
         List<PropertiesFinder.JvSnapshotProperty> properties = propertiesFinder.findProperties(Integer.valueOf(snapshotPk.get(0)));
+        
+        Map<Property, Object> prop = asMap(globalId.getCdoClass(), properties);
 
         CommitMetadata commitMetadata = new CommitMetadata(jvCommitDto.get(0).author, jvCommitDto.get(0).date, CommitId.valueOf(jvCommitDto.get(0).commitId));
 
-        CdoSnapshotBuilder snapshotBuilder = CdoSnapshotBuilder.cdoSnapshot(globalId, commitMetadata).withType(jvCommitDto.get(0).snapshotType);
+        JvSnapshotDto jvSnapshotDto = new JvSnapshotDto(globalId, commitMetadata, prop, jvCommitDto.get(0).snapshotType);
         
-        for (PropertiesFinder.JvSnapshotProperty property: properties) {
-            snapshotBuilder.withPropertyValue(globalId.getCdoClass().getProperty(property.name), jsonConverter.fromJson(property.value, globalId.getCdoClass().getProperty(property.name).getType()));
+        return Optional.of(jsonConverter.fromJson(jsonConverter.toJson(jvSnapshotDto), CdoSnapshot.class));
+    }
+
+    private Map<Property, Object> asMap(ManagedClass cdoClass, List<PropertiesFinder.JvSnapshotProperty> state) {
+        Map<Property, Object> stateAsMap = new HashMap<>();
+
+        for (PropertiesFinder.JvSnapshotProperty prop: state) {
+            stateAsMap.put(cdoClass.getProperty(prop.name), prop.value);
         }
         
-        return Optional.of(snapshotBuilder.build());
+        return stateAsMap;
     }
 
     public List<CdoSnapshot> getStateHistory(Object cdoId, String className, int limit) {
@@ -109,10 +122,21 @@ public class CdoSnapshotFinder {
         this.jsonConverter = jsonConverter;
     }
 
-    public JsonConverter getJsonConverter() {
-        return jsonConverter;
-    }
+    private static class JvSnapshotDto {
+        GlobalId globalId;
+        CommitMetadata commitMetadata;
+        Map<Property, Object> state;
+        SnapshotType type;
 
+        public JvSnapshotDto(GlobalId globalId, CommitMetadata commitMetadata, Map<Property, Object> state, SnapshotType type) {
+            this.globalId = globalId;
+            this.commitMetadata = commitMetadata;
+            this.state = state;
+            this.type = type;
+        }
+        
+    }
+    
     private static class JvCommitDto {
         SnapshotType snapshotType;
         String author;
