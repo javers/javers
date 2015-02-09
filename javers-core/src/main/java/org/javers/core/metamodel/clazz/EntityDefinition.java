@@ -2,17 +2,19 @@ package org.javers.core.metamodel.clazz;
 
 import java.util.Collections;
 import java.util.List;
-
+import org.javers.core.metamodel.type.EntityType;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
+ * Recipe for {@link EntityType}
+ *
  * @author bartosz walacik
  */
 public class EntityDefinition  extends ClientsClassDefinition {
     private final String idPropertyName;
 
     /**
-     * creates Entity with id property selected by @Id annotation
+     * Creates Entity with Id-property selected by @Id annotation
      */
     public EntityDefinition(Class<?> clazz) {
         super(clazz);
@@ -20,14 +22,14 @@ public class EntityDefinition  extends ClientsClassDefinition {
     }
 
     /**
-     * creates Entity with id property selected explicitly by name
+     * Creates Entity with Id-property selected explicitly by name
      */
     public EntityDefinition(Class<?> clazz, String idPropertyName){
         this(clazz, idPropertyName, Collections.<String>emptyList());
     }
 
     /**
-     * creates Entity with id property selected explicitly by name,
+     * Creates Entity with Id-property selected explicitly by name,
      * ignores given properties
      */
     public EntityDefinition(Class<?> clazz, String idPropertyName, List<String> ignoredProperties) {

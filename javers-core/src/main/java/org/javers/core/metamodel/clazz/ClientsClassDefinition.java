@@ -18,9 +18,7 @@ public abstract class ClientsClassDefinition {
 
 
     ClientsClassDefinition(Class<?> clazz) {
-        argumentIsNotNull(clazz);
-        this.clazz = clazz;
-        this.ignoredProperties = Collections.emptyList();
+        this(clazz, Collections.EMPTY_LIST);
     }
 
     ClientsClassDefinition(Class<?> clazz, List<String> ignoredProperties) {

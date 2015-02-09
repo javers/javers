@@ -25,7 +25,6 @@ import org.javers.repository.api.JaversRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -116,34 +115,32 @@ public final class JaversBuilder extends AbstractJaversBuilder {
 
     /**
      * Registers an {@link Entity}. <br/>
-     * Use this method if you are not willing to use annotations.
+     * Use this method if you are not willing to use annotations to mark Id-property
+     * and ignored properties.
      *
-     * @param idPropertyName mandatory, name of Id-property
-     * @param ignoredProperties optional, list of property names to be ignore by JaVers
      * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
-    public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName, List<String> ignoredProperties) {
-        argumentsAreNotNull(entityClass, idPropertyName);
-
-        List<String> ignored = Collections.EMPTY_LIST;
-        if (ignoredProperties != null){
-            ignored = ignoredProperties;
-        }
-        return registerEntity( new EntityDefinition(entityClass, idPropertyName, ignored) );
+    public JaversBuilder registerEntity(EntityDefinition entityDefinition){
+        argumentIsNotNull(entityDefinition);
+        clientsClassDefinitions.add(entityDefinition);
+        return this;
     }
 
     /**
      * Deprecated since 1.0.6,
      * use {@link #registerEntity(Class)}  or
-     * {@link #registerEntity(Class, String, java.util.List)}
+     * {@link #registerEntity(EntityDefinition)}
      */
     @Deprecated
     public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName){
-        return registerEntity(entityClass, idPropertyName, Collections.EMPTY_LIST);
+        return registerEntity(new EntityDefinition(entityClass, idPropertyName));
     }
 
     /**
-     * Registers a ValueObject type (see {@link ValueObjectType}). <br/>
+     * Registers a {@link ValueObjectType}. <br/>
+     * Use @Transient or @{@link DiffIgnore} to mark ignored properties.
+     * <br/><br/>
+     *
      * For example, ValueObjects are: Address, Point
      *
      * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
@@ -155,7 +152,21 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * Registers a simple value type (see {@link ValueType}). <br/>
+     * Registers a {@link ValueObjectType}. <br/>
+     * Use this method if you are not willing to use annotations to mark ignored properties.
+     *
+     * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
+     */
+    public JaversBuilder registerValueObject(ValueObjectDefinition valueObjectDefinition) {
+        argumentIsNotNull(valueObjectDefinition);
+        clientsClassDefinitions.add(valueObjectDefinition);
+        return this;
+    }
+
+    /**
+     * Registers a simple value type (see {@link ValueType}).
+     * <br/><br/>
+     *
      * For example, values are: BigDecimal, LocalDateTime
      *
      * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
@@ -218,14 +229,14 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    public JaversBuilder registerEntities(Class<?>...entityClasses) {
+    public JaversBuilder registerEntities(Class<?>... entityClasses) {
         for(Class clazz : entityClasses) {
             registerEntity(clazz);
         }
         return this;
     }
 
-    public JaversBuilder registerValueObjects(Class<?>...valueObjectClasses) {
+    public JaversBuilder registerValueObjects(Class<?>... valueObjectClasses) {
         for(Class clazz : valueObjectClasses) {
             registerValueObject(clazz);
         }
@@ -317,10 +328,4 @@ public final class JaversBuilder extends AbstractJaversBuilder {
        //JaversExtendedRepository can be created after users calls JaversBuilder.registerJaversRepository()
         addComponent(JaversExtendedRepository.class);
     }
-
-    private JaversBuilder registerEntity(EntityDefinition entityDefinition) {
-        clientsClassDefinitions.add(entityDefinition);
-        return this;
-    }
-
 }
