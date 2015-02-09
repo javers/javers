@@ -47,6 +47,10 @@ subprojects {
         gradleVersion = '2.1'
     }
 
+    javadoc {
+        options.noTimestamp()
+    }
+
     task example (dependsOn: 'cleanTest') << {
         tasks.test.testLogging {
             events 'failed', 'passed'
