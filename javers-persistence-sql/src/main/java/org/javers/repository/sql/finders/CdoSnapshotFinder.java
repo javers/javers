@@ -4,11 +4,9 @@ import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.SnapshotType;
-import org.javers.core.metamodel.property.Property;
 import org.javers.repository.sql.finders.PropertiesFinder.JvSnapshotProperty;
 import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
 import org.joda.time.LocalDateTime;
@@ -39,25 +37,54 @@ public class CdoSnapshotFinder {
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         Optional<String> snapshotPk = selectSnapshotPrimaryKey(globalId);
-        
+
         if (snapshotPk.isEmpty()) {
             return Optional.empty();
         }
 
         JvCommitDto jvCommitDto = selectCommitMetadata(snapshotPk);
         List<JvSnapshotProperty> properties = propertiesFinder.findProperties(Integer.valueOf(snapshotPk.get()));
-        Map<Property, Object> prop = propertiesAsMap(globalId.getCdoClass(), properties);
-
         CommitMetadata commitMetadata = new CommitMetadata(jvCommitDto.author, jvCommitDto.date, CommitId.valueOf(jvCommitDto.commitId));
-        JvSnapshotDto jvSnapshotDto = new JvSnapshotDto(globalId, commitMetadata, prop, jvCommitDto.snapshotType);
+        String snapshotAsJson = snapshotToJson(globalId, jvCommitDto, properties, commitMetadata);
 
-        return Optional.of(jsonConverter.fromJson(jsonConverter.toJson(jvSnapshotDto), CdoSnapshot.class));
+
+        return Optional.of(jsonConverter.fromJson(snapshotAsJson, CdoSnapshot.class));
+    }
+
+    //TODO
+    private String snapshotToJson(GlobalId globalId, JvCommitDto jvCommitDto, List<JvSnapshotProperty> properties, CommitMetadata commitMetadata) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{ \"globalId\" : ");
+        sb.append(jsonConverter.toJson(globalId));
+        sb.append(", \"commitMetadata\" : ");
+        sb.append(jsonConverter.toJson(commitMetadata));
+        sb.append(", \"type\" : ");
+        sb.append(jsonConverter.toJson(jvCommitDto.snapshotType));
+        appendState(sb, properties);
+        sb.append(" }");
+        return sb.toString();
+    }
+
+    private void appendState(StringBuilder sb, List<JvSnapshotProperty> properties) {
+        sb.append(", \"state\" : {");
+        for (JvSnapshotProperty property : properties) {
+            sb.append("\"");
+            sb.append(property.name);
+            sb.append("\" : ");
+            sb.append(property.value);
+            sb.append(",");
+        }
+
+        //remove last dot
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append(" }");
+
     }
 
     public List<CdoSnapshot> getStateHistory(GlobalId cdoId, String className, int limit) {
 
         SelectQuery query = javersPolyJDBC.query()
-                .select(SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_PK+ ", " + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_TYPE + ", " + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_AUTHOR + ", " + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_COMMIT_DATE + ", " + COMMIT_TABLE_COMMIT_ID)
+                .select(SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_PK + ", " + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_TYPE + ", " + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_AUTHOR + ", " + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_COMMIT_DATE + ", " + COMMIT_TABLE_COMMIT_ID)
                 .from(SNAPSHOT_TABLE_NAME +
                         " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_PK + "=" + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_COMMIT_FK +
                         " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " ON " + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_PK + "=" + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_GLOBAL_ID_FK +
@@ -76,17 +103,17 @@ public class CdoSnapshotFinder {
         });
 
         List<CdoSnapshot> snapshots = new ArrayList<>();
-        
-        for (JvCommitDto jvCommitDto: jvCommitDtos) {
+
+        for (JvCommitDto jvCommitDto : jvCommitDtos) {
             //TODO n + 1 problem
             List<JvSnapshotProperty> properties = propertiesFinder.findProperties(jvCommitDto.snapshotPk);
-            Map<Property, Object> prop = propertiesAsMap(cdoId.getCdoClass(), properties);
-            
+            Map<String, String> prop = propertiesAsMap(properties);
             CommitMetadata commitMetadata = new CommitMetadata(jvCommitDto.author, jvCommitDto.date, CommitId.valueOf(jvCommitDto.commitId));
             JvSnapshotDto jvSnapshotDto = new JvSnapshotDto(cdoId, commitMetadata, prop, jvCommitDto.snapshotType);
+
             snapshots.add(jsonConverter.fromJson(jsonConverter.toJson(jvSnapshotDto), CdoSnapshot.class));
         }
-        
+
         return snapshots;
     }
 
@@ -104,7 +131,7 @@ public class CdoSnapshotFinder {
                 return new JvCommitDto(resultSet.getString(SNAPSHOT_TABLE_TYPE), resultSet.getString(COMMIT_TABLE_AUTHOR), resultSet.getTimestamp(COMMIT_TABLE_COMMIT_DATE), resultSet.getString(COMMIT_TABLE_COMMIT_ID));
             }
         });
-        
+
         return jvCommitDto.get(0);
     }
 
@@ -118,7 +145,7 @@ public class CdoSnapshotFinder {
                 .withArgument("localId", jsonConverter.toJson(globalId.getCdoId()))
                 .withArgument("qualifiedName", globalId.getCdoClass().getName());
 
-        
+
         List<String> snapshotPk = javersPolyJDBC.queryRunner().queryList(selectQuery, new ObjectMapper<String>() {
             @Override
             public String createObject(ResultSet resultSet) throws SQLException {
@@ -129,15 +156,15 @@ public class CdoSnapshotFinder {
         if (snapshotPk.size() != 1 || (snapshotPk.size() == 1 && snapshotPk.get(0) == null)) {
             return Optional.empty();
         }
-        
+
         return Optional.of(snapshotPk.get(0));
     }
 
-    private Map<Property, Object> propertiesAsMap(ManagedClass cdoClass, List<JvSnapshotProperty> state) {
-        Map<Property, Object> stateAsMap = new HashMap<>();
+    private Map<String, String> propertiesAsMap(List<JvSnapshotProperty> state) {
+        Map<String, String> stateAsMap = new HashMap<>();
 
         for (JvSnapshotProperty prop : state) {
-            stateAsMap.put(cdoClass.getProperty(prop.name), prop.value);
+            stateAsMap.put(prop.name, prop.value);
         }
 
         return stateAsMap;
@@ -150,10 +177,10 @@ public class CdoSnapshotFinder {
     private static class JvSnapshotDto {
         GlobalId globalId;
         CommitMetadata commitMetadata;
-        Map<Property, Object> state;
+        Map<String, String> state;
         SnapshotType type;
 
-        public JvSnapshotDto(GlobalId globalId, CommitMetadata commitMetadata, Map<Property, Object> state, SnapshotType type) {
+        public JvSnapshotDto(GlobalId globalId, CommitMetadata commitMetadata, Map<String, String> state, SnapshotType type) {
             this.globalId = globalId;
             this.commitMetadata = commitMetadata;
             this.state = state;
@@ -175,7 +202,7 @@ public class CdoSnapshotFinder {
             this.date = new LocalDateTime(date.getTime());
             this.commitId = commmitId;
         }
-        
+
         private JvCommitDto(int snapshotPk, String snapshotType, String author, Timestamp date, String commmitId) {
             this.snapshotPk = snapshotPk;
             this.snapshotType = SnapshotType.valueOf(snapshotType);
@@ -183,6 +210,6 @@ public class CdoSnapshotFinder {
             this.date = new LocalDateTime(date.getTime());
             this.commitId = commmitId;
         }
-        
+
     }
 }

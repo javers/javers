@@ -74,7 +74,6 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
-    @Ignore
     def "should compare Entity property values with latest from repository"() {
         given:
         def user = dummyUser("John").withAge(18).build()
@@ -96,7 +95,6 @@ class JaversRepositoryE2ETest extends Specification {
         history[1] instanceof NewObject
     }
 
-    @Ignore
     def "should compare ValueObject property values with latest from repository"() {
         given:
         def cdo = new SnapshotEntity(id: 1, listOfValueObjects: [new DummyAddress("London","street")])
@@ -120,7 +118,6 @@ class JaversRepositoryE2ETest extends Specification {
         history[1] instanceof NewObject
     }
 
-    @Ignore
     @Unroll
     def "should store snapshot of #what and find it by id"() {
         given:

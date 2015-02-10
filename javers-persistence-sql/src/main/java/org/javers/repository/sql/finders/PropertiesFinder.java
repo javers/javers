@@ -32,7 +32,7 @@ public class PropertiesFinder {
         return javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<JvSnapshotProperty>() {
             @Override
             public JvSnapshotProperty createObject(ResultSet resultSet) throws SQLException {
-                    return new JvSnapshotProperty(resultSet.getString(SNAP_PROPERTY_NAME), resultSet.getString(SNAP_PROPERTY_VALUE));
+                return new JvSnapshotProperty(resultSet.getString(SNAP_PROPERTY_NAME), resultSet.getString(SNAP_PROPERTY_VALUE));
             }
         });
     }
