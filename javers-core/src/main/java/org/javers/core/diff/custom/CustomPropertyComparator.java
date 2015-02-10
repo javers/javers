@@ -9,7 +9,7 @@ import org.javers.core.metamodel.property.Property;
  * Custom property-scope comparator.
  * <br/><br/>
  *
- * Implementation should calculate a diff between two property values of type T.
+ * Implementation should calculate a diff between two values of type T.
  * <br/><br/>
  *
  * For example, if you are using Multimap from Guava,

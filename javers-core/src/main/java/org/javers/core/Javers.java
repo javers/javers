@@ -63,15 +63,15 @@ public class Javers {
     }
 
     /**
-     * Persists a current state of a given domain objects graph
+     * Persists a current state of a given domain object graph
      * in JaVers repository.
      * <br/><br/>
      * 
      * JaVers applies commit() to given object and all objects navigable from it.
-     * You can capture a state of an arbitrary complex objects graph with a single commit() call.
+     * You can capture a state of an arbitrary complex object graph with a single commit() call.
      *
      * @see <a href="http://javers.org/documentation/repository-examples/">http://javers.org/documentation/repository-examples</a>
-     * @param currentVersion standalone object or handle to an objects graph
+     * @param currentVersion standalone object or handle to an object graph
      */
     public Commit commit(String author, Object currentVersion) {
         Commit commit = commitFactory.create(author, currentVersion);
@@ -105,15 +105,15 @@ public class Javers {
     /**
      * <p>
      * JaVers core function,
-     * deeply compares two arbitrary complex objects graphs.
+     * deeply compares two arbitrary complex object graphs.
      * </p>
      *
      * <p>
      * To calculate a diff, just provide two versions of the
-     * same object or handles to two versions of the same objects graph.
+     * same object or handles to two versions of the same object graph.
      * <br/>
      * The handle could be a root of an aggregate, tree root
-     * or any node in an objects graph from where all other nodes are navigable.
+     * or any node in an object graph from where all other nodes are navigable.
      * </p>
      *
      * <p>
@@ -132,7 +132,7 @@ public class Javers {
     }
 
     /**
-     * Initial diff is a kind of snapshot of given domain objects graph.
+     * Initial diff is a kind of snapshot of given domain object graph.
      * Use it alongside with {@link #compare(Object, Object)}
      */
     public Diff initial(Object newDomainObject) {

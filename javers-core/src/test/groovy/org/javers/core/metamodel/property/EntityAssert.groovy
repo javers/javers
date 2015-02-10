@@ -28,7 +28,7 @@ class EntityAssert {
         PropertyAssert.assertThat(found)
     }
 
-    void hasntGotProperty(String withName) {
+    EntityAssert hasntGotProperty(String withName) {
         assert !actual.hasProperty(withName)
     }
 }

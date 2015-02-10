@@ -16,7 +16,6 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     def setup() {
         Server.createTcpServer().start()
         dbConnection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test")
-//        dbConnection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/pawel.szymczyk", "pawel.szymczyk", "");
         def connectionProvider = new ConnectionProvider() {
             @Override
             Connection getConnection() {

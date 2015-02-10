@@ -42,7 +42,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
     private boolean isSupportedContainer(Property property) {
         ContainerType propertyType = typeMapper.getPropertyType(property);
 
-        if (typeMapper.isValueObject(propertyType.getItemClass())) {
+        if (typeMapper.isValueObject(propertyType.getItemType())) {
             logger.error("could not diff " + property +", "+
                          JaversExceptionCode.SET_OF_VO_DIFF_NOT_IMPLEMENTED.getMessage() );
             return false;
@@ -52,15 +52,15 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
 
     private List<ContainerElementChange> calculateEntryChanges(SetType setType, Set leftRawSet, Set rightRawSet, OwnerContext owner) {
 
-        JaversType itemType = typeMapper.getJaversType(setType.getItemClass());
+        JaversType itemType = typeMapper.getJaversType(setType.getItemType());
         DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
 
         if (nullSafeEquals(leftRawSet, rightRawSet)) {
             return Collections.EMPTY_LIST;
         }
 
-        Set<GlobalId> leftSet = (Set<GlobalId>) setType.map(leftRawSet, dehydrateFunction, owner);
-        Set<GlobalId> rightSet = (Set<GlobalId>) setType.map(rightRawSet, dehydrateFunction, owner);
+        Set<GlobalId> leftSet = (Set) setType.map(leftRawSet, dehydrateFunction, owner);
+        Set<GlobalId> rightSet = (Set) setType.map(rightRawSet, dehydrateFunction, owner);
 
         List<ContainerElementChange> changes = new ArrayList<>();
 

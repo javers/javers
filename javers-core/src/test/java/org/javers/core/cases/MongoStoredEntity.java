@@ -1,4 +1,4 @@
-package org.javers.core.cases.morphia;
+package org.javers.core.cases;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Id;

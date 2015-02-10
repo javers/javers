@@ -18,7 +18,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
 
 /**
- * Node in client's domain objects graph. Reflects one {@link Cdo} or {@link CdoSnapshot}.
+ * Node in client's domain object graph. Reflects one {@link Cdo} or {@link CdoSnapshot}.
  * <p/>
  * Cdo could be an {@link Entity} or a {@link ValueObject}
  * <p/>

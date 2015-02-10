@@ -7,6 +7,7 @@ import org.javers.core.diff.changetype.container.*;
 import org.javers.core.metamodel.type.ContainerType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,8 +65,8 @@ abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends Cha
     }
 
     private ElementValueChange parseElementValueChange(JsonObject elementChange, JsonDeserializationContext context, ContainerType containerType){
-        Object lValue = decodeValue(elementChange, context, LEFT_VALUE_FIELD, containerType.getItemClass());
-        Object rValue = decodeValue(elementChange, context, RIGHT_VALUE_FIELD, containerType.getItemClass());
+        Object lValue = decodeValue(elementChange, context, LEFT_VALUE_FIELD, containerType.getItemType());
+        Object rValue = decodeValue(elementChange, context, RIGHT_VALUE_FIELD, containerType.getItemType());
         return new ElementValueChange(parseIndex(elementChange), lValue, rValue);
     }
 
@@ -97,7 +98,7 @@ abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends Cha
         return elementChange.get(INDEX_FIELD).getAsInt();
     }
 
-    private Object decodeValue(JsonObject elementChange, JsonDeserializationContext context, String fieldName, Class expectedType){
+    private Object decodeValue(JsonObject elementChange, JsonDeserializationContext context, String fieldName, Type expectedType){
         return context.deserialize(elementChange.get(fieldName), typeMapper.getDehydratedType(expectedType));
     }
 

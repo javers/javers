@@ -1,10 +1,11 @@
-package org.javers.core.metamodel.property
+package org.javers.core.metamodel.clazz
 
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.metamodel.clazz.Entity
 import org.javers.core.metamodel.clazz.EntityDefinition
 import org.javers.core.metamodel.clazz.ManagedClassFactory
+import org.javers.core.metamodel.property.EntityAssert
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
@@ -12,12 +13,12 @@ import spock.lang.Specification
 /**
  * @author bartosz walacik
  */
-abstract class EntityIdTest extends Specification {
+abstract class EntityFactoryIdTest extends Specification {
     protected ManagedClassFactory entityFactory
 
     def "should use @id property by default"() {
         when:
-        Entity entity = entityFactory.create(new EntityDefinition(DummyUser.class))
+        def entity = entityFactory.create(new EntityDefinition(DummyUser.class))
 
         then:
         EntityAssert.assertThat(entity).hasIdProperty("name")
@@ -25,7 +26,7 @@ abstract class EntityIdTest extends Specification {
 
     def "should use custom id property when given"() {
         when:
-        Entity entity = entityFactory.create(new EntityDefinition(DummyUser.class,"bigFlag"))
+        def entity = entityFactory.create(new EntityDefinition(DummyUser,"bigFlag"))
 
         then:
         EntityAssert.assertThat(entity).hasIdProperty("bigFlag")
@@ -38,5 +39,14 @@ abstract class EntityIdTest extends Specification {
         then:
         JaversException e = thrown()
         e.code == JaversExceptionCode.ENTITY_WITHOUT_ID
+    }
+
+    def "should fail when given Id property name doesn't exists"() {
+        when:
+        entityFactory.create(new EntityDefinition(DummyUser,"zonk"))
+
+        then:
+        JaversException e = thrown()
+        e.code == JaversExceptionCode.PROPERTY_NOT_FOUND
     }
 }

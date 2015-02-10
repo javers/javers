@@ -3,6 +3,7 @@ package org.javers.core.metamodel.type
 import com.google.common.reflect.TypeToken
 import org.javers.common.exception.JaversException
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.lang.reflect.Type
 
@@ -14,55 +15,54 @@ import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClas
  */
 class CollectionTypeTest extends Specification{
     class Dummy <T> {
-        Set noGeneric
-        Set<?> wildcardGeneric
-        Set<T> parametrizedGeneric
-        Set<String> genericWithArgument
+        Set rawType
+        Set<?> unboundedWildcardType
+        Set<T> genericType
+        Set<String> parametrizedType
+        Set<ThreadLocal<String>> nestedParametrizedType
     }
 
-    def "should not be generic if baseJavaType is not generic"(){
+    @Unroll
+    def "should fail for #fieldName"(){
         given:
-        Type noGeneric = getFieldFromClass(Dummy, "noGeneric").genericType
+        def noGeneric = getFieldFromClass(Dummy, fieldName).genericType
 
         when:
-        CollectionType cType = new CollectionType(noGeneric)
-
-        then:
-        cType.baseJavaType == Set
-        cType.genericType == false
-        cType.fullyParametrized == false
-
-        when:
-        cType.getItemClass()
+        def cType = new ListType(noGeneric).getItemClass()
 
         then:
         def e = thrown(JaversException)
-        e.code == GENERIC_TYPE_NOT_PARAMETRIZED;
+        e.code == GENERIC_TYPE_NOT_PARAMETRIZED
+        println e.message
+
+        where:
+        fieldName    << ["rawType", "unboundedWildcardType", "genericType"]
     }
 
-    def "should ignore unbounded type parameter" () {
+    def "should scan actual class from type parameter" () {
         given:
-        Type parametrizedGeneric = getFieldFromClass(Dummy, "parametrizedGeneric").genericType
+        def genericWithArgument = getFieldFromClass(Dummy, "parametrizedType").genericType
 
         when:
-        CollectionType cType = new CollectionType(parametrizedGeneric)
-
-        then:
-        cType.genericType == true
-        cType.fullyParametrized == false
-    }
-
-    def "should hold actual elementType" () {
-        given:
-        Type genericWithArgument   =    getFieldFromClass(Dummy, "genericWithArgument").genericType
-
-        when:
-        CollectionType cType = new CollectionType(genericWithArgument)
+        def cType = new ListType(genericWithArgument)
 
         then:
         cType.baseJavaType == new TypeToken<Set<String>>(){}.type
         cType.genericType == true
         cType.fullyParametrized == true
-        cType.itemClass == String
+        cType.itemType == String
+    }
+
+    def "should scan nested generic type from type parameter" () {
+        given:
+        def genericWithArgument = getFieldFromClass(Dummy, "nestedParametrizedType").genericType
+
+        when:
+        def cType = new ListType(genericWithArgument)
+
+        then:
+        cType.baseJavaType == new TypeToken< Set<ThreadLocal<String>> >(){}.type
+        cType.fullyParametrized == true
+        cType.itemType ==  new TypeToken< ThreadLocal<String> >(){}.type
     }
 }

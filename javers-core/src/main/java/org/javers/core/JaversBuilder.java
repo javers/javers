@@ -1,21 +1,22 @@
 package org.javers.core;
 
-import org.javers.core.metamodel.type.*;
 import com.google.gson.TypeAdapter;
-import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.type.CustomType;
 import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.ValueObjectType;
 import org.javers.core.metamodel.type.ValueType;
 import org.javers.core.snapshot.GraphSnapshotModule;
 import org.javers.repository.api.InMemoryRepositoryModule;
@@ -27,6 +28,9 @@ import org.slf4j.LoggerFactory;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.javers.common.validation.Validate.argumentIsNotNull;
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * Creates a JaVers instance based on your domain model metadata and custom configuration.
@@ -90,51 +94,85 @@ public final class JaversBuilder extends AbstractJaversBuilder {
      * @see <a href="http://javers.org/documentation/configuration/#repository-setup">http://javers.org/documentation/configuration/#repository-setup</a>
      */
     public JaversBuilder registerJaversRepository(JaversRepository repository){
-        Validate.argumentsAreNotNull(repository);
+        argumentsAreNotNull(repository);
         this.repository = repository;
         return this;
     }
 
     /**
-     * registers an {@link Entity} with id-property pointed by @Id annotation
+     * Registers an {@link Entity}.
+     * Use @Id annotation to mark exactly one Id-property.
+     * <br/><br/>
+     *
+     * Optionally, use @Transient or @{@link DiffIgnore} to mark ignored properties.
      *
      * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
-        Validate.argumentIsNotNull(entityClass);
+        argumentIsNotNull(entityClass);
         return registerEntity( new EntityDefinition(entityClass));
     }
 
     /**
-     * registers an {@link Entity} with id-property selected explicitly by name
+     * Registers an {@link Entity}. <br/>
+     * Use this method if you are not willing to use annotations to mark Id-property
+     * and ignored properties.
      *
      * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
-    public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName) {
-        Validate.argumentsAreNotNull(entityClass, idPropertyName);
-        return registerEntity( new EntityDefinition(entityClass, idPropertyName) );
+    public JaversBuilder registerEntity(EntityDefinition entityDefinition){
+        argumentIsNotNull(entityDefinition);
+        clientsClassDefinitions.add(entityDefinition);
+        return this;
     }
 
     /**
-     * Registers a ValueObject type (see {@link ValueObjectType}). <br/>
-     * For example, values are: Address, Point
+     * Deprecated since 1.0.6,
+     * use {@link #registerEntity(Class)}  or
+     * {@link #registerEntity(EntityDefinition)}
+     */
+    @Deprecated
+    public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName){
+        return registerEntity(new EntityDefinition(entityClass, idPropertyName));
+    }
+
+    /**
+     * Registers a {@link ValueObjectType}. <br/>
+     * Use @Transient or @{@link DiffIgnore} to mark ignored properties.
+     * <br/><br/>
+     *
+     * For example, ValueObjects are: Address, Point
      *
      * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
-        Validate.argumentIsNotNull(valueObjectClass);
+        argumentIsNotNull(valueObjectClass);
         clientsClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
         return this;
     }
 
     /**
-     * Registers a simple value type (see {@link ValueType}). <br/>
+     * Registers a {@link ValueObjectType}. <br/>
+     * Use this method if you are not willing to use annotations to mark ignored properties.
+     *
+     * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
+     */
+    public JaversBuilder registerValueObject(ValueObjectDefinition valueObjectDefinition) {
+        argumentIsNotNull(valueObjectDefinition);
+        clientsClassDefinitions.add(valueObjectDefinition);
+        return this;
+    }
+
+    /**
+     * Registers a simple value type (see {@link ValueType}).
+     * <br/><br/>
+     *
      * For example, values are: BigDecimal, LocalDateTime
      *
      * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValue(Class<?> valueClass) {
-        Validate.argumentIsNotNull(valueClass);
+        argumentIsNotNull(valueClass);
         clientsClassDefinitions.add(new ValueDefinition(valueClass));
         return this;
     }
@@ -191,14 +229,14 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    public JaversBuilder registerEntities(Class<?>...entityClasses) {
+    public JaversBuilder registerEntities(Class<?>... entityClasses) {
         for(Class clazz : entityClasses) {
             registerEntity(clazz);
         }
         return this;
     }
 
-    public JaversBuilder registerValueObjects(Class<?>...valueObjectClasses) {
+    public JaversBuilder registerValueObjects(Class<?>... valueObjectClasses) {
         for(Class clazz : valueObjectClasses) {
             registerValueObject(clazz);
         }
@@ -209,7 +247,7 @@ public final class JaversBuilder extends AbstractJaversBuilder {
      * Default style is {@link MappingStyle#FIELD}.
      */
     public JaversBuilder withMappingStyle(MappingStyle mappingStyle) {
-        Validate.argumentIsNotNull(mappingStyle);
+        argumentIsNotNull(mappingStyle);
         coreConfiguration().withMappingStyle(mappingStyle);
         return this;
     }
@@ -283,16 +321,11 @@ public final class JaversBuilder extends AbstractJaversBuilder {
             logger.info("using fake InMemoryRepository, register actual implementation via JaversBuilder.registerJaversRepository()");
             addModule(new InMemoryRepositoryModule(getContainer()));
         } else {
+            repository.setJsonConverter( getContainerComponent(JsonConverter.class));
             addComponent(repository);
         }
 
        //JaversExtendedRepository can be created after users calls JaversBuilder.registerJaversRepository()
         addComponent(JaversExtendedRepository.class);
     }
-
-    private JaversBuilder registerEntity(EntityDefinition entityDefinition) {
-        clientsClassDefinitions.add(entityDefinition);
-        return this;
-    }
-
 }

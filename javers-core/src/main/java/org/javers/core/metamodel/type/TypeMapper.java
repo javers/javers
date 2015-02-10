@@ -53,6 +53,7 @@ public class TypeMapper {
         registerValueType(LocalDate.class);
         registerValueType(BigDecimal.class);
         registerValueType(Date.class);
+        registerValueType(ThreadLocal.class);
 
         //Collections
         addType(new SetType(Set.class));
@@ -60,6 +61,21 @@ public class TypeMapper {
 
         //& Maps
         addType(new MapType(Map.class));
+    }
+
+    public MapContentType getMapContentType(MapType mapType){
+        JaversType keyType = getJaversType(mapType.getKeyType());
+        JaversType valueType = getJaversType(mapType.getValueType());
+        return new MapContentType(keyType, valueType);
+    }
+
+    /**
+     * for change appenders
+     */
+    public MapContentType getMapContentType(ContainerType containerType){
+        JaversType keyType = getJaversType(Integer.class);
+        JaversType valueType = getJaversType(containerType.getItemType());
+        return new MapContentType(keyType, valueType);
     }
 
     /**
@@ -116,7 +132,7 @@ public class TypeMapper {
             return false;
         }
 
-        return getJaversType(((ContainerType) javersType).getItemClass()) instanceof ManagedType;
+        return getJaversType(((ContainerType) javersType).getItemType()) instanceof ManagedType;
     }
 
     /**
@@ -131,8 +147,8 @@ public class TypeMapper {
 
         MapType mapType = (MapType)enumerableType;
 
-        JaversType keyType = getJaversType(mapType.getKeyClass());
-        JaversType valueType = getJaversType(mapType.getValueClass());
+        JaversType keyType = getJaversType(mapType.getKeyType());
+        JaversType valueType = getJaversType(mapType.getValueType());
 
         return keyType instanceof ManagedType || valueType instanceof ManagedType;
     }
@@ -163,12 +179,12 @@ public class TypeMapper {
         return result;
     }
 
-    public boolean isValueObject(Class clazz) {
-        JaversType jType  = getJaversType(clazz);
+    public boolean isValueObject(Type type) {
+        JaversType jType  = getJaversType(type);
         return  jType instanceof ValueObjectType;
     }
 
-    public Class getDehydratedType(Class expectedType){
+    public Type getDehydratedType(Type expectedType){
         JaversType expectedJaversType = getJaversType(expectedType);
 
         if (expectedJaversType instanceof ManagedType){
@@ -207,7 +223,7 @@ public class TypeMapper {
         }
 
         if (javersType instanceof ContainerType) {
-            JaversType contentType  = getJaversType(((ContainerType) javersType).getItemClass());
+            JaversType contentType  = getJaversType(((ContainerType) javersType).getItemType());
             if (contentType instanceof ValueObjectType){
                 return ((ValueObjectType)contentType).getManagedClass();
             }
@@ -230,7 +246,7 @@ public class TypeMapper {
         if (! (javersType instanceof ContainerType)) {
             return false;
         }
-        return getJaversType(((ContainerType) javersType).getItemClass()) instanceof ValueObjectType;
+        return getJaversType(((ContainerType) javersType).getItemType()) instanceof ValueObjectType;
     }
 
     private void addType(JaversType jType) {

@@ -1,5 +1,5 @@
 ﻿﻿
-![JVlogo.png](JVlogo2.png)
+![javers-black-logo-1.0.png](javers-black-logo-1.0.png)
 
 ## What is JaVers
 JaVers is a lightweight java library for **auditing** changes in your data.

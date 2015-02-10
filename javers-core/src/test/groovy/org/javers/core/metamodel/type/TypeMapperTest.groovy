@@ -125,8 +125,8 @@ class TypeMapperTest extends Specification {
 
         then:
         jType.baseJavaType == givenJavaType
-        jType.keyClass == String
-        jType.valueClass == Integer
+        jType.keyType == String
+        jType.valueType == Integer
 
         where:
         givenJavaType << [new TypeToken<Map<String, Integer>>(){}.type,new TypeToken<HashMap<String, Integer>>(){}.type]

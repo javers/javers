@@ -172,19 +172,6 @@ class SnapshotFactoryTest extends Specification{
                        ]
     }
 
-    def "should not support Map of <ValueObject,?>, no good idea how to handle this"() {
-        given:
-        def snapshotFactory = javers.snapshotFactory
-
-        when:
-        def cdo = new SnapshotEntity(mapVoToPrimitive:  [(new DummyAddress("London")):"this"])
-        snapshotFactory.create(cdo, javers.instanceId(cdo), new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0)))
-
-        then:
-        def e = thrown(JaversException)
-        e.code == VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
-    }
-
     def "should throw exception when property Type is not fully parametrized"() {
         given:
         def snapshotFactory = javers.snapshotFactory

@@ -2,7 +2,6 @@ package org.javers.core
 
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
-import org.fest.assertions.error.ShouldBe
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.commit.CommitAssert

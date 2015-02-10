@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Decomposes given live objects graph into a flat list of object Snapshots.
+ * Decomposes given live object graph into a flat list of object Snapshots.
  * Resulting structure can be easily serialized and persisted.
  *
  * @author bartosz walacik

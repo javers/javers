@@ -4,7 +4,7 @@ import org.bson.types.ObjectId;
 import org.fest.assertions.api.Assertions;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
-import org.javers.core.cases.morphia.MongoStoredEntity;
+import org.javers.core.cases.MongoStoredEntity;
 import org.javers.core.diff.Diff;
 import org.javers.core.examples.adapter.ObjectIdTypeAdapter;
 import org.junit.Test;

@@ -34,14 +34,14 @@ class MapTypeTest extends Specification{
         mType.fullyParametrized == false
 
         when:
-        mType.getKeyClass()
+        mType.getKeyType()
 
         then:
         def e = thrown(JaversException)
         e.code == GENERIC_TYPE_NOT_PARAMETRIZED;
 
         when:
-        mType.getValueClass()
+        mType.getValueType()
 
         then:
         e = thrown(JaversException)
@@ -60,7 +60,7 @@ class MapTypeTest extends Specification{
 
         then:
         mType.baseJavaType == new TypeToken<Map<String,Integer>>(){}.type
-        mType.keyClass == String
-        mType.valueClass == Integer
+        mType.keyType == String
+        mType.valueType == Integer
     }
 }

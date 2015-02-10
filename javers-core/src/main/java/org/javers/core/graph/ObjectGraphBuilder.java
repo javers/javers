@@ -38,7 +38,7 @@ public class ObjectGraphBuilder {
     /**
      * @param handle domain object, instance of Entity or ValueObject.
      *               It should be root of an aggregate, tree root
-     *               or any node in objects graph from where all other nodes are navigable
+     *               or any node in object graph from where all other nodes are navigable
      * @return graph nodes set
      */
     public LiveGraph buildGraph(Object handle) {
@@ -85,7 +85,7 @@ public class ObjectGraphBuilder {
             EnumerableType enumerableType = typeMapper.getPropertyType(containerProperty);
 
             //looks like we have Container or Map with Entity references or Value Objects
-            MultiEdge multiEdge = edgeBuilder.createMultiEdge(containerProperty, enumerableType, node, this);
+            MultiEdge multiEdge = edgeBuilder.createMultiEdge(containerProperty, enumerableType, node);
 
             node.addEdge(multiEdge);
         }
@@ -93,7 +93,7 @@ public class ObjectGraphBuilder {
 
     private void switchToBuilt() {
         if (built){
-            throw new IllegalStateException("ObjectGraphBuilder is stateful builder (not a Service)");
+            throw new IllegalStateException("ObjectGraphBuilder is a stateful builder (not a Service)");
         }
         built = true;
     }
