@@ -6,7 +6,6 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
-import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -24,7 +23,6 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
-    @Ignore
     def "should fetch terminal snapshots from the repository"() {
         given:
         def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))

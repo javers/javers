@@ -30,6 +30,6 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     }
     
     def cleanup() {
-//        dbConnection.commit()
+        dbConnection.close()
     }
 }
