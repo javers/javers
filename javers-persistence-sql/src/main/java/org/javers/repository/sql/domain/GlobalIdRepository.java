@@ -72,7 +72,7 @@ public class GlobalIdRepository {
         return javersPolyjdbc.queryRunner().insert(insertGlobalIdQuery);
     }
 
-    public void setJSONConverter(JsonConverter JSONConverter) {
+    public void setJsonConverter(JsonConverter JSONConverter) {
         this.jsonConverter = JSONConverter;
     }
 }

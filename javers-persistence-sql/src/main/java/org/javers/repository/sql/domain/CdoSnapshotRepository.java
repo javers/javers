@@ -39,7 +39,7 @@ public class CdoSnapshotRepository {
         return cdoSnapshotPrimaryKey;
     }
 
-    public void setJSONConverter(JsonConverter jsonConverter) {
+    public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }
 }

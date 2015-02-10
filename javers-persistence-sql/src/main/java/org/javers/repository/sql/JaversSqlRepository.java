@@ -69,8 +69,8 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
-        globalIdRepository.setJSONConverter(jsonConverter);
-        cdoSnapshotRepository.setJSONConverter(jsonConverter);
+        globalIdRepository.setJsonConverter(jsonConverter);
+        cdoSnapshotRepository.setJsonConverter(jsonConverter);
         finder.setJsonConverter(jsonConverter);
         commitRepository.setJsonConverter(jsonConverter);
     }
