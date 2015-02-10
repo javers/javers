@@ -19,12 +19,12 @@ public class Entity extends ManagedClass {
     Entity(Class sourceClass, List<Property> properties, Property idProperty) {
         super(sourceClass, properties);
 
-//        if (idProperty == null) {
-//            this.idProperty = findDefaultIdProperty();
-//        }
-//        else {
+        if (idProperty == null) {
+            this.idProperty = findDefaultIdProperty();
+        }
+        else {
             this.idProperty = idProperty;
-//        }
+        }
     }
 
     /**
