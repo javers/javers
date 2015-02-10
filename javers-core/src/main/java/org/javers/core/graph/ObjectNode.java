@@ -69,7 +69,7 @@ public class ObjectNode {
             return ((SingleEdge)edge).getReference().getGlobalId();
         }
         else {
-                return (GlobalId)getPropertyValue(property);
+            return (GlobalId)getPropertyValue(property);
         }
     }
 
