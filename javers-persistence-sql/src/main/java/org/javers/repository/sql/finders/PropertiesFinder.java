@@ -1,6 +1,5 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.core.json.JsonConverter;
 import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
@@ -22,28 +21,36 @@ public class PropertiesFinder {
         this.javersPolyJDBC = javersPolyJDBC;
     }
 
-    public List<JvSnapshotProperty> findProperties(int snapshotPk) {
+    public List<SnapshotPropertyDto> findProperties(int snapshotPk) {
         SelectQuery query = javersPolyJDBC.query()
                 .select(SNAP_PROPERTY_NAME + ", " + SNAP_PROPERTY_VALUE)
                 .from(SNAP_PROPERTY_TABLE_NAME)
                 .where(SNAP_PROPERTY_SNAPSHOT_FK + " = :snapshot_fk")
                 .withArgument("snapshot_fk", snapshotPk);
 
-        return javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<JvSnapshotProperty>() {
+        return javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<SnapshotPropertyDto>() {
             @Override
-            public JvSnapshotProperty createObject(ResultSet resultSet) throws SQLException {
-                return new JvSnapshotProperty(resultSet.getString(SNAP_PROPERTY_NAME), resultSet.getString(SNAP_PROPERTY_VALUE));
+            public SnapshotPropertyDto createObject(ResultSet resultSet) throws SQLException {
+                return new SnapshotPropertyDto(resultSet.getString(SNAP_PROPERTY_NAME), resultSet.getString(SNAP_PROPERTY_VALUE));
             }
         });
     }
 
-    public static class JvSnapshotProperty {
-        String name;
-        String value;
+    public static class SnapshotPropertyDto {
+        private String name;
+        private String value;
 
-        private JvSnapshotProperty(String name, String value) {
+        private SnapshotPropertyDto(String name, String value) {
             this.name = name;
             this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getValue() {
+            return value;
         }
     }
 }
