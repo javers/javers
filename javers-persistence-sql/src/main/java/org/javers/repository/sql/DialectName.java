@@ -1,4 +1,4 @@
-package org.javers.repository.jdbc;
+package org.javers.repository.sql;
 
 import org.polyjdbc.core.dialect.*;
 

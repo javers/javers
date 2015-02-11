@@ -84,11 +84,6 @@ public class MongoRepository implements JaversRepository {
         return getStateHistory(createIdQuery(globalId), limit);
     }
 
-    @Override
-    public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit) {
-        return getStateHistory(createIdQuery(globalIdDTO), limit);
-    }
-
     private List<CdoSnapshot> getStateHistory(DBObject cdoId, int limit) {
 
         DBCursor mongoSnapshots = getMongoSnapshotsCoursor(cdoId, limit);
@@ -112,11 +107,6 @@ public class MongoRepository implements JaversRepository {
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         return getLatest(createIdQuery(globalId));
-    }
-
-    @Override
-    public Optional<CdoSnapshot> getLatest(GlobalIdDTO globalIdDTO) {
-        return getLatest(createIdQuery(globalIdDTO));
     }
 
     private Optional<CdoSnapshot> getLatest(DBObject idQuery) {
@@ -150,10 +140,6 @@ public class MongoRepository implements JaversRepository {
 
     private BasicDBObject createIdQuery(GlobalId id) {
         return new BasicDBObject(GLOBAL_ID_KEY, id.value());
-    }
-
-    private BasicDBObject createIdQuery(GlobalIdDTO id) {
-        return new BasicDBObject(GLOBAL_ID_KEY,  id.value());
     }
 
     private CdoSnapshot readFromDBObject(DBObject dbObject) {

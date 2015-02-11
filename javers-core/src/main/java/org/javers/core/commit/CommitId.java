@@ -1,5 +1,9 @@
 package org.javers.core.commit;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.validation.Validate;
+
 /**
  * Consists of two parts : <br>
  * majorId = PREVIOUS.majorId + 1  <br>
@@ -17,6 +21,21 @@ public final class CommitId {
         this.minorId = minorId;
     }
 
+    public static CommitId valueOf(String majorDotMinor) {
+        Validate.argumentIsNotNull(majorDotMinor);
+
+        String[] strings = majorDotMinor.split("\\.");
+
+        if (strings.length != 2) {
+            throw new JaversException(JaversExceptionCode.CANT_PARSE_COMMIT_ID, majorDotMinor);
+        }
+
+        long major = Long.parseLong(strings[0]);
+        int minor = Integer.parseInt(strings[1]);
+
+        return new CommitId(major, minor);
+    } 
+    
     @Override
     public String toString() {
         return value();
