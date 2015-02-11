@@ -11,6 +11,8 @@ import org.polyjdbc.core.util.TheCloser;
 import java.io.Closeable;
 
 /**
+ * TODO update latest POLY and get rid of this
+ *
  * @author bartosz walacik
  */
 public class JaversPolyJDBC {
