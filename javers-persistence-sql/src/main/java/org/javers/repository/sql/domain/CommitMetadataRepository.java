@@ -1,6 +1,8 @@
 package org.javers.repository.sql.domain;
 
 import org.javers.common.collections.Optional;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -15,22 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_PK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_QUALIFIED_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_AUTHOR;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_COMMIT_DATE;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_COMMIT_ID;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_PK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_PK_SEQ;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_CLASS_FK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_LOCAL_ID;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_PK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_GLOBAL_ID_FK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_PK;
+import static org.javers.repository.sql.domain.FixedSchemaFactory.*;
 
 /**
  * @author pawel szymczyk
@@ -38,7 +25,6 @@ import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE
 public class CommitMetadataRepository {
 
     private final JaversPolyJDBC javersPolyJDBC;
-    
     private JsonConverter jsonConverter;
 
     public CommitMetadataRepository(JaversPolyJDBC javersPolyjdbc) {
@@ -55,24 +41,16 @@ public class CommitMetadataRepository {
         return javersPolyJDBC.queryRunner().insert(query);
     }
 
-    private Timestamp toTimestamp(LocalDateTime commitMetadata) {
-        return Timestamp.from(commitMetadata.toDate());
-    }
-
-    public Optional<Long> find(Commit commit) {
-        String author = commit.getAuthor();
-        LocalDateTime date = commit.getCommitDate();
-        CommitId commitId = commit.getId();
-        
+    public Optional<Long> getCommitPrimaryKey(Commit commit) {
         SelectQuery selectQuery = javersPolyJDBC.query()
                 .select(COMMIT_TABLE_PK)
                 .from(COMMIT_TABLE_NAME)
                 .where(COMMIT_TABLE_AUTHOR + " = :author " +
                         "AND " + COMMIT_TABLE_COMMIT_DATE + " = :date " +
                         "AND " + COMMIT_TABLE_COMMIT_ID + " = :id")
-                .withArgument("author", author)
-                .withArgument("date", toTimestamp(date))
-                .withArgument("id", commitId.value());
+                .withArgument("author", commit.getAuthor())
+                .withArgument("date", toTimestamp(commit.getCommitDate()))
+                .withArgument("id", commit.getId().value());
 
         return Optional.fromNullable(javersPolyJDBC.queryRunner().queryUnique(selectQuery, new ObjectMapper<Long>() {
             @Override
@@ -82,45 +60,57 @@ public class CommitMetadataRepository {
         }, false));
     }
 
-    public CommitId getHeadId() {
+    private Timestamp toTimestamp(LocalDateTime commitMetadata) {
+        return Timestamp.from(commitMetadata.toDate());
+    }
 
-        SelectQuery selectQuery1 = javersPolyJDBC.query()
+    public CommitId getCommitHeadId() {
+        Optional<Integer> maxPrimaryKey = selectMaxCommitPrimaryKey();
+
+        return maxPrimaryKey.isEmpty() ? null : selectCommitId(maxPrimaryKey.get());
+    }
+
+    private Optional<Integer> selectMaxCommitPrimaryKey() {
+        SelectQuery query = javersPolyJDBC.query()
                 .select("MAX(" + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_PK + ") AS " + COMMIT_TABLE_PK)
                 .from(COMMIT_TABLE_NAME);
 
-        List<Integer> maxPrimaryKey = javersPolyJDBC.queryRunner().queryList(selectQuery1, new ObjectMapper<Integer>() {
+        List<String> maxPrimaryKey = javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<String>() {
             @Override
-            public Integer createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getInt(COMMIT_TABLE_PK);
+            public String createObject(ResultSet resultSet) throws SQLException {
+                return resultSet.getString(COMMIT_TABLE_PK);
             }
         });
-        
-        if (maxPrimaryKey.size() != 1) {
-            return null;
+
+        if (maxPrimaryKey.size() != 1 || maxPrimaryKey.get(0) == null) {
+            return Optional.empty();
         }
-        
-        int commitPrimaryKey = maxPrimaryKey.get(0);
-        
-        SelectQuery selectQuery2 = javersPolyJDBC.query()
+
+        return Optional.of(Integer.valueOf(maxPrimaryKey.get(0)));
+    }
+
+    private CommitId selectCommitId(int primaryKey) {
+        SelectQuery query = javersPolyJDBC.query()
                 .select(COMMIT_TABLE_NAME + "." + COMMIT_TABLE_COMMIT_ID)
                 .from(COMMIT_TABLE_NAME)
                 .where(COMMIT_TABLE_PK + " = :maxPrimaryKey")
-                .withArgument("maxPrimaryKey", commitPrimaryKey);
+                .withArgument("maxPrimaryKey", primaryKey);
 
-        List<CommitId> commitId = javersPolyJDBC.queryRunner().queryList(selectQuery2, new ObjectMapper<CommitId>() {
+        List<CommitId> commitId = javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<CommitId>() {
             @Override
             public CommitId createObject(ResultSet resultSet) throws SQLException {
                 return jsonConverter.fromJson(resultSet.getString(COMMIT_TABLE_COMMIT_ID), CommitId.class);
             }
         });
-        
+
         if (commitId.size() != 1) {
-            return null;
+            throw new JaversException(JaversExceptionCode.CANT_FIND_COMMIT_HEAD_ID);
         }
-        
+
         return commitId.get(0);
     }
 
+    //TODO dependency injection
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }
