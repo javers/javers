@@ -102,7 +102,7 @@ public class CdoSnapshotFinder {
         return snapshots;
     }
 
-    //TODO
+    //TODO get rid of this to-from JSON workaround
     private String snapshotToJson(GlobalId globalId, JvCommitDto jvCommitDto, List<JvSnapshotProperty> properties, CommitMetadata commitMetadata) {
         StringBuilder sb = new StringBuilder();
         sb.append("{ \"globalId\" : ");
