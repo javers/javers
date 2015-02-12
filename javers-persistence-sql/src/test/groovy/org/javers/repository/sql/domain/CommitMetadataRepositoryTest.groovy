@@ -2,6 +2,7 @@ package org.javers.repository.sql.domain
 
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
+import org.javers.repository.sql.reposiotries.CommitMetadataRepository
 import org.joda.time.LocalDateTime
 
 /**

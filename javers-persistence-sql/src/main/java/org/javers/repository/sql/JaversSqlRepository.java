@@ -9,9 +9,9 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.repository.api.JaversRepository;
-import org.javers.repository.sql.domain.CdoSnapshotRepository;
-import org.javers.repository.sql.domain.CommitMetadataRepository;
-import org.javers.repository.sql.domain.GlobalIdRepository;
+import org.javers.repository.sql.reposiotries.CdoSnapshotRepository;
+import org.javers.repository.sql.reposiotries.CommitMetadataRepository;
+import org.javers.repository.sql.reposiotries.GlobalIdRepository;
 import org.javers.repository.sql.finders.CdoSnapshotFinder;
 
 import java.util.List;

@@ -8,8 +8,8 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.sql.finders.PropertiesFinder.SnapshotPropertyDto;
-import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
 import org.joda.time.LocalDateTime;
+import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
@@ -20,31 +20,15 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_PK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_QUALIFIED_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_AUTHOR;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_COMMIT_DATE;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_COMMIT_ID;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.COMMIT_TABLE_PK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_CLASS_FK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_LOCAL_ID;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_PK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_COMMIT_FK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_GLOBAL_ID_FK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_PK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAPSHOT_TABLE_TYPE;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CdoSnapshotFinder {
 
-    private final JaversPolyJDBC javersPolyJDBC;
+    private final PolyJDBC javersPolyJDBC;
     private final PropertiesFinder propertiesFinder;
     private JsonConverter jsonConverter;
 
-    public CdoSnapshotFinder(JaversPolyJDBC javersPolyJDBC, PropertiesFinder propertiesFinder) {
+    public CdoSnapshotFinder(PolyJDBC javersPolyJDBC, PropertiesFinder propertiesFinder) {
         this.javersPolyJDBC = javersPolyJDBC;
         this.propertiesFinder = propertiesFinder;
     }

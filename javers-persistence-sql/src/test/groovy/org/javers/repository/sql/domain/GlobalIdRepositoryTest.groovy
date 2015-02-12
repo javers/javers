@@ -2,6 +2,7 @@ package org.javers.repository.sql.domain
 
 import org.javers.core.JaversBuilder
 import org.javers.core.model.DummyUser
+import org.javers.repository.sql.reposiotries.GlobalIdRepository
 
 class GlobalIdRepositoryTest extends BaseRepositoryTest {
 

@@ -1,19 +1,19 @@
-package org.javers.repository.sql.domain;
+package org.javers.repository.sql.reposiotries;
 
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.property.Property;
-import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
+import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 
-import static org.javers.repository.sql.domain.FixedSchemaFactory.*;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CdoSnapshotRepository {
 
-    private JaversPolyJDBC javersPolyJDBC;
+    private PolyJDBC javersPolyJDBC;
     private JsonConverter jsonConverter;
 
-    public CdoSnapshotRepository(JaversPolyJDBC javersPolyJDBC) {
+    public CdoSnapshotRepository(PolyJDBC javersPolyJDBC) {
         this.javersPolyJDBC = javersPolyJDBC;
     }
 

@@ -1,9 +1,9 @@
-package org.javers.repository.sql.domain;
+package org.javers.repository.sql.schema;
 
+import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.dialect.Dialect;
 import org.polyjdbc.core.schema.*;
 import org.polyjdbc.core.schema.model.Schema;
-import org.polyjdbc.core.transaction.TransactionManager;
 import org.polyjdbc.core.util.TheCloser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +16,16 @@ import java.util.Map;
 public class JaversSchemaManager {
     private static final Logger logger = LoggerFactory.getLogger(JaversSchemaManager.class);
 
-    private FixedSchemaFactory schemaFactory;
-    private TransactionManager transactionManager;
+    private SchemaInspector schemaInspector;
+    private SchemaManager schemaManager;
     private Dialect dialect;
+    private final FixedSchemaFactory schemaFactory;
 
-    public JaversSchemaManager(Dialect dialect, FixedSchemaFactory schemaFactory, TransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
-        this.schemaFactory = schemaFactory;
+    public JaversSchemaManager(Dialect dialect, FixedSchemaFactory fixedSchemaFactory, PolyJDBC polyJDBC) {
         this.dialect = dialect;
+        this.schemaFactory = fixedSchemaFactory;
+        this.schemaInspector = polyJDBC.schemaInspector();
+        this.schemaManager = polyJDBC.schemaManager();
     }
 
     public void ensureSchema() {
@@ -33,16 +35,11 @@ public class JaversSchemaManager {
     }
 
     private void ensureTable(String tableName, Schema schema){
-        SchemaManagerFactory schemaManagerFactory = new SchemaManagerFactory(transactionManager);
-        SchemaManager schemaManager = null;
-        SchemaInspector schemaInspector = null;
         try {
-            schemaInspector = schemaManagerFactory.createInspector();
             if (schemaInspector.relationExists(tableName)) {
                 return;
             }
             logger.info("creating javers table {} ...", tableName);
-            schemaManager = schemaManagerFactory.createManager();
             schemaManager.create(schema);
         } finally {
             TheCloser.close(schemaManager, schemaInspector);
