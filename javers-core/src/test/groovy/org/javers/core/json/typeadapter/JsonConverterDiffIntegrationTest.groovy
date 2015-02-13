@@ -1,10 +1,9 @@
 package org.javers.core.json.typeadapter
 
 import org.javers.core.diff.Change
-import org.javers.core.json.JsonConverter
 import spock.lang.Specification
 
-import static org.javers.core.json.JsonConverterBuilder.jsonConverter
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
 /**
  * @author bartosz walacik
@@ -16,10 +15,10 @@ class JsonConverterDiffIntegrationTest extends Specification {
 
     def "should be null safe when converting to json"(){
         given:
-        JsonConverter jsonConverter = jsonConverter().build()
+        def jsonConverter = javersTestAssembly().jsonConverter
 
         when:
-        String json = jsonConverter.toJson(new ClassWithChange())
+        def json = jsonConverter.toJson(new ClassWithChange())
 
         then:
         assert json.contains('"change": null')

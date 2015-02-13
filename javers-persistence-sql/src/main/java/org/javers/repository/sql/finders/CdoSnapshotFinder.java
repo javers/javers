@@ -5,9 +5,10 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.SnapshotType;
-import org.javers.repository.sql.finders.PropertiesFinder.SnapshotPropertyDto;
+import org.javers.core.metamodel.property.Property;
 import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.Order;
@@ -38,26 +39,25 @@ public class CdoSnapshotFinder {
         if (snapshotPk.isEmpty()) return Optional.empty();
 
         CommitDto commitDto = selectCommitMetadata(snapshotPk);
-        List<SnapshotPropertyDto> properties = propertiesFinder.findProperties(Integer.valueOf(snapshotPk.get()));
+        List<SnapshotPropertyDTO> properties = propertiesFinder.findProperties(Integer.valueOf(snapshotPk.get()));
         
         CommitMetadata commitMetadata = new CommitMetadata(commitDto.author, commitDto.date, CommitId.valueOf(commitDto.commitId));
-        String snapshotAsJson = snapshotToJson(globalId, commitDto, properties, commitMetadata);
+        CdoSnapshot snapshot = assemble(globalId, commitDto, properties, commitMetadata);
 
-        return Optional.of(jsonConverter.fromJson(snapshotAsJson, CdoSnapshot.class));
+        return Optional.of( snapshot );
     }
 
-    public List<CdoSnapshot> getStateHistory(GlobalId cdoId, String className, int limit) {
-        List<CommitDto> commits = selectCommit(cdoId, className, limit);
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, String className, int limit) {
+        List<CommitDto> commits = selectCommit(globalId, className, limit);
 
         List<CdoSnapshot> snapshots = new ArrayList<>();
 
         //TODO n + 1 problem
         for (CommitDto commitDto : commits) {
-            List<SnapshotPropertyDto> properties = propertiesFinder.findProperties(commitDto.snapshotPk);
+            List<SnapshotPropertyDTO> properties = propertiesFinder.findProperties(commitDto.snapshotPk);
             CommitMetadata commitMetadata = new CommitMetadata(commitDto.author, commitDto.date, CommitId.valueOf(commitDto.commitId));
-            String snapshotAsJson = snapshotToJson(cdoId, commitDto, properties, commitMetadata);
 
-            snapshots.add(jsonConverter.fromJson(snapshotAsJson, CdoSnapshot.class));
+            snapshots.add( assemble(globalId, commitDto, properties, commitMetadata) );
         }
 
         return snapshots;
@@ -87,39 +87,23 @@ public class CdoSnapshotFinder {
         });
     }
 
-    //TODO get rid of this to-from JSON workaround
-    private String snapshotToJson(GlobalId globalId, CommitDto commitDto, List<SnapshotPropertyDto> properties, CommitMetadata commitMetadata) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{ \"globalId\" : ");
-        sb.append(jsonConverter.toJson(globalId));
-        sb.append(", \"commitMetadata\" : ");
-        sb.append(jsonConverter.toJson(commitMetadata));
-        sb.append(", \"type\" : ");
-        sb.append(jsonConverter.toJson(commitDto.snapshotType));
-        appendState(sb, properties);
-        sb.append(" }");
-        return sb.toString();
-    }
+    private CdoSnapshot assemble(GlobalId globalId,
+                                 CommitDto commitDto,
+                                 List<SnapshotPropertyDTO> properties,
+                                 CommitMetadata commitMetadata) {
+        CdoSnapshotBuilder cdoSnapshotBuilder = CdoSnapshotBuilder.cdoSnapshot(globalId, commitMetadata);
+        cdoSnapshotBuilder.withType(commitDto.snapshotType);
 
-    private void appendState(StringBuilder sb, List<SnapshotPropertyDto> properties) {
-        sb.append(", \"state\" : {");
-        for (SnapshotPropertyDto property : properties) {
-            sb.append("\"");
-            sb.append(property.getName());
-            sb.append("\" : ");
-            sb.append(property.getValue());
-            sb.append(",");
+        for (SnapshotPropertyDTO propertyDTO : properties) {
+            Property jProperty = globalId.getCdoClass().getProperty(propertyDTO.getName());
+
+            Object propertyValue = jsonConverter.deserializePropertyValue(jProperty, propertyDTO.getValue());
+            cdoSnapshotBuilder.withPropertyValue(jProperty, propertyValue);
         }
 
-        //remove last dot
-        if (!properties.isEmpty()) {
-            sb.deleteCharAt(sb.length() - 1);
-        }
-        
-        sb.append(" }");
-
+        return cdoSnapshotBuilder.build();
     }
-    
+
     private CommitDto selectCommitMetadata(Optional<String> snapshotPk) {
         SelectQuery selectQuery2 = javersPolyJDBC.query()
                 .select(SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_PK + ", " +

@@ -48,7 +48,6 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         GlobalId cdoId = context.deserialize(jsonObject.get(GLOBAL_CDO_ID), GlobalId.class);
 
         CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId, commitMetadata);
-        cdoSnapshotBuilder.withCommitMetadata(commitMetadata);
 
         deserializeType(jsonObject,cdoSnapshotBuilder);
 
@@ -76,8 +75,8 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
     private Object decodePropertyValue(JsonObject element, final JsonDeserializationContext context, Property property) {
         JsonElement propertyElement = element.get(property.getName());
-        Type propertyType = property.getGenericType();
-        return context.deserialize(propertyElement, typeMapper.getDehydratedType(propertyType));
+        Type dehydratedPropertyType = typeMapper.getDehydratedType(property.getGenericType());
+        return context.deserialize(propertyElement, dehydratedPropertyType);
     }
 
     @Override
