@@ -9,8 +9,8 @@ import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.core.metamodel.property.Property;
-import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
 import org.joda.time.LocalDateTime;
+import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
@@ -20,15 +20,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.javers.repository.sql.domain.FixedSchemaFactory.*;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CdoSnapshotFinder {
 
-    private final JaversPolyJDBC javersPolyJDBC;
+    private final PolyJDBC javersPolyJDBC;
     private final PropertiesFinder propertiesFinder;
     private JsonConverter jsonConverter;
 
-    public CdoSnapshotFinder(JaversPolyJDBC javersPolyJDBC, PropertiesFinder propertiesFinder) {
+    public CdoSnapshotFinder(PolyJDBC javersPolyJDBC, PropertiesFinder propertiesFinder) {
         this.javersPolyJDBC = javersPolyJDBC;
         this.propertiesFinder = propertiesFinder;
     }
@@ -179,6 +179,5 @@ public class CdoSnapshotFinder {
             dto.commitId = resultSet.getString(COMMIT_TABLE_COMMIT_ID);
             return dto;
         }
-
     }
 }

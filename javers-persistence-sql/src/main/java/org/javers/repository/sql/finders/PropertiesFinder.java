@@ -1,6 +1,6 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
+import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
 
@@ -8,16 +8,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAP_PROPERTY_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAP_PROPERTY_SNAPSHOT_FK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAP_PROPERTY_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.SNAP_PROPERTY_VALUE;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class PropertiesFinder {
 
-    private final JaversPolyJDBC javersPolyJDBC;
+    private final PolyJDBC javersPolyJDBC;
 
-    public PropertiesFinder(JaversPolyJDBC javersPolyJDBC) {
+    public PropertiesFinder(PolyJDBC javersPolyJDBC) {
         this.javersPolyJDBC = javersPolyJDBC;
     }
 

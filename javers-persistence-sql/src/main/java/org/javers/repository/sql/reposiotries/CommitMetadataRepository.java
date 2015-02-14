@@ -1,4 +1,4 @@
-package org.javers.repository.sql.domain;
+package org.javers.repository.sql.reposiotries;
 
 import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
@@ -6,8 +6,8 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
 import org.joda.time.LocalDateTime;
+import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
@@ -17,17 +17,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.javers.repository.sql.domain.FixedSchemaFactory.*;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 /**
  * @author pawel szymczyk
  */
 public class CommitMetadataRepository {
 
-    private final JaversPolyJDBC javersPolyJDBC;
+    private final PolyJDBC javersPolyJDBC;
     private JsonConverter jsonConverter;
 
-    public CommitMetadataRepository(JaversPolyJDBC javersPolyjdbc) {
+    public CommitMetadataRepository(PolyJDBC javersPolyjdbc) {
         this.javersPolyJDBC = javersPolyjdbc;
     }
 

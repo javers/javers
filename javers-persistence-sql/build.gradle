@@ -1,6 +1,10 @@
+repositories {
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+}
+
 dependencies {
     compile project(':javers-core')
-    compile 'org.polyjdbc:polyjdbc:0.4.0'
+    compile 'org.polyjdbc:polyjdbc:0.5.0-SNAPSHOT'
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'commons-dbcp:commons-dbcp:1.4'

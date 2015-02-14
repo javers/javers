@@ -1,9 +1,9 @@
-package org.javers.repository.sql.domain;
+package org.javers.repository.sql.reposiotries;
 
 import org.javers.common.collections.Optional;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.repository.sql.infrastructure.poly.JaversPolyJDBC;
+import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
@@ -11,25 +11,17 @@ import org.polyjdbc.core.query.mapper.ObjectMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_PK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_QUALIFIED_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_CLASS_TABLE_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.CDO_PK_SEQ_NAME;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_CLASS_FK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_LOCAL_ID;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_PK;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_PK_SEQ;
-import static org.javers.repository.sql.domain.FixedSchemaFactory.GLOBAL_ID_TABLE_NAME;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class GlobalIdRepository {
 
     private static final String NATIVE_QUERY = GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_CLASS_FK + " = " + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_PK
             + " AND " + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_LOCAL_ID + " = '%s'";
 
-    private JaversPolyJDBC javersPolyjdbc;
+    private PolyJDBC javersPolyjdbc;
     private JsonConverter jsonConverter;
 
-    public GlobalIdRepository(JaversPolyJDBC javersPolyjdbc) {
+    public GlobalIdRepository(PolyJDBC javersPolyjdbc) {
         this.javersPolyjdbc = javersPolyjdbc;
     }
 

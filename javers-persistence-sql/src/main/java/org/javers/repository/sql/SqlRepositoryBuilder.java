@@ -2,10 +2,15 @@ package org.javers.repository.sql;
 
 import org.javers.core.AbstractJaversBuilder;
 import org.javers.core.json.JsonConverter;
-import org.javers.repository.sql.infrastructure.pico.JaversSqlModule;
-import org.javers.repository.sql.domain.JaversSchemaManager;
+import org.javers.repository.sql.pico.JaversSqlModule;
+import org.javers.repository.sql.schema.JaversSchemaManager;
+import org.polyjdbc.core.PolyJDBC;
+import org.polyjdbc.core.PolyJDBCBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * @author bartosz walacik
@@ -42,11 +47,18 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
     public JaversSqlRepository build() {
         logger.info("starting up SQL repository module ...");
         bootContainer();
+
+        PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect())
+                .usingManagedConnections(new org.polyjdbc.core.transaction.ConnectionProvider() {
+                    @Override
+                    public Connection getConnection() throws SQLException {
+                        return connectionProvider.getConnection();
+                    }
+                }).build();
+
+        addComponent(polyJDBC);
         addModule(new JaversSqlModule());
         addComponent(dialectName.getPolyDialect());
-        addComponent(dialectName);
-        addComponent(connectionProvider);
-
         ensureSchema();
         return getContainerComponent(JaversSqlRepository.class);
     }
