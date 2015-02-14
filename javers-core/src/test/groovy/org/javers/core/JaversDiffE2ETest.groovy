@@ -5,14 +5,9 @@ import com.google.common.collect.Multimaps
 import groovy.json.JsonSlurper
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
-import org.javers.core.diff.changetype.map.EntryValueChange
-import org.javers.core.diff.changetype.map.MapChange
-import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
-import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
-import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
 import spock.lang.Specification
 
@@ -129,9 +124,8 @@ class JaversDiffE2ETest extends Specification {
 
     def "should support custom JsonTypeAdapter for ValueChange"() {
         given:
-        def javers = javers()
-                       .registerValueTypeAdapter( new DummyPointJsonTypeAdapter() )
-                       .build()
+        def javers = javers().registerValueTypeAdapter( new DummyPointJsonTypeAdapter() )
+                             .build()
 
         when:
         def diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))

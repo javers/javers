@@ -1,24 +1,30 @@
 package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
-import org.javers.common.reflection.ReflectionUtilTest
 import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.clazz.Entity
 import org.javers.core.metamodel.clazz.ManagedClassFactory
-import org.javers.core.metamodel.clazz.ValueObject
+import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
 /**
  * @author bartosz walacik
  */
 class TypeMapperTest extends Specification {
+
+    @Shared
+    def mapper = JaversTestBuilder.javersTestAssembly().typeMapper
 
     enum DummyEnum {A,B}
 
@@ -28,14 +34,42 @@ class TypeMapperTest extends Specification {
         int[] intArray
     }
 
+    @Unroll
+    def "should return dehydrated type for simple #givenJaversType"() {
+        expect:
+        mapper.getDehydratedType(givenJaversType) == expectedGenericDehydratedType
+
+        where:
+        givenJaversType || expectedGenericDehydratedType
+        DummyUser       || GlobalId
+        DummyAddress    || GlobalId
+        String          || String
+        Integer         || Integer
+    }
+
+    @Unroll
+    def "should return dehydrated type for generic #givenJaversType"() {
+        when:
+        def dehydrated =  mapper.getDehydratedType(givenJaversType)
+
+        then:
+        dehydrated instanceof ParameterizedType
+        dehydrated.rawType == expectedRawType
+        dehydrated.actualTypeArguments == expectedActualTypeArguments
+
+        where:
+        givenJaversType                                || expectedRawType  || expectedActualTypeArguments
+        new TypeToken<Set<String>>(){}.type            || Set              || [String]
+        new TypeToken<Map<String, DummyUser>>(){}.type || Map              || [String, GlobalId]
+    }
+
     def "should spawn concrete Array type"() {
         given:
-        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
         int arrayPrototypes  = mapper.getMappedTypes(ArrayType).size()
         Type intArray   = getFieldFromClass(Dummy, "intArray").genericType
 
         when:
-        JaversType jType = mapper.getJaversType(intArray)
+        def jType = mapper.getJaversType(intArray)
 
         then:
         jType.baseJavaType == int[]
@@ -45,11 +79,8 @@ class TypeMapperTest extends Specification {
     }
 
     def "should spawn concrete Enum type"() {
-        given:
-        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
-
         when:
-        JaversType jType = mapper.getJaversType(DummyEnum)
+        def jType = mapper.getJaversType(DummyEnum)
 
         then:
         jType.baseJavaType == DummyEnum
@@ -58,11 +89,8 @@ class TypeMapperTest extends Specification {
 
     @Unroll
     def "should map Container #expectedColType.simpleName by default"() {
-        given:
-        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
-
         when:
-        JaversType jType = mapper.getJaversType(givenJavaType)
+        def jType = mapper.getJaversType(givenJavaType)
 
         then:
         jType.baseJavaType == givenJavaType
@@ -77,11 +105,8 @@ class TypeMapperTest extends Specification {
 
     @Unroll
     def "should spawn concrete Container #expectedColType.simpleName from prototype interface for #givenJavaType.simpleName"() {
-        given:
-        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
-
         when:
-        JaversType jType = mapper.getJaversType(givenJavaType)
+        def jType = mapper.getJaversType(givenJavaType)
 
         then:
         jType.baseJavaType == givenJavaType
@@ -96,9 +121,6 @@ class TypeMapperTest extends Specification {
 
     @Unroll
     def "should spawn generic Collection #givenJavaType from non-generic prototype interface"() {
-        given:
-        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
-
         when:
         def jType = mapper.getJaversType( givenJavaType )
 
@@ -117,11 +139,8 @@ class TypeMapperTest extends Specification {
 
     @Unroll
     def "should spawn generic Map #givenJavaType from non-generic prototype interface"() {
-        given:
-        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
-
         when:
-        MapType jType = mapper.getJaversType(givenJavaType)
+        def jType = mapper.getJaversType(givenJavaType)
 
         then:
         jType.baseJavaType == givenJavaType
@@ -134,7 +153,7 @@ class TypeMapperTest extends Specification {
 
     def "should spawn ValueType from mapped superclass"() {
         given:
-        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
+        def mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
         mapper.registerValueType(AbstractDummyUser)
 
         when:
@@ -146,12 +165,9 @@ class TypeMapperTest extends Specification {
     }
 
     def "should spawn generic types as distinct javers types"() {
-        given:
-        TypeMapper mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
-
         when:
-        JaversType setWithStringJaversType  = mapper.getJaversType(new TypeToken<Set<String>>(){}.type)
-        JaversType hashSetWithIntJaversType = mapper.getJaversType(new TypeToken<HashSet<Integer>>(){}.type)
+        def setWithStringJaversType  = mapper.getJaversType(new TypeToken<Set<String>>(){}.type)
+        def hashSetWithIntJaversType = mapper.getJaversType(new TypeToken<HashSet<Integer>>(){}.type)
 
         then:
         setWithStringJaversType != hashSetWithIntJaversType
@@ -160,9 +176,6 @@ class TypeMapperTest extends Specification {
     }
 
     def "should recognize Object.class as empty ValueType"() {
-        given:
-        TypeMapper mapper = JaversTestBuilder.javersTestAssembly().typeMapper
-
         when:
         def jType = mapper.getJaversType(Object)
 
@@ -172,11 +185,10 @@ class TypeMapperTest extends Specification {
 
     def "should return child ValueObject for ValueObjectType"() {
         given:
-        TypeMapper mapper = JaversTestBuilder.javersTestAssembly().typeMapper
         def snapshotEntity = mapper.getManagedClass(SnapshotEntity, Entity)
 
         when:
-        ValueObject vo = mapper.getChildValueObject(snapshotEntity, "valueObjectRef")
+        def vo = mapper.getChildValueObject(snapshotEntity, "valueObjectRef")
 
         then:
         vo.clientsClass == DummyAddress
@@ -184,11 +196,10 @@ class TypeMapperTest extends Specification {
 
     def "should return child ValueObject for List of ValueObjectType"() {
         given:
-        TypeMapper mapper = JaversTestBuilder.javersTestAssembly().typeMapper
         def snapshotEntity = mapper.getManagedClass(SnapshotEntity, Entity)
 
         when:
-        ValueObject vo = mapper.getChildValueObject(snapshotEntity, "listOfValueObjects")
+        def vo = mapper.getChildValueObject(snapshotEntity, "listOfValueObjects")
 
         then:
         vo.clientsClass == DummyAddress
