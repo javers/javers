@@ -16,6 +16,8 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     def setup() {
         Server.createTcpServer().start()
         dbConnection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test")
+        //dbConnection = DriverManager.getConnection("jdbc:postgresql://horton.elephantsql.com:5432/xzvpycnt", "xzvpycnt", "******");
+        //dbConnection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/javers", "javers", "javers");
         def connectionProvider = new ConnectionProvider() {
             @Override
             Connection getConnection() {
@@ -23,7 +25,7 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
             }
         }
         
-        def sqlRepository = SqlRepositoryBuilder.sqlRepository().withConnectionProvider(connectionProvider).withDialect(DialectName.H2).build()
+        def sqlRepository = SqlRepositoryBuilder.sqlRepository().withConnectionProvider(connectionProvider).withDialect(DialectName.POSTGRES).build()
         javers = javers().registerJaversRepository(sqlRepository).build()
         sqlRepository.setJsonConverter(javers.jsonConverter)
     }

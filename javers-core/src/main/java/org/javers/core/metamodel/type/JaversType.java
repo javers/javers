@@ -97,4 +97,8 @@ public abstract class JaversType {
      public List<Type> getActualTypeArguments(){
          return Collections.unmodifiableList(actualTypeArguments);
      }
+
+     Type getRawDehydratedType() {
+         return getBaseJavaClass();
+     }
 }

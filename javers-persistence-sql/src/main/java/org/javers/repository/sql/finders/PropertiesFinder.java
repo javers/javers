@@ -21,36 +21,19 @@ public class PropertiesFinder {
         this.javersPolyJDBC = javersPolyJDBC;
     }
 
-    public List<SnapshotPropertyDto> findProperties(int snapshotPk) {
+    public List<SnapshotPropertyDTO> findProperties(int snapshotPk) {
         SelectQuery query = javersPolyJDBC.query()
                 .select(SNAP_PROPERTY_NAME + ", " + SNAP_PROPERTY_VALUE)
                 .from(SNAP_PROPERTY_TABLE_NAME)
                 .where(SNAP_PROPERTY_SNAPSHOT_FK + " = :snapshot_fk")
                 .withArgument("snapshot_fk", snapshotPk);
 
-        return javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<SnapshotPropertyDto>() {
+        return javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<SnapshotPropertyDTO>() {
             @Override
-            public SnapshotPropertyDto createObject(ResultSet resultSet) throws SQLException {
-                return new SnapshotPropertyDto(resultSet.getString(SNAP_PROPERTY_NAME), resultSet.getString(SNAP_PROPERTY_VALUE));
+            public SnapshotPropertyDTO createObject(ResultSet resultSet) throws SQLException {
+                return new SnapshotPropertyDTO(resultSet.getString(SNAP_PROPERTY_NAME), resultSet.getString(SNAP_PROPERTY_VALUE));
             }
         });
     }
 
-    public static class SnapshotPropertyDto {
-        private String name;
-        private String value;
-
-        private SnapshotPropertyDto(String name, String value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
 }
