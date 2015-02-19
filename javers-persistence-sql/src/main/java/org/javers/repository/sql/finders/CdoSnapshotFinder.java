@@ -1,19 +1,10 @@
 package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.validation.Validate;
-import org.javers.core.commit.CommitId;
-import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.SnapshotType;
-import org.javers.core.metamodel.property.Property;
 import org.javers.repository.sql.PolyUtil;
-import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
 import org.polyjdbc.core.query.SelectQuery;
@@ -21,11 +12,9 @@ import org.polyjdbc.core.query.mapper.ObjectMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 import static org.javers.repository.sql.PolyUtil.queryForOptionalInteger;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
@@ -101,32 +90,8 @@ public class CdoSnapshotFinder {
             }
         });
 
-        List<CdoSnapshot> snapshots = new ArrayList<>();
-
-        //tricky assembly loop
-        int lastSnapshotPk = -1;
-        CdoSnapshotBuilder cdoSnapshotBuilder = null;
-        for (SnapshotWideDto row : rows){
-            if (row.snapshotPk != lastSnapshotPk){
-                //yield
-                if (cdoSnapshotBuilder != null) {
-                    snapshots.add(cdoSnapshotBuilder.build());
-                }
-                cdoSnapshotBuilder = cdoSnapshot(globalId.instance, row.getCommitMetadata()).withType(row.snapshotType);
-                lastSnapshotPk = row.snapshotPk;
-            }
-
-            if (row.hasProperty()) { //terminal snapshots come wth properties
-                Property jProperty = globalId.getProperty(row.snapshotPropertyName);
-                Object propertyValue = jsonConverter.deserializePropertyValue(jProperty, row.snapshotPropertyValue);
-                cdoSnapshotBuilder.withPropertyValue(jProperty, propertyValue);
-            }
-        }
-        if (cdoSnapshotBuilder != null) {
-            snapshots.add(cdoSnapshotBuilder.build());
-        }
-
-        return snapshots;
+        SnapshotAssembler assembler = new SnapshotAssembler(jsonConverter);
+        return assembler.assemble(rows, globalId);
     }
 
     private SelectQuery buildSnapshotsContentQuery(int minSnapshotPk, int maxSnapshotPk, PersistentGlobalId globalId) {
@@ -176,56 +141,5 @@ public class CdoSnapshotFinder {
             return Optional.empty();
         }
         return result;
-    }
-
-    private static class SnapshotWideDto{
-        String commitAuthor;
-        LocalDateTime commitDate;
-        String commitId;
-        int snapshotPk;
-        SnapshotType snapshotType;
-        String snapshotPropertyName;
-        String snapshotPropertyValue;
-
-        SnapshotWideDto(ResultSet resultSet) {
-            try {
-                commitAuthor = resultSet.getString(COMMIT_AUTHOR);
-                commitDate = new LocalDateTime(resultSet.getTimestamp(COMMIT_COMMIT_DATE));
-                commitId = resultSet.getString(COMMIT_COMMIT_ID);
-                snapshotPk = resultSet.getInt(SNAPSHOT_PK);
-                snapshotType = SnapshotType.valueOf(resultSet.getString(SNAPSHOT_TYPE));
-                snapshotPropertyName = resultSet.getString(SNAP_PROPERTY_NAME);
-                snapshotPropertyValue = resultSet.getString(SNAP_PROPERTY_VALUE);
-            } catch (SQLException e){
-                throw new JaversException(JaversExceptionCode.SQL_EXCEPTION, e.getMessage());
-            }
-        }
-
-        CommitMetadata getCommitMetadata(){
-            return new CommitMetadata(commitAuthor, commitDate, CommitId.valueOf(commitId));
-        }
-
-        boolean hasProperty(){
-            return snapshotPropertyName != null && !snapshotPropertyName.isEmpty();
-        }
-    }
-
-    private static class PersistentGlobalId {
-        GlobalId instance;
-        Optional<Integer> primaryKey;
-
-        PersistentGlobalId(GlobalId instance, Optional<Integer> primaryKey) {
-            Validate.argumentsAreNotNull( instance, primaryKey);
-            this.instance = instance;
-            this.primaryKey = primaryKey;
-        }
-
-        boolean found() {
-            return primaryKey.isPresent();
-        }
-
-        Property getProperty(String name) {
-            return instance.getCdoClass().getProperty(name);
-        }
     }
 }
