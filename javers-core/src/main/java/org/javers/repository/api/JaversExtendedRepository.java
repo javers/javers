@@ -7,7 +7,6 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdDTO;
-import org.javers.core.metamodel.object.GlobalIdFactory;
 
 import java.util.List;
 
@@ -18,11 +17,9 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public class JaversExtendedRepository implements JaversRepository {
     private final JaversRepository delegate;
-    private final GlobalIdFactory globalIdFactory;
 
-    public JaversExtendedRepository(JaversRepository delegate, GlobalIdFactory globalIdFactory) {
+    public JaversExtendedRepository(JaversRepository delegate) {
         this.delegate = delegate;
-        this.globalIdFactory = globalIdFactory;
     }
 
     @Override
