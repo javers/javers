@@ -35,7 +35,7 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
-        return finder.getStateHistory(globalId, globalId.getCdoClass().getName(), limit);
+        return finder.getStateHistory(globalId, limit);
     }
 
     @Override
