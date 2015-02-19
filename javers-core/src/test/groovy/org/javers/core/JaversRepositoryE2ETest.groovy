@@ -7,6 +7,7 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
 import org.joda.time.LocalDate
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -41,6 +42,7 @@ class JaversRepositoryE2ETest extends Specification {
 
     }
 
+    @Ignore
     def "should store state history of Entity in JaversRepository and fetch snapshots in reverse order"() {
         given:
         def ref = new SnapshotEntity(id:2)
