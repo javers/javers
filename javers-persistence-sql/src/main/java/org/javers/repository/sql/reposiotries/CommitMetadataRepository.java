@@ -33,21 +33,21 @@ public class CommitMetadataRepository {
 
     public long save(String author, LocalDateTime date, CommitId commitId) {
         InsertQuery query = javersPolyJDBC.query().insert().into(COMMIT_TABLE_NAME)
-                .value(COMMIT_TABLE_AUTHOR, author)
-                .value(COMMIT_TABLE_COMMIT_DATE, toTimestamp(date))
-                .value(COMMIT_TABLE_COMMIT_ID, commitId.value())
-                .sequence(COMMIT_TABLE_PK, COMMIT_TABLE_PK_SEQ);
+                .value(COMMIT_AUTHOR, author)
+                .value(COMMIT_COMMIT_DATE, toTimestamp(date))
+                .value(COMMIT_COMMIT_ID, commitId.value())
+                .sequence(COMMIT_PK, COMMIT_PK_SEQ);
 
         return javersPolyJDBC.queryRunner().insert(query);
     }
 
     public Optional<Long> getCommitPrimaryKey(Commit commit) {
         SelectQuery selectQuery = javersPolyJDBC.query()
-                .select(COMMIT_TABLE_PK)
+                .select(COMMIT_PK)
                 .from(COMMIT_TABLE_NAME)
-                .where(COMMIT_TABLE_AUTHOR + " = :author " +
-                        "AND " + COMMIT_TABLE_COMMIT_DATE + " = :date " +
-                        "AND " + COMMIT_TABLE_COMMIT_ID + " = :id")
+                .where(COMMIT_AUTHOR + " = :author " +
+                        "AND " + COMMIT_COMMIT_DATE + " = :date " +
+                        "AND " + COMMIT_COMMIT_ID + " = :id")
                 .withArgument("author", commit.getAuthor())
                 .withArgument("date", toTimestamp(commit.getCommitDate()))
                 .withArgument("id", commit.getId().value());
@@ -55,7 +55,7 @@ public class CommitMetadataRepository {
         return Optional.fromNullable(javersPolyJDBC.queryRunner().queryUnique(selectQuery, new ObjectMapper<Long>() {
             @Override
             public Long createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getLong(COMMIT_TABLE_PK);
+                return resultSet.getLong(COMMIT_PK);
             }
         }, false));
     }
@@ -72,13 +72,13 @@ public class CommitMetadataRepository {
 
     private Optional<Integer> selectMaxCommitPrimaryKey() {
         SelectQuery query = javersPolyJDBC.query()
-                .select("MAX(" + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_PK + ") AS " + COMMIT_TABLE_PK)
+                .select("MAX(" + COMMIT_TABLE_NAME + "." + COMMIT_PK + ") AS " + COMMIT_PK)
                 .from(COMMIT_TABLE_NAME);
 
         List<String> maxPrimaryKey = javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<String>() {
             @Override
             public String createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getString(COMMIT_TABLE_PK);
+                return resultSet.getString(COMMIT_PK);
             }
         });
 
@@ -91,15 +91,15 @@ public class CommitMetadataRepository {
 
     private CommitId selectCommitId(int primaryKey) {
         SelectQuery query = javersPolyJDBC.query()
-                .select(COMMIT_TABLE_NAME + "." + COMMIT_TABLE_COMMIT_ID)
+                .select(COMMIT_TABLE_NAME + "." + COMMIT_COMMIT_ID)
                 .from(COMMIT_TABLE_NAME)
-                .where(COMMIT_TABLE_PK + " = :maxPrimaryKey")
+                .where(COMMIT_PK + " = :maxPrimaryKey")
                 .withArgument("maxPrimaryKey", primaryKey);
 
         List<CommitId> commitId = javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<CommitId>() {
             @Override
             public CommitId createObject(ResultSet resultSet) throws SQLException {
-                return jsonConverter.fromJson(resultSet.getString(COMMIT_TABLE_COMMIT_ID), CommitId.class);
+                return jsonConverter.fromJson(resultSet.getString(COMMIT_COMMIT_ID), CommitId.class);
             }
         });
 

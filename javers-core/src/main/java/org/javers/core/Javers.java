@@ -49,17 +49,19 @@ public class Javers {
     private final CommitFactory commitFactory;
     private final JaversExtendedRepository repository;
     private final GraphSnapshotFacade graphSnapshotFacade;
+    private final GlobalIdFactory globalIdFactory;
 
     /**
      * JaVers instance should be constructed by {@link JaversBuilder}
      */
-    Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, GraphSnapshotFacade graphSnapshotFacade) {
+    public Javers(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, GraphSnapshotFacade graphSnapshotFacade, GlobalIdFactory globalIdFactory) {
         this.diffFactory = diffFactory;
         this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;
         this.commitFactory = commitFactory;
         this.repository = repository;
         this.graphSnapshotFacade = graphSnapshotFacade;
+        this.globalIdFactory = globalIdFactory;
     }
 
     /**
@@ -96,6 +98,18 @@ public class Javers {
      */
     public Commit commitShallowDelete(String author, Object deleted) {
         Commit commit = commitFactory.createTerminal(author, deleted);
+
+        repository.persist(commit);
+        logger.info(commit.toString());
+        return commit;
+    }
+
+    /**
+     * The same like {@link #commitShallowDelete(String,Object)}
+     * but deleted object is selected using globalId
+     */
+    public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId) {
+        Commit commit = commitFactory.createTerminalByGlobalId(author, globalIdFactory.createFromDto(globalId));
 
         repository.persist(commit);
         logger.info(commit.toString());
@@ -147,7 +161,7 @@ public class Javers {
     }
 
     public IdBuilder idBuilder() {
-        return new IdBuilder(new GlobalIdFactory(typeMapper));
+        return new IdBuilder(globalIdFactory);
     }
 
     /**

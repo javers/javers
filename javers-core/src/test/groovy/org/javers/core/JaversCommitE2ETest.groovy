@@ -8,6 +8,7 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.JaversBuilder.javers
@@ -20,22 +21,28 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class JaversCommitE2ETest extends Specification {
 
-    def "should create terminal commit for removed object"() {
+    @Unroll
+    def "should create terminal commit for removed object when #opType"() {
         given:
-        def javers = javers().build()
+        def final javers = javers().build()
         def anEntity = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
         javers.commit("some.login", anEntity)
 
         when:
-        def commit = javers.commitShallowDelete("some.login", anEntity)
+        def commit = deleteMethod.call(javers)
 
         then:
         CommitAssert.assertThat(commit)
                 .hasId("2.0")
                 .hasChanges(1)
-                .hasObjectRemoved(instanceId(1,SnapshotEntity), anEntity)
+                .hasObjectRemoved(instanceId(1,SnapshotEntity))
                 .hasSnapshots(1)
                 .hasTerminalSnapshot(instanceId(1,SnapshotEntity))
+
+        where:
+        deleteMethod << [ { j -> j.commitShallowDelete("some.login", new SnapshotEntity(id:1)) },
+                          { j -> j.commitShallowDeleteById("some.login", instanceId(1,SnapshotEntity))} ]
+        opType << ["using object instance","using globalId"]
     }
 
     def "should fail when deleting non existing object"() {
