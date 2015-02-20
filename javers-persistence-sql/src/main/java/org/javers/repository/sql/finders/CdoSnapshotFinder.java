@@ -4,7 +4,6 @@ import org.javers.common.collections.Optional;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.repository.sql.PolyUtil;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
 import org.polyjdbc.core.query.SelectQuery;
@@ -15,7 +14,8 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
-import static org.javers.repository.sql.PolyUtil.queryForOptionalInteger;
+import static org.javers.repository.sql.PolyUtil.queryForLongList;
+import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CdoSnapshotFinder {
@@ -33,7 +33,7 @@ public class CdoSnapshotFinder {
             return Optional.empty();
         }
 
-        Optional<Integer> maxSnapshot = selectMaxSnapshotPrimaryKey(persistentGlobalId);
+        Optional<Long> maxSnapshot = selectMaxSnapshotPrimaryKey(persistentGlobalId);
 
         if (maxSnapshot.isEmpty()) {
             return Optional.empty();
@@ -48,14 +48,14 @@ public class CdoSnapshotFinder {
             return Collections.emptyList();
         }
 
-        List<Integer> latestSnapshots = selectLatestSnapshotPrimaryKeys(persistentGlobalId, limit);
+        List<Long> latestSnapshots = selectLatestSnapshotPrimaryKeys(persistentGlobalId, limit);
 
         if (latestSnapshots.isEmpty()){
             return Collections.emptyList();
         }
 
-        int minSnapshotPk = latestSnapshots.get(0);
-        int maxSnapshotPk = latestSnapshots.get(latestSnapshots.size()-1);
+        long minSnapshotPk = latestSnapshots.get(0);
+        long maxSnapshotPk = latestSnapshots.get(latestSnapshots.size()-1);
         return getCdoSnapshotsBySnapshotPk(minSnapshotPk, maxSnapshotPk, persistentGlobalId);
     }
 
@@ -74,12 +74,12 @@ public class CdoSnapshotFinder {
             .withArgument("localId", jsonConverter.toJson(globalId.getCdoId()))
             .withArgument("qualifiedName", globalId.getCdoClass().getName());
 
-        Optional<Integer> primaryKey = queryForOptionalInteger(query, polyJDBC);
+        Optional<Long> primaryKey = queryForOptionalLong(query, polyJDBC);
 
         return new PersistentGlobalId(globalId, primaryKey);
     }
 
-    private List<CdoSnapshot> getCdoSnapshotsBySnapshotPk(int minSnapshotPk, int maxSnapshotPk, PersistentGlobalId globalId){
+    private List<CdoSnapshot> getCdoSnapshotsBySnapshotPk(long minSnapshotPk, long maxSnapshotPk, PersistentGlobalId globalId){
         SelectQuery query = buildSnapshotsContentQuery(minSnapshotPk, maxSnapshotPk, globalId);
 
         List<SnapshotWideDto> rows =
@@ -94,7 +94,7 @@ public class CdoSnapshotFinder {
         return assembler.assemble(rows, globalId);
     }
 
-    private SelectQuery buildSnapshotsContentQuery(int minSnapshotPk, int maxSnapshotPk, PersistentGlobalId globalId) {
+    private SelectQuery buildSnapshotsContentQuery(long minSnapshotPk, long maxSnapshotPk, PersistentGlobalId globalId) {
         return polyJDBC.query()
             .select("s." + SNAPSHOT_PK + ", " +
                     "s." + SNAPSHOT_TYPE + ", " +
@@ -116,7 +116,7 @@ public class CdoSnapshotFinder {
             .withArgument("maxSnapshotPk", maxSnapshotPk);
     }
 
-    private List<Integer> selectLatestSnapshotPrimaryKeys(PersistentGlobalId globalId, int limit) {
+    private List<Long> selectLatestSnapshotPrimaryKeys(PersistentGlobalId globalId, int limit) {
         SelectQuery query = polyJDBC.query()
             .select(SNAPSHOT_PK)
             .from(SNAPSHOT_TABLE_NAME)
@@ -125,17 +125,17 @@ public class CdoSnapshotFinder {
             .orderBy(SNAPSHOT_PK, Order.ASC)
             .limit(limit);
 
-        return PolyUtil.queryForIntegerList(query, polyJDBC);
+        return queryForLongList(query, polyJDBC);
     }
 
-    private Optional<Integer> selectMaxSnapshotPrimaryKey(PersistentGlobalId globalId) {
+    private Optional<Long> selectMaxSnapshotPrimaryKey(PersistentGlobalId globalId) {
         SelectQuery query = polyJDBC.query()
             .select("MAX(" + SNAPSHOT_PK + ")")
             .from(SNAPSHOT_TABLE_NAME)
             .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
             .withArgument("globalIdPk", globalId.primaryKey.get());
 
-        Optional<Integer> result = queryForOptionalInteger(query, polyJDBC);
+        Optional<Long> result = queryForOptionalLong(query, polyJDBC);
 
         if (result.isPresent() && result.get() == 0){
             return Optional.empty();

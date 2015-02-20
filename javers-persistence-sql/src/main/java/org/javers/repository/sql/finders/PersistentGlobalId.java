@@ -10,9 +10,9 @@ import org.javers.core.metamodel.property.Property;
 */
 class PersistentGlobalId {
     GlobalId instance;
-    Optional<Integer> primaryKey;
+    Optional<Long> primaryKey;
 
-    PersistentGlobalId(GlobalId instance, Optional<Integer> primaryKey) {
+    PersistentGlobalId(GlobalId instance, Optional<Long> primaryKey) {
         Validate.argumentsAreNotNull(instance, primaryKey);
         this.instance = instance;
         this.primaryKey = primaryKey;

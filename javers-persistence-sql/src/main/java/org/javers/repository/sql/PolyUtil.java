@@ -13,17 +13,17 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class PolyUtil {
-    public static List<Integer> queryForIntegerList(SelectQuery query, PolyJDBC poly){
-        return poly.queryRunner().queryList(query, new ObjectMapper<Integer>() {
+    public static List<Long> queryForLongList(SelectQuery query, PolyJDBC poly){
+        return poly.queryRunner().queryList(query, new ObjectMapper<Long>() {
             @Override
-            public Integer createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getInt(1);
+            public Long createObject(ResultSet resultSet) throws SQLException {
+                return resultSet.getLong(1);
             }
         });
     }
 
-    public static Optional<Integer> queryForOptionalInteger(SelectQuery query, PolyJDBC poly){
-        List<Integer> result = queryForIntegerList(query, poly);
+    public static Optional<Long> queryForOptionalLong(SelectQuery query, PolyJDBC poly){
+        List<Long> result = queryForLongList(query, poly);
 
         if (result.isEmpty()){
             return Optional.empty();
