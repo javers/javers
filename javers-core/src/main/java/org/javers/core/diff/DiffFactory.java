@@ -12,7 +12,7 @@ import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectNode;
-import org.javers.core.metamodel.object.Cdo;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -65,11 +65,11 @@ public class DiffFactory {
         return createAndAppendChanges(graphPair, commitMetadata);
     }
 
-    public Diff singleTerminal(Cdo removedCdo, CommitMetadata commitMetadata){
-        Validate.argumentIsNotNull(removedCdo);
+    public Diff singleTerminal(GlobalId removedId, CommitMetadata commitMetadata){
+        Validate.argumentsAreNotNull(removedId, commitMetadata);
 
         DiffBuilder diff = diff();
-        diff.addChange(new ObjectRemoved(removedCdo.getGlobalId(), removedCdo.getWrappedCdo(), commitMetadata));
+        diff.addChange(new ObjectRemoved(removedId, Optional.empty(), commitMetadata));
 
         return diff.build();
     }

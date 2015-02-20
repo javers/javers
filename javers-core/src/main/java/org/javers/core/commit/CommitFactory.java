@@ -12,6 +12,7 @@ import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.SnapshotFactory;
 import org.javers.core.snapshot.GraphSnapshotFacade;
 import org.javers.core.snapshot.ShadowGraph;
@@ -41,23 +42,29 @@ public class CommitFactory {
         this.snapshotFactory = snapshotFactory;
     }
 
-    public Commit createTerminal(String author, Object removed){
-        Validate.argumentsAreNotNull(author, removed);
+    public Commit createTerminalByGlobalId(String author, GlobalId removedId){
+        Validate.argumentsAreNotNull(author, removedId);
 
-        Cdo removedCdo = liveGraphFactory.createCdo(removed);
-
-        if (javersRepository.getLatest(removedCdo.getGlobalId()).isEmpty()){
-            throw new JaversException(JaversExceptionCode.CANT_DELETE_OBJECT_NOT_FOUND, removedCdo.getGlobalId().value());
+        if (javersRepository.getLatest(removedId).isEmpty()){
+            throw new JaversException(JaversExceptionCode.CANT_DELETE_OBJECT_NOT_FOUND,removedId.value());
         }
 
         CommitMetadata commitMetadata = nextCommit(author);
 
         CdoSnapshot terminalSnapshot =
-                snapshotFactory.createTerminal(removedCdo.getGlobalId(), commitMetadata);
+                snapshotFactory.createTerminal(removedId, commitMetadata);
 
-        Diff diff = diffFactory.singleTerminal(removedCdo, commitMetadata);
+        Diff diff = diffFactory.singleTerminal(removedId, commitMetadata);
 
         return new Commit(commitMetadata, Lists.asList(terminalSnapshot), diff);
+    }
+
+    public Commit createTerminal(String author, Object removed){
+        Validate.argumentsAreNotNull(author, removed);
+
+        Cdo removedCdo = liveGraphFactory.createCdo(removed);
+
+        return createTerminalByGlobalId(author, removedCdo.getGlobalId());
     }
 
     public Commit create(String author, Object currentVersion){
