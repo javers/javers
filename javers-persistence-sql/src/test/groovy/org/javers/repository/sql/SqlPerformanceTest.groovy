@@ -2,6 +2,7 @@ package org.javers.repository.sql
 
 import org.h2.tools.Server
 import org.javers.core.Javers
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.math.RoundingMode
@@ -13,6 +14,7 @@ import static org.javers.core.JaversBuilder.javers
 /**
  * @author bartosz walacik
  */
+@Ignore
 class SqlPerformanceTest extends Specification{
 
     Connection dbConnection;
