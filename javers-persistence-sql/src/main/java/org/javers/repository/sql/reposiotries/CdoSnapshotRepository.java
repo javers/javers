@@ -2,7 +2,6 @@ package org.javers.repository.sql.reposiotries;
 
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.property.Property;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 
@@ -18,24 +17,7 @@ public class CdoSnapshotRepository {
     }
 
     public long save(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot) {
-        long cdoSnapshotPk = insertSnapshot(globalIdPk, commitIdPk, cdoSnapshot);
-
-        for (Property property : cdoSnapshot.getProperties()) {
-            saveProperty(cdoSnapshot, cdoSnapshotPk, property);
-        }
-
-        return cdoSnapshotPk;
-    }
-
-    private void saveProperty(CdoSnapshot cdoSnapshot, long cdoSnapshotPrimaryKey, Property property) {
-        InsertQuery propertyQuery = javersPolyJDBC.query().insert().into(SNAP_PROPERTY_TABLE_NAME)
-                .value(SNAPSHOT_FK, cdoSnapshotPrimaryKey)
-                .value(SNAP_PROPERTY_NAME, property.getName())
-                .value(SNAP_PROPERTY_VALUE, jsonConverter.toJson(cdoSnapshot.getPropertyValue(property)))
-                .sequence(SNAP_PROPERTY_PK, SNAP_PROPERTY_PK_SEQ);
-
-
-        javersPolyJDBC.queryRunner().insert(propertyQuery);
+        return insertSnapshot(globalIdPk, commitIdPk, cdoSnapshot);
     }
 
     private long insertSnapshot(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot) {
@@ -43,6 +25,7 @@ public class CdoSnapshotRepository {
                 .value(SNAPSHOT_TYPE, cdoSnapshot.getType().toString())
                 .value(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
                 .value(SNAPSHOT_COMMIT_FK, commitIdPk)
+                .value(SNAPSHOT_STATE, jsonConverter.toJson(cdoSnapshot))
                 .sequence(SNAPSHOT_PK, SNAPSHOT_TABLE_PK_SEQ);
 
         return javersPolyJDBC.queryRunner().insert(query);

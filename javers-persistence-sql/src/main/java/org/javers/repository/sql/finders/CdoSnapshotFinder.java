@@ -80,47 +80,34 @@ public class CdoSnapshotFinder {
     }
 
     private List<CdoSnapshot> getCdoSnapshotsBySnapshotPk(long minSnapshotPk, long maxSnapshotPk, PersistentGlobalId globalId){
-        SelectQuery query = buildSnapshotsContentQuery(minSnapshotPk, maxSnapshotPk, globalId);
-
-        List<SnapshotWideDto> rows =
-        polyJDBC.queryRunner().queryList(query, new ObjectMapper<SnapshotWideDto>() {
+        SelectQuery query =
+            polyJDBC.query()
+                    .select(SNAPSHOT_STATE+ ", " +
+                            COMMIT_AUTHOR + ", " +
+                            COMMIT_COMMIT_DATE + ", " +
+                            COMMIT_COMMIT_ID)
+                    .from(SNAPSHOT_TABLE_NAME + " INNER JOIN " +
+                          COMMIT_TABLE_NAME + "  ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK)
+                    .where(SNAPSHOT_PK + " between :minSnapshotPk and :maxSnapshotPk AND " +
+                           SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
+                    .orderBy(SNAPSHOT_PK, Order.DESC)
+                    .withArgument("globalIdPk", globalId.primaryKey.get())
+                    .withArgument("minSnapshotPk", minSnapshotPk)
+                    .withArgument("maxSnapshotPk", maxSnapshotPk);
+        return
+        polyJDBC.queryRunner().queryList(query, new ObjectMapper<CdoSnapshot>() {
             @Override
-            public SnapshotWideDto createObject(ResultSet resultSet) throws SQLException {
-                return new SnapshotWideDto(resultSet);
+            public CdoSnapshot createObject(ResultSet resultSet) throws SQLException {
+                return jsonConverter.fromJson(resultSet.getString(SNAPSHOT_STATE), CdoSnapshot.class);
             }
         });
-
-        SnapshotAssembler assembler = new SnapshotAssembler(jsonConverter);
-        return assembler.assemble(rows, globalId);
-    }
-
-    private SelectQuery buildSnapshotsContentQuery(long minSnapshotPk, long maxSnapshotPk, PersistentGlobalId globalId) {
-        return polyJDBC.query()
-            .select("s." + SNAPSHOT_PK + ", " +
-                    "s." + SNAPSHOT_TYPE + ", " +
-                    "cm." + COMMIT_AUTHOR + ", " +
-                    "cm." + COMMIT_COMMIT_DATE + ", " +
-                    "cm." + COMMIT_COMMIT_ID + ", " +
-                    "p." + SNAP_PROPERTY_NAME + ", " +
-                    "p." + SNAP_PROPERTY_VALUE
-            )
-            .from(SNAPSHOT_TABLE_NAME + " as s INNER JOIN " +
-                  COMMIT_TABLE_NAME + " as cm ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK + " LEFT OUTER JOIN " +
-                  SNAP_PROPERTY_TABLE_NAME + " as p ON " + SNAPSHOT_PK + " = " + SNAPSHOT_FK
-            )
-            .where("s." + SNAPSHOT_PK + " between :minSnapshotPk and :maxSnapshotPk AND " +
-                   "s." + SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
-            .orderBy("s." + SNAPSHOT_PK, Order.DESC)
-            .withArgument("globalIdPk", globalId.primaryKey.get())
-            .withArgument("minSnapshotPk", minSnapshotPk)
-            .withArgument("maxSnapshotPk", maxSnapshotPk);
     }
 
     private List<Long> selectLatestSnapshotPrimaryKeys(PersistentGlobalId globalId, int limit) {
         SelectQuery query = polyJDBC.query()
             .select(SNAPSHOT_PK)
             .from(SNAPSHOT_TABLE_NAME)
-            .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
+                .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
             .withArgument("globalIdPk", globalId.primaryKey.get())
             .orderBy(SNAPSHOT_PK, Order.ASC)
             .limit(limit);

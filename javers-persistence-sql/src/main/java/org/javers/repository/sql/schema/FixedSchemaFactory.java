@@ -14,13 +14,6 @@ import java.util.TreeMap;
  */
 public class FixedSchemaFactory {
 
-    public static final String SNAP_PROPERTY_TABLE_NAME =   "jv_snapshot_property";
-    public static final String SNAP_PROPERTY_PK =           "snapshot_property_pk";
-    public static final String SNAPSHOT_FK =                "snapshot_fk";
-    public static final String SNAP_PROPERTY_NAME =         "name";
-    public static final String SNAP_PROPERTY_VALUE =        "value";
-    public static final String SNAP_PROPERTY_PK_SEQ =       "jv_snapshot_property_pk_seq";
-
     public static final String CDO_CLASS_TABLE_NAME =     "jv_cdo_class";
     public static final String CDO_CLASS_PK =             "cdo_class_pk";
     public static final String CDO_CLASS_QUALIFIED_NAME = "qualified_name";
@@ -45,28 +38,14 @@ public class FixedSchemaFactory {
     public static final String SNAPSHOT_GLOBAL_ID_FK = "global_id_fk";
     public static final String SNAPSHOT_TYPE =         "type";
     public static final String SNAPSHOT_TABLE_PK_SEQ = "jv_snapshot_pk_seq";
-
-
-    private Schema snapshotPropertyTableSchema(Dialect dialect, String tableName){
-        Schema schema = new Schema(dialect);
-        RelationBuilder relationBuilder = schema.addRelation(tableName);
-        primaryKey(tableName, SNAP_PROPERTY_PK, schema, relationBuilder);
-        relationBuilder
-                .withAttribute().string(SNAP_PROPERTY_NAME).withMaxLength(200).and()
-                .withAttribute().text(SNAP_PROPERTY_VALUE).and();
-        foreignKey(tableName, SNAPSHOT_FK, SNAPSHOT_TABLE_NAME, SNAPSHOT_PK, relationBuilder, schema);
-        relationBuilder.build();
-
-        foreignKeyIndex(tableName, SNAPSHOT_FK, schema);
-
-        return schema;
-    }
+    public static final String SNAPSHOT_STATE =        "state";
 
     private Schema snapshotTableSchema(Dialect dialect, String tableName){
         Schema schema = new Schema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         primaryKey(tableName, SNAPSHOT_PK, schema, relationBuilder);
-        relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and();
+        relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
+                       .withAttribute().text(SNAPSHOT_STATE).and();
         foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);
         foreignKey(tableName, SNAPSHOT_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder, schema);
         relationBuilder.build();
@@ -136,7 +115,6 @@ public class FixedSchemaFactory {
         schema.put(GLOBAL_ID_TABLE_NAME, globalIdTableSchema(dialect, GLOBAL_ID_TABLE_NAME));
         schema.put(COMMIT_TABLE_NAME,    commitTableSchema(dialect, COMMIT_TABLE_NAME));
         schema.put(SNAPSHOT_TABLE_NAME,  snapshotTableSchema(dialect, SNAPSHOT_TABLE_NAME));
-        schema.put(SNAP_PROPERTY_TABLE_NAME,  snapshotPropertyTableSchema(dialect, SNAP_PROPERTY_TABLE_NAME));
 
         return schema;
     }
