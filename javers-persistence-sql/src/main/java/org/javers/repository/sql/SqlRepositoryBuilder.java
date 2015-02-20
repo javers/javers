@@ -20,7 +20,6 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
 
     private DialectName dialectName;
     private ConnectionProvider connectionProvider;
-    private JsonConverter jsonConverter;
 
     private SqlRepositoryBuilder() {
     }
@@ -36,11 +35,6 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
 
     public SqlRepositoryBuilder withConnectionProvider(ConnectionProvider connectionProvider){
         this.connectionProvider = connectionProvider;
-        return this;
-    }
-
-    public SqlRepositoryBuilder withJSONConverter(JsonConverter jsonConverter) {
-        this.jsonConverter = jsonConverter;
         return this;
     }
 

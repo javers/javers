@@ -35,7 +35,6 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
                 .withConnectionProvider(connectionProvider)
                 .withDialect(DialectName.H2).build()
         javers = javers().registerJaversRepository(sqlRepository).build()
-        sqlRepository.setJsonConverter(javers.jsonConverter)
     }
     
     def cleanup() {
