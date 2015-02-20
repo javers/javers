@@ -2,12 +2,14 @@ package org.javers.repository.sql
 
 import org.h2.tools.Server
 import org.javers.core.JaversRepositoryE2ETest
+import org.javers.core.model.SnapshotEntity
 import spock.lang.Shared
 
 import java.sql.Connection
 import java.sql.DriverManager
 
 import static org.javers.core.JaversBuilder.javers
+import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
 class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
@@ -17,18 +19,12 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     def setup() {
         Server.createTcpServer().start()
         dbConnection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test")
-        //dbConnection = DriverManager.getConnection("jdbc:postgresql://horton.elephantsql.com:5432/xzvpycnt", "xzvpycnt", "******");
+        dbConnection.setAutoCommit(false)
 
         //PG
         //dbConnection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/javers", "javers", "javers")
-        //dbConnection.setAutoCommit(false)
 
-        def connectionProvider = new ConnectionProvider() {
-            @Override
-            Connection getConnection() {
-               return dbConnection
-            }
-        }
+        def connectionProvider = { dbConnection } as ConnectionProvider
         
         def sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
@@ -36,24 +32,30 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
                 .withDialect(DialectName.H2).build()
         javers = javers().registerJaversRepository(sqlRepository).build()
     }
-    
+
+    def "should not interfere with user transactions"() {
+        given:
+        def anEntity = new SnapshotEntity(id:1)
+
+        when:
+        javers.commit("author", anEntity)
+        dbConnection.rollback()
+        def snapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 2)
+
+        then:
+        !snapshots
+
+        when:
+        javers.commit("author", anEntity)
+        dbConnection.commit()
+        snapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 2)
+
+        then:
+        snapshots.size() == 1
+    }
+
     def cleanup() {
         dbConnection.rollback()
         dbConnection.close()
     }
-
-    /*
-    def clearTables(){
-        execute("delete  from jv_snapshot_property;")
-        execute("delete  from jv_snapshot;")
-        execute("delete  from jv_commit;")
-        execute("delete  from jv_global_id;")
-        execute("delete  from jv_cdo_class;")
-    }
-
-    def execute(String sql){
-        def stmt = dbConnection.createStatement()
-        stmt.executeUpdate(sql)
-        stmt.close()
-    }*/
 }
