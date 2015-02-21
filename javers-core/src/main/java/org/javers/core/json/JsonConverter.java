@@ -2,8 +2,10 @@ package org.javers.core.json;
 
 import com.google.gson.*;
 import org.javers.common.validation.Validate;
+import org.javers.core.json.typeadapter.commit.CdoSnapshotStateDeserializer;
 import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.object.CdoSnapshotState;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.joda.time.LocalDateTime;
 
@@ -43,12 +45,19 @@ import java.lang.reflect.Type;
  */
 public class JsonConverter {
     private Gson gson;
-    private final TypeMapper typeMapper;
+    private final CdoSnapshotStateDeserializer stateDeserializer;
 
     JsonConverter(TypeMapper typeMapper, Gson gson) {
         Validate.argumentsAreNotNull(typeMapper, gson);
-        this.typeMapper = typeMapper;
         this.gson = gson;
+
+        JsonDeserializationContext deserializationContext =  new JsonDeserializationContext() {
+            @SuppressWarnings("unchecked")
+            public <T> T deserialize(JsonElement json, Type typeOfT) throws JsonParseException {
+                return (T) fromJson(json, typeOfT);
+            }
+        };
+        this.stateDeserializer = new CdoSnapshotStateDeserializer(typeMapper, deserializationContext);
     }
 
     public String toJson(Object value) {
@@ -67,9 +76,13 @@ public class JsonConverter {
         return gson.fromJson(json, expectedType);
     }
 
-    public Object deserializePropertyValue(Property property, String valueAsJson){
-        Type dehydratedPropertyType = typeMapper.getDehydratedType(property.getGenericType());
-        return fromJson(valueAsJson, dehydratedPropertyType);
+    public Object fromJson(JsonElement json, Type expectedType) {
+        return gson.fromJson(json, expectedType);
     }
 
+    public CdoSnapshotState snapshotStateFromJson(String json, GlobalId globalId){
+        Validate.argumentsAreNotNull(json, globalId);
+        JsonElement stateElement = fromJson(json, JsonElement.class);
+        return stateDeserializer.deserialize(stateElement, globalId);
+    }
 }

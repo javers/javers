@@ -6,14 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonTypeAdapterTemplate;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.CdoSnapshotBuilder;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.SnapshotType;
-import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.*;
-
-import java.lang.reflect.Type;
+import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.type.TypeMapper;
 
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 
@@ -51,13 +45,11 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
         deserializeType(jsonObject,cdoSnapshotBuilder);
 
-        JsonObject state = jsonObject.get(STATE_NAME).getAsJsonObject();
+        JsonElement state = jsonObject.get(STATE_NAME);
+        CdoSnapshotStateDeserializer stateDeserializer = new CdoSnapshotStateDeserializer(typeMapper, context);
+        CdoSnapshotState snapshotState = stateDeserializer.deserialize(state, cdoId);
 
-        for (Property property : cdoId.getCdoClass().getProperties()) {
-            cdoSnapshotBuilder.withPropertyValue(property, decodePropertyValue(state, context, property));
-        }
-
-        return cdoSnapshotBuilder.build();
+        return cdoSnapshotBuilder.withState(snapshotState).build();
     }
 
     private void deserializeType(JsonObject jsonObject, CdoSnapshotBuilder cdoSnapshotBuilder){
@@ -73,12 +65,6 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         }
     }
 
-    private Object decodePropertyValue(JsonObject element, final JsonDeserializationContext context, Property property) {
-        JsonElement propertyElement = element.get(property.getName());
-        Type dehydratedPropertyType = typeMapper.getDehydratedType(property.getGenericType());
-        return context.deserialize(propertyElement, dehydratedPropertyType);
-    }
-
     @Override
     public JsonElement toJson(CdoSnapshot snapshot, JsonSerializationContext context) {
 
@@ -86,20 +72,9 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
         jsonObject.add(COMMIT_METADATA, context.serialize(snapshot.getCommitMetadata()));
         jsonObject.add(GLOBAL_CDO_ID, context.serialize(snapshot.getGlobalId()));
-        jsonObject.add(STATE_NAME, getState(snapshot, context));
+        jsonObject.add(STATE_NAME, context.serialize(snapshot.getState()));
         jsonObject.add(TYPE_NAME, context.serialize(snapshot.getType().name()));
 
         return jsonObject;
     }
-
-    private JsonElement getState(CdoSnapshot snapshot, JsonSerializationContext context) {
-        JsonObject jsonObject = new JsonObject();
-
-        for (Property property : snapshot.getProperties()) {
-           jsonObject.add(property.getName(), context.serialize(snapshot.getPropertyValue(property)));
-        }
-
-        return jsonObject;
-    }
-
 }

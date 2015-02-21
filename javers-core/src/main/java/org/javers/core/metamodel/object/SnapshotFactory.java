@@ -12,6 +12,7 @@ import org.javers.core.metamodel.type.*;
 import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 import static org.javers.common.exception.JaversExceptionCode.NOT_IMPLEMENTED;
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
+import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapshotState;
 import static org.javers.core.metamodel.object.SnapshotType.*;
 
 /**
@@ -34,8 +35,8 @@ public class SnapshotFactory {
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     CdoSnapshot create(Object liveCdo, GlobalId id, CommitMetadata commitMetadata, SnapshotType type) {
-        CdoSnapshotBuilder snapshot =
-                cdoSnapshot(id, commitMetadata).withType(type);
+        CdoSnapshotBuilder snapshot = cdoSnapshot(id, commitMetadata).withType(type);
+        CdoSnapshotStateBuilder stateBuilder = cdoSnapshotState();
 
         for (Property property : id.getCdoClass().getProperties()) {
             Object propertyVal = property.get(liveCdo);
@@ -53,10 +54,10 @@ public class SnapshotFactory {
                 filteredPropertyVal = globalIdFactory.dehydrate(propertyVal, propertyType, owner);
             }
 
-            snapshot.withPropertyValue(property, filteredPropertyVal);
+            stateBuilder.withPropertyValue(property, filteredPropertyVal);
         }
 
-        return snapshot.build();
+        return snapshot.withState(stateBuilder.build()).build();
     }
 
     public CdoSnapshot createTerminal(GlobalId globalId, CommitMetadata commitMetadata) {
