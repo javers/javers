@@ -26,7 +26,11 @@ public class GlobalIdRepository {
 
     private PolyJDBC polyJdbc;
     private JsonConverter jsonConverter;
-    private GlobalIdCache cache = new GlobalIdCache(10_000, 10);
+    private ThreadLocal<GlobalIdCache> cache = new ThreadLocal<GlobalIdCache>() {
+        protected GlobalIdCache initialValue() {
+            return new GlobalIdCache(5_000, 5);
+        }
+    };
 
     private Map<String, Optional<Long>> dummyIdCache = new HashMap<>();
 
@@ -40,6 +44,10 @@ public class GlobalIdRepository {
         return lookup.found() ? lookup.getPrimaryKey() : insert(globalId);
     }
 
+    public void evictCache(){
+        cache().evict();
+    }
+
     public long getOrInsertClass(GlobalId globalId) {
         Class cdoClass = globalId.getCdoClass().getClientsClass();
         Optional<Long> lookup = findClassPk(cdoClass);
@@ -47,11 +55,15 @@ public class GlobalIdRepository {
         return lookup.isPresent() ? lookup.get() : insertClass(cdoClass);
     }
 
-    public PersistentGlobalId findPersistedGlobalId(GlobalId globalId){
+    public PersistentGlobalId findPersistedGlobalId(GlobalId globalId) {
         //cached
-        Optional<Long> globalIdPrimaryKey = cache.load(globalId);
+        Optional<Long> globalIdPrimaryKey = cache().load(globalId);
 
         return new PersistentGlobalId(globalId, globalIdPrimaryKey);
+    }
+
+    private GlobalIdCache cache() {
+        return cache.get();
     }
 
     private Optional<Long> findGlobalIdPk(GlobalId globalId){
@@ -81,7 +93,7 @@ public class GlobalIdRepository {
         long globalIdPk = polyJdbc.queryRunner().insert(insertGlobalIdQuery);
 
         //cache write
-        cache.explicitPut(globalId, globalIdPk);
+        cache().explicitPut(globalId, globalIdPk);
 
         return globalIdPk;
     }
@@ -104,7 +116,6 @@ public class GlobalIdRepository {
                 .sequence(CDO_CLASS_PK, CDO_PK_SEQ_NAME);
         return polyJdbc.queryRunner().insert(query);
     }
-
 
     //TODO dependency injection
     public void setJsonConverter(JsonConverter JSONConverter) {
@@ -139,6 +150,10 @@ public class GlobalIdRepository {
             } catch (RuntimeException | ExecutionException e) {
                 throw new JaversException(e.getCause());
             }
+        }
+
+        void evict(){
+            primaryKeys.invalidateAll();
         }
     }
 }

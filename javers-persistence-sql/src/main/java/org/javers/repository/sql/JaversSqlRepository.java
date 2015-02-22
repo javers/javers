@@ -9,10 +9,10 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.repository.api.JaversRepository;
+import org.javers.repository.sql.finders.CdoSnapshotFinder;
 import org.javers.repository.sql.reposiotries.CdoSnapshotRepository;
 import org.javers.repository.sql.reposiotries.CommitMetadataRepository;
 import org.javers.repository.sql.reposiotries.GlobalIdRepository;
-import org.javers.repository.sql.finders.CdoSnapshotFinder;
 
 import java.util.List;
 
@@ -22,6 +22,7 @@ public class JaversSqlRepository implements JaversRepository {
     private final GlobalIdRepository globalIdRepository;
     private final CdoSnapshotRepository cdoSnapshotRepository;
     private final CdoSnapshotFinder finder;
+    public  final ThreadLocal<String> sessionId = new ThreadLocal<>();
 
     public JaversSqlRepository(CommitMetadataRepository commitRepository,
                                GlobalIdRepository globalIdRepository,
@@ -45,6 +46,8 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public void persist(Commit commit) {
+        globalIdRepository.evictCache();
+
         Optional<Long> primaryKey = commitRepository.getCommitPrimaryKey(commit);
 
         if (primaryKey.isPresent()) {
