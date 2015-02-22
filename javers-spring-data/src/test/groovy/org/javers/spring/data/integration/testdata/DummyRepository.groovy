@@ -1,4 +1,4 @@
-package org.javers.spring.data.testdata
+package org.javers.spring.data.integration.testdata
 
 import org.javers.spring.data.JaversSpringDataAuditable
 import org.springframework.data.repository.CrudRepository

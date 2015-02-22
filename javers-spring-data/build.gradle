@@ -11,5 +11,6 @@ dependencies {
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'ch.qos.logback:logback-classic:1.1.2'
     testCompile 'org.springframework:spring-test:3.2.2.RELEASE'
-    testCompile 'org.objenesis:objenesis:2.1' // For mocking final classes
+    testCompile 'org.springframework.data:spring-data-mongodb:1.6.2.RELEASE'
+    testCompile 'com.github.fakemongo:fongo:1.5.8'
 }

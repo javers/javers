@@ -1,4 +1,4 @@
-package org.javers.spring.data.testdata
+package org.javers.spring.data.integration.testdata
 
 import org.javers.core.metamodel.annotation.Id
 
