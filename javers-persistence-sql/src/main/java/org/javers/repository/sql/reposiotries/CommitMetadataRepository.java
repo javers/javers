@@ -29,8 +29,9 @@ public class CommitMetadataRepository {
     private final PolyJDBC polyJDBC;
     private JsonConverter jsonConverter;
 
-    public CommitMetadataRepository(PolyJDBC javersPolyjdbc) {
-        this.polyJDBC = javersPolyjdbc;
+
+    public CommitMetadataRepository(PolyJDBC polyjdbc) {
+        this.polyJDBC = polyjdbc;
     }
 
     public long save(String author, LocalDateTime date, CommitId commitId) {

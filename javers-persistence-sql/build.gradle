@@ -5,6 +5,7 @@ repositories {
 dependencies {
     compile project(':javers-core')
     compile 'org.polyjdbc:polyjdbc:0.5.0'
+    compile 'com.google.guava:guava:18.0' //for caching
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'commons-dbcp:commons-dbcp:1.4'

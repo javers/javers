@@ -34,7 +34,7 @@ public class CdoSnapshotFinder {
     }
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        PersistentGlobalId persistentGlobalId = globalIdRepository.findGlobalIdPk(globalId);
+        PersistentGlobalId persistentGlobalId = globalIdRepository.findPersistedGlobalId(globalId);
         if (!persistentGlobalId.found()){
             return Optional.empty();
         }
@@ -49,7 +49,7 @@ public class CdoSnapshotFinder {
     }
 
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
-        PersistentGlobalId persistentGlobalId = globalIdRepository.findGlobalIdPk(globalId);
+        PersistentGlobalId persistentGlobalId = globalIdRepository.findPersistedGlobalId(globalId);
         if (!persistentGlobalId.found()){
             return Collections.emptyList();
         }
