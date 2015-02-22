@@ -2,8 +2,11 @@ package org.javers.repository.sql.reposiotries;
 
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.sql.ConnectionProvider;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
+
+import java.util.List;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
@@ -11,13 +14,21 @@ public class CdoSnapshotRepository {
 
     private PolyJDBC javersPolyJDBC;
     private JsonConverter jsonConverter;
+    private ConnectionProvider connectionProvider;
+    private GlobalIdRepository globalIdRepository;
 
-    public CdoSnapshotRepository(PolyJDBC javersPolyJDBC) {
+    public CdoSnapshotRepository(ConnectionProvider connectionProvider, PolyJDBC javersPolyJDBC, GlobalIdRepository globalIdRepository) {
+        this.connectionProvider = connectionProvider;
         this.javersPolyJDBC = javersPolyJDBC;
+        this.globalIdRepository = globalIdRepository;
     }
 
-    public long save(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot) {
-        return insertSnapshot(globalIdPk, commitIdPk, cdoSnapshot);
+    public void save(long commitIdPk, List<CdoSnapshot> cdoSnapshots) {
+        //TODO add batch insert
+        for (CdoSnapshot cdoSnapshot : cdoSnapshots) {
+            long globalIdPk = globalIdRepository.getOrInsertId(cdoSnapshot.getGlobalId());
+            insertSnapshot(globalIdPk, commitIdPk, cdoSnapshot);
+        }
     }
 
     private long insertSnapshot(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot) {

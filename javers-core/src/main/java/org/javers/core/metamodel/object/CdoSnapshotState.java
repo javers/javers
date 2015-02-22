@@ -15,6 +15,7 @@ public class CdoSnapshotState {
     private final Map<Property, Object> properties;
 
     CdoSnapshotState(Map<Property, Object> state) {
+        Validate.argumentIsNotNull(state);
         this.properties = state;
     }
 
@@ -38,5 +39,19 @@ public class CdoSnapshotState {
 
     public Set<Property> getProperties() {
         return Collections.unmodifiableSet(properties.keySet());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CdoSnapshotState that = (CdoSnapshotState) o;
+
+        return properties.equals(that.properties);
+    }
+
+    @Override
+    public int hashCode() {
+        return properties.hashCode();
     }
 }

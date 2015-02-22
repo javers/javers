@@ -36,31 +36,37 @@ class GraphSnapshotFactory {
     List<CdoSnapshot> create(LiveGraph currentVersion, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata){
         Validate.argumentsAreNotNull(currentVersion, commitMetadata, latestShadowGraph);
 
-        List<CdoSnapshot> reused = new ArrayList<>();
+        List<CdoSnapshot> result = new ArrayList<>();
 
         for (ObjectNode node : currentVersion.nodes()) {
             boolean initial = isInitial(node, latestShadowGraph);
 
-            CdoSnapshot fresh;
-            if (initial){
-                fresh = snapshotFactory.createInitial(node, commitMetadata);
-            }
-            else{
-                fresh = snapshotFactory.create(node, commitMetadata);
-            }
+            CdoSnapshot fresh = createFreshSnapshot(initial, node, commitMetadata);
 
             Optional<CdoSnapshot> existing = javersRepository.getLatest(fresh.getGlobalId());
+
             if (existing.isEmpty()) {
-                reused.add(fresh);
+                result.add(fresh); //when insert
                 continue;
             }
 
             if (!existing.get().stateEquals(fresh)) {
-                reused.add(fresh);
+                result.add(fresh); //when update
             }
+
+            //when not changed
         }
 
-        return reused;
+        return result;
+    }
+
+    private CdoSnapshot createFreshSnapshot(boolean initial, ObjectNode node, CommitMetadata commitMetadata){
+        if (initial){
+            return snapshotFactory.createInitial(node, commitMetadata);
+        }
+        else{
+            return snapshotFactory.create(node, commitMetadata);
+        }
     }
 
     List<CdoSnapshot> create(LiveGraph currentVersion, CommitMetadata commitMetadata) {

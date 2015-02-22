@@ -51,12 +51,8 @@ public class JaversSqlRepository implements JaversRepository {
             throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT);
         }
 
-        long commitMetadataPk = commitRepository.save(commit.getAuthor(), commit.getCommitDate(), commit.getId());
-
-        for (CdoSnapshot cdoSnapshot : commit.getSnapshots()) {
-            long globalIdPk = globalIdRepository.getOrInsertId(cdoSnapshot.getGlobalId());
-            cdoSnapshotRepository.save(globalIdPk, commitMetadataPk, cdoSnapshot);
-        }
+        long commitPk = commitRepository.save(commit.getAuthor(), commit.getCommitDate(), commit.getId());
+        cdoSnapshotRepository.save(commitPk, commit.getSnapshots());
     }
 
     @Override
