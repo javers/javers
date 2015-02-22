@@ -33,10 +33,10 @@ class PerformanceEntity {
     LocalDate date4 = new LocalDate(2001, 1, 4);
     LocalDate date5 = new LocalDate(2001, 1, 5);
 
-    void change(){
-        intList.add(intList.size());
+    void change() {
+        intList.set(0, intList.get(0) + 1);
 
-        for (PerformanceEntity ref : refs){
+        for (PerformanceEntity ref : refs) {
             ref.change();
         }
     }

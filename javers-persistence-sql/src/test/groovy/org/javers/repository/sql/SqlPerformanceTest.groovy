@@ -98,7 +98,6 @@ class SqlPerformanceTest extends Specification{
     }
 
     def clearTables(){
-        execute("delete  from jv_snapshot_property;")
         execute("delete  from jv_snapshot;")
         execute("delete  from jv_commit;")
         execute("delete  from jv_global_id;")

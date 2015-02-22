@@ -54,7 +54,7 @@ public class JaversSqlRepository implements JaversRepository {
         long commitMetadataPk = commitRepository.save(commit.getAuthor(), commit.getCommitDate(), commit.getId());
 
         for (CdoSnapshot cdoSnapshot : commit.getSnapshots()) {
-            long globalIdPk = globalIdRepository.save(cdoSnapshot.getGlobalId());
+            long globalIdPk = globalIdRepository.getOrInsertId(cdoSnapshot.getGlobalId());
             cdoSnapshotRepository.save(globalIdPk, commitMetadataPk, cdoSnapshot);
         }
     }

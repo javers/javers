@@ -6,63 +6,80 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
-import org.polyjdbc.core.query.mapper.ObjectMapper;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
+import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class GlobalIdRepository {
 
-    private static final String NATIVE_QUERY = GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_CLASS_FK + " = " + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_PK
-            + " AND " + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_LOCAL_ID + " = '%s'";
-
-    private PolyJDBC javersPolyjdbc;
+    private PolyJDBC polyJdbc;
     private JsonConverter jsonConverter;
 
     public GlobalIdRepository(PolyJDBC javersPolyjdbc) {
-        this.javersPolyjdbc = javersPolyjdbc;
+        this.polyJdbc = javersPolyjdbc;
     }
 
-    public long save(GlobalId globalId) {
-        Optional<Long> lookup = getIfExists(globalId);
+    public long getOrInsertId(GlobalId globalId) {
+        PersistentGlobalId lookup = findGlobalIdPk(globalId);
 
-        return lookup.isPresent() ? lookup.get() : insert(globalId);
+        return lookup.found() ? lookup.getPrimaryKey() : insert(globalId);
     }
 
-    private Optional<Long> getIfExists(GlobalId globalId) {
-        SelectQuery selectQuery = javersPolyjdbc.query()
+    public long getOrInsertClass(GlobalId globalId) {
+        Class cdoClass = globalId.getCdoClass().getClientsClass();
+        Optional<Long> lookup = findClassPk(cdoClass);
+
+        return lookup.isPresent() ? lookup.get() : insertClass(cdoClass);
+    }
+
+    public PersistentGlobalId findGlobalIdPk(GlobalId globalId){
+        SelectQuery query = polyJdbc.query()
                 .select(GLOBAL_ID_PK)
-                .from(GLOBAL_ID_TABLE_NAME + "," + CDO_CLASS_TABLE_NAME)
-                .where(String.format(NATIVE_QUERY, jsonConverter.toJson(globalId.getCdoId())));
+                .from(  GLOBAL_ID_TABLE_NAME + " as g INNER JOIN " +
+                        CDO_CLASS_TABLE_NAME + " as c ON " + CDO_CLASS_PK + " = " + GLOBAL_ID_CLASS_FK)
+                .where("g." + GLOBAL_ID_LOCAL_ID + " = :localId " +
+                        "AND c." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName ")
+                .withArgument("localId", jsonConverter.toJson(globalId.getCdoId()))
+                .withArgument("qualifiedName", globalId.getCdoClass().getName());
 
-        return Optional.fromNullable(javersPolyjdbc.queryRunner().queryUnique(selectQuery, new ObjectMapper<Long>() {
-            @Override
-            public Long createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getLong(GLOBAL_ID_PK);
-            }
-        }, false));
+        Optional<Long> primaryKey = queryForOptionalLong(query, polyJdbc);
+
+        return new PersistentGlobalId(globalId, primaryKey);
     }
 
-    private Long insert(GlobalId globalId) {
-        InsertQuery insertClassQuery = javersPolyjdbc.query()
-                .insert()
-                .into(CDO_CLASS_TABLE_NAME)
-                .value(CDO_CLASS_QUALIFIED_NAME, globalId.getCdoClass().getClientsClass().getName())
-                .sequence(CDO_CLASS_PK, CDO_PK_SEQ_NAME);
+    private long insert(GlobalId globalId) {
 
-        long insertedClassId = javersPolyjdbc.queryRunner().insert(insertClassQuery);
+        long classPk = getOrInsertClass(globalId);
 
-        InsertQuery insertGlobalIdQuery = javersPolyjdbc.query()
+        InsertQuery insertGlobalIdQuery = polyJdbc.query()
                 .insert()
                 .into(GLOBAL_ID_TABLE_NAME)
                 .value(GLOBAL_ID_LOCAL_ID, jsonConverter.toJson(globalId.getCdoId()))
-                .value(GLOBAL_ID_CLASS_FK, insertedClassId)
+                .value(GLOBAL_ID_CLASS_FK, classPk)
                 .sequence(GLOBAL_ID_PK, GLOBAL_ID_PK_SEQ);
 
-        return javersPolyjdbc.queryRunner().insert(insertGlobalIdQuery);
+        return polyJdbc.queryRunner().insert(insertGlobalIdQuery);
     }
+
+    private Optional<Long> findClassPk(Class<?> cdoClass){
+        SelectQuery query = polyJdbc.query()
+                .select(CDO_CLASS_PK)
+                .from(CDO_CLASS_TABLE_NAME)
+                .where(CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName ")
+                .withArgument("qualifiedName", cdoClass.getName());
+
+        return queryForOptionalLong(query, polyJdbc);
+    }
+
+    private long insertClass(Class<?> cdoClass){
+        InsertQuery query = polyJdbc.query()
+                .insert()
+                .into(CDO_CLASS_TABLE_NAME)
+                .value(CDO_CLASS_QUALIFIED_NAME, cdoClass.getName())
+                .sequence(CDO_CLASS_PK, CDO_PK_SEQ_NAME);
+        return polyJdbc.queryRunner().insert(query);
+    }
+
 
     //TODO dependency injection
     public void setJsonConverter(JsonConverter JSONConverter) {

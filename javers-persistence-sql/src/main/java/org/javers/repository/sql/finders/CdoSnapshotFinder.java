@@ -5,6 +5,8 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.*;
+import org.javers.repository.sql.reposiotries.GlobalIdRepository;
+import org.javers.repository.sql.reposiotries.PersistentGlobalId;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
@@ -24,13 +26,15 @@ public class CdoSnapshotFinder {
 
     private final PolyJDBC polyJDBC;
     private JsonConverter jsonConverter;
+    private GlobalIdRepository globalIdRepository;
 
-    public CdoSnapshotFinder(PolyJDBC javersPolyJDBC) {
-        this.polyJDBC = javersPolyJDBC;
+    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, PolyJDBC polyJDBC) {
+        this.globalIdRepository = globalIdRepository;
+        this.polyJDBC = polyJDBC;
     }
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        PersistentGlobalId persistentGlobalId = findGlobalIdPk(globalId);
+        PersistentGlobalId persistentGlobalId = globalIdRepository.findGlobalIdPk(globalId);
         if (!persistentGlobalId.found()){
             return Optional.empty();
         }
@@ -45,7 +49,7 @@ public class CdoSnapshotFinder {
     }
 
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
-        PersistentGlobalId persistentGlobalId = findGlobalIdPk(globalId);
+        PersistentGlobalId persistentGlobalId = globalIdRepository.findGlobalIdPk(globalId);
         if (!persistentGlobalId.found()){
             return Collections.emptyList();
         }
@@ -66,35 +70,20 @@ public class CdoSnapshotFinder {
         this.jsonConverter = jsonConverter;
     }
 
-    private PersistentGlobalId findGlobalIdPk(GlobalId globalId){
-        SelectQuery query = polyJDBC.query()
-            .select(GLOBAL_ID_PK)
-            .from(GLOBAL_ID_TABLE_NAME + " as g INNER JOIN " +
-                  CDO_CLASS_TABLE_NAME + " as c ON " + CDO_CLASS_PK + " = " + GLOBAL_ID_CLASS_FK)
-            .where("g." + GLOBAL_ID_LOCAL_ID + " = :localId " +
-                   "AND c." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName ")
-            .withArgument("localId", jsonConverter.toJson(globalId.getCdoId()))
-            .withArgument("qualifiedName", globalId.getCdoClass().getName());
-
-        Optional<Long> primaryKey = queryForOptionalLong(query, polyJDBC);
-
-        return new PersistentGlobalId(globalId, primaryKey);
-    }
-
     private List<CdoSnapshot> getCdoSnapshotsBySnapshotPk(long minSnapshotPk, long maxSnapshotPk, final PersistentGlobalId globalId){
         SelectQuery query =
             polyJDBC.query()
-                    .select(SNAPSHOT_STATE+ ", " +
-                            SNAPSHOT_TYPE+ ", " +
+                    .select(SNAPSHOT_STATE + ", " +
+                            SNAPSHOT_TYPE + ", " +
                             COMMIT_AUTHOR + ", " +
                             COMMIT_COMMIT_DATE + ", " +
                             COMMIT_COMMIT_ID)
                     .from(SNAPSHOT_TABLE_NAME + " INNER JOIN " +
-                          COMMIT_TABLE_NAME + "  ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK)
+                            COMMIT_TABLE_NAME + "  ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK)
                     .where(SNAPSHOT_PK + " between :minSnapshotPk and :maxSnapshotPk AND " +
                             SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
                     .orderBy(SNAPSHOT_PK, Order.DESC)
-                    .withArgument("globalIdPk", globalId.primaryKey.get())
+                    .withArgument("globalIdPk", globalId.getPrimaryKey())
                     .withArgument("minSnapshotPk", minSnapshotPk)
                     .withArgument("maxSnapshotPk", maxSnapshotPk);
         return
@@ -109,8 +98,8 @@ public class CdoSnapshotFinder {
 
                 SnapshotType snapshotType = SnapshotType.valueOf(resultSet.getString(SNAPSHOT_TYPE));
                 CdoSnapshotState state =
-                        jsonConverter.snapshotStateFromJson(resultSet.getString(SNAPSHOT_STATE), globalId.instance);
-                CdoSnapshotBuilder builder = CdoSnapshotBuilder.cdoSnapshot(globalId.instance, commit);
+                        jsonConverter.snapshotStateFromJson(resultSet.getString(SNAPSHOT_STATE), globalId.getInstance());
+                CdoSnapshotBuilder builder = CdoSnapshotBuilder.cdoSnapshot(globalId.getInstance(), commit);
                 builder.withType(snapshotType);
                 return builder.withState(state).build();
             }
@@ -122,7 +111,7 @@ public class CdoSnapshotFinder {
             .select(SNAPSHOT_PK)
             .from(SNAPSHOT_TABLE_NAME)
                 .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
-            .withArgument("globalIdPk", globalId.primaryKey.get())
+            .withArgument("globalIdPk", globalId.getPrimaryKey())
             .orderBy(SNAPSHOT_PK, Order.ASC)
             .limit(limit);
 
@@ -134,7 +123,7 @@ public class CdoSnapshotFinder {
             .select("MAX(" + SNAPSHOT_PK + ")")
             .from(SNAPSHOT_TABLE_NAME)
             .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
-            .withArgument("globalIdPk", globalId.primaryKey.get());
+            .withArgument("globalIdPk", globalId.getPrimaryKey());
 
         Optional<Long> result = queryForOptionalLong(query, polyJDBC);
 
