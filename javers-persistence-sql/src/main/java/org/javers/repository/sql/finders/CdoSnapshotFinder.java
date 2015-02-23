@@ -79,9 +79,9 @@ public class CdoSnapshotFinder {
                             COMMIT_COMMIT_DATE + ", " +
                             COMMIT_COMMIT_ID)
                     .from(SNAPSHOT_TABLE_NAME + " INNER JOIN " +
-                            COMMIT_TABLE_NAME + "  ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK)
+                          COMMIT_TABLE_NAME + "  ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK)
                     .where(SNAPSHOT_PK + " between :minSnapshotPk and :maxSnapshotPk AND " +
-                            SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
+                           SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
                     .orderBy(SNAPSHOT_PK, Order.DESC)
                     .withArgument("globalIdPk", globalId.getPrimaryKey())
                     .withArgument("minSnapshotPk", minSnapshotPk)
@@ -112,7 +112,7 @@ public class CdoSnapshotFinder {
             .from(SNAPSHOT_TABLE_NAME)
                 .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
             .withArgument("globalIdPk", globalId.getPrimaryKey())
-            .orderBy(SNAPSHOT_PK, Order.ASC)
+            .orderBy(SNAPSHOT_PK, Order.DESC)
             .limit(limit);
 
         return queryForLongList(query, polyJDBC);

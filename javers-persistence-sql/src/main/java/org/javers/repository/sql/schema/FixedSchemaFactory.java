@@ -50,8 +50,8 @@ public class FixedSchemaFactory {
         foreignKey(tableName, SNAPSHOT_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder, schema);
         relationBuilder.build();
 
-        foreignKeyIndex(tableName, SNAPSHOT_GLOBAL_ID_FK, schema);
-        foreignKeyIndex(tableName, SNAPSHOT_COMMIT_FK, schema);
+        columnIndex(tableName, SNAPSHOT_GLOBAL_ID_FK, schema);
+        columnIndex(tableName, SNAPSHOT_COMMIT_FK, schema);
 
         return schema;
     }
@@ -63,8 +63,11 @@ public class FixedSchemaFactory {
         relationBuilder
                 .withAttribute().string(COMMIT_AUTHOR).withMaxLength(200).and()
                 .withAttribute().timestamp(COMMIT_COMMIT_DATE).and()
-                .withAttribute().string(COMMIT_COMMIT_ID).withMaxLength(10).and()
+                .withAttribute().string(COMMIT_COMMIT_ID).withMaxLength(12).and()
                 .build();
+
+        columnIndex(tableName, COMMIT_COMMIT_ID, schema);
+
         return schema;
     }
 
@@ -72,7 +75,7 @@ public class FixedSchemaFactory {
         Schema schema = new Schema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         primaryKey(tableName, CDO_CLASS_PK, schema,relationBuilder);
-        relationBuilder.withAttribute().string(CDO_CLASS_QUALIFIED_NAME).withMaxLength(100).and()
+        relationBuilder.withAttribute().string(CDO_CLASS_QUALIFIED_NAME).withMaxLength(200).and()
                 .build();
         return schema;
     }
@@ -82,11 +85,12 @@ public class FixedSchemaFactory {
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         primaryKey(tableName, GLOBAL_ID_PK, schema,relationBuilder);
         relationBuilder
-                .withAttribute().text(GLOBAL_ID_LOCAL_ID).and();
+                .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(200).and();
         foreignKey(tableName, GLOBAL_ID_CLASS_FK, CDO_CLASS_TABLE_NAME, CDO_CLASS_PK, relationBuilder, schema);
         relationBuilder.build();
 
-        foreignKeyIndex(tableName, GLOBAL_ID_CLASS_FK, schema);
+        columnIndex(tableName, GLOBAL_ID_CLASS_FK, schema);
+        columnIndex(tableName, GLOBAL_ID_LOCAL_ID, schema);
 
         return schema;
     }
@@ -97,8 +101,8 @@ public class FixedSchemaFactory {
                 .foreignKey(tableName + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName).and();
     }
 
-    private void foreignKeyIndex(String tableName, String fkColName, Schema schema){
-        schema.addIndex(tableName+"_"+ fkColName +"_idx").indexing(fkColName).on(tableName).build();
+    private void columnIndex(String tableName, String colName, Schema schema){
+        schema.addIndex(tableName+"_"+ colName +"_idx").indexing(colName).on(tableName).build();
     }
 
     private void primaryKey(String tableName, String pkColName, Schema schema, RelationBuilder relationBuilder) {
