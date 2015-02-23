@@ -14,15 +14,13 @@ import spock.lang.Specification
  */
 class JaversSpringDataRepositoryAspectTest extends Specification {
 
-    def javers = Mock(Javers.class);
-    def authorProvider = Mock(AuthorProvider.class);
     def saveHandler = Mock(AuditChangeHandler.class);
     def deleteHandler = Mock(AuditChangeHandler.class)
 
     def changedObject = Mock(DummyObject.class);
     def pjp = Mock(ProceedingJoinPoint.class)
 
-    def sut = new JaversSpringDataRepositoryAspect(javers, authorProvider, saveHandler, deleteHandler)
+    def sut = new JaversSpringDataRepositoryAspect(saveHandler, deleteHandler)
 
     def "Should trigger save handler for single object"(){
         setup:
