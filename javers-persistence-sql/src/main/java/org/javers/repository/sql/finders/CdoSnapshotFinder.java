@@ -60,8 +60,8 @@ public class CdoSnapshotFinder {
             return Collections.emptyList();
         }
 
-        long minSnapshotPk = latestSnapshots.get(0);
-        long maxSnapshotPk = latestSnapshots.get(latestSnapshots.size()-1);
+        long maxSnapshotPk = latestSnapshots.get(0);
+        long minSnapshotPk = latestSnapshots.get(latestSnapshots.size()-1);
         return getCdoSnapshotsBySnapshotPk(minSnapshotPk, maxSnapshotPk, persistentGlobalId);
     }
 
