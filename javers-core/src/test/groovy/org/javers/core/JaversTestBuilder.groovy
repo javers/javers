@@ -6,6 +6,7 @@ import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectGraphBuilder
 import org.javers.core.json.JsonConverter
+import org.javers.core.json.JsonConverterBuilder
 import org.javers.core.metamodel.clazz.ClassAnnotationsScanner
 import org.javers.core.metamodel.clazz.ManagedClassFactory
 import org.javers.core.metamodel.object.GlobalIdFactory
@@ -124,6 +125,10 @@ class JaversTestBuilder {
 
     JsonConverter getJsonConverter() {
         javersBuilder.getContainerComponent(JsonConverter)
+    }
+
+    JsonConverterBuilder getJsonConverterBuilder() {
+        javersBuilder.getContainerComponent(JsonConverterBuilder)
     }
 
     def getContainerComponent(Class type) {

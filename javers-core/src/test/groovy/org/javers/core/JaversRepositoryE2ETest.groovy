@@ -1,15 +1,12 @@
 package org.javers.core
 
-import com.google.common.collect.Multimap
-import com.google.common.collect.Multimaps
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.metamodel.object.UnboundedValueObjectIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
-import org.javers.core.model.GuavaObject
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
+import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -26,24 +23,6 @@ class JaversRepositoryE2ETest extends Specification {
         // InMemoryRepository is used by default
         javers = javers().build()
     }
-
-    def "should store history for custom types"() {
-        given:
-        def javers = JaversBuilder.javers()
-                .registerCustomComparator(new CustomMultimapFakeComparator(), Multimap).build()
-        def cdo =  new GuavaObject(multimap: Multimaps.forMap(["a":1]))
-        javers.commit("author", cdo)
-        cdo.setMultimap(Multimaps.forMap(["a":2]))
-        javers.commit("author", cdo)
-
-        when:
-        def snapshots = javers.getStateHistory(UnboundedValueObjectIdDTO.unboundedValueObjectId(GuavaObject), 10)
-
-        then:
-        snapshots[1].getPropertyValue("multimap") == Multimaps.forMap(["a":1])
-        snapshots[0].getPropertyValue("multimap") == Multimaps.forMap(["a":2])
-    }
-
 
     def "should fetch terminal snapshots from the repository"() {
         given:
@@ -62,24 +41,34 @@ class JaversRepositoryE2ETest extends Specification {
 
     }
 
-    def "should store state history of Entity instance in JaversRepository and fetch snapshots in reverse order"() {
+    def "should store state history of Entity in JaversRepository and fetch snapshots in reverse order"() {
         given:
         def ref = new SnapshotEntity(id:2)
-        def cdo = new SnapshotEntity(id: 1, entityRef: ref)
-        javers.commit("author",cdo) //v. 1
-        ref.intProperty = 5
-        javers.commit("author2",cdo) //v. 2
+        def cdo = new SnapshotEntity(id: 1,
+                                     entityRef: ref,
+                                     arrayOfIntegers: [1,2],
+                                     listOfDates: [new LocalDate(2001,1,1), new LocalDate(2001,1,2)],
+                                     mapOfValues: [(new LocalDate(2001,1,1)):1.1])
+        javers.commit("author", cdo) //v. 1
+        cdo.intProperty = 5
+        javers.commit("author2", cdo) //v. 2
 
         when:
-        def snapshots = javers.getStateHistory(instanceId(2, SnapshotEntity), 10)
+        def snapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 10)
 
         then:
-        def cdoId = instanceId(2,SnapshotEntity)
-        SnapshotsAssert.assertThat(snapshots)
-                .hasSize(2)
-                .hasSnapshot(cdoId, "1.0", [id:2])
-                .hasSnapshot(cdoId, "2.0", [id:2, intProperty:5])
+        def cdoId = instanceId(1,SnapshotEntity)
+        def refId = instanceId(2,SnapshotEntity)
 
+        //assert properties
+        SnapshotsAssert.assertThat(snapshots)
+                .hasSnapshot(cdoId, "2.0", [id:1,
+                                            entityRef:refId,
+                                            arrayOfIntegers:[1,2],
+                                            listOfDates: [new LocalDate(2001,1,1), new LocalDate(2001,1,2)],
+                                            mapOfValues: [(new LocalDate(2001,1,1)):1.1],
+                                            intProperty:5,])
+        //assert metadata
         with(snapshots[0]) {
              commitId == "2.0"
              commitMetadata.author == "author2"
@@ -90,6 +79,7 @@ class JaversRepositoryE2ETest extends Specification {
             commitId == "1.0"
             commitMetadata.author == "author"
             commitMetadata.commitDate
+            !getPropertyValue("intProperty")
             initial
         }
     }

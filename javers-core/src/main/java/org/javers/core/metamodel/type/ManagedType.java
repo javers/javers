@@ -3,6 +3,9 @@ package org.javers.core.metamodel.type;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.clazz.ManagedClassFactory;
+import org.javers.core.metamodel.object.GlobalId;
+
+import java.lang.reflect.Type;
 
 /**
  * @author bartosz walacik
@@ -21,4 +24,9 @@ public abstract class ManagedType extends JaversType {
     }
 
     abstract ManagedType spawn(Class javaType, ManagedClassFactory managedClassFactory);
+
+    @Override
+    protected Type getRawDehydratedType() {
+        return GlobalId.class;
+    }
 }

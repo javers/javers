@@ -55,8 +55,8 @@ public final class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
     private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
-
     private JaversRepository repository;
+
 
     public static JaversBuilder javers() {
         return new JaversBuilder();
@@ -224,7 +224,7 @@ public final class JaversBuilder extends AbstractJaversBuilder {
      *
      * @see org.javers.core.json.JsonConverterBuilder#typeSafeValues(boolean)
      */
-    public JaversBuilder typeSafeValues(){
+    public JaversBuilder typeSafeValues() {
         jsonConverterBuilder().typeSafeValues(true);
         return this;
     }
@@ -311,7 +311,9 @@ public final class JaversBuilder extends AbstractJaversBuilder {
 
         addModule(new ChangeTypeAdaptersModule(getContainer()));
         addModule(new CommitTypeAdaptersModule(getContainer()));
-        jsonConverterBuilder.registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
+        jsonConverterBuilder
+                .typeMapper(typeMapper())
+                .registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
 
         addComponent(jsonConverterBuilder.build());
     }

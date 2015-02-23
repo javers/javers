@@ -2,12 +2,12 @@ package org.javers.core.json.typeadapter
 
 import groovy.json.JsonSlurper
 import org.javers.core.diff.changetype.Atomic
-import org.javers.core.json.JsonConverter
 import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static org.javers.core.json.JsonConverterBuilder.jsonConverter
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.core.JaversTestBuilder.javersTestAssemblyTypeSafe
 
 /**
  * @author bartosz walacik
@@ -15,11 +15,10 @@ import static org.javers.core.json.JsonConverterBuilder.jsonConverter
 class AtomicTypeAdapterTest extends Specification {
     def "should serialize Atomic type-safely when switched on"() {
         given:
-        JsonConverter jsonConverter = jsonConverter().typeSafeValues(true).build()
+        def jsonConverter = javersTestAssemblyTypeSafe().jsonConverter
 
         when:
         def jsonText = jsonConverter.toJson(new Atomic(new LocalDate(2000, 1, 1)))
-        //println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -29,11 +28,10 @@ class AtomicTypeAdapterTest extends Specification {
 
     def "should serialize Atomic without type-safety by default"() {
         given:
-        JsonConverter jsonConverter = jsonConverter().build()
+        def jsonConverter = javersTestAssembly().jsonConverter
 
         when:
         def jsonText = jsonConverter.toJson(new Atomic(new LocalDate(2000, 1, 1)))
-        //println(jsonText)
 
         then:
         jsonText == '"2000-01-01"'
@@ -42,7 +40,7 @@ class AtomicTypeAdapterTest extends Specification {
     @Unroll
     def "should not wrap primitive #primitive.class.simpleName when typeSafe is switched on"() {
         given:
-        JsonConverter jsonConverter = jsonConverter().typeSafeValues(true).build()
+        def jsonConverter = javersTestAssemblyTypeSafe().jsonConverter
 
         when:
         def jsonText = jsonConverter.toJson(new AtomicHolder(primitive))

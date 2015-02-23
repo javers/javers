@@ -52,7 +52,7 @@ class MongoRepositoryIntTest extends Specification {
         def commitFactory = javersTestBuilder.commitFactory
 
         def kazik = new DummyUser("kazik")
-        def id = InstanceIdDTO.instanceId("kazik", DummyUser)
+        def id = javersTestBuilder.javers().idBuilder().instanceId(new DummyUser("kazik"))
 
         when:
         //persist
@@ -96,7 +96,7 @@ class MongoRepositoryIntTest extends Specification {
         def db = new Fongo("myDb").mongo.getDB("test")
         def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
         def commitFactory = javersTestBuilder.commitFactory
-        def id = InstanceIdDTO.instanceId("kazik", DummyUser)
+        def id = javersTestBuilder.javers().idBuilder().instanceId(new DummyUser("kazik"))
 
         //create entity & persist commit
         def kazik = new DummyUser("kazik")
@@ -128,7 +128,7 @@ class MongoRepositoryIntTest extends Specification {
         javers.commit("andy", kazikV1)
         javers.commit("andy", kazikV2)
 
-        def id = InstanceIdDTO.instanceId("kazik", DummyUser)
+        def id = javersTestBuilder.javers().idBuilder().instanceId(new DummyUser("kazik"))
 
         when:
         def history = mongoRepository.getStateHistory(id, 2)
