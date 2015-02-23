@@ -22,7 +22,6 @@ public class JaversSqlRepository implements JaversRepository {
     private final GlobalIdRepository globalIdRepository;
     private final CdoSnapshotRepository cdoSnapshotRepository;
     private final CdoSnapshotFinder finder;
-    public  final ThreadLocal<String> sessionId = new ThreadLocal<>();
 
     public JaversSqlRepository(CommitMetadataRepository commitRepository,
                                GlobalIdRepository globalIdRepository,
@@ -46,8 +45,6 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public void persist(Commit commit) {
-        globalIdRepository.evictCache();
-
         Optional<Long> primaryKey = commitRepository.getCommitPrimaryKey(commit);
 
         if (primaryKey.isPresent()) {

@@ -8,8 +8,6 @@ import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.SnapshotFactory;
-import org.javers.core.metamodel.object.SnapshotType;
-import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +21,9 @@ import java.util.List;
 class GraphSnapshotFactory {
 
     private final SnapshotFactory snapshotFactory;
-    private final JaversExtendedRepository javersRepository;
 
-    GraphSnapshotFactory(SnapshotFactory snapshotFactory, JaversExtendedRepository javersRepository) {
+    GraphSnapshotFactory(SnapshotFactory snapshotFactory) {
         this.snapshotFactory = snapshotFactory;
-        this.javersRepository = javersRepository;
     }
 
     /**
@@ -41,9 +37,9 @@ class GraphSnapshotFactory {
         for (ObjectNode node : currentVersion.nodes()) {
             boolean initial = isInitial(node, latestShadowGraph);
 
-            Optional<CdoSnapshot> existing = javersRepository.getLatest(node.getGlobalId());
+           Optional<CdoSnapshot> existing = latestShadowGraph.get(node.getGlobalId());
 
-            CdoSnapshot fresh = createFreshSnapshot(initial, node, commitMetadata);
+           CdoSnapshot fresh = createFreshSnapshot(initial, node, commitMetadata, existing);
 
             if (existing.isEmpty()) {
                 result.add(fresh); //when insert
@@ -60,20 +56,17 @@ class GraphSnapshotFactory {
         return result;
     }
 
-    private CdoSnapshot createFreshSnapshot(boolean initial, ObjectNode node, CommitMetadata commitMetadata){
+    private CdoSnapshot createFreshSnapshot(boolean initial, ObjectNode node, CommitMetadata commitMetadata, Optional<CdoSnapshot> previous){
         if (initial){
             return snapshotFactory.createInitial(node, commitMetadata);
         }
         else{
-            return snapshotFactory.create(node, commitMetadata);
+            //we take previous globalId because it could be PersistentGlobalId
+            return snapshotFactory.create(node, previous.get().getGlobalId(), commitMetadata);
         }
     }
 
-    List<CdoSnapshot> create(LiveGraph currentVersion, CommitMetadata commitMetadata) {
-        return create(currentVersion, ShadowGraph.EMPTY, commitMetadata);
-    }
-
     private boolean isInitial(ObjectNode node, ShadowGraph latestShadowGraph){
-        return !latestShadowGraph.nodes().contains(node);
+        return !latestShadowGraph.contains(node);
     }
 }

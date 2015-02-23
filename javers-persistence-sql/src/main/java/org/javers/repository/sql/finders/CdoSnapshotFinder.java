@@ -35,7 +35,7 @@ public class CdoSnapshotFinder {
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         PersistentGlobalId persistentGlobalId = globalIdRepository.findPersistedGlobalId(globalId);
-        if (!persistentGlobalId.found()){
+        if (!persistentGlobalId.persisted()){
             return Optional.empty();
         }
 
@@ -50,7 +50,7 @@ public class CdoSnapshotFinder {
 
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
         PersistentGlobalId persistentGlobalId = globalIdRepository.findPersistedGlobalId(globalId);
-        if (!persistentGlobalId.found()){
+        if (!persistentGlobalId.persisted()){
             return Collections.emptyList();
         }
 
@@ -98,8 +98,8 @@ public class CdoSnapshotFinder {
 
                 SnapshotType snapshotType = SnapshotType.valueOf(resultSet.getString(SNAPSHOT_TYPE));
                 CdoSnapshotState state =
-                        jsonConverter.snapshotStateFromJson(resultSet.getString(SNAPSHOT_STATE), globalId.getInstance());
-                CdoSnapshotBuilder builder = CdoSnapshotBuilder.cdoSnapshot(globalId.getInstance(), commit);
+                        jsonConverter.snapshotStateFromJson(resultSet.getString(SNAPSHOT_STATE), globalId);
+                CdoSnapshotBuilder builder = CdoSnapshotBuilder.cdoSnapshot(globalId, commit);
                 builder.withType(snapshotType);
                 return builder.withState(state).build();
             }

@@ -112,7 +112,7 @@ public class ObjectNode {
     }
 
 
-    Cdo getCdo() {
+    public Cdo getCdo() {
         return cdo;
     }
 

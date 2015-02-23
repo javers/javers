@@ -1,51 +1,42 @@
 package org.javers.repository.sql.reposiotries;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.JaversException;
+import org.javers.common.validation.Validate;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.GlobalId;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
-import org.slf4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
+import static org.javers.common.validation.Validate.conditionFulfilled;
 import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class GlobalIdRepository {
-    private static final Logger logger = getLogger(GlobalIdRepository.class);
 
     private PolyJDBC polyJdbc;
     private JsonConverter jsonConverter;
-    private ThreadLocal<GlobalIdCache> cache = new ThreadLocal<GlobalIdCache>() {
-        protected GlobalIdCache initialValue() {
-            return new GlobalIdCache(5_000, 5);
-        }
-    };
-
-    private Map<String, Optional<Long>> dummyIdCache = new HashMap<>();
 
     public GlobalIdRepository(PolyJDBC javersPolyjdbc) {
         this.polyJdbc = javersPolyjdbc;
     }
 
+    public PersistentGlobalId findPersistedGlobalId(GlobalId globalId) {
+        if (globalId instanceof PersistentGlobalId) {
+            PersistentGlobalId persistentGlobalId = (PersistentGlobalId) globalId;
+            conditionFulfilled(persistentGlobalId.persisted(), "unexpected empty persistentGlobalId: " + globalId.value());
+            //already persisted
+            return persistentGlobalId;
+        }
+
+        Optional<Long> globalIdPrimaryKey = findGlobalIdPk(globalId);
+        return new PersistentGlobalId(globalId, globalIdPrimaryKey);
+    }
+
     public long getOrInsertId(GlobalId globalId) {
         PersistentGlobalId lookup = findPersistedGlobalId(globalId);
 
-        return lookup.found() ? lookup.getPrimaryKey() : insert(globalId);
-    }
-
-    public void evictCache(){
-        cache().evict();
+        return lookup.persisted() ? lookup.getPrimaryKey() : insert(globalId);
     }
 
     public long getOrInsertClass(GlobalId globalId) {
@@ -53,17 +44,6 @@ public class GlobalIdRepository {
         Optional<Long> lookup = findClassPk(cdoClass);
 
         return lookup.isPresent() ? lookup.get() : insertClass(cdoClass);
-    }
-
-    public PersistentGlobalId findPersistedGlobalId(GlobalId globalId) {
-        //cached
-        Optional<Long> globalIdPrimaryKey = cache().load(globalId);
-
-        return new PersistentGlobalId(globalId, globalIdPrimaryKey);
-    }
-
-    private GlobalIdCache cache() {
-        return cache.get();
     }
 
     private Optional<Long> findGlobalIdPk(GlobalId globalId){
@@ -92,9 +72,6 @@ public class GlobalIdRepository {
 
         long globalIdPk = polyJdbc.queryRunner().insert(insertGlobalIdQuery);
 
-        //cache write
-        cache().explicitPut(globalId, globalIdPk);
-
         return globalIdPk;
     }
 
@@ -122,38 +99,4 @@ public class GlobalIdRepository {
         this.jsonConverter = JSONConverter;
     }
 
-    private class GlobalIdCache {
-        private LoadingCache<GlobalId, Optional<Long>> primaryKeys;
-
-        GlobalIdCache(long maxSize, long timeToLiveSeconds) {
-            logger.info("initializing cache for GlobalId primaryKeys, maxSize: "+maxSize + ", timeToLive: " +timeToLiveSeconds+"s");
-
-            primaryKeys = CacheBuilder.newBuilder()
-                    .maximumSize(maxSize)
-                    .expireAfterWrite(timeToLiveSeconds, TimeUnit.SECONDS)
-                    .build(
-                            new CacheLoader<GlobalId, Optional<Long>>() {
-                                @Override
-                                public Optional<Long> load(GlobalId key) throws Exception {
-                                    return findGlobalIdPk(key);
-                                }
-                            });
-        }
-
-        void explicitPut(GlobalId globalId, long primaryKey) {
-            primaryKeys.put(globalId, Optional.of(primaryKey));
-        }
-
-        Optional<Long> load(GlobalId globalId) {
-            try {
-                return primaryKeys.get(globalId);
-            } catch (RuntimeException | ExecutionException e) {
-                throw new JaversException(e.getCause());
-            }
-        }
-
-        void evict(){
-            primaryKeys.invalidateAll();
-        }
-    }
 }

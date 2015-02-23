@@ -27,10 +27,6 @@ public class SnapshotFactory {
         this.globalIdFactory = globalIdFactory;
     }
 
-    CdoSnapshot create(Object liveCdo, GlobalId id, CommitMetadata commitMetadata) {
-        return create(liveCdo, id, commitMetadata, UPDATE);
-    }
-
     /**
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
@@ -68,8 +64,8 @@ public class SnapshotFactory {
         return create(objectNode.wrappedCdo().get(), objectNode.getGlobalId(), commitMetadata, INITIAL);
     }
 
-    public CdoSnapshot create(ObjectNode objectNode, CommitMetadata commitMetadata) {
-        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalId(), commitMetadata, UPDATE);
+    public CdoSnapshot create(ObjectNode objectNode, GlobalId globalId, CommitMetadata commitMetadata) {
+        return create(objectNode.wrappedCdo().get(), globalId, commitMetadata, UPDATE);
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {

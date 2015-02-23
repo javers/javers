@@ -2,13 +2,13 @@ package org.javers.repository.sql.reposiotries;
 
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Property;
 
 /**
 * @author bartosz walacik
 */
-public class PersistentGlobalId {
+public class PersistentGlobalId extends GlobalId{
     private GlobalId instance;
     private Optional<Long> primaryKey;
 
@@ -18,19 +18,31 @@ public class PersistentGlobalId {
         this.primaryKey = primaryKey;
     }
 
-    public boolean found() {
+    public boolean persisted() {
         return primaryKey.isPresent();
-    }
-
-    public Property getProperty(String name) {
-        return instance.getCdoClass().getProperty(name);
-    }
-
-    public GlobalId getInstance() {
-        return instance;
     }
 
     public long getPrimaryKey() {
         return primaryKey.get();
+    }
+
+    @Override
+    public ManagedClass getCdoClass() {
+        return instance.getCdoClass();
+    }
+
+    @Override
+    public Object getCdoId() {
+        return instance.getCdoId();
+    }
+
+    @Override
+    public String value() {
+        return instance.value();
+    }
+
+    @Override
+    public int hashCode() {
+        return instance.hashCode();
     }
 }
