@@ -28,7 +28,7 @@ class OnSaveAuditChangeHandlerTest extends Specification {
 
     def "Should commit new version"() {
         when:
-        sut.onAfterRepositoryCall(repositoryMetadata, domainObject)
+        sut.handle(repositoryMetadata, domainObject)
 
         then:
         1 * javers.commit(AUTHOR_NAME, domainObject)
@@ -37,7 +37,7 @@ class OnSaveAuditChangeHandlerTest extends Specification {
 
     def "Should fail to commit new version as data is not a valid domain object"() {
         when:
-        sut.onAfterRepositoryCall(repositoryMetadata, "foo")
+        sut.handle(repositoryMetadata, "foo")
 
         then:
         def ex = thrown(IllegalArgumentException.class)

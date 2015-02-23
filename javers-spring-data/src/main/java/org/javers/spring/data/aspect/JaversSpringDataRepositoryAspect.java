@@ -25,8 +25,6 @@ import java.util.Collections;
 public class JaversSpringDataRepositoryAspect {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JaversSpringDataRepositoryAspect.class);
-    private final Javers javers;
-    private final AuthorProvider authorProvider;
     private final AuditChangeHandler saveHandler;
     private final AuditChangeHandler deleteHandler;
 
@@ -35,12 +33,10 @@ public class JaversSpringDataRepositoryAspect {
     }
 
     public JaversSpringDataRepositoryAspect(Javers javers, AuthorProvider authorProvider) {
-        this(javers, authorProvider, new OnSaveAuditChangeHandler(javers, authorProvider), new OnDeleteAuditChangeHandler(javers, authorProvider));
+        this(new OnSaveAuditChangeHandler(javers, authorProvider), new OnDeleteAuditChangeHandler(javers, authorProvider));
     }
 
-    protected JaversSpringDataRepositoryAspect(Javers javers, AuthorProvider authorProvider, AuditChangeHandler saveHandler, AuditChangeHandler deleteHandler) {
-        this.javers = javers;
-        this.authorProvider = authorProvider;
+    protected JaversSpringDataRepositoryAspect(AuditChangeHandler saveHandler, AuditChangeHandler deleteHandler) {
         this.saveHandler = saveHandler;
         this.deleteHandler = deleteHandler;
     }
@@ -59,11 +55,11 @@ public class JaversSpringDataRepositoryAspect {
     private Object onVersionEvent(ProceedingJoinPoint pjp, AuditChangeHandler handler) throws Throwable {
         if (isVersionedRepository(pjp)) {
             RepositoryMetadata metadata = getMetadata(pjp);
-            Iterable<Object> toBeProcessed = getObjectList(pjp);
+            Iterable<Object> domainObjects = getDomainObjectsFromMethodArgumentsOfJoinPoint(pjp);
 
             Object retVal = pjp.proceed();
 
-            applyVersionChanges(metadata, toBeProcessed, handler);
+            applyVersionChanges(metadata, domainObjects, handler);
             return retVal;
         }
         return pjp.proceed();
@@ -90,7 +86,7 @@ public class JaversSpringDataRepositoryAspect {
         return Optional.empty();
     }
 
-    private Iterable<Object> getObjectList(ProceedingJoinPoint pjp) {
+    private Iterable<Object> getDomainObjectsFromMethodArgumentsOfJoinPoint(ProceedingJoinPoint pjp) {
         if (pjp.getArgs() != null && pjp.getArgs().length > 0) {
             Object arg = pjp.getArgs()[0];
             if (arg instanceof Collection) {
@@ -102,15 +98,15 @@ public class JaversSpringDataRepositoryAspect {
         return Collections.EMPTY_LIST;
     }
 
-    private void applyVersionChanges(RepositoryMetadata metadata, Iterable<Object> obj, AuditChangeHandler handler) {
-        for (Object o : obj) {
-            applyVersionChange(metadata, o, handler);
+    private void applyVersionChanges(RepositoryMetadata metadata, Iterable<Object> domainObjects, AuditChangeHandler handler) {
+        for (Object domainObject : domainObjects) {
+            applyVersionChange(metadata, domainObject, handler);
         }
     }
 
-    private void applyVersionChange(RepositoryMetadata metadata, Object changeObject, AuditChangeHandler handler) {
-        LOGGER.info("Commit new version " + changeObject.toString());
-        handler.onAfterRepositoryCall(metadata, changeObject);
+    private void applyVersionChange(RepositoryMetadata metadata, Object domainObject, AuditChangeHandler handler) {
+        LOGGER.info("Commit new version " + domainObject.toString());
+        handler.handle(metadata, domainObject);
     }
 
 }

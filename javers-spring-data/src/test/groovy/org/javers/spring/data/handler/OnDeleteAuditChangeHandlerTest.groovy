@@ -28,7 +28,7 @@ class OnDeleteAuditChangeHandlerTest extends Specification {
 
     def "Should commit delete by object"() {
         when:
-        sut.onAfterRepositoryCall(repositoryMetadata, domainObject)
+        sut.handle(repositoryMetadata, domainObject)
 
         then:
         1 * javers.commitShallowDelete(AUTHOR_NAME, domainObject)
@@ -40,7 +40,7 @@ class OnDeleteAuditChangeHandlerTest extends Specification {
         def id = UUID.randomUUID().toString();
 
         when:
-        sut.onAfterRepositoryCall(repositoryMetadata, id)
+        sut.handle(repositoryMetadata, id)
 
         then:
         1 * javers.commitShallowDeleteById(AUTHOR_NAME, _)
@@ -48,7 +48,7 @@ class OnDeleteAuditChangeHandlerTest extends Specification {
 
     def "Should fail to delete as object type does not match repository type"() {
         when:
-        sut.onAfterRepositoryCall(repositoryMetadata, BigDecimal.TEN)
+        sut.handle(repositoryMetadata, BigDecimal.TEN)
 
         then:
         def ex = thrown(IllegalArgumentException.class)

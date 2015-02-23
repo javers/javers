@@ -33,7 +33,7 @@ class JaversSpringDataRepositoryAspectTest extends Specification {
         sut.onSaveExecuted(pjp)
 
         then:
-        1 * saveHandler.onAfterRepositoryCall(_, changedObject)
+        1 * saveHandler.handle(_, changedObject)
     }
 
     def "Should trigger save handler for multiple objects"(){
@@ -46,7 +46,7 @@ class JaversSpringDataRepositoryAspectTest extends Specification {
         sut.onSaveExecuted(pjp)
 
         then:
-        2 * saveHandler.onAfterRepositoryCall(_, changedObject)
+        2 * saveHandler.handle(_, changedObject)
     }
 
     def "Should trigger delete handler for single object"(){
@@ -58,7 +58,7 @@ class JaversSpringDataRepositoryAspectTest extends Specification {
         sut.onDeleteExecuted(pjp)
 
         then:
-        1 * deleteHandler.onAfterRepositoryCall(_, changedObject)
+        1 * deleteHandler.handle(_, changedObject)
     }
 
     def "Should trigger delete handler for multiple objects"(){
@@ -71,7 +71,7 @@ class JaversSpringDataRepositoryAspectTest extends Specification {
         sut.onDeleteExecuted(pjp)
 
         then:
-        2 * deleteHandler.onAfterRepositoryCall(_, changedObject)
+        2 * deleteHandler.handle(_, changedObject)
     }
 
     def initRepository(){

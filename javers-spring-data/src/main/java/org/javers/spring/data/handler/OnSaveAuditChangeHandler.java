@@ -13,9 +13,9 @@ public class OnSaveAuditChangeHandler extends AbstractAuditChangeHandler{
     }
 
     @Override
-    public void onAfterRepositoryCall(RepositoryMetadata repositoryMetadata, Object changedObject) {
-        if(isDomainClass(repositoryMetadata, changedObject)){
-            javers.commit(authorProvider.provide(), changedObject);
+    public void handle(RepositoryMetadata repositoryMetadata, Object domainObject) {
+        if(isDomainClass(repositoryMetadata, domainObject)){
+            javers.commit(authorProvider.provide(), domainObject);
         }else {
             throw new IllegalArgumentException("Domain object expected");
         }
