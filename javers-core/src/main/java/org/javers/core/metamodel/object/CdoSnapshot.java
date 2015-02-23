@@ -1,17 +1,15 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.common.collections.Defaults;
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
-import static org.javers.core.metamodel.object.SnapshotType.*;
+import static org.javers.core.metamodel.object.SnapshotType.INITIAL;
+import static org.javers.core.metamodel.object.SnapshotType.TERMINAL;
 
 /**
  * Captured state of client's domain object.
@@ -22,13 +20,13 @@ import static org.javers.core.metamodel.object.SnapshotType.*;
  */
 public final class CdoSnapshot extends Cdo {
     private CommitMetadata commitMetadata;
-    private final Map<Property, Object> state;
+    private final CdoSnapshotState state;
     private final SnapshotType type;
 
     /**
      * should be assembled by {@link CdoSnapshotBuilder}
      */
-    CdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata, Map<Property, Object> state, SnapshotType type) {
+    CdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata, CdoSnapshotState state, SnapshotType type) {
         super(globalId);
         Validate.argumentsAreNotNull(state, commitMetadata, type);
         this.state = state;
@@ -50,12 +48,7 @@ public final class CdoSnapshot extends Cdo {
 
     @Override
     public Object getPropertyValue(Property property) {
-        Validate.argumentIsNotNull(property);
-        Object val = state.get(property);
-        if (val == null){
-            return Defaults.defaultValue(property.getType());
-        }
-        return val;
+        return state.getPropertyValue(property);
     }
 
     @Override
@@ -66,8 +59,7 @@ public final class CdoSnapshot extends Cdo {
 
     @Override
     public boolean isNull(Property property) {
-        Validate.argumentIsNotNull(property);
-        return !state.containsKey(property);
+        return state.isNull(property);
     }
 
     public CommitId getCommitId() {
@@ -88,10 +80,14 @@ public final class CdoSnapshot extends Cdo {
     }
 
     /**
-     * returns non null properties
+     * returns non null properties Set
      */
     public Set<Property> getProperties() {
-        return Collections.unmodifiableSet(state.keySet());
+        return state.getProperties();
+    }
+
+    public CdoSnapshotState getState() {
+        return state;
     }
 
     public boolean isInitial() {

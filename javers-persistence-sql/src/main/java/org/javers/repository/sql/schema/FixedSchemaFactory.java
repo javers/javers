@@ -14,65 +14,44 @@ import java.util.TreeMap;
  */
 public class FixedSchemaFactory {
 
-    public static final String SNAP_PROPERTY_TABLE_NAME =  "jv_snapshot_property";
-    public static final String SNAP_PROPERTY_PK =          "snapshot_property_pk";
-    public static final String SNAP_PROPERTY_SNAPSHOT_FK = "snapshot_fk";
-    public static final String SNAP_PROPERTY_NAME =         "name";
-    public static final String SNAP_PROPERTY_VALUE =        "value";
-    public static final String SNAP_PROPERTY_PK_SEQ = "jv_snapshot_property_pk_seq";
-
-    public static final String CDO_CLASS_TABLE_NAME = "jv_cdo_class";
-    public static final String CDO_CLASS_PK =         "cdo_class_pk";
+    public static final String CDO_CLASS_TABLE_NAME =     "jv_cdo_class";
+    public static final String CDO_CLASS_PK =             "cdo_class_pk";
     public static final String CDO_CLASS_QUALIFIED_NAME = "qualified_name";
-    public static final String CDO_PK_SEQ_NAME = "jv_cdo_class_pk_seq";
+    public static final String CDO_PK_SEQ_NAME =          "jv_cdo_class_pk_seq";
 
     public static final String GLOBAL_ID_TABLE_NAME = "jv_global_id";
     public static final String GLOBAL_ID_PK =         "global_id_pk";
     public static final String GLOBAL_ID_CLASS_FK =   "cdo_class_fk";
     public static final String GLOBAL_ID_LOCAL_ID =   "local_id";
-    public static final String GLOBAL_ID_PK_SEQ = "jv_global_id_pk_seq";
+    public static final String GLOBAL_ID_PK_SEQ =     "jv_global_id_pk_seq";
 
     public static final String COMMIT_TABLE_NAME =    "jv_commit";
-    public static final String COMMIT_TABLE_PK =      "commit_pk";
-    public static final String COMMIT_TABLE_AUTHOR =  "author";
-    public static final String COMMIT_TABLE_COMMIT_DATE = "commit_date";
-    public static final String COMMIT_TABLE_COMMIT_ID =   "commit_id";
-    public static final String COMMIT_TABLE_PK_SEQ = "jv_commit_pk_seq";
+    public static final String COMMIT_PK =            "commit_pk";
+    public static final String COMMIT_AUTHOR =        "author";
+    public static final String COMMIT_COMMIT_DATE =   "commit_date";
+    public static final String COMMIT_COMMIT_ID =     "commit_id";
+    public static final String COMMIT_PK_SEQ =        "jv_commit_pk_seq";
 
-    public static final String SNAPSHOT_TABLE_NAME = "jv_snapshot";
-    public static final String SNAPSHOT_TABLE_PK =   "snapshot_pk";
-    public static final String SNAPSHOT_TABLE_COMMIT_FK = "commit_fk";
-    public static final String SNAPSHOT_TABLE_GLOBAL_ID_FK = "global_id_fk";
-    public static final String SNAPSHOT_TABLE_TYPE = "type";
+    public static final String SNAPSHOT_TABLE_NAME =   "jv_snapshot";
+    public static final String SNAPSHOT_PK =           "snapshot_pk";
+    public static final String SNAPSHOT_COMMIT_FK =    "commit_fk";
+    public static final String SNAPSHOT_GLOBAL_ID_FK = "global_id_fk";
+    public static final String SNAPSHOT_TYPE =         "type";
     public static final String SNAPSHOT_TABLE_PK_SEQ = "jv_snapshot_pk_seq";
-
-
-    private Schema snapshotPropertyTableSchema(Dialect dialect, String tableName){
-        Schema schema = new Schema(dialect);
-        RelationBuilder relationBuilder = schema.addRelation(tableName);
-        primaryKey(tableName, SNAP_PROPERTY_PK, schema, relationBuilder);
-        relationBuilder
-                .withAttribute().string(SNAP_PROPERTY_NAME).withMaxLength(200).and()
-                .withAttribute().text(SNAP_PROPERTY_VALUE).and();
-        foreignKey(tableName, SNAP_PROPERTY_SNAPSHOT_FK, SNAPSHOT_TABLE_NAME, SNAPSHOT_TABLE_PK, relationBuilder, schema);
-        relationBuilder.build();
-
-        foreignKeyIndex(tableName, SNAP_PROPERTY_SNAPSHOT_FK, schema);
-
-        return schema;
-    }
+    public static final String SNAPSHOT_STATE =        "state";
 
     private Schema snapshotTableSchema(Dialect dialect, String tableName){
         Schema schema = new Schema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName);
-        primaryKey(tableName, SNAPSHOT_TABLE_PK, schema, relationBuilder);
-        relationBuilder.withAttribute().string(SNAPSHOT_TABLE_TYPE).withMaxLength(200).and();
-        foreignKey(tableName, SNAPSHOT_TABLE_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);
-        foreignKey(tableName, SNAPSHOT_TABLE_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_TABLE_PK, relationBuilder, schema);
+        primaryKey(tableName, SNAPSHOT_PK, schema, relationBuilder);
+        relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
+                       .withAttribute().text(SNAPSHOT_STATE).and();
+        foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);
+        foreignKey(tableName, SNAPSHOT_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder, schema);
         relationBuilder.build();
 
-        foreignKeyIndex(tableName, SNAPSHOT_TABLE_GLOBAL_ID_FK, schema);
-        foreignKeyIndex(tableName, SNAPSHOT_TABLE_COMMIT_FK, schema);
+        columnIndex(tableName, SNAPSHOT_GLOBAL_ID_FK, schema);
+        columnIndex(tableName, SNAPSHOT_COMMIT_FK, schema);
 
         return schema;
     }
@@ -80,12 +59,15 @@ public class FixedSchemaFactory {
     private Schema commitTableSchema(Dialect dialect, String tableName) {
         Schema schema = new Schema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName);
-        primaryKey(tableName, COMMIT_TABLE_PK,schema,relationBuilder);
+        primaryKey(tableName, COMMIT_PK,schema,relationBuilder);
         relationBuilder
-                .withAttribute().string(COMMIT_TABLE_AUTHOR).withMaxLength(200).and()
-                .withAttribute().timestamp(COMMIT_TABLE_COMMIT_DATE).and()
-                .withAttribute().string(COMMIT_TABLE_COMMIT_ID).withMaxLength(10).and()
+                .withAttribute().string(COMMIT_AUTHOR).withMaxLength(200).and()
+                .withAttribute().timestamp(COMMIT_COMMIT_DATE).and()
+                .withAttribute().string(COMMIT_COMMIT_ID).withMaxLength(12).and()
                 .build();
+
+        columnIndex(tableName, COMMIT_COMMIT_ID, schema);
+
         return schema;
     }
 
@@ -93,7 +75,7 @@ public class FixedSchemaFactory {
         Schema schema = new Schema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         primaryKey(tableName, CDO_CLASS_PK, schema,relationBuilder);
-        relationBuilder.withAttribute().string(CDO_CLASS_QUALIFIED_NAME).withMaxLength(100).and()
+        relationBuilder.withAttribute().string(CDO_CLASS_QUALIFIED_NAME).withMaxLength(200).and()
                 .build();
         return schema;
     }
@@ -103,11 +85,12 @@ public class FixedSchemaFactory {
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         primaryKey(tableName, GLOBAL_ID_PK, schema,relationBuilder);
         relationBuilder
-                .withAttribute().text(GLOBAL_ID_LOCAL_ID).and();
+                .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(200).and();
         foreignKey(tableName, GLOBAL_ID_CLASS_FK, CDO_CLASS_TABLE_NAME, CDO_CLASS_PK, relationBuilder, schema);
         relationBuilder.build();
 
-        foreignKeyIndex(tableName, GLOBAL_ID_CLASS_FK, schema);
+        columnIndex(tableName, GLOBAL_ID_CLASS_FK, schema);
+        columnIndex(tableName, GLOBAL_ID_LOCAL_ID, schema);
 
         return schema;
     }
@@ -118,8 +101,8 @@ public class FixedSchemaFactory {
                 .foreignKey(tableName + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName).and();
     }
 
-    private void foreignKeyIndex(String tableName, String fkColName, Schema schema){
-        schema.addIndex(tableName+"_"+ fkColName +"_idx").indexing(fkColName).on(tableName).build();
+    private void columnIndex(String tableName, String colName, Schema schema){
+        schema.addIndex(tableName+"_"+ colName +"_idx").indexing(colName).on(tableName).build();
     }
 
     private void primaryKey(String tableName, String pkColName, Schema schema, RelationBuilder relationBuilder) {
@@ -136,7 +119,6 @@ public class FixedSchemaFactory {
         schema.put(GLOBAL_ID_TABLE_NAME, globalIdTableSchema(dialect, GLOBAL_ID_TABLE_NAME));
         schema.put(COMMIT_TABLE_NAME,    commitTableSchema(dialect, COMMIT_TABLE_NAME));
         schema.put(SNAPSHOT_TABLE_NAME,  snapshotTableSchema(dialect, SNAPSHOT_TABLE_NAME));
-        schema.put(SNAP_PROPERTY_TABLE_NAME,  snapshotPropertyTableSchema(dialect, SNAP_PROPERTY_TABLE_NAME));
 
         return schema;
     }

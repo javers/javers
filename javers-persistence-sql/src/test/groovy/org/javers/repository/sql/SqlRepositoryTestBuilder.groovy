@@ -21,11 +21,6 @@ class SqlRepositoryTestBuilder {
         return builder.getContainerComponent(ofClass)
     }
 
-    def withJSONConverter(JsonConverter jsonConverter) {
-        builder.withJSONConverter(jsonConverter)
-        this
-    }
-
     def build() {
         builder.build()
     }
