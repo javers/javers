@@ -1,8 +1,8 @@
 package org.javers.spring.integration;
 
 import org.javers.spring.AuthorProvider;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author bartosz walacik
