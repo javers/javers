@@ -6,6 +6,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
+import org.javers.repository.sql.PolyUtil;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
@@ -17,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 /**
@@ -24,40 +26,32 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
  */
 public class CommitMetadataRepository {
 
-    private final PolyJDBC javersPolyJDBC;
+    private final PolyJDBC polyJDBC;
     private JsonConverter jsonConverter;
 
-    public CommitMetadataRepository(PolyJDBC javersPolyjdbc) {
-        this.javersPolyJDBC = javersPolyjdbc;
+
+    public CommitMetadataRepository(PolyJDBC polyjdbc) {
+        this.polyJDBC = polyjdbc;
     }
 
     public long save(String author, LocalDateTime date, CommitId commitId) {
-        InsertQuery query = javersPolyJDBC.query().insert().into(COMMIT_TABLE_NAME)
-                .value(COMMIT_TABLE_AUTHOR, author)
-                .value(COMMIT_TABLE_COMMIT_DATE, toTimestamp(date))
-                .value(COMMIT_TABLE_COMMIT_ID, commitId.value())
-                .sequence(COMMIT_TABLE_PK, COMMIT_TABLE_PK_SEQ);
+        InsertQuery query = polyJDBC.query().insert().into(COMMIT_TABLE_NAME)
+                .value(COMMIT_AUTHOR, author)
+                .value(COMMIT_COMMIT_DATE, toTimestamp(date))
+                .value(COMMIT_COMMIT_ID, commitId.value())
+                .sequence(COMMIT_PK, COMMIT_PK_SEQ);
 
-        return javersPolyJDBC.queryRunner().insert(query);
+        return polyJDBC.queryRunner().insert(query);
     }
 
     public Optional<Long> getCommitPrimaryKey(Commit commit) {
-        SelectQuery selectQuery = javersPolyJDBC.query()
-                .select(COMMIT_TABLE_PK)
+        SelectQuery selectQuery = polyJDBC.query()
+                .select(COMMIT_PK)
                 .from(COMMIT_TABLE_NAME)
-                .where(COMMIT_TABLE_AUTHOR + " = :author " +
-                        "AND " + COMMIT_TABLE_COMMIT_DATE + " = :date " +
-                        "AND " + COMMIT_TABLE_COMMIT_ID + " = :id")
-                .withArgument("author", commit.getAuthor())
-                .withArgument("date", toTimestamp(commit.getCommitDate()))
+                .where(COMMIT_COMMIT_ID + " = :id")
                 .withArgument("id", commit.getId().value());
 
-        return Optional.fromNullable(javersPolyJDBC.queryRunner().queryUnique(selectQuery, new ObjectMapper<Long>() {
-            @Override
-            public Long createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getLong(COMMIT_TABLE_PK);
-            }
-        }, false));
+        return PolyUtil.queryForOptionalLong(selectQuery, polyJDBC);
     }
 
     private Timestamp toTimestamp(LocalDateTime commitMetadata) {
@@ -65,41 +59,35 @@ public class CommitMetadataRepository {
     }
 
     public CommitId getCommitHeadId() {
-        Optional<Integer> maxPrimaryKey = selectMaxCommitPrimaryKey();
+        Optional<Long> maxPrimaryKey = selectMaxCommitPrimaryKey();
 
         return maxPrimaryKey.isEmpty() ? null : selectCommitId(maxPrimaryKey.get());
     }
 
-    private Optional<Integer> selectMaxCommitPrimaryKey() {
-        SelectQuery query = javersPolyJDBC.query()
-                .select("MAX(" + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_PK + ") AS " + COMMIT_TABLE_PK)
+    private Optional<Long> selectMaxCommitPrimaryKey() {
+        SelectQuery query = polyJDBC.query()
+                .select("MAX(" + COMMIT_PK + ")")
                 .from(COMMIT_TABLE_NAME);
 
-        List<String> maxPrimaryKey = javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<String>() {
-            @Override
-            public String createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getString(COMMIT_TABLE_PK);
-            }
-        });
+        Optional<Long> result = queryForOptionalLong(query, polyJDBC);
 
-        if (maxPrimaryKey.size() != 1 || maxPrimaryKey.get(0) == null) {
+        if (result.isPresent() && result.get() == 0){
             return Optional.empty();
         }
-
-        return Optional.of(Integer.valueOf(maxPrimaryKey.get(0)));
+        return result;
     }
 
-    private CommitId selectCommitId(int primaryKey) {
-        SelectQuery query = javersPolyJDBC.query()
-                .select(COMMIT_TABLE_NAME + "." + COMMIT_TABLE_COMMIT_ID)
+    private CommitId selectCommitId(long primaryKey) {
+        SelectQuery query = polyJDBC.query()
+                .select(COMMIT_COMMIT_ID)
                 .from(COMMIT_TABLE_NAME)
-                .where(COMMIT_TABLE_PK + " = :maxPrimaryKey")
+                .where(COMMIT_PK + " = :maxPrimaryKey")
                 .withArgument("maxPrimaryKey", primaryKey);
 
-        List<CommitId> commitId = javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<CommitId>() {
+        List<CommitId> commitId = polyJDBC.queryRunner().queryList(query, new ObjectMapper<CommitId>() {
             @Override
             public CommitId createObject(ResultSet resultSet) throws SQLException {
-                return jsonConverter.fromJson(resultSet.getString(COMMIT_TABLE_COMMIT_ID), CommitId.class);
+                return jsonConverter.fromJson(resultSet.getString(COMMIT_COMMIT_ID), CommitId.class);
             }
         });
 

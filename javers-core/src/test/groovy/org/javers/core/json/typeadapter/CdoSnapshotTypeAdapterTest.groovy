@@ -16,6 +16,7 @@ import spock.lang.Specification
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 import static org.javers.core.metamodel.object.SnapshotType.*
+import static org.javers.core.metamodel.object.SnapshotType.UPDATE
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
@@ -57,7 +58,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 .withCharacter('a' as char)
                 .build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUser, id, someCommitMetadata())
+        def snapshot = javers.snapshotFactory.create(dummyUser, id, someCommitMetadata(), UPDATE)
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -83,7 +84,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 .withDetails()
                 .build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUser, id, someCommitMetadata())
+        def snapshot = javers.snapshotFactory.create(dummyUser, id, someCommitMetadata(), UPDATE)
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -101,7 +102,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         def dummyUserDetails = DummyUserDetailsBuilder.dummyUserDetails(1).withAddress("London", "St John Street").build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUserDetails, id, someCommitMetadata())
+        def snapshot = javers.snapshotFactory.create(dummyUserDetails, id, someCommitMetadata(), UPDATE)
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -124,7 +125,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 .withPrimitiveMap([time: new LocalDateTime(2000, 1, 1, 12, 0)])
                 .build()
 
-        def snapshot = javers.snapshotFactory.create(dummyUser, id, someCommitMetadata())
+        def snapshot = javers.snapshotFactory.create(dummyUser, id, someCommitMetadata(), UPDATE)
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)

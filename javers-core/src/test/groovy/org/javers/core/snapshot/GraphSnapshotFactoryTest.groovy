@@ -32,21 +32,47 @@ class GraphSnapshotFactoryTest extends Specification {
         new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0))
     }
 
-    def "should mark snapshot as initial if not present in latestShadowGraph"() {
+    def "should not mark snapshot as initial even if not present in previous commit but committed before"() {
         given:
-        def cdo = new SnapshotEntity(id: 1, entityRef: new SnapshotEntity(id: 5))
-        def node = javers.createLiveGraph(cdo)
+        def cdo5 = new SnapshotEntity(id: 5)
+        javers.javers().commit("author", cdo5)
 
-        def latestShadowGraph = new ShadowGraph(javers.createLiveGraph(new SnapshotEntity(id: 1)).nodes())
+        def cdo1 = new SnapshotEntity(id: 1)
+        javers.javers().commit("author", cdo1)
 
         when:
-        def snapshots =
-                graphSnapshotFactory.create(node, latestShadowGraph, someCommitMetadata())
+        cdo1.entityRef = cdo5
+        cdo5.intProperty = 1
+        def commit = javers.javers().commit("author", cdo1)
 
         then:
-        assertThat(snapshots).hasSize(2)
-                             .hasInitialSnapshot(instanceId(5, SnapshotEntity))
-                             .hasOrdinarySnapshot(instanceId(1, SnapshotEntity))
+        assertThat(commit.snapshots)
+                .hasSize(2)
+                .hasOrdinarySnapshot(instanceId(5, SnapshotEntity))
+                .hasOrdinarySnapshot(instanceId(1, SnapshotEntity))
+    }
+
+    def "should mark first snapshot as initial"() {
+        given:
+        def cdo = new SnapshotEntity(id: 1)
+
+        when:
+        def commit = javers.javers().commit("author", cdo)
+
+        then:
+        assertThat(commit.snapshots)
+                .hasSize(1)
+                .hasInitialSnapshot(instanceId(1, SnapshotEntity))
+
+        when:
+        cdo.entityRef = new SnapshotEntity(id: 5)
+        commit = javers.javers().commit("author", cdo)
+
+        then:
+        assertThat(commit.snapshots)
+                .hasSize(2)
+                .hasInitialSnapshot(instanceId(5, SnapshotEntity))
+                .hasOrdinarySnapshot(instanceId(1, SnapshotEntity))
     }
 
     def "should flatten straight Entity relation"() {
@@ -55,7 +81,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = graphSnapshotFactory.create(node, someCommitMetadata())
+        def snapshots = graphSnapshotFactory.create(node, ShadowGraph.EMPTY, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(2)
@@ -72,7 +98,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = graphSnapshotFactory.create(node, someCommitMetadata())
+        def snapshots = graphSnapshotFactory.create(node, ShadowGraph.EMPTY, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -87,7 +113,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = graphSnapshotFactory.create(node, someCommitMetadata())
+        def snapshots = graphSnapshotFactory.create(node, ShadowGraph.EMPTY, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(2)
@@ -101,7 +127,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = graphSnapshotFactory.create(node, someCommitMetadata())
+        def snapshots = graphSnapshotFactory.create(node, ShadowGraph.EMPTY, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -117,7 +143,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = graphSnapshotFactory.create(node, someCommitMetadata())
+        def snapshots = graphSnapshotFactory.create(node, ShadowGraph.EMPTY, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -145,7 +171,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = graphSnapshotFactory.create(node, someCommitMetadata())
+        def snapshots = graphSnapshotFactory.create(node, ShadowGraph.EMPTY, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -167,7 +193,7 @@ class GraphSnapshotFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = graphSnapshotFactory.create(node, someCommitMetadata())
+        def snapshots = graphSnapshotFactory.create(node, ShadowGraph.EMPTY, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -192,15 +218,15 @@ class GraphSnapshotFactoryTest extends Specification {
     def "should reuse existing snapshots when nothing changed"() {
         given:
         def cdo = new SnapshotEntity(listOfEntities:    [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
-        def firstCommit = javers.commitFactory.create("author",cdo)
-        javers.javersRepository.persist(firstCommit)
+        def firstCommit = javers.javers().commit("author",cdo)
 
         when:
-        def secondSnapshots = graphSnapshotFactory.create(javers.createLiveGraph(cdo), someCommitMetadata())
+        def secondCommit = javers.javers().commit("author",cdo)
 
         then:
         firstCommit.snapshots.size() == 3
-        !secondSnapshots
+        secondCommit.snapshots.size() == 0
+        secondCommit.changes.size() == 0
     }
 
     def "should reuse existing root snapshot when not changed"() {
@@ -212,12 +238,13 @@ class GraphSnapshotFactoryTest extends Specification {
         when:
         cdo.listOfEntities.get(0).intProperty = 1
         cdo.listOfEntities.get(1).intProperty = 1
-        def secondSnapshots = graphSnapshotFactory.create(javers.createLiveGraph(cdo), someCommitMetadata())
+        def secondCommit = javers.javers().commit("author",cdo)
 
         then:
-        assertThat(secondSnapshots).hasSize(2)
-                                   .hasSnapshot(instanceId(2, SnapshotEntity))
-                                   .hasSnapshot(instanceId(3, SnapshotEntity))
+        assertThat(secondCommit.snapshots)
+                .hasSize(2)
+                .hasSnapshot(instanceId(2, SnapshotEntity))
+                .hasSnapshot(instanceId(3, SnapshotEntity))
     }
 
     def "should reuse existing ref snapshots when not changed"() {
@@ -228,11 +255,12 @@ class GraphSnapshotFactoryTest extends Specification {
 
         when:
         cdo.intProperty = 1
-        def secondSnapshots = graphSnapshotFactory.create(javers.createLiveGraph(cdo), someCommitMetadata())
+        def secondCommit = javers.javers().commit("author",cdo)
 
         then:
-        assertThat(secondSnapshots).hasSize(1)
-                                   .hasSnapshot(instanceId(1, SnapshotEntity))
+        assertThat(secondCommit.snapshots)
+                .hasSize(1)
+                .hasSnapshot(instanceId(1, SnapshotEntity))
     }
 
 }

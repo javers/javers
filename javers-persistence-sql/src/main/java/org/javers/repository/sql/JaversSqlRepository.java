@@ -9,10 +9,10 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.repository.api.JaversRepository;
+import org.javers.repository.sql.finders.CdoSnapshotFinder;
 import org.javers.repository.sql.reposiotries.CdoSnapshotRepository;
 import org.javers.repository.sql.reposiotries.CommitMetadataRepository;
 import org.javers.repository.sql.reposiotries.GlobalIdRepository;
-import org.javers.repository.sql.finders.CdoSnapshotFinder;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
-        return finder.getStateHistory(globalId, globalId.getCdoClass().getName(), limit);
+        return finder.getStateHistory(globalId, limit);
     }
 
     @Override
@@ -51,12 +51,8 @@ public class JaversSqlRepository implements JaversRepository {
             throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT);
         }
 
-        long commitMetadataPk = commitRepository.save(commit.getAuthor(), commit.getCommitDate(), commit.getId());
-
-        for (CdoSnapshot cdoSnapshot : commit.getSnapshots()) {
-            long globalIdPk = globalIdRepository.save(cdoSnapshot.getGlobalId());
-            cdoSnapshotRepository.save(globalIdPk, commitMetadataPk, cdoSnapshot);
-        }
+        long commitPk = commitRepository.save(commit.getAuthor(), commit.getCommitDate(), commit.getId());
+        cdoSnapshotRepository.save(commitPk, commit.getSnapshots());
     }
 
     @Override

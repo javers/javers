@@ -36,7 +36,7 @@ public abstract class GlobalId {
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
-        if (o == null || this.getClass() != o.getClass() ) {return false;}
+        if (o == null || !(o instanceof GlobalId) ) {return false;}
 
         return value().equals(((GlobalId) o).value());
     }

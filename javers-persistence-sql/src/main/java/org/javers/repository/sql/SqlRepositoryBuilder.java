@@ -20,7 +20,6 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
 
     private DialectName dialectName;
     private ConnectionProvider connectionProvider;
-    private JsonConverter jsonConverter;
 
     private SqlRepositoryBuilder() {
     }
@@ -39,11 +38,6 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    public SqlRepositoryBuilder withJSONConverter(JsonConverter jsonConverter) {
-        this.jsonConverter = jsonConverter;
-        return this;
-    }
-
     public JaversSqlRepository build() {
         logger.info("starting up SQL repository module ...");
         bootContainer();
@@ -59,6 +53,7 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
         addComponent(polyJDBC);
         addModule(new JaversSqlModule());
         addComponent(dialectName.getPolyDialect());
+        addComponent(connectionProvider);
         ensureSchema();
         return getContainerComponent(JaversSqlRepository.class);
     }

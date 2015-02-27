@@ -4,11 +4,9 @@ import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.CdoSnapshotBuilder;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.SnapshotType;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.object.*;
+import org.javers.repository.sql.reposiotries.GlobalIdRepository;
+import org.javers.repository.sql.reposiotries.PersistentGlobalId;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
@@ -17,142 +15,54 @@ import org.polyjdbc.core.query.mapper.ObjectMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import static org.javers.repository.sql.PolyUtil.queryForLongList;
+import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CdoSnapshotFinder {
 
-    private final PolyJDBC javersPolyJDBC;
-    private final PropertiesFinder propertiesFinder;
+    private final PolyJDBC polyJDBC;
     private JsonConverter jsonConverter;
+    private GlobalIdRepository globalIdRepository;
 
-    public CdoSnapshotFinder(PolyJDBC javersPolyJDBC, PropertiesFinder propertiesFinder) {
-        this.javersPolyJDBC = javersPolyJDBC;
-        this.propertiesFinder = propertiesFinder;
+    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, PolyJDBC polyJDBC) {
+        this.globalIdRepository = globalIdRepository;
+        this.polyJDBC = polyJDBC;
     }
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        Optional<String> snapshotPk = selectSnapshotPrimaryKey(globalId);
-
-        if (snapshotPk.isEmpty()) return Optional.empty();
-
-        CommitDto commitDto = selectCommitMetadata(snapshotPk);
-        List<SnapshotPropertyDTO> properties = propertiesFinder.findProperties(Integer.valueOf(snapshotPk.get()));
-        
-        CommitMetadata commitMetadata = new CommitMetadata(commitDto.author, commitDto.date, CommitId.valueOf(commitDto.commitId));
-        CdoSnapshot snapshot = assemble(globalId, commitDto, properties, commitMetadata);
-
-        return Optional.of( snapshot );
-    }
-
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, String className, int limit) {
-        List<CommitDto> commits = selectCommit(globalId, className, limit);
-
-        List<CdoSnapshot> snapshots = new ArrayList<>();
-
-        //TODO n + 1 problem
-        for (CommitDto commitDto : commits) {
-            List<SnapshotPropertyDTO> properties = propertiesFinder.findProperties(commitDto.snapshotPk);
-            CommitMetadata commitMetadata = new CommitMetadata(commitDto.author, commitDto.date, CommitId.valueOf(commitDto.commitId));
-
-            snapshots.add( assemble(globalId, commitDto, properties, commitMetadata) );
-        }
-
-        return snapshots;
-    }
-
-    private List<CommitDto> selectCommit(GlobalId cdoId, String className, int limit) {
-        SelectQuery query = javersPolyJDBC.query()
-                .select(SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_PK + ", " +
-                        SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_TYPE + ", " +
-                        COMMIT_TABLE_NAME + "." + COMMIT_TABLE_AUTHOR + ", " +
-                        COMMIT_TABLE_NAME + "." + COMMIT_TABLE_COMMIT_DATE + ", " + COMMIT_TABLE_COMMIT_ID)
-                .from(SNAPSHOT_TABLE_NAME +
-                        " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_TABLE_NAME + "." + COMMIT_TABLE_PK + "=" + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_COMMIT_FK +
-                        " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " ON " + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_PK + "=" + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_GLOBAL_ID_FK +
-                        " INNER JOIN " + CDO_CLASS_TABLE_NAME + " ON " + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_PK + "=" + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_CLASS_FK)
-                .where(GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_LOCAL_ID + " = :localId AND " + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName")
-                .orderBy(SNAPSHOT_TABLE_PK, Order.DESC)
-                .limit(limit)
-                .withArgument("localId", jsonConverter.toJson(cdoId.getCdoId()))
-                .withArgument("qualifiedName", className);
-
-        return javersPolyJDBC.queryRunner().queryList(query, new ObjectMapper<CommitDto>() {
-            @Override
-            public CommitDto createObject(ResultSet resultSet) throws SQLException {
-                return CommitDto.fromResultSet(resultSet);
-            }
-        });
-    }
-
-    private CdoSnapshot assemble(GlobalId globalId,
-                                 CommitDto commitDto,
-                                 List<SnapshotPropertyDTO> properties,
-                                 CommitMetadata commitMetadata) {
-        CdoSnapshotBuilder cdoSnapshotBuilder = CdoSnapshotBuilder.cdoSnapshot(globalId, commitMetadata);
-        cdoSnapshotBuilder.withType(commitDto.snapshotType);
-
-        for (SnapshotPropertyDTO propertyDTO : properties) {
-            Property jProperty = globalId.getCdoClass().getProperty(propertyDTO.getName());
-
-            Object propertyValue = jsonConverter.deserializePropertyValue(jProperty, propertyDTO.getValue());
-            cdoSnapshotBuilder.withPropertyValue(jProperty, propertyValue);
-        }
-
-        return cdoSnapshotBuilder.build();
-    }
-
-    private CommitDto selectCommitMetadata(Optional<String> snapshotPk) {
-        SelectQuery selectQuery2 = javersPolyJDBC.query()
-                .select(SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_PK + ", " +
-                        SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_TYPE + ", " +
-                        COMMIT_TABLE_NAME + "." + COMMIT_TABLE_AUTHOR + ", " +
-                        COMMIT_TABLE_NAME + "." + COMMIT_TABLE_COMMIT_DATE + ", " +
-                        COMMIT_TABLE_NAME + "." + COMMIT_TABLE_COMMIT_ID)
-                .from(SNAPSHOT_TABLE_NAME +
-                      " INNER JOIN " + COMMIT_TABLE_NAME + " ON " +
-                      COMMIT_TABLE_NAME + "." + COMMIT_TABLE_PK + "=" + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_COMMIT_FK)
-                .where(SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_PK + " = :snapshotPk")
-                .withArgument("snapshotPk", Integer.valueOf(snapshotPk.get()));
-
-        List<CommitDto> commitDto = javersPolyJDBC.queryRunner().queryList(selectQuery2, new ObjectMapper<CommitDto>() {
-            @Override
-            public CommitDto createObject(ResultSet resultSet) throws SQLException {
-                return CommitDto.fromResultSet(resultSet);
-            }
-        });
-
-        return commitDto.get(0);
-    }
-
-    private Optional<String> selectSnapshotPrimaryKey(GlobalId globalId) {
-        SelectQuery selectQuery = javersPolyJDBC.query()
-                .select("MAX(" + SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_PK + ") AS " + SNAPSHOT_TABLE_PK)
-                .from(SNAPSHOT_TABLE_NAME +
-                        " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " ON " +
-                        SNAPSHOT_TABLE_NAME + "." + SNAPSHOT_TABLE_GLOBAL_ID_FK + "=" + GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_PK +
-                        " INNER JOIN " + CDO_CLASS_TABLE_NAME + " ON " +
-                        GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_CLASS_FK + "=" + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_PK)
-                .where(GLOBAL_ID_TABLE_NAME + "." + GLOBAL_ID_LOCAL_ID +
-                       " = :localId AND " + CDO_CLASS_TABLE_NAME + "." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName")
-                .withArgument("localId", jsonConverter.toJson(globalId.getCdoId()))
-                .withArgument("qualifiedName", globalId.getCdoClass().getName());
-
-
-        List<String> snapshotPk = javersPolyJDBC.queryRunner().queryList(selectQuery, new ObjectMapper<String>() {
-            @Override
-            public String createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getString(SNAPSHOT_TABLE_PK);
-            }
-        });
-
-        if (snapshotPk.size() != 1 || (snapshotPk.size() == 1 && snapshotPk.get(0) == null)) {
+        PersistentGlobalId persistentGlobalId = globalIdRepository.findPersistedGlobalId(globalId);
+        if (!persistentGlobalId.persisted()){
             return Optional.empty();
         }
 
-        return Optional.of(snapshotPk.get(0));
+        Optional<Long> maxSnapshot = selectMaxSnapshotPrimaryKey(persistentGlobalId);
+
+        if (maxSnapshot.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(getCdoSnapshotsBySnapshotPk(maxSnapshot.get(), maxSnapshot.get(), persistentGlobalId).get(0));
+    }
+
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
+        PersistentGlobalId persistentGlobalId = globalIdRepository.findPersistedGlobalId(globalId);
+        if (!persistentGlobalId.persisted()){
+            return Collections.emptyList();
+        }
+
+        List<Long> latestSnapshots = selectLatestSnapshotPrimaryKeys(persistentGlobalId, limit);
+
+        if (latestSnapshots.isEmpty()){
+            return Collections.emptyList();
+        }
+
+        long maxSnapshotPk = latestSnapshots.get(0);
+        long minSnapshotPk = latestSnapshots.get(latestSnapshots.size()-1);
+        return getCdoSnapshotsBySnapshotPk(minSnapshotPk, maxSnapshotPk, persistentGlobalId);
     }
 
     //TODO dependency injection
@@ -160,24 +70,66 @@ public class CdoSnapshotFinder {
         this.jsonConverter = jsonConverter;
     }
 
-    private static class CommitDto {
-        SnapshotType snapshotType;
-        String author;
-        LocalDateTime date;
-        String commitId;
-        int snapshotPk;
+    private List<CdoSnapshot> getCdoSnapshotsBySnapshotPk(long minSnapshotPk, long maxSnapshotPk, final PersistentGlobalId globalId){
+        SelectQuery query =
+            polyJDBC.query()
+                    .select(SNAPSHOT_STATE + ", " +
+                            SNAPSHOT_TYPE + ", " +
+                            COMMIT_AUTHOR + ", " +
+                            COMMIT_COMMIT_DATE + ", " +
+                            COMMIT_COMMIT_ID)
+                    .from(SNAPSHOT_TABLE_NAME + " INNER JOIN " +
+                          COMMIT_TABLE_NAME + "  ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK)
+                    .where(SNAPSHOT_PK + " between :minSnapshotPk and :maxSnapshotPk AND " +
+                           SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
+                    .orderBy(SNAPSHOT_PK, Order.DESC)
+                    .withArgument("globalIdPk", globalId.getPrimaryKey())
+                    .withArgument("minSnapshotPk", minSnapshotPk)
+                    .withArgument("maxSnapshotPk", maxSnapshotPk);
+        return
+        polyJDBC.queryRunner().queryList(query, new ObjectMapper<CdoSnapshot>() {
+            @Override
+            public CdoSnapshot createObject(ResultSet resultSet) throws SQLException {
 
-        CommitDto() {
-        }
+                String author = resultSet.getString(COMMIT_AUTHOR);
+                LocalDateTime commitDate = new LocalDateTime(resultSet.getTimestamp(COMMIT_COMMIT_DATE));
+                CommitId commitId = CommitId.valueOf(resultSet.getString(COMMIT_COMMIT_ID));
+                CommitMetadata commit = new CommitMetadata(author, commitDate, commitId);
 
-        static CommitDto fromResultSet(ResultSet resultSet) throws SQLException{
-            CommitDto dto = new CommitDto();
-            dto.snapshotPk = resultSet.getInt(SNAPSHOT_TABLE_PK);
-            dto.snapshotType = SnapshotType.valueOf(resultSet.getString(SNAPSHOT_TABLE_TYPE));
-            dto.author = resultSet.getString(COMMIT_TABLE_AUTHOR);
-            dto.date =   new LocalDateTime(resultSet.getTimestamp(COMMIT_TABLE_COMMIT_DATE));
-            dto.commitId = resultSet.getString(COMMIT_TABLE_COMMIT_ID);
-            return dto;
+                SnapshotType snapshotType = SnapshotType.valueOf(resultSet.getString(SNAPSHOT_TYPE));
+                CdoSnapshotState state =
+                        jsonConverter.snapshotStateFromJson(resultSet.getString(SNAPSHOT_STATE), globalId);
+                CdoSnapshotBuilder builder = CdoSnapshotBuilder.cdoSnapshot(globalId, commit);
+                builder.withType(snapshotType);
+                return builder.withState(state).build();
+            }
+        });
+    }
+
+    private List<Long> selectLatestSnapshotPrimaryKeys(PersistentGlobalId globalId, int limit) {
+        SelectQuery query = polyJDBC.query()
+            .select(SNAPSHOT_PK)
+            .from(SNAPSHOT_TABLE_NAME)
+                .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
+            .withArgument("globalIdPk", globalId.getPrimaryKey())
+            .orderBy(SNAPSHOT_PK, Order.DESC)
+            .limit(limit);
+
+        return queryForLongList(query, polyJDBC);
+    }
+
+    private Optional<Long> selectMaxSnapshotPrimaryKey(PersistentGlobalId globalId) {
+        SelectQuery query = polyJDBC.query()
+            .select("MAX(" + SNAPSHOT_PK + ")")
+            .from(SNAPSHOT_TABLE_NAME)
+            .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
+            .withArgument("globalIdPk", globalId.getPrimaryKey());
+
+        Optional<Long> result = queryForOptionalLong(query, polyJDBC);
+
+        if (result.isPresent() && result.get() == 0){
+            return Optional.empty();
         }
+        return result;
     }
 }

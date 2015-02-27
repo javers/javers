@@ -62,7 +62,7 @@ class JaversRepositoryE2ETest extends Specification {
         def cdoId = instanceId(1,SnapshotEntity)
         def refId = instanceId(2,SnapshotEntity)
 
-        //assert state
+        //assert properties
         SnapshotsAssert.assertThat(snapshots)
                 .hasSnapshot(cdoId, "2.0", [id:1,
                                             entityRef:refId,
