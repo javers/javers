@@ -5,6 +5,7 @@ import com.google.common.collect.Multimaps
 import groovy.json.JsonSlurper
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
+import org.javers.core.diff.custom.CustomBigDecimalComparator
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.metamodel.object.UnboundedValueObjectId
@@ -23,7 +24,26 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class JaversDiffE2ETest extends Specification {
 
-    def "should support custom comparator"() {
+    def "should support custom comparator for Value types"(){
+        given:
+        def left = new DummyUserWithValues("user", 10.11)
+        def right = new DummyUserWithValues("user", 10.12)
+
+        when:
+        def javers = JaversBuilder.javers().build()
+
+        then:
+        javers.compare(left,right).hasChanges()
+
+        when:
+        javers = JaversBuilder.javers()
+                .registerCustomComparator(new CustomBigDecimalComparator(1), BigDecimal).build()
+
+        then:
+        !javers.compare(left,right).hasChanges()
+    }
+
+    def "should support custom comparator for custom types"() {
         given:
         def left =  new GuavaObject(multimap: Multimaps.forMap(["a":1]))
         def right = new GuavaObject(multimap: Multimaps.forMap(["a":2]))
