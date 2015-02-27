@@ -1,11 +1,11 @@
 package org.javers.common.collections;
 
 import java.util.*;
+import java.util.Collections;
 
 import static java.util.Collections.EMPTY_LIST;
-import static java.util.Collections.EMPTY_SET;
 import static java.util.Collections.unmodifiableList;
-import static org.javers.common.validation.Validate.*;
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 public class Lists {
 
@@ -74,7 +74,7 @@ public class Lists {
         for (F element : input) {
             result.add(transformation.apply(element));
         }
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
     public static <E> List<E> difference(List<E> first, List<E> second) {

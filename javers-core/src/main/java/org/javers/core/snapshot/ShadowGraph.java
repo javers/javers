@@ -1,7 +1,10 @@
 package org.javers.core.snapshot;
 
+import org.javers.common.collections.Optional;
 import org.javers.core.diff.ObjectGraph;
 import org.javers.core.graph.ObjectNode;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.Collections;
 import java.util.Set;
@@ -15,16 +18,29 @@ public class ShadowGraph implements ObjectGraph {
     public static ShadowGraph EMPTY = new ShadowGraph(Collections.EMPTY_SET);
 
     ShadowGraph(Set<ObjectNode> snapshots) {
-        this.snapshots = Collections.unmodifiableSet(snapshots);
+        this.snapshots = snapshots;
     }
 
     @Override
     public Set<ObjectNode> nodes() {
-        return snapshots;
+        return Collections.unmodifiableSet(snapshots);
     }
 
     @Override
     public ObjectNode root() {
         throw new RuntimeException("not implemented");
+    }
+
+    boolean contains(ObjectNode node) {
+        return snapshots.contains(node);
+    }
+
+    Optional<CdoSnapshot> get(GlobalId globalId) {
+        for (ObjectNode node : snapshots){
+           if (globalId.equals(node.getGlobalId())){
+               return Optional.of((CdoSnapshot) node.getCdo());
+           }
+        }
+        return Optional.empty();
     }
 }

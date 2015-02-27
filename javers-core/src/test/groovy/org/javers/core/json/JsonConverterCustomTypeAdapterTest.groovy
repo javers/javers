@@ -1,7 +1,11 @@
 package org.javers.core.json
 
+import org.javers.core.JaversTestBuilder
 import org.javers.core.model.DummyPoint
+import spock.lang.Shared
 import spock.lang.Specification
+
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
 /**
  * @author bartosz walacik
@@ -10,11 +14,11 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
 
     def "should use custom typeAdapter when converting to json"() {
         given:
-        JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
-                                       registerJsonTypeAdapter(new DummyPointJsonTypeAdapter()).build()
+        def jsonConverter= javersTestAssembly().jsonConverterBuilder
+                          .registerJsonTypeAdapter(new DummyPointJsonTypeAdapter()).build()
 
         when:
-        String json = jsonConverter.toJson( new DummyPoint(1,2))
+        def json = jsonConverter.toJson( new DummyPoint(1,2))
 
         then:
         json == '"1,2"'
@@ -22,10 +26,10 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
 
     def  "should use custom typeAdapter when converting from json"() {
         given:
-        JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
-                                       registerJsonTypeAdapter(new DummyPointJsonTypeAdapter()).build()
+        def jsonConverter= javersTestAssembly().jsonConverterBuilder
+                          .registerJsonTypeAdapter(new DummyPointJsonTypeAdapter()).build()
         when:
-        DummyPoint person = jsonConverter.fromJson('"1,2"',DummyPoint.class)
+        def person = jsonConverter.fromJson('"1,2"',DummyPoint.class)
 
         then:
         person == new DummyPoint(1,2)
@@ -33,11 +37,11 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
 
     def "should use custom native Gson typeAdapter when converting to json"() {
         given:
-        JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
-                                       registerNativeTypeAdapter(DummyPoint, new DummyPointNativeTypeAdapter()).build()
+        def jsonConverter= javersTestAssembly().jsonConverterBuilder
+                          .registerNativeTypeAdapter(DummyPoint, new DummyPointNativeTypeAdapter()).build()
 
         when:
-        String json = jsonConverter.toJson( new DummyPoint(1,2))
+        def json = jsonConverter.toJson( new DummyPoint(1,2))
 
         then:
         json == '"1,2"'
@@ -45,10 +49,10 @@ class JsonConverterCustomTypeAdapterTest extends Specification {
 
     def  "should use custom native Gson typeAdapter when converting from json"() {
         given:
-        JsonConverter jsonConverter =  JsonConverterBuilder.jsonConverter().
-                                       registerNativeTypeAdapter(DummyPoint, new DummyPointNativeTypeAdapter()).build()
+        def jsonConverter= javersTestAssembly().jsonConverterBuilder
+                          .registerNativeTypeAdapter(DummyPoint, new DummyPointNativeTypeAdapter()).build()
         when:
-        DummyPoint person = jsonConverter.fromJson('"1,2"',DummyPoint.class)
+        def person = jsonConverter.fromJson('"1,2"',DummyPoint.class)
 
         then:
         person == new DummyPoint(1,2)

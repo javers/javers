@@ -77,20 +77,6 @@ class InMemoryRepository implements JaversRepository {
     public void setJsonConverter(JsonConverter jsonConverter) {
     }
 
-    @Override
-    public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit) {
-        Validate.argumentsAreNotNull(globalIdDTO);
-
-        return getStateHistory(globalIdFactory.createFromDto(globalIdDTO),limit);
-    }
-
-    @Override
-    public Optional<CdoSnapshot> getLatest(GlobalIdDTO globalIdDTO) {
-        Validate.argumentsAreNotNull(globalIdDTO);
-
-        return getLatest(globalIdFactory.createFromDto(globalIdDTO));
-    }
-
     private void persist(CdoSnapshot snapshot) {
         LinkedList<CdoSnapshot> states = snapshots.get(snapshot.getGlobalId());
         if (states == null){

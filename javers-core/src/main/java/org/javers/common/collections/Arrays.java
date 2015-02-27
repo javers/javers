@@ -18,9 +18,10 @@ public class Arrays {
      * @return index -> value
      */
     public static <T> Map<Integer, T> asMap(Object array) {
-        argumentIsNotNull(array);
-
         Map<Integer, T> result = new HashMap<>();
+        if (array == null){
+            return result;
+        }
 
         for (int i=0 ;i< Array.getLength(array); i++) {
             result.put(i, (T) Array.get(array, i));
