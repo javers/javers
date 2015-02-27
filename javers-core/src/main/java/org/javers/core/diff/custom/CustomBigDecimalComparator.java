@@ -9,6 +9,13 @@ import static java.math.BigDecimal.ROUND_HALF_UP;
 /**
  * Compares BigDecimals with custom precision.
  * Before compare, values are rounded (HALF_UP) to required scale.
+ * <br/><br/>
+ *
+ * Usage example:
+ * <pre>
+ * JaversBuilder.javers()
+ *     .registerCustomComparator(new CustomBigDecimalComparator(2), BigDecimal).build();
+ * </pre>
  *
  * @author bartosz walacik
  */
@@ -20,7 +27,9 @@ public class CustomBigDecimalComparator implements CustomPropertyComparator<BigD
     }
 
     @Override
-    public ValueChange compare(BigDecimal left, BigDecimal right, GlobalId affectedId, Property property) {
+    public ValueChange compare(BigDecimal left, BigDecimal right, GlobalId affectedId,
+        Property property)
+    {
         BigDecimal leftRounded = left.setScale(significantDecimalPlaces, ROUND_HALF_UP);
         BigDecimal rightRounded = right.setScale(significantDecimalPlaces, ROUND_HALF_UP);
 
