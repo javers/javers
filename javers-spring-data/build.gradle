@@ -1,14 +1,14 @@
 dependencies {
     compile project(':javers-core')
-    compile 'org.springframework:spring-context:4.1.4.RELEASE'
-    compile 'org.springframework:spring-aop:4.1.4.RELEASE'
+	compile project(':javers-spring')
+	compile 'org.springframework.data:spring-data-commons:1.9.2.RELEASE'
     compile 'org.aspectj:aspectjrt:1.6.11'
     compile 'org.aspectj:aspectjweaver:1.6.11'
     compile 'cglib:cglib:3.1'
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'ch.qos.logback:logback-classic:1.1.2'
-    testCompile 'org.springframework.security:spring-security-core:3.2.5.RELEASE'
     testCompile 'org.springframework:spring-test:3.2.2.RELEASE'
-    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
+    testCompile 'org.springframework.data:spring-data-mongodb:1.6.2.RELEASE'
+    testCompile 'com.github.fakemongo:fongo:1.5.8'
 }

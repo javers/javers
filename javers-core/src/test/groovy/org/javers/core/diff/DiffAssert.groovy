@@ -100,10 +100,9 @@ class DiffAssert {
         this
     }
 
-    DiffAssert hasObjectRemoved(def globalId, def expectedObject){
+    DiffAssert hasObjectRemoved(def globalId){
         def change = actual.changes.find{it instanceof ObjectRemoved && it.affectedGlobalId == globalId}
         assert change, "no ObjectRemoved change with expected globalId: "+globalId
-        assert change.affectedCdo == expectedObject
         this
     }
 }
