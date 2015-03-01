@@ -7,7 +7,6 @@ import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.core.Javers;
 import org.javers.spring.AuthorProvider;
-import org.javers.spring.DefaultAuthorProvider;
 import org.javers.spring.data.JaversSpringDataAuditable;
 import org.javers.spring.data.handler.AuditChangeHandler;
 import org.javers.spring.data.handler.OnDeleteAuditChangeHandler;
@@ -24,13 +23,9 @@ import java.util.Collections;
 @Aspect
 public class JaversSpringDataRepositoryAspect {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JaversSpringDataRepositoryAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(JaversSpringDataRepositoryAspect.class);
     private final AuditChangeHandler saveHandler;
     private final AuditChangeHandler deleteHandler;
-
-    public JaversSpringDataRepositoryAspect(Javers javers) {
-        this(javers, new DefaultAuthorProvider());
-    }
 
     public JaversSpringDataRepositoryAspect(Javers javers, AuthorProvider authorProvider) {
         this(new OnSaveAuditChangeHandler(javers, authorProvider), new OnDeleteAuditChangeHandler(javers, authorProvider));
@@ -105,7 +100,7 @@ public class JaversSpringDataRepositoryAspect {
     }
 
     private void applyVersionChange(RepositoryMetadata metadata, Object domainObject, AuditChangeHandler handler) {
-        LOGGER.info("Commit new version " + domainObject.toString());
+        //logger.debug("Committing: " + domainObject.toString());
         handler.handle(metadata, domainObject);
     }
 

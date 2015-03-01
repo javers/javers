@@ -1,4 +1,4 @@
-package org.javers.spring.data.integration.testdata
+package org.javers.spring.data.integration
 
 import org.javers.spring.data.JaversSpringDataAuditable
 import org.springframework.data.repository.CrudRepository
@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 @JaversSpringDataAuditable
-interface DummyRepository extends CrudRepository<DummyObject, String> {
+interface DummyAuditedRepository extends CrudRepository<DummyObject, String> {
 
 }

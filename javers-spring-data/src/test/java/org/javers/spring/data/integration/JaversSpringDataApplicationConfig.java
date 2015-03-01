@@ -19,8 +19,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @Configuration
 @ComponentScan
 @EnableAspectJAutoProxy
-@EnableMongoRepositories(basePackages = "org.javers.spring.data.integration.testdata")
-public class SpringApplicationConfig {
+@EnableMongoRepositories(basePackages = "org.javers.spring.data.integration")
+public class JaversSpringDataApplicationConfig {
     private static final String DB_NAME = "dummy";
 
     @Bean
@@ -30,7 +30,11 @@ public class SpringApplicationConfig {
 
     @Bean
     public AuthorProvider authorProvider() {
-        return new TestAuthorProvider();
+        return new AuthorProvider() {
+            public String provide() {
+                return "author";
+            }
+        };
     }
 
     @Bean

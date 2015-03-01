@@ -2,9 +2,6 @@ dependencies {
     compile project(':javers-core')
 	compile project(':javers-spring')
 	compile 'org.springframework.data:spring-data-commons:1.9.2.RELEASE'
-    compile 'org.aspectj:aspectjrt:1.6.11'
-    compile 'org.aspectj:aspectjweaver:1.6.11'
-    compile 'cglib:cglib:3.1'
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'ch.qos.logback:logback-classic:1.1.2'

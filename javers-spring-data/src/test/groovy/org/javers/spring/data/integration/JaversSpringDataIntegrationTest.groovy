@@ -2,10 +2,6 @@ package org.javers.spring.data.integration
 
 import org.javers.core.Javers
 import org.javers.core.metamodel.object.InstanceIdDTO
-import org.javers.spring.AuthorProvider
-import org.javers.spring.data.integration.testdata.DummyNoAuditRepository
-import org.javers.spring.data.integration.testdata.DummyObject
-import org.javers.spring.data.integration.testdata.DummyRepository
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification
@@ -16,143 +12,134 @@ import spock.lang.Specification
 class JaversSpringDataIntegrationTest extends Specification {
     @Shared
     AnnotationConfigApplicationContext context
+
     @Shared
     Javers javers
-    @Shared
-    TestAuthorProvider authorProvider
 
     @Shared
-    DummyRepository repository;
+    DummyAuditedRepository repository
+
     @Shared
-    DummyNoAuditRepository noAuditRepository;
+    DummyNoAuditRepository noAuditRepository
 
     def setupSpec() {
-        context = new AnnotationConfigApplicationContext(SpringApplicationConfig.class);
+        context = new AnnotationConfigApplicationContext(JaversSpringDataApplicationConfig)
         javers = context.getBean(Javers)
-        authorProvider = (TestAuthorProvider) context.getBean(AuthorProvider.class)
-        repository = context.getBean(DummyRepository.class);
-        noAuditRepository = context.getBean(DummyNoAuditRepository.class)
+        repository = context.getBean(DummyAuditedRepository)
+        noAuditRepository = context.getBean(DummyNoAuditRepository)
     }
 
-    def "should create a new version on create via audit enabled repository"() {
+    def "should create a new version on create via audited repository"() {
         setup:
-        DummyObject o = createNewDummyObject("foo")
+        def o = new DummyObject("foo")
 
         when:
-        repository.save(o);
+        repository.save(o)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject.class, o.id), 10)
+        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
         snapshots.size() == 1
-        snapshots.get(0).isInitial()
+        snapshots[0].initial
     }
 
-    def "should create a new version on update via audit enabled repository"() {
+    def "should create a new version on update via audited repository"() {
         setup:
-        DummyObject o = createNewDummyObject("foo")
+        def o = new DummyObject("foo")
 
         when:
-        repository.save(o);
+        repository.save(o)
         o.name = "bar"
         repository.save(o)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject.class, o.id), 10)
+        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
         snapshots.size() == 2
-        !snapshots.get(0).isInitial()
-        !snapshots.get(0).isTerminal()
-        snapshots.get(1).isInitial()
+        !snapshots[0].initial
+        snapshots[1].initial
     }
 
-    def "should create a new version on delete by object via audit enabled repository"() {
+    def "should create a new version on delete using object instance via audited repository"() {
         setup:
-        DummyObject o = createNewDummyObject("foo")
+        def o =  new DummyObject("foo")
 
         when:
-        repository.save(o);
+        repository.save(o)
         repository.delete(o)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject.class, o.id), 10)
+        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
         snapshots.size() == 2
-        snapshots.get(0).isTerminal()
-        snapshots.get(1).isInitial()
+        snapshots[0].terminal
+        snapshots[1].initial
     }
 
-    def "should create a new version on delete by id via audit enabled repository"() {
+    def "should create a new version on delete using object id via audited repository"() {
         setup:
-        DummyObject o = createNewDummyObject("foo")
+        def o =  new DummyObject("foo")
 
         when:
-        repository.save(o);
+        repository.save(o)
         repository.delete(o.id)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject.class, o.id), 10)
+        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
         snapshots.size() == 2
-        snapshots.get(0).isTerminal()
-        snapshots.get(1).isInitial()
+        snapshots[0].terminal
+        snapshots[1].initial
     }
 
     def "should not create new version when finder is executed on audit enabled repository"() {
         setup:
-        DummyObject o = createNewDummyObject("foo")
+        def o =  new DummyObject("foo")
 
         when:
-        repository.save(o);
-        Object result = repository.findOne(o.id)
+        repository.save(o)
+        def result = repository.findOne(o.id)
 
         then:
         result != null
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject.class, o.id), 10)
+        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
         snapshots.size() == 1
-        snapshots.get(0).isInitial()
+        snapshots[0].initial
     }
 
 
-    def "should not create a new version on save via default repository"() {
+    def "should not create a new version on save via normal repository"() {
         setup:
-        DummyObject o = createNewDummyObject("foo")
+        def o = new DummyObject("foo")
 
         when:
-        noAuditRepository.save(o);
+        noAuditRepository.save(o)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject.class, o.id), 10)
-        snapshots.isEmpty()
+        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        snapshots.empty
     }
 
-    def "should not create a new version on delete via default repository"() {
+    def "should not create a new version on delete via normal repository"() {
         setup:
-        DummyObject o = createNewDummyObject("foo")
+        def o = new DummyObject("foo")
 
         when:
-        noAuditRepository.save(o);
+        noAuditRepository.save(o)
         noAuditRepository.delete(o)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject.class, o.id), 10)
-        snapshots.isEmpty()
+        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        snapshots.empty
     }
 
-    def "should not create new version when finder is executed on default repository"() {
+    def "should not create new version when finder is executed on normal repository"() {
         setup:
-        DummyObject o = createNewDummyObject("foo")
+        def o =  new DummyObject("foo")
 
         when:
-        noAuditRepository.save(o);
+        noAuditRepository.save(o)
         def result = noAuditRepository.findOne(o.id)
 
         then:
         result != null
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject.class, o.id), 10)
-        snapshots.isEmpty()
-    }
-
-    def createNewDummyObject(String name) {
-        def o = new DummyObject()
-        o.id = UUID.randomUUID().toString()
-        o.name = name
-        return o
+        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        snapshots.empty
     }
 }

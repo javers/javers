@@ -1,4 +1,4 @@
-package org.javers.spring.data.integration.testdata
+package org.javers.spring.data.integration
 
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository

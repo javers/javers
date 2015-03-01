@@ -2,11 +2,9 @@ package org.javers.spring.data.aspect
 
 import org.aspectj.lang.ProceedingJoinPoint
 import org.javers.common.collections.Lists
-import org.javers.core.Javers
-import org.javers.spring.AuthorProvider
 import org.javers.spring.data.handler.AuditChangeHandler
-import org.javers.spring.data.integration.testdata.DummyObject
-import org.javers.spring.data.integration.testdata.DummyRepository
+import org.javers.spring.data.integration.DummyObject
+import org.javers.spring.data.integration.DummyAuditedRepository
 import spock.lang.Specification
 
 /**
@@ -73,7 +71,7 @@ class JaversSpringDataRepositoryAspectTest extends Specification {
     }
 
     def initRepository(){
-        def repo = Mock(DummyRepository.class)
+        def repo = Mock(DummyAuditedRepository.class)
         pjp.getTarget() >> repo
     }
 }

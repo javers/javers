@@ -2,7 +2,7 @@ package org.javers.spring.data.handler
 
 import org.javers.core.Javers
 import org.javers.spring.AuthorProvider
-import org.javers.spring.data.integration.testdata.DummyObject
+import org.javers.spring.data.integration.DummyObject
 import org.springframework.data.repository.core.RepositoryMetadata
 import spock.lang.Specification
 
