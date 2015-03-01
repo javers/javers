@@ -2,6 +2,7 @@ package org.javers.spring.data.integration
 
 import org.javers.core.Javers
 import org.javers.core.metamodel.object.InstanceIdDTO
+import org.javers.spring.common.DummyObject
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification
@@ -17,16 +18,16 @@ class JaversSpringDataIntegrationTest extends Specification {
     Javers javers
 
     @Shared
-    DummyAuditedRepository repository
+    DummyAuditedCrudRepository repository
 
     @Shared
-    DummyNoAuditRepository noAuditRepository
+    DummyNoAuditCrudRepository noAuditRepository
 
     def setupSpec() {
         context = new AnnotationConfigApplicationContext(JaversSpringDataApplicationConfig)
         javers = context.getBean(Javers)
-        repository = context.getBean(DummyAuditedRepository)
-        noAuditRepository = context.getBean(DummyNoAuditRepository)
+        repository = context.getBean(DummyAuditedCrudRepository)
+        noAuditRepository = context.getBean(DummyNoAuditCrudRepository)
     }
 
     def "should create a new version on create via audited repository"() {
@@ -41,6 +42,22 @@ class JaversSpringDataIntegrationTest extends Specification {
         snapshots.size() == 1
         snapshots[0].initial
     }
+
+    def "should create a new version when creating few objects via audited repository"() {
+        setup:
+        def objects = [new DummyObject("foo"), new DummyObject("foo")]
+
+        when:
+        repository.save(objects)
+
+        then:
+        objects.each {
+            def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, it.id), 10)
+            snapshots.size() == 1
+            snapshots[0].initial
+        }
+    }
+
 
     def "should create a new version on update via audited repository"() {
         setup:

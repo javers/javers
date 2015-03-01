@@ -1,16 +1,13 @@
 package org.javers.spring.data.aspect;
 
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.core.Javers;
-import org.javers.spring.AuthorProvider;
-import org.javers.spring.data.JaversSpringDataAuditable;
-import org.javers.spring.data.handler.AuditChangeHandler;
-import org.javers.spring.data.handler.OnDeleteAuditChangeHandler;
-import org.javers.spring.data.handler.OnSaveAuditChangeHandler;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.javers.spring.auditable.AuthorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.CrudRepository;
@@ -31,48 +28,39 @@ public class JaversSpringDataRepositoryAspect {
         this(new OnSaveAuditChangeHandler(javers, authorProvider), new OnDeleteAuditChangeHandler(javers, authorProvider));
     }
 
-    protected JaversSpringDataRepositoryAspect(AuditChangeHandler saveHandler, AuditChangeHandler deleteHandler) {
+    JaversSpringDataRepositoryAspect(AuditChangeHandler saveHandler, AuditChangeHandler deleteHandler) {
         this.saveHandler = saveHandler;
         this.deleteHandler = deleteHandler;
     }
 
 
-    @Around("execution(public * delete(..)) && this(org.springframework.data.repository.CrudRepository)")
-    public Object onDeleteExecuted(ProceedingJoinPoint pjp) throws Throwable {
-        return onVersionEvent(pjp, deleteHandler);
+    @After("execution(public * delete(..)) && this(org.springframework.data.repository.CrudRepository)")
+    public void onDeleteExecuted(JoinPoint pjp)  {
+        onVersionEvent(pjp, deleteHandler);
     }
 
-    @Around("execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)")
-    public Object onSaveExecuted(ProceedingJoinPoint pjp) throws Throwable {
-        return onVersionEvent(pjp, saveHandler);
+    @After("execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)")
+    public void onSaveExecuted(JoinPoint pjp) {
+        onVersionEvent(pjp, saveHandler);
     }
 
-    private Object onVersionEvent(ProceedingJoinPoint pjp, AuditChangeHandler handler) throws Throwable {
-        if (isVersionedRepository(pjp)) {
-            RepositoryMetadata metadata = getMetadata(pjp);
-            Iterable<Object> domainObjects = getDomainObjectsFromMethodArgumentsOfJoinPoint(pjp);
-
-            Object retVal = pjp.proceed();
-
-            applyVersionChanges(metadata, domainObjects, handler);
-            return retVal;
+    private void onVersionEvent(JoinPoint pjp, AuditChangeHandler handler) {
+        Optional<Class> versionedInterface = getRepositoryInterface(pjp);
+        if (versionedInterface.isEmpty()){
+            return;
         }
-        return pjp.proceed();
+
+        RepositoryMetadata metadata = getMetadata(versionedInterface.get());
+        Iterable<Object> domainObjects = getDomainObjectsFromMethodArgumentsOfJoinPoint(pjp);
+
+        applyVersionChanges(metadata, domainObjects, handler);
     }
 
-    private RepositoryMetadata getMetadata(ProceedingJoinPoint pjp) {
-        Optional<Class> repoClass = getRepositoryInterface(pjp);
-        if (repoClass.isPresent()) {
-            return DefaultRepositoryMetadata.getMetadata(repoClass.get());
-        }
-        throw new IllegalStateException("Cannot determine repository interface");
+    private RepositoryMetadata getMetadata(Class versionedInterface) {
+        return DefaultRepositoryMetadata.getMetadata(versionedInterface);
     }
 
-    private boolean isVersionedRepository(ProceedingJoinPoint pjp) {
-        return getRepositoryInterface(pjp).isPresent();
-    }
-
-    private Optional<Class> getRepositoryInterface(ProceedingJoinPoint pjp) {
+    private Optional<Class> getRepositoryInterface(JoinPoint pjp) {
         for (Class i : pjp.getTarget().getClass().getInterfaces()) {
             if (i.isAnnotationPresent(JaversSpringDataAuditable.class) && CrudRepository.class.isAssignableFrom(i)) {
                 return Optional.of(i);
@@ -81,7 +69,7 @@ public class JaversSpringDataRepositoryAspect {
         return Optional.empty();
     }
 
-    private Iterable<Object> getDomainObjectsFromMethodArgumentsOfJoinPoint(ProceedingJoinPoint pjp) {
+    private Iterable<Object> getDomainObjectsFromMethodArgumentsOfJoinPoint(JoinPoint pjp) {
         if (pjp.getArgs() != null && pjp.getArgs().length > 0) {
             Object arg = pjp.getArgs()[0];
             if (arg instanceof Collection) {
