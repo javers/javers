@@ -3,19 +3,16 @@ package org.javers.spring.data.aspect;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
-import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.core.Javers;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
-
-import java.util.Collection;
-import java.util.Collections;
 
 @Aspect
 public class JaversSpringDataRepositoryAspect {
@@ -51,7 +48,7 @@ public class JaversSpringDataRepositoryAspect {
         }
 
         RepositoryMetadata metadata = getMetadata(versionedInterface.get());
-        Iterable<Object> domainObjects = getDomainObjectsFromMethodArgumentsOfJoinPoint(pjp);
+        Iterable<Object> domainObjects = AspectUtil.collectArguments(pjp);
 
         applyVersionChanges(metadata, domainObjects, handler);
     }
@@ -67,18 +64,6 @@ public class JaversSpringDataRepositoryAspect {
             }
         }
         return Optional.empty();
-    }
-
-    private Iterable<Object> getDomainObjectsFromMethodArgumentsOfJoinPoint(JoinPoint pjp) {
-        if (pjp.getArgs() != null && pjp.getArgs().length > 0) {
-            Object arg = pjp.getArgs()[0];
-            if (arg instanceof Collection) {
-                return (Collection<Object>) arg;
-            } else {
-                return Lists.asList(arg);
-            }
-        }
-        return Collections.EMPTY_LIST;
     }
 
     private void applyVersionChanges(RepositoryMetadata metadata, Iterable<Object> domainObjects, AuditChangeHandler handler) {

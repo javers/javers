@@ -17,10 +17,10 @@ abstract class AbstractAuditChangeHandler implements AuditChangeHandler {
     }
 
     protected boolean isDomainClass(RepositoryMetadata metadata, Object o) {
-        return metadata.getDomainType().equals(o.getClass());
+        return metadata.getDomainType().isAssignableFrom(o.getClass());
     }
 
     protected boolean isIdClass(RepositoryMetadata metadata, Object o) {
-        return metadata.getIdType().equals(o.getClass());
+        return metadata.getIdType().isAssignableFrom(o.getClass());
     }
 }
