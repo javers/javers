@@ -1,4 +1,4 @@
-package org.javers.spring.data.aspect;
+package org.javers.spring.auditable.aspect;
 
 import org.springframework.data.repository.core.RepositoryMetadata;
 

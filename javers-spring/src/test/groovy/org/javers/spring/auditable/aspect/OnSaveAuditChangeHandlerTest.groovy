@@ -1,8 +1,8 @@
-package org.javers.spring.data.aspect
+package org.javers.spring.auditable.aspect
 
 import org.javers.core.Javers
 import org.javers.spring.auditable.AuthorProvider
-import org.javers.spring.common.DummyObject
+import org.javers.spring.auditable.integration.DummyObject
 import org.springframework.data.repository.core.RepositoryMetadata
 import spock.lang.Specification
 

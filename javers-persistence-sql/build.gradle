@@ -11,5 +11,4 @@ dependencies {
     testCompile 'com.h2database:h2:1.4.184'
     testCompile 'org.postgresql:postgresql:9.2-1003-jdbc4'
     testCompile 'com.google.guava:guava:18.0'
-    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
 }

@@ -1,4 +1,4 @@
-package org.javers.spring.data.aspect;
+package org.javers.spring.auditable.aspect;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -15,21 +15,29 @@ import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 
 @Aspect
-public class JaversSpringDataRepositoryAspect {
+public class JaversAuditableRepositoryAspect {
 
-    private static final Logger logger = LoggerFactory.getLogger(JaversSpringDataRepositoryAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(JaversAuditableRepositoryAspect.class);
     private final AuditChangeHandler saveHandler;
     private final AuditChangeHandler deleteHandler;
+    private final JaversCommitAdvice javersCommitAdvice;
 
-    public JaversSpringDataRepositoryAspect(Javers javers, AuthorProvider authorProvider) {
-        this(new OnSaveAuditChangeHandler(javers, authorProvider), new OnDeleteAuditChangeHandler(javers, authorProvider));
+    public JaversAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider) {
+        this(new OnSaveAuditChangeHandler(javers, authorProvider),
+             new OnDeleteAuditChangeHandler(javers, authorProvider),
+             new JaversCommitAdvice(javers,authorProvider) );
     }
 
-    JaversSpringDataRepositoryAspect(AuditChangeHandler saveHandler, AuditChangeHandler deleteHandler) {
+    JaversAuditableRepositoryAspect(AuditChangeHandler saveHandler, AuditChangeHandler deleteHandler, JaversCommitAdvice javersCommitAdvice) {
         this.saveHandler = saveHandler;
         this.deleteHandler = deleteHandler;
+        this.javersCommitAdvice = javersCommitAdvice;
     }
 
+    @After("@annotation(org.javers.spring.annotation.JaversAuditable)")
+    public void commitAdvice(JoinPoint pjp) {
+        javersCommitAdvice.commitMethodArguments(pjp);
+    }
 
     @After("execution(public * delete(..)) && this(org.springframework.data.repository.CrudRepository)")
     public void onDeleteExecuted(JoinPoint pjp)  {

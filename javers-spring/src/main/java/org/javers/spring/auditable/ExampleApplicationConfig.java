@@ -1,9 +1,8 @@
-package org.javers.spring.auditable.aspect;
+package org.javers.spring.auditable;
 
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
-import org.javers.spring.auditable.AuthorProvider;
-import org.javers.spring.auditable.SpringSecurityAuthorProvider;
+import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +22,8 @@ public class ExampleApplicationConfig {
     }
 
     @Bean
-    public JaversAuditableMethodAspect auditableMethodAspect() {
-        return new JaversAuditableMethodAspect(javers(), authorProvider());
+    public JaversAuditableRepositoryAspect auditableRepositoryAspect() {
+        return new JaversAuditableRepositoryAspect(javers(), authorProvider());
     }
 
     @Bean

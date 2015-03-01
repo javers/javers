@@ -1,7 +1,6 @@
-package org.javers.spring.data.integration
+package org.javers.spring.auditable.integration
 
 import org.javers.spring.annotation.JaversSpringDataAuditable
-import org.javers.spring.common.DummyObject
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 

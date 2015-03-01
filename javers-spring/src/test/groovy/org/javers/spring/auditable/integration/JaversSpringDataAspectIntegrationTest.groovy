@@ -1,8 +1,7 @@
-package org.javers.spring.data.integration
+package org.javers.spring.auditable.integration
 
 import org.javers.core.Javers
 import org.javers.core.metamodel.object.InstanceIdDTO
-import org.javers.spring.common.DummyObject
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification
@@ -10,7 +9,7 @@ import spock.lang.Specification
 /**
  * Created by gessnerfl on 22.02.15.
  */
-class JaversSpringDataIntegrationTest extends Specification {
+class JaversSpringDataAspectIntegrationTest extends Specification {
     @Shared
     AnnotationConfigApplicationContext context
 
@@ -24,7 +23,7 @@ class JaversSpringDataIntegrationTest extends Specification {
     DummyNoAuditCrudRepository noAuditRepository
 
     def setupSpec() {
-        context = new AnnotationConfigApplicationContext(JaversSpringDataApplicationConfig)
+        context = new AnnotationConfigApplicationContext(JaversAuditableAspectApplicationConfig)
         javers = context.getBean(Javers)
         repository = context.getBean(DummyAuditedCrudRepository)
         noAuditRepository = context.getBean(DummyNoAuditCrudRepository)
@@ -41,6 +40,7 @@ class JaversSpringDataIntegrationTest extends Specification {
         def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
         snapshots.size() == 1
         snapshots[0].initial
+        snapshots[0].commitMetadata.author == "author"
     }
 
     def "should create a new version when creating few objects via audited repository"() {

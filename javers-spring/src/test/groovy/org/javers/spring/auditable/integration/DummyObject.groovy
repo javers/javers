@@ -1,6 +1,6 @@
-package org.javers.spring.common
+package org.javers.spring.auditable.integration
 
-import org.javers.core.metamodel.annotation.Id
+import javax.persistence.Id;
 
 /**
  * Created by gessnerfl on 21.02.15.

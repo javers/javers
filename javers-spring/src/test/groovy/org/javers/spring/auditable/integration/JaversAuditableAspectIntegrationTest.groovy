@@ -1,8 +1,6 @@
 package org.javers.spring.auditable.integration
 
 import org.javers.core.Javers
-import org.javers.spring.common.DummyObject
-import org.javers.spring.integration.*
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification
@@ -24,7 +22,7 @@ class JaversAuditableAspectIntegrationTest extends Specification {
     DummyAuditedRepository repository
 
     def setupSpec() {
-        context = new AnnotationConfigApplicationContext(JaversAuditableApplicationConfig.class);
+        context = new AnnotationConfigApplicationContext(JaversAuditableAspectApplicationConfig)
         javers = context.getBean(Javers)
         repository = context.getBean(DummyAuditedRepository)
     }

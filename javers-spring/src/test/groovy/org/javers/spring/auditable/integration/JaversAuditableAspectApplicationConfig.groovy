@@ -1,11 +1,11 @@
-package org.javers.spring.data.integration
+package org.javers.spring.auditable.integration
 
 import com.github.fakemongo.Fongo
 import com.mongodb.Mongo
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.spring.auditable.AuthorProvider
-import org.javers.spring.data.aspect.JaversSpringDataRepositoryAspect
+import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
@@ -19,8 +19,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @Configuration
 @ComponentScan
 @EnableAspectJAutoProxy
-@EnableMongoRepositories(basePackages = "org.javers.spring.data.integration")
-public class JaversSpringDataApplicationConfig {
+@EnableMongoRepositories(basePackages = "org.javers.spring.auditable.integration")
+public class JaversAuditableAspectApplicationConfig {
 
     @Bean
     public Javers javers() {
@@ -33,8 +33,13 @@ public class JaversSpringDataApplicationConfig {
     }
 
     @Bean
-    public JaversSpringDataRepositoryAspect springDataRepositoryAspect() {
-        return new JaversSpringDataRepositoryAspect(javers(), authorProvider())
+    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect() {
+        return new JaversAuditableRepositoryAspect(javers(), authorProvider())
+    }
+
+    @Bean
+    public DummyAuditedRepository dummyAuditedRepository() {
+        return new DummyAuditedRepository()
     }
 
     @Bean

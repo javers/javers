@@ -1,15 +1,15 @@
-package org.javers.spring.data.aspect
+package org.javers.spring.auditable.aspect
 
 import org.aspectj.lang.ProceedingJoinPoint
 import org.javers.common.collections.Lists
-import org.javers.spring.common.DummyObject
-import org.javers.spring.data.integration.DummyAuditedCrudRepository
+import org.javers.spring.auditable.integration.DummyObject
+import org.javers.spring.auditable.integration.DummyAuditedCrudRepository
 import spock.lang.Specification
 
 /**
  * Created by gessnerfl on 22.02.15.
  */
-class JaversSpringDataRepositoryAspectTest extends Specification {
+class JaversAuditableRepositoryAspectTest extends Specification {
 
     def saveHandler = Mock(AuditChangeHandler.class);
     def deleteHandler = Mock(AuditChangeHandler.class)
@@ -17,7 +17,7 @@ class JaversSpringDataRepositoryAspectTest extends Specification {
     def changedObject = Mock(DummyObject.class);
     def pjp = Mock(ProceedingJoinPoint.class)
 
-    def sut = new JaversSpringDataRepositoryAspect(saveHandler, deleteHandler)
+    def sut = new JaversAuditableRepositoryAspect(saveHandler, deleteHandler, Mock(JaversCommitAdvice))
 
     def "Should trigger save handler for single object"(){
         setup:

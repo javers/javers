@@ -6,6 +6,12 @@ dependencies {
 	optional 'org.springframework.data:spring-data-commons:1.9.2.RELEASE'
     optional 'org.springframework.security:spring-security-core:3.2.5.RELEASE'
 
+    //for SpringJpaConnectionProvider test
+    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
+    testCompile 'com.h2database:h2'
+    testCompile 'org.hibernate:hibernate-core:4.2.18.Final'
+    testCompile 'org.hibernate:hibernate-entitymanager:4.2.18.Final'
+
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'org.springframework:spring-test:3.2.2.RELEASE'
     testCompile 'org.springframework.data:spring-data-mongodb:1.6.2.RELEASE'
