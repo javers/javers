@@ -42,7 +42,6 @@ class JaversRepositoryE2ETest extends Specification {
 
     }
 
-    @Ignore
     def "should store state history of Entity in JaversRepository and fetch snapshots in reverse order"() {
         given:
         def ref = new SnapshotEntity(id:2)
