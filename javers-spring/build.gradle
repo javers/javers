@@ -3,14 +3,10 @@ dependencies {
     compile 'org.springframework:spring-context:4.1.5.RELEASE'
     compile 'org.aspectj:aspectjweaver:1.8.5'
 
-    //TODO: optional
-	compile 'org.springframework.data:spring-data-commons:1.9.2.RELEASE'
-
-    //TODO: optional
-    compile 'org.springframework.security:spring-security-core:3.2.5.RELEASE'
+	optional 'org.springframework.data:spring-data-commons:1.9.2.RELEASE'
+    optional 'org.springframework.security:spring-security-core:3.2.5.RELEASE'
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
-    testCompile 'ch.qos.logback:logback-classic:1.1.2'
     testCompile 'org.springframework:spring-test:3.2.2.RELEASE'
     testCompile 'org.springframework.data:spring-data-mongodb:1.6.2.RELEASE'
     testCompile 'com.github.fakemongo:fongo:1.5.8'
