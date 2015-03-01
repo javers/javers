@@ -7,6 +7,7 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
 import org.joda.time.LocalDate
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 

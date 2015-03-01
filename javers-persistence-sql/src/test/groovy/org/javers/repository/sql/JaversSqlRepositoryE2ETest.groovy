@@ -69,7 +69,6 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     }
 
     def cleanup() {
-        dbConnection.rollback()
         dbConnection.close()
     }
 }
