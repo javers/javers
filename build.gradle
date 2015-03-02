@@ -1,14 +1,16 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
 
     dependencies {
-        classpath 'pl.allegro.tech.build:axion-release-plugin:0.9.5'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+        classpath 'pl.allegro.tech.build:axion-release-plugin:1.2.0'
     }
 }
 
 apply plugin: 'axion-release'
+apply plugin: 'com.jfrog.bintray'
 
 scmVersion {
     tag {
@@ -29,7 +31,7 @@ subprojects {
     project.version = scmVersion.version
 
     repositories {
-        mavenCentral()
+        jcenter()
     }
 
     dependencies {
@@ -143,6 +145,34 @@ subprojects {
                         }
                     }
 
+                }
+            }
+        }
+    }
+
+    bintray {
+        user = project.ext.has('bintrayUsername') ? project.ext.bintrayUsername : System.env.bintrayUsername
+        key = project.ext.has('bintrayApiKey') ? project.ext.bintrayApiKey : System.env.bintrayApiKey
+        dryRun = project.ext.has('bintrayDryRun') ? project.ext.bintrayDryRun : System.env.bintrayDryRun
+        publish = true
+
+        pkg {
+            repo = 'javers'
+            name = 'javers-parent'
+            desc = 'JaVers is designed as a framework for auditing changes in your object-oriented data'
+            websiteUrl = 'http://javers.org'
+            issueTrackerUrl = 'https://github.com/javers/javers/issues'
+            vcsUrl = 'https://github.com/javers/javers'
+            licenses = ['Apache-2.0']
+            publicDownloadNumbers = true
+
+            version {
+                gpg {
+                    sign = true
+                }
+                mavenCentralSync {
+                    user = project.ext.has('sonatypeUser') ? project.ext.sonatypeUser : System.env.sonatypeUser
+                    password = project.ext.has('sonatypePassword') ? project.ext.sonatypePassword : System.env.sonatypePassword
                 }
             }
         }
