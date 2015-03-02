@@ -1,16 +1,19 @@
+def springVersion = '4.1.5.RELEASE'
+def hibernateVersion = '4.2.7.Final'
+
 dependencies {
     compile project(':javers-core')
-    compile 'org.springframework:spring-context:4.1.5.RELEASE'
+    compile project(':javers-persistence-sql')
+    compile 'org.springframework:spring-context:'+springVersion
     compile 'org.aspectj:aspectjweaver:1.8.5'
 
 	optional 'org.springframework.data:spring-data-commons:1.9.2.RELEASE'
     optional 'org.springframework.security:spring-security-core:3.2.5.RELEASE'
+    optional 'org.hibernate:hibernate-entitymanager:'+hibernateVersion
 
-    //for SpringJpaConnectionProvider test
-    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
-    testCompile 'com.h2database:h2'
-    testCompile 'org.hibernate:hibernate-core:4.2.18.Final'
-    testCompile 'org.hibernate:hibernate-entitymanager:4.2.18.Final'
+    //for JpaConnectionProvider test
+    testCompile 'com.h2database:h2:1.4.184'
+    testCompile 'org.springframework:spring-orm:'+springVersion
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'org.springframework:spring-test:3.2.2.RELEASE'

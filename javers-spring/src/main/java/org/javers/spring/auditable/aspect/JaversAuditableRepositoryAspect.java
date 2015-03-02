@@ -14,6 +14,17 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 
+/**
+ * Creates three @After advices.
+ * <br/><br/>
+ *
+ * Commits all arguments passed to methods with @JaversAuditable annotation.
+ * <br/><br/>
+ *
+ * For spring-data Repositories with @JaversSpringDataAuditable annotation: <br/>
+ * - commits all arguments passed to save() methods,  <br/>
+ * - commits delete of arguments passed to delete() methods.  <br/>
+ */
 @Aspect
 public class JaversAuditableRepositoryAspect {
 

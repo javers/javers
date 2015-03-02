@@ -1,6 +1,7 @@
 package org.javers.spring.auditable.integration
 
 import org.javers.core.Javers
+import org.javers.spring.model.DummyObject
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification

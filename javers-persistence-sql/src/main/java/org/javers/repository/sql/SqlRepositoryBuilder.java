@@ -9,6 +9,7 @@ import org.polyjdbc.core.PolyJDBCBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.transaction.Transactional;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -21,7 +22,7 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
     private DialectName dialectName;
     private ConnectionProvider connectionProvider;
 
-    private SqlRepositoryBuilder() {
+    public SqlRepositoryBuilder() {
     }
 
     public static SqlRepositoryBuilder sqlRepository() {
