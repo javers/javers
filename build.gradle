@@ -153,7 +153,7 @@ subprojects {
     bintray {
         user = project.ext.has('bintrayUsername') ? project.ext.bintrayUsername : System.env.bintrayUsername
         key = project.ext.has('bintrayApiKey') ? project.ext.bintrayApiKey : System.env.bintrayApiKey
-        dryRun = project.hasProperty('bintrayDryRun') ? project.ext.bintrayDryRun : System.env.bintrayDryRun
+        dryRun = project.ext.has('bintrayDryRun') ? project.ext.bintrayDryRun : System.env.bintrayDryRun
         publish = true
 
         pkg {
