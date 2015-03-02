@@ -1,1 +1,10 @@
 language: java
+
+script:
+  - if [ $TRAVIS_BRANCH == "production" ]; then 
+      ./gradlew bintrayUpload \
+      -PbintrayApiKey=$PbintrayApiKey \
+      -PsonatypeUser=$sonatypeUser \
+      -PsonatypePassword=$sonatypePassword \
+      -PbintrayDryRun
+    fi

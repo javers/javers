@@ -151,9 +151,9 @@ subprojects {
     }
 
     bintray {
-        user = project.ext.has('bintrayUsername') ? project.ext.bintrayUsername : System.env.bintrayUsername
-        key = project.ext.has('bintrayApiKey') ? project.ext.bintrayApiKey : System.env.bintrayApiKey
-        dryRun = project.ext.has('bintrayDryRun') ? project.ext.bintrayDryRun : System.env.bintrayDryRun
+        user = project.ext.has('bintrayUsername') ? project.ext.bintrayUsername : ''
+        key = project.ext.has('bintrayApiKey') ? project.ext.bintrayApiKey : ''
+        dryRun = project.ext.has('bintrayDryRun')
         publish = true
 
         pkg {
@@ -167,12 +167,13 @@ subprojects {
             publicDownloadNumbers = true
 
             version {
+                name = project.version
                 gpg {
                     sign = true
                 }
                 mavenCentralSync {
-                    user = project.ext.has('sonatypeUser') ? project.ext.sonatypeUser : System.env.sonatypeUser
-                    password = project.ext.has('sonatypePassword') ? project.ext.sonatypePassword : System.env.sonatypePassword
+                    user = project.ext.has('sonatypeUser') ? project.ext.sonatypeUser : ''
+                    password = project.ext.has('sonatypePassword') ? project.ext.sonatypePassword : ''
                 }
             }
         }
