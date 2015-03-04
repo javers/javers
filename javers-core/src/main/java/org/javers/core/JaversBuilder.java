@@ -324,6 +324,7 @@ public final class JaversBuilder extends AbstractJaversBuilder {
             addModule(new InMemoryRepositoryModule(getContainer()));
         } else {
             repository.setJsonConverter( getContainerComponent(JsonConverter.class));
+            repository.ensureSchema();
             addComponent(repository);
         }
 

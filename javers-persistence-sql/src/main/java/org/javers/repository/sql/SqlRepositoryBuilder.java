@@ -1,15 +1,12 @@
 package org.javers.repository.sql;
 
 import org.javers.core.AbstractJaversBuilder;
-import org.javers.core.json.JsonConverter;
 import org.javers.repository.sql.pico.JaversSqlModule;
-import org.javers.repository.sql.schema.JaversSchemaManager;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.PolyJDBCBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.transaction.Transactional;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -55,12 +52,7 @@ public class SqlRepositoryBuilder extends AbstractJaversBuilder {
         addModule(new JaversSqlModule());
         addComponent(dialectName.getPolyDialect());
         addComponent(connectionProvider);
-        ensureSchema();
         return getContainerComponent(JaversSqlRepository.class);
-    }
-    private void ensureSchema() {
-        JaversSchemaManager schemaManager = getContainerComponent(JaversSchemaManager.class);
-        schemaManager.ensureSchema();
     }
 
     /**

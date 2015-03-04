@@ -59,6 +59,10 @@ public class JaversExtendedRepository implements JaversRepository {
 
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
+    }
 
+    @Override
+    public void ensureSchema() {
+        delegate.ensureSchema();
     }
 }

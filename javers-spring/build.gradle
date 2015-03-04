@@ -6,6 +6,7 @@ dependencies {
     compile project(':javers-persistence-sql')
     compile 'org.springframework:spring-context:'+springVersion
     compile 'org.aspectj:aspectjweaver:1.8.5'
+    compile 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:1.0.0.Final'
 
 	optional 'org.springframework.data:spring-data-commons:1.9.2.RELEASE'
     optional 'org.springframework.security:spring-security-core:3.2.5.RELEASE'
@@ -14,6 +15,7 @@ dependencies {
     //for JpaConnectionProvider test
     testCompile 'com.h2database:h2:1.4.184'
     testCompile 'org.springframework:spring-orm:'+springVersion
+
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'org.springframework:spring-test:3.2.2.RELEASE'
