@@ -13,7 +13,7 @@ class SetsTest extends Specification {
         Set<String> difference = Sets.difference(first, second)
 
         then:
-        difference.size() != 22
+        difference.size() == 2
         difference.contains "a"
     }
 
