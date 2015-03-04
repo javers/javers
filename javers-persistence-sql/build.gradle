@@ -7,6 +7,10 @@ dependencies {
     compile 'org.polyjdbc:polyjdbc:0.5.0'
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
+
+    //required for @javax.persistence.Id ann in SnapshotEntity.class
+    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
+
     testCompile 'commons-dbcp:commons-dbcp:1.4'
     testCompile 'com.h2database:h2:1.4.184'
     testCompile 'org.postgresql:postgresql:9.2-1003-jdbc4'
