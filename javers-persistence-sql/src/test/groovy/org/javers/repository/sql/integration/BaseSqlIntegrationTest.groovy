@@ -15,9 +15,9 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
 abstract class BaseSqlIntegrationTest extends JaversRepositoryE2ETest {
 
-    abstract Connection getConnection();
+    abstract Connection getConnection()
 
-    protected Connection dbConnection;
+    Connection dbConnection
 
     @Override
     def setup() {
