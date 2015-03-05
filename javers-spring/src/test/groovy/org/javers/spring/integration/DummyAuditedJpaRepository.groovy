@@ -1,7 +1,6 @@
-package org.javers.spring.jpa.connectionprovider
+package org.javers.spring.integration
 
 import org.javers.spring.annotation.JaversAuditable
-import org.javers.spring.model.DummyObject
 
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
@@ -10,7 +9,7 @@ import javax.transaction.Transactional
 /**
  * @author bartosz walacik
  */
-class DummyJpaRepository {
+class DummyAuditedJpaRepository {
     @PersistenceContext
     EntityManager entityManager
 

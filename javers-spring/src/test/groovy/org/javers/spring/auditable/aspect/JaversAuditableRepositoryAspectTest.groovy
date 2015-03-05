@@ -2,8 +2,8 @@ package org.javers.spring.auditable.aspect
 
 import org.aspectj.lang.ProceedingJoinPoint
 import org.javers.common.collections.Lists
-import org.javers.spring.model.DummyObject
-import org.javers.spring.auditable.integration.DummyAuditedCrudRepository
+import org.javers.spring.integration.DummyObject
+import org.javers.spring.integration.DummyAuditedCrudRepository
 import spock.lang.Specification
 
 /**

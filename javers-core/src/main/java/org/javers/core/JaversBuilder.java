@@ -333,6 +333,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         if (repository == null){
             logger.info("using fake InMemoryRepository, register actual implementation via JaversBuilder.registerJaversRepository()");
             addModule(new InMemoryRepositoryModule(getContainer()));
+            repository = getContainerComponent(JaversRepository.class);
         } else {
             repository.setJsonConverter( getContainerComponent(JsonConverter.class));
             addComponent(repository);

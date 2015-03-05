@@ -1,7 +1,8 @@
-package org.javers.spring.auditable.integration
+package org.javers.spring.integration
 
 import org.javers.spring.annotation.JaversSpringDataAuditable
-import org.javers.spring.model.DummyObject
+import org.javers.spring.integration.DummyObject
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
@@ -10,6 +11,6 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 @JaversSpringDataAuditable
-interface DummyAuditedCrudRepository extends CrudRepository<DummyObject, String> {
+interface DummyAuditedCrudRepository extends JpaRepository<DummyObject, String> {
 
 }

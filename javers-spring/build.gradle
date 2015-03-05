@@ -25,7 +25,5 @@ dependencies {
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'org.springframework:spring-test:3.2.2.RELEASE'
-    testCompile 'org.springframework.data:spring-data-mongodb:1.6.2.RELEASE'
     testCompile 'org.springframework.data:spring-data-jpa:1.7.2.RELEASE'
-    testCompile 'com.github.fakemongo:fongo:1.5.8'
 }

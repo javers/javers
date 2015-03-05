@@ -1,7 +1,6 @@
-package org.javers.spring.auditable.integration
+package org.javers.spring.integration
 
 import org.javers.spring.annotation.JaversAuditable
-import org.javers.spring.model.DummyObject
 
 /**
  * @author bartosz walacik

@@ -2,7 +2,11 @@ package org.javers.spring.auditable.integration
 
 import org.javers.core.Javers
 import org.javers.core.metamodel.object.InstanceIdDTO
-import org.javers.spring.model.DummyObject
+import org.javers.spring.integration.DummyAuditedCrudRepository
+import org.javers.spring.integration.DummyNoAuditCrudRepository
+import org.javers.spring.integration.DummyObject
+import org.javers.spring.integration.JaversSpringIntegrationTestApplicationConfig
+import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification
@@ -12,7 +16,7 @@ import spock.lang.Specification
  */
 class JaversSpringDataAspectIntegrationTest extends Specification {
     @Shared
-    AnnotationConfigApplicationContext context
+    ApplicationContext context
 
     @Shared
     Javers javers
@@ -24,7 +28,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
     DummyNoAuditCrudRepository noAuditRepository
 
     def setupSpec() {
-        context = new AnnotationConfigApplicationContext(JaversAuditableAspectApplicationConfig)
+        context = new AnnotationConfigApplicationContext(JaversSpringIntegrationTestApplicationConfig)
         javers = context.getBean(Javers)
         repository = context.getBean(DummyAuditedCrudRepository)
         noAuditRepository = context.getBean(DummyNoAuditCrudRepository)

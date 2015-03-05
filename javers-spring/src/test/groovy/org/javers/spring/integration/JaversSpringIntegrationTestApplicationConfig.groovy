@@ -1,4 +1,4 @@
-package org.javers.spring.jpa.connectionprovider
+package org.javers.spring.integration
 
 import org.javers.core.Javers
 import org.javers.repository.sql.ConnectionProvider
@@ -33,8 +33,8 @@ import javax.sql.DataSource
 @ComponentScan
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
-@EnableJpaRepositories(basePackages = "org.javers.spring.auditable.integration")
-class JpaHibernateConnectionProviderApplicationConfig {
+@EnableJpaRepositories(basePackages = "org.javers.spring.integration")
+class JaversSpringIntegrationTestApplicationConfig {
 
     @Bean
     public Javers javers() {
@@ -52,7 +52,9 @@ class JpaHibernateConnectionProviderApplicationConfig {
 
     @Bean
     public AuthorProvider authorProvider() {
-        return { "author" } as AuthorProvider
+        return new AuthorProvider() {
+            String provide() {"author"}
+        }
     }
 
     @Bean
@@ -66,10 +68,15 @@ class JpaHibernateConnectionProviderApplicationConfig {
     }
     //EOF JaVers setup
 
-    //test JPA repository
+
     @Bean
-    public DummyJpaRepository dummyJpaRepository(){
-        return new DummyJpaRepository();
+    public DummyAuditedJpaRepository dummyJpaRepository(){
+        return new DummyAuditedJpaRepository();
+    }
+
+    @Bean
+    public DummyAuditedRepository dummyAuditedRepository(){
+        return new DummyAuditedRepository();
     }
 
     //Spring-JPA-Hibernate setup
@@ -77,7 +84,7 @@ class JpaHibernateConnectionProviderApplicationConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan("org.javers.spring.model");
+        em.setPackagesToScan("org.javers.spring.integration");
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
@@ -116,4 +123,5 @@ class JpaHibernateConnectionProviderApplicationConfig {
         return properties;
     }
     //EOF Spring-JPA-Hibernate setup
+
 }
