@@ -1,18 +1,20 @@
 package org.javers.spring.jpa.connectionprovider
 
 import org.javers.core.Javers
-import org.javers.core.JaversBuilder
 import org.javers.repository.sql.ConnectionProvider
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.JaversSqlRepository
 import org.javers.repository.sql.SqlRepositoryBuilder
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect
+import org.javers.spring.jpa.JpaHibernateConnectionProvider
+import org.javers.spring.jpa.TransactionalJaversBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.jdbc.datasource.DriverManagerDataSource
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.JpaVendorAdapter
@@ -31,27 +33,21 @@ import javax.sql.DataSource
 @ComponentScan
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
+@EnableJpaRepositories(basePackages = "org.javers.spring.auditable.integration")
 class JpaHibernateConnectionProviderApplicationConfig {
-
-    //JaVers setup
-    @Bean
-    public SqlRepositoryBuilder javersSqlRepositoryBuilder(){
-        return SqlRepositoryBuilder
-                .sqlRepository()
-                .withConnectionProvider(jpaConnectionProvider())
-                .withDialect(DialectName.H2)
-    }
-
-
-    @Bean
-    public JaversSqlRepository javersSqlRepository() {
-        return javersSqlRepositoryBuilder().build()
-    }
 
     @Bean
     public Javers javers() {
-        JaversSqlRepository sqlRepository = javersSqlRepositoryBuilder().build()
-        return JaversBuilder.javers().registerJaversRepository(sqlRepository).build()
+        JaversSqlRepository sqlRepository = SqlRepositoryBuilder
+                .sqlRepository()
+                .withConnectionProvider(jpaConnectionProvider())
+                .withDialect(DialectName.H2)
+                .build()
+
+        return TransactionalJaversBuilder
+                .javers()
+                .registerJaversRepository(sqlRepository)
+                .build()
     }
 
     @Bean

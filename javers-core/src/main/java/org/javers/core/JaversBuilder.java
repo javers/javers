@@ -51,7 +51,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @see <a href="http://javers.org/documentation/configuration/">http://javers.org/documentation/configuration</a>
  * @author bartosz walacik
  */
-public final class JaversBuilder extends AbstractJaversBuilder {
+public class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
     private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
@@ -62,8 +62,11 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         return new JaversBuilder();
     }
 
-    private JaversBuilder() {
-        logger.debug("starting up javers ...");
+    /**
+     * use static factory method {@link JaversBuilder#javers()}
+     */
+    protected JaversBuilder() {
+        logger.debug("starting up JaVers ...");
 
         // bootstrap phase 1: core beans
         bootContainer();
@@ -76,6 +79,14 @@ public final class JaversBuilder extends AbstractJaversBuilder {
 
     public Javers build() {
 
+        Javers javers = assembleJaversInstance();
+        repository.ensureSchema();
+
+        logger.info("JaVers instance is up & ready");
+        return javers;
+    }
+
+    protected Javers assembleJaversInstance(){
         // ManagedClassFactory & managed clazz registration
         bootManagedClasses();
 
@@ -85,8 +96,8 @@ public final class JaversBuilder extends AbstractJaversBuilder {
         // Repository
         bootRepository();
 
-        Javers javers = getContainerComponent(Javers.class);
-        logger.info("javers instance is up & ready");
+        Javers javers = getContainerComponent(JaversCore.class);
+        logger.info("JaVers instance is up & ready");
         return javers;
     }
 
@@ -324,7 +335,6 @@ public final class JaversBuilder extends AbstractJaversBuilder {
             addModule(new InMemoryRepositoryModule(getContainer()));
         } else {
             repository.setJsonConverter( getContainerComponent(JsonConverter.class));
-            repository.ensureSchema();
             addComponent(repository);
         }
 

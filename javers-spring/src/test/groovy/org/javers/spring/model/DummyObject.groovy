@@ -15,6 +15,7 @@ class DummyObject {
     String name
 
     DummyObject() {
+        this.id = UUID.randomUUID().toString()
     }
 
     DummyObject(String name) {
