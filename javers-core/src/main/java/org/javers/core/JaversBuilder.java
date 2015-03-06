@@ -48,7 +48,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  *                              .build();
  * </pre>
  *
- * @see <a href="http://javers.org/documentation/configuration/">http://javers.org/documentation/configuration</a>
+ * @see <a href="http://javers.org/documentation/domain-configuration/">http://javers.org/documentation/domain-configuration</a>
  * @author bartosz walacik
  */
 public class JaversBuilder extends AbstractJaversBuilder {
@@ -102,7 +102,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * @see <a href="http://javers.org/documentation/configuration/#repository-setup">http://javers.org/documentation/configuration/#repository-setup</a>
+     * @see <a href="http://javers.org/documentation/repository-configuration">http://javers.org/documentation/repository-configuration</a>
      */
     public JaversBuilder registerJaversRepository(JaversRepository repository){
         argumentsAreNotNull(repository);
@@ -117,7 +117,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      *
      * Optionally, use @Transient or @{@link DiffIgnore} to mark ignored properties.
      *
-     * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
+     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
         argumentIsNotNull(entityClass);
@@ -129,7 +129,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * Use this method if you are not willing to use annotations to mark Id-property
      * and ignored properties.
      *
-     * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
+     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerEntity(EntityDefinition entityDefinition){
         argumentIsNotNull(entityDefinition);
@@ -154,7 +154,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      *
      * For example, ValueObjects are: Address, Point
      *
-     * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
+     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         argumentIsNotNull(valueObjectClass);
@@ -166,7 +166,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * Registers a {@link ValueObjectType}. <br/>
      * Use this method if you are not willing to use annotations to mark ignored properties.
      *
-     * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
+     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValueObject(ValueObjectDefinition valueObjectDefinition) {
         argumentIsNotNull(valueObjectDefinition);
@@ -180,7 +180,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      *
      * For example, values are: BigDecimal, LocalDateTime
      *
-     * @see <a href="http://javers.org/documentation/configuration/#domain-model-mapping">http://javers.org/documentation/configuration/#domain-model-mapping</a>
+     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValue(Class<?> valueClass) {
         argumentIsNotNull(valueClass);
@@ -194,7 +194,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      *
      * Useful for not trivial ValueTypes when Gson's default representation isn't appropriate
      *
-     * @see <a href="http://javers.org/documentation/configuration/#json-type-adapters">http://javers.org/documentation/configuration/#json-type-adapters</a>
+     * @see <a href="http://javers.org/documentation/repository-configuration/#json-type-adapters">http://javers.org/documentation/repository-configuration/#json-type-adapters</a>
      * @see JsonTypeAdapter
      */
     public JaversBuilder registerValueTypeAdapter(JsonTypeAdapter typeAdapter) {

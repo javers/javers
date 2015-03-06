@@ -176,7 +176,5 @@ public interface Javers {
      */
     <T> T processChangeList(List<Change> changes, ChangeProcessor<T> changeProcessor);
 
-    //JaversType getForClass(Class<?> clazz);
-
     IdBuilder idBuilder();
 }
