@@ -45,7 +45,8 @@ public class JaversSpringMongoApplicationConfig {
     /**
      * Enables Repository auto-audit aspect. <br/>
      *
-     * Use @{@link org.javers.spring.annotation.JaversSpringDataAuditable} to annotate Spring Data Repositories,
+     * Use @{@link org.javers.spring.annotation.JaversSpringDataAuditable}
+     * to annotate Spring Data Repositories,
      * or @{@link org.javers.spring.annotation.JaversAuditable} for ordinary Repositories.
      */
     @Bean
