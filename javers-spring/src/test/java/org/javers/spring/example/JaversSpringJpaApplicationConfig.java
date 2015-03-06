@@ -59,7 +59,8 @@ public class JaversSpringJpaApplicationConfig {
     }
 
     /**
-     * Enables Repository auto-audit.
+     * Enables Repository auto-audit aspect. <br/>
+     *
      * Use @{@link JaversSpringDataAuditable} to annotate Spring Data Repositories,
      * or @{@link JaversAuditable} for ordinary Repositories.
      */
@@ -69,8 +70,7 @@ public class JaversSpringJpaApplicationConfig {
     }
 
     /**
-     * Required for Repository auto-audit.
-     * <br/><br/>
+     * Required by Repository auto-audit aspect. <br/><br/>
      *
      * Returns mock implementation for testing.
      * <br/>

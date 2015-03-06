@@ -22,8 +22,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories(basePackages = "org.javers.spring.repository.mongo")
 public class JaversSpringMongoApplicationConfig {
 
-    //.. JaVers setup ..
-
     /**
      * Creates JaVers instance with {@link org.javers.repository.mongo.MongoRepository}
      */
@@ -37,7 +35,16 @@ public class JaversSpringMongoApplicationConfig {
     }
 
     /**
-     * Enables Repository auto-audit.
+     * MongoDB setup
+     */
+    @Bean
+    public DB mongoDB(){
+        return new Fongo("test").getMongo().getDB("test");
+    }
+
+    /**
+     * Enables Repository auto-audit aspect. <br/>
+     *
      * Use @{@link org.javers.spring.annotation.JaversSpringDataAuditable} to annotate Spring Data Repositories,
      * or @{@link org.javers.spring.annotation.JaversAuditable} for ordinary Repositories.
      */
@@ -47,8 +54,7 @@ public class JaversSpringMongoApplicationConfig {
     }
 
     /**
-     * Required for Repository auto-audit.
-     * <br/><br/>
+     * Required by Repository auto-audit aspect. <br/><br/>
      *
      * Returns mock implementation for testing.
      * <br/>
@@ -64,13 +70,5 @@ public class JaversSpringMongoApplicationConfig {
                 return "unknown";
             }
         };
-    }
-    //.. EOF JaVers setup ..
-
-    /**
-     * MongoDB setup
-     */
-    public DB mongoDB(){
-        return new Fongo("test").getMongo().getDB("test");
     }
 }
