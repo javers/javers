@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
  * @author Pawel Szymczyk
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.METHOD})
 public @interface JaversAuditable {
 }

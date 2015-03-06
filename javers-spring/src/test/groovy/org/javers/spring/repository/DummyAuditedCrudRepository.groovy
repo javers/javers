@@ -1,9 +1,7 @@
-package org.javers.spring.integration
+package org.javers.spring.repository
 
 import org.javers.spring.annotation.JaversSpringDataAuditable
-import org.javers.spring.integration.DummyObject
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 /**

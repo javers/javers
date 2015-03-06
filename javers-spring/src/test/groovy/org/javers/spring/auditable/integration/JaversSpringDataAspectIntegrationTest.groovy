@@ -2,10 +2,10 @@ package org.javers.spring.auditable.integration
 
 import org.javers.core.Javers
 import org.javers.core.metamodel.object.InstanceIdDTO
-import org.javers.spring.integration.DummyAuditedCrudRepository
-import org.javers.spring.integration.DummyNoAuditCrudRepository
-import org.javers.spring.integration.DummyObject
-import org.javers.spring.integration.JaversSpringIntegrationTestApplicationConfig
+import org.javers.spring.example.JaversSpringJpaApplicationConfig
+import org.javers.spring.repository.DummyAuditedCrudRepository
+import org.javers.spring.repository.DummyNoAuditCrudRepository
+import org.javers.spring.repository.DummyObject
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
@@ -28,7 +28,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
     DummyNoAuditCrudRepository noAuditRepository
 
     def setupSpec() {
-        context = new AnnotationConfigApplicationContext(JaversSpringIntegrationTestApplicationConfig)
+        context = new AnnotationConfigApplicationContext(JaversSpringJpaApplicationConfig)
         javers = context.getBean(Javers)
         repository = context.getBean(DummyAuditedCrudRepository)
         noAuditRepository = context.getBean(DummyNoAuditCrudRepository)
@@ -45,7 +45,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
         snapshots.size() == 1
         snapshots[0].initial
-        snapshots[0].commitMetadata.author == "author"
+        snapshots[0].commitMetadata.author == "unknown"
     }
 
     def "should create a new version when creating few objects via audited repository"() {

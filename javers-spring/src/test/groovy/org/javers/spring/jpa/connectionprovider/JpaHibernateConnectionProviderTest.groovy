@@ -2,10 +2,10 @@ package org.javers.spring.jpa.connectionprovider
 
 import org.javers.core.Javers
 import org.javers.core.metamodel.object.InstanceIdDTO
-import org.javers.spring.integration.DummyAuditedCrudRepository
-import org.javers.spring.integration.DummyAuditedJpaRepository
-import org.javers.spring.integration.DummyObject
-import org.javers.spring.integration.JaversSpringIntegrationTestApplicationConfig
+import org.javers.spring.example.JaversSpringJpaApplicationConfig
+import org.javers.spring.repository.DummyAuditedCrudRepository
+import org.javers.spring.repository.DummyAuditedJpaRepository
+import org.javers.spring.repository.DummyObject
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification
@@ -27,7 +27,7 @@ class JpaHibernateConnectionProviderTest extends Specification {
 
 
     def setupSpec() {
-        context = new AnnotationConfigApplicationContext(JaversSpringIntegrationTestApplicationConfig)
+        context = new AnnotationConfigApplicationContext(JaversSpringJpaApplicationConfig)
         javers = context.getBean(Javers)
     }
 

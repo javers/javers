@@ -1,10 +1,12 @@
-package org.javers.spring.integration
+package org.javers.spring.repository
 
 import org.javers.spring.annotation.JaversAuditable
+import org.springframework.stereotype.Repository
 
 /**
  * @author bartosz walacik
  */
+@Repository
 class DummyAuditedRepository {
 
     @JaversAuditable

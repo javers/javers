@@ -1,4 +1,4 @@
-package org.javers.spring.integration
+package org.javers.spring.repository
 
 import javax.persistence.Entity
 import javax.persistence.Id
