@@ -2,8 +2,9 @@ def springVersion = '4.1.5.RELEASE'
 def hibernateVersion = '4.2.7.Final'
 
 dependencies {
-    compile project(':javers-core')
     compile project(':javers-persistence-sql')
+    compile project(':javers-core')
+
     compile 'org.springframework:spring-context:'+springVersion
     compile 'org.aspectj:aspectjweaver:1.8.5'
     compile 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:1.0.0.Final'
@@ -26,4 +27,9 @@ dependencies {
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'org.springframework:spring-test:3.2.2.RELEASE'
     testCompile 'org.springframework.data:spring-data-jpa:1.7.2.RELEASE'
+
+    testCompile 'org.springframework.data:spring-data-mongodb:1.6.2.RELEASE'
+    testCompile 'com.github.fakemongo:fongo:1.5.8'
+
+    testCompile project(':javers-persistence-mongo')
 }

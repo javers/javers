@@ -2,8 +2,8 @@ package org.javers.spring.auditable.aspect
 
 import org.aspectj.lang.ProceedingJoinPoint
 import org.javers.common.collections.Lists
-import org.javers.spring.repository.DummyObject
-import org.javers.spring.repository.DummyAuditedCrudRepository
+import org.javers.spring.repository.jpa.DummyAuditedJpaCrudRepository
+import org.javers.spring.model.DummyObject
 import spock.lang.Specification
 
 /**
@@ -70,7 +70,7 @@ class JaversAuditableRepositoryAspectTest extends Specification {
     }
 
     def initRepository(){
-        def repo = Mock(DummyAuditedCrudRepository.class)
+        def repo = Mock(DummyAuditedJpaCrudRepository.class)
         pjp.getTarget() >> repo
     }
 }

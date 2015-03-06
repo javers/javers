@@ -2,7 +2,7 @@ package org.javers.spring.auditable;
 
 /**
  * Implementation has to be thread-safe and has to provide
- * an author (typically a user login), bounded to current transaction.
+ * an author (typically a user login), to current user session.
  *
  * @author Pawel Szymczyk
  */

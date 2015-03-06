@@ -2,7 +2,7 @@ package org.javers.spring.auditable.aspect
 
 import org.javers.core.Javers
 import org.javers.spring.auditable.AuthorProvider
-import org.javers.spring.repository.DummyObject
+import org.javers.spring.model.DummyObject
 import org.springframework.data.repository.core.RepositoryMetadata
 import spock.lang.Specification
 

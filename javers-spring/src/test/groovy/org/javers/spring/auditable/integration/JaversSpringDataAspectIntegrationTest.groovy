@@ -3,9 +3,9 @@ package org.javers.spring.auditable.integration
 import org.javers.core.Javers
 import org.javers.core.metamodel.object.InstanceIdDTO
 import org.javers.spring.example.JaversSpringJpaApplicationConfig
-import org.javers.spring.repository.DummyAuditedCrudRepository
-import org.javers.spring.repository.DummyNoAuditCrudRepository
-import org.javers.spring.repository.DummyObject
+import org.javers.spring.model.DummyObject
+import org.javers.spring.repository.jpa.DummyAuditedJpaCrudRepository
+import org.javers.spring.repository.jpa.DummyNoAuditJpaCrudRepository
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
@@ -22,16 +22,16 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
     Javers javers
 
     @Shared
-    DummyAuditedCrudRepository repository
+    DummyAuditedJpaCrudRepository repository
 
     @Shared
-    DummyNoAuditCrudRepository noAuditRepository
+    DummyNoAuditJpaCrudRepository noAuditRepository
 
     def setupSpec() {
         context = new AnnotationConfigApplicationContext(JaversSpringJpaApplicationConfig)
         javers = context.getBean(Javers)
-        repository = context.getBean(DummyAuditedCrudRepository)
-        noAuditRepository = context.getBean(DummyNoAuditCrudRepository)
+        repository = context.getBean(DummyAuditedJpaCrudRepository)
+        noAuditRepository = context.getBean(DummyNoAuditJpaCrudRepository)
     }
 
     def "should create a new version on create via audited repository"() {

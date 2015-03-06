@@ -1,6 +1,7 @@
-package org.javers.spring.repository
+package org.javers.spring.repository.jpa
 
 import org.javers.spring.annotation.JaversAuditable
+import org.javers.spring.model.DummyObject
 import org.springframework.stereotype.Repository
 
 import javax.persistence.EntityManager

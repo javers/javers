@@ -33,10 +33,10 @@ import java.util.Properties;
  * @author bartosz walacik
  */
 @Configuration
-@ComponentScan(basePackages = "org.javers.spring.repository")
+@ComponentScan(basePackages = "org.javers.spring.repository.jpa")
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
-@EnableJpaRepositories(basePackages = "org.javers.spring.repository")
+@EnableJpaRepositories(basePackages = "org.javers.spring.repository.jpa")
 public class JaversSpringJpaApplicationConfig {
 
     //.. JaVers setup ..
@@ -103,7 +103,7 @@ public class JaversSpringJpaApplicationConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan("org.javers.spring.repository");
+        em.setPackagesToScan("org.javers.spring.model");
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
