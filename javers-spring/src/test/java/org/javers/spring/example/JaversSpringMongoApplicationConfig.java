@@ -23,7 +23,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 public class JaversSpringMongoApplicationConfig {
 
     /**
-     * Creates JaVers instance with {@link org.javers.repository.mongo.MongoRepository}
+     * Creates JaVers instance backed by {@link MongoRepository}
      */
     @Bean
     public Javers javers() {
