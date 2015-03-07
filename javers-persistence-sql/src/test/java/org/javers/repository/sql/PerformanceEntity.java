@@ -1,10 +1,8 @@
 package org.javers.repository.sql;
 
-import org.javers.common.collections.Arrays;
 import org.javers.common.collections.Lists;
+import org.javers.core.metamodel.annotation.Id;
 import org.joda.time.LocalDate;
-
-import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
 

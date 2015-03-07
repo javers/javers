@@ -35,11 +35,6 @@ public class MongoRepository implements JaversRepository {
 
     public MongoRepository(DB mongo) {
         this.mongo = mongo;
-
-        //ensures collections and indexes
-        DBCollection snapshots = snapshotsCollection();
-        snapshots.ensureIndex(new BasicDBObject(GLOBAL_ID_KEY,ASC),"global_id_idx");
-        headCollection();
     }
 
     MongoRepository(DB mongo, JsonConverter jsonConverter) {
@@ -159,5 +154,13 @@ public class MongoRepository implements JaversRepository {
 
     private DBCollection headCollection() {
         return mongo.getCollection(MongoHeadId.COLLECTION_NAME);
+    }
+
+    @Override
+    public void ensureSchema() {
+        //ensures collections and indexes
+        DBCollection snapshots = snapshotsCollection();
+        snapshots.ensureIndex(new BasicDBObject(GLOBAL_ID_KEY,ASC),"global_id_idx");
+        headCollection();
     }
 }

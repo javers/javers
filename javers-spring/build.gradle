@@ -1,14 +1,35 @@
+def springVersion = '4.1.5.RELEASE'
+def hibernateVersion = '4.2.7.Final'
+
 dependencies {
+    compile project(':javers-persistence-sql')
     compile project(':javers-core')
-    compile 'org.springframework:spring-context:4.1.4.RELEASE'
-    compile 'org.springframework:spring-aop:4.1.4.RELEASE'
-    compile 'org.aspectj:aspectjrt:1.6.11'
-    compile 'org.aspectj:aspectjweaver:1.6.11'
-    compile 'cglib:cglib:3.1'
+
+    compile 'org.springframework:spring-context:'+springVersion
+    compile 'org.aspectj:aspectjweaver:1.8.5'
+    compile 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:1.0.0.Final'
+
+    //should be on application's classpath when using JaversSpringDataAuditable
+    optional 'org.springframework.data:spring-data-commons:1.9.2.RELEASE'
+
+    //should be on application's classpath when using SpringSecurityAuthorProvider
+    optional 'org.springframework.security:spring-security-core:3.2.5.RELEASE'
+
+    //both should be on application's classpath when using JaversTransactionalDecorator
+    optional 'org.hibernate:hibernate-entitymanager:'+hibernateVersion
+    optional 'org.springframework:spring-tx:'+springVersion
+    //..
+
+    //for JpaConnectionProvider test
+    testCompile 'com.h2database:h2:1.4.184'
+    testCompile 'org.springframework:spring-orm:'+springVersion
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
-    testCompile 'ch.qos.logback:logback-classic:1.1.2'
-    testCompile 'org.springframework.security:spring-security-core:3.2.5.RELEASE'
     testCompile 'org.springframework:spring-test:3.2.2.RELEASE'
-    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
+    testCompile 'org.springframework.data:spring-data-jpa:1.7.2.RELEASE'
+
+    testCompile 'org.springframework.data:spring-data-mongodb:1.6.2.RELEASE'
+    testCompile 'com.github.fakemongo:fongo:1.5.8'
+
+    testCompile project(':javers-persistence-mongo')
 }
