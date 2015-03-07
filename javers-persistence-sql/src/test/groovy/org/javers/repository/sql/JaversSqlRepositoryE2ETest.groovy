@@ -13,12 +13,20 @@ import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
 class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
-    Connection dbConnection;
+    protected Connection getConnection() {
+        DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test")
+    }
+
+    protected DialectName getDialect() {
+        DialectName.H2
+    }
+
+    Connection dbConnection
 
     @Override
     def setup() {
         Server.createTcpServer().start()
-        dbConnection = DriverManager.getConnection("jdbc:h2:mem:sql_test");//;TRACE_LEVEL_SYSTEM_OUT=2")
+        dbConnection = getConnection()
 
         dbConnection.setAutoCommit(false)
 
@@ -27,9 +35,26 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         def sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(connectionProvider)
-                .withDialect(DialectName.H2).build()
+                .withDialect(getDialect()).build()
         javers = javers().registerJaversRepository(sqlRepository).build()
+        clearTables()
+
+        dbConnection.commit()
     }
+
+    def clearTables() {
+        execute("delete  from jv_snapshot;")
+        execute("delete  from jv_commit;")
+        execute("delete  from jv_global_id;")
+        execute("delete  from jv_cdo_class;")
+    }
+
+    def execute(String sql) {
+        def stmt = dbConnection.createStatement()
+        stmt.executeUpdate(sql)
+        stmt.close()
+    }
+
 
     def "should not interfere with user transactions"() {
         given:
