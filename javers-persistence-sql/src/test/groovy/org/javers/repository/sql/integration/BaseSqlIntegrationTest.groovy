@@ -1,5 +1,4 @@
 package org.javers.repository.sql.integration
-
 import org.h2.tools.Server
 import org.javers.core.JaversRepositoryE2ETest
 import org.javers.core.model.SnapshotEntity
@@ -17,6 +16,8 @@ abstract class BaseSqlIntegrationTest extends JaversRepositoryE2ETest {
 
     abstract Connection getConnection()
 
+    abstract DialectName getDialect()
+
     Connection dbConnection
 
     @Override
@@ -31,10 +32,12 @@ abstract class BaseSqlIntegrationTest extends JaversRepositoryE2ETest {
         def sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(connectionProvider)
-                .withDialect(DialectName.H2).build()
+                .withDialect(getDialect()).build()
         javers = javers().registerJaversRepository(sqlRepository).build()
 
         clearTables()
+
+        dbConnection.commit()
     }
 
     def clearTables() {
