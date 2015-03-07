@@ -26,7 +26,7 @@ public class CoreJaversModule extends InstantiatingModule {
     @Override
     protected Collection<Class> getImplementations() {
         return (Collection) Lists.asList(
-                Javers.class,
+                JaversCore.class,
                 ObjectGraphBuilder.class,
                 JsonConverterBuilder.class,
                 TypeMapper.class,

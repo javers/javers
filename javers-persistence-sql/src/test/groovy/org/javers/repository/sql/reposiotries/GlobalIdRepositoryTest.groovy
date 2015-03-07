@@ -1,6 +1,7 @@
 package org.javers.repository.sql.reposiotries
 
 import org.javers.common.collections.Optional
+import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceId
 import spock.lang.Specification
 
@@ -10,7 +11,7 @@ import spock.lang.Specification
 class GlobalIdRepositoryTest extends Specification {
     def "should not query if given globalId is already persisted"() {
         given:
-        def persistentInstanceId = new PersistentGlobalId(Stub(InstanceId), Optional.of(5L))
+        def persistentInstanceId = new PersistentGlobalId(Stub(GlobalId), Optional.of(5L))
         def globalIdRepository = new GlobalIdRepository()
 
         when:

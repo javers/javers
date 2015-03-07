@@ -18,32 +18,33 @@ public class JaversSchemaManager {
 
     private SchemaInspector schemaInspector;
     private SchemaManager schemaManager;
-    private Dialect dialect;
+    private final Dialect dialect;
     private final FixedSchemaFactory schemaFactory;
+    private final PolyJDBC polyJDBC;
 
     public JaversSchemaManager(Dialect dialect, FixedSchemaFactory fixedSchemaFactory, PolyJDBC polyJDBC) {
         this.dialect = dialect;
         this.schemaFactory = fixedSchemaFactory;
-        this.schemaInspector = polyJDBC.schemaInspector();
-        this.schemaManager = polyJDBC.schemaManager();
+        this.polyJDBC = polyJDBC;
     }
 
     public void ensureSchema() {
+        this.schemaInspector = polyJDBC.schemaInspector();
+        this.schemaManager = polyJDBC.schemaManager();
+
         for (Map.Entry<String, Schema> e : schemaFactory.allTablesSchema(dialect).entrySet()){
             ensureTable(e.getKey(), e.getValue());
         }
+
+        TheCloser.close(schemaManager, schemaInspector);
     }
 
     private void ensureTable(String tableName, Schema schema){
-        try {
-            if (schemaInspector.relationExists(tableName)) {
-                return;
-            }
-            logger.info("creating javers table {} ...", tableName);
-            schemaManager.create(schema);
-        } finally {
-            TheCloser.close(schemaManager, schemaInspector);
+        if (schemaInspector.relationExists(tableName)) {
+            return;
         }
+        logger.info("creating javers table {} ...", tableName);
+        schemaManager.create(schema);
     }
 
     public void dropSchema(){

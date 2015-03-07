@@ -55,4 +55,9 @@ public interface JaversRepository {
 
     void setJsonConverter(JsonConverter jsonConverter);
 
+    /**
+     * Called at the end of JaVers bootstrap,
+     * good place to put database schema update
+     */
+    public void ensureSchema();
 }

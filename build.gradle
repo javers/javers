@@ -1,9 +1,11 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven { url 'http://repo.spring.io/plugins-release' }
     }
 
     dependencies {
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
         classpath 'pl.allegro.tech.build:axion-release-plugin:0.9.5'
     }
 }
@@ -21,6 +23,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'groovy'
     apply plugin: 'signing'
+    apply plugin: 'propdeps'
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7

@@ -86,4 +86,8 @@ class InMemoryRepository implements JaversRepository {
 
         states.push(snapshot);
     }
+
+    @Override
+    public void ensureSchema() {
+    }
 }
