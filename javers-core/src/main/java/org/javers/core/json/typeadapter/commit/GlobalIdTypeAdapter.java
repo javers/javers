@@ -51,7 +51,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     private ValueObjectId parseValueObjectId(JsonObject jsonObject, JsonDeserializationContext context) {
         Class valueObjectClass = parseClass(jsonObject, VALUE_OBJECT_FIELD);
         String fragment = jsonObject.get(FRAGMENT_FIELD).getAsString();
-        InstanceId ownerId = context.deserialize(jsonObject.get(OWNER_ID_FIELD), InstanceId.class);
+        GlobalId ownerId = context.deserialize(jsonObject.get(OWNER_ID_FIELD), GlobalId.class);
 
         return globalIdFactory.createFromPath(ownerId, valueObjectClass, fragment);
     }
