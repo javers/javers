@@ -27,8 +27,6 @@ import org.springframework.data.repository.core.support.DefaultRepositoryMetadat
  */
 @Aspect
 public class JaversAuditableRepositoryAspect {
-
-    private static final Logger logger = LoggerFactory.getLogger(JaversAuditableRepositoryAspect.class);
     private final AuditChangeHandler saveHandler;
     private final AuditChangeHandler deleteHandler;
     private final JaversCommitAdvice javersCommitAdvice;
@@ -92,7 +90,6 @@ public class JaversAuditableRepositoryAspect {
     }
 
     private void applyVersionChange(RepositoryMetadata metadata, Object domainObject, AuditChangeHandler handler) {
-        //logger.debug("Committing: " + domainObject.toString());
         handler.handle(metadata, domainObject);
     }
 

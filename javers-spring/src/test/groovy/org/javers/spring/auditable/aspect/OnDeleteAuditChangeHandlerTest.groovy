@@ -10,7 +10,7 @@ import spock.lang.Specification
  * Created by gessnerfl on 21.02.15.
  */
 class OnDeleteAuditChangeHandlerTest extends Specification {
-    def String AUTHOR_NAME = "foo"
+    def AUTHOR_NAME = "foo"
     def javers = Mock(Javers)
     def authorProvider = Stub(AuthorProvider)
     def repositoryMetadata = Mock(RepositoryMetadata)
