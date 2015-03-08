@@ -8,13 +8,17 @@ import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.type.TypeMapper;
+import org.slf4j.Logger;
 
 import java.util.List;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author bartosz walacik
  */
 class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
+    private static final Logger logger = getLogger(GlobalIdTypeAdapter.class);
 
     private static final String ENTITY_FIELD = "entity";
     private static final String CDO_ID_FIELD = "cdoId";
@@ -33,6 +37,8 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     @Override
     public GlobalId fromJson(JsonElement json, JsonDeserializationContext context) {
         JsonObject jsonObject = (JsonObject) json;
+
+        logger.debug("deserializing "+json);
 
         if (jsonObject.get(ENTITY_FIELD) != null) {
             return parseInstanceId(jsonObject, context);
@@ -72,6 +78,8 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
         if (globalId == null) {
             return JsonNull.INSTANCE;
         }
+
+        logger.debug("serializing "+globalId.getClass().getSimpleName()+":"+globalId);
         JsonObject jsonObject = new JsonObject();
 
         //managedClass
