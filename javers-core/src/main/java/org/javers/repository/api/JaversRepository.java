@@ -44,21 +44,10 @@ public interface JaversRepository {
     List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit);
 
     /**
-     * Convenient method to query by DTO,
-     * see {@link #getStateHistory(org.javers.core.metamodel.object.GlobalId, int)}
-     */
-    List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit);
-
-    /**
      * Latest snapshot of given object,
      * Optional#EMPTY if object is not versioned
      */
     Optional<CdoSnapshot> getLatest(GlobalId globalId);
-
-    /**
-     * Convenient method to query by DTO, see {@link #getLatest(org.javers.core.metamodel.object.GlobalId)}
-     */
-    Optional<CdoSnapshot> getLatest(GlobalIdDTO globalIdDTO);
 
     void persist(Commit commit);
 
@@ -66,4 +55,9 @@ public interface JaversRepository {
 
     void setJsonConverter(JsonConverter jsonConverter);
 
+    /**
+     * Called at the end of JaVers bootstrap,
+     * good place to put database schema update
+     */
+    public void ensureSchema();
 }

@@ -38,6 +38,7 @@ public interface CustomPropertyComparator<T, C extends PropertyChange> {
      * @param right right (or current) property value
      * @param affectedId Id of domain object being compared
      * @param property property being compared
+     * @return should return null if compared objects have no differences
      */
     C compare(T left, T right, GlobalId affectedId, Property property);
 }

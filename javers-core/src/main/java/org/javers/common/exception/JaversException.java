@@ -1,8 +1,8 @@
 package org.javers.common.exception;
 
+import static org.javers.common.exception.JaversExceptionCode.RUNTIME_EXCEPTION;
+
 /**
- * Basic javers exception.
- *
  *  @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 @SuppressWarnings("serial")
@@ -11,6 +11,11 @@ public class JaversException extends RuntimeException {
     public static final String RUNTIME_ERROR = "JaVers runtime error - ";
 
     private final JaversExceptionCode code;
+
+    public JaversException(Throwable throwable) {
+        super(RUNTIME_EXCEPTION.getMessage(), throwable);
+        this.code = RUNTIME_EXCEPTION;
+    }
 
     public JaversException(JaversExceptionCode code, Object... arguments) {
         super(code.name() + " " + String.format(code.getMessage(), arguments));

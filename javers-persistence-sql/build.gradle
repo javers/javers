@@ -1,10 +1,27 @@
 dependencies {
     compile project(':javers-core')
-    compile 'org.polyjdbc:polyjdbc:0.3.0'
-    compile 'commons-dbcp:commons-dbcp:1.4'
+    compile 'org.polyjdbc:polyjdbc:0.5.0'
 
-    testCompile 'ch.qos.logback:logback-classic:1.1.2'
-    testCompile 'com.h2database:h2:1.3.172'
+    testCompile project(path: ":javers-core", configuration: "testArtifacts")
+
+    //required for @javax.persistence.Id ann in SnapshotEntity.class
+    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
+
+    testCompile 'commons-dbcp:commons-dbcp:1.4'
+    testCompile 'com.h2database:h2:1.4.184'
     testCompile 'org.postgresql:postgresql:9.2-1003-jdbc4'
-    testCompile 'org.polyjdbc:polyjdbc:0.3.0'
+    testCompile 'mysql:mysql-connector-java:5.1.34'
+    testCompile 'com.google.guava:guava:18.0'
 }
+
+task integrationTest(type: Test) {
+    filter {
+        includeTestsMatching 'org.javers.repository.sql.integration.**'
+    }
+}
+
+test {
+    exclude 'org/javers/repository/sql/integration/**'
+}
+
+

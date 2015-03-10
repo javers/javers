@@ -4,9 +4,11 @@ import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.core.metamodel.clazz.*;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.*;
+import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ManagedClass;
+import org.javers.core.metamodel.clazz.ValueObject;
+import org.javers.core.metamodel.property.Property;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -184,15 +186,13 @@ public class TypeMapper {
         return  jType instanceof ValueObjectType;
     }
 
-    public Type getDehydratedType(Type expectedType){
-        JaversType expectedJaversType = getJaversType(expectedType);
+    public Type getDehydratedType(Type type){
+        final JaversType javersType = getJaversType(type);
 
-        if (expectedJaversType instanceof ManagedType){
-            return GlobalId.class;
+        if (!javersType.isGenericType()){
+            return javersType.getRawDehydratedType();
         }
-        else {
-            return expectedType;
-        }
+        return new ParametrizedDehydratedType(javersType, this);
     }
 
     /**

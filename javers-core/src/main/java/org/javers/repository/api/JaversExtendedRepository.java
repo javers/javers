@@ -7,6 +7,7 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdDTO;
+import org.javers.core.metamodel.object.GlobalIdFactory;
 
 import java.util.List;
 
@@ -17,15 +18,16 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public class JaversExtendedRepository implements JaversRepository {
     private final JaversRepository delegate;
+    private final GlobalIdFactory globalIdFactory;
 
-    public JaversExtendedRepository(JaversRepository delegate) {
+    public JaversExtendedRepository(JaversRepository delegate, GlobalIdFactory globalIdFactory) {
         this.delegate = delegate;
+        this.globalIdFactory = globalIdFactory;
     }
 
-    @Override
     public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit){
         argumentIsNotNull(globalIdDTO);
-        return delegate.getStateHistory(globalIdDTO, limit);
+        return delegate.getStateHistory(globalIdFactory.createFromDto(globalIdDTO), limit);
     }
 
     @Override
@@ -34,10 +36,9 @@ public class JaversExtendedRepository implements JaversRepository {
         return delegate.getStateHistory(globalId, limit);
     }
 
-    @Override
     public Optional<CdoSnapshot> getLatest(GlobalIdDTO globalCdoIdDTO) {
         argumentIsNotNull(globalCdoIdDTO);
-        return delegate.getLatest(globalCdoIdDTO);
+        return delegate.getLatest(globalIdFactory.createFromDto(globalCdoIdDTO));
     }
 
     @Override
@@ -58,6 +59,10 @@ public class JaversExtendedRepository implements JaversRepository {
 
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
+    }
 
+    @Override
+    public void ensureSchema() {
+        delegate.ensureSchema();
     }
 }

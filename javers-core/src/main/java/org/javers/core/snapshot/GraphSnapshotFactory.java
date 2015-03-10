@@ -8,8 +8,6 @@ import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.SnapshotFactory;
-import org.javers.core.metamodel.object.SnapshotType;
-import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +21,9 @@ import java.util.List;
 class GraphSnapshotFactory {
 
     private final SnapshotFactory snapshotFactory;
-    private final JaversExtendedRepository javersRepository;
 
-    GraphSnapshotFactory(SnapshotFactory snapshotFactory, JaversExtendedRepository javersRepository) {
+    GraphSnapshotFactory(SnapshotFactory snapshotFactory) {
         this.snapshotFactory = snapshotFactory;
-        this.javersRepository = javersRepository;
     }
 
     /**
@@ -36,38 +32,41 @@ class GraphSnapshotFactory {
     List<CdoSnapshot> create(LiveGraph currentVersion, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata){
         Validate.argumentsAreNotNull(currentVersion, commitMetadata, latestShadowGraph);
 
-        List<CdoSnapshot> reused = new ArrayList<>();
+        List<CdoSnapshot> result = new ArrayList<>();
 
         for (ObjectNode node : currentVersion.nodes()) {
             boolean initial = isInitial(node, latestShadowGraph);
 
-            CdoSnapshot fresh;
-            if (initial){
-                fresh = snapshotFactory.createInitial(node, commitMetadata);
-            }
-            else{
-                fresh = snapshotFactory.create(node, commitMetadata);
-            }
+           Optional<CdoSnapshot> existing = latestShadowGraph.get(node.getGlobalId());
 
-            Optional<CdoSnapshot> existing = javersRepository.getLatest(fresh.getGlobalId());
+           CdoSnapshot fresh = createFreshSnapshot(initial, node, commitMetadata, existing);
+
             if (existing.isEmpty()) {
-                reused.add(fresh);
+                result.add(fresh); //when insert
                 continue;
             }
 
             if (!existing.get().stateEquals(fresh)) {
-                reused.add(fresh);
+                result.add(fresh); //when update
             }
+
+            //when not changed
         }
 
-        return reused;
+        return result;
     }
 
-    List<CdoSnapshot> create(LiveGraph currentVersion, CommitMetadata commitMetadata) {
-        return create(currentVersion, ShadowGraph.EMPTY, commitMetadata);
+    private CdoSnapshot createFreshSnapshot(boolean initial, ObjectNode node, CommitMetadata commitMetadata, Optional<CdoSnapshot> previous){
+        if (initial){
+            return snapshotFactory.createInitial(node, commitMetadata);
+        }
+        else{
+            //we take previous globalId because it could be PersistentGlobalId
+            return snapshotFactory.create(node, previous.get().getGlobalId(), commitMetadata);
+        }
     }
 
     private boolean isInitial(ObjectNode node, ShadowGraph latestShadowGraph){
-        return !latestShadowGraph.nodes().contains(node);
+        return !latestShadowGraph.contains(node);
     }
 }

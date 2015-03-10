@@ -2,14 +2,12 @@ package org.javers.core.metamodel.clazz;
 
 import org.javers.common.collections.Predicate;
 import org.javers.common.exception.JaversException;
+import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.javers.common.exception.JaversExceptionCode.PROPERTY_NOT_FOUND;
-import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
@@ -18,19 +16,23 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 public abstract class ManagedClass extends ClientsDomainClass {
-    
+
+    private final Map<String, Property> propertiesByName;
     private final List<Property> properties;
-    private final List<Property> propertiesUnmodifiable;
 
     ManagedClass(Class clientsClass, List<Property> properties) {
         super(clientsClass);
         argumentsAreNotNull(properties);
         this.properties = new ArrayList<>(properties);
-        this.propertiesUnmodifiable = Collections.unmodifiableList(properties);
+
+        this.propertiesByName = new HashMap<>();
+        for (Property property : properties) {
+            propertiesByName.put(property.getName(),property);
+        }
     }
 
     public List<Property> getProperties() {
-        return propertiesUnmodifiable;
+        return Collections.unmodifiableList(properties);
     }
 
     public List<Property> getProperties(Predicate<Property> query) {
@@ -49,12 +51,11 @@ public abstract class ManagedClass extends ClientsDomainClass {
      * @throws JaversException PROPERTY_NOT_FOUND
      */
     public Property getProperty(String withName) {
-        for (Property property : properties) {
-            if (property.getName().equals(withName)) {
-                return property;
-            }
+        Validate.argumentIsNotNull(withName);
+        if (!propertiesByName.containsKey(withName)){
+            throw new JaversException(PROPERTY_NOT_FOUND, withName, this.getName());
         }
-        throw new JaversException(PROPERTY_NOT_FOUND, withName, this.getName());
+        return propertiesByName.get(withName);
     }
 
     public boolean hasProperty(String withName){

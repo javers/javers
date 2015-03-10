@@ -1,21 +1,22 @@
 package org.javers.core.json;
 
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonSerializer;
-import com.google.gson.TypeAdapter;
+import com.google.gson.*;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
 import org.javers.core.json.typeadapter.joda.LocalDateTypeAdapter;
-import org.javers.core.diff.changetype.Atomic;
+import org.javers.core.metamodel.type.TypeMapper;
+
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author bartosz walacik
  * @see JsonConverter
  */
 public class JsonConverterBuilder {
+    public static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     private static final JsonTypeAdapter[] BUILT_IN_ADAPTERS = new JsonTypeAdapter[]{
             new LocalDateTimeTypeAdapter(),
@@ -23,19 +24,12 @@ public class JsonConverterBuilder {
     };
 
     private boolean typeSafeValues = false;
+    private TypeMapper typeMapper;
+    private final GsonBuilder gsonBuilder;
 
-    private final JsonConverter jsonConverter;
-
-    /**
-     * choose between new JsonConverterBuilder() or static jsonConverter()
-     */
     public JsonConverterBuilder() {
-        jsonConverter = new JsonConverter();
-        jsonConverter.registerJsonTypeAdapters(Arrays.asList(BUILT_IN_ADAPTERS));
-    }
-
-    public static JsonConverterBuilder jsonConverter() {
-        return new JsonConverterBuilder();
+        this.gsonBuilder = new GsonBuilder();
+        registerJsonTypeAdapters(Arrays.asList(BUILT_IN_ADAPTERS));
     }
 
     /**
@@ -59,12 +53,19 @@ public class JsonConverterBuilder {
         return this;
     }
 
+    public JsonConverterBuilder typeMapper(TypeMapper typeMapper){
+        this.typeMapper = typeMapper;
+        return this;
+    }
+
     /**
-     * @see JsonConverter#registerNativeGsonTypeAdapter(Type, TypeAdapter)
+     * @param nativeAdapter should be null safe, if not so,
+     *                      simply call {@link TypeAdapter#nullSafe()} before registering it
+     * @see TypeAdapter
      */
     public JsonConverterBuilder registerNativeTypeAdapter(Type targetType, TypeAdapter nativeAdapter) {
         Validate.argumentsAreNotNull(targetType, nativeAdapter);
-        jsonConverter.registerNativeGsonTypeAdapter(targetType, nativeAdapter);
+        gsonBuilder.registerTypeAdapter(targetType, nativeAdapter);
         return this;
     }
 
@@ -73,7 +74,7 @@ public class JsonConverterBuilder {
      */
     public JsonConverterBuilder registerNativeGsonSerializer(Type targetType, JsonSerializer<?> jsonSerializer) {
         Validate.argumentsAreNotNull(targetType, jsonSerializer);
-        jsonConverter.registerNativeGsonSerializer(targetType, jsonSerializer);
+        gsonBuilder.registerTypeAdapter(targetType, jsonSerializer);
         return this;
     }
 
@@ -82,29 +83,58 @@ public class JsonConverterBuilder {
      */
     public JsonConverterBuilder registerNativeGsonDeserializer(Type targetType, JsonDeserializer<?> jsonDeserializer) {
         Validate.argumentsAreNotNull(targetType, jsonDeserializer);
-        jsonConverter.registerNativeGsonDeserializer(targetType, jsonDeserializer);
-        return this;
-    }
-
-    public JsonConverterBuilder registerJsonTypeAdapter(JsonTypeAdapter adapter) {
-        Validate.argumentIsNotNull(adapter);
-        jsonConverter.registerJsonTypeAdapter(adapter);
+        gsonBuilder.registerTypeAdapter(targetType, jsonDeserializer);
         return this;
     }
 
     public JsonConverterBuilder registerJsonTypeAdapters(Collection<JsonTypeAdapter> adapters) {
         Validate.argumentIsNotNull(adapters);
-        jsonConverter.registerJsonTypeAdapters(adapters);
+        for (JsonTypeAdapter adapter : adapters) {
+            registerJsonTypeAdapter(adapter);
+        }
         return this;
     }
 
+    /**
+     * Maps given {@link JsonTypeAdapter}
+     * into pair of {@link JsonDeserializer} and {@link JsonDeserializer}
+     * and registers them with this.gsonBuilder
+     */
+    public JsonConverterBuilder registerJsonTypeAdapter(JsonTypeAdapter adapter) {
+        Validate.argumentIsNotNull(adapter);
+        for (Class c : (List<Class>)adapter.getValueTypes()){
+            registerJsonTypeAdapterForType(c, adapter);
+        }
+        return this;
+    }
 
     public JsonConverter build() {
+        registerJsonTypeAdapter(new AtomicTypeAdapter(typeSafeValues));
 
-        jsonConverter.registerJsonTypeAdapter(new AtomicTypeAdapter(typeSafeValues));
+        gsonBuilder.serializeNulls()
+                   .setPrettyPrinting()
+                   .setDateFormat(ISO_DATE_TIME_FORMAT);
 
-        jsonConverter.initialize();
-        return jsonConverter;
+        return new JsonConverter(typeMapper, gsonBuilder.create());
+    }
+
+    private void registerJsonTypeAdapterForType(Type targetType, final JsonTypeAdapter adapter) {
+        JsonSerializer jsonSerializer = new JsonSerializer() {
+            @Override
+            public JsonElement serialize(Object value, Type type, JsonSerializationContext jsonSerializationContext) {
+                return adapter.toJson(value, jsonSerializationContext);
+            }
+        };
+
+        JsonDeserializer jsonDeserializer = new JsonDeserializer() {
+            @Override
+            public Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+                return adapter.fromJson(jsonElement, jsonDeserializationContext);
+            }
+        };
+
+        registerNativeGsonSerializer(targetType, jsonSerializer);
+        registerNativeGsonDeserializer(targetType, jsonDeserializer);
     }
 
 }

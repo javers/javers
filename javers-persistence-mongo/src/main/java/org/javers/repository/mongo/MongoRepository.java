@@ -35,11 +35,6 @@ public class MongoRepository implements JaversRepository {
 
     public MongoRepository(DB mongo) {
         this.mongo = mongo;
-
-        //ensures collections and indexes
-        DBCollection snapshots = snapshotsCollection();
-        snapshots.ensureIndex(new BasicDBObject(GLOBAL_ID_KEY,ASC),"global_id_idx");
-        headCollection();
     }
 
     MongoRepository(DB mongo, JsonConverter jsonConverter) {
@@ -84,11 +79,6 @@ public class MongoRepository implements JaversRepository {
         return getStateHistory(createIdQuery(globalId), limit);
     }
 
-    @Override
-    public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit) {
-        return getStateHistory(createIdQuery(globalIdDTO), limit);
-    }
-
     private List<CdoSnapshot> getStateHistory(DBObject cdoId, int limit) {
 
         DBCursor mongoSnapshots = getMongoSnapshotsCoursor(cdoId, limit);
@@ -112,11 +102,6 @@ public class MongoRepository implements JaversRepository {
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         return getLatest(createIdQuery(globalId));
-    }
-
-    @Override
-    public Optional<CdoSnapshot> getLatest(GlobalIdDTO globalIdDTO) {
-        return getLatest(createIdQuery(globalIdDTO));
     }
 
     private Optional<CdoSnapshot> getLatest(DBObject idQuery) {
@@ -152,10 +137,6 @@ public class MongoRepository implements JaversRepository {
         return new BasicDBObject(GLOBAL_ID_KEY, id.value());
     }
 
-    private BasicDBObject createIdQuery(GlobalIdDTO id) {
-        return new BasicDBObject(GLOBAL_ID_KEY,  id.value());
-    }
-
     private CdoSnapshot readFromDBObject(DBObject dbObject) {
         return jsonConverter.fromJson(dbObject.toString(), CdoSnapshot.class);
     }
@@ -173,5 +154,13 @@ public class MongoRepository implements JaversRepository {
 
     private DBCollection headCollection() {
         return mongo.getCollection(MongoHeadId.COLLECTION_NAME);
+    }
+
+    @Override
+    public void ensureSchema() {
+        //ensures collections and indexes
+        DBCollection snapshots = snapshotsCollection();
+        snapshots.ensureIndex(new BasicDBObject(GLOBAL_ID_KEY,ASC),"global_id_idx");
+        headCollection();
     }
 }

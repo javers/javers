@@ -65,8 +65,14 @@ public enum JaversExceptionCode {
             "CommitId should consists of two parts : majorId.minorId e.g. 1.0"),
 
     CANT_DELETE_OBJECT_NOT_FOUND(JaversException.RUNTIME_ERROR+"failed to delete object {'%s'}, "+
-            "it doesn't exists in JaversRepository")
+            "it doesn't exists in JaversRepository"),
+    
+    CANT_FIND_COMMIT_HEAD_ID(JaversException.RUNTIME_ERROR+"can't find commit head id in JaversRepository"),
+    CANT_SAVE_ALREADY_PERSISTED_COMMIT(JaversException.RUNTIME_ERROR+"can't save already persisted commit"),
 
+    SQL_EXCEPTION(JaversException.RUNTIME_ERROR+"SqlException: '%s'"),
+
+    RUNTIME_EXCEPTION(JaversException.RUNTIME_ERROR+"uncategorized runtime exception")
     ;
 
     private final String message;

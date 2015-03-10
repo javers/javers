@@ -1,12 +1,15 @@
 package org.javers.core.json;
 
 import com.google.gson.*;
+import org.javers.common.validation.Validate;
+import org.javers.core.json.typeadapter.commit.CdoSnapshotStateDeserializer;
 import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
+import org.javers.core.metamodel.object.CdoSnapshotState;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Javers is meant to support various persistence stores for
@@ -41,106 +44,45 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class JsonConverter {
-    public static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
-
     private Gson gson;
-    private final GsonBuilder gsonBuilder;
+    private final CdoSnapshotStateDeserializer stateDeserializer;
 
-    JsonConverter() {
-        gsonBuilder = new GsonBuilder();
-    }
+    JsonConverter(TypeMapper typeMapper, Gson gson) {
+        Validate.argumentsAreNotNull(typeMapper, gson);
+        this.gson = gson;
 
-    void initialize() {
-        gson = gsonBuilder.serializeNulls()
-                          .setPrettyPrinting()
-                          .setDateFormat(ISO_DATE_TIME_FORMAT)
-                          .create();
-    }
-
-    /**
-     * @param nativeAdapter should be null safe, if not so,
-     *                      simply call {@link TypeAdapter#nullSafe()} before registering it
-     * @see TypeAdapter
-     */
-    void registerNativeGsonTypeAdapter(Type targetType, TypeAdapter nativeAdapter) {
-        gsonBuilder.registerTypeAdapter(targetType, nativeAdapter);
-    }
-
-    /**
-     * @see JsonSerializer
-     */
-    void registerNativeGsonSerializer(Type targetType, JsonSerializer<?> jsonSerializer){
-        gsonBuilder.registerTypeAdapter(targetType, jsonSerializer);
-
-    }
-
-    /**
-     * @see JsonDeserializer
-     */
-    void registerNativeGsonDeserializer(Type targetType, JsonDeserializer<?> jsonDeserializer){
-        gsonBuilder.registerTypeAdapter(targetType, jsonDeserializer);
-    }
-
-    void registerJsonTypeAdapters(Collection<JsonTypeAdapter> adapters){
-        for (JsonTypeAdapter adapter : adapters) {
-            registerJsonTypeAdapter(adapter);
-        }
-    }
-
-    /**
-     * Maps given {@link JsonTypeAdapter}
-     * into pair of {@link JsonDeserializer} and {@link JsonDeserializer}
-     * and registers them with this.gsonBuilder
-     */
-    void registerJsonTypeAdapter(JsonTypeAdapter adapter) {
-        for (Class c : (List<Class>)adapter.getValueTypes()){
-            registerJsonTypeAdapter(c, adapter);
-        }
+        JsonDeserializationContext deserializationContext =  new JsonDeserializationContext() {
+            @SuppressWarnings("unchecked")
+            public <T> T deserialize(JsonElement json, Type typeOfT) throws JsonParseException {
+                return (T) fromJson(json, typeOfT);
+            }
+        };
+        this.stateDeserializer = new CdoSnapshotStateDeserializer(typeMapper, deserializationContext);
     }
 
     public String toJson(Object value) {
-        checkState();
         return gson.toJson(value);
     }
 
     public JsonElement toJsonElement(Object value) {
-        checkState();
         return gson.toJsonTree(value);
     }
 
-    public <T> T fromJson(String json, Class<T> expectedType) {
-        checkState();
-        return gson.fromJson(json,expectedType);
+    public <T> T fromJson(String json, Class<T> expectedType){
+        return gson.fromJson(json, expectedType);
     }
 
-    public <T> T fromJsonTree(JsonElement json, Class<T> expectedType) {
-        checkState();
-        return gson.fromJson(json,expectedType);
+    public Object fromJson(String json, Type expectedType) {
+        return gson.fromJson(json, expectedType);
     }
 
-    private void checkState() {
-        if (gson == null) {
-            throw new IllegalStateException("JsonConverter not initialized");
-        }
+    public Object fromJson(JsonElement json, Type expectedType) {
+        return gson.fromJson(json, expectedType);
     }
 
-    void registerJsonTypeAdapter(Type targetType, final JsonTypeAdapter adapter) {
-        JsonSerializer jsonSerializer = new JsonSerializer() {
-            @Override
-            public JsonElement serialize(Object value, Type type, JsonSerializationContext jsonSerializationContext) {
-                return adapter.toJson(value, jsonSerializationContext);
-            }
-        };
-
-        JsonDeserializer jsonDeserializer = new JsonDeserializer() {
-            @Override
-            public Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-                return adapter.fromJson(jsonElement, jsonDeserializationContext);
-            }
-        };
-
-        registerNativeGsonSerializer(targetType, jsonSerializer);
-        registerNativeGsonDeserializer(targetType, jsonDeserializer);
+    public CdoSnapshotState snapshotStateFromJson(String json, GlobalId globalId){
+        Validate.argumentsAreNotNull(json, globalId);
+        JsonElement stateElement = fromJson(json, JsonElement.class);
+        return stateDeserializer.deserialize(stateElement, globalId);
     }
-
 }
