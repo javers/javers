@@ -64,8 +64,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private JaversRepository repository;
 
-    private ListCompareAlgorithm listCompareAlgorithm = ListCompareAlgorithm.SIMPLE;
-
     public static JaversBuilder javers() {
         return new JaversBuilder();
     }
@@ -111,7 +109,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private void bootDiffAppenders() {
-        addModule(new DiffAppendersModule(getContainer(), listCompareAlgorithm));
+        addModule(new DiffAppendersModule(getContainer(), coreConfiguration()));
     }
 
     /**
@@ -307,7 +305,9 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * @param algorithm, ListCompareAlgorithm.SIMPLE is used as a default
      */
     public JaversBuilder withListCompareAlgorithm(ListCompareAlgorithm algorithm) {
-        this.listCompareAlgorithm = algorithm;
+        argumentIsNotNull(algorithm);
+        coreConfiguration().withListCompareAlgorithm(algorithm);
+
         return this;
     }
 
