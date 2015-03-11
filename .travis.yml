@@ -6,3 +6,4 @@ before_script:
 
 script:
   - "./gradlew check"
+  - "./gradlew integrationTest"
