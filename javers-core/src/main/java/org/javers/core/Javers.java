@@ -147,6 +147,15 @@ public interface Javers {
      */
     List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
 
+    /**
+     * If you are serializing JaVers objects like
+     * {@link Commit}, {@link Change}, {@link Diff} or {@link CdoSnapshot} to JSON, use this JsonConverter.
+     * For example:
+     *
+     * <pre>
+     * javers.getJsonConverter().toJson(changes);
+     * </pre>
+     */
     JsonConverter getJsonConverter();
 
     /**
