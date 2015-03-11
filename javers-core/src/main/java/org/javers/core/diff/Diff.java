@@ -4,6 +4,7 @@ import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Predicate;
 import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.changetype.PropertyChange;
 
 import java.util.Collections;
@@ -33,15 +34,17 @@ public class Diff {
     /**
      * Selects new, removed or changed objects
      *
-     * @throws JaversException AFFECTED_CDO_IS_NOT_AVAILABLE if diff is restored from repository,
-     *         see {@link Change#getAffectedCdo()}
+     * @throws JaversException AFFECTED_CDO_IS_NOT_AVAILABLE if diff is restored from a repository
      */
     public <C extends Change> List getObjectsByChangeType(final Class<C> type) {
         argumentIsNotNull(type);
 
         return Lists.transform(getChangesByType(type), new Function<C, Object>() {
             public Object apply(C input) {
-                return ((Change)input).getAffectedCdo();
+                if (input.getAffectedObject().isEmpty()){
+                    throw new JaversException(JaversExceptionCode.AFFECTED_CDO_IS_NOT_AVAILABLE);
+                }
+                return input.getAffectedObject().get();
             }
         });
     }
@@ -51,13 +54,15 @@ public class Diff {
      * with changed property for given property name
      *
      * @throws JaversException AFFECTED_CDO_IS_NOT_AVAILABLE if diff is restored from repository,
-     *         see {@link Change#getAffectedCdo()}
      */
     public List getObjectsWithChangedProperty(String propertyName){
         argumentIsNotNull(propertyName);
         return Lists.transform(getPropertyChanges(propertyName), new Function<PropertyChange, Object>() {
             public Object apply(PropertyChange input) {
-                return input.getAffectedCdo();
+                if (input.getAffectedObject().isEmpty()){
+                    throw new JaversException(JaversExceptionCode.AFFECTED_CDO_IS_NOT_AVAILABLE);
+                }
+                return input.getAffectedObject().get();
             }
         });
     }

@@ -25,7 +25,7 @@ class ValueChangeAssert {
     }
 
     def hasAffectedCdo(Object expectedAffectedCdo) {
-        actual.affectedCdo == expectedAffectedCdo
+        actual.affectedObject.get() == expectedAffectedCdo
         this
     }
 

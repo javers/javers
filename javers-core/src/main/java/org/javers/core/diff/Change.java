@@ -3,16 +3,14 @@ package org.javers.core.diff;
 import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.string.ToStringBuilder;
+import org.javers.core.Javers;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalId;
 
 import static org.javers.common.string.ToStringBuilder.addFirstField;
-import static org.javers.common.validation.Validate.argumentIsNotNull;
-import static org.javers.common.validation.Validate.argumentsAreNotNull;
-import static org.javers.common.validation.Validate.conditionFulfilled;
+import static org.javers.common.validation.Validate.*;
 
 /**
  * Change represents <b>atomic</b> difference between two objects.
@@ -46,16 +44,6 @@ public abstract class Change {
         this.commitMetadata = Optional.of(commitMetadata);
     }
 
-    public void bindToCommit(CommitMetadata commitMetadata) {
-        argumentIsNotNull(commitMetadata);
-
-        if (this.commitMetadata.isPresent()) {
-            throw new IllegalStateException("Change should be effectively immutable");
-        }
-
-        this.commitMetadata = Optional.of(commitMetadata);
-    }
-
     /**
      * Affected domain object GlobalId
      */
@@ -64,7 +52,7 @@ public abstract class Change {
     }
 
     /**
-     * old name of {@link #getAffectedGlobalId()},
+     * use {@link #getAffectedGlobalId()},
      * left for backward compatibility
      */
     @Deprecated
@@ -80,15 +68,22 @@ public abstract class Change {
     }
 
     /**
-     * Affected Cdo (domain object).
+     * Affected domain object (Cdo).
      * Depending on concrete Change type,
      * it could be new Object, removed Object or new version of changed Object
      * <br> <br>
      *
-     * <b>Transient</b> reference - available only for freshly generated diff
-     *
-     * @throws JaversException AFFECTED_CDO_IS_NOT_AVAILABLE
+     * <b>Optional</b> reference - available only for freshly generated diff
      */
+    public Optional<Object> getAffectedObject() {
+        return affectedCdo;
+    }
+
+    /**
+     * use {@link #getAffectedObject()},
+     * left for backward compatibility
+     */
+    @Deprecated
     public Object getAffectedCdo() {
         if (affectedCdo == null || affectedCdo.isEmpty()) {
             throw new JaversException(JaversExceptionCode.AFFECTED_CDO_IS_NOT_AVAILABLE);
@@ -96,12 +91,9 @@ public abstract class Change {
         return affectedCdo.get();
     }
 
-    protected void setAffectedCdo(Optional<Object> affectedCdo) {
-        argumentIsNotNull(affectedCdo);
-        conditionFulfilled(this.affectedCdo == null, "affectedCdo already set");
-        this.affectedCdo = affectedCdo;
-    }
-
+    /**
+     * Empty if change is calculated by {@link Javers#compare(Object, Object)}
+     */
     public Optional<CommitMetadata> getCommitMetadata() {
         return commitMetadata;
     }
@@ -113,5 +105,24 @@ public abstract class Change {
 
     protected String fieldsToString(){
         return addFirstField("globalId", getAffectedGlobalId());
+    }
+
+    protected void setAffectedCdo(Optional<Object> affectedCdo) {
+        argumentIsNotNull(affectedCdo);
+        conditionFulfilled(this.affectedCdo == null, "affectedCdo already set");
+        this.affectedCdo = affectedCdo;
+    }
+
+    /**
+     * //TODO reduce visibility to protected
+     */
+    public void bindToCommit(CommitMetadata commitMetadata) {
+        argumentIsNotNull(commitMetadata);
+
+        if (this.commitMetadata.isPresent()) {
+            throw new IllegalStateException("Change should be effectively immutable");
+        }
+
+        this.commitMetadata = Optional.of(commitMetadata);
     }
 }
