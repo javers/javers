@@ -1,6 +1,7 @@
 package org.javers.core
 
 import org.javers.core.diff.DiffFactory
+import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
 import org.javers.core.metamodel.property.PropertyScanner
@@ -153,6 +154,17 @@ class JaversBuilderTest extends Specification {
 
         then:
         builder.getContainerComponent(Javers) == builder.getContainerComponent(Javers)
+    }
+
+    def "should contain LevenshteinListChangeAppender"() {
+        given:
+        JaversBuilder builder = javers().withLevenshteinListChangeAppender()
+
+        when:
+        builder.build()
+
+        then:
+        builder.getContainerComponent(LevenshteinListChangeAppender)
     }
 
     class DummyEntity {

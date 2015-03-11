@@ -7,9 +7,10 @@ import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ListType;
+import org.javers.core.metamodel.type.MapContentType;
+import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.List;
 
@@ -18,9 +19,7 @@ import static org.javers.common.collections.Lists.asMap;
 /**
  * @author pawel szymczyk
  */
-class ListChangeAppender extends CorePropertyChangeAppender<ListChange> {
-
-    private static final Logger logger = LoggerFactory.getLogger(ListChangeAppender.class);
+public class ListChangeAppender extends CorePropertyChangeAppender<ListChange> {
 
     private final MapChangeAppender mapChangeAppender;
     private final TypeMapper typeMapper;

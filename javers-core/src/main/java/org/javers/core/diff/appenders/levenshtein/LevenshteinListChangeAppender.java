@@ -2,22 +2,19 @@ package org.javers.core.diff.appenders.levenshtein;
 
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.CorePropertyChangeAppender;
-import org.javers.core.diff.changetype.container.*;
+import org.javers.core.diff.changetype.container.ContainerElementChange;
+import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ListType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 /**
  * @author kornel kiełczewski
  */
-class LevenshteinListChangeAppender extends CorePropertyChangeAppender<ListChange> {
-
-    private static final Logger logger = LoggerFactory.getLogger(LevenshteinListChangeAppender.class);
+public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<ListChange> {
 
     private final Backtrack backtrack = new Backtrack();
 
