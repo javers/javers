@@ -158,7 +158,7 @@ class JaversBuilderTest extends Specification {
 
     def "should contain LevenshteinListChangeAppender"() {
         given:
-        JaversBuilder builder = javers().withLevenshteinListChangeAppender()
+        JaversBuilder builder = javers().withListCompareAlgorithm(ListCompareAlgorithm.LEVENSTEIN_EDIT_DISTANCE)
 
         when:
         builder.build()

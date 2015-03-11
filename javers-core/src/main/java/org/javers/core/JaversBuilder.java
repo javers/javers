@@ -3,12 +3,8 @@ package org.javers.core;
 import com.google.gson.TypeAdapter;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
-import org.javers.core.diff.appenders.CorePropertyChangeAppender;
 import org.javers.core.diff.appenders.DiffAppendersModule;
-import org.javers.core.diff.appenders.ListChangeAppender;
-import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender;
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
 import org.javers.core.json.JsonConverter;
@@ -66,9 +62,9 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
 
-    private Class<? extends CorePropertyChangeAppender<ListChange>> listChangeAppender = ListChangeAppender.class;
-
     private JaversRepository repository;
+
+    private ListCompareAlgorithm listCompareAlgorithm = ListCompareAlgorithm.SIMPLE;
 
     public static JaversBuilder javers() {
         return new JaversBuilder();
@@ -115,7 +111,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private void bootDiffAppenders() {
-        addModule(new DiffAppendersModule(getContainer(), listChangeAppender));
+        addModule(new DiffAppendersModule(getContainer(), listCompareAlgorithm));
     }
 
     /**
@@ -307,8 +303,11 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    public JaversBuilder withLevenshteinListChangeAppender() {
-        listChangeAppender = LevenshteinListChangeAppender.class;
+    /**
+     * @param algorithm, ListCompareAlgorithm.SIMPLE is used as a default
+     */
+    public JaversBuilder withListCompareAlgorithm(ListCompareAlgorithm algorithm) {
+        this.listCompareAlgorithm = algorithm;
         return this;
     }
 
