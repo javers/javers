@@ -7,8 +7,8 @@ import org.javers.core.diff.AbstractDiffTest;
  */
 abstract class AbstractDiffAppendersTest extends AbstractDiffTest {
 
-    ListChangeAppender listChangeAppender() {
-        new ListChangeAppender(mapChangeAppender(), javers.typeMapper)
+    SimpleListChangeAppender listChangeAppender() {
+        new SimpleListChangeAppender(mapChangeAppender(), javers.typeMapper)
     }
 
     MapChangeAppender mapChangeAppender() {

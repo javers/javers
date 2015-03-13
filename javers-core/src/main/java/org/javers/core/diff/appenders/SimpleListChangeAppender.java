@@ -19,12 +19,12 @@ import static org.javers.common.collections.Lists.asMap;
 /**
  * @author pawel szymczyk
  */
-public class ListChangeAppender extends CorePropertyChangeAppender<ListChange> {
+public class SimpleListChangeAppender extends CorePropertyChangeAppender<ListChange> {
 
     private final MapChangeAppender mapChangeAppender;
     private final TypeMapper typeMapper;
 
-    ListChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper) {
+    SimpleListChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper) {
         this.mapChangeAppender = mapChangeAppender;
         this.typeMapper = typeMapper;
     }
