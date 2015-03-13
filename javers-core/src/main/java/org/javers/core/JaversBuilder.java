@@ -302,6 +302,21 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
+     * Choose between two algorithms for comparing list:<br/>
+     * <br/>
+     * {@link ListCompareAlgorithm#SIMPLE} is used by default, it is fast even for long lists,
+     * but produces long and messy change lists in case when groups of elements are shifted.
+     * If your lists are usually short, always choose smarter LEVENSTEIN_EDIT_DISTANCE
+     *  <br/>
+     *
+     * {@link ListCompareAlgorithm#LEVENSTEIN_EDIT_DISTANCE}
+     * is based on Levenshtein edit distance.
+     * It calculates short and clear change lists,
+     * even in case when groups of elements are shifted as a result of adding or
+     * removing elements in the middle of the list.
+     * This algorithm is far more smarter than SIMPLE but could be slow for long lists,
+     * say more then 300 elements.
+     *
      * @param algorithm, ListCompareAlgorithm.SIMPLE is used as a default
      */
     public JaversBuilder withListCompareAlgorithm(ListCompareAlgorithm algorithm) {
