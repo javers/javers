@@ -100,8 +100,12 @@ public interface Javers {
     Diff initial(Object newDomainObject);
 
     /**
-     * Diff serialized to pretty JSON, useful if you are not using {@link JaversRepository}
+     * use:
+     * <pre>
+     * javers.getJsonConverter().toJson(diff);
+     * </pre>
      */
+    @Deprecated
     String toJson(Diff diff);
 
     /**
