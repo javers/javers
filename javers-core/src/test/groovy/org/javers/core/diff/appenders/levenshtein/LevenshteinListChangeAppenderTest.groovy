@@ -29,21 +29,6 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
         [1, 2, 3] | [9, 2, 3] | "changed"  || {it -> assertThat(it).hasValueChange(0, 1, 9)}
     }
 
-    def "should find added element at the beginning of the list"() {
-        given:
-        def leftNode =  dummyUser().withIntegerList([2, 3]).build()
-        def rightNode = dummyUser().withIntegerList([1, 2, 3]).build()
-
-        when:
-        def change = levenshteinListChangeAppender().calculateChanges(
-                realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
-
-        then:
-        assertThat(change)
-                .hasSize(1)
-                .hasValueRemoved(0, 1)
-    }
-
     @Unroll
     def "should recognise that lists as equal"() {
 
