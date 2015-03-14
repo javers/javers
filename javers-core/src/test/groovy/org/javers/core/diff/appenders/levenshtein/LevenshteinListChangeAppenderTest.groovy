@@ -29,7 +29,6 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
         [1, 2, 3] | [9, 2, 3] | "changed"  || {it -> assertThat(it).hasValueChange(0, 1, 9)}
     }
 
-    @Unroll
     def "should recognise that lists as equal"() {
 
         when:
@@ -43,7 +42,6 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
         !change
     }
 
-    @Unroll
     def "should find added element at the end of the list"() {
 
         when:
@@ -59,7 +57,6 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
                 .hasValueAdded(3, 4)
     }
 
-    @Unroll
     def "should find added element in the middle of the list"() {
 
         when:
