@@ -3,13 +3,49 @@ package org.javers.core.diff.appenders.levenshtein
 import org.javers.core.model.DummyUser
 import spock.lang.Unroll
 
-import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
+import static org.javers.core.diff.appenders.ContainerChangeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
 
     @Unroll
-    def "should recognise lists as equal"() {
+    def "should find #changeDesc element at the beginning of the list"() {
+        given:
+        def leftNode =  dummyUser().withIntegerList(leftList).build()
+        def rightNode = dummyUser().withIntegerList(rightList).build()
+
+        when:
+        def change = levenshteinListChangeAppender().calculateChanges(
+                     realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
+
+        then:
+        change.changes.size() == 1
+        assertion.call(change)
+
+        where:
+        leftList  | rightList | changeDesc || assertion
+        [1, 2, 3] | [2, 3]    | "removed"  || {it -> assertThat(it).hasValueRemoved(0, 1)}
+        [2, 3]    | [1, 2, 3] | "added"    || {it -> assertThat(it).hasValueAdded(0, 1)}
+        [1, 2, 3] | [9, 2, 3] | "changed"  || {it -> assertThat(it).hasValueChange(0, 1, 9)}
+    }
+
+    def "should find added element at the beginning of the list"() {
+        given:
+        def leftNode =  dummyUser().withIntegerList([2, 3]).build()
+        def rightNode = dummyUser().withIntegerList([1, 2, 3]).build()
+
+        when:
+        def change = levenshteinListChangeAppender().calculateChanges(
+                realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
+
+        then:
+        assertThat(change)
+                .hasSize(1)
+                .hasValueRemoved(0, 1)
+    }
+
+    @Unroll
+    def "should recognise that lists as equal"() {
 
         when:
         def leftNode = dummyUser().withIntegerList([1, 2, 3]).build()
@@ -19,7 +55,7 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
         then:
-        change == null
+        !change
     }
 
     @Unroll
@@ -35,7 +71,7 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceAdded(3, 4)
+                .hasValueAdded(3, 4)
     }
 
     @Unroll
@@ -51,10 +87,9 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceAdded(2, 4)
+                .hasValueAdded(2, 4)
     }
 
-    @Unroll
     def "should find removed element in the middle of the list"() {
 
         when:
@@ -67,10 +102,24 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceRemoved(2, 4)
+                .hasValueRemoved(2, 4)
     }
 
-    @Unroll
+    def "should find removed element at the end of the list"() {
+
+        when:
+        def leftNode =   dummyUser().withIntegerList([1, 2, 3]).build()
+        def rightNode =  dummyUser().withIntegerList([1, 2]).build()
+
+        def change = levenshteinListChangeAppender().calculateChanges(
+                realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
+
+        then:
+        assertThat(change)
+                .hasSize(1)
+                .hasValueRemoved(2, 3)
+    }
+
     def "should find changed element in the middle of the list"() {
 
         when:
@@ -81,16 +130,13 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
 
 
-        println(change)
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceChange(2, 4, 5)
+                .hasValueChange(2, 4, 5)
     }
 
-    @Unroll
     def "should find changed element at the end of the list"() {
-
         when:
         def leftNode = dummyUser().withIntegerList([0, 1, 2, 4]).build()
         def rightNode = dummyUser().withIntegerList([0, 1, 2, 5]).build()
@@ -101,12 +147,10 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceChange(3, 4, 5)
+                .hasValueChange(3, 4, 5)
     }
 
-    @Unroll
     def "should find changed and added element"() {
-
         when:
         def leftNode = dummyUser().withIntegerList([0, 1, 2, 4]).build()
         def rightNode = dummyUser().withIntegerList([0, 1, 3, 5, 6]).build()
@@ -117,8 +161,8 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
         then:
         assertThat(change)
                 .hasSize(3)
-                .hasReferenceChange(2, 2, 3)
-                .hasReferenceChange(3, 4, 5)
-                .hasReferenceAdded(4, 6)
+                .hasValueChange(2, 2, 3)
+                .hasValueChange(3, 4, 5)
+                .hasValueAdded(4, 6)
     }
 }
