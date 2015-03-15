@@ -36,6 +36,17 @@ class StepsToChanges {
                 j--;
             }
         }
+
+        while(i > 0) {
+            changes.add(new ValueRemoved(i - 1, leftList.get(i - 1)));
+            i--;
+        }
+
+        while(j > 0) {
+            changes.add(new ValueAdded(j - 1, rightList.get(j - 1)));
+            j--;
+        }
+
         return changes;
     }
 }
