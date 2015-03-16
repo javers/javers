@@ -3,6 +3,7 @@ package org.javers.core;
 import com.google.gson.TypeAdapter;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
+import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.custom.CustomPropertyComparator;

@@ -26,7 +26,7 @@ class ListReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                   .hasSize(1)
-                  .hasReferenceChange(1,instanceId(3, SnapshotEntity), instanceId(5, SnapshotEntity))
+                  .hasValueChange(1,instanceId(3, SnapshotEntity), instanceId(5, SnapshotEntity))
     }
 
     def "should NOT append ElementReferenceChange in List of ValueObject"() {
@@ -54,7 +54,7 @@ class ListReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                   .hasSize(1)
-                  .hasReferenceAdded(1, instanceId(5, SnapshotEntity))
+                  .hasValueAdded(1, instanceId(5, SnapshotEntity))
     }
 
     def "should append ReferenceRemoved in List of Entities"() {
@@ -69,7 +69,7 @@ class ListReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                   .hasSize(1)
-                  .hasReferenceRemoved(1, instanceId(5, SnapshotEntity))
+                  .hasValueRemoved(1, instanceId(5, SnapshotEntity))
     }
 
     def "should append ReferenceAdded in List of ValueObject"() {
@@ -84,7 +84,7 @@ class ListReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                   .hasSize(1)
-                  .hasReferenceAdded(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "listOfValueObjects/1"))
+                  .hasValueAdded(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "listOfValueObjects/1"))
     }
 
     def "should append ReferenceRemoved in List of ValueObject"() {
@@ -99,7 +99,7 @@ class ListReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                   .hasSize(1)
-                  .hasReferenceRemoved(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "listOfValueObjects/1"))
+                  .hasValueRemoved(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "listOfValueObjects/1"))
     }
 
 }

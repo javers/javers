@@ -1,4 +1,4 @@
-package org.javers.core;
+package org.javers.core.diff;
 
 import org.javers.core.diff.appenders.CorePropertyChangeAppender;
 import org.javers.core.diff.appenders.SimpleListChangeAppender;

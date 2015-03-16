@@ -1,6 +1,7 @@
 package org.javers.core
 
 import org.javers.core.diff.DiffFactory
+import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.appenders.SimpleListChangeAppender
 import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
