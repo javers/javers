@@ -8,7 +8,7 @@ import org.javers.core.diff.changetype.container.ListChange;
 public enum ListCompareAlgorithm {
 
     SIMPLE(SimpleListChangeAppender.class),
-    LEVENSTEIN_EDIT_DISTANCE(LevenshteinListChangeAppender.class);
+    LEVENSHTEIN_DISTANCE(LevenshteinListChangeAppender.class);
 
     private final Class<? extends CorePropertyChangeAppender<ListChange>> listChangeAppender;
 

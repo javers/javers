@@ -302,41 +302,17 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * Choose between two algorithms for comparing list:<br/>
-     * <br/>
-     * {@link ListCompareAlgorithm#SIMPLE} -
-     * calculates index changes for shifted elements
-     * (in case when elements are inserted or removed in the middle of a list).
-     * <br/>
-     * For example, for these two lists:
-     * <pre>
-     * [A, B, C]
-     * [B, C]</pre>
-     * SIMPLE algorithm calculates <b>three</b> changes:
-     * <pre>
-     * ListChange{(0).'A'>>'B', (1).'B'>>'C', (2).removed:'C']}</pre>
-     *
-     * SIMPLE algorithm if fast even for long lists
-     * but in most cases, using smarter LEVENSTEIN_EDIT_DISTANCE makes more sense.
+     * Choose between two algorithms for comparing list: ListCompareAlgorithm.SIMPLE
+     * or ListCompareAlgorithm.LEVENSHTEIN_DISTANCE.
+     * <br/><br/>
+     * Generally, we recommend using LEVENSHTEIN_DISTANCE, because it’s smarter.
+     * Hoverer, it can be slow for long lists, so SIMPLE is enabled by default.
      * <br/><br/>
      *
-     * {@link ListCompareAlgorithm#LEVENSTEIN_EDIT_DISTANCE} -
-     * calculates short and clear change lists even
-     * in case when elements are shifted.
-     * Doesn't care about index changes for shifted elements.
-     * <br/>
-     * For example, for these two lists:
-     * <pre>
-     * [A, B, C]
-     * [B, C]</pre>
-     * LEVENSTEIN_EDIT_DISTANCE algorithm calculates <b>one</b> change:
-     * <pre>
-     * ListChange{(0).removed:'A']}</pre>
+     * Refer to <a href="http://javers.org/documentation/diff-configuration/#list-algorithms">javers.org/documentation/diff-configuration</a>
+     * for description of both algorithms
      *
-     * This algorithm is far more smarter than SIMPLE but could be slow for long lists,
-     * say more then 300 elements.
-     *
-     * @param algorithm, ListCompareAlgorithm.SIMPLE is used as a default
+     * @param algorithm ListCompareAlgorithm.SIMPLE is used by default
      */
     public JaversBuilder withListCompareAlgorithm(ListCompareAlgorithm algorithm) {
         argumentIsNotNull(algorithm);
