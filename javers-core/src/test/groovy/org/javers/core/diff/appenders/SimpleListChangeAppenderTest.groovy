@@ -6,7 +6,7 @@ import spock.lang.Unroll
 
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
-class ListChangeAppenderTest extends AbstractDiffAppendersTest {
+class SimpleListChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should index List changes"() {
         given:

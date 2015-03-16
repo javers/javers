@@ -24,7 +24,7 @@ class ArrayReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                   .hasSize(1)
-                  .hasReferenceChange(1,instanceId(3, SnapshotEntity), instanceId(5, SnapshotEntity))
+                  .hasValueChange(1,instanceId(3, SnapshotEntity), instanceId(5, SnapshotEntity))
     }
 
     def "should append ReferenceAdded in Array of Entities"() {
@@ -39,7 +39,7 @@ class ArrayReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceAdded(1, instanceId(5, SnapshotEntity))
+                .hasValueAdded(1, instanceId(5, SnapshotEntity))
     }
 
     def "should append ReferenceRemoved in Array of Entities"() {
@@ -54,7 +54,7 @@ class ArrayReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceRemoved(1, instanceId(5, SnapshotEntity))
+                .hasValueRemoved(1, instanceId(5, SnapshotEntity))
     }
 
     def "should append ReferenceAdded in Array of ValueObject"() {
@@ -69,7 +69,7 @@ class ArrayReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceAdded(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "arrayOfValueObjects/1"))
+                .hasValueAdded(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "arrayOfValueObjects/1"))
     }
 
     def "should append ReferenceRemoved in Array of ValueObject"() {
@@ -84,7 +84,7 @@ class ArrayReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                 .hasSize(1)
-                .hasReferenceRemoved(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "arrayOfValueObjects/1"))
+                .hasValueRemoved(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "arrayOfValueObjects/1"))
     }
 
     def "should not append ReferenceChanged in Array of ValueObject"() {

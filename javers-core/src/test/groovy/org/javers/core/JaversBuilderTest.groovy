@@ -1,6 +1,9 @@
 package org.javers.core
 
 import org.javers.core.diff.DiffFactory
+import org.javers.core.diff.ListCompareAlgorithm
+import org.javers.core.diff.appenders.SimpleListChangeAppender
+import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
 import org.javers.core.metamodel.property.PropertyScanner
@@ -153,6 +156,28 @@ class JaversBuilderTest extends Specification {
 
         then:
         builder.getContainerComponent(Javers) == builder.getContainerComponent(Javers)
+    }
+
+    def "should use LevenshteinListChangeAppender when selected"() {
+        given:
+        def builder = javers().withListCompareAlgorithm(ListCompareAlgorithm.LEVENSHTEIN_DISTANCE)
+
+        when:
+        builder.build()
+
+        then:
+        builder.getContainerComponent(LevenshteinListChangeAppender)
+    }
+
+    def "should use SimpleListChangeAppender by default"() {
+        given:
+        def builder = javers()
+
+        when:
+        builder.build()
+
+        then:
+        builder.getContainerComponent(SimpleListChangeAppender)
     }
 
     class DummyEntity {

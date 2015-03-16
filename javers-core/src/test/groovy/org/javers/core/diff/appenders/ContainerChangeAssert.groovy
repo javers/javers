@@ -26,13 +26,13 @@ class ContainerChangeAssert {
         this
     }
 
-    ContainerChangeAssert hasReferenceChange(int expectedIndex, def expectedLeftId, def expectedRightId){
+    ContainerChangeAssert hasValueChange(int expectedIndex, def expectedLeftId, def expectedRightId){
         assert actual.changes.find{it.index == expectedIndex && it instanceof ElementValueChange && it.leftValue == expectedLeftId && it.rightValue == expectedRightId}
         this
     }
 
-    ContainerChangeAssert hasReferenceAdded(int expectedIndex, def expectedId) {
-        assert actual.changes.find{it.index == expectedIndex && it instanceof ValueAdded && it.addedValue== expectedId}
+    ContainerChangeAssert hasValueAdded(int expectedIndex, def expected) {
+        assert actual.changes.find{it.index == expectedIndex && it instanceof ValueAdded && it.addedValue== expected}
         this
     }
 
@@ -41,7 +41,7 @@ class ContainerChangeAssert {
         this
     }
 
-    ContainerChangeAssert hasReferenceRemoved(int expectedIndex, def expectedId) {
+    ContainerChangeAssert hasValueRemoved(int expectedIndex, def expectedId) {
         assert actual.changes.find{it.index == expectedIndex && it instanceof ValueRemoved && it.removedValue == expectedId}
         this
     }
