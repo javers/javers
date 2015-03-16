@@ -309,7 +309,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * Hoverer, it can be slow for long lists, so SIMPLE is enabled by default.
      * <br/><br/>
      *
-     * Refer to <a href="http://javers.org/documentation/diff-configuration/#list-algorithms">javers.org/documentation/diff-configuration</a>
+     * Refer to <a href="http://javers.org/documentation/diff-configuration/#list-algorithms">javers.org/documentation/diff-configuration/#list-algorithms</a>
      * for description of both algorithms
      *
      * @param algorithm ListCompareAlgorithm.SIMPLE is used by default
