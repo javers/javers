@@ -1,15 +1,18 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.Optional;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.exception.JaversGetterException;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ManagedClass;
+import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoWrapper;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.clazz.ValueObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,7 +78,11 @@ public class ObjectNode {
 
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
-        return cdo.getPropertyValue(property);
+        try {
+            return cdo.getPropertyValue(property);
+        } catch (JaversGetterException e){
+            throw new JaversException(JaversExceptionCode.TYPE_MISMATCH, property.getName(),cdo.getManagedClass().getName());
+        }
     }
 
     public boolean isNull(Property property){
