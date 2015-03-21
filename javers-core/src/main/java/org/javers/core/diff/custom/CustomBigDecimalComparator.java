@@ -8,7 +8,7 @@ import static java.math.BigDecimal.ROUND_HALF_UP;
 
 /**
  * Compares BigDecimals with custom precision.
- * Before compare, values are rounded (HALF_UP) to required scale.
+ * Before comparing, values are rounded (HALF_UP) to required scale.
  * <br/><br/>
  *
  * Usage example:
