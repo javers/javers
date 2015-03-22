@@ -37,7 +37,7 @@ class SnapshotFactoryTest extends Specification{
         def id = javers.instanceId(cdo)
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, id, someCommitMetadata(), UPDATE)
+        CdoSnapshot snapshot = snapshotFactory.createInitial(cdo, id, someCommitMetadata())
 
         then:
         snapshot.globalId == id
@@ -50,7 +50,7 @@ class SnapshotFactoryTest extends Specification{
         def id = javers.instanceId(cdo)
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, id, someCommitMetadata(), UPDATE)
+        CdoSnapshot snapshot = snapshotFactory.createInitial(cdo, id, someCommitMetadata())
 
         then:
         snapshot.size() == 0
@@ -62,7 +62,7 @@ class SnapshotFactoryTest extends Specification{
         def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo), someCommitMetadata(), UPDATE)
+        CdoSnapshot snapshot = snapshotFactory.createInitial(cdo, javers.instanceId(cdo), someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == cdo.getAt(propertyName)
@@ -80,7 +80,7 @@ class SnapshotFactoryTest extends Specification{
         def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo), someCommitMetadata(), UPDATE)
+        CdoSnapshot snapshot = snapshotFactory.createInitial(cdo, javers.instanceId(cdo), someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -101,7 +101,7 @@ class SnapshotFactoryTest extends Specification{
         def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo), someCommitMetadata(), UPDATE)
+        CdoSnapshot snapshot = snapshotFactory.createInitial(cdo, javers.instanceId(cdo), someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -145,7 +145,7 @@ class SnapshotFactoryTest extends Specification{
         def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo), someCommitMetadata(), UPDATE)
+        CdoSnapshot snapshot = snapshotFactory.createInitial(cdo, javers.instanceId(cdo), someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -174,7 +174,7 @@ class SnapshotFactoryTest extends Specification{
 
         when:
         def cdo = new SnapshotEntity(nonParametrizedMap:  ["a":1])
-        snapshotFactory.create(cdo, javers.instanceId(cdo), someCommitMetadata(), UPDATE)
+        snapshotFactory.createInitial(cdo, javers.instanceId(cdo), someCommitMetadata())
 
         then:
         def e = thrown(JaversException)
@@ -187,7 +187,7 @@ class SnapshotFactoryTest extends Specification{
         def snapshotFactory = javers.snapshotFactory
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.create(cdo, javers.instanceId(cdo), someCommitMetadata(), UPDATE)
+        CdoSnapshot snapshot = snapshotFactory.createInitial(cdo, javers.instanceId(cdo), someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal

@@ -2,7 +2,9 @@ package org.javers.core.metamodel.object;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.metamodel.property.Property;
 
+import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapshotState;
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL;
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE;
 
@@ -14,6 +16,7 @@ public class CdoSnapshotBuilder {
     private CommitMetadata commitMetadata;
     private SnapshotType type = UPDATE;
     private CdoSnapshotState state;
+    private CdoSnapshotStateBuilder stateBuilder = cdoSnapshotState();
 
     private CdoSnapshotBuilder(GlobalId globalId, CommitMetadata commitMetadata) {
         Validate.argumentsAreNotNull(globalId, commitMetadata);
@@ -33,7 +36,7 @@ public class CdoSnapshotBuilder {
 
     public CdoSnapshot build() {
         if (state == null) {
-            state = CdoSnapshotStateBuilder.cdoSnapshotState().build();
+            state = stateBuilder.build();
         }
         return new CdoSnapshot(globalId, commitMetadata, state, type);
     }
@@ -41,6 +44,11 @@ public class CdoSnapshotBuilder {
     public CdoSnapshotBuilder withType(SnapshotType type) {
         Validate.argumentIsNotNull(type);
         this.type = type;
+        return this;
+    }
+
+    public CdoSnapshotBuilder withPropertyValue(Property property, Object value) {
+        stateBuilder.withPropertyValue(property, value);
         return this;
     }
 
