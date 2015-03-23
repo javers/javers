@@ -4,6 +4,9 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapshotState;
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL;
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE;
@@ -17,6 +20,8 @@ public class CdoSnapshotBuilder {
     private SnapshotType type = UPDATE;
     private CdoSnapshotState state;
     private CdoSnapshotStateBuilder stateBuilder = cdoSnapshotState();
+    private List<Property> changed = new ArrayList<>();
+    private CdoSnapshot previous;
 
     private CdoSnapshotBuilder(GlobalId globalId, CommitMetadata commitMetadata) {
         Validate.argumentsAreNotNull(globalId, commitMetadata);
@@ -38,7 +43,12 @@ public class CdoSnapshotBuilder {
         if (state == null) {
             state = stateBuilder.build();
         }
-        return new CdoSnapshot(globalId, commitMetadata, state, type);
+
+        if (previous != null){
+            calculateChanged();
+        }
+
+        return new CdoSnapshot(globalId, commitMetadata, state, type, changed);
     }
 
     public CdoSnapshotBuilder withType(SnapshotType type) {
@@ -60,5 +70,21 @@ public class CdoSnapshotBuilder {
             this.type = UPDATE;
         }
         return this;
+    }
+
+    public CdoSnapshotBuilder markAllAsChanged() {
+        changed = new ArrayList<>(state.getProperties());
+        return this;
+    }
+
+    public CdoSnapshotBuilder markChanged(CdoSnapshot previous) {
+        this.previous = previous;
+        return this;
+    }
+
+    private void calculateChanged(){
+        for (Property property : state.getProperties())
+        state.getProperties();
+       //TODO previous.
     }
 }

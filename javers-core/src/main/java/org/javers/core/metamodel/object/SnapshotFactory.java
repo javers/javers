@@ -32,12 +32,14 @@ public class SnapshotFactory {
     public CdoSnapshot createInitial(Object liveCdo, GlobalId globalId, CommitMetadata commitMetadata) {
         return createSnapshotState(liveCdo, globalId, commitMetadata)
                 .withType(INITIAL)
+                .markAllAsChanged()
                 .build();
     }
 
     public CdoSnapshot createUpdate(Object liveCdo, CdoSnapshot previous, CommitMetadata commitMetadata) {
         return createSnapshotState(liveCdo, previous.getGlobalId(), commitMetadata)
                 .withType(UPDATE)
+                .markChanged(previous)
                 .build();
     }
 

@@ -3,8 +3,10 @@ package org.javers.core.metamodel.object;
 import org.javers.common.collections.Defaults;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.MapEnumeratorContext;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,6 +50,16 @@ public class CdoSnapshotState {
         CdoSnapshotState that = (CdoSnapshotState) o;
 
         return properties.equals(that.properties);
+    }
+
+    /**
+     * List of properties with changed values (when comparing to previous state)
+     */
+    public List<Property> differentValues(CdoSnapshotState previous){
+        for (Map.Entry<Property, Object> entries : properties.entrySet()){
+            //Object
+        }
+        return null;
     }
 
     @Override

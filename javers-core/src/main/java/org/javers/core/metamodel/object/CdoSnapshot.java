@@ -6,8 +6,10 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
 
+import java.util.List;
 import java.util.Set;
 
+import static java.util.Collections.unmodifiableList;
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL;
 import static org.javers.core.metamodel.object.SnapshotType.TERMINAL;
 
@@ -22,16 +24,22 @@ public final class CdoSnapshot extends Cdo {
     private CommitMetadata commitMetadata;
     private final CdoSnapshotState state;
     private final SnapshotType type;
+    private final List<Property> changed;
 
     /**
      * should be assembled by {@link CdoSnapshotBuilder}
      */
-    CdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata, CdoSnapshotState state, SnapshotType type) {
+    CdoSnapshot(GlobalId globalId,
+                CommitMetadata commitMetadata,
+                CdoSnapshotState state,
+                SnapshotType type,
+                List<Property> changed) {
         super(globalId);
         Validate.argumentsAreNotNull(state, commitMetadata, type);
         this.state = state;
         this.commitMetadata = commitMetadata;
         this.type = type;
+        this.changed = changed;
     }
 
     /**
@@ -49,6 +57,11 @@ public final class CdoSnapshot extends Cdo {
     @Override
     public Object getPropertyValue(Property property) {
         return state.getPropertyValue(property);
+    }
+
+    public List<Property> getChanged() {
+        return unmodifiableList(changed);
+
     }
 
     @Override
