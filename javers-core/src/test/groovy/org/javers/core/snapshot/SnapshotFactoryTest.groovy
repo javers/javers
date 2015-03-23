@@ -34,19 +34,6 @@ class SnapshotFactoryTest extends Specification{
         snapshotFactory = javers.snapshotFactory
     }
 
-    def "should "() {
-        given:
-        def a = 1
-
-
-        when:
-        a = 2
-        b = "2"
-
-        then:
-        true
-    }
-
     def "should mark all not-nul properties as changed for initial snapshot"() {
         given:
         def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1])
@@ -59,7 +46,7 @@ class SnapshotFactoryTest extends Specification{
         snapshot.changed.collect{it.name} == ["id","arrayOfIntegers"]
     }
 
-    def "should mark changed properties for update snapshot"() {
+    def "should mark changed and added properties for update snapshot"() {
         given:
         def ref = new SnapshotEntity(id:2)
         def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1], entityRef: ref)
@@ -81,6 +68,14 @@ class SnapshotFactoryTest extends Specification{
 
         then:
         updateSnapshot.changed.collect{it.name} == ["entityRef"]
+
+        when:
+        prevSnapshot = updateSnapshot
+        cdo.dob = new LocalDate()
+        updateSnapshot = snapshotFactory.createUpdate(cdo, prevSnapshot, someCommitMetadata())
+
+        then:
+        updateSnapshot.changed.collect{it.name} == ["dob"]
     }
 
     def "should create snapshot with given GlobalId"() {
