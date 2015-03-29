@@ -6,7 +6,7 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdDTO;
+import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 
 import java.util.List;
@@ -34,6 +34,11 @@ public class JaversExtendedRepository implements JaversRepository {
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
         argumentIsNotNull(globalId);
         return delegate.getStateHistory(globalId, limit);
+    }
+
+    @Override
+    public List<CdoSnapshot> getPropertyHistory(GlobalId globalId, String propertyName, int limit) {
+        return null;
     }
 
     public Optional<CdoSnapshot> getLatest(GlobalIdDTO globalCdoIdDTO) {

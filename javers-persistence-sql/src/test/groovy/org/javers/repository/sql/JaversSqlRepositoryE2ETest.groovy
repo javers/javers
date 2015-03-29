@@ -9,7 +9,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
 
 class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 

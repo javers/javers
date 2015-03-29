@@ -2,7 +2,7 @@ package org.javers.core.cases
 
 import org.bson.types.ObjectId
 import org.javers.core.JaversBuilder
-import org.javers.core.metamodel.object.InstanceIdDTO
+import org.javers.repository.jql.InstanceIdDTO
 import spock.lang.Specification
 
 /**

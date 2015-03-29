@@ -10,7 +10,7 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalIdDTO;
+import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;

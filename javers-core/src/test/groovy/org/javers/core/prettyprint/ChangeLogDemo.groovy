@@ -2,7 +2,7 @@ package org.javers.core.prettyprint
 
 import org.javers.core.JaversBuilder
 import org.javers.core.changelog.SimpleTextChangeLog
-import org.javers.core.metamodel.object.InstanceIdDTO
+import org.javers.repository.jql.InstanceIdDTO
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
 

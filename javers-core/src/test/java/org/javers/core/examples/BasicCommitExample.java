@@ -7,11 +7,11 @@ import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.examples.model.Person;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.InstanceIdDTO;
+import org.javers.repository.jql.InstanceIdDTO;
 import org.junit.Test;
 import java.util.List;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;
+import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
 public class BasicCommitExample {
     @Test

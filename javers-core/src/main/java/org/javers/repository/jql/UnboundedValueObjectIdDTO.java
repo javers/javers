@@ -1,10 +1,9 @@
-package org.javers.core.metamodel.object;
+package org.javers.repository.jql;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.graph.LiveCdoFactory;
 import org.javers.core.graph.LiveGraphFactory;
-import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.clazz.ValueObject;
+import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.type.TypeMapper;
 
 /**
@@ -40,7 +39,7 @@ public final class UnboundedValueObjectIdDTO extends GlobalIdDTO {
     }
 
     @Override
-    UnboundedValueObjectId create(TypeMapper typeMapper) {
+    public UnboundedValueObjectId create(TypeMapper typeMapper) {
         return new UnboundedValueObjectId( typeMapper.getManagedClass(javaClass, ValueObject.class));
     }
 }

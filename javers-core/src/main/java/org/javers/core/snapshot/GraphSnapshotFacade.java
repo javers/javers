@@ -4,7 +4,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalIdDTO;
+import org.javers.repository.jql.GlobalIdDTO;
 
 import java.util.List;
 

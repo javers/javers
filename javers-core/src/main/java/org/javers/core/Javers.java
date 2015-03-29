@@ -9,8 +9,7 @@ import org.javers.core.diff.Diff;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdDTO;
-import org.javers.repository.api.JaversRepository;
+import org.javers.repository.jql.GlobalIdDTO;
 
 import java.util.List;
 

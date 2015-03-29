@@ -5,7 +5,7 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.changelog.SimpleTextChangeLog;
 import org.javers.core.diff.Change;
 import org.javers.core.examples.model.Employee;
-import org.javers.core.metamodel.object.InstanceIdDTO;
+import org.javers.repository.jql.InstanceIdDTO;
 import org.junit.Test;
 
 import java.util.List;

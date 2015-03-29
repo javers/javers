@@ -1,10 +1,9 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.ChangeAssert
 import org.javers.core.diff.RealNodePair
 import org.javers.core.graph.ObjectNode
-import org.javers.core.metamodel.object.InstanceIdDTO
+import org.javers.repository.jql.InstanceIdDTO
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser

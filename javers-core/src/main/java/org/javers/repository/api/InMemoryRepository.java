@@ -1,6 +1,8 @@
 package org.javers.repository.api;
 
+import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
+import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -10,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+
+import static java.util.Collections.unmodifiableList;
 
 /**
  * Fake impl of JaversRepository
@@ -35,14 +39,33 @@ class InMemoryRepository implements JaversRepository {
         Validate.argumentIsNotNull(globalId);
 
         if (snapshots.containsKey(globalId)) {
-            int size = snapshots.get(globalId).size();
-            if (size <= limit){
-                return Collections.unmodifiableList(snapshots.get(globalId));
-            } else {
-                return Collections.unmodifiableList(snapshots.get(globalId).subList(size - limit, size));
-            }
+            return unmodifiableList(limit(snapshots.get(globalId), limit));
         }
         return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    public List<CdoSnapshot> getPropertyHistory(GlobalId globalId, final String propertyName, int limit) {
+        Validate.argumentsAreNotNull(globalId, propertyName);
+
+        if (snapshots.containsKey(globalId)) {
+            List<CdoSnapshot> filtered = Lists.positiveFilter(snapshots.get(globalId), new Predicate<CdoSnapshot>() {
+                public boolean apply(CdoSnapshot input) {
+                    return input.getChanged().contains(propertyName);
+                }
+            });
+            return unmodifiableList(limit(filtered, limit));
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    private List<CdoSnapshot> limit(List<CdoSnapshot> list, int limit){
+        int size = list.size();
+        if (size <= limit){
+            return list;
+        } else {
+            return list.subList(size - limit, size);
+        }
     }
 
     @Override
@@ -64,7 +87,7 @@ class InMemoryRepository implements JaversRepository {
         for (CdoSnapshot s : snapshots){
             persist(s);
         }
-        logger.debug("{} snapshot(s) persisted",snapshots.size());
+        logger.debug("{} snapshot(s) persisted", snapshots.size());
         head = commit.getId();
     }
 

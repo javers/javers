@@ -1,7 +1,7 @@
 package org.javers.spring.jpa.connectionprovider
 
 import org.javers.core.Javers
-import org.javers.core.metamodel.object.InstanceIdDTO
+import org.javers.repository.jql.InstanceIdDTO
 import org.javers.spring.example.JaversSpringJpaApplicationConfig
 import org.javers.spring.repository.jpa.DummyAuditedJpaCrudRepository
 import org.javers.spring.repository.jpa.DummyAuditedJpaRepository

@@ -1,7 +1,7 @@
 package org.javers.spring.auditable.aspect;
 
 import org.javers.core.Javers;
-import org.javers.core.metamodel.object.InstanceIdDTO;
+import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.spring.auditable.AuthorProvider;
 import org.springframework.data.repository.core.RepositoryMetadata;
 

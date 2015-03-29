@@ -7,7 +7,7 @@ import org.javers.core.diff.changetype.map.MapChange
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static org.javers.core.metamodel.object.UnboundedValueObjectIdDTO.*
+import static org.javers.repository.jql.UnboundedValueObjectIdDTO.*
 
 /**
  * @author bartosz walacik

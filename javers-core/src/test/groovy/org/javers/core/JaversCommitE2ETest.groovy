@@ -13,8 +13,8 @@ import spock.lang.Unroll
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
-import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**

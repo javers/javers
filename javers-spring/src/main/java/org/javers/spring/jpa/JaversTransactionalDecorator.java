@@ -10,7 +10,7 @@ import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalIdDTO;
+import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;

@@ -1,7 +1,7 @@
 package org.javers.core.graph
 
 import org.javers.core.IdBuilder
-import org.javers.core.metamodel.object.ValueObjectIdDTO
+import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.model.*
 import spock.lang.Shared

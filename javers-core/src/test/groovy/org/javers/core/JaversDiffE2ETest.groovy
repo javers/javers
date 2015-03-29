@@ -13,7 +13,7 @@ import org.javers.core.model.*
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
 import static org.javers.core.model.DummyUserWithPoint.userWithPoint

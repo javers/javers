@@ -1,10 +1,12 @@
-package org.javers.core.metamodel.object;
+package org.javers.repository.jql;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.ValueObject;
+import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.type.TypeMapper;
 
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;
+import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
 /**
 * @author bartosz walacik
@@ -24,7 +26,7 @@ public final class ValueObjectIdDTO extends GlobalIdDTO {
     }
 
     @Override
-    ValueObjectId create(TypeMapper typeMapper) {
+    public ValueObjectId create(TypeMapper typeMapper) {
         String voProperty = decodePropertyName();
 
         InstanceId ownerId = ownerIdDTO.create(typeMapper);

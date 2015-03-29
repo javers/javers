@@ -8,7 +8,6 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdDTO;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.mongo.model.MongoHeadId;
 

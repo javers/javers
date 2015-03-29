@@ -11,8 +11,8 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
-import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 class JaversRepositoryE2ETest extends Specification {
@@ -22,6 +22,24 @@ class JaversRepositoryE2ETest extends Specification {
     def setup() {
         // InMemoryRepository is used by default
         javers = javers().build()
+    }
+
+    def "should find snapshots by changed property"() {
+        given:
+        def entity = new SnapshotEntity(id:1, intProperty: 4)
+        javers.commit("author", entity)
+
+        entity.dob = new LocalDate()
+        javers.commit("author", entity)
+
+        entity.intProperty = 5
+        javers.commit("author", entity)
+
+        when:
+        def snapshots = javers.get
+
+        then:
+        false
     }
 
     def "should fetch terminal snapshots from the repository"() {

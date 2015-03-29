@@ -10,8 +10,8 @@ import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalIdDTO;
-import org.javers.core.metamodel.object.InstanceIdDTO;
+import org.javers.repository.jql.GlobalIdDTO;
+import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.ArrayList;

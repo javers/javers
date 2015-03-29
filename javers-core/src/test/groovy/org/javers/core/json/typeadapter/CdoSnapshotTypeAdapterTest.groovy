@@ -5,7 +5,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.metamodel.object.CdoSnapshot
-import org.javers.core.metamodel.object.ValueObjectIdDTO
+import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.test.builder.DummyUserDetailsBuilder
@@ -13,7 +13,7 @@ import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**

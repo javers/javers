@@ -3,7 +3,6 @@ package org.javers.repository.mongo
 import com.github.fakemongo.Fongo
 import org.javers.core.JaversTestBuilder
 import org.javers.core.json.JsonConverter
-import org.javers.core.metamodel.object.InstanceIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.test.builder.DummyUserBuilder
 import spock.lang.Specification

@@ -9,7 +9,6 @@ import org.javers.core.diff.changetype.map.EntryAdded
 import org.javers.core.diff.changetype.map.EntryRemoved
 import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.map.MapChange
-import org.javers.core.json.JsonConverter
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
@@ -19,7 +18,7 @@ import spock.lang.Specification
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.JaversTestBuilder.javersTestAssemblyTypeSafe
 import static org.javers.core.json.builder.ChangeTestBuilder.mapChange
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**

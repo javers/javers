@@ -16,8 +16,8 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
-import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
 /**
  * @author bartosz walacik
@@ -43,7 +43,7 @@ class SnapshotFactoryTest extends Specification{
         def snapshot = snapshotFactory.createInitial(cdo, id, someCommitMetadata())
 
         then:
-        snapshot.changed.collect{it.name} == ["id","arrayOfIntegers"]
+        snapshot.changed.collect{it.name} as Set == ["id","arrayOfIntegers"] as Set
     }
 
     def "should mark changed and added properties for update snapshot"() {
