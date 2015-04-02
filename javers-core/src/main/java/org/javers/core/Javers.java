@@ -9,7 +9,9 @@ import org.javers.core.diff.Diff;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.repository.jql.ChangeQuery;
 import org.javers.repository.jql.GlobalIdDTO;
+import org.javers.repository.jql.SnapshotQuery;
 
 import java.util.List;
 
@@ -108,6 +110,18 @@ public interface Javers {
     String toJson(Diff diff);
 
     /**
+     * TODO: javadoc
+     */
+    List<CdoSnapshot> getStateHistory(SnapshotQuery query);
+
+    /**
+     * TODO: javadoc
+     */
+    List<Change> getChangeHistory(ChangeQuery query);
+
+    /**
+     * TODO: deprecate
+     *
      * Snapshots (historical versions) of given object,
      * in reverse chronological order.
      * <br/><br/>
@@ -124,6 +138,23 @@ public interface Javers {
     List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit);
 
     /**
+     * TODO: deprecate
+     *
+     * Changes history (diff sequence) of given object,
+     * in reverse chronological order.
+     *
+     * For example, to get change history of "bob" Person, call:
+     * <pre>
+     * javers.calculateDiffs(InstanceIdDTO.instanceId("bob", Person.class), 5);
+     * </pre>
+     *
+     * @param globalId given object ID
+     * @param limit choose reasonable limit
+     * @return empty List, if object is not versioned or was committed only once
+     */
+    List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
+
+    /**
      * Latest snapshot of given object
      * or Optional#EMPTY if object is not versioned.
      * <br/><br/>
@@ -134,21 +165,6 @@ public interface Javers {
      * </pre>
      */
     Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId);
-
-    /**
-     * Changes history (diff sequence) of given object,
-     * in reverse chronological order.
-     *
-     * For example, to get change history of "bob" Person, call:
-     * <pre>
-     * javers.getChangeHistory(InstanceIdDTO.instanceId("bob", Person.class), 5);
-     * </pre>
-     *
-     * @param globalId given object ID
-     * @param limit choose reasonable limit
-     * @return empty List, if object is not versioned or was committed only once
-     */
-    List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
 
     /**
      * If you are serializing JaVers objects like
@@ -179,7 +195,7 @@ public interface Javers {
      * <br/><br/>
      * For example, to get pretty change log, call:
      * <pre>
-     * List&lt;Change&gt; changes = javers.getChangeHistory(...);
+     * List&lt;Change&gt; changes = javers.calculateDiffs(...);
      * String changeLog = javers.processChangeList(changes, new SimpleTextChangeLog());
      * System.out.println( changeLog );
      * </pre>

@@ -33,6 +33,7 @@ class SetChangeAppenderTest extends AbstractDiffAppendersTest {
 
         where:
         leftSet              | rightSet             || changesCount
+        null                 | ["1", "2"]           || 2
         []                   | ["1", "2"]           || 2
         ["1", "2"]           | ["1", "2", "3", "4"] || 2
         ["1", "2"]           | ["2", "1", "3"]      || 1
@@ -42,7 +43,7 @@ class SetChangeAppenderTest extends AbstractDiffAppendersTest {
     }
 
     @Unroll
-    def "should not append changes when left set #leftSet and right set #rightSet is equal"() {
+    def "should not append changes when left set #leftSet and right set #rightSet are equal"() {
 
         when:
         def leftNode = buildGraph(dummyUser().withStringsSet(leftSet as Set).build())
@@ -55,7 +56,7 @@ class SetChangeAppenderTest extends AbstractDiffAppendersTest {
         change == null
 
         where:
-        leftSet | rightSet
+        leftSet        | rightSet
         []             | []
         ["1", "2"]     | ["1", "2"]
         ["1", "2"]     | ["2", "1"]

@@ -1,18 +1,16 @@
 package org.javers.core.snapshot;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.JaversException;
+import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
-import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ObjectRemoved;
+import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.repository.jql.GlobalIdDTO;
-import org.javers.repository.jql.InstanceIdDTO;
-import org.javers.repository.api.JaversExtendedRepository;
+import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,37 +21,21 @@ import java.util.List;
  *
  * @author bartosz walacik
  */
-class SnapshotDiffer {
+public class SnapshotDiffer {
 
-    private final JaversExtendedRepository javersExtendedRepository;
-    private final GraphShadowFactory graphShadowFactory;
     private final DiffFactory diffFactory;
 
-    SnapshotDiffer(JaversExtendedRepository javersExtendedRepository, GraphShadowFactory graphShadowFactory, DiffFactory diffFactory) {
-        this.javersExtendedRepository = javersExtendedRepository;
-        this.graphShadowFactory = graphShadowFactory;
+    public SnapshotDiffer(DiffFactory diffFactory) {
         this.diffFactory = diffFactory;
-    }
-
-    /**
-     * Changes (diff sequence) of given entity instance, in reverse chronological order
-     *
-     * @throws JaversException ENTITY_EXPECTED if given javaClass is NOT mapped to Entity
-     */
-    List<Change> getChangeHistory(Object localId, Class entityClass, int limit){
-       return getChangeHistory(InstanceIdDTO.instanceId(localId,entityClass),limit);
     }
 
     /**
      * Changes (diff sequence) of given managed class instance, in reverse chronological order
      */
-    List<Change> getChangeHistory(GlobalIdDTO globalCdoId, int limit) {
-        Validate.argumentsAreNotNull(globalCdoId);
+    public List<Change> calculateDiffs(List<CdoSnapshot> snapshots) {
+        Validate.argumentsAreNotNull(snapshots);
 
-
-        List<CdoSnapshot> snapshots = javersExtendedRepository.getStateHistory(globalCdoId, limit);
         List<Change> result = new ArrayList<>();
-
         addObjectRemovedIfTerminal(result, snapshots.get(0));
 
         //compare pair-by-pair
@@ -69,7 +51,7 @@ class SnapshotDiffer {
             }
         }
 
-        addNewObjectIfInitial(result, snapshots.get(snapshots.size() - 1));
+        addNewObjectChangesIfInitial(result, snapshots.get(snapshots.size() - 1));
 
         return result;
     }
@@ -80,21 +62,27 @@ class SnapshotDiffer {
          }
     }
 
-    private void addNewObjectIfInitial(List<Change> changes, CdoSnapshot first) {
+    private void addNewObjectChangesIfInitial(List<Change> changes, CdoSnapshot first) {
         if (first.isInitial()){
+            //add initial values to change history (with null at left)
+            //switching off this feature may be added to JQL in the future
+            CdoSnapshot empty = CdoSnapshotBuilder.emptyCopyOf(first);
+            Diff diff = diffFactory.create(fromSnapshot(empty),
+                    fromSnapshot(first), Optional.of(first.getCommitMetadata()));
+            changes.addAll(diff.getChanges());
+
+            //add NewObject change at the bottom of the change list
             changes.add(new NewObject(first.getGlobalId(), Optional.empty(), first.getCommitMetadata()));
         }
     }
 
     private List<Change> compare(CdoSnapshot oldVer, CdoSnapshot newVer){
-        CommitMetadata commitMetadata = newVer.getCommitMetadata();
-
         Diff diff = diffFactory.create(fromSnapshot(oldVer),
-                fromSnapshot(newVer), Optional.of(commitMetadata));
+                fromSnapshot(newVer), Optional.of(newVer.getCommitMetadata()));
         return diff.getChanges();
     }
 
     private ShadowGraph fromSnapshot(CdoSnapshot snapshot){
-        return graphShadowFactory.createFromSnapshot(snapshot);
+        return new ShadowGraph(Sets.asSet(new ObjectNode(snapshot)));
     }
 }

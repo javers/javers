@@ -31,6 +31,10 @@ public class CdoSnapshotBuilder {
         this.commitMetadata = commitMetadata;
     }
 
+    public static CdoSnapshot emptyCopyOf(CdoSnapshot snapshot){
+        return cdoSnapshot(snapshot.getGlobalId(), snapshot.getCommitMetadata()).withType(snapshot.getType()).build();
+    }
+
     public static CdoSnapshotBuilder cdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata) {
         return new CdoSnapshotBuilder(globalId, commitMetadata);
     }

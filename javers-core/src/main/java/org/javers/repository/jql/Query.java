@@ -1,6 +1,8 @@
 package org.javers.repository.jql;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.List;
 
@@ -10,13 +12,11 @@ import java.util.List;
 public abstract class Query<T> {
 
     private final int limit;
-    private final Class from;
     private final List<Filter> filters;
 
-    Query (Class from, List<Filter> filters, int limit) {
-        Validate.argumentsAreNotNull(from, filters);
+    Query (List<Filter> filters, int limit) {
+        Validate.argumentsAreNotNull(filters);
         this.limit = limit;
-        this.from = from;
         this.filters = filters;
     }
 
@@ -24,7 +24,36 @@ public abstract class Query<T> {
      * choose reasonable limit (number of objects to fetch),
      * production database could contain more records than you expect
      */
-    public int getLimit() {
+    int getLimit() {
         return limit;
+    }
+
+    boolean hasFilter(Class<? extends Filter> ofType){
+        return getFilter(ofType).isPresent();
+    }
+
+    GlobalIdDTO getIdFilter() {
+        return getFilter(IdFilter.class).get().getGlobalId();
+    }
+
+    String getPropertyName(){
+        return getFilter(PropertyFilter.class).get().getPropertyName();
+    }
+
+    <T extends Filter> Optional<T> getFilter(Class<T> ofType) {
+        for (Filter f : filters) {
+            if (f.getClass().equals(ofType)) {
+                return Optional.of((T)f);
+            }
+        }
+        return Optional.empty();
+    }
+
+    boolean isIdOnlyQuery(){
+        return hasFilter(IdFilter.class) && !hasFilter(PropertyFilter.class);
+    }
+
+    boolean isPropertyQuery(){
+        return hasFilter(IdFilter.class) && hasFilter(PropertyFilter.class);
     }
 }

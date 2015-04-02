@@ -76,7 +76,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
 
         then:
             change.class == changeType_
-            change.property.name == propertyName
+            change.propertyName == propertyName
             change.getAffectedGlobalId() == instanceId(1, SnapshotEntity)
 
             with(change.commitMetadata.get()) {
@@ -235,7 +235,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
 
         then:
         change.class == changeType_
-        change.property.name == propertyName
+        change.propertyName == propertyName
         change.affectedGlobalId == instanceId(1, SnapshotEntity)
         with(change.changes[0]) {
             it.class == ElementValueChange
@@ -374,7 +374,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
 
         then:
         change.class == SetChange
-        change.property.name == "setOfIntegers"
+        change.propertyName == "setOfIntegers"
         change.affectedGlobalId == instanceId(1, SnapshotEntity)
         with(change.changes[0]) {
             it.class == ValueAdded

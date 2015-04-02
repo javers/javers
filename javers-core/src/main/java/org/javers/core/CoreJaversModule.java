@@ -11,6 +11,7 @@ import org.javers.core.metamodel.object.SnapshotFactory;
 import org.javers.core.metamodel.type.TypeFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.pico.InstantiatingModule;
+import org.javers.repository.jql.QueryRunner;
 import org.picocontainer.MutablePicoContainer;
 
 import java.util.Collection;
@@ -36,7 +37,8 @@ public class CoreJaversModule extends InstantiatingModule {
                 LiveCdoFactory.class,
                 LiveGraphFactory.class,
                 GlobalIdFactory.class,
-                DefaultDateProvider.class
+                DefaultDateProvider.class,
+                QueryRunner.class
         );
     }
 }

@@ -72,7 +72,7 @@ class ReferenceChangeTypeAdapterTest extends Specification {
             change.affectedGlobalId  == instanceId("kaz",DummyUser)
             change.left  == instanceId(1,DummyUserDetails)
             change.right == instanceId(2,DummyUserDetails)
-            change.property.name  == "dummyUserDetails"
+            change.propertyName  == "dummyUserDetails"
     }
 
     def "should be nullSafe when writing leftId & rightId for ReferenceChange" () {

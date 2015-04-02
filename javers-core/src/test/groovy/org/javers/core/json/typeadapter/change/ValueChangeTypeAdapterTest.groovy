@@ -62,7 +62,7 @@ class ValueChangeTypeAdapterTest extends Specification {
             change.affectedGlobalId == instanceId("kaz",DummyUser)
             change.left == null
             change.right == true
-            change.property.name == "bigFlag"
+            change.propertyName == "bigFlag"
     }
 
     def "should serialize ValueChange with Values using custom TypeAdapter" () {

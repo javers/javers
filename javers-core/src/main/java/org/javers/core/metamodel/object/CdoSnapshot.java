@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Collections.unmodifiableList;
+import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL;
 import static org.javers.core.metamodel.object.SnapshotType.TERMINAL;
 
@@ -61,7 +62,16 @@ public final class CdoSnapshot extends Cdo {
 
     public List<Property> getChanged() {
         return unmodifiableList(changed);
+    }
 
+    public boolean hasChangeAt(String propertyName) {
+        argumentIsNotNull(propertyName);
+        for (Property p : changed){
+            if (p.getName().equals(propertyName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

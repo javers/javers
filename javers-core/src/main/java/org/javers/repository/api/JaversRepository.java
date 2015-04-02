@@ -47,7 +47,7 @@ public interface JaversRepository {
      * Filtered version of {@link #getStateHistory(GlobalId, int)},
      * selects snapshots with a change recorded on given property
      */
-    List<CdoSnapshot> getPropertyHistory(GlobalId globalId, String propertyName, int limit);
+    List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit);
 
     /**
      * Latest snapshot of given object,

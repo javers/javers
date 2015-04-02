@@ -1,11 +1,11 @@
 package org.javers.core
 
-import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
+import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -24,7 +24,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
-    def "should find snapshots by changed property"() {
+    def "should find snapshots and changes by changed property"() {
         given:
         def entity = new SnapshotEntity(id:1, intProperty: 4)
         javers.commit("author", entity)
@@ -35,11 +35,28 @@ class JaversRepositoryE2ETest extends Specification {
         entity.intProperty = 5
         javers.commit("author", entity)
 
-        when:
-        def snapshots = javers.get
+        when: "should find snapshots"
+        def snapshots = javers.getStateHistory(QueryBuilder.findSnapshotsByIdAndProperty(instanceId(1, SnapshotEntity),"intProperty",5))
 
         then:
-        false
+        snapshots.size() == 2
+        snapshots[0].commitId.majorId == 3
+        snapshots[1].commitId.majorId == 1
+
+        when: "should find changes"
+        def changes = javers.getChangeHistory(QueryBuilder.findChangesByIdAndProperty(instanceId(1, SnapshotEntity),"intProperty",5))
+
+        then:
+        changes.size() == 2
+        changes[0].commitMetadata.get().id.majorId == 3
+        changes[0].left == 4
+        changes[0].right == 5
+        changes[1].commitMetadata.get().id.majorId == 1
+        changes[1].left == 0
+        changes[1].right == 4
+        changes.each {
+            assert it.propertyName == "intProperty"
+        }
     }
 
     def "should fetch terminal snapshots from the repository"() {
@@ -102,7 +119,7 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
-    def "should compare Entity property values with latest from repository"() {
+    def "should compare Entity properties with latest from repository"() {
         given:
         def user = dummyUser("John").withAge(18).build()
         javers.commit("login", user)
@@ -110,20 +127,19 @@ class JaversRepositoryE2ETest extends Specification {
         when:
         user.age = 19
         javers.commit("login", user)
-        def history = javers.getChangeHistory(instanceId("John", DummyUser), 100)
+        def history = javers.getChangeHistory(instanceId("John", DummyUser), 5)
 
         then:
         with(history[0]) {
             it instanceof ValueChange
             affectedGlobalId == instanceId("John", DummyUser)
-            property.name == "age"
+            propertyName == "age"
             left == 18
             right == 19
         }
-        history[1] instanceof NewObject
     }
 
-    def "should compare ValueObject property values with latest from repository"() {
+    def "should compare ValueObject properties with latest from repository"() {
         given:
         def cdo = new SnapshotEntity(id: 1, listOfValueObjects: [new DummyAddress("London","street")])
         javers.commit("login", cdo)
@@ -135,15 +151,13 @@ class JaversRepositoryE2ETest extends Specification {
         def history = javers.getChangeHistory(voId, 100)
 
         then:
-        history.size() == 2
         with(history[0]) {
             it instanceof ValueChange
             affectedGlobalId == voId
-            property.name == "city"
+            propertyName == "city"
             left == "London"
             right == "Paris"
         }
-        history[1] instanceof NewObject
     }
 
     @Unroll

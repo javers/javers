@@ -8,7 +8,7 @@ import org.javers.core.metamodel.object.GlobalId;
  *
  * Created by bartosz.walacik on 2015-03-28.
  */
-public class PropertyFilter extends Filter {
+class PropertyFilter extends Filter {
     private final String propertyName;
 
     PropertyFilter(String propertyName) {

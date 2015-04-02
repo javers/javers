@@ -45,13 +45,13 @@ class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyHistory(GlobalId globalId, final String propertyName, int limit) {
+    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, final String propertyName, int limit) {
         Validate.argumentsAreNotNull(globalId, propertyName);
 
         if (snapshots.containsKey(globalId)) {
             List<CdoSnapshot> filtered = Lists.positiveFilter(snapshots.get(globalId), new Predicate<CdoSnapshot>() {
                 public boolean apply(CdoSnapshot input) {
-                    return input.getChanged().contains(propertyName);
+                    return input.hasChangeAt(propertyName);
                 }
             });
             return unmodifiableList(limit(filtered, limit));
@@ -64,7 +64,7 @@ class InMemoryRepository implements JaversRepository {
         if (size <= limit){
             return list;
         } else {
-            return list.subList(size - limit, size);
+            return list.subList(0, limit);
         }
     }
 

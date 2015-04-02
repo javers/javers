@@ -15,7 +15,7 @@ public final class ValueObjectIdDTO extends GlobalIdDTO {
     private InstanceIdDTO ownerIdDTO;
     private final String fragment;
 
-    public ValueObjectIdDTO(Class ownerClass, Object ownerLocalId, String fragment) {
+    ValueObjectIdDTO(Class ownerClass, Object ownerLocalId, String fragment) {
         Validate.argumentsAreNotNull(ownerClass, ownerLocalId, fragment);
         ownerIdDTO = instanceId(ownerLocalId, ownerClass);
         this.fragment = fragment;

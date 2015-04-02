@@ -18,7 +18,7 @@ public class ListType extends CollectionType{
     @Override
     public Object map(Object sourceList_, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentsAreNotNull(sourceList_, mapFunction, owner);
-        List sourceList = (List)sourceList_;
+        List sourceList = toNotNullList(sourceList_);
         List targetList = new ArrayList(sourceList.size());
 
         IndexableContext indexableContext = new IndexableContext();
@@ -29,5 +29,14 @@ public class ListType extends CollectionType{
             indexableContext.incIndex();
         }
         return Collections.unmodifiableList(targetList);
+    }
+
+    private List toNotNullList(Object sourceList) {
+        if (sourceList == null) {
+            return Collections.emptyList();
+        }
+        else{
+            return (List)sourceList;
+        }
     }
 }

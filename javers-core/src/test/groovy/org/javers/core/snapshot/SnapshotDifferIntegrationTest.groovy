@@ -4,15 +4,18 @@ import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
+import org.javers.repository.jql.UnboundedValueObjectIdDTO
 import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
@@ -23,21 +26,21 @@ class SnapshotDifferIntegrationTest extends Specification {
     def "shouldn't add NewObject to change history for ordinary commit"() {
         given:
         def javers = javers().build()
-        def user = new DummyUser("kaz")
-        javers.commit("some.login", user) //initial commit
+        def cdo = new DummyAddress("London")
+        javers.commit("some.login", cdo) //initial commit
 
         (1..2).each {
-            user.setAge(it)
-            javers.commit("some.login", user) //change commit
+            cdo.setCity(it+"")
+            javers.commit("some.login", cdo) //change commit
         }
 
         when:
-        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),2)
+        def changes = javers.getChangeHistory(unboundedValueObjectId(DummyAddress),2)
 
         then:
-        changes.size() == 2
+        changes.size() == 1
         changes.each {
-            it instanceof ValueChange
+            assert it instanceof ValueChange
         }
     }
 
@@ -51,8 +54,13 @@ class SnapshotDifferIntegrationTest extends Specification {
         def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
 
         then:
-        changes.size() == 1
-        changes[0] instanceof NewObject
+        changes.size() == 2
+        changes[0] instanceof ValueChange //initial value
+        changes[1] instanceof NewObject
+        changes.each {
+            assert it.affectedGlobalId == instanceId("kaz",DummyUser)
+            assert it.commitMetadata.get().id.majorId == 1
+        }
 
         when:
         user.setAge(18)
@@ -60,11 +68,14 @@ class SnapshotDifferIntegrationTest extends Specification {
         changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
 
         then:
-        changes.size() == 2
-        changes[0] instanceof ValueChange
-        changes[1] instanceof NewObject
-        changes[1].affectedGlobalId == instanceId("kaz",DummyUser)
-        changes[1].commitMetadata.get().id.majorId == 1
+        changes.size() == 3
+        changes[0] instanceof ValueChange //update
+        changes[1] instanceof ValueChange //initial value
+        changes[2] instanceof NewObject
+
+        changes.each {
+            assert it.affectedGlobalId == instanceId("kaz",DummyUser)
+        }
     }
 
     def "should add ObjectRemoved to change history for terminal commit"() {
@@ -78,11 +89,9 @@ class SnapshotDifferIntegrationTest extends Specification {
         def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
 
         then:
-        changes.size() == 2
         changes[0] instanceof ObjectRemoved
         changes[0].affectedGlobalId == instanceId("kaz",DummyUser)
         changes[0].commitMetadata.get().id.majorId == 2
-        changes[1] instanceof NewObject
     }
 
     @Unroll
@@ -96,11 +105,10 @@ class SnapshotDifferIntegrationTest extends Specification {
         def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),10)
 
         then:
-        changes.size() == 2
         def change = changes[0]
         change.class == expectedChangeType
         change.affectedGlobalId == instanceId("kaz",DummyUser)
-        change.property.name == expectedChangedProperty
+        change.propertyName == expectedChangedProperty
         change.left == expectedLeftValue
         change.right == expectedRightValue
         change.commitMetadata.get().commitDate
@@ -127,10 +135,9 @@ class SnapshotDifferIntegrationTest extends Specification {
         def changes = javers.getChangeHistory(instanceId(1,SnapshotEntity),10)
 
         then:
-        changes.size() == 2
         def change = changes[0]
         change.affectedGlobalId == instanceId(1,SnapshotEntity)
-        change.property.name == propertyName
+        change.propertyName == propertyName
         change.changes.size() == 1
         def elementChange = change.changes[0]
         elementChange.leftValue == expectedLeftValue
@@ -166,12 +173,10 @@ class SnapshotDifferIntegrationTest extends Specification {
         def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
 
         then:
-        changes.size() == 4
         (0..2).each {
             ValueChange change = changes[it]
             assert change.left  == 4-it-1
             assert change.right == 4-it
         }
-        changes[3] instanceof NewObject
     }
 }

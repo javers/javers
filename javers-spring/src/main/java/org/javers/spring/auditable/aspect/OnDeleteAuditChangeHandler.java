@@ -16,7 +16,7 @@ class OnDeleteAuditChangeHandler extends AbstractAuditChangeHandler {
     @Override
     public void handle(RepositoryMetadata repositoryMetadata, Object domainObject) {
         if (isIdClass(repositoryMetadata, domainObject)) {
-            javers.commitShallowDeleteById(authorProvider.provide(), new InstanceIdDTO(repositoryMetadata.getDomainType(), domainObject));
+            javers.commitShallowDeleteById(authorProvider.provide(), InstanceIdDTO.instanceId(domainObject, repositoryMetadata.getDomainType()));
         } else if (isDomainClass(repositoryMetadata, domainObject)) {
             javers.commitShallowDelete(authorProvider.provide(), domainObject);
         } else {

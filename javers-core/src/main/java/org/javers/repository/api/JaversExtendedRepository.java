@@ -1,33 +1,52 @@
 package org.javers.repository.api;
 
+import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
+import org.javers.common.collections.Predicate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
+import org.javers.core.diff.Change;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.repository.jql.GlobalIdDTO;
-import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.snapshot.SnapshotDiffer;
 
 import java.util.List;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * @author bartosz walacik
  */
 public class JaversExtendedRepository implements JaversRepository {
     private final JaversRepository delegate;
-    private final GlobalIdFactory globalIdFactory;
+    private final SnapshotDiffer snapshotDiffer;
 
-    public JaversExtendedRepository(JaversRepository delegate, GlobalIdFactory globalIdFactory) {
+    public JaversExtendedRepository(JaversRepository delegate, SnapshotDiffer snapshotDiffer) {
         this.delegate = delegate;
-        this.globalIdFactory = globalIdFactory;
+        this.snapshotDiffer = snapshotDiffer;
     }
 
-    public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalIdDTO, int limit){
-        argumentIsNotNull(globalIdDTO);
-        return delegate.getStateHistory(globalIdFactory.createFromDto(globalIdDTO), limit);
+    public List<Change> getPropertyChangeHistory(GlobalId globalId,  final String propertyName, int limit) {
+        argumentsAreNotNull(globalId, propertyName);
+
+        List<CdoSnapshot> snapshots = getPropertyStateHistory(globalId, propertyName, limit);
+        List<Change> changes = snapshotDiffer.calculateDiffs(snapshots);
+
+        return Lists.positiveFilter(changes, new Predicate<Change>() {
+            public boolean apply(Change input) {
+                return input instanceof PropertyChange && ((PropertyChange) input).getPropertyName().equals(propertyName);
+            }
+        });
+    }
+
+    public List<Change> getChangeHistory(GlobalId globalId, int limit) {
+        argumentsAreNotNull(globalId);
+
+        List<CdoSnapshot> snapshots = getStateHistory(globalId, limit);
+        return snapshotDiffer.calculateDiffs(snapshots);
     }
 
     @Override
@@ -37,13 +56,9 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyHistory(GlobalId globalId, String propertyName, int limit) {
-        return null;
-    }
-
-    public Optional<CdoSnapshot> getLatest(GlobalIdDTO globalCdoIdDTO) {
-        argumentIsNotNull(globalCdoIdDTO);
-        return delegate.getLatest(globalIdFactory.createFromDto(globalCdoIdDTO));
+    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit) {
+        argumentsAreNotNull(globalId, propertyName);
+        return delegate.getPropertyStateHistory(globalId, propertyName, limit);
     }
 
     @Override

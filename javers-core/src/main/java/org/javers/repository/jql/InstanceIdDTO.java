@@ -12,7 +12,7 @@ public final class InstanceIdDTO extends GlobalIdDTO {
     private final Class  javaClass;
     private final Object localId;
 
-    public InstanceIdDTO(Class javaClass, Object localId) {
+    InstanceIdDTO(Class javaClass, Object localId) {
         Validate.argumentsAreNotNull(javaClass, localId);
         this.javaClass = javaClass;
         this.localId = localId;

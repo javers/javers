@@ -237,7 +237,7 @@ class MapChangeTypeAdapterTest extends Specification {
         change.commitMetadata.get().author == "kazik"
         change.commitMetadata.get().id == "1.0"
         change.commitMetadata.get().commitDate == new LocalDateTime("2001-12-01T22:23:03")
-        change.property.name == "mapOfPrimitives"
+        change.propertyName == "mapOfPrimitives"
         MapChangeAssert.assertThat(change)
                        .hasEntryAdded("some1",1)
                        .hasEntryRemoved("some2",2)

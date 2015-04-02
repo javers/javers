@@ -73,4 +73,9 @@ public class JaversSqlRepository implements JaversRepository {
     public void ensureSchema() {
         schemaManager.ensureSchema();
     }
+
+    @Override
+    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit) {
+        throw new RuntimeException("not implemented");
+    }
 }

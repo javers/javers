@@ -57,7 +57,7 @@ class JaversDiffE2ETest extends Specification {
         diff.changes.size() == 1
         with(diff.changes[0]) {
             affectedCdoId instanceof UnboundedValueObjectId
-            property.name == "multimap"
+            propertyName == "multimap"
             changes[0].key == "a"
             changes[0].leftValue == 1
             changes[0].rightValue == 2

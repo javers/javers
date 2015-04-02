@@ -162,4 +162,9 @@ public class MongoRepository implements JaversRepository {
         snapshots.ensureIndex(new BasicDBObject(GLOBAL_ID_KEY,ASC),"global_id_idx");
         headCollection();
     }
+
+    @Override
+    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit) {
+        throw new RuntimeException("not implemented");
+    }
 }
