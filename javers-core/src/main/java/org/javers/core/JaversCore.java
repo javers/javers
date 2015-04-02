@@ -1,6 +1,7 @@
 package org.javers.core;
 
 import org.javers.common.collections.Optional;
+import org.javers.common.validation.Validate;
 import org.javers.core.changelog.ChangeListTraverser;
 import org.javers.core.changelog.ChangeProcessor;
 import org.javers.core.commit.Commit;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
+import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 import static org.javers.repository.jql.QueryBuilder.*;
 
 /**
@@ -114,13 +116,21 @@ class JaversCore implements Javers {
      */
     @Deprecated
     public List<Change> getChangeHistory(GlobalIdDTO globalId, int limit) {
-        return queryRunner.runQuery(QueryBuilder.findChanges().byGlobalIdDTO(globalId).limit(limit).build() );
+        return queryRunner.runQuery(QueryBuilder.findChanges().byGlobalIdDTO(globalId).limit(limit).build());
     }
 
+    @Override
+    public Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass) {
+        Validate.argumentsAreNotNull(localId, entityClass);
+        return queryRunner.runQueryForLatestSnapshot(instanceId(localId, entityClass));
+    }
+
+    @Override
+    @Deprecated
     public Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId){
-        return queryRunner.runQueryForLatestSnapshot(getLatestSnapshotQuery(globalId));
+        Validate.argumentIsNotNull(globalId);
+        return queryRunner.runQueryForLatestSnapshot(globalId);
     }
-
 
     public JsonConverter getJsonConverter() {
         return jsonConverter;

@@ -11,6 +11,8 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import static org.javers.repository.jql.QueryBuilder.findSnapshots
+
 /**
  * @author bartosz walacik
  */
@@ -39,7 +41,7 @@ class JpaHibernateConnectionProviderTest extends Specification {
 
         when:
         repository.save(o)
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        def snapshots = javers.getStateHistory(findSnapshots().byInstanceId(o.id, DummyObject).build())
 
         then:
         true

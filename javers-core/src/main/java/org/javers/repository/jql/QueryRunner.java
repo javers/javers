@@ -26,9 +26,9 @@ public class QueryRunner {
         this.globalIdFactory = globalIdFactory;
     }
 
-    public Optional<CdoSnapshot> runQueryForLatestSnapshot(SnapshotQuery query) {
-        Validate.argumentIsNotNull(query);
-        return repository.getLatest(fromDto(query.getIdFilter()));
+    public Optional<CdoSnapshot> runQueryForLatestSnapshot(GlobalIdDTO globalId) {
+        Validate.argumentIsNotNull(globalId);
+        return repository.getLatest(fromDto(globalId));
     }
 
     public List<CdoSnapshot> runQuery(SnapshotQuery query){

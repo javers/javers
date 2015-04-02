@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
+import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId;
 
 /**
  * Created by bartosz.walacik on 2015-03-29.
@@ -24,11 +25,6 @@ public abstract class QueryBuilder<S extends QueryBuilder, Q extends Query> {
         myself = (S) selfType.cast(this);
     }
 
-    public static SnapshotQuery getLatestSnapshotQuery(GlobalIdDTO globalId) {
-        Validate.argumentIsNotNull(globalId);
-        return new SnapshotQuery((List) Lists.asList(new IdFilter(globalId)),1);
-    }
-
     public static ChangeQueryBuilder findChanges() {
         ChangeQueryBuilder builder = new ChangeQueryBuilder();
         return builder;
@@ -39,9 +35,21 @@ public abstract class QueryBuilder<S extends QueryBuilder, Q extends Query> {
         return builder;
     }
 
-    public S byInstanceId(Object localId, Class javaClass){
-        Validate.argumentsAreNotNull(localId, javaClass);
-        addFilter(new IdFilter(instanceId(localId, javaClass)));
+    public S byInstanceId(Object localId, Class entityClass){
+        Validate.argumentsAreNotNull(localId, entityClass);
+        addFilter(new IdFilter(instanceId(localId, entityClass)));
+        return myself;
+    }
+
+    public S byValueObjectId(Object ownerLocalId, Class ownerEntityClass, String path){
+        Validate.argumentsAreNotNull(ownerEntityClass, ownerLocalId, path);
+        addFilter(new IdFilter(ValueObjectIdDTO.valueObjectId(ownerLocalId, ownerEntityClass, path)));
+        return myself;
+    }
+
+    public S byUnboundedValueObjectId(Class valueObjectClass){
+        Validate.argumentIsNotNull(valueObjectClass);
+        addFilter(new IdFilter(unboundedValueObjectId(valueObjectClass)));
         return myself;
     }
 

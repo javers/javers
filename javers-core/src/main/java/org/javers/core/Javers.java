@@ -153,15 +153,18 @@ public interface Javers {
     List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
 
     /**
-     * Latest snapshot of given object
-     * or Optional#EMPTY if object is not versioned.
+     * Latest snapshot of given entity instance
+     * or Optional#EMPTY if instance is not versioned.
      * <br/><br/>
      *
      * For example, to get last snapshot of "bob" Person, call:
      * <pre>
-     * javers.getStateHistory(InstanceIdDTO.instanceId("bob", Person.class), 5);
+     * javers.getLatestSnapshot("bob", Person.class));
      * </pre>
      */
+    Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass);
+
+    @Deprecated
     Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId);
 
     /**

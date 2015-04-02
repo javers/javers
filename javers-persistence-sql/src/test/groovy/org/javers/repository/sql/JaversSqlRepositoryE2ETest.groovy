@@ -3,6 +3,7 @@ package org.javers.repository.sql
 import org.h2.tools.Server
 import org.javers.core.JaversRepositoryE2ETest
 import org.javers.core.model.SnapshotEntity
+import org.javers.repository.jql.QueryBuilder
 import org.javers.repository.sql.reposiotries.PersistentGlobalId
 
 import java.sql.Connection
@@ -10,6 +11,7 @@ import java.sql.DriverManager
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.QueryBuilder.findSnapshots
 
 class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
@@ -63,7 +65,7 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         when:
         javers.commit("author", anEntity)
         dbConnection.rollback()
-        def snapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 2)
+        def snapshots = javers.getStateHistory(findSnapshots().byInstanceId(1, SnapshotEntity).build())
 
         then:
         !snapshots
@@ -71,7 +73,7 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         when:
         javers.commit("author", anEntity)
         dbConnection.commit()
-        snapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 2)
+        snapshots = javers.getStateHistory(findSnapshots().byInstanceId(1, SnapshotEntity).build())
 
         then:
         snapshots.size() == 1

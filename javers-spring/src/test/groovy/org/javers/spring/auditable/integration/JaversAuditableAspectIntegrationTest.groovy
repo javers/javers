@@ -1,6 +1,7 @@
 package org.javers.spring.auditable.integration
 
 import org.javers.core.Javers
+import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.example.JaversSpringMongoApplicationConfig
 import org.javers.spring.repository.mongo.DummyAuditedRepository
 import org.javers.spring.model.DummyObject
@@ -10,6 +11,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.QueryBuilder.findSnapshots
 
 /**
  * @author Pawel Szymczyk
@@ -39,7 +41,7 @@ class JaversAuditableAspectIntegrationTest extends Specification {
         repository.save(o)
 
         then:
-        javers.getStateHistory(instanceId(o.id, DummyObject), 10).size() == 1
+        javers.getStateHistory(findSnapshots().byInstanceId(o.id, DummyObject).build()).size() == 1
     }
 
     def "should commit few arguments when method is annotated with @JaversAuditable"() {
@@ -51,8 +53,8 @@ class JaversAuditableAspectIntegrationTest extends Specification {
         repository.saveTwo(o1, o2)
 
         then:
-        javers.getStateHistory(instanceId(o1.id, DummyObject), 10).size() == 1
-        javers.getStateHistory(instanceId(o2.id, DummyObject), 10).size() == 1
+        javers.getStateHistory(findSnapshots().byInstanceId(o1.id, DummyObject).build()).size() == 1
+        javers.getStateHistory(findSnapshots().byInstanceId(o2.id, DummyObject).build()).size() == 1
     }
 
     def "should commit iterable argument when method is annotated with @JaversAuditable"() {
@@ -64,7 +66,7 @@ class JaversAuditableAspectIntegrationTest extends Specification {
 
         then:
         objects.each {
-            javers.getStateHistory(instanceId(it.id, DummyObject), 10).size() == 1
+            javers.getStateHistory(findSnapshots().byInstanceId(it.id, DummyObject).build()).size() == 1
         }
     }
 
@@ -76,6 +78,6 @@ class JaversAuditableAspectIntegrationTest extends Specification {
         repository.find(o)
 
         then:
-        javers.getStateHistory(instanceId(o.id, DummyObject), 10).size() == 0
+        javers.getStateHistory(findSnapshots().byInstanceId(o.id, DummyObject).build()).size() == 0
     }
 }
