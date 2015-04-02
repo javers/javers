@@ -1,17 +1,15 @@
 package org.javers.spring.jpa.connectionprovider
 
 import org.javers.core.Javers
-import org.javers.repository.jql.InstanceIdDTO
+import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.example.JaversSpringJpaApplicationConfig
+import org.javers.spring.model.DummyObject
 import org.javers.spring.repository.jpa.DummyAuditedJpaCrudRepository
 import org.javers.spring.repository.jpa.DummyAuditedJpaRepository
-import org.javers.spring.model.DummyObject
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
-
-import static org.javers.repository.jql.QueryBuilder.findSnapshots
 
 /**
  * @author bartosz walacik
@@ -41,7 +39,7 @@ class JpaHibernateConnectionProviderTest extends Specification {
 
         when:
         repository.save(o)
-        def snapshots = javers.getStateHistory(findSnapshots().byInstanceId(o.id, DummyObject).build())
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
 
         then:
         true

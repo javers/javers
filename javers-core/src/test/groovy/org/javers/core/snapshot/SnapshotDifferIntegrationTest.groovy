@@ -8,14 +8,13 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
-import org.javers.repository.jql.UnboundedValueObjectIdDTO
+import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
@@ -35,7 +34,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         }
 
         when:
-        def changes = javers.getChangeHistory(unboundedValueObjectId(DummyAddress),2)
+        def changes = javers.findChanges(QueryBuilder.byUnboundedValueObjectId(DummyAddress).limit(2).build())
 
         then:
         changes.size() == 1
@@ -51,7 +50,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         javers.commit("some.login", user) //initial commit
 
         when:
-        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
+        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
 
         then:
         changes.size() == 2
@@ -65,7 +64,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         when:
         user.setAge(18)
         javers.commit("some.login",user) //change commit
-        changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
+        changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
 
         then:
         changes.size() == 3
@@ -86,7 +85,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         javers.commitShallowDelete("some.login", user)
 
         when:
-        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
+        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
 
         then:
         changes[0] instanceof ObjectRemoved
@@ -102,7 +101,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         javers.commit("some.login", newCdo)
 
         when:
-        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),10)
+        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
 
         then:
         def change = changes[0]
@@ -132,7 +131,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         javers.commit("some.login", newCdo)
 
         when:
-        def changes = javers.getChangeHistory(instanceId(1,SnapshotEntity),10)
+        def changes = javers.findChanges(QueryBuilder.byInstanceId(1,SnapshotEntity).build())
 
         then:
         def change = changes[0]
@@ -170,7 +169,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         }
 
         when:
-        def changes = javers.getChangeHistory(instanceId("kaz",DummyUser),5)
+        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
 
         then:
         (0..2).each {

@@ -10,9 +10,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.repository.jql.QueryBuilder.findSnapshots
-
 /**
  * @author Pawel Szymczyk
  */
@@ -41,7 +38,7 @@ class JaversAuditableAspectIntegrationTest extends Specification {
         repository.save(o)
 
         then:
-        javers.getStateHistory(findSnapshots().byInstanceId(o.id, DummyObject).build()).size() == 1
+        javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build()).size() == 1
     }
 
     def "should commit few arguments when method is annotated with @JaversAuditable"() {
@@ -53,8 +50,8 @@ class JaversAuditableAspectIntegrationTest extends Specification {
         repository.saveTwo(o1, o2)
 
         then:
-        javers.getStateHistory(findSnapshots().byInstanceId(o1.id, DummyObject).build()).size() == 1
-        javers.getStateHistory(findSnapshots().byInstanceId(o2.id, DummyObject).build()).size() == 1
+        javers.findSnapshots(QueryBuilder.byInstanceId(o1.id, DummyObject).build()).size() == 1
+        javers.findSnapshots(QueryBuilder.byInstanceId(o2.id, DummyObject).build()).size() == 1
     }
 
     def "should commit iterable argument when method is annotated with @JaversAuditable"() {
@@ -66,7 +63,7 @@ class JaversAuditableAspectIntegrationTest extends Specification {
 
         then:
         objects.each {
-            javers.getStateHistory(findSnapshots().byInstanceId(it.id, DummyObject).build()).size() == 1
+            javers.findSnapshots(QueryBuilder.byInstanceId(it.id, DummyObject).build()).size() == 1
         }
     }
 
@@ -78,6 +75,6 @@ class JaversAuditableAspectIntegrationTest extends Specification {
         repository.find(o)
 
         then:
-        javers.getStateHistory(findSnapshots().byInstanceId(o.id, DummyObject).build()).size() == 0
+        javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build()).size() == 0
     }
 }
