@@ -36,7 +36,8 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("author", entity)
 
         when: "should find snapshots"
-        def snapshots = javers.getStateHistory(QueryBuilder.findSnapshotsByIdAndProperty(instanceId(1, SnapshotEntity),"intProperty",5))
+        def snapshots = javers.getStateHistory(
+                QueryBuilder.findSnapshots().byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
 
         then:
         snapshots.size() == 2
@@ -44,7 +45,8 @@ class JaversRepositoryE2ETest extends Specification {
         snapshots[1].commitId.majorId == 1
 
         when: "should find changes"
-        def changes = javers.getChangeHistory(QueryBuilder.findChangesByIdAndProperty(instanceId(1, SnapshotEntity),"intProperty",5))
+        def changes = javers.getChangeHistory(
+                QueryBuilder.findChanges().byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
 
         then:
         changes.size() == 2

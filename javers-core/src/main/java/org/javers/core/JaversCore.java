@@ -14,10 +14,7 @@ import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.JaversExtendedRepository;
-import org.javers.repository.jql.ChangeQuery;
-import org.javers.repository.jql.GlobalIdDTO;
-import org.javers.repository.jql.QueryRunner;
-import org.javers.repository.jql.SnapshotQuery;
+import org.javers.repository.jql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,15 +104,17 @@ class JaversCore implements Javers {
     /**
      * TODO: deprecate
      */
+    @Deprecated
     public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit) {
-        return queryRunner.runQuery(findSnapshotsByGlobalId(globalId, limit));
+        return queryRunner.runQuery(QueryBuilder.findSnapshots().byGlobalIdDTO(globalId).limit(limit).build() );
     }
 
     /**
      * TODO: deprecate
      */
+    @Deprecated
     public List<Change> getChangeHistory(GlobalIdDTO globalId, int limit) {
-        return queryRunner.runQuery(findChangesByGlobalId(globalId, limit));
+        return queryRunner.runQuery(QueryBuilder.findChanges().byGlobalIdDTO(globalId).limit(limit).build() );
     }
 
     public Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId){

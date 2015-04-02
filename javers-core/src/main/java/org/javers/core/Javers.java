@@ -120,8 +120,6 @@ public interface Javers {
     List<Change> getChangeHistory(ChangeQuery query);
 
     /**
-     * TODO: deprecate
-     *
      * Snapshots (historical versions) of given object,
      * in reverse chronological order.
      * <br/><br/>
@@ -135,11 +133,10 @@ public interface Javers {
      * @param limit choose reasonable limit
      * @return empty List if object is not versioned
      */
+    @Deprecated
     List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit);
 
     /**
-     * TODO: deprecate
-     *
      * Changes history (diff sequence) of given object,
      * in reverse chronological order.
      *
@@ -152,6 +149,7 @@ public interface Javers {
      * @param limit choose reasonable limit
      * @return empty List, if object is not versioned or was committed only once
      */
+    @Deprecated
     List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
 
     /**
