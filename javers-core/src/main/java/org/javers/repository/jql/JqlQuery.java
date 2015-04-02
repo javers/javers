@@ -10,12 +10,12 @@ import java.util.List;
 /**
  * Created by bartosz.walacik on 2015-03-28.
  */
-public abstract class Query<T> {
+public class JqlQuery<T> {
 
     private final int limit;
     private final List<Filter> filters;
 
-    Query (List<Filter> filters, int limit) {
+    JqlQuery(List<Filter> filters, int limit) {
         Validate.argumentsAreNotNull(filters);
         this.limit = limit;
         this.filters = filters;

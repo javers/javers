@@ -13,7 +13,7 @@ import org.javers.repository.api.JaversExtendedRepository;
 import java.util.List;
 
 /**
- * Adapter from a Query to JaversRepository API
+ * Adapter from a JqlQuery to JaversRepository API
  *
  * Created by bartosz.walacik on 2015-03-29.
  */
@@ -31,7 +31,7 @@ public class QueryRunner {
         return repository.getLatest(fromDto(globalId));
     }
 
-    public List<CdoSnapshot> runQuery(SnapshotQuery query){
+    public List<CdoSnapshot> queryForSnapshots(JqlQuery query){
         Validate.argumentIsNotNull(query);
 
         if (query.isIdOnlyQuery()){
@@ -42,10 +42,10 @@ public class QueryRunner {
             return repository.getPropertyStateHistory(fromDto(query.getIdFilter()), query.getPropertyName(), query.getLimit());
         }
 
-        throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "Query " + query + " is not supported");
+        throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "JqlQuery " + query + " is not supported");
     }
 
-    public List<Change> runQuery(ChangeQuery query){
+    public List<Change> queryForChanges(JqlQuery query){
         Validate.argumentIsNotNull(query);
 
         if (query.isIdOnlyQuery()){
@@ -56,7 +56,7 @@ public class QueryRunner {
             return repository.getPropertyChangeHistory(fromDto(query.getIdFilter()), query.getPropertyName(), query.getLimit());
         }
 
-        throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "Query " + query + " is not supported");
+        throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "JqlQuery " + query + " is not supported");
     }
 
     private GlobalId fromDto(GlobalIdDTO globalIdDTO) {

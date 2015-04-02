@@ -23,7 +23,6 @@ import java.util.List;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
-import static org.javers.repository.jql.QueryBuilder.*;
 
 /**
  * core JaVers instance
@@ -95,12 +94,14 @@ class JaversCore implements Javers {
         return jsonConverter.toJson(diff);
     }
 
-    public List<CdoSnapshot> getStateHistory(SnapshotQuery query){
-        return queryRunner.runQuery(query);
+    @Override
+    public List<CdoSnapshot> findSnapshots(JqlQuery query){
+        return queryRunner.queryForSnapshots(query);
     }
 
-    public List<Change> getChangeHistory(ChangeQuery query){
-        return queryRunner.runQuery(query);
+    @Override
+    public List<Change> findChanges(JqlQuery query){
+        return queryRunner.queryForChanges(query);
     }
 
     /**
@@ -108,7 +109,7 @@ class JaversCore implements Javers {
      */
     @Deprecated
     public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit) {
-        return queryRunner.runQuery(QueryBuilder.findSnapshots().byGlobalIdDTO(globalId).limit(limit).build() );
+        return queryRunner.queryForSnapshots(QueryBuilder.byGlobalIdDTO(globalId).limit(limit).build());
     }
 
     /**
@@ -116,7 +117,7 @@ class JaversCore implements Javers {
      */
     @Deprecated
     public List<Change> getChangeHistory(GlobalIdDTO globalId, int limit) {
-        return queryRunner.runQuery(QueryBuilder.findChanges().byGlobalIdDTO(globalId).limit(limit).build());
+        return queryRunner.queryForChanges(QueryBuilder.byGlobalIdDTO(globalId).limit(limit).build());
     }
 
     @Override

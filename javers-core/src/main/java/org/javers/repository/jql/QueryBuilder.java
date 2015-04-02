@@ -1,6 +1,5 @@
 package org.javers.repository.jql;
 
-import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 
 import java.util.ArrayList;
@@ -12,62 +11,44 @@ import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValue
 
 /**
  * Created by bartosz.walacik on 2015-03-29.
- *
- * @param <S> the "self" type of Builder
- * @param <Q> the Query type of Builder
  */
-public abstract class QueryBuilder<S extends QueryBuilder, Q extends Query> {
+public class QueryBuilder {
     private int limit = 1000;
     private final List<Filter> filters = new ArrayList<>();
-    protected final S myself;
 
-    QueryBuilder(Class<?> selfType) {
-        myself = (S) selfType.cast(this);
+    private QueryBuilder(Filter initialFilter) {
+        addFilter(initialFilter);
     }
 
-    public static ChangeQueryBuilder findChanges() {
-        ChangeQueryBuilder builder = new ChangeQueryBuilder();
-        return builder;
-    }
-
-    public static SnapshotQueryBuilder findSnapshots() {
-        SnapshotQueryBuilder builder = new SnapshotQueryBuilder();
-        return builder;
-    }
-
-    public S byInstanceId(Object localId, Class entityClass){
+    public static QueryBuilder byInstanceId(Object localId, Class entityClass){
         Validate.argumentsAreNotNull(localId, entityClass);
-        addFilter(new IdFilter(instanceId(localId, entityClass)));
-        return myself;
+        return new QueryBuilder(new IdFilter(instanceId(localId, entityClass)));
     }
 
-    public S byValueObjectId(Object ownerLocalId, Class ownerEntityClass, String path){
+    public static QueryBuilder byValueObjectId(Object ownerLocalId, Class ownerEntityClass, String path){
         Validate.argumentsAreNotNull(ownerEntityClass, ownerLocalId, path);
-        addFilter(new IdFilter(ValueObjectIdDTO.valueObjectId(ownerLocalId, ownerEntityClass, path)));
-        return myself;
+        return new QueryBuilder(new IdFilter(ValueObjectIdDTO.valueObjectId(ownerLocalId, ownerEntityClass, path)));
     }
 
-    public S byUnboundedValueObjectId(Class valueObjectClass){
+    public static QueryBuilder byUnboundedValueObjectId(Class valueObjectClass){
         Validate.argumentIsNotNull(valueObjectClass);
-        addFilter(new IdFilter(unboundedValueObjectId(valueObjectClass)));
-        return myself;
+        return new QueryBuilder(new IdFilter(unboundedValueObjectId(valueObjectClass)));
     }
 
     @Deprecated
-    public S byGlobalIdDTO(GlobalIdDTO globalId){
+    public static QueryBuilder byGlobalIdDTO(GlobalIdDTO globalId){
         Validate.argumentIsNotNull(globalId);
-        addFilter(new IdFilter(globalId));
-        return myself;
+        return new QueryBuilder(new IdFilter(globalId));
     }
 
-    public S andProperty(String propertyName) {
+    public QueryBuilder andProperty(String propertyName) {
         addFilter(new PropertyFilter(propertyName));
-        return myself;
+        return this;
     }
 
-    public S limit(int limit) {
+    public QueryBuilder limit(int limit) {
         this.limit = limit;
-        return myself;
+        return this;
     }
 
     protected void addFilter(Filter filter) {
@@ -82,28 +63,7 @@ public abstract class QueryBuilder<S extends QueryBuilder, Q extends Query> {
         return limit;
     }
 
-    public abstract Q build();
-
-    public static class ChangeQueryBuilder extends QueryBuilder<ChangeQueryBuilder, ChangeQuery> {
-        public ChangeQueryBuilder() {
-            super(ChangeQueryBuilder.class);
-        }
-
-        @Override
-        public ChangeQuery build(){
-            return new ChangeQuery(getFilters(), getLimit());
-        }
+    public JqlQuery build(){
+        return new JqlQuery(getFilters(), getLimit());
     }
-
-    public static class SnapshotQueryBuilder extends QueryBuilder<SnapshotQueryBuilder, SnapshotQuery> {
-        public SnapshotQueryBuilder() {
-            super(SnapshotQueryBuilder.class);
-        }
-
-        @Override
-        public SnapshotQuery build(){
-            return new SnapshotQuery(getFilters(), getLimit());
-        }
-    }
-
 }

@@ -9,9 +9,8 @@ import org.javers.core.diff.Diff;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.repository.jql.ChangeQuery;
 import org.javers.repository.jql.GlobalIdDTO;
-import org.javers.repository.jql.SnapshotQuery;
+import org.javers.repository.jql.JqlQuery;
 
 import java.util.List;
 
@@ -112,12 +111,12 @@ public interface Javers {
     /**
      * TODO: javadoc
      */
-    List<CdoSnapshot> getStateHistory(SnapshotQuery query);
+    List<CdoSnapshot> findSnapshots(JqlQuery query);
 
     /**
      * TODO: javadoc
      */
-    List<Change> getChangeHistory(ChangeQuery query);
+    List<Change> findChanges(JqlQuery query);
 
     /**
      * Snapshots (historical versions) of given object,

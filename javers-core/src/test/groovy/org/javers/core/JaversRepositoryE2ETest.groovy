@@ -5,14 +5,13 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
+import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.repository.jql.QueryBuilder.findChanges
-import static org.javers.repository.jql.QueryBuilder.findSnapshots
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
@@ -37,8 +36,8 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("author", entity)
 
         when: "should find snapshots"
-        def snapshots = javers.getStateHistory(
-                findSnapshots().byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
+        def snapshots = javers.findSnapshots(
+                QueryBuilder.byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
 
         then:
         snapshots.size() == 2
@@ -46,8 +45,8 @@ class JaversRepositoryE2ETest extends Specification {
         snapshots[1].commitId.majorId == 1
 
         when: "should find changes"
-        def changes = javers.getChangeHistory(
-                findChanges().byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
+        def changes = javers.findChanges(
+                QueryBuilder.byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
 
         then:
         changes.size() == 2
@@ -69,7 +68,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commitShallowDelete("author", anEntity)
 
         when:
-        def snapshots = javers.getStateHistory(findSnapshots().byInstanceId(1, SnapshotEntity).build())
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         then:
         SnapshotsAssert.assertThat(snapshots)
@@ -92,7 +91,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("author2", cdo) //v. 2
 
         when:
-        def snapshots = javers.getStateHistory(findSnapshots().byInstanceId(1, SnapshotEntity).build())
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         then:
         def cdoId = instanceId(1,SnapshotEntity)
@@ -130,7 +129,7 @@ class JaversRepositoryE2ETest extends Specification {
         when:
         user.age = 19
         javers.commit("login", user)
-        def history = javers.getChangeHistory(findChanges().byInstanceId("John", DummyUser).build())
+        def history = javers.findChanges(QueryBuilder.byInstanceId("John", DummyUser).build())
 
         then:
         with(history[0]) {
@@ -150,8 +149,8 @@ class JaversRepositoryE2ETest extends Specification {
         when:
         cdo.listOfValueObjects[0].city = "Paris"
         javers.commit("login", cdo)
-        def history = javers.getChangeHistory(
-                findChanges().byValueObjectId(1, SnapshotEntity, "listOfValueObjects/0").build())
+        def history = javers.findChanges(
+                QueryBuilder.byValueObjectId(1, SnapshotEntity, "listOfValueObjects/0").build())
 
 
         then:

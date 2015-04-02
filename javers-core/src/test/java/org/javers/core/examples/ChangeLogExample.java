@@ -29,8 +29,8 @@ public class ChangeLogExample {
         javers.commit("hr.manager", bob);
 
         // when:
-        List<Change> changes = javers.getChangeHistory(
-            QueryBuilder.findChanges().byInstanceId("Bob", Employee.class).build());
+        List<Change> changes = javers.findChanges(
+            QueryBuilder.byInstanceId("Bob", Employee.class).build());
         String changeLog = javers.processChangeList(changes, new SimpleTextChangeLog());
 
         // then:

@@ -10,9 +10,8 @@ import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.repository.jql.ChangeQuery;
 import org.javers.repository.jql.GlobalIdDTO;
-import org.javers.repository.jql.SnapshotQuery;
+import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -104,14 +103,14 @@ class JaversTransactionalDecorator implements Javers {
 
     @Transactional
     @Override
-    public List<CdoSnapshot> getStateHistory(SnapshotQuery query) {
-        return delegate.getStateHistory(query);
+    public List<CdoSnapshot> findSnapshots(JqlQuery query) {
+        return delegate.findSnapshots(query);
     }
 
     @Transactional
     @Override
-    public List<Change> getChangeHistory(ChangeQuery query) {
-        return delegate.getChangeHistory(query);
+    public List<Change> findChanges(JqlQuery query) {
+        return delegate.findChanges(query);
     }
 
     @Override
