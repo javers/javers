@@ -1,5 +1,7 @@
 package org.javers.repository.jql;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 
 import java.util.ArrayList;
@@ -18,6 +20,10 @@ public class QueryBuilder {
 
     private QueryBuilder(Filter initialFilter) {
         addFilter(initialFilter);
+    }
+
+    public static QueryBuilder byClass(Class requiredClass){
+        return new QueryBuilder(new ClassFilter(requiredClass));
     }
 
     public static QueryBuilder byInstanceId(Object localId, Class entityClass){
@@ -42,6 +48,7 @@ public class QueryBuilder {
     }
 
     public QueryBuilder andProperty(String propertyName) {
+        Validate.argumentIsNotNull(propertyName);
         addFilter(new PropertyFilter(propertyName));
         return this;
     }
@@ -64,6 +71,10 @@ public class QueryBuilder {
     }
 
     public JqlQuery build(){
+        if (filters.isEmpty()){
+            throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "empty JqlQuery");
+        }
+
         return new JqlQuery(getFilters(), getLimit());
     }
 }

@@ -45,6 +45,29 @@ class InMemoryRepository implements JaversRepository {
     }
 
     @Override
+    public List<CdoSnapshot> getStateHistory(Class givenClass, int limit) {
+        Validate.argumentIsNotNull(givenClass);
+        List<CdoSnapshot> filtered = new ArrayList<>();
+
+        for (CdoSnapshot snapshot : getAll()) {
+            if (snapshot.getGlobalId().getCdoClass().getClientsClass().equals(givenClass)) {
+                filtered.add(snapshot);
+            }
+        }
+
+        return filtered;
+    }
+
+
+    private List<CdoSnapshot> getAll(){
+        List<CdoSnapshot> all = new ArrayList<>();
+        for (LinkedList<CdoSnapshot> snapshotsList : snapshots.values()) {
+            all.addAll(snapshotsList);
+        }
+        return all;
+    }
+
+    @Override
     public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, final String propertyName, int limit) {
         Validate.argumentsAreNotNull(globalId, propertyName);
 

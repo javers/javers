@@ -29,7 +29,7 @@ public class JaversExtendedRepository implements JaversRepository {
         this.snapshotDiffer = snapshotDiffer;
     }
 
-    public List<Change> getPropertyChangeHistory(GlobalId globalId,  final String propertyName, int limit) {
+    public List<Change> getPropertyChangeHistory(GlobalId globalId, final String propertyName, int limit) {
         argumentsAreNotNull(globalId, propertyName);
 
         List<CdoSnapshot> snapshots = getPropertyStateHistory(globalId, propertyName, limit);
@@ -37,7 +37,7 @@ public class JaversExtendedRepository implements JaversRepository {
 
         return Lists.positiveFilter(changes, new Predicate<Change>() {
             public boolean apply(Change input) {
-                return input instanceof PropertyChange && ((PropertyChange) input).getPropertyName().equals(propertyName);
+            return input instanceof PropertyChange && ((PropertyChange) input).getPropertyName().equals(propertyName);
             }
         });
     }
@@ -46,6 +46,13 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(globalId);
 
         List<CdoSnapshot> snapshots = getStateHistory(globalId, limit);
+        return snapshotDiffer.calculateDiffs(snapshots);
+    }
+
+    public List<Change> getChangeHistory(Class givenClass, int limit) {
+        argumentsAreNotNull(givenClass);
+
+        List<CdoSnapshot> snapshots = getStateHistory(givenClass, limit);
         return snapshotDiffer.calculateDiffs(snapshots);
     }
 
@@ -65,6 +72,11 @@ public class JaversExtendedRepository implements JaversRepository {
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         argumentIsNotNull(globalId);
         return delegate.getLatest(globalId);
+    }
+
+    @Override
+    public List<CdoSnapshot> getStateHistory(Class givenClass, int limit) {
+        return delegate.getStateHistory(givenClass, limit);
     }
 
     @Override

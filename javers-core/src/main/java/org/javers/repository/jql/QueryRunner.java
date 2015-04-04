@@ -38,11 +38,15 @@ public class QueryRunner {
             return repository.getStateHistory(fromDto(query.getIdFilter()), query.getLimit());
         }
 
-        if (query.isPropertyQuery()){
+        if (query.isIdAndPropertyQuery()){
             return repository.getPropertyStateHistory(fromDto(query.getIdFilter()), query.getPropertyName(), query.getLimit());
         }
 
-        throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "JqlQuery " + query + " is not supported");
+        if (query.isClassOnlyQuery()){
+            return repository.getStateHistory(query.getClassFilter(), query.getLimit());
+        }
+
+        throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForSnapshots: " + query + " is not supported");
     }
 
     public List<Change> queryForChanges(JqlQuery query){
@@ -52,11 +56,15 @@ public class QueryRunner {
             return repository.getChangeHistory(fromDto(query.getIdFilter()), query.getLimit());
         }
 
-        if (query.isPropertyQuery()){
+        if (query.isIdAndPropertyQuery()){
             return repository.getPropertyChangeHistory(fromDto(query.getIdFilter()), query.getPropertyName(), query.getLimit());
         }
 
-        throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "JqlQuery " + query + " is not supported");
+        if (query.isClassOnlyQuery()){
+            return repository.getChangeHistory(query.getClassFilter(), query.getLimit());
+        }
+
+        throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForChanges: " + query + " is not supported");
     }
 
     private GlobalId fromDto(GlobalIdDTO globalIdDTO) {

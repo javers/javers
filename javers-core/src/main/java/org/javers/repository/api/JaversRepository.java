@@ -50,6 +50,15 @@ public interface JaversRepository {
     List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit);
 
     /**
+     * Snapshots of objects with given Entity or UnboundedValueObject class,
+     * in reverse chronological order
+     *
+     * @param limit choose reasonable limits
+     * @return empty List if no snapshots found
+     */
+    List<CdoSnapshot> getStateHistory(Class givenClass, int limit);
+
+    /**
      * Latest snapshot of given object,
      * Optional#EMPTY if object is not versioned
      */

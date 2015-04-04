@@ -24,6 +24,56 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
+    def "should find Entity instance snapshots and changes by Entity class"() {
+         given:
+         javers.commit("author", new SnapshotEntity(id:1))
+         javers.commit("author", new SnapshotEntity(id:2))
+         javers.commit("author", new DummyAddress())
+
+         when:
+         def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).build())
+
+         then:
+         snapshots.size() == 2
+         snapshots.each {
+             it.globalId.cdoClass.clientsClass == SnapshotEntity
+         }
+
+         when:
+         def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity).build())
+
+         then:
+         changes.size() >= 2
+         changes.each {
+             it.affectedGlobalId.cdoClass.clientsClass == SnapshotEntity
+         }
+    }
+
+    def "should find ValueObject snapshots and changes by ValueObject class"() {
+        given:
+        javers.commit("author", new DummyAddress(city:"London"))
+        javers.commit("author", new DummyAddress(city:"Paris"))
+        javers.commit("author", new SnapshotEntity(id:2))
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress).build())
+
+        then:
+        snapshots.size() == 2
+        snapshots.each {
+            it.globalId.cdoClass.clientsClass == DummyAddress
+        }
+
+        when:
+        def changes = javers.findChanges(QueryBuilder.byClass(DummyAddress).build())
+
+        then:
+        changes.size() >= 2
+        changes.each {
+            it.affectedGlobalId.cdoClass.clientsClass == DummyAddress
+        }
+    }
+
     def "should find snapshots and changes by changed property"() {
         given:
         def entity = new SnapshotEntity(id:1, intProperty: 4)

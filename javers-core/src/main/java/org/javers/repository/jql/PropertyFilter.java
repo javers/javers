@@ -19,4 +19,9 @@ class PropertyFilter extends Filter {
     public String getPropertyName() {
         return propertyName;
     }
+
+    @Override
+    public String toString() {
+        return "property=" + propertyName;
+    }
 }

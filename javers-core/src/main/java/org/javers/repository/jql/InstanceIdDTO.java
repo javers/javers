@@ -19,6 +19,7 @@ public final class InstanceIdDTO extends GlobalIdDTO {
     }
 
     public static InstanceIdDTO instanceId(Object localId, Class javaClass){
+        Validate.argumentsAreNotNull(localId, javaClass);
         return new InstanceIdDTO(javaClass,localId);
     }
 

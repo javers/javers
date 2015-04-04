@@ -19,10 +19,14 @@ public class JqlQuery<T> {
         Validate.argumentsAreNotNull(filters);
         this.limit = limit;
         this.filters = filters;
+    }
 
-        if (!isIdQuery()){
-            throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "no GlobalId, provide object GlobalId using QueryBuilder.byInstanceId()");
-        }
+    @Override
+    public String toString() {
+        return "JqlQuery{" +
+                "limit=" + limit +
+                ", filters=" + filters +
+                '}';
     }
 
     /**
@@ -35,6 +39,10 @@ public class JqlQuery<T> {
 
     boolean hasFilter(Class<? extends Filter> ofType){
         return getFilter(ofType).isPresent();
+    }
+
+    Class getClassFilter(){
+        return getFilter(ClassFilter.class).get().getRequiredClass();
     }
 
     GlobalIdDTO getIdFilter() {
@@ -55,14 +63,18 @@ public class JqlQuery<T> {
     }
 
     boolean isIdOnlyQuery(){
-        return hasFilter(IdFilter.class) && !hasFilter(PropertyFilter.class);
+        return hasFilter(IdFilter.class) && filters.size() == 1;
     }
 
-    boolean isIdQuery(){
-        return hasFilter(IdFilter.class);
-    }
-
-    boolean isPropertyQuery(){
+    boolean isIdAndPropertyQuery(){
         return hasFilter(IdFilter.class) && hasFilter(PropertyFilter.class);
+    }
+
+    boolean isClassOnlyQuery() {
+        return hasFilter(ClassFilter.class) && filters.size() == 1;
+    }
+
+    boolean isClassAndPropertyQuery() {
+        return hasFilter(ClassFilter.class) && hasFilter(PropertyFilter.class);
     }
 }
