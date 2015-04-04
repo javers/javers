@@ -25,6 +25,36 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
+    def "should find snapshots and changes by Entity class and changed property"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 1))
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 1, dob: new LocalDate()))
+        javers.commit("author", new DummyAddress())
+        javers.commit("author", new SnapshotEntity(id:2, intProperty: 1))
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 2))
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).andProperty("intProperty").build())
+
+        then:
+        snapshots.size() == 3
+        snapshots[0].commitId.majorId == 5
+        snapshots.each {
+            assert it.globalId.cdoClass.clientsClass == SnapshotEntity
+        }
+
+        when:
+        def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity).andProperty("intProperty").build())
+
+        then:
+        changes.size() == 3
+        changes[0].getCommitMetadata().get().id.majorId == 5
+        changes.each {
+            assert it instanceof ValueChange
+            assert it.propertyName == "intProperty"
+        }
+    }
+
     def "should find Entity changes by Entity class"() {
         given:
         javers.commit("author", new SnapshotEntity(id:1, intProperty: 1))
@@ -54,8 +84,9 @@ class JaversRepositoryE2ETest extends Specification {
 
          then:
          snapshots.size() == 2
+         snapshots[0].commitId.majorId == 2
          snapshots.each {
-             it.globalId.cdoClass.clientsClass == SnapshotEntity
+             assert it.globalId.cdoClass.clientsClass == SnapshotEntity
          }
     }
 
@@ -71,11 +102,11 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         snapshots.size() == 2
         snapshots.each {
-            it.globalId.cdoClass.clientsClass == DummyAddress
+            assert it.globalId.cdoClass.clientsClass == DummyAddress
         }
     }
 
-    def "should find snapshots and changes by changed property"() {
+    def "should find snapshots and changes by Id and changed property"() {
         given:
         def entity = new SnapshotEntity(id:1, intProperty: 4)
         javers.commit("author", entity)
@@ -101,13 +132,14 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         changes.size() == 2
-        changes[0].commitMetadata.get().id.value() == "3.0"
+        changes[0].commitMetadata.get().id.majorId == 3
         changes[0].left == 4
         changes[0].right == 5
-        changes[1].commitMetadata.get().id.value() == "1.0"
+        changes[1].commitMetadata.get().id.majorId == 1
         changes[1].left == 0
         changes[1].right == 4
         changes.each {
+            assert it instanceof ValueChange
             assert it.propertyName == "intProperty"
         }
     }

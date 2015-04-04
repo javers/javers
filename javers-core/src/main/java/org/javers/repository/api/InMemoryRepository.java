@@ -7,7 +7,8 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.GlobalId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,11 +28,7 @@ class InMemoryRepository implements JaversRepository {
 
     private CommitId head;
 
-    private final GlobalIdFactory globalIdFactory;
-
-    public InMemoryRepository(GlobalIdFactory globalIdFactory) {
-        Validate.argumentIsNotNull(globalIdFactory);
-        this.globalIdFactory = globalIdFactory;
+    public InMemoryRepository() {
     }
 
     @Override
@@ -58,28 +55,23 @@ class InMemoryRepository implements JaversRepository {
         return filtered;
     }
 
-
-    private List<CdoSnapshot> getAll(){
-        List<CdoSnapshot> all = new ArrayList<>();
-        for (LinkedList<CdoSnapshot> snapshotsList : snapshots.values()) {
-            all.addAll(snapshotsList);
-        }
-        return all;
-    }
-
     @Override
     public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, final String propertyName, int limit) {
         Validate.argumentsAreNotNull(globalId, propertyName);
 
         if (snapshots.containsKey(globalId)) {
-            List<CdoSnapshot> filtered = Lists.positiveFilter(snapshots.get(globalId), new Predicate<CdoSnapshot>() {
-                public boolean apply(CdoSnapshot input) {
-                    return input.hasChangeAt(propertyName);
-                }
-            });
+            List<CdoSnapshot> filtered = filterByPropertyName(snapshots.get(globalId), propertyName);
             return unmodifiableList(limit(filtered, limit));
         }
         return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    public List<CdoSnapshot> getPropertyStateHistory(Class givenClass, String propertyName, int limit) {
+        Validate.argumentsAreNotNull(givenClass, propertyName);
+
+        List<CdoSnapshot> filtered = filterByPropertyName(getStateHistory(givenClass, limit * 10), propertyName);
+        return unmodifiableList(limit(filtered, limit));
     }
 
     private List<CdoSnapshot> limit(List<CdoSnapshot> list, int limit){
@@ -121,6 +113,29 @@ class InMemoryRepository implements JaversRepository {
 
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
+    }
+
+    private List<CdoSnapshot> filterByPropertyName(List<CdoSnapshot> snapshots, final String propertyName){
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(CdoSnapshot input) {
+                return input.hasChangeAt(propertyName);
+            }
+        });
+    }
+
+    private List<CdoSnapshot> getAll(){
+        List<CdoSnapshot> all = new ArrayList<>();
+        for (LinkedList<CdoSnapshot> snapshotsList : snapshots.values()) {
+            all.addAll(snapshotsList);
+        }
+
+        Collections.sort(all, new Comparator<CdoSnapshot>() {
+            @Override
+            public int compare(CdoSnapshot o1, CdoSnapshot o2) {
+                return o2.getCommitId().compareTo(o1.getCommitId());
+            }
+        });
+        return all;
     }
 
     private void persist(CdoSnapshot snapshot) {

@@ -35,11 +35,16 @@ public class JaversExtendedRepository implements JaversRepository {
         List<CdoSnapshot> snapshots = getPropertyStateHistory(globalId, propertyName, limit);
         List<Change> changes = snapshotDiffer.calculateDiffs(snapshots);
 
-        return Lists.positiveFilter(changes, new Predicate<Change>() {
-            public boolean apply(Change input) {
-            return input instanceof PropertyChange && ((PropertyChange) input).getPropertyName().equals(propertyName);
-            }
-        });
+        return filterByPropertyName(changes, propertyName);
+    }
+
+    public List<Change> getPropertyChangeHistory(Class givenClass, final String propertyName, int limit) {
+        argumentsAreNotNull(givenClass, propertyName);
+
+        List<CdoSnapshot> snapshots = getPropertyStateHistory(givenClass, propertyName, limit);
+        List<Change> changes = snapshotDiffer.calculateMultiDiffs(snapshots);
+
+        return filterByPropertyName(changes, propertyName);
     }
 
     public List<Change> getChangeHistory(GlobalId globalId, int limit) {
@@ -66,6 +71,12 @@ public class JaversExtendedRepository implements JaversRepository {
     public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit) {
         argumentsAreNotNull(globalId, propertyName);
         return delegate.getPropertyStateHistory(globalId, propertyName, limit);
+    }
+
+    @Override
+    public List<CdoSnapshot> getPropertyStateHistory(Class givenClass, String propertyName, int limit) {
+        argumentsAreNotNull(givenClass, propertyName);
+        return delegate.getPropertyStateHistory(givenClass, propertyName, limit);
     }
 
     @Override
@@ -96,5 +107,13 @@ public class JaversExtendedRepository implements JaversRepository {
     @Override
     public void ensureSchema() {
         delegate.ensureSchema();
+    }
+
+    private List<Change> filterByPropertyName(List<Change> changes, final String propertyName) {
+        return Lists.positiveFilter(changes, new Predicate<Change>() {
+            public boolean apply(Change input) {
+                return input instanceof PropertyChange && ((PropertyChange) input).getPropertyName().equals(propertyName);
+            }
+        });
     }
 }

@@ -74,7 +74,7 @@ public class JqlQuery<T> {
         return hasFilter(ClassFilter.class) && filters.size() == 1;
     }
 
-    boolean isClassAndPropertyQuery() {
+    boolean isClassAndPropertyQuery(){
         return hasFilter(ClassFilter.class) && hasFilter(PropertyFilter.class);
     }
 }
