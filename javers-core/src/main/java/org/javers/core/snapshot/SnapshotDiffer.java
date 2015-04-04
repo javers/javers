@@ -11,9 +11,9 @@ import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoSnapshotBuilder;
+import org.javers.core.metamodel.object.GlobalId;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Loads snapshots of given instance from javersRepository,
@@ -55,6 +55,41 @@ public class SnapshotDiffer {
 
         return result;
     }
+
+    public List<Change> calculateMultiDiffs(List<CdoSnapshot> snapshots) {
+        Validate.argumentsAreNotNull(snapshots);
+
+        //split
+        Map<GlobalId, List<CdoSnapshot>> snapshotsStreams = new HashMap<>();
+        for (CdoSnapshot s : snapshots){
+            if (snapshotsStreams.containsKey(s.getGlobalId())){
+                snapshotsStreams.get(s.getGlobalId()).add(s);
+            }
+            else {
+                List<CdoSnapshot> stream = new ArrayList<>();
+                stream.add(s);
+                snapshotsStreams.put(s.getGlobalId(), stream);
+            }
+        }
+
+        //diff & join
+        List<Change> result = new ArrayList<>();
+        for (List<CdoSnapshot> singleMalt : snapshotsStreams.values()){
+            result.addAll(calculateDiffs(singleMalt));
+        }
+
+        //sort desc
+        Collections.sort(result, new Comparator<Change>() {
+            @Override
+            public int compare(Change o1, Change o2) {
+                return o2.getCommitMetadata().get().getId().compareTo(
+                       o1.getCommitMetadata().get().getId());
+            }
+        });
+
+        return result;
+    }
+
 
     private void addObjectRemovedIfTerminal(List<Change> changes, CdoSnapshot last) {
          if (last.isTerminal()){

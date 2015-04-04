@@ -53,7 +53,7 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(givenClass);
 
         List<CdoSnapshot> snapshots = getStateHistory(givenClass, limit);
-        return snapshotDiffer.calculateDiffs(snapshots);
+        return snapshotDiffer.calculateMultiDiffs(snapshots);
     }
 
     @Override

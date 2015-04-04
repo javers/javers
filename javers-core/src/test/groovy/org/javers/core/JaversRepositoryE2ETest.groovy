@@ -1,5 +1,6 @@
 package org.javers.core
 
+import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -24,7 +25,25 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
-    def "should find Entity instance snapshots and changes by Entity class"() {
+    def "should find Entity changes by Entity class"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 1))
+        javers.commit("author", new SnapshotEntity(id:2, intProperty: 1))
+        javers.commit("author", new DummyAddress())
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 2))
+        javers.commit("author", new SnapshotEntity(id:2, intProperty: 2))
+
+        when:
+        def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity).build())
+
+        then:
+        changes.size() == 8
+        changes[0].commitMetadata.get().id.majorId == 5
+        changes.findAll{it instanceof ValueChange}.size() == 6
+        changes.findAll{it instanceof NewObject}.size() == 2
+    }
+
+    def "should find Entity snapshots by Entity class"() {
          given:
          javers.commit("author", new SnapshotEntity(id:1))
          javers.commit("author", new SnapshotEntity(id:2))
@@ -38,18 +57,9 @@ class JaversRepositoryE2ETest extends Specification {
          snapshots.each {
              it.globalId.cdoClass.clientsClass == SnapshotEntity
          }
-
-         when:
-         def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity).build())
-
-         then:
-         changes.size() >= 2
-         changes.each {
-             it.affectedGlobalId.cdoClass.clientsClass == SnapshotEntity
-         }
     }
 
-    def "should find ValueObject snapshots and changes by ValueObject class"() {
+    def "should find ValueObject snapshots by ValueObject class"() {
         given:
         javers.commit("author", new DummyAddress(city:"London"))
         javers.commit("author", new DummyAddress(city:"Paris"))
@@ -62,15 +72,6 @@ class JaversRepositoryE2ETest extends Specification {
         snapshots.size() == 2
         snapshots.each {
             it.globalId.cdoClass.clientsClass == DummyAddress
-        }
-
-        when:
-        def changes = javers.findChanges(QueryBuilder.byClass(DummyAddress).build())
-
-        then:
-        changes.size() >= 2
-        changes.each {
-            it.affectedGlobalId.cdoClass.clientsClass == DummyAddress
         }
     }
 

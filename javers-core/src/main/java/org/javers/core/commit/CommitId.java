@@ -12,7 +12,7 @@ import org.javers.common.validation.Validate;
  * @see CommitSeqGenerator
  * @author bartosz walacik
  */
-public final class CommitId {
+public final class CommitId implements Comparable<CommitId> {
     private final long majorId;
     private final int  minorId;
 
@@ -72,5 +72,10 @@ public final class CommitId {
     @Override
     public int hashCode() {
         return value().hashCode();
+    }
+
+    @Override
+    public int compareTo(CommitId o) {
+        return this.value().compareTo(o.value());
     }
 }
