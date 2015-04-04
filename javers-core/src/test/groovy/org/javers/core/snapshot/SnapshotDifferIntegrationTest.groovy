@@ -112,7 +112,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         change.right == expectedRightValue
         change.commitMetadata.get().commitDate
         change.commitMetadata.get().author == "some.login"
-        change.commitMetadata.get().id  == "2.0"
+        change.commitMetadata.get().id.majorId == 2
 
         where:
         oldCdo <<  [dummyUser("kaz").withAge(5).build(), dummyUser("kaz").withDetails(1)]

@@ -235,7 +235,7 @@ class MapChangeTypeAdapterTest extends Specification {
         then:
         change.affectedGlobalId == instanceId(1,SnapshotEntity)
         change.commitMetadata.get().author == "kazik"
-        change.commitMetadata.get().id == "1.0"
+        change.commitMetadata.get().id.majorId == 1
         change.commitMetadata.get().commitDate == new LocalDateTime("2001-12-01T22:23:03")
         change.propertyName == "mapOfPrimitives"
         MapChangeAssert.assertThat(change)

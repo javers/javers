@@ -82,7 +82,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
             with(change.commitMetadata.get()) {
                 author == "author"
                 commitDate == new LocalDateTime("2001-12-01T22:23:03")
-                id == "1.0"
+                id.majorId == 1.0
 
             }
             with((ElementValueChange)change.changes[0]) {

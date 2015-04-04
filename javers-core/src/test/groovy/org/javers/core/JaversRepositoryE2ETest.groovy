@@ -101,10 +101,10 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         changes.size() == 2
-        changes[0].commitMetadata.get().id.majorId == 3
+        changes[0].commitMetadata.get().id.value() == "3.0"
         changes[0].left == 4
         changes[0].right == 5
-        changes[1].commitMetadata.get().id.majorId == 1
+        changes[1].commitMetadata.get().id.value() == "1.0"
         changes[1].left == 0
         changes[1].right == 4
         changes.each {
@@ -158,13 +158,13 @@ class JaversRepositoryE2ETest extends Specification {
                                             intProperty:5,])
         //assert metadata
         with(snapshots[0]) {
-             commitId == "2.0"
+             commitId.value() == "2.0"
              commitMetadata.author == "author2"
              commitMetadata.commitDate
              !initial
         }
         with(snapshots[1]) {
-            commitId == "1.0"
+            commitId.value() == "1.0"
             commitMetadata.author == "author"
             commitMetadata.commitDate
             !getPropertyValue("intProperty")
