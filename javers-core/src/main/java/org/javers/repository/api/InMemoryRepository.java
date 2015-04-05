@@ -52,7 +52,7 @@ class InMemoryRepository implements JaversRepository {
             }
         }
 
-        return filtered;
+        return limit(filtered,limit);
     }
 
     @Override
@@ -88,8 +88,8 @@ class InMemoryRepository implements JaversRepository {
         Validate.argumentsAreNotNull(globalId);
 
         if (snapshots.containsKey(globalId)) {
-            List<CdoSnapshot> states = snapshots.get(globalId);
-            return Optional.of(states.get(states.size() - 1));
+            LinkedList<CdoSnapshot> states = snapshots.get(globalId);
+            return Optional.of(states.peek());
         }
 
         return Optional.empty();

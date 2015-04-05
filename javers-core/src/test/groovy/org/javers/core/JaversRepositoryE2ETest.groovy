@@ -3,6 +3,7 @@ package org.javers.core
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.model.DummyAddress
+import org.javers.core.model.DummyPoint
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.snapshot.SnapshotsAssert
@@ -13,6 +14,7 @@ import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
@@ -25,11 +27,47 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
-    def "should find snapshots and changes by Entity class and changed property"() {
+    @Unroll
+    def "should query for #what snapshot by GlobalId with limit"() {
+        given:
+        objects.each {
+            javers.commit("author",it)
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.size() == 3
+        snapshots[0].commitId.majorId == 5
+        snapshots.each {
+            assert it.globalId == expectedGlobalId
+        }
+
+        where:
+        what <<    ["Entity", "Unbounded ValueObject", "Bounded ValueObject"]
+        objects << [
+                    (1..5).collect{ new SnapshotEntity(id:1,intProperty: it) }
+                     + new SnapshotEntity(id:2), //noise
+                    (1..5).collect{ new DummyAddress(city: "London"+it)}
+                     + new DummyPoint(1,2), //noise
+                    (1..5).collect{ new SnapshotEntity(id:1,valueObjectRef: new DummyAddress(city: "London"+it)) }
+                     + new SnapshotEntity(id:2,valueObjectRef: new DummyAddress(city: "London"+1)) //noise
+                   ]
+        query   << [QueryBuilder.byInstanceId(1, SnapshotEntity).limit(3).build(),
+                    QueryBuilder.byClass(DummyAddress).limit(3).build(),
+                    QueryBuilder.byValueObjectId(1,SnapshotEntity,"valueObjectRef").limit(3).build()
+                   ]
+        expectedGlobalId << [instanceId(1,SnapshotEntity),
+                             unboundedValueObjectId(DummyAddress),
+                             valueObjectId(1,SnapshotEntity,"valueObjectRef")]
+    }
+
+    def "should query for snapshots and changes by Entity class and changed property"() {
         given:
         javers.commit("author", new SnapshotEntity(id:1, intProperty: 1))
         javers.commit("author", new SnapshotEntity(id:1, intProperty: 1, dob: new LocalDate()))
-        javers.commit("author", new DummyAddress())
+        javers.commit("author", new DummyAddress()) //noise
         javers.commit("author", new SnapshotEntity(id:2, intProperty: 1))
         javers.commit("author", new SnapshotEntity(id:1, intProperty: 2))
 
@@ -55,7 +93,7 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
-    def "should find Entity changes by Entity class"() {
+    def "should query for Entity changes by Entity class"() {
         given:
         javers.commit("author", new SnapshotEntity(id:1, intProperty: 1))
         javers.commit("author", new SnapshotEntity(id:2, intProperty: 1))
@@ -73,7 +111,7 @@ class JaversRepositoryE2ETest extends Specification {
         changes.findAll{it instanceof NewObject}.size() == 2
     }
 
-    def "should find Entity snapshots by Entity class"() {
+    def "should query for Entity snapshots by Entity class"() {
          given:
          javers.commit("author", new SnapshotEntity(id:1))
          javers.commit("author", new SnapshotEntity(id:2))
@@ -90,11 +128,12 @@ class JaversRepositoryE2ETest extends Specification {
          }
     }
 
-    def "should find ValueObject snapshots by ValueObject class"() {
+    @Unroll
+    def "should query for #voType ValueObject snapshots by ValueObject class"() {
         given:
-        javers.commit("author", new DummyAddress(city:"London"))
-        javers.commit("author", new DummyAddress(city:"Paris"))
-        javers.commit("author", new SnapshotEntity(id:2))
+        objects.each {
+            javers.commit("author", it)
+        }
 
         when:
         def snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress).build())
@@ -104,18 +143,21 @@ class JaversRepositoryE2ETest extends Specification {
         snapshots.each {
             assert it.globalId.cdoClass.clientsClass == DummyAddress
         }
+
+        where:
+        voType <<  ["Bounded","Unbounded"]
+        objects << [[new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London")),
+                     new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "London"))],
+                    [new DummyAddress(city:"London"), new DummyAddress(city:"Paris")]
+                   ]
     }
 
-    def "should find snapshots and changes by Id and changed property"() {
+    def "should query for Entity snapshots and changes by GlobalId and changed property"() {
         given:
-        def entity = new SnapshotEntity(id:1, intProperty: 4)
-        javers.commit("author", entity)
-
-        entity.dob = new LocalDate()
-        javers.commit("author", entity)
-
-        entity.intProperty = 5
-        javers.commit("author", entity)
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 4))
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 4, dob : new LocalDate()))
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 5, dob : new LocalDate()))
+        javers.commit("author", new SnapshotEntity(id:2, intProperty: 4)) //noise
 
         when: "should find snapshots"
         def snapshots = javers.findSnapshots(
@@ -142,6 +184,34 @@ class JaversRepositoryE2ETest extends Specification {
             assert it instanceof ValueChange
             assert it.propertyName == "intProperty"
         }
+    }
+
+    @Unroll
+    def "should query for LatestSnapshot of #what by GlobalId"() {
+        given:
+        cdos.each{
+            javers.commit("login", it)
+        }
+
+        when:
+        def snapshot = javers.getLatestSnapshot(givenId).get()
+
+        then:
+        snapshot.globalId == givenId
+        snapshot.commitId.majorId == 2
+        snapshot.getPropertyValue(property) == expextedState
+
+        where:
+        cdos  <<  [[new SnapshotEntity(id: 1, intProperty: 1), new SnapshotEntity(id: 1, intProperty: 2)],
+                   [new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress("London")),
+                    new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress("Paris"))],
+                   [new DummyAddress("London"), new DummyAddress("Paris")]]
+        what <<    ["Entity", "Bounded ValueObject", "Unbounded ValueObject"]
+        givenId << [instanceId(1, SnapshotEntity),
+                    valueObjectId(1, SnapshotEntity, "valueObjectRef"),
+                    unboundedValueObjectId(DummyAddress)]
+        property <<      ["intProperty", "city",  "city"]
+        expextedState << [2,             "Paris", "Paris"]
     }
 
     def "should fetch terminal snapshots from the repository"() {
@@ -246,23 +316,4 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
-    @Unroll
-    def "should store snapshot of #what and find it by id"() {
-        given:
-        def cdo = new SnapshotEntity(id: 1, listOfValueObjects: [new DummyAddress("London")])
-        javers.commit("login", cdo)
-
-        when:
-        def snapshot = javers.getLatestSnapshot(givenId).get()
-
-        then:
-        snapshot.globalId == givenId
-        snapshot.getPropertyValue(property) == expextedState
-
-        where:
-        what <<    ["Entity instance", "ValueObject"]
-        givenId << [instanceId(1, SnapshotEntity), valueObjectId(1, SnapshotEntity, "listOfValueObjects/0")]
-        property << ["id","city"]
-        expextedState << [1,"London"]
-     }
 }

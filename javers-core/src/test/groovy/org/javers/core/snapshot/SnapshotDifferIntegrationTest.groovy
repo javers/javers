@@ -34,7 +34,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         }
 
         when:
-        def changes = javers.findChanges(QueryBuilder.byUnboundedValueObjectId(DummyAddress).limit(2).build())
+        def changes = javers.findChanges(QueryBuilder.byClass(DummyAddress).limit(2).build())
 
         then:
         changes.size() == 1
