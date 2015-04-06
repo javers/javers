@@ -13,12 +13,11 @@ class JaversMongoRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     @Override
     def setup() {
-        //def db = new Fongo("myDb").mongo.getDB("test")
-        //def mongoRepository = new MongoRepository(db)
+        def db = new Fongo("myDb").mongo.getDB("test")
+        def mongoRepository = new MongoRepository(db)
 
-        //TODO
-        def mongoClient = new MongoClient()
-        def mongoRepository =  new MongoRepository(mongoClient.getDB("test"))
+        // def mongoClient = new MongoClient()
+        // def mongoRepository =  new MongoRepository(mongoClient.getDB("test"))
 
         mongoRepository.clean();
         javers = javers().registerJaversRepository(mongoRepository).build()
