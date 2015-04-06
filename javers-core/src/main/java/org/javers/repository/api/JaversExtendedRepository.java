@@ -8,6 +8,8 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.snapshot.SnapshotDiffer;
@@ -38,7 +40,7 @@ public class JaversExtendedRepository implements JaversRepository {
         return filterByPropertyName(changes, propertyName);
     }
 
-    public List<Change> getPropertyChangeHistory(Class givenClass, final String propertyName, boolean newObjects, int limit) {
+    public List<Change> getPropertyChangeHistory(ManagedClass givenClass, final String propertyName, boolean newObjects, int limit) {
         argumentsAreNotNull(givenClass, propertyName);
 
         List<CdoSnapshot> snapshots = getPropertyStateHistory(givenClass, propertyName, limit);
@@ -54,17 +56,17 @@ public class JaversExtendedRepository implements JaversRepository {
         return snapshotDiffer.calculateDiffs(snapshots, newObjects);
     }
 
-    public List<Change> getChangeHistory(Class givenClass, boolean newObjects, int limit) {
+    public List<Change> getChangeHistory(ManagedClass givenClass, boolean newObjects, int limit) {
         argumentsAreNotNull(givenClass);
 
         List<CdoSnapshot> snapshots = getStateHistory(givenClass, limit);
         return snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
     }
 
-    public List<Change> getValueObjectChangeHistory(Class ownerEntityClass, String path, boolean newObjects, int limit) {
-        argumentsAreNotNull(ownerEntityClass, path);
+    public List<Change> getValueObjectChangeHistory(Entity ownerEntity, String path, boolean newObjects, int limit) {
+        argumentsAreNotNull(ownerEntity, path);
 
-        List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntityClass, path, limit);
+        List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntity, path, limit);
         return snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
     }
 
@@ -81,15 +83,15 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(Class givenClass, String propertyName, int limit) {
+    public List<CdoSnapshot> getPropertyStateHistory(ManagedClass givenClass, String propertyName, int limit) {
         argumentsAreNotNull(givenClass, propertyName);
         return delegate.getPropertyStateHistory(givenClass, propertyName, limit);
     }
 
     @Override
-    public List<CdoSnapshot> getValueObjectStateHistory(Class ownerEntityClass, String path, int limit) {
-        argumentsAreNotNull(ownerEntityClass, path);
-        return delegate.getValueObjectStateHistory(ownerEntityClass, path, limit);
+    public List<CdoSnapshot> getValueObjectStateHistory(Entity ownerEntity, String path, int limit) {
+        argumentsAreNotNull(ownerEntity, path);
+        return delegate.getValueObjectStateHistory(ownerEntity, path, limit);
     }
 
     @Override
@@ -99,7 +101,7 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(Class givenClass, int limit) {
+    public List<CdoSnapshot> getStateHistory(ManagedClass givenClass, int limit) {
         return delegate.getStateHistory(givenClass, limit);
     }
 

@@ -106,13 +106,33 @@ class JaversRepositoryE2ETest extends Specification {
                              valueObjectId(1,SnapshotEntity,"valueObjectRef")]
     }
 
-    def "should query for snapshots and changes by Entity class and changed property"() {
+    def "should query for ValueObject snapshots by ValueObject class and changed property"() {
         given:
-        javers.commit("author", new SnapshotEntity(id:1, intProperty: 1))
-        javers.commit("author", new SnapshotEntity(id:1, intProperty: 1, dob: new LocalDate()))
-        javers.commit("author", new DummyAddress()) //noise
-        javers.commit("author", new SnapshotEntity(id:2, intProperty: 1))
-        javers.commit("author", new SnapshotEntity(id:1, intProperty: 2))
+        def objects = [
+          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London", street: "1")) ,
+          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London", street: "new")) ,
+          new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "London", street: "1"))]
+        objects.each {
+            javers.commit("author", it)
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress).andProperty("city").build())
+
+        then:
+        snapshots.size() == 2
+        snapshots.each {
+            assert it.globalId.cdoClass.clientsClass == DummyAddress
+        }
+    }
+
+    def "should query for Entity snapshots and changes by Entity class and changed property"() {
+        given:
+        javers.commit( "author", new SnapshotEntity(id:1, intProperty: 1) )
+        javers.commit( "author", new SnapshotEntity(id:1, intProperty: 1, dob: new LocalDate()) )
+        javers.commit( "author", new DummyAddress() ) //noise
+        javers.commit( "author", new SnapshotEntity(id:2, intProperty: 1) )
+        javers.commit( "author", new SnapshotEntity(id:1, intProperty: 2) )
 
         when:
         def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).andProperty("intProperty").build())

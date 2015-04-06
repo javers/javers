@@ -6,6 +6,8 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.*;
 
 import java.util.List;
@@ -44,9 +46,9 @@ public interface JaversRepository {
     List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit);
 
     /**
-     * Snapshots of all ValueObjects owned by given ownerEntityClass at given path
+     * Snapshots of all ValueObjects owned by given ownerEntity at given path
      */
-    List<CdoSnapshot> getValueObjectStateHistory(Class ownerEntityClass, String path, int limit);
+    List<CdoSnapshot> getValueObjectStateHistory(Entity ownerEntity, String path, int limit);
 
     /**
      * Filtered version of {@link #getStateHistory(GlobalId, int)},
@@ -61,13 +63,13 @@ public interface JaversRepository {
      * @param limit choose reasonable limits
      * @return empty List if no snapshots found
      */
-    List<CdoSnapshot> getStateHistory(Class givenClass, int limit);
+    List<CdoSnapshot> getStateHistory(ManagedClass givenClass, int limit);
 
     /**
-     * Filtered version of {@link #getStateHistory(Class, int)},
+     * Filtered version of {@link #getStateHistory(ManagedClass, int)},
      * selects all snapshots with a change recorded on a given property
      */
-    List<CdoSnapshot> getPropertyStateHistory(Class givenClass, String propertyName, int limit);
+    List<CdoSnapshot> getPropertyStateHistory(ManagedClass givenClass, String propertyName, int limit);
 
     /**
      * Latest snapshot of given object,

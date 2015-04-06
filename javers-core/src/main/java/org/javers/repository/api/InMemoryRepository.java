@@ -7,9 +7,10 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +35,8 @@ class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getValueObjectStateHistory(final Class ownerEntityClass, final String path, int limit) {
-        Validate.argumentsAreNotNull(ownerEntityClass, path);
+    public List<CdoSnapshot> getValueObjectStateHistory(final Entity ownerEntity, final String path, int limit) {
+        Validate.argumentsAreNotNull(ownerEntity, path);
 
         List<CdoSnapshot> result =  Lists.positiveFilter(getAll(), new Predicate<CdoSnapshot>() {
             @Override
@@ -45,7 +46,7 @@ class InMemoryRepository implements JaversRepository {
                 }
                 ValueObjectId id = (ValueObjectId) input.getGlobalId();
 
-                return id.getOwnerId().getCdoClass().getClientsClass().equals(ownerEntityClass)
+                return id.getOwnerId().getCdoClass().getClientsClass().equals(ownerEntity.getClientsClass())
                         && id.getFragment().equals(path);
             }
         });
@@ -64,12 +65,12 @@ class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(Class givenClass, int limit) {
+    public List<CdoSnapshot> getStateHistory(ManagedClass givenClass, int limit) {
         Validate.argumentIsNotNull(givenClass);
         List<CdoSnapshot> filtered = new ArrayList<>();
 
         for (CdoSnapshot snapshot : getAll()) {
-            if (snapshot.getGlobalId().getCdoClass().getClientsClass().equals(givenClass)) {
+            if (snapshot.getGlobalId().getCdoClass().getClientsClass().equals(givenClass.getClientsClass())) {
                 filtered.add(snapshot);
             }
         }
@@ -89,7 +90,7 @@ class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(Class givenClass, String propertyName, int limit) {
+    public List<CdoSnapshot> getPropertyStateHistory(ManagedClass givenClass, String propertyName, int limit) {
         Validate.argumentsAreNotNull(givenClass, propertyName);
 
         List<CdoSnapshot> filtered = filterByPropertyName(getStateHistory(givenClass, limit * 10), propertyName);
