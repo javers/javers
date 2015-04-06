@@ -2,10 +2,7 @@ package org.javers.core
 
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyPoint
-import org.javers.core.model.DummyUser
-import org.javers.core.model.SnapshotEntity
+import org.javers.core.model.*
 import org.javers.core.snapshot.SnapshotsAssert
 import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
@@ -25,6 +22,52 @@ class JaversRepositoryE2ETest extends Specification {
     def setup() {
         // InMemoryRepository is used by default
         javers = javers().build()
+    }
+
+    def "should query for ValueObject changes by owning Entity class"() {
+        given:
+        def data = [ new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city:"London")),
+                     new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city:"Paris")),
+                     new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city:"London")),
+                     new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city:"Paris")),
+                     new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city:"Rome")),
+                     new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city:"Paris")),
+        ]
+
+        data.each{
+            javers.commit("author",it)
+        }
+
+        when:
+        def changes = javers.findChanges(QueryBuilder.byValueObject(SnapshotEntity, "valueObjectRef").build())
+
+        then:
+        changes.findAll{ it instanceof ValueChange }.size() == 4
+        changes[0].commitMetadata.get().id.majorId == 6
+        changes.each{
+            assert it.affectedGlobalId.fragment == "valueObjectRef"
+            assert it.affectedGlobalId.cdoClass.getClientsClass() == DummyAddress
+        }
+    }
+
+    def "should query for ValueObject changes by owning Entity GlobalId"() {
+        given:
+        def vo = new DummyAddress(city: "London")
+        def entity = new SnapshotEntity(id:1, valueObjectRef: vo)
+        javers.commit("author",entity)
+
+        vo.city = "Paris"
+        javers.commit("author",entity)
+
+        when:
+        def changes = javers.findChanges(QueryBuilder.byValueObjectId(1,SnapshotEntity,"valueObjectRef").build())
+
+        then:
+        changes.findAll{ it instanceof ValueChange }.size() == 2
+        changes[0].commitMetadata.get().id.majorId == 2
+        changes.each {
+            assert it.affectedGlobalId == valueObjectId(1,SnapshotEntity,"valueObjectRef")
+        }
     }
 
     @Unroll

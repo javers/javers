@@ -53,6 +53,10 @@ public class JqlQuery<T> {
         return getFilter(PropertyFilter.class).get().getPropertyName();
     }
 
+    VoOwnerFilter getVoOwnerFilter() {
+        return getFilter(VoOwnerFilter.class).get();
+    }
+
     <T extends Filter> Optional<T> getFilter(Class<T> ofType) {
         for (Filter f : filters) {
             if (f.getClass().equals(ofType)) {
@@ -76,5 +80,9 @@ public class JqlQuery<T> {
 
     boolean isClassAndPropertyQuery(){
         return hasFilter(ClassFilter.class) && hasFilter(PropertyFilter.class);
+    }
+
+    boolean isVoOwnerOnlyQuery(){
+        return hasFilter(VoOwnerFilter.class) && filters.size() == 1;
     }
 }

@@ -61,6 +61,13 @@ public class JaversExtendedRepository implements JaversRepository {
         return snapshotDiffer.calculateMultiDiffs(snapshots);
     }
 
+    public List<Change> getValueObjectChangeHistory(Class ownerEntityClass, String path, int limit) {
+        argumentsAreNotNull(ownerEntityClass, path);
+
+        List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntityClass, path, limit);
+        return snapshotDiffer.calculateMultiDiffs(snapshots);
+    }
+
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
         argumentIsNotNull(globalId);
@@ -77,6 +84,12 @@ public class JaversExtendedRepository implements JaversRepository {
     public List<CdoSnapshot> getPropertyStateHistory(Class givenClass, String propertyName, int limit) {
         argumentsAreNotNull(givenClass, propertyName);
         return delegate.getPropertyStateHistory(givenClass, propertyName, limit);
+    }
+
+    @Override
+    public List<CdoSnapshot> getValueObjectStateHistory(Class ownerEntityClass, String path, int limit) {
+        argumentsAreNotNull(ownerEntityClass, path);
+        return delegate.getValueObjectStateHistory(ownerEntityClass, path, limit);
     }
 
     @Override

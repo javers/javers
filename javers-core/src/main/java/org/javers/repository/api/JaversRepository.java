@@ -44,13 +44,18 @@ public interface JaversRepository {
     List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit);
 
     /**
+     * Snapshots of all ValueObjects owned by given ownerEntityClass at given path
+     */
+    List<CdoSnapshot> getValueObjectStateHistory(Class ownerEntityClass, String path, int limit);
+
+    /**
      * Filtered version of {@link #getStateHistory(GlobalId, int)},
      * selects snapshots with a change recorded on a given property
      */
     List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit);
 
     /**
-     * Snapshots of objects with given Entity or UnboundedValueObject class,
+     * All snapshots of objects within a given class,
      * in reverse chronological order
      *
      * @param limit choose reasonable limits

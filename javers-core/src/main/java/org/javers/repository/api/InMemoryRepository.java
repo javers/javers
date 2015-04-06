@@ -9,6 +9,8 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.ValueObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,26 @@ class InMemoryRepository implements JaversRepository {
     private CommitId head;
 
     public InMemoryRepository() {
+    }
+
+    @Override
+    public List<CdoSnapshot> getValueObjectStateHistory(final Class ownerEntityClass, final String path, int limit) {
+        Validate.argumentsAreNotNull(ownerEntityClass, path);
+
+        List<CdoSnapshot> result =  Lists.positiveFilter(getAll(), new Predicate<CdoSnapshot>() {
+            @Override
+            public boolean apply(CdoSnapshot input) {
+                if (!(input.getGlobalId() instanceof ValueObjectId)) {
+                    return false;
+                }
+                ValueObjectId id = (ValueObjectId) input.getGlobalId();
+
+                return id.getOwnerId().getCdoClass().getClientsClass().equals(ownerEntityClass)
+                        && id.getFragment().equals(path);
+            }
+        });
+
+        return limit(result, limit);
     }
 
     @Override
@@ -132,7 +154,7 @@ class InMemoryRepository implements JaversRepository {
         Collections.sort(all, new Comparator<CdoSnapshot>() {
             @Override
             public int compare(CdoSnapshot o1, CdoSnapshot o2) {
-                return o2.getCommitId().compareTo(o1.getCommitId());
+            return o2.getCommitId().compareTo(o1.getCommitId());
             }
         });
         return all;

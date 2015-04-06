@@ -50,6 +50,11 @@ public class QueryRunner {
             return repository.getPropertyStateHistory(query.getClassFilter(), query.getPropertyName(), query.getLimit());
         }
 
+        if (query.isVoOwnerOnlyQuery()) {
+            VoOwnerFilter filter = query.getVoOwnerFilter();
+            return repository.getValueObjectStateHistory(filter.getOwnerEntityClass(),filter.getPath(), query.getLimit());
+        }
+
         throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForSnapshots: " + query + " is not supported");
     }
 
@@ -70,6 +75,11 @@ public class QueryRunner {
 
         if (query.isClassAndPropertyQuery()){
             return repository.getPropertyChangeHistory(query.getClassFilter(), query.getPropertyName(), query.getLimit());
+        }
+
+        if (query.isVoOwnerOnlyQuery()) {
+            VoOwnerFilter filter = query.getVoOwnerFilter();
+            return repository.getValueObjectChangeHistory(filter.getOwnerEntityClass(), filter.getPath(), query.getLimit());
         }
 
         throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForChanges: " + query + " is not supported");
