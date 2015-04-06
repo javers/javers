@@ -34,7 +34,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         }
 
         when:
-        def changes = javers.findChanges(QueryBuilder.byClass(DummyAddress).limit(2).build())
+        def changes = javers.findChanges(QueryBuilder.byClass(DummyAddress).limit(2).withNewObjectChanges().build())
 
         then:
         changes.size() == 1
@@ -50,7 +50,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         javers.commit("some.login", user) //initial commit
 
         when:
-        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
+        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).withNewObjectChanges().build())
 
         then:
         changes.size() == 2
@@ -64,7 +64,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         when:
         user.setAge(18)
         javers.commit("some.login",user) //change commit
-        changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
+        changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).withNewObjectChanges().build())
 
         then:
         changes.size() == 3
@@ -88,6 +88,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
 
         then:
+        changes.size() == 2
         changes[0] instanceof ObjectRemoved
         changes[0].affectedGlobalId == instanceId("kaz",DummyUser)
         changes[0].commitMetadata.get().id.majorId == 2
@@ -172,7 +173,8 @@ class SnapshotDifferIntegrationTest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
 
         then:
-        (0..2).each {
+        changes.size() == 5
+        (0..3).each {
             ValueChange change = changes[it]
             assert change.left  == 4-it-1
             assert change.right == 4-it

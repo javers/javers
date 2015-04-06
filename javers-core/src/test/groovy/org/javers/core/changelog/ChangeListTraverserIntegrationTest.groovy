@@ -33,8 +33,8 @@ class ChangeListTraverserIntegrationTest extends Specification {
             1 * beforeChangeList()
 
             3 * onCommit(_)
-            6 * beforeChange(_)
-            6 * afterChange(_)
+            5 * beforeChange(_)
+            5 * afterChange(_)
 
             1 * onObjectRemoved(_)
 
@@ -42,7 +42,6 @@ class ChangeListTraverserIntegrationTest extends Specification {
             4 * onPropertyChange(_)
             4 * onValueChange(_)
 
-            1 * onNewObject(_)
             1 * afterChangeList()
 
             1 * result()

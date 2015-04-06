@@ -42,7 +42,7 @@ class JaversRepositoryE2ETest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byValueObject(SnapshotEntity, "valueObjectRef").build())
 
         then:
-        changes.findAll{ it instanceof ValueChange }.size() == 4
+        changes.size() == 4
         changes[0].commitMetadata.get().id.majorId == 6
         changes.each{
             assert it.affectedGlobalId.fragment == "valueObjectRef"
@@ -63,7 +63,7 @@ class JaversRepositoryE2ETest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byValueObjectId(1,SnapshotEntity,"valueObjectRef").build())
 
         then:
-        changes.findAll{ it instanceof ValueChange }.size() == 2
+        changes.size() == 2
         changes[0].commitMetadata.get().id.majorId == 2
         changes.each {
             assert it.affectedGlobalId == valueObjectId(1,SnapshotEntity,"valueObjectRef")
@@ -148,10 +148,9 @@ class JaversRepositoryE2ETest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity).build())
 
         then:
-        changes.size() == 8
+        changes.size() == 6
         changes[0].commitMetadata.get().id.majorId == 5
         changes.findAll{it instanceof ValueChange}.size() == 6
-        changes.findAll{it instanceof NewObject}.size() == 2
     }
 
     def "should query for Entity snapshots by Entity class"() {

@@ -29,43 +29,43 @@ public class JaversExtendedRepository implements JaversRepository {
         this.snapshotDiffer = snapshotDiffer;
     }
 
-    public List<Change> getPropertyChangeHistory(GlobalId globalId, final String propertyName, int limit) {
+    public List<Change> getPropertyChangeHistory(GlobalId globalId, final String propertyName, boolean newObjects, int limit) {
         argumentsAreNotNull(globalId, propertyName);
 
         List<CdoSnapshot> snapshots = getPropertyStateHistory(globalId, propertyName, limit);
-        List<Change> changes = snapshotDiffer.calculateDiffs(snapshots);
+        List<Change> changes = snapshotDiffer.calculateDiffs(snapshots, newObjects);
 
         return filterByPropertyName(changes, propertyName);
     }
 
-    public List<Change> getPropertyChangeHistory(Class givenClass, final String propertyName, int limit) {
+    public List<Change> getPropertyChangeHistory(Class givenClass, final String propertyName, boolean newObjects, int limit) {
         argumentsAreNotNull(givenClass, propertyName);
 
         List<CdoSnapshot> snapshots = getPropertyStateHistory(givenClass, propertyName, limit);
-        List<Change> changes = snapshotDiffer.calculateMultiDiffs(snapshots);
+        List<Change> changes = snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
 
         return filterByPropertyName(changes, propertyName);
     }
 
-    public List<Change> getChangeHistory(GlobalId globalId, int limit) {
+    public List<Change> getChangeHistory(GlobalId globalId, boolean newObjects, int limit) {
         argumentsAreNotNull(globalId);
 
         List<CdoSnapshot> snapshots = getStateHistory(globalId, limit);
-        return snapshotDiffer.calculateDiffs(snapshots);
+        return snapshotDiffer.calculateDiffs(snapshots, newObjects);
     }
 
-    public List<Change> getChangeHistory(Class givenClass, int limit) {
+    public List<Change> getChangeHistory(Class givenClass, boolean newObjects, int limit) {
         argumentsAreNotNull(givenClass);
 
         List<CdoSnapshot> snapshots = getStateHistory(givenClass, limit);
-        return snapshotDiffer.calculateMultiDiffs(snapshots);
+        return snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
     }
 
-    public List<Change> getValueObjectChangeHistory(Class ownerEntityClass, String path, int limit) {
+    public List<Change> getValueObjectChangeHistory(Class ownerEntityClass, String path, boolean newObjects, int limit) {
         argumentsAreNotNull(ownerEntityClass, path);
 
         List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntityClass, path, limit);
-        return snapshotDiffer.calculateMultiDiffs(snapshots);
+        return snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
     }
 
     @Override

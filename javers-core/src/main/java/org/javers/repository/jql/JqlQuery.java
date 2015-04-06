@@ -13,12 +13,14 @@ import java.util.List;
 public class JqlQuery<T> {
 
     private final int limit;
+    private final boolean newObjectChanges;
     private final List<Filter> filters;
 
-    JqlQuery(List<Filter> filters, int limit) {
+    JqlQuery(List<Filter> filters, boolean newObjectChanges, int limit) {
         Validate.argumentsAreNotNull(filters);
         this.limit = limit;
         this.filters = filters;
+        this.newObjectChanges = newObjectChanges;
     }
 
     @Override
@@ -26,6 +28,7 @@ public class JqlQuery<T> {
         return "JqlQuery{" +
                 "limit=" + limit +
                 ", filters=" + filters +
+                ", newObjectChanges="+ newObjectChanges +
                 '}';
     }
 
@@ -64,6 +67,10 @@ public class JqlQuery<T> {
             }
         }
         return Optional.empty();
+    }
+
+    public boolean isNewObjectChanges() {
+        return newObjectChanges;
     }
 
     boolean isIdOnlyQuery(){

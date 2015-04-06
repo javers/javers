@@ -32,7 +32,7 @@ public class SnapshotDiffer {
     /**
      * Changes (diff sequence) of given managed class instance, in reverse chronological order
      */
-    public List<Change> calculateDiffs(List<CdoSnapshot> snapshots) {
+    public List<Change> calculateDiffs(List<CdoSnapshot> snapshots, boolean generateNewObjectChanges) {
         Validate.argumentsAreNotNull(snapshots);
 
         List<Change> result = new ArrayList<>();
@@ -51,12 +51,12 @@ public class SnapshotDiffer {
             }
         }
 
-        addNewObjectChangesIfInitial(result, snapshots.get(snapshots.size() - 1));
+        addInitialChangesIfInitial(result, snapshots.get(snapshots.size() - 1), generateNewObjectChanges);
 
         return result;
     }
 
-    public List<Change> calculateMultiDiffs(List<CdoSnapshot> snapshots) {
+    public List<Change> calculateMultiDiffs(List<CdoSnapshot> snapshots, boolean generateNewObjectChanges) {
         Validate.argumentsAreNotNull(snapshots);
 
         //split
@@ -75,7 +75,7 @@ public class SnapshotDiffer {
         //diff & join
         List<Change> result = new ArrayList<>();
         for (List<CdoSnapshot> singleMalt : snapshotsStreams.values()){
-            result.addAll(calculateDiffs(singleMalt));
+            result.addAll(calculateDiffs(singleMalt, generateNewObjectChanges));
         }
 
         //sort desc
@@ -83,7 +83,7 @@ public class SnapshotDiffer {
             @Override
             public int compare(Change o1, Change o2) {
                 return o2.getCommitMetadata().get().getId().compareTo(
-                       o1.getCommitMetadata().get().getId());
+                        o1.getCommitMetadata().get().getId());
             }
         });
 
@@ -97,7 +97,7 @@ public class SnapshotDiffer {
          }
     }
 
-    private void addNewObjectChangesIfInitial(List<Change> changes, CdoSnapshot first) {
+    private void addInitialChangesIfInitial(List<Change> changes, CdoSnapshot first, boolean generateNewObjectChanges) {
         if (first.isInitial()){
             //add initial values to change history (with null at left)
             //switching off this feature may be added to JQL in the future
@@ -107,7 +107,9 @@ public class SnapshotDiffer {
             changes.addAll(diff.getChanges());
 
             //add NewObject change at the bottom of the change list
-            changes.add(new NewObject(first.getGlobalId(), Optional.empty(), first.getCommitMetadata()));
+            if (generateNewObjectChanges) {
+                changes.add(new NewObject(first.getGlobalId(), Optional.empty(), first.getCommitMetadata()));
+            }
         }
     }
 

@@ -16,6 +16,7 @@ import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValue
  */
 public class QueryBuilder {
     private int limit = 1000;
+    private boolean newObjectChanges;
     private final List<Filter> filters = new ArrayList<>();
 
     private QueryBuilder(Filter initialFilter) {
@@ -58,6 +59,11 @@ public class QueryBuilder {
         return this;
     }
 
+    public QueryBuilder withNewObjectChanges(){
+        this.newObjectChanges = true;
+        return this;
+    }
+
     public QueryBuilder limit(int limit) {
         this.limit = limit;
         return this;
@@ -80,6 +86,6 @@ public class QueryBuilder {
             throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "empty JqlQuery");
         }
 
-        return new JqlQuery(getFilters(), getLimit());
+        return new JqlQuery(getFilters(), newObjectChanges, getLimit());
     }
 }

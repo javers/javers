@@ -62,24 +62,29 @@ public class QueryRunner {
         Validate.argumentIsNotNull(query);
 
         if (query.isIdOnlyQuery()){
-            return repository.getChangeHistory(fromDto(query.getIdFilter()), query.getLimit());
+            return repository.getChangeHistory(fromDto(query.getIdFilter()),
+                    query.isNewObjectChanges(), query.getLimit());
         }
 
         if (query.isIdAndPropertyQuery()){
-            return repository.getPropertyChangeHistory(fromDto(query.getIdFilter()), query.getPropertyName(), query.getLimit());
+            return repository.getPropertyChangeHistory(fromDto(query.getIdFilter()),
+                    query.getPropertyName(), query.isNewObjectChanges(), query.getLimit());
         }
 
         if (query.isClassOnlyQuery()){
-            return repository.getChangeHistory(query.getClassFilter(), query.getLimit());
+            return repository.getChangeHistory(query.getClassFilter(),
+                    query.isNewObjectChanges(), query.getLimit());
         }
 
         if (query.isClassAndPropertyQuery()){
-            return repository.getPropertyChangeHistory(query.getClassFilter(), query.getPropertyName(), query.getLimit());
+            return repository.getPropertyChangeHistory(query.getClassFilter(),
+                    query.getPropertyName(), query.isNewObjectChanges(), query.getLimit());
         }
 
         if (query.isVoOwnerOnlyQuery()) {
             VoOwnerFilter filter = query.getVoOwnerFilter();
-            return repository.getValueObjectChangeHistory(filter.getOwnerEntityClass(), filter.getPath(), query.getLimit());
+            return repository.getValueObjectChangeHistory(filter.getOwnerEntityClass(),
+                    filter.getPath(), query.isNewObjectChanges(), query.getLimit());
         }
 
         throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForChanges: " + query + " is not supported");
