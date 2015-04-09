@@ -4,6 +4,7 @@ import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.*;
 import org.javers.repository.sql.reposiotries.GlobalIdRepository;
 import org.javers.repository.sql.reposiotries.PersistentGlobalId;
@@ -45,7 +46,21 @@ public class CdoSnapshotFinder {
             return Optional.empty();
         }
 
-        return Optional.of(getCdoSnapshotsBySnapshotPk(maxSnapshot.get(), maxSnapshot.get(), persistentGlobalId).get(0));
+        return Optional.of(queryForCdoSnapshotsInRange(new Range(maxSnapshot.get()), persistentGlobalId).get(0));
+    }
+
+    public List<CdoSnapshot> getStateHistory(ManagedClass givenClass, int limit) {
+        Optional<Long> classPk = globalIdRepository.findClassPk(givenClass.getClientsClass());
+        if (classPk.isEmpty()){
+            return Collections.emptyList();
+        }
+
+       // Optional<Range> latestSnapshots = selectLatestSnapshotPrimaryKeysByClassPk(classPk.get(), limit);
+        //if (latestSnapshots.isEmpty()){
+       //     return Collections.emptyList();
+       // }
+
+        return null;
     }
 
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
@@ -54,23 +69,22 @@ public class CdoSnapshotFinder {
             return Collections.emptyList();
         }
 
-        List<Long> latestSnapshots = selectLatestSnapshotPrimaryKeys(persistentGlobalId, limit);
-
+        Optional<Range> latestSnapshots = selectLatestSnapshotPrimaryKeys(persistentGlobalId, limit);
         if (latestSnapshots.isEmpty()){
             return Collections.emptyList();
         }
 
-        long maxSnapshotPk = latestSnapshots.get(0);
-        long minSnapshotPk = latestSnapshots.get(latestSnapshots.size()-1);
-        return getCdoSnapshotsBySnapshotPk(minSnapshotPk, maxSnapshotPk, persistentGlobalId);
+        return queryForCdoSnapshotsInRange(latestSnapshots.get(), persistentGlobalId);
     }
+
 
     //TODO dependency injection
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }
 
-    private List<CdoSnapshot> getCdoSnapshotsBySnapshotPk(long minSnapshotPk, long maxSnapshotPk, final PersistentGlobalId globalId){
+    private List<CdoSnapshot> queryForCdoSnapshotsInRange(Range snapshotPkRange, final PersistentGlobalId globalId){
+
         SelectQuery query =
             polyJDBC.query()
                     .select(SNAPSHOT_STATE + ", " +
@@ -84,13 +98,12 @@ public class CdoSnapshotFinder {
                            SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
                     .orderBy(SNAPSHOT_PK, Order.DESC)
                     .withArgument("globalIdPk", globalId.getPrimaryKey())
-                    .withArgument("minSnapshotPk", minSnapshotPk)
-                    .withArgument("maxSnapshotPk", maxSnapshotPk);
+                    .withArgument("minSnapshotPk", snapshotPkRange.from)
+                    .withArgument("maxSnapshotPk", snapshotPkRange.to);
         return
         polyJDBC.queryRunner().queryList(query, new ObjectMapper<CdoSnapshot>() {
             @Override
             public CdoSnapshot createObject(ResultSet resultSet) throws SQLException {
-
                 String author = resultSet.getString(COMMIT_AUTHOR);
                 LocalDateTime commitDate = new LocalDateTime(resultSet.getTimestamp(COMMIT_COMMIT_DATE));
                 CommitId commitId = CommitId.valueOf(resultSet.getString(COMMIT_COMMIT_ID));
@@ -98,7 +111,7 @@ public class CdoSnapshotFinder {
 
                 SnapshotType snapshotType = SnapshotType.valueOf(resultSet.getString(SNAPSHOT_TYPE));
                 CdoSnapshotState state =
-                        jsonConverter.snapshotStateFromJson(resultSet.getString(SNAPSHOT_STATE), globalId);
+                        jsonConverter.snapshotStateFromJson(resultSet.getString(SNAPSHOT_STATE), globalId); //ManagedClass?
                 CdoSnapshotBuilder builder = CdoSnapshotBuilder.cdoSnapshot(globalId, commit);
                 builder.withType(snapshotType);
                 return builder.withState(state).build();
@@ -106,16 +119,22 @@ public class CdoSnapshotFinder {
         });
     }
 
-    private List<Long> selectLatestSnapshotPrimaryKeys(PersistentGlobalId globalId, int limit) {
+    private Optional<Range> selectLatestSnapshotPrimaryKeys(PersistentGlobalId globalId, int limit) {
         SelectQuery query = polyJDBC.query()
             .select(SNAPSHOT_PK)
             .from(SNAPSHOT_TABLE_NAME)
-                .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
+            .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
             .withArgument("globalIdPk", globalId.getPrimaryKey())
             .orderBy(SNAPSHOT_PK, Order.DESC)
             .limit(limit);
 
-        return queryForLongList(query, polyJDBC);
+        List<Long> primaryKeys = queryForLongList(query, polyJDBC);
+
+        if (primaryKeys.isEmpty()){
+            return Optional.empty();
+        }
+
+        return Optional.of( new Range(primaryKeys.get(primaryKeys.size() - 1), primaryKeys.get(0)) );
     }
 
     private Optional<Long> selectMaxSnapshotPrimaryKey(PersistentGlobalId globalId) {
@@ -131,5 +150,35 @@ public class CdoSnapshotFinder {
             return Optional.empty();
         }
         return result;
+    }
+
+    private class Range{
+        long from;
+        long to;
+
+        Range(long fromTo) {
+            this.from = fromTo;
+            this.to = fromTo;
+        }
+        Range(long from, long to) {
+            this.from = from;
+            this.to = to;
+        }
+    }
+
+    private abstract class SnapshotFilter{
+    }
+
+    private class GlobalIdFilter extends SnapshotFilter{
+        long globalIdPk;
+        GlobalIdFilter(long globalIdPk) {
+            this.globalIdPk = globalIdPk;
+        }
+    }
+    private class ClassIdFilter extends SnapshotFilter{
+        long classPk;
+        ClassIdFilter(long classPk) {
+            this.classPk = classPk;
+        }
     }
 }

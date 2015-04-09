@@ -50,21 +50,22 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
-    def "should query for ValueObject changes by owning Entity GlobalId"() {
+    def "should query for ValueObject changes by (owning Entity) GlobalId"() {
         given:
         def vo = new DummyAddress(city: "London")
         def entity = new SnapshotEntity(id:1, valueObjectRef: vo)
-        javers.commit("author",entity)
+        javers.commit("author", entity)
+        javers.commit("author", new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city: "Paris"))) //noise
 
         vo.city = "Paris"
-        javers.commit("author",entity)
+        javers.commit("author", entity)
 
         when:
         def changes = javers.findChanges(QueryBuilder.byValueObjectId(1,SnapshotEntity,"valueObjectRef").build())
 
         then:
         changes.size() == 2
-        changes[0].commitMetadata.get().id.majorId == 2
+        changes[0].commitMetadata.get().id.majorId == 3
         changes.each {
             assert it.affectedGlobalId == valueObjectId(1,SnapshotEntity,"valueObjectRef")
         }
@@ -103,7 +104,8 @@ class JaversRepositoryE2ETest extends Specification {
                    ]
         expectedGlobalId << [instanceId(1,SnapshotEntity),
                              unboundedValueObjectId(DummyAddress),
-                             valueObjectId(1,SnapshotEntity,"valueObjectRef")]
+                             valueObjectId(1,SnapshotEntity,"valueObjectRef")
+                            ]
     }
 
     def "should query for ValueObject snapshots by ValueObject class and changed property"() {

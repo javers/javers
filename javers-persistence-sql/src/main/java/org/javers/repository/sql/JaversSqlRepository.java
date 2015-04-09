@@ -6,6 +6,8 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.repository.api.JaversRepository;
@@ -77,5 +79,20 @@ public class JaversSqlRepository implements JaversRepository {
     @Override
     public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit) {
         throw new RuntimeException("not implemented");
+    }
+
+    @Override
+    public List<CdoSnapshot> getValueObjectStateHistory(Entity ownerEntity, String path, int limit) {
+        return null;
+    }
+
+    @Override
+    public List<CdoSnapshot> getStateHistory(ManagedClass givenClass, int limit) {
+        return finder.getStateHistory(givenClass, limit);
+    }
+
+    @Override
+    public List<CdoSnapshot> getPropertyStateHistory(ManagedClass givenClass, String propertyName, int limit) {
+        return null;
     }
 }

@@ -23,6 +23,8 @@ public class FixedSchemaFactory {
     public static final String GLOBAL_ID_PK =         "global_id_pk";
     public static final String GLOBAL_ID_CLASS_FK =   "cdo_class_fk";
     public static final String GLOBAL_ID_LOCAL_ID =   "local_id";
+    public static final String GLOBAL_ID_FRAGMENT =   "fragment";     //since v.1.2
+    public static final String GLOBAL_ID_OWNER_ID_FK ="owner_id_fk";  //since v.1.2
     public static final String GLOBAL_ID_PK_SEQ =     "jv_global_id_pk_seq";
 
     public static final String COMMIT_TABLE_NAME =    "jv_commit";
@@ -85,8 +87,10 @@ public class FixedSchemaFactory {
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         primaryKey(tableName, GLOBAL_ID_PK, schema,relationBuilder);
         relationBuilder
-                .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(200).and();
+                .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(200).and()
+                .withAttribute().string(GLOBAL_ID_FRAGMENT).withMaxLength(200).and();
         foreignKey(tableName, GLOBAL_ID_CLASS_FK, CDO_CLASS_TABLE_NAME, CDO_CLASS_PK, relationBuilder, schema);
+        foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);
         relationBuilder.build();
 
         columnIndex(tableName, GLOBAL_ID_CLASS_FK, schema);
@@ -97,7 +101,7 @@ public class FixedSchemaFactory {
 
     private void foreignKey(String tableName, String fkColName, String targetTableName, String targetPkColName, RelationBuilder relationBuilder, Schema schema){
         relationBuilder
-                .withAttribute().longAttr(fkColName).notNull().and()
+                .withAttribute().longAttr(fkColName).and()
                 .foreignKey(tableName + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName).and();
     }
 
