@@ -327,6 +327,8 @@ class JaversRepositoryE2ETest extends Specification {
              commitId.value() == "2.0"
              commitMetadata.author == "author2"
              commitMetadata.commitDate
+             changed.size() == 1
+             changed[0].name == "intProperty"
              !initial
         }
         with(snapshots[1]) {

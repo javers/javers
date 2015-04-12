@@ -42,24 +42,24 @@ public class CdoSnapshotFinder {
         return Optional.of(queryForCdoSnapshots(new SnapshotIdFilter(maxSnapshot.get(), persistentGlobalId), 1).get(0));
     }
 
-    public List<CdoSnapshot> getStateHistory(ManagedClass givenClass, int limit) {
+    public List<CdoSnapshot> getStateHistory(ManagedClass givenClass, Optional<String> propertyName, int limit) {
         Optional<Long> classPk = globalIdRepository.findClassPk(givenClass.getClientsClass());
         if (classPk.isEmpty()){
             return Collections.emptyList();
         }
 
-        ClassIdFilter classIdFilter = new ClassIdFilter(classPk.get());
+        ManagedClassFilter classFilter = new ManagedClassFilter(classPk.get(), propertyName);
 
-        return queryForCdoSnapshots(classIdFilter, limit);
+        return queryForCdoSnapshots(classFilter, limit);
     }
 
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, Optional<String> propertyName, int limit) {
         PersistentGlobalId persistentGlobalId = globalIdRepository.findPersistedGlobalId(globalId);
         if (!persistentGlobalId.persisted()){
             return Collections.emptyList();
         }
 
-        return queryForCdoSnapshots(new GlobalIdFilter(persistentGlobalId), limit);
+        return queryForCdoSnapshots(new GlobalIdFilter(persistentGlobalId, propertyName), limit);
     }
 
     //TODO dependency injection
@@ -69,8 +69,7 @@ public class CdoSnapshotFinder {
 
     private List<CdoSnapshot> queryForCdoSnapshots(SnapshotFilter snapshotFilter, int limit){
 
-        SelectQuery query =  polyJDBC.query()
-            .select(snapshotFilter.select());
+        SelectQuery query =  polyJDBC.query().select(snapshotFilter.select());
         snapshotFilter.addFrom(query);
         snapshotFilter.addWhere(query);
         query.orderBy(SNAPSHOT_PK, Order.DESC).limit(limit);
@@ -100,85 +99,4 @@ public class CdoSnapshotFinder {
         }
         return result;
     }
-
-    private abstract class SnapshotFilter{
-        static final String COMMIT_WITH_SNAPSHOT
-                = SNAPSHOT_TABLE_NAME + " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK;
-
-        static final String BASE_FIELDS =
-                SNAPSHOT_STATE + ", " +
-                SNAPSHOT_TYPE + ", " +
-                COMMIT_AUTHOR + ", " +
-                COMMIT_COMMIT_DATE + ", " +
-                COMMIT_COMMIT_ID;
-
-        private final long primaryKey;
-        private final String pkFieldName;
-
-        public SnapshotFilter(long primaryKey, String pkFieldName) {
-            this.primaryKey = primaryKey;
-            this.pkFieldName = pkFieldName;
-        }
-
-        void addWhere(SelectQuery query) {
-            String argName = this.getClass().getSimpleName()+"Pk";
-            query.where(pkFieldName + " = :"+argName).withArgument(argName, primaryKey);
-        }
-
-        void addFrom(SelectQuery query) {
-            query.from(COMMIT_WITH_SNAPSHOT);
-        }
-
-        String select(){
-            return BASE_FIELDS;
-        }
-    }
-
-    private class ClassIdFilter extends SnapshotFilter{
-        ClassIdFilter(long classPk) {
-            super(classPk, "g."+GLOBAL_ID_CLASS_FK);
-        }
-
-        @Override
-        void addFrom(SelectQuery query) {
-            final String JOIN_GLOBAL_ID_TO_SNAPSHOT
-                    = " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " as g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
-                    " INNER JOIN " + CDO_CLASS_TABLE_NAME + " as g_c ON g_c." + CDO_CLASS_PK + " = g."+GLOBAL_ID_CLASS_FK +
-                    " LEFT OUTER JOIN " + GLOBAL_ID_TABLE_NAME + " as o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK +
-                    " LEFT OUTER JOIN " + CDO_CLASS_TABLE_NAME + " as o_c ON o_c." + CDO_CLASS_PK + " = o."+GLOBAL_ID_CLASS_FK;
-
-            query.from(COMMIT_WITH_SNAPSHOT + JOIN_GLOBAL_ID_TO_SNAPSHOT);
-        }
-
-        @Override
-        String select() {
-            return BASE_FIELDS + ", " +
-                   "g."+GLOBAL_ID_LOCAL_ID + ", " +
-                   "g."+GLOBAL_ID_FRAGMENT + ", " +
-                   "g."+GLOBAL_ID_OWNER_ID_FK + ", " +
-                   "g_c."+CDO_CLASS_QUALIFIED_NAME + ", " +
-                   "o."+GLOBAL_ID_LOCAL_ID + " as owner_" + GLOBAL_ID_LOCAL_ID + ", " +
-                   "o."+GLOBAL_ID_FRAGMENT + " as owner_" + GLOBAL_ID_FRAGMENT + ", " +
-                   "o_c."+CDO_CLASS_QUALIFIED_NAME + " as owner_" + CDO_CLASS_QUALIFIED_NAME;
-        }
-    }
-
-    private class SnapshotIdFilter extends SnapshotFilter{
-        private final GlobalId globalId;
-
-        SnapshotIdFilter(long snapshotId, GlobalId globalId) {
-            super(snapshotId, SNAPSHOT_PK);
-            this.globalId = globalId;
-        }
-    }
-
-    private class GlobalIdFilter extends SnapshotFilter{
-        private final GlobalId globalId;
-
-        GlobalIdFilter(PersistentGlobalId id) {
-           super(id.getPrimaryKey(), SNAPSHOT_GLOBAL_ID_FK);
-           this.globalId = id.getInstance();
-        }
-    }
-
 }

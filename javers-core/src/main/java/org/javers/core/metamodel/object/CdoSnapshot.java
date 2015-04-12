@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.common.collections.Function;
+import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
@@ -62,6 +64,15 @@ public final class CdoSnapshot extends Cdo {
 
     public List<Property> getChanged() {
         return unmodifiableList(changed);
+    }
+
+    public List<String> getChangedPropertyNames(){
+        return
+        Lists.transform(getChanged(), new Function<Property, String>() {
+            public String apply(Property input) {
+                return input.getName();
+            }
+        });
     }
 
     public boolean hasChangeAt(String propertyName) {

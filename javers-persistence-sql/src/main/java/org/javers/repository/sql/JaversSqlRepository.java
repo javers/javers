@@ -36,11 +36,6 @@ public class JaversSqlRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
-        return finder.getStateHistory(globalId, limit);
-    }
-
-    @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         return finder.getLatest(globalId);
     }
@@ -77,22 +72,27 @@ public class JaversSqlRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit) {
-        throw new RuntimeException("not implemented");
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
+        return finder.getStateHistory(globalId, Optional.<String>empty(), limit);
     }
 
     @Override
-    public List<CdoSnapshot> getValueObjectStateHistory(Entity ownerEntity, String path, int limit) {
-        return null;
+    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit) {
+        return finder.getStateHistory(globalId, Optional.of(propertyName), limit);
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(ManagedClass givenClass, int limit) {
-        return finder.getStateHistory(givenClass, limit);
+        return finder.getStateHistory(givenClass, Optional.<String>empty(), limit);
     }
 
     @Override
     public List<CdoSnapshot> getPropertyStateHistory(ManagedClass givenClass, String propertyName, int limit) {
+        return finder.getStateHistory(givenClass, Optional.of(propertyName), limit);
+    }
+
+    @Override
+    public List<CdoSnapshot> getValueObjectStateHistory(Entity ownerEntity, String path, int limit) {
         return null;
     }
 }

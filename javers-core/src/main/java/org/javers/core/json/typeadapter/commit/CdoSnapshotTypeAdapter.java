@@ -86,17 +86,10 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
         JsonObject jsonObject = new JsonObject();
 
-        List<String> changedProperties =
-        Lists.transform(snapshot.getChanged(), new Function<Property, String>() {
-            public String apply(Property input) {
-                return input.getName();
-            }
-        });
-
         jsonObject.add(COMMIT_METADATA, context.serialize(snapshot.getCommitMetadata()));
         jsonObject.add(GLOBAL_CDO_ID, context.serialize(snapshot.getGlobalId()));
         jsonObject.add(STATE_NAME, context.serialize(snapshot.getState()));
-        jsonObject.add(CHANGED_NAME, context.serialize(changedProperties));
+        jsonObject.add(CHANGED_NAME, context.serialize(snapshot.getChangedPropertyNames()));
         jsonObject.add(TYPE_NAME, context.serialize(snapshot.getType().name()));
 
         return jsonObject;
