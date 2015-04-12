@@ -73,7 +73,6 @@ class GlobalIdTypeAdapterTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.cdoId == "/"
         json.valueObject == "org.javers.core.model.DummyAddress"
     }
 

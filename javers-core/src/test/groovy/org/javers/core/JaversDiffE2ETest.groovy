@@ -150,13 +150,11 @@ class JaversDiffE2ETest extends Specification {
         when:
         def diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
         def jsonText = javers.toJson(diff)
-        //println("jsonText:\n"+jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
         def change = json.changes[0];
         change.globalId.valueObject == "org.javers.core.model.DummyUserWithPoint"
-        change.globalId.cdoId == "/"
         change.changeType == "ValueChange"
         change.property == "point"
         change.left == "1,2" //this is most important in this test

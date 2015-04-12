@@ -97,8 +97,5 @@ public class BasicCommitExample {
         assertThat(change.getProperty().getName()).isEqualTo("name");
         assertThat(change.getLeft()).isNull();
         assertThat(change.getRight()).isEqualTo("Robert Martin");
-
-        //and one NewObject change for Bob's initial commit
-        assertThat(changes.get(3)).isInstanceOf(NewObject.class);
     }
 }
