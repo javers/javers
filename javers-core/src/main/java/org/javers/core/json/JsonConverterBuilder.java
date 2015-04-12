@@ -4,6 +4,7 @@ import com.google.gson.*;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
 import org.javers.core.json.typeadapter.joda.LocalDateTypeAdapter;
+import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.lang.reflect.Type;
@@ -25,6 +26,7 @@ public class JsonConverterBuilder {
 
     private boolean typeSafeValues = false;
     private TypeMapper typeMapper;
+    private GlobalIdFactory globalIdFactory;
     private final GsonBuilder gsonBuilder;
 
     public JsonConverterBuilder() {
@@ -55,6 +57,11 @@ public class JsonConverterBuilder {
 
     public JsonConverterBuilder typeMapper(TypeMapper typeMapper){
         this.typeMapper = typeMapper;
+        return this;
+    }
+
+    public JsonConverterBuilder globalIdFactory(GlobalIdFactory globalIdFactory){
+        this.globalIdFactory = globalIdFactory;
         return this;
     }
 
@@ -115,7 +122,7 @@ public class JsonConverterBuilder {
                    .setPrettyPrinting()
                    .setDateFormat(ISO_DATE_TIME_FORMAT);
 
-        return new JsonConverter(typeMapper, gsonBuilder.create());
+        return new JsonConverter(typeMapper, globalIdFactory, gsonBuilder.create());
     }
 
     private void registerJsonTypeAdapterForType(Type targetType, final JsonTypeAdapter adapter) {

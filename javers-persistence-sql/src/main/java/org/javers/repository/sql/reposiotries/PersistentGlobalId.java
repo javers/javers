@@ -9,8 +9,8 @@ import org.javers.core.metamodel.object.GlobalId;
 * @author bartosz walacik
 */
 public class PersistentGlobalId extends GlobalId{
-    private GlobalId instance;
-    private Optional<Long> primaryKey;
+    private final GlobalId instance;
+    private final Optional<Long> primaryKey;
 
     PersistentGlobalId(GlobalId instance, Optional<Long> primaryKey) {
         Validate.argumentsAreNotNull(instance, primaryKey);
@@ -44,5 +44,9 @@ public class PersistentGlobalId extends GlobalId{
     @Override
     public int hashCode() {
         return instance.hashCode();
+    }
+
+    public GlobalId getInstance() {
+        return instance;
     }
 }

@@ -33,13 +33,9 @@ public class ValueObjectId extends UnboundedValueObjectId {
      * Usually, property name.
      * It works like <i>fragment identifier</i> in URL
      */
+    @Override
     public String getFragment() {
         return fragment;
-    }
-
-    @Override
-    public Object getCdoId() {
-        return null;
     }
 
     public GlobalId getOwnerId() {

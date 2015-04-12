@@ -1,8 +1,13 @@
 package org.javers.core.json
 
-import org.javers.core.JaversTestBuilder
+import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.object.UnboundedValueObjectId
+import org.javers.core.metamodel.object.ValueObjectId
+import org.javers.core.model.DummyAddress
+import org.javers.core.model.SnapshotEntity
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.math.RoundingMode
 
@@ -18,7 +23,7 @@ class JsonConverterBasicTest extends Specification{
 
     def shouldConvertIntToJson() {
         when:
-        String json = jsonConverter.toJson(12)
+        def json = jsonConverter.toJson(12)
 
         then:
         json == "12"
@@ -35,7 +40,7 @@ class JsonConverterBasicTest extends Specification{
     def void shouldConvertDoubleToJson() {
         when:
         double value = 1/3D
-        String json = jsonConverter.toJson(value)
+        def json = jsonConverter.toJson(value)
 
         then:
         json == "0.3333333333333333"
@@ -52,8 +57,8 @@ class JsonConverterBasicTest extends Specification{
 
     def void shouldConvertBigDecimalToJson(){
         when:
-        BigDecimal value= new BigDecimal(22.22).setScale(3, RoundingMode.HALF_UP)
-        String json = jsonConverter.toJson(value)
+        def value= new BigDecimal(22.22).setScale(3, RoundingMode.HALF_UP)
+        def json = jsonConverter.toJson(value)
 
         then:
         json == "22.220"
@@ -61,7 +66,7 @@ class JsonConverterBasicTest extends Specification{
 
     def void shouldConvertBigDecimalFromJson() {
         when:
-        BigDecimal value = jsonConverter.fromJson("22.220",BigDecimal.class)
+        def value = jsonConverter.fromJson("22.220",BigDecimal.class)
 
         then:
         value == new BigDecimal(22.22).setScale(3, RoundingMode.HALF_UP)
@@ -69,7 +74,7 @@ class JsonConverterBasicTest extends Specification{
 
     def void shouldConvertNullToJson() {
         when:
-        String json = jsonConverter.toJson(null)
+        def json = jsonConverter.toJson(null)
 
         then:
         json == "null"
@@ -78,9 +83,29 @@ class JsonConverterBasicTest extends Specification{
     
     def void shouldConvertNullFromJson() {
         when:
-        Integer value = jsonConverter.fromJson("null", Integer.class)
+        def value = jsonConverter.fromJson("null", Integer.class)
 
         then:
         value == null
     }
+
+    @Unroll
+    def "should #expectedType.simpleName convert from GlobalIdRawDTO"() {
+        when:
+        def globalId = jsonConverter.fromDto(dto)
+
+        then:
+        globalId.class == expectedType
+        globalId.value() == expectedValue
+
+
+        where:
+        dto << [new GlobalIdRawDTO(SnapshotEntity.class.name,"1",null,null),
+                new GlobalIdRawDTO(DummyAddress.class.name,null,"/",null),
+                new GlobalIdRawDTO(DummyAddress.class.name,null,"address",new GlobalIdRawDTO(SnapshotEntity.class.name,"1",null,null) )
+               ]
+        expectedType <<  [InstanceId, UnboundedValueObjectId, ValueObjectId]
+        expectedValue << [SnapshotEntity.class.name+"/1", DummyAddress.class.name+"/", SnapshotEntity.class.name+"/1#address"]
+    }
+
 }

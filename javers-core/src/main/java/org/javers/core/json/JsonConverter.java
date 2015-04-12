@@ -1,11 +1,13 @@
 package org.javers.core.json;
 
 import com.google.gson.*;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.commit.CdoSnapshotStateDeserializer;
 import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
-import org.javers.core.metamodel.object.CdoSnapshotState;
-import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.joda.time.LocalDateTime;
 
@@ -46,8 +48,10 @@ import java.lang.reflect.Type;
 public class JsonConverter {
     private Gson gson;
     private final CdoSnapshotStateDeserializer stateDeserializer;
+    private final TypeMapper typeMapper;
+    private final GlobalIdFactory globalIdFactory;
 
-    JsonConverter(TypeMapper typeMapper, Gson gson) {
+    JsonConverter(TypeMapper typeMapper, GlobalIdFactory globalIdFactory, Gson gson) {
         Validate.argumentsAreNotNull(typeMapper, gson);
         this.gson = gson;
 
@@ -58,6 +62,8 @@ public class JsonConverter {
             }
         };
         this.stateDeserializer = new CdoSnapshotStateDeserializer(typeMapper, deserializationContext);
+        this.typeMapper = typeMapper;
+        this.globalIdFactory = globalIdFactory;
     }
 
     public String toJson(Object value) {
@@ -80,9 +86,34 @@ public class JsonConverter {
         return gson.fromJson(json, expectedType);
     }
 
+    public GlobalId fromDto(GlobalIdRawDTO globalIdDTO) {
+        Validate.argumentIsNotNull(globalIdDTO);
+
+        Class cdoClass = parseClass(globalIdDTO.getCdoClassName());
+        if (globalIdDTO.isInstanceId()){
+            Entity entity = typeMapper.getManagedClass(cdoClass, Entity.class);
+            Object cdoId = fromJson(globalIdDTO.getLocalIdJSON(), entity.getIdProperty().getType());
+            return globalIdFactory.createFromId(cdoId, entity);
+        } else if (globalIdDTO.isValueObjectId()){
+            GlobalId ownerId = fromDto(globalIdDTO.getOwnerId());
+            return globalIdFactory.createFromPath(ownerId, cdoClass, globalIdDTO.getFragment());
+        } else {
+            return globalIdFactory.createFromClass(cdoClass);
+        }
+    }
+
     public CdoSnapshotState snapshotStateFromJson(String json, GlobalId globalId){
         Validate.argumentsAreNotNull(json, globalId);
         JsonElement stateElement = fromJson(json, JsonElement.class);
         return stateDeserializer.deserialize(stateElement, globalId);
+    }
+
+    public static Class parseClass(String qualifiedName){
+        try {
+            return JsonConverter.class.forName(qualifiedName);
+        }
+        catch (ClassNotFoundException e){
+            throw new JaversException(JaversExceptionCode.CLASS_NOT_FOUND, qualifiedName);
+        }
     }
 }

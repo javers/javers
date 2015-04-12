@@ -2,8 +2,7 @@ package org.javers.core.json.typeadapter.commit;
 
 import com.google.gson.*;
 import org.javers.common.collections.Lists;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.clazz.Entity;
@@ -11,7 +10,6 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 
 import java.util.List;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -68,9 +66,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
         JsonElement cdoIdElement = jsonObject.get(CDO_ID_FIELD);
         Object cdoId = context.deserialize(cdoIdElement, entity.getIdProperty().getType());
 
-        jsonObject.get(ENTITY_FIELD).getAsString();
-
-        return globalIdFactory.createFromId(cdoId,entity);
+        return globalIdFactory.createFromId(cdoId, entity);
     }
 
     @Override
@@ -114,17 +110,11 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     }
 
     private Entity parseEntity(JsonObject object, String fieldName){
-        return typeMapper.getManagedClass(parseClass(object,fieldName), Entity.class);
+        return typeMapper.getManagedClass(parseClass(object, fieldName), Entity.class);
     }
 
-    private Class parseClass(JsonObject object, String fieldName){
-
+    private Class parseClass(JsonObject object, String fieldName) {
         String className = object.get(fieldName).getAsString();
-        try {
-            return this.getClass().forName(className);
-        }
-        catch (ClassNotFoundException e){
-            throw new JaversException(JaversExceptionCode.CLASS_NOT_FOUND, className);
-        }
+        return JsonConverter.parseClass(className);
     }
 }
