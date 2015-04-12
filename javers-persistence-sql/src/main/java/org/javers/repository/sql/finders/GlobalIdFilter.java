@@ -9,7 +9,7 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_GLOBA
 /**
  * Created by bartosz.walacik on 2015-04-12.
  */
-class GlobalIdFilter extends PropertyNameFilter {
+class GlobalIdFilter extends SnapshotFilter {
     final GlobalId globalId;
 
     GlobalIdFilter(PersistentGlobalId id, Optional<String> propertyName) {

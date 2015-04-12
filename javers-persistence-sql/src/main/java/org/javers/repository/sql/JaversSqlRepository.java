@@ -93,6 +93,6 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getValueObjectStateHistory(Entity ownerEntity, String path, int limit) {
-        return null;
+        return finder.getVOStateHistory(ownerEntity, path, limit);
     }
 }

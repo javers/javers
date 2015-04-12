@@ -8,9 +8,13 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 /**
  * Created by bartosz.walacik on 2015-04-12.
  */
-class ManagedClassFilter extends PropertyNameFilter {
+class ManagedClassFilter extends SnapshotFilter {
     ManagedClassFilter(long classPk, Optional<String> propertyName) {
         super(classPk, "g." + GLOBAL_ID_CLASS_FK, propertyName);
+    }
+
+    ManagedClassFilter(long classPk, String pkFieldName) {
+        super(classPk, pkFieldName, Optional.<String>empty());
     }
 
     @Override

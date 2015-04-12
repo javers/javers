@@ -2,6 +2,7 @@ package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Optional;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.*;
 import org.javers.repository.sql.reposiotries.GlobalIdRepository;
@@ -51,6 +52,17 @@ public class CdoSnapshotFinder {
         ManagedClassFilter classFilter = new ManagedClassFilter(classPk.get(), propertyName);
 
         return queryForCdoSnapshots(classFilter, limit);
+    }
+
+    public List<CdoSnapshot> getVOStateHistory(Entity ownerEntity, String fragment, int limit) {
+        Optional<Long> ownerEntityClassPk = globalIdRepository.findClassPk(ownerEntity.getClientsClass());
+        if (ownerEntityClassPk.isEmpty()){
+            return Collections.emptyList();
+        }
+
+        VoOwnerEntityFilter voOwnerFilter = new VoOwnerEntityFilter(ownerEntityClassPk.get(), fragment);
+
+        return queryForCdoSnapshots(voOwnerFilter, limit);
     }
 
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, Optional<String> propertyName, int limit) {

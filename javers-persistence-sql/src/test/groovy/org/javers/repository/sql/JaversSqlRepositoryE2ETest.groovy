@@ -14,7 +14,7 @@ import static org.javers.core.JaversBuilder.javers
 class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     protected Connection getConnection() {
-        DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test")
+        DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test;")//TRACE_LEVEL_SYSTEM_OUT=2")
     }
 
     protected DialectName getDialect() {

@@ -32,6 +32,8 @@ class JaversRepositoryE2ETest extends Specification {
                      new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city:"Paris")),
                      new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city:"Rome")),
                      new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city:"Paris")),
+                     //noise
+                     new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city:"Paris"), arrayOfValueObjects: [new DummyAddress(city:"Luton")])
         ]
 
         data.each{
