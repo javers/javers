@@ -2,6 +2,8 @@
 ![javers-black-logo-1.0.png](javers-black-logo-1.0.png)
 
 ## What is JaVers
+
+[![Join the chat at https://gitter.im/javers/javers](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/javers/javers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 JaVers is a lightweight java library for **auditing** changes in your data.
 
 We all use Version Control Systems for source code,
