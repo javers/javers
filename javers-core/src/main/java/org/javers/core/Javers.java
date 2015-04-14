@@ -110,12 +110,45 @@ public interface Javers {
     /**
      * Snapshots (historical versions) of given class, object or property,
      * in reverse chronological order.
-     * <br/><br/>
      *
-     * For example, to get last 5 snapshots of "bob" Person, call:
+     * <h3>Querying for Entity snapshots by instance Id</h3>
+     *
+     * To get last 5 snapshots of "bob" Person, call:
      * <pre>
-     * javers.findSnapshots(QueryBuilder.byInstanceId("bob", Person.class).limit(5).build());
+     * javers.findSnapshots( QueryBuilder.byInstanceId("bob", Person.class).limit(5).build() );
      * </pre>
+     *
+     * Last snapshots of "bob" Person with a "salary" change:
+     * <pre>
+     * javers.findSnapshots( QueryBuilder.byInstanceId("bob", Person.class).andProperty("salary").limit(5).build() );
+     * </pre>
+     *
+     *
+     * <h3>Querying for ValueObject snapshots</h3>
+     *
+     * Last snapshots of Address ValueObject owned by "bob" Person:
+     * <pre>
+     * javers.findSnapshots( QueryBuilder.byValueObjectId("bob", Person.class, "address").build() );
+     * </pre>
+     *
+     * Last snapshots of Address ValueObject owned by any Person:
+     * <pre>
+     * javers.findSnapshots( QueryBuilder.byValueObject(Person.class, "address").build() );
+     * </pre>
+     *
+     *
+     * <h3>Querying for any object snapshots regardless of its type</h3>
+     *
+     * Last snapshots of any object of MyClass.class:
+     * <pre>
+     * javers.findSnapshots( QueryBuilder.byClass(MyClass.class).limit(5).build() );
+     * </pre>
+     *
+     * Last snapshots of any object of MyClass.class with a "myProperty" change:
+     * <pre>
+     * javers.findSnapshots( QueryBuilder.byClass(Person.class).andProperty("myProperty").limit(5).build() );
+     * </pre>
+     *
      * @return empty List if nothing found
      */
     List<CdoSnapshot> findSnapshots(JqlQuery query);
@@ -127,25 +160,16 @@ public interface Javers {
      *
      * For example, to get change history of last 5 versions of "bob" Person, call:
      * <pre>
-     * javers.findChanges(QueryBuilder.byInstanceId("bob", Person.class).limit(5).build());
+     * javers.findChanges( QueryBuilder.byInstanceId("bob", Person.class).limit(5).build() );
      * </pre>
+     *
+     * For more query examples, see {@link #findSnapshots(JqlQuery)} method.
+     * Both methods use Javers Query Language (JQL).
+     * So you can use the same query object to get changes and snapshots views.
      *
      * @return empty List if nothing found
      */
     List<Change> findChanges(JqlQuery query);
-
-
-    /**
-     * use {@link #findSnapshots(JqlQuery)}
-     */
-    @Deprecated
-    List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit);
-
-    /**
-     * use {@link #findChanges(JqlQuery)}
-     */
-    @Deprecated
-    List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
 
     /**
      * Latest snapshot of given entity instance
@@ -158,6 +182,18 @@ public interface Javers {
      * </pre>
      */
     Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass);
+
+    /**
+     * use {@link #findSnapshots(JqlQuery)}
+     */
+    @Deprecated
+    List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit);
+
+    /**
+     * use {@link #findChanges(JqlQuery)}
+     */
+    @Deprecated
+    List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
 
     /**
      * use {@link #getLatestSnapshot(Object, Class)}
