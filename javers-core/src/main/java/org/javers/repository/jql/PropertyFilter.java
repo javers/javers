@@ -6,7 +6,7 @@ import org.javers.core.metamodel.object.GlobalId;
 /**
  * Queries for Snapshots or Changes by {@link GlobalId} and changed property
  *
- * Created by bartosz.walacik on 2015-03-28.
+ * @author bartosz.walacik
  */
 class PropertyFilter extends Filter {
     private final String propertyName;

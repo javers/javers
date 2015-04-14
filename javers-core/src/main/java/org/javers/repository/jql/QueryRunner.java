@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Adapter from a JqlQuery to JaversRepository API
  *
- * Created by bartosz.walacik on 2015-03-29.
+ * @author bartosz.walacik
  */
 public class QueryRunner {
     private final JaversExtendedRepository repository;

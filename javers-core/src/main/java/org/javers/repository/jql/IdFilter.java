@@ -3,7 +3,7 @@ package org.javers.repository.jql;
 import org.javers.common.validation.Validate;
 
 /**
- * Created by bartosz.walacik on 2015-03-28.
+ * @author bartosz.walacik
  */
 class IdFilter extends Filter {
     private final GlobalIdDTO globalId;

@@ -6,7 +6,7 @@ import org.polyjdbc.core.query.SelectQuery;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 /**
- * Created by bartosz.walacik on 2015-04-12.
+ * @author bartosz.walacik
  */
 class ManagedClassFilter extends SnapshotFilter {
     ManagedClassFilter(long classPk, Optional<String> propertyName) {

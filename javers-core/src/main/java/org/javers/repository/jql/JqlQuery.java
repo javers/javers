@@ -1,14 +1,20 @@
 package org.javers.repository.jql;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.Javers;
 
 import java.util.List;
 
 /**
- * Created by bartosz.walacik on 2015-03-28.
+ * JaversRepository query.
+ * Use it to query for object snapshots and object change history.
+ * <br/><br/>
+ *
+ * Queries should be created by {@link QueryBuilder}
+ * and executed with {@link Javers#findSnapshots(JqlQuery)} and {@link Javers#findChanges(JqlQuery)}
+ *
+ * @author bartosz.walacik
  */
 public class JqlQuery<T> {
 

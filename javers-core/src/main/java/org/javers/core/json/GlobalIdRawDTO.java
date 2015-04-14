@@ -1,7 +1,7 @@
 package org.javers.core.json;
 
 /**
- * Created by bartosz.walacik on 2015-04-11.
+ * @author bartosz.walacik
  */
 public class GlobalIdRawDTO {
     private final String cdoClassName;

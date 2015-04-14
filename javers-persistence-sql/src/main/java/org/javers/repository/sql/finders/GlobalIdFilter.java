@@ -7,7 +7,7 @@ import org.javers.repository.sql.reposiotries.PersistentGlobalId;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_GLOBAL_ID_FK;
 
 /**
- * Created by bartosz.walacik on 2015-04-12.
+ * @author bartosz.walacik
  */
 class GlobalIdFilter extends SnapshotFilter {
     final GlobalId globalId;

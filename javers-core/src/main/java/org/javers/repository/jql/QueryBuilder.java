@@ -3,16 +3,19 @@ package org.javers.repository.jql;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.Javers;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
-import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId;
 
 /**
- * Created by bartosz.walacik on 2015-03-29.
+ * Fluent API for building {@link JqlQuery},
+ * executed with {@link Javers#findSnapshots(JqlQuery)} and {@link Javers#findChanges(JqlQuery)}
+ *
+ * @author bartosz.walacik
  */
 public class QueryBuilder {
     private int limit = 1000;

@@ -8,7 +8,7 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.CDO_CLASS_QUAL
 import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_FRAGMENT;
 
 /**
- * Created by bartosz.walacik on 2015-04-12.
+ * @author bartosz.walacik
  */
 public class VoOwnerEntityFilter extends ManagedClassFilter {
     final String fragment;

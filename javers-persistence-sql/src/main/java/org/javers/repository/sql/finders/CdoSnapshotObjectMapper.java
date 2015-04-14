@@ -19,7 +19,7 @@ import static org.javers.core.metamodel.object.SnapshotType.valueOf;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 /**
- * Created by bartosz.walacik on 2015-04-11.
+ * @author bartosz.walacik
  */
 class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
     private final GlobalId providedGlobalId;

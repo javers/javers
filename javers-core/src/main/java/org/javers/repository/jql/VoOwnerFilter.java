@@ -3,7 +3,7 @@ package org.javers.repository.jql;
 import org.javers.common.validation.Validate;
 
 /**
- * Created by bartosz.walacik on 2015-04-06.
+ * @author bartosz.walacik
  */
 class VoOwnerFilter extends Filter {
 
