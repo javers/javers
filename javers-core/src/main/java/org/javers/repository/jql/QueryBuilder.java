@@ -42,11 +42,6 @@ public class QueryBuilder {
         return new QueryBuilder(new IdFilter(ValueObjectIdDTO.valueObjectId(ownerLocalId, ownerEntityClass, path)));
     }
 
-    /*public static QueryBuilder byUnboundedValueObjectId(Class valueObjectClass){
-        Validate.argumentIsNotNull(valueObjectClass);
-        return new QueryBuilder(new IdFilter(unboundedValueObjectId(valueObjectClass)));
-    }*/
-
     @Deprecated
     public static QueryBuilder byGlobalIdDTO(GlobalIdDTO globalId){
         Validate.argumentIsNotNull(globalId);

@@ -100,8 +100,7 @@ public interface Javers {
     Diff initial(Object newDomainObject);
 
     /**
-     * use:
-     * <pre>
+     * use: <pre>
      * javers.getJsonConverter().toJson(diff);
      * </pre>
      */
@@ -109,44 +108,41 @@ public interface Javers {
     String toJson(Diff diff);
 
     /**
-     * TODO: javadoc
+     * Snapshots (historical versions) of given class, object or property,
+     * in reverse chronological order.
+     * <br/><br/>
+     *
+     * For example, to get last 5 snapshots of "bob" Person, call:
+     * <pre>
+     * javers.findSnapshots(QueryBuilder.byInstanceId("bob", Person.class).limit(5).build());
+     * </pre>
+     * @return empty List if nothing found
      */
     List<CdoSnapshot> findSnapshots(JqlQuery query);
 
     /**
-     * TODO: javadoc
-     */
-    List<Change> findChanges(JqlQuery query);
-
-    /**
-     * Snapshots (historical versions) of given object,
+     * Changes history (diff sequence) of given class, object or property,
      * in reverse chronological order.
      * <br/><br/>
      *
-     * For example, to list 5 last snapshots of "bob" Person, call:
+     * For example, to get change history of last 5 versions of "bob" Person, call:
      * <pre>
-     * javers.getStateHistory(InstanceIdDTO.instanceId("bob", Person.class), 5);
+     * javers.findChanges(QueryBuilder.byInstanceId("bob", Person.class).limit(5).build());
      * </pre>
      *
-     * @param globalId given object ID
-     * @param limit choose reasonable limit
-     * @return empty List if object is not versioned
+     * @return empty List if nothing found
+     */
+    List<Change> findChanges(JqlQuery query);
+
+
+    /**
+     * use {@link #findSnapshots(JqlQuery)}
      */
     @Deprecated
     List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit);
 
     /**
-     * Changes history (diff sequence) of given object,
-     * in reverse chronological order.
-     *
-     * For example, to get change history of "bob" Person, call:
-     * <pre>
-     * javers.calculateDiffs(InstanceIdDTO.instanceId("bob", Person.class), 5);
-     * </pre>
-     *
-     * @param globalId given object ID
-     * @param limit choose reasonable limit
-     * @return empty List, if object is not versioned or was committed only once
+     * use {@link #findChanges(JqlQuery)}
      */
     @Deprecated
     List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
@@ -163,6 +159,9 @@ public interface Javers {
      */
     Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass);
 
+    /**
+     * use {@link #getLatestSnapshot(Object, Class)}
+     */
     @Deprecated
     Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId);
 
