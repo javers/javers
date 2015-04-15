@@ -67,8 +67,7 @@ public final class CdoSnapshot extends Cdo {
     }
 
     public List<String> getChangedPropertyNames(){
-        return
-        Lists.transform(getChanged(), new Function<Property, String>() {
+        return Lists.transform(getChanged(), new Function<Property, String>() {
             public String apply(Property input) {
                 return input.getName();
             }
