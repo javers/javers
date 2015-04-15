@@ -12,7 +12,7 @@ import java.util.List;
  * <br/><br/>
  *
  * Queries should be created by {@link QueryBuilder}
- * and executed with {@link Javers#findSnapshots(JqlQuery)} and {@link Javers#findChanges(JqlQuery)}
+ * and executed with {@link Javers#findChanges(JqlQuery)} and {@link Javers#findSnapshots(JqlQuery)}
  *
  * @author bartosz.walacik
  */

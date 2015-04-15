@@ -13,7 +13,7 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
 /**
  * Fluent API for building {@link JqlQuery},
- * executed with {@link Javers#findSnapshots(JqlQuery)} and {@link Javers#findChanges(JqlQuery)}
+ * executed with {@link Javers#findChanges(JqlQuery)} and {@link Javers#findSnapshots(JqlQuery)}
  *
  * @author bartosz.walacik
  */

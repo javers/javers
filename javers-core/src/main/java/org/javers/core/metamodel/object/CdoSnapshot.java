@@ -19,7 +19,7 @@ import static org.javers.core.metamodel.object.SnapshotType.TERMINAL;
 /**
  * Captured state of client's domain object.
  * Values and primitives are stored 'by value',
- * Referenced Entities and ValueObjects are stored 'by reference' using {@link GlobalId}
+ * referenced Entities and ValueObjects are stored 'by reference' using {@link GlobalId}
  *
  * @author bartosz walacik
  */
