@@ -52,9 +52,9 @@ public class BasicCommitExample {
         javers.commit("user", robert);
 
         // when:
-        // list state history - snapshots
+        // list state history - last 10 snapshots
         List<CdoSnapshot> snapshots = javers.findSnapshots(
-            QueryBuilder.byInstanceId("bob", Person.class).build());
+            QueryBuilder.byInstanceId("bob", Person.class).limit(10).build());
 
         // then:
         // there should be two Snapshots with Bob's state
