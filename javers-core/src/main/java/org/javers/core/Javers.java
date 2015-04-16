@@ -110,8 +110,9 @@ public interface Javers {
      * <br/><br/>
      *
      * Resulting List is ordered in reverse chronological order.
+     * <br/><br/>
      *
-     * <h3>Querying for Entity changes by instance Id</h3>
+     * <b>Querying for Entity changes by instance Id</b><br/><br/>
      *
      * For example, to get change history of last 5 versions of "bob" Person, call:
      * <pre>
@@ -124,7 +125,7 @@ public interface Javers {
      * </pre>
      *
      *
-     * <h3>Querying for ValueObject changes</h3>
+     * <b>Querying for ValueObject changes</b><br/><br/>
      *
      * Last changes on Address ValueObject owned by "bob" Person:
      * <pre>
@@ -137,7 +138,7 @@ public interface Javers {
      * </pre>
      *
      *
-     * <h3>Querying for any object changes regardless of its type</h3>
+     * <b>Querying for any object changes regardless of its type</b><br/><br/>
      *
      * Last changes on any object of MyClass.class:
      * <pre>
