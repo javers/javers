@@ -5,10 +5,8 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.changelog.SimpleTextChangeLog;
 import org.javers.core.diff.Change;
 import org.javers.core.examples.model.Employee;
-import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.jql.QueryBuilder;
 import org.junit.Test;
-
 import java.util.List;
 
 public class ChangeLogExample {

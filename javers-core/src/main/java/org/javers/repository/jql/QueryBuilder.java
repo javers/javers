@@ -15,10 +15,13 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId;
  * Fluent API for building {@link JqlQuery},
  * executed with {@link Javers#findChanges(JqlQuery)} and {@link Javers#findSnapshots(JqlQuery)}
  *
+ * @see Javers#findChanges(JqlQuery)
  * @author bartosz.walacik
  */
 public class QueryBuilder {
-    private int limit = 1000;
+    private static int DEFAULT_LIMIT = 100;
+
+    private int limit = DEFAULT_LIMIT;
     private boolean newObjectChanges;
     private final List<Filter> filters = new ArrayList<>();
 
@@ -62,6 +65,11 @@ public class QueryBuilder {
         return this;
     }
 
+    /**
+     * Limits number of snapshots to be read from JaversRepository, default is 100.
+     * <br/>
+     * Always choose reasonable limits to improve performance of your queries.
+     */
     public QueryBuilder limit(int limit) {
         this.limit = limit;
         return this;
