@@ -4,8 +4,11 @@ package org.javers.core.examples.model;
  * @author bartosz walacik
  */
 public class Address {
-    private final String city;
-    private final String street;
+    private String city;
+    private String street;
+
+    public Address(){
+    }
 
     public Address(String city, String street) {
         this.city = city;

@@ -124,7 +124,6 @@ public interface Javers {
      * javers.findChanges( QueryBuilder.byInstanceId("bob", Person.class).andProperty("salary").build() );
      * </pre>
      *
-     *
      * <b>Querying for ValueObject changes</b><br/><br/>
      *
      * Last changes on Address ValueObject owned by "bob" Person:
@@ -136,7 +135,6 @@ public interface Javers {
      * <pre>
      * javers.findChanges( QueryBuilder.byValueObject(Person.class, "address").build() );
      * </pre>
-     *
      *
      * <b>Querying for any object changes regardless of its type</b><br/><br/>
      *

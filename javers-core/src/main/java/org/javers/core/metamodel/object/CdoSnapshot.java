@@ -62,6 +62,12 @@ public final class CdoSnapshot extends Cdo {
         return state.getPropertyValue(property);
     }
 
+    /**
+     * List of properties changed with this snapshot
+     * (comparing to latest from repository).
+     * <br/>
+     * For initial snapshot, returns all properties.
+     */
     public List<Property> getChanged() {
         return unmodifiableList(changed);
     }

@@ -4,6 +4,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
+import org.javers.core.metamodel.object.CdoSnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,6 +55,11 @@ public class QueryBuilder {
         return new QueryBuilder(new IdFilter(globalId));
     }
 
+    /**
+     * Selects snapshots with a given property on changed properties list.
+     *
+     * @see CdoSnapshot#getChanged()
+     */
     public QueryBuilder andProperty(String propertyName) {
         Validate.argumentIsNotNull(propertyName);
         addFilter(new PropertyFilter(propertyName));
