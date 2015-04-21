@@ -22,58 +22,39 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class SnapshotDifferIntegrationTest extends Specification {
 
-    def "shouldn't add NewObject to change history for ordinary commit"() {
+    def "shouldn't add NewObject changes to change history by default"() {
         given:
         def javers = javers().build()
-        def cdo = new DummyAddress("London")
-        javers.commit("some.login", cdo) //initial commit
-
-        (1..2).each {
-            cdo.setCity(it+"")
-            javers.commit("some.login", cdo) //change commit
-        }
+        javers.commit("some.login", new DummyAddress("London"))   //initial commit
+        javers.commit("some.login", new DummyAddress("London 1")) //change commit
 
         when:
-        def changes = javers.findChanges(QueryBuilder.byClass(DummyAddress).limit(2).withNewObjectChanges().build())
+        def changes = javers.findChanges(
+            QueryBuilder.byClass(DummyAddress).build())
 
         then:
         changes.size() == 1
-        changes.each {
-            assert it instanceof ValueChange
-        }
+        changes[0] instanceof ValueChange
     }
 
-    def "should add NewObject to change history for initial commit"() {
+    def "should add NewObject changes to change history for initial commit when required"() {
         given:
         def javers = javers().build()
         def user = new DummyUser("kaz")
         javers.commit("some.login", user) //initial commit
 
         when:
-        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).withNewObjectChanges().build())
+        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).withNewObjectChanges(true).build())
 
         then:
         changes.size() == 2
         changes[0] instanceof ValueChange //initial value
+        changes[0].left == null
+        changes[0].right == "kaz"
         changes[1] instanceof NewObject
         changes.each {
             assert it.affectedGlobalId == instanceId("kaz",DummyUser)
             assert it.commitMetadata.get().id.majorId == 1
-        }
-
-        when:
-        user.setAge(18)
-        javers.commit("some.login",user) //change commit
-        changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).withNewObjectChanges().build())
-
-        then:
-        changes.size() == 3
-        changes[0] instanceof ValueChange //update
-        changes[1] instanceof ValueChange //initial value
-        changes[2] instanceof NewObject
-
-        changes.each {
-            assert it.affectedGlobalId == instanceId("kaz",DummyUser)
         }
     }
 
@@ -88,7 +69,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
 
         then:
-        changes.size() == 2
+        changes.size() == 1
         changes[0] instanceof ObjectRemoved
         changes[0].affectedGlobalId == instanceId("kaz",DummyUser)
         changes[0].commitMetadata.get().id.majorId == 2
@@ -159,25 +140,4 @@ class SnapshotDifferIntegrationTest extends Specification {
         expectedRightValue << [5, new LocalDate(2002, 2, 2), instanceId(5,SnapshotEntity)]
     }
 
-    def "should return changes in reverse chronological order"() {
-        given:
-        def javers = javers().build()
-        def user = new DummyUser("kaz")
-
-        (1..4).each {
-            user.setAge(it)
-            javers.commit("some.login", user)
-        }
-
-        when:
-        def changes = javers.findChanges(QueryBuilder.byInstanceId("kaz",DummyUser).build())
-
-        then:
-        changes.size() == 5
-        (0..3).each {
-            ValueChange change = changes[it]
-            assert change.left  == 4-it-1
-            assert change.right == 4-it
-        }
-    }
 }

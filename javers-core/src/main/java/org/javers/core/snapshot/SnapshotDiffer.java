@@ -51,7 +51,9 @@ public class SnapshotDiffer {
             }
         }
 
-        addInitialChangesIfInitial(result, snapshots.get(snapshots.size() - 1), generateNewObjectChanges);
+        if (generateNewObjectChanges) {
+            addInitialChangesIfInitial(result, snapshots.get(snapshots.size() - 1));
+        }
 
         return result;
     }
@@ -97,7 +99,7 @@ public class SnapshotDiffer {
          }
     }
 
-    private void addInitialChangesIfInitial(List<Change> changes, CdoSnapshot first, boolean generateNewObjectChanges) {
+    private void addInitialChangesIfInitial(List<Change> changes, CdoSnapshot first) {
         if (first.isInitial()){
             //add initial values to change history (with null at left)
             //switching off this feature may be added to JQL in the future
@@ -107,9 +109,7 @@ public class SnapshotDiffer {
             changes.addAll(diff.getChanges());
 
             //add NewObject change at the bottom of the change list
-            if (generateNewObjectChanges) {
-                changes.add(new NewObject(first.getGlobalId(), Optional.empty(), first.getCommitMetadata()));
-            }
+            changes.add(new NewObject(first.getGlobalId(), Optional.empty(), first.getCommitMetadata()));
         }
     }
 

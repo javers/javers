@@ -66,8 +66,17 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder withNewObjectChanges(){
-        this.newObjectChanges = true;
+    /**
+     * Affects changes query only.
+     * When switched on, additional changes are generated for the initial snapshot
+     * (the first commit of a given object). Off by default.
+     * <br/>
+     * It means one NewObject change for each initial snapshot
+     * and the full set of initial PropertyChanges with null on the left side
+     * and initial property value on the right.
+     */
+    public QueryBuilder withNewObjectChanges(boolean newObjectChanges) {
+        this.newObjectChanges = newObjectChanges;
         return this;
     }
 

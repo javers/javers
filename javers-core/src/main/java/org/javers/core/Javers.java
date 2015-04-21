@@ -136,7 +136,7 @@ public interface Javers {
      * javers.findChanges( QueryBuilder.byValueObject(Person.class, "address").build() );
      * </pre>
      *
-     * <b>Querying for any object changes regardless of its type</b><br/><br/>
+     * <b>Querying for any object changes by its class</b><br/><br/>
      *
      * Last changes on any object of MyClass.class:
      * <pre>
