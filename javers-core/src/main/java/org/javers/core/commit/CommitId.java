@@ -4,6 +4,8 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 
+import java.math.BigDecimal;
+
 /**
  * Consists of two parts : <br>
  * majorId = PREVIOUS.majorId + 1  <br>
@@ -19,6 +21,15 @@ public final class CommitId implements Comparable<CommitId> {
     public CommitId(long majorId, int minorId) {
         this.majorId = majorId;
         this.minorId = minorId;
+    }
+
+    public static CommitId valueOf(BigDecimal majorDotMinor) {
+        Validate.argumentIsNotNull(majorDotMinor);
+
+        long major = majorDotMinor.longValue();
+        double minor = (majorDotMinor.doubleValue() - major) * 100;
+
+        return new CommitId(major, (int)minor);
     }
 
     public static CommitId valueOf(String majorDotMinor) {
@@ -39,6 +50,10 @@ public final class CommitId implements Comparable<CommitId> {
     @Override
     public String toString() {
         return value();
+    }
+
+    public BigDecimal valueAsNumber(){
+        return new BigDecimal(majorId+(minorId*.01)).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     public String value(){

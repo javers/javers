@@ -7,6 +7,8 @@ import com.google.gson.JsonSerializationContext;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 
+import java.math.BigDecimal;
+
 class CommitIdTypeAdapter extends JsonTypeAdapterTemplate<CommitId> {
 
     @Override
@@ -16,12 +18,12 @@ class CommitIdTypeAdapter extends JsonTypeAdapterTemplate<CommitId> {
 
     @Override
     public CommitId fromJson(JsonElement json, JsonDeserializationContext jsonDeserializationContext) {
-        String majorDotMinor = json.getAsString();
+        BigDecimal majorDotMinor = json.getAsBigDecimal();
         return CommitId.valueOf(majorDotMinor);
     }
 
     @Override
     public JsonElement toJson(CommitId commitId, JsonSerializationContext context) {
-        return new JsonPrimitive(commitId.value());
+        return new JsonPrimitive(commitId.valueAsNumber());
     }
 }

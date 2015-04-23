@@ -1,6 +1,5 @@
 package org.javers.core
 
-import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.model.*
 import org.javers.core.snapshot.SnapshotsAssert
@@ -44,7 +43,7 @@ class JaversRepositoryE2ETest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byValueObject(SnapshotEntity, "valueObjectRef").build())
 
         then:
-        changes.size() == 4
+        changes.size() == 2
         changes[0].commitMetadata.get().id.majorId == 6
         changes.each{
             assert it.affectedGlobalId.fragment == "valueObjectRef"
@@ -66,7 +65,7 @@ class JaversRepositoryE2ETest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byValueObjectId(1,SnapshotEntity,"valueObjectRef").build())
 
         then:
-        changes.size() == 2
+        changes.size() == 1
         changes[0].commitMetadata.get().id.majorId == 3
         changes.each {
             assert it.affectedGlobalId == valueObjectId(1,SnapshotEntity,"valueObjectRef")
@@ -113,9 +112,10 @@ class JaversRepositoryE2ETest extends Specification {
     def "should query for ValueObject snapshots by ValueObject class and changed property"() {
         given:
         def objects = [
-          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London", street: "1")) ,
-          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London", street: "new")) ,
-          new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "London", street: "1"))]
+          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London",   street: "str")) ,
+          new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London 2", street: "str")) ,
+          new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris", street: "str")) ,
+          new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris", street: "str 2"))] //noise
         objects.each {
             javers.commit("author", it)
         }
@@ -124,7 +124,7 @@ class JaversRepositoryE2ETest extends Specification {
         def snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress).andProperty("city").build())
 
         then:
-        snapshots.size() == 2
+        snapshots.size() == 3
         snapshots.each {
             assert it.globalId.cdoClass.clientsClass == DummyAddress
         }
@@ -133,27 +133,27 @@ class JaversRepositoryE2ETest extends Specification {
     def "should query for Entity snapshots and changes by Entity class and changed property"() {
         given:
         javers.commit( "author", new SnapshotEntity(id:1, intProperty: 1) )
-        javers.commit( "author", new SnapshotEntity(id:1, intProperty: 1, dob: new LocalDate()) )
+        javers.commit( "author", new SnapshotEntity(id:1, intProperty: 1, dob: new LocalDate()) ) //noise
+        javers.commit( "author", new SnapshotEntity(id:1, intProperty: 2) )
         javers.commit( "author", new DummyAddress() ) //noise
         javers.commit( "author", new SnapshotEntity(id:2, intProperty: 1) )
-        javers.commit( "author", new SnapshotEntity(id:1, intProperty: 2) )
 
         when:
         def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).andProperty("intProperty").build())
 
-        then:
+        then: "snapshots query"
         snapshots.size() == 3
         snapshots[0].commitId.majorId == 5
         snapshots.each {
             assert it.globalId.cdoClass.clientsClass == SnapshotEntity
         }
 
-        when:
+        when: "changes query"
         def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity).andProperty("intProperty").build())
 
         then:
-        changes.size() == 3
-        changes[0].getCommitMetadata().get().id.majorId == 5
+        changes.size() == 1
+        changes[0].getCommitMetadata().get().id.majorId == 3
         changes.each {
             assert it instanceof ValueChange
             assert it.propertyName == "intProperty"
@@ -172,9 +172,9 @@ class JaversRepositoryE2ETest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity).build())
 
         then:
-        changes.size() == 6
+        changes.size() == 2
         changes[0].commitMetadata.get().id.majorId == 5
-        changes.findAll{it instanceof ValueChange}.size() == 6
+        changes.each {assert it instanceof ValueChange}
     }
 
     def "should query for Entity snapshots by Entity class"() {
@@ -239,17 +239,11 @@ class JaversRepositoryE2ETest extends Specification {
                 QueryBuilder.byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
 
         then:
-        changes.size() == 2
+        changes.size() == 1
+        changes[0] instanceof ValueChange
         changes[0].commitMetadata.get().id.majorId == 3
         changes[0].left == 4
         changes[0].right == 5
-        changes[1].commitMetadata.get().id.majorId == 1
-        changes[1].left == 0
-        changes[1].right == 4
-        changes.each {
-            assert it instanceof ValueChange
-            assert it.propertyName == "intProperty"
-        }
     }
 
     @Unroll
@@ -297,7 +291,31 @@ class JaversRepositoryE2ETest extends Specification {
 
     }
 
-    def "should store state history of Entity in JaversRepository and fetch snapshots in reverse order"() {
+    def "should fetch changes in reverse chronological order"() {
+        given:
+        def user = new DummyUser("kaz")
+
+        (1..50).each {
+            user.age = it
+            javers.commit("some.login", user)
+        }
+
+        when:
+        def changes = javers.findChanges(
+            QueryBuilder.byInstanceId("kaz",DummyUser).withNewObjectChanges(true).andProperty("age").build())
+
+        then:
+        changes.size() == 50
+        (0..49).each {
+            def change = changes[it]
+            println change
+            change.commitMetadata.get().id.majorId == 50-it
+            assert change.left  == 50-it-1
+            assert change.right == 50-it
+        }
+    }
+
+    def "should store state history of Entity in JaversRepository"() {
         given:
         def ref = new SnapshotEntity(id:2)
         def cdo = new SnapshotEntity(id: 1,

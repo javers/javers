@@ -2,6 +2,7 @@ package org.javers.repository.mongo;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;
+import org.bson.BSONObject;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -17,6 +18,7 @@ import org.javers.repository.mongo.model.MongoHeadId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static org.javers.common.validation.Validate.conditionFulfilled;
 
@@ -128,6 +130,15 @@ public class MongoRepository implements JaversRepository {
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
         headCollection();
+
+        //schema migration script from 1.1 to 1.2
+        BSONObject doc = snapshots.findOne();
+        if (doc != null) {
+            Object stringCommitId = ((Map)doc.get("commitMetadata")).get("id");
+            if (stringCommitId instanceof String) {
+                mongo.eval("db.jv_snapshots.find().forEach(function(snapshot){snapshot.commitMetadata.id = Number(snapshot.commitMetadata.id);db.jv_snapshots.save(snapshot);});");
+            }
+        }
     }
 
     private BasicDBObject createIdQuery(GlobalId id) {
