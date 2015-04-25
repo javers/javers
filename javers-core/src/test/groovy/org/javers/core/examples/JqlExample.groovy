@@ -24,7 +24,7 @@ class JqlExample extends Specification {
 
         then:
         printChanges(changes)
-        assert changes.size() == 5
+        assert changes.size() == 2
 
         when: "query by instance Id and property"
         changes = javers.findChanges( QueryBuilder.byInstanceId("bob", Employee.class)
@@ -32,7 +32,7 @@ class JqlExample extends Specification {
 
         then:
         printChanges(changes)
-        assert changes.size() == 2
+        assert changes.size() == 1
     }
 
     def "should query for changes with limit"() {
@@ -62,6 +62,7 @@ class JqlExample extends Specification {
         javers.commit( "author", new Employee(name:"bob",  primaryAddress: new Address(city:"London")))
         javers.commit( "author", new Employee(name:"bob",  primaryAddress: new Address(city:"Paris")))
         javers.commit( "author", new Employee(name:"lucy", primaryAddress: new Address(city:"New York")))
+        javers.commit( "author", new Employee(name:"lucy", primaryAddress: new Address(city:"Washington")))
 
         when: "query for ValueObject changes by owning Entity instance Id"
         def changes = javers
@@ -69,7 +70,7 @@ class JqlExample extends Specification {
 
         then:
         printChanges(changes)
-        assert changes.size() == 2
+        assert changes.size() == 1
 
         when: "query for ValueObject changes by owning Entity class"
         changes = javers
@@ -77,11 +78,11 @@ class JqlExample extends Specification {
 
         then:
         printChanges(changes)
-        assert changes.size() == 3
+        assert changes.size() == 2
     }
 
     def printChanges(def changes){
         def i = 0
-        changes.each {println "$i. commit "+ it.commitMetadata.get().id.toString()+": $it"; i++}
+        changes.each {println "commit "+ it.commitMetadata.get().id.toString()+": $it"; i++}
     }
 }

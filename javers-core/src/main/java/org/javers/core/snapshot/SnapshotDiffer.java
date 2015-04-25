@@ -34,6 +34,9 @@ public class SnapshotDiffer {
      */
     public List<Change> calculateDiffs(List<CdoSnapshot> snapshots, boolean generateNewObjectChanges) {
         Validate.argumentsAreNotNull(snapshots);
+        if (snapshots.isEmpty()){
+            return Collections.emptyList();
+        }
 
         List<Change> result = new ArrayList<>();
         addObjectRemovedIfTerminal(result, snapshots.get(0));

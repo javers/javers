@@ -293,25 +293,25 @@ class JaversRepositoryE2ETest extends Specification {
 
     def "should fetch changes in reverse chronological order"() {
         given:
-        def user = new DummyUser("kaz")
+        def user = new SnapshotEntity(id:1)
+        def n = 25
 
-        (1..50).each {
-            user.age = it
+        (1..n).each {
+            user.intProperty = it
             javers.commit("some.login", user)
         }
 
         when:
         def changes = javers.findChanges(
-            QueryBuilder.byInstanceId("kaz",DummyUser).withNewObjectChanges(true).andProperty("age").build())
+            QueryBuilder.byInstanceId(1,SnapshotEntity).andProperty("intProperty").build())
 
         then:
-        changes.size() == 50
-        (0..49).each {
+        changes.size() == n-1
+        (0..n-2).each {
             def change = changes[it]
-            println change
-            change.commitMetadata.get().id.majorId == 50-it
-            assert change.left  == 50-it-1
-            assert change.right == 50-it
+            change.commitMetadata.get().id.majorId == n-it
+            assert change.left  == n-it-1
+            assert change.right == n-it
         }
     }
 

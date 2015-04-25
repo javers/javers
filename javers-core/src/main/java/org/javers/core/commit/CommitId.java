@@ -75,7 +75,7 @@ public final class CommitId implements Comparable<CommitId> {
         }
 
         if (o instanceof CommitId) {
-            return this.value().equals(((CommitId)o).value());
+            return this.valueAsNumber().equals(((CommitId)o).valueAsNumber());
         }
         if (o instanceof String) {
             return this.value().equals(o);
@@ -91,6 +91,6 @@ public final class CommitId implements Comparable<CommitId> {
 
     @Override
     public int compareTo(CommitId o) {
-        return this.value().compareTo(o.value());
+        return this.valueAsNumber().compareTo(o.valueAsNumber());
     }
 }

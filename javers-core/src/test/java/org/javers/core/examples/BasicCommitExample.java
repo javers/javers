@@ -79,23 +79,14 @@ public class BasicCommitExample {
         // when:
         // list change history
         List<Change> changes = javers.findChanges(
-                QueryBuilder.byInstanceId("bob", Person.class).build());
+            QueryBuilder.byInstanceId("bob", Person.class).build());
 
         // then:
         // there should be one ValueChange with Bob's firstName
+        assertThat(changes).hasSize(1);
         ValueChange change = (ValueChange) changes.get(0);
         assertThat(change.getProperty().getName()).isEqualTo("name");
         assertThat(change.getLeft()).isEqualTo("Robert Martin");
         assertThat(change.getRight()).isEqualTo("Robert C.");
-
-        // and two ValueChanges with Bob's initial values
-        change = (ValueChange) changes.get(1);
-        assertThat(change.getProperty().getName()).isEqualTo("login");
-        assertThat(change.getLeft()).isNull();
-        assertThat(change.getRight()).isEqualTo("bob");
-        change = (ValueChange) changes.get(2);
-        assertThat(change.getProperty().getName()).isEqualTo("name");
-        assertThat(change.getLeft()).isNull();
-        assertThat(change.getRight()).isEqualTo("Robert Martin");
     }
 }

@@ -34,7 +34,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.commitMetadata.id == "1.0"
+        json.commitMetadata.id == 1.00
         json.commitMetadata.author == "kazik"
         //TODO date assertion
         json.commitMetadata.commitDate
