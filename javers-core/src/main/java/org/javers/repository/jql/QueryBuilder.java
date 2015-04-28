@@ -56,7 +56,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Selects snapshots with a given property on changed properties list.
+     * Filters to snapshots with a given property on changed properties list.
      *
      * @see CdoSnapshot#getChanged()
      */
