@@ -1,6 +1,7 @@
 package org.javers.core.examples
 
 import org.javers.core.JaversBuilder
+import org.javers.core.diff.changetype.NewObject
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
 import org.javers.core.model.DummyAddress
@@ -102,11 +103,29 @@ class JqlExample extends Specification {
 
         when:
         def changes = javers
-                .findChanges( QueryBuilder.byInstanceId("bob", Employee.class).limit(3).build() )
+            .findChanges( QueryBuilder.byInstanceId("bob", Employee.class).limit(3).build() )
 
         then:
         printChanges(changes)
         assert changes.size() == 4
+    }
+
+    def "should query for changes with NewObject filter"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        javers.commit( "author", new Employee(name:"bob", age:30, salary: 1000) )
+        javers.commit( "author", new Employee(name:"bob", age:30, salary: 1200) )
+
+        when:
+        def changes = javers
+            .findChanges( QueryBuilder.byInstanceId("bob", Employee.class)
+            .withNewObjectChanges(true).build() )
+
+        then:
+        printChanges(changes)
+        assert changes.size() == 5
+        assert changes[4] instanceof NewObject
     }
 
     def printChanges(def changes){
