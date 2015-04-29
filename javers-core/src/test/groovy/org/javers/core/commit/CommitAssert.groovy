@@ -2,7 +2,7 @@ package org.javers.core.commit
 
 import org.javers.core.diff.Change
 import org.javers.core.diff.DiffAssert
-import org.javers.core.metamodel.object.GlobalIdDTO
+import org.javers.repository.jql.GlobalIdDTO
 import org.javers.core.snapshot.SnapshotsAssert
 
 /**

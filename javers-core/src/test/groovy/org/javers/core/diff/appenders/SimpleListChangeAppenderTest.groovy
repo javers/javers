@@ -36,6 +36,7 @@ class SimpleListChangeAppenderTest extends AbstractDiffAppendersTest {
 
         where:
         leftList     | rightList    || changesCount
+        []           | [1, 2]       || 2
         []           | [1, 2, 2, 2] || 4
         [1, 2]       | [1, 2, 3, 4] || 2
         [1, 2]       | [1, 2, 2, 2] || 2

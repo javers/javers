@@ -2,7 +2,7 @@ package org.javers.core.cases
 
 import org.bson.types.ObjectId
 import org.javers.core.JaversBuilder
-import org.javers.core.metamodel.object.InstanceIdDTO
+import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
 /**
@@ -43,7 +43,7 @@ class JaversMorphiaObjectIdTest extends Specification {
         //println (javers.jsonConverter.toJson(commit.snapshots))
 
         when:
-        def list = javers.getStateHistory(InstanceIdDTO.instanceId(id2, MongoStoredEntity),2)
+        def list = javers.findSnapshots(QueryBuilder.byInstanceId(id2, MongoStoredEntity).build())
 
         then:
         commit.snapshots.size() == 1

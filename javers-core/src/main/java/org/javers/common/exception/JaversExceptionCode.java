@@ -73,7 +73,9 @@ public enum JaversExceptionCode {
     CANT_FIND_COMMIT_HEAD_ID(JaversException.RUNTIME_ERROR+"can't find commit head id in JaversRepository"),
     CANT_SAVE_ALREADY_PERSISTED_COMMIT(JaversException.RUNTIME_ERROR+"can't save already persisted commit"),
 
-    SQL_EXCEPTION(JaversException.RUNTIME_ERROR+"SqlException: '%s'"),
+    SQL_EXCEPTION(JaversException.RUNTIME_ERROR+"SqlException: %s"),
+
+    MALFORMED_JQL(JaversException.RUNTIME_ERROR+"Invalid JQL query, %s"),
 
     RUNTIME_EXCEPTION(JaversException.RUNTIME_ERROR+"uncategorized runtime exception")
     ;

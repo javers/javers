@@ -25,6 +25,14 @@ public class Employee {
 
     private final List<Employee> subordinates = new ArrayList<>();
 
+    private Address primaryAddress;
+    private Address postalAddress;
+
+    private int age;
+
+    public Employee() {
+    }
+
     public Employee(String name) {
         this(name, 10000);
     }
@@ -74,6 +82,13 @@ public class Employee {
         return salary;
     }
 
+    public int getAge() {
+        return age;
+    }
+
+    public Address getPrimaryAddress() {
+        return primaryAddress;
+    }
 
     public List<Employee> getSubordinates() {
         return Collections.unmodifiableList(subordinates);

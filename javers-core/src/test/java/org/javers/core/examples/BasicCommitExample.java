@@ -7,11 +7,10 @@ import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.examples.model.Person;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.InstanceIdDTO;
+import org.javers.repository.jql.QueryBuilder;
 import org.junit.Test;
 import java.util.List;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId;
 
 public class BasicCommitExample {
     @Test
@@ -33,12 +32,37 @@ public class BasicCommitExample {
         javers.commit("user", robert);
 
         // when:
-        List<CdoSnapshot> snapshots =
-            javers.getStateHistory(InstanceIdDTO.instanceId("bob", Person.class),10);
+        List<CdoSnapshot> snapshots = javers.findSnapshots(
+            QueryBuilder.byInstanceId("bob", Person.class).build());
 
         // then:
         // there should be two Snapshots with Bob's state
         assertThat(snapshots).hasSize(2);
+    }
+
+    @Test
+    public void shouldListStateHistory() {
+        // given:
+        // commit some changes
+        Javers javers = JaversBuilder.javers().build();
+        Person robert = new Person("bob", "Robert Martin");
+        javers.commit("user", robert);
+
+        robert.setName("Robert C.");
+        javers.commit("user", robert);
+
+        // when:
+        // list state history - last 10 snapshots
+        List<CdoSnapshot> snapshots = javers.findSnapshots(
+            QueryBuilder.byInstanceId("bob", Person.class).limit(10).build());
+
+        // then:
+        // there should be two Snapshots with Bob's state
+        assertThat(snapshots).hasSize(2);
+        CdoSnapshot newState = snapshots.get(0);
+        CdoSnapshot oldState = snapshots.get(1);
+        assertThat(oldState.getPropertyValue("name")).isEqualTo("Robert Martin");
+        assertThat(newState.getPropertyValue("name")).isEqualTo("Robert C.");
     }
 
     @Test
@@ -54,42 +78,15 @@ public class BasicCommitExample {
 
         // when:
         // list change history
-        List<Change> changes =
-            javers.getChangeHistory(InstanceIdDTO.instanceId("bob", Person.class), 5);
+        List<Change> changes = javers.findChanges(
+            QueryBuilder.byInstanceId("bob", Person.class).build());
 
         // then:
         // there should be one ValueChange with Bob's firstName
-        // and one NewObject change for Bob's initial commit
-        assertThat(changes).hasSize(2);
+        assertThat(changes).hasSize(1);
         ValueChange change = (ValueChange) changes.get(0);
         assertThat(change.getProperty().getName()).isEqualTo("name");
         assertThat(change.getLeft()).isEqualTo("Robert Martin");
         assertThat(change.getRight()).isEqualTo("Robert C.");
-        assertThat(changes.get(1)).isInstanceOf(NewObject.class);
-    }
-
-    @Test
-    public void shouldListStateHistory() {
-        // given:
-        // commit some changes
-        Javers javers = JaversBuilder.javers().build();
-        Person robert = new Person("bob", "Robert Martin");
-        javers.commit("user", robert);
-
-        robert.setName("Robert C.");
-        javers.commit("user", robert);
-
-        // when:
-        // list state history - snapshots
-        List<CdoSnapshot> snapshots =
-            javers.getStateHistory(instanceId("bob", Person.class), 5);
-
-        // then:
-        // there should be two Snapshots with Bob's state
-        assertThat(snapshots).hasSize(2);
-        CdoSnapshot newState = snapshots.get(0);
-        CdoSnapshot oldState = snapshots.get(1);
-        assertThat(oldState.getPropertyValue("name")).isEqualTo("Robert Martin");
-        assertThat(newState.getPropertyValue("name")).isEqualTo("Robert C.");
     }
 }

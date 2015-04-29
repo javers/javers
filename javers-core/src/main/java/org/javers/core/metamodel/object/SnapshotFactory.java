@@ -5,14 +5,12 @@ import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.collections.Objects;
 import org.javers.common.exception.JaversException;
 import org.javers.core.commit.CommitMetadata;
-import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
 import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 import static org.javers.common.exception.JaversExceptionCode.NOT_IMPLEMENTED;
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
-import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapshotState;
 import static org.javers.core.metamodel.object.SnapshotType.*;
 
 /**
@@ -27,45 +25,22 @@ public class SnapshotFactory {
         this.globalIdFactory = globalIdFactory;
     }
 
-    /**
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
-     */
-    CdoSnapshot create(Object liveCdo, GlobalId id, CommitMetadata commitMetadata, SnapshotType type) {
-        CdoSnapshotBuilder snapshot = cdoSnapshot(id, commitMetadata).withType(type);
-        CdoSnapshotStateBuilder stateBuilder = cdoSnapshotState();
-
-        for (Property property : id.getCdoClass().getProperties()) {
-            Object propertyVal = property.get(liveCdo);
-            if (Objects.nullSafeEquals(propertyVal, Defaults.defaultValue(property.getType()))) {
-                continue;
-            }
-
-            JaversType propertyType = typeMapper.getPropertyType(property);
-            OwnerContext owner = new OwnerContext(id, property.getName());
-
-            Object filteredPropertyVal;
-            if (propertyType instanceof EnumerableType) {
-                filteredPropertyVal = extractAndDehydrateEnumerable(propertyVal, (EnumerableType) propertyType, owner);
-            } else {
-                filteredPropertyVal = globalIdFactory.dehydrate(propertyVal, propertyType, owner);
-            }
-
-            stateBuilder.withPropertyValue(property, filteredPropertyVal);
-        }
-
-        return snapshot.withState(stateBuilder.build()).build();
-    }
-
     public CdoSnapshot createTerminal(GlobalId globalId, CommitMetadata commitMetadata) {
         return cdoSnapshot(globalId, commitMetadata).withType(TERMINAL).build();
     }
 
-    public CdoSnapshot createInitial(ObjectNode objectNode, CommitMetadata commitMetadata) {
-        return create(objectNode.wrappedCdo().get(), objectNode.getGlobalId(), commitMetadata, INITIAL);
+    public CdoSnapshot createInitial(Object liveCdo, GlobalId globalId, CommitMetadata commitMetadata) {
+        return createSnapshotState(liveCdo, globalId, commitMetadata)
+                .withType(INITIAL)
+                .markAllAsChanged()
+                .build();
     }
 
-    public CdoSnapshot create(ObjectNode objectNode, GlobalId globalId, CommitMetadata commitMetadata) {
-        return create(objectNode.wrappedCdo().get(), globalId, commitMetadata, UPDATE);
+    public CdoSnapshot createUpdate(Object liveCdo, CdoSnapshot previous, CommitMetadata commitMetadata) {
+        return createSnapshotState(liveCdo, previous.getGlobalId(), commitMetadata)
+                .withType(UPDATE)
+                .markChanged(previous)
+                .build();
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
@@ -87,5 +62,29 @@ public class SnapshotFactory {
         }
 
         return  propertyType.map(propertyVal, dehydratorMapFunction, owner);
+    }
+
+    private CdoSnapshotBuilder createSnapshotState(Object liveCdo, GlobalId id, CommitMetadata commitMetadata){
+        CdoSnapshotBuilder snapshotBuilder = cdoSnapshot(id, commitMetadata);
+
+        for (Property property : id.getCdoClass().getProperties()) {
+            Object propertyVal = property.get(liveCdo);
+            if (Objects.nullSafeEquals(propertyVal, Defaults.defaultValue(property.getType()))) {
+                continue;
+            }
+            snapshotBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, id));
+        }
+        return snapshotBuilder;
+    }
+
+    private Object dehydrateProperty(Property property, Object propertyVal, GlobalId id){
+        JaversType propertyType = typeMapper.getPropertyType(property);
+        OwnerContext owner = new OwnerContext(id, property.getName());
+
+        if (propertyType instanceof EnumerableType) {
+            return extractAndDehydrateEnumerable(propertyVal, (EnumerableType) propertyType, owner);
+        } else {
+            return  globalIdFactory.dehydrate(propertyVal, propertyType, owner);
+        }
     }
 }

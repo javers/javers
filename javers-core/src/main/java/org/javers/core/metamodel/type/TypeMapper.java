@@ -16,6 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
@@ -56,6 +59,10 @@ public class TypeMapper {
         registerValueType(BigDecimal.class);
         registerValueType(Date.class);
         registerValueType(ThreadLocal.class);
+        registerValueType(URI.class);
+        registerValueType(URL.class);
+        registerValueType(Path.class);
+
 
         //Collections
         addType(new SetType(Set.class));

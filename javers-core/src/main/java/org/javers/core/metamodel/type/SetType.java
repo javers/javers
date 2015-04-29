@@ -18,8 +18,8 @@ public class SetType extends CollectionType{
 
     @Override
     public Object map(Object sourceSet_, EnumerableFunction mapFunction, OwnerContext owner) {
-        Validate.argumentsAreNotNull(sourceSet_, mapFunction);
-        Set sourceSet = (Set)sourceSet_;
+        Validate.argumentIsNotNull(mapFunction);
+        Set sourceSet = toNotNullSet(sourceSet_);
         Set targetSet = new HashSet(sourceSet.size());
 
         SetEnumeratorContext enumeratorContext = new SetEnumeratorContext();
@@ -30,6 +30,15 @@ public class SetType extends CollectionType{
             enumeratorContext.nextId();
         }
         return Collections.unmodifiableSet(targetSet);
+    }
+
+    private Set toNotNullSet(Object sourceSet) {
+        if (sourceSet == null) {
+            return Collections.emptySet();
+        }
+        else{
+            return (Set)sourceSet;
+        }
     }
 
     private class SetEnumeratorContext implements EnumeratorContext {

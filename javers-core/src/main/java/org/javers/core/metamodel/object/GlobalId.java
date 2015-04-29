@@ -2,6 +2,7 @@ package org.javers.core.metamodel.object;
 
 import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.clazz.ManagedClass;
+import org.javers.repository.jql.GlobalIdDTO;
 
 /**
  * Global ID of Client's domain object (CDO)

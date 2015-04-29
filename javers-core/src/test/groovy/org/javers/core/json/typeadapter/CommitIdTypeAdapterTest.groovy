@@ -14,25 +14,25 @@ class CommitIdTypeAdapterTest extends Specification{
 
         given:
         def javers = javersTestAssembly()
-        def commitId = new CommitId(1, 0)
+        def commitId = new CommitId(13, 7)
 
         when:
         def jsonText = javers.jsonConverter.toJson(commitId)
 
         then:
-        jsonText == /"1.0"/
+        jsonText == "13.07"
     }
 
     def "should deserialize CommitId"() {
 
         given:
-        def json = /"1.0"/
+        def json = "12.9"
 
         when:
         def commitId = javersTestAssembly().jsonConverter.fromJson(json, CommitId)
 
         then:
-        commitId.getMajorId() == 1
-        commitId.getMinorId() == 0
+        commitId.getMajorId() == 12
+        commitId.getMinorId() == 90
     }
 }

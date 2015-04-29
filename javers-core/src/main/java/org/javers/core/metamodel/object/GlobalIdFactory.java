@@ -9,6 +9,7 @@ import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.repository.jql.GlobalIdDTO;
 
 /**
  * @author bartosz walacik

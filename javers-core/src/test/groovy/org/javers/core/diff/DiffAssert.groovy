@@ -41,7 +41,7 @@ class DiffAssert {
     }
 
     DiffAssert hasValueChangeAt(String property, Object oldVal, Object newVal) {
-        ValueChange change = actual.changes.find{it instanceof ValueChange && it.property.name == property}
+        ValueChange change = actual.changes.find{it instanceof ValueChange && it.propertyName == property}
         assert change
         assert change.left == oldVal
         assert change.right == newVal
@@ -49,7 +49,7 @@ class DiffAssert {
     }
 
     DiffAssert hasReferenceChangeAt(String property, def oldRef, def newRef) {
-        ReferenceChange change = actual.changes.find{it instanceof ReferenceChange && it.property.name == property}
+        ReferenceChange change = actual.changes.find{it instanceof ReferenceChange && it.propertyName == property}
         assert change
         assert change.left == oldRef
         assert change.right == newRef
@@ -68,7 +68,7 @@ class DiffAssert {
         expectedInitialState.entrySet().each{ entry ->
             PropertyChange change = actual.changes.find{it instanceof PropertyChange &&
                                                         it.affectedCdoId == expectedId &&
-                                                        it.property.name == entry.key}
+                                                        it.propertyName == entry.key}
             assert change, "no PropertyChange for "+ entry.key
             assert !change.left
             assert change.right ==  entry.value
@@ -77,7 +77,7 @@ class DiffAssert {
     }*/
 
     DiffAssert hasListReferenceAddedAt(String property, def addedRef){
-        ListChange change = actual.changes.find{it instanceof ListChange && it.property.name == property}
+        ListChange change = actual.changes.find{it instanceof ListChange && it.propertyName == property}
         assert change
 
         ValueAdded removed = change.changes.find{it instanceof ValueAdded}
@@ -89,7 +89,7 @@ class DiffAssert {
     }
 
     DiffAssert hasListReferenceRemovedAt(String property, def removedRef){
-        ListChange change = actual.changes.find{it instanceof ListChange && it.property.name == property}
+        ListChange change = actual.changes.find{it instanceof ListChange && it.propertyName == property}
         assert change
 
         ValueRemoved removed = change.changes.find{it instanceof ValueRemoved}

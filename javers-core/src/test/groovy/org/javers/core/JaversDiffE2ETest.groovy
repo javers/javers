@@ -13,7 +13,7 @@ import org.javers.core.model.*
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
 import static org.javers.core.model.DummyUserWithPoint.userWithPoint
@@ -57,7 +57,7 @@ class JaversDiffE2ETest extends Specification {
         diff.changes.size() == 1
         with(diff.changes[0]) {
             affectedCdoId instanceof UnboundedValueObjectId
-            property.name == "multimap"
+            propertyName == "multimap"
             changes[0].key == "a"
             changes[0].leftValue == 1
             changes[0].rightValue == 2
@@ -150,13 +150,11 @@ class JaversDiffE2ETest extends Specification {
         when:
         def diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
         def jsonText = javers.toJson(diff)
-        //println("jsonText:\n"+jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
         def change = json.changes[0];
         change.globalId.valueObject == "org.javers.core.model.DummyUserWithPoint"
-        change.globalId.cdoId == "/"
         change.changeType == "ValueChange"
         change.property == "point"
         change.left == "1,2" //this is most important in this test

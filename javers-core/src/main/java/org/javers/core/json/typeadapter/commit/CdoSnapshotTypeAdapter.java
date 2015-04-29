@@ -4,10 +4,15 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
+import org.javers.common.collections.Function;
+import org.javers.common.collections.Lists;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.TypeMapper;
+
+import java.util.List;
 
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 
@@ -21,6 +26,7 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
     public static final String STATE_NAME = "state";
     public static final String INITIAL_NAME_LEGACY = "initial";
     public static final String TYPE_NAME = "type";
+    public static final String CHANGED_NAME = "changedProperties";
 
     private TypeMapper typeMapper;
 
@@ -43,7 +49,8 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
         CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId, commitMetadata);
 
-        deserializeType(jsonObject,cdoSnapshotBuilder);
+        deserializeType(jsonObject, cdoSnapshotBuilder);
+        deserializeChangedProperties(jsonObject, cdoSnapshotBuilder, context);
 
         JsonElement state = jsonObject.get(STATE_NAME);
         CdoSnapshotStateDeserializer stateDeserializer = new CdoSnapshotStateDeserializer(typeMapper, context);
@@ -52,16 +59,25 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         return cdoSnapshotBuilder.withState(snapshotState).build();
     }
 
-    private void deserializeType(JsonObject jsonObject, CdoSnapshotBuilder cdoSnapshotBuilder){
+    private void deserializeChangedProperties(JsonObject jsonObject, CdoSnapshotBuilder builder, JsonDeserializationContext context){
+        JsonElement propsElement = jsonObject.get(CHANGED_NAME);
+        if (propsElement == null){ //for legacy JSON's
+            return;
+        }
+        List<String> changedPropNames = context.deserialize(propsElement, List.class);
+        builder.withChangedProperties(changedPropNames);
+    }
+
+    private void deserializeType(JsonObject jsonObject, CdoSnapshotBuilder builder){
         JsonElement initial = jsonObject.get(INITIAL_NAME_LEGACY);
         if (initial != null){ //for legacy JSON's
-            cdoSnapshotBuilder.withInitial(initial.getAsBoolean());
+            builder.withInitial(initial.getAsBoolean());
             return;
         }
 
         JsonElement type = jsonObject.get(TYPE_NAME);
         if (type != null) {
-            cdoSnapshotBuilder.withType(SnapshotType.valueOf(type.getAsString()));
+            builder.withType(SnapshotType.valueOf(type.getAsString()));
         }
     }
 
@@ -73,6 +89,7 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         jsonObject.add(COMMIT_METADATA, context.serialize(snapshot.getCommitMetadata()));
         jsonObject.add(GLOBAL_CDO_ID, context.serialize(snapshot.getGlobalId()));
         jsonObject.add(STATE_NAME, context.serialize(snapshot.getState()));
+        jsonObject.add(CHANGED_NAME, context.serialize(snapshot.getChangedPropertyNames()));
         jsonObject.add(TYPE_NAME, context.serialize(snapshot.getType().name()));
 
         return jsonObject;

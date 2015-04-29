@@ -12,7 +12,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
 
 /**
  * @author bartosz walacik
@@ -76,13 +76,13 @@ class ContainerChangeTypeAdapterTest extends Specification{
 
         then:
             change.class == changeType_
-            change.property.name == propertyName
+            change.propertyName == propertyName
             change.getAffectedGlobalId() == instanceId(1, SnapshotEntity)
 
             with(change.commitMetadata.get()) {
                 author == "author"
                 commitDate == new LocalDateTime("2001-12-01T22:23:03")
-                id == "1.0"
+                id.majorId == 1.0
 
             }
             with((ElementValueChange)change.changes[0]) {
@@ -235,7 +235,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
 
         then:
         change.class == changeType_
-        change.property.name == propertyName
+        change.propertyName == propertyName
         change.affectedGlobalId == instanceId(1, SnapshotEntity)
         with(change.changes[0]) {
             it.class == ElementValueChange
@@ -374,7 +374,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
 
         then:
         change.class == SetChange
-        change.property.name == "setOfIntegers"
+        change.propertyName == "setOfIntegers"
         change.affectedGlobalId == instanceId(1, SnapshotEntity)
         with(change.changes[0]) {
             it.class == ValueAdded

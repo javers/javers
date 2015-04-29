@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.Diff
+import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.model.DummyParameterEntry
 import org.javers.core.model.DummyUser
 import org.joda.time.LocalDate
@@ -32,7 +33,6 @@ class JaversSmartparamIntegrationTest extends Specification{
         when:
         Diff diff = javers.compare(entry1, entry2)
         String jsonText = javers.toJson(diff)
-        println("jsonText:\n"+jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -40,7 +40,6 @@ class JaversSmartparamIntegrationTest extends Specification{
 
         mapChange.changeType == "MapChange"
         mapChange.globalId.valueObject == "org.javers.core.model.DummyParameterEntry"
-        mapChange.globalId.cdoId == "/"
         mapChange.property == "levels"
         mapChange.entryChanges.size() == 5
         List sortedEntryChanges = mapChange.entryChanges.sort{it.key}

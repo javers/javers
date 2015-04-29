@@ -4,9 +4,7 @@ import org.javers.common.collections.Defaults;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author bartosz walacik
@@ -47,7 +45,44 @@ public class CdoSnapshotState {
 
         CdoSnapshotState that = (CdoSnapshotState) o;
 
-        return properties.equals(that.properties);
+        if (this.properties.size() != that.properties.size()){
+            return false;
+        }
+
+        for (Property p :  this.properties.keySet()) {
+            if (!propertyEquals(that, p)){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean propertyEquals(CdoSnapshotState that, Property property){
+        Object thisValue = this.getPropertyValue(property);
+        Validate.conditionFulfilled(thisValue != null, "null value at CdoCnapshot property " + property.getName());
+
+        Object thatValue = that.getPropertyValue(property);
+
+        if (property.getType().isArray()){
+            return Arrays.equals((Object[])thisValue, (Object[])thatValue);
+        }
+
+        return thisValue.equals(thatValue);
+    }
+
+    /**
+     * List of properties with changed values (when comparing to previous state)
+     */
+    public List<Property> differentValues(CdoSnapshotState previous) {
+        List<Property> different = new ArrayList<>();
+        for (Property property : properties.keySet()) {
+
+            if (!propertyEquals(previous, property)){
+                different.add(property);
+            }
+        }
+        return different;
     }
 
     @Override

@@ -3,18 +3,18 @@ package org.javers.repository.sql
 import org.h2.tools.Server
 import org.javers.core.JaversRepositoryE2ETest
 import org.javers.core.model.SnapshotEntity
+import org.javers.repository.jql.QueryBuilder
 import org.javers.repository.sql.reposiotries.PersistentGlobalId
 
 import java.sql.Connection
 import java.sql.DriverManager
 
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
 class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     protected Connection getConnection() {
-        DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test")
+        DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test;")//TRACE_LEVEL_SYSTEM_OUT=2")
     }
 
     protected DialectName getDialect() {
@@ -63,7 +63,7 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         when:
         javers.commit("author", anEntity)
         dbConnection.rollback()
-        def snapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 2)
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         then:
         !snapshots
@@ -71,7 +71,7 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         when:
         javers.commit("author", anEntity)
         dbConnection.commit()
-        snapshots = javers.getStateHistory(instanceId(1, SnapshotEntity), 2)
+        snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         then:
         snapshots.size() == 1

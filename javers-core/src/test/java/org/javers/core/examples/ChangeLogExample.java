@@ -5,9 +5,8 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.changelog.SimpleTextChangeLog;
 import org.javers.core.diff.Change;
 import org.javers.core.examples.model.Employee;
-import org.javers.core.metamodel.object.InstanceIdDTO;
+import org.javers.repository.jql.QueryBuilder;
 import org.junit.Test;
-
 import java.util.List;
 
 public class ChangeLogExample {
@@ -28,7 +27,8 @@ public class ChangeLogExample {
         javers.commit("hr.manager", bob);
 
         // when:
-        List<Change> changes = javers.getChangeHistory(InstanceIdDTO.instanceId("Bob", Employee.class),5);
+        List<Change> changes = javers.findChanges(
+            QueryBuilder.byInstanceId("Bob", Employee.class).build());
         String changeLog = javers.processChangeList(changes, new SimpleTextChangeLog());
 
         // then:

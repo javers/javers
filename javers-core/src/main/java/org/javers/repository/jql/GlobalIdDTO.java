@@ -1,5 +1,6 @@
-package org.javers.core.metamodel.object;
+package org.javers.repository.jql;
 
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.TypeMapper;
 
 /**
@@ -13,5 +14,5 @@ public abstract class GlobalIdDTO {
         return "Dto("+value()+")";
     }
 
-    abstract GlobalId create(TypeMapper typeMapper);
+    public abstract GlobalId create(TypeMapper typeMapper);
 }

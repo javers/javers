@@ -40,8 +40,4 @@ class GraphShadowFactory {
 
         return new ShadowGraph(snapshotNodes);
     }
-
-    ShadowGraph createFromSnapshot(CdoSnapshot cdoSnapshot){
-        return new ShadowGraph(Sets.asSet(new ObjectNode(cdoSnapshot)));
-    }
 }

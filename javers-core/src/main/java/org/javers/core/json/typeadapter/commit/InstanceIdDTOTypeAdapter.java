@@ -7,7 +7,7 @@ import com.google.gson.JsonSerializationContext;
 import org.javers.common.collections.Lists;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.InstanceIdDTO;
+import org.javers.repository.jql.InstanceIdDTO;
 
 import java.util.List;
 

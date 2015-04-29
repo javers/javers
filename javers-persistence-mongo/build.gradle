@@ -1,6 +1,6 @@
 dependencies {
     compile project(':javers-core')
-    compile 'org.mongodb:mongo-java-driver:2.12.4'
+    compile 'org.mongodb:mongo-java-driver:2.13.0'
 
     testCompile 'com.google.guava:guava:18.0'
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'

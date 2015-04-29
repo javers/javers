@@ -1,7 +1,7 @@
 package org.javers.spring.auditable.integration
 
 import org.javers.core.Javers
-import org.javers.core.metamodel.object.InstanceIdDTO
+import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.example.JaversSpringJpaApplicationConfig
 import org.javers.spring.model.DummyObject
 import org.javers.spring.repository.jpa.DummyAuditedJpaCrudRepository
@@ -42,7 +42,8 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         repository.save(o)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
+
         snapshots.size() == 1
         snapshots[0].initial
         snapshots[0].commitMetadata.author == "unknown"
@@ -57,7 +58,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
 
         then:
         objects.each {
-            def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, it.id), 10)
+            def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(it.id, DummyObject).build())
             snapshots.size() == 1
             snapshots[0].initial
         }
@@ -74,7 +75,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         repository.save(o)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
         snapshots.size() == 2
         !snapshots[0].initial
         snapshots[1].initial
@@ -89,7 +90,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         repository.delete(o)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
         snapshots.size() == 2
         snapshots[0].terminal
         snapshots[1].initial
@@ -104,7 +105,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         repository.delete(o.id)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
         snapshots.size() == 2
         snapshots[0].terminal
         snapshots[1].initial
@@ -120,7 +121,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
 
         then:
         result != null
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
         snapshots.size() == 1
         snapshots[0].initial
     }
@@ -134,7 +135,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         noAuditRepository.save(o)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
         snapshots.empty
     }
 
@@ -147,7 +148,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         noAuditRepository.delete(o)
 
         then:
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
         snapshots.empty
     }
 
@@ -161,7 +162,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
 
         then:
         result != null
-        def snapshots = javers.getStateHistory(new InstanceIdDTO(DummyObject, o.id), 10)
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
         snapshots.empty
     }
 }

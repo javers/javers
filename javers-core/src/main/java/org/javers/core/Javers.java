@@ -6,11 +6,15 @@ import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.NewObject;
+import org.javers.core.diff.changetype.ReferenceChange;
+import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdDTO;
-import org.javers.repository.api.JaversRepository;
+import org.javers.repository.jql.GlobalIdDTO;
+import org.javers.repository.jql.JqlQuery;
 
 import java.util.List;
 
@@ -100,56 +104,88 @@ public interface Javers {
     Diff initial(Object newDomainObject);
 
     /**
-     * use:
-     * <pre>
-     * javers.getJsonConverter().toJson(diff);
-     * </pre>
-     */
-    @Deprecated
-    String toJson(Diff diff);
-
-    /**
-     * Snapshots (historical versions) of given object,
-     * in reverse chronological order.
+     * Queries JaversRepository for changes history (diff sequence) of given class, object or property.<br/>
+     * There are various types of changes: {@link ValueChange}, {@link ReferenceChange}, {@link ListChange}, {@link NewObject} and so on. <br/>
+     * See {@link Change} class hierarchy.
      * <br/><br/>
      *
-     * For example, to list 5 last snapshots of "bob" Person, call:
+     * Resulting List is ordered in reverse chronological order.
+     * <br/><br/>
+     *
+     * <b>Querying for Entity changes by instance Id</b><br/><br/>
+     *
+     * For example, to get change history of last 5 versions of "bob" Person, call:
      * <pre>
-     * javers.getStateHistory(InstanceIdDTO.instanceId("bob", Person.class), 5);
+     * javers.findChanges( QueryBuilder.byInstanceId("bob", Person.class).limit(5).build() );
      * </pre>
      *
-     * @param globalId given object ID
-     * @param limit choose reasonable limit
-     * @return empty List if object is not versioned
+     * Last "salary" changes of "bob" Person:
+     * <pre>
+     * javers.findChanges( QueryBuilder.byInstanceId("bob", Person.class).andProperty("salary").build() );
+     * </pre>
+     *
+     * <b>Querying for ValueObject changes</b><br/><br/>
+     *
+     * Last changes on Address ValueObject owned by "bob" Person:
+     * <pre>
+     * javers.findChanges( QueryBuilder.byValueObjectId("bob", Person.class, "address").build() );
+     * </pre>
+     *
+     * Last changes on Address ValueObject owned by any Person:
+     * <pre>
+     * javers.findChanges( QueryBuilder.byValueObject(Person.class, "address").build() );
+     * </pre>
+     *
+     * <b>Querying for any object changes by its class</b><br/><br/>
+     *
+     * Last changes on any object of MyClass.class:
+     * <pre>
+     * javers.findChanges( QueryBuilder.byClass(MyClass.class).build() );
+     * </pre>
+     *
+     * Last "myProperty" changes on any object of MyClass.class:
+     * <pre>
+     * javers.findChanges( QueryBuilder.byClass(Person.class).andProperty("myProperty").build() );
+     * </pre>
+     *
+     * @return empty List if nothing found
+     * @see <a href="http://javers.org/documentation/repository-examples/#jql/">http://javers.org/documentation/repository-examples/#jql</a>
      */
-    List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit);
+    List<Change> findChanges(JqlQuery query);
 
     /**
-     * Latest snapshot of given object
-     * or Optional#EMPTY if object is not versioned.
+     * Queries JaversRepository for object Snapshots (historical versions). <br/>
+     * Snapshot is a simple Map (property -> value) representation of your domain object.
+     * <br/><br/>
+     *
+     * Resulting List is ordered in reverse chronological order.
+     * <br/><br/>
+     *
+     * For example, to get last 5 snapshots versions of "bob" Person, call:
+     * <pre>
+     * javers.findSnapshots( QueryBuilder.byInstanceId("bob", Person.class).limit(5).build() );
+     * </pre>
+     *
+     * For more query examples, see {@link #findChanges(JqlQuery)} method.
+     * Both methods use Javers Query Language (JQL).
+     * So you can use the same query object to get changes and snapshots views.
+     *
+     * @return empty List if nothing found
+     * @see <a href="http://javers.org/documentation/repository-examples/#jql/">http://javers.org/documentation/repository-examples/#jql</a>
+     */
+    List<CdoSnapshot> findSnapshots(JqlQuery query);
+
+    /**
+     * Latest snapshot of given entity instance
+     * or Optional#EMPTY if instance is not versioned.
      * <br/><br/>
      *
      * For example, to get last snapshot of "bob" Person, call:
      * <pre>
-     * javers.getStateHistory(InstanceIdDTO.instanceId("bob", Person.class), 5);
+     * javers.getLatestSnapshot("bob", Person.class));
      * </pre>
      */
-    Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId);
-
-    /**
-     * Changes history (diff sequence) of given object,
-     * in reverse chronological order.
-     *
-     * For example, to get change history of "bob" Person, call:
-     * <pre>
-     * javers.getChangeHistory(InstanceIdDTO.instanceId("bob", Person.class), 5);
-     * </pre>
-     *
-     * @param globalId given object ID
-     * @param limit choose reasonable limit
-     * @return empty List, if object is not versioned or was committed only once
-     */
-    List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
+    Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass);
 
     /**
      * If you are serializing JaVers objects like
@@ -180,7 +216,7 @@ public interface Javers {
      * <br/><br/>
      * For example, to get pretty change log, call:
      * <pre>
-     * List&lt;Change&gt; changes = javers.getChangeHistory(...);
+     * List&lt;Change&gt; changes = javers.calculateDiffs(...);
      * String changeLog = javers.processChangeList(changes, new SimpleTextChangeLog());
      * System.out.println( changeLog );
      * </pre>
@@ -188,6 +224,32 @@ public interface Javers {
      * @see org.javers.core.changelog.SimpleTextChangeLog
      */
     <T> T processChangeList(List<Change> changes, ChangeProcessor<T> changeProcessor);
+
+    /**
+     * use: <pre>
+     * javers.getJsonConverter().toJson(diff);
+     * </pre>
+     */
+    @Deprecated
+    String toJson(Diff diff);
+
+    /**
+     * use {@link #findSnapshots(JqlQuery)}
+     */
+    @Deprecated
+    List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit);
+
+    /**
+     * use {@link #findChanges(JqlQuery)}
+     */
+    @Deprecated
+    List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
+
+    /**
+     * use {@link #getLatestSnapshot(Object, Class)}
+     */
+    @Deprecated
+    Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId);
 
     IdBuilder idBuilder();
 }

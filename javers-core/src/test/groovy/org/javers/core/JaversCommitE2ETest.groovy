@@ -7,19 +7,35 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
+import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
-import static org.javers.core.metamodel.object.ValueObjectIdDTO.valueObjectId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
  * @author bartosz walacik
  */
 class JaversCommitE2ETest extends Specification {
+
+    def "should mark changed properties"() {
+        given:
+        def javers = javers().build()
+        def entity = new SnapshotEntity(id:1, intProperty:4)
+
+        when:
+        javers.commit("author",entity)
+        entity.dob = new LocalDate()
+        entity.intProperty = 5
+        def commit = javers.commit("author",entity)
+
+        then:
+        commit.snapshots[0].changed.collect{it.name} as Set == ["dob","intProperty"] as Set
+    }
 
     @Unroll
     def "should create terminal commit for removed object when #opType"() {

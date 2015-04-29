@@ -11,7 +11,7 @@ import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.builder.ChangeTestBuilder.referenceChanged
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
@@ -72,7 +72,7 @@ class ReferenceChangeTypeAdapterTest extends Specification {
             change.affectedGlobalId  == instanceId("kaz",DummyUser)
             change.left  == instanceId(1,DummyUserDetails)
             change.right == instanceId(2,DummyUserDetails)
-            change.property.name  == "dummyUserDetails"
+            change.propertyName  == "dummyUserDetails"
     }
 
     def "should be nullSafe when writing leftId & rightId for ReferenceChange" () {

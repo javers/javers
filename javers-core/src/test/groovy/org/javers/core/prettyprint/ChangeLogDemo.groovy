@@ -2,8 +2,8 @@ package org.javers.core.prettyprint
 
 import org.javers.core.JaversBuilder
 import org.javers.core.changelog.SimpleTextChangeLog
-import org.javers.core.metamodel.object.InstanceIdDTO
 import org.javers.core.model.DummyUser
+import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
 /**
@@ -33,7 +33,7 @@ class ChangeLogDemo extends Specification {
 
 
         when:
-            def changes = javers.getChangeHistory(InstanceIdDTO.instanceId('bob',DummyUser),20)
+            def changes = javers.findChanges(QueryBuilder.byInstanceId('bob',DummyUser).build())
             def textChangeLog = javers.processChangeList(changes, new SimpleTextChangeLog())
 
         then:

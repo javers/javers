@@ -2,7 +2,7 @@ package org.javers.core.cases
 
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.container.ListChange
-import org.javers.core.metamodel.object.InstanceIdDTO
+import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
 /**
@@ -26,7 +26,7 @@ class NestedListsTest extends Specification{
         javers.commit("me@here.com", cdo)
 
         then:
-        def changes = javers.getChangeHistory(InstanceIdDTO.instanceId(1, EntityWithNestedList.class), 5)
+        def changes = javers.findChanges(QueryBuilder.byInstanceId(1, EntityWithNestedList.class).build())
         ListChange change = changes[0]
         with(change.changes[0]) {
             index == 0
@@ -47,7 +47,7 @@ class NestedListsTest extends Specification{
         javers.commit("me@here.com", cdo)
 
         then:
-        def changes = javers.getChangeHistory(InstanceIdDTO.instanceId(1, EntityWithNestedList.class), 5)
+        def changes = javers.findChanges(QueryBuilder.byInstanceId(1, EntityWithNestedList.class).build())
 
         ListChange change = changes[0]
         with(change.changes[0]){

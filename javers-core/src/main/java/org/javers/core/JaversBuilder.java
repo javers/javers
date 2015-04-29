@@ -21,6 +21,7 @@ import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.javers.core.metamodel.clazz.ManagedClassFactoryModule;
 import org.javers.core.metamodel.clazz.ValueDefinition;
 import org.javers.core.metamodel.clazz.ValueObjectDefinition;
+import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.CustomType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueObjectType;
@@ -329,6 +330,10 @@ public class JaversBuilder extends AbstractJaversBuilder {
         }
     }
 
+    private GlobalIdFactory globalIdFactory(){
+        return getContainerComponent(GlobalIdFactory.class);
+    }
+
     private TypeMapper typeMapper() {
         return getContainerComponent(TypeMapper.class);
     }
@@ -356,6 +361,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new CommitTypeAdaptersModule(getContainer()));
         jsonConverterBuilder
                 .typeMapper(typeMapper())
+                .globalIdFactory(globalIdFactory())
                 .registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
 
         addComponent(jsonConverterBuilder.build());

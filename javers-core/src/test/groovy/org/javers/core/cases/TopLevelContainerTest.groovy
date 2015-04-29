@@ -7,7 +7,7 @@ import org.javers.core.diff.changetype.map.MapChange
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static org.javers.core.metamodel.object.UnboundedValueObjectIdDTO.*
+import static org.javers.repository.jql.UnboundedValueObjectIdDTO.*
 
 /**
  * @author bartosz walacik
@@ -24,7 +24,7 @@ class TopLevelContainerTest extends Specification {
 
         then:
         diff.changes.size() == 1
-        diff.changes[0].property.name == colType
+        diff.changes[0].propertyName == colType
         //println diff
 
         where:
@@ -40,14 +40,13 @@ class TopLevelContainerTest extends Specification {
         def javers = JaversBuilder.javers().build();
 
         when:
-        def commit1 = javers.commit("author",container1)
-        def commit2 = javers.commit("author",container2)
+        javers.commit("author",container1)
+        javers.commit("author",container2)
 
         def changes = javers.getChangeHistory(voId,2)
 
         then:
-        changes.size() == 2
-        //println changes[0]
+        changes[0].propertyName == colType
 
         where:
         colType << ["map","list","set"]

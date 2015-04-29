@@ -10,7 +10,8 @@ import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalIdDTO;
+import org.javers.repository.jql.GlobalIdDTO;
+import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -75,20 +76,41 @@ class JaversTransactionalDecorator implements Javers {
 
     @Override
     @Transactional
+    @Deprecated
     public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit) {
         return delegate.getStateHistory(globalId, limit);
     }
 
     @Override
     @Transactional
+    @Deprecated
     public Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId) {
         return delegate.getLatestSnapshot(globalId);
     }
 
     @Override
     @Transactional
+    @Deprecated
     public List<Change> getChangeHistory(GlobalIdDTO globalId, int limit) {
         return delegate.getChangeHistory(globalId, limit);
+    }
+
+    @Transactional
+    @Override
+    public Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass) {
+        return delegate.getLatestSnapshot(localId, entityClass);
+    }
+
+    @Transactional
+    @Override
+    public List<CdoSnapshot> findSnapshots(JqlQuery query) {
+        return delegate.findSnapshots(query);
+    }
+
+    @Transactional
+    @Override
+    public List<Change> findChanges(JqlQuery query) {
+        return delegate.findChanges(query);
     }
 
     @Override

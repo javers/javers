@@ -57,12 +57,13 @@ class GraphSnapshotFactory {
     }
 
     private CdoSnapshot createFreshSnapshot(boolean initial, ObjectNode node, CommitMetadata commitMetadata, Optional<CdoSnapshot> previous){
+        Object liveCdo = node.wrappedCdo().get();
         if (initial){
-            return snapshotFactory.createInitial(node, commitMetadata);
+            return snapshotFactory.createInitial(liveCdo, node.getGlobalId(), commitMetadata);
         }
         else{
             //we take previous globalId because it could be PersistentGlobalId
-            return snapshotFactory.create(node, previous.get().getGlobalId(), commitMetadata);
+            return snapshotFactory.createUpdate(liveCdo, previous.get(), commitMetadata);
         }
     }
 

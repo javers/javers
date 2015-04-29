@@ -6,7 +6,7 @@ import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.core.metamodel.object.ValueObjectIdDTO
+import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -14,7 +14,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
 
 /**
  * @author bartosz walacik
@@ -73,7 +73,6 @@ class GlobalIdTypeAdapterTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.cdoId == "/"
         json.valueObject == "org.javers.core.model.DummyAddress"
     }
 

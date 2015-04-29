@@ -28,6 +28,10 @@ public abstract class PropertyChange extends Change {
         return property;
     }
 
+    public String getPropertyName(){
+        return property.getName();
+    }
+
     @Override
     protected String fieldsToString() {
         return super.fieldsToString() + addField("property", property.getName());

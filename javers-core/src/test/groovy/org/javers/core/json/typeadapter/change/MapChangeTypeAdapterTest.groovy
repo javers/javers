@@ -9,7 +9,6 @@ import org.javers.core.diff.changetype.map.EntryAdded
 import org.javers.core.diff.changetype.map.EntryRemoved
 import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.map.MapChange
-import org.javers.core.json.JsonConverter
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
@@ -19,7 +18,7 @@ import spock.lang.Specification
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.JaversTestBuilder.javersTestAssemblyTypeSafe
 import static org.javers.core.json.builder.ChangeTestBuilder.mapChange
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
@@ -236,9 +235,9 @@ class MapChangeTypeAdapterTest extends Specification {
         then:
         change.affectedGlobalId == instanceId(1,SnapshotEntity)
         change.commitMetadata.get().author == "kazik"
-        change.commitMetadata.get().id == "1.0"
+        change.commitMetadata.get().id.majorId == 1
         change.commitMetadata.get().commitDate == new LocalDateTime("2001-12-01T22:23:03")
-        change.property.name == "mapOfPrimitives"
+        change.propertyName == "mapOfPrimitives"
         MapChangeAssert.assertThat(change)
                        .hasEntryAdded("some1",1)
                        .hasEntryRemoved("some2",2)

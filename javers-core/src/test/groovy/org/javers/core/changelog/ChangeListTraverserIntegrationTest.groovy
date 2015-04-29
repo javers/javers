@@ -2,9 +2,8 @@ package org.javers.core.changelog
 
 import org.javers.core.JaversBuilder
 import org.javers.core.model.DummyUser
+import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
-
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
 
 /**
  * @author bartosz walacik
@@ -26,16 +25,16 @@ class ChangeListTraverserIntegrationTest extends Specification {
         def callbackMock = Mock(ChangeProcessor)
 
         when:
-        def changes = javers.getChangeHistory(instanceId('bob',DummyUser),10)
+        def changes = javers.findChanges(QueryBuilder.byInstanceId('bob',DummyUser).build())
         javers.processChangeList(changes, callbackMock)
 
         then:
         with(callbackMock) {
             1 * beforeChangeList()
 
-            3 * onCommit(_)
-            4 * beforeChange(_)
-            4 * afterChange(_)
+            2 * onCommit(_)
+            3 * beforeChange(_)
+            3 * afterChange(_)
 
             1 * onObjectRemoved(_)
 
@@ -43,7 +42,6 @@ class ChangeListTraverserIntegrationTest extends Specification {
             2 * onPropertyChange(_)
             2 * onValueChange(_)
 
-            1 * onNewObject(_)
             1 * afterChangeList()
 
             1 * result()

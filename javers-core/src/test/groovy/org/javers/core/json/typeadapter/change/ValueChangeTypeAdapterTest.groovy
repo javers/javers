@@ -13,7 +13,7 @@ import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
-import static org.javers.core.metamodel.object.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
@@ -62,7 +62,7 @@ class ValueChangeTypeAdapterTest extends Specification {
             change.affectedGlobalId == instanceId("kaz",DummyUser)
             change.left == null
             change.right == true
-            change.property.name == "bigFlag"
+            change.propertyName == "bigFlag"
     }
 
     def "should serialize ValueChange with Values using custom TypeAdapter" () {
