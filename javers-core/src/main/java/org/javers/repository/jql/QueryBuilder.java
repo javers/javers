@@ -16,7 +16,7 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId;
  * Fluent API for building {@link JqlQuery},
  * executed with {@link Javers#findChanges(JqlQuery)} and {@link Javers#findSnapshots(JqlQuery)}
  *
- * @see Javers#findChanges(JqlQuery)
+ * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
  * @author bartosz.walacik
  */
 public class QueryBuilder {

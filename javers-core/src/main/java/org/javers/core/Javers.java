@@ -149,7 +149,7 @@ public interface Javers {
      * </pre>
      *
      * @return empty List if nothing found
-     * @see <a href="http://javers.org/documentation/repository-examples/#jql/">http://javers.org/documentation/repository-examples/#jql</a>
+     * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      */
     List<Change> findChanges(JqlQuery query);
 
@@ -171,7 +171,7 @@ public interface Javers {
      * So you can use the same query object to get changes and snapshots views.
      *
      * @return empty List if nothing found
-     * @see <a href="http://javers.org/documentation/repository-examples/#jql/">http://javers.org/documentation/repository-examples/#jql</a>
+     * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      */
     List<CdoSnapshot> findSnapshots(JqlQuery query);
 
