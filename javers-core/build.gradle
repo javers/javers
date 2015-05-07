@@ -12,13 +12,19 @@ dependencies {
     testCompile 'org.mongodb.morphia:morphia:0.108'
 }
 
+task testJar (type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+
 configurations {
     testArtifacts
 }
-task testJar (type: Jar) {
-    baseName = "${project.name}-test"
-    from sourceSets.test.output
+
+artifacts {
+    archives javadocJar, sourceJar, testJar
 }
+
 artifacts {
     testArtifacts testJar
 }
