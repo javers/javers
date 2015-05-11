@@ -13,6 +13,7 @@ import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 
@@ -251,5 +252,8 @@ public interface Javers {
     @Deprecated
     Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId);
 
+    JaversType getTypeMapping(Class<?> clazz);
+
     IdBuilder idBuilder();
+
 }

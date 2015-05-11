@@ -10,6 +10,7 @@ import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.sql.JaversSqlRepository;
@@ -121,6 +122,11 @@ class JaversTransactionalDecorator implements Javers {
     @Override
     public <T> T processChangeList(List<Change> changes, ChangeProcessor<T> changeProcessor) {
         return delegate.processChangeList(changes, changeProcessor);
+    }
+
+    @Override
+    public JaversType getTypeMapping(Class<?> clazz) {
+        return delegate.getTypeMapping(clazz);
     }
 
     @Override

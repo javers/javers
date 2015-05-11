@@ -15,7 +15,7 @@ import static org.javers.common.reflection.ReflectionUtil.extractClass;
  * Managed property type
  * <br/><br/>
  *
- * This is convenient abstraction layer over raw and awkward
+ * This is a convenient abstraction layer over raw and awkward
  * java.lang.reflect.Type and java.lang.Class
  *
  * @author bartosz walacik

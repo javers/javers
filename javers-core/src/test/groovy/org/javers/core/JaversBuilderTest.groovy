@@ -41,7 +41,7 @@ class JaversBuilderTest extends Specification {
         Javers javers = javers().registerEntity(DummyEntity).build()
 
         then:
-        javers.getForClass(DummyEntity) instanceof EntityType
+        javers.getTypeMapping(DummyEntity) instanceof EntityType
     }
 
     def "should manage ValueObject"() {
@@ -49,7 +49,7 @@ class JaversBuilderTest extends Specification {
         Javers javers = javers().registerValueObject(DummyNetworkAddress).build()
 
         then:
-        javers.getForClass(DummyNetworkAddress) instanceof ValueObjectType
+        javers.getTypeMapping(DummyNetworkAddress) instanceof ValueObjectType
     }
 
 
