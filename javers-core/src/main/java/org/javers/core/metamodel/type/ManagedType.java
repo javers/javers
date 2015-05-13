@@ -31,9 +31,8 @@ public abstract class ManagedType extends JaversType {
         return GlobalId.class;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder b = new StringBuilder(super.toString()+"\n");
+    public String printProperties() {
+        StringBuilder b = new StringBuilder();
         b.append("properties {"+"\n");
         for (Property p : managedClass.getProperties()) {
             b.append("  " + p.toString() + "\n");
