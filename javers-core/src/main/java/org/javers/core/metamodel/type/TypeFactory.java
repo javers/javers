@@ -35,12 +35,12 @@ public class TypeFactory {
         if (prototype.isPresent()) {
             jType = spawnFromPrototype(javaType, prototype.get());
             logger.info("javersType of [{}] inferred as {} from prototype {}",
-                        javaType, jType.getClass().getSimpleName(), prototype.get());
+                        jType.getBaseJavaClass(), jType.getClass().getSimpleName(), prototype.get());
         }
         else {
             jType = inferFromAnnotations(javaType);
             logger.info("javersType of [{}] inferred as {}",
-                        jType.getBaseJavaClass().getSimpleName(), jType.getClass().getSimpleName());
+                        jType.getBaseJavaClass(), jType.getClass().getSimpleName());
         }
 
         return jType;
