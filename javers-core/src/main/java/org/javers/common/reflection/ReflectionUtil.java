@@ -97,8 +97,8 @@ public class ReflectionUtil {
     }
 
     public static boolean isGetter(Method m) {
-        return (m.getName().substring(0,3).equals("get")  ||
-                m.getName().substring(0,2).equals("is") ) &&
+        return (m.getName().startsWith("get") ||
+                m.getName().startsWith("is")) &&
                 m.getParameterTypes().length == 0;
     }
 
