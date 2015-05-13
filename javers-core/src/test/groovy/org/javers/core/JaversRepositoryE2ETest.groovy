@@ -402,4 +402,18 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
+    def "should commit and read subsequent snapshots from repository"() {
+        given:
+        def cdo = new SnapshotEntity(id: 1)
+
+
+        expect:
+        (1..25).each {
+            cdo.intProperty = it
+            javers.commit("login", cdo)
+            def snap = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())[0]
+            assert snap.getPropertyValue("intProperty") == it
+        }
+    }
+
 }
