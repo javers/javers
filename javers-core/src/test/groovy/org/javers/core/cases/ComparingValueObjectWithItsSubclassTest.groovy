@@ -13,7 +13,7 @@ import static org.javers.core.cases.ComparingValueObjectWithItsSubclassClasses.M
  */
 class ComparingValueObjectWithItsSubclassTest extends Specification {
 
-    def "should compare ValueObject with its subclass as not equals when subclass has more properties"(){
+    def "should compare ValueObject with its subclass even if subclass has more fields"(){
         given:
         def javers = JaversBuilder.javers().build()
 
@@ -24,6 +24,9 @@ class ComparingValueObjectWithItsSubclassTest extends Specification {
         println diff
 
         then:
-        diff.changes.size() == 2
+        diff.changes.size() == 1
+        diff.changes[0].propertyName == "seatHeight"
+        diff.changes[0].left == 1
+        diff.changes[0].right == null
     }
 }

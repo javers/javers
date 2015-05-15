@@ -2,7 +2,6 @@ package org.javers.core.graph;
 
 import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.exception.JaversGetterException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.Entity;
@@ -17,6 +16,7 @@ import org.javers.core.metamodel.property.Property;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.javers.common.exception.JaversExceptionCode.MISSING_PROPERTY;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
 
@@ -81,7 +81,7 @@ public class ObjectNode {
         try {
             return cdo.getPropertyValue(property);
         } catch (JaversGetterException e){
-            throw new JaversException(JaversExceptionCode.TYPE_MISMATCH, property.getName(),cdo.getManagedClass().getName());
+            throw new JaversException(MISSING_PROPERTY, property.getName(), cdo.getManagedClass().getName());
         }
     }
 
