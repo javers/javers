@@ -14,13 +14,7 @@ import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
 import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.clazz.ClientsClassDefinition;
-import org.javers.core.metamodel.clazz.CustomDefinition;
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.EntityDefinition;
-import org.javers.core.metamodel.clazz.ManagedClassFactoryModule;
-import org.javers.core.metamodel.clazz.ValueDefinition;
-import org.javers.core.metamodel.clazz.ValueObjectDefinition;
+import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.CustomType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -278,6 +272,12 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     public JaversBuilder withNewObjectsSnapshot(boolean newObjectsSnapshot){
         coreConfiguration().withNewObjectsSnapshot(newObjectsSnapshot);
+        return this;
+    }
+
+    public JaversBuilder withProxyManager(ProxyManager proxyManager) {
+        addComponent(proxyManager);
+
         return this;
     }
 

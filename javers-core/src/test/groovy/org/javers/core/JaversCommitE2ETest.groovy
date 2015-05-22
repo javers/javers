@@ -237,6 +237,23 @@ class JaversCommitE2ETest extends Specification {
         !secondCommit.diff.changes
     }
 
+    def "should unproxy"() {
+        given:
+        def javers = javers().withProxyManager(new ProxyManager() {
+            @Override
+            def <T> T unproxy(T entity) {
+                return entity;
+            }
+        }).build()
+        def cdo = new SnapshotEntity(mapVoToPrimitive: [(new DummyAddress("London")): "this"])
+
+        when:
+        def commit = javers.commit("author", cdo)
+
+        then:
+        commit.snapshots.size() == 2
+    }
+
     def "should not support Map of <ValueObject,?>, no good idea how to handle this"() {
         given:
         def javers = javers().build()
