@@ -2,9 +2,6 @@ package org.javers.core;
 
 import org.javers.common.collections.Lists;
 import org.javers.common.date.DefaultDateProvider;
-import org.javers.core.graph.LiveCdoFactory;
-import org.javers.core.graph.LiveGraphFactory;
-import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.SnapshotFactory;
@@ -28,14 +25,11 @@ public class CoreJaversModule extends InstantiatingModule {
     protected Collection<Class> getImplementations() {
         return (Collection) Lists.asList(
                 JaversCore.class,
-                ObjectGraphBuilder.class,
                 JsonConverterBuilder.class,
                 TypeMapper.class,
                 TypeFactory.class,
                 JaversCoreConfiguration.class,
                 SnapshotFactory.class,
-                LiveCdoFactory.class,
-                LiveGraphFactory.class,
                 GlobalIdFactory.class,
                 DefaultDateProvider.class,
                 QueryRunner.class

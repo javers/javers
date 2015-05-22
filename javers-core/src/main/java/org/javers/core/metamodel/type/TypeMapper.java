@@ -35,6 +35,7 @@ public class TypeMapper {
     private final ValueType OBJECT_TYPE = new ValueType(Object.class);
     private final TypeFactory typeFactory;
     private final Map<Type, JaversType> mappedTypes;
+    private final DehydratedTypeBuilder dehydratedTypeBuilder = new DehydratedTypeBuilder(this);
 
     public TypeMapper(TypeFactory typeFactory) {
         this.typeFactory = typeFactory;
@@ -193,13 +194,11 @@ public class TypeMapper {
         return  jType instanceof ValueObjectType;
     }
 
-    public Type getDehydratedType(Type type){
-        final JaversType javersType = getJaversType(type);
-
-        if (!javersType.isGenericType()){
-            return javersType.getRawDehydratedType();
-        }
-        return new ParametrizedDehydratedType(javersType, this);
+    /**
+     * Type for JSON representation
+     */
+    public Type getDehydratedType(Type type) {
+        return dehydratedTypeBuilder.build(type);
     }
 
     /**

@@ -5,6 +5,7 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.json.JsonConverter
 import org.javers.core.model.DummyUser
 import org.javers.test.builder.DummyUserBuilder
+import spock.lang.Shared
 import spock.lang.Specification
 
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
@@ -12,14 +13,19 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author pawel szymczyk
  */
-class MongoRepositoryIntTest extends Specification {
+class MongoRepositoryFongoIntTest extends Specification {
+
+    @Shared def mongoDb
+
+    def setup(){
+        mongoDb = new Fongo("myDb").getDatabase("test")
+    }
 
     def "should persist head id"() {
 
         given:
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def db = new Fongo("myDb").mongo.getDB("test")
-        def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
+        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
 
         def kazikV1 = dummyUser("Kazik").withAge(1).build()
         def kazikV2 = dummyUser("Kazik").withAge(2).build()
@@ -46,8 +52,7 @@ class MongoRepositoryIntTest extends Specification {
 
         given:
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def db = new Fongo("myDb").mongo.getDB("test")
-        def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
+        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
         def commitFactory = javersTestBuilder.commitFactory
 
         def kazik = new DummyUser("kazik")
@@ -70,8 +75,7 @@ class MongoRepositoryIntTest extends Specification {
         given:
         //create components
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def db = new Fongo("myDb").mongo.getDB("test")
-        def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
+        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
         def commitFactory = javersTestBuilder.commitFactory
         def id = javersTestBuilder.globalIdFactory.createFromId("kazik", DummyUser)
 
@@ -92,8 +96,7 @@ class MongoRepositoryIntTest extends Specification {
         given:
         //create components
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def db = new Fongo("myDb").mongo.getDB("test")
-        def mongoRepository = new MongoRepository(db, javersTestBuilder.jsonConverter)
+        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
         def commitFactory = javersTestBuilder.commitFactory
         def id = javersTestBuilder.javers().idBuilder().instanceId(new DummyUser("kazik"))
 
@@ -112,8 +115,7 @@ class MongoRepositoryIntTest extends Specification {
     def "should get state history"() {
 
         given:
-        def db = new Fongo("myDb").mongo.getDB("test")
-        def mongoRepository = new MongoRepository(db, Stub(JsonConverter))
+        def mongoRepository = new MongoRepository(mongoDb, Stub(JsonConverter))
 
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly(mongoRepository)
 

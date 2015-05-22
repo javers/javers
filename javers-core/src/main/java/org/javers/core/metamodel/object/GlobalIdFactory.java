@@ -3,6 +3,7 @@ package org.javers.core.metamodel.object;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.clazz.ValueObject;
@@ -17,9 +18,11 @@ import org.javers.repository.jql.GlobalIdDTO;
 public class GlobalIdFactory {
 
     private final TypeMapper typeMapper;
+    private ObjectAccessHook objectAccessHook;
 
-    public GlobalIdFactory(TypeMapper typeMapper) {
+    public GlobalIdFactory(TypeMapper typeMapper, ObjectAccessHook objectAccessHook) {
         this.typeMapper = typeMapper;
+        this.objectAccessHook = objectAccessHook;
     }
 
     public GlobalId createId(Object targetCdo) {
@@ -32,6 +35,7 @@ public class GlobalIdFactory {
     public GlobalId createId(Object targetCdo, OwnerContext owner) {
         Validate.argumentsAreNotNull(targetCdo);
 
+        targetCdo = objectAccessHook.access(targetCdo);
         ManagedClass targetManagedClass = getManagedClassOf(targetCdo);
 
         if (targetManagedClass instanceof Entity) {
@@ -79,6 +83,9 @@ public class GlobalIdFactory {
      * if item is already instance of GlobalId - returns it.
      */
     public Object dehydrate(Object item, JaversType targetType, OwnerContext context){
+        if (item == null) {
+            return null;
+        }
         if (!(item instanceof GlobalId) && targetType instanceof ManagedType) {
             return createId(item, context);
         } else {

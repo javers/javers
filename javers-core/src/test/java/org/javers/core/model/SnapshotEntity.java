@@ -3,6 +3,7 @@ package org.javers.core.model;
 import org.joda.time.LocalDate;
 import javax.persistence.Id;
 import java.math.BigDecimal;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,6 +12,9 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public class SnapshotEntity {
+
+    public enum DummyEnum { val1, val2, val3 }
+
     @Id
     private int id = 1;
 
@@ -44,6 +48,7 @@ public class SnapshotEntity {
     private Map<String,SnapshotEntity> mapPrimitiveToEntity;
     private Map<SnapshotEntity, SnapshotEntity> mapOfEntities;
     private Map<Object,Object> polymorficMap;
+    private Map<String,EnumSet<DummyEnum>> mapOfGenericValues;
 
     @Id
     public int getId() {
@@ -248,5 +253,13 @@ public class SnapshotEntity {
 
     public void setMapPrimitiveToEntity(Map<String, SnapshotEntity> mapPrimitiveToEntity) {
         this.mapPrimitiveToEntity = mapPrimitiveToEntity;
+    }
+
+    public Map<String,EnumSet<DummyEnum>> getMapOfGenericValues() {
+        return mapOfGenericValues;
+    }
+
+    public void setMapOfGenericValues(Map<String,EnumSet<DummyEnum>> mapOfGenericValues) {
+        this.mapOfGenericValues = mapOfGenericValues;
     }
 }

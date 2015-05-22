@@ -2,7 +2,6 @@ package org.javers.core;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.validation.Validate;
 import org.javers.core.pico.InstantiatingModule;
 import org.javers.core.pico.JaversModule;
 import org.picocontainer.DefaultPicoContainer;
@@ -39,7 +38,7 @@ public abstract class AbstractJaversBuilder {
         }
     }
 
-    protected <T> List<T> getComponents(Class<T> ofType){
+    protected <T> List<T> getComponents(Class<T> ofType) {
         return container.getComponents(ofType);
     }
 
@@ -52,15 +51,15 @@ public abstract class AbstractJaversBuilder {
         container.addComponent(classOrInstance);
     }
 
-    protected void bindComponent(Class bindToInterface, Object implementationOrInstance) {
+
+    protected void removeComponent(Object classOrInstance) {
         checkIfBuilt();
-        container.addComponent(bindToInterface, implementationOrInstance);
+        container.removeComponent(classOrInstance);
     }
 
-    private void checkIfNotBuilt() {
-        if (isBuilt()) {
-            throw new JaversException(JaversExceptionCode.ALREADY_BUILT);
-        }
+    protected void bindComponent(Object componentKey, Object implementationOrInstance) {
+        checkIfBuilt();
+        container.addComponent(componentKey, implementationOrInstance);
     }
 
     private void checkIfBuilt() {

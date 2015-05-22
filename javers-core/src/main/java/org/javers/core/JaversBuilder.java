@@ -8,19 +8,15 @@ import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
+import org.javers.core.graph.ObjectAccessHook;
+import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
 import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.clazz.ClientsClassDefinition;
-import org.javers.core.metamodel.clazz.CustomDefinition;
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.EntityDefinition;
-import org.javers.core.metamodel.clazz.ManagedClassFactoryModule;
-import org.javers.core.metamodel.clazz.ValueDefinition;
-import org.javers.core.metamodel.clazz.ValueObjectDefinition;
+import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.CustomType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -82,6 +78,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new DiffFactoryModule());
         addModule(new CommitFactoryModule(getContainer()));
         addModule(new GraphSnapshotModule(getContainer()));
+        addModule(new GraphFactoryModule(getContainer()));
     }
 
     public Javers build() {
@@ -281,6 +278,12 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
+    public JaversBuilder withObjectAccessHook(ObjectAccessHook objectAccessHook) {
+        removeComponent(ObjectAccessHook.class);
+        bindComponent(ObjectAccessHook.class, objectAccessHook);
+        return this;
+    }
+
     /**
      * Registers a custom comparator for given custom type.
      * <br/><br/>
@@ -299,7 +302,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      */
     public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
         clientsClassDefinitions.add(new CustomDefinition(customType));
-        addComponent(new CustomToNativeAppenderAdapter(comparator, customType));
+        bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
     }
 

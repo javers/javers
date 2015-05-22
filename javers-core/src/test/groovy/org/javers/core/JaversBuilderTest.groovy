@@ -4,20 +4,21 @@ import org.javers.core.diff.DiffFactory
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.appenders.SimpleListChangeAppender
 import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender
+import org.javers.core.graph.ObjectAccessHook
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
 import org.javers.core.metamodel.property.PropertyScanner
 import org.javers.core.metamodel.type.EntityType
+import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.model.DummyNetworkAddress
-import org.javers.core.metamodel.type.TypeMapper
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import javax.persistence.Id
 
 import static org.fest.assertions.api.Assertions.assertThat
-import static org.javers.core.JaversBuilder.*
+import static org.javers.core.JaversBuilder.javers
 
 /**
  * @author bartosz walacik
@@ -71,7 +72,19 @@ class JaversBuilderTest extends Specification {
         javers1 != javers2
     }
 
-    def "should contain FieldBasedPropertyScanner when Field style"(){
+    def "should contain ObjectAccessHook when given"() {
+        given:
+        def graphFactoryHook = Stub(ObjectAccessHook)
+        JaversBuilder javersBuilder = javers().withObjectAccessHook(graphFactoryHook)
+
+        when:
+        javersBuilder.build()
+
+        then:
+        javersBuilder.getContainerComponent(ObjectAccessHook) == graphFactoryHook
+    }
+
+    def "should contain FieldBasedPropertyScanner when Field style"() {
         given:
         JaversBuilder javersBuilder = javers().withMappingStyle(MappingStyle.FIELD)
 
@@ -83,7 +96,7 @@ class JaversBuilderTest extends Specification {
     }
 
 
-    def "should contain BeanBasedPropertyScanner when Bean style"(){
+    def "should contain BeanBasedPropertyScanner when Bean style"() {
         given:
         JaversBuilder javersBuilder = javers().withMappingStyle(MappingStyle.BEAN)
 
@@ -107,7 +120,7 @@ class JaversBuilderTest extends Specification {
     }
 
 
-    def "should not contain BeanBasedPropertyScanner when Field style"(){
+    def "should not contain BeanBasedPropertyScanner when Field style"() {
         given:
         JaversBuilder javersBuilder = javers().withMappingStyle(MappingStyle.FIELD)
 

@@ -1,10 +1,10 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.clazz.ManagedClassFactory;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Property;
 
 import java.lang.reflect.Type;
 
@@ -31,13 +31,8 @@ public abstract class ManagedType extends JaversType {
         return GlobalId.class;
     }
 
-    public String printProperties() {
-        StringBuilder b = new StringBuilder();
-        b.append("properties {"+"\n");
-        for (Property p : managedClass.getProperties()) {
-            b.append("  " + p.toString() + "\n");
-        }
-        b.append("}");
-        return b.toString();
+    @Override
+    protected PrettyPrintBuilder prettyPrintBuilder() {
+        return super.prettyPrintBuilder().addMultiField("managedProperties", managedClass.getProperties());
     }
 }

@@ -5,6 +5,8 @@ import org.javers.common.exception.JaversGetterException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
+import static org.javers.common.string.ToStringBuilder.typeName;
+
 /**
  * @author bartosz walacik
  */
@@ -37,6 +39,6 @@ public class JaversField extends JaversMember<Field> {
 
     @Override
     public String toString() {
-        return "Field " + getGenericType()+" " + name() +"; //declaring class:" +getDeclaringClass().getName();
+        return "Field " + typeName(getGenericType())+" " + name() +"; //declared in: " +getDeclaringClass().getSimpleName();
     }
 }

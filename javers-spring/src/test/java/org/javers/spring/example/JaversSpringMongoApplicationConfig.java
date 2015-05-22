@@ -1,7 +1,7 @@
 package org.javers.spring.example;
 
 import com.github.fakemongo.Fongo;
-import com.mongodb.DB;
+import com.mongodb.client.MongoDatabase;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
@@ -38,8 +38,8 @@ public class JaversSpringMongoApplicationConfig {
      * MongoDB setup
      */
     @Bean
-    public DB mongoDB(){
-        return new Fongo("test").getMongo().getDB("test");
+    public MongoDatabase mongoDB() {
+        return new Fongo("test").getDatabase("test");
     }
 
     /**

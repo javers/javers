@@ -15,11 +15,14 @@ import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClas
  */
 class MapTypeTest extends Specification{
 
+    enum DummyEnum{}
+    
     class Dummy <T> {
         Map                  noGeneric
         Map<?, String>       wildcardGeneric
         Map<String, T>       parametrizedGeneric
         Map<String, Integer> genericWithArgument
+        Map<String, EnumSet<DummyEnum>> mapWithNestedParametrizedType
     }
 
     @Unroll
@@ -62,5 +65,18 @@ class MapTypeTest extends Specification{
         mType.baseJavaType == new TypeToken<Map<String,Integer>>(){}.type
         mType.keyType == String
         mType.valueType == Integer
+    }
+
+    def "should scan nested generic type from Map value type parameter" () {
+        given:
+        def genericWithGenericArgument = getFieldFromClass(Dummy, "mapWithNestedParametrizedType").genericType
+
+        when:
+        def mType = new MapType(genericWithGenericArgument)
+
+        then:
+        mType.baseJavaType == new TypeToken<Map<String,EnumSet<DummyEnum>>>(){}.type
+        mType.keyType == String
+        mType.valueType == new TypeToken< EnumSet<DummyEnum> >(){}.type
     }
 }

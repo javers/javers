@@ -125,8 +125,8 @@ class JaversTransactionalDecorator implements Javers {
     }
 
     @Override
-    public JaversType getTypeMapping(Class<?> clazz) {
-        return delegate.getTypeMapping(clazz);
+    public <T extends JaversType> T getTypeMapping(Class<?> clientsClass) {
+        return delegate.getTypeMapping(clientsClass);
     }
 
     @Override
