@@ -4,6 +4,7 @@ import org.javers.core.diff.DiffFactory
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.appenders.SimpleListChangeAppender
 import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender
+import org.javers.core.graph.GraphFactoryHook
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
 import org.javers.core.metamodel.property.PropertyScanner
@@ -71,11 +72,11 @@ class JaversBuilderTest extends Specification {
         javers1 != javers2
     }
 
-    def "should contain ProxyManager when given one"() {
+    def "should contain GraphFactoryHook when given"() {
         given:
-        JaversBuilder javersBuilder = javers().withProxyManager(new ProxyManager() {
+        JaversBuilder javersBuilder = javers().withGraphFactoryHook(new GraphFactoryHook() {
             @Override
-            def <T> T unproxy(T entity) {
+            def <T> T beforeAdd(T entity) {
                 return null
             }
         })
@@ -84,7 +85,7 @@ class JaversBuilderTest extends Specification {
         javersBuilder.build()
 
         then:
-        javersBuilder.getContainerComponent(ProxyManager) instanceof ProxyManager
+        javersBuilder.getContainerComponent(GraphFactoryHook) instanceof GraphFactoryHook
     }
 
     def "should contain FieldBasedPropertyScanner when Field style"() {

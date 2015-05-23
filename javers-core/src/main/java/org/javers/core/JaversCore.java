@@ -39,9 +39,8 @@ class JaversCore implements Javers {
     private final JaversExtendedRepository repository;
     private final QueryRunner queryRunner;
     private final GlobalIdFactory globalIdFactory;
-    private final ProxyManager proxyManager;
 
-    JaversCore(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, QueryRunner queryRunner, GlobalIdFactory globalIdFactory, ProxyManager proxyManager) {
+    JaversCore(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, QueryRunner queryRunner, GlobalIdFactory globalIdFactory) {
         this.diffFactory = diffFactory;
         this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;
@@ -49,21 +48,16 @@ class JaversCore implements Javers {
         this.repository = repository;
         this.queryRunner = queryRunner;
         this.globalIdFactory = globalIdFactory;
-        this.proxyManager = proxyManager;
     }
 
     public Commit commit(String author, Object currentVersion) {
         argumentsAreNotNull(author, currentVersion);
 
-        Commit commit = commitFactory.create(author, unproxyIfNeeded(currentVersion));
+        Commit commit = commitFactory.create(author, currentVersion);
 
         repository.persist(commit);
         logger.info(commit.toString());
         return commit;
-    }
-
-    private Object unproxyIfNeeded(Object currentVersion) {
-        return proxyManager.unproxy(currentVersion);
     }
 
     public Commit commitShallowDelete(String author, Object deleted) {

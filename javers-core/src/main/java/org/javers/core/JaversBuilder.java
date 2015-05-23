@@ -8,6 +8,8 @@ import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
+import org.javers.core.graph.GraphFactoryHook;
+import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
@@ -76,6 +78,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new DiffFactoryModule());
         addModule(new CommitFactoryModule(getContainer()));
         addModule(new GraphSnapshotModule(getContainer()));
+        addModule(new GraphFactoryModule(getContainer()));
     }
 
     public Javers build() {
@@ -275,9 +278,9 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    public JaversBuilder withProxyManager(ProxyManager proxyManager) {
-        addComponent(proxyManager);
-
+    public JaversBuilder withGraphFactoryHook(GraphFactoryHook graphFactoryHook) {
+        removeComponent(GraphFactoryHook.class);
+        bindComponent(GraphFactoryHook.class, graphFactoryHook);
         return this;
     }
 

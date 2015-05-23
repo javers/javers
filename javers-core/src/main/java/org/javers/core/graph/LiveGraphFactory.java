@@ -13,10 +13,12 @@ import java.util.Set;
 public class LiveGraphFactory {
     private final TypeMapper typeMapper;
     private final LiveCdoFactory liveCdoFactory;
+    private GraphFactoryHook graphFactoryHook;
 
-    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory) {
+    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, GraphFactoryHook graphFactoryHook) {
         this.typeMapper = typeMapper;
         this.liveCdoFactory = liveCdoFactory;
+        this.graphFactoryHook = graphFactoryHook;
     }
 
     /**
@@ -24,6 +26,8 @@ public class LiveGraphFactory {
      */
     public LiveGraph createLiveGraph(Object handle) {
         Object wrappedHandle = wrapTopLevelContainer(handle);
+
+        graphFactoryHook.beforeAdd(handle);
 
         return new ObjectGraphBuilder(typeMapper, liveCdoFactory).buildGraph(wrappedHandle);
     }

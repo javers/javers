@@ -3,15 +3,15 @@ package org.javers.hibernate;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
-import org.javers.core.ProxyManager;
+import org.javers.core.graph.GraphFactoryHook;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 
 
-public class HibernateProxyManager implements ProxyManager {
+public class HibernateProxyManager implements GraphFactoryHook {
 
-    public <T> T unproxy(T entity) {
+    public <T> T beforeAdd(T entity) {
         Hibernate.initialize(entity);
         PropertyDescriptor[] properties = PropertyUtils.getPropertyDescriptors(entity);
         for (PropertyDescriptor propertyDescriptor : properties) {
