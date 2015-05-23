@@ -74,18 +74,14 @@ class JaversBuilderTest extends Specification {
 
     def "should contain GraphFactoryHook when given"() {
         given:
-        JaversBuilder javersBuilder = javers().withGraphFactoryHook(new GraphFactoryHook() {
-            @Override
-            def <T> T beforeAdd(T entity) {
-                return null
-            }
-        })
+        def graphFactoryHook = Stub(GraphFactoryHook)
+        JaversBuilder javersBuilder = javers().withGraphFactoryHook(graphFactoryHook)
 
         when:
         javersBuilder.build()
 
         then:
-        javersBuilder.getContainerComponent(GraphFactoryHook) instanceof GraphFactoryHook
+        javersBuilder.getContainerComponent(GraphFactoryHook) == graphFactoryHook
     }
 
     def "should contain FieldBasedPropertyScanner when Field style"() {
