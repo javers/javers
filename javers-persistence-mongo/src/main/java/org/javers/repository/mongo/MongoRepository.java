@@ -5,6 +5,7 @@ import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.javers.common.collections.Optional;
@@ -18,6 +19,8 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.mongo.model.MongoHeadId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,7 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
  * @author pawel szymczyk
  */
 public class MongoRepository implements JaversRepository {
+    private static final Logger logger = LoggerFactory.getLogger(MongoRepository.class);
 
     private static final int DESC = -1;
     private static final int ASC = 1;
@@ -40,7 +44,7 @@ public class MongoRepository implements JaversRepository {
     public static final String GLOBAL_ID_FRAGMENT = "globalId.fragment";
     public static final String GLOBAL_ID_VALUE_OBJECT = "globalId.valueObject";
     public static final String CHANGED_PROPERTIES = "changedProperties";
-
+    public static final String OBJECT_ID = "_id";
 
     private MongoDatabase mongo;
     private JsonConverter jsonConverter;
@@ -139,10 +143,22 @@ public class MongoRepository implements JaversRepository {
         if (doc != null) {
             Object stringCommitId = ((Map)doc.get("commitMetadata")).get("id");
             if (stringCommitId instanceof String) {
+                logger.info("executing db migration script, from JaVers 1.1 to 1.2 ...");
                 DBObject updateCmd = new BasicDBObject();
 
-                //TODO
-              //  mongo.runCommand("db.jv_snapshots.find().forEach(function(snapshot){snapshot.commitMetadata.id = Number(snapshot.commitMetadata.id);db.jv_snapshots.save(snapshot);});");
+                Document update = new Document("eval",
+                    "function() { \n"+
+                            "    db.jv_snapshots.find().forEach( \n"+
+                            "      function(snapshot) { \n"+
+                            "        snapshot.commitMetadata.id = Number(snapshot.commitMetadata.id); \n"+
+                            "        db.jv_snapshots.save(snapshot); } \n" +
+                            "    ); "+
+                            "    return 'ok'; \n"+
+                            "}"
+                    );
+
+                Document ret = mongo.runCommand(update);
+                logger.info("result: \n "+ ret.toJson());
             }
         }
     }
@@ -200,8 +216,12 @@ public class MongoRepository implements JaversRepository {
         if (oldHead == null) {
             headIdCollection.insertOne(newHeadId.toDocument());
         } else {
-            headIdCollection.findOneAndUpdate(oldHead, newHeadId.toDocument());
+            headIdCollection.updateOne(objectIdFiler(oldHead), newHeadId.getUpdateCommand());
         }
+    }
+
+    private Bson objectIdFiler(Document document) {
+        return Filters.eq(OBJECT_ID, document.getObjectId("_id"));
     }
 
     private MongoCursor getMongoSnapshotsCoursor(Bson idQuery, int limit) {
