@@ -13,7 +13,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
 /**
  * @author pawel szymczyk
  */
-class MongoRepositoryIntTest extends Specification {
+class MongoRepositoryFongoIntTest extends Specification {
 
     @Shared def mongoDb
 

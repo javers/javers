@@ -6,6 +6,8 @@ import org.javers.core.JaversRepositoryE2ETest
 import static org.javers.core.JaversBuilder.javers
 
 /**
+ * runs e2e test suite with Fongo
+ *
  * @author bartosz walacik
  */
 class JaversMongoRepositoryE2ETest extends JaversRepositoryE2ETest {

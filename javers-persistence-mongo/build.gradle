@@ -7,3 +7,13 @@ dependencies {
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'com.github.fakemongo:fongo:2.0.0'
 }
+
+task integrationTest(type: Test) {
+    filter {
+        includeTestsMatching 'org.javers.repository.mongo.integration.**'
+    }
+}
+
+test {
+    exclude 'org/javers/repository/mongo/integration/**'
+}
