@@ -19,7 +19,11 @@ class ParametrizedDehydratedType implements ParameterizedType{
         this.actualTypeArguments =
                 Lists.transform(javersType.getActualTypeArguments(), new Function<Type, Type>() {
                     public Type apply(Type input) {
-                        return typeMapper.getJaversType(input).getRawDehydratedType();
+                        JaversType javersType = typeMapper.getJaversType(input);
+                        if (!javersType.isGenericType()){
+                            return javersType.getRawDehydratedType();
+                        }
+                        return new ParametrizedDehydratedType(javersType, typeMapper);
                     }
                 }).toArray(new Type[]{});
     }
@@ -37,5 +41,5 @@ class ParametrizedDehydratedType implements ParameterizedType{
     @Override
     public Type getOwnerType() {
         return null;
-    }
+    }    
 }
