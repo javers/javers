@@ -193,6 +193,9 @@ public class TypeMapper {
         return  jType instanceof ValueObjectType;
     }
 
+    /**
+     * Type of JSON representation. Generic version of {@link JaversType#getRawDehydratedType()}
+     */
     public Type getDehydratedType(Type type){
         final JaversType javersType = getJaversType(type);
 

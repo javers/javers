@@ -98,6 +98,14 @@ public abstract class JaversType {
          return Collections.unmodifiableList(actualTypeArguments);
      }
 
+    /**
+     * Type of JSON representation.
+     *
+     * For Values it's simply baseJavaType.
+     *
+     * For ManagedTypes (references to Entities and ValueObjects) it's GlobalId
+     * because JaVers serializes references in the 'dehydrated' form.
+     */
      Type getRawDehydratedType() {
          return getBaseJavaClass();
      }
