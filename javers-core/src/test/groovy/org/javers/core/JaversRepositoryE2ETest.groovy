@@ -2,6 +2,7 @@ package org.javers.core
 
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.model.*
+import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.core.snapshot.SnapshotsAssert
 import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
@@ -322,7 +323,8 @@ class JaversRepositoryE2ETest extends Specification {
                                      entityRef: ref,
                                      arrayOfIntegers: [1,2],
                                      listOfDates: [new LocalDate(2001,1,1), new LocalDate(2001,1,2)],
-                                     mapOfValues: [(new LocalDate(2001,1,1)):1.1])
+                                     mapOfValues: [(new LocalDate(2001,1,1)):1.1],
+                                     mapOfGenericValues: [("enumSet"):EnumSet.of(DummyEnum.val1, DummyEnum.val2)])
         javers.commit("author", cdo) //v. 1
         cdo.intProperty = 5
         javers.commit("author2", cdo) //v. 2
@@ -341,7 +343,8 @@ class JaversRepositoryE2ETest extends Specification {
                                             arrayOfIntegers:[1,2],
                                             listOfDates: [new LocalDate(2001,1,1), new LocalDate(2001,1,2)],
                                             mapOfValues: [(new LocalDate(2001,1,1)):1.1],
-                                            intProperty:5,])
+                                            intProperty:5,
+                                            mapOfGenericValues: [("enumSet"):EnumSet.of(DummyEnum.val1, DummyEnum.val2)]])
         //assert metadata
         with(snapshots[0]) {
              commitId.value() == "2.0"
