@@ -1,20 +1,25 @@
 package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
+
 import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.clazz.Entity
 import org.javers.core.metamodel.clazz.ManagedClassFactory
 import org.javers.core.metamodel.object.GlobalId
+import org.javers.core.metamodel.type.MapTypeTest.DummyEnum;
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
+
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import java.util.EnumSet;
+import java.util.Map;
 
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
@@ -25,7 +30,7 @@ class TypeMapperTest extends Specification {
 
     @Shared
     def mapper = JaversTestBuilder.javersTestAssembly().typeMapper
-
+    
     enum DummyEnum {A,B}
 
     class DummySet extends HashSet{}
@@ -33,7 +38,12 @@ class TypeMapperTest extends Specification {
     class Dummy <T,X> {
         int[] intArray
     }
-
+    
+    class DummyMapWithGenericValue
+    {
+        Map<String, EnumSet<DummyEnum>> mapWithGenericValueArgument
+    }
+    
     @Unroll
     def "should return dehydrated type for simple #givenJaversType"() {
         expect:
@@ -47,6 +57,22 @@ class TypeMapperTest extends Specification {
         Integer         || Integer
     }
 
+    def "should return dehydrated type for Map<String,EnumSet<DummyEnum>>"() {
+        given:
+        Type givenJaversType = getFieldFromClass(DummyMapWithGenericValue, "mapWithGenericValueArgument").genericType
+        
+        when:
+        def dehydrated = mapper.getDehydratedType(givenJaversType)
+        
+        then:
+        dehydrated instanceof ParameterizedType
+        dehydrated.rawType == Map
+        dehydrated.actualTypeArguments[0] == String
+        dehydrated.actualTypeArguments[1] instanceof ParameterizedType
+        dehydrated.actualTypeArguments[1].rawType == EnumSet
+        dehydrated.actualTypeArguments[1].actualTypeArguments[0] == new TypeToken<DummyEnum>(){}.type
+    }
+    
     @Unroll
     def "should return dehydrated type for generic #givenJaversType"() {
         when:
@@ -58,9 +84,9 @@ class TypeMapperTest extends Specification {
         dehydrated.actualTypeArguments == expectedActualTypeArguments
 
         where:
-        givenJaversType                                || expectedRawType  || expectedActualTypeArguments
-        new TypeToken<Set<String>>(){}.type            || Set              || [String]
-        new TypeToken<Map<String, DummyUser>>(){}.type || Map              || [String, GlobalId]
+        givenJaversType                                         || expectedRawType  || expectedActualTypeArguments
+        new TypeToken<Set<String>>(){}.type                     || Set              || [String]
+        new TypeToken<Map<String, DummyUser>>(){}.type          || Map              || [String, GlobalId]
     }
 
     def "should spawn concrete Array type"() {
