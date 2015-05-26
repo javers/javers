@@ -22,7 +22,7 @@ class MapTypeTest extends Specification{
         Map<?, String>       wildcardGeneric
         Map<String, T>       parametrizedGeneric
         Map<String, Integer> genericWithArgument
-        Map<String, EnumSet<DummyEnum>> genericWithGenericArgument
+        Map<String, EnumSet<DummyEnum>> mapWithNestedParametrizedType
     }
 
     @Unroll
@@ -67,16 +67,16 @@ class MapTypeTest extends Specification{
         mType.valueType == Integer
     }
 
-    def "should return key & value Class if baseJavaType and value type are generic"(){
+    def "should scan nested generic type from Map value type parameter" () {
         given:
-        Type genericWithGenericArgument = getFieldFromClass(Dummy, "genericWithGenericArgument").genericType
+        def genericWithGenericArgument = getFieldFromClass(Dummy, "mapWithNestedParametrizedType").genericType
 
         when:
-        MapType mType = new MapType(genericWithGenericArgument)
+        def mType = new MapType(genericWithGenericArgument)
 
         then:
         mType.baseJavaType == new TypeToken<Map<String,EnumSet<DummyEnum>>>(){}.type
         mType.keyType == String
-        mType.valueType == new TypeToken<EnumSet<DummyEnum>>(){}.type
+        mType.valueType == new TypeToken< EnumSet<DummyEnum> >(){}.type
     }
 }

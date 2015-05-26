@@ -1,10 +1,8 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Function;
-import org.javers.common.collections.Lists;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * @author bartosz walacik
@@ -13,19 +11,9 @@ class ParametrizedDehydratedType implements ParameterizedType{
     private final Type rawType;
     private final Type[] actualTypeArguments;
 
-    ParametrizedDehydratedType(JaversType javersType, final TypeMapper typeMapper) {
-        this.rawType = javersType.getBaseJavaClass();
-
-        this.actualTypeArguments =
-                Lists.transform(javersType.getActualTypeArguments(), new Function<Type, Type>() {
-                    public Type apply(Type input) {
-                        JaversType javersType = typeMapper.getJaversType(input);
-                        if (!javersType.isGenericType()){
-                            return javersType.getRawDehydratedType();
-                        }
-                        return new ParametrizedDehydratedType(javersType, typeMapper);
-                    }
-                }).toArray(new Type[]{});
+    ParametrizedDehydratedType(Type rawType, List<Type> actualDehydratedTypeArguments) {
+        this.rawType = rawType;
+        this.actualTypeArguments = actualDehydratedTypeArguments.toArray(new Type[]{});
     }
 
     @Override

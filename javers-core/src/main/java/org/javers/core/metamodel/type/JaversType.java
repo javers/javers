@@ -99,7 +99,7 @@ public abstract class JaversType {
      }
 
     /**
-     * Type of JSON representation.
+     * Type for JSON representation.
      *
      * For Values it's simply baseJavaType.
      *
