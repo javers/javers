@@ -1,23 +1,23 @@
 package org.javers.repository.mongo
 
 import com.github.fakemongo.Fongo
-import com.mongodb.MongoClient
 import org.javers.core.JaversRepositoryE2ETest
 
 import static org.javers.core.JaversBuilder.javers
 
 /**
+ * runs e2e test suite with Fongo
+ *
  * @author bartosz walacik
  */
 class JaversMongoRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     @Override
     def setup() {
-        def db = new Fongo("myDb").mongo.getDB("test")
-        def mongoRepository = new MongoRepository(db)
+        def mongoDb = new Fongo("myDb").getDatabase("test")
+        // def mongoDb = new MongoClient( "localhost" ).getDatabase("test")
 
-        // def mongoClient = new MongoClient()
-        // def mongoRepository =  new MongoRepository(mongoClient.getDB("test"))
+        def mongoRepository = new MongoRepository(mongoDb)
 
         mongoRepository.clean();
         javers = javers().registerJaversRepository(mongoRepository).build()
