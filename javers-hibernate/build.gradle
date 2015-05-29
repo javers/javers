@@ -6,6 +6,8 @@ dependencies {
     optional 'org.hibernate:hibernate-core:'+hibernateVersion
 
     testCompile 'org.hibernate:hibernate-core:'+hibernateVersion
+    testCompile 'org.hibernate:hibernate-entitymanager:'+hibernateVersion
+
     testCompile project(':javers-spring')
     testCompile project(':javers-persistence-sql')
     testCompile 'com.h2database:h2:1.4.184'

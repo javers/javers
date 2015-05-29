@@ -56,7 +56,7 @@ public class JaversProxyManagerApplicationConfig {
         return TransactionalJaversBuilder
                 .javers()
                 .registerJaversRepository(sqlRepository)
-                .withProxyManager(new HibernateProxyManager())
+                .withGraphFactoryHook(new HibernateProxyManager())
                 .build();
     }
 
@@ -85,7 +85,7 @@ public class JaversProxyManagerApplicationConfig {
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager(EntityManagerFactory emf){
+    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(emf);
 
@@ -93,12 +93,12 @@ public class JaversProxyManagerApplicationConfig {
     }
 
     @Bean
-    public PersistenceExceptionTranslationPostProcessor exceptionTranslation(){
+    public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
         return new PersistenceExceptionTranslationPostProcessor();
     }
 
     @Bean
-    public DataSource dataSource(){
+    public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.h2.Driver");
         dataSource.setUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
@@ -128,7 +128,12 @@ public class JaversProxyManagerApplicationConfig {
      */
     @Bean
     public AuthorProvider authorProvider() {
-        return () -> "unknown";
+        return new AuthorProvider() {
+            @Override
+            public String provide() {
+                return "unknown";
+            }
+        };
     }
 
     Properties additionalProperties() {

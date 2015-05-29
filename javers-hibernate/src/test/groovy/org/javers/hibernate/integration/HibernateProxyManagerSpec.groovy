@@ -1,7 +1,5 @@
 package org.javers.hibernate.integration
 
-import org.hibernate.Hibernate
-import org.hibernate.proxy.HibernateProxy
 import org.javers.core.Javers
 import org.javers.hibernate.integration.config.JaversProxyManagerApplicationConfig
 import org.javers.hibernate.integration.entity.Person
@@ -43,6 +41,7 @@ class HibernateProxyManagerSpec extends Specification {
 
         then:
         repository.findOne("1").name == "bartosz"
+        javers.getLatestSnapshot("1", Person).present
     }
 
 }
