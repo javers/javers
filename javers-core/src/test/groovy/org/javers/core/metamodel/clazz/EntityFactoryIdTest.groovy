@@ -24,7 +24,7 @@ abstract class EntityFactoryIdTest extends Specification {
         EntityAssert.assertThat(entity).hasIdProperty("name")
     }
 
-    def "should use custom id property when given"() {
+    def "should ignore @Id annotation where idProperty name is given"() {
         when:
         def entity = entityFactory.create(new EntityDefinition(DummyUser,"bigFlag"))
 

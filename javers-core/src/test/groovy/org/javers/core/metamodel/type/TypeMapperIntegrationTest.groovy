@@ -1,4 +1,4 @@
-package org.javers.core.metamodel.type;
+package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
 import org.bson.types.ObjectId
@@ -6,11 +6,11 @@ import org.javers.core.cases.MongoStoredEntity
 import org.javers.core.metamodel.clazz.*
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyUser;
-import spock.lang.Specification;
+import org.javers.core.model.DummyUser
+import spock.lang.Specification
 import spock.lang.Unroll
 
-import static org.javers.core.JaversTestBuilder.javersTestAssembly;
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
 /**
  * @author bartosz walacik
@@ -153,6 +153,19 @@ public class TypeMapperIntegrationTest extends Specification {
                 new ValueObjectDefinition(AbstractDummyUser),
                 new ValueDefinition(AbstractDummyUser)]
         expectedJaversType << [EntityType, ValueObjectType, ValueType]
+    }
+
+    def "should inherit custom idProperty mapping from explicitly mapped Entity"() {
+        given:
+        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+
+        when:
+        mapper.registerClientsClass(new EntityDefinition(AbstractDummyUser,"inheritedInt"))
+        def jType = mapper.getJaversType(DummyUser)
+
+        then:
+        jType instanceof EntityType
+        jType.idProperty.name == "inheritedInt"
     }
 
     def "should spawn from mapped superclass when querying for generic class"() {
