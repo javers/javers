@@ -5,6 +5,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.PropertyScanner;
+import org.javers.core.metamodel.type.EntityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +80,12 @@ public class ManagedClassFactory {
 
         Property idProperty = null;
         if (entityDefinition.hasCustomId()){
-            idProperty = findIdPropertyByName(properties, entityDefinition);
+            if (entityDefinition.hasCustomIdDefinedByName()){
+                idProperty = findIdPropertyByName(properties, entityDefinition);
+            }
+            else{
+                idProperty = entityDefinition.getIdProperty();
+            }
         }
 
         List<Property> filteredProperties = filterIgnored(properties, entityDefinition);
