@@ -37,6 +37,6 @@ public class JaversField extends JaversMember<Field> {
 
     @Override
     public String toString() {
-        return "Field " + getGenericType()+" " + name() +"; //declaring class:" +getDeclaringClass().getName();
+        return "Field " + getGenericType().getTypeName()+" " + name() +"; //declared in: " +getDeclaringClass().getSimpleName();
     }
 }

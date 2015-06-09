@@ -191,8 +191,9 @@ public interface Javers {
     /**
      * If you are serializing JaVers objects like
      * {@link Commit}, {@link Change}, {@link Diff} or {@link CdoSnapshot} to JSON, use this JsonConverter.
-     * For example:
+     * <br/><br/>
      *
+     * For example:
      * <pre>
      * javers.getJsonConverter().toJson(changes);
      * </pre>
@@ -252,7 +253,40 @@ public interface Javers {
     @Deprecated
     Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId);
 
-    JaversType getTypeMapping(Class<?> clazz);
+    /**
+     * Describes given user's class in the context of JaVers domain model mapping.
+     * <br/><br/>
+     * Use it, if you want to check how JaVers maps your classes.
+     * <br/><br/>
+     *
+     * For example, you can pretty-print JaversType for your class and
+     * check if mapping is correct.
+     * <pre>
+     * class Person {
+     *   &#64;Id int id;
+     *   &#64;Transient String notImportantField;
+     *   String name;
+     * }
+     * </pre>
+     *
+     * Calling
+     * <pre>
+     * System.out.println( javers.getTypeMapping(Person.class).prettyPrint() );
+     * </pre>
+     *
+     * prints:
+     * <pre>
+     * EntityType{
+     *   baseType: org.javers.core.examples.Person
+     *   managedProperties:
+     *      Field int id; //declared in: Person
+     *      Field java.lang.String name; //declared in: Person
+     *   idProperty: login
+     * }
+     * </pre>
+     *
+     */
+    <T extends JaversType> T getTypeMapping(Class<?> clientsClass);
 
     IdBuilder idBuilder();
 

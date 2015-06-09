@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.string.PrettyPrintBuilder;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 
 import java.lang.reflect.Constructor;
@@ -71,7 +73,7 @@ public abstract class JaversType {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName()+ "(type:"+baseJavaType+")" ;
+        return ToStringBuilder.toString(this, "baseType", baseJavaType.getTypeName());
     }
 
     @Override
@@ -108,5 +110,14 @@ public abstract class JaversType {
      */
      Type getRawDehydratedType() {
          return getBaseJavaClass();
+     }
+
+     public final String prettyPrint(){
+         return prettyPrintBuilder().build();
+     }
+
+     protected PrettyPrintBuilder prettyPrintBuilder(){
+         return new PrettyPrintBuilder(this)
+                 .addField("baseType", baseJavaType.getTypeName());
      }
 }

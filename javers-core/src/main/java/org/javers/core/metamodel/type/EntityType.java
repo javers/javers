@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.string.PrettyPrintBuilder;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.javers.core.metamodel.clazz.ManagedClassFactory;
@@ -53,7 +55,14 @@ public class EntityType extends ManagedType {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName()+ "(type:"+getBaseJavaType()+", id:"+getManagedClass().getIdProperty().getName()+")" ;
+        return ToStringBuilder.toString(this,
+                "baseType", getBaseJavaType().getTypeName(),
+                "id", getIdProperty().getName());
+    }
+
+    @Override
+    protected PrettyPrintBuilder prettyPrintBuilder() {
+        return super.prettyPrintBuilder().addField("idProperty", getIdProperty().getName());
     }
 
     public Property getIdProperty() {
