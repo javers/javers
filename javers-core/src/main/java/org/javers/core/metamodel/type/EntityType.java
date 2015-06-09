@@ -56,7 +56,7 @@ public class EntityType extends ManagedType {
     @Override
     public String toString() {
         return ToStringBuilder.toString(this,
-                "baseType", getBaseJavaType().getTypeName(),
+                "baseType", getBaseJavaType(),
                 "id", getIdProperty().getName());
     }
 

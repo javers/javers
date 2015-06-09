@@ -73,7 +73,7 @@ public abstract class JaversType {
 
     @Override
     public String toString() {
-        return ToStringBuilder.toString(this, "baseType", baseJavaType.getTypeName());
+        return ToStringBuilder.toString(this, "baseType", baseJavaType);
     }
 
     @Override
@@ -118,6 +118,6 @@ public abstract class JaversType {
 
      protected PrettyPrintBuilder prettyPrintBuilder(){
          return new PrettyPrintBuilder(this)
-                 .addField("baseType", baseJavaType.getTypeName());
+                 .addField("baseType", baseJavaType);
      }
 }

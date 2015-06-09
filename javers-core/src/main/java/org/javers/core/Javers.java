@@ -280,7 +280,7 @@ public interface Javers {
      *   baseType: org.javers.core.examples.Person
      *   managedProperties:
      *      Field int id; //declared in: Person
-     *      Field java.lang.String name; //declared in: Person
+     *      Field String name; //declared in: Person
      *   idProperty: login
      * }
      * </pre>
