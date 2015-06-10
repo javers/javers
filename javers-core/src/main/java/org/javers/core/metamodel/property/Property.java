@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * Bean's data property, getter or field
+ * Domain object's data property, getter or field
  */
 public class Property {
     public static final String ID_ANN = "Id";

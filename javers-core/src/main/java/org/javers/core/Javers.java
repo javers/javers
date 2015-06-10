@@ -13,6 +13,7 @@ import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
@@ -254,18 +255,21 @@ public interface Javers {
     Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId);
 
     /**
-     * Describes given user's class in the context of JaVers domain model mapping.
-     * <br/><br/>
-     * Use it, if you want to check how JaVers maps your classes.
+     * Use JaversTypes, if you want to: <br/>
+     * - describe your class in the context of JaVers domain model mapping, <br/>
+     * - use JaVers Reflection API to conveniently access your object properties
+     *  (instead of awkward java.lang.reflect API).
+     *
      * <br/><br/>
      *
-     * For example, you can pretty-print JaversType for your class and
+     * <b>Class describe example</b>.
+     * You can pretty-print JaversType of your class and
      * check if mapping is correct.
      * <pre>
      * class Person {
-     *   &#64;Id int id;
-     *   &#64;Transient String notImportantField;
-     *   String name;
+     *     &#64;Id int id;
+     *     &#64;Transient String notImportantField;
+     *     String name;
      * }
      * </pre>
      *
@@ -285,6 +289,26 @@ public interface Javers {
      * }
      * </pre>
      *
+     * <b>Property access example</b>.
+     * You can list object property values using {@link Property} abstraction.
+     * <pre>
+     * Javers javers = JaversBuilder.javers().build();
+     * EntityType jType = javers.getTypeMapping(Person.class);
+     * Person person = new Person("bob", "Uncle Bob");
+     *
+     * System.out.println("Bob's properties:");
+     * for (Property p : jType.getManagedClass().getProperties()){
+     *     Object value = p.get(person);
+     *     System.out.println( "property:" + p.getName() + ", value:" + value );
+     * }
+     * </pre>
+     *
+     * prints:
+     * <pre>
+     * Bob's properties:
+     * property:login, value:bob
+     * property:name, value:Uncle Bob
+     * </pre>
      */
     <T extends JaversType> T getTypeMapping(Class<?> clientsClass);
 
