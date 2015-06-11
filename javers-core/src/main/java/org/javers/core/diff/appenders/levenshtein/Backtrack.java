@@ -1,6 +1,6 @@
 package org.javers.core.diff.appenders.levenshtein;
 
-import org.javers.common.collections.Objects;
+import org.javers.core.diff.EqualsFunction;
 
 import java.util.List;
 
@@ -9,6 +9,12 @@ import java.util.List;
 class Backtrack {
 
     private final static int PENALTY = 1;
+
+    private final EqualsFunction equalsFunction;
+
+    public Backtrack(EqualsFunction equalsFunction) {
+        this.equalsFunction = equalsFunction;
+    }
 
     BacktrackSteps[][] evaluateSteps(final List leftList, final List rightList) {
 
@@ -56,7 +62,7 @@ class Backtrack {
     }
 
     private int compareListElements(final Object left, final Object right) {
-        if (Objects.nullSafeEquals(left, right)) {
+        if (equalsFunction.nullSafeEquals(left, right)) {
             return 0;
         } else {
             return PENALTY;

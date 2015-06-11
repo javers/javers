@@ -1,6 +1,6 @@
 package org.javers.core.diff.appenders.levenshtein;
 
-import org.javers.common.collections.Objects;
+import org.javers.core.diff.EqualsFunction;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ElementValueChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
@@ -10,6 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 class StepsToChanges {
+
+    private final EqualsFunction equalsFunction;
+
+    public StepsToChanges(EqualsFunction equalsFunction) {
+        this.equalsFunction = equalsFunction;
+    }
 
     List<ContainerElementChange> convert(final BacktrackSteps[][] backtrack, final List leftList, final List rightList) {
         int i = leftList.size();
@@ -23,7 +29,7 @@ class StepsToChanges {
             final Object rightValue = rightList.get(j - 1);
 
             if (choice == BacktrackSteps.TAKE) {
-                if (!Objects.nullSafeEquals(leftValue, rightValue)) {
+                if (!equalsFunction.nullSafeEquals(leftValue, rightValue)) {
                     changes.add(new ElementValueChange(i - 1, leftValue, rightValue));
                 }
                 i--;
