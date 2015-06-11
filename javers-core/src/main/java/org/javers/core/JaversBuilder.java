@@ -299,7 +299,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      */
     public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
         clientsClassDefinitions.add(new CustomDefinition(customType));
-        addComponent(new CustomToNativeAppenderAdapter(comparator, customType));
+        bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
     }
 
