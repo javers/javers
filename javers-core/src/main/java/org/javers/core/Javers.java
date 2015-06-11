@@ -293,7 +293,7 @@ public interface Javers {
      * You can list object property values using {@link Property} abstraction.
      * <pre>
      * Javers javers = JaversBuilder.javers().build();
-     * EntityType jType = javers.getTypeMapping(Person.class);
+     * ManagedType jType = javers.getTypeMapping(Person.class);
      * Person person = new Person("bob", "Uncle Bob");
      *
      * System.out.println("Bob's properties:");

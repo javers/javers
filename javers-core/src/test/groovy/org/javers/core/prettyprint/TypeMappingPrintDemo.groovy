@@ -4,7 +4,7 @@ import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.core.examples.model.Person
 import org.javers.core.metamodel.property.Property
-import org.javers.core.metamodel.type.EntityType
+import org.javers.core.metamodel.type.ManagedType
 import org.javers.core.model.DummyUserDetails
 import spock.lang.Specification
 
@@ -29,7 +29,7 @@ class TypeMappingPrintDemo extends Specification {
     def "should allow basic Reflective operations"() {
         expect:
         Javers javers = JaversBuilder.javers().build();
-        EntityType jType = javers.getTypeMapping(Person.class);
+        ManagedType jType = javers.getTypeMapping(Person.class);
         Person person = new Person("bob", "Uncle Bob");
 
         System.out.println("Bob's properties:");
