@@ -15,7 +15,10 @@ import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.JaversExtendedRepository;
-import org.javers.repository.jql.*;
+import org.javers.repository.jql.GlobalIdDTO;
+import org.javers.repository.jql.JqlQuery;
+import org.javers.repository.jql.QueryBuilder;
+import org.javers.repository.jql.QueryRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +53,7 @@ class JaversCore implements Javers {
         this.globalIdFactory = globalIdFactory;
     }
 
+    @Override
     public Commit commit(String author, Object currentVersion) {
         argumentsAreNotNull(author, currentVersion);
 
@@ -60,6 +64,7 @@ class JaversCore implements Javers {
         return commit;
     }
 
+    @Override
     public Commit commitShallowDelete(String author, Object deleted) {
         argumentsAreNotNull(author, deleted);
 
@@ -70,6 +75,7 @@ class JaversCore implements Javers {
         return commit;
     }
 
+    @Override
     public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId) {
         argumentsAreNotNull(author, globalId);
 
@@ -80,16 +86,19 @@ class JaversCore implements Javers {
         return commit;
     }
 
+    @Override
     public Diff compare(Object oldVersion, Object currentVersion) {
         argumentsAreNotNull(oldVersion, currentVersion);
 
         return diffFactory.compare(oldVersion, currentVersion);
     }
 
+    @Override
     public Diff initial(Object newDomainObject) {
         return diffFactory.initial(newDomainObject);
     }
 
+    @Override
     public String toJson(Diff diff) {
         return jsonConverter.toJson(diff);
     }
@@ -108,6 +117,7 @@ class JaversCore implements Javers {
      * TODO: deprecate
      */
     @Deprecated
+    @Override
     public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit) {
         return queryRunner.queryForSnapshots(QueryBuilder.byGlobalIdDTO(globalId).limit(limit).build());
     }
@@ -116,6 +126,7 @@ class JaversCore implements Javers {
      * TODO: deprecate
      */
     @Deprecated
+    @Override
     public List<Change> getChangeHistory(GlobalIdDTO globalId, int limit) {
         return queryRunner.queryForChanges(QueryBuilder.byGlobalIdDTO(globalId).limit(limit).build());
     }
@@ -133,10 +144,12 @@ class JaversCore implements Javers {
         return queryRunner.runQueryForLatestSnapshot(globalId);
     }
 
+    @Override
     public JsonConverter getJsonConverter() {
         return jsonConverter;
     }
 
+    @Override
     public <T> T processChangeList(List<Change> changes, ChangeProcessor<T> changeProcessor){
         argumentsAreNotNull(changes, changeProcessor);
 
@@ -144,14 +157,13 @@ class JaversCore implements Javers {
         return changeProcessor.result();
     }
 
+    @Override
     public IdBuilder idBuilder() {
         return new IdBuilder(globalIdFactory);
     }
 
     @Override
-    public JaversType getTypeMapping(Class<?> clazz) {
-        return typeMapper.getJaversType(clazz);
+    public <T extends JaversType> T getTypeMapping(Class<?> clientsClass) {
+        return (T) typeMapper.getJaversType(clientsClass);
     }
-
-
 }

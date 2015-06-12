@@ -25,8 +25,9 @@ dependencies {
     testCompile 'org.springframework:spring-test:3.2.2.RELEASE'
     testCompile 'org.springframework.data:spring-data-jpa:1.7.2.RELEASE'
 
-    testCompile 'org.springframework.data:spring-data-mongodb:1.6.2.RELEASE'
-    testCompile 'com.github.fakemongo:fongo:1.5.8'
+    testCompile 'org.springframework.data:spring-data-mongodb:1.7.0.RELEASE'
+    testCompile 'com.github.fakemongo:fongo:2.0.0'
+    testCompile 'org.mongodb:mongo-java-driver:3.0.1'
 
     testCompile project(':javers-persistence-mongo')
 }

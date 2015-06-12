@@ -79,6 +79,9 @@ public class GlobalIdFactory {
      * if item is already instance of GlobalId - returns it.
      */
     public Object dehydrate(Object item, JaversType targetType, OwnerContext context){
+        if (item == null) {
+            return null;
+        }
         if (!(item instanceof GlobalId) && targetType instanceof ManagedType) {
             return createId(item, context);
         } else {

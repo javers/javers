@@ -1,12 +1,42 @@
 package org.javers.core.diff.appenders.levenshtein
 
+import org.javers.core.diff.appenders.AbstractDiffAppendersTest
 import org.javers.core.model.DummyUser
+import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
 
 import static org.javers.core.diff.appenders.ContainerChangeAssert.assertThat
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
-class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
+class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
+
+    def "should recognise that entity lists as equal"() {
+
+        when:
+        def leftNode =  new SnapshotEntity(id:1, listOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
+        def rightNode = new SnapshotEntity(id:1, listOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
+
+        def change = levenshteinListChangeAppender().calculateChanges(
+                realNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "listOfEntities"))
+
+        then:
+        !change
+    }
+
+    def "should compare entity lists using GlobalId"() {
+
+        when:
+        def added = new SnapshotEntity(id:3)
+        def leftNode =  new SnapshotEntity(id:1, listOfEntities: [new SnapshotEntity(id:2)])
+        def rightNode = new SnapshotEntity(id:1, listOfEntities: [new SnapshotEntity(id:2), added])
+
+        def change = levenshteinListChangeAppender().calculateChanges(
+                realNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "listOfEntities"))
+
+        then:
+        assertThat(change).hasSize(1)
+                          .hasValueAdded(1, added)
+    }
 
     @Unroll
     def "should find #changeDesc element at the beginning of the list"() {
@@ -29,7 +59,7 @@ class LevenshteinListChangeAppenderTest extends AbstractLevenshteinListTest {
         [1, 2, 3] | [9, 2, 3] | "changed"  || {it -> assertThat(it).hasValueChange(0, 1, 9)}
     }
 
-    def "should recognise that lists as equal"() {
+    def "should recognise that integer lists as equal"() {
 
         when:
         def leftNode = dummyUser().withIntegerList([1, 2, 3]).build()

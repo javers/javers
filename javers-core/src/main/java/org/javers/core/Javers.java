@@ -13,6 +13,7 @@ import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
@@ -191,8 +192,9 @@ public interface Javers {
     /**
      * If you are serializing JaVers objects like
      * {@link Commit}, {@link Change}, {@link Diff} or {@link CdoSnapshot} to JSON, use this JsonConverter.
-     * For example:
+     * <br/><br/>
      *
+     * For example:
      * <pre>
      * javers.getJsonConverter().toJson(changes);
      * </pre>
@@ -252,7 +254,63 @@ public interface Javers {
     @Deprecated
     Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId);
 
-    JaversType getTypeMapping(Class<?> clazz);
+    /**
+     * Use JaversTypes, if you want to: <br/>
+     * - describe your class in the context of JaVers domain model mapping, <br/>
+     * - use JaVers Reflection API to conveniently access your object properties
+     *  (instead of awkward java.lang.reflect API).
+     *
+     * <br/><br/>
+     *
+     * <b>Class describe example</b>.
+     * You can pretty-print JaversType of your class and
+     * check if mapping is correct.
+     * <pre>
+     * class Person {
+     *     &#64;Id int id;
+     *     &#64;Transient String notImportantField;
+     *     String name;
+     * }
+     * </pre>
+     *
+     * Calling
+     * <pre>
+     * System.out.println( javers.getTypeMapping(Person.class).prettyPrint() );
+     * </pre>
+     *
+     * prints:
+     * <pre>
+     * EntityType{
+     *   baseType: org.javers.core.examples.Person
+     *   managedProperties:
+     *      Field int id; //declared in: Person
+     *      Field String name; //declared in: Person
+     *   idProperty: login
+     * }
+     * </pre>
+     *
+     * <b>Property access example</b>.
+     * You can list object property values using {@link Property} abstraction.
+     * <pre>
+     * Javers javers = JaversBuilder.javers().build();
+     * ManagedType jType = javers.getTypeMapping(Person.class);
+     * Person person = new Person("bob", "Uncle Bob");
+     *
+     * System.out.println("Bob's properties:");
+     * for (Property p : jType.getManagedClass().getProperties()){
+     *     Object value = p.get(person);
+     *     System.out.println( "property:" + p.getName() + ", value:" + value );
+     * }
+     * </pre>
+     *
+     * prints:
+     * <pre>
+     * Bob's properties:
+     * property:login, value:bob
+     * property:name, value:Uncle Bob
+     * </pre>
+     */
+    <T extends JaversType> T getTypeMapping(Class<?> clientsClass);
 
     IdBuilder idBuilder();
 

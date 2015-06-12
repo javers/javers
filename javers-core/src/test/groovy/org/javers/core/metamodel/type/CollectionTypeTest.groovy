@@ -53,12 +53,12 @@ class CollectionTypeTest extends Specification{
         cType.itemType == String
     }
 
-    def "should scan nested generic type from type parameter" () {
+    def "should scan nested generic type from Set type parameter" () {
         given:
         def genericWithArgument = getFieldFromClass(Dummy, "nestedParametrizedType").genericType
 
         when:
-        def cType = new ListType(genericWithArgument)
+        def cType = new SetType(genericWithArgument)
 
         then:
         cType.baseJavaType == new TypeToken< Set<ThreadLocal<String>> >(){}.type

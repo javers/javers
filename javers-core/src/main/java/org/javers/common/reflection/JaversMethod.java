@@ -3,6 +3,8 @@ package org.javers.common.reflection;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import static org.javers.common.string.ToStringBuilder.typeName;
+
 /**
  * @author bartosz walacik
  */
@@ -41,7 +43,7 @@ public class JaversMethod extends JaversMember<Method> {
 
     @Override
     public String toString() {
-        return "Method " + getGenericType()+" " + getDeclaringClass().getSimpleName()+"."+name() +"();";
+        return "Method " + typeName(getGenericType())+" " + name() +"; //declared in: " +getDeclaringClass().getSimpleName();
     }
 
     /**
