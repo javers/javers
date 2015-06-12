@@ -10,7 +10,7 @@ import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 
@@ -48,12 +48,12 @@ public class JaversAuditableRepositoryAspect {
         javersCommitAdvice.commitMethodArguments(pjp);
     }
 
-    @After("execution(public * delete(..)) && this(org.springframework.data.repository.CrudRepository)")
+    @After("execution(public * delete(..)) && this(org.springframework.data.repository.Repository)")
     public void onDeleteExecuted(JoinPoint pjp)  {
         onVersionEvent(pjp, deleteHandler);
     }
 
-    @After("execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)")
+    @After("execution(public * save(..)) && this(org.springframework.data.repository.Repository)")
     public void onSaveExecuted(JoinPoint pjp) {
         onVersionEvent(pjp, saveHandler);
     }
@@ -76,7 +76,7 @@ public class JaversAuditableRepositoryAspect {
 
     private Optional<Class> getRepositoryInterface(JoinPoint pjp) {
         for (Class i : pjp.getTarget().getClass().getInterfaces()) {
-            if (i.isAnnotationPresent(JaversSpringDataAuditable.class) && CrudRepository.class.isAssignableFrom(i)) {
+            if (i.isAnnotationPresent(JaversSpringDataAuditable.class) && Repository.class.isAssignableFrom(i)) {
                 return Optional.of(i);
             }
         }
