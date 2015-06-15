@@ -10,34 +10,47 @@ import org.javers.hibernate.integration.entity.*
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class HibernateProxyManagerSpec extends Specification {
 
     @Shared
     AnnotationConfigApplicationContext context
 
-    def "should unproxy hibernate entity with Field MappingType and save it to Javers repository"() {
+    @Unroll
+    def "should unproxy hibernate entity with Field MappingType when modPointLevel is #modPointLevel and savePointLevel is #savePointLevel"() {
         given:
         context = new AnnotationConfigApplicationContext(HibernateConfig, JaversFieldProxyManagerConfig)
         def javers = context.getBean(Javers)
         def repository = context.getBean(PersonCrudRepository)
 
-        def person1 = new Person("1", "kaz")
-        def person2 = new Person("2", "pawel")
-        person1.boss = person2
-        repository.save(person2)
-        repository.save(person1)
+        def developer = new Person("0", "kaz")
+        def manager =   new Person("1", "pawel")
+        def director =  new Person("2", "Steve")
+        developer.boss = manager
+        manager.boss = director
+        repository.save([director, manager, developer])
 
-        def person = repository.findOne("1")
-        assert person.boss instanceof HibernateProxy
+        def loadedDeveloper = repository.findOne(developer.id)
+
+        def proxy = loadedDeveloper.getBoss(modPointLevel)
+        assert proxy instanceof HibernateProxy
+        assert !Hibernate.isInitialized(proxy)
 
         when:
-        person.name = "bartosz"
-        repository.save(person)
+        proxy.name = "New Name"
+        def savePoint = loadedDeveloper.getBoss(savePointLevel)
+        println "altered proxy: " + developer.getBoss(modPointLevel) +" ..."
+        println "save point:    " + developer.getBoss(savePointLevel) +" ..."
+        repository.save(savePoint)
 
         then:
-        def snapshot = javers.getLatestSnapshot("1", Person)
-        snapshot.get().getPropertyValue("boss")
+        def snapshot = javers.getLatestSnapshot(proxy.id, Person).get
+        snapshot.getPropertyValue("name") == "New Name"
+
+        where:
+        savePointLevel <<     [0, 1, 0, 1]
+        modPointLevel  <<     [1, 1, 2, 2]
     }
 
     def "should unproxy hibernate entity with Bean MappingType and save it to Javers repository"() {

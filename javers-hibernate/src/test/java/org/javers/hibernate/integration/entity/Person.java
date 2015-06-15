@@ -1,5 +1,8 @@
 package org.javers.hibernate.integration.entity;
 
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
+
 import javax.persistence.*;
 
 @Entity
@@ -24,6 +27,16 @@ public class Person {
         return boss;
     }
 
+    public Person getBoss(int level) {
+        if (level == 0){
+            return this;
+        }
+        if (level == 1){
+            return boss;
+        }
+        return boss.getBoss(level-1);
+    }
+
     public void setBoss(Person boss) {
         this.boss = boss;
     }
@@ -41,7 +54,6 @@ public class Person {
         return "Person{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", boss=" + boss +
                 '}';
     }
 }
