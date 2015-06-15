@@ -1,5 +1,6 @@
 package org.javers.hibernate.integration
 
+import org.hibernate.Hibernate
 import org.hibernate.proxy.HibernateProxy
 import org.javers.core.Javers
 import org.javers.hibernate.integration.config.HibernateConfig
@@ -15,7 +16,7 @@ class HibernateProxyManagerSpec extends Specification {
     @Shared
     AnnotationConfigApplicationContext context
 
-    def "should unproxy hibernate entity with Field Mapping Type and save it to Javers repository"() {
+    def "should unproxy hibernate entity with Field MappingType and save it to Javers repository"() {
         given:
         context = new AnnotationConfigApplicationContext(HibernateConfig, JaversFieldProxyManagerConfig)
         def javers = context.getBean(Javers)
@@ -39,7 +40,7 @@ class HibernateProxyManagerSpec extends Specification {
         snapshot.get().getPropertyValue("boss")
     }
 
-    def "should unproxy hibernate entity with Bean Mapping Type and save it to Javers repository"() {
+    def "should unproxy hibernate entity with Bean MappingType and save it to Javers repository"() {
         given:
         context = new AnnotationConfigApplicationContext(HibernateConfig, JaversBeanProxyManagerConfig)
         def javers = context.getBean(Javers)
@@ -53,15 +54,14 @@ class HibernateProxyManagerSpec extends Specification {
 
         def book = ebookRepository.findOne("1")
         assert book.author instanceof HibernateProxy
+        assert !Hibernate.isInitialized(book.author)
 
         when:
-        book.title = "Game of Thrones"
-        book.comments = ["very bad"]
-        ebookRepository.save(book)
+        book.author.name = "kazik"
+        ebookRepository.save(book.author)
 
         then:
-        def snapshot = javers.getLatestSnapshot("1", Ebook)
-        snapshot.get().getPropertyValue("author")
-        snapshot.get().getPropertyValue("comments")
+        def snapshot = javers.getLatestSnapshot("1", Author).get()
+        snapshot.getPropertyValue("name") == "kazik"
     }
 }
