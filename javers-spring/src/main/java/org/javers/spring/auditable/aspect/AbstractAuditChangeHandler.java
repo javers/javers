@@ -16,10 +16,6 @@ abstract class AbstractAuditChangeHandler implements AuditChangeHandler {
         this.authorProvider = authorProvider;
     }
 
-    protected boolean isDomainClass(RepositoryMetadata metadata, Object o) {
-        return metadata.getDomainType().isAssignableFrom(o.getClass());
-    }
-
     protected boolean isIdClass(RepositoryMetadata metadata, Object o) {
         return metadata.getIdType().isAssignableFrom(o.getClass());
     }

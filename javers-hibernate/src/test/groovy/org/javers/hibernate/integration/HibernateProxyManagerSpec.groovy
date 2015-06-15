@@ -2,8 +2,9 @@ package org.javers.hibernate.integration
 
 import org.hibernate.proxy.HibernateProxy
 import org.javers.core.Javers
-import org.javers.hibernate.integration.config.JaversBeanProxyManagerApplicationConfig
-import org.javers.hibernate.integration.config.JaversProxyManagerApplicationConfig
+import org.javers.hibernate.integration.config.HibernateConfig
+import org.javers.hibernate.integration.config.JaversBeanProxyManagerConfig
+import org.javers.hibernate.integration.config.JaversFieldProxyManagerConfig
 import org.javers.hibernate.integration.entity.*
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
@@ -16,7 +17,7 @@ class HibernateProxyManagerSpec extends Specification {
 
     def "should unproxy hibernate entity with Field Mapping Type and save it to Javers repository"() {
         given:
-        context = new AnnotationConfigApplicationContext(JaversProxyManagerApplicationConfig)
+        context = new AnnotationConfigApplicationContext(HibernateConfig, JaversFieldProxyManagerConfig)
         def javers = context.getBean(Javers)
         def repository = context.getBean(PersonCrudRepository)
 
@@ -40,7 +41,7 @@ class HibernateProxyManagerSpec extends Specification {
 
     def "should unproxy hibernate entity with Bean Mapping Type and save it to Javers repository"() {
         given:
-        context = new AnnotationConfigApplicationContext(JaversBeanProxyManagerApplicationConfig)
+        context = new AnnotationConfigApplicationContext(HibernateConfig, JaversBeanProxyManagerConfig)
         def javers = context.getBean(Javers)
         def ebookRepository = context.getBean(EbookCrudRepository)
         def authorRepository = context.getBean(AuthorCrudRepository)

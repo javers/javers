@@ -34,15 +34,4 @@ class OnSaveAuditChangeHandlerTest extends Specification {
         1 * javers.commit(AUTHOR_NAME, domainObject)
 
     }
-
-    def "should fail to commit new version when argument is not a valid domain object"() {
-        when:
-        sut.handle(repositoryMetadata, "foo")
-
-        then:
-        def ex = thrown(IllegalArgumentException.class)
-        ex.message.startsWith("Domain object expected")
-
-        0 * javers.commit(_, _)
-    }
 }
