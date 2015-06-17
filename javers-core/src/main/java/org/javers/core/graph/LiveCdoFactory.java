@@ -8,16 +8,16 @@ import org.javers.core.metamodel.object.*;
 public class LiveCdoFactory implements CdoFactory {
 
     private final GlobalIdFactory globalIdFactory;
-    private GraphFactoryHook graphFactoryHook;
+    private ObjectAccessHook objectAccessHook;
 
-    public LiveCdoFactory(GlobalIdFactory globalIdFactory, GraphFactoryHook graphFactoryHook) {
+    public LiveCdoFactory(GlobalIdFactory globalIdFactory, ObjectAccessHook objectAccessHook) {
         this.globalIdFactory = globalIdFactory;
-        this.graphFactoryHook = graphFactoryHook;
+        this.objectAccessHook = objectAccessHook;
     }
 
     @Override
     public Cdo create (Object wrappedCdo, OwnerContext owner){
-        wrappedCdo = graphFactoryHook.beforeAdd(wrappedCdo);
+        wrappedCdo = objectAccessHook.access(wrappedCdo);
         GlobalId globalId = globalIdFactory.createId(wrappedCdo, owner);
         return new CdoWrapper(wrappedCdo, globalId);
     }

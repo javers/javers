@@ -4,7 +4,7 @@ import org.javers.core.diff.DiffFactory
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.appenders.SimpleListChangeAppender
 import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender
-import org.javers.core.graph.GraphFactoryHook
+import org.javers.core.graph.ObjectAccessHook
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
 import org.javers.core.metamodel.property.PropertyScanner
@@ -74,14 +74,14 @@ class JaversBuilderTest extends Specification {
 
     def "should contain GraphFactoryHook when given"() {
         given:
-        def graphFactoryHook = Stub(GraphFactoryHook)
+        def graphFactoryHook = Stub(ObjectAccessHook)
         JaversBuilder javersBuilder = javers().withGraphFactoryHook(graphFactoryHook)
 
         when:
         javersBuilder.build()
 
         then:
-        javersBuilder.getContainerComponent(GraphFactoryHook) == graphFactoryHook
+        javersBuilder.getContainerComponent(ObjectAccessHook) == graphFactoryHook
     }
 
     def "should contain FieldBasedPropertyScanner when Field style"() {

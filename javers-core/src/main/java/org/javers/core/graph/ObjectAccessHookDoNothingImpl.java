@@ -3,9 +3,9 @@ package org.javers.core.graph;
 /**
  * @author bartosz.walacik
  */
-class GraphFactoryHookDoNothingImpl implements GraphFactoryHook {
+class ObjectAccessHookDoNothingImpl implements ObjectAccessHook {
     @Override
-    public <T> T beforeAdd(T entity) {
+    public <T> T access(T entity) {
         return entity;
     }
 }

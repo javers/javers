@@ -2,14 +2,21 @@ package org.javers.hibernate;
 
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
-import org.javers.core.graph.GraphFactoryHook;
+import org.javers.core.graph.ObjectAccessHook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class HibernateProxyManager implements GraphFactoryHook {
+public class HibernateProxyManager implements ObjectAccessHook {
 
-    public <T> T beforeAdd(T entity) {
-        Hibernate.initialize(entity);
+    private static final Logger logger = LoggerFactory.getLogger(HibernateProxyManager.class);
+
+    public <T> T access(T entity) {
         if (entity instanceof HibernateProxy) {
-            return (T) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
+            Hibernate.initialize(entity);
+            HibernateProxy proxy = (HibernateProxy) entity;
+            T unproxed = (T) proxy.getHibernateLazyInitializer().getImplementation();
+            logger.info("unproxying instance of " + entity.getClass().getSimpleName() + " to " + unproxed.getClass().getSimpleName());
+            return unproxed;
         }
         return entity;
     }

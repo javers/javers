@@ -19,6 +19,6 @@ public class GraphFactoryModule extends InstantiatingModule {
                LiveCdoFactory.class,
                LiveGraphFactory.class,
                ObjectGraphBuilder.class,
-               GraphFactoryHookDoNothingImpl.class);
+               ObjectAccessHookDoNothingImpl.class);
     }
 }

@@ -8,7 +8,7 @@ import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
-import org.javers.core.graph.GraphFactoryHook;
+import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
@@ -278,9 +278,9 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    public JaversBuilder withGraphFactoryHook(GraphFactoryHook graphFactoryHook) {
-        removeComponent(GraphFactoryHook.class);
-        bindComponent(GraphFactoryHook.class, graphFactoryHook);
+    public JaversBuilder withGraphFactoryHook(ObjectAccessHook objectAccessHook) {
+        removeComponent(ObjectAccessHook.class);
+        bindComponent(ObjectAccessHook.class, objectAccessHook);
         return this;
     }
 

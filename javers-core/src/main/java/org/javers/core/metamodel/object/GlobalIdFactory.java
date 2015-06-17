@@ -3,7 +3,7 @@ package org.javers.core.metamodel.object;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
-import org.javers.core.graph.GraphFactoryHook;
+import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.clazz.ValueObject;
@@ -18,11 +18,11 @@ import org.javers.repository.jql.GlobalIdDTO;
 public class GlobalIdFactory {
 
     private final TypeMapper typeMapper;
-    private GraphFactoryHook graphFactoryHook;
+    private ObjectAccessHook objectAccessHook;
 
-    public GlobalIdFactory(TypeMapper typeMapper, GraphFactoryHook graphFactoryHook) {
+    public GlobalIdFactory(TypeMapper typeMapper, ObjectAccessHook objectAccessHook) {
         this.typeMapper = typeMapper;
-        this.graphFactoryHook = graphFactoryHook;
+        this.objectAccessHook = objectAccessHook;
     }
 
     public GlobalId createId(Object targetCdo) {
@@ -35,7 +35,7 @@ public class GlobalIdFactory {
     public GlobalId createId(Object targetCdo, OwnerContext owner) {
         Validate.argumentsAreNotNull(targetCdo);
 
-        targetCdo = graphFactoryHook.beforeAdd(targetCdo);
+        targetCdo = objectAccessHook.access(targetCdo);
         ManagedClass targetManagedClass = getManagedClassOf(targetCdo);
 
         if (targetManagedClass instanceof Entity) {

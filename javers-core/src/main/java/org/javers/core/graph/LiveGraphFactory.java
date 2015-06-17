@@ -13,12 +13,12 @@ import java.util.Set;
 public class LiveGraphFactory {
     private final TypeMapper typeMapper;
     private final LiveCdoFactory liveCdoFactory;
-    private GraphFactoryHook graphFactoryHook;
+    private ObjectAccessHook objectAccessHook;
 
-    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, GraphFactoryHook graphFactoryHook) {
+    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, ObjectAccessHook objectAccessHook) {
         this.typeMapper = typeMapper;
         this.liveCdoFactory = liveCdoFactory;
-        this.graphFactoryHook = graphFactoryHook;
+        this.objectAccessHook = objectAccessHook;
     }
 
     /**
