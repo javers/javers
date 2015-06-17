@@ -72,10 +72,10 @@ class JaversBuilderTest extends Specification {
         javers1 != javers2
     }
 
-    def "should contain GraphFactoryHook when given"() {
+    def "should contain ObjectAccessHook when given"() {
         given:
         def graphFactoryHook = Stub(ObjectAccessHook)
-        JaversBuilder javersBuilder = javers().withGraphFactoryHook(graphFactoryHook)
+        JaversBuilder javersBuilder = javers().withObjectAccessHook(graphFactoryHook)
 
         when:
         javersBuilder.build()

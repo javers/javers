@@ -12,7 +12,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class HibernateProxyManagerSpec extends Specification {
+class ObjectAccessHookSpec extends Specification {
 
     @Shared
     AnnotationConfigApplicationContext context
@@ -40,8 +40,6 @@ class HibernateProxyManagerSpec extends Specification {
         when:
         proxy.name = "New Name"
         def savePoint = loadedDeveloper.getBoss(savePointLevel)
-        println "altered proxy: " + developer.getBoss(modPointLevel) +" ..."
-        println "save point:    " + developer.getBoss(savePointLevel) +" ..."
         repository.save(savePoint)
 
         then:

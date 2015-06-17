@@ -6,9 +6,9 @@ import org.javers.core.graph.ObjectAccessHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HibernateProxyManager implements ObjectAccessHook {
+public class HibernateUnproxyObjectAccessHook implements ObjectAccessHook {
 
-    private static final Logger logger = LoggerFactory.getLogger(HibernateProxyManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(HibernateUnproxyObjectAccessHook.class);
 
     public <T> T access(T entity) {
         if (entity instanceof HibernateProxy) {

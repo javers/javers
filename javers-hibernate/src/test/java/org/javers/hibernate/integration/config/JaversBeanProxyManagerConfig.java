@@ -2,7 +2,7 @@ package org.javers.hibernate.integration.config;
 
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
-import org.javers.hibernate.HibernateProxyManager;
+import org.javers.hibernate.HibernateUnproxyObjectAccessHook;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
@@ -45,7 +45,7 @@ public class JaversBeanProxyManagerConfig {
         return TransactionalJaversBuilder
                 .javers()
                 .registerJaversRepository(sqlRepository)
-                .withGraphFactoryHook(new HibernateProxyManager())
+                .withObjectAccessHook(new HibernateUnproxyObjectAccessHook())
                 .withMappingStyle(MappingStyle.BEAN)
                 .build();
     }

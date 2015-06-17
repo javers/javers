@@ -278,7 +278,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
-    public JaversBuilder withGraphFactoryHook(ObjectAccessHook objectAccessHook) {
+    public JaversBuilder withObjectAccessHook(ObjectAccessHook objectAccessHook) {
         removeComponent(ObjectAccessHook.class);
         bindComponent(ObjectAccessHook.class, objectAccessHook);
         return this;
