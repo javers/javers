@@ -17,6 +17,8 @@ class OnDeleteAuditChangeHandler extends AbstractAuditChangeHandler {
     public void handle(RepositoryMetadata repositoryMetadata, Object domainObject) {
         if (isIdClass(repositoryMetadata, domainObject)) {
             javers.commitShallowDeleteById(authorProvider.provide(), InstanceIdDTO.instanceId(domainObject, repositoryMetadata.getDomainType()));
+        } else if (isDomainClass(repositoryMetadata, domainObject)) {
+            javers.commitShallowDelete(authorProvider.provide(), domainObject);
         } else {
             throw new IllegalArgumentException("Domain object or object id expected");
         }

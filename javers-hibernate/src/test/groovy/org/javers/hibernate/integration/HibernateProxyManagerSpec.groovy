@@ -45,7 +45,7 @@ class HibernateProxyManagerSpec extends Specification {
         repository.save(savePoint)
 
         then:
-        def snapshot = javers.getLatestSnapshot(proxy.id, Person).get
+        def snapshot = javers.getLatestSnapshot(proxy.id, Person).get()
         snapshot.getPropertyValue("name") == "New Name"
 
         where:

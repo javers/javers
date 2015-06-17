@@ -27,8 +27,6 @@ public class LiveGraphFactory {
     public LiveGraph createLiveGraph(Object handle) {
         Object wrappedHandle = wrapTopLevelContainer(handle);
 
-        graphFactoryHook.beforeAdd(handle);
-
         return new ObjectGraphBuilder(typeMapper, liveCdoFactory).buildGraph(wrappedHandle);
     }
 

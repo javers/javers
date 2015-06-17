@@ -23,6 +23,10 @@ public class Person {
         this.name = name;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public Person getBoss() {
         return boss;
     }
