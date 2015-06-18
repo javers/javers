@@ -4,8 +4,8 @@ import org.hibernate.Hibernate
 import org.hibernate.proxy.HibernateProxy
 import org.javers.core.Javers
 import org.javers.hibernate.integration.config.HibernateConfig
-import org.javers.hibernate.integration.config.JaversBeanProxyManagerConfig
-import org.javers.hibernate.integration.config.JaversFieldProxyManagerConfig
+import org.javers.hibernate.integration.config.JaversBeanHibernateProxyConfig
+import org.javers.hibernate.integration.config.JaversFieldHibernateProxyConfig
 import org.javers.hibernate.integration.entity.*
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
@@ -20,7 +20,7 @@ class ObjectAccessHookSpec extends Specification {
     @Unroll
     def "should unproxy hibernate entity with Field MappingType when modPointLevel is #modPointLevel and savePointLevel is #savePointLevel"() {
         given:
-        context = new AnnotationConfigApplicationContext(HibernateConfig, JaversFieldProxyManagerConfig)
+        context = new AnnotationConfigApplicationContext(HibernateConfig, JaversFieldHibernateProxyConfig)
         def javers = context.getBean(Javers)
         def repository = context.getBean(PersonCrudRepository)
 
@@ -53,7 +53,7 @@ class ObjectAccessHookSpec extends Specification {
 
     def "should unproxy hibernate entity with Bean MappingType and save it to Javers repository"() {
         given:
-        context = new AnnotationConfigApplicationContext(HibernateConfig, JaversBeanProxyManagerConfig)
+        context = new AnnotationConfigApplicationContext(HibernateConfig, JaversBeanHibernateProxyConfig)
         def javers = context.getBean(Javers)
         def ebookRepository = context.getBean(EbookCrudRepository)
         def authorRepository = context.getBean(AuthorCrudRepository)
