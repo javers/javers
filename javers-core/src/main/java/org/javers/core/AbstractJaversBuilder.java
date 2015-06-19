@@ -51,7 +51,6 @@ public abstract class AbstractJaversBuilder {
         container.addComponent(classOrInstance);
     }
 
-
     protected void removeComponent(Object classOrInstance) {
         checkIfBuilt();
         container.removeComponent(classOrInstance);
