@@ -57,6 +57,11 @@ public abstract class AbstractJaversBuilder {
         container.addComponent(componentKey, implementationOrInstance);
     }
 
+    protected void removeComponent(Object classOrInstance) {
+        checkIfBuilt();
+        container.removeComponent(classOrInstance);
+    }
+    
     private void checkIfNotBuilt() {
         if (isBuilt()) {
             throw new JaversException(JaversExceptionCode.ALREADY_BUILT);

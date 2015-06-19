@@ -3,7 +3,7 @@ dependencies {
     compile 'org.mongodb:mongo-java-driver:3.0.1'
 
     testCompile 'com.google.guava:guava:18.0'
-    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
+    testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile 'com.github.fakemongo:fongo:2.0.0'
 }
