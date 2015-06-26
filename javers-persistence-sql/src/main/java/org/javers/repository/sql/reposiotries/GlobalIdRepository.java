@@ -59,8 +59,8 @@ public class GlobalIdRepository {
     }
 
     private Optional<Long> findGlobalIdPk(GlobalId globalId){
-        final String GLOBAL_ID_WITH_CDO_CLASS = GLOBAL_ID_TABLE_NAME + " as g INNER JOIN " +
-                     CDO_CLASS_TABLE_NAME + " as c ON " + CDO_CLASS_PK + " = " + GLOBAL_ID_CLASS_FK;
+        final String GLOBAL_ID_WITH_CDO_CLASS = GLOBAL_ID_TABLE_NAME + " g INNER JOIN " +
+                     CDO_CLASS_TABLE_NAME + " c ON " + CDO_CLASS_PK + " = " + GLOBAL_ID_CLASS_FK;
 
         SelectQuery query = polyJdbc.query().select(GLOBAL_ID_PK);
 

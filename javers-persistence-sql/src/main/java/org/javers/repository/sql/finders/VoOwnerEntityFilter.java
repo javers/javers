@@ -24,9 +24,9 @@ public class VoOwnerEntityFilter extends ManagedClassFilter {
                 "g." + GLOBAL_ID_FRAGMENT + ", " +
                 "g." + GLOBAL_ID_OWNER_ID_FK + ", " +
                 "g_c." + CDO_CLASS_QUALIFIED_NAME + ", " +
-                "o." + GLOBAL_ID_LOCAL_ID + " as owner_" + GLOBAL_ID_LOCAL_ID + ", " +
-                "o." + GLOBAL_ID_FRAGMENT + " as owner_" + GLOBAL_ID_FRAGMENT + ", " +
-                "o_c." + CDO_CLASS_QUALIFIED_NAME + " as owner_" + CDO_CLASS_QUALIFIED_NAME;
+                "o." + GLOBAL_ID_LOCAL_ID + " owner_" + GLOBAL_ID_LOCAL_ID + ", " +
+                "o." + GLOBAL_ID_FRAGMENT + " owner_" + GLOBAL_ID_FRAGMENT + ", " +
+                "o_c." + CDO_CLASS_QUALIFIED_NAME + " owner_" + CDO_CLASS_QUALIFIED_NAME;
     }
 
     void addWhere(SelectQuery query) {

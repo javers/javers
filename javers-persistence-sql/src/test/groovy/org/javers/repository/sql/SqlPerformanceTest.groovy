@@ -23,7 +23,8 @@ class SqlPerformanceTest extends Specification{
     def setup() {
         Server.createTcpServer().start()
         //dbConnection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test;TRACE_LEVEL_SYSTEM_OUT=2")
-        dbConnection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/javers", "javers", "javers")
+        //dbConnection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/javers", "javers", "javers")
+        dbConnection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "polly", "polly");
 
         dbConnection.setAutoCommit(false)
 
@@ -32,7 +33,7 @@ class SqlPerformanceTest extends Specification{
         def sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(connectionProvider)
-                .withDialect(DialectName.POSTGRES).build()
+                .withDialect(DialectName.ORACLE).build()
         javers = javers().registerJaversRepository(sqlRepository).build()
 
         clearTables()
@@ -98,10 +99,10 @@ class SqlPerformanceTest extends Specification{
     }
 
     def clearTables(){
-        execute("delete  from jv_snapshot;")
-        execute("delete  from jv_commit;")
-        execute("delete  from jv_global_id;")
-        execute("delete  from jv_cdo_class;")
+        execute("delete  from jv_snapshot")
+        execute("delete  from jv_commit")
+        execute("delete  from jv_global_id")
+        execute("delete  from jv_cdo_class")
     }
 
     def execute(String sql){

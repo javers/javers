@@ -1,6 +1,10 @@
+repositories {
+    mavenLocal()   //TODO remove
+}
+
 dependencies {
     compile project(':javers-core')
-    compile 'org.polyjdbc:polyjdbc:0.5.0'
+    compile 'org.polyjdbc:polyjdbc:0.5.1-SNAPSHOT' //TODO release version
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
 
@@ -16,7 +20,17 @@ dependencies {
 
 task integrationTest(type: Test) {
     filter {
-        includeTestsMatching 'org.javers.repository.sql.integration.**'
+        includeTestsMatching 'org.javers.repository.sql.integration.*'
+    }
+}
+
+task integrationTestOracle(type: Test) {
+    dependencies{
+        testCompile files('../libs/ojdbc6.jar') //ojdbc6.jar should be manually copied to project /libs and .gitingored
+        testCompile files('../libs/xdb6.jar')
+    }
+    filter {
+        includeTestsMatching 'org.javers.repository.sql.integration.oracle.*'
     }
 }
 
