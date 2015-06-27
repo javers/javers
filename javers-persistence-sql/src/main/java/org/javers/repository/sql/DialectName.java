@@ -8,20 +8,12 @@ import org.polyjdbc.core.dialect.*;
  * @author bartosz walacik
  */
 public enum DialectName {
-    H2("org.h2.Driver"),
-    POSTGRES("org.postgresql.Driver"),
-    ORACLE("oracle.jdbc.OracleDriver"),
-    MYSQL("com.mysql.jdbc.Driver");
-
-    private String driverClass;
-
-    private DialectName(String driverClass) {
-        this.driverClass = driverClass;
-    }
-
-    public String getDriverClass() {
-        return driverClass;
-    }
+    H2,
+    POSTGRES,
+    ORACLE,
+    MYSQL,
+    /** Microsoft SQL Server*/
+    MSSQL;
 
     public DialectRegistry getPolyDialectName() {
         return DialectRegistry.valueOf(this.name());

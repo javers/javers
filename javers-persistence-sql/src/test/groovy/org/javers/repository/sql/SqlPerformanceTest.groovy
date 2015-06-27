@@ -23,8 +23,9 @@ class SqlPerformanceTest extends Specification{
     def setup() {
         Server.createTcpServer().start()
         //dbConnection = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:test;TRACE_LEVEL_SYSTEM_OUT=2")
-        //dbConnection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/javers", "javers", "javers")
-        dbConnection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "polly", "polly");
+        dbConnection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/javers", "javers", "javers")
+        //dbConnection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "polly", "polly");
+        //dbConnection = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;DatabaseName=polly", "polly", "polly");
 
         dbConnection.setAutoCommit(false)
 
@@ -33,7 +34,7 @@ class SqlPerformanceTest extends Specification{
         def sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(connectionProvider)
-                .withDialect(DialectName.ORACLE).build()
+                .withDialect(DialectName.POSTGRES).build()
         javers = javers().registerJaversRepository(sqlRepository).build()
 
         clearTables()

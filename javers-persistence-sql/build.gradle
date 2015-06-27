@@ -24,6 +24,15 @@ task integrationTest(type: Test) {
     }
 }
 
+task integrationTestMs(type: Test) {
+    dependencies{
+        testCompile files('../libs/sqljdbc4.jar') //sqljdbc4.jar should be manually copied to project /libs and .gitingored
+    }
+    filter {
+        includeTestsMatching 'org.javers.repository.sql.integration.mssql.*'
+    }
+}
+
 task integrationTestOracle(type: Test) {
     dependencies{
         testCompile files('../libs/ojdbc6.jar') //ojdbc6.jar should be manually copied to project /libs and .gitingored
