@@ -73,26 +73,33 @@ public interface Javers {
     Commit commitShallowDeleteById(String author, GlobalIdDTO globalId);
 
     /**
-     * <p>
+     * <h2>Deep compare</h2>
+     *
      * JaVers core function,
      * deeply compares two arbitrary complex object graphs.
-     * </p>
      *
      * <p>
      * To calculate a diff, just provide two versions of the
-     * same object or handles to two versions of the same object graph.
+     * same Domain Object (Entity or ValueObject)
+     * or handles to two versions of the same object graph.
      * <br/>
-     * The handle could be a root of an aggregate, tree root
-     * or any node in an object graph from where all other nodes are navigable.
+     * The handle could be a root of an Aggregate, tree root
+     * or any node in an Domain Object graph from where all other nodes are navigable.
      * </p>
      *
-     * <p>
-     * This function is used for ad-hoc objects comparing.
+     * <h2>Flat collection compare</h2>
+     * You can also pass object collections here (List, Sets or Maps),
+     * but in this case, JaVers calculates flat collection diff only.
+     * Because it's impossible to determine type of raw collection items, JaVers maps them as Values
+     * and compares using {@link Object#equals(Object)}. <br/>
+     * So if you need to deep compare, wrap collections in some Value Objects.
+     *
+     * <h2>Misc</h2>
+     * <code>compare()</code> function is used for ad-hoc objects comparing.
      * In order to use data auditing feature, call {@link #commit(String, Object)}.
-     * </p>
      *
      * <p>
-     * Diffs can be converted to JSON with {@link #toJson(Diff)}.
+     * Diffs can be converted to JSON with {@link Javers#toJson(Diff)} or pretty-printed with {@link Diff#prettyPrint()}
      * </p>
      *
      * @see <a href="http://javers.org/documentation/diff-examples/">http://javers.org/documentation/diff-examples</a>

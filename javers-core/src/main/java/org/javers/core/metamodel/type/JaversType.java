@@ -112,6 +112,9 @@ public abstract class JaversType {
          return getBaseJavaClass();
      }
 
+    /**
+     * Prints this object to String
+     */
      public final String prettyPrint(){
          return prettyPrintBuilder().build();
      }

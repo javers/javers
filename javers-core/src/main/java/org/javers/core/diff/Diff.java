@@ -80,7 +80,7 @@ public class Diff {
      * Changes that satisfies given filter condition
      */
     public List<Change> getChanges(Predicate<Change> predicate) {
-        return Lists.positiveFilter(changes,predicate);
+        return Lists.positiveFilter(changes, predicate);
     }
 
     public <C extends Change> List<C> getChangesByType(final Class<C> type) {
@@ -107,6 +107,13 @@ public class Diff {
 
     public boolean hasChanges() {
         return !changes.isEmpty();
+    }
+
+    /**
+     * Prints to String list of changes within this Diff
+     */
+    public final String prettyPrint(){
+        return toString();
     }
 
     @Override
