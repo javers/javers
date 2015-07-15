@@ -1,10 +1,6 @@
-repositories {
-    mavenLocal()   //TODO remove
-}
-
 dependencies {
     compile project(':javers-core')
-    compile 'org.polyjdbc:polyjdbc:0.5.1-SNAPSHOT' //TODO release version
+    compile 'org.polyjdbc:polyjdbc:0.6.0'
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
 
