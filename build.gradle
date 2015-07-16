@@ -51,6 +51,20 @@ subprojects {
         testCompile 'org.easytesting:fest-assert-core:2.0M10'
     }
 
+    test {
+        testLogging {
+            // set options for log level LIFECYCLE
+            events "failed"
+            exceptionFormat "full"
+
+            // set options for log level DEBUG
+            info {
+                events "started", "skipped", "failed"
+                exceptionFormat "full"
+            }
+        }
+    }
+
     task wrapper(type: Wrapper) {
         gradleVersion = '2.5'
     }
