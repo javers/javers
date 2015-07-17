@@ -51,10 +51,6 @@ subprojects {
         testCompile 'org.easytesting:fest-assert-core:2.0M10'
     }
 
-    test {
-        testLogging.showStandardStreams = true
-    }
-
     task wrapper(type: Wrapper) {
         gradleVersion = '2.5'
     }
