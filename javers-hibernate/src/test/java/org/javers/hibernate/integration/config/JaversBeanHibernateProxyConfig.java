@@ -29,13 +29,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories(basePackages = "org.javers.hibernate")
 public class JaversBeanHibernateProxyConfig {
 
-    //.. JaVers setup ..
-
     /**
      * Creates JaVers instance with {@link JaversSqlRepository}
      */
     @Bean
     public Javers javers(JpaHibernateConnectionProvider jpaHibernateConnectionProvider) {
+
         JaversSqlRepository sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(jpaHibernateConnectionProvider)
@@ -50,34 +49,4 @@ public class JaversBeanHibernateProxyConfig {
                 .build();
     }
 
-    /**
-     * Enables Repository auto-audit aspect. <br/>
-     * <p>
-     * Use {@link JaversSpringDataAuditable}
-     * to annotate Spring Data Repositories
-     * or {@link JaversAuditable} for ordinary Repositories.
-     */
-    @Bean
-    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect(Javers javers) {
-        return new JaversAuditableRepositoryAspect(javers, authorProvider());
-    }
-
-    /**
-     * Required by Repository auto-audit aspect. <br/><br/>
-     * <p>
-     * Returns mock implementation for testing.
-     * <br/>
-     * Provide real implementation,
-     * when using Spring Security you can use
-     * {@link org.javers.spring.auditable.SpringSecurityAuthorProvider}.
-     */
-    @Bean
-    public AuthorProvider authorProvider() {
-        return new AuthorProvider() {
-            @Override
-            public String provide() {
-                return "unknown";
-            }
-        };
-    }
 }
