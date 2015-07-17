@@ -16,7 +16,7 @@ dependencies {
 
 task integrationTest(type: Test) {
     filter {
-        includeTestsMatching 'org.javers.repository.sql.integration.*'
+        includeTestsMatching 'org.javers.repository.sql.integration.opendatabases.*'
     }
 }
 
