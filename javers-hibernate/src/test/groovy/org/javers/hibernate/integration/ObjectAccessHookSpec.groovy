@@ -8,19 +8,15 @@ import org.javers.hibernate.integration.config.JaversBeanHibernateProxyConfig
 import org.javers.hibernate.integration.config.JaversFieldHibernateProxyConfig
 import org.javers.hibernate.integration.entity.*
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
-import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class ObjectAccessHookSpec extends Specification {
 
-    @Shared
-    AnnotationConfigApplicationContext context
-
     @Unroll
     def "should unproxy hibernate entity with Field MappingType when modPointLevel is #modPointLevel and savePointLevel is #savePointLevel"() {
         given:
-        context = new AnnotationConfigApplicationContext(HibernateConfig, JaversFieldHibernateProxyConfig)
+        def context = new AnnotationConfigApplicationContext(HibernateConfig, JaversFieldHibernateProxyConfig)
         def javers = context.getBean(Javers)
         def repository = context.getBean(PersonCrudRepository)
 
@@ -53,7 +49,7 @@ class ObjectAccessHookSpec extends Specification {
 
     def "should unproxy hibernate entity with Bean MappingType and save it to Javers repository"() {
         given:
-        context = new AnnotationConfigApplicationContext(HibernateConfig, JaversBeanHibernateProxyConfig)
+        def context = new AnnotationConfigApplicationContext(HibernateConfig, JaversBeanHibernateProxyConfig)
         def javers = context.getBean(Javers)
         def ebookRepository = context.getBean(EbookCrudRepository)
         def authorRepository = context.getBean(AuthorCrudRepository)
