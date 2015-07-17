@@ -1,4 +1,4 @@
-package org.javers.repository.sql.integration
+package org.javers.repository.sql.integration.opendatabases
 
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.JaversSqlRepositoryE2ETest
