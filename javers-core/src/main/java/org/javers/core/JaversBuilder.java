@@ -1,6 +1,7 @@
 package org.javers.core;
 
 import com.google.gson.TypeAdapter;
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
@@ -23,6 +24,7 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueObjectType;
 import org.javers.core.metamodel.type.ValueType;
 import org.javers.core.snapshot.GraphSnapshotModule;
+import org.javers.java8support.Java8AddOns;
 import org.javers.repository.api.InMemoryRepositoryModule;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
@@ -79,6 +81,11 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new CommitFactoryModule(getContainer()));
         addModule(new GraphSnapshotModule(getContainer()));
         addModule(new GraphFactoryModule(getContainer()));
+
+        // bootstrap phase 2: add-ons
+        if (ReflectionUtil.isJava8runtime()){
+            new Java8AddOns().beforeAssemble(this);
+        }
     }
 
     public Javers build() {
@@ -103,7 +110,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
         bootRepository();
 
         Javers javers = getContainerComponent(JaversCore.class);
-        logger.info("JaVers instance is up & ready");
         return javers;
     }
 
