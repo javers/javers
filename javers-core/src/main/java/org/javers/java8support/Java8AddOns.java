@@ -11,5 +11,6 @@ public class Java8AddOns implements JaversBuilderPlugin {
     public void beforeAssemble(JaversBuilder javersBuilder) {
         logger.info("loading Java8 add-ons ...");
         javersBuilder.registerValueTypeAdapter(new LocalDateTypeAdapter());
+        javersBuilder.registerValueTypeAdapter(new LocalDateTimeTypeAdapter());
     }
 }

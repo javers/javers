@@ -2,13 +2,11 @@ package org.javers.core.json;
 
 import com.google.gson.*;
 import org.javers.common.validation.Validate;
-import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
-import org.javers.core.json.typeadapter.joda.LocalDateTypeAdapter;
+import org.javers.core.json.typeadapter.joda.JodaTypeAdapters;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,11 +17,6 @@ import java.util.List;
 public class JsonConverterBuilder {
     public static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
-    private static final JsonTypeAdapter[] BUILT_IN_ADAPTERS = new JsonTypeAdapter[]{
-            new LocalDateTimeTypeAdapter(),
-            new LocalDateTypeAdapter()
-    };
-
     private boolean typeSafeValues = false;
     private TypeMapper typeMapper;
     private GlobalIdFactory globalIdFactory;
@@ -31,7 +24,7 @@ public class JsonConverterBuilder {
 
     public JsonConverterBuilder() {
         this.gsonBuilder = new GsonBuilder();
-        registerJsonTypeAdapters(Arrays.asList(BUILT_IN_ADAPTERS));
+        registerJsonTypeAdapters(JodaTypeAdapters.adapters());
     }
 
     /**

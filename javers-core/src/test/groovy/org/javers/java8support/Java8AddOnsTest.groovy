@@ -6,6 +6,7 @@ import spock.lang.IgnoreIf
 import spock.lang.Specification
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 import static org.javers.core.JaversBuilder.javers
 
@@ -15,14 +16,12 @@ import static org.javers.core.JaversBuilder.javers
 class Java8AddOnsTest extends Specification {
 
     @IgnoreIf({ !ReflectionUtil.isJava8runtime() })
-    def "should register java.time.LocalDate as ValueType"(){
+    def "should register java.time.LocalDate and LocalDateTime as ValueTypes"(){
         given:
         def javers = javers().build()
 
-        when:
-        def jType = javers.getTypeMapping(LocalDate)
-
-        then:
-        jType instanceof ValueType
+        expect:
+        javers.getTypeMapping(LocalDate) instanceof ValueType
+        javers.getTypeMapping(LocalDateTime) instanceof ValueType
     }
 }

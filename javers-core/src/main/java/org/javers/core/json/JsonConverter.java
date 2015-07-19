@@ -5,10 +5,10 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.commit.CdoSnapshotStateDeserializer;
-import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
 import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.TypeMapper;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;
@@ -39,9 +39,8 @@ import java.lang.reflect.Type;
  *     <li> native Gson {@link JsonDeserializer}
  * </ul>
  *
- * Javers provides JsonTypeAdapters for some well known Values like {@link LocalDateTime}.
- * Those adapters are included by default in Javers setup, see {@link JsonConverterBuilder#BUILT_IN_ADAPTERS}
- * <br>
+ * Javers provides JsonTypeAdapters for some well known Values like Joda {@link LocalDateTime},
+ * Joda {@link LocalDate}, java.time.LocalDate, java.time.LocalDateTime
  *
  * @author bartosz walacik
  */

@@ -9,16 +9,17 @@ import java.time.format.DateTimeFormatter;
 /**
  * @author bartosz.walacik
  */
-public class LocalDateTypeAdapter extends BasicStringTypeAdapter<LocalDate> {
+class LocalDateTypeAdapter extends BasicStringTypeAdapter<LocalDate> {
+    private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ISO_DATE;
 
     @Override
     public String serialize(LocalDate sourceValue) {
-        return sourceValue.format(DateTimeFormatter.ISO_DATE);
+        return sourceValue.format(ISO_FORMAT);
     }
 
     @Override
     public LocalDate deserialize(String serializedValue) {
-        return LocalDate.parse(serializedValue, DateTimeFormatter.ISO_DATE);
+        return LocalDate.parse(serializedValue, ISO_FORMAT);
     }
 
     @Override

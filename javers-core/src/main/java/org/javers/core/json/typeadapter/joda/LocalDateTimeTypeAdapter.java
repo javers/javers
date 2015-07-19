@@ -16,7 +16,7 @@ import org.joda.time.format.ISODateTimeFormat;
  *
  * @author bartosz walacik
  */
-public class LocalDateTimeTypeAdapter extends BasicStringTypeAdapter<LocalDateTime> {
+class LocalDateTimeTypeAdapter extends BasicStringTypeAdapter<LocalDateTime> {
     public static final DateTimeFormatter ISO_FORMATTER = ISODateTimeFormat.dateHourMinuteSecond();
 
     @Override
