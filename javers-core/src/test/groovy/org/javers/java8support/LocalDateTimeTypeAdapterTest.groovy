@@ -19,6 +19,5 @@ class LocalDateTimeTypeAdapterTest extends Specification {
         expect:
         adapter.serialize( dateTime ) == "2001-01-31T15:14:13"
         adapter.deserialize("2001-01-31T15:14:13") == dateTime
-
     }
 }

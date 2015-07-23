@@ -134,11 +134,46 @@ class SnapshotFactoryTest extends Specification{
                          valueObjectId(1, SnapshotEntity, "valueObjectRef")]
     }
 
+    def "should record empty Optional"(){
+        given:
+        def cdo = new SnapshotEntity(optionalInteger: Optional.empty())
+
+        when:
+        def snapshot = snapshotFactory.createInitial(cdo, javers.instanceId(cdo), someCommitMetadata())
+
+        then:
+        snapshot.getPropertyValue("optionalInteger") == Optional.empty()
+    }
+
+    @Unroll
+    def "should record Optional of #propertyType"(){
+        when:
+        def snapshot = snapshotFactory.createInitial(cdo, javers.instanceId(cdo), someCommitMetadata())
+
+        then:
+        snapshot.getPropertyValue(propertyName) == expectedVal
+
+        where:
+        propertyType <<  ["Primitive", "Value", "Entity", "ValueObject"]
+        propertyName <<  ["optionalInteger", "optionalDate", "optionalEntity", "optionalValueObject"]
+        cdo << [new SnapshotEntity(optionalInteger: Optional.of(1)),
+                new SnapshotEntity(optionalDate: Optional.of(new LocalDate(2000, 1, 1))),
+                new SnapshotEntity(optionalEntity: Optional.of(new SnapshotEntity(id:1))),
+                new SnapshotEntity(optionalValueObject: Optional.of(new DummyAddress("London")))
+        ]
+        expectedVal <<[
+                Optional.of(1),
+                Optional.of(new LocalDate(2000, 1, 1)),
+                Optional.of(instanceId(2, SnapshotEntity)),
+                Optional.of(valueObjectId(1, SnapshotEntity,"optionalValueObject"))
+        ]
+    }
+
 
     @Unroll
     def "should record #containerType of #propertyType"() {
         when:
-        CdoSnapshot snapshot = snapshotFactory.createInitial(cdo, javers.instanceId(cdo), someCommitMetadata())
+        def snapshot = snapshotFactory.createInitial(cdo, javers.instanceId(cdo), someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal

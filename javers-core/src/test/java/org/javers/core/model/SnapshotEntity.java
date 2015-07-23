@@ -1,5 +1,6 @@
 package org.javers.core.model;
 
+import java.util.Optional;
 import org.joda.time.LocalDate;
 import javax.persistence.Id;
 import java.math.BigDecimal;
@@ -41,6 +42,10 @@ public class SnapshotEntity {
     private Set<SnapshotEntity> setOfEntities;
     private Set<DummyAddress> setOfValueObjects;
 
+    private Optional<Integer> optionalInteger;
+    private Optional<LocalDate> optionalDate;
+    private Optional<SnapshotEntity> optionalEntity;
+    private Optional<DummyAddress> optionalValueObject;
 
     private Map<String, Integer> mapOfPrimitives;
     private Map<LocalDate,BigDecimal> mapOfValues;
