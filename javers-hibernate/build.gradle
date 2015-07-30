@@ -1,3 +1,8 @@
+ext {
+    springVersion = '4.1.5.RELEASE'
+    hibernateVersion = '4.3.10.Final'
+}
+
 dependencies {
     compile project(':javers-core')
     compile 'commons-beanutils:commons-beanutils:1.9.2'
@@ -12,6 +17,6 @@ dependencies {
     testCompile project(':javers-persistence-sql')
     testCompile 'com.h2database:h2:1.4.184'
     testCompile 'org.springframework:spring-orm:'+springVersion
-    testCompile 'org.springframework:spring-test:3.2.2.RELEASE'
-    testCompile 'org.springframework.data:spring-data-jpa:1.7.2.RELEASE'
+    testCompile 'org.springframework:spring-test:'+springVersion
+    testCompile 'org.springframework.data:spring-data-jpa:1.8.2.RELEASE'
 }
