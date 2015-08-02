@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -40,7 +41,7 @@ public class TypeMapper {
     public TypeMapper(TypeFactory typeFactory) {
         this.typeFactory = typeFactory;
 
-        mappedTypes = new HashMap<>();
+        mappedTypes = new ConcurrentHashMap<>();
 
         //primitives & boxes
         for (Class primitiveOrBox : Primitives.getPrimitiveAndBoxTypes()) {
