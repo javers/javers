@@ -14,6 +14,14 @@ import java.util.Set;
  */
 public class SnapshotEntity {
 
+    public Optional<Integer> getOptionalInteger() {
+        return optionalInteger;
+    }
+
+    public void setOptionalInteger(Optional<Integer> optionalInteger) {
+        this.optionalInteger = optionalInteger;
+    }
+
     public enum DummyEnum { val1, val2, val3 }
 
     @Id
@@ -234,6 +242,30 @@ public class SnapshotEntity {
 
     public void setMapOfEntities(Map<SnapshotEntity, SnapshotEntity> mapOfEntities) {
         this.mapOfEntities = mapOfEntities;
+    }
+
+    public Optional<LocalDate> getOptionalDate() {
+        return optionalDate;
+    }
+
+    public void setOptionalDate(Optional<LocalDate> optionalDate) {
+        this.optionalDate = optionalDate;
+    }
+
+    public Optional<SnapshotEntity> getOptionalEntity() {
+        return optionalEntity;
+    }
+
+    public void setOptionalEntity(Optional<SnapshotEntity> optionalEntity) {
+        this.optionalEntity = optionalEntity;
+    }
+
+    public Optional<DummyAddress> getOptionalValueObject() {
+        return optionalValueObject;
+    }
+
+    public void setOptionalValueObject(Optional<DummyAddress> optionalValueObject) {
+        this.optionalValueObject = optionalValueObject;
     }
 
     public Map<DummyAddress, String> getMapVoToPrimitive() {

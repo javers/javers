@@ -416,4 +416,24 @@ abstract class ObjectGraphBuilderTest extends Specification {
         }
     }
 
+
+    @Unroll
+    def "should build graph with Optional<#managedClass> SingleEdge"() {
+        given:
+        def graphBuilder = newBuilder()
+
+        when:
+        def node = graphBuilder.buildGraph(cdo).root()
+
+        then:
+        assertThat(node).hasSingleEdge(propertyName)
+
+        where:
+        managedClass  << ["ValueObject", "Entity"]
+        propertyName <<  ["optionalValueObject", "optionalEntity"]
+        cdo << [
+                new SnapshotEntity(optionalValueObject:  Optional.of(new DummyAddress("London"))) ,
+                new SnapshotEntity(optionalEntity: Optional.of(new SnapshotEntity(id:1)))
+        ]
+    }
 }
