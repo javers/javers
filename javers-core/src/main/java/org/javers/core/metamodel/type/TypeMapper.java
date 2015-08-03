@@ -4,6 +4,7 @@ import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.clazz.ManagedClass;
@@ -71,6 +72,11 @@ public class TypeMapper {
 
         //& Maps
         addType(new MapType(Map.class));
+
+        // bootstrap phase 2: add-ons
+        if (ReflectionUtil.isJava8runtime()){
+            addType(new OptionalType());
+        }
     }
 
     public MapContentType getMapContentType(MapType mapType){

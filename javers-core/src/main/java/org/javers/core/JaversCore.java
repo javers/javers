@@ -22,6 +22,7 @@ import org.javers.repository.jql.QueryRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -163,7 +164,7 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public <T extends JaversType> T getTypeMapping(Class<?> clientsClass) {
-        return (T) typeMapper.getJaversType(clientsClass);
+    public <T extends JaversType> T getTypeMapping(Type clientsType) {
+        return (T) typeMapper.getJaversType(clientsType);
     }
 }

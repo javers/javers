@@ -6,7 +6,6 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.clazz.Entity
 import org.javers.core.metamodel.clazz.ManagedClassFactory
 import org.javers.core.metamodel.object.GlobalId
-import org.javers.core.metamodel.type.MapTypeTest.DummyEnum;
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -18,8 +17,6 @@ import spock.lang.Unroll
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-import java.util.EnumSet;
-import java.util.Map;
 
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
@@ -76,7 +73,7 @@ class TypeMapperTest extends Specification {
     @Unroll
     def "should return dehydrated type for generic #givenJaversType"() {
         when:
-        def dehydrated =  mapper.getDehydratedType(givenJaversType)
+        def dehydrated =  mapper.getDehydratedType(givenJavaType)
 
         then:
         dehydrated instanceof ParameterizedType
@@ -84,7 +81,7 @@ class TypeMapperTest extends Specification {
         dehydrated.actualTypeArguments == expectedActualTypeArguments
 
         where:
-        givenJaversType                                         || expectedRawType  || expectedActualTypeArguments
+        givenJavaType                                         || expectedRawType  || expectedActualTypeArguments
         new TypeToken<Set<String>>(){}.type                     || Set              || [String]
         new TypeToken<Map<String, DummyUser>>(){}.type          || Map              || [String, GlobalId]
     }
@@ -127,6 +124,7 @@ class TypeMapperTest extends Specification {
         Set  | SetType
         List | ListType
         Map  | MapType
+        Optional | OptionalType
     }
 
     @Unroll
@@ -156,11 +154,12 @@ class TypeMapperTest extends Specification {
         jType.itemClass == String
 
         where:
-        givenJavaType                        | expectedJaversType
-        new TypeToken<Set<String>>(){}.type  | SetType
-        new TypeToken<HashSet<String>>(){}.type  | SetType
-        new TypeToken<List<String>>(){}.type | ListType
+        givenJavaType                             | expectedJaversType
+        new TypeToken<Set<String>>(){}.type       | SetType
+        new TypeToken<HashSet<String>>(){}.type   | SetType
+        new TypeToken<List<String>>(){}.type      | ListType
         new TypeToken<ArrayList<String>>(){}.type | ListType
+        new TypeToken<Optional<String>>(){}.type  | OptionalType
     }
 
     @Unroll

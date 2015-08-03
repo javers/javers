@@ -18,6 +18,7 @@ import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 
@@ -317,7 +318,7 @@ public interface Javers {
      * property:name, value:Uncle Bob
      * </pre>
      */
-    <T extends JaversType> T getTypeMapping(Class<?> clientsClass);
+    <T extends JaversType> T getTypeMapping(Type clientsType);
 
     IdBuilder idBuilder();
 

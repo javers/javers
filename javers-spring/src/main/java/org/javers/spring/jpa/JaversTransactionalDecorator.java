@@ -22,6 +22,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -125,8 +126,8 @@ class JaversTransactionalDecorator implements Javers {
     }
 
     @Override
-    public <T extends JaversType> T getTypeMapping(Class<?> clientsClass) {
-        return delegate.getTypeMapping(clientsClass);
+    public <T extends JaversType> T getTypeMapping(Type clientsType) {
+        return delegate.getTypeMapping(clientsType);
     }
 
     @Override

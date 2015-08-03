@@ -14,6 +14,10 @@ public class OptionalType extends CollectionType {
         super(baseJavaType);
     }
 
+    public OptionalType() {
+        super(java.util.Optional.class);
+    }
+
     @Override
     public boolean isFullyParametrized() {
         return getActualTypeArguments().size() == 1;
@@ -21,6 +25,6 @@ public class OptionalType extends CollectionType {
 
     @Override
     public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
-        return null;
+        return new RuntimeException("not implemented");
     }
 }
