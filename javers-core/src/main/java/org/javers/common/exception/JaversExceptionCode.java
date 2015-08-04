@@ -9,7 +9,7 @@ public enum JaversExceptionCode {
 
     CLASS_EXTRACTION_ERROR(JaversException.BOOTSTRAP_ERROR + "Don't know how to extract Class from type '%s'.") ,
 
-    ENTITY_WITHOUT_ID (JaversException.BOOTSTRAP_ERROR + "Class '%s' has no Id property. Use @Id annotation to mark unique Entity identifier"),
+    ENTITY_WITHOUT_ID (JaversException.RUNTIME_ERROR + "Class '%s' mapped as Entity has no Id property. Use @Id annotation to mark unique and not-null Entity identifier"),
     ENTITY_INSTANCE_WITH_NULL_ID(JaversException.RUNTIME_ERROR + "Found Entity instance of class '%s' with null id"),
     NOT_INSTANCE_OF(JaversException.BOOTSTRAP_ERROR + "expected instance of '%s', got instance of '%s'"),
 
