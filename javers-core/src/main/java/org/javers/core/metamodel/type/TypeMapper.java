@@ -133,42 +133,6 @@ public class TypeMapper {
         return (T) getJaversType(property.getGenericType());
     }
 
-    public boolean isEntityReferenceOrValueObject(Property property){
-        JaversType javersType = getPropertyType(property);
-        return javersType instanceof ManagedType;
-    }
-
-    /**
-     * is Set, List or Array of ManagedClasses
-     *
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
-     */
-    public boolean isContainerOfManagedClasses(JaversType javersType){
-        if (! (javersType instanceof ContainerType)) {
-            return false;
-        }
-
-        return getJaversType(((ContainerType) javersType).getItemType()) instanceof ManagedType;
-    }
-
-    /**
-     * is Map with ManagedClass on Key or Value position
-     *
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
-     */
-    public boolean isMapWithManagedClass(EnumerableType enumerableType) {
-        if (! (enumerableType instanceof MapType)) {
-            return false;
-        }
-
-        MapType mapType = (MapType)enumerableType;
-
-        JaversType keyType = getJaversType(mapType.getKeyType());
-        JaversType valueType = getJaversType(mapType.getValueType());
-
-        return keyType instanceof ManagedType || valueType instanceof ManagedType;
-    }
-
     private void registerPrimitiveType(Class<?> primitiveClass) {
         addType(new PrimitiveType(primitiveClass));
     }

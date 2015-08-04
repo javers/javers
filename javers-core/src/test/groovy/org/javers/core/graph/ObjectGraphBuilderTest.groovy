@@ -436,4 +436,17 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 new SnapshotEntity(optionalEntity: Optional.of(new SnapshotEntity(id:1)))
         ]
     }
+
+    @Unroll
+    def "should ignore empty Optional"() {
+        given:
+        def graphBuilder = newBuilder()
+
+        when:
+        def cdo = new SnapshotEntity(optionalValueObject:  Optional.empty())
+        def node = graphBuilder.buildGraph(cdo).root()
+
+        then:
+        assertThat(node).hasNoEdges()
+    }
 }

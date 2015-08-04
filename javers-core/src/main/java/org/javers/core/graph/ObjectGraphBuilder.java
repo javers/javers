@@ -1,13 +1,12 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.Predicate;
+import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.EnumerableType;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +100,7 @@ public class ObjectGraphBuilder {
     private List<Property> getSingleReferences(ManagedClass managedClass) {
         return managedClass.getProperties(new Predicate<Property>() {
             public boolean apply(Property property) {
-                return (typeMapper.isEntityReferenceOrValueObject(property));
+                return (isManagedClassReferenceOrOptional(property));
             }
         });
     }
@@ -110,10 +109,10 @@ public class ObjectGraphBuilder {
         return node.getManagedClass().getProperties(new Predicate<Property>() {
             public boolean apply(Property property) {
                 JaversType javersType = typeMapper.getPropertyType(property);
-                if (! (javersType instanceof EnumerableType)) {
+                if (!(javersType instanceof EnumerableType)) {
                     return false;
                 }
-                EnumerableType enumerableType = (EnumerableType)javersType;
+                EnumerableType enumerableType = (EnumerableType) javersType;
 
                 Object container = node.getPropertyValue(property);
                 if (enumerableType.isEmpty(container)) {
@@ -123,11 +122,60 @@ public class ObjectGraphBuilder {
                 if (node.isNull(property)) {
                     return false;
                 }
-                return (typeMapper.isContainerOfManagedClasses(enumerableType) ||
-                        typeMapper.isMapWithManagedClass(enumerableType)
-                  );
+                return (isContainerOfManagedClasses(enumerableType) ||
+                        isMapWithManagedClass(enumerableType)
+                );
             }
         });
+    }
+
+    public boolean isManagedClassReferenceOrOptional(Property property){
+        JaversType javersType = typeMapper.getPropertyType(property);
+
+        if (javersType instanceof ManagedType){
+            return true;
+        }
+
+        if (javersType instanceof OptionalType){
+            return isItemManagedType((OptionalType) javersType);
+        }
+
+        return false;
+    }
+
+    /**
+     * is Set, List or Array of ManagedClasses
+     *
+     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
+     */
+    private boolean isContainerOfManagedClasses(JaversType javersType){
+        if (! (javersType instanceof ContainerType)) {
+            return false;
+        }
+
+        return isItemManagedType((ContainerType) javersType);
+    }
+
+    private boolean isItemManagedType(ContainerType containerType){
+        return typeMapper.getJaversType(containerType.getItemType()) instanceof ManagedType;
+    }
+
+    /**
+     * is Map with ManagedClass on Key or Value position
+     *
+     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
+     */
+    private boolean isMapWithManagedClass(EnumerableType enumerableType) {
+        if (! (enumerableType instanceof MapType)) {
+            return false;
+        }
+
+        MapType mapType = (MapType)enumerableType;
+
+        JaversType keyType = typeMapper.getJaversType(mapType.getKeyType());
+        JaversType valueType = typeMapper.getJaversType(mapType.getValueType());
+
+        return keyType instanceof ManagedType || valueType instanceof ManagedType;
     }
 
 }
