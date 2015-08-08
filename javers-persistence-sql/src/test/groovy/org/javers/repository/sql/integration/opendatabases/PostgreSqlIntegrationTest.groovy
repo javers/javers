@@ -21,9 +21,6 @@ class PostgreSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
         DialectName.POSTGRES
     }
 
-    protected dbConnectionCommit(){
-    }
-
     //giving up creating concurrent write test for all databases
     def "should allow concurrent writes"(){
         given:
@@ -34,7 +31,6 @@ class PostgreSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
         def threads = 20
         //initial commit
         javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
-        dbConnectionCommit()
 
         when:
         (1..threads).each{
