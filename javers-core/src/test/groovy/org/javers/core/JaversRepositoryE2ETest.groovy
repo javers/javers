@@ -28,8 +28,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
-    def setupSpec(){
-        System.setProperty("isDatabaseNotMultithreaded","true")
+    protected dbConnectionCommit(){
     }
 
     def "should allow concurrent writes"(){
@@ -41,12 +40,14 @@ class JaversRepositoryE2ETest extends Specification {
         def threads = 20
         //initial commit
         javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
+        dbConnectionCommit()
 
         when:
         (1..threads).each{
             futures << executor.submit({
                 try {
                     javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
+                    dbConnectionCommit()
                 } catch (Exception e){
                     println "Exception: "+ e
                 }

@@ -4,7 +4,6 @@ import org.javers.core.JaversRepositoryE2ETest
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
 import org.javers.repository.sql.reposiotries.PersistentGlobalId
-import spock.lang.Ignore
 import spock.lang.Shared
 
 import java.sql.Connection
@@ -14,25 +13,31 @@ import static org.javers.core.JaversBuilder.javers
 
 class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
-    protected Connection getConnection() {
+    @Shared
+    protected ThreadLocal<Connection> connectionThreadLocal = ThreadLocal.withInitial( { createConnection() } )
+
+    protected Connection createConnection() {
         DriverManager.getConnection("jdbc:h2:mem:")//TRACE_LEVEL_SYSTEM_OUT=2")
+    }
+
+    Connection getConnection() {
+        def conn = connectionThreadLocal.get()
+        conn.setAutoCommit(false)
+        conn
     }
 
     protected DialectName getDialect() {
         DialectName.H2
     }
 
-    @Shared
-    Connection dbConnection
-
-    def setupSpec(){
-        dbConnection = getConnection()
-        dbConnection.setAutoCommit(false)
+    @Override
+    protected dbConnectionCommit() {
+        getConnection().commit()
     }
 
     @Override
     def setup() {
-        def connectionProvider = { dbConnection } as ConnectionProvider
+        def connectionProvider = { getConnection() } as ConnectionProvider
 
         def sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
@@ -41,7 +46,7 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         javers = javers().registerJaversRepository(sqlRepository).build()
         clearTables()
 
-        dbConnection.commit()
+        getConnection().commit()
     }
 
     def clearTables() {
@@ -52,19 +57,18 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     }
 
     def cleanup() {
-        dbConnection.rollback()
+        getConnection().rollback()
     }
 
     def cleanupSpec() {
-        dbConnection.close()
+        getConnection().close()
     }
 
     def execute(String sql) {
-        def stmt = dbConnection.createStatement()
+        def stmt = getConnection().createStatement()
         stmt.executeUpdate(sql)
         stmt.close()
     }
-
 
     def "should not interfere with user transactions"() {
         given:
@@ -72,7 +76,7 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
         when:
         javers.commit("author", anEntity)
-        dbConnection.rollback()
+        getConnection().rollback()
         def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         then:
@@ -80,7 +84,7 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
         when:
         javers.commit("author", anEntity)
-        dbConnection.commit()
+        getConnection().commit()
         snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         then:
