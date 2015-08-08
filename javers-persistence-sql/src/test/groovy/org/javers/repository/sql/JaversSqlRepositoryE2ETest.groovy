@@ -15,7 +15,7 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     private Connection con
 
     protected Connection createConnection() {
-        DriverManager.getConnection("jdbc:h2:mem:")//TRACE_LEVEL_SYSTEM_OUT=2")
+        DriverManager.getConnection("jdbc:h2:mem:test")//TRACE_LEVEL_SYSTEM_OUT=2")
     }
 
     Connection getConnection() {
