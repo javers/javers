@@ -14,16 +14,18 @@ import static org.javers.core.JaversBuilder.javers
 class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     @Shared
-    protected ThreadLocal<Connection> connectionThreadLocal = ThreadLocal.withInitial( { createConnection() } )
+    protected ThreadLocal<Connection> connectionThreadLocal = ThreadLocal.withInitial( {
+        def con = createConnection()
+        con.setAutoCommit(false)
+        con
+    } )
 
     protected Connection createConnection() {
         DriverManager.getConnection("jdbc:h2:mem:")//TRACE_LEVEL_SYSTEM_OUT=2")
     }
 
     Connection getConnection() {
-        def conn = connectionThreadLocal.get()
-        conn.setAutoCommit(false)
-        conn
+       connectionThreadLocal.get()
     }
 
     protected DialectName getDialect() {

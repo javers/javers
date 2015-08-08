@@ -8,8 +8,8 @@ import java.sql.DriverManager
 
 class PostgreSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
 
-    Connection getConnection() {
-        DriverManager.getConnection("jdbc:postgresql://localhost:5432/travis_ci_test", "postgres", "");
+    Connection createConnection() {
+        DriverManager.getConnection("jdbc:postgresql://localhost:5432/javers", "javers", "javers");
     }
 
     DialectName getDialect() {
