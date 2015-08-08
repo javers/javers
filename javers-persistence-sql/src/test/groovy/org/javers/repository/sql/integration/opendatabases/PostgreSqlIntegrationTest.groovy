@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class PostgreSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
 
-    Connection getConnection() {
+    Connection createConnection() {
         DriverManager.getConnection("jdbc:postgresql://localhost:5432/travis_ci_test", "postgres", "");
     }
 
