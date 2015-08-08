@@ -45,7 +45,7 @@ public class JaversSqlRepository implements JaversRepository {
         Optional<Long> primaryKey = commitRepository.getCommitPrimaryKey(commit);
 
         if (primaryKey.isPresent()) {
-            throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT);
+            throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT, commit.getId());
         }
 
         long commitPk = commitRepository.save(commit.getAuthor(), commit.getCommitDate(), commit.getId());

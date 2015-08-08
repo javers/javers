@@ -9,6 +9,10 @@ import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
+
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
@@ -22,6 +26,41 @@ class JaversRepositoryE2ETest extends Specification {
     def setup() {
         // InMemoryRepository is used by default
         javers = javers().build()
+    }
+
+    def setupSpec(){
+        System.setProperty("isDatabaseNotMultithreaded","true")
+    }
+
+    def "should allow concurrent writes"(){
+        given:
+        def executor = Executors.newFixedThreadPool(20)
+        def futures = new ArrayList()
+        def cnt = new AtomicInteger()
+        def sId = 222
+        def threads = 20
+        //initial commit
+        javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
+
+        when:
+        (1..threads).each{
+            futures << executor.submit({
+                try {
+                    javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
+                } catch (Exception e){
+                    println "Exception: "+ e
+                }
+            } as Callable)
+        }
+
+        while( futures.count { it.done } < threads){
+            println "waiting for all threads, " + futures.count { it.done } + " threads have finished ..."
+            Thread.currentThread().sleep(10)
+        }
+        println futures.count { it.done } + " threads have finished ..."
+
+        then:
+        javers.findSnapshots(QueryBuilder.byInstanceId(sId, SnapshotEntity).build()).size() == threads + 1
     }
 
     def "should query for ValueObject changes by owning Entity class"() {
