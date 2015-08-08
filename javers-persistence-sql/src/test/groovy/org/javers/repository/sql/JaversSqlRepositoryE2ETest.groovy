@@ -4,7 +4,6 @@ import org.javers.core.JaversRepositoryE2ETest
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
 import org.javers.repository.sql.reposiotries.PersistentGlobalId
-import spock.lang.Shared
 
 import java.sql.Connection
 import java.sql.DriverManager
@@ -13,19 +12,14 @@ import static org.javers.core.JaversBuilder.javers
 
 class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
-    @Shared
-    protected ThreadLocal<Connection> connectionThreadLocal = ThreadLocal.withInitial( {
-        def con = createConnection()
-        con.setAutoCommit(false)
-        con
-    } )
+    private Connection con
 
     protected Connection createConnection() {
         DriverManager.getConnection("jdbc:h2:mem:")//TRACE_LEVEL_SYSTEM_OUT=2")
     }
 
     Connection getConnection() {
-       connectionThreadLocal.get()
+        con
     }
 
     protected DialectName getDialect() {
@@ -33,12 +27,10 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     }
 
     @Override
-    protected dbConnectionCommit() {
-        getConnection().commit()
-    }
-
-    @Override
     def setup() {
+        con = createConnection()
+        con.setAutoCommit(false)
+
         def connectionProvider = { getConnection() } as ConnectionProvider
 
         def sqlRepository = SqlRepositoryBuilder
@@ -60,9 +52,6 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     def cleanup() {
         getConnection().rollback()
-    }
-
-    def cleanupSpec() {
         getConnection().close()
     }
 

@@ -28,42 +28,6 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
-    protected dbConnectionCommit(){
-    }
-
-    def "should allow concurrent writes"(){
-        given:
-        def executor = Executors.newFixedThreadPool(20)
-        def futures = new ArrayList()
-        def cnt = new AtomicInteger()
-        def sId = 222
-        def threads = 20
-        //initial commit
-        javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
-        dbConnectionCommit()
-
-        when:
-        (1..threads).each{
-            futures << executor.submit({
-                try {
-                    javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
-                    dbConnectionCommit()
-                } catch (Exception e){
-                    println "Exception: "+ e
-                }
-            } as Callable)
-        }
-
-        while( futures.count { it.done } < threads){
-            println "waiting for all threads, " + futures.count { it.done } + " threads have finished ..."
-            Thread.currentThread().sleep(10)
-        }
-        println futures.count { it.done } + " threads have finished ..."
-
-        then:
-        javers.findSnapshots(QueryBuilder.byInstanceId(sId, SnapshotEntity).build()).size() == threads + 1
-    }
-
     def "should query for ValueObject changes by owning Entity class"() {
         given:
         def data = [ new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city:"London")),
