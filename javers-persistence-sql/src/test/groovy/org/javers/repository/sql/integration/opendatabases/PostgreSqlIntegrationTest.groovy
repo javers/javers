@@ -13,8 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class PostgreSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
 
-    Connection createConnection() {
-        DriverManager.getConnection("jdbc:postgresql://localhost:5432/javers", "javers", "javers");
+    Connection getConnection() {
+        DriverManager.getConnection("jdbc:postgresql://localhost:5432/travis_ci_test", "postgres", "");
     }
 
     DialectName getDialect() {
@@ -24,6 +24,7 @@ class PostgreSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
     protected dbConnectionCommit(){
     }
 
+    //giving up creating concurrent write test for all databases
     def "should allow concurrent writes"(){
         given:
         def executor = Executors.newFixedThreadPool(20)
