@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -27,7 +28,7 @@ import static java.util.Collections.unmodifiableList;
 class InMemoryRepository implements JaversRepository {
     private static final Logger logger = LoggerFactory.getLogger(InMemoryRepository.class);
 
-    private Map<GlobalId, LinkedList<CdoSnapshot>> snapshots = new HashMap<>();
+    private Map<GlobalId, LinkedList<CdoSnapshot>> snapshots = new ConcurrentHashMap<>();
 
     private CommitId head;
 
@@ -161,7 +162,7 @@ class InMemoryRepository implements JaversRepository {
         return all;
     }
 
-    private void persist(CdoSnapshot snapshot) {
+    private synchronized void persist(CdoSnapshot snapshot) {
         LinkedList<CdoSnapshot> states = snapshots.get(snapshot.getGlobalId());
         if (states == null){
             states = new LinkedList<>();

@@ -8,7 +8,7 @@ import java.sql.DriverManager
 
 class MsSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
 
-    Connection getConnection() {
+    Connection createConnection() {
        DriverManager.getConnection("jdbc:sqlserver://localhost:1433;DatabaseName=polly", "polly", "polly");
     }
 
