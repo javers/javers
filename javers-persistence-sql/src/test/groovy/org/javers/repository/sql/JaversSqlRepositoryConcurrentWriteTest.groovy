@@ -36,15 +36,13 @@ class JaversSqlRepositoryConcurrentWriteTest extends Specification{
         connection.close()
     }
 
-    //giving up creating concurrent write test for all databases
-    @Ignore
     def "should allow concurrent writes"(){
         given:
         def executor = Executors.newFixedThreadPool(20)
         def futures = new ArrayList()
         def cnt = new AtomicInteger()
         def sId = 222
-        def threads = 20
+        def threads = 99
         //initial commit
         javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
 
@@ -60,7 +58,6 @@ class JaversSqlRepositoryConcurrentWriteTest extends Specification{
         }
 
         while( futures.count { it.done } < threads){
-            println "waiting for all threads, " + futures.count { it.done } + " threads have finished ..."
             Thread.currentThread().sleep(10)
         }
         println futures.count { it.done } + " threads have finished ..."

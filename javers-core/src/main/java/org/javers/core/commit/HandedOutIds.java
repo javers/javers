@@ -12,26 +12,57 @@ import java.util.List;
 class HandedOutIds {
     private static final Logger logger = LoggerFactory.getLogger(HandedOutIds.class);
 
-    private int limit = 5;
+    private int qLimit = 35;
 
     private List<CommitId> handedOutList = new ArrayList<>();
 
     void put (CommitId handedOut) {
-        if (handedOutList.size() == limit) {
-            handedOutList.remove(limit - 1);
-        }
 
-        int found = findIndex(handedOut.getMajorId());
+        int found = findExistingIndex(handedOut.getMajorId());
 
-        if (found < 0){
-            handedOutList.add(0, handedOut);
-        } else {
+        if (found >= 0){
             handedOutList.remove(found);
             handedOutList.add(found, handedOut);
+            maintainQueueSize(found);
+        } else {
+            int insertTo = findInsertIndex(handedOut.getMajorId());
+            handedOutList.add(insertTo, handedOut);
+            maintainQueueSize(insertTo);
         }
+
     }
 
-    private int findIndex(Long majorId){
+    private void maintainQueueSize(int touchedIndex) {
+        if (touchedIndex < qLimit /2) {
+            if (handedOutList.size() > qLimit) {
+                handedOutList.remove(handedOutList.size() - 1);
+            }
+        }
+        else {
+            qLimit += qLimit/10;
+        }
+
+    }
+
+    private int findInsertIndex(Long majorId) {
+        if (handedOutList.size() == 0){
+            return 0;
+        }
+
+        int i = 0;
+        while (i < handedOutList.size() &&  handedOutList.get(i).getMajorId() > majorId) {
+            i++;
+        }
+
+        if (i == handedOutList.size()) {
+            logger.error("DANGER, inserting {} at the end of handedOutList: ",majorId);
+            logger.error(handedOutList.toString());
+        }
+
+        return i;
+    }
+
+    private int findExistingIndex(Long majorId){
         for (int i=0; i<handedOutList.size(); i++){
             CommitId c = handedOutList.get(i);
             if (c.getMajorId() == majorId){
