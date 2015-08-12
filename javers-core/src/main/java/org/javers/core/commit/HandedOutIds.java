@@ -12,7 +12,7 @@ import java.util.List;
 class HandedOutIds {
     private static final Logger logger = LoggerFactory.getLogger(HandedOutIds.class);
 
-    private int qLimit = 35;
+    private int qLimit = 50;
 
     private List<CommitId> handedOutList = new ArrayList<>();
 
