@@ -18,27 +18,42 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public abstract class ManagedClass extends ClientsDomainClass {
 
     private final Map<String, Property> propertiesByName;
-    private final List<Property> properties;
+    private final List<Property> managedProperties;
+    private final List<Property> transientAnnProperties;
 
-    ManagedClass(Class clientsClass, List<Property> properties) {
+    ManagedClass(Class clientsClass, List<Property> allProperties) {
         super(clientsClass);
-        argumentsAreNotNull(properties);
-        this.properties = new ArrayList<>(properties);
+        argumentsAreNotNull(allProperties);
 
+        this.managedProperties = new ArrayList<>();
+        this.transientAnnProperties = new ArrayList<>();
         this.propertiesByName = new HashMap<>();
-        for (Property property : properties) {
+
+        for (Property property : allProperties) {
+            if (property.isHasTransientAnn()){
+                this.transientAnnProperties.add(property);
+            }else {
+                this.managedProperties.add(property);
+            }
+
             propertiesByName.put(property.getName(),property);
         }
     }
 
+    /**
+     * returns all managed properties
+     */
     public List<Property> getProperties() {
-        return Collections.unmodifiableList(properties);
+        return Collections.unmodifiableList(managedProperties);
     }
 
+    /**
+     * returns managed properties subset
+     */
     public List<Property> getProperties(Predicate<Property> query) {
         List<Property> retProperties = new ArrayList<>();
 
-        for (Property property : properties) {
+        for (Property property : managedProperties) {
             if (query.apply(property)){
                 retProperties.add(property);
             }
@@ -48,6 +63,8 @@ public abstract class ManagedClass extends ClientsDomainClass {
     }
 
     /**
+     * finds property by name (managed or withTransientAnn)
+     *
      * @throws JaversException PROPERTY_NOT_FOUND
      */
     public Property getProperty(String withName) {

@@ -25,11 +25,9 @@ public class BeanBasedPropertyScanner implements PropertyScanner {
 
         for (JaversMethod getter : getters) {
 
-            if (getter.hasAnyAnnotation(annotationNamesProvider.getTransientAliases())){
-                continue;
-            }
+            boolean hasTransientAnn = getter.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
 
-            beanProperties.add(new Property(getter));
+            beanProperties.add(new Property(getter, hasTransientAnn));
         }
         return beanProperties;
     }

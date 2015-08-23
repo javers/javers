@@ -13,10 +13,12 @@ public class Property {
     public static final String ID_ANN = "Id";
 
     private transient final JaversMember member;
+    private transient final boolean hasTransientAnn;
 
-    Property(JaversMember member) {
+    Property(JaversMember member, boolean hasTransientAnn){
         argumentIsNotNull(member);
         this.member = member;
+        this.hasTransientAnn = hasTransientAnn;
     }
 
     public Type getGenericType() {
@@ -49,6 +51,10 @@ public class Property {
 
     public String getName() {
         return member.propertyName();
+    }
+
+    public boolean isHasTransientAnn() {
+        return hasTransientAnn;
     }
 
     @Override
