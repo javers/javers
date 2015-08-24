@@ -28,6 +28,19 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
+    def "should support long numbers as Entity Id "(){
+        given:
+        def javers = javers().build()
+        def longId = 1000000000L*1000
+        def category = new Category(longId)
+
+        when:
+        javers.commit("author",category)
+
+        then:
+        javers.getLatestSnapshot(longId, Category).get().globalId.cdoId == longId
+    }
+
     def "should query for ValueObject changes by owning Entity class"() {
         given:
         def data = [ new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city:"London")),
