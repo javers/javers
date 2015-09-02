@@ -77,7 +77,7 @@ public enum JaversExceptionCode {
 
     MALFORMED_JQL(JaversException.RUNTIME_ERROR+"Invalid JQL query, %s"),
 
-    RUNTIME_EXCEPTION(JaversException.RUNTIME_ERROR+"uncategorized runtime exception")
+    RUNTIME_EXCEPTION(JaversException.RUNTIME_ERROR+"uncategorized runtime exception. %s")
     ;
 
     private final String message;

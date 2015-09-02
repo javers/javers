@@ -40,7 +40,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .hasInstanceId(DummyUser, "Mad Kaz")
     }
 
-
     def "should build graph starting from root ValueObject"(){
         given:
         def graphBuilder = newBuilder()
@@ -54,7 +53,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .hasCdo(address)
                 .hasUnboundedValueObjectId(DummyAddress)
     }
-
 
     def "should build graph with ValueObject node"() {
         given:
@@ -426,7 +424,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(cdo).root()
 
         then:
-        assertThat(node).hasSingleEdge(propertyName)
+        assertThat(node).hasMultiEdge(propertyName).ofSize(1)
 
         where:
         managedClass  << ["ValueObject", "Entity"]

@@ -3,8 +3,8 @@ package org.javers.core.graph;
 import org.javers.common.collections.Predicate;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.clazz.ManagedClass;
+import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 import org.slf4j.Logger;
@@ -55,8 +55,8 @@ public class ObjectGraphBuilder {
         }
 
         logger.debug("{} graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
-                         edgeBuilder.graphType(),
-                         nodeReuser.nodesCount(),  nodeReuser.entitiesCount(), nodeReuser.voCount());
+                edgeBuilder.graphType(),
+                nodeReuser.nodesCount(), nodeReuser.entitiesCount(), nodeReuser.voCount());
         switchToBuilt();
         return new LiveGraph(root, nodeReuser.nodes());
     }
@@ -68,7 +68,7 @@ public class ObjectGraphBuilder {
     }
 
     private void buildSingleEdges(ObjectNode node) {
-        for (Property singleRef : getSingleReferences(node.getManagedClass())) {
+        for (Property singleRef : getSingleReferencesWithManagedClasses(node.getManagedClass())) {
             if (node.isNull(singleRef)) {
                 continue;
             }
@@ -97,10 +97,12 @@ public class ObjectGraphBuilder {
         built = true;
     }
 
-    private List<Property> getSingleReferences(ManagedClass managedClass) {
+    private List<Property> getSingleReferencesWithManagedClasses(ManagedClass managedClass) {
         return managedClass.getProperties(new Predicate<Property>() {
             public boolean apply(Property property) {
-                return (isManagedClassReferenceOrOptional(property));
+                JaversType javersType = typeMapper.getPropertyType(property);
+
+                return javersType instanceof ManagedType;
             }
         });
     }
@@ -127,20 +129,6 @@ public class ObjectGraphBuilder {
                 );
             }
         });
-    }
-
-    public boolean isManagedClassReferenceOrOptional(Property property){
-        JaversType javersType = typeMapper.getPropertyType(property);
-
-        if (javersType instanceof ManagedType){
-            return true;
-        }
-
-        if (javersType instanceof OptionalType){
-            return isItemManagedType((OptionalType) javersType);
-        }
-
-        return false;
     }
 
     /**
