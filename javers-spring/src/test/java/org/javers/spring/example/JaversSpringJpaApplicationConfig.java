@@ -1,12 +1,11 @@
 package org.javers.spring.example;
 
 import org.javers.core.Javers;
+import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
-import org.javers.spring.annotation.JaversAuditable;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
@@ -54,6 +53,7 @@ public class JaversSpringJpaApplicationConfig {
 
         return TransactionalJaversBuilder
                 .javers()
+                .withObjectAccessHook(new HibernateUnproxyObjectAccessHook())
                 .registerJaversRepository(sqlRepository)
                 .build();
     }

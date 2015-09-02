@@ -4,7 +4,7 @@ mainClassName = "org.javers.core.selftest.Application"
 dependencies {
     compile 'joda-time:joda-time:2.3'
     compile 'org.slf4j:slf4j-api:1.7.2'
-    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.google.code.gson:gson:2.3.1'
     compile 'org.picocontainer:picocontainer:2.14.3'
 
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'

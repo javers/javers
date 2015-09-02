@@ -21,6 +21,11 @@ class PropertyAssert {
         this
     }
 
+    PropertyAssert isTransient() {
+        assert actual.hasTransientAnn
+        this
+    }
+
     PropertyAssert looksLikeId() {
         assert actual.looksLikeId()
         this

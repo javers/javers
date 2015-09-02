@@ -36,18 +36,13 @@ class CommitSeqGeneratorTest extends Specification {
     def "should inc minor when the same head"() {
         given:
         def commitSeqGenerator = new CommitSeqGenerator()
-        def head = commitSeqGenerator.nextId(null)
+        def commit1 = commitSeqGenerator.nextId(null)     //1.0
+        def commit2 = commitSeqGenerator.nextId(commit1)  //2.0
 
-        when:
-        def gen1 = commitSeqGenerator.nextId(head)
-        def gen2 = commitSeqGenerator.nextId(head)
-        def gen3 = commitSeqGenerator.nextId(head)
-        def gen4 = commitSeqGenerator.nextId(gen2)
-
-        then:
-        gen1.value() == "2.0"
-        gen2.value() == "2.1"
-        gen3.value() == "2.2"
-        gen4.value() == "3.0"
+        expect:
+        commitSeqGenerator.nextId(commit1)  == new CommitId(2,1)
+        commitSeqGenerator.nextId(commit2)  == new CommitId(3,0)
+        commitSeqGenerator.nextId(commit1)  == new CommitId(2,2)
+        commitSeqGenerator.nextId(commit2)  == new CommitId(3,1)
     }
 }

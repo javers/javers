@@ -8,7 +8,7 @@ import java.sql.DriverManager
 
 class MySqlIntegrationTest extends JaversSqlRepositoryE2ETest {
 
-    Connection getConnection() {
+    Connection createConnection() {
         DriverManager.getConnection("jdbc:mysql://localhost/travis_ci_test", "travis", "");
     }
 

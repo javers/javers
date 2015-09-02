@@ -73,20 +73,20 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(int)
     }
 
-    def "should ignore @Transient property"() {
+    def "should scan @Transient property as transient"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
         then:
-        assertThat(properties).hasntGotProperty("propertyWithTransientAnn")
+        assertThat(properties).hasProperty("propertyWithTransientAnn").isTransient()
     }
 
-    def "should ignore @DiffIgnore property"() {
+    def "should scan @DiffIgnore property as transient"() {
         when:
         def properties = propertyScanner.scan(DummyUser)
 
         then:
-        assertThat(properties).hasntGotProperty("propertyWithDiffIgnoreAnn")
+        assertThat(properties).hasProperty("propertyWithDiffIgnoreAnn").isTransient()
     }
 
     def "should scan set property"() {

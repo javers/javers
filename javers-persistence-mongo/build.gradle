@@ -12,6 +12,9 @@ task integrationTest(type: Test) {
     filter {
         includeTestsMatching 'org.javers.repository.mongo.integration.**'
     }
+    testLogging {
+        showStandardStreams = true
+    }
 }
 
 test {

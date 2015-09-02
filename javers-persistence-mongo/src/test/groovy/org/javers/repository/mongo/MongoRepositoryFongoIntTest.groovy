@@ -26,12 +26,13 @@ class MongoRepositoryFongoIntTest extends Specification {
         given:
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
         def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
+        def commitFactory = javersTestBuilder.commitFactory
 
         def kazikV1 = dummyUser("Kazik").withAge(1).build()
         def kazikV2 = dummyUser("Kazik").withAge(2).build()
 
-        def commit1 = javersTestBuilder.commitFactory.create("author", kazikV1)
-        def commit2 = javersTestBuilder.commitFactory.create("author", kazikV2)
+        def commit1 = commitFactory.create("author", kazikV1)
+        def commit2 = commitFactory.create("author", kazikV2)
 
         when:
         mongoRepository.persist(commit1)

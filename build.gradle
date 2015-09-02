@@ -18,11 +18,6 @@ scmVersion {
     }
 }
 
-ext {
-    springVersion = '4.1.5.RELEASE'
-    hibernateVersion = '4.3.10.Final'
-}
-
 subprojects {
     apply plugin: 'maven'
     apply plugin: 'java'
@@ -42,7 +37,6 @@ subprojects {
 
     dependencies {
         testCompile 'junit:junit:4.11'
-        //testCompile 'org.codehaus.groovy:groovy-all:2.3.3'
         testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
         testCompile 'org.apache.commons:commons-lang3:3.3.2'
         testCompile 'ch.qos.logback:logback-classic:1.1.2'

@@ -1,6 +1,8 @@
 package org.javers.hibernate.integration.entity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "author")

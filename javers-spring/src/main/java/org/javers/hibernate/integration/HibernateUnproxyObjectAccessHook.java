@@ -1,4 +1,4 @@
-package org.javers.hibernate;
+package org.javers.hibernate.integration;
 
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;

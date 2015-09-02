@@ -22,8 +22,7 @@ class PropertiesAssert {
     }
 
     void hasntGotProperty(String withName) {
-        Property found = getProperty(withName)
-        assert found == null
+        assert getProperty(withName) == null
     }
 
     Property getProperty(String withName) {

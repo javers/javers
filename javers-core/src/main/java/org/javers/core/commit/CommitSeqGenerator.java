@@ -7,22 +7,23 @@ package org.javers.core.commit;
  * @author bartosz walacik
  */
 class CommitSeqGenerator {
+    private HandedOutIds handedOut = new HandedOutIds();
 
-    private int seq;
-    private CommitId lastReturned;
+    public synchronized CommitId nextId(CommitId head)
+    {
+        Long major = getHeadMajorId(head) + 1;
 
-    public synchronized CommitId nextId(CommitId head) {
-        long major = getHeadMajorId(head) + 1;
+        CommitId lastReturned = handedOut.get(major);
 
-        if (lastReturned!= null && major == lastReturned.getMajorId()){
-            seq++;
+        CommitId result;
+        if (lastReturned == null){
+            result = new CommitId(major,0);
         }
-        else{
-            seq = 0;
+        else {
+            result = new CommitId(major, lastReturned.getMinorId() + 1);
         }
 
-        CommitId result = new CommitId(major, seq);
-        lastReturned = result;
+        handedOut.put(result);
         return result;
     }
 

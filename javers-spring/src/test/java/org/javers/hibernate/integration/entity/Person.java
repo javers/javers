@@ -1,8 +1,5 @@
 package org.javers.hibernate.integration.entity;
 
-import org.hibernate.Hibernate;
-import org.hibernate.proxy.HibernateProxy;
-
 import javax.persistence.*;
 
 @Entity

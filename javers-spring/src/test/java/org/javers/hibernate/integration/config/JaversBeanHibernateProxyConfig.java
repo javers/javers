@@ -1,7 +1,8 @@
 package org.javers.hibernate.integration.config;
 
 import org.javers.core.Javers;
-import org.javers.hibernate.HibernateUnproxyObjectAccessHook;
+import org.javers.core.MappingStyle;
+import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
@@ -20,15 +21,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAspectJAutoProxy
 @EnableJpaRepositories(basePackages = "org.javers.hibernate")
 @Import(HibernateConfig.class)
-public class JaversFieldHibernateProxyConfig extends HibernateConfig{
-
-    //.. JaVers setup ..
+public class JaversBeanHibernateProxyConfig {
 
     /**
      * Creates JaVers instance with {@link JaversSqlRepository}
      */
     @Bean
     public Javers javers(JpaHibernateConnectionProvider jpaHibernateConnectionProvider) {
+
         JaversSqlRepository sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(jpaHibernateConnectionProvider)
@@ -39,6 +39,8 @@ public class JaversFieldHibernateProxyConfig extends HibernateConfig{
                 .javers()
                 .registerJaversRepository(sqlRepository)
                 .withObjectAccessHook(new HibernateUnproxyObjectAccessHook())
+                .withMappingStyle(MappingStyle.BEAN)
                 .build();
     }
+
 }

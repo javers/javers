@@ -24,12 +24,20 @@ abstract class EntityFactoryIdTest extends Specification {
         EntityAssert.assertThat(entity).hasIdProperty("name")
     }
 
-    def "should ignore @Id annotation where idProperty name is given"() {
+    def "should ignore @Id annotation when idProperty name is given"() {
         when:
         def entity = entityFactory.create(new EntityDefinition(DummyUser,"bigFlag"))
 
         then:
         EntityAssert.assertThat(entity).hasIdProperty("bigFlag")
+    }
+
+    def "should ignore @Transient annotation when idProperty name is given"() {
+        when:
+        def entity = entityFactory.create(new EntityDefinition(DummyUser,"propertyWithTransientAnn"))
+
+        then:
+        EntityAssert.assertThat(entity).hasIdProperty("propertyWithTransientAnn")
     }
 
     def "should fail for Entity without Id property"() {

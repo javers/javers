@@ -9,6 +9,10 @@ import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
+
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
@@ -22,6 +26,19 @@ class JaversRepositoryE2ETest extends Specification {
     def setup() {
         // InMemoryRepository is used by default
         javers = javers().build()
+    }
+
+    def "should support long numbers as Entity Id "(){
+        given:
+        def javers = javers().build()
+        def longId = 1000000000L*1000
+        def category = new Category(longId)
+
+        when:
+        javers.commit("author",category)
+
+        then:
+        javers.getLatestSnapshot(longId, Category).get().globalId.cdoId == longId
     }
 
     def "should query for ValueObject changes by owning Entity class"() {
