@@ -6,9 +6,14 @@ import org.javers.core.cases.MongoStoredEntity
 import org.javers.core.metamodel.clazz.*
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
+import org.javers.core.model.DummyEntityWithEmbeddedId
+import org.javers.core.model.DummyPoint
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import javax.persistence.EmbeddedId
+import javax.persistence.Id
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
@@ -60,23 +65,23 @@ public class TypeMapperIntegrationTest extends Specification {
         jType.baseJavaClass == DummyAddress
     }
 
-    def "should map as Value if the class is used as @Id in another class"(){
+    @Unroll
+    def "should map as ValueType if a class is used as #usedAnn.simpleName in another class"(){
         given:
         def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
 
         when:
-        entityRegisterAction.call(mapper)
-        def jType = mapper.getJaversType(ObjectId)
+        mapper.getJaversType(entity)
+        def jType = mapper.getJaversType(idType)
 
         then:
         jType.class == ValueType
-        jType.baseJavaClass == ObjectId
+        jType.baseJavaClass == idType
 
         where:
-        entityRegisterAction << [
-            { m -> m.registerClientsClass(new EntityDefinition(MongoStoredEntity)) },
-            { m -> m.getJaversType(MongoStoredEntity) }
-        ]
+        entity <<  [MongoStoredEntity, DummyEntityWithEmbeddedId]
+        usedAnn << [Id, EmbeddedId]
+        idType <<  [ObjectId, DummyPoint]
     }
 
     def "should map as Entity when class has @Id property annotation"() {

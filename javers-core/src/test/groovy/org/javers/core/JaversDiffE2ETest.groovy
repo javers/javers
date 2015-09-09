@@ -5,6 +5,7 @@ import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
+import org.javers.core.model.DummyEntityWithEmbeddedId
 import org.javers.core.model.DummyPoint
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -22,6 +23,19 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  * @author bartosz walacik
  */
 class JaversDiffE2ETest extends Specification {
+
+    def "should compare objects with @EmbeddedId using id.toString() to match instances"(){
+        given:
+        def javers = JaversTestBuilder.newInstance()
+        def left  = new DummyEntityWithEmbeddedId(point: new DummyPoint(1,2), someVal: 5)
+        def right = new DummyEntityWithEmbeddedId(point: new DummyPoint(1,2), someVal: 6)
+
+        when:
+        def diff = javers.compare(left,right)
+
+        then:
+        DiffAssert.assertThat(diff).hasChanges(1).hasValueChangeAt("someVal",5,6)
+    }
 
     def "should create NewObject for all nodes in initial diff"() {
         given:

@@ -2,11 +2,9 @@ package org.javers.core.metamodel.clazz
 
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
-import org.javers.core.metamodel.clazz.Entity
-import org.javers.core.metamodel.clazz.EntityDefinition
-import org.javers.core.metamodel.clazz.ManagedClassFactory
 import org.javers.core.metamodel.property.EntityAssert
 import org.javers.core.model.DummyAddress
+import org.javers.core.model.DummyEntityWithEmbeddedId
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
 
@@ -16,7 +14,15 @@ import spock.lang.Specification
 abstract class EntityFactoryIdTest extends Specification {
     protected ManagedClassFactory entityFactory
 
-    def "should use @id property by default"() {
+    def "should use @EmbeddedId property"(){
+        when:
+        def entity = entityFactory.create(new EntityDefinition(DummyEntityWithEmbeddedId.class))
+
+        then:
+        EntityAssert.assertThat(entity).hasIdProperty("point")
+    }
+
+    def "should use @Id property by default"() {
         when:
         def entity = entityFactory.create(new EntityDefinition(DummyUser.class))
 
