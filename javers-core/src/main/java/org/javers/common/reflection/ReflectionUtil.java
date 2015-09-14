@@ -1,5 +1,6 @@
 package org.javers.common.reflection;
 
+import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -169,5 +170,33 @@ public class ReflectionUtil {
         }
 
         return Integer.MAX_VALUE;
+    }
+
+    public static String reflectiveToString(Object cdoId) {
+        if (cdoId == null){
+            return "";
+        }
+
+        if (cdoId instanceof String) {
+            return (String) cdoId;
+        }
+
+        if (Primitives.isPrimitiveOrBox(cdoId)){
+            return cdoId.toString();
+        }
+
+        StringBuilder ret = new StringBuilder();
+        for (JaversField f : getAllPersistentFields(cdoId.getClass()) ){
+            ret.append( f.invokeEvenIfPrivate(cdoId).toString() );
+            ret.append(",");
+        }
+
+        if (ret.length() == 0) {
+            return cdoId.toString();
+        }
+        else{
+            ret.delete(ret.length()-1, ret.length());
+            return ret.toString();
+        }
     }
 }

@@ -21,7 +21,7 @@ public class RealNodePair implements NodePair {
 
     public RealNodePair(ObjectNode left, ObjectNode right) {
         Validate.argumentsAreNotNull(left, right);
-        Validate.argumentCheck(left.getGlobalId().equals(right.getGlobalId()),"left & right should refer to the same Cdo");
+        Validate.argumentCheck(left.getGlobalId().equals(right.getGlobalId()), "left & right should refer to the same Cdo");
         this.left = left;
         this.right = right;
     }
@@ -29,7 +29,7 @@ public class RealNodePair implements NodePair {
     @Override
     public boolean isNullOnBothSides(Property property) {
         return left.getPropertyValue(property) == null &&
-               right.getPropertyValue(property) == null;
+                right.getPropertyValue(property) == null;
     }
 
     @Override
@@ -39,21 +39,21 @@ public class RealNodePair implements NodePair {
 
     @Override
     public Object getRightPropertyValue(Property property) {
-        return getPropertyValueEvenIfMissing(right,property);
+        return getPropertyValueEvenIfMissing(right, property);
     }
 
     /**
      * Converts JaversException.MISSING_PROPERTY to null value
      */
-    private Object getPropertyValueEvenIfMissing(ObjectNode source, Property property){
-       try{
-           return source.getPropertyValue(property);
-       } catch (JaversException e){
-           if (e.getCode() == JaversExceptionCode.MISSING_PROPERTY){
-               return null;
-           }
-           throw e;
-       }
+    private Object getPropertyValueEvenIfMissing(ObjectNode source, Property property) {
+        try {
+            return source.getPropertyValue(property);
+        } catch (JaversException e) {
+            if (e.getCode() == JaversExceptionCode.MISSING_PROPERTY) {
+                return null;
+            }
+            throw e;
+        }
     }
 
     @Override
@@ -64,10 +64,6 @@ public class RealNodePair implements NodePair {
     @Override
     public GlobalId getLeftGlobalId(Property property) {
         return left.getReference(property);
-    }
-
-    public ObjectNode getLeft() {
-        return left;
     }
 
     @Override
@@ -84,5 +80,4 @@ public class RealNodePair implements NodePair {
     public GlobalId getGlobalId() {
         return left.getGlobalId();
     }
-
 }

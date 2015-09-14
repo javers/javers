@@ -6,6 +6,8 @@ import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
+import org.javers.core.model.DummyEntityWithEmbeddedId
+import org.javers.core.model.DummyPoint
 import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -28,7 +30,6 @@ class GlobalIdTypeAdapterTest extends Specification {
     @Unroll
     def "should deserialize InstanceId with #type cdoId"() {
         when:
-        //println givenJson
         def idHolder = javersTestAssembly().jsonConverter.fromJson(givenJson, IdHolder)
 
         then:
@@ -47,14 +48,27 @@ class GlobalIdTypeAdapterTest extends Specification {
         ]
     }
 
+    def "should serialize Instance @EmbeddedId using json fields"(){
+        given:
+        def javers = javersTestAssembly()
+        def id = javers.idBuilder().instanceId(new DummyPoint(2,3),DummyEntityWithEmbeddedId)
+
+        when:
+        def jsonText = javers.jsonConverter.toJson(id)
+
+        then:
+        def json = new JsonSlurper().parseText(jsonText)
+        json.cdoId.x == 2
+        json.cdoId.y == 3
+    }
+
     def "should serialize InstanceId"() {
         given:
         def javers = javersTestAssembly()
         def id = javers.idBuilder().instanceId("kaz",DummyUser)
 
         when:
-        String jsonText = javers.jsonConverter.toJson(id)
-        println(jsonText)
+        def jsonText = javers.jsonConverter.toJson(id)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -68,8 +82,7 @@ class GlobalIdTypeAdapterTest extends Specification {
         def id = javers.idBuilder().unboundedValueObjectId(DummyAddress)
 
         when:
-        String jsonText = javers.jsonConverter.toJson(id)
-        println(jsonText)
+        def jsonText = javers.jsonConverter.toJson(id)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -89,6 +102,27 @@ class GlobalIdTypeAdapterTest extends Specification {
         idHolder.id == javers.idBuilder().unboundedValueObjectId(DummyAddress)
     }
 
+    def "should deserialize Instance @EmbeddedId from json fields"(){
+        given:
+        def json =
+'''
+{ "entity": "org.javers.core.model.DummyEntityWithEmbeddedId",
+  "cdoId": {
+    "x": 2,
+    "y": 3
+  }}
+'''
+        def javers = javersTestAssembly()
+
+        when:
+        def id = javers.jsonConverter.fromJson(json, GlobalId)
+
+        then:
+        id instanceof InstanceId
+        id.cdoId instanceof DummyPoint
+        id.cdoId.x == 2
+        id.cdoId.y == 3
+    }
 
     def "should serialize ValueObjectId"() {
         given:
