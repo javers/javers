@@ -24,7 +24,7 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  */
 class JaversDiffE2ETest extends Specification {
 
-    def "should compare objects with @EmbeddedId using id.toString() to match instances"(){
+    def "should compare objects with @EmbeddedId using Id reflectiveToString() to match instances"(){
         given:
         def javers = JaversTestBuilder.newInstance()
         def left  = new DummyEntityWithEmbeddedId(point: new DummyPoint(1,2), someVal: 5)

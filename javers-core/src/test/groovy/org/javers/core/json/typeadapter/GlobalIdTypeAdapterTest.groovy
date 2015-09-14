@@ -119,7 +119,9 @@ class GlobalIdTypeAdapterTest extends Specification {
 
         then:
         id instanceof InstanceId
-        id.cdoId == new DummyPoint(2,3)
+        id.cdoId instanceof DummyPoint
+        id.cdoId.x == 2
+        id.cdoId.y == 3
     }
 
     def "should serialize ValueObjectId"() {

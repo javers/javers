@@ -54,6 +54,4 @@ class FakeNodePair implements NodePair {
     public GlobalId getLeftGlobalId(Property property) {
         return null;
     }
-
-
 }
