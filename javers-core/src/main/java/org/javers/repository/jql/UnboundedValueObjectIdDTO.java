@@ -29,6 +29,10 @@ public final class UnboundedValueObjectIdDTO extends GlobalIdDTO {
         return new UnboundedValueObjectIdDTO(LiveGraphFactory.getListWrapperType());
     }
 
+    public static UnboundedValueObjectIdDTO unboundedArrayId(){
+        return new UnboundedValueObjectIdDTO(LiveGraphFactory.getArrayWrapperType());
+    }
+
     public static UnboundedValueObjectIdDTO unboundedValueObjectId(Class valueObjectClass) {
         return new UnboundedValueObjectIdDTO(valueObjectClass);
     }

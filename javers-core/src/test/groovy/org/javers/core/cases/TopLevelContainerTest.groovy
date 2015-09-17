@@ -1,6 +1,7 @@
 package org.javers.core.cases
 
 import org.javers.core.JaversBuilder
+import org.javers.core.diff.changetype.container.ArrayChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.container.SetChange
 import org.javers.core.diff.changetype.map.MapChange
@@ -25,13 +26,12 @@ class TopLevelContainerTest extends Specification {
         then:
         diff.changes.size() == 1
         diff.changes[0].propertyName == colType
-        //println diff
 
         where:
-        colType << ["map","list","set"]
-        expectedChangeType << [MapChange, ListChange, SetChange]
-        container1 << [ [a:1], [1], [1] as Set]
-        container2 << [ [a:1 , b:2], [1,2], [1,2] as Set]
+        colType << ["map","list","set", "objects"]
+        expectedChangeType << [MapChange, ListChange, SetChange, ArrayChange]
+        container1 << [ [a:1], [1], [1] as Set, (int[]) [1,2,3]]
+        container2 << [ [a:1 , b:2], [1,2], [1,2] as Set, (int[]) [1,2]]
     }
 
     @Unroll
@@ -43,17 +43,19 @@ class TopLevelContainerTest extends Specification {
         javers.commit("author",container1)
         javers.commit("author",container2)
 
-        def changes = javers.getChangeHistory(voId,2)
+
+        def changes = javers.getChangeHistory(voId,3)
 
         then:
         changes[0].propertyName == colType
 
         where:
-        colType << ["map","list","set"]
-        expectedChangeType << [MapChange, ListChange, SetChange]
-        container1 << [ [a:1], [1], [1] as Set]
-        container2 << [ [a:1 , b:2], [1,2], [1,2] as Set]
-        voId << [unboundedMapId(), unboundedListId(), unboundedSetId()]
+        colType << ["map","list","set", "objects"]
+        expectedChangeType << [MapChange, ListChange, SetChange, ArrayChange]
+        container1 << [ [a:1], [1], [1] as Set, [1, 2].toArray()]
+        container2 << [ [a:1 , b:2], [1,2], [1,2] as Set, [1].toArray()]
+        voId << [unboundedMapId(), unboundedListId(), unboundedSetId(), unboundedArrayId()]
     }
 
 }
+
