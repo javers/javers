@@ -42,7 +42,8 @@ public abstract class GlobalId {
         return value().equals(((GlobalId) o).value());
     }
 
-    public boolean equals(GlobalIdDTO o) {
+    //for testing
+    boolean equals(GlobalIdDTO o) {
         return this.value().equals(o.value());
     }
 

@@ -28,6 +28,19 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
+    def "should support EmbeddeId as Entity Id"(){
+      given:
+      def javers = javers().build()
+      def cdo  = new DummyEntityWithEmbeddedId(point: new DummyPoint(1,2), someVal: 5)
+
+      when:
+      javers.commit("author", cdo)
+
+      then:
+      def snapshot = javers.getLatestSnapshot(new DummyPoint(1,2), DummyEntityWithEmbeddedId).get()
+      snapshot.globalId.cdoId == new DummyPoint(1,2)
+    }
+
     def "should support long numbers as Entity Id "(){
         given:
         def javers = javers().build()

@@ -11,6 +11,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public class Property {
     public static final String ID_ANN = "Id";
+    public static final String EMBEDDED_ID_ANN = "EmbeddedId";
 
     private transient final JaversMember member;
     private transient final boolean hasTransientAnn;
@@ -33,7 +34,7 @@ public class Property {
      * true if property looks like identifier of an Entity, for example has @Id annotation
      */
     public boolean looksLikeId() {
-        return member.isAnnotationPresent(ID_ANN);
+        return member.isAnnotationPresent(ID_ANN) || member.isAnnotationPresent(EMBEDDED_ID_ANN);
     }
 
     /**
