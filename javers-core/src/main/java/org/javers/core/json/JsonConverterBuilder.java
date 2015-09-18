@@ -18,6 +18,7 @@ public class JsonConverterBuilder {
     public static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     private boolean typeSafeValues = false;
+    private boolean prettyPrint = true;
     private TypeMapper typeMapper;
     private GlobalIdFactory globalIdFactory;
     private final GsonBuilder gsonBuilder;
@@ -45,6 +46,14 @@ public class JsonConverterBuilder {
      */
     public JsonConverterBuilder typeSafeValues(boolean typeSafeValues) {
         this.typeSafeValues = typeSafeValues;
+        return this;
+    }
+
+     /**
+     * @param prettyPrint default true
+     */
+    public JsonConverterBuilder prettyPrint(boolean prettyPrint) {
+        this.prettyPrint = prettyPrint;
         return this;
     }
 
@@ -111,8 +120,11 @@ public class JsonConverterBuilder {
     public JsonConverter build() {
         registerJsonTypeAdapter(new AtomicTypeAdapter(typeSafeValues));
 
+        if (prettyPrint){
+            gsonBuilder.setPrettyPrinting();
+        }
+
         gsonBuilder.serializeNulls()
-                   .setPrettyPrinting()
                    .setDateFormat(ISO_DATE_TIME_FORMAT);
 
         return new JsonConverter(typeMapper, globalIdFactory, gsonBuilder.create());

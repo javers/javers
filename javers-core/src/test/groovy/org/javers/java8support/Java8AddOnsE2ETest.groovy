@@ -1,6 +1,7 @@
 package org.javers.java8support
 
 import org.javers.core.metamodel.type.ValueType
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -27,25 +28,22 @@ class Java8AddOnsE2ETest extends Specification {
     }
 
     @Unroll
-    def "should support optional values (#expectedLeft, #expectedRight) in diff" (){
-        given:
+    def "should support optional ValueObjects in diff "(){
         def javers = javers().build()
-        def left =  new SnapshotEntity(optionalInteger: leftOptional)
-        def right = new SnapshotEntity(optionalInteger: rightOptional)
+        def left =  new SnapshotEntity(optionalValueObject: Optional.of(new DummyAddress("New York")) )
+        def right = new SnapshotEntity(optionalValueObject: Optional.of(new DummyAddress("Paris")) )
 
         when:
         def diff = javers.compare(left,right)
 
         then:
-        assertThat(diff).hasValueChangeAt("optionalInteger", expectedLeft, expectedRight)
-
-        where:
-        leftOptional     | rightOptional  || expectedLeft | expectedRight
-        Optional.empty() | Optional.of(1) || null         | 1
-        Optional.of(1)   | Optional.of(2) || 1            | 2
+        assertThat(diff)
+                .hasSize(1)
+                .hasValueChangeAt("city", "New York", "Paris")
     }
 
-    def "should ignore equal optionals "(){
+    @Unroll
+    def "should support optional values (#leftOptional, #rightOptional) in diff" (){
         given:
         def javers = javers().build()
         def left =  new SnapshotEntity(optionalInteger: leftOptional)
@@ -55,11 +53,11 @@ class Java8AddOnsE2ETest extends Specification {
         def diff = javers.compare(left,right)
 
         then:
-        diff.changes.size() == 0
+        assertThat(diff).hasValueChangeAt("optionalInteger", leftOptional, rightOptional)
 
         where:
         leftOptional     | rightOptional
-        Optional.empty() | Optional.empty()
-        Optional.of(2)   | Optional.of(2)
+        Optional.empty() | Optional.of(1)
+        Optional.of(1)   | Optional.of(2)
     }
 }

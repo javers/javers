@@ -67,8 +67,8 @@ class JaversTestBuilder {
         new JaversTestBuilder(dateProvider)
     }
 
-    static JaversTestBuilder javersTestAssemblyTypeSafe(){
-        new JaversTestBuilder(new JaversBuilder().typeSafeValues())
+    static JaversTestBuilder javersTestAssemblyTypeSafe() {
+        new JaversTestBuilder(new JaversBuilder().withTypeSafeValues(true))
     }
 
     static Javers newInstance() {

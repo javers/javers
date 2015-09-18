@@ -27,8 +27,6 @@ class SnapshotFactoryTest extends Specification{
     @Shared JaversTestBuilder javers
     @Shared SnapshotFactory snapshotFactory
 
-    final String = "1"
-
     def setupSpec(){
         javers = JaversTestBuilder.javersTestAssembly()
         snapshotFactory = javers.snapshotFactory
@@ -158,13 +156,13 @@ class SnapshotFactoryTest extends Specification{
         propertyName <<  ["optionalInteger", "optionalDate", "optionalEntity", "optionalValueObject"]
         cdo << [new SnapshotEntity(optionalInteger: Optional.of(1)),
                 new SnapshotEntity(optionalDate: Optional.of(new LocalDate(2000, 1, 1))),
-                new SnapshotEntity(optionalEntity: Optional.of(new SnapshotEntity(id:1))),
+                new SnapshotEntity(optionalEntity: Optional.of(new SnapshotEntity(id:5))),
                 new SnapshotEntity(optionalValueObject: Optional.of(new DummyAddress("London")))
         ]
         expectedVal <<[
                 Optional.of(1),
                 Optional.of(new LocalDate(2000, 1, 1)),
-                Optional.of(instanceId(2, SnapshotEntity)),
+                Optional.of(instanceId(5, SnapshotEntity)),
                 Optional.of(valueObjectId(1, SnapshotEntity,"optionalValueObject"))
         ]
     }

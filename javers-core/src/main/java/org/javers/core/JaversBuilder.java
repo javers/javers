@@ -250,9 +250,32 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * with exactly one type of items like List&lt;String&gt;.
      *
      * @see org.javers.core.json.JsonConverterBuilder#typeSafeValues(boolean)
+     * @param typeSafeValues default false
      */
-    public JaversBuilder typeSafeValues() {
-        jsonConverterBuilder().typeSafeValues(true);
+    public JaversBuilder withTypeSafeValues(boolean typeSafeValues) {
+        jsonConverterBuilder().typeSafeValues(typeSafeValues);
+        return this;
+    }
+
+    /**
+     * choose between JSON pretty or concise printing style, i.e. :
+     *
+     * <ul><li>pretty:
+     * <pre>
+     * {
+     *     "value": 5
+     * }
+     * </pre>
+     * </li><li>concise:
+     * <pre>
+     * {"value":5}
+     * </pre>
+     * </li></ul>
+     *
+     * @param prettyPrint default true
+     */
+    public JaversBuilder withPrettyPrint(boolean prettyPrint) {
+        jsonConverterBuilder().prettyPrint(prettyPrint);
         return this;
     }
 

@@ -37,13 +37,19 @@ public abstract class GlobalId {
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
+
+        //for testing
+        if (o != null && o instanceof GlobalIdDTO) {
+            return equals((GlobalIdDTO)o);
+        }
+
         if (o == null || !(o instanceof GlobalId) ) {return false;}
 
         return value().equals(((GlobalId) o).value());
     }
 
     //for testing
-    boolean equals(GlobalIdDTO o) {
+    private boolean equals(GlobalIdDTO o) {
         return this.value().equals(o.value());
     }
 

@@ -1,8 +1,8 @@
-package org.javers.core.json
+package org.javers.core.json.typeadapter
 
-import org.javers.core.JaversTestBuilder
+import org.javers.core.json.DummyPointJsonTypeAdapter
+import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.model.DummyPoint
-import spock.lang.Shared
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly

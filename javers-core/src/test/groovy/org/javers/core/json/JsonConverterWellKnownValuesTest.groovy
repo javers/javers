@@ -1,14 +1,10 @@
-package org.javers.core.json.typeadapter
+package org.javers.core.json
 
-import org.javers.core.json.JsonConverterBuilder
-
+import org.javers.core.diff.Change
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import org.javers.core.json.JsonConverter
 import spock.lang.Shared
 import spock.lang.Specification
-
 import java.text.SimpleDateFormat
-
 import static java.math.RoundingMode.HALF_UP
 
 /**
@@ -57,5 +53,11 @@ class JsonConverterWellKnownValuesTest extends Specification {
 
         then:
         date == sdfIso.parse("2014-01-12T20:04:48+0100")
+    }
+
+    def "should be null safe when converting to and from JSON"(){
+        expect:
+        jsonConverter.toJson(null) == "null"
+        jsonConverter.fromJson("null", Integer) == null
     }
 }
