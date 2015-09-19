@@ -45,8 +45,9 @@ public class LiveGraphFactory {
         if (handle instanceof  Set){
             return new SetWrapper((Set)handle);
         }
-        if (handle != null && handle.getClass().isArray()){
-            return new ArrayWrapper(convertToObjectArray(handle));
+        if (handle.getClass().isArray()){
+            //return new ArrayWrapper(convertToObjectArray(handle));
+            return new ArrayWrapper((Object[])handle);
         }
         return handle;
     }
@@ -63,7 +64,9 @@ public class LiveGraphFactory {
         return ListWrapper.class;
     }
 
-    public static Class getArrayWrapperType() { return ArrayWrapper.class; }
+    public static Class getArrayWrapperType() {
+        return ArrayWrapper.class;
+    }
 
     private class MapWrapper{
         private final Map<Object,Object> map;
@@ -92,7 +95,9 @@ public class LiveGraphFactory {
     private class ArrayWrapper {
         private final Object[] objects;
 
-        public ArrayWrapper(Object[] objects){ this.objects = objects; }
+        public ArrayWrapper(Object[] objects) {
+            this.objects = objects;
+        }
     }
 
     //this is primarily used for casting array primitives to array objects

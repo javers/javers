@@ -30,8 +30,8 @@ class TopLevelContainerTest extends Specification {
         where:
         colType << ["map","list","set", "objects"]
         expectedChangeType << [MapChange, ListChange, SetChange, ArrayChange]
-        container1 << [ [a:1], [1], [1] as Set, (int[]) [1,2,3]]
-        container2 << [ [a:1 , b:2], [1,2], [1,2] as Set, (int[]) [1,2]]
+        container1 << [ [a:1], [1], [1] as Set, [1,2,3].toArray()]
+        container2 << [ [a:1 , b:2], [1,2], [1,2] as Set, [1,2].toArray()]
     }
 
     @Unroll
