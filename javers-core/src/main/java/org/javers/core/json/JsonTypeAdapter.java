@@ -46,7 +46,7 @@ public interface JsonTypeAdapter<T> {
     JsonElement toJson(T sourceValue, JsonSerializationContext jsonSerializationContext);
 
     /**
-     * Target clazz.
+     * Target class.
      * If adapter is designed to handle single class, return List with one element.
      * If adapter is polymorfic, return list captaining all supported clazz
      */

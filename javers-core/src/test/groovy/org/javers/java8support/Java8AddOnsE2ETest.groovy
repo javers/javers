@@ -8,8 +8,16 @@ import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.Period
+import java.time.Year
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.diff.DiffAssert.assertThat
@@ -19,14 +27,16 @@ import static org.javers.core.diff.DiffAssert.assertThat
  */
 class Java8AddOnsE2ETest extends Specification {
 
-    //@IgnoreIf({ !ReflectionUtil.isJava8runtime() })
-    def "should register java.time.LocalDate and LocalDateTime as ValueTypes"(){
+    @Unroll
+    def "should register #j8type.simpleName as ValueTypes"(){
         given:
         def javers = javers().build()
 
         expect:
-        javers.getTypeMapping(LocalDate) instanceof ValueType
-        javers.getTypeMapping(LocalDateTime) instanceof ValueType
+        javers.getTypeMapping(j8type) instanceof ValueType
+
+        where:
+        j8type << [LocalDate, LocalDateTime, LocalTime, Year, ZonedDateTime, ZoneOffset, OffsetDateTime, Instant, Period, Duration]
     }
 
     @Unroll
