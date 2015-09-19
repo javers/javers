@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
+import org.javers.common.collections.Function;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -28,9 +29,9 @@ public class OptionalType extends CollectionType {
 
     @Override
     public Object map(Object sourceOptional_, EnumerableFunction mapFunction, OwnerContext owner) {
-        Validate.argumentsAreNotNull(sourceOptional_, mapFunction, owner);
+        Validate.argumentsAreNotNull(sourceOptional_, mapFunction);
 
-        java.util.Optional sourceOptional = toOptional(sourceOptional_);
+        java.util.Optional sourceOptional = toNormalizedOptional(sourceOptional_);
 
         if (!sourceOptional.isPresent()){
             return java.util.Optional.empty();
@@ -38,16 +39,35 @@ public class OptionalType extends CollectionType {
 
         Object applied = mapFunction.apply(sourceOptional.get(), owner);
 
-        if (applied == null){
-            return java.util.Optional.empty();
-        }
-
         return java.util.Optional.of( applied );
     }
 
     @Override
     public boolean isEmpty(Object optional){
-        return optional == null || !toOptional(optional).isPresent();
+        return optional == null || !toNormalizedOptional(optional).isPresent();
+    }
+
+    private Object get(Object sourceOptional_){
+        java.util.Optional sourceOptional = toNormalizedOptional(sourceOptional_);
+
+        if (sourceOptional.isPresent()) {
+            return sourceOptional.get();
+        }
+        return null;
+    }
+
+    public Object mapAndGet(Object sourceOptional, Function mapFunction){
+        return mapFunction.apply(get(sourceOptional));
+    }
+
+    /**
+     * converts nulls to Optional.empty()
+     */
+    public Object normalize(Object sourceOptional){
+        if (sourceOptional == null){
+            return java.util.Optional.empty();
+        }
+        return sourceOptional;
     }
 
     /**
@@ -59,5 +79,9 @@ public class OptionalType extends CollectionType {
         }
 
         return (java.util.Optional) optional;
+    }
+
+    private java.util.Optional toNormalizedOptional(Object optional){
+        return (java.util.Optional)normalize( toOptional(optional) );
     }
 }

@@ -74,7 +74,7 @@ class EdgeBuilder {
             }
             ObjectNode objectNode = buildNodeStubOrReuse(asCdo(input, enumerationAwareOwnerContext));
             multiEdge.addReferenceNode(objectNode);
-            return null;
+            return input;
         }
 
         boolean isManagedPosition(Object input){

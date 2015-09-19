@@ -1,8 +1,10 @@
 package org.javers.java8support
 
+import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.metamodel.type.ValueType
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
+import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -28,22 +30,7 @@ class Java8AddOnsE2ETest extends Specification {
     }
 
     @Unroll
-    def "should support optional ValueObjects in diff "(){
-        def javers = javers().build()
-        def left =  new SnapshotEntity(optionalValueObject: Optional.of(new DummyAddress("New York")) )
-        def right = new SnapshotEntity(optionalValueObject: Optional.of(new DummyAddress("Paris")) )
-
-        when:
-        def diff = javers.compare(left,right)
-
-        then:
-        assertThat(diff)
-                .hasSize(1)
-                .hasValueChangeAt("city", "New York", "Paris")
-    }
-
-    @Unroll
-    def "should support optional values (#leftOptional, #rightOptional) in diff" (){
+    def "should support optional values (#leftOptional, #rightOptional) changes" (){
         given:
         def javers = javers().build()
         def left =  new SnapshotEntity(optionalInteger: leftOptional)
@@ -59,5 +46,22 @@ class Java8AddOnsE2ETest extends Specification {
         leftOptional     | rightOptional
         Optional.empty() | Optional.of(1)
         Optional.of(1)   | Optional.of(2)
+    }
+
+    def "should support value changes in optional ValueObjects"(){
+        def javers = javers().build()
+        def left =  new SnapshotEntity(optionalValueObject: Optional.of(new DummyAddress("New York")) )
+        def right = new SnapshotEntity(optionalValueObject: Optional.of(new DummyAddress("Paris")) )
+
+        when:
+        def diff = javers.compare(left,right)
+
+        then:
+        diff.changes.size() == 1
+        def change = diff.changes[0]
+        change.affectedGlobalId == ValueObjectIdDTO.valueObjectId(1, SnapshotEntity, "optionalValueObject")
+        change instanceof ValueChange
+        change.left == "New York"
+        change.right == "Paris"
     }
 }
