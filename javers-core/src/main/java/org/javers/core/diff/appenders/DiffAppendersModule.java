@@ -30,6 +30,7 @@ public class DiffAppendersModule extends InstantiatingModule {
                 ArrayChangeAppender.class,
                 ObjectRemovedAppender.class,
                 ReferenceChangeAppender.class,
+                OptionalChangeAppender.class,
                 ValueChangeAppender.class
         );
     }

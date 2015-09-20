@@ -77,7 +77,9 @@ public enum JaversExceptionCode {
 
     MALFORMED_JQL(JaversException.RUNTIME_ERROR+"Invalid JQL query, %s"),
 
-    RUNTIME_EXCEPTION(JaversException.RUNTIME_ERROR+"uncategorized runtime exception")
+    UNSUPPORTED_OPTIONAL_CONTENT_TYPE(JaversException.RUNTIME_ERROR+"%s is not supported as Optional<> content type"),
+
+    RUNTIME_EXCEPTION(JaversException.RUNTIME_ERROR+"uncategorized runtime exception. %s")
     ;
 
     private final String message;

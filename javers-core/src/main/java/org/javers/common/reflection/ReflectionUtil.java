@@ -4,6 +4,7 @@ import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.Javers;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
@@ -14,6 +15,22 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class ReflectionUtil {
+
+    public static boolean isJava8runtime(){
+        return isClassPresent("java.time.LocalDate");
+    }
+
+    public static boolean isClassPresent(String className) {
+        try {
+            Class.forName(className, false, Javers.class.getClassLoader());
+            return true;
+        }
+        catch (Throwable ex) {
+            // Class or one of its dependencies is not present...
+            return false;
+        }
+    }
+
     /**
      * Creates new instance of public or package-private class.
      * Calls first, not-private constructor

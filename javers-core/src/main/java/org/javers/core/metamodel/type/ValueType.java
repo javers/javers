@@ -11,11 +11,11 @@ import org.javers.core.JaversBuilder;
  * Value class in client's domain model. Simple value holder.
  * <br/>
  *
- * JaVers do not interact with internal properties of this type but treats its similarly to primitives.
+ * JaVers doesn't interact with internal properties of this type but treats its similarly to primitives.
  * <br><br>
  *
  * Two Value instances are compared using equals() so
- * its highly important to implement it properly by comparing underlying field (or fields).
+ * it's highly important to implement it properly by comparing underlying field (or fields).
  * <br><br>
  *
  * It's highly advisable to implement Values as immutable objects, for example:

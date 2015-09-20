@@ -40,7 +40,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .hasInstanceId(DummyUser, "Mad Kaz")
     }
 
-
     def "should build graph starting from root ValueObject"(){
         given:
         def graphBuilder = newBuilder()
@@ -54,7 +53,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .hasCdo(address)
                 .hasUnboundedValueObjectId(DummyAddress)
     }
-
 
     def "should build graph with ValueObject node"() {
         given:
@@ -416,4 +414,37 @@ abstract class ObjectGraphBuilderTest extends Specification {
         }
     }
 
+
+    @Unroll
+    def "should build graph with Optional<#managedClass> SingleEdge"() {
+        given:
+        def graphBuilder = newBuilder()
+
+        when:
+        def node = graphBuilder.buildGraph(cdo).root()
+
+        then:
+        assertThat(node).hasMultiEdge(propertyName).ofSize(1)
+
+        where:
+        managedClass  << ["ValueObject", "Entity"]
+        propertyName <<  ["optionalValueObject", "optionalEntity"]
+        cdo << [
+                new SnapshotEntity(optionalValueObject:  Optional.of(new DummyAddress("London"))) ,
+                new SnapshotEntity(optionalEntity: Optional.of(new SnapshotEntity(id:1)))
+        ]
+    }
+
+    @Unroll
+    def "should ignore empty Optional"() {
+        given:
+        def graphBuilder = newBuilder()
+
+        when:
+        def cdo = new SnapshotEntity(optionalValueObject:  Optional.empty())
+        def node = graphBuilder.buildGraph(cdo).root()
+
+        then:
+        assertThat(node).hasNoEdges()
+    }
 }

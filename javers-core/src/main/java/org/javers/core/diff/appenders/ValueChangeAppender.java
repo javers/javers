@@ -35,10 +35,10 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
                                        reflectiveToString(rightValue))){
                 return null;
             }
-        }
-
-        if (Objects.nullSafeEquals(leftValue,rightValue)) {
-            return null;
+        }else {
+            if (Objects.nullSafeEquals(leftValue, rightValue)) {
+                return null;
+            }
         }
 
         return new ValueChange(pair.getGlobalId(), property, leftValue, rightValue);

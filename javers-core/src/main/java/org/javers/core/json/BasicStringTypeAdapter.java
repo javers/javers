@@ -4,7 +4,6 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
-import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
 import org.javers.core.metamodel.type.ValueType;
 
 /**
@@ -15,7 +14,7 @@ import org.javers.core.metamodel.type.ValueType;
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
  * <br><br>
  *
- * For concrete class example see {@link LocalDateTimeTypeAdapter}.
+ * For concrete class example see {@link org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter}.
  * <br><br>
  *
  * @author bartosz walacik

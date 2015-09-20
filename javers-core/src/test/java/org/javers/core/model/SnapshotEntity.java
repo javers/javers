@@ -1,5 +1,6 @@
 package org.javers.core.model;
 
+import java.util.Optional;
 import org.joda.time.LocalDate;
 import javax.persistence.Id;
 import java.math.BigDecimal;
@@ -12,6 +13,14 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public class SnapshotEntity {
+
+    public Optional<Integer> getOptionalInteger() {
+        return optionalInteger;
+    }
+
+    public void setOptionalInteger(Optional<Integer> optionalInteger) {
+        this.optionalInteger = optionalInteger;
+    }
 
     public enum DummyEnum { val1, val2, val3 }
 
@@ -41,6 +50,10 @@ public class SnapshotEntity {
     private Set<SnapshotEntity> setOfEntities;
     private Set<DummyAddress> setOfValueObjects;
 
+    private Optional<Integer> optionalInteger;
+    private Optional<LocalDate> optionalDate;
+    private Optional<SnapshotEntity> optionalEntity;
+    private Optional<DummyAddress> optionalValueObject;
 
     private Map<String, Integer> mapOfPrimitives;
     private Map<LocalDate,BigDecimal> mapOfValues;
@@ -229,6 +242,30 @@ public class SnapshotEntity {
 
     public void setMapOfEntities(Map<SnapshotEntity, SnapshotEntity> mapOfEntities) {
         this.mapOfEntities = mapOfEntities;
+    }
+
+    public Optional<LocalDate> getOptionalDate() {
+        return optionalDate;
+    }
+
+    public void setOptionalDate(Optional<LocalDate> optionalDate) {
+        this.optionalDate = optionalDate;
+    }
+
+    public Optional<SnapshotEntity> getOptionalEntity() {
+        return optionalEntity;
+    }
+
+    public void setOptionalEntity(Optional<SnapshotEntity> optionalEntity) {
+        this.optionalEntity = optionalEntity;
+    }
+
+    public Optional<DummyAddress> getOptionalValueObject() {
+        return optionalValueObject;
+    }
+
+    public void setOptionalValueObject(Optional<DummyAddress> optionalValueObject) {
+        this.optionalValueObject = optionalValueObject;
     }
 
     public Map<DummyAddress, String> getMapVoToPrimitive() {

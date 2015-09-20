@@ -20,7 +20,7 @@ class JaversSmartparamIntegrationTest extends Specification{
     def "should serialize parameter entry"() {
         given:
         Javers javers = JaversBuilder.javers()
-                                     .typeSafeValues()
+                                     .withTypeSafeValues(true)
                                      .build()
 
         def entry1 = new DummyParameterEntry(["date":new LocalDate(2014,01,10)])

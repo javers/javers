@@ -3,8 +3,8 @@ package org.javers.core.json;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
-import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.CustomType;
+import org.javers.core.metamodel.type.ValueType;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ import java.util.List;
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
  * <p/>
  *
- * For implementation example see {@link LocalDateTimeTypeAdapter}.
+ * For implementation example see {@link org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter}.
  * <p/>
  *
  * @param <T> user type, mapped to {@link ValueType} or {@link CustomType}
@@ -46,7 +46,7 @@ public interface JsonTypeAdapter<T> {
     JsonElement toJson(T sourceValue, JsonSerializationContext jsonSerializationContext);
 
     /**
-     * Target clazz.
+     * Target class.
      * If adapter is designed to handle single class, return List with one element.
      * If adapter is polymorfic, return list captaining all supported clazz
      */

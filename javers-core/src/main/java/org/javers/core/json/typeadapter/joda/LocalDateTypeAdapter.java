@@ -11,7 +11,7 @@ import org.joda.time.format.ISODateTimeFormat;
  *
  * @author bartosz walacik
  */
-public class LocalDateTypeAdapter extends BasicStringTypeAdapter<LocalDate> {
+class LocalDateTypeAdapter extends BasicStringTypeAdapter<LocalDate> {
     public static final DateTimeFormatter ISO_FORMATTER = ISODateTimeFormat.date();
 
     @Override

@@ -4,6 +4,7 @@ import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.clazz.ManagedClass;
@@ -72,6 +73,11 @@ public class TypeMapper {
 
         //& Maps
         addType(new MapType(Map.class));
+
+        // bootstrap phase 2: add-ons
+        if (ReflectionUtil.isJava8runtime()){
+            addType(new OptionalType());
+        }
     }
 
     public MapContentType getMapContentType(MapType mapType){
@@ -126,42 +132,6 @@ public class TypeMapper {
     public <T extends JaversType> T getPropertyType(Property property){
         argumentIsNotNull(property);
         return (T) getJaversType(property.getGenericType());
-    }
-
-    public boolean isEntityReferenceOrValueObject(Property property){
-        JaversType javersType = getPropertyType(property);
-        return javersType instanceof ManagedType;
-    }
-
-    /**
-     * is Set, List or Array of ManagedClasses
-     *
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
-     */
-    public boolean isContainerOfManagedClasses(JaversType javersType){
-        if (! (javersType instanceof ContainerType)) {
-            return false;
-        }
-
-        return getJaversType(((ContainerType) javersType).getItemType()) instanceof ManagedType;
-    }
-
-    /**
-     * is Map with ManagedClass on Key or Value position
-     *
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
-     */
-    public boolean isMapWithManagedClass(EnumerableType enumerableType) {
-        if (! (enumerableType instanceof MapType)) {
-            return false;
-        }
-
-        MapType mapType = (MapType)enumerableType;
-
-        JaversType keyType = getJaversType(mapType.getKeyType());
-        JaversType valueType = getJaversType(mapType.getValueType());
-
-        return keyType instanceof ManagedType || valueType instanceof ManagedType;
     }
 
     private void registerPrimitiveType(Class<?> primitiveClass) {

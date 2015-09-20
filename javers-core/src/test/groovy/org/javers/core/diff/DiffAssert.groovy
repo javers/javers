@@ -40,6 +40,11 @@ class DiffAssert {
         this
     }
 
+    DiffAssert hasSize(int expected){
+        assert actual.changes.size() == expected
+        this
+    }
+
     DiffAssert hasValueChangeAt(String property, Object oldVal, Object newVal) {
         ValueChange change = actual.changes.find{it instanceof ValueChange && it.propertyName == property}
         assert change
