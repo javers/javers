@@ -2,6 +2,7 @@ package org.javers.core.cases
 
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.container.ArrayChange
+import org.javers.core.diff.changetype.container.ContainerChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.container.SetChange
 import org.javers.core.diff.changetype.map.MapChange
@@ -16,7 +17,7 @@ import static org.javers.repository.jql.UnboundedValueObjectIdDTO.*
 class TopLevelContainerTest extends Specification {
 
     @Unroll
-    def "should compare top-level #colType(s)"() {
+    def "should compare top-level #containerType"() {
         given:
         def javers = JaversBuilder.javers().build();
 
@@ -25,13 +26,24 @@ class TopLevelContainerTest extends Specification {
 
         then:
         diff.changes.size() == 1
-        diff.changes[0].propertyName == colType
+        with(diff.changes[0]) {
+            propertyName == pName
+            changes.size() == 1
+        }
 
         where:
-        colType << ["map","list","set", "objects"]
-        expectedChangeType << [MapChange, ListChange, SetChange, ArrayChange]
-        container1 << [ [a:1], [1], [1] as Set, [1,2,3].toArray()]
-        container2 << [ [a:1 , b:2], [1,2], [1,2] as Set, [1,2].toArray()]
+        pName << ["map","list","set", "array", "array"]
+        containerType << ["map","list","set", "primitive array", "object array"]
+        expectedChangeType << [MapChange, ListChange, SetChange, ArrayChange, ArrayChange]
+        container1 << [ [a:1], [1], [1] as Set, intArray([1,2]), ["a","b"].toArray()]
+        container2 << [ [a:1, b:2], [1,2], [1,2] as Set, intArray([1,2,3]), ["a","b","c"].toArray()]
+    }
+
+    int[] intArray(List values){
+        def ret = new int[values.size()]
+        values.eachWithIndex{ def entry, int i -> ret[i] = entry}
+        println ret
+        ret
     }
 
     @Unroll
@@ -50,7 +62,7 @@ class TopLevelContainerTest extends Specification {
         changes[0].propertyName == colType
 
         where:
-        colType << ["map","list","set", "objects"]
+        colType << ["map","list","set", "array"]
         expectedChangeType << [MapChange, ListChange, SetChange, ArrayChange]
         container1 << [ [a:1], [1], [1] as Set, [1, 2].toArray()]
         container2 << [ [a:1 , b:2], [1,2], [1,2] as Set, [1].toArray()]

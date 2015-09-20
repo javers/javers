@@ -46,8 +46,7 @@ public class LiveGraphFactory {
             return new SetWrapper((Set)handle);
         }
         if (handle.getClass().isArray()){
-            //return new ArrayWrapper(convertToObjectArray(handle));
-            return new ArrayWrapper((Object[])handle);
+            return new ArrayWrapper(convertToObjectArray(handle));
         }
         return handle;
     }
@@ -93,16 +92,19 @@ public class LiveGraphFactory {
     }
 
     private class ArrayWrapper {
-        private final Object[] objects;
+        private final Object[] array;
 
         public ArrayWrapper(Object[] objects) {
-            this.objects = objects;
+            this.array = objects;
         }
     }
 
-    //this is primarily used for casting array primitives to array objects
+    //this is primarily used for copying array of primitives to array of objects
+    //as there seems be no legal way for casting
     private static Object[] convertToObjectArray(Object obj) {
-        if (obj instanceof Object[]){return (Object[]) obj;}
+        if (obj instanceof Object[]) {
+            return (Object[]) obj;
+        }
         int arrayLength = Array.getLength(obj);
         Object[] retArray = new Object[arrayLength];
         for (int i = 0; i < arrayLength; ++i){
