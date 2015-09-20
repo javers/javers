@@ -7,7 +7,7 @@ import java.time.Duration;
 /**
  * @author bartosz.walacik
  */
-public class DurationTypeAdapter extends BasicStringTypeAdapter<Duration> {
+class DurationTypeAdapter extends BasicStringTypeAdapter<Duration> {
     @Override
     public String serialize(Duration sourceValue) {
         return sourceValue.toString();

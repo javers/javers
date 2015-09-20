@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * @author bartosz.walacik
  */
-public class LocalTimeTypeAdapter extends BasicStringTypeAdapter<LocalTime> {
+class LocalTimeTypeAdapter extends BasicStringTypeAdapter<LocalTime> {
     private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ISO_LOCAL_TIME;
 
     @Override

@@ -7,7 +7,7 @@ import java.time.Period;
 /**
  * @author bartosz.walacik
  */
-public class PeriodTypeAdapter extends BasicStringTypeAdapter<Period> {
+class PeriodTypeAdapter extends BasicStringTypeAdapter<Period> {
     @Override
     public String serialize(Period sourceValue) {
         return sourceValue.toString();

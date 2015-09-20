@@ -7,7 +7,7 @@ import java.time.Instant;
 /**
  * @author bartosz.walacik
  */
-public class InstantTypeAdapter extends BasicStringTypeAdapter<Instant> {
+class InstantTypeAdapter extends BasicStringTypeAdapter<Instant> {
     @Override
     public String serialize(Instant sourceValue) {
         return sourceValue.toString();

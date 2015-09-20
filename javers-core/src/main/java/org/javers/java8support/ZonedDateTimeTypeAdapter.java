@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * @author bartosz.walacik
  */
-public class ZonedDateTimeTypeAdapter extends BasicStringTypeAdapter<ZonedDateTime> {
+class ZonedDateTimeTypeAdapter extends BasicStringTypeAdapter<ZonedDateTime> {
     private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
     @Override

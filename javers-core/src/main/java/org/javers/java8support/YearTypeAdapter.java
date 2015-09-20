@@ -7,7 +7,7 @@ import java.time.Year;
 /**
  * @author bartosz.walacik
  */
-public class YearTypeAdapter extends BasicStringTypeAdapter<Year> {
+class YearTypeAdapter extends BasicStringTypeAdapter<Year> {
     @Override
     public String serialize(Year sourceValue) {
         return sourceValue.toString();

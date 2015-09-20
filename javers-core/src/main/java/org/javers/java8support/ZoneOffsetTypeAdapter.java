@@ -8,7 +8,7 @@ import java.time.ZoneOffset;
 /**
  * @author bartosz.walacik
  */
-public class ZoneOffsetTypeAdapter extends BasicStringTypeAdapter<ZoneOffset> {
+class ZoneOffsetTypeAdapter extends BasicStringTypeAdapter<ZoneOffset> {
     @Override
     public String serialize(ZoneOffset sourceValue) {
         return sourceValue.getId();

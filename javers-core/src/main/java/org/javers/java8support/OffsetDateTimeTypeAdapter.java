@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * @author bartosz.walacik
  */
-public class OffsetDateTimeTypeAdapter extends BasicStringTypeAdapter<OffsetDateTime> {
+class OffsetDateTimeTypeAdapter extends BasicStringTypeAdapter<OffsetDateTime> {
     private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
     @Override
