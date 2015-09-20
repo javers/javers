@@ -14,14 +14,12 @@ public class Application {
     public static void main(String[] args) {
         System.out.println(".. Starting javers-core runtime environment self test ...");
 
-
         System.out.println("java.runtime.name:          " + System.getProperty("java.runtime.name"));
         System.out.println("java.vendor:                " + System.getProperty("java.vendor"));
         System.out.println("java.runtime.version:       " + System.getProperty("java.runtime.version"));
         System.out.println("java.version:               " + System.getProperty("java.version"));
         System.out.println("java.home:                  " + System.getProperty("java.home"));
         System.out.println("os.name & ver:              " + System.getProperty("os.name")+" v."+System.getProperty("os.version"));
-
 
         System.out.println(".. building JaVers instance ...");
 
@@ -47,7 +45,6 @@ public class Application {
 
     private static class SampleValueObject {
         private String color;
-
         private SampleValueObject(String value) {
             this.color = value;
         }

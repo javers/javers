@@ -33,8 +33,6 @@ Run environment self-test, to check if JaVers is compatible with your JDK versio
 gradlew javers-core:run
 ```
 
-
-
 ## Project Team
 Check out our site to find [the team](http://javers.org/#team) and contact us.
 
