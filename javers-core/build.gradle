@@ -10,6 +10,7 @@ dependencies {
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
     testCompile 'com.google.guava:guava:18.0'
     testCompile 'org.mongodb.morphia:morphia:0.108'
+    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
 }
 
 task testJar (type: Jar) {

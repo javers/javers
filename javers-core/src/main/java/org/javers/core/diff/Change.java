@@ -80,18 +80,6 @@ public abstract class Change {
     }
 
     /**
-     * use {@link #getAffectedObject()},
-     * left for backward compatibility
-     */
-    @Deprecated
-    public Object getAffectedCdo() {
-        if (affectedCdo == null || affectedCdo.isEmpty()) {
-            throw new JaversException(JaversExceptionCode.AFFECTED_CDO_IS_NOT_AVAILABLE);
-        }
-        return affectedCdo.get();
-    }
-
-    /**
      * Empty if change is calculated by {@link Javers#compare(Object, Object)}
      */
     public Optional<CommitMetadata> getCommitMetadata() {
