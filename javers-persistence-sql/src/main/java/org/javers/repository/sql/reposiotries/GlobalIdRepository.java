@@ -10,7 +10,6 @@ import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
 
-import static org.javers.common.validation.Validate.conditionFulfilled;
 import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
@@ -23,22 +22,10 @@ public class GlobalIdRepository {
         this.polyJdbc = javersPolyjdbc;
     }
 
-    public PersistentGlobalId findPersistedGlobalId(GlobalId globalId) {
-        if (globalId instanceof PersistentGlobalId) {
-            PersistentGlobalId persistentGlobalId = (PersistentGlobalId) globalId;
-            conditionFulfilled(persistentGlobalId.persisted(), "unexpected empty persistentGlobalId: " + globalId.value());
-            //already persisted
-            return persistentGlobalId;
-        }
-
-        Optional<Long> globalIdPrimaryKey = findGlobalIdPk(globalId);
-        return new PersistentGlobalId(globalId, globalIdPrimaryKey);
-    }
-
     public long getOrInsertId(GlobalId globalId) {
-        PersistentGlobalId lookup = findPersistedGlobalId(globalId);
+        Optional<Long> pk = findGlobalIdPk(globalId);
 
-        return lookup.persisted() ? lookup.getPrimaryKey() : insert(globalId);
+        return pk.isPresent() ? pk.get() : insert(globalId);
     }
 
     public long getOrInsertClass(GlobalId globalId) {
@@ -58,7 +45,8 @@ public class GlobalIdRepository {
         return queryForOptionalLong(query, polyJdbc);
     }
 
-    private Optional<Long> findGlobalIdPk(GlobalId globalId){
+    //TODO cache
+    public Optional<Long> findGlobalIdPk(GlobalId globalId){
         final String GLOBAL_ID_WITH_CDO_CLASS = GLOBAL_ID_TABLE_NAME + " g INNER JOIN " +
                      CDO_CLASS_TABLE_NAME + " c ON " + CDO_CLASS_PK + " = " + GLOBAL_ID_CLASS_FK;
 
@@ -66,15 +54,15 @@ public class GlobalIdRepository {
 
         if (globalId instanceof ValueObjectId) {
             ValueObjectId valueObjectId  = (ValueObjectId) globalId;
-            PersistentGlobalId ownerFk = findPersistedGlobalId(valueObjectId.getOwnerId());
-            if (!ownerFk.persisted()){
+            Optional<Long> ownerFk = findGlobalIdPk(valueObjectId.getOwnerId());
+            if (ownerFk.isEmpty()){
                 return Optional.empty();
             }
             query.from(GLOBAL_ID_TABLE_NAME)
                  .where(GLOBAL_ID_FRAGMENT + " = :fragment " +
                         "AND " + GLOBAL_ID_OWNER_ID_FK + " = :ownerFk ")
                  .withArgument("fragment", valueObjectId.getFragment())
-                 .withArgument("ownerFk", ownerFk.getPrimaryKey());
+                 .withArgument("ownerFk", ownerFk.get());
         }
         else if (globalId instanceof InstanceId){
             query.from(GLOBAL_ID_WITH_CDO_CLASS)

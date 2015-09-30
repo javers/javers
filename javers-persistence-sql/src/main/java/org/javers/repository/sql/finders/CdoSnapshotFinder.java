@@ -6,7 +6,6 @@ import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.*;
 import org.javers.repository.sql.reposiotries.GlobalIdRepository;
-import org.javers.repository.sql.reposiotries.PersistentGlobalId;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
 import org.polyjdbc.core.query.SelectQuery;
@@ -29,18 +28,18 @@ public class CdoSnapshotFinder {
     }
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        PersistentGlobalId persistentGlobalId = globalIdRepository.findPersistedGlobalId(globalId);
-        if (!persistentGlobalId.persisted()){
+        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId);
+        if (globalIdPk.isEmpty()){
             return Optional.empty();
         }
 
-        Optional<Long> maxSnapshot = selectMaxSnapshotPrimaryKey(persistentGlobalId);
+        Optional<Long> maxSnapshot = selectMaxSnapshotPrimaryKey(globalIdPk.get());
 
         if (maxSnapshot.isEmpty()) {
             return Optional.empty();
         }
 
-        return Optional.of(queryForCdoSnapshots(new SnapshotIdFilter(maxSnapshot.get(), persistentGlobalId), 1).get(0));
+        return Optional.of(queryForCdoSnapshots(new SnapshotIdFilter(maxSnapshot.get()), Optional.of(globalId), 1).get(0));
     }
 
     public List<CdoSnapshot> getStateHistory(ManagedClass givenClass, Optional<String> propertyName, int limit) {
@@ -51,7 +50,7 @@ public class CdoSnapshotFinder {
 
         ManagedClassFilter classFilter = new ManagedClassFilter(classPk.get(), propertyName);
 
-        return queryForCdoSnapshots(classFilter, limit);
+        return queryForCdoSnapshots(classFilter, Optional.<GlobalId>empty(), limit);
     }
 
     public List<CdoSnapshot> getVOStateHistory(Entity ownerEntity, String fragment, int limit) {
@@ -62,16 +61,17 @@ public class CdoSnapshotFinder {
 
         VoOwnerEntityFilter voOwnerFilter = new VoOwnerEntityFilter(ownerEntityClassPk.get(), fragment);
 
-        return queryForCdoSnapshots(voOwnerFilter, limit);
+        return queryForCdoSnapshots(voOwnerFilter, Optional.<GlobalId>empty(), limit);
     }
 
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, Optional<String> propertyName, int limit) {
-        PersistentGlobalId persistentGlobalId = globalIdRepository.findPersistedGlobalId(globalId);
-        if (!persistentGlobalId.persisted()){
+        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId);
+
+        if (globalIdPk.isEmpty()){
             return Collections.emptyList();
         }
 
-        return queryForCdoSnapshots(new GlobalIdFilter(persistentGlobalId, propertyName), limit);
+        return queryForCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), propertyName), Optional.of(globalId), limit);
     }
 
     //TODO dependency injection
@@ -79,30 +79,23 @@ public class CdoSnapshotFinder {
         this.jsonConverter = jsonConverter;
     }
 
-    private List<CdoSnapshot> queryForCdoSnapshots(SnapshotFilter snapshotFilter, int limit){
+    private List<CdoSnapshot> queryForCdoSnapshots(SnapshotFilter snapshotFilter, Optional<GlobalId> providedGlobalId, int limit){
 
         SelectQuery query =  polyJDBC.query().select(snapshotFilter.select());
         snapshotFilter.addFrom(query);
         snapshotFilter.addWhere(query);
         query.orderBy(SNAPSHOT_PK, Order.DESC).limit(limit);
 
-        GlobalId providedId = null;
-        if (snapshotFilter instanceof GlobalIdFilter ) {
-            providedId = ((GlobalIdFilter) snapshotFilter).globalId;
-        } else if ( snapshotFilter instanceof SnapshotIdFilter ){
-            providedId = ((SnapshotIdFilter) snapshotFilter).globalId;
-        }
-
         return
-        polyJDBC.queryRunner().queryList(query, new CdoSnapshotObjectMapper(jsonConverter, providedId));
+        polyJDBC.queryRunner().queryList(query, new CdoSnapshotObjectMapper(jsonConverter, providedGlobalId));
     }
 
-    private Optional<Long> selectMaxSnapshotPrimaryKey(PersistentGlobalId globalId) {
+    private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk) {
         SelectQuery query = polyJDBC.query()
             .select("MAX(" + SNAPSHOT_PK + ")")
             .from(SNAPSHOT_TABLE_NAME)
             .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
-            .withArgument("globalIdPk", globalId.getPrimaryKey());
+            .withArgument("globalIdPk", globalIdPk);
 
         Optional<Long> result = queryForOptionalLong(query, polyJDBC);
 

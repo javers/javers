@@ -1,5 +1,6 @@
 package org.javers.repository.sql.finders;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitId;
@@ -22,10 +23,10 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
  * @author bartosz.walacik
  */
 class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
-    private final GlobalId providedGlobalId;
+    private final Optional<GlobalId> providedGlobalId;
     private final JsonConverter jsonConverter;
 
-    public CdoSnapshotObjectMapper(JsonConverter jsonConverter, GlobalId providedGlobalId) {
+    public CdoSnapshotObjectMapper(JsonConverter jsonConverter, Optional<GlobalId> providedGlobalId) {
         this.jsonConverter = jsonConverter;
         this.providedGlobalId = providedGlobalId;
     }
@@ -33,8 +34,8 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
     @Override
     public CdoSnapshot createObject(ResultSet resultSet) throws SQLException {
         GlobalId usedGlobalId;
-        if (providedGlobalId != null){
-            usedGlobalId = providedGlobalId;
+        if (providedGlobalId.isPresent()){
+            usedGlobalId = providedGlobalId.get();
         }
         else{
             GlobalIdRawDTO globalIdRawDTO = assembleGlobalIdRawDTO(resultSet);

@@ -1,9 +1,9 @@
 package org.javers.repository.sql
 
 import org.javers.core.JaversRepositoryE2ETest
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
-import org.javers.repository.sql.reposiotries.PersistentGlobalId
 
 import java.sql.Connection
 import java.sql.DriverManager
@@ -82,17 +82,18 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         snapshots.size() == 1
     }
 
-    def "should preserve globalId.pk as PersistentGlobalId to minimize number of queries"() {
-        given:
-        def anEntity = new SnapshotEntity(id: 1)
-        javers.commit("author", anEntity)
+    //see https://github.com/javers/javers/issues/206
+    def "should persist PersistentGlobalId in CdoSnapshot.state"(){
+      given:
+      def master = new SnapshotEntity(id:1)
+      javers.commit("anonymous", master)
+      master.valueObjectRef = new DummyAddress("details")
 
-        when:
-        anEntity.intProperty = 2
-        def commit = javers.commit("author", anEntity)
+      when:
+      javers.commit("anonymous", master)
 
-        then:
-        commit.snapshots.get(0).globalId instanceof PersistentGlobalId
-        commit.snapshots.get(0).globalId.primaryKey > 0
+      then:
+      def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).build())
+      snapshots.size() == 1
     }
 }

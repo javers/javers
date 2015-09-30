@@ -9,10 +9,8 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_PK;
  * @author bartosz.walacik
  */
 class SnapshotIdFilter extends SnapshotFilter {
-    final GlobalId globalId;
 
-    SnapshotIdFilter(long snapshotId, GlobalId globalId) {
+    SnapshotIdFilter(long snapshotId) {
         super(snapshotId, SNAPSHOT_PK, Optional.<String>empty());
-        this.globalId = globalId;
     }
 }
