@@ -32,7 +32,7 @@ class SnapshotFactoryTest extends Specification{
         snapshotFactory = javers.snapshotFactory
     }
 
-    def "should mark all not-nul properties as changed for initial snapshot"() {
+    def "should mark all not-nul properties as changed of initial snapshot"() {
         given:
         def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1])
         def id = javers.instanceId(cdo)
@@ -44,7 +44,21 @@ class SnapshotFactoryTest extends Specification{
         snapshot.changed.collect{it.name} as Set == ["id","arrayOfIntegers"] as Set
     }
 
-    def "should mark changed and added properties for update snapshot"() {
+    def "should mark nullified properties of update snapshot"() {
+        given:
+        def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1])
+        def id = javers.instanceId(cdo)
+        def prevSnapshot = snapshotFactory.createInitial(cdo, id, someCommitMetadata())
+
+        when:
+        cdo.arrayOfIntegers = null
+        def updateSnapshot = snapshotFactory.createUpdate(cdo, prevSnapshot, someCommitMetadata())
+
+        then:
+        updateSnapshot.changed.collect{it.name} == ["arrayOfIntegers"]
+    }
+
+    def "should mark changed and added properties of update snapshot"() {
         given:
         def ref = new SnapshotEntity(id:2)
         def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1], entityRef: ref)
