@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.Defaults;
+import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
 
@@ -72,16 +73,23 @@ public class CdoSnapshotState {
     }
 
     /**
-     * List of properties with changed values (when comparing to previous state)
+     * List of properties with changed values (when comparing to the previous state)
      */
     public List<Property> differentValues(CdoSnapshotState previous) {
         List<Property> different = new ArrayList<>();
-        for (Property property : properties.keySet()) {
 
+        for (Property property : properties.keySet()) {
+            if (previous.isNull(property)){
+                continue;
+            }
             if (!propertyEquals(previous, property)){
                 different.add(property);
             }
         }
+
+        //add nullified
+        different.addAll(Sets.xor(properties.keySet(), previous.properties.keySet()));
+
         return different;
     }
 

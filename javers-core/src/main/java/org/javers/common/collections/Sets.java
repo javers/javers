@@ -1,12 +1,11 @@
 package org.javers.common.collections;
 
-import java.util.*;
-
 import org.javers.common.validation.Validate;
 
-import static java.util.Collections.EMPTY_SET;
+import java.util.*;
+
 import static java.util.Arrays.asList;
-import static org.javers.common.collections.Objects.nullSafeEquals;
+import static java.util.Collections.EMPTY_SET;
 
 /**
  * @author Maciej Zasada
@@ -32,6 +31,13 @@ public class Sets {
             }
         }
         return intersection;
+    }
+
+    public static <E> Set<E> xor(Set<E> first, Set<E> second) {
+        Set<E> xor = difference(first, second);
+        xor.addAll(difference(second, first));
+
+        return xor;
     }
 
     /**
