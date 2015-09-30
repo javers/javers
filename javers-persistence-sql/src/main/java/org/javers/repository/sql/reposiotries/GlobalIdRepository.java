@@ -1,5 +1,7 @@
 package org.javers.repository.sql.reposiotries;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.javers.common.collections.Optional;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.GlobalId;
@@ -17,6 +19,10 @@ public class GlobalIdRepository {
 
     private PolyJDBC polyJdbc;
     private JsonConverter jsonConverter;
+
+    private Cache<GlobalId, Long> globalIdPkCache = CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .build();
 
     public GlobalIdRepository(PolyJDBC javersPolyjdbc) {
         this.polyJdbc = javersPolyjdbc;
@@ -45,8 +51,27 @@ public class GlobalIdRepository {
         return queryForOptionalLong(query, polyJdbc);
     }
 
-    //TODO cache
-    public Optional<Long> findGlobalIdPk(GlobalId globalId){
+
+    /**
+     * cached
+     */
+    public Optional<Long> findGlobalIdPk(GlobalId globalId) {
+        Long foundPk = globalIdPkCache.getIfPresent(globalId);
+
+        if (foundPk != null){
+            return Optional.of(foundPk);
+        }
+
+        Optional<Long> fresh = findGlobalIdPkRaw(globalId);
+        if (fresh.isPresent()){
+            globalIdPkCache.put(globalId, fresh.get());
+        }
+
+        return fresh;
+    }
+
+    private Optional<Long> findGlobalIdPkRaw(GlobalId globalId) {
+
         final String GLOBAL_ID_WITH_CDO_CLASS = GLOBAL_ID_TABLE_NAME + " g INNER JOIN " +
                      CDO_CLASS_TABLE_NAME + " c ON " + CDO_CLASS_PK + " = " + GLOBAL_ID_CLASS_FK;
 
