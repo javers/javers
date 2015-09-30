@@ -94,6 +94,6 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
       then:
       def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).build())
-      snapshots.size() == 1
+      snapshots.size() == 2
     }
 }
