@@ -19,6 +19,7 @@ class JsonConverterDateTimeTest extends Specification {
     @Unroll
     def "should convert #expectedType to and from JSON (#expectedJson) in ISO format"() {
         expect:
+        println "date "+givenValue.toString() +" converted to:" + jsonConverter.toJson(givenValue)+", expected:"+expectedJson
         jsonConverter.toJson(givenValue) == expectedJson
         jsonConverter.fromJson(expectedJson, expectedType) == givenValue
         jsonConverter.fromJson(jsonConverter.toJson(givenValue), expectedType) == givenValue
