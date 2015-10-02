@@ -1,5 +1,6 @@
 package org.javers.core.json
 
+import org.joda.time.DateTimeZone
 import org.slf4j.LoggerFactory
 import spock.lang.Shared
 import spock.lang.Specification
@@ -41,10 +42,10 @@ class JsonConverterDateTimeTest extends Specification {
                          new java.sql.Date(time),
                          new java.sql.Timestamp(time),
                          new java.sql.Time(time),
-                         new org.joda.time.LocalDateTime(time),
+                         new org.joda.time.LocalDateTime(time, DateTimeZone.UTC),
                          new org.joda.time.LocalDate(2015,10,02)
         ]
-        expectedJson << ['"2015-10-02T19:37:07.050"'] *5 +
+        expectedJson << ['"2015-10-02T17:37:07.050"'] *5 +
                         ['"2015-10-02"']
     }
 

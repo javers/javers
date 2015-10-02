@@ -19,7 +19,7 @@ class JavaSqlDateTypeAdapter extends BasicStringTypeAdapter<Date> {
 
     @Override
     public Date deserialize(String serializedValue) {
-        return new Date(DateTypeAdapters.deserialize(serializedValue).toDate().getTime());
+        return new Date(DateTypeAdapters.deserialize(serializedValue).toDate(DateTypeAdapters.UTC).getTime());
     }
 
     @Override
