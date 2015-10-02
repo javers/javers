@@ -14,7 +14,7 @@ import org.javers.core.metamodel.type.ValueType;
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
  * <br><br>
  *
- * For concrete class example see {@link org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter}.
+ * For concrete class example see {@link org.javers.core.json.typeadapter.date.LocalDateTimeTypeAdapter}.
  * <br><br>
  *
  * @author bartosz walacik
@@ -25,7 +25,7 @@ public abstract class BasicStringTypeAdapter<T> extends JsonTypeAdapterTemplate<
      * Example serialization for LocalDateTime:
      * <pre>
      * public String serialize(LocalDateTime sourceValue) {
-     *     return ISO_FORMATTER.print(sourceValue);
+     *     return ISO_DATE_TIME_FORMATTER.print(sourceValue);
      * }
      * </pre>
      * @param sourceValue not null
@@ -36,7 +36,7 @@ public abstract class BasicStringTypeAdapter<T> extends JsonTypeAdapterTemplate<
      * Example deserialization for LocalDateTime:
      * <pre>
      * public LocalDateTime deserialize(String serializedValue) {
-     *     return ISO_FORMATTER.parseLocalDateTime(serializedValue);
+     *     return ISO_DATE_TIME_FORMATTER.parseLocalDateTime(serializedValue);
      * }
      * </pre>
      *

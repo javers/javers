@@ -1,6 +1,7 @@
 package org.javers.repository.sql
 
 import org.javers.core.JaversRepositoryE2ETest
+import org.javers.core.model.DateTimeTypes
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
@@ -96,4 +97,23 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
       def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).build())
       snapshots.size() == 2
     }
+
+    /**
+     * see https://github.com/javers/javers/issues/208
+     */
+    def "should not commit when date/time values are unchanged" () {
+        given:
+        def obj = new DateTimeTypes("1")
+
+        when:
+        javers.commit("anonymous", obj)
+        javers.commit("anonymous", obj)
+
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId("1", DateTimeTypes).build())
+
+        then:
+        snapshots.size() == 1
+        snapshots[0].commitId.majorId == 1
+    }
+
 }

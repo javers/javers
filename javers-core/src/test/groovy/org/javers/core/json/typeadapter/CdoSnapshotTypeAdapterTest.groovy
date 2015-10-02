@@ -136,7 +136,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
             intArray == [1, 2]
             integerList == [3, 4]
             stringSet == ["5", "6"]
-            primitiveMap.time == "2000-01-01T12:00:00"
+            primitiveMap.time == "2000-01-01T12:00:00.000"
         }
     }
 

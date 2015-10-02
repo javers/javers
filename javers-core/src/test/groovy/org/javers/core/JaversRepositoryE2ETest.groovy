@@ -9,10 +9,6 @@ import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import java.util.concurrent.Callable
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
-
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
@@ -28,7 +24,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers = javers().build()
     }
 
-    def "should support EmbeddeId as Entity Id"(){
+     def "should support EmbeddedId as Entity Id"(){
       given:
       def javers = javers().build()
       def cdo  = new DummyEntityWithEmbeddedId(point: new DummyPoint(1,2), someVal: 5)

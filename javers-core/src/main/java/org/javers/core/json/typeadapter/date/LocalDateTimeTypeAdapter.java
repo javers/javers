@@ -1,14 +1,11 @@
-package org.javers.core.json.typeadapter.joda;
+package org.javers.core.json.typeadapter.date;
 
 import org.javers.core.json.BasicStringTypeAdapter;
 import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 
 /**
- * Serializes LocalDateTime to JSON String using ISO date format yyyy-MM-dd'T'HH:mm,
- * for ex. 2001-12-01T22:23
+ * Serializes LocalDateTime to JSON String using ISO date format yyyy-MM-dd'T'HH:mm:ss.SSS
  * <br><br>
  *
  * Without typeAdapter, LocalDateTime written to JSON would be:
@@ -17,16 +14,15 @@ import org.joda.time.format.ISODateTimeFormat;
  * @author bartosz walacik
  */
 class LocalDateTimeTypeAdapter extends BasicStringTypeAdapter<LocalDateTime> {
-    public static final DateTimeFormatter ISO_FORMATTER = ISODateTimeFormat.dateHourMinuteSecond();
 
     @Override
     public String serialize(LocalDateTime sourceValue) {
-        return ISO_FORMATTER.print(sourceValue);
+        return DateTypeAdapters.serialize(sourceValue);
     }
 
     @Override
     public LocalDateTime deserialize(String serializedValue) {
-        return ISO_FORMATTER.parseLocalDateTime(serializedValue);
+        return DateTypeAdapters.deserialize(serializedValue);
     }
 
     @Override

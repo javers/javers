@@ -2,7 +2,7 @@ package org.javers.core.json;
 
 import com.google.gson.*;
 import org.javers.common.validation.Validate;
-import org.javers.core.json.typeadapter.joda.JodaTypeAdapters;
+import org.javers.core.json.typeadapter.date.DateTypeAdapters;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 
@@ -25,7 +25,7 @@ public class JsonConverterBuilder {
 
     public JsonConverterBuilder() {
         this.gsonBuilder = new GsonBuilder();
-        registerJsonTypeAdapters(JodaTypeAdapters.adapters());
+        registerJsonTypeAdapters(DateTypeAdapters.adapters());
     }
 
     /**

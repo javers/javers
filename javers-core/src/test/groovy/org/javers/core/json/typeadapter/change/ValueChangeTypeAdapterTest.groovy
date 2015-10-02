@@ -5,7 +5,8 @@ import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
-import org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter
+import org.javers.core.json.typeadapter.date.DateTypeAdapters
+import org.javers.core.json.typeadapter.date.LocalDateTimeTypeAdapter
 import org.javers.core.model.DummyUser
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
@@ -78,7 +79,7 @@ class ValueChangeTypeAdapterTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.left ==  null
-        json.right == LocalDateTimeTypeAdapter.ISO_FORMATTER.print(dob)
+        json.right == DateTypeAdapters.serialize(dob)
     }
 
     def "should deserialize ValueChange with Values using custom TypeAdapter"() {
