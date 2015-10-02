@@ -1,8 +1,11 @@
 package org.javers.core.json
 
+import org.slf4j.LoggerFactory
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.util.logging.Logger
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
@@ -10,6 +13,8 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  * @author bartosz walacik
  */
 class JsonConverterDateTimeTest extends Specification {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(JsonConverterDateTimeTest.class);
+
     @Shared
     def jsonConverter = javersTestAssembly().jsonConverter
 
@@ -19,7 +24,7 @@ class JsonConverterDateTimeTest extends Specification {
     @Unroll
     def "should convert #expectedType to and from JSON (#expectedJson) in ISO format"() {
         expect:
-        println "date "+givenValue.toString() +" converted to:" + jsonConverter.toJson(givenValue)+", expected:"+expectedJson
+        logger.info ( "date "+givenValue.toString() +" converted to:" + jsonConverter.toJson(givenValue)+", expected:"+expectedJson)
         jsonConverter.toJson(givenValue) == expectedJson
         jsonConverter.fromJson(expectedJson, expectedType) == givenValue
         jsonConverter.fromJson(jsonConverter.toJson(givenValue), expectedType) == givenValue
