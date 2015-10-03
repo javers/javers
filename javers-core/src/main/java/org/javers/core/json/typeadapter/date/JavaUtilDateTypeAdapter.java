@@ -1,7 +1,7 @@
 package org.javers.core.json.typeadapter.date;
 
 import org.javers.core.json.BasicStringTypeAdapter;
-import org.joda.time.DateTime;
+
 import java.util.Date;
 
 
@@ -14,13 +14,12 @@ class JavaUtilDateTypeAdapter extends BasicStringTypeAdapter<Date> {
 
     @Override
     public String serialize(Date sourceValue) {
-        DateTime jodaDate = new DateTime(sourceValue.getTime());
-        return DateTypeAdapters.serialize(jodaDate);
+        return DateTypeAdapters.serialize(sourceValue);
     }
 
     @Override
     public Date deserialize(String serializedValue) {
-        return DateTypeAdapters.deserialize(serializedValue).toDate();
+        return DateTypeAdapters.deserialize(serializedValue).toDate(DateTypeAdapters.UTC);
     }
 
     @Override

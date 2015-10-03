@@ -19,7 +19,7 @@ class JavaSqlTimestampTypeAdapter extends BasicStringTypeAdapter<Timestamp> {
 
     @Override
     public Timestamp deserialize(String serializedValue) {
-        return new Timestamp(DateTypeAdapters.deserialize(serializedValue).toDate().getTime());
+        return new Timestamp(DateTypeAdapters.deserialize(serializedValue).toDate(DateTypeAdapters.UTC).getTime());
     }
 
     @Override
