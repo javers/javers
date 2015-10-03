@@ -51,9 +51,9 @@ class JsonConverterDateTimeTest extends Specification {
 
     def "should deserialize org.joda.time.LocalDateTime from legacy format"(){
       given:
-      def noMillisDate = new org.joda.time.LocalDateTime(time-50)
+      def noMillisDate = new org.joda.time.LocalDateTime(time-50, DateTimeZone.UTC)
 
       expect:
-      jsonConverter.fromJson('"2015-10-02T19:37:07"', org.joda.time.LocalDateTime) == noMillisDate
+      jsonConverter.fromJson('"2015-10-02T17:37:07"', org.joda.time.LocalDateTime) == noMillisDate
     }
 }
