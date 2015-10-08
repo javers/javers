@@ -302,6 +302,16 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return this;
     }
 
+    /**
+     * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
+     * generates additional 'Snapshots' of new objects (objects added in currentVersion graph).
+     * <br/>
+     * For each new object, state of its properties is captured and returned as a Set of PropertyChanges.
+     * These Changes have null at the left side and a current property value at the right side.
+     * <br/><br/>
+     *
+     * Disabled by default.
+     */
     public JaversBuilder withNewObjectsSnapshot(boolean newObjectsSnapshot){
         coreConfiguration().withNewObjectsSnapshot(newObjectsSnapshot);
         return this;
