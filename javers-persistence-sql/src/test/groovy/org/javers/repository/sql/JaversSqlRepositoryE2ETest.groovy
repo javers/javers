@@ -1,7 +1,9 @@
 package org.javers.repository.sql
 
 import org.javers.core.JaversRepositoryE2ETest
-import org.javers.core.model.DateTimeTypes
+import org.javers.core.cases.Case207Arrays
+import org.javers.core.metamodel.type.ValueObjectType
+import org.javers.core.cases.Case208DateTimeTypes
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
@@ -99,21 +101,44 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     }
 
     /**
+     * Case 208
      * see https://github.com/javers/javers/issues/208
      */
     def "should not commit when date/time values are unchanged" () {
         given:
-        def obj = new DateTimeTypes("1")
+        def obj = new Case208DateTimeTypes("1")
 
         when:
         javers.commit("anonymous", obj)
         javers.commit("anonymous", obj)
 
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId("1", DateTimeTypes).build())
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId("1", Case208DateTimeTypes).build())
 
         then:
         snapshots.size() == 1
         snapshots[0].commitId.majorId == 1
     }
 
+    /**
+     * Case 207
+     * see https://github.com/javers/javers/issues/207
+     */
+    def "should not commit when Arrays of ValueObjects and ints are unchanged" () {
+      given:
+        def master = new Case207Arrays.Master(
+            id:1,
+            array: new Case207Arrays.Detail("details-array"),
+            iArray: [1,2]
+        )
+
+        javers.commit("anonymous", master)
+        javers.commit("anonymous", master)
+
+      when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(Case207Arrays.Master).build())
+
+      then:
+      snapshots.size() == 1
+      snapshots[0].commitId.majorId == 1
+    }
 }
