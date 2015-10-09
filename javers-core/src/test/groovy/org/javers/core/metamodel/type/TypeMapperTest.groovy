@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
-
+import com.sun.xml.internal.bind.v2.TODO
 import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.clazz.Entity
 import org.javers.core.metamodel.clazz.ManagedClassFactory
@@ -51,7 +51,19 @@ class TypeMapperTest extends Specification {
         DummyUser       || GlobalId
         DummyAddress    || GlobalId
         String          || String
-        Integer         || Integer
+        Integer.TYPE    || Integer.TYPE
+    }
+    @Unroll
+    def "should return dehydrated type for array of #givenJaversType"() {
+        expect:
+        mapper.getDehydratedType(givenJaversType) == expectedDehydratedType
+
+        where:
+        givenJaversType || expectedDehydratedType
+        ([] as DummyUser[]).class     || ([] as GlobalId[]).class
+        ([] as DummyAddress[]).class  || ([] as GlobalId[]).class
+        ([] as int[]).class           || ([] as int[]).class
+        ([] as String[]).class        || ([] as String[]).class
     }
 
     def "should return dehydrated type for Map<String,EnumSet<DummyEnum>>"() {
@@ -71,7 +83,7 @@ class TypeMapperTest extends Specification {
     }
     
     @Unroll
-    def "should return dehydrated type for generic #givenJaversType"() {
+    def "should return dehydrated type for generic #givenJavaType"() {
         when:
         def dehydrated =  mapper.getDehydratedType(givenJavaType)
 
@@ -81,24 +93,29 @@ class TypeMapperTest extends Specification {
         dehydrated.actualTypeArguments == expectedActualTypeArguments
 
         where:
-        givenJavaType                                         || expectedRawType  || expectedActualTypeArguments
-        new TypeToken<Set<String>>(){}.type                     || Set              || [String]
-        new TypeToken<Map<String, DummyUser>>(){}.type          || Map              || [String, GlobalId]
+        givenJavaType                                     || expectedRawType  || expectedActualTypeArguments
+        new TypeToken<Set<String>>(){}.type               || Set              || [String]
+        new TypeToken<Set<DummyUser>>(){}.type            || Set              || [GlobalId]
+        new TypeToken<List<String>>(){}.type              || List             || [String]
+        new TypeToken<List<DummyUser>>(){}.type           || List             || [GlobalId]
+        new TypeToken<Map<String, DummyUser>>(){}.type    || Map              || [String, GlobalId]
     }
 
-    def "should spawn concrete Array type"() {
-        given:
-        int arrayPrototypes  = mapper.getMappedTypes(ArrayType).size()
-        Type intArray   = getFieldFromClass(Dummy, "intArray").genericType
-
+    @Unroll
+    def "should spawn concrete Array type for #givenJavaType"() {
         when:
-        def jType = mapper.getJaversType(intArray)
+        def jType = mapper.getJaversType(givenJavaType)
 
         then:
-        jType.baseJavaType == int[]
+        jType.baseJavaType == givenJavaType
         jType.class == ArrayType
-        jType.itemClass == int
-        mapper.getMappedTypes(ArrayType).size() == arrayPrototypes + 1
+        jType.itemClass == expectedItemClass
+
+        where:
+        givenJavaType               || expectedItemClass
+        ([] as int[]).class         || int
+        ([] as String[]).class      || String
+        ([] as DummyUser[]).class   || DummyUser
     }
 
     def "should spawn concrete Enum type"() {

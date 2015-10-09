@@ -1,8 +1,10 @@
 package org.javers.core.json
 
+import org.javers.common.collections.Arrays
 import org.joda.time.LocalDateTime
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static java.math.RoundingMode.HALF_UP
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
@@ -12,7 +14,21 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  */
 class JsonConverterWellKnownValuesTest extends Specification {
     @Shared
-    def jsonConverter = javersTestAssembly().jsonConverter
+    def jsonConverter = javersTestAssembly().jsonConverterMinifiedPrint
+
+    @Unroll
+    def "should convert array of type #arrayType to and from JSON"(){
+      expect:
+      jsonConverter.toJson(givenArray) == expectedJson
+      def from = jsonConverter.fromJson(expectedJson, arrayType)
+      from == givenArray
+      from.class == arrayType
+
+      where:
+      expectedJson << ["[1,2]"] * 2
+      arrayType <<    [Arrays.INTEGER_ARRAY_TYPE, Arrays.INT_ARRAY_TYPE]
+      givenArray <<   [ [1,2].toArray(), Arrays.intArray(1,2) ]
+    }
 
     def "should convert BigDecimal to and from JSON with proper scale"() {
         given:
@@ -39,7 +55,7 @@ class JsonConverterWellKnownValuesTest extends Specification {
         def json = jsonConverter.toJson(new WithLocalDateTime())
 
         then:
-        assert json.contains('"ldt": null')
+        assert json.contains('"ldt":null')
     }
 
     def "should be null safe when converting objects from JSON"() {

@@ -7,6 +7,8 @@ import org.javers.core.metamodel.property.Property;
 
 import java.util.*;
 
+import org.javers.common.collections.Arrays;
+
 /**
  * @author bartosz walacik
  */
@@ -66,7 +68,7 @@ public class CdoSnapshotState {
         Object thatValue = that.getPropertyValue(property);
 
         if (property.getType().isArray()){
-            return Arrays.equals((Object[])thisValue, (Object[])thatValue);
+            return Arrays.equals(thisValue, thatValue);
         }
 
         return thisValue.equals(thatValue);

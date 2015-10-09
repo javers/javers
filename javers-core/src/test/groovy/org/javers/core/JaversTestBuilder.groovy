@@ -127,6 +127,10 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(JsonConverter)
     }
 
+    JsonConverter getJsonConverterMinifiedPrint() {
+        JaversBuilder.javers().withPrettyPrint(false).build().getJsonConverter()
+    }
+
     JsonConverterBuilder getJsonConverterBuilder() {
         javersBuilder.getContainerComponent(JsonConverterBuilder)
     }

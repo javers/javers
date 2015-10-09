@@ -1,5 +1,6 @@
 package org.javers.core.snapshot
 
+import org.javers.common.collections.Arrays
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.JaversTestBuilder
@@ -16,6 +17,9 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import static java.util.Arrays.*
+import static java.util.Arrays.*
+import static org.javers.common.collections.Arrays.intArray
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
@@ -34,14 +38,14 @@ class SnapshotFactoryTest extends Specification{
 
     def "should mark all not-nul properties as changed of initial snapshot"() {
         given:
-        def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1])
+        def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1], arrayOfInts:[1])
         def id = javers.instanceId(cdo)
 
         when:
         def snapshot = snapshotFactory.createInitial(cdo, id, someCommitMetadata())
 
         then:
-        snapshot.changed.collect{it.name} as Set == ["id","arrayOfIntegers"] as Set
+        snapshot.changed.collect{it.name} as Set == ["id","arrayOfIntegers", "arrayOfInts"] as Set
     }
 
     def "should mark nullified properties of update snapshot"() {
@@ -61,17 +65,18 @@ class SnapshotFactoryTest extends Specification{
     def "should mark changed and added properties of update snapshot"() {
         given:
         def ref = new SnapshotEntity(id:2)
-        def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1], entityRef: ref)
+        def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1,1], arrayOfInts:[5,5], entityRef: ref)
         def id = javers.instanceId(cdo)
 
         def prevSnapshot = snapshotFactory.createInitial(cdo, id, someCommitMetadata())
 
         when:
         cdo.arrayOfIntegers[0] = 2
+        cdo.arrayOfInts[0] = 2
         def updateSnapshot = snapshotFactory.createUpdate(cdo, prevSnapshot, someCommitMetadata())
 
         then:
-        updateSnapshot.changed.collect{it.name} == ["arrayOfIntegers"]
+        updateSnapshot.changed.collect{it.name} as Set == ["arrayOfIntegers","arrayOfInts"] as Set
 
         when:
         prevSnapshot = updateSnapshot
@@ -189,17 +194,20 @@ class SnapshotFactoryTest extends Specification{
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
-        //we need shallow copy
+        expectedType.isAssignableFrom(snapshot.getPropertyValue(propertyName).class)
+        //we need copy
         System.identityHashCode(snapshot.getPropertyValue(propertyName)) !=
         System.identityHashCode( cdo.getAt(propertyName) )
 
 
         where:
-        containerType << ["Array"]*4 +["List"]*4
-        propertyType <<  ["Primitive", "Value", "Entity", "ValueObject"]*2
-        propertyName <<  ["arrayOfIntegers", "arrayOfDates", "arrayOfEntities", "arrayOfValueObjects",
-                         "listOfIntegers",  "listOfDates",  "listOfEntities",  "listOfValueObjects"]
+        expectedType  <<  [Arrays.INT_ARRAY_TYPE] + [Arrays.OBJECT_ARRAY_TYPE]*4 +[List]*4
+        containerType <<  ["Array"]*5 +["List"]*4
+        propertyType  <<  ["primitive"] + ["Primitive", "Value", "Entity", "ValueObject"]*2
+        propertyName  <<  ["arrayOfInts", "arrayOfIntegers", "arrayOfDates", "arrayOfEntities", "arrayOfValueObjects",
+                           "listOfIntegers",  "listOfDates",  "listOfEntities",  "listOfValueObjects"]
         cdo << [
+                new SnapshotEntity(arrayOfInts:         [1, 2]),
                 new SnapshotEntity(arrayOfIntegers:     [1, 2]),
                 new SnapshotEntity(arrayOfDates:        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
                 new SnapshotEntity(arrayOfEntities:     [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
@@ -208,19 +216,20 @@ class SnapshotFactoryTest extends Specification{
                 new SnapshotEntity(listOfDates:         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
                 new SnapshotEntity(listOfEntities:      [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
                 new SnapshotEntity(listOfValueObjects:  [new DummyAddress("London"), new DummyAddress("London City")])
-               ]
+        ]
         expectedVal << [
-                        [1, 2],
-                        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
-                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
-                        [valueObjectId(1, SnapshotEntity,"arrayOfValueObjects/0"),
-                         valueObjectId(1, SnapshotEntity,"arrayOfValueObjects/1")] ,
-                        [1, 2],
-                        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
-                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
-                        [valueObjectId(1, SnapshotEntity,"listOfValueObjects/0"),
-                         valueObjectId(1, SnapshotEntity,"listOfValueObjects/1")]
-                       ]
+                [1, 2],
+                [1, 2],
+                [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
+                [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
+                [valueObjectId(1, SnapshotEntity,"arrayOfValueObjects/0"),
+                 valueObjectId(1, SnapshotEntity,"arrayOfValueObjects/1")] ,
+                [1, 2],
+                [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)],
+                [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)],
+                [valueObjectId(1, SnapshotEntity,"listOfValueObjects/0"),
+                 valueObjectId(1, SnapshotEntity,"listOfValueObjects/1")]
+        ]
     }
 
     @Unroll

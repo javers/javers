@@ -36,6 +36,7 @@ public class SnapshotEntity {
     private DummyAddress valueObjectRef;
 
     private Integer[] arrayOfIntegers;
+    private int[] arrayOfInts;
     private LocalDate[] arrayOfDates;
     private SnapshotEntity[] arrayOfEntities;
     private DummyAddress[] arrayOfValueObjects;

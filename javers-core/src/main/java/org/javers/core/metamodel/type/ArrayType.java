@@ -9,6 +9,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.List;
 
+
 /**
  * @author bartosz walacik
  */
@@ -33,7 +34,13 @@ public class ArrayType extends ContainerType {
         Validate.argumentsAreNotNull(sourceArray, mapFunction, owner);
 
         int len = Array.getLength(sourceArray);
-        Object targetArray = new Object[len];
+
+        Object targetArray;
+        if (getItemClass().isPrimitive()){
+            targetArray = Array.newInstance(getItemClass(), len);
+        } else {
+            targetArray = new Object[len];
+        }
 
         IndexableContext indexableContext = new IndexableContext();
         owner.setEnumeratorContext(indexableContext);

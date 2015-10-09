@@ -1,4 +1,4 @@
-package org.javers.core.model;
+package org.javers.core.cases;
 
 import javax.persistence.Id;
 import java.math.BigDecimal;
@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 /**
  * @author bartosz.walacik
  */
-public class DateTimeTypes {
+public class Case208DateTimeTypes {
     @Id
     String id;
 
@@ -23,7 +23,7 @@ public class DateTimeTypes {
 
     BigDecimal bigDecimalNumber = BigDecimal.ONE;
 
-    public DateTimeTypes(String id) {
+    public Case208DateTimeTypes(String id) {
         this.id = id;
     }
 }
