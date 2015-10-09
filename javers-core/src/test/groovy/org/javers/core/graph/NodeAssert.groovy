@@ -38,13 +38,18 @@ class NodeAssert {
         this
     }
 
-    public NodeAssert hasValueObjectId(Class expectedManagedClass, Object owner, String expectedFragment) {
+    public NodeAssert hasValueObjectId(String value){
+        assert actual.globalId.value() == value
+        this
+    }
+
+    public NodeAssert hasValueObjectId(Class expectedManagedClass, Object ownerId, String expectedFragment) {
         ValueObjectId valueObjectId = actual.globalId
 
         assert valueObjectId.cdoClass.clientsClass == expectedManagedClass
         assert valueObjectId.cdoId == null
         assert valueObjectId.fragment == expectedFragment
-        assert (valueObjectId.ownerId as InstanceId).idEquals(owner)
+        assert (valueObjectId.ownerId as InstanceId).idEquals(ownerId)
         this
     }
 

@@ -91,7 +91,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
     def "should build two node graph for different Entities"() {
         given:
         def graphBuilder = newBuilder()
-        DummyUser user = dummyUser().withName("Mad Kaz").withDetails().build()
+        def user = dummyUser().withName("Mad Kaz").withDetails().build()
 
         when:
         def node = graphBuilder.buildGraph(user).root()
@@ -103,22 +103,41 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .isSingleEdgeTo(1L)
     }
 
+    def "should build graph from nested ValueObjects"(){
+      given:
+      def graphBuilder = newBuilder()
+      def cat1 = new CategoryVo()
+      def cat2 = new CategoryVo()
+      def cat3 = new CategoryVo()
+      cat1.parent = cat2
+      cat2.parent = cat3
 
+      when:
+      def node = graphBuilder.buildGraph(cat1).root()
 
-    def "should build three nodes linear graph"() {
+      then:
+      NodeAssert.assertThat(node)
+                .hasSingleEdge("parent")
+                .andTargetNode()
+                .hasValueObjectId("org.javers.core.model.CategoryVo/#parent")
+                .and()
+                .hasSingleEdge("parent")
+                .andTargetNode()
+                .hasValueObjectId("org.javers.core.model.CategoryVo/#parent#parent")
+    }
+
+    def "should build three nodes linear graph from Entities"() {
         given:
         //kaz0 - kaz1 - kaz2
-        ObjectGraphBuilder graphBuilder = newBuilder();
-        DummyUser[] kaziki = new DummyUser[4];
-        for (int i=0; i<3; i++){
-            kaziki[i] = dummyUser().withName("Mad Kaz "+i).build();
-            if (i>0) {
-                kaziki[i-1].setSupervisor(kaziki[i]);
-            }
-        }
+        def graphBuilder = newBuilder()
+        def kazik = new DummyUser("Mad Kaz 0")
+        def kazik1 = new DummyUser("Mad Kaz 1")
+        def kazik2 = new DummyUser("Mad Kaz 2")
+        kazik.supervisor = kazik1
+        kazik1.supervisor = kazik2
 
         when:
-        def node = graphBuilder.buildGraph(kaziki[0]).root()
+        def node = graphBuilder.buildGraph(kazik).root()
 
         then:
         NodeAssert.assertThat(node).hasEdges(1)
@@ -130,9 +149,8 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .hasSingleEdge("supervisor")
                 .andTargetNode()
                 .hasNoEdges()
-                .hasCdoId("Mad Kaz 2");
+                .hasCdoId("Mad Kaz 2")
     }
-
 
     def "should build four node graph with three levels"() {
         // kaz - kaz.details
