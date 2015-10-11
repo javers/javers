@@ -54,7 +54,7 @@ class NewObjectTypeAdapterTest extends Specification {
         change.affectedGlobalId == instanceId("kaz",DummyUser)
     }
 
-    def "should serialize NewObject after Commit"() {
+    def "should serialize Change with CommitMetadata unwrapped from Optional"() {
         given:
         def javers = javers().build()
         def dummyUser = new DummyUser(name: "bob")
