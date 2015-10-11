@@ -6,8 +6,10 @@ import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.json.JsonConverter
 import org.javers.core.model.DummyUser
+import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
+import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.builder.ChangeTestBuilder.newObject
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
@@ -50,5 +52,28 @@ class NewObjectTypeAdapterTest extends Specification {
         then:
         change instanceof NewObject
         change.affectedGlobalId == instanceId("kaz",DummyUser)
+    }
+
+    def "should serialize NewObject after Commit"() {
+        given:
+        def javers = javers().build()
+        def dummyUser = new DummyUser(name: "bob")
+        javers.commit("author", dummyUser)
+        def changes = javers
+                .findChanges(QueryBuilder.byInstanceId("bob", DummyUser.class)
+                .withNewObjectChanges(true).build())
+        def change = changes[1]
+        when:
+        def jsonText = javers.jsonConverter.toJson(change)
+
+        then:
+        change.commitMetadata instanceof org.javers.common.collections.Optional
+        def json = new JsonSlurper().parseText(jsonText)
+        json.commitMetadata.id == 1.00
+        json.commitMetadata.author == "author"
+        json.changeType == "NewObject"
+        json.globalId.entity == "org.javers.core.model.DummyUser"
+        json.globalId.cdoId == "bob"
+
     }
 }
