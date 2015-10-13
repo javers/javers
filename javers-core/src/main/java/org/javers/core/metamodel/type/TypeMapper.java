@@ -22,6 +22,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -106,12 +107,26 @@ public class TypeMapper {
             return OBJECT_TYPE;
         }
 
-        JaversType jType = getExactMatchingJaversType(javaType);
+        JaversType jType = mappedTypes.get(javaType);
         if (jType != null) {
             return jType;
         }
 
-        return infer(javaType);
+        return mappedTypes.computeIfAbsent(javaType, new Function<Type, JaversType>() {
+            public JaversType apply(Type type) {
+                return infer(type);
+            }
+        });
+    }
+
+    private JaversType infer(Type javaType) {
+        argumentIsNotNull(javaType);
+        JaversType prototype = findNearestAncestor(javaType);
+        JaversType newType = typeFactory.infer(javaType, Optional.fromNullable(prototype));
+
+        inferIdPropertyTypeForEntityIfNeeed(newType);
+
+        return newType;
     }
 
     /**
@@ -148,16 +163,6 @@ public class TypeMapper {
 
     public void registerCustomType(Class<?> customCLass) {
         addType(new CustomType(customCLass));
-    }
-
-    protected <T extends JaversType> List<T> getMappedTypes(Class<T> ofType) {
-        List<T> result = new ArrayList<>();
-        for(JaversType jType : mappedTypes.values()) {
-            if(ofType.isAssignableFrom(jType.getClass()) ) {
-                result.add((T)jType);
-            }
-        }
-        return result;
     }
 
     public boolean isValueObject(Type type) {
@@ -214,55 +219,26 @@ public class TypeMapper {
 
     //-- private
 
-    /**
-     * is ContainerType (Set, List or Array) of ManagedClasses
-     *
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
-     */
-    private boolean isContainerOfValueObjects(JaversType javersType){
-        if (! (javersType instanceof ContainerType)) {
-            return false;
-        }
-        return getJaversType(((ContainerType) javersType).getItemType()) instanceof ValueObjectType;
-    }
-
     private void addType(JaversType jType) {
-        mappedTypes.put(jType.getBaseJavaType(), jType);
-
-        if (jType instanceof EntityType){
-            inferIdPropertyTypeAsValue((EntityType) jType);
-        }
+        mappedTypes.putIfAbsent(jType.getBaseJavaType(), jType);
+        inferIdPropertyTypeForEntityIfNeeed(jType);
     }
 
     /**
-     * @return null if not found
+     * if type of given id-property is not already mapped, maps it as ValueType
      */
-    private JaversType getExactMatchingJaversType(Type javaType) {
-        return mappedTypes.get(javaType);
-    }
-
-    private JaversType infer(Type javaType) {
-        argumentIsNotNull(javaType);
-        JaversType prototype = findNearestAncestor(javaType);
-        JaversType newType = typeFactory.infer(javaType, Optional.fromNullable(prototype));
-
-        addType(newType);
-        return newType;
-    }
-
-    /**
-     * if type of id-property is not already mapped, maps it as ValueType
-     */
-    private void inferIdPropertyTypeAsValue(EntityType eType) {
-        argumentIsNotNull(eType);
-
-        if (!isMapped(eType.getIdPropertyGenericType())) {
-            addType(typeFactory.inferIdPropertyTypeAsValue(eType));;
+    private void inferIdPropertyTypeForEntityIfNeeed(JaversType jType) {
+        argumentIsNotNull(jType);
+        if (! (jType instanceof EntityType)){
+            return;
         }
-    }
 
-    private boolean isMapped(Type javaType) {
-        return mappedTypes.containsKey(javaType);
+        EntityType entityType = (EntityType) jType;
+        mappedTypes.computeIfAbsent(entityType.getIdPropertyGenericType(), new Function<Type, JaversType>() {
+            public JaversType apply(Type type) {
+                return typeFactory.inferIdPropertyTypeAsValue(type);
+            }
+        });
     }
 
     private JaversType findNearestAncestor(Type javaType) {
