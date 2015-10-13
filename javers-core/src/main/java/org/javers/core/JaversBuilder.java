@@ -324,7 +324,11 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * Registers a custom comparator for given custom type.
+     * Registers a custom comparator for a given Value type
+     * (type of a property owned by Entity or ValueObject).
+     * <br/><br/>
+     *
+     * Custom comparators are used by diff algorithm to calculate property-to-property diff.
      * <br/><br/>
      *
      * Comparator has to calculate and return a subtype of {@link PropertyChange}.
