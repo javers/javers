@@ -46,13 +46,12 @@ public class TypeFactory {
         return jType;
     }
 
-    JaversType inferIdPropertyTypeAsValue(EntityType eType) {
-        Type idPropertyType = eType.getIdPropertyGenericType();
+    ValueType inferIdPropertyTypeAsValue(Type idPropertyGenericType) {
 
-        logger.info("javersType of [{}] inferred as ValueType, it's used as id-property type in {}",
-                idPropertyType, eType);
+        logger.info("javersType of [{}] inferred as ValueType, it's used as id-property type",
+                idPropertyGenericType);
 
-        return new ValueType(idPropertyType);
+        return new ValueType(idPropertyGenericType);
     }
 
     private JaversType spawnFromPrototype(Type javaType, JaversType prototype) {

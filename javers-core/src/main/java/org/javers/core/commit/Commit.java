@@ -42,7 +42,8 @@ public final class Commit {
     }
 
     /**
-     * Monotonically increasing id
+     * Monotonically increasing id,
+     * e.g. 1.0, 2.0, ...
      */
     public CommitId getId() {
         return commitMetadata.getId();

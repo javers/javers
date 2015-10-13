@@ -56,6 +56,9 @@ public final class CommitId implements Comparable<CommitId> {
         return new BigDecimal(majorId+(minorId*.01)).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
+    /**
+     * e.g. "1.0"
+     */
     public String value(){
         return majorId+"."+minorId;
     }
