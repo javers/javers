@@ -1,6 +1,5 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
@@ -21,10 +20,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
-import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
@@ -34,16 +30,11 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public class TypeMapper {
     private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
-
-    private final ValueType OBJECT_TYPE = new ValueType(Object.class);
-    private final TypeFactory typeFactory;
-    private final Map<Type, JaversType> mappedTypes;
+    private final TypeMapperState state;
     private final DehydratedTypeFactory dehydratedTypeFactory = new DehydratedTypeFactory(this);
 
     public TypeMapper(TypeFactory typeFactory) {
-        this.typeFactory = typeFactory;
-
-        mappedTypes = new ConcurrentHashMap<>();
+        this.state = new TypeMapperState(typeFactory);
 
         //primitives & boxes
         for (Class primitiveOrBox : Primitives.getPrimitiveAndBoxTypes()) {
@@ -103,30 +94,7 @@ public class TypeMapper {
     public JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
 
-        if (javaType == Object.class){
-            return OBJECT_TYPE;
-        }
-
-        JaversType jType = mappedTypes.get(javaType);
-        if (jType != null) {
-            return jType;
-        }
-
-        return mappedTypes.computeIfAbsent(javaType, new Function<Type, JaversType>() {
-            public JaversType apply(Type type) {
-                return infer(type);
-            }
-        });
-    }
-
-    private JaversType infer(Type javaType) {
-        argumentIsNotNull(javaType);
-        JaversType prototype = findNearestAncestor(javaType);
-        JaversType newType = typeFactory.infer(javaType, Optional.fromNullable(prototype));
-
-        inferIdPropertyTypeForEntityIfNeeed(newType);
-
-        return newType;
+        return state.getJaversType(javaType);
     }
 
     /**
@@ -154,7 +122,7 @@ public class TypeMapper {
     }
 
     public void registerClientsClass(ClientsClassDefinition def) {
-        addType(typeFactory.createFromDefinition(def));
+        state.computeIfAbsent(def);
     }
 
     public void registerValueType(Class<?> valueCLass) {
@@ -220,54 +188,7 @@ public class TypeMapper {
     //-- private
 
     private void addType(JaversType jType) {
-        mappedTypes.putIfAbsent(jType.getBaseJavaType(), jType);
-        inferIdPropertyTypeForEntityIfNeeed(jType);
-    }
-
-    /**
-     * if type of given id-property is not already mapped, maps it as ValueType
-     */
-    private void inferIdPropertyTypeForEntityIfNeeed(JaversType jType) {
-        argumentIsNotNull(jType);
-        if (! (jType instanceof EntityType)){
-            return;
-        }
-
-        EntityType entityType = (EntityType) jType;
-        mappedTypes.computeIfAbsent(entityType.getIdPropertyGenericType(), new Function<Type, JaversType>() {
-            public JaversType apply(Type type) {
-                return typeFactory.inferIdPropertyTypeAsValue(type);
-            }
-        });
-    }
-
-    private JaversType findNearestAncestor(Type javaType) {
-        Class javaClass = extractClass(javaType);
-        List<DistancePair> distances = new ArrayList<>();
-
-        for (JaversType javersType : mappedTypes.values()) {
-            DistancePair distancePair = new DistancePair(javaClass, javersType);
-
-            //this is due too spoiled Java Array reflection API
-            if (javaClass.isArray()) {
-                return getJaversType(Object[].class);
-            }
-
-            //just to better speed
-            if (distancePair.getDistance() == 1) {
-                return distancePair.getJaversType();
-            }
-
-            distances.add(distancePair);
-        }
-
-        Collections.sort(distances);
-
-        if (distances.get(0).isMax()){
-            return null;
-        }
-
-        return distances.get(0).getJaversType();
+        state.putIfAbsent(jType.getBaseJavaType(), jType);
     }
 
 }
