@@ -13,4 +13,12 @@ public final class ArrayChange extends ContainerChange {
     public ArrayChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
         super(affectedCdoId, property, changes);
     }
+
+    public Object[] getLeftArray() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    public Object[] getRightArray() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 }
