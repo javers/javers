@@ -2,10 +2,7 @@ package org.javers.repository.sql.schema;
 
 import org.javers.repository.sql.ConnectionProvider;
 import org.polyjdbc.core.PolyJDBC;
-import org.polyjdbc.core.dialect.Dialect;
-import org.polyjdbc.core.dialect.H2Dialect;
-import org.polyjdbc.core.dialect.MysqlDialect;
-import org.polyjdbc.core.dialect.PostgresDialect;
+import org.polyjdbc.core.dialect.*;
 import org.polyjdbc.core.schema.SchemaInspector;
 import org.polyjdbc.core.schema.SchemaManager;
 import org.polyjdbc.core.schema.model.Schema;
@@ -60,22 +57,21 @@ public class JaversSchemaManager {
         if (getTypeOf("jv_commit", "commit_id") == Types.VARCHAR){
             logger.info("migrating db schema from JaVers 1.3.15 to 1.3.16 ...");
 
-            String alter = null;
             if (dialect instanceof PostgresDialect){
-                alter = "ALTER TABLE jv_commit ALTER COLUMN commit_id TYPE numeric(12,2) USING commit_id::numeric";
-            }
-
-            if (dialect instanceof H2Dialect){
-                alter = "ALTER TABLE jv_commit ALTER COLUMN commit_id numeric(12,2)";
-            }
-
-            if (dialect instanceof MysqlDialect){
-                alter = "ALTER TABLE jv_commit MODIFY commit_id numeric(12,2)";
-            }
-
-            if (alter != null) {
-                logger.info("executing {}", alter);
-                executeSQL(alter);
+                executeSQL("ALTER TABLE jv_commit ALTER COLUMN commit_id TYPE numeric(12,2) USING commit_id::numeric");
+            } else if (dialect instanceof H2Dialect){
+                executeSQL("ALTER TABLE jv_commit ALTER COLUMN commit_id numeric(12,2)");
+            } else if (dialect instanceof MysqlDialect){
+                executeSQL("ALTER TABLE jv_commit MODIFY commit_id numeric(12,2)");
+            } else if (dialect instanceof OracleDialect){
+                executeSQL("ALTER TABLE jv_commit MODIFY commit_id number(12,2)");
+            } else if (dialect instanceof MsSqlDialect) {
+                executeSQL("drop index jv_commit_commit_id_idx on jv_commit");
+                executeSQL("ALTER TABLE jv_commit ALTER COLUMN commit_id numeric(12,2)");
+                executeSQL("CREATE INDEX jv_commit_commit_id_idx ON jv_commit (commit_id)");
+            } else {
+                logger.error("\nno DB schema migration script for {} :(\nplease contact with JaVers team, javers@javers.org",
+                        dialect.getCode());
             }
         }
     }

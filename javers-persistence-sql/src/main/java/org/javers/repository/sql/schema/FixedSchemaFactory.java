@@ -68,6 +68,7 @@ public class FixedSchemaFactory {
                 .withAttribute().string(COMMIT_AUTHOR).withMaxLength(200).and()
                 .withAttribute().timestamp(COMMIT_COMMIT_DATE).and()
                 .withAttribute().string(COMMIT_COMMIT_ID).withMaxLength(12).and()
+                //.withAttribute().number(COMMIT_COMMIT_ID).withIntegerPrecision(12).withDecimalPrecision(2).and()
                 .build();
 
         columnIndex(tableName, COMMIT_COMMIT_ID, schema);
