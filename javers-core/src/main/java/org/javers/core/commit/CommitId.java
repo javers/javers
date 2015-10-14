@@ -29,7 +29,7 @@ public final class CommitId implements Comparable<CommitId> {
         long major = majorDotMinor.longValue();
         double minor = (majorDotMinor.doubleValue() - major) * 100;
 
-        return new CommitId(major, (int)minor);
+        return new CommitId(major, new BigDecimal(minor).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
     }
 
     public static CommitId valueOf(String majorDotMinor) {

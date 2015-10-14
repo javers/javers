@@ -42,9 +42,7 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public void persist(Commit commit) {
-        Optional<Long> primaryKey = commitRepository.getCommitPrimaryKey(commit);
-
-        if (primaryKey.isPresent()) {
+        if (commitRepository.isPersisted(commit)) {
             throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT, commit.getId());
         }
 

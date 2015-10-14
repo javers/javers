@@ -8,7 +8,7 @@ import static groovyx.gpars.GParsPool.withPool
 /**
  * @author bartosz.walacik
  */
-class TypeMapperAsyncTest extends Specification {
+class TypeMapperConcurrentTest extends Specification {
 
     def "should not create more than one JaversType for given Java type, even if called from many threads "(){
       given:
