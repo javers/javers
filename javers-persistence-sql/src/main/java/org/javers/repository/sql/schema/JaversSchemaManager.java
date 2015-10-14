@@ -70,7 +70,7 @@ public class JaversSchemaManager {
             }
 
             if (dialect instanceof MysqlDialect){
-                //alter = "ALTER TABLE jv_commit ALTER COLUMN commit_id numeric(12,2)";
+                alter = "ALTER TABLE jv_commit MODIFY commit_id numeric(12,2)";
             }
 
             if (alter != null) {
