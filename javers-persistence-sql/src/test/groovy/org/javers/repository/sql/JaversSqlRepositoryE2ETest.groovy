@@ -1,8 +1,8 @@
 package org.javers.repository.sql
 
+import groovy.sql.Sql
 import org.javers.core.JaversRepositoryE2ETest
 import org.javers.core.cases.Case207Arrays
-import org.javers.core.metamodel.type.ValueObjectType
 import org.javers.core.cases.Case208DateTimeTypes
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
@@ -15,7 +15,8 @@ import static org.javers.core.JaversBuilder.javers
 
 class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
-    private Connection con
+    Connection con
+    JaversSqlRepository sqlRepository
 
     protected Connection createConnection() {
         DriverManager.getConnection( "jdbc:h2:mem:test" )//TRACE_LEVEL_SYSTEM_OUT=2")
@@ -36,7 +37,7 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
         def connectionProvider = { getConnection() } as ConnectionProvider
 
-        def sqlRepository = SqlRepositoryBuilder
+        sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(connectionProvider)
                 .withDialect(getDialect()).build()
@@ -62,6 +63,26 @@ class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         def stmt = getConnection().createStatement()
         stmt.executeUpdate(sql)
         stmt.close()
+    }
+
+    def "should select Head using max CommitId and not table PK"(){
+        given:
+        def sql = new Sql(getConnection())
+        [
+                [3, 3.00],
+                [2, 11.02],
+                [1, 11.01]
+        ].each {
+            sql.execute 'insert into jv_commit (commit_pk, commit_id) values (?,?)', it
+        }
+
+        when:
+        def head = sqlRepository.headId
+        println head
+
+        then:
+        head.majorId == 11
+        head.minorId == 2
     }
 
     def "should not interfere with user transactions"() {

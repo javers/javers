@@ -11,7 +11,6 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 class CommitIdTypeAdapterTest extends Specification{
 
     def "should serialize CommitId to Json"() {
-
         given:
         def javers = javersTestAssembly()
         def commitId = new CommitId(13, 7)

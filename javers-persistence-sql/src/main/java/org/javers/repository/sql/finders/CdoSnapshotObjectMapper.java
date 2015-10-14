@@ -66,7 +66,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
     private CommitMetadata assembleCommitMetadata(ResultSet resultSet) throws SQLException {
         String author = resultSet.getString(COMMIT_AUTHOR);
         LocalDateTime commitDate = new LocalDateTime(resultSet.getTimestamp(COMMIT_COMMIT_DATE));
-        CommitId commitId = CommitId.valueOf(resultSet.getString(COMMIT_COMMIT_ID));
+        CommitId commitId = CommitId.valueOf(resultSet.getBigDecimal(COMMIT_COMMIT_ID));
         return new CommitMetadata(author, commitDate, commitId);
     }
 
