@@ -114,12 +114,6 @@ public class TypeMapper {
         return infer(javaType);
     }
 
-    public void inferIfNeeded(Type javaType) {
-        if (mappedTypes.containsKey(javaType)) {
-            infer(javaType);
-        }
-    }
-
     /**
      * @throws JaversException CLASS_NOT_MANAGED if given javaClass is NOT mapped to {@link ManagedType}
      */
