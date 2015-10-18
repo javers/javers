@@ -5,6 +5,7 @@ import org.javers.core.diff.ObjectGraph;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EnumerableType;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -45,10 +46,11 @@ public class CollectionsGraphBuilder {
         nodeReuser.saveForReuse(node);
 
         Property property = containerProperty(node);
-        typeMapper.inferIfNeeded(clazz);
-
         EnumerableType enumerableType = typeMapper.getPropertyType(property);
-        node.addEdge(edgeBuilder.createMultiEdge(property, enumerableType, node));
+
+        if (typeMapper.getJaversType(clazz) instanceof ManagedType) {
+            node.addEdge(edgeBuilder.createMultiEdge(property, enumerableType, node));
+        }
     }
 
     private Property containerProperty(ObjectNode node) {
