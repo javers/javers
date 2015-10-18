@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -161,6 +162,11 @@ class JaversCore implements Javers {
     @Override
     public IdBuilder idBuilder() {
         return new IdBuilder(globalIdFactory);
+    }
+
+    @Override
+    public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz) {
+        return diffFactory.compareCollections(oldVersion, currentVersion, clazz);
     }
 
     @Override

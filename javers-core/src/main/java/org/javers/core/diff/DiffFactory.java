@@ -17,6 +17,7 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -55,14 +56,22 @@ public class DiffFactory {
      * @see Javers#compare(Object, Object)
      */
     public Diff compare(Object oldVersion, Object currentVersion) {
-        return create(buildGraph(oldVersion), buildGraph(currentVersion), Optional.<CommitMetadata>empty());
+        return create(buildGraph(oldVersion), buildGraph(currentVersion));
+    }
+
+    public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz) {
+        return create(graphFactory.createLiveGraph(oldVersion, clazz), graphFactory.createLiveGraph(currentVersion, clazz));
+    }
+
+    public Diff create(ObjectGraph leftGraph, ObjectGraph rightGraph) {
+        return create(leftGraph, rightGraph, Optional.<CommitMetadata>empty());
     }
 
     public Diff create(ObjectGraph leftGraph, ObjectGraph rightGraph, Optional<CommitMetadata> commitMetadata) {
         Validate.argumentsAreNotNull(leftGraph, rightGraph);
 
         GraphPair graphPair = new GraphPair(leftGraph, rightGraph);
-        return createAndAppendChanges(graphPair, commitMetadata);
+        return createAndAppendChanges(graphPair, Optional.<CommitMetadata>empty());
     }
 
     public Diff singleTerminal(GlobalId removedId, CommitMetadata commitMetadata){
@@ -152,4 +161,6 @@ public class DiffFactory {
             break;
         }
     }
+
+
 }

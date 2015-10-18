@@ -1,9 +1,11 @@
 package org.javers.core.graph;
 
+import org.javers.core.diff.ObjectGraph;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +31,12 @@ public class LiveGraphFactory {
         Object wrappedHandle = wrapTopLevelContainer(handle);
 
         return new ObjectGraphBuilder(typeMapper, liveCdoFactory).buildGraph(wrappedHandle);
+    }
+
+    public <T> ObjectGraph createLiveGraph(Collection<T> handle, Class<T> clazz) {
+        Object wrappedHandle = wrapTopLevelContainer(handle);
+
+        return new CollectionsGraphBuilder(typeMapper, liveCdoFactory).buildGraph(wrappedHandle, clazz);
     }
 
     public Cdo createCdo(Object cdo){
