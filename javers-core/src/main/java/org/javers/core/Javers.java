@@ -19,6 +19,7 @@ import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -322,4 +323,5 @@ public interface Javers {
 
     IdBuilder idBuilder();
 
+    <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz);
 }

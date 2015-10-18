@@ -26,12 +26,17 @@ public class ObjectGraphBuilder {
     private final TypeMapper typeMapper;
     private boolean built;
     private final EdgeBuilder edgeBuilder;
-    private final NodeReuser nodeReuser = new NodeReuser();
+    private final NodeReuser nodeReuser;
 
     public ObjectGraphBuilder(TypeMapper typeMapper, CdoFactory cdoFactory) {
+        this(typeMapper, cdoFactory, new NodeReuser());
+    }
+
+    ObjectGraphBuilder(TypeMapper typeMapper, CdoFactory cdoFactory, NodeReuser nodeReuser) {
         Validate.argumentsAreNotNull(typeMapper, cdoFactory);
         this.typeMapper = typeMapper;
         this.edgeBuilder = new EdgeBuilder(typeMapper, nodeReuser, cdoFactory);
+        this.nodeReuser = new NodeReuser();
     }
 
     /**
@@ -41,15 +46,22 @@ public class ObjectGraphBuilder {
      * @return graph nodes set
      */
     public LiveGraph buildGraph(Object handle) {
+        ObjectNode root = buildRoot(handle);
+        return buildLeafs(root);
+    }
+
+    private ObjectNode buildRoot(Object handle) {
         argumentIsNotNull(handle);
 
         Cdo cdo = edgeBuilder.asCdo(handle, null);
-       // logger.debug("building objectGraph for handle [{}] ...",cdo);
+        // logger.debug("building objectGraph for handle [{}] ...",cdo);
 
-        ObjectNode root = edgeBuilder.buildNodeStub(cdo);
+        return edgeBuilder.buildNodeStub(cdo);
+    }
 
+    LiveGraph buildLeafs(ObjectNode root) {
         //we can't use recursion here, it could cause StackOverflow for large graphs
-        while(nodeReuser.hasMoreStubs()){
+        while (nodeReuser.hasMoreStubs()) {
             ObjectNode stub = nodeReuser.pollStub();
             buildEdges(stub); //edgeBuilder should append new stubs to queue
         }
@@ -80,7 +92,7 @@ public class ObjectGraphBuilder {
     }
 
     private void buildMultiEdges(ObjectNode node) {
-        for (Property containerProperty : getNonEmptyEnumerablesWithManagedClasses(node))  {
+        for (Property containerProperty : getNonEmptyEnumerablesWithManagedClasses(node)) {
             EnumerableType enumerableType = typeMapper.getPropertyType(containerProperty);
 
             //looks like we have Container or Map with Entity references or Value Objects
@@ -91,7 +103,7 @@ public class ObjectGraphBuilder {
     }
 
     private void switchToBuilt() {
-        if (built){
+        if (built) {
             throw new IllegalStateException("ObjectGraphBuilder is a stateful builder (not a Service)");
         }
         built = true;
@@ -136,15 +148,15 @@ public class ObjectGraphBuilder {
      *
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
      */
-    private boolean isContainerOfManagedClasses(JaversType javersType){
-        if (! (javersType instanceof ContainerType)) {
+    private boolean isContainerOfManagedClasses(JaversType javersType) {
+        if (!(javersType instanceof ContainerType)) {
             return false;
         }
 
         return isItemManagedType((ContainerType) javersType);
     }
 
-    private boolean isItemManagedType(ContainerType containerType){
+    private boolean isItemManagedType(ContainerType containerType) {
         return typeMapper.getJaversType(containerType.getItemType()) instanceof ManagedType;
     }
 
@@ -154,11 +166,11 @@ public class ObjectGraphBuilder {
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
      */
     private boolean isMapWithManagedClass(EnumerableType enumerableType) {
-        if (! (enumerableType instanceof MapType)) {
+        if (!(enumerableType instanceof MapType)) {
             return false;
         }
 
-        MapType mapType = (MapType)enumerableType;
+        MapType mapType = (MapType) enumerableType;
 
         JaversType keyType = typeMapper.getJaversType(mapType.getKeyType());
         JaversType valueType = typeMapper.getJaversType(mapType.getValueType());
