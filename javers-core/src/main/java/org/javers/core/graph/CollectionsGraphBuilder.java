@@ -9,6 +9,9 @@ import org.javers.core.metamodel.type.TypeMapper;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
+/**
+ * @author pawelszymczyk
+ */
 public class CollectionsGraphBuilder {
 
     private final TypeMapper typeMapper;

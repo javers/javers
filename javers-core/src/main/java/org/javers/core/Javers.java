@@ -109,6 +109,11 @@ public interface Javers {
     Diff compare(Object oldVersion, Object currentVersion);
 
     /**
+     * Deeply compares two collections, introduced due to the lack of possibility to determined at runtime collection item class
+     */
+    <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz);
+
+    /**
      * Initial diff is a kind of snapshot of given domain object graph.
      * Use it alongside with {@link #compare(Object, Object)}
      */
@@ -322,6 +327,4 @@ public interface Javers {
     <T extends JaversType> T getTypeMapping(Type clientsType);
 
     IdBuilder idBuilder();
-
-    <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz);
 }
