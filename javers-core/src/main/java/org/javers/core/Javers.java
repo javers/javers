@@ -109,7 +109,7 @@ public interface Javers {
     Diff compare(Object oldVersion, Object currentVersion);
 
     /**
-     * Deeply compares two collections, introduced due to the lack of possibility to determined at runtime collection item class
+     * Deeply compares two collections, introduced due to the lack of possibility to determined collection item class at runtime
      */
     <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz);
 
