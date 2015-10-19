@@ -34,7 +34,7 @@ public class UnboundedValueObjectId extends GlobalId {
 
     @Override
     public String value() {
-        return valueObject.getClientsClass().getName()+UNBOUNDED_FRAGMENT;
+        return valueObject.getName()+UNBOUNDED_FRAGMENT;
     }
 
     public String getFragment() {

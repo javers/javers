@@ -15,17 +15,22 @@ public abstract class ClientsDomainClass {
         this.clientsClass = clientsClass;
     }
 
+    @Deprecated
     public Class getClientsClass() {
         return clientsClass;
     }
 
     public boolean isInstance(Object cdo) {
         argumentIsNotNull(cdo);
-        return (clientsClass.isAssignableFrom(cdo.getClass()));
+        return isAssignableFrom(cdo.getClass());
+    }
+
+    public boolean isAssignableFrom(Class<?> clazz) {
+        return clientsClass.isAssignableFrom(clazz);
     }
 
     /**
-     * clientsClass.name
+     * type name, clientsClass.name by default
      */
     public String getName() {
         return clientsClass.getName();

@@ -74,7 +74,7 @@ public class TypeFactory {
 
     private JaversType createFromClientsClass(ClientsDomainClass clientsClass) {
         if (clientsClass instanceof Value) {
-            return new ValueType(clientsClass.getClientsClass());
+            return new ValueType((Value)clientsClass);
         }
         if (clientsClass instanceof ValueObject) {
             return new ValueObjectType((ValueObject)clientsClass);

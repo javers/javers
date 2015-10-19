@@ -7,9 +7,9 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 /**
  * @author bartosz walacik
  */
-class EntityFieldIdTest extends EntityFactoryIdTest {
+class ManagedClassFieldIdTest extends ManagedClassFactoryIdTest {
 
     def setup() {
-        entityFactory = javersTestAssembly(MappingStyle.FIELD).managedClassFactory
+        managedClassFactory = javersTestAssembly(MappingStyle.FIELD).managedClassFactory
     }
 }

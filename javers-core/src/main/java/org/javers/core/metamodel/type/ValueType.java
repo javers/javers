@@ -1,11 +1,12 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.core.JaversBuilder;
 import org.javers.core.json.JsonTypeAdapter;
+import org.javers.core.metamodel.clazz.Value;
 import org.joda.time.LocalDateTime;
-import org.javers.core.json.JsonTypeAdapter;
+
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import org.javers.core.JaversBuilder;
 
 /**
  * Value class in client's domain model. Simple value holder.
@@ -31,5 +32,9 @@ import org.javers.core.JaversBuilder;
 public class ValueType extends PrimitiveOrValueType {
     public ValueType(Type baseJavaType) {
         super(baseJavaType);
+    }
+
+    public ValueType(Value value){
+        super(value.getClientsClass());
     }
 }

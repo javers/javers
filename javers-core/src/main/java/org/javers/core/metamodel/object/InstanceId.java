@@ -47,14 +47,14 @@ public class InstanceId extends GlobalId {
     }
 
     public String value() {
-        return entity.getClientsClass().getName()+"/"+getCdoIdAsString();
+        return entity.getName()+"/"+getCdoIdAsString();
     }
 
     public boolean idEquals(Object instance) {
         if (instance == null) {
             return false;
         }
-        if (!entity.getClientsClass().isAssignableFrom(instance.getClass())){
+        if (!entity.isInstance(instance)){
             return false;
         }
 

@@ -5,6 +5,7 @@ import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.MappingStyle
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -22,6 +23,20 @@ class ManagedClassFactoryTest extends Specification {
 
     @Shared
     def ManagedClassFactory managedClassFactory
+
+    @Unroll
+    @Ignore //TODO
+    def "should use name from @TypeAlias for #what"(){
+        when:
+        def entity = managedClassFactory.inferFromAnnotations(clazz)
+
+        then:
+        entity.name == "NyName"
+
+        where:
+        what  << ["Entity"]
+        clazz << [JaversEntityWithTypeAlias]
+    }
 
     def "should create Entity with properties, ID property and reference to client's class"() {
         when:
