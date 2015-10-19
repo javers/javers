@@ -1,4 +1,6 @@
-package org.javers.core.metamodel.clazz;
+package org.javers.core.metamodel.annotation;
+
+import org.javers.common.collections.Lists;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
@@ -10,16 +12,16 @@ import java.util.Set;
  * @author bartosz walacik
  */
 public class AnnotationNamesProvider {
-
-    private final List<AnnotationsNameSpace> namesProviders;
-
     private final Set<String> entityAliases = new HashSet<>();
     private final Set<String> valueObjectAliases = new HashSet<>();
     private final Set<String> valueAliases = new HashSet<>();
     private final Set<String> transientPropertyAliases = new HashSet<>();
+    private final List<AnnotationsNameSpace> namesProviders = Lists.immutableListOf(
+            new JaversAnnotationsNamesSpace(),
+            new JPAAnnotationsNameSpace());
 
-    public AnnotationNamesProvider(List<AnnotationsNameSpace> namesProviders) {
-        this.namesProviders = namesProviders;
+
+    public AnnotationNamesProvider() {
 
         for (AnnotationsNameSpace provider : namesProviders){
             entityAliases.addAll(provider.getEntityAliases());

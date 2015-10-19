@@ -1,6 +1,16 @@
-package org.javers.core.metamodel.clazz
+package org.javers.core.metamodel.annotation
 
 import org.javers.core.JaversTestBuilder
+import org.javers.core.metamodel.clazz.EntityDefinition
+import org.javers.core.metamodel.clazz.JaversEntity
+import org.javers.core.metamodel.clazz.JaversValue
+import org.javers.core.metamodel.clazz.JaversValueObject
+import org.javers.core.metamodel.clazz.JpaEmbeddable
+import org.javers.core.metamodel.clazz.JpaEntity
+import org.javers.core.metamodel.clazz.JpaMappedSuperclass
+import org.javers.core.metamodel.clazz.NotAnnotatedClass
+import org.javers.core.metamodel.clazz.ValueDefinition
+import org.javers.core.metamodel.clazz.ValueObjectDefinition
 import spock.lang.Specification
 import spock.lang.Unroll
 

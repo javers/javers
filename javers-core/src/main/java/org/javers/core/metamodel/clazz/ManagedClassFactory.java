@@ -3,9 +3,9 @@ package org.javers.core.metamodel.clazz;
 import org.javers.common.validation.Validate;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.core.metamodel.annotation.ClassAnnotationsScanner;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.PropertyScanner;
-import org.javers.core.metamodel.type.EntityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

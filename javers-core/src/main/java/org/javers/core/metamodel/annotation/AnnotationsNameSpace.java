@@ -1,11 +1,11 @@
-package org.javers.core.metamodel.clazz;
+package org.javers.core.metamodel.annotation;
 
 import java.util.Set;
 
 /**
  * @author bartosz walacik
  */
-public interface AnnotationsNameSpace {
+interface AnnotationsNameSpace {
 
     Set<String> getEntityAliases();
 

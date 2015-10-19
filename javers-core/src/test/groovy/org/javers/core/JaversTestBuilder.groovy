@@ -7,7 +7,7 @@ import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectGraphBuilder
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.JsonConverterBuilder
-import org.javers.core.metamodel.clazz.ClassAnnotationsScanner
+import org.javers.core.metamodel.annotation.ClassAnnotationsScanner
 import org.javers.core.metamodel.clazz.ManagedClassFactory
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId

@@ -25,18 +25,6 @@ import static org.javers.core.JaversBuilder.javers
  */
 class JaversBuilderTest extends Specification {
 
-    def "should load default properties file"() {
-        given:
-        JaversBuilder javersBuilder = javers()
-
-        when:
-        javersBuilder.build()
-
-        then:
-        javersBuilder.getContainerComponent(PropertyScanner) instanceof FieldBasedPropertyScanner
-    }
-
-
     def "should manage Entity"() {
         when:
         Javers javers = javers().registerEntity(DummyEntity).build()
@@ -83,30 +71,6 @@ class JaversBuilderTest extends Specification {
         then:
         javersBuilder.getContainerComponent(ObjectAccessHook) == graphFactoryHook
     }
-
-    def "should contain FieldBasedPropertyScanner when Field style"() {
-        given:
-        JaversBuilder javersBuilder = javers().withMappingStyle(MappingStyle.FIELD)
-
-        when:
-        javersBuilder.build()
-
-        then:
-        javersBuilder.getContainerComponent(PropertyScanner) instanceof FieldBasedPropertyScanner
-    }
-
-
-    def "should contain BeanBasedPropertyScanner when Bean style"() {
-        given:
-        JaversBuilder javersBuilder = javers().withMappingStyle(MappingStyle.BEAN)
-
-        when:
-        javersBuilder.build()
-
-        then:
-        javersBuilder.getContainerComponent(PropertyScanner) instanceof BeanBasedPropertyScanner
-    }
-
 
     def "should not contain FieldBasedPropertyScanner when Bean style"() {
         given:
