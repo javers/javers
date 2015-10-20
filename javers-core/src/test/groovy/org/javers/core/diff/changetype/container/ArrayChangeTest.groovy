@@ -1,10 +1,11 @@
-package org.javers.core.diff
+package org.javers.core.diff.changetype.container
 
 import org.javers.core.JaversBuilder
-import org.javers.core.diff.changetype.container.ArrayChange
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
+
+import static org.javers.common.collections.Arrays.intArray
 
 /**
  * @author akrystian
@@ -13,63 +14,22 @@ class ArrayChangeTest extends Specification {
     @Shared
     def javers = JaversBuilder.javers().build();
 
-    @Ignore
-    def "should getLeftArray for simple values"() {
+    @Unroll
+    def "should create leftArray and rightArray for diff #container1 to #container2"() {
         given:
-        def container1 = intArray([1, 2]);
-        def container2 = intArray([1, 2, 3])
         def diff = javers.compare(container1, container2)
         ArrayChange arrayChange = diff.changes[0];
         when:
         Object[] leftArray = arrayChange.getLeftArray()
-        then:
-        leftArray == intArray([1, 2]);
-    }
-
-    @Ignore
-    def "should getRightArray for simple values"() {
-        given:
-        def container1 = intArray([1, 2]);
-        def container2 = intArray([1, 2, 3])
-        def diff = javers.compare(container1, container2)
-        ArrayChange arrayChange = diff.changes[0];
-        when:
         Object[] rightArray = arrayChange.getRightArray()
         then:
-        rightArray == intArray([3]);
-    }
+        leftArray == expectedLeftArray
+        rightArray == expectedRightArray
 
-    @Ignore
-    def "should getLeftArray for objects"() {
-        given:
-        def container1 = ["a", "b"].toArray();
-        def container2 = ["a", "b", "c"].toArray();
-        def diff = javers.compare(container1, container2)
-        ArrayChange arrayChange = diff.changes[0];
-        when:
-        Object[] leftArray = arrayChange.getLeftArray()
-        then:
-        leftArray == ["a", "b"].toArray();
-    }
-
-    @Ignore
-    def "should getRightArray for objects"() {
-        given:
-        def container1 = ["a", "b"].toArray();
-        def container2 = ["a", "b", "c"].toArray();
-        def diff = javers.compare(container1, container2)
-        ArrayChange arrayChange = diff.changes[0];
-        when:
-        Object[] rightArray = arrayChange.getRightArray()
-        then:
-        rightArray == ["c"].toArray();
-    }
-
-
-    private int[] intArray(List values) {
-        def ret = new int[values.size()]
-        values.eachWithIndex { def entry, int i -> ret[i] = entry }
-        println ret
-        ret
+        where:
+        container1 << [intArray(1, 2, 3), intArray(1, 2), ["a", "b", "c"].toArray(), ["a", "b"].toArray()]
+        container2 << [intArray(1, 2), intArray(1, 2, 3), ["a", "b"].toArray(), ["a", "b", "c"].toArray()]
+        expectedLeftArray << [intArray(3), [], ["c"].toArray(), []]
+        expectedRightArray << [[], intArray(3), [], ["c"].toArray()]
     }
 }

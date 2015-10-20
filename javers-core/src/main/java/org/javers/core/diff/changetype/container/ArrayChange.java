@@ -3,6 +3,7 @@ package org.javers.core.diff.changetype.container;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,10 +16,26 @@ public final class ArrayChange extends ContainerChange {
     }
 
     public Object[] getLeftArray() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        ArrayList<Object> left = new ArrayList<>();
+        for (ContainerElementChange elementChange : this.getChanges()) {
+            if (elementChange instanceof ElementValueChange) {
+                left.add(((ElementValueChange) elementChange).getLeftValue());
+            } else if (elementChange instanceof ValueRemoved) {
+                left.add(((ValueRemoved) elementChange).getValue());
+            }
+        }
+        return left.toArray();
     }
 
     public Object[] getRightArray() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        ArrayList<Object> right = new ArrayList<>();
+        for (ContainerElementChange elementChange : this.getChanges()) {
+            if (elementChange instanceof ElementValueChange) {
+                right.add(((ElementValueChange) elementChange).getRightValue());
+            } else if (elementChange instanceof ValueAdded) {
+                right.add(((ValueAdded) elementChange).getAddedValue());
+            }
+        }
+        return right.toArray();
     }
 }
