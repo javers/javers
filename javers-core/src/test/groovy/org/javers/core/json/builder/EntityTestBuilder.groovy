@@ -1,15 +1,14 @@
 package org.javers.core.json.builder
 
 import org.javers.core.JaversTestBuilder
-import org.javers.core.metamodel.clazz.Entity
 import org.javers.core.metamodel.clazz.EntityDefinition
-import org.javers.core.metamodel.clazz.ManagedClassFactory
-import org.javers.core.metamodel.clazz.ValueObject
 import org.javers.core.metamodel.clazz.ValueObjectDefinition
+import org.javers.core.metamodel.type.*
 
 /**
  * @author bartosz walacik
  */
+@Deprecated
 class EntityTestBuilder {
     static ManagedClassFactory managedClassFactory;
 

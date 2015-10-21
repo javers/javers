@@ -18,15 +18,19 @@ public class TypeFactory {
 
     private final ManagedClassFactory managedClassFactory;
 
-    public TypeFactory(ManagedClassFactory managedClassFactory) {
+    TypeFactory(ManagedClassFactory managedClassFactory) {
         this.managedClassFactory = managedClassFactory;
     }
 
-    JaversType createFromDefinition(ClientsClassDefinition def){
+    JaversType create(ClientsClassDefinition def){
         if (def instanceof CustomDefinition){
             return new CustomType(def.getClazz());
         }
         return createFromClientsClass(managedClassFactory.create(def));
+    }
+
+    EntityType createEntity(Class<?> javaType) {
+        return (EntityType) create(new EntityDefinition(javaType));
     }
 
     JaversType infer(Type javaType, Optional<JaversType> prototype){

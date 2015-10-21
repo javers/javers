@@ -8,7 +8,7 @@ import org.javers.core.graph.ObjectGraphBuilder
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.JsonConverterBuilder
 import org.javers.core.metamodel.annotation.ClassAnnotationsScanner
-import org.javers.core.metamodel.clazz.ManagedClassFactory
+import org.javers.core.metamodel.type.ManagedClassFactory
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.SnapshotFactory
@@ -85,10 +85,6 @@ class JaversTestBuilder {
 
     ClassAnnotationsScanner getClassAnnotationsScanner(){
         javersBuilder.getContainerComponent(ClassAnnotationsScanner)
-    }
-
-    ManagedClassFactory getManagedClassFactory() {
-        javersBuilder.getContainerComponent(ManagedClassFactory)
     }
 
     SnapshotFactory getSnapshotFactory() {

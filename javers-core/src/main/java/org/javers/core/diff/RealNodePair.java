@@ -73,7 +73,7 @@ public class RealNodePair implements NodePair {
 
     @Override
     public List<Property> getProperties() {
-        return left.getManagedClass().getProperties();
+        return left.getManagedType().getProperties();
     }
 
     @Override

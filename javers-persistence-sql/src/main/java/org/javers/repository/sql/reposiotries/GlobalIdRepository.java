@@ -35,7 +35,7 @@ public class GlobalIdRepository {
     }
 
     public long getOrInsertClass(GlobalId globalId) {
-        Class cdoClass = globalId.getCdoClass().getClientsClass();
+        Class cdoClass = globalId.getCdoClass().getBaseJavaClass();
         Optional<Long> lookup = findClassPk(cdoClass);
 
         return lookup.isPresent() ? lookup.get() : insertClass(cdoClass);

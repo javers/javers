@@ -1,7 +1,8 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.ManagedClass;
+import org.javers.core.metamodel.type.Entity;
+import org.javers.core.metamodel.type.ManagedClass;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.jql.GlobalIdDTO;
 
 /**
@@ -10,9 +11,11 @@ import org.javers.repository.jql.GlobalIdDTO;
 public abstract class GlobalId {
 
     /**
-     * Class of client's domain object, preferably {@link Entity}
+     * JaversType of client's domain object
+     *
+     * //TODO rename to getManagedType()
      */
-    public abstract ManagedClass getCdoClass();
+    public abstract ManagedType getCdoClass();
 
     /**
      * ID of Client's domain object, should be unique in Class scope,

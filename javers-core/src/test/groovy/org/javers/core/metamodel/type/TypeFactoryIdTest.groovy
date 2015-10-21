@@ -1,8 +1,8 @@
-package org.javers.core.metamodel.clazz
+package org.javers.core.metamodel.type
 
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
-import org.javers.core.metamodel.property.EntityAssert
+import org.javers.core.metamodel.clazz.EntityDefinition
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyEntityWithEmbeddedId
 import org.javers.core.model.DummyUser
@@ -11,44 +11,44 @@ import spock.lang.Specification
 /**
  * @author bartosz walacik
  */
-abstract class ManagedClassFactoryIdTest extends Specification {
-    protected ManagedClassFactory managedClassFactory
+abstract class TypeFactoryIdTest extends Specification {
+    protected TypeFactory typeFactory
 
     def "should use @EmbeddedId property"(){
         when:
-        def entity = managedClassFactory.create(new EntityDefinition(DummyEntityWithEmbeddedId.class))
+        def entity = typeFactory.create(new EntityDefinition(DummyEntityWithEmbeddedId.class))
 
         then:
-        EntityAssert.assertThat(entity).hasIdProperty("point")
+        entity.idProperty.name == 'point'
     }
 
     def "should use @Id property by default"() {
         when:
-        def entity = managedClassFactory.create(new EntityDefinition(DummyUser.class))
+        def entity = typeFactory.create(new EntityDefinition(DummyUser.class))
 
         then:
-        EntityAssert.assertThat(entity).hasIdProperty("name")
+        entity.idProperty.name == 'name'
     }
 
     def "should ignore @Id annotation when idProperty name is given"() {
         when:
-        def entity = managedClassFactory.create(new EntityDefinition(DummyUser,"bigFlag"))
+        def entity = typeFactory.create(new EntityDefinition(DummyUser,"bigFlag"))
 
         then:
-        EntityAssert.assertThat(entity).hasIdProperty("bigFlag")
+        entity.idProperty.name == 'bigFlag'
     }
 
     def "should ignore @Transient annotation when idProperty name is given"() {
         when:
-        def entity = managedClassFactory.create(new EntityDefinition(DummyUser,"propertyWithTransientAnn"))
+        def entity = typeFactory.create(new EntityDefinition(DummyUser,"propertyWithTransientAnn"))
 
         then:
-        EntityAssert.assertThat(entity).hasIdProperty("propertyWithTransientAnn")
+        entity.idProperty.name == 'propertyWithTransientAnn'
     }
 
     def "should fail for Entity without Id property"() {
         when:
-        managedClassFactory.createEntity(DummyAddress.class)
+        typeFactory.create(new EntityDefinition(DummyAddress.class))
 
         then:
         JaversException e = thrown()
@@ -57,7 +57,7 @@ abstract class ManagedClassFactoryIdTest extends Specification {
 
     def "should fail when given Id property name doesn't exists"() {
         when:
-        managedClassFactory.create(new EntityDefinition(DummyUser,"zonk"))
+        typeFactory.create(new EntityDefinition(DummyUser,"zonk"))
 
         then:
         JaversException e = thrown()

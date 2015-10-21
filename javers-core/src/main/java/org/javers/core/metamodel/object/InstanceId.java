@@ -2,7 +2,7 @@ package org.javers.core.metamodel.object;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.type.EntityType;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -12,10 +12,10 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 public class InstanceId extends GlobalId {
-    private transient final Entity entity;
+    private transient final EntityType entity;
     private final Object cdoId;
 
-    private InstanceId(Object cdoId, Entity entity) {
+    private InstanceId(Object cdoId, EntityType entity) {
         argumentsAreNotNull(cdoId, entity);
         this.entity = entity;
         this.cdoId = cdoId;
@@ -25,16 +25,16 @@ public class InstanceId extends GlobalId {
      * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
      * @throws JaversException NOT_INSTANCE_OF
      */
-    public static InstanceId createFromInstance(Object instance, Entity entity){
+    public static InstanceId createFromInstance(Object instance, EntityType entity){
         return new InstanceId(entity.getIdOf(instance), entity);
     }
 
-    public static InstanceId createFromId(Object id, Entity entity){
+    public static InstanceId createFromId(Object id, EntityType entity){
         return new InstanceId(id, entity);
     }
 
     @Override
-    public Entity getCdoClass() {
+    public EntityType getCdoClass() {
         return entity;
     }
 

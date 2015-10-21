@@ -5,8 +5,9 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.commit.CdoSnapshotStateDeserializer;
-import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.type.Entity;
 import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
@@ -32,7 +33,7 @@ import java.lang.reflect.Type;
  * <ul>
  *     <li> {@link BasicStringTypeAdapter} -
  *           extend it if you need to represent Value as single String and don't want to deal with JSON API.
- *           For concrete class example see {@link LocalDateTimeTypeAdapter}.
+ *           For concrete class example see {@link org.javers.java8support.LocalDateTimeTypeAdapter}.
  *     <li> {@link JsonTypeAdapter} - use it if you need full control over JSON conversion
  *     <li> native Gson {@link TypeAdapter}
  *     <li> native Gson {@link JsonSerializer}
@@ -90,7 +91,7 @@ public class JsonConverter {
 
         Class cdoClass = parseClass(globalIdDTO.getCdoClassName());
         if (globalIdDTO.isInstanceId()){
-            Entity entity = typeMapper.getManagedClass(cdoClass, Entity.class);
+            EntityType entity = typeMapper.getJaversManagedType(cdoClass, EntityType.class);
             Object cdoId = fromJson(globalIdDTO.getLocalIdJSON(), entity.getIdProperty().getType());
             return globalIdFactory.createFromId(cdoId, entity);
         } else if (globalIdDTO.isValueObjectId()){

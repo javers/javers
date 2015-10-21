@@ -5,8 +5,6 @@ import org.javers.common.date.DefaultDateProvider;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.SnapshotFactory;
-import org.javers.core.metamodel.type.TypeFactory;
-import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.pico.InstantiatingModule;
 import org.javers.repository.jql.QueryRunner;
 import org.picocontainer.MutablePicoContainer;
@@ -26,8 +24,6 @@ public class CoreJaversModule extends InstantiatingModule {
         return (Collection) Lists.asList(
                 JaversCore.class,
                 JsonConverterBuilder.class,
-                TypeMapper.class,
-                TypeFactory.class,
                 JaversCoreConfiguration.class,
                 SnapshotFactory.class,
                 GlobalIdFactory.class,

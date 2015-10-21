@@ -1,10 +1,10 @@
 package org.javers.repository.jql;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.ValueObjectType;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
@@ -31,7 +31,7 @@ public final class ValueObjectIdDTO extends GlobalIdDTO {
 
         InstanceId ownerId = ownerIdDTO.create(typeMapper);
 
-        ValueObject valueObject = typeMapper.getChildValueObject(ownerId.getCdoClass(), voProperty);
+        ValueObjectType valueObject = typeMapper.getChildValueObject(ownerId.getCdoClass(), voProperty);
 
         return new ValueObjectId(valueObject, ownerId, fragment);
     }

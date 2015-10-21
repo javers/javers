@@ -1,8 +1,9 @@
-package org.javers.core.metamodel.clazz;
+package org.javers.core.metamodel.type;
 
 /**
  * @author bartosz walacik
  */
+@Deprecated
 public class Value extends ClientsDomainClass {
 
     Value(Class clientsClass) {

@@ -3,7 +3,6 @@ package org.javers.core.graph;
 import org.javers.common.collections.Predicate;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
@@ -68,7 +67,7 @@ public class ObjectGraphBuilder {
     }
 
     private void buildSingleEdges(ObjectNode node) {
-        for (Property singleRef : getSingleReferencesWithManagedClasses(node.getManagedClass())) {
+        for (Property singleRef : getSingleReferencesWithManagedClasses(node.getManagedType())) {
             if (node.isNull(singleRef)) {
                 continue;
             }
@@ -97,8 +96,8 @@ public class ObjectGraphBuilder {
         built = true;
     }
 
-    private List<Property> getSingleReferencesWithManagedClasses(ManagedClass managedClass) {
-        return managedClass.getProperties(new Predicate<Property>() {
+    private List<Property> getSingleReferencesWithManagedClasses(ManagedType managedType) {
+        return managedType.getProperties(new Predicate<Property>() {
             public boolean apply(Property property) {
                 JaversType javersType = typeMapper.getPropertyType(property);
 
@@ -108,7 +107,7 @@ public class ObjectGraphBuilder {
     }
 
     private List<Property> getNonEmptyEnumerablesWithManagedClasses(final ObjectNode node) {
-        return node.getManagedClass().getProperties(new Predicate<Property>() {
+        return node.getManagedType().getProperties(new Predicate<Property>() {
             public boolean apply(Property property) {
                 JaversType javersType = typeMapper.getPropertyType(property);
                 if (!(javersType instanceof EnumerableType)) {

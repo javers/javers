@@ -2,10 +2,8 @@ package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.ManagedClass;
+import org.javers.core.metamodel.type.*;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.clazz.ValueObject;
 
 /**
  * Abstract holder for client's domain object, {@link Entity} or {@link ValueObject}
@@ -28,7 +26,7 @@ public abstract class Cdo {
      * shortcut to {@link GlobalId#getCdoClass()}
      */
     public ManagedClass getManagedClass() {
-        return globalId.getCdoClass();
+        return globalId.getCdoClass().getManagedClass();
     }
 
     public abstract Optional<Object> getWrappedCdo();

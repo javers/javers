@@ -1,10 +1,11 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;
-import org.javers.core.metamodel.clazz.Entity;
+import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.EntityDefinition;
-import org.javers.core.metamodel.clazz.ManagedClassFactory;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.property.Property;
 
@@ -40,6 +41,7 @@ public class EntityType extends ManagedType {
     }
 
     @Override
+    @Deprecated
     public Entity getManagedClass() {
         return (Entity)super.getManagedClass();
     }
@@ -67,5 +69,25 @@ public class EntityType extends ManagedType {
 
     public Property getIdProperty() {
         return getManagedClass().getIdProperty();
+    }
+
+    /**
+     * @param instance instance of {@link #getBaseJavaClass()}
+     * @return returns ID of given instance (value of idProperty)
+     * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
+     * @throws JaversException NOT_INSTANCE_OF
+     */
+    public Object getIdOf(Object instance) {
+        Validate.argumentIsNotNull(instance);
+
+        if (!getBaseJavaClass().isInstance(instance)) {
+            throw new JaversException(JaversExceptionCode.NOT_INSTANCE_OF, getName(), instance.getClass().getName());
+        }
+
+        Object cdoId = getIdProperty().get(instance);
+        if (cdoId == null) {
+            throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, getName());
+        }
+        return cdoId;
     }
 }

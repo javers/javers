@@ -21,10 +21,7 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.property.PropertyScannerModule;
-import org.javers.core.metamodel.type.CustomType;
-import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.metamodel.type.ValueObjectType;
-import org.javers.core.metamodel.type.ValueType;
+import org.javers.core.metamodel.type.*;
 import org.javers.core.snapshot.GraphSnapshotModule;
 import org.javers.java8support.Java8AddOns;
 import org.javers.repository.api.InMemoryRepositoryModule;
@@ -396,8 +393,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private void bootManagedClasses() {
-        addModule(new ManagedClassFactoryModule());
         addModule(new PropertyScannerModule(getContainer(), coreConfiguration()));
+        addModule(new TypeModule(getContainer()));
         mapRegisteredClasses();
     }
 

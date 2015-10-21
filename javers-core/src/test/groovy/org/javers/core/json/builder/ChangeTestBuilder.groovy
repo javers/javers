@@ -1,6 +1,7 @@
 package org.javers.core.json.builder
 
 import org.javers.common.collections.Optional
+import org.javers.core.JaversTestBuilder
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ReferenceChange
@@ -13,11 +14,13 @@ import org.javers.core.diff.changetype.map.EntryChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.property.Property
+import org.javers.core.metamodel.type.TypeMapper
 
 /**
  * @author bartosz walacik
  */
 class ChangeTestBuilder {
+    static TypeMapper typeMapper = JaversTestBuilder.javersTestAssembly().typeMapper
 
     static NewObject newObject(Object newObject) {
         InstanceId globalId = instanceId(newObject)
@@ -76,6 +79,6 @@ class ChangeTestBuilder {
             return null
         }
 
-        return InstanceId.createFromInstance(cdo, EntityTestBuilder.entity(cdo.getClass()))
+        return InstanceId.createFromInstance(cdo, typeMapper.getJaversType(cdo.getClass()))
     }
 }

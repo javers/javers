@@ -1,6 +1,6 @@
 package org.javers.test.assertion
 
-import org.javers.core.metamodel.clazz.Entity
+import org.javers.core.metamodel.type.Entity
 
 /**
  * @author Pawel Cierpiatka

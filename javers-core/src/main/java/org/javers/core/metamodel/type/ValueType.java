@@ -2,7 +2,6 @@ package org.javers.core.metamodel.type;
 
 import org.javers.core.JaversBuilder;
 import org.javers.core.json.JsonTypeAdapter;
-import org.javers.core.metamodel.clazz.Value;
 import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;

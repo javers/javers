@@ -6,8 +6,8 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.ManagedClass;
+import org.javers.core.metamodel.type.Entity;
+import org.javers.core.metamodel.type.ManagedClass;
 import org.javers.core.metamodel.object.*;
 
 import java.util.List;

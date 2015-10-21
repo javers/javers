@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.core.metamodel.clazz.ValueObject;
+import org.javers.core.metamodel.type.ValueObjectType;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -20,15 +20,15 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class UnboundedValueObjectId extends GlobalId {
     public static final String UNBOUNDED_FRAGMENT = "/";
 
-    private transient final ValueObject valueObject;
+    private transient final ValueObjectType valueObject;
 
-    public UnboundedValueObjectId(ValueObject valueObject) {
+    public UnboundedValueObjectId(ValueObjectType valueObject) {
         argumentIsNotNull(valueObject);
         this.valueObject = valueObject;
     }
 
     @Override
-    public ValueObject getCdoClass() {
+    public ValueObjectType getCdoClass() {
         return valueObject;
     }
 

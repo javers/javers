@@ -7,8 +7,8 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.ManagedClass;
+import org.javers.core.metamodel.type.Entity;
+import org.javers.core.metamodel.type.ManagedClass;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.ValueObjectId;
@@ -47,7 +47,7 @@ class InMemoryRepository implements JaversRepository {
                 }
                 ValueObjectId id = (ValueObjectId) input.getGlobalId();
 
-                return id.getOwnerId().getCdoClass().equals(ownerEntity)
+                return id.getOwnerId().getCdoClass().getManagedClass().equals(ownerEntity)
                         && id.getFragment().equals(path);
             }
         });
@@ -71,7 +71,7 @@ class InMemoryRepository implements JaversRepository {
         List<CdoSnapshot> filtered = new ArrayList<>();
 
         for (CdoSnapshot snapshot : getAll()) {
-            if (snapshot.getGlobalId().getCdoClass().equals(givenClass)) {
+            if (snapshot.getGlobalId().getCdoClass().getManagedClass().equals(givenClass)) {
                 filtered.add(snapshot);
             }
         }
