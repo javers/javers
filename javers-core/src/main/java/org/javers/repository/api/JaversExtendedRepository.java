@@ -8,10 +8,10 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.ManagedClass;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.type.Entity;
+import org.javers.core.metamodel.type.ManagedClass;
 import org.javers.core.snapshot.SnapshotDiffer;
 
 import java.util.List;

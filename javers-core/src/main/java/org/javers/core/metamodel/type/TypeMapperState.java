@@ -21,7 +21,7 @@ class TypeMapperState {
     private final TypeFactory typeFactory;
     private final ValueType OBJECT_TYPE = new ValueType(Object.class);
 
-    public TypeMapperState(TypeFactory typeFactory) {
+    TypeMapperState(TypeFactory typeFactory) {
         this.typeFactory = typeFactory;
     }
 
@@ -55,7 +55,7 @@ class TypeMapperState {
     void computeIfAbsent(final ClientsClassDefinition def){
         computeIfAbsent(def.getClazz(), new Function<Type, JaversType>() {
             public JaversType apply(Type ignored) {
-                return typeFactory.createFromDefinition(def);
+                return typeFactory.create(def);
             }
         });
     }

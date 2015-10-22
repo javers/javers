@@ -5,11 +5,12 @@ import org.javers.common.collections.Lists;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.object.*;
-import org.javers.core.metamodel.clazz.Entity;
+import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 
 import java.util.List;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -61,7 +62,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     }
 
     private InstanceId parseInstanceId(JsonObject jsonObject, JsonDeserializationContext context) {
-        Entity entity = parseEntity(jsonObject, ENTITY_FIELD);
+        EntityType entity = parseEntity(jsonObject, ENTITY_FIELD);
 
         JsonElement cdoIdElement = jsonObject.get(CDO_ID_FIELD);
         Object cdoId = context.deserialize(cdoIdElement, entity.getIdProperty().getType());
@@ -79,7 +80,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
         JsonObject jsonObject = new JsonObject();
 
         //managedClass
-        if (globalId.getCdoClass() instanceof Entity) {
+        if (globalId.getCdoClass() instanceof EntityType) {
             jsonObject.addProperty(ENTITY_FIELD, globalId.getCdoClass().getName());
         } else {
             jsonObject.addProperty(VALUE_OBJECT_FIELD, globalId.getCdoClass().getName());
@@ -109,8 +110,8 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
                                             ValueObjectId.class);
     }
 
-    private Entity parseEntity(JsonObject object, String fieldName){
-        return typeMapper.getManagedClass(parseClass(object, fieldName), Entity.class);
+    private EntityType parseEntity(JsonObject object, String fieldName){
+        return typeMapper.getJaversManagedType(parseClass(object, fieldName), EntityType.class);
     }
 
     private Class parseClass(JsonObject object, String fieldName) {

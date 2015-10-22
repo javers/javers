@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.core.metamodel.clazz.ValueObject;
+import org.javers.core.metamodel.type.ValueObjectType;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -17,14 +17,14 @@ public class ValueObjectId extends UnboundedValueObjectId {
     private final GlobalId ownerId;
     private final String fragment;
 
-    public ValueObjectId(ValueObject valueObject, GlobalId ownerId, String fragment) {
+    public ValueObjectId(ValueObjectType valueObject, GlobalId ownerId, String fragment) {
         super(valueObject);
         argumentsAreNotNull(ownerId, fragment);
         this.ownerId = ownerId;
         this.fragment = fragment;
     }
 
-    public ValueObjectId(ValueObject valueObject, OwnerContext ownerContext) {
+    public ValueObjectId(ValueObjectType valueObject, OwnerContext ownerContext) {
         this(valueObject, ownerContext.getGlobalId(), ownerContext.getPath());
     }
 

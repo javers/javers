@@ -1,4 +1,4 @@
-package org.javers.core.metamodel.clazz;
+package org.javers.core.metamodel.type;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -7,7 +7,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  *
  * @author bartosz walacik
  */
-public abstract class ClientsDomainClass {
+abstract class ClientsDomainClass {
     private final Class clientsClass;
 
     ClientsDomainClass(Class clientsClass) {
@@ -15,18 +15,21 @@ public abstract class ClientsDomainClass {
         this.clientsClass = clientsClass;
     }
 
+    @Deprecated
     public Class getClientsClass() {
         return clientsClass;
     }
 
-    public boolean isInstance(Object cdo) {
-        argumentIsNotNull(cdo);
-        return (clientsClass.isAssignableFrom(cdo.getClass()));
+    public boolean isAssignableFrom(Class<?> clazz) {
+        return clientsClass.isAssignableFrom(clazz);
     }
 
     /**
-     * clientsClass.name
+     * type name, clientsClass.name by default
+     *
+     * @deprecated moved to JaversType
      */
+@Deprecated
     public String getName() {
         return clientsClass.getName();
     }

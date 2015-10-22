@@ -25,7 +25,7 @@ public class TypeMapperIntegrationTest extends Specification {
     @Unroll
     def "should override Entity type inferred form annotations when ValueObject is explicitly registered for #queryClass.simpleName"() {
         given:
-        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = javersTestAssembly().typeMapper
         mapper.registerClientsClass(new ValueObjectDefinition(queryClass))
 
         when:
@@ -43,7 +43,7 @@ public class TypeMapperIntegrationTest extends Specification {
 
     def "should override ValueObject type inferred form annotations when Entity is explicitly registered"() {
         given:
-        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = javersTestAssembly().typeMapper
         mapper.registerClientsClass(new EntityDefinition(JpaEmbeddable,"some"))
 
         when:
@@ -55,7 +55,7 @@ public class TypeMapperIntegrationTest extends Specification {
 
     def "should map as ValueObject by default"() {
         given:
-        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = javersTestAssembly().typeMapper
 
         when:
         def jType = mapper.getJaversType(DummyAddress)
@@ -68,7 +68,7 @@ public class TypeMapperIntegrationTest extends Specification {
     @Unroll
     def "should map as ValueType if a class is used as #usedAnn.simpleName in another class"(){
         given:
-        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = javersTestAssembly().typeMapper
 
         when:
         mapper.getJaversType(entity)
@@ -86,7 +86,7 @@ public class TypeMapperIntegrationTest extends Specification {
 
     def "should map as Entity when class has @Id property annotation"() {
         given:
-        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = javersTestAssembly().typeMapper
 
         when:
         def jType = mapper.getJaversType(DummyUser)
@@ -99,7 +99,7 @@ public class TypeMapperIntegrationTest extends Specification {
     @Unroll
     def "should map as #expectedJaversType.simpleName for annotated class #queryClass.simpleName"() {
         given:
-        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = javersTestAssembly().typeMapper
 
         when:
         def jType = mapper.getJaversType(queryClass)
@@ -121,7 +121,7 @@ public class TypeMapperIntegrationTest extends Specification {
     @Unroll
     def "should map as #expectedJaversType.simpleName for explicitly registered class"() {
         given:
-        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = javersTestAssembly().typeMapper
         mapper.registerClientsClass(givenDefinition)
 
         when:
@@ -142,7 +142,7 @@ public class TypeMapperIntegrationTest extends Specification {
     @Unroll
     def "should spawn #expectedJaversType.simpleName from mapped superclass"() {
         given:
-        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = javersTestAssembly().typeMapper
         mapper.registerClientsClass(givenDefinitionOfSuperclass)
 
         when:
@@ -162,7 +162,7 @@ public class TypeMapperIntegrationTest extends Specification {
 
     def "should inherit custom idProperty mapping from explicitly mapped Entity"() {
         given:
-        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = javersTestAssembly().typeMapper
 
         when:
         mapper.registerClientsClass(new EntityDefinition(AbstractDummyUser,"inheritedInt"))
@@ -175,7 +175,7 @@ public class TypeMapperIntegrationTest extends Specification {
 
     def "should spawn from mapped superclass when querying for generic class"() {
         given:
-        def mapper = new TypeMapper(javersTestAssembly().typeSpawningFactory)
+        def mapper = javersTestAssembly().typeMapper
         mapper.registerClientsClass(new ValueDefinition(AbstractDummyUser))
 
         when:

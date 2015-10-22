@@ -1,8 +1,5 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.core.metamodel.clazz.ManagedClassFactory;
-import org.javers.core.metamodel.clazz.ValueObject;
-
 /**
  * ValueObject class in client's domain model.
  * <br/><br/>

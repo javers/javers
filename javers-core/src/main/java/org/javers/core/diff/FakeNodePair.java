@@ -32,7 +32,7 @@ class FakeNodePair implements NodePair {
 
     @Override
     public List<Property> getProperties() {
-        return right.getManagedClass().getProperties();
+        return right.getManagedType().getProperties();
     }
 
     @Override

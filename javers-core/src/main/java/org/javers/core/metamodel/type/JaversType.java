@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.javers.common.reflection.ReflectionUtil.extractActualClassTypeArguments;
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
+import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * Managed property type
@@ -117,6 +118,19 @@ public abstract class JaversType {
      */
      public final String prettyPrint(){
          return prettyPrintBuilder().build();
+     }
+
+    /**
+     * type name, clientsClass.name by default
+     *
+     */
+     public String getName() {
+        return baseJavaClass.getName();
+     }
+
+     public boolean isInstance(Object cdo) {
+        argumentIsNotNull(cdo);
+        return baseJavaClass.isAssignableFrom(cdo.getClass());
      }
 
      protected PrettyPrintBuilder prettyPrintBuilder(){

@@ -4,14 +4,14 @@ import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversGetterException;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.ManagedClass;
-import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoWrapper;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.EntityType;
+import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.ValueObjectType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +23,7 @@ import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
 /**
  * Node in client's domain object graph. Reflects one {@link Cdo} or {@link CdoSnapshot}.
  * <p/>
- * Cdo could be an {@link Entity} or a {@link ValueObject}
+ * Cdo could be an {@link EntityType} or a {@link ValueObjectType}
  * <p/>
  * Implementation should delegate equals() and hashCode() to {@link Cdo}
  *
@@ -38,7 +38,7 @@ public class ObjectNode {
         this.cdo = cdo;
     }
 
-    ObjectNode(Object cdo, Entity entity) {
+    ObjectNode(Object cdo, EntityType entity) {
         this(new CdoWrapper(cdo, createFromInstance(cdo, entity)));
     }
 
@@ -111,13 +111,9 @@ public class ObjectNode {
         return edges.size();
     }
 
-    /**
-     * shortcut to {@link Cdo#getManagedClass()}
-     */
-    public ManagedClass getManagedClass() {
-        return cdo.getManagedClass();
+    public ManagedType getManagedType() {
+        return cdo.getGlobalId().getCdoClass();
     }
-
 
     public Cdo getCdo() {
         return cdo;

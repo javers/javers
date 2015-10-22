@@ -1,16 +1,12 @@
 package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
-import com.sun.xml.internal.bind.v2.TODO
 import org.javers.core.JaversTestBuilder
-import org.javers.core.metamodel.clazz.Entity
-import org.javers.core.metamodel.clazz.ManagedClassFactory
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
-
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -227,23 +223,23 @@ class TypeMapperTest extends Specification {
 
     def "should return child ValueObject for ValueObjectType"() {
         given:
-        def snapshotEntity = mapper.getManagedClass(SnapshotEntity, Entity)
+        def snapshotEntity = mapper.getJaversType(SnapshotEntity)
 
         when:
         def vo = mapper.getChildValueObject(snapshotEntity, "valueObjectRef")
 
         then:
-        vo.clientsClass == DummyAddress
+        vo.baseJavaClass == DummyAddress
     }
 
     def "should return child ValueObject for List of ValueObjectType"() {
         given:
-        def snapshotEntity = mapper.getManagedClass(SnapshotEntity, Entity)
+        def snapshotEntity = mapper.getJaversType(SnapshotEntity)
 
         when:
         def vo = mapper.getChildValueObject(snapshotEntity, "listOfValueObjects")
 
         then:
-        vo.clientsClass == DummyAddress
+        vo.baseJavaClass == DummyAddress
     }
 }

@@ -1,14 +1,12 @@
-package org.javers.core.metamodel.clazz;
+package org.javers.core.metamodel.annotation;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.javers.core.metamodel.clazz.ValueDefinition;
+import org.javers.core.metamodel.clazz.ValueObjectDefinition;
 
 import java.lang.annotation.Annotation;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static java.util.Collections.unmodifiableSet;
-import static org.javers.common.collections.Sets.asSet;
 
 /**
  * Should scan well known annotations at class level
@@ -23,7 +21,7 @@ public class ClassAnnotationsScanner {
         this.annotationNamesProvider = annotationNamesProvider;
     }
 
-    ClientsClassDefinition scanAndInfer(Class javaClass){
+    public ClientsClassDefinition scanAndInfer(Class javaClass){
         Validate.argumentIsNotNull(javaClass);
 
         for (Annotation ann : javaClass.getAnnotations()){

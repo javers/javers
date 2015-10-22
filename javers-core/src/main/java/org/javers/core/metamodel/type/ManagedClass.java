@@ -1,4 +1,4 @@
-package org.javers.core.metamodel.clazz;
+package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Predicate;
 import org.javers.common.exception.JaversException;
@@ -15,6 +15,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * 
  * @author bartosz walacik
  */
+@Deprecated
 public abstract class ManagedClass extends ClientsDomainClass {
 
     private final Map<String, Property> propertiesByName;
@@ -43,14 +44,14 @@ public abstract class ManagedClass extends ClientsDomainClass {
     /**
      * returns all managed properties
      */
-    public List<Property> getProperties() {
+    List<Property> getProperties() {
         return Collections.unmodifiableList(managedProperties);
     }
 
     /**
      * returns managed properties subset
      */
-    public List<Property> getProperties(Predicate<Property> query) {
+    List<Property> getProperties(Predicate<Property> query) {
         List<Property> retProperties = new ArrayList<>();
 
         for (Property property : managedProperties) {
@@ -67,7 +68,7 @@ public abstract class ManagedClass extends ClientsDomainClass {
      *
      * @throws JaversException PROPERTY_NOT_FOUND
      */
-    public Property getProperty(String withName) {
+    Property getProperty(String withName) {
         Validate.argumentIsNotNull(withName);
         if (!propertiesByName.containsKey(withName)){
             throw new JaversException(PROPERTY_NOT_FOUND, withName, this.getName());
@@ -75,7 +76,7 @@ public abstract class ManagedClass extends ClientsDomainClass {
         return propertiesByName.get(withName);
     }
 
-    public boolean hasProperty(String withName){
+    boolean hasProperty(String withName){
         try{
             getProperty(withName);
             return true;

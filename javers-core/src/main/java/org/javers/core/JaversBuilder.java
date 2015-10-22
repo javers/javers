@@ -16,13 +16,12 @@ import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
+import org.javers.core.metamodel.annotation.AnnotationsModule;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.type.CustomType;
-import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.metamodel.type.ValueObjectType;
-import org.javers.core.metamodel.type.ValueType;
+import org.javers.core.metamodel.property.PropertyScannerModule;
+import org.javers.core.metamodel.type.*;
 import org.javers.core.snapshot.GraphSnapshotModule;
 import org.javers.java8support.Java8AddOns;
 import org.javers.repository.api.InMemoryRepositoryModule;
@@ -81,6 +80,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new CommitFactoryModule(getContainer()));
         addModule(new GraphSnapshotModule(getContainer()));
         addModule(new GraphFactoryModule(getContainer()));
+        addModule(new AnnotationsModule(getContainer()));
 
         // bootstrap phase 2: add-ons
         if (ReflectionUtil.isJava8runtime()){
@@ -393,7 +393,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private void bootManagedClasses() {
-        addModule(new ManagedClassFactoryModule(coreConfiguration()));
+        addModule(new PropertyScannerModule(getContainer(), coreConfiguration()));
+        addModule(new TypeModule(getContainer()));
         mapRegisteredClasses();
     }
 

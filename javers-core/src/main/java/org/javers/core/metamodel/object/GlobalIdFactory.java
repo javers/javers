@@ -4,12 +4,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectAccessHook;
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.ManagedClass;
-import org.javers.core.metamodel.clazz.ValueObject;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.ManagedType;
-import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.*;
 import org.javers.repository.jql.GlobalIdDTO;
 
 /**
@@ -36,40 +31,40 @@ public class GlobalIdFactory {
         Validate.argumentsAreNotNull(targetCdo);
 
         targetCdo = objectAccessHook.access(targetCdo);
-        ManagedClass targetManagedClass = getManagedClassOf(targetCdo);
+        ManagedType targetManagedType = typeMapper.getJaversManagedType(targetCdo.getClass());
 
-        if (targetManagedClass instanceof Entity) {
-            return InstanceId.createFromInstance(targetCdo, (Entity) targetManagedClass);
+        if (targetManagedType instanceof EntityType) {
+            return InstanceId.createFromInstance(targetCdo, (EntityType) targetManagedType);
         }
 
-        if (targetManagedClass instanceof ValueObject && hasNoOwner(owner)) {
-            return new UnboundedValueObjectId((ValueObject)targetManagedClass);
+        if (targetManagedType instanceof ValueObjectType && hasNoOwner(owner)) {
+            return new UnboundedValueObjectId((ValueObjectType)targetManagedType);
         }
 
-        if (targetManagedClass instanceof ValueObject && hasOwner(owner)) {
-            return new ValueObjectId((ValueObject) targetManagedClass, owner);
+        if (targetManagedType instanceof ValueObjectType && hasOwner(owner)) {
+            return new ValueObjectId((ValueObjectType) targetManagedType, owner);
         }
 
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
     }
 
     public UnboundedValueObjectId createFromClass(Class valueObjectClass){
-        ValueObject valueObject = typeMapper.getManagedClass(valueObjectClass, ValueObject.class);
+        ValueObjectType valueObject = typeMapper.getJaversManagedType(valueObjectClass, ValueObjectType.class);
         return new UnboundedValueObjectId(valueObject);
     }
 
     public ValueObjectId createFromPath(GlobalId owner, Class valueObjectClass, String path){
-        ValueObject valueObject = typeMapper.getManagedClass(valueObjectClass, ValueObject.class);
+        ValueObjectType valueObject = typeMapper.getJaversManagedType(valueObjectClass, ValueObjectType.class);
         return new ValueObjectId(valueObject, owner, path);
     }
 
 
-    public InstanceId createFromId(Object localId, Entity entity){
+    public InstanceId createFromId(Object localId, EntityType entity){
         return InstanceId.createFromId(localId, entity);
     }
 
     public InstanceId createFromId(Object localId, Class entityClass){
-        Entity entity = typeMapper.getManagedClass(entityClass, Entity.class);
+        EntityType entity = typeMapper.getJaversManagedType(entityClass, EntityType.class);
         return InstanceId.createFromId(localId, entity);
     }
 
@@ -91,11 +86,6 @@ public class GlobalIdFactory {
         } else {
             return item;
         }
-    }
-
-    private ManagedClass getManagedClassOf(Object cdo) {
-        Validate.argumentIsNotNull(cdo);
-        return typeMapper.getJaversManagedType(cdo.getClass()).getManagedClass();
     }
 
     private boolean hasOwner(OwnerContext context) {

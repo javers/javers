@@ -4,10 +4,8 @@ import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
+import org.javers.core.Javers;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
-import org.javers.core.metamodel.clazz.Entity;
-import org.javers.core.metamodel.clazz.ManagedClass;
-import org.javers.core.metamodel.clazz.ValueObject;
 import org.javers.core.metamodel.property.Property;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
@@ -98,18 +96,27 @@ public class TypeMapper {
     }
 
     /**
-     * @throws JaversException CLASS_NOT_MANAGED if given javaClass is NOT mapped to {@link ManagedType}
+     * throws JaversException.MANAGED_CLASS_MAPPING_ERROR if given javaClass is NOT mapped to {@link ManagedType}
      */
     public ManagedType getJaversManagedType(Class javaType) {
-        JaversType javersType = getJaversType(javaType);
+        return getJaversManagedType(javaType, ManagedType.class);
+    }
 
-        if (!(javersType instanceof  ManagedType)){
-            throw new JaversException(JaversExceptionCode.CLASS_NOT_MANAGED,
-                                      javaType.getName(),
-                                      javersType.getClass().getSimpleName()) ;
+    /**
+     * if given javaClass is mapped to expected JaversType, returns its JaversType,
+     * otherwise throws JaversException.MANAGED_CLASS_MAPPING_ERROR
+     */
+    public <T extends ManagedType> T getJaversManagedType(Class javaClass, Class<T> expectedType) {
+        JaversType mType = getJaversType(javaClass);
+
+        if (expectedType.isAssignableFrom(mType.getClass())) {
+            return (T) mType;
+        } else {
+            throw new JaversException(JaversExceptionCode.MANAGED_CLASS_MAPPING_ERROR,
+                    javaClass,
+                    mType.getName(),
+                    expectedType.getSimpleName());
         }
-
-        return (ManagedType)javersType;
     }
 
     public <T extends JaversType> T getPropertyType(Property property){
@@ -151,31 +158,22 @@ public class TypeMapper {
      *
      * @throws JaversException MANAGED_CLASS_MAPPING_ERROR
      */
-    public <T extends ManagedClass> T getManagedClass(Class javaClass, Class<T> expectedType) {
-        ManagedType mType = getJaversManagedType(javaClass);
-
-        if (mType.getManagedClass().getClass().equals( expectedType)) {
-            return (T)mType.getManagedClass();
-        }
-        else {
-            throw new JaversException(JaversExceptionCode.MANAGED_CLASS_MAPPING_ERROR,
-                    javaClass,
-                    mType.getManagedClass().getSimpleName(),
-                    expectedType.getSimpleName());
-        }
+    @Deprecated
+    public ManagedClass getManagedClass(Class javaClass) {
+        return getJaversManagedType(javaClass).getManagedClass();
     }
 
-    public ValueObject getChildValueObject(Entity owner, String voPropertyName) {
-        JaversType javersType = getJaversType( owner.getProperty(voPropertyName).getGenericType() );
+    public ValueObjectType getChildValueObject(EntityType owner, String voPropertyName) {
+        JaversType javersType = getJaversType(owner.getProperty(voPropertyName).getGenericType());
 
         if (javersType instanceof ValueObjectType) {
-            return ((ValueObjectType) javersType).getManagedClass();
+            return (ValueObjectType) javersType;
         }
 
         if (javersType instanceof ContainerType) {
             JaversType contentType  = getJaversType(((ContainerType) javersType).getItemType());
             if (contentType instanceof ValueObjectType){
-                return ((ValueObjectType)contentType).getManagedClass();
+                return (ValueObjectType)contentType;
             }
         }
 

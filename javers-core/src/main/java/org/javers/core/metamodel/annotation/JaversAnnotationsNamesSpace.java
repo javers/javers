@@ -1,17 +1,13 @@
-package org.javers.core.metamodel.clazz;
+package org.javers.core.metamodel.annotation;
 
 import org.javers.common.collections.Sets;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.Value;
-import org.javers.core.metamodel.annotation.ValueObject;
-import org.javers.core.metamodel.annotation.Entity;
 
 import java.util.Set;
 
 /**
  * @author bartosz walacik
  */
-public class JaversAnnotationsNamesSpace implements AnnotationsNameSpace {
+class JaversAnnotationsNamesSpace implements AnnotationsNameSpace {
 
     @Override
     public Set<String> getEntityAliases() {

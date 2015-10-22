@@ -1,4 +1,4 @@
-package org.javers.core.metamodel.clazz;
+package org.javers.core.metamodel.type;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
@@ -10,6 +10,7 @@ import java.util.List;
 /**
  * @author Pawel Cierpiatka
  */
+@Deprecated
 public class Entity extends ManagedClass {
     private final Property idProperty;
 
@@ -45,11 +46,14 @@ public class Entity extends ManagedClass {
     }
 
     /**
+     * Moved to EntityType
+     *
      * @param instance instance of {@link #getClientsClass()}
      * @return returns ID of given instance so value of idProperty
      * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
      * @throws JaversException NOT_INSTANCE_OF
      */
+@Deprecated
     public Object getIdOf(Object instance) {
         Validate.argumentIsNotNull(instance);
 

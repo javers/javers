@@ -2,7 +2,7 @@ package org.javers.core.metamodel.property;
 
 import org.javers.common.reflection.JaversMethod;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.metamodel.clazz.AnnotationNamesProvider;
+import org.javers.core.metamodel.annotation.AnnotationNamesProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author pawel szymczyk
  */
-public class BeanBasedPropertyScanner implements PropertyScanner {
+class BeanBasedPropertyScanner implements PropertyScanner {
 
     private final AnnotationNamesProvider annotationNamesProvider;
 

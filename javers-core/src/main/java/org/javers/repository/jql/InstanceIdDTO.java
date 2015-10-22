@@ -1,8 +1,8 @@
 package org.javers.repository.jql;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.clazz.Entity;
 import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 /**
@@ -25,7 +25,7 @@ public final class InstanceIdDTO extends GlobalIdDTO {
 
     @Override
     public InstanceId create(TypeMapper typeMapper) {
-        return InstanceId.createFromId(localId, typeMapper.getManagedClass(javaClass, Entity.class));
+        return InstanceId.createFromId(localId, typeMapper.getJaversManagedType(javaClass, EntityType.class));
     }
 
     @Override

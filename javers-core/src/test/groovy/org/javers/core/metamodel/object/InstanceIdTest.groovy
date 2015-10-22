@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.object
 
 import org.javers.core.MappingStyle
-import org.javers.core.metamodel.clazz.ManagedClassFactory
+import org.javers.core.metamodel.type.TypeFactory
 import org.javers.core.model.Category
 import org.javers.core.model.DummyEntityWithEmbeddedId
 import org.javers.core.model.DummyPoint
@@ -16,15 +16,15 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 class InstanceIdTest extends Specification {
 
     def setupSpec() {
-        managedClassFactory = javersTestAssembly(MappingStyle.FIELD).managedClassFactory
+        typeFactory = javersTestAssembly(MappingStyle.FIELD).typeSpawningFactory
     }
 
     @Shared
-    def ManagedClassFactory managedClassFactory
+    def TypeFactory typeFactory
 
     def "should build value() from class name and id.toString for primitive Id "() {
         given:
-        def entity = managedClassFactory.createEntity(Category)
+        def entity = typeFactory.createEntity(Category)
 
         when:
         def instanceId = InstanceId.createFromId(12, entity)
@@ -37,7 +37,7 @@ class InstanceIdTest extends Specification {
 
     def "should build value() from class name and id.toString for Embedded Id "() {
         given:
-        def entity = managedClassFactory.createEntity(DummyEntityWithEmbeddedId)
+        def entity = typeFactory.createEntity(DummyEntityWithEmbeddedId)
 
         when:
         def instanceId = InstanceId.createFromId(new DummyPoint(1,3), entity)
