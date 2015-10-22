@@ -30,7 +30,7 @@ class InstanceIdTest extends Specification {
         def instanceId = InstanceId.createFromId(12, entity)
 
         then:
-        instanceId.cdoClass == entity
+        instanceId.managedType == entity
         instanceId.cdoId == 12
         instanceId.value() == Category.name + "/12"
     }
@@ -43,7 +43,7 @@ class InstanceIdTest extends Specification {
         def instanceId = InstanceId.createFromId(new DummyPoint(1,3), entity)
 
         then:
-        instanceId.cdoClass == entity
+        instanceId.managedType == entity
         instanceId.cdoId.x == 1
         instanceId.cdoId.y == 3
         instanceId.value() == DummyEntityWithEmbeddedId.name + "/1,3"

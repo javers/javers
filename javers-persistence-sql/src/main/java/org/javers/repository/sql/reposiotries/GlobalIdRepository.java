@@ -35,7 +35,7 @@ public class GlobalIdRepository {
     }
 
     public long getOrInsertClass(GlobalId globalId) {
-        Class cdoClass = globalId.getCdoClass().getBaseJavaClass();
+        Class cdoClass = globalId.getManagedType().getBaseJavaClass();
         Optional<Long> lookup = findClassPk(cdoClass);
 
         return lookup.isPresent() ? lookup.get() : insertClass(cdoClass);
@@ -94,12 +94,12 @@ public class GlobalIdRepository {
                 .where("g." + GLOBAL_ID_LOCAL_ID + " = :localId " +
                        "AND c." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName ")
                 .withArgument("localId", jsonConverter.toJson(globalId.getCdoId()))
-                .withArgument("qualifiedName", globalId.getCdoClass().getName());
+                .withArgument("qualifiedName", globalId.getManagedType().getName());
         }
         else if (globalId instanceof UnboundedValueObjectId){
             query.from(GLOBAL_ID_WITH_CDO_CLASS)
                  .where("c." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName ")
-                 .withArgument("qualifiedName", globalId.getCdoClass().getName());
+                 .withArgument("qualifiedName", globalId.getManagedType().getName());
         }
 
         return queryForOptionalLong(query, polyJdbc);

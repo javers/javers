@@ -80,10 +80,10 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
         JsonObject jsonObject = new JsonObject();
 
         //managedClass
-        if (globalId.getCdoClass() instanceof EntityType) {
-            jsonObject.addProperty(ENTITY_FIELD, globalId.getCdoClass().getName());
+        if (globalId.getManagedType() instanceof EntityType) {
+            jsonObject.addProperty(ENTITY_FIELD, globalId.getManagedType().getName());
         } else {
-            jsonObject.addProperty(VALUE_OBJECT_FIELD, globalId.getCdoClass().getName());
+            jsonObject.addProperty(VALUE_OBJECT_FIELD, globalId.getManagedType().getName());
         }
 
         //cdoId

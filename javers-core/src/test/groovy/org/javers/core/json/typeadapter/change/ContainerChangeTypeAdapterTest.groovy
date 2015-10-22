@@ -115,7 +115,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
                                   new ValueAdded  (2, ref2),
                                   new ValueRemoved(3, ref3)]
 
-            def property =  affectedId.cdoClass.getProperty(propertyName)
+            def property =  affectedId.managedType.getProperty(propertyName)
             def change = changeType.newInstance(affectedId, property, elementChanges)
 
         when:
@@ -163,7 +163,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
                                   new ValueAdded  (2,new LocalDate(2001,1,3)),
                                   new ValueRemoved(3,new LocalDate(2001,1,4))]
 
-            def property =  affectedId.cdoClass.getProperty(propertyName)
+            def property =  affectedId.managedType.getProperty(propertyName)
             def change = changeType.newInstance(affectedId, property, elementChanges)
 
         when:
@@ -274,7 +274,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
                                   new ValueAdded  (2,20),
                                   new ValueRemoved(3,30)]
 
-            def property =  affectedId.cdoClass.getProperty(propertyName)
+            def property =  affectedId.managedType.getProperty(propertyName)
             def change = changeType.newInstance(affectedId, property, elementChanges)
 
         when:
@@ -315,7 +315,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
 
         def elementChanges = [new ValueAdded  (20), new ValueRemoved(30)]
 
-        def property =  affectedId.cdoClass.getProperty("setOfIntegers")
+        def property =  affectedId.managedType.getProperty("setOfIntegers")
         def change = new SetChange(affectedId, property, elementChanges)
 
         when:

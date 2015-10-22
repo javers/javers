@@ -31,7 +31,7 @@ class NodeAssert {
     NodeAssert hasInstanceId(Class expectedSourceClass, def expectedLocalCdoId) {
         actual.globalId.with {
             assert it instanceof InstanceId
-            assert it.cdoClass.baseJavaClass == expectedSourceClass
+            assert it.managedType.baseJavaClass == expectedSourceClass
             assert it.cdoId == expectedLocalCdoId
             it
         }
@@ -46,7 +46,7 @@ class NodeAssert {
     public NodeAssert hasValueObjectId(Class expectedManagedClass, Object ownerId, String expectedFragment) {
         ValueObjectId valueObjectId = actual.globalId
 
-        assert valueObjectId.cdoClass.baseJavaClass == expectedManagedClass
+        assert valueObjectId.managedType.baseJavaClass == expectedManagedClass
         assert valueObjectId.cdoId == null
         assert valueObjectId.fragment == expectedFragment
         assert (valueObjectId.ownerId as InstanceId).idEquals(ownerId)
@@ -54,7 +54,7 @@ class NodeAssert {
     }
 
     NodeAssert hasUnboundedValueObjectId(Class expectedSourceClass) {
-        assert actual.globalId.cdoClass.baseJavaClass == expectedSourceClass
+        assert actual.globalId.managedType.baseJavaClass == expectedSourceClass
         this
     }
 

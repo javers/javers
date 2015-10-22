@@ -78,7 +78,7 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
     private Property deserializeProperty(JsonObject jsonObject, GlobalId id){
         String propertyName = jsonObject.get(PROPERTY_FIELD).getAsString();
 
-        return id.getCdoClass().getProperty(propertyName);
+        return id.getManagedType().getProperty(propertyName);
     }
 
     protected JsonObject createJsonObject(T change, JsonSerializationContext context) {

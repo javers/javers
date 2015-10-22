@@ -81,7 +81,7 @@ public class ObjectNode {
         try {
             return cdo.getPropertyValue(property);
         } catch (JaversGetterException e){
-            throw new JaversException(MISSING_PROPERTY, property.getName(), cdo.getManagedClass().getName());
+            throw new JaversException(MISSING_PROPERTY, property.getName(), cdo.getManagedType().getName());
         }
     }
 
@@ -112,7 +112,7 @@ public class ObjectNode {
     }
 
     public ManagedType getManagedType() {
-        return cdo.getGlobalId().getCdoClass();
+        return cdo.getGlobalId().getManagedType();
     }
 
     public Cdo getCdo() {

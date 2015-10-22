@@ -152,17 +152,6 @@ public class TypeMapper {
         return dehydratedTypeFactory.build(type);
     }
 
-    /**
-     * if given javaClass is mapped to {@link ManagedType}
-     * returns {@link ManagedType#getManagedClass()}
-     *
-     * @throws JaversException MANAGED_CLASS_MAPPING_ERROR
-     */
-    @Deprecated
-    public ManagedClass getManagedClass(Class javaClass) {
-        return getJaversManagedType(javaClass).getManagedClass();
-    }
-
     public ValueObjectType getChildValueObject(EntityType owner, String voPropertyName) {
         JaversType javersType = getJaversType(owner.getProperty(voPropertyName).getGenericType());
 

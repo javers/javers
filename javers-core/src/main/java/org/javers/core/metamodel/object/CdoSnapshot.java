@@ -92,7 +92,7 @@ public final class CdoSnapshot extends Cdo {
 
     @Override
     public Object getPropertyValue(String withName) {
-        Property property = this.getGlobalId().getCdoClass().getProperty(withName);
+        Property property = this.getGlobalId().getManagedType().getProperty(withName);
         return getPropertyValue(property);
     }
 

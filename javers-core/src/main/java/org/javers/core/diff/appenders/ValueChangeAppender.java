@@ -48,7 +48,7 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
         GlobalId globalId = nodePair.getGlobalId();
 
         if (globalId instanceof InstanceId) {
-            return ((InstanceId) globalId).getCdoClass().getIdProperty().equals(property);
+            return ((InstanceId) globalId).getManagedType().getIdProperty().equals(property);
         }
         return false;
     }

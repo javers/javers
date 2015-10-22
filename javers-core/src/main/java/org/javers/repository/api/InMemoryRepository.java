@@ -47,7 +47,7 @@ class InMemoryRepository implements JaversRepository {
                 }
                 ValueObjectId id = (ValueObjectId) input.getGlobalId();
 
-                return id.getOwnerId().getCdoClass().equals(ownerEntity)
+                return id.getOwnerId().getManagedType().equals(ownerEntity)
                         && id.getFragment().equals(path);
             }
         });
@@ -71,7 +71,7 @@ class InMemoryRepository implements JaversRepository {
         List<CdoSnapshot> filtered = new ArrayList<>();
 
         for (CdoSnapshot snapshot : getAll()) {
-            if (snapshot.getGlobalId().getCdoClass().equals(givenClass)) {
+            if (snapshot.getGlobalId().getManagedType().equals(givenClass)) {
                 filtered.add(snapshot);
             }
         }

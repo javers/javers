@@ -28,7 +28,7 @@ public class UnboundedValueObjectId extends GlobalId {
     }
 
     @Override
-    public ValueObjectType getCdoClass() {
+    public ValueObjectType getManagedType() {
         return valueObject;
     }
 

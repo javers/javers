@@ -90,7 +90,7 @@ public class CdoSnapshotBuilder {
     public CdoSnapshotBuilder withChangedProperties(List<String> changedPropertyNames) {
         changed = new ArrayList<>();
         for (String propertyName : changedPropertyNames) {
-            changed.add(globalId.getCdoClass().getProperty(propertyName));
+            changed.add(globalId.getManagedType().getProperty(propertyName));
         }
         return this;
     }

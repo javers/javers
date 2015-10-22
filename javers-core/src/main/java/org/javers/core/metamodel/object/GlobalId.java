@@ -10,10 +10,8 @@ public abstract class GlobalId {
 
     /**
      * JaversType of client's domain object
-     *
-     * //TODO rename to getManagedType()
      */
-    public abstract ManagedType getCdoClass();
+    public abstract ManagedType getManagedType();
 
     /**
      * ID of Client's domain object, should be unique in Class scope,

@@ -23,10 +23,10 @@ public abstract class Cdo {
     }
 
     /**
-     * shortcut to {@link GlobalId#getCdoClass()}
+     * shortcut to {@link GlobalId#getManagedType()}
      */
-    public ManagedType getManagedClass() {
-        return globalId.getCdoClass();
+    public ManagedType getManagedType() {
+        return globalId.getManagedType();
     }
 
     public abstract Optional<Object> getWrappedCdo();
@@ -37,7 +37,7 @@ public abstract class Cdo {
 
     public Object getPropertyValue(String propertyName) {
         Validate.argumentIsNotNull(propertyName);
-        Property property = getGlobalId().getCdoClass().getProperty(propertyName);
+        Property property = getGlobalId().getManagedType().getProperty(propertyName);
         return getPropertyValue(property);
     }
 
