@@ -2,9 +2,10 @@ package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Optional;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.type.Entity;
-import org.javers.core.metamodel.type.ManagedClass;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.type.EntityType;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.sql.reposiotries.GlobalIdRepository;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
@@ -42,8 +43,8 @@ public class CdoSnapshotFinder {
         return Optional.of(queryForCdoSnapshots(new SnapshotIdFilter(maxSnapshot.get()), Optional.of(globalId), 1).get(0));
     }
 
-    public List<CdoSnapshot> getStateHistory(ManagedClass givenClass, Optional<String> propertyName, int limit) {
-        Optional<Long> classPk = globalIdRepository.findClassPk(givenClass.getClientsClass());
+    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, Optional<String> propertyName, int limit) {
+        Optional<Long> classPk = globalIdRepository.findClassPk(givenClass.getBaseJavaClass());
         if (classPk.isEmpty()){
             return Collections.emptyList();
         }
@@ -53,8 +54,8 @@ public class CdoSnapshotFinder {
         return queryForCdoSnapshots(classFilter, Optional.<GlobalId>empty(), limit);
     }
 
-    public List<CdoSnapshot> getVOStateHistory(Entity ownerEntity, String fragment, int limit) {
-        Optional<Long> ownerEntityClassPk = globalIdRepository.findClassPk(ownerEntity.getClientsClass());
+    public List<CdoSnapshot> getVOStateHistory(EntityType ownerEntity, String fragment, int limit) {
+        Optional<Long> ownerEntityClassPk = globalIdRepository.findClassPk(ownerEntity.getBaseJavaClass());
         if (ownerEntityClassPk.isEmpty()){
             return Collections.emptyList();
         }

@@ -100,8 +100,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     protected Javers assembleJaversInstance(){
         bootDiffAppenders();
 
-        // ManagedClassFactory & managed clazz registration
-        bootManagedClasses();
+        bootManagedTypeModule();
 
         // JSON beans & domain aware typeAdapters
         bootJsonConverter();
@@ -392,7 +391,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         return getContainerComponent(JsonConverterBuilder.class);
     }
 
-    private void bootManagedClasses() {
+    private void bootManagedTypeModule() {
         addModule(new PropertyScannerModule(getContainer(), coreConfiguration()));
         addModule(new TypeModule(getContainer()));
         mapRegisteredClasses();

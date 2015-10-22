@@ -5,7 +5,6 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.Change;
-import org.javers.core.metamodel.type.Entity;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
@@ -50,12 +49,12 @@ public class QueryRunner {
 
         if (query.isClassOnlyQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getStateHistory(mType.getManagedClass(), query.getLimit());
+            return repository.getStateHistory(mType, query.getLimit());
         }
 
         if (query.isClassAndPropertyQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getPropertyStateHistory(mType.getManagedClass(), query.getPropertyName(), query.getLimit());
+            return repository.getPropertyStateHistory(mType, query.getPropertyName(), query.getLimit());
         }
 
         if (query.isVoOwnerOnlyQuery()) {
@@ -82,14 +81,12 @@ public class QueryRunner {
 
         if (query.isClassOnlyQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getChangeHistory(mType.getManagedClass(),
-                    query.isNewObjectChanges(), query.getLimit());
+            return repository.getChangeHistory(mType, query.isNewObjectChanges(), query.getLimit());
         }
 
         if (query.isClassAndPropertyQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getPropertyChangeHistory(mType.getManagedClass(),
-                    query.getPropertyName(), query.isNewObjectChanges(), query.getLimit());
+            return repository.getPropertyChangeHistory(mType,query.getPropertyName(), query.isNewObjectChanges(), query.getLimit());
         }
 
         if (query.isVoOwnerOnlyQuery()) {
@@ -106,7 +103,7 @@ public class QueryRunner {
         return globalIdFactory.createFromDto(globalIdDTO);
     }
 
-    private Entity getOwnerEntity(VoOwnerFilter filter){
+    private EntityType getOwnerEntity(VoOwnerFilter filter){
         ManagedType mType = typeMapper.getJaversManagedType(filter.getOwnerEntityClass());
 
         if (! (mType instanceof EntityType)) {
@@ -114,6 +111,6 @@ public class QueryRunner {
                     JaversExceptionCode.MALFORMED_JQL, "queryForChanges: ownerEntityClass {'"+filter.getOwnerEntityClass().getName()+"'} should be an Entity");
         }
 
-        return  ((EntityType) mType).getManagedClass();
+        return  ((EntityType) mType);
     }
 }

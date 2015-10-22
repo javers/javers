@@ -3,9 +3,8 @@ package org.javers.core.diff
 import org.javers.core.JaversTestBuilder
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.ObjectNode
-import org.javers.core.metamodel.type.Entity
-import org.javers.core.metamodel.type.ManagedClass
 import org.javers.core.metamodel.property.Property
+import org.javers.core.metamodel.type.EntityType
 import org.javers.core.metamodel.type.JaversType
 import spock.lang.Shared
 import spock.lang.Specification
@@ -26,13 +25,12 @@ abstract class AbstractDiffTest extends Specification {
         javers.createObjectGraphBuilder().buildGraph(any)
     }
 
-    Entity getEntity(Class forClass) {
-        (Entity)javers.typeMapper.getJaversType(forClass).managedClass
+    EntityType getEntity(Class forClass) {
+        (EntityType)javers.typeMapper.getJaversType(forClass)
     }
 
     Property getManagedProperty(Class forClass, String propertyName) {
-        ManagedClass clazz = javers.typeMapper.getJaversType(forClass).managedClass;
-        clazz.getProperty(propertyName)
+        javers.typeMapper.getJaversType(forClass).getProperty(propertyName)
     }
 
     Property getProperty(Class forClass, String propName) {

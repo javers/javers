@@ -25,8 +25,8 @@ public abstract class Cdo {
     /**
      * shortcut to {@link GlobalId#getCdoClass()}
      */
-    public ManagedClass getManagedClass() {
-        return globalId.getCdoClass().getManagedClass();
+    public ManagedType getManagedClass() {
+        return globalId.getCdoClass();
     }
 
     public abstract Optional<Object> getWrappedCdo();

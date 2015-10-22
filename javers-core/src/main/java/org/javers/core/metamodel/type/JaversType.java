@@ -121,8 +121,7 @@ public abstract class JaversType {
      }
 
     /**
-     * type name, clientsClass.name by default
-     *
+     * JaversType name, clientsClass.name by default
      */
      public String getName() {
         return baseJavaClass.getName();
