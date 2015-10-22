@@ -36,37 +36,37 @@ class ChangeTestBuilder {
 
     static MapChange mapChange(Object cdo, String propertyName, List<EntryChange> changes) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.cdoClass.getProperty(propertyName)
+        Property prop = globalId.managedType.getProperty(propertyName)
         new MapChange(globalId, prop, changes)
     }
 
     static ListChange listChange(Object cdo, String propertyName, List<ContainerElementChange> changes) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.cdoClass.getProperty(propertyName)
+        Property prop = globalId.managedType.getProperty(propertyName)
         new ListChange(globalId, prop, changes)
     }
 
     static ArrayChange arrayChange(Object cdo, String propertyName, List<ContainerElementChange> changes) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.cdoClass.getProperty(propertyName)
+        Property prop = globalId.managedType.getProperty(propertyName)
         new ArrayChange(globalId, prop, changes)
     }
 
     static SetChange setChange(Object cdo, String propertyName, List<ContainerElementChange> changes) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.cdoClass.getProperty(propertyName)
+        Property prop = globalId.managedType.getProperty(propertyName)
         new SetChange(globalId, prop, changes)
     }
 
     static ValueChange valueChange(Object cdo, String propertyName, oldVal=null, newVal=null) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.cdoClass.getProperty(propertyName)
+        Property prop = globalId.managedType.getProperty(propertyName)
         new ValueChange(globalId, prop, oldVal, newVal)
     }
 
     static ReferenceChange referenceChanged(Object cdo, String propertyName, Object oldRef , Object newRef) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.cdoClass.getProperty(propertyName)
+        Property prop = globalId.managedType.getProperty(propertyName)
 
         InstanceId oldRefId = instanceId(oldRef)
         InstanceId newRefId = instanceId(newRef)

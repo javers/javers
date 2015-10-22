@@ -67,7 +67,7 @@ public class ObjectGraphBuilder {
     }
 
     private void buildSingleEdges(ObjectNode node) {
-        for (Property singleRef : getSingleReferencesWithManagedClasses(node.getManagedType())) {
+        for (Property singleRef : getSingleReferencesWithManagedTypes(node.getManagedType())) {
             if (node.isNull(singleRef)) {
                 continue;
             }
@@ -79,7 +79,7 @@ public class ObjectGraphBuilder {
     }
 
     private void buildMultiEdges(ObjectNode node) {
-        for (Property containerProperty : getNonEmptyEnumerablesWithManagedClasses(node))  {
+        for (Property containerProperty : getNonEmptyEnumerablesWithManagedTypes(node))  {
             EnumerableType enumerableType = typeMapper.getPropertyType(containerProperty);
 
             //looks like we have Container or Map with Entity references or Value Objects
@@ -96,7 +96,7 @@ public class ObjectGraphBuilder {
         built = true;
     }
 
-    private List<Property> getSingleReferencesWithManagedClasses(ManagedType managedType) {
+    private List<Property> getSingleReferencesWithManagedTypes(ManagedType managedType) {
         return managedType.getProperties(new Predicate<Property>() {
             public boolean apply(Property property) {
                 JaversType javersType = typeMapper.getPropertyType(property);
@@ -106,7 +106,7 @@ public class ObjectGraphBuilder {
         });
     }
 
-    private List<Property> getNonEmptyEnumerablesWithManagedClasses(final ObjectNode node) {
+    private List<Property> getNonEmptyEnumerablesWithManagedTypes(final ObjectNode node) {
         return node.getManagedType().getProperties(new Predicate<Property>() {
             public boolean apply(Property property) {
                 JaversType javersType = typeMapper.getPropertyType(property);
@@ -123,8 +123,8 @@ public class ObjectGraphBuilder {
                 if (node.isNull(property)) {
                     return false;
                 }
-                return (isContainerOfManagedClasses(enumerableType) ||
-                        isMapWithManagedClass(enumerableType)
+                return (isContainerOfManagedTypes(enumerableType) ||
+                    isMapWithManagedTypes(enumerableType)
                 );
             }
         });
@@ -135,7 +135,7 @@ public class ObjectGraphBuilder {
      *
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
      */
-    private boolean isContainerOfManagedClasses(JaversType javersType){
+    private boolean isContainerOfManagedTypes(JaversType javersType){
         if (! (javersType instanceof ContainerType)) {
             return false;
         }
@@ -152,7 +152,7 @@ public class ObjectGraphBuilder {
      *
      * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
      */
-    private boolean isMapWithManagedClass(EnumerableType enumerableType) {
+    private boolean isMapWithManagedTypes(EnumerableType enumerableType) {
         if (! (enumerableType instanceof MapType)) {
             return false;
         }

@@ -6,11 +6,10 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.type.Entity;
-import org.javers.core.metamodel.type.ManagedClass;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.type.ManagedClass;
+import org.javers.core.metamodel.type.EntityType;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.sql.finders.CdoSnapshotFinder;
 import org.javers.repository.sql.reposiotries.CdoSnapshotRepository;
@@ -81,17 +80,17 @@ public class JaversSqlRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(ManagedClass givenClass, int limit) {
+    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, int limit) {
         return finder.getStateHistory(givenClass, Optional.<String>empty(), limit);
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(ManagedClass givenClass, String propertyName, int limit) {
+    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, int limit) {
         return finder.getStateHistory(givenClass, Optional.of(propertyName), limit);
     }
 
     @Override
-    public List<CdoSnapshot> getValueObjectStateHistory(Entity ownerEntity, String path, int limit) {
+    public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, int limit) {
         return finder.getVOStateHistory(ownerEntity, path, limit);
     }
 }

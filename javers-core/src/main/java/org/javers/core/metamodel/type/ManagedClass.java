@@ -16,7 +16,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 @Deprecated
-public abstract class ManagedClass extends ClientsDomainClass {
+abstract class ManagedClass extends ClientsDomainClass {
 
     private final Map<String, Property> propertiesByName;
     private final List<Property> managedProperties;
@@ -74,14 +74,5 @@ public abstract class ManagedClass extends ClientsDomainClass {
             throw new JaversException(PROPERTY_NOT_FOUND, withName, this.getName());
         }
         return propertiesByName.get(withName);
-    }
-
-    boolean hasProperty(String withName){
-        try{
-            getProperty(withName);
-            return true;
-        } catch (JaversException e){
-            return false;
-        }
     }
 }

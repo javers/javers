@@ -67,7 +67,7 @@ public class SnapshotFactory {
     private CdoSnapshotBuilder createSnapshotState(Object liveCdo, GlobalId id, CommitMetadata commitMetadata){
         CdoSnapshotBuilder snapshotBuilder = cdoSnapshot(id, commitMetadata);
 
-        for (Property property : id.getCdoClass().getProperties()) {
+        for (Property property : id.getManagedType().getProperties()) {
             Object propertyVal = property.get(liveCdo);
             if (Objects.nullSafeEquals(propertyVal, Defaults.defaultValue(property.getType()))) {
                 continue;

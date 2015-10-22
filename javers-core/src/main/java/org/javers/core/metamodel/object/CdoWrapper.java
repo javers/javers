@@ -17,7 +17,7 @@ public class CdoWrapper extends Cdo {
     public CdoWrapper(Object wrappedCdo, GlobalId globalId) {
         super(globalId);
         argumentsAreNotNull(wrappedCdo);
-        argumentCheck(globalId.getCdoClass().isInstance(wrappedCdo), "wrappedCdo is not an instance of given managedClass");
+        argumentCheck(globalId.getManagedType().isInstance(wrappedCdo), "wrappedCdo is not an instance of given managedClass");
 
         this.wrappedCdo = wrappedCdo;
     }

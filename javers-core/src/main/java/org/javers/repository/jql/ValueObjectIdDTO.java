@@ -31,7 +31,7 @@ public final class ValueObjectIdDTO extends GlobalIdDTO {
 
         InstanceId ownerId = ownerIdDTO.create(typeMapper);
 
-        ValueObjectType valueObject = typeMapper.getChildValueObject(ownerId.getCdoClass(), voProperty);
+        ValueObjectType valueObject = typeMapper.getChildValueObject(ownerId.getManagedType(), voProperty);
 
         return new ValueObjectId(valueObject, ownerId, fragment);
     }

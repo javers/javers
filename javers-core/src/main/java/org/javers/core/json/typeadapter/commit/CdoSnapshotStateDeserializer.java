@@ -35,7 +35,7 @@ public class CdoSnapshotStateDeserializer {
 
         CdoSnapshotStateBuilder builder = cdoSnapshotState();
 
-        for (Property property : globalId.getCdoClass().getProperties()) {
+        for (Property property : globalId.getManagedType().getProperties()) {
             builder.withPropertyValue(property, decodePropertyValue(stateObject, context, property));
         }
 

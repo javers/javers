@@ -74,7 +74,7 @@ class JaversRepositoryE2ETest extends Specification {
         changes[0].commitMetadata.get().id.majorId == 6
         changes.each{
             assert it.affectedGlobalId.fragment == "valueObjectRef"
-            assert it.affectedGlobalId.cdoClass.baseJavaClass == DummyAddress
+            assert it.affectedGlobalId.managedType.baseJavaClass == DummyAddress
         }
     }
 
@@ -153,7 +153,7 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         snapshots.size() == 3
         snapshots.each {
-            assert it.globalId.cdoClass.baseJavaClass == DummyAddress
+            assert it.globalId.managedType.baseJavaClass == DummyAddress
         }
     }
 
@@ -172,7 +172,7 @@ class JaversRepositoryE2ETest extends Specification {
         snapshots.size() == 3
         snapshots[0].commitId.majorId == 5
         snapshots.each {
-            assert it.globalId.cdoClass.baseJavaClass == SnapshotEntity
+            assert it.globalId.managedType.baseJavaClass == SnapshotEntity
         }
 
         when: "changes query"
@@ -217,7 +217,7 @@ class JaversRepositoryE2ETest extends Specification {
          snapshots.size() == 2
          snapshots[0].commitId.majorId == 2
          snapshots.each {
-             assert it.globalId.cdoClass.baseJavaClass == SnapshotEntity
+             assert it.globalId.managedType.baseJavaClass == SnapshotEntity
          }
     }
 
@@ -234,7 +234,7 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         snapshots.size() == 2
         snapshots.each {
-            assert it.globalId.cdoClass.baseJavaClass == DummyAddress
+            assert it.globalId.managedType.baseJavaClass == DummyAddress
         }
 
         where:

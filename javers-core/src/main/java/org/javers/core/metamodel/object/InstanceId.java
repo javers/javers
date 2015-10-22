@@ -34,7 +34,7 @@ public class InstanceId extends GlobalId {
     }
 
     @Override
-    public EntityType getCdoClass() {
+    public EntityType getManagedType() {
         return entity;
     }
 

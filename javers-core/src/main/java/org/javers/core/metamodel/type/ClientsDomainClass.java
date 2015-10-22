@@ -16,12 +16,8 @@ abstract class ClientsDomainClass {
     }
 
     @Deprecated
-    public Class getClientsClass() {
+    Class getClientsClass() {
         return clientsClass;
-    }
-
-    public boolean isAssignableFrom(Class<?> clazz) {
-        return clientsClass.isAssignableFrom(clazz);
     }
 
     /**
@@ -29,15 +25,15 @@ abstract class ClientsDomainClass {
      *
      * @deprecated moved to JaversType
      */
-@Deprecated
-    public String getName() {
+    @Deprecated
+    String getName() {
         return clientsClass.getName();
     }
 
     /**
      * 'Entity', 'ValueObject' or 'Value'
      */
-    public String getSimpleName() {
+    String getSimpleName() {
         return this.getClass().getSimpleName();
     }
 

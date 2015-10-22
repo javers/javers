@@ -2,7 +2,6 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.List;
  * @author Pawel Cierpiatka
  */
 @Deprecated
-public class Entity extends ManagedClass {
+class Entity extends ManagedClass {
     private final Property idProperty;
 
     /**
@@ -45,32 +44,7 @@ public class Entity extends ManagedClass {
         return super.toString();
     }
 
-    /**
-     * Moved to EntityType
-     *
-     * @param instance instance of {@link #getClientsClass()}
-     * @return returns ID of given instance so value of idProperty
-     * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
-     * @throws JaversException NOT_INSTANCE_OF
-     */
-@Deprecated
-    public Object getIdOf(Object instance) {
-        Validate.argumentIsNotNull(instance);
-
-        if (!getClientsClass().isInstance(instance)) {
-            throw new JaversException(JaversExceptionCode.NOT_INSTANCE_OF, getName(), instance.getClass().getName());
-        }
-        Validate.argumentCheck(getClientsClass().isInstance(instance),
-                               "expected instance of "+ getClientsClass().getName()+", got instance of "+ instance.getClass().getName());
-
-        Object cdoId = getIdProperty().get(instance);
-        if (cdoId == null) {
-            throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, getName());
-        }
-        return cdoId;
-    }
-
-    public Property getIdProperty() {
+    Property getIdProperty() {
         return idProperty;
     }
 

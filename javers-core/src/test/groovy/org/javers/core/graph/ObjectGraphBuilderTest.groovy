@@ -334,7 +334,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         assertThat(node).hasMultiEdge(propertyName).ofSize(2)
 
         where:
-        managedClass  << ["ValueObject"] * 3 + ["Entity"] *3
+        getManagedType  << ["ValueObject"] * 3 + ["Entity"] *3
         containerType << ["Set","Array", "List"] * 2
         propertyName <<  ["setOfValueObjects","arrayOfValueObjects","listOfValueObjects", "setOfEntities","arrayOfEntities", "listOfEntities"]
         cdo << [
@@ -445,7 +445,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         assertThat(node).hasMultiEdge(propertyName).ofSize(1)
 
         where:
-        managedClass  << ["ValueObject", "Entity"]
+        getManagedType  << ["ValueObject", "Entity"]
         propertyName <<  ["optionalValueObject", "optionalEntity"]
         cdo << [
                 new SnapshotEntity(optionalValueObject:  Optional.of(new DummyAddress("London"))) ,

@@ -21,8 +21,7 @@ public abstract class ManagedType extends JaversType {
         this.managedClass = managedClass;
     }
 
-    @Deprecated
-    public ManagedClass getManagedClass() {
+    ManagedClass getManagedClass() {
         return managedClass;
     }
 

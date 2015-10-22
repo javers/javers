@@ -5,7 +5,6 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.commit.CdoSnapshotStateDeserializer;
-import org.javers.core.metamodel.type.Entity;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.TypeMapper;

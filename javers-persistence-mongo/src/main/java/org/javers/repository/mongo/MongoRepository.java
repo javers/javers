@@ -12,11 +12,11 @@ import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.type.Entity;
-import org.javers.core.metamodel.type.ManagedClass;
-import org.javers.core.metamodel.type.ValueObject;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.type.EntityType;
+import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.ValueObjectType;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.mongo.model.MongoHeadId;
 import org.slf4j.Logger;
@@ -80,8 +80,8 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getValueObjectStateHistory(Entity ownerEntity, String path, int limit) {
-        BasicDBObject query = new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ownerEntity.getClientsClass().getName());
+    public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, int limit) {
+        BasicDBObject query = new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ownerEntity.getName());
         query.append(GLOBAL_ID_FRAGMENT, path);
 
         return queryForSnapshots(query, limit);
@@ -97,7 +97,7 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(ManagedClass givenClass, String propertyName, int limit) {
+    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, int limit) {
         BasicDBObject query = createGlobalIdClassQuery(givenClass);
 
         query.append(CHANGED_PROPERTIES, propertyName);
@@ -106,7 +106,7 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(ManagedClass givenClass, int limit) {
+    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, int limit) {
         BasicDBObject query = createGlobalIdClassQuery(givenClass);
         return queryForSnapshots(query, limit);
     }
@@ -167,14 +167,14 @@ public class MongoRepository implements JaversRepository {
         return new BasicDBObject (GLOBAL_ID_KEY, id.value());
     }
 
-    private BasicDBObject createGlobalIdClassQuery(ManagedClass givenClass) {
-        String cName = givenClass.getClientsClass().getName();
+    private BasicDBObject createGlobalIdClassQuery(ManagedType givenClass) {
+        String cName = givenClass.getName();
 
         BasicDBObject query = null;
-        if (givenClass instanceof Entity) {
+        if (givenClass instanceof EntityType) {
             query = new BasicDBObject(GLOBAL_ID_ENTITY, cName);
         }
-        if (givenClass instanceof ValueObject) {
+        if (givenClass instanceof ValueObjectType) {
             query = new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, cName);
         }
         return query;
