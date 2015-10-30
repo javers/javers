@@ -31,4 +31,12 @@ class BeanBasedPropertyScanner implements PropertyScanner {
         }
         return beanProperties;
     }
+
+    @Override
+    public Property scanSingleProperty(Class<?> managedClass, String propertyName) {
+        JaversMethod persistentGetter = ReflectionUtil.findPersistentGetter(managedClass, propertyName);
+
+
+        return null;
+    }
 }

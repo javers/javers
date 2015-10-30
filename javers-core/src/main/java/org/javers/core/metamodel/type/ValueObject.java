@@ -8,9 +8,9 @@ import java.util.List;
  * @author bartosz walacik
  */
 @Deprecated
-class ValueObject extends ManagedClass {
+public class ValueObject extends ManagedClass {
 
-    ValueObject(Class clientsClass, List<Property> properties) {
+    public ValueObject(Class clientsClass, List<Property> properties) {
         super(clientsClass, properties);
     }
 }

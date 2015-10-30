@@ -19,7 +19,7 @@ class FieldBasedPropertyScanner implements PropertyScanner {
     }
 
     @Override
-    public  List<Property> scan(Class<?> managedClass) {
+    public List<Property> scan(Class<?> managedClass) {
         List<JaversField> fields = ReflectionUtil.getAllPersistentFields(managedClass);
         List<Property> propertyList = new ArrayList<>(fields.size());
 
@@ -30,5 +30,13 @@ class FieldBasedPropertyScanner implements PropertyScanner {
             propertyList.add(new Property(field, hasTransientAnn));
         }
         return propertyList;
+    }
+
+    @Override
+    public Property scanSingleProperty(Class<?> managedClass, String propertyName) {
+        JaversField field = ReflectionUtil.getPersistentField(managedClass, propertyName);
+        boolean hasTransientAnn = field.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
+
+        return new Property(field, hasTransientAnn);
     }
 }

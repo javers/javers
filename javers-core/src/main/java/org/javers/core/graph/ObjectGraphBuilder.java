@@ -25,12 +25,17 @@ public class ObjectGraphBuilder {
     private final TypeMapper typeMapper;
     private boolean built;
     private final EdgeBuilder edgeBuilder;
-    private final NodeReuser nodeReuser = new NodeReuser();
+    private final NodeReuser nodeReuser;
 
     public ObjectGraphBuilder(TypeMapper typeMapper, CdoFactory cdoFactory) {
+        this(typeMapper, cdoFactory, new NodeReuser());
+    }
+
+    public ObjectGraphBuilder(TypeMapper typeMapper, CdoFactory cdoFactory, NodeReuser nodeReuser) {
         Validate.argumentsAreNotNull(typeMapper, cdoFactory);
         this.typeMapper = typeMapper;
         this.edgeBuilder = new EdgeBuilder(typeMapper, nodeReuser, cdoFactory);
+        this.nodeReuser = nodeReuser;
     }
 
     /**
@@ -40,13 +45,11 @@ public class ObjectGraphBuilder {
      * @return graph nodes set
      */
     public LiveGraph buildGraph(Object handle) {
-        argumentIsNotNull(handle);
+        ObjectNode root = buildRoot(handle);
+        return buildLeafs(root);
+    }
 
-        Cdo cdo = edgeBuilder.asCdo(handle, null);
-       // logger.debug("building objectGraph for handle [{}] ...",cdo);
-
-        ObjectNode root = edgeBuilder.buildNodeStub(cdo);
-
+    LiveGraph buildLeafs(ObjectNode root) {
         //we can't use recursion here, it could cause StackOverflow for large graphs
         while(nodeReuser.hasMoreStubs()){
             ObjectNode stub = nodeReuser.pollStub();
@@ -59,6 +62,16 @@ public class ObjectGraphBuilder {
         switchToBuilt();
         return new LiveGraph(root, nodeReuser.nodes());
     }
+
+    ObjectNode buildRoot(Object handle) {
+        argumentIsNotNull(handle);
+
+        Cdo cdo = edgeBuilder.asCdo(handle, null);
+        // logger.debug("building objectGraph for handle [{}] ...",cdo);
+
+        return edgeBuilder.buildNodeStub(cdo);
+    }
+
 
     private void buildEdges(ObjectNode nodeStub) {
         nodeReuser.saveForReuse(nodeStub);

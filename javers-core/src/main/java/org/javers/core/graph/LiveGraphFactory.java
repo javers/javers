@@ -1,9 +1,17 @@
 package org.javers.core.graph;
 
+import org.javers.core.JaversCoreConfiguration;
+import org.javers.core.MappingStyle;
+import org.javers.core.graph.wrappers.ArrayWrapper;
+import org.javers.core.graph.wrappers.ListWrapper;
+import org.javers.core.graph.wrappers.MapWrapper;
+import org.javers.core.graph.wrappers.SetWrapper;
+import org.javers.core.graph.wrappers.SpecifiedClassCollectionWrapper;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,12 +22,22 @@ import java.util.Set;
 public class LiveGraphFactory {
     private final TypeMapper typeMapper;
     private final LiveCdoFactory liveCdoFactory;
+    private final CollectionsCdoFactory collectionsCdoFactory;
     private ObjectAccessHook objectAccessHook;
+    private final MappingStyle mappingStyle;
 
-    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, ObjectAccessHook objectAccessHook) {
+    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, CollectionsCdoFactory collectionsCdoFactory, ObjectAccessHook objectAccessHook, JaversCoreConfiguration coreConfiguration) {
         this.typeMapper = typeMapper;
         this.liveCdoFactory = liveCdoFactory;
+        this.collectionsCdoFactory = collectionsCdoFactory;
         this.objectAccessHook = objectAccessHook;
+        this.mappingStyle = coreConfiguration.getMappingStyle();
+    }
+
+    public LiveGraph createLiveGraph(Collection handle, Class clazz) {
+        SpecifiedClassCollectionWrapper wrappedCollection = (SpecifiedClassCollectionWrapper) wrapTopLevelContainer(handle);
+
+        return new CollectionsGraphBuilder(typeMapper, liveCdoFactory, collectionsCdoFactory).buildGraph(wrappedCollection, clazz, mappingStyle);
     }
 
     /**
@@ -65,38 +83,6 @@ public class LiveGraphFactory {
 
     public static Class getArrayWrapperType() {
         return ArrayWrapper.class;
-    }
-
-    private class MapWrapper{
-        private final Map<Object,Object> map;
-
-        private MapWrapper(Map map) {
-            this.map = map;
-        }
-    }
-
-    private class SetWrapper{
-        private final Set<Object> set;
-
-        private SetWrapper(Set set) {
-            this.set = set;
-        }
-    }
-
-    private class ListWrapper{
-        private final List<Object> list;
-
-        public ListWrapper(List list) {
-            this.list = list;
-        }
-    }
-
-    private class ArrayWrapper {
-        private final Object[] array;
-
-        public ArrayWrapper(Object[] objects) {
-            this.array = objects;
-        }
     }
 
     //this is primarily used for copying array of primitives to array of objects
