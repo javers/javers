@@ -8,6 +8,9 @@ import org.javers.core.model.ListContainer
 import org.javers.core.model.SetContainer
 import spock.lang.Specification
 
+/**
+ * @autho pawelszymczyk
+ */
 class ComparingWrappedAndNonWrappedCollections extends Specification {
 
     def "should return the same diff for wrapped and non wrapped collections"() {

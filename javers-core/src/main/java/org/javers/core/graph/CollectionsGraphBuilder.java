@@ -8,6 +8,9 @@ import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+/**
+ * @author pawelszymczyk
+ */
 public class CollectionsGraphBuilder {
     private final TypeMapper typeMapper;
     private final CollectionsCdoFactory collectionsCdoFactory;

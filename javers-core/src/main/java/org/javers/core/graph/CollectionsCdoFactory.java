@@ -13,6 +13,9 @@ import org.javers.core.metamodel.property.PropertyScanner;
 import org.javers.core.metamodel.type.ValueObject;
 import org.javers.core.metamodel.type.ValueObjectType;
 
+/**
+ * @author pawelszymczyk
+ */
 public class CollectionsCdoFactory {
 
     private final PropertyScanner propertyScanner;
