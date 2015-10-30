@@ -1,13 +1,12 @@
 package org.javers.core.cases
-
 import com.google.common.collect.Lists
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.Diff
 import org.javers.core.model.DummyUser
 import org.javers.core.model.ListContainer
+import org.javers.core.model.SetContainer
 import spock.lang.Specification
-
 
 class ComparingWrappedAndNonWrappedCollections extends Specification {
 
@@ -18,7 +17,7 @@ class ComparingWrappedAndNonWrappedCollections extends Specification {
 
         when:
         Diff diffDirect = javers.compareCollections(oldVersion, currentVersion, DummyUser.class);
-        Diff diffWithContainer = javers.compare(new ListContainer(oldVersion), new ListContainer(currentVersion));
+        Diff diffWithContainer = javers.compare(wrap(oldVersion), wrap(currentVersion));
 
         then:
         diffDirect.changes.size() == diffWithContainer.changes.size()
@@ -36,6 +35,15 @@ class ComparingWrappedAndNonWrappedCollections extends Specification {
         complexList().toSet()   || complexListValueChanged().toSet()
     }
 
+    def wrap(def dummyUsers) {
+        if (dummyUsers instanceof List) {
+            return new ListContainer(dummyUsers)
+        } else if (dummyUsers instanceof Set) {
+            return new SetContainer(dummyUsers);
+        }
+
+        throw new RuntimeException("Expected Set or List, found: " + dummyUsers.class.simpleName)
+    }
 
     List<DummyUser> complexListValueChanged() {
         List<DummyUser> users = Lists.newArrayList(complexList())
