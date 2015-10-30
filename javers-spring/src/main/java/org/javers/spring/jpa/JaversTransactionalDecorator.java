@@ -69,7 +69,7 @@ class JaversTransactionalDecorator implements Javers {
 
     @Override
     public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz) {
-        delegate.compareCollections(oldVersion, currentVersion, clazz);
+        return delegate.compareCollections(oldVersion, currentVersion, clazz);
     }
 
     @Override

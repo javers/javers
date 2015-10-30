@@ -42,10 +42,10 @@ class JaversFieldFactory {
     }
 
     public JaversField getField(String fieldName) {
-        return createJField(findField(fieldName), new TypeResolvingContext());
+        return createJField(getDeclaredField(fieldName), new TypeResolvingContext());
     }
 
-    private Field findField(String fieldName) {
+    private Field getDeclaredField(String fieldName) {
         try {
             return methodSource.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
