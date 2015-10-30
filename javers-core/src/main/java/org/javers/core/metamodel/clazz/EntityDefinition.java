@@ -1,10 +1,9 @@
 package org.javers.core.metamodel.clazz;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EntityType;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,73 +12,78 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class EntityDefinition  extends ClientsClassDefinition {
-    private final IdPropertyDefinition idPropertyDefinition;
+    private final Optional<String> idPropertyName;
 
     /**
-     * Creates Entity with Id-property selected by @Id annotation
+     * Recipe for Entity with Id-property selected by @Id annotation
      */
-    public EntityDefinition(Class<?> clazz) {
-        super(clazz);
-        this.idPropertyDefinition = null;
-    }
-
-    private EntityDefinition(Class<?> clazz, IdPropertyDefinition idPropertyDefinition, List<String> ignoredProperties) {
-        super(clazz, ignoredProperties);
-        this.idPropertyDefinition = idPropertyDefinition;
+    public EntityDefinition(Class<?> entity) {
+        this(new EntityDefinitionBuilder(entity));
     }
 
     /**
-     * Creates Entity with Id-property selected explicitly by name
+     * Recipe for Entity with Id-property selected explicitly by name
      */
-    public EntityDefinition(Class<?> clazz, String idPropertyName){
-        this(clazz, new IdPropertyDefinition(idPropertyName), Collections.EMPTY_LIST);
+    public EntityDefinition(Class<?> entity, String idPropertyName){
+        this(new EntityDefinitionBuilder(entity)
+                .withIdPropertyName(idPropertyName));
+    }
 
+    private EntityDefinition(EntityDefinitionBuilder builder) {
+        super(builder);
+        this.idPropertyName = builder.idPropertyName;
     }
 
     /**
-     * Creates Entity with Id-property selected explicitly
+     * @deprecated use {@link EntityDefinitionBuilder}
      */
-    public EntityDefinition(Class<?> clazz, Property idProperty){
-        this(clazz, new IdPropertyDefinition(idProperty), Collections.EMPTY_LIST);
-
-    }
-
-    /**
-     * Creates Entity with Id-property selected explicitly by name, ignores given properties
-     */
-    public EntityDefinition(Class<?> clazz, String idPropertyName, List<String> ignoredProperties) {
-        this(clazz, new IdPropertyDefinition(idPropertyName), ignoredProperties);
-
+    @Deprecated
+    public EntityDefinition(Class<?> entity, String idPropertyName, List<String> ignoredProperties) {
+        this(new EntityDefinitionBuilder(entity)
+                .withIdPropertyName(idPropertyName)
+                .withIgnoredProperties(ignoredProperties));
     }
 
     public boolean hasCustomId() {
-        return idPropertyDefinition != null;
-    }
-
-    public boolean hasCustomIdDefinedByName() {
-        return hasCustomId() && idPropertyDefinition.propertyName != null;
+        return idPropertyName.isPresent();
     }
 
     public String getIdPropertyName() {
-        return idPropertyDefinition.propertyName;
+        return idPropertyName.get();
     }
 
-    public Property getIdProperty(){
-        return idPropertyDefinition.property;
-    }
+    /**
+     * Full recipe for Entity,
+     * allows to set all optional attributes of EntityDefinition:
+     * Id-property, ignoredProperties and typeAlias, for example:
+     * <pre>
+     * EntityDefinitionBuilder.entityDefinition(entity)
+     *    .withIdPropertyName(idPropertyName)
+     *    .withIgnoredProperties(ignoredProperties)
+     *    .withTypeName(typeName)
+     *    .build()
+     *</pre>
+     */
+    public static class EntityDefinitionBuilder extends ClientsClassDefinitionBuilder<EntityDefinitionBuilder>{
+        private Optional<String> idPropertyName = Optional.empty();
 
-    private static class IdPropertyDefinition{
-        private String propertyName;
-        private Property property;
-
-        public IdPropertyDefinition(Property property) {
-            Validate.argumentIsNotNull(property);
-            this.property = property;
+        private EntityDefinitionBuilder(Class<?> entity) {
+            super(entity);
         }
 
-        public IdPropertyDefinition(String propertyName) {
-            Validate.argumentIsNotNull(propertyName);
-            this.propertyName = propertyName;
+        public static EntityDefinitionBuilder entityDefinition(Class<?> entity) {
+            return new EntityDefinitionBuilder(entity);
+        }
+
+        public EntityDefinitionBuilder withIdPropertyName(String idPropertyName) {
+            Validate.argumentIsNotNull(idPropertyName);
+            this.idPropertyName = Optional.of(idPropertyName);
+            return this;
+        }
+
+        @Override
+        public EntityDefinition build() {
+            return new EntityDefinition(this);
         }
     }
 }

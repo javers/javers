@@ -1,8 +1,8 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.collections.Predicate;
 import org.javers.common.string.PrettyPrintBuilder;
-import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
@@ -16,16 +16,15 @@ public abstract class ManagedType extends JaversType {
     private final ManagedClass managedClass;
 
     ManagedType(ManagedClass managedClass) {
-        super(managedClass.getClientsClass());
-        Validate.argumentIsNotNull(managedClass);
+        this(managedClass, Optional.<String>empty());
+    }
+
+    ManagedType(ManagedClass managedClass, Optional<String> typeName) {
+        super(managedClass.getBaseJavaClass(), typeName);
         this.managedClass = managedClass;
     }
 
-    ManagedClass getManagedClass() {
-        return managedClass;
-    }
-
-    abstract ManagedType spawn(Class javaType, ManagedClassFactory managedClassFactory);
+    abstract ManagedType spawn(ManagedClass managedClass);
 
     @Override
     protected Type getRawDehydratedType() {

@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Optional;
+
 /**
  * ValueObject class in client's domain model.
  * <br/><br/>
@@ -24,17 +26,16 @@ package org.javers.core.metamodel.type;
  */
 public class ValueObjectType extends ManagedType{
 
-    public ValueObjectType(ValueObject valueObject){
+    ValueObjectType(ManagedClass valueObject){
         super(valueObject);
     }
 
-    @Override
-    public ValueObject getManagedClass() {
-        return (ValueObject)super.getManagedClass();
+    ValueObjectType(ManagedClass valueObject, Optional<String> typeName) {
+        super(valueObject, typeName);
     }
 
     @Override
-    ManagedType spawn(Class javaType, ManagedClassFactory managedClassFactory) {
-        return new ValueObjectType(managedClassFactory.createValueObject(javaType));
+    ValueObjectType spawn(ManagedClass managedClass) {
+        return new ValueObjectType(managedClass);
     }
 }

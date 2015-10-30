@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.string.PrettyPrintBuilder;
@@ -35,24 +36,31 @@ import java.lang.reflect.Type;
  * @author bartosz walacik
  */
 public class EntityType extends ManagedType {
+    private final Property idProperty;
 
-    public EntityType(Entity entity){
-        super(entity);
+    EntityType(ManagedClass entity, Optional<Property> idProperty, Optional<String> typeName) {
+        super(entity, typeName);
+        Validate.argumentIsNotNull(idProperty);
+
+        if (idProperty.isEmpty()) {
+            this.idProperty = findDefaultIdProperty();
+        }
+        else {
+            this.idProperty = idProperty.get();
+        }
+    }
+
+    EntityType(ManagedClass entity, Optional<Property> idProperty) {
+        this(entity, idProperty, Optional.<String>empty());
     }
 
     @Override
-    @Deprecated
-    public Entity getManagedClass() {
-        return (Entity)super.getManagedClass();
-    }
-
-    @Override
-    ManagedType spawn(Class javaType, ManagedClassFactory managedClassFactory) {
-        return new EntityType(managedClassFactory.create(new EntityDefinition(javaType, getManagedClass().getIdProperty())));
+    EntityType spawn(ManagedClass managedClass) {
+        return new EntityType(managedClass, Optional.of(idProperty));
     }
 
     public Type getIdPropertyGenericType() {
-        return getManagedClass().getIdProperty().getGenericType();
+        return getIdProperty().getGenericType();
     }
 
     @Override
@@ -68,7 +76,7 @@ public class EntityType extends ManagedType {
     }
 
     public Property getIdProperty() {
-        return getManagedClass().getIdProperty();
+        return idProperty;
     }
 
     /**
@@ -89,5 +97,31 @@ public class EntityType extends ManagedType {
             throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, getName());
         }
         return cdoId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || !(o instanceof EntityType)) {return false;}
+
+        EntityType that = (EntityType) o;
+        return super.equals(that) && idProperty.equals(that.idProperty);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() + idProperty.hashCode();
+    }
+
+    /**
+     * @throws JaversException ENTITY_WITHOUT_ID
+     */
+    private Property findDefaultIdProperty() {
+        for (Property p : getProperties()) {
+            if (p.looksLikeId()) {
+                return p;
+            }
+        }
+        throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID, getName());
     }
 }

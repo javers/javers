@@ -33,7 +33,7 @@ public class ValueType extends PrimitiveOrValueType {
         super(baseJavaType);
     }
 
-    public ValueType(Value value){
-        super(value.getClientsClass());
+    ValueType(Class<?> baseJavaClass) {
+        super(baseJavaClass);
     }
 }

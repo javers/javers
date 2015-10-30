@@ -53,7 +53,7 @@ class TypeMapperState {
     }
 
     void computeIfAbsent(final ClientsClassDefinition def){
-        computeIfAbsent(def.getClazz(), new Function<Type, JaversType>() {
+        computeIfAbsent(def.getBaseJavaClass(), new Function<Type, JaversType>() {
             public JaversType apply(Type ignored) {
                 return typeFactory.create(def);
             }

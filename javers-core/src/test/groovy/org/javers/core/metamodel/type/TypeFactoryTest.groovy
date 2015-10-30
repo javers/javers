@@ -1,20 +1,23 @@
 package org.javers.core.metamodel.type
 
-import org.javers.common.collections.Optional
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.MappingStyle
 import org.javers.core.metamodel.clazz.EntityDefinition
+import org.javers.core.metamodel.clazz.JaversEntity
 import org.javers.core.metamodel.clazz.JaversEntityWithTypeAlias
+import org.javers.core.metamodel.clazz.JaversValue
+import org.javers.core.metamodel.clazz.JaversValueObjectWithTypeAlias
 import org.javers.core.metamodel.clazz.ValueObjectDefinition
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.core.metamodel.clazz.EntityDefinition.EntityDefinitionBuilder.entityDefinition
+import static org.javers.core.metamodel.clazz.ValueObjectDefinition.ValueObjectDefinitionBuilder.valueObjectDefinition
 
 /**
  * @author Pawel Cierpiatka
@@ -22,24 +25,40 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 class TypeFactoryTest extends Specification {
 
     def setupSpec() {
-        typeFactory = javersTestAssembly(MappingStyle.BEAN).typeSpawningFactory
+        typeFactory = javersTestAssembly(MappingStyle.FIELD).typeSpawningFactory
     }
 
     @Shared
     def TypeFactory typeFactory
 
     @Unroll
-    @Ignore //TODO
-    def "should use name from @TypeAlias for #what"(){
+    def "should use name from @TypeAlias for inferred #expectedType.simpleName"(){
         when:
-        def entity = typeFactory.infer(clazz, Optional.empty())
+        def type = typeFactory.inferFromAnnotations(clazz)
 
         then:
-        entity.name == "NyName"
+        type.name == "myName"
+        type.class == expectedType
 
         where:
-        what  << ["EntityType"]
-        clazz << [JaversEntityWithTypeAlias]
+        expectedType  << [ValueObjectType, EntityType]
+        clazz << [JaversValueObjectWithTypeAlias, JaversEntityWithTypeAlias]
+    }
+
+    @Unroll
+    def "should use typeName from ClientClassDefinition for #expectedType.simpleName"(){
+        when:
+        def type = typeFactory.create(definition)
+
+        then:
+        type.name == "myName"
+        type.class == expectedType
+
+        where:
+        expectedType  << [EntityType,ValueObjectType]
+        definition << [entityDefinition(DummyUser).withTypeName("myName").build(),
+                       valueObjectDefinition(DummyUser).withTypeName("myName").build()
+        ]
     }
 
     def "should create EntityType with properties, ID property and reference to client's class"() {
@@ -65,20 +84,25 @@ class TypeFactoryTest extends Specification {
     }
 
     def "should map as ValueObjectType by default"(){
-        when:
-        def vo = typeFactory.infer(DummyAddress, Optional.empty())
+        expect:
+        typeFactory.inferFromAnnotations(DummyAddress) instanceof ValueObjectType
+    }
 
-        then:
-        vo instanceof ValueObjectType
+    def "should map as ValueType when @Value annotation is present "(){
+        expect:
+        typeFactory.inferFromAnnotations(JaversValue) instanceof ValueType
     }
 
     def "should map as EntityType if property level @Id annotation is present"() {
-        when:
-        def vo = typeFactory.infer(DummyUser, Optional.empty())
-
-        then:
-        vo instanceof EntityType
+        expect:
+        typeFactory.inferFromAnnotations(DummyUser) instanceof EntityType
     }
+
+    def "should map as EntityType when @Entity annotation is present"() {
+        expect:
+        typeFactory.inferFromAnnotations(JaversEntity) instanceof EntityType
+    }
+
 
     @Unroll
     def "should ignore given #managedType properties"() {

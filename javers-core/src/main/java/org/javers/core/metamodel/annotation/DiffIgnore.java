@@ -8,11 +8,11 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Use @DiffIgnore to mark certain properties
- * (fields or getters) to be ignored by JaVers diff.
+ * Use DiffIgnore annotation to mark certain properties
+ * (fields or getters) as ignored by JaVers.
  * <br/><br/>
  *
- * @DiffIgnore is an equivalent for javax.persistence.Transient
+ * DiffIgnore is an equivalent for javax.persistence.Transient annotation.
  *
  * @author bartosz walacik
  */
