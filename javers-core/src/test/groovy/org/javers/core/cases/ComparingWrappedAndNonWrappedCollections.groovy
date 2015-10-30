@@ -9,7 +9,7 @@ import org.javers.core.model.SetContainer
 import spock.lang.Specification
 
 /**
- * @autho pawelszymczyk
+ * @author pawelszymczyk
  */
 class ComparingWrappedAndNonWrappedCollections extends Specification {
 
