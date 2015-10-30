@@ -11,7 +11,7 @@ public class ListWrapper implements SpecifiedClassCollectionWrapper {
     }
 
     @Override
-    public String getWrappedCollectionFieldName() {
+    public String getWrappedCollectionPropertyName() {
         return "list";
     }
 }

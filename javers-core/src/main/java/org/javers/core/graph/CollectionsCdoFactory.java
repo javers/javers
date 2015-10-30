@@ -24,7 +24,7 @@ public class CollectionsCdoFactory {
     }
 
     public Cdo createCdo(SpecifiedClassCollectionWrapper wrapper, final Class<?> clazz, MappingStyle mappingStyle) {
-        Property primaryProperty = propertyScanner.scanSingleProperty(wrapper.getClass(), wrapper.getWrappedCollectionFieldName());
+        Property primaryProperty = propertyScanner.scanSingleProperty(wrapper.getClass(), wrapper.getWrappedCollectionPropertyName());
         JaversMember javersMember = memberGenericTypeInjector.injectGenericType(new ChangeMetadata(primaryProperty, clazz), mappingStyle);
         Property fixedProperty = new Property(javersMember, false);
         ValueObjectType valueObject = new ValueObjectType(new ValueObject(wrapper.getClass(), Lists.asList(fixedProperty)));

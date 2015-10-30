@@ -11,7 +11,7 @@ public class SetWrapper implements SpecifiedClassCollectionWrapper {
     }
 
     @Override
-    public String getWrappedCollectionFieldName() {
+    public String getWrappedCollectionPropertyName() {
         return "set";
     }
 }
