@@ -31,7 +31,7 @@ public class CollectionsGraphBuilder {
         ObjectNode root = edgeBuilder.buildNodeStub(cdo);
         buildCollectionEdge(nodeReuser.pollStub(), clazz);
 
-        return objectGraphBuilder.buildLeafs(root);
+        return objectGraphBuilder.buildLeaves(root);
     }
 
     private void buildCollectionEdge(ObjectNode node, Class clazz) {

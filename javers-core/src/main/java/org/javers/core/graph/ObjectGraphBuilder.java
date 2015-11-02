@@ -46,10 +46,10 @@ public class ObjectGraphBuilder {
      */
     public LiveGraph buildGraph(Object handle) {
         ObjectNode root = buildRoot(handle);
-        return buildLeafs(root);
+        return buildLeaves(root);
     }
 
-    LiveGraph buildLeafs(ObjectNode root) {
+    LiveGraph buildLeaves(ObjectNode root) {
         //we can't use recursion here, it could cause StackOverflow for large graphs
         while(nodeReuser.hasMoreStubs()){
             ObjectNode stub = nodeReuser.pollStub();
