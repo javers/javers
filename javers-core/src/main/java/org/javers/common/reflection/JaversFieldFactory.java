@@ -23,16 +23,16 @@ class JaversFieldFactory {
         this.methodSource = methodSource;
     }
 
-    public List<JaversField> getAllFields() {
+    public List<JaversField> getAllFields(){
         List<JaversField> fields = new ArrayList<>();
         TypeResolvingContext context = new TypeResolvingContext();
 
         Class clazz = methodSource;
-        while (clazz != null && clazz != Object.class) {
+        while (clazz != null && clazz != Object.class)  {
             context.addTypeSubstitutions(clazz);
 
-            for (Field f : clazz.getDeclaredFields()) {
-                fields.add(createJField(f, context));
+            for (Field f : clazz.getDeclaredFields()){
+                fields.add(createJField(f,context));
             }
 
             clazz = clazz.getSuperclass();

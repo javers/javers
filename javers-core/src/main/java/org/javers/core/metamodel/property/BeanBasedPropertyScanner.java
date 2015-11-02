@@ -20,7 +20,7 @@ class BeanBasedPropertyScanner implements PropertyScanner {
 
     @Override
     public List<Property> scan(Class<?> managedClass) {
-        List<JaversMethod> getters = ReflectionUtil.findAllPersistentGetters(managedClass);
+        List<JaversMethod> getters = ReflectionUtil.getAllPersistentGetters(managedClass);
         List<Property> beanProperties = new ArrayList<>();
 
         for (JaversMethod getter : getters) {
@@ -34,7 +34,7 @@ class BeanBasedPropertyScanner implements PropertyScanner {
 
     @Override
     public Property scanSingleProperty(Class<?> managedClass, String propertyName) {
-        JaversMethod persistentGetter = ReflectionUtil.findPersistentGetter(managedClass, propertyName);
+        JaversMethod persistentGetter = ReflectionUtil.getPersistentGetter(managedClass, propertyName);
 
 
         return null;

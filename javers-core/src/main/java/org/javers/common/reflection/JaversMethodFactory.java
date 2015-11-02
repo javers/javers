@@ -27,7 +27,7 @@ class JaversMethodFactory {
      * List all class methods, including inherited and private.
      * Inheritance duplicates cleared
      */
-    public List<JaversMethod> getAllMethods() {
+    public List<JaversMethod> getAllMethods(){
         List<JaversMethod> methods = new ArrayList<>();
         Set<Integer> added = new HashSet<>();
         TypeResolvingContext context = new TypeResolvingContext();
@@ -50,12 +50,12 @@ class JaversMethodFactory {
         return methods;
     }
 
-    private JaversMethod createJMethod(Method rawMethod, TypeResolvingContext context) {
+    private JaversMethod createJMethod(Method rawMethod, TypeResolvingContext context){
         Type actualReturnType = context.getSubstitution(rawMethod.getGenericReturnType());
         return new JaversMethod(rawMethod, actualReturnType);
     }
 
-    public static int methodKey(Method m) {
+    public static int methodKey(Method m){
         int key = shaDigest(m.getName());
         for (Class c : m.getParameterTypes()) {
             key += c.hashCode();
@@ -63,15 +63,15 @@ class JaversMethodFactory {
         return key;
     }
 
-    private static int shaDigest(String text) {
+    private static int shaDigest(String text){
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             digest.update(text.getBytes("UTF-8"));
             byte[] hashBytes = digest.digest();
 
             int result = 0;
-            for (int i = 0; i < hashBytes.length; i++) {
-                result += Math.abs(hashBytes[i]) * (i + 1);
+            for (int i=0; i<hashBytes.length; i++){
+                result += Math.abs(hashBytes[i]) * (i+1);
             }
             return result;
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
