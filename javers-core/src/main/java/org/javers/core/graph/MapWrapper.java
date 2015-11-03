@@ -1,4 +1,4 @@
-package org.javers.core.graph.wrappers;
+package org.javers.core.graph;
 
 import java.util.Map;
 

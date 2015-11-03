@@ -9,5 +9,4 @@ import java.util.List;
  */
 public interface PropertyScanner {
     List<Property> scan(Class<?> managedClass);
-    Property scanSingleProperty(Class<?> managedClass, String propertyName);
 }

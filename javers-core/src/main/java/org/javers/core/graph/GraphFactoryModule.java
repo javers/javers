@@ -17,7 +17,6 @@ public class GraphFactoryModule extends InstantiatingModule {
     protected Collection<Class> getImplementations() {
         return (Collection) Lists.asList(
                LiveCdoFactory.class,
-               JaversMemberGenericTypeInjector.class,
                CollectionsCdoFactory.class,
                LiveGraphFactory.class,
                ObjectGraphBuilder.class,

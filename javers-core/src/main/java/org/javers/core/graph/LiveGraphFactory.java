@@ -1,12 +1,5 @@
 package org.javers.core.graph;
 
-import org.javers.core.JaversCoreConfiguration;
-import org.javers.core.MappingStyle;
-import org.javers.core.graph.wrappers.ArrayWrapper;
-import org.javers.core.graph.wrappers.ListWrapper;
-import org.javers.core.graph.wrappers.MapWrapper;
-import org.javers.core.graph.wrappers.SetWrapper;
-import org.javers.core.graph.wrappers.SpecifiedClassCollectionWrapper;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.type.TypeMapper;
 
@@ -24,20 +17,18 @@ public class LiveGraphFactory {
     private final LiveCdoFactory liveCdoFactory;
     private final CollectionsCdoFactory collectionsCdoFactory;
     private ObjectAccessHook objectAccessHook;
-    private final MappingStyle mappingStyle;
 
-    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, CollectionsCdoFactory collectionsCdoFactory, ObjectAccessHook objectAccessHook, JaversCoreConfiguration coreConfiguration) {
+    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, CollectionsCdoFactory collectionsCdoFactory, ObjectAccessHook objectAccessHook) {
         this.typeMapper = typeMapper;
         this.liveCdoFactory = liveCdoFactory;
         this.collectionsCdoFactory = collectionsCdoFactory;
         this.objectAccessHook = objectAccessHook;
-        this.mappingStyle = coreConfiguration.getMappingStyle();
     }
 
     public LiveGraph createLiveGraph(Collection handle, Class clazz) {
-        SpecifiedClassCollectionWrapper wrappedCollection = (SpecifiedClassCollectionWrapper) wrapTopLevelContainer(handle);
+        CollectionWrapper wrappedCollection = (CollectionWrapper) wrapTopLevelContainer(handle);
 
-        return new CollectionsGraphBuilder(typeMapper, liveCdoFactory, collectionsCdoFactory).buildGraph(wrappedCollection, clazz, mappingStyle);
+        return new CollectionsGraphBuilder(typeMapper, liveCdoFactory, collectionsCdoFactory).buildGraph(wrappedCollection, clazz);
     }
 
     /**

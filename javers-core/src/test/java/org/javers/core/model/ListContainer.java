@@ -8,4 +8,8 @@ public class ListContainer {
     public ListContainer(List<DummyUser> dummyUsers) {
         this.dummyUsers = dummyUsers;
     }
+
+    public List<DummyUser> getDummyUsers() {
+        return dummyUsers;
+    }
 }

@@ -67,21 +67,7 @@ public class ReflectionUtil {
         return result;
     }
 
-    public static JaversField getPersistentField(Class<?> clazz, String propertyName) {
-        JaversField field = getField(clazz, propertyName);
-
-        if (!isPersistentField(field.getRawMember())) {
-            throw new JaversException(JaversExceptionCode.UNEXPECTED_TRANSIENT_PROPERTY, propertyName, clazz.getName());
-        }
-
-        return field;
-    }
-
-    public static JaversField getField(Class<?> clazz, String propertyName) {
-        return new JaversFieldFactory(clazz).getField(propertyName);
-    }
-
-    public static List<JaversMethod> getAllPersistentGetters(Class methodSource) {
+    public static List<JaversMethod> findAllPersistentGetters(Class methodSource) {
         List<JaversMethod> result = new ArrayList<>();
         for(JaversMethod m : getAllMethods(methodSource)) {
              if (isPersistentGetter(m.getRawMember())) {
@@ -89,17 +75,6 @@ public class ReflectionUtil {
              }
         }
         return result;
-    }
-
-    public static JaversMethod getPersistentGetter(Class<?> clazz, String propertyName) {
-        JaversMethodFactory methodFactory = new JaversMethodFactory(clazz);
-        JaversMethod method = methodFactory.getMethod(propertyName);
-
-        if (!isPersistentGetter(method.getRawMember())) {
-            throw new JaversException(JaversExceptionCode.UNEXPECTED_TRANSIENT_PROPERTY, propertyName, clazz.getName());
-        }
-
-        return method;
     }
 
     /**

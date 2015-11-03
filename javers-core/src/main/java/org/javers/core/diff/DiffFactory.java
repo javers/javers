@@ -59,12 +59,12 @@ public class DiffFactory {
         return create(buildGraph(oldVersion), buildGraph(currentVersion), Optional.<CommitMetadata>empty());
     }
 
-    public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz) {
-        return create(buildGraph(oldVersion, clazz), buildGraph(currentVersion, clazz), Optional.<CommitMetadata>empty());
+    public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> itemClass) {
+        return create(buildGraph(oldVersion, itemClass), buildGraph(currentVersion, itemClass), Optional.<CommitMetadata>empty());
     }
 
-    private LiveGraph buildGraph(Collection handle, Class clazz) {
-        return graphFactory.createLiveGraph(handle, clazz);
+    private LiveGraph buildGraph(Collection handle, Class itemClass) {
+        return graphFactory.createLiveGraph(handle, itemClass);
     }
 
     public Diff create(ObjectGraph leftGraph, ObjectGraph rightGraph, Optional<CommitMetadata> commitMetadata) {

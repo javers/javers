@@ -8,4 +8,8 @@ public class SetContainer {
     public SetContainer(Set<DummyUser> dummyUsers) {
         this.dummyUsers = dummyUsers;
     }
+
+    public Set<DummyUser> getDummyUsers() {
+        return dummyUsers;
+    }
 }

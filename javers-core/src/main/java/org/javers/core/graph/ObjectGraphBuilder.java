@@ -25,17 +25,12 @@ public class ObjectGraphBuilder {
     private final TypeMapper typeMapper;
     private boolean built;
     private final EdgeBuilder edgeBuilder;
-    private final NodeReuser nodeReuser;
+    private final NodeReuser nodeReuser = new NodeReuser();
 
     public ObjectGraphBuilder(TypeMapper typeMapper, CdoFactory cdoFactory) {
-        this(typeMapper, cdoFactory, new NodeReuser());
-    }
-
-    public ObjectGraphBuilder(TypeMapper typeMapper, CdoFactory cdoFactory, NodeReuser nodeReuser) {
         Validate.argumentsAreNotNull(typeMapper, cdoFactory);
         this.typeMapper = typeMapper;
         this.edgeBuilder = new EdgeBuilder(typeMapper, nodeReuser, cdoFactory);
-        this.nodeReuser = nodeReuser;
     }
 
     /**
@@ -45,11 +40,19 @@ public class ObjectGraphBuilder {
      * @return graph nodes set
      */
     public LiveGraph buildGraph(Object handle) {
-        ObjectNode root = buildRoot(handle);
-        return buildLeaves(root);
+        argumentIsNotNull(handle);
+
+        Cdo cdo = edgeBuilder.asCdo(handle, null);
+        // logger.debug("building objectGraph for handle [{}] ...",cdo);
+
+        return buildGraphFromCdo(cdo);
     }
 
-    LiveGraph buildLeaves(ObjectNode root) {
+    LiveGraph buildGraphFromCdo(Cdo cdo) {
+        argumentIsNotNull(cdo);
+
+        ObjectNode root = edgeBuilder.buildNodeStub(cdo);
+
         //we can't use recursion here, it could cause StackOverflow for large graphs
         while(nodeReuser.hasMoreStubs()){
             ObjectNode stub = nodeReuser.pollStub();
@@ -62,16 +65,6 @@ public class ObjectGraphBuilder {
         switchToBuilt();
         return new LiveGraph(root, nodeReuser.nodes());
     }
-
-    ObjectNode buildRoot(Object handle) {
-        argumentIsNotNull(handle);
-
-        Cdo cdo = edgeBuilder.asCdo(handle, null);
-        // logger.debug("building objectGraph for handle [{}] ...",cdo);
-
-        return edgeBuilder.buildNodeStub(cdo);
-    }
-
 
     private void buildEdges(ObjectNode nodeStub) {
         nodeReuser.saveForReuse(nodeStub);

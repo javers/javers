@@ -31,12 +31,4 @@ class FieldBasedPropertyScanner implements PropertyScanner {
         }
         return propertyList;
     }
-
-    @Override
-    public Property scanSingleProperty(Class<?> managedClass, String propertyName) {
-        JaversField field = ReflectionUtil.getPersistentField(managedClass, propertyName);
-        boolean hasTransientAnn = field.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
-
-        return new Property(field, hasTransientAnn);
-    }
 }
