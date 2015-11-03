@@ -125,7 +125,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Makes sense only for {@link ParameterizedType}
+     * Makes sense only for {@link ParameterizedType} and upper-bounded {@link WildcardType}
      */
     public static List<Type> extractActualClassTypeArguments(Type javaType) {
         if (!(javaType instanceof ParameterizedType)) {
@@ -151,7 +151,6 @@ public class ReflectionUtil {
                     }
                 }
             }
-
         }
 
         return Collections.unmodifiableList(result);
