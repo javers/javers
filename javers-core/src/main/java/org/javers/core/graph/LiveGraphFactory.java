@@ -16,13 +16,11 @@ public class LiveGraphFactory {
     private final TypeMapper typeMapper;
     private final LiveCdoFactory liveCdoFactory;
     private final CollectionsCdoFactory collectionsCdoFactory;
-    private ObjectAccessHook objectAccessHook;
 
-    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, CollectionsCdoFactory collectionsCdoFactory, ObjectAccessHook objectAccessHook) {
+    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, CollectionsCdoFactory collectionsCdoFactory) {
         this.typeMapper = typeMapper;
         this.liveCdoFactory = liveCdoFactory;
         this.collectionsCdoFactory = collectionsCdoFactory;
-        this.objectAccessHook = objectAccessHook;
     }
 
     public LiveGraph createLiveGraph(Collection handle, Class clazz) {
@@ -75,6 +73,46 @@ public class LiveGraphFactory {
 
     public static Class getArrayWrapperType() {
         return ArrayWrapper.class;
+    }
+
+    static class MapWrapper {
+        private final Map<Object,Object> map;
+
+        MapWrapper(Map map) {
+            this.map = map;
+        }
+    }
+
+    static class SetWrapper implements CollectionWrapper {
+        private final Set<Object> set;
+
+        SetWrapper(Set set) {
+            this.set = set;
+        }
+
+        Set<Object> getSet() {
+            return set;
+        }
+    }
+
+    static class ListWrapper implements CollectionWrapper {
+        private final List<Object> list;
+
+        ListWrapper(List list) {
+            this.list = list;
+        }
+
+        List<Object> getList() {
+            return list;
+        }
+    }
+
+    static class ArrayWrapper {
+        private final Object[] array;
+
+        ArrayWrapper(Object[] objects) {
+            this.array = objects;
+        }
     }
 
     //this is primarily used for copying array of primitives to array of objects
