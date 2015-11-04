@@ -17,6 +17,7 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -56,6 +57,14 @@ public class DiffFactory {
      */
     public Diff compare(Object oldVersion, Object currentVersion) {
         return create(buildGraph(oldVersion), buildGraph(currentVersion), Optional.<CommitMetadata>empty());
+    }
+
+    public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> itemClass) {
+        return create(buildGraph(oldVersion, itemClass), buildGraph(currentVersion, itemClass), Optional.<CommitMetadata>empty());
+    }
+
+    private LiveGraph buildGraph(Collection handle, Class itemClass) {
+        return graphFactory.createLiveGraph(handle, itemClass);
     }
 
     public Diff create(ObjectGraph leftGraph, ObjectGraph rightGraph, Optional<CommitMetadata> commitMetadata) {

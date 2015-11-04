@@ -136,7 +136,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Makes sense only for {@link ParameterizedType}
+     * Makes sense only for {@link ParameterizedType} and upper-bounded {@link WildcardType}
      */
     public static List<Type> extractActualClassTypeArguments(Type javaType) {
         if (!(javaType instanceof ParameterizedType)) {
@@ -150,6 +150,17 @@ public class ReflectionUtil {
 
             if (t instanceof Class || t instanceof ParameterizedType) {
                 result.add(t);
+            } else if (t instanceof WildcardType) {
+                // If the wildcard type has an explicit upper bound (i.e. not Object), we use that
+                WildcardType wildcardType = (WildcardType) t;
+                if (wildcardType.getLowerBounds().length == 0) {
+                    for (Type type : wildcardType.getUpperBounds()) {
+                        if (type instanceof Class && ((Class<?>) type).equals(Object.class)) {
+                            continue;
+                        }
+                        result.add(type);
+                    }
+                }
             }
         }
 

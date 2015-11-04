@@ -19,6 +19,7 @@ import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -106,6 +107,16 @@ public interface Javers {
      * @see <a href="http://javers.org/documentation/diff-examples/">http://javers.org/documentation/diff-examples</a>
      */
     Diff compare(Object oldVersion, Object currentVersion);
+
+    /**
+     * Deeply compares two collections.
+     * <br/><br/>
+     *
+     * Introduced due to the lack of possibility to statically
+     * determine type of collection items when two collections are passed to
+     * {@link #compare(Object, Object)}
+     */
+    <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz);
 
     /**
      * Initial diff is a kind of snapshot of given domain object graph.

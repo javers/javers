@@ -11,6 +11,7 @@ import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.GraphFactoryModule;
+import org.javers.core.graph.TailoredJaversMemberFactoryModule;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
@@ -98,7 +99,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     protected Javers assembleJaversInstance(){
-        bootDiffAppenders();
+        addModule(new DiffAppendersModule(getContainer(), coreConfiguration()));
+        addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
 
         bootManagedTypeModule();
 
@@ -110,10 +112,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
         Javers javers = getContainerComponent(JaversCore.class);
         return javers;
-    }
-
-    private void bootDiffAppenders() {
-        addModule(new DiffAppendersModule(getContainer(), coreConfiguration()));
     }
 
     /**

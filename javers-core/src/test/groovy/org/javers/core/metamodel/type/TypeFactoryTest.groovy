@@ -127,5 +127,4 @@ class TypeFactoryTest extends Specification {
         JaversException e = thrown()
         e.code == JaversExceptionCode.PROPERTY_NOT_FOUND
     }
-
 }

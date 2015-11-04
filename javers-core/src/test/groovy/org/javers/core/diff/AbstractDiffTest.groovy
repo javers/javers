@@ -18,11 +18,11 @@ abstract class AbstractDiffTest extends Specification {
     @Shared protected JaversTestBuilder javers = javersTestAssembly()
 
     ObjectNode buildGraph(def any) {
-        javers.createObjectGraphBuilder().buildGraph(any).root()
+        javers.createLiveGraph(any).root()
     }
 
     LiveGraph buildLiveGraph(def any) {
-        javers.createObjectGraphBuilder().buildGraph(any)
+        javers.createLiveGraph(any)
     }
 
     EntityType getEntity(Class forClass) {

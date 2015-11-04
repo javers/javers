@@ -4,11 +4,10 @@ import org.javers.common.date.DateProvider
 import org.javers.core.commit.CommitFactory
 import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.LiveGraph
-import org.javers.core.graph.ObjectGraphBuilder
+import org.javers.core.graph.LiveGraphFactory
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.JsonConverterBuilder
 import org.javers.core.metamodel.annotation.ClassAnnotationsScanner
-import org.javers.core.metamodel.type.ManagedClassFactory
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.SnapshotFactory
@@ -135,13 +134,8 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(type)
     }
 
-    ObjectGraphBuilder createObjectGraphBuilder() {
-        new ObjectGraphBuilder(getTypeMapper(), getLiveCdoFactory())
-    }
-
-
     LiveGraph createLiveGraph(Object liveCdo) {
-        createObjectGraphBuilder().buildGraph(liveCdo)
+        javersBuilder.getContainerComponent(LiveGraphFactory).createLiveGraph(liveCdo)
     }
 
     IdBuilder idBuilder(){
