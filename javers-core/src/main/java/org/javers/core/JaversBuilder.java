@@ -99,28 +99,19 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     protected Javers assembleJaversInstance(){
-        bootDiffAppenders();
+        addModule(new DiffAppendersModule(getContainer(), coreConfiguration()));
+        addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
 
         bootManagedTypeModule();
 
         // JSON beans & domain aware typeAdapters
         bootJsonConverter();
 
-        bootTailoredJaversMemberFactory();
-
         // Repository
         bootRepository();
 
         Javers javers = getContainerComponent(JaversCore.class);
         return javers;
-    }
-
-    private void bootTailoredJaversMemberFactory() {
-        addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
-    }
-
-    private void bootDiffAppenders() {
-        addModule(new DiffAppendersModule(getContainer(), coreConfiguration()));
     }
 
     /**
