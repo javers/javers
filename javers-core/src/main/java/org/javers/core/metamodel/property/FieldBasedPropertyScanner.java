@@ -19,7 +19,7 @@ class FieldBasedPropertyScanner implements PropertyScanner {
     }
 
     @Override
-    public  List<Property> scan(Class<?> managedClass) {
+    public List<Property> scan(Class<?> managedClass) {
         List<JaversField> fields = ReflectionUtil.getAllPersistentFields(managedClass);
         List<Property> propertyList = new ArrayList<>(fields.size());
 

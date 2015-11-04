@@ -23,6 +23,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -64,6 +65,11 @@ class JaversTransactionalDecorator implements Javers {
     @Override
     public Diff compare(Object oldVersion, Object currentVersion) {
         return delegate.compare(oldVersion, currentVersion);
+    }
+
+    @Override
+    public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz) {
+        return delegate.compareCollections(oldVersion, currentVersion, clazz);
     }
 
     @Override

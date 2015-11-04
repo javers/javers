@@ -4,6 +4,7 @@ import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,12 +15,19 @@ import java.util.Set;
 public class LiveGraphFactory {
     private final TypeMapper typeMapper;
     private final LiveCdoFactory liveCdoFactory;
-    private ObjectAccessHook objectAccessHook;
+    private final CollectionsCdoFactory collectionsCdoFactory;
 
-    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, ObjectAccessHook objectAccessHook) {
+    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, CollectionsCdoFactory collectionsCdoFactory) {
         this.typeMapper = typeMapper;
         this.liveCdoFactory = liveCdoFactory;
-        this.objectAccessHook = objectAccessHook;
+        this.collectionsCdoFactory = collectionsCdoFactory;
+    }
+
+    public LiveGraph createLiveGraph(Collection handle, Class clazz) {
+        CollectionWrapper wrappedCollection = (CollectionWrapper) wrapTopLevelContainer(handle);
+
+        return new CollectionsGraphBuilder(new ObjectGraphBuilder(typeMapper, liveCdoFactory), collectionsCdoFactory)
+                .buildGraph(wrappedCollection, clazz);
     }
 
     /**
@@ -67,34 +75,42 @@ public class LiveGraphFactory {
         return ArrayWrapper.class;
     }
 
-    private class MapWrapper{
+    static class MapWrapper {
         private final Map<Object,Object> map;
 
-        private MapWrapper(Map map) {
+        MapWrapper(Map map) {
             this.map = map;
         }
     }
 
-    private class SetWrapper{
+    static class SetWrapper implements CollectionWrapper {
         private final Set<Object> set;
 
-        private SetWrapper(Set set) {
+        SetWrapper(Set set) {
             this.set = set;
         }
-    }
 
-    private class ListWrapper{
-        private final List<Object> list;
-
-        public ListWrapper(List list) {
-            this.list = list;
+        Set<Object> getSet() {
+            return set;
         }
     }
 
-    private class ArrayWrapper {
+    static class ListWrapper implements CollectionWrapper {
+        private final List<Object> list;
+
+        ListWrapper(List list) {
+            this.list = list;
+        }
+
+        List<Object> getList() {
+            return list;
+        }
+    }
+
+    static class ArrayWrapper {
         private final Object[] array;
 
-        public ArrayWrapper(Object[] objects) {
+        ArrayWrapper(Object[] objects) {
             this.array = objects;
         }
     }

@@ -32,7 +32,7 @@ public class JaversMethod extends JaversMember<Method> {
         try {
             return getRawMember().invoke(onObject, EMPTY_ARRAY);
         } catch (Exception e) {
-            throw new RuntimeException("error calling getter {"+ this +"}",e);
+            throw new RuntimeException("error calling getter {"+ getRawMember() +"}",e);
         }
     }
 

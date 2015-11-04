@@ -7,11 +7,11 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-class ParametrizedDehydratedType implements ParameterizedType{
+public class ParametrizedDehydratedType implements ParameterizedType{
     private final Type rawType;
     private final Type[] actualTypeArguments;
 
-    ParametrizedDehydratedType(Type rawType, List<Type> actualDehydratedTypeArguments) {
+    public ParametrizedDehydratedType(Type rawType, List<Type> actualDehydratedTypeArguments) {
         this.rawType = rawType;
         this.actualTypeArguments = actualDehydratedTypeArguments.toArray(new Type[]{});
     }

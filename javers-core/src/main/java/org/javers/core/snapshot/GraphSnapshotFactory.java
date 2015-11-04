@@ -4,7 +4,6 @@ import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.LiveGraph;
-import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.SnapshotFactory;
@@ -27,7 +26,7 @@ class GraphSnapshotFactory {
     }
 
     /**
-     * @param currentVersion outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
+     * @param currentVersion outcome from ObjectGraphBuilder.buildGraph()
      */
     List<CdoSnapshot> create(LiveGraph currentVersion, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata){
         Validate.argumentsAreNotNull(currentVersion, commitMetadata, latestShadowGraph);

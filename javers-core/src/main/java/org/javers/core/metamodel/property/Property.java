@@ -16,7 +16,7 @@ public class Property {
     private transient final JaversMember member;
     private transient final boolean hasTransientAnn;
 
-    Property(JaversMember member, boolean hasTransientAnn){
+    public Property(JaversMember member, boolean hasTransientAnn){
         argumentIsNotNull(member);
         this.member = member;
         this.hasTransientAnn = hasTransientAnn;
@@ -75,5 +75,9 @@ public class Property {
     @Override
     public String toString() {
         return member.toString();
+    }
+
+    public JaversMember getMember() {
+        return member;
     }
 }

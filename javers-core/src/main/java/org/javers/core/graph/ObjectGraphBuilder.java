@@ -19,7 +19,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  *
  * @author bartosz walacik
  */
-public class ObjectGraphBuilder {
+class ObjectGraphBuilder {
     private static final Logger logger = LoggerFactory.getLogger(ObjectGraphBuilder.class);
 
     private final TypeMapper typeMapper;
@@ -43,7 +43,13 @@ public class ObjectGraphBuilder {
         argumentIsNotNull(handle);
 
         Cdo cdo = edgeBuilder.asCdo(handle, null);
-       // logger.debug("building objectGraph for handle [{}] ...",cdo);
+        // logger.debug("building objectGraph for handle [{}] ...",cdo);
+
+        return buildGraphFromCdo(cdo);
+    }
+
+    LiveGraph buildGraphFromCdo(Cdo cdo) {
+        argumentIsNotNull(cdo);
 
         ObjectNode root = edgeBuilder.buildNodeStub(cdo);
 
