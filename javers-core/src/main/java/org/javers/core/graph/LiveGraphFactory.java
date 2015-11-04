@@ -28,7 +28,8 @@ public class LiveGraphFactory {
     public LiveGraph createLiveGraph(Collection handle, Class clazz) {
         CollectionWrapper wrappedCollection = (CollectionWrapper) wrapTopLevelContainer(handle);
 
-        return new CollectionsGraphBuilder(typeMapper, liveCdoFactory, collectionsCdoFactory).buildGraph(wrappedCollection, clazz);
+        return new CollectionsGraphBuilder(new ObjectGraphBuilder(typeMapper, liveCdoFactory), collectionsCdoFactory)
+                .buildGraph(wrappedCollection, clazz);
     }
 
     /**
