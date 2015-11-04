@@ -3,9 +3,13 @@ language: java
 jdk:
   - oraclejdk8
 
+services:
+  - mongodb
+
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
   - mysql -e 'create database travis_ci_test;' -u root
+  - mongo mydb_test --eval 'db.addUser("travis", "test");'
 
 script:
   - "./gradlew check"
