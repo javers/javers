@@ -13,7 +13,7 @@ import spock.lang.Unroll
  * @author pawelszymczyk
  */
 
-class BeanScanning extends ComparingWrappedAndNonWrappedCollections {
+class BeanScanning extends ComparingWrappedAndNonWrappedCollectionsTest {
 
     @Override
     Javers javers() {
@@ -22,7 +22,7 @@ class BeanScanning extends ComparingWrappedAndNonWrappedCollections {
 }
 
 
-class FieldScanning extends ComparingWrappedAndNonWrappedCollections {
+class FieldScanning extends ComparingWrappedAndNonWrappedCollectionsTest {
 
     @Override
     Javers javers() {
@@ -30,7 +30,7 @@ class FieldScanning extends ComparingWrappedAndNonWrappedCollections {
     }
 }
 
-abstract class ComparingWrappedAndNonWrappedCollections extends Specification {
+abstract class ComparingWrappedAndNonWrappedCollectionsTest extends Specification {
 
     abstract Javers javers()
 
