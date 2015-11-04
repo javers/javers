@@ -1,8 +1,5 @@
 package org.javers.common.reflection;
 
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
-
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -76,17 +73,6 @@ class JaversMethodFactory {
             return result;
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    public JaversMethod getMethod(String name) {
-        try {
-            Method method = methodSource.getDeclaredMethod(name);
-            JaversMethod jMethod = createJMethod(method, new TypeResolvingContext());
-            return jMethod;
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            throw new JaversException(JaversExceptionCode.PROPERTY_NOT_FOUND, name, methodSource.getName());
         }
     }
 }

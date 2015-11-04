@@ -47,8 +47,6 @@ public enum JaversExceptionCode {
 
     PROPERTY_NOT_FOUND(JaversException.RUNTIME_ERROR +"property '%s' not found in class '%s'"),
 
-    UNEXPECTED_TRANSIENT_PROPERTY(JaversException.RUNTIME_ERROR+ "property '%s' found in class '%s' is transient, expected persistent property"),
-
     MANAGED_CLASS_MAPPING_ERROR(JaversException.RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, expected %s"),
 
     MALFORMED_CHANGE_TYPE_FIELD(JaversException.RUNTIME_ERROR+"no such Change type - '%s'"),
