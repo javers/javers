@@ -12,11 +12,36 @@ import javax.persistence.EmbeddedId
 import javax.persistence.Id
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.core.metamodel.clazz.EntityDefinition.EntityDefinitionBuilder.entityDefinition
 
 /**
  * @author bartosz walacik
  */
 public class TypeMapperIntegrationTest extends Specification {
+
+    /*
+  //TODO
+    def "should find EntityType by typeName when class has @TypeName annotation and its package is registered"(){
+        given:
+        def mapper = javersTestAssembly().typeMapper
+
+        when:
+
+        then:
+    }
+    */
+
+    def "should find EntityType by typeName when class is registered using EntityDefinition"(){
+        given:
+        def mapper = javersTestAssembly().typeMapper
+
+        when:
+        mapper.registerClientsClass(entityDefinition(DummyUser).withTypeName("DummyType").build())
+        def type = mapper.getEntityByName("DummyType")
+
+        then:
+        type.baseJavaClass == DummyUser
+    }
 
     @Unroll
     def "should override Entity type inferred form annotations when ValueObject is explicitly registered for #queryClass.simpleName"() {

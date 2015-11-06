@@ -1,10 +1,10 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.Javers;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.property.Property;
 import org.joda.time.LocalDate;
@@ -96,15 +96,35 @@ public class TypeMapper {
     }
 
     /**
-     * throws JaversException.MANAGED_CLASS_MAPPING_ERROR if given javaClass is NOT mapped to {@link ManagedType}
+     * facade for {@link #getTypeByName(String)} and {@link #getJaversManagedType(Class, Class)}
+     */
+    public EntityType getEntityByName(String typeName){
+        return getJaversManagedType(getTypeByName(typeName), EntityType.class);
+    }
+
+    /**
+     * @throws {@link JaversExceptionCode#TYPE_NAME_NOT_FOUND} if given name is not mapped to {@link JaversType}
+     */
+    private Class getTypeByName(String typeName){
+        Optional<Class> type = state.getTypeByName(typeName);
+        if (type.isPresent()){
+            return type.get();
+        }
+
+        throw new JaversException(JaversExceptionCode.TYPE_NAME_NOT_FOUND, typeName);
+    }
+
+    /**
+     * @throws {@link JaversExceptionCode#MANAGED_CLASS_MAPPING_ERROR} if given javaClass is NOT mapped to {@link ManagedType}
      */
     public ManagedType getJaversManagedType(Class javaType) {
         return getJaversManagedType(javaType, ManagedType.class);
     }
 
     /**
-     * if given javaClass is mapped to expected JaversType, returns its JaversType,
-     * otherwise throws JaversException.MANAGED_CLASS_MAPPING_ERROR
+     * if given javaClass is mapped to expected JaversType, returns its JaversType
+     *
+     * @throws {@link JaversExceptionCode#MANAGED_CLASS_MAPPING_ERROR}
      */
     public <T extends ManagedType> T getJaversManagedType(Class javaClass, Class<T> expectedType) {
         JaversType mType = getJaversType(javaClass);

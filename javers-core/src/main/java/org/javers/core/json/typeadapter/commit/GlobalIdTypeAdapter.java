@@ -62,7 +62,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     }
 
     private InstanceId parseInstanceId(JsonObject jsonObject, JsonDeserializationContext context) {
-        EntityType entity = parseEntity(jsonObject, ENTITY_FIELD);
+        EntityType entity = parseEntity(jsonObject);
 
         JsonElement cdoIdElement = jsonObject.get(CDO_ID_FIELD);
         Object cdoId = context.deserialize(cdoIdElement, entity.getIdProperty().getType());
@@ -110,12 +110,20 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
                                             ValueObjectId.class);
     }
 
-    private EntityType parseEntity(JsonObject object, String fieldName){
-        return typeMapper.getJaversManagedType(parseClass(object, fieldName), EntityType.class);
-    }
-
     private Class parseClass(JsonObject object, String fieldName) {
         String className = object.get(fieldName).getAsString();
         return JsonConverter.parseClass(className);
+    }
+
+    private EntityType parseEntity(JsonObject object){
+        String entityName = object.get(ENTITY_FIELD).getAsString();
+
+        if (entityName.contains(".")){
+            Class javaClazz = JsonConverter.parseClass(entityName);
+            return typeMapper.getJaversManagedType(javaClazz, EntityType.class);
+        } else {
+            return typeMapper.getEntityByName(entityName);
+        }
+
     }
 }

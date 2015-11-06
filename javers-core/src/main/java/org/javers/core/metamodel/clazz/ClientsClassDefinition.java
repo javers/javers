@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.clazz;
 
+import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.type.CustomType;
@@ -67,6 +68,10 @@ public abstract class ClientsClassDefinition {
         return typeName;
     }
 
+    public boolean hasTypeName(){
+        return typeName.isPresent();
+    }
+
     public static class ClientsClassDefinitionBuilder<T extends ClientsClassDefinitionBuilder> {
         private Class<?> clazz;
         private List<String> ignoredProperties = Collections.EMPTY_LIST;
@@ -74,6 +79,11 @@ public abstract class ClientsClassDefinition {
 
         ClientsClassDefinitionBuilder(Class<?> clazz) {
             this.clazz = clazz;
+        }
+
+        public T withIgnoredProperties(String... ignoredProperties) {
+            withIgnoredProperties(Lists.asList(ignoredProperties));
+            return (T) this;
         }
 
         public T withIgnoredProperties(List<String> ignoredProperties) {

@@ -1,5 +1,7 @@
 package org.javers.common.exception;
 
+import org.javers.core.metamodel.annotation.TypeName;
+
 /**
  * Enums with all Javers errors codes
  *
@@ -46,6 +48,10 @@ public enum JaversExceptionCode {
     SNAPSHOT_STATE_VIOLATION(JaversException.RUNTIME_ERROR + "snapshots are immutable"),
 
     PROPERTY_NOT_FOUND(JaversException.RUNTIME_ERROR +"property '%s' not found in class '%s'"),
+
+    TYPE_NAME_NOT_FOUND(JaversException.RUNTIME_ERROR + "type name '%s' not found." +
+            " If you are using @TypeName annotation, remember to register your packages to scan using JaversBuilder.scanTypeNames()." +
+            " Alternatively you can register a type name using JaversBuilder.registerEntity()."),
 
     MANAGED_CLASS_MAPPING_ERROR(JaversException.RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, expected %s"),
 

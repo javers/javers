@@ -20,6 +20,7 @@ import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
 import org.javers.core.metamodel.annotation.AnnotationsModule;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.clazz.*;
+import org.javers.core.metamodel.clazz.EntityDefinition.EntityDefinitionBuilder;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.property.PropertyScannerModule;
 import org.javers.core.metamodel.type.*;
@@ -139,14 +140,29 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     /**
      * Registers an {@link EntityType}. <br/>
-     * Use this method if you are not willing to use annotations to mark Id-property
-     * and ignored properties.
+     * Use this method if you are not willing to use annotations.
+     * <br/></br/>
      *
+     * Recommended way to create EntityDefinition is using EntityDefinitionBuilder. For example:
+     * <pre>
+     * javersBuilder.registerEntity(entityDefinition(Person.class)
+     *     .withIdPropertyName("id")
+     *     .withTypeName("Person")
+     *     .withIgnoredProperties("notImportantProperty","transientProperty")
+     *     .build());
+     * </pre>
+     *
+     * @see EntityDefinitionBuilder#entityDefinition(Class)
      * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerEntity(EntityDefinition entityDefinition){
         argumentIsNotNull(entityDefinition);
         clientsClassDefinitions.add(entityDefinition);
+        return this;
+    }
+
+    public JaversBuilder scanTypeNames(String packageToScan){
+        //TODO
         return this;
     }
 

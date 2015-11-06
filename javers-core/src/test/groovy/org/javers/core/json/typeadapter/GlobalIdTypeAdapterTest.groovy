@@ -1,7 +1,11 @@
 package org.javers.core.json.typeadapter
 
+import eu.infomas.annotation.AnnotationDetector
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
+import org.javers.core.metamodel.annotation.TypeName
+import org.javers.core.metamodel.clazz.JaversEntity
+import org.javers.core.metamodel.clazz.JaversEntityWithTypeAlias
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
@@ -14,6 +18,8 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.lang.annotation.Annotation
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
@@ -48,6 +54,27 @@ class GlobalIdTypeAdapterTest extends Specification {
         ]
     }
 
+    def "should scan annotations"(){
+        when:
+        def reporter = new AnnotationDetector.TypeReporter() {
+            @Override
+            void reportTypeAnnotation(Class<? extends Annotation> annotation, String className) {
+                println className
+            }
+
+            @Override
+            Class[] annotations() {
+                return [TypeName]
+            }
+        }
+
+        AnnotationDetector cf = new AnnotationDetector(reporter)
+        cf.detect('org.javers.core.metamodel')
+
+        then:
+        false
+    }
+
     def "should serialize Instance @EmbeddedId using json fields"(){
         given:
         def javers = javersTestAssembly()
@@ -62,10 +89,11 @@ class GlobalIdTypeAdapterTest extends Specification {
         json.cdoId.y == 3
     }
 
-    def "should serialize InstanceId"() {
+    @Unroll
+    def "should serialize InstanceId with #what name"() {
         given:
         def javers = javersTestAssembly()
-        def id = javers.idBuilder().instanceId("kaz",DummyUser)
+        def id = javers.idBuilder().instanceId("kaz",clazz)
 
         when:
         def jsonText = javers.jsonConverter.toJson(id)
@@ -73,7 +101,12 @@ class GlobalIdTypeAdapterTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.cdoId == "kaz"
-        json.entity == "org.javers.core.model.DummyUser"
+        json.entity == expectedName
+
+        where:
+        what <<  ["default", "@TypeName"]
+        clazz << [JaversEntity, JaversEntityWithTypeAlias]
+        expectedName << [JaversEntity.name, "myName"]
     }
 
     def "should serialize UnboundedValueObjectId"() {
@@ -89,7 +122,7 @@ class GlobalIdTypeAdapterTest extends Specification {
         json.valueObject == "org.javers.core.model.DummyAddress"
     }
 
-    def "should deserialize UnboundedValueObjectId"() {
+    def "should deserialize UnboundedValueObjectId from JSON"() {
         given:
         def json = '{"id":{"valueObject":"org.javers.core.model.DummyAddress","cdoId":"/"}}'
         def javers = javersTestAssembly()
@@ -102,7 +135,21 @@ class GlobalIdTypeAdapterTest extends Specification {
         idHolder.id == javers.idBuilder().unboundedValueObjectId(DummyAddress)
     }
 
-    def "should deserialize Instance @EmbeddedId from json fields"(){
+    def "should deserialize InstanceId with @TypeName from JSON"() {
+        given:
+        def json = '{ "entity": "myName", "cdoId": "x"}'
+        def javers = javersTestAssembly()
+
+        when:
+        InstanceId id = javers.jsonConverter.fromJson(json, GlobalId)
+
+        then:
+        id instanceof InstanceId
+        id.cdoId == "x"
+        id.managedType == javers.typeMapper.getJaversType(JaversEntityWithTypeAlias)
+    }
+
+    def "should deserialize InstanceId with @EmbeddedId from JSON"(){
         given:
         def json =
 '''
@@ -130,7 +177,7 @@ class GlobalIdTypeAdapterTest extends Specification {
         def id = javers.idBuilder().withOwner("kaz",DummyUser).voId(DummyAddress,"somePath")
 
         when:
-        String jsonText = javers.jsonConverter.toJson(id)
+        def jsonText = javers.jsonConverter.toJson(id)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -159,5 +206,4 @@ class GlobalIdTypeAdapterTest extends Specification {
         idHolder.id instanceof ValueObjectId
         idHolder.id == ValueObjectIdDTO.valueObjectId("kaz",DummyUser,"somePath")
     }
-
 }

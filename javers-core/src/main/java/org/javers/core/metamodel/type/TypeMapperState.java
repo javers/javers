@@ -17,6 +17,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz.walacik
  */
 class TypeMapperState {
+    private final TypeMapperNames typeNames = new TypeMapperNames();
     private final Map<Type, JaversType> mappedTypes = new ConcurrentHashMap<>();
     private final TypeFactory typeFactory;
     private final ValueType OBJECT_TYPE = new ValueType(Object.class);
@@ -55,6 +56,11 @@ class TypeMapperState {
     void computeIfAbsent(final ClientsClassDefinition def){
         computeIfAbsent(def.getBaseJavaClass(), new Function<Type, JaversType>() {
             public JaversType apply(Type ignored) {
+
+                if (def.hasTypeName()){
+                    typeNames.registerTypeName(def.getTypeName().get(), def.getBaseJavaClass());
+                }
+
                 return typeFactory.create(def);
             }
         });
@@ -131,5 +137,9 @@ class TypeMapperState {
         }
 
         return distances.get(0).getJaversType();
+    }
+
+    Optional<Class> getTypeByName(String typeName) {
+        return null;
     }
 }
