@@ -28,4 +28,9 @@ class JaversAnnotationsNamesSpace implements AnnotationsNameSpace {
     public Set<String> getTransientPropertyAliases() {
         return Sets.asSet(DiffIgnore.class.getSimpleName());
     }
+
+    @Override
+    public Set<String> getTypeNameAliases() {
+        return Sets.asSet(TypeName.class.getSimpleName());
+    }
 }

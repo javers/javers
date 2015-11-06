@@ -22,22 +22,13 @@ class ClassAnnotationsScannerTest extends Specification {
     def scanner = JaversTestBuilder.javersTestAssembly().classAnnotationsScanner
 
     @Unroll
-    def "should map to ValueObject when no annotation found"() {
-        when:
-        def result = scanner.scanAndInfer(NotAnnotatedClass)
-
-        then:
-        result instanceof ValueObjectDefinition
-    }
-
-    @Unroll
     def "should map #annotation.name to Entity"() {
 
         when:
-        def result = scanner.scanAndInfer(classToScan)
+        def result = scanner.scan(classToScan)
 
         then:
-        result instanceof EntityDefinition
+        result.hasEntity
 
         where:
         annotation << [javax.persistence.Entity,
@@ -50,10 +41,10 @@ class ClassAnnotationsScannerTest extends Specification {
     def "should map #annotation.name to ValueObject"() {
 
         when:
-        def result = scanner.scanAndInfer(classToScan)
+        def result = scanner.scan(classToScan)
 
         then:
-        result instanceof ValueObjectDefinition
+        result.hasValueObject
 
         where:
         annotation << [javax.persistence.Embeddable,
@@ -65,10 +56,10 @@ class ClassAnnotationsScannerTest extends Specification {
     def "should map #annotation.name to Value"() {
 
         when:
-        def result = scanner.scanAndInfer(classToScan)
+        def result = scanner.scan(classToScan)
 
         then:
-        result instanceof ValueDefinition
+        result.hasValue
 
         where:
         annotation << [org.javers.core.metamodel.annotation.Value]

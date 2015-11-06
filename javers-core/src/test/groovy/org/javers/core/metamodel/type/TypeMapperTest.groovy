@@ -191,7 +191,7 @@ class TypeMapperTest extends Specification {
 
     def "should spawn ValueType from mapped superclass"() {
         given:
-        def mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
+        def mapper = JaversTestBuilder.javersTestAssembly().typeMapper
         mapper.registerValueType(AbstractDummyUser)
 
         when:
