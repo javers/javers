@@ -9,6 +9,13 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 public class Lists {
 
+    public static List wrapNull(List list){
+        if (list == null){
+            return Collections.EMPTY_LIST;
+        }
+        return list;
+    }
+
     public static <T> List<T> immutableListOf(T... elements){
         return unmodifiableList(java.util.Arrays.asList(elements));
     }
