@@ -162,6 +162,21 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
                 .hasValueChange(3, 4, 5)
     }
 
+    def "should not fail on nulls"(){
+      given:
+      def leftNode = dummyUser().withIntegerList(null).build()
+      def rightNode = dummyUser().withIntegerList([5]).build()
+
+      when:
+      def change = levenshteinListChangeAppender().calculateChanges(
+              realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
+
+      then:
+      assertThat(change)
+              .hasSize(1)
+              .hasValueAdded(0, 5)
+    }
+
     def "should find changed and added element"() {
         when:
         def leftNode = dummyUser().withIntegerList([0, 1, 2, 4]).build()
