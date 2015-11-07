@@ -10,6 +10,7 @@ import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TimerTask;
 
 /**
  * @author bartosz walacik
@@ -28,6 +29,16 @@ public class ReflectionUtil {
         catch (Throwable ex) {
             // Class or one of its dependencies is not present...
             return false;
+        }
+    }
+
+    public static Object invokeGetter(Object target, String getterName) {
+        Validate.argumentsAreNotNull(target, getterName);
+        try {
+            Method m = target.getClass().getMethod(getterName, new Class[]{});
+            return m.invoke(target, new Object[]{});
+        }catch (Exception e ) {
+            throw new JaversException(e);
         }
     }
 
@@ -160,8 +171,8 @@ public class ReflectionUtil {
      * for example: Map<String, String> -> Map
      */
     public static Class extractClass(Type javaType) {
-        if (javaType instanceof ParameterizedType &&
-                ((ParameterizedType)javaType).getRawType() instanceof Class){
+        if (javaType instanceof ParameterizedType
+                && ((ParameterizedType)javaType).getRawType() instanceof Class){
             return (Class)((ParameterizedType)javaType).getRawType();
         }  else if (javaType instanceof Class) {
             return (Class)javaType;

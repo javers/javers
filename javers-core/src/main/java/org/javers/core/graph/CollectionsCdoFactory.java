@@ -7,7 +7,6 @@ import org.javers.core.metamodel.object.CdoWrapper;
 import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.PropertyScanner;
-import org.javers.core.metamodel.type.ValueObject;
 import org.javers.core.metamodel.type.ValueObjectType;
 
 /**
@@ -27,7 +26,7 @@ public class CollectionsCdoFactory {
         Property primaryProperty = propertyScanner.scan(wrapper.getClass()).get(0);
         JaversMember javersMember = memberGenericTypeInjector.create(primaryProperty, clazz);
         Property fixedProperty = new Property(javersMember, false);
-        ValueObjectType valueObject = new ValueObjectType(new ValueObject(wrapper.getClass(), Lists.asList(fixedProperty)));
+        ValueObjectType valueObject = new ValueObjectType(wrapper.getClass(), Lists.asList(fixedProperty));
         return new CdoWrapper(wrapper, new UnboundedValueObjectId(valueObject));
     }
 }

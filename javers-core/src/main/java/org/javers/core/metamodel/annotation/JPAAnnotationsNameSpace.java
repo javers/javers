@@ -2,6 +2,7 @@ package org.javers.core.metamodel.annotation;
 
 import org.javers.common.collections.Sets;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -26,5 +27,10 @@ class JPAAnnotationsNameSpace implements AnnotationsNameSpace {
     @Override
     public Set<String> getTransientPropertyAliases() {
         return Sets.asSet("Transient");
+    }
+
+    @Override
+    public Set<String> getTypeNameAliases() {
+        return Collections.emptySet();
     }
 }

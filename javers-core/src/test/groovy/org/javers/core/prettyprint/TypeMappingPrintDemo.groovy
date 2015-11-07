@@ -33,7 +33,7 @@ class TypeMappingPrintDemo extends Specification {
         Person person = new Person("bob", "Uncle Bob");
 
         System.out.println("Bob's properties:");
-        for (Property p : jType.getManagedClass().getProperties()){
+        for (Property p : jType.getProperties()){
             Object value = p.get(person);
             System.out.println( "property:"+ p.getName() +", value:"+value );
         }

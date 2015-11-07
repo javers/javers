@@ -4,11 +4,7 @@ import com.google.gson.reflect.TypeToken
 import org.bson.types.ObjectId
 import org.javers.core.cases.MongoStoredEntity
 import org.javers.core.metamodel.clazz.*
-import org.javers.core.model.AbstractDummyUser
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyEntityWithEmbeddedId
-import org.javers.core.model.DummyPoint
-import org.javers.core.model.DummyUser
+import org.javers.core.model.*
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -47,10 +43,11 @@ public class TypeMapperIntegrationTest extends Specification {
         mapper.registerClientsClass(new EntityDefinition(JpaEmbeddable,"some"))
 
         when:
-        EntityType jType = mapper.getJaversType(JpaEmbeddable)
+        def jType = mapper.getJaversType(JpaEmbeddable)
 
         then:
-        jType.managedClass.idProperty.name == "some"
+        jType.class == EntityType
+        jType.idProperty.name == "some"
     }
 
     def "should map as ValueObject by default"() {

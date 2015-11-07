@@ -9,8 +9,8 @@ import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
-import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.GraphFactoryModule;
+import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.TailoredJaversMemberFactoryModule;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
@@ -124,7 +124,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * Registers an {@link Entity}.
+     * Registers an {@link EntityType}.
      * Use @Id annotation to mark exactly one Id-property.
      * <br/><br/>
      *
@@ -138,7 +138,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * Registers an {@link Entity}. <br/>
+     * Registers an {@link EntityType}. <br/>
      * Use this method if you are not willing to use annotations to mark Id-property
      * and ignored properties.
      *
