@@ -105,7 +105,7 @@ public class EmployeeHierarchiesDiffExample {
 
   /** {@link NewObject} example, large structure */
   @Test
-  public void shouldDetectFiredForLargeDepthStructure() {
+  public void shouldDetectFiredInLargeDepthStructure() {
     //given
     Javers javers = JaversBuilder.javers().build();
 
