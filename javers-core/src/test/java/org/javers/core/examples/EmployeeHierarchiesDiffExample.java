@@ -3,13 +3,9 @@ package org.javers.core.examples;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.NewObject;
-import org.javers.core.diff.changetype.ObjectRemoved;
-import org.javers.core.diff.changetype.ReferenceChange;
-import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.*;
 import org.javers.core.examples.model.Employee;
 import org.junit.Test;
-
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class EmployeeHierarchiesDiffExample {
