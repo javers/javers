@@ -18,6 +18,7 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId;
  *
  * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
  * @author bartosz.walacik
+ * @author michael.igler
  */
 public class QueryBuilder {
     private static int DEFAULT_LIMIT = 100;
@@ -26,12 +27,25 @@ public class QueryBuilder {
     private boolean newObjectChanges;
     private final List<Filter> filters = new ArrayList<>();
 
+    private QueryBuilder(List<Filter> filters) {
+        this.filters.addAll(filters);
+    }
+
     private QueryBuilder(Filter initialFilter) {
         addFilter(initialFilter);
     }
 
-    public static QueryBuilder byClass(Class requiredClass){
-        return new QueryBuilder(new ClassFilter(requiredClass));
+    public static QueryBuilder byClass(Class... requiredClasses){
+
+        List<Filter> filters = new ArrayList<>();
+
+        for (Class requiredClass : requiredClasses) {
+            filters.add(new ClassFilter(requiredClass));
+        }
+
+        QueryBuilder queryBuilder = new QueryBuilder(filters);
+
+        return queryBuilder;
     }
 
     public static QueryBuilder byInstanceId(Object localId, Class entityClass){

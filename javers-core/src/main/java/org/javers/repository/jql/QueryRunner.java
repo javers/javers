@@ -79,7 +79,7 @@ public class QueryRunner {
                     query.getPropertyName(), query.isNewObjectChanges(), query.getLimit());
         }
 
-        if (query.isClassOnlyQuery()){
+        if (query.isClassOnlyQuery() || query.isClassesQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
             return repository.getChangeHistory(mType, query.isNewObjectChanges(), query.getLimit());
         }
