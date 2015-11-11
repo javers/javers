@@ -4,6 +4,7 @@ import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
+import org.javers.core.examples.model.Person
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
@@ -56,6 +57,40 @@ class JqlExample extends Specification {
         then:
         printChanges(changes)
         assert changes.size() == 2
+    }
+
+    def "should query for ValueObject changes when stored in a List"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        javers.commit("author",
+                new Person(login: "bob", addresses: [new Address(city: "London"), new Address(city: "Luton")]))
+        javers.commit("author",
+                new Person(login: "bob", addresses: [new Address(city: "Paris"), new Address(city: "Luton")]))
+
+        when:
+        def changes = javers
+                .findChanges(QueryBuilder.byValueObject(Person.class, "addresses/0").build())
+
+        then:
+        printChanges(changes)
+        assert changes.size() == 1
+    }
+
+    def "should query for ValueObject changes when stored as Map values"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        javers.commit("author", new Person(login: "bob", addressMap: ["HOME":new Address(city: "Paris")]))
+        javers.commit("author", new Person(login: "bob", addressMap: ["HOME":new Address(city: "London")]))
+
+        when:
+        def changes = javers
+            .findChanges(QueryBuilder.byValueObject(Person.class, "addressMap/HOME").build())
+
+        then:
+        printChanges(changes)
+        assert changes.size() == 1
     }
 
     def "should query for Object changes by its class"() {
