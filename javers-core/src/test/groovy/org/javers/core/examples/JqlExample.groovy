@@ -70,7 +70,7 @@ class JqlExample extends Specification {
 
         when:
         def changes = javers
-                .findChanges(QueryBuilder.byValueObject(Person.class, "addresses/0").build())
+                .findChanges(QueryBuilder.byValueObjectId("bob",Person.class, "addresses/0").build())
 
         then:
         printChanges(changes)
@@ -86,7 +86,7 @@ class JqlExample extends Specification {
 
         when:
         def changes = javers
-            .findChanges(QueryBuilder.byValueObject(Person.class, "addressMap/HOME").build())
+            .findChanges(QueryBuilder.byValueObjectId("bob", Person.class, "addressMap/HOME").build())
 
         then:
         printChanges(changes)

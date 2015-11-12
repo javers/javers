@@ -62,7 +62,7 @@ public enum JaversExceptionCode {
     CLASS_NOT_FOUND(JaversException.RUNTIME_ERROR+"class not found - '%s'") ,
 
     CANT_EXTRACT_CHILD_VALUE_OBJECT(JaversException.RUNTIME_ERROR+"error while extracting child ValueObject from '%s'" +
-            ", invalid property type, expected ValueObjectType or ContainerType<ValueObjectType>, got '%s'"),
+            ", invalid property type, expected ValueObjectType, ContainerType<ValueObjectType> or MapType<?,ValueObjectType>, got '%s'"),
 
     CANT_PARSE_COMMIT_ID(JaversException.RUNTIME_ERROR+"can't parse given value {'%s'} to CommitId. " +
             "CommitId should consists of two parts : majorId.minorId e.g. 1.0"),

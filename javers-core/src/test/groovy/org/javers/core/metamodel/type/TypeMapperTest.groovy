@@ -225,21 +225,23 @@ class TypeMapperTest extends Specification {
         given:
         def snapshotEntity = mapper.getJaversType(SnapshotEntity)
 
-        when:
-        def vo = mapper.getChildValueObject(snapshotEntity, "valueObjectRef")
-
-        then:
-        vo.baseJavaClass == DummyAddress
+        expect:
+        mapper.getChildValueObject(snapshotEntity, "valueObjectRef").baseJavaClass == DummyAddress
     }
 
     def "should return child ValueObject for List of ValueObjectType"() {
         given:
         def snapshotEntity = mapper.getJaversType(SnapshotEntity)
 
-        when:
-        def vo = mapper.getChildValueObject(snapshotEntity, "listOfValueObjects")
+        expect:
+        mapper.getChildValueObject(snapshotEntity, "listOfValueObjects").baseJavaClass == DummyAddress
+    }
 
-        then:
-        vo.baseJavaClass == DummyAddress
+    def "should return child ValueObject for Map with ValueObjectType values"() {
+        given:
+        def snapshotEntity = mapper.getJaversType(SnapshotEntity)
+
+        expect:
+        mapper.getChildValueObject(snapshotEntity, "mapPrimitiveToVO").baseJavaClass == DummyAddress
     }
 }
