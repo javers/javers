@@ -77,8 +77,8 @@ class ReflectionUtilTest extends Specification {
 
         where:
         memberType | action
-        "Method"   | { ReflectionUtil.getAllMethods(ConcreteWithActualType)[0] }
-        "Field"    | { ReflectionUtil.getAllFields(ConcreteWithActualType)[0] }
+        "Method"   | { ReflectionUtil.getAllMethods(ConcreteWithActualType).find{it.name() == "getValue"} }
+        "Field"    | { ReflectionUtil.getAllFields(ConcreteWithActualType).find{it.name() == "value"} }
     }
 
     def "should return empty list when type is not generic"() {
