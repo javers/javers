@@ -91,6 +91,11 @@ public class JqlQuery<T> {
         return hasFilter(ClassFilter.class) && filters.size() == 1;
     }
 
+    // Not sure if we want to merge this into isClassOnlyQuery()?
+    boolean isClassesQuery() {
+        return hasFilter(ClassFilter.class) && filters.size() > 1;
+    }
+
     boolean isClassAndPropertyQuery(){
         return hasFilter(ClassFilter.class) && hasFilter(PropertyFilter.class);
     }
