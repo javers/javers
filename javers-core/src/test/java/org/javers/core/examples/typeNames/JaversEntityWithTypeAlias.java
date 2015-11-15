@@ -1,4 +1,4 @@
-package org.javers.core.metamodel.clazz;
+package org.javers.core.examples.typeNames;
 
 import org.javers.core.metamodel.annotation.Entity;
 import org.javers.core.metamodel.annotation.Id;

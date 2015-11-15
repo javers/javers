@@ -19,6 +19,7 @@ import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
 import org.javers.core.metamodel.annotation.AnnotationsModule;
 import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
 import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.clazz.EntityDefinition.EntityDefinitionBuilder;
 import org.javers.core.metamodel.object.GlobalIdFactory;
@@ -121,6 +122,16 @@ public class JaversBuilder extends AbstractJaversBuilder {
     public JaversBuilder registerJaversRepository(JaversRepository repository){
         argumentsAreNotNull(repository);
         this.repository = repository;
+        return this;
+    }
+
+    /**
+     * Scans given packages and looks for classes with {@link TypeName}
+     * annotation.
+     *
+     * @param packageNames list of package names
+     */
+    public JaversBuilder registerPackagesToScan(String... packageNames){
         return this;
     }
 

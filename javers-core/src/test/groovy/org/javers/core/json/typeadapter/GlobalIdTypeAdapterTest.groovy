@@ -5,7 +5,7 @@ import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.metamodel.annotation.TypeName
 import org.javers.core.metamodel.clazz.JaversEntity
-import org.javers.core.metamodel.clazz.JaversEntityWithTypeAlias
+import org.javers.core.examples.typeNames.JaversEntityWithTypeAlias
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId

@@ -5,9 +5,9 @@ import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.MappingStyle
 import org.javers.core.metamodel.clazz.EntityDefinition
 import org.javers.core.metamodel.clazz.JaversEntity
-import org.javers.core.metamodel.clazz.JaversEntityWithTypeAlias
+import org.javers.core.examples.typeNames.JaversEntityWithTypeAlias
 import org.javers.core.metamodel.clazz.JaversValue
-import org.javers.core.metamodel.clazz.JaversValueObjectWithTypeAlias
+import org.javers.core.examples.typeNames.JaversValueObjectWithTypeAlias
 import org.javers.core.metamodel.clazz.ValueObjectDefinition
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser

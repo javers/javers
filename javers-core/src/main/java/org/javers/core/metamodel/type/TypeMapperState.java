@@ -140,6 +140,6 @@ class TypeMapperState {
     }
 
     Optional<Class> getTypeByName(String typeName) {
-        return null;
+        return Optional.empty();
     }
 }

@@ -50,8 +50,17 @@ class JaversTestBuilder {
         javersBuilder.registerJaversRepository(javersRepository).build()
     }
 
+    private JaversTestBuilder (String packageToScan) {
+        javersBuilder = new JaversBuilder()
+        javersBuilder.registerPackagesToScan(packageToScan).build()
+    }
+
     static JaversTestBuilder javersTestAssembly(){
         new JaversTestBuilder(MappingStyle.FIELD)
+    }
+
+    static JaversTestBuilder javersTestAssembly(String packageToScan){
+        new JaversTestBuilder(packageToScan)
     }
 
     static JaversTestBuilder javersTestAssembly(JaversRepository javersRepository){

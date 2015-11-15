@@ -3,6 +3,7 @@ package org.javers.core.metamodel.type
 import com.google.gson.reflect.TypeToken
 import org.bson.types.ObjectId
 import org.javers.core.cases.MongoStoredEntity
+import org.javers.core.examples.typeNames.JaversEntityWithTypeAlias
 import org.javers.core.metamodel.clazz.*
 import org.javers.core.model.*
 import spock.lang.Specification
@@ -19,17 +20,16 @@ import static org.javers.core.metamodel.clazz.EntityDefinition.EntityDefinitionB
  */
 public class TypeMapperIntegrationTest extends Specification {
 
-    /*
-  //TODO
     def "should find EntityType by typeName when class has @TypeName annotation and its package is registered"(){
         given:
-        def mapper = javersTestAssembly().typeMapper
+        def mapper = javersTestAssembly("org.javers.core.metamodel.clazz").typeMapper
 
         when:
+        def type = mapper.getEntityByName("myName")
 
         then:
+        type.baseJavaClass == JaversEntityWithTypeAlias
     }
-    */
 
     def "should find EntityType by typeName when class is registered using EntityDefinition"(){
         given:

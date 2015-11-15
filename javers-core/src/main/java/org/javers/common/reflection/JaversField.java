@@ -1,6 +1,7 @@
 package org.javers.common.reflection;
 
-import org.javers.common.exception.JaversGetterException;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -33,7 +34,8 @@ public class JaversField extends JaversMember<Field> {
         try {
             return getRawMember().get(onObject);
         } catch (IllegalAccessException | IllegalArgumentException e) {
-            throw new JaversGetterException("error getting value from the field {"+ this +"}, " + e.getClass().getName()+": "+e.getMessage());
+            throw new JaversException(JaversExceptionCode.PROPERTY_ACCESS_ERROR,
+                  this, onObject.getClass().getSimpleName(), e.getClass().getName()+": "+e.getMessage());
         }
     }
 

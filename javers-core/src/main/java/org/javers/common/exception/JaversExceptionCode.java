@@ -23,6 +23,8 @@ public enum JaversExceptionCode {
 
     ALREADY_BUILT(JaversException.BOOTSTRAP_ERROR + "instance already built, each AbstractJaversBuilder may produce only one target instance"),
 
+    PROPERTY_ACCESS_ERROR(JaversException.RUNTIME_ERROR +"error getting value from property '%s' on target object of type '%s', cause: %s"),
+
     CONTAINER_NOT_READY(JaversException.BOOTSTRAP_ERROR +"pico container is not ready"),
 
     AFFECTED_CDO_IS_NOT_AVAILABLE(JaversException.RUNTIME_ERROR +"affected cdo is not available, you can access it only for freshly generated diffs"),
@@ -50,7 +52,7 @@ public enum JaversExceptionCode {
     PROPERTY_NOT_FOUND(JaversException.RUNTIME_ERROR +"property '%s' not found in class '%s'"),
 
     TYPE_NAME_NOT_FOUND(JaversException.RUNTIME_ERROR + "type name '%s' not found." +
-            " If you are using @TypeName annotation, remember to register your packages to scan using JaversBuilder.scanTypeNames()." +
+            " If you are using @TypeName annotation, remember to register your packages-to-scan using JaversBuilder.registerPackagesToScan()." +
             " Alternatively you can register a type name using JaversBuilder.registerEntity()."),
 
     MANAGED_CLASS_MAPPING_ERROR(JaversException.RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, expected %s"),
