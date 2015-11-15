@@ -33,7 +33,9 @@ public class JaversField extends JaversMember<Field> {
 
         try {
             return getRawMember().get(onObject);
-        } catch (IllegalAccessException | IllegalArgumentException e) {
+        } catch (IllegalArgumentException ie){
+            throw new JaversException(JaversExceptionCode.MISSING_PROPERTY, this, ie.getClass().getName());
+        } catch (IllegalAccessException e) {
             throw new JaversException(JaversExceptionCode.PROPERTY_ACCESS_ERROR,
                   this, onObject.getClass().getSimpleName(), e.getClass().getName()+": "+e.getMessage());
         }

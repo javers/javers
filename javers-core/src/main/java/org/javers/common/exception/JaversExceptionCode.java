@@ -29,8 +29,7 @@ public enum JaversExceptionCode {
 
     AFFECTED_CDO_IS_NOT_AVAILABLE(JaversException.RUNTIME_ERROR +"affected cdo is not available, you can access it only for freshly generated diffs"),
 
-    MISSING_PROPERTY(JaversException.RUNTIME_ERROR + "Looks like you are comparing two objects with different types. " +
-            "There is no property '%s' in type '%s'."),
+    MISSING_PROPERTY(JaversException.RUNTIME_ERROR + "There is no property '%s' in type '%s'."),
 
     NOT_IMPLEMENTED(JaversException.RUNTIME_ERROR + "not implemented"),
 

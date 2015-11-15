@@ -34,26 +34,12 @@ public class RealNodePair implements NodePair {
 
     @Override
     public Object getLeftPropertyValue(Property property) {
-        return getPropertyValueEvenIfMissing(left, property);
+        return left.getPropertyValue(property);
     }
 
     @Override
     public Object getRightPropertyValue(Property property) {
-        return getPropertyValueEvenIfMissing(right, property);
-    }
-
-    /**
-     * Converts JaversException.MISSING_PROPERTY to null value
-     */
-    private Object getPropertyValueEvenIfMissing(ObjectNode source, Property property) {
-        try {
-            return source.getPropertyValue(property);
-        } catch (JaversException e) {
-            if (e.getCode() == JaversExceptionCode.MISSING_PROPERTY) {
-                return null;
-            }
-            throw e;
-        }
+        return right.getPropertyValue(property);
     }
 
     @Override

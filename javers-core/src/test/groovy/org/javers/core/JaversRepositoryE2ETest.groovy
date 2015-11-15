@@ -446,20 +446,19 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
-    def "should manage property added to ValueObject"(){
+    def "should manage ValueObject class name refactor"(){
         when:
         javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  5)))
         javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  10)))
         javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  15)))
 
         def changes = javers.findChanges(QueryBuilder.byValueObject(EntityWithRefactoredValueObject,"value").build())
+        println changes
 
         then:
-        changes.size() == 1
-        ValueChange change = changes[0]
-        change.propertyName == "newField"
-        change.left == 10
-        change.right == 15
+        changes.size() == 2
+        changes.find {it.propertyName == "oldField"}.right == 0 //removed properties are treated as nulls
+        changes.find {it.propertyName == "newField"}.right == 15
     }
 
     def "should manage Entity class name refactor"(){
@@ -473,21 +472,6 @@ class JaversRepositoryE2ETest extends Specification {
       changes.size() == 1
       ValueChange change = changes[0]
       change.propertyName == "value"
-      change.left == 5
-      change.right == 15
-    }
-
-    def "should manage ValueObject class name refactor"(){
-      when:
-      javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  6)))
-      javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(15, 6)))
-
-      def changes = javers.findChanges(QueryBuilder.byValueObject(EntityWithRefactoredValueObject,"value").build())
-
-      then:
-      changes.size() == 1
-      ValueChange change = changes[0]
-      change.propertyName == "someValue"
       change.left == 5
       change.right == 15
     }

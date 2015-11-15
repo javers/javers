@@ -56,7 +56,7 @@ class SnapshotFactoryTest extends Specification{
 
         when:
         cdo.arrayOfIntegers = null
-        def updateSnapshot = snapshotFactory.createUpdate(cdo, prevSnapshot, someCommitMetadata())
+        def updateSnapshot = snapshotFactory.createUpdate(cdo, id, prevSnapshot, someCommitMetadata())
 
         then:
         updateSnapshot.changed.collect{it.name} == ["arrayOfIntegers"]
@@ -73,7 +73,7 @@ class SnapshotFactoryTest extends Specification{
         when:
         cdo.arrayOfIntegers[0] = 2
         cdo.arrayOfInts[0] = 2
-        def updateSnapshot = snapshotFactory.createUpdate(cdo, prevSnapshot, someCommitMetadata())
+        def updateSnapshot = snapshotFactory.createUpdate(cdo, id, prevSnapshot, someCommitMetadata())
 
         then:
         updateSnapshot.changed.collect{it.name} as Set == ["arrayOfIntegers","arrayOfInts"] as Set
@@ -81,7 +81,7 @@ class SnapshotFactoryTest extends Specification{
         when:
         prevSnapshot = updateSnapshot
         cdo.entityRef = new SnapshotEntity(id:3)
-        updateSnapshot = snapshotFactory.createUpdate(cdo, prevSnapshot, someCommitMetadata())
+        updateSnapshot = snapshotFactory.createUpdate(cdo, id, prevSnapshot, someCommitMetadata())
 
         then:
         updateSnapshot.changed.collect{it.name} == ["entityRef"]
@@ -89,7 +89,7 @@ class SnapshotFactoryTest extends Specification{
         when:
         prevSnapshot = updateSnapshot
         cdo.dob = new LocalDate()
-        updateSnapshot = snapshotFactory.createUpdate(cdo, prevSnapshot, someCommitMetadata())
+        updateSnapshot = snapshotFactory.createUpdate(cdo, id, prevSnapshot, someCommitMetadata())
 
         then:
         updateSnapshot.changed.collect{it.name} == ["dob"]

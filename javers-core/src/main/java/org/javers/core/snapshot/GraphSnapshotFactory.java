@@ -61,8 +61,7 @@ class GraphSnapshotFactory {
             return snapshotFactory.createInitial(liveCdo, node.getGlobalId(), commitMetadata);
         }
         else{
-            //we take previous globalId because it could be PersistentGlobalId
-            return snapshotFactory.createUpdate(liveCdo, previous.get(), commitMetadata);
+            return snapshotFactory.createUpdate(liveCdo, node.getGlobalId(), previous.get(), commitMetadata);
         }
     }
 

@@ -36,8 +36,8 @@ public class SnapshotFactory {
                 .build();
     }
 
-    public CdoSnapshot createUpdate(Object liveCdo, CdoSnapshot previous, CommitMetadata commitMetadata) {
-        return createSnapshotState(liveCdo, previous.getGlobalId(), commitMetadata)
+    public CdoSnapshot createUpdate(Object liveCdo, GlobalId globalId, CdoSnapshot previous, CommitMetadata commitMetadata) {
+        return createSnapshotState(liveCdo, globalId, commitMetadata)
                 .withType(UPDATE)
                 .markChanged(previous)
                 .build();
