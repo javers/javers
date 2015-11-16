@@ -1,5 +1,6 @@
 package org.javers.core
 
+import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.typeNames.*
 import org.javers.core.model.*
@@ -475,4 +476,19 @@ class JaversRepositoryE2ETest extends Specification {
       change.left == 5
       change.right == 15
     }
+    def "should do diff and persist commit when class has complex Generic fields inherited from Generic superclass"() {
+        given:
+        javers.commit("author", new ConcreteWithActualType("a", ["1"]) )
+        javers.commit("author", new ConcreteWithActualType("a", ["1","2"]) )
+
+        when:
+        def changes = javers.findChanges(QueryBuilder.byClass(ConcreteWithActualType).build())
+
+        then:
+        def change = changes[0]
+        change.changes[0].index == 1
+        change.changes[0].addedValue instanceof String
+        change.changes[0].addedValue == "2"
+    }
+
 }

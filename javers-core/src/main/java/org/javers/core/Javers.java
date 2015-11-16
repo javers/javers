@@ -104,19 +104,31 @@ public interface Javers {
      * Diffs can be converted to JSON with {@link Javers#toJson(Diff)} or pretty-printed with {@link Diff#prettyPrint()}
      * </p>
      *
-     * @see <a href="http://javers.org/documentation/diff-examples/">http://javers.org/documentation/diff-examples</a>
+     * @see <a href="http://javers.org/documentation/diff-examples/">
+     *     http://javers.org/documentation/diff-examples</a>
      */
     Diff compare(Object oldVersion, Object currentVersion);
 
     /**
-     * Deeply compares two collections.
+     * Deeply compares two top-level collections.
      * <br/><br/>
      *
      * Introduced due to the lack of possibility to statically
-     * determine type of collection items when two collections are passed to
-     * {@link #compare(Object, Object)}
+     * determine type of collection items when two top-level collections are passed as references to
+     * {@link #compare(Object, Object)}.
+     * <br/><br/>
+     *
+     * Usage example:
+     * <pre>
+     * List&lt;Person&gt; oldList = ...
+     * List&lt;Person&gt; newList = ...
+     * Diff diff = javers.compareCollections(oldList, newList, Person.class);
+     * </pre>
+     *
+     * @see <a href="http://javers.org/documentation/diff-examples/#compare-collections">
+     *     Compare top-level collections</a> example
      */
-    <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz);
+    <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> itemClass);
 
     /**
      * Initial diff is a kind of snapshot of given domain object graph.

@@ -1,5 +1,6 @@
 package org.javers.core.diff.appenders.levenshtein;
 
+import org.javers.common.collections.Lists;
 import org.javers.common.collections.Objects;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.EqualsFunction;
@@ -14,6 +15,8 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
 import java.util.List;
+
+import static org.javers.common.collections.Lists.wrapNull;
 
 /**
  * @author kornel kiełczewski
@@ -37,8 +40,8 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
     @Override
     public ListChange calculateChanges(final NodePair pair, final Property property) {
 
-        final List leftList = (List) pair.getLeftPropertyValue(property);
-        final List rightList = (List) pair.getRightPropertyValue(property);
+        final List leftList =  wrapNull( (List) pair.getLeftPropertyValue(property) );
+        final List rightList = wrapNull((List) pair.getRightPropertyValue(property));
 
         EqualsFunction equalsFunction = createDehydratingEqualsFunction(pair, property);
         Backtrack backtrack = new Backtrack(equalsFunction);

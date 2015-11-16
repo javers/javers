@@ -170,7 +170,7 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> clazz) {
-        return diffFactory.compareCollections(oldVersion, currentVersion, clazz);
+    public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> itemClass) {
+        return diffFactory.compareCollections(oldVersion, currentVersion, itemClass);
     }
 }

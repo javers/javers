@@ -39,11 +39,56 @@ public class QueryBuilder {
         return new QueryBuilder(new IdFilter(instanceId(localId, entityClass)));
     }
 
+    /**
+     * Query for selecting changes (or snapshots)
+     * made on all ValueObjects at given path, owned by any instance of given Entity.
+     * <br/><br/>
+     *
+     * See Path parameter hints in {@link #byValueObjectId(Object, Class, String)}.
+     */
     public static QueryBuilder byValueObject(Class ownerEntityClass, String path){
         Validate.argumentsAreNotNull(ownerEntityClass, path);
         return new QueryBuilder(new VoOwnerFilter(ownerEntityClass, path));
     }
 
+    /**
+     * Query for selecting changes (or snapshots) made on a concrete ValueObject
+     * (so a ValueObject owned by a concrete Entity instance).
+     * <br/><br/>
+     *
+     * <b>Path parameter</b> is a relative path from owning Entity instance to ValueObject that you are looking for.
+     * <br/><br/>
+     *
+     * When ValueObject is just <b>a property</b>, use propertyName. For example:
+     * <pre>
+     * class Employee {
+     *     &#64;Id String name;
+     *     Address primaryAddress;
+     * }
+     * ...
+     * javers.findChanges( QueryBuilder.byValueObjectId("bob", Employee.class, "primaryAddress").build() );
+     * </pre>
+     *
+     * When ValueObject is stored in <b>a List</b>, use propertyName and list index separated by "/", for example:
+     * <pre>
+     * class Employee {
+     *     &#64;Id String name;
+     *     List&lt;Address&gt; addresses;
+     * }
+     * ...
+     * javers.findChanges( QueryBuilder.byValueObjectId("bob", Employee.class, "addresses/0").build() );
+     * </pre>
+     *
+     * When ValueObject is stored as <b>a Map value</b>, use propertyName and map key separated by "/", for example:
+     * <pre>
+     * class Employee {
+     *     &#64;Id String name;
+     *     Map&lt;String,Address&gt; addressMap;
+     * }
+     * ...
+     * javers.findChanges( QueryBuilder.byValueObjectId("bob", Employee.class, "addressMap/HOME").build() );
+     * </pre>
+     */
     public static QueryBuilder byValueObjectId(Object ownerLocalId, Class ownerEntityClass, String path){
         Validate.argumentsAreNotNull(ownerEntityClass, ownerLocalId, path);
         return new QueryBuilder(new IdFilter(ValueObjectIdDTO.valueObjectId(ownerLocalId, ownerEntityClass, path)));

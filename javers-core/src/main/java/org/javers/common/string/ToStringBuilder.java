@@ -2,6 +2,7 @@ package org.javers.common.string;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
 
 import static org.javers.common.validation.Validate.argumentCheck;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -32,6 +33,23 @@ public class ToStringBuilder {
         }
     }
 
+    public static String listToString(List list){
+        if (list == null || list.size() == 0){
+            return "[]";
+        }
+
+        StringBuilder out = new StringBuilder();
+        for (int i=0; i<list.size(); i++){
+            if (i==0){
+                out.append( list.get(i) );
+            }
+            else{
+                out.append( ","+list.get(i) );
+            }
+        }
+
+        return "[" + out.toString() + "]";
+    }
 
     public static String toStringSimple(Object... fieldsMap){
         argumentCheck(fieldsMap.length % 2 == 0, "map expected");
