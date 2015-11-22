@@ -6,7 +6,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 /**
  * @author bartosz.walacik
  */
-@TypeName("OldEntity")
+@TypeName("org.javers.core.examples.typeNames.OldEntity")
 public class NewEntity {
     @Id
     private int id;

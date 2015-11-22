@@ -448,15 +448,14 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
-    @Ignore
-    def "should manage ValueObject class name refactor"(){
+
+    def "should manage ValueObject class name refactor without TypeName when querying by owning Instance"(){
         when:
         javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  5)))
         javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  10)))
         javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  15)))
 
         def changes = javers.findChanges(QueryBuilder.byValueObject(EntityWithRefactoredValueObject,"value").build())
-        println changes
 
         then:
         changes.size() == 2
@@ -464,8 +463,19 @@ class JaversRepositoryE2ETest extends Specification {
         changes.find {it.propertyName == "newField"}.right == 15
     }
 
-    @Ignore
-    def "should manage Entity class name refactor"(){
+    def "should manage ValueObject class name refactor when querying using new class with TypeName"(){
+        when:
+        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  10)))
+        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewNamedValueObject(6,  10)))
+
+        def changes = javers.findChanges(QueryBuilder.byClass(NewNamedValueObject).build())
+
+        then:
+        changes.size() == 1
+        changes.find {it.propertyName == "someField"}.right == 6
+    }
+
+    def "should manage Entity class name refactor when querying using new class with TypeName"(){
       when:
       javers.commit("author", new OldEntity(id:1, value:5))
       javers.commit("author", new NewEntity(id:1, value:15))
@@ -474,11 +484,9 @@ class JaversRepositoryE2ETest extends Specification {
 
       then:
       changes.size() == 1
-      ValueChange change = changes[0]
-      change.propertyName == "value"
-      change.left == 5
-      change.right == 15
+      changes.find {it.propertyName == "value"}.right == 15
     }
+
     def "should do diff and persist commit when class has complex Generic fields inherited from Generic superclass"() {
         given:
         javers.commit("author", new ConcreteWithActualType("a", ["1"]) )

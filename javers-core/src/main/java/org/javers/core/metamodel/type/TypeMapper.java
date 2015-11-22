@@ -1,6 +1,5 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
@@ -93,25 +92,6 @@ public class TypeMapper {
         argumentIsNotNull(javaType);
 
         return state.getJaversType(javaType);
-    }
-
-    /**
-     * facade for {@link #getTypeByName(String)} and {@link #getJaversManagedType(Class, Class)}
-     */
-    public EntityType getEntityByName(String typeName){
-        return getJaversManagedType(getTypeByName(typeName), EntityType.class);
-    }
-
-    /**
-     * @throws {@link JaversExceptionCode#TYPE_NAME_NOT_FOUND} if given name is not mapped to {@link JaversType}
-     */
-    private Class getTypeByName(String typeName){
-        Optional<Class> type = state.getTypeByName(typeName);
-        if (type.isPresent()){
-            return type.get();
-        }
-
-        throw new JaversException(JaversExceptionCode.TYPE_NAME_NOT_FOUND, typeName);
     }
 
     /**

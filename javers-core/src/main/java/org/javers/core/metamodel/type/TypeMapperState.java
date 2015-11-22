@@ -17,7 +17,6 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz.walacik
  */
 class TypeMapperState {
-    private final TypeMapperNames typeNames = new TypeMapperNames();
     private final Map<Type, JaversType> mappedTypes = new ConcurrentHashMap<>();
     private final TypeFactory typeFactory;
     private final ValueType OBJECT_TYPE = new ValueType(Object.class);
@@ -29,7 +28,7 @@ class TypeMapperState {
     JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
 
-        if (javaType == Object.class){
+        if (javaType == Object.class) {
             return OBJECT_TYPE;
         }
 
@@ -53,14 +52,9 @@ class TypeMapperState {
         });
     }
 
-    void computeIfAbsent(final ClientsClassDefinition def){
+    void computeIfAbsent(final ClientsClassDefinition def) {
         computeIfAbsent(def.getBaseJavaClass(), new Function<Type, JaversType>() {
             public JaversType apply(Type ignored) {
-
-                if (def.hasTypeName()){
-                    typeNames.registerTypeName(def.getTypeName().get(), def.getBaseJavaClass());
-                }
-
                 return typeFactory.create(def);
             }
         });
@@ -69,10 +63,10 @@ class TypeMapperState {
     //synchronizes on map Key (javaType) only for map writes
     private JaversType computeIfAbsent(Type javaType, Function<Type, JaversType> computeFunction) {
 
-        synchronized (javaType){
+        synchronized (javaType) {
             //map.contains double check
             JaversType mappedType = mappedTypes.get(javaType);
-            if (mappedType != null){
+            if (mappedType != null) {
                 return mappedType;
             }
 
@@ -87,7 +81,7 @@ class TypeMapperState {
 
     /**
      * if type of given id-property is not already mapped, maps it as ValueType
-     *
+     * <p/>
      * must be called within synchronized block
      */
     private void inferIdPropertyTypeForEntityIfNeed(JaversType jType) {
@@ -132,14 +126,10 @@ class TypeMapperState {
 
         Collections.sort(distances);
 
-        if (distances.get(0).isMax()){
+        if (distances.get(0).isMax()) {
             return null;
         }
 
         return distances.get(0).getJaversType();
-    }
-
-    Optional<Class> getTypeByName(String typeName) {
-        return Optional.empty();
     }
 }

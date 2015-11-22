@@ -3,7 +3,6 @@ package org.javers.core.metamodel.type
 import com.google.gson.reflect.TypeToken
 import org.bson.types.ObjectId
 import org.javers.core.cases.MongoStoredEntity
-import org.javers.core.examples.typeNames.JaversEntityWithTypeAlias
 import org.javers.core.metamodel.clazz.*
 import org.javers.core.model.*
 import spock.lang.Specification
@@ -13,35 +12,11 @@ import javax.persistence.EmbeddedId
 import javax.persistence.Id
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.metamodel.clazz.EntityDefinition.EntityDefinitionBuilder.entityDefinition
 
 /**
  * @author bartosz walacik
  */
 public class TypeMapperIntegrationTest extends Specification {
-
-    def "should find EntityType by typeName when class has @TypeName annotation and its package is registered"(){
-        given:
-        def mapper = javersTestAssembly("org.javers.core.metamodel.clazz").typeMapper
-
-        when:
-        def type = mapper.getEntityByName("myName")
-
-        then:
-        type.baseJavaClass == JaversEntityWithTypeAlias
-    }
-
-    def "should find EntityType by typeName when class is registered using EntityDefinition"(){
-        given:
-        def mapper = javersTestAssembly().typeMapper
-
-        when:
-        mapper.registerClientsClass(entityDefinition(DummyUser).withTypeName("DummyType").build())
-        def type = mapper.getEntityByName("DummyType")
-
-        then:
-        type.baseJavaClass == DummyUser
-    }
 
     @Unroll
     def "should override Entity type inferred form annotations when ValueObject is explicitly registered for #queryClass.simpleName"() {
