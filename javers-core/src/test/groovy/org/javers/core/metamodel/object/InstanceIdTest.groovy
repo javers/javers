@@ -15,12 +15,7 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  */
 class InstanceIdTest extends Specification {
 
-    def setupSpec() {
-        typeFactory = javersTestAssembly(MappingStyle.FIELD).typeSpawningFactory
-    }
-
-    @Shared
-    def TypeFactory typeFactory
+    TypeFactory typeFactory = javersTestAssembly(MappingStyle.FIELD).typeSpawningFactory
 
     def "should build value() from class name and id.toString for primitive Id "() {
         given:

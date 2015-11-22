@@ -30,7 +30,7 @@ class InstanceIdDTOTypeAdapter implements JsonTypeAdapter<InstanceIdDTO>  {
             return JsonNull.INSTANCE;
         }
 
-        return context.serialize(globalIdFactory.createFromId(dtoId.getCdoId(), dtoId.getEntity()));
+        return context.serialize(globalIdFactory.createInstanceId(dtoId.getCdoId(), dtoId.getEntity()));
     }
 
     @Override

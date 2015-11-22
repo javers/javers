@@ -18,7 +18,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class UnboundedValueObjectId extends GlobalId {
-    public static final String UNBOUNDED_FRAGMENT = "/";
+    private static final String UNBOUNDED_FRAGMENT = "/";
 
     private transient final ValueObjectType valueObject;
 
@@ -35,14 +35,5 @@ public class UnboundedValueObjectId extends GlobalId {
     @Override
     public String value() {
         return valueObject.getName()+UNBOUNDED_FRAGMENT;
-    }
-
-    public String getFragment() {
-        return UNBOUNDED_FRAGMENT;
-    }
-
-    @Override
-    public Object getCdoId() {
-        return null;
     }
 }

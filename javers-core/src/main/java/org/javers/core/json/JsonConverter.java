@@ -5,7 +5,9 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.commit.CdoSnapshotStateDeserializer;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.CdoSnapshotState;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.joda.time.LocalDate;
@@ -88,16 +90,17 @@ public class JsonConverter {
     public GlobalId fromDto(GlobalIdRawDTO globalIdDTO) {
         Validate.argumentIsNotNull(globalIdDTO);
 
-        Class cdoClass = parseClass(globalIdDTO.getCdoClassName());
         if (globalIdDTO.isInstanceId()){
+            Class cdoClass = parseClass(globalIdDTO.getCdoClassName());
             EntityType entity = typeMapper.getJaversManagedType(cdoClass, EntityType.class);
             Object cdoId = fromJson(globalIdDTO.getLocalIdJSON(), entity.getIdProperty().getType());
-            return globalIdFactory.createFromId(cdoId, entity);
+            return globalIdFactory.createInstanceId(cdoId, cdoClass);
         } else if (globalIdDTO.isValueObjectId()){
             GlobalId ownerId = fromDto(globalIdDTO.getOwnerId());
-            return globalIdFactory.createFromPath(ownerId, cdoClass, globalIdDTO.getFragment());
+            return globalIdFactory.createValueObjectId(ownerId, globalIdDTO.getFragment());
         } else {
-            return globalIdFactory.createFromClass(cdoClass);
+            Class cdoClass = parseClass(globalIdDTO.getCdoClassName());
+            return globalIdFactory.createUnboundedValueObjectId(cdoClass);
         }
     }
 

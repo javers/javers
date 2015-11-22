@@ -94,7 +94,6 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     }
 
     def "should serialize state with value object in CdoSnapshot"() {
-
         given:
         def javers = javersTestAssembly()
         def id = javers.idBuilder().instanceId(1, DummyUserDetails)
@@ -108,7 +107,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.state.dummyAddress.valueObject == "org.javers.core.model.DummyAddress"
+        json.state.dummyAddress.fragment == "dummyAddress"
     }
 
     def "should serialize state with collections in CdoSnapshots"() {

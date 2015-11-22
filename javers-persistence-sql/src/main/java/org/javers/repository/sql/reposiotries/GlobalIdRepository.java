@@ -93,7 +93,7 @@ public class GlobalIdRepository {
             query.from(GLOBAL_ID_WITH_CDO_CLASS)
                 .where("g." + GLOBAL_ID_LOCAL_ID + " = :localId " +
                        "AND c." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName ")
-                .withArgument("localId", jsonConverter.toJson(globalId.getCdoId()))
+                .withArgument("localId", jsonConverter.toJson(((InstanceId)globalId).getCdoId()))
                 .withArgument("qualifiedName", globalId.getManagedType().getName());
         }
         else if (globalId instanceof UnboundedValueObjectId){
@@ -121,7 +121,7 @@ public class GlobalIdRepository {
                  .value(GLOBAL_ID_OWNER_ID_FK, ownerFk);
         }
         else if (globalId instanceof InstanceId){
-           query.value(GLOBAL_ID_LOCAL_ID, jsonConverter.toJson(globalId.getCdoId()));
+           query.value(GLOBAL_ID_LOCAL_ID, jsonConverter.toJson(((InstanceId)globalId).getCdoId()));
         }
 
         query.sequence(GLOBAL_ID_PK, GLOBAL_ID_PK_SEQ);

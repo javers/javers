@@ -39,9 +39,9 @@ public class InstanceId extends GlobalId {
     }
 
     /**
-     * Identifier of (client's) Entity <b>instance</b>, should be unique in Entity scope
+     * Identifier of (client's) Entity <b>instance</b>, should be unique in Entity scope.
+     * For example database primary key or any domain identifier like user.login
      */
-    @Override
     public Object getCdoId() {
         return cdoId;
     }

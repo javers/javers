@@ -50,15 +50,14 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
 
     private UnboundedValueObjectId parseUnboundedValueObject(JsonObject jsonObject){
         Class valueObjectClass = parseClass(jsonObject, VALUE_OBJECT_FIELD);
-        return globalIdFactory.createFromClass(valueObjectClass);
+        return globalIdFactory.createUnboundedValueObjectId(valueObjectClass);
     }
 
     private ValueObjectId parseValueObjectId(JsonObject jsonObject, JsonDeserializationContext context) {
-        Class valueObjectClass = parseClass(jsonObject, VALUE_OBJECT_FIELD);
         String fragment = jsonObject.get(FRAGMENT_FIELD).getAsString();
         GlobalId ownerId = context.deserialize(jsonObject.get(OWNER_ID_FIELD), GlobalId.class);
 
-        return globalIdFactory.createFromPath(ownerId, valueObjectClass, fragment);
+        return globalIdFactory.createValueObjectId(ownerId, fragment);
     }
 
     private InstanceId parseInstanceId(JsonObject jsonObject, JsonDeserializationContext context) {
@@ -67,7 +66,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
         JsonElement cdoIdElement = jsonObject.get(CDO_ID_FIELD);
         Object cdoId = context.deserialize(cdoIdElement, entity.getIdProperty().getType());
 
-        return globalIdFactory.createFromId(cdoId, entity);
+        return globalIdFactory.createInstanceId(cdoId, entity);
     }
 
     @Override
@@ -80,15 +79,11 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
         JsonObject jsonObject = new JsonObject();
 
         //managedClass
-        if (globalId.getManagedType() instanceof EntityType) {
+        if (globalId instanceof InstanceId) {
             jsonObject.addProperty(ENTITY_FIELD, globalId.getManagedType().getName());
+            jsonObject.add(CDO_ID_FIELD, context.serialize(((InstanceId)globalId).getCdoId()));
         } else {
             jsonObject.addProperty(VALUE_OBJECT_FIELD, globalId.getManagedType().getName());
-        }
-
-        //cdoId
-        if (globalId.getCdoId() != null) {
-            jsonObject.add(CDO_ID_FIELD, context.serialize(globalId.getCdoId()));
         }
 
         //owningId & fragment

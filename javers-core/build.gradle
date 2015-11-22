@@ -12,7 +12,6 @@ dependencies {
     testCompile 'org.mongodb.morphia:morphia:0.108'
     testCompile 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
-    testCompile 'eu.infomas:annotation-detector:3.0.5'
 }
 
 task testJar (type: Jar) {

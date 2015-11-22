@@ -8,6 +8,7 @@ import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.core.snapshot.SnapshotsAssert
 import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -447,6 +448,7 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
+    @Ignore
     def "should manage ValueObject class name refactor"(){
         when:
         javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  5)))
@@ -462,6 +464,7 @@ class JaversRepositoryE2ETest extends Specification {
         changes.find {it.propertyName == "newField"}.right == 15
     }
 
+    @Ignore
     def "should manage Entity class name refactor"(){
       when:
       javers.commit("author", new OldEntity(id:1, value:5))

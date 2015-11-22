@@ -6,6 +6,9 @@ import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.metamodel.type.*;
 import org.javers.repository.jql.GlobalIdDTO;
+import org.javers.repository.jql.InstanceIdDTO;
+import org.javers.repository.jql.UnboundedValueObjectIdDTO;
+import org.javers.repository.jql.ValueObjectIdDTO;
 
 /**
  * @author bartosz walacik
@@ -48,28 +51,40 @@ public class GlobalIdFactory {
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
     }
 
-    public UnboundedValueObjectId createFromClass(Class valueObjectClass){
+    public UnboundedValueObjectId createUnboundedValueObjectId(Class valueObjectClass){
         ValueObjectType valueObject = typeMapper.getJaversManagedType(valueObjectClass, ValueObjectType.class);
         return new UnboundedValueObjectId(valueObject);
     }
 
-    public ValueObjectId createFromPath(GlobalId owner, Class valueObjectClass, String path){
-        ValueObjectType valueObject = typeMapper.getJaversManagedType(valueObjectClass, ValueObjectType.class);
-        return new ValueObjectId(valueObject, owner, path);
+    @Deprecated
+    public ValueObjectId createValueObjectId(GlobalId owner, String path){
+        GlobalIdPathParser pathParser = new GlobalIdPathParser(path, owner, typeMapper);
+        return new ValueObjectId(pathParser.parseChildValueObject(), owner, path);
     }
 
-
-    public InstanceId createFromId(Object localId, EntityType entity){
+    public InstanceId createInstanceId(Object localId, EntityType entity){
         return InstanceId.createFromId(localId, entity);
     }
 
-    public InstanceId createFromId(Object localId, Class entityClass){
+    public InstanceId createInstanceId(Object localId, Class entityClass){
         EntityType entity = typeMapper.getJaversManagedType(entityClass, EntityType.class);
         return InstanceId.createFromId(localId, entity);
     }
 
-    public GlobalId createFromDto(GlobalIdDTO idDto){
-        return idDto.create(typeMapper);
+    public GlobalId createFromDto(GlobalIdDTO globalIdDTO){
+        if (globalIdDTO instanceof InstanceIdDTO){
+            InstanceIdDTO idDTO = (InstanceIdDTO) globalIdDTO;
+            return createInstanceId(idDTO.getCdoId(), idDTO.getEntity());
+        }
+        if (globalIdDTO instanceof UnboundedValueObjectIdDTO){
+            UnboundedValueObjectIdDTO idDTO = (UnboundedValueObjectIdDTO) globalIdDTO;
+            return createUnboundedValueObjectId(idDTO.getVoClass());
+        }
+        if (globalIdDTO instanceof ValueObjectIdDTO){
+            ValueObjectIdDTO idDTO = (ValueObjectIdDTO) globalIdDTO;
+            return createValueObjectId(createFromDto(idDTO.getOwnerIdDTO()), idDTO.getPath());
+        }
+        throw new RuntimeException("type " + globalIdDTO.getClass() + " is not implemented");
     }
 
     /**

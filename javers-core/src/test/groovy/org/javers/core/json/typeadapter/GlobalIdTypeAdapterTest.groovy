@@ -1,25 +1,17 @@
 package org.javers.core.json.typeadapter
 
-import eu.infomas.annotation.AnnotationDetector
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import org.javers.core.metamodel.annotation.TypeName
-import org.javers.core.metamodel.clazz.JaversEntity
 import org.javers.core.examples.typeNames.JaversEntityWithTypeAlias
+import org.javers.core.metamodel.clazz.JaversEntity
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.core.model.DummyEntityWithEmbeddedId
-import org.javers.core.model.DummyPoint
+import org.javers.core.model.*
 import org.javers.repository.jql.ValueObjectIdDTO
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyUser
-import org.javers.core.model.DummyUserDetails
 import spock.lang.Specification
 import spock.lang.Unroll
-
-import java.lang.annotation.Annotation
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
@@ -52,27 +44,6 @@ class GlobalIdTypeAdapterTest extends Specification {
                 instanceId("kaz", DummyUser),
                 instanceId(1L, DummyUserDetails)
         ]
-    }
-
-    def "should scan annotations"(){
-        when:
-        def reporter = new AnnotationDetector.TypeReporter() {
-            @Override
-            void reportTypeAnnotation(Class<? extends Annotation> annotation, String className) {
-                println className
-            }
-
-            @Override
-            Class[] annotations() {
-                return [TypeName]
-            }
-        }
-
-        AnnotationDetector cf = new AnnotationDetector(reporter)
-        cf.detect('org.javers.core.metamodel')
-
-        then:
-        false
     }
 
     def "should serialize Instance @EmbeddedId using json fields"(){
@@ -174,28 +145,27 @@ class GlobalIdTypeAdapterTest extends Specification {
     def "should serialize ValueObjectId"() {
         given:
         def javers = javersTestAssembly()
-        def id = javers.idBuilder().withOwner("kaz",DummyUser).voId(DummyAddress,"somePath")
+        def id = javers.idBuilder().withOwner(5,DummyUserDetails).voId("dummyAddress")
 
         when:
         def jsonText = javers.jsonConverter.toJson(id)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
-        json.ownerId.entity == "org.javers.core.model.DummyUser"
-        json.ownerId.cdoId ==  "kaz"
+        json.ownerId.entity == "org.javers.core.model.DummyUserDetails"
+        json.ownerId.cdoId ==  5
         json.valueObject == "org.javers.core.model.DummyAddress"
-        json.fragment == "somePath"
+        json.fragment == "dummyAddress"
     }
 
     def "should deserialize ValueObjectId"() {
         given:
         def json = new JsonBuilder()
         json.id {
-            fragment "somePath"
-            valueObject "org.javers.core.model.DummyAddress"
+            fragment "dummyAddress"
             ownerId {
-                entity "org.javers.core.model.DummyUser"
-                cdoId "kaz"
+                entity "org.javers.core.model.DummyUserDetails"
+                cdoId 5
             }
         }
 
@@ -204,6 +174,6 @@ class GlobalIdTypeAdapterTest extends Specification {
 
         then:
         idHolder.id instanceof ValueObjectId
-        idHolder.id == ValueObjectIdDTO.valueObjectId("kaz",DummyUser,"somePath")
+        idHolder.id == ValueObjectIdDTO.valueObjectId(5,DummyUserDetails,"dummyAddress")
     }
 }

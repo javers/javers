@@ -172,35 +172,6 @@ public class TypeMapper {
         return dehydratedTypeFactory.build(type);
     }
 
-    public ValueObjectType getChildValueObject(EntityType owner, String voPropertyName) {
-        JaversType javersType = getJaversType(owner.getProperty(voPropertyName).getGenericType());
-
-        if (javersType instanceof ValueObjectType) {
-            return (ValueObjectType) javersType;
-        }
-        
-        if (javersType instanceof ContainerType) {
-            JaversType contentType  = getJaversType(((ContainerType) javersType).getItemType());
-            if (contentType instanceof ValueObjectType){
-                return (ValueObjectType)contentType;
-            }
-        } 
-        
-        if (javersType instanceof MapType){
-            JaversType valueType  = getJaversType(((MapType) javersType).getValueType());
-            if (valueType instanceof ValueObjectType){
-                return (ValueObjectType)valueType;
-            } 
-        }
-
-        throw new JaversException(JaversExceptionCode.CANT_EXTRACT_CHILD_VALUE_OBJECT,
-                  owner.getName()+"."+voPropertyName,
-                  javersType);
-
-    }
-
-    //-- private
-
     private void addType(JaversType jType) {
         state.putIfAbsent(jType.getBaseJavaType(), jType);
     }

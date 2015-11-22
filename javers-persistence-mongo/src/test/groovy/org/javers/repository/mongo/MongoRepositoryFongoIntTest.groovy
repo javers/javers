@@ -78,7 +78,7 @@ class MongoRepositoryFongoIntTest extends Specification {
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
         def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
         def commitFactory = javersTestBuilder.commitFactory
-        def id = javersTestBuilder.globalIdFactory.createFromId("kazik", DummyUser)
+        def id = javersTestBuilder.globalIdFactory.createInstanceId("kazik", DummyUser)
 
         //create entity & persist commit
         def kazik = new DummyUser("kazik")

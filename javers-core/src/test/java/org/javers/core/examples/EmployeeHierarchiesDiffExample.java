@@ -93,8 +93,8 @@ public class EmployeeHierarchiesDiffExample {
     ReferenceChange change = diff.getChangesByType(ReferenceChange.class).get(0);
 
     assertThat(change.getAffectedLocalId()).isEqualTo("Great Developer");
-    assertThat(change.getLeft().getCdoId()).isEqualTo("Manager One");
-    assertThat(change.getRight().getCdoId()).isEqualTo("Manager Second");
+    assertThat(change.getLeft().value()).endsWith("Manager One");
+    assertThat(change.getRight().value()).endsWith("Manager Second");
 
     System.out.println(diff);
   }

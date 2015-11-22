@@ -401,8 +401,8 @@ abstract class ObjectGraphBuilderTest extends Specification {
         then:
         assertThat(node).hasGlobalId(idBuilder.unboundedValueObjectId(CategoryVo))
         assertThat(node).hasMultiEdge("children").refersToGlobalIds([
-                idBuilder.withUnboundedOwner(CategoryVo).voId(CategoryVo,"children/0"),
-                idBuilder.withUnboundedOwner(CategoryVo).voId(CategoryVo,"children/1")
+                idBuilder.withUnboundedOwner(CategoryVo).voId("children/0"),
+                idBuilder.withUnboundedOwner(CategoryVo).voId("children/1")
         ])
         assertThat(node).hasMultiEdge("children")
                         .andFirstTargetNode()
