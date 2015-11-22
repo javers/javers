@@ -16,6 +16,7 @@ public class AnnotationNamesProvider {
     private final Set<String> valueObjectAliases = new HashSet<>();
     private final Set<String> valueAliases = new HashSet<>();
     private final Set<String> transientPropertyAliases = new HashSet<>();
+    private final Set<String> shallowReferenceAliases = new HashSet<>();
     private final List<AnnotationsNameSpace> namesProviders = Lists.immutableListOf(
             new JaversAnnotationsNamesSpace(),
             new JPAAnnotationsNameSpace());
@@ -28,6 +29,7 @@ public class AnnotationNamesProvider {
             valueObjectAliases.addAll(provider.getValueObjectAliases());
             valueAliases.addAll(provider.getValueAliases());
             transientPropertyAliases.addAll(provider.getTransientPropertyAliases());
+            shallowReferenceAliases.addAll(provider.getShallowReferenceAliases());
         }
     }
 
@@ -46,4 +48,6 @@ public class AnnotationNamesProvider {
     public Set<String> getTransientAliases() {
         return Collections.unmodifiableSet(transientPropertyAliases);
     }
+
+    boolean isShallowReference(Annotation ann){return  shallowReferenceAliases.contains(ann.annotationType().getSimpleName());}
 }

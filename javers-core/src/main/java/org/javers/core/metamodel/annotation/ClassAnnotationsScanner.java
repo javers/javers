@@ -1,10 +1,7 @@
 package org.javers.core.metamodel.annotation;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.clazz.ClientsClassDefinition;
-import org.javers.core.metamodel.clazz.EntityDefinition;
-import org.javers.core.metamodel.clazz.ValueDefinition;
-import org.javers.core.metamodel.clazz.ValueObjectDefinition;
+import org.javers.core.metamodel.clazz.*;
 
 import java.lang.annotation.Annotation;
 
@@ -35,6 +32,10 @@ public class ClassAnnotationsScanner {
 
             if (annotationNamesProvider.isValueAlias(ann)) {
                 return new ValueDefinition(javaClass);
+            }
+
+            if(annotationNamesProvider.isShallowReference(ann)){
+                return new ShallowReferenceDefinition(javaClass);
             }
         }
 

@@ -14,4 +14,6 @@ interface AnnotationsNameSpace {
     Set<String> getValueAliases();
 
     Set<String> getTransientPropertyAliases();
+
+    Set<String> getShallowReferenceAliases();
 }

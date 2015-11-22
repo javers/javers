@@ -27,4 +27,9 @@ class JPAAnnotationsNameSpace implements AnnotationsNameSpace {
     public Set<String> getTransientPropertyAliases() {
         return Sets.asSet("Transient");
     }
+
+    @Override
+    public Set<String> getShallowReferenceAliases() {
+        return Sets.asSet("ShallowReference");
+    }
 }

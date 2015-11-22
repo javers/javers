@@ -1,6 +1,7 @@
 package org.javers.core.model;
 
 import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.ShallowReference;
 import org.joda.time.LocalDateTime;
 
 import javax.persistence.Id;
@@ -15,6 +16,10 @@ public class DummyUser extends AbstractDummyUser {
     public enum Sex {FEMALE, MALE, OCCASIONALLY}
 
     private transient int someTransientField;
+
+
+    @ShallowReference
+    private DummyUser propertyWithShallowReferenceAnn;
 
     @Transient
     private int propertyWithTransientAnn;
@@ -47,7 +52,7 @@ public class DummyUser extends AbstractDummyUser {
     private int[] intArray;
     private LocalDateTime[] dateTimes;
 
-     //reference
+    //reference
     private DummyUser supervisor;
     private DummyUserDetails dummyUserDetails;
     private List<DummyUserDetails> dummyUserDetailsList;
@@ -254,5 +259,13 @@ public class DummyUser extends AbstractDummyUser {
 
     public void setPropertyWithDiffIgnoreAnn(int propertyWithDiffIgnoreAnn) {
         this.propertyWithDiffIgnoreAnn = propertyWithDiffIgnoreAnn;
+    }
+
+    public DummyUser getPropertyWithShallowReferenceAnn() {
+        return propertyWithShallowReferenceAnn;
+    }
+
+    public void setPropertyWithShallowReferenceAnn(DummyUser propertyWithShallowReferenceAnn) {
+        this.propertyWithShallowReferenceAnn = propertyWithShallowReferenceAnn;
     }
 }
