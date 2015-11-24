@@ -68,9 +68,8 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .andTargetNode()
                 .hasNoEdges()
                 .hasCdo(user.getDummyAddress())
-                .hasValueObjectId(DummyAddress, user, "dummyAddress")
+                .hasGlobalIdValue(DummyUserDetails.name+"/1#dummyAddress")
     }
-
 
     def "should build two node graph for the same Entity"(){
         given:

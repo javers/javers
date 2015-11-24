@@ -1,8 +1,5 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.core.metamodel.type.ManagedType;
-import org.javers.core.metamodel.type.ValueObjectType;
-
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
@@ -17,17 +14,16 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class ValueObjectId extends GlobalId {
     private final GlobalId ownerId;
     private final String fragment;
-    private transient final ValueObjectType valueObject;
 
-    public ValueObjectId(ValueObjectType valueObject, GlobalId ownerId, String fragment) {
-        argumentsAreNotNull(valueObject, ownerId, fragment);
+    ValueObjectId(String typeName, GlobalId ownerId, String fragment) {
+        super(typeName);
+        argumentsAreNotNull(ownerId, fragment);
         this.ownerId = ownerId;
         this.fragment = fragment;
-        this.valueObject = valueObject;
     }
 
-    public ValueObjectId(ValueObjectType valueObject, OwnerContext ownerContext) {
-        this(valueObject, ownerContext.getGlobalId(), ownerContext.getPath());
+    ValueObjectId(String typeName, OwnerContext ownerContext) {
+        this(typeName, ownerContext.getGlobalId(), ownerContext.getPath());
     }
 
     /**
@@ -46,10 +42,5 @@ public class ValueObjectId extends GlobalId {
     @Override
     public String value() {
         return getOwnerId().value()+"#"+fragment;
-    }
-
-    @Override
-    public ValueObjectType getManagedType() {
-        return valueObject;
     }
 }

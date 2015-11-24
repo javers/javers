@@ -89,7 +89,7 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         jsonObject.add(COMMIT_METADATA, context.serialize(snapshot.getCommitMetadata()));
         jsonObject.add(GLOBAL_CDO_ID, context.serialize(snapshot.getGlobalId()));
         jsonObject.add(STATE_NAME, context.serialize(snapshot.getState()));
-        jsonObject.add(CHANGED_NAME, context.serialize(snapshot.getChangedPropertyNames()));
+        jsonObject.add(CHANGED_NAME, context.serialize(snapshot.getChanged()));
         jsonObject.add(TYPE_NAME, context.serialize(snapshot.getType().name()));
 
         return jsonObject;

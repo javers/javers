@@ -23,7 +23,7 @@ public class CdoSnapshotBuilder {
     private CdoSnapshotStateBuilder stateBuilder = cdoSnapshotState();
     private CdoSnapshot previous;
     private boolean markAllAsChanged;
-    private List<Property> changed = Collections.EMPTY_LIST;
+    private List<String> changed = Collections.EMPTY_LIST;
 
     private CdoSnapshotBuilder(GlobalId globalId, CommitMetadata commitMetadata) {
         Validate.argumentsAreNotNull(globalId, commitMetadata);
@@ -88,10 +88,7 @@ public class CdoSnapshotBuilder {
     }
 
     public CdoSnapshotBuilder withChangedProperties(List<String> changedPropertyNames) {
-        changed = new ArrayList<>();
-        for (String propertyName : changedPropertyNames) {
-            changed.add(globalId.getManagedType().getProperty(propertyName));
-        }
+        changed = new ArrayList<>(changedPropertyNames);
         return this;
     }
 

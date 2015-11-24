@@ -29,15 +29,15 @@ public class SnapshotFactory {
         return cdoSnapshot(globalId, commitMetadata).withType(TERMINAL).build();
     }
 
-    public CdoSnapshot createInitial(Object liveCdo, GlobalId globalId, CommitMetadata commitMetadata) {
-        return createSnapshotState(liveCdo, globalId, commitMetadata)
+    public CdoSnapshot createInitial(CdoWrapper cdoWrapper, CommitMetadata commitMetadata) {
+        return createSnapshotState(cdoWrapper, commitMetadata)
                 .withType(INITIAL)
                 .markAllAsChanged()
                 .build();
     }
 
-    public CdoSnapshot createUpdate(Object liveCdo, GlobalId globalId, CdoSnapshot previous, CommitMetadata commitMetadata) {
-        return createSnapshotState(liveCdo, globalId, commitMetadata)
+    public CdoSnapshot createUpdate(CdoWrapper cdoWrapper, CdoSnapshot previous, CommitMetadata commitMetadata) {
+        return createSnapshotState(cdoWrapper, commitMetadata)
                 .withType(UPDATE)
                 .markChanged(previous)
                 .build();
@@ -64,15 +64,15 @@ public class SnapshotFactory {
         return  propertyType.map(propertyVal, dehydratorMapFunction, owner);
     }
 
-    private CdoSnapshotBuilder createSnapshotState(Object liveCdo, GlobalId id, CommitMetadata commitMetadata){
-        CdoSnapshotBuilder snapshotBuilder = cdoSnapshot(id, commitMetadata);
+    private CdoSnapshotBuilder createSnapshotState(CdoWrapper cdoWrapper, CommitMetadata commitMetadata){
+        CdoSnapshotBuilder snapshotBuilder = cdoSnapshot(cdoWrapper.getGlobalId(), commitMetadata);
 
-        for (Property property : id.getManagedType().getProperties()) {
-            Object propertyVal = property.get(liveCdo);
+        for (Property property : cdoWrapper.getManagedType().getProperties()) {
+            Object propertyVal = cdoWrapper.getPropertyValue(property.getName());
             if (Objects.nullSafeEquals(propertyVal, Defaults.defaultValue(property.getType()))) {
                 continue;
             }
-            snapshotBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, id));
+            snapshotBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, cdoWrapper.getGlobalId()));
         }
         return snapshotBuilder;
     }

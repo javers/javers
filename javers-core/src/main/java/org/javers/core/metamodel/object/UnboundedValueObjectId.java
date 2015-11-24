@@ -1,9 +1,5 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.core.metamodel.type.ValueObjectType;
-
-import static org.javers.common.validation.Validate.argumentIsNotNull;
-
 /**
  * Unbounded ValueObject, has '/' as symbolic cdoId representation.
  * <p/>
@@ -20,20 +16,12 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class UnboundedValueObjectId extends GlobalId {
     private static final String UNBOUNDED_FRAGMENT = "/";
 
-    private transient final ValueObjectType valueObject;
-
-    public UnboundedValueObjectId(ValueObjectType valueObject) {
-        argumentIsNotNull(valueObject);
-        this.valueObject = valueObject;
-    }
-
-    @Override
-    public ValueObjectType getManagedType() {
-        return valueObject;
+    UnboundedValueObjectId(String typeName) {
+        super(typeName);
     }
 
     @Override
     public String value() {
-        return valueObject.getName()+UNBOUNDED_FRAGMENT;
+        return getTypeName()+UNBOUNDED_FRAGMENT;
     }
 }

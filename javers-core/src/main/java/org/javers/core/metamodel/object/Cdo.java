@@ -6,7 +6,7 @@ import org.javers.core.metamodel.type.*;
 import org.javers.core.metamodel.property.Property;
 
 /**
- * Abstract holder for client's domain object, {@link Entity} or {@link ValueObject}
+ * Abstract holder for client's domain object, {@link EntityType} or {@link ValueObjectType}
  *
  * @author bartosz walacik
  */
@@ -22,24 +22,12 @@ public abstract class Cdo {
         return globalId;
     }
 
-    /**
-     * shortcut to {@link GlobalId#getManagedType()}
-     */
-    public ManagedType getManagedType() {
-        return globalId.getManagedType();
-    }
-
     public abstract Optional<Object> getWrappedCdo();
 
-    public abstract Object getPropertyValue(Property property);
 
     public abstract boolean isNull(Property property);
 
-    public Object getPropertyValue(String propertyName) {
-        Validate.argumentIsNotNull(propertyName);
-        Property property = getGlobalId().getManagedType().getProperty(propertyName);
-        return getPropertyValue(property);
-    }
+    public abstract Object getPropertyValue(String propertyName);
 
     @Override
     public String toString() {

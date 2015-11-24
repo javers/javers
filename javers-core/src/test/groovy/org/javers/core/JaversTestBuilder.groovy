@@ -8,6 +8,7 @@ import org.javers.core.graph.LiveGraphFactory
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.JsonConverterBuilder
 import org.javers.core.metamodel.annotation.ClassAnnotationsScanner
+import org.javers.core.metamodel.object.CdoWrapper
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.SnapshotFactory
@@ -85,6 +86,13 @@ class JaversTestBuilder {
 
     Javers javers() {
         javersBuilder.getContainerComponent(Javers)
+    }
+
+    CdoWrapper createCdoWrapper(Object cdo){
+        def mType = getTypeMapper().getJaversManagedType(cdo.class)
+        def id = idBuilder().instanceId(cdo)
+
+        new CdoWrapper(cdo, id, mType)
     }
 
     PropertyScanner getPropertyScanner(){

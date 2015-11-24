@@ -43,12 +43,8 @@ class NodeAssert {
         this
     }
 
-    public NodeAssert hasValueObjectId(Class expectedManagedClass, Object ownerId, String expectedFragment) {
-        ValueObjectId valueObjectId = actual.globalId
-
-        assert valueObjectId.managedType.baseJavaClass == expectedManagedClass
-        assert valueObjectId.fragment == expectedFragment
-        assert (valueObjectId.ownerId as InstanceId).idEquals(ownerId)
+    public NodeAssert hasGlobalIdValue(String expectedValue) {
+        actual.globalId.value() == expectedValue
         this
     }
 

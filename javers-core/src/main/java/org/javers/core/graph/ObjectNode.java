@@ -36,7 +36,7 @@ public class ObjectNode {
     }
 
     ObjectNode(Object cdo, EntityType entity) {
-        this(new CdoWrapper(cdo, createFromInstance(cdo, entity)));
+        this(new CdoWrapper(cdo, createFromInstance(cdo, entity), entity));
     }
 
     /**
@@ -75,7 +75,7 @@ public class ObjectNode {
 
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
-        return cdo.getPropertyValue(property);
+        return cdo.getPropertyValue(property.getName());
     }
 
     public boolean isNull(Property property){
@@ -105,7 +105,7 @@ public class ObjectNode {
     }
 
     public ManagedType getManagedType() {
-        return cdo.getGlobalId().getManagedType();
+        return ((CdoWrapper)cdo).getManagedType();
     }
 
     public Cdo getCdo() {
@@ -124,5 +124,4 @@ public class ObjectNode {
     public int hashCode() {
         return cdo.hashCode();
     }
-
 }

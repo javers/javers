@@ -1,17 +1,18 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.core.metamodel.type.ManagedType;
+import org.javers.common.validation.Validate;
 import org.javers.repository.jql.GlobalIdDTO;
 
 /**
  * Global ID of Client's domain object (CDO)
  */
 public abstract class GlobalId {
+    private final String typeName;
 
-    /**
-     * JaversType of client's domain object
-     */
-    public abstract ManagedType getManagedType();
+    GlobalId(String typeName) {
+        Validate.argumentIsNotNull(typeName);
+        this.typeName = typeName;
+    }
 
     /**
      * <pre>
@@ -49,5 +50,9 @@ public abstract class GlobalId {
     @Override
     public int hashCode() {
         return value().hashCode();
+    }
+
+    public String getTypeName() {
+        return typeName;
     }
 }

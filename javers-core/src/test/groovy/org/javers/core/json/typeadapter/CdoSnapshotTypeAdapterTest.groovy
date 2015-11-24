@@ -24,9 +24,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     def "should serialize CdoSnapshot to Json"() {
         given:
         def javers = javersTestAssembly()
-        def dummyUser = new DummyUser(name:"kaz", age:5)
-        def id = javers.idBuilder().instanceId(dummyUser)
-        def snapshot = javers.snapshotFactory.createInitial(dummyUser, id, someCommitMetadata())
+        def dummyUserCdo = javers.createCdoWrapper( new DummyUser(name:"kaz", age:5) )
+        def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata())
 
         when:
         def jsonText = javers.jsonConverter.toJson(snapshot)
@@ -46,18 +45,16 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     }
 
     def "should serialize state with primitive values in CdoSnapshot"() {
-
         given:
         def javers = javersTestAssembly()
-        def id = javers.idBuilder().instanceId("kaz", DummyUser)
-
         def dummyUser = dummyUser("kaz")
                 .withAge(1)
                 .withFlag(true)
                 .withCharacter('a' as char)
                 .build()
 
-        def snapshot = javers.snapshotFactory.createInitial(dummyUser, id, someCommitMetadata())
+        def dummyUserCdo = javers.createCdoWrapper( dummyUser )
+        def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata())
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -74,16 +71,14 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     }
 
     def "should serialize state with entity in CdoSnapshot"() {
-
         given:
         def javers = javersTestAssembly()
-        def id = javers.idBuilder().instanceId("kaz", DummyUser)
-
         def dummyUser = dummyUser("kaz")
                 .withDetails()
                 .build()
 
-        def snapshot = javers.snapshotFactory.createInitial(dummyUser, id, someCommitMetadata())
+        def cdoWrapper = javers.createCdoWrapper( dummyUser )
+        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -96,11 +91,10 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     def "should serialize state with value object in CdoSnapshot"() {
         given:
         def javers = javersTestAssembly()
-        def id = javers.idBuilder().instanceId(1, DummyUserDetails)
-
         def dummyUserDetails = DummyUserDetailsBuilder.dummyUserDetails(1).withAddress("London", "St John Street").build()
 
-        def snapshot = javers.snapshotFactory.createInitial(dummyUserDetails, id, someCommitMetadata())
+        def cdoWrapper = javers.createCdoWrapper( dummyUserDetails )
+        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -111,11 +105,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     }
 
     def "should serialize state with collections in CdoSnapshots"() {
-
         given:
         def javers = javersTestAssembly()
-        def id = javers.idBuilder().instanceId("kaz", DummyUser)
-
         def dummyUser = dummyUser("kaz")
                 .withIntArray(1, 2)
                 .withIntegerList(3, 4)
@@ -123,7 +114,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 .withPrimitiveMap([time: new LocalDateTime(2000, 1, 1, 12, 0)])
                 .build()
 
-        def snapshot = javers.snapshotFactory.createInitial(dummyUser, id, someCommitMetadata())
+        def cdoWrapper = javers.createCdoWrapper( dummyUser )
+        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -140,7 +132,6 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     }
 
     def "should deserialize CdoSnapshot"() {
-
         given:
         def changed = ["name", "age"]
         def json = new JsonBuilder()
