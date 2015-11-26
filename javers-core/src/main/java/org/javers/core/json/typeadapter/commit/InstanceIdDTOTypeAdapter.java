@@ -11,6 +11,8 @@ import org.javers.repository.jql.InstanceIdDTO;
 
 import java.util.List;
 
+//TODO remove
+@Deprecated
 class InstanceIdDTOTypeAdapter implements JsonTypeAdapter<InstanceIdDTO>  {
 
     private GlobalIdFactory globalIdFactory;

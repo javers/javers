@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.core.metamodel.type.EntityType;
+
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
@@ -22,6 +24,7 @@ public class ValueObjectId extends GlobalId {
         this.fragment = fragment;
     }
 
+
     ValueObjectId(String typeName, OwnerContext ownerContext) {
         this(typeName, ownerContext.getGlobalId(), ownerContext.getPath());
     }
@@ -33,6 +36,10 @@ public class ValueObjectId extends GlobalId {
      */
     public String getFragment() {
         return fragment;
+    }
+
+    public boolean hasOwnerOfType(EntityType entityType){
+        return ownerId.getTypeName().equals(entityType.getName());
     }
 
     public GlobalId getOwnerId() {

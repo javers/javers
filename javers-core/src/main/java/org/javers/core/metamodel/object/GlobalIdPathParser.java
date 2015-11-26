@@ -12,6 +12,7 @@ import java.util.LinkedList;
 /**
  * @author bartosz.walacik
  */
+//TODO remove
 @Deprecated
 class GlobalIdPathParser {
 
@@ -25,8 +26,8 @@ class GlobalIdPathParser {
         this.ownerId = ownerId;
     }
 
-    ValueObjectType parseChildValueObject(){
-        return parseChildValueObjectFromPathSegments(ownerId.getManagedType(), pathToSegments(path));
+    ValueObjectType parseChildValueObject(ManagedType managedType){
+        return parseChildValueObjectFromPathSegments(managedType, pathToSegments(path));
     }
 
     private ValueObjectType parseChildValueObjectFromPathSegments(ManagedType ownerType, LinkedList<String> segments) {

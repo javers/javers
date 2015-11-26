@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.object;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.jql.GlobalIdDTO;
 
 /**
@@ -26,6 +27,10 @@ public abstract class GlobalId {
     @Override
     public String toString(){
         return this.value();
+    }
+
+    public boolean isTypeOf(ManagedType managedType){
+        return getTypeName().equals(managedType.getName());
     }
 
     @Override
