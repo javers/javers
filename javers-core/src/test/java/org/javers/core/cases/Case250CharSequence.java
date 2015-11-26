@@ -10,7 +10,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * see https://github.com/javers/javers/issues/250
- * @author bartosz.walacik
+ * @author Rick Schertz
  */
 public class Case250CharSequence {
     private static class AvroAddress {
