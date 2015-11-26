@@ -55,7 +55,6 @@ class TopLevelContainerTest extends Specification {
         javers.commit("author",container1)
         javers.commit("author",container2)
 
-
         def changes = javers.getChangeHistory(voId,3)
 
         then:
