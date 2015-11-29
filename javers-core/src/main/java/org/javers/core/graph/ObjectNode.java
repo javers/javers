@@ -1,6 +1,8 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.Optional;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -105,6 +107,10 @@ public class ObjectNode {
     }
 
     public ManagedType getManagedType() {
+        if (!isLive()){
+            throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION,
+                    "cant get ManagedType from " + cdo.getClass().getSimpleName());
+        }
         return ((CdoWrapper)cdo).getManagedType();
     }
 
@@ -119,6 +125,10 @@ public class ObjectNode {
 
         ObjectNode that = (ObjectNode) o;
         return cdo.equals(that.cdo);
+    }
+
+    public boolean isLive(){
+        return cdo instanceof CdoWrapper;
     }
 
     public int hashCode() {

@@ -3,10 +3,10 @@ package org.javers.core.diff.appenders;
 import org.javers.common.collections.Objects;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.PrimitiveOrValueType;
 
 import static org.javers.common.reflection.ReflectionUtil.reflectiveToString;
@@ -45,10 +45,10 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
     }
 
     private boolean isIdProperty(NodePair nodePair, Property property){
-        GlobalId globalId = nodePair.getGlobalId();
+        ManagedType managedType = nodePair.getManagedType();
 
-        if (globalId instanceof InstanceId) {
-            return ((InstanceId) globalId).getManagedType().getIdProperty().equals(property);
+        if (managedType instanceof EntityType) {
+            return ((EntityType)managedType).getIdProperty().equals(property);
         }
         return false;
     }

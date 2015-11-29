@@ -1,11 +1,10 @@
 package org.javers.core.diff;
 
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.List;
 
@@ -24,6 +23,14 @@ public class RealNodePair implements NodePair {
         Validate.argumentCheck(left.getGlobalId().equals(right.getGlobalId()), "left & right should refer to the same Cdo");
         this.left = left;
         this.right = right;
+    }
+
+    @Override
+    public ManagedType getManagedType() {
+        if (right.isLive()){
+            return right.getManagedType();
+        }
+        return left.getManagedType();
     }
 
     @Override
