@@ -41,11 +41,11 @@ public class GlobalIdFactory {
         }
 
         if (targetManagedType instanceof ValueObjectType && hasNoOwner(owner)) {
-            return new UnboundedValueObjectId((ValueObjectType)targetManagedType);
+            return new UnboundedValueObjectId(targetManagedType.getName());
         }
 
         if (targetManagedType instanceof ValueObjectType && hasOwner(owner)) {
-            return new ValueObjectId((ValueObjectType) targetManagedType, owner);
+            return new ValueObjectId(targetManagedType.getName(), owner.getGlobalId(), owner.getPath());
         }
 
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
@@ -53,22 +53,25 @@ public class GlobalIdFactory {
 
     public UnboundedValueObjectId createUnboundedValueObjectId(Class valueObjectClass){
         ValueObjectType valueObject = typeMapper.getJaversManagedType(valueObjectClass, ValueObjectType.class);
-        return new UnboundedValueObjectId(valueObject);
-    }
-
-    @Deprecated
-    public ValueObjectId createValueObjectId(GlobalId owner, String path){
-        GlobalIdPathParser pathParser = new GlobalIdPathParser(path, owner, typeMapper);
-        return new ValueObjectId(pathParser.parseChildValueObject(), owner, path);
+        return new UnboundedValueObjectId(valueObject.getName());
     }
 
     public InstanceId createInstanceId(Object localId, EntityType entity){
-        return InstanceId.createFromId(localId, entity);
+        return new InstanceId(entity.getName(), localId);
+    }
+
+    public ValueObjectId createUnnamedValueObjectId( GlobalId owner, String fragment){
+        return new ValueObjectId("unnamed", owner, fragment);
+    }
+
+    public ValueObjectId createValueObjectId(Class valueObjectClass, GlobalId owner, String fragment){
+        ValueObjectType valueObject = typeMapper.getJaversManagedType(valueObjectClass, ValueObjectType.class);
+        return new ValueObjectId(valueObject.getName(), owner, fragment);
     }
 
     public InstanceId createInstanceId(Object localId, Class entityClass){
         EntityType entity = typeMapper.getJaversManagedType(entityClass, EntityType.class);
-        return InstanceId.createFromId(localId, entity);
+        return createInstanceId(localId, entity);
     }
 
     public GlobalId createFromDto(GlobalIdDTO globalIdDTO){
@@ -82,7 +85,8 @@ public class GlobalIdFactory {
         }
         if (globalIdDTO instanceof ValueObjectIdDTO){
             ValueObjectIdDTO idDTO = (ValueObjectIdDTO) globalIdDTO;
-            return createValueObjectId(createFromDto(idDTO.getOwnerIdDTO()), idDTO.getPath());
+            GlobalId ownerId = createFromDto(idDTO.getOwnerIdDTO());
+            return createUnnamedValueObjectId(ownerId, idDTO.getPath());
         }
         throw new RuntimeException("type " + globalIdDTO.getClass() + " is not implemented");
     }

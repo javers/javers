@@ -24,11 +24,6 @@ public class ValueObjectId extends GlobalId {
         this.fragment = fragment;
     }
 
-
-    ValueObjectId(String typeName, OwnerContext ownerContext) {
-        this(typeName, ownerContext.getGlobalId(), ownerContext.getPath());
-    }
-
     /**
      * Path to ValueObject, should be unique in the Entity <b>instance</b> scope.
      * Usually, property name.

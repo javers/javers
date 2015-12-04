@@ -16,7 +16,7 @@ package org.javers.core.metamodel.object;
 public class UnboundedValueObjectId extends GlobalId {
     private static final String UNBOUNDED_FRAGMENT = "/";
 
-    UnboundedValueObjectId(String typeName) {
+    public UnboundedValueObjectId(String typeName) {
         super(typeName);
     }
 
