@@ -41,7 +41,7 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
             }
         }
 
-        return new ValueChange(pair.getGlobalId(), property, leftValue, rightValue);
+        return new ValueChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);
     }
 
     private boolean isIdProperty(NodePair nodePair, Property property){

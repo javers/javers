@@ -29,8 +29,8 @@ class ValueChangeAssert {
         this
     }
 
-    def hasProperty(Property expected) {
-        assert actual.property == expected
+    def hasProperty(String expected) {
+        assert actual.propertyName == expected
         this
     }
 

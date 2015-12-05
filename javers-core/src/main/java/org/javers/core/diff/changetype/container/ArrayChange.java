@@ -10,7 +10,7 @@ import java.util.List;
  */
 public final class ArrayChange extends ContainerChange {
 
-    public ArrayChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
-        super(affectedCdoId, property, changes);
+    public ArrayChange(GlobalId affectedCdoId, String propertyName, List<ContainerElementChange> changes) {
+        super(affectedCdoId, propertyName, changes);
     }
 }

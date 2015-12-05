@@ -18,7 +18,7 @@ class SetChangeTypeAdapter extends ContainerChangeTypeAdapter<SetChange> {
 
     @Override
     protected ContainerChange newInstance(PropertyChangeStub stub, List<ContainerElementChange> changes) {
-        return new SetChange(stub.id, stub.property, changes);
+        return new SetChange(stub.id, stub.getPropertyName(), changes);
     }
 
     @Override

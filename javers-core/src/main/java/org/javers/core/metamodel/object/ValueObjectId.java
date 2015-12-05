@@ -17,7 +17,7 @@ public class ValueObjectId extends GlobalId {
     private final GlobalId ownerId;
     private final String fragment;
 
-    ValueObjectId(String typeName, GlobalId ownerId, String fragment) {
+    public ValueObjectId(String typeName, GlobalId ownerId, String fragment) {
         super(typeName);
         argumentsAreNotNull(ownerId, fragment);
         this.ownerId = ownerId;

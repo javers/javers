@@ -35,18 +35,18 @@ public class GlobalIdRepository {
     }
 
     public long getOrInsertClass(GlobalId globalId) {
-        Class cdoClass = globalId.getManagedType().getBaseJavaClass();
-        Optional<Long> lookup = findClassPk(cdoClass);
+        String typeName = globalId.getTypeName();
+        Optional<Long> lookup = findClassPk(typeName);
 
-        return lookup.isPresent() ? lookup.get() : insertClass(cdoClass);
+        return lookup.isPresent() ? lookup.get() : insertClass(typeName);
     }
 
-    public Optional<Long> findClassPk(Class<?> cdoClass){
+    public Optional<Long> findClassPk(String typeName){
         SelectQuery query = polyJdbc.query()
             .select(CDO_CLASS_PK)
             .from(CDO_CLASS_TABLE_NAME)
             .where(CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName ")
-            .withArgument("qualifiedName", cdoClass.getName());
+            .withArgument("qualifiedName", typeName);
 
         return queryForOptionalLong(query, polyJdbc);
     }
@@ -94,12 +94,12 @@ public class GlobalIdRepository {
                 .where("g." + GLOBAL_ID_LOCAL_ID + " = :localId " +
                        "AND c." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName ")
                 .withArgument("localId", jsonConverter.toJson(((InstanceId)globalId).getCdoId()))
-                .withArgument("qualifiedName", globalId.getManagedType().getName());
+                .withArgument("qualifiedName", globalId.getTypeName());
         }
         else if (globalId instanceof UnboundedValueObjectId){
             query.from(GLOBAL_ID_WITH_CDO_CLASS)
                  .where("c." + CDO_CLASS_QUALIFIED_NAME + " = :qualifiedName ")
-                 .withArgument("qualifiedName", globalId.getManagedType().getName());
+                 .withArgument("qualifiedName", globalId.getTypeName());
         }
 
         return queryForOptionalLong(query, polyJdbc);
@@ -130,11 +130,11 @@ public class GlobalIdRepository {
         return globalIdPk;
     }
 
-    private long insertClass(Class<?> cdoClass){
+    private long insertClass(String typeName){
         InsertQuery query = polyJdbc.query()
                 .insert()
                 .into(CDO_CLASS_TABLE_NAME)
-                .value(CDO_CLASS_QUALIFIED_NAME, cdoClass.getName())
+                .value(CDO_CLASS_QUALIFIED_NAME, typeName)
                 .sequence(CDO_CLASS_PK, CDO_PK_SEQ_NAME);
         return polyJdbc.queryRunner().insert(query);
     }

@@ -4,6 +4,7 @@ import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.property.Property;
 import org.joda.time.LocalDate;
@@ -92,6 +93,31 @@ public class TypeMapper {
         argumentIsNotNull(javaType);
 
         return state.getJaversType(javaType);
+    }
+
+    /**
+     * @since 1.4
+     */
+    public JaversType getJaversType(String typeName){
+        //TODO typeName lookup
+        Class javaClazz = JsonConverter.parseClass(typeName);
+        return getJaversType(javaClazz);
+    }
+
+    /**
+     * @since 1.4
+     */
+    public ManagedType getJaversManagedType(String typeName) {
+        return getJaversManagedType(typeName, ManagedType.class);
+    }
+
+    /**
+     * @since 1.4
+     */
+    public <T extends ManagedType> T getJaversManagedType(String typeName, Class<T> expectedType) {
+        //TODO typeName lookup
+        Class javaClazz = JsonConverter.parseClass(typeName);
+        return getJaversManagedType(javaClazz, expectedType);
     }
 
     /**

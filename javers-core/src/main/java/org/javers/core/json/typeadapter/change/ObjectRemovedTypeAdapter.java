@@ -5,8 +5,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.javers.common.collections.Optional;
 import org.javers.core.diff.changetype.ObjectRemoved;
+import org.javers.core.metamodel.type.TypeMapper;
 
 class ObjectRemovedTypeAdapter extends ChangeTypeAdapter<ObjectRemoved> {
+
+    public ObjectRemovedTypeAdapter(TypeMapper typeMapper) {
+        super(typeMapper);
+    }
 
     @Override
     public ObjectRemoved fromJson(JsonElement json, JsonDeserializationContext context) {

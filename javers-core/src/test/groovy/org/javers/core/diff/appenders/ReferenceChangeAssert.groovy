@@ -15,8 +15,8 @@ class ReferenceChangeAssert {
         new ReferenceChangeAssert(actual:actual)
     }
 
-    ReferenceChangeAssert hasProperty(Property expected) {
-        assert actual.property == expected
+    ReferenceChangeAssert hasProperty(String expected) {
+        assert actual.propertyName == expected
         this
     }
 

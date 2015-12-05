@@ -70,14 +70,13 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         given:
         def left =  buildGraph(dummyUser("1").withSex(FEMALE).build())
         def right = buildGraph(dummyUser("1").withSex(OCCASIONALLY).build())
-        def sex = getManagedProperty(DummyUser,"sex")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),sex)
 
         then:
         assertThat(change)
-                  .hasProperty(sex)
+                  .hasProperty("sex")
                   .hasLeftValue(FEMALE)
                   .hasRightValue(OCCASIONALLY)
     }
@@ -86,14 +85,13 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         given:
         def left =  buildGraph(dummyUser("1").withAge(1).build())
         def right = buildGraph(dummyUser("1").withAge(2).build())
-        def age = getManagedProperty(DummyUser,"age")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),age)
 
         then:
         assertThat(change)
-                  .hasProperty(age)
+                  .hasProperty("age")
                   .hasLeftValue(1)
                   .hasRightValue(2)
     }
@@ -102,14 +100,13 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         given:
         def left =  buildGraph(dummyUser("1").build())
         def right = buildGraph(dummyUser("1").withInteger(5).build())
-        def largeInt = getManagedProperty(DummyUser,"largeInt")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),largeInt)
 
         then:
         assertThat(change)
-                  .hasProperty(largeInt)
+                  .hasProperty("largeInt")
                   .haveLeftValueNull()
                   .hasRightValue(5)
     }
@@ -118,14 +115,13 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         given:
         def left =  buildGraph(dummyUser("1").withFlag(true).build())
         def right = buildGraph(dummyUser("1").withFlag(false).build())
-        def flag = getManagedProperty(DummyUser, "flag")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
 
         then:
         assertThat(change)
-                  .hasProperty(flag)
+                  .hasProperty("flag")
                   .hasLeftValue(true)
                   .hasRightValue(false)
     }
@@ -134,14 +130,13 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         given:
         def left =  buildGraph(dummyUser("1").build())
         def right = buildGraph(dummyUser("1").withBoxedFlag(true).build())
-        def flag = getManagedProperty(DummyUser,"bigFlag")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
 
         then:
         assertThat(change)
-                  .hasProperty(flag)
+                  .hasProperty("bigFlag")
                   .haveLeftValueNull()
                   .hasRightValue(Boolean.TRUE)
     }
@@ -153,14 +148,13 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightUser = dummyUserWithDate("kaz", dob)
         def left = buildGraph(leftUser)
         def right = buildGraph(rightUser)
-        def dobProperty = getManagedProperty(DummyUserWithValues,"dob")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), dobProperty)
 
         then:
         assertThat(change)
-                .hasProperty(dobProperty)
+                .hasProperty("dob")
                 .hasLeftValue(null)
                 .hasRightValue(dob)
     }
@@ -172,14 +166,13 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def rightUser = dummyUserWithSalary("kaz", salary)
         def left = buildGraph(leftUser)
         def right = buildGraph(rightUser)
-        def salaryProperty = getManagedProperty(DummyUserWithValues,"salary")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), salaryProperty)
 
         then:
         assertThat(change)
-                .hasProperty(salaryProperty)
+                .hasProperty("salary")
                 .hasLeftValue(null)
                 .hasRightValue(salary)
     }
@@ -191,7 +184,6 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def left = buildGraph(leftUser)
         def right = buildGraph(rightUser)
         def address = getManagedProperty(DummyUserDetails,"dummyAddress")
-        def street =  getManagedProperty(DummyAddress,"street")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(
@@ -202,7 +194,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
                   .hasValueObjectId(DummyAddress, new InstanceIdDTO(DummyUserDetails,1), "dummyAddress")
                   .hasLeftValue("Washington Street")
                   .hasRightValue("Wall Street")
-                  .hasProperty(street)
+                  .hasProperty("street")
     }
 
     ObjectNode followEdge(ObjectNode node, Property property) {

@@ -10,6 +10,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.List;
@@ -53,8 +54,11 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         deserializeChangedProperties(jsonObject, cdoSnapshotBuilder, context);
 
         JsonElement state = jsonObject.get(STATE_NAME);
+
+        ManagedType managedType = typeMapper.getJaversManagedType(cdoId.getTypeName());
+
         CdoSnapshotStateDeserializer stateDeserializer = new CdoSnapshotStateDeserializer(typeMapper, context);
-        CdoSnapshotState snapshotState = stateDeserializer.deserialize(state, cdoId);
+        CdoSnapshotState snapshotState = stateDeserializer.deserialize(state, managedType);
 
         return cdoSnapshotBuilder.withState(snapshotState).build();
     }

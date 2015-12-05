@@ -18,7 +18,7 @@ class ArrayChangeTypeAdapter extends ContainerChangeTypeAdapter<ArrayChange> {
 
     @Override
     protected ContainerChange newInstance(PropertyChangeStub stub, List<ContainerElementChange> changes) {
-        return new ArrayChange(stub.id, stub.property, changes);
+        return new ArrayChange(stub.id, stub.getPropertyName(), changes);
     }
 
     @Override

@@ -58,7 +58,7 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
         List<EntryChange> changes = calculateEntryChanges(leftRawMap, rightRawMap, owner, mapContentType);
 
         if (!changes.isEmpty()){
-            return new MapChange(pair.getGlobalId(), property, changes);
+            return new MapChange(pair.getGlobalId(), property.getName(), changes);
         }
         else {
             return null;

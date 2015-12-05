@@ -9,6 +9,7 @@ import org.javers.core.metamodel.object.CdoSnapshotState;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.EntityType;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
@@ -97,7 +98,7 @@ public class JsonConverter {
             return globalIdFactory.createInstanceId(cdoId, cdoClass);
         } else if (globalIdDTO.isValueObjectId()){
             GlobalId ownerId = fromDto(globalIdDTO.getOwnerId());
-            return globalIdFactory.createValueObjectId(ownerId, globalIdDTO.getFragment());
+            return globalIdFactory.createUnnamedValueObjectId(ownerId, globalIdDTO.getFragment());
         } else {
             Class cdoClass = parseClass(globalIdDTO.getCdoClassName());
             return globalIdFactory.createUnboundedValueObjectId(cdoClass);
@@ -107,7 +108,9 @@ public class JsonConverter {
     public CdoSnapshotState snapshotStateFromJson(String json, GlobalId globalId){
         Validate.argumentsAreNotNull(json, globalId);
         JsonElement stateElement = fromJson(json, JsonElement.class);
-        return stateDeserializer.deserialize(stateElement, globalId);
+
+        ManagedType managedType = typeMapper.getJaversManagedType(globalId.getTypeName());
+        return stateDeserializer.deserialize(stateElement, managedType);
     }
 
     public static Class parseClass(String qualifiedName){

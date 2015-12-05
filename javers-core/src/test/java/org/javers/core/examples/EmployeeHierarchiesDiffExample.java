@@ -33,7 +33,7 @@ public class EmployeeHierarchiesDiffExample {
     ValueChange change =  diff.getChangesByType(ValueChange.class).get(0);
 
     assertThat(change.getAffectedLocalId()).isEqualTo("Great Developer");
-    assertThat(change.getProperty().getName()).isEqualTo("salary");
+    assertThat(change.getPropertyName()).isEqualTo("salary");
     assertThat(change.getLeft()).isEqualTo(10000);
     assertThat(change.getRight()).isEqualTo(20000);
 

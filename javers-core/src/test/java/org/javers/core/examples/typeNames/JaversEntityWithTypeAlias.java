@@ -4,6 +4,8 @@ import org.javers.core.metamodel.annotation.Entity;
 import org.javers.core.metamodel.annotation.Id;
 import org.javers.core.metamodel.annotation.TypeName;
 
+import java.math.BigDecimal;
+
 /**
  * @author bartosz.walacik
  */
@@ -11,5 +13,6 @@ import org.javers.core.metamodel.annotation.TypeName;
 @Entity
 public class JaversEntityWithTypeAlias {
     @Id
-    private String id;
+    private BigDecimal id;
+
 }

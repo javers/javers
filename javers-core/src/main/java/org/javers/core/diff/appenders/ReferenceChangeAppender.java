@@ -28,6 +28,6 @@ class ReferenceChangeAppender extends CorePropertyChangeAppender<ReferenceChange
             return null;
         }
 
-        return new ReferenceChange(pair.getGlobalId(), property, leftId, rightId);
+        return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId);
     }
 }

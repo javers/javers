@@ -73,7 +73,7 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
         if (changes.size() == 0) {
             result = null;
         } else {
-            result = new ListChange(affectedCdoId, property, changes);
+            result = new ListChange(affectedCdoId, property.getName(), changes);
         }
         return result;
     }

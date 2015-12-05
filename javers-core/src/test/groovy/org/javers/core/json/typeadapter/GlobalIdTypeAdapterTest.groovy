@@ -106,30 +106,16 @@ class GlobalIdTypeAdapterTest extends Specification {
         idHolder.id == javers.idBuilder().unboundedValueObjectId(DummyAddress)
     }
 
-    def "should deserialize InstanceId with @TypeName from JSON"() {
-        given:
-        def json = '{ "entity": "myName", "cdoId": "x"}'
-        def javers = javersTestAssembly()
-
-        when:
-        InstanceId id = javers.jsonConverter.fromJson(json, GlobalId)
-
-        then:
-        id instanceof InstanceId
-        id.cdoId == "x"
-        id.managedType == javers.typeMapper.getJaversType(JaversEntityWithTypeAlias)
-    }
-
-    def "should deserialize InstanceId with @EmbeddedId from JSON"(){
+    def "should deserialize InstanceId with @EmbeddedId to original Type"(){
         given:
         def json =
-'''
-{ "entity": "org.javers.core.model.DummyEntityWithEmbeddedId",
-  "cdoId": {
-    "x": 2,
-    "y": 3
-  }}
-'''
+        '''
+        { "entity": "org.javers.core.model.DummyEntityWithEmbeddedId",
+          "cdoId": {
+            "x": 2,
+            "y": 3
+          }}
+        '''
         def javers = javersTestAssembly()
 
         when:
@@ -140,6 +126,21 @@ class GlobalIdTypeAdapterTest extends Specification {
         id.cdoId instanceof DummyPoint
         id.cdoId.x == 2
         id.cdoId.y == 3
+    }
+
+    def "should deserialize InstanceId with @TypeName when EntityType is mapped"(){
+        given:
+        def json = '{ "entity": "myName", "cdoId": 1}'
+        def javers = javersTestAssembly()
+        javers.typeMapper.getJaversType(JaversEntityWithTypeAlias)
+
+        when:
+        def id = javers.jsonConverter.fromJson(json, GlobalId)
+
+        then:
+        id instanceof InstanceId
+        id.cdoId instanceof BigDecimal
+        id.cdoId == 1
     }
 
     def "should serialize ValueObjectId"() {

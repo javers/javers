@@ -49,18 +49,20 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     }
 
     private UnboundedValueObjectId parseUnboundedValueObject(JsonObject jsonObject){
-        Class valueObjectClass = parseClass(jsonObject, VALUE_OBJECT_FIELD);
-        return globalIdFactory.createUnboundedValueObjectId(valueObjectClass);
+        String typeName = jsonObject.get(VALUE_OBJECT_FIELD).getAsString();
+        return new UnboundedValueObjectId(typeName);
     }
 
     private ValueObjectId parseValueObjectId(JsonObject jsonObject, JsonDeserializationContext context) {
+        String typeName = jsonObject.get(VALUE_OBJECT_FIELD).getAsString();
         String fragment = jsonObject.get(FRAGMENT_FIELD).getAsString();
         GlobalId ownerId = context.deserialize(jsonObject.get(OWNER_ID_FIELD), GlobalId.class);
 
-        return globalIdFactory.createValueObjectId(ownerId, fragment);
+        return new ValueObjectId(typeName, ownerId, fragment);
     }
 
     private InstanceId parseInstanceId(JsonObject jsonObject, JsonDeserializationContext context) {
+
         EntityType entity = parseEntity(jsonObject);
 
         JsonElement cdoIdElement = jsonObject.get(CDO_ID_FIELD);
@@ -80,10 +82,10 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
 
         //managedClass
         if (globalId instanceof InstanceId) {
-            jsonObject.addProperty(ENTITY_FIELD, globalId.getManagedType().getName());
+            jsonObject.addProperty(ENTITY_FIELD, globalId.getTypeName());
             jsonObject.add(CDO_ID_FIELD, context.serialize(((InstanceId)globalId).getCdoId()));
         } else {
-            jsonObject.addProperty(VALUE_OBJECT_FIELD, globalId.getManagedType().getName());
+            jsonObject.addProperty(VALUE_OBJECT_FIELD, globalId.getTypeName());
         }
 
         //owningId & fragment
@@ -100,20 +102,13 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     @Override
     public List<Class> getValueTypes() {
         return (List) Lists.immutableListOf(GlobalId.class,
-                                            InstanceId.class,
-                                            UnboundedValueObjectId.class,
-                                            ValueObjectId.class);
-    }
-
-    private Class parseClass(JsonObject object, String fieldName) {
-        String className = object.get(fieldName).getAsString();
-        return JsonConverter.parseClass(className);
+                InstanceId.class,
+                UnboundedValueObjectId.class,
+                ValueObjectId.class);
     }
 
     private EntityType parseEntity(JsonObject object){
         String entityName = object.get(ENTITY_FIELD).getAsString();
-
-        Class javaClazz = JsonConverter.parseClass(entityName);
-        return typeMapper.getJaversManagedType(javaClazz, EntityType.class);
+        return typeMapper.getJaversManagedType(entityName, EntityType.class);
     }
 }

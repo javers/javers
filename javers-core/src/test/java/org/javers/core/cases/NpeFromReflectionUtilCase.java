@@ -40,7 +40,7 @@ public class NpeFromReflectionUtilCase {
               .voId("interfaceProperty");
 
         Assertions.assertThat(change.getAffectedGlobalId()).isEqualTo(voId);
-        Assertions.assertThat(change.getProperty().getName()).isEqualTo("value");
+        Assertions.assertThat(change.getPropertyName()).isEqualTo("value");
         Assertions.assertThat(change.getLeft()).isEqualTo("Foo");
         Assertions.assertThat(change.getRight()).isEqualTo("Bar");
     }

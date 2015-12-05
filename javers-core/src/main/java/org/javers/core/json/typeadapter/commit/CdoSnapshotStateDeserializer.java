@@ -8,6 +8,7 @@ import org.javers.core.metamodel.object.CdoSnapshotState;
 import org.javers.core.metamodel.object.CdoSnapshotStateBuilder;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.lang.reflect.Type;
@@ -15,7 +16,7 @@ import java.lang.reflect.Type;
 import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapshotState;
 
 /**
- * CdoSnapshotState can't be done by standard {@link CdoSnapshotStateTypeAdapter}
+ * CdoSnapshotState can't be created by standard {@link CdoSnapshotStateTypeAdapter}
  * due to required globalId
  *
  * @author bartosz walacik
@@ -29,13 +30,13 @@ public class CdoSnapshotStateDeserializer {
         this.context = context;
     }
 
-    public CdoSnapshotState deserialize(JsonElement stateElement, GlobalId globalId){
-        Validate.argumentsAreNotNull(stateElement, globalId, context);
+    public CdoSnapshotState deserialize(JsonElement stateElement, ManagedType managedType){
+        Validate.argumentsAreNotNull(stateElement, managedType, context);
         JsonObject stateObject = (JsonObject) stateElement;
 
         CdoSnapshotStateBuilder builder = cdoSnapshotState();
 
-        for (Property property : globalId.getManagedType().getProperties()) {
+        for (Property property : managedType.getProperties()) {
             builder.withPropertyValue(property, decodePropertyValue(stateObject, context, property));
         }
 

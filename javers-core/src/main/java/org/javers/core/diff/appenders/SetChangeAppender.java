@@ -23,13 +23,10 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
 
     private final TypeMapper typeMapper;
 
-    private final MapChangeAppender mapChangeAppender;
-
     private final GlobalIdFactory globalIdFactory;
 
-    SetChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
+    SetChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
         this.typeMapper = typeMapper;
-        this.mapChangeAppender = mapChangeAppender;
         this.globalIdFactory = globalIdFactory;
     }
 
@@ -89,7 +86,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
                 calculateEntryChanges(setType, leftValues, rightValues, owner);
 
         if (!entryChanges.isEmpty()) {
-            return new SetChange(pair.getGlobalId(), property, entryChanges);
+            return new SetChange(pair.getGlobalId(), property.getName(), entryChanges);
         } else {
             return null;
         }
