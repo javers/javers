@@ -55,8 +55,8 @@ public final class CdoSnapshot extends Cdo {
     }
 
     @Override
-    public Object getPropertyValue(String withName) {
-        throw new RuntimeException("not implemented");
+    public Object getPropertyValue(String propertyName) {
+        return state.getPropertyValue(propertyName);
     }
 
     /**

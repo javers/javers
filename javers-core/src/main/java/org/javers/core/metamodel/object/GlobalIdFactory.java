@@ -60,8 +60,16 @@ public class GlobalIdFactory {
         return new InstanceId(entity.getName(), localId);
     }
 
-    public ValueObjectId createUnnamedValueObjectId( GlobalId owner, String fragment){
+    public ValueObjectId createUnnamedValueObjectId(GlobalId owner, String fragment){
         return new ValueObjectId("unnamed", owner, fragment);
+    }
+
+    public ValueObjectId createValueObjectIdFromPath(GlobalId owner, String fragment){
+        GlobalIdPathParser pathParser = new GlobalIdPathParser(fragment, typeMapper);
+        ManagedType ownerType = typeMapper.getJaversManagedType(owner.getTypeName());
+        ValueObjectType valueObjectType = pathParser.parseChildValueObject(ownerType);
+
+        return new ValueObjectId(valueObjectType.getName(), owner, fragment);
     }
 
     public ValueObjectId createValueObjectId(Class valueObjectClass, GlobalId owner, String fragment){

@@ -35,7 +35,6 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def json = new JsonSlurper().parseText(jsonText)
         json.commitMetadata.id == 1.00
         json.commitMetadata.author == "kazik"
-        //TODO date assertion
         json.commitMetadata.commitDate
         json.changedProperties == ["name","age"]
 
@@ -159,7 +158,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         snapshot.commitMetadata.id.value() == "1.0"
         snapshot.globalId == instanceId("kaz",DummyUser)
         snapshot.initial == true
-        snapshot.changed.collect{it.name} as Set == ["name", "age"] as Set
+        snapshot.changed.collect{it} as Set == ["name", "age"] as Set
     }
 
     def "should deserialize CdoSnapshot state with primitive values"() {

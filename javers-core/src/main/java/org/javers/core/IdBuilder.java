@@ -27,7 +27,7 @@ public class IdBuilder {
 
     public ValueObjectId voId(String path){
         Validate.conditionFulfilled(owner != null, "call withOwner() first");
-        return globalIdFactory.createUnnamedValueObjectId(owner, path);
+        return globalIdFactory.createValueObjectIdFromPath(owner, path);
     }
 
     public InstanceId instanceId(Object instance){

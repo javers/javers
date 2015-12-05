@@ -14,14 +14,12 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 /**
  * @author bartosz.walacik
  */
-@Deprecated
 class GlobalIdFactoryTest extends Specification {
 
     @Shared
     GlobalIdFactory globalIdFactory = javersTestAssembly().globalIdFactory
 
     @Unroll
-    @Deprecated
     def "should infer valueObjectType from path when path is #pathType"(){
       when:
       def id = globalIdFactory.createFromDto(ValueObjectIdDTO.valueObjectId(1, SnapshotEntity, path))
@@ -35,7 +33,6 @@ class GlobalIdFactoryTest extends Specification {
     }
 
     @Unroll
-    @Deprecated
     def "should parse valueObjectType from path for embedded ValueObject (#pathType)"() {
         when:
         def id = globalIdFactory.createFromDto(ValueObjectIdDTO.valueObjectId(1, SnapshotEntity, path))

@@ -12,22 +12,18 @@ import java.util.LinkedList;
 /**
  * @author bartosz.walacik
  */
-//TODO remove
-@Deprecated
 class GlobalIdPathParser {
 
     private final TypeMapper typeMapper;
     private final String path;
-    private final GlobalId ownerId;
 
-    public GlobalIdPathParser(String path, GlobalId ownerId, TypeMapper typeMapper) {
+    public GlobalIdPathParser(String path, TypeMapper typeMapper) {
         this.typeMapper = typeMapper;
         this.path = path;
-        this.ownerId = ownerId;
     }
 
-    ValueObjectType parseChildValueObject(ManagedType managedType){
-        return parseChildValueObjectFromPathSegments(managedType, pathToSegments(path));
+    ValueObjectType parseChildValueObject(ManagedType ownerType){
+        return parseChildValueObjectFromPathSegments(ownerType, pathToSegments(path));
     }
 
     private ValueObjectType parseChildValueObjectFromPathSegments(ManagedType ownerType, LinkedList<String> segments) {

@@ -164,6 +164,7 @@ class GlobalIdTypeAdapterTest extends Specification {
         def json = new JsonBuilder()
         json.id {
             fragment "dummyAddress"
+            valueObject "org.javers.core.model.DummyAddress"
             ownerId {
                 entity "org.javers.core.model.DummyUserDetails"
                 cdoId 5
