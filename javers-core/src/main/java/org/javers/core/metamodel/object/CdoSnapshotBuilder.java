@@ -3,6 +3,7 @@ package org.javers.core.metamodel.object;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,19 +25,21 @@ public class CdoSnapshotBuilder {
     private CdoSnapshot previous;
     private boolean markAllAsChanged;
     private List<String> changed = Collections.EMPTY_LIST;
+    private ManagedType managedType;
 
-    private CdoSnapshotBuilder(GlobalId globalId, CommitMetadata commitMetadata) {
-        Validate.argumentsAreNotNull(globalId, commitMetadata);
+    private CdoSnapshotBuilder(GlobalId globalId, CommitMetadata commitMetadata, ManagedType managedType) {
+        Validate.argumentsAreNotNull(globalId, commitMetadata, managedType);
         this.globalId = globalId;
+        this.managedType = managedType;
         this.commitMetadata = commitMetadata;
     }
 
     public static CdoSnapshot emptyCopyOf(CdoSnapshot snapshot){
-        return cdoSnapshot(snapshot.getGlobalId(), snapshot.getCommitMetadata()).withType(snapshot.getType()).build();
+        return cdoSnapshot(snapshot.getGlobalId(), snapshot.getCommitMetadata(), snapshot.getManagedType()).withType(snapshot.getType()).build();
     }
 
-    public static CdoSnapshotBuilder cdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata) {
-        return new CdoSnapshotBuilder(globalId, commitMetadata);
+    public static CdoSnapshotBuilder cdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata, ManagedType managedType) {
+        return new CdoSnapshotBuilder(globalId, commitMetadata, managedType);
     }
 
     public CdoSnapshotBuilder withState(CdoSnapshotState state) {
@@ -58,7 +61,7 @@ public class CdoSnapshotBuilder {
             changed = new ArrayList<>(state.getProperties());
         }
 
-        return new CdoSnapshot(globalId, commitMetadata, state, type, changed);
+        return new CdoSnapshot(globalId, commitMetadata, state, type, changed, managedType);
     }
 
     public CdoSnapshotBuilder withType(SnapshotType type) {

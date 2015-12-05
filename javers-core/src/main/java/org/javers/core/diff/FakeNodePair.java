@@ -38,7 +38,7 @@ class FakeNodePair implements NodePair {
 
     @Override
     public List<Property> getProperties() {
-        return right.getManagedType().getProperties();
+        return getManagedType().getProperties();
     }
 
     @Override
@@ -60,6 +60,4 @@ class FakeNodePair implements NodePair {
     public GlobalId getLeftGlobalId(Property property) {
         return null;
     }
-
-
 }

@@ -60,13 +60,9 @@ public class GlobalIdFactory {
         return new InstanceId(entity.getName(), localId);
     }
 
-    public ValueObjectId createUnnamedValueObjectId(GlobalId owner, String fragment){
-        return new ValueObjectId("unnamed", owner, fragment);
-    }
-
     public ValueObjectId createValueObjectIdFromPath(GlobalId owner, String fragment){
         GlobalIdPathParser pathParser = new GlobalIdPathParser(fragment, typeMapper);
-        ManagedType ownerType = typeMapper.getJaversManagedType(owner.getTypeName());
+        ManagedType ownerType = typeMapper.getJaversManagedType(owner);
         ValueObjectType valueObjectType = pathParser.parseChildValueObject(ownerType);
 
         return new ValueObjectId(valueObjectType.getName(), owner, fragment);
@@ -94,7 +90,7 @@ public class GlobalIdFactory {
         if (globalIdDTO instanceof ValueObjectIdDTO){
             ValueObjectIdDTO idDTO = (ValueObjectIdDTO) globalIdDTO;
             GlobalId ownerId = createFromDto(idDTO.getOwnerIdDTO());
-            return createUnnamedValueObjectId(ownerId, idDTO.getPath());
+            return createValueObjectIdFromPath(ownerId, idDTO.getPath());
         }
         throw new RuntimeException("type " + globalIdDTO.getClass() + " is not implemented");
     }

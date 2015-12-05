@@ -98,18 +98,23 @@ public class JsonConverter {
             return globalIdFactory.createInstanceId(cdoId, cdoClass);
         } else if (globalIdDTO.isValueObjectId()){
             GlobalId ownerId = fromDto(globalIdDTO.getOwnerId());
-            return globalIdFactory.createUnnamedValueObjectId(ownerId, globalIdDTO.getFragment());
+            return globalIdFactory.createValueObjectIdFromPath(ownerId, globalIdDTO.getFragment());
         } else {
             Class cdoClass = parseClass(globalIdDTO.getCdoClassName());
             return globalIdFactory.createUnboundedValueObjectId(cdoClass);
         }
     }
 
+    public ManagedType getManagedType(GlobalId globalId){
+        Validate.argumentsAreNotNull(globalId);
+        return typeMapper.getJaversManagedType(globalId);
+    }
+
     public CdoSnapshotState snapshotStateFromJson(String json, GlobalId globalId){
         Validate.argumentsAreNotNull(json, globalId);
         JsonElement stateElement = fromJson(json, JsonElement.class);
 
-        ManagedType managedType = typeMapper.getJaversManagedType(globalId.getTypeName());
+        ManagedType managedType = typeMapper.getJaversManagedType(globalId);
         return stateDeserializer.deserialize(stateElement, managedType);
     }
 

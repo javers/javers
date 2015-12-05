@@ -1,8 +1,6 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -15,8 +13,7 @@ import org.javers.core.metamodel.type.ValueObjectType;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.javers.common.validation.Validate.argumentIsNotNull;
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
 
 /**
@@ -33,7 +30,7 @@ public class ObjectNode {
     private final Map<Property, Edge> edges = new HashMap<>();
 
     public ObjectNode(Cdo cdo) {
-        argumentIsNotNull(cdo);
+        argumentsAreNotNull(cdo);
         this.cdo = cdo;
     }
 
@@ -77,7 +74,7 @@ public class ObjectNode {
 
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
-        return cdo.getPropertyValue(property.getName());
+        return cdo.getPropertyValue(property);
     }
 
     public boolean isNull(Property property){
@@ -107,11 +104,7 @@ public class ObjectNode {
     }
 
     public ManagedType getManagedType() {
-        if (!isLive()){
-            throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION,
-                    "cant get ManagedType from " + cdo.getClass().getSimpleName());
-        }
-        return ((CdoWrapper)cdo).getManagedType();
+        return cdo.getManagedType();
     }
 
     public Cdo getCdo() {
@@ -125,10 +118,6 @@ public class ObjectNode {
 
         ObjectNode that = (ObjectNode) o;
         return cdo.equals(that.cdo);
-    }
-
-    public boolean isLive(){
-        return cdo instanceof CdoWrapper;
     }
 
     public int hashCode() {

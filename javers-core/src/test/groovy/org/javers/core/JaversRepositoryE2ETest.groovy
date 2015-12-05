@@ -77,7 +77,7 @@ class JaversRepositoryE2ETest extends Specification {
         changes[0].commitMetadata.get().id.majorId == 6
         changes.each{
             assert it.affectedGlobalId.fragment == "valueObjectRef"
-            assert it.affectedGlobalId.managedType.baseJavaClass == DummyAddress
+            assert it.affectedGlobalId.typeName == DummyAddress.name
         }
     }
 
@@ -156,7 +156,7 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         snapshots.size() == 3
         snapshots.each {
-            assert it.globalId.managedType.baseJavaClass == DummyAddress
+            assert it.globalId.typeName == DummyAddress.name
         }
     }
 
@@ -175,7 +175,7 @@ class JaversRepositoryE2ETest extends Specification {
         snapshots.size() == 3
         snapshots[0].commitId.majorId == 5
         snapshots.each {
-            assert it.globalId.managedType.baseJavaClass == SnapshotEntity
+            assert it.globalId.typeName == SnapshotEntity.name
         }
 
         when: "changes query"
@@ -220,7 +220,7 @@ class JaversRepositoryE2ETest extends Specification {
          snapshots.size() == 2
          snapshots[0].commitId.majorId == 2
          snapshots.each {
-             assert it.globalId.managedType.baseJavaClass == SnapshotEntity
+             assert it.globalId.typeName == SnapshotEntity.name
          }
     }
 
@@ -237,7 +237,7 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         snapshots.size() == 2
         snapshots.each {
-            assert it.globalId.managedType.baseJavaClass == DummyAddress
+            assert it.globalId.typeName == DummyAddress.name
         }
 
         where:
@@ -380,7 +380,7 @@ class JaversRepositoryE2ETest extends Specification {
              commitMetadata.author == "author2"
              commitMetadata.commitDate
              changed.size() == 1
-             changed[0].name == "intProperty"
+             changed[0] == "intProperty"
              !initial
         }
         with(snapshots[1]) {
@@ -475,6 +475,7 @@ class JaversRepositoryE2ETest extends Specification {
         changes.find {it.propertyName == "someField"}.right == 6
     }
 
+    //TODO wtf ???
     def "should manage Entity class name refactor when querying using new class with TypeName"(){
       when:
       javers.commit("author", new OldEntity(id:1, value:5))

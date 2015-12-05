@@ -23,6 +23,9 @@ public class CdoSnapshotState {
         return properties.size();
     }
 
+    /**
+     * returns default values for null primitives
+     */
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
         Object val = properties.get(property.getName());
@@ -32,9 +35,6 @@ public class CdoSnapshotState {
         return val;
     }
 
-    /**
-     * TODO no null defaultValue
-     */
     public Object getPropertyValue(String propertyName) {
         Validate.argumentIsNotNull(propertyName);
         return properties.get(propertyName);

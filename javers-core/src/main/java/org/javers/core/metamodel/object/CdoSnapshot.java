@@ -5,6 +5,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.List;
 
@@ -33,9 +34,10 @@ public final class CdoSnapshot extends Cdo {
                 CommitMetadata commitMetadata,
                 CdoSnapshotState state,
                 SnapshotType type,
-                List<String> changed) {
-        super(globalId);
-        Validate.argumentsAreNotNull(state, commitMetadata, type);
+                List<String> changed,
+                ManagedType managedType) {
+        super(globalId, managedType);
+        Validate.argumentsAreNotNull(state, commitMetadata, type, managedType);
         this.state = state;
         this.commitMetadata = commitMetadata;
         this.type = type;
@@ -57,6 +59,14 @@ public final class CdoSnapshot extends Cdo {
     @Override
     public Object getPropertyValue(String propertyName) {
         return state.getPropertyValue(propertyName);
+    }
+
+    /**
+     * returns default values for null primitives
+     */
+    @Override
+    public Object getPropertyValue(Property property) {
+        return state.getPropertyValue(property);
     }
 
     /**

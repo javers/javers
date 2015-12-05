@@ -73,7 +73,7 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
         GlobalId id = deserializeAffectedCdoId(jsonObject, context);
         String propertyName = jsonObject.get(PROPERTY_FIELD).getAsString();
 
-        ManagedType managedType = typeMapper.getJaversManagedType(id.getTypeName());
+        ManagedType managedType = typeMapper.getJaversManagedType(id);
         return new PropertyChangeStub(id, managedType.getProperty(propertyName));
     }
 

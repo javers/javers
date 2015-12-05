@@ -13,7 +13,6 @@ import java.util.List;
  *
  * @author bartosz walacik
  */
-//TODO refactor -> extends FakeNodePair???
 public class RealNodePair implements NodePair {
     private final ObjectNode left;
     private final ObjectNode right;
@@ -27,9 +26,6 @@ public class RealNodePair implements NodePair {
 
     @Override
     public ManagedType getManagedType() {
-        if (right.isLive()){
-            return right.getManagedType();
-        }
         return left.getManagedType();
     }
 
@@ -66,7 +62,7 @@ public class RealNodePair implements NodePair {
 
     @Override
     public List<Property> getProperties() {
-        return left.getManagedType().getProperties();
+        return getManagedType().getProperties();
     }
 
     @Override

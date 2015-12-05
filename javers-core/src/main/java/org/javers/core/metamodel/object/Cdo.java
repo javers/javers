@@ -12,10 +12,12 @@ import org.javers.core.metamodel.property.Property;
  */
 public abstract class Cdo {
     private final GlobalId globalId;
+    private final ManagedType managedType;
 
-    protected Cdo(GlobalId globalId) {
-        Validate.argumentIsNotNull(globalId);
+    protected Cdo(GlobalId globalId, ManagedType managedType) {
+        Validate.argumentsAreNotNull(globalId, managedType);
         this.globalId = globalId;
+        this.managedType = managedType;
     }
 
     public GlobalId getGlobalId() {
@@ -24,8 +26,9 @@ public abstract class Cdo {
 
     public abstract Optional<Object> getWrappedCdo();
 
-
     public abstract boolean isNull(Property property);
+
+    public abstract Object getPropertyValue(Property property);
 
     public abstract Object getPropertyValue(String propertyName);
 
@@ -49,4 +52,7 @@ public abstract class Cdo {
         return globalId.hashCode();
     }
 
+    public ManagedType getManagedType() {
+        return managedType;
+    }
 }

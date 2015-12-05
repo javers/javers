@@ -1,47 +1,35 @@
 package org.javers.core.metamodel.object
 
-import org.javers.core.MappingStyle
-import org.javers.core.metamodel.type.TypeFactory
-import org.javers.core.model.Category
-import org.javers.core.model.DummyEntityWithEmbeddedId
 import org.javers.core.model.DummyPoint
-import spock.lang.Shared
 import spock.lang.Specification
 
-import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
 /**
  * @author bartosz.walacik
  */
 class InstanceIdTest extends Specification {
 
-    TypeFactory typeFactory = javersTestAssembly(MappingStyle.FIELD).typeSpawningFactory
-
-    def "should build value() from class name and id.toString for primitive Id "() {
-        given:
-        def entity = typeFactory.createEntity(Category)
-
+    def "should build value() from typeName and id.toString for primitive Id "() {
         when:
-        def instanceId = InstanceId.createFromId(12, entity)
+        def instanceId = new InstanceId("entity", 12)
 
         then:
-        instanceId.managedType == entity
+        instanceId.typeName == "entity"
         instanceId.cdoId == 12
-        instanceId.value() == Category.name + "/12"
+        instanceId.value() == "entity/12"
     }
 
-    def "should build value() from class name and id.toString for Embedded Id "() {
+    def "should build value() from typeName and id.toString for Embedded Id "() {
         given:
-        def entity = typeFactory.createEntity(DummyEntityWithEmbeddedId)
 
         when:
-        def instanceId = InstanceId.createFromId(new DummyPoint(1,3), entity)
+        def instanceId = new InstanceId("entity", new DummyPoint(1,3))
 
         then:
-        instanceId.managedType == entity
+        instanceId.typeName == "entity"
         instanceId.cdoId.x == 1
         instanceId.cdoId.y == 3
-        instanceId.value() == DummyEntityWithEmbeddedId.name + "/1,3"
+        instanceId.value() == "entity/1,3"
     }
 
 }

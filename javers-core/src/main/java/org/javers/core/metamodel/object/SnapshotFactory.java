@@ -26,7 +26,8 @@ public class SnapshotFactory {
     }
 
     public CdoSnapshot createTerminal(GlobalId globalId, CommitMetadata commitMetadata) {
-        return cdoSnapshot(globalId, commitMetadata).withType(TERMINAL).build();
+        ManagedType managedType = typeMapper.getJaversManagedType(globalId);
+        return cdoSnapshot(globalId, commitMetadata, managedType).withType(TERMINAL).build();
     }
 
     public CdoSnapshot createInitial(CdoWrapper cdoWrapper, CommitMetadata commitMetadata) {
@@ -65,7 +66,7 @@ public class SnapshotFactory {
     }
 
     private CdoSnapshotBuilder createSnapshotState(CdoWrapper cdoWrapper, CommitMetadata commitMetadata){
-        CdoSnapshotBuilder snapshotBuilder = cdoSnapshot(cdoWrapper.getGlobalId(), commitMetadata);
+        CdoSnapshotBuilder snapshotBuilder = cdoSnapshot(cdoWrapper.getGlobalId(), commitMetadata, cdoWrapper.getManagedType());
 
         for (Property property : cdoWrapper.getManagedType().getProperties()) {
             Object propertyVal = cdoWrapper.getPropertyValue(property.getName());

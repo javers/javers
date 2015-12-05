@@ -6,6 +6,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
@@ -107,8 +108,8 @@ public class TypeMapper {
     /**
      * @since 1.4
      */
-    public ManagedType getJaversManagedType(String typeName) {
-        return getJaversManagedType(typeName, ManagedType.class);
+    public ManagedType getJaversManagedType(GlobalId globalId) {
+        return getJaversManagedType(globalId.getTypeName(), ManagedType.class);
     }
 
     /**

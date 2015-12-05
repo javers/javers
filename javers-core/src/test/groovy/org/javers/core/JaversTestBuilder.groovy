@@ -12,12 +12,15 @@ import org.javers.core.metamodel.object.CdoWrapper
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.SnapshotFactory
+import org.javers.core.metamodel.property.Property
 import org.javers.core.metamodel.property.PropertyScanner
 import org.javers.core.metamodel.type.TypeFactory
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.snapshot.GraphSnapshotFacade
 import org.javers.repository.api.JaversExtendedRepository
 import org.javers.repository.api.JaversRepository
+
+import java.lang.reflect.Type
 
 /**
  * This is just a test builder,
@@ -93,6 +96,10 @@ class JaversTestBuilder {
         def id = idBuilder().instanceId(cdo)
 
         new CdoWrapper(cdo, id, mType)
+    }
+
+    Property getProperty(Class type, String propName) {
+        getTypeMapper().getJaversManagedType(type).getProperty(propName)
     }
 
     PropertyScanner getPropertyScanner(){

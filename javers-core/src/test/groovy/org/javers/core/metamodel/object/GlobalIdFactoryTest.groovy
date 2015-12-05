@@ -6,7 +6,6 @@ import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
 import spock.lang.Specification
-import org.javers.core.examples.model.Person
 import spock.lang.Unroll
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
@@ -25,7 +24,7 @@ class GlobalIdFactoryTest extends Specification {
       def id = globalIdFactory.createFromDto(ValueObjectIdDTO.valueObjectId(1, SnapshotEntity, path))
 
       then:
-      id.managedType.baseJavaClass == DummyAddress
+      id.typeName == DummyAddress.name
 
       where:
       path <<     ["valueObjectRef",  "mapPrimitiveToVO/HOME", "listOfValueObjects/0"]
@@ -38,7 +37,7 @@ class GlobalIdFactoryTest extends Specification {
         def id = globalIdFactory.createFromDto(ValueObjectIdDTO.valueObjectId(1, SnapshotEntity, path))
 
         then:
-        id.managedType.baseJavaClass == DummyNetworkAddress
+        id.typeName == DummyNetworkAddress.name
 
         where:
         path <<     ["valueObjectRef/networkAddress",

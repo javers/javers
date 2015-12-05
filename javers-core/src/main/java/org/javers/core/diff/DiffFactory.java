@@ -15,6 +15,7 @@ import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.Collection;
@@ -30,7 +31,7 @@ import static org.javers.core.diff.DiffBuilder.diff;
  */
 public class DiffFactory {
 
-    private final NodeMatcher nodeMatcher = new NodeMatcher();
+    private final NodeMatcher nodeMatcher;
     private final TypeMapper typeMapper;
     private final List<NodeChangeAppender> nodeChangeAppenders;
     private final List<PropertyChangeAppender> propertyChangeAppender;
@@ -39,6 +40,7 @@ public class DiffFactory {
 
     public DiffFactory(TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, LiveGraphFactory graphFactory, JaversCoreConfiguration javersCoreConfiguration) {
         this.typeMapper = typeMapper;
+        this.nodeMatcher = new NodeMatcher();
         this.nodeChangeAppenders = nodeChangeAppenders;
         this.graphFactory = graphFactory;
         this.javersCoreConfiguration = javersCoreConfiguration;

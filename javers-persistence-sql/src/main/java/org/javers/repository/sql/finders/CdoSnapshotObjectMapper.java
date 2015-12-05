@@ -8,6 +8,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.GlobalIdRawDTO;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.type.ManagedType;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
 
@@ -45,8 +46,9 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
         CommitMetadata commit = assembleCommitMetadata(resultSet);
         CdoSnapshotState state = jsonConverter.snapshotStateFromJson(resultSet.getString(SNAPSHOT_STATE), usedGlobalId);
         List<String> changedPropNames = assembleChangedPropNames(resultSet);
+        ManagedType managedType = jsonConverter.getManagedType(usedGlobalId);
 
-        CdoSnapshotBuilder builder = CdoSnapshotBuilder.cdoSnapshot(usedGlobalId, commit);
+        CdoSnapshotBuilder builder = CdoSnapshotBuilder.cdoSnapshot(usedGlobalId, commit, managedType);
         builder.withType(valueOf(resultSet.getString(SNAPSHOT_TYPE)));
         builder.withChangedProperties(changedPropNames);
 

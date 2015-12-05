@@ -47,15 +47,14 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         CommitMetadata commitMetadata = context.deserialize(((JsonObject) json).get(COMMIT_METADATA), CommitMetadata.class);
 
         GlobalId cdoId = context.deserialize(jsonObject.get(GLOBAL_CDO_ID), GlobalId.class);
+        ManagedType managedType = typeMapper.getJaversManagedType(cdoId);
 
-        CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId, commitMetadata);
+        CdoSnapshotBuilder cdoSnapshotBuilder = cdoSnapshot(cdoId, commitMetadata, managedType);
 
         deserializeType(jsonObject, cdoSnapshotBuilder);
         deserializeChangedProperties(jsonObject, cdoSnapshotBuilder, context);
 
         JsonElement state = jsonObject.get(STATE_NAME);
-
-        ManagedType managedType = typeMapper.getJaversManagedType(cdoId.getTypeName());
 
         CdoSnapshotStateDeserializer stateDeserializer = new CdoSnapshotStateDeserializer(typeMapper, context);
         CdoSnapshotState snapshotState = stateDeserializer.deserialize(state, managedType);

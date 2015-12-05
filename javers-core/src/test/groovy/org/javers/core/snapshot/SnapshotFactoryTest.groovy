@@ -42,7 +42,7 @@ class SnapshotFactoryTest extends Specification{
         def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
 
         then:
-        snapshot.changed.collect{it.name} as Set == ["id","arrayOfIntegers", "arrayOfInts"] as Set
+        snapshot.changed as Set == ["id","arrayOfIntegers", "arrayOfInts"] as Set
     }
 
     def "should mark nullified properties of update snapshot"() {
@@ -56,7 +56,7 @@ class SnapshotFactoryTest extends Specification{
         def updateSnapshot = snapshotFactory.createUpdate(cdoWrapper, prevSnapshot, someCommitMetadata())
 
         then:
-        updateSnapshot.changed.collect{it.name} == ["arrayOfIntegers"]
+        updateSnapshot.changed == ["arrayOfIntegers"]
     }
 
     def "should mark changed and added properties of update snapshot"() {
@@ -73,7 +73,7 @@ class SnapshotFactoryTest extends Specification{
         def updateSnapshot = snapshotFactory.createUpdate(cdoWrapper, prevSnapshot, someCommitMetadata())
 
         then:
-        updateSnapshot.changed.collect{it.name} as Set == ["arrayOfIntegers","arrayOfInts"] as Set
+        updateSnapshot.changed as Set == ["arrayOfIntegers","arrayOfInts"] as Set
 
         when:
         prevSnapshot = updateSnapshot
@@ -81,7 +81,7 @@ class SnapshotFactoryTest extends Specification{
         updateSnapshot = snapshotFactory.createUpdate(cdoWrapper, prevSnapshot, someCommitMetadata())
 
         then:
-        updateSnapshot.changed.collect{it.name} == ["entityRef"]
+        updateSnapshot.changed == ["entityRef"]
 
         when:
         prevSnapshot = updateSnapshot
@@ -89,13 +89,14 @@ class SnapshotFactoryTest extends Specification{
         updateSnapshot = snapshotFactory.createUpdate(cdoWrapper, prevSnapshot, someCommitMetadata())
 
         then:
-        updateSnapshot.changed.collect{it.name} == ["dob"]
+        updateSnapshot.changed == ["dob"]
     }
 
     def "should create snapshot with given GlobalId"() {
         given:
         def cdo = new SnapshotEntity(id:1)
         def cdoWrapper = javers.createCdoWrapper(cdo)
+        def id = javers.instanceId(cdo)
 
         when:
         def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())

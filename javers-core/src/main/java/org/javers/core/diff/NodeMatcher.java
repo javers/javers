@@ -3,7 +3,6 @@ package org.javers.core.diff;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
-
 import java.util.*;
 
 /**
@@ -22,7 +21,7 @@ class NodeMatcher {
         for (ObjectNode left : graphPair.getLeftNodeSet()) {
             GlobalId key = left.getGlobalId();
             if (rightMap.containsKey(key)) {
-                pairs.add(new RealNodePair(left,rightMap.get(key)));
+                pairs.add(new RealNodePair(left, rightMap.get(key)));
             }
         }
 
