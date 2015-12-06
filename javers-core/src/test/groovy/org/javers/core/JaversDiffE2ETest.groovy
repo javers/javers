@@ -104,7 +104,7 @@ class JaversDiffE2ETest extends Specification {
 
         when:
         def diff = javers.compare(user, user2)
-        def jsonText = javers.toJson(diff)
+        def jsonText = javers.getJsonConverter().toJson(diff)
         //println("jsonText:\n"+jsonText)
 
         then:
@@ -122,7 +122,7 @@ class JaversDiffE2ETest extends Specification {
 
         when:
         def diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
-        def jsonText = javers.toJson(diff)
+        def jsonText = javers.getJsonConverter().toJson(diff)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -142,7 +142,7 @@ class JaversDiffE2ETest extends Specification {
 
         when:
         def diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
-        def jsonText = javers.toJson(diff)
+        def jsonText = javers.getJsonConverter().toJson(diff)
         //println("jsonText:\n"+jsonText)
 
         then:
