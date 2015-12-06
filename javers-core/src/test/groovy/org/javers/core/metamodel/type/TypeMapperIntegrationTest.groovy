@@ -26,18 +26,6 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  */
 public class TypeMapperIntegrationTest extends Specification {
 
-    def "should not copy TypeName from prototype"(){
-        given:
-        def mapper = javersTestAssembly().typeMapper
-
-        when:
-        mapper.getJaversType(AbstractValueObject).name
-        mapper.getJaversType(OldValueObject).name
-
-        then:
-        mapper.getJaversType(NewNamedValueObject).name == OldValueObject.name
-    }
-
     @Unroll
     def "should find #what type by typeName"(){
         given:

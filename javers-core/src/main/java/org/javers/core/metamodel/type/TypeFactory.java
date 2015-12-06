@@ -95,7 +95,8 @@ public class TypeFactory {
 
         if (prototype instanceof ManagedType) {
             ManagedClass managedClass = managedClassFactory.create(javaClass);
-            return ((ManagedType)prototype).spawn(managedClass);
+            ClassAnnotationsScan scan = classAnnotationsScanner.scan(javaClass);
+            return ((ManagedType)prototype).spawn(managedClass, scan.typeName());
         }
         else {
             return prototype.spawn(javaType); //delegate to simple constructor

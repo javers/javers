@@ -24,7 +24,7 @@ public abstract class ManagedType extends JaversType {
         this.managedClass = managedClass;
     }
 
-    abstract ManagedType spawn(ManagedClass managedClass);
+    abstract ManagedType spawn(ManagedClass managedClass, Optional<String> typeName);
 
     @Override
     protected Type getRawDehydratedType() {

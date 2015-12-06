@@ -520,12 +520,13 @@ class JaversRepositoryE2ETest extends Specification {
 
         def changes = javers.findChanges(QueryBuilder.byClass(NewNamedValueObject).build())
 
-
-        println javers.getTypeMapping(NewNamedValueObject).prettyPrint()
-
         then:
-        changes.size() == 1
-        with (changes.find {it.propertyName == "someField"}) {
+        changes.size() == 2
+        with(changes.find {it.propertyName == "oldField"}) {
+            assert left == 10
+            assert right == 0 //removed properties are treated as nulls
+        }
+        with (changes.find {it.propertyName == "someValue"}) {
             assert left == 5
             assert right == 6
         }
