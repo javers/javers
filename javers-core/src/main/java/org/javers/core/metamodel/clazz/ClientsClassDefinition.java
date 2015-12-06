@@ -1,8 +1,6 @@
 package org.javers.core.metamodel.clazz;
 
-import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
-import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.type.CustomType;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ValueObjectType;
@@ -25,19 +23,22 @@ public abstract class ClientsClassDefinition {
     private final Optional<String> typeName;
 
     ClientsClassDefinition(Class<?> baseJavaClass) {
-        this(new ClientsClassDefinitionBuilder(baseJavaClass));
+        this(baseJavaClass, Collections.<String>emptyList(), Optional.<String>empty());
     }
 
-    ClientsClassDefinition(Class<?> clazz, List<String> ignoredProperties) {
-        this(new ClientsClassDefinitionBuilder(clazz)
-                .withIgnoredProperties(ignoredProperties));
+    ClientsClassDefinition(Class<?> baseJavaClass, List<String> ignoredProperties) {
+        this(baseJavaClass, ignoredProperties, Optional.<String>empty());
     }
 
     ClientsClassDefinition(ClientsClassDefinitionBuilder builder) {
-        argumentsAreNotNull(builder);
-        this.baseJavaClass = builder.clazz;
-        this.ignoredProperties = new ArrayList<>(builder.ignoredProperties);
-        this.typeName = builder.typeName;
+        this(builder.getClazz(), builder.getIgnoredProperties(), builder.getTypeName());
+    }
+
+    private ClientsClassDefinition(Class<?> baseJavaClass, List<String> ignoredProperties, Optional<String> typeName) {
+        argumentsAreNotNull(baseJavaClass, typeName, ignoredProperties);
+        this.baseJavaClass = baseJavaClass;
+        this.ignoredProperties = new ArrayList<>(ignoredProperties);
+        this.typeName = typeName;
     }
 
     public Class<?> getBaseJavaClass() {
@@ -72,34 +73,4 @@ public abstract class ClientsClassDefinition {
         return typeName.isPresent();
     }
 
-    public static class ClientsClassDefinitionBuilder<T extends ClientsClassDefinitionBuilder> {
-        private Class<?> clazz;
-        private List<String> ignoredProperties = Collections.EMPTY_LIST;
-        private Optional<String> typeName = Optional.empty();
-
-        ClientsClassDefinitionBuilder(Class<?> clazz) {
-            this.clazz = clazz;
-        }
-
-        public T withIgnoredProperties(String... ignoredProperties) {
-            withIgnoredProperties(Lists.asList(ignoredProperties));
-            return (T) this;
-        }
-
-        public T withIgnoredProperties(List<String> ignoredProperties) {
-            Validate.argumentIsNotNull(ignoredProperties);
-            this.ignoredProperties = ignoredProperties;
-            return (T) this;
-        }
-
-        public T withTypeName(String typeName) {
-            Validate.argumentIsNotNull(typeName);
-            this.typeName = Optional.of(typeName);
-            return (T)this;
-        }
-
-        public ClientsClassDefinition build() {
-            throw new RuntimeException("not implemented");
-        }
-    }
 }

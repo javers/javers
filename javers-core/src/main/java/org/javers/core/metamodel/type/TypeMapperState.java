@@ -2,6 +2,9 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Function;
 import org.javers.common.collections.Optional;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 
 import java.lang.reflect.Type;
@@ -10,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * thread-safe, thin wrapper for map
@@ -18,11 +22,35 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 class TypeMapperState {
     private final Map<Type, JaversType> mappedTypes = new ConcurrentHashMap<>();
+    private final Map<String, Class> mappedTypeNames = new ConcurrentHashMap<>();
     private final TypeFactory typeFactory;
     private final ValueType OBJECT_TYPE = new ValueType(Object.class);
 
     TypeMapperState(TypeFactory typeFactory) {
         this.typeFactory = typeFactory;
+    }
+
+    /**
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
+     * @since 1.4
+     */
+    Class getClassByTypeName(String typeName) {
+        argumentsAreNotNull(typeName);
+
+        Class javaType = mappedTypeNames.get(typeName);
+        if (javaType != null){
+            return javaType;
+        }
+
+        synchronized (typeName) {
+            Optional<? extends Class> classForName = parseClass(typeName);
+            if (classForName.isPresent()) {
+                mappedTypeNames.put(typeName, classForName.get());
+                return classForName.get();
+            }
+        }
+
+        throw new JaversException(JaversExceptionCode.TYPE_NAME_NOT_FOUND, typeName);
     }
 
     JaversType getJaversType(Type javaType) {
@@ -71,7 +99,8 @@ class TypeMapperState {
             }
 
             JaversType newType = computeFunction.apply(javaType);
-            mappedTypes.put(javaType, newType);
+
+            addFullMapping(javaType, newType);
 
             inferIdPropertyTypeForEntityIfNeed(newType);
 
@@ -89,8 +118,16 @@ class TypeMapperState {
         if (jType instanceof EntityType) {
             EntityType entityType = (EntityType) jType;
             Type idType = entityType.getIdPropertyGenericType();
-            mappedTypes.put(idType, typeFactory.inferIdPropertyTypeAsValue(idType));
+            addFullMapping(idType, typeFactory.inferIdPropertyTypeAsValue(idType));
         }
+    }
+
+    /**
+     * must be called within synchronized block
+     */
+    private void addFullMapping(Type javaType, JaversType newType){
+        mappedTypes.put(javaType, newType);
+        mappedTypeNames.put(newType.getName(), ReflectionUtil.extractClass(javaType));
     }
 
     /**
@@ -131,5 +168,14 @@ class TypeMapperState {
         }
 
         return distances.get(0).getJaversType();
+    }
+
+    private Optional<? extends Class> parseClass(String qualifiedName){
+        try {
+            return Optional.of( TypeMapperState.class.forName(qualifiedName) );
+        }
+        catch (ClassNotFoundException e){
+            return Optional.empty();
+        }
     }
 }

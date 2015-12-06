@@ -8,6 +8,7 @@ import org.javers.core.json.typeadapter.commit.CdoSnapshotStateDeserializer;
 import org.javers.core.metamodel.object.CdoSnapshotState;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -92,16 +93,14 @@ public class JsonConverter {
         Validate.argumentIsNotNull(globalIdDTO);
 
         if (globalIdDTO.isInstanceId()){
-            Class cdoClass = parseClass(globalIdDTO.getCdoClassName());
-            EntityType entity = typeMapper.getJaversManagedType(cdoClass, EntityType.class);
+            EntityType entity = typeMapper.getJaversManagedType(globalIdDTO.getTypeName(), EntityType.class);
             Object cdoId = fromJson(globalIdDTO.getLocalIdJSON(), entity.getIdProperty().getType());
-            return globalIdFactory.createInstanceId(cdoId, cdoClass);
+            return globalIdFactory.createInstanceId(cdoId, entity);
         } else if (globalIdDTO.isValueObjectId()){
             GlobalId ownerId = fromDto(globalIdDTO.getOwnerId());
             return globalIdFactory.createValueObjectIdFromPath(ownerId, globalIdDTO.getFragment());
         } else {
-            Class cdoClass = parseClass(globalIdDTO.getCdoClassName());
-            return globalIdFactory.createUnboundedValueObjectId(cdoClass);
+            return new UnboundedValueObjectId(globalIdDTO.getTypeName());
         }
     }
 
@@ -116,14 +115,5 @@ public class JsonConverter {
 
         ManagedType managedType = typeMapper.getJaversManagedType(globalId);
         return stateDeserializer.deserialize(stateElement, managedType);
-    }
-
-    public static Class parseClass(String qualifiedName){
-        try {
-            return JsonConverter.class.forName(qualifiedName);
-        }
-        catch (ClassNotFoundException e){
-            throw new JaversException(JaversExceptionCode.CLASS_NOT_FOUND, qualifiedName);
-        }
     }
 }

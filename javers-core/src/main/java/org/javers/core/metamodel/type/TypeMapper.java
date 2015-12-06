@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Primitives;
+import org.javers.common.collections.*;
+import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
@@ -92,20 +93,19 @@ public class TypeMapper {
      */
     public JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
-
         return state.getJaversType(javaType);
     }
 
     /**
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
      * @since 1.4
      */
     public JaversType getJaversType(String typeName){
-        //TODO typeName lookup
-        Class javaClazz = JsonConverter.parseClass(typeName);
-        return getJaversType(javaClazz);
+        return getJaversType(state.getClassByTypeName(typeName));
     }
 
     /**
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
      * @since 1.4
      */
     public ManagedType getJaversManagedType(GlobalId globalId) {
@@ -113,25 +113,26 @@ public class TypeMapper {
     }
 
     /**
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
      * @since 1.4
      */
     public <T extends ManagedType> T getJaversManagedType(String typeName, Class<T> expectedType) {
-        //TODO typeName lookup
-        Class javaClazz = JsonConverter.parseClass(typeName);
-        return getJaversManagedType(javaClazz, expectedType);
+        return getJaversManagedType(state.getClassByTypeName(typeName), expectedType);
     }
 
     /**
-     * @throws {@link JaversExceptionCode#MANAGED_CLASS_MAPPING_ERROR} if given javaClass is NOT mapped to {@link ManagedType}
+     * If given javaClass is mapped to ManagedType, returns its JaversType
+     *
+     * @throws JaversException MANAGED_CLASS_MAPPING_ERROR
      */
     public ManagedType getJaversManagedType(Class javaType) {
         return getJaversManagedType(javaType, ManagedType.class);
     }
 
     /**
-     * if given javaClass is mapped to expected JaversType, returns its JaversType
+     * If given javaClass is mapped to expected ManagedType, returns its JaversType
      *
-     * @throws {@link JaversExceptionCode#MANAGED_CLASS_MAPPING_ERROR}
+     * @throws JaversException MANAGED_CLASS_MAPPING_ERROR
      */
     public <T extends ManagedType> T getJaversManagedType(Class javaClass, Class<T> expectedType) {
         JaversType mType = getJaversType(javaClass);

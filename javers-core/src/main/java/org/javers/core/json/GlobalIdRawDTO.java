@@ -4,13 +4,13 @@ package org.javers.core.json;
  * @author bartosz.walacik
  */
 public class GlobalIdRawDTO {
-    private final String cdoClassName;
+    private final String typeName;
     private final String localIdJSON;
     private final String fragment;
     private final GlobalIdRawDTO ownerId;
 
-    public GlobalIdRawDTO(String cdoClassName, String localIdJSON, String fragment, GlobalIdRawDTO ownerId) {
-        this.cdoClassName = cdoClassName;
+    public GlobalIdRawDTO(String typeName, String localIdJSON, String fragment, GlobalIdRawDTO ownerId) {
+        this.typeName = typeName;
         this.localIdJSON = localIdJSON;
         this.fragment = fragment;
         this.ownerId = ownerId;
@@ -24,8 +24,8 @@ public class GlobalIdRawDTO {
         return ownerId != null;
     }
 
-    public String getCdoClassName() {
-        return cdoClassName;
+    public String getTypeName() {
+        return typeName;
     }
 
     public String getLocalIdJSON() {

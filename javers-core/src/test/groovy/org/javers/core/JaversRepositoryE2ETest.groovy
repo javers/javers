@@ -8,7 +8,6 @@ import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.core.snapshot.SnapshotsAssert
 import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
-import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -276,32 +275,17 @@ class JaversRepositoryE2ETest extends Specification {
         changes[0].right == 5
     }
 
-    @Unroll
-    def "should query for LatestSnapshot of #what by GlobalId"() {
+    def "should query for LatestSnapshot of Entity"() {
         given:
-        cdos.each{
-            javers.commit("login", it)
-        }
+        javers.commit("login", new SnapshotEntity(id: 1, intProperty: 1))
+        javers.commit("login", new SnapshotEntity(id: 1, intProperty: 2))
 
         when:
-        def snapshot = javers.getLatestSnapshot(givenId).get()
+        def snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
 
         then:
-        snapshot.globalId == givenId
         snapshot.commitId.majorId == 2
-        snapshot.getPropertyValue(property) == expextedState
-
-        where:
-        cdos  <<  [[new SnapshotEntity(id: 1, intProperty: 1), new SnapshotEntity(id: 1, intProperty: 2)],
-                   [new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress("London")),
-                    new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress("Paris"))],
-                   [new DummyAddress("London"), new DummyAddress("Paris")]]
-        what <<    ["Entity", "Bounded ValueObject", "Unbounded ValueObject"]
-        givenId << [instanceId(1, SnapshotEntity),
-                    valueObjectId(1, SnapshotEntity, "valueObjectRef"),
-                    unboundedValueObjectId(DummyAddress)]
-        property <<      ["intProperty", "city",  "city"]
-        expextedState << [2,             "Paris", "Paris"]
+        snapshot.getPropertyValue("intProperty") == 2
     }
 
     def "should fetch terminal snapshots from the repository"() {
@@ -448,46 +432,6 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
-
-    def "should manage ValueObject class name refactor without TypeName when querying by owning Instance"(){
-        when:
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  5)))
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  10)))
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  15)))
-
-        def changes = javers.findChanges(QueryBuilder.byValueObject(EntityWithRefactoredValueObject,"value").build())
-
-        then:
-        changes.size() == 2
-        changes.find {it.propertyName == "oldField"}.right == 0 //removed properties are treated as nulls
-        changes.find {it.propertyName == "newField"}.right == 15
-    }
-
-    def "should manage ValueObject class name refactor when querying using new class with TypeName"(){
-        when:
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  10)))
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewNamedValueObject(6,  10)))
-
-        def changes = javers.findChanges(QueryBuilder.byClass(NewNamedValueObject).build())
-
-        then:
-        changes.size() == 1
-        changes.find {it.propertyName == "someField"}.right == 6
-    }
-
-    //TODO wtf ???
-    def "should manage Entity class name refactor when querying using new class with TypeName"(){
-      when:
-      javers.commit("author", new OldEntity(id:1, value:5))
-      javers.commit("author", new NewEntity(id:1, value:15))
-
-      def changes = javers.findChanges(QueryBuilder.byInstanceId(1, NewEntity).build())
-
-      then:
-      changes.size() == 1
-      changes.find {it.propertyName == "value"}.right == 15
-    }
-
     def "should do diff and persist commit when class has complex Generic fields inherited from Generic superclass"() {
         given:
         javers.commit("author", new ConcreteWithActualType("a", ["1"]) )
@@ -501,6 +445,90 @@ class JaversRepositoryE2ETest extends Specification {
         change.changes[0].index == 1
         change.changes[0].addedValue instanceof String
         change.changes[0].addedValue == "2"
+    }
+
+    def "should manage Entity class name refactor when querying using new class with @TypeName retrofitted to old class name"(){
+        when:
+        javers.commit("author", new OldEntity(id:1, value:5))
+        javers.commit("author", new NewEntity(id:1, value:15))
+
+        def changes = javers.findChanges(QueryBuilder.byInstanceId(1, NewEntity).build())
+
+        then:
+        changes.size() == 1
+        with(changes.find {it.propertyName == "value"}){
+            assert left == 5
+            assert right == 15
+        }
+    }
+
+    def "should manage Entity class name refactor when old and new class uses @TypeName"(){
+        when:
+        javers.commit("author", new OldEntityWithTypeAlias(id:1, val:5))
+        javers.commit("author", new NewEntityWithTypeAlias(id:1, val:15))
+
+        def changes = javers.findChanges(QueryBuilder.byInstanceId(1, NewEntityWithTypeAlias).build())
+
+        then:
+        changes.size() == 1
+        with(changes.find {it.propertyName == "val"}){
+            assert left == 5
+            assert right == 15
+        }
+    }
+
+    def "should manage ValueObject query when both ValueObject and owner Entity uses @TypeName"(){
+        when:
+        javers.commit("author", new NewEntityWithTypeAlias(id: 1, valueObject: new NewValueObjectWithTypeAlias(some:5)) )
+        javers.commit("author", new NewEntityWithTypeAlias(id: 1, valueObject: new NewValueObjectWithTypeAlias(some:6)) )
+
+        def changes = javers.findChanges(QueryBuilder.byValueObject(NewEntityWithTypeAlias,"valueObject").build())
+
+        then:
+        changes.size() == 1
+        with (changes.find {it.propertyName == "some"}) {
+            assert left == 5
+            assert right == 6
+        }
+
+    }
+
+    def "should manage ValueObject class name refactor without TypeName when querying by owning Instance"(){
+        when:
+        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  5)))
+        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  10)))
+        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  15)))
+
+        def changes = javers.findChanges(QueryBuilder.byValueObject(EntityWithRefactoredValueObject,"value").build())
+
+        then:
+        changes.size() == 2
+        with(changes.find {it.propertyName == "oldField"}) {
+            assert left == 5
+            assert right == 0 //removed properties are treated as nulls
+        }
+        with(changes.find {it.propertyName == "newField"}) {
+            assert left == 10
+            assert right == 15
+        }
+    }
+
+    def "should manage ValueObject class name refactor when querying using new class with @TypeName retrofitted to old class name"(){
+        when:
+        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  10)))
+        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewNamedValueObject(6,  10)))
+
+        def changes = javers.findChanges(QueryBuilder.byClass(NewNamedValueObject).build())
+
+
+        println javers.getTypeMapping(NewNamedValueObject).prettyPrint()
+
+        then:
+        changes.size() == 1
+        with (changes.find {it.propertyName == "someField"}) {
+            assert left == 5
+            assert right == 6
+        }
     }
 
 }

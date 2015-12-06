@@ -11,8 +11,11 @@ import java.math.BigDecimal;
  */
 @TypeName("myName")
 @Entity
-public class JaversEntityWithTypeAlias {
+public class OldEntityWithTypeAlias {
     @Id
     private BigDecimal id;
 
+    private int val;
+
+    private NewValueObjectWithTypeAlias valueObject;
 }

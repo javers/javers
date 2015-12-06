@@ -2,7 +2,15 @@ package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
 import org.bson.types.ObjectId
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.cases.MongoStoredEntity
+import org.javers.core.examples.typeNames.AbstractValueObject
+import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
+import org.javers.core.examples.typeNames.NewNamedValueObject
+import org.javers.core.examples.typeNames.NewValueObject
+import org.javers.core.examples.typeNames.NewValueObjectWithTypeAlias
+import org.javers.core.examples.typeNames.OldValueObject
 import org.javers.core.metamodel.clazz.*
 import org.javers.core.model.*
 import spock.lang.Specification
@@ -17,6 +25,51 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  * @author bartosz walacik
  */
 public class TypeMapperIntegrationTest extends Specification {
+
+    def "should not copy TypeName from prototype"(){
+        given:
+        def mapper = javersTestAssembly().typeMapper
+
+        when:
+        mapper.getJaversType(AbstractValueObject).name
+        mapper.getJaversType(OldValueObject).name
+
+        then:
+        mapper.getJaversType(NewNamedValueObject).name == OldValueObject.name
+    }
+
+    @Unroll
+    def "should find #what type by typeName"(){
+        given:
+        def mapper = javersTestAssembly().typeMapper
+        mapper.getJaversType(clazz) //touch
+
+        when:
+        def managedType = mapper.getJaversType(typeName)
+
+        then:
+        managedType instanceof ManagedType
+        managedType.baseJavaClass == clazz
+        managedType.name == typeName
+
+        where:
+        what <<  ["Entity", "ValueObject", "retrofitted ValueObject"]
+        clazz << [NewEntityWithTypeAlias, NewValueObjectWithTypeAlias, NewNamedValueObject]
+        typeName << ["myName","myValueObject", "org.javers.core.examples.typeNames.OldValueObject"]
+    }
+
+    def "should throw TYPE_NAME_NOT_FOUND Exception when TypeName is not found"() {
+        given:
+        def mapper = javersTestAssembly().typeMapper
+
+        when:
+        mapper.getJaversType("not.registered")
+
+        then:
+        JaversException e = thrown()
+        e.code == JaversExceptionCode.TYPE_NAME_NOT_FOUND
+        println e
+    }
 
     @Unroll
     def "should override Entity type inferred form annotations when ValueObject is explicitly registered for #queryClass.simpleName"() {
@@ -182,5 +235,6 @@ public class TypeMapperIntegrationTest extends Specification {
         jType.class == ValueType
         jType.baseJavaClass == DummyGenericUser
     }
+
     class DummyGenericUser<T> extends AbstractDummyUser {}
 }

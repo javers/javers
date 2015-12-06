@@ -2,7 +2,7 @@ package org.javers.core.json.typeadapter
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import org.javers.core.examples.typeNames.JaversEntityWithTypeAlias
+import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.metamodel.clazz.JaversEntity
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceId
@@ -76,7 +76,7 @@ class GlobalIdTypeAdapterTest extends Specification {
 
         where:
         what <<  ["default", "@TypeName"]
-        clazz << [JaversEntity, JaversEntityWithTypeAlias]
+        clazz << [JaversEntity, NewEntityWithTypeAlias]
         expectedName << [JaversEntity.name, "myName"]
     }
 
@@ -132,7 +132,7 @@ class GlobalIdTypeAdapterTest extends Specification {
         given:
         def json = '{ "entity": "myName", "cdoId": 1}'
         def javers = javersTestAssembly()
-        javers.typeMapper.getJaversType(JaversEntityWithTypeAlias)
+        javers.typeMapper.getJaversType(NewEntityWithTypeAlias)
 
         when:
         def id = javers.jsonConverter.fromJson(json, GlobalId)

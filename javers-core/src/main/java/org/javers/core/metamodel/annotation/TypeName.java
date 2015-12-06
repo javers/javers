@@ -21,6 +21,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * TypeName is an equivalent for org.springframework.data.annotation.TypeAlias
  * from Spring Data.
  *
+ * @since 1.4
  * @author bartosz.walacik
  */
 @Target(TYPE)

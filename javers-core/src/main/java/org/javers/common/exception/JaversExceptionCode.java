@@ -1,7 +1,5 @@
 package org.javers.common.exception;
 
-import org.javers.core.metamodel.annotation.TypeName;
-
 /**
  * Enums with all Javers errors codes
  *
@@ -50,9 +48,13 @@ public enum JaversExceptionCode {
 
     PROPERTY_NOT_FOUND(JaversException.RUNTIME_ERROR +"property '%s' not found in class '%s'"),
 
-    TYPE_NAME_NOT_FOUND(JaversException.RUNTIME_ERROR + "type name '%s' not found." +
-            " If you are using @TypeName annotation, remember to register your packages-to-scan using JaversBuilder.registerPackagesToScan()." +
-            " Alternatively you can register a type name using JaversBuilder.registerEntity()."),
+    /** @since 1.4 */
+    TYPE_NAME_NOT_FOUND(JaversException.RUNTIME_ERROR +
+            "type name '%s' not found. " +
+            "If you are using @TypeName annotation, " +
+            "remember to register this class " +
+            "using JaversBuilder.scanTypeName(Class). " +
+            "See also https://github.com/javers/javers/issues/263"),
 
     MANAGED_CLASS_MAPPING_ERROR(JaversException.RUNTIME_ERROR+"given javaClass '%s' is mapped to %s, expected %s"),
 
