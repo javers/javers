@@ -17,10 +17,12 @@ public class GlobalIdFactory {
 
     private final TypeMapper typeMapper;
     private ObjectAccessHook objectAccessHook;
+    private final GlobalIdPathParser pathParser;
 
     public GlobalIdFactory(TypeMapper typeMapper, ObjectAccessHook objectAccessHook) {
         this.typeMapper = typeMapper;
         this.objectAccessHook = objectAccessHook;
+        this.pathParser = new GlobalIdPathParser(typeMapper);
     }
 
     public GlobalId createId(Object targetCdo) {
@@ -61,12 +63,15 @@ public class GlobalIdFactory {
     }
 
     public ValueObjectId createValueObjectIdFromPath(GlobalId owner, String fragment){
-        GlobalIdPathParser pathParser = new GlobalIdPathParser(fragment, typeMapper);
         ManagedType ownerType = typeMapper.getJaversManagedType(owner);
-        ValueObjectType valueObjectType = pathParser.parseChildValueObject(ownerType);
-
+        ValueObjectType valueObjectType = pathParser.parseChildValueObject(ownerType,fragment);
         return new ValueObjectId(valueObjectType.getName(), owner, fragment);
     }
+
+    public void touchValueObjectFromPath(ManagedType ownerType, String fragment){
+        pathParser.parseChildValueObject(ownerType, fragment);
+    }
+
 
     public ValueObjectId createValueObjectId(Class valueObjectClass, GlobalId owner, String fragment){
         ValueObjectType valueObject = typeMapper.getJaversManagedType(valueObjectClass, ValueObjectType.class);

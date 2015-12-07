@@ -59,8 +59,9 @@ public class QueryRunner {
 
         if (query.isVoOwnerOnlyQuery()) {
             VoOwnerFilter filter = query.getVoOwnerFilter();
-
-            return repository.getValueObjectStateHistory(getOwnerEntity(filter), filter.getPath(), query.getLimit());
+            EntityType ownerEntity = getOwnerEntity(filter);
+            globalIdFactory.touchValueObjectFromPath(ownerEntity, filter.getPath());
+            return repository.getValueObjectStateHistory(ownerEntity, filter.getPath(), query.getLimit());
         }
 
         throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForSnapshots: " + query + " is not supported");
@@ -86,14 +87,15 @@ public class QueryRunner {
 
         if (query.isClassAndPropertyQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getPropertyChangeHistory(mType,query.getPropertyName(), query.isNewObjectChanges(), query.getLimit());
+            return repository.getPropertyChangeHistory(mType, query.getPropertyName(), query.isNewObjectChanges(), query.getLimit());
         }
 
         if (query.isVoOwnerOnlyQuery()) {
             VoOwnerFilter filter = query.getVoOwnerFilter();
-
-            return repository.getValueObjectChangeHistory(getOwnerEntity(filter),
-                    filter.getPath(), query.isNewObjectChanges(), query.getLimit());
+            EntityType ownerEntity = getOwnerEntity(filter);
+            globalIdFactory.touchValueObjectFromPath(ownerEntity, filter.getPath());
+            return repository.getValueObjectChangeHistory(
+                    ownerEntity, filter.getPath(), query.isNewObjectChanges(), query.getLimit());
         }
 
         throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForChanges: " + query + " is not supported");

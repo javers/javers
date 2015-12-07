@@ -69,6 +69,5 @@ class TopLevelContainerTest extends Specification {
         container2 << [ [a:1 , b:2], [1,2], [1,2] as Set, [1].toArray()]
         voId << [unboundedMapId(), unboundedListId(), unboundedSetId(), unboundedArrayId()]
     }
-
 }
 

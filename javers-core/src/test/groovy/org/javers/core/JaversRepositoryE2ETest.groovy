@@ -531,5 +531,4 @@ class JaversRepositoryE2ETest extends Specification {
             assert right == 6
         }
     }
-
 }

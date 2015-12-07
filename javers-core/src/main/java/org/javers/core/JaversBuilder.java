@@ -65,6 +65,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
 
+
     private JaversRepository repository;
 
     public static JaversBuilder javers() {

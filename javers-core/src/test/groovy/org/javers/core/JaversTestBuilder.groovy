@@ -19,6 +19,7 @@ import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.snapshot.GraphSnapshotFacade
 import org.javers.repository.api.JaversExtendedRepository
 import org.javers.repository.api.JaversRepository
+import org.javers.repository.jql.QueryRunner
 
 import java.lang.reflect.Type
 
@@ -54,17 +55,17 @@ class JaversTestBuilder {
         javersBuilder.registerJaversRepository(javersRepository).build()
     }
 
-    private JaversTestBuilder (String packageToScan) {
+    private JaversTestBuilder (Class classToScan) {
         javersBuilder = new JaversBuilder()
-        javersBuilder.registerPackagesToScan(packageToScan).build()
+        javersBuilder.scanTypeName(classToScan).build()
     }
 
     static JaversTestBuilder javersTestAssembly(){
         new JaversTestBuilder(MappingStyle.FIELD)
     }
 
-    static JaversTestBuilder javersTestAssembly(String packageToScan){
-        new JaversTestBuilder(packageToScan)
+    static JaversTestBuilder javersTestAssembly(Class classToScan){
+        new JaversTestBuilder(classToScan)
     }
 
     static JaversTestBuilder javersTestAssembly(JaversRepository javersRepository){
@@ -128,6 +129,10 @@ class JaversTestBuilder {
 
     TypeMapper getTypeMapper(){
         javersBuilder.getContainerComponent(TypeMapper)
+    }
+
+    QueryRunner getQueryRunner(){
+        javersBuilder.getContainerComponent(QueryRunner)
     }
 
     GlobalIdFactory getGlobalIdFactory(){

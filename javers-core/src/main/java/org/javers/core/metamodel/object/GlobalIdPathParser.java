@@ -15,22 +15,20 @@ import java.util.LinkedList;
 class GlobalIdPathParser {
 
     private final TypeMapper typeMapper;
-    private final String path;
 
-    public GlobalIdPathParser(String path, TypeMapper typeMapper) {
+    public GlobalIdPathParser(TypeMapper typeMapper) {
         this.typeMapper = typeMapper;
-        this.path = path;
     }
 
-    ValueObjectType parseChildValueObject(ManagedType ownerType){
-        return parseChildValueObjectFromPathSegments(ownerType, pathToSegments(path));
+    ValueObjectType parseChildValueObject(ManagedType ownerType, String path){
+        return parseChildValueObjectFromPathSegments(ownerType, pathToSegments(path), path);
     }
 
-    private ValueObjectType parseChildValueObjectFromPathSegments(ManagedType ownerType, LinkedList<String> segments) {
+    private ValueObjectType parseChildValueObjectFromPathSegments(ManagedType ownerType, LinkedList<String> segments, String path) {
         Property property = ownerType.getProperty(segments.getFirst());
         JaversType propertyType = typeMapper.getJaversType(property.getGenericType());
 
-        ValueObjectType childVoType = extractChildValueObject(propertyType);
+        ValueObjectType childVoType = extractChildValueObject(propertyType, path);
 
         if (segments.size() == 1 ||
             segments.size() == 2 &&  propertyType instanceof EnumerableType){
@@ -42,10 +40,10 @@ class GlobalIdPathParser {
             segments.removeFirst(); //removing segment with list index or map key
         }
 
-        return parseChildValueObjectFromPathSegments(childVoType, segments);
+        return parseChildValueObjectFromPathSegments(childVoType, segments, path);
     }
 
-    private ValueObjectType extractChildValueObject(JaversType voPropertyType) {
+    private ValueObjectType extractChildValueObject(JaversType voPropertyType, String path) {
 
         if (voPropertyType instanceof ValueObjectType) {
             return (ValueObjectType) voPropertyType;
