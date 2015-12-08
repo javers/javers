@@ -98,7 +98,7 @@ public class JsonConverter {
             return globalIdFactory.createInstanceId(cdoId, entity);
         } else if (globalIdDTO.isValueObjectId()){
             GlobalId ownerId = fromDto(globalIdDTO.getOwnerId());
-            return globalIdFactory.createValueObjectIdFromPath(ownerId, globalIdDTO.getFragment());
+            return globalIdFactory.createValueObjectId(globalIdDTO.getTypeName(), ownerId, globalIdDTO.getFragment());
         } else {
             return new UnboundedValueObjectId(globalIdDTO.getTypeName());
         }

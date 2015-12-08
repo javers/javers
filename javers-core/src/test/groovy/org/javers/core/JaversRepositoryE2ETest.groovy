@@ -526,9 +526,20 @@ class JaversRepositoryE2ETest extends Specification {
             assert left == 10
             assert right == 0 //removed properties are treated as nulls
         }
-        with (changes.find {it.propertyName == "someValue"}) {
+        with(changes.find {it.propertyName == "someValue"}) {
             assert left == 5
             assert right == 6
         }
+    }
+
+    def "should load Snapshot with @TypeName of concrete (used) ValueObject"(){
+        given:
+        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewNamedValueObject(6,  10)))
+
+        when:
+        def snapshot = javers.findSnapshots(QueryBuilder.byClass(NewNamedValueObject).build())[0]
+
+        then:
+        snapshot.globalId.typeName.endsWith("OldValueObject")
     }
 }

@@ -62,16 +62,21 @@ public class GlobalIdFactory {
         return new InstanceId(entity.getName(), localId);
     }
 
+    @Deprecated
     public ValueObjectId createValueObjectIdFromPath(GlobalId owner, String fragment){
         ManagedType ownerType = typeMapper.getJaversManagedType(owner);
         ValueObjectType valueObjectType = pathParser.parseChildValueObject(ownerType,fragment);
         return new ValueObjectId(valueObjectType.getName(), owner, fragment);
     }
 
+    public ValueObjectId createValueObjectId(String voTypeName, GlobalId owner, String fragment){
+        ValueObjectType valueObjectType = typeMapper.getJaversManagedType(voTypeName, ValueObjectType.class);
+        return new ValueObjectId(valueObjectType.getName(), owner, fragment);
+    }
+
     public void touchValueObjectFromPath(ManagedType ownerType, String fragment){
         pathParser.parseChildValueObject(ownerType, fragment);
     }
-
 
     public ValueObjectId createValueObjectId(Class valueObjectClass, GlobalId owner, String fragment){
         ValueObjectType valueObject = typeMapper.getJaversManagedType(valueObjectClass, ValueObjectType.class);

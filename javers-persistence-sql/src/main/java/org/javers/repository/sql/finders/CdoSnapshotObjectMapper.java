@@ -34,6 +34,10 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
 
     @Override
     public CdoSnapshot createObject(ResultSet resultSet) throws SQLException {
+
+        System.out.println("deserializing:  " + resultSet.getString(SNAPSHOT_STATE));
+
+
         GlobalId usedGlobalId;
         if (providedGlobalId.isPresent()){
             usedGlobalId = providedGlobalId.get();
@@ -41,10 +45,16 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
         else{
             GlobalIdRawDTO globalIdRawDTO = assembleGlobalIdRawDTO(resultSet);
             usedGlobalId = jsonConverter.fromDto(globalIdRawDTO);
+
+            System.out.println(".. globalIdRawDTO.name " + globalIdRawDTO.getTypeName());
+            System.out.println(".. usedGlobalId:       " + usedGlobalId);
+            System.out.println(".. usedGlobalId.name:  " + usedGlobalId.getTypeName());
         }
 
         CommitMetadata commit = assembleCommitMetadata(resultSet);
         CdoSnapshotState state = jsonConverter.snapshotStateFromJson(resultSet.getString(SNAPSHOT_STATE), usedGlobalId);
+        System.out.println(".. state.size():   " + state.getProperties().size() );
+
         List<String> changedPropNames = assembleChangedPropNames(resultSet);
         ManagedType managedType = jsonConverter.getManagedType(usedGlobalId);
 

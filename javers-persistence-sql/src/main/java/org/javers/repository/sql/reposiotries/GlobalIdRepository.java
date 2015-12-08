@@ -51,7 +51,6 @@ public class GlobalIdRepository {
         return queryForOptionalLong(query, polyJdbc);
     }
 
-
     /**
      * cached
      */
@@ -83,10 +82,12 @@ public class GlobalIdRepository {
             if (ownerFk.isEmpty()){
                 return Optional.empty();
             }
-            query.from(GLOBAL_ID_TABLE_NAME)
+            query.from(GLOBAL_ID_WITH_CDO_CLASS)
                  .where(GLOBAL_ID_FRAGMENT + " = :fragment " +
-                        "AND " + GLOBAL_ID_OWNER_ID_FK + " = :ownerFk ")
+                        "AND " + GLOBAL_ID_OWNER_ID_FK + " = :ownerFk "+
+                        "AND c." + CDO_CLASS_QUALIFIED_NAME + " = :voQualifiedName ")
                  .withArgument("fragment", valueObjectId.getFragment())
+                 .withArgument("voQualifiedName", valueObjectId.getTypeName())
                  .withArgument("ownerFk", ownerFk.get());
         }
         else if (globalId instanceof InstanceId){

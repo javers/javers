@@ -65,6 +65,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
 
+    private final Set<Class> classesToScan = new HashSet<>();
 
     private JaversRepository repository;
 
@@ -111,8 +112,13 @@ public class JaversBuilder extends AbstractJaversBuilder {
         // JSON beans & domain aware typeAdapters
         bootJsonConverter();
 
-        // Repository
+        // repository
         bootRepository();
+
+        // clases to scan
+        for (Class c : classesToScan){
+            typeMapper().getJaversType(c);
+        }
 
         Javers javers = getContainerComponent(JaversCore.class);
         return javers;
@@ -252,6 +258,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * @since 1.4
      */
     public JaversBuilder scanTypeName(Class userType){
+        classesToScan.add(userType);
         return this;
     }
 
