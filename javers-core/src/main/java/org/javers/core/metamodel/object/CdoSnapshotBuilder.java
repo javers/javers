@@ -27,19 +27,28 @@ public class CdoSnapshotBuilder {
     private List<String> changed = Collections.EMPTY_LIST;
     private ManagedType managedType;
 
-    private CdoSnapshotBuilder(GlobalId globalId, CommitMetadata commitMetadata, ManagedType managedType) {
-        Validate.argumentsAreNotNull(globalId, commitMetadata, managedType);
+    private CdoSnapshotBuilder(GlobalId globalId, ManagedType managedType) {
+        Validate.argumentsAreNotNull(globalId, managedType);
         this.globalId = globalId;
         this.managedType = managedType;
-        this.commitMetadata = commitMetadata;
     }
 
     public static CdoSnapshot emptyCopyOf(CdoSnapshot snapshot){
-        return cdoSnapshot(snapshot.getGlobalId(), snapshot.getCommitMetadata(), snapshot.getManagedType()).withType(snapshot.getType()).build();
+        return cdoSnapshot(snapshot.getGlobalId(), snapshot.getManagedType())
+                .withCommitMetadata(snapshot.getCommitMetadata())
+                .withType(snapshot.getType()).build();
     }
 
+    public static CdoSnapshotBuilder cdoSnapshot(GlobalId globalId, ManagedType managedType) {
+        return new CdoSnapshotBuilder(globalId, managedType);}
+
     public static CdoSnapshotBuilder cdoSnapshot(GlobalId globalId, CommitMetadata commitMetadata, ManagedType managedType) {
-        return new CdoSnapshotBuilder(globalId, commitMetadata, managedType);
+        return new CdoSnapshotBuilder(globalId, managedType).withCommitMetadata(commitMetadata);
+    }
+
+    public CdoSnapshotBuilder withCommitMetadata(CommitMetadata commitMetadata) {
+        this.commitMetadata = commitMetadata;
+        return this;
     }
 
     public CdoSnapshotBuilder withState(CdoSnapshotState state) {

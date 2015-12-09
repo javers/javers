@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.CdoSnapshotState;
 import org.javers.core.metamodel.object.CdoSnapshotStateBuilder;
-import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -17,11 +16,11 @@ import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapsh
 
 /**
  * CdoSnapshotState can't be created by standard {@link CdoSnapshotStateTypeAdapter}
- * due to required globalId
+ * due to required managedType
  *
  * @author bartosz walacik
  */
-public class CdoSnapshotStateDeserializer {
+class CdoSnapshotStateDeserializer {
     private final TypeMapper typeMapper;
     private final JsonDeserializationContext context;
 

@@ -1,13 +1,7 @@
 package org.javers.core.json
 
-import org.javers.core.metamodel.object.InstanceId
-import org.javers.core.metamodel.object.UnboundedValueObjectId
-import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.SnapshotEntity
 import spock.lang.Shared
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import java.math.RoundingMode
 
@@ -88,24 +82,4 @@ class JsonConverterBasicTest extends Specification{
         then:
         value == null
     }
-
-    @Unroll
-    def "should convert #expectedType.simpleName from GlobalIdRawDTO"() {
-        when:
-        def globalId = jsonConverter.fromDto(dto)
-
-        then:
-        globalId.class == expectedType
-        globalId.value() == expectedValue
-
-
-        where:
-        dto << [new GlobalIdRawDTO(SnapshotEntity.name,"1",null,null),
-                new GlobalIdRawDTO(DummyAddress.name,null,"/",null),
-                new GlobalIdRawDTO(null,null,"valueObjectRef",new GlobalIdRawDTO(SnapshotEntity.class.name,"1",null,null) )
-               ]
-        expectedType <<  [InstanceId, UnboundedValueObjectId, ValueObjectId]
-        expectedValue << [SnapshotEntity.class.name+"/1", DummyAddress.class.name+"/", SnapshotEntity.class.name+"/1#valueObjectRef"]
-    }
-
 }

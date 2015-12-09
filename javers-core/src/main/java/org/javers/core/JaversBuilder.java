@@ -448,10 +448,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
         }
     }
 
-    private GlobalIdFactory globalIdFactory(){
-        return getContainerComponent(GlobalIdFactory.class);
-    }
-
     private TypeMapper typeMapper() {
         return getContainerComponent(TypeMapper.class);
     }
@@ -479,8 +475,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new ChangeTypeAdaptersModule(getContainer()));
         addModule(new CommitTypeAdaptersModule(getContainer()));
         jsonConverterBuilder
-                .typeMapper(typeMapper())
-                .globalIdFactory(globalIdFactory())
                 .registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
 
         addComponent(jsonConverterBuilder.build());

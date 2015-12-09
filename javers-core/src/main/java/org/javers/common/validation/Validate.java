@@ -28,8 +28,10 @@ public class Validate {
      * @throws  IllegalArgumentException
      */
     public static void argumentsAreNotNull(Object... arguments) {
-        for (Object argument:arguments) {
-            argumentIsNotNull(argument);
+        for (Object argument : arguments) {
+            if(argument == null) {
+                throw new IllegalArgumentException("argument should not be null");
+            }
         }
     }
 

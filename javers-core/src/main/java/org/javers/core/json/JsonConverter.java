@@ -1,21 +1,12 @@
 package org.javers.core.json;
 
 import com.google.gson.*;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.validation.Validate;
-import org.javers.core.json.typeadapter.commit.CdoSnapshotStateDeserializer;
-import org.javers.core.metamodel.object.CdoSnapshotState;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.UnboundedValueObjectId;
-import org.javers.core.metamodel.type.EntityType;
-import org.javers.core.metamodel.type.ManagedType;
-import org.javers.core.metamodel.type.TypeMapper;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;
+
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * Javers is meant to support various persistence stores for
@@ -50,23 +41,10 @@ import java.lang.reflect.Type;
  */
 public class JsonConverter {
     private Gson gson;
-    private final CdoSnapshotStateDeserializer stateDeserializer;
-    private final TypeMapper typeMapper;
-    private final GlobalIdFactory globalIdFactory;
 
-    JsonConverter(TypeMapper typeMapper, GlobalIdFactory globalIdFactory, Gson gson) {
-        Validate.argumentsAreNotNull(typeMapper, gson);
+    JsonConverter(Gson gson) {
+        argumentsAreNotNull(gson);
         this.gson = gson;
-
-        JsonDeserializationContext deserializationContext =  new JsonDeserializationContext() {
-            @SuppressWarnings("unchecked")
-            public <T> T deserialize(JsonElement json, Type typeOfT) throws JsonParseException {
-                return (T) fromJson(json, typeOfT);
-            }
-        };
-        this.stateDeserializer = new CdoSnapshotStateDeserializer(typeMapper, deserializationContext);
-        this.typeMapper = typeMapper;
-        this.globalIdFactory = globalIdFactory;
     }
 
     public String toJson(Object value) {
@@ -85,35 +63,7 @@ public class JsonConverter {
         return gson.fromJson(json, expectedType);
     }
 
-    public Object fromJson(JsonElement json, Type expectedType) {
+    public <T> T fromJson(JsonElement json, Class<T> expectedType) {
         return gson.fromJson(json, expectedType);
-    }
-
-    public GlobalId fromDto(GlobalIdRawDTO globalIdDTO) {
-        Validate.argumentIsNotNull(globalIdDTO);
-
-        if (globalIdDTO.isInstanceId()){
-            EntityType entity = typeMapper.getJaversManagedType(globalIdDTO.getTypeName(), EntityType.class);
-            Object cdoId = fromJson(globalIdDTO.getLocalIdJSON(), entity.getIdProperty().getType());
-            return globalIdFactory.createInstanceId(cdoId, entity);
-        } else if (globalIdDTO.isValueObjectId()){
-            GlobalId ownerId = fromDto(globalIdDTO.getOwnerId());
-            return globalIdFactory.createValueObjectId(globalIdDTO.getTypeName(), ownerId, globalIdDTO.getFragment());
-        } else {
-            return new UnboundedValueObjectId(globalIdDTO.getTypeName());
-        }
-    }
-
-    public ManagedType getManagedType(GlobalId globalId){
-        Validate.argumentsAreNotNull(globalId);
-        return typeMapper.getJaversManagedType(globalId);
-    }
-
-    public CdoSnapshotState snapshotStateFromJson(String json, GlobalId globalId){
-        Validate.argumentsAreNotNull(json, globalId);
-        JsonElement stateElement = fromJson(json, JsonElement.class);
-
-        ManagedType managedType = typeMapper.getJaversManagedType(globalId);
-        return stateDeserializer.deserialize(stateElement, managedType);
     }
 }

@@ -22,12 +22,12 @@ import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
  */
 class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
-    public static final String GLOBAL_CDO_ID = "globalId";
-    public static final String COMMIT_METADATA = "commitMetadata";
-    public static final String STATE_NAME = "state";
-    public static final String INITIAL_NAME_LEGACY = "initial";
-    public static final String TYPE_NAME = "type";
-    public static final String CHANGED_NAME = "changedProperties";
+    static final String GLOBAL_CDO_ID = "globalId";
+    static final String COMMIT_METADATA = "commitMetadata";
+    static final String STATE_NAME = "state";
+    static final String INITIAL_NAME_LEGACY = "initial";
+    static final String TYPE_NAME = "type";
+    static final String CHANGED_NAME = "changedProperties";
 
     private TypeMapper typeMapper;
 

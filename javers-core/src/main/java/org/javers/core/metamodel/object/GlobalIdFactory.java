@@ -70,6 +70,7 @@ public class GlobalIdFactory {
     }
 
     public ValueObjectId createValueObjectId(String voTypeName, GlobalId owner, String fragment){
+        Validate.argumentsAreNotNull(voTypeName, owner, fragment);
         ValueObjectType valueObjectType = typeMapper.getJaversManagedType(voTypeName, ValueObjectType.class);
         return new ValueObjectId(valueObjectType.getName(), owner, fragment);
     }
