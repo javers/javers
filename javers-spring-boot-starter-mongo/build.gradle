@@ -1,8 +1,10 @@
 dependencies {
     compile project(':javers-spring')
     compile project(':javers-persistence-mongo')
-    compile 'org.springframework.boot:spring-boot-starter:1.3.0.RELEASE'
+    //should be on application's classpath when using JaversSpringBootStarterMongo
+    optional 'org.springframework.boot:spring-boot-starter:1.3.0.RELEASE'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test:1.3.0.RELEASE'
+    testCompile 'org.springframework.data:spring-data-commons:1.10.2.RELEASE'
     testCompile 'com.github.fakemongo:fongo:2.0.3'
 }
