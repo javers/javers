@@ -5,7 +5,6 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.annotation.ClassAnnotationsScan;
 import org.javers.core.metamodel.annotation.ClassAnnotationsScanner;
 import org.javers.core.metamodel.clazz.*;
-import org.javers.core.metamodel.clazz.ClientsClassDefinition.ClientsClassDefinitionBuilder;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.property.PropertyScanner;
 import org.slf4j.Logger;
@@ -13,7 +12,7 @@ import org.slf4j.Logger;
 import java.lang.reflect.Type;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
-import static org.javers.core.metamodel.clazz.EntityDefinition.EntityDefinitionBuilder.entityDefinition;
+import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -96,7 +95,8 @@ public class TypeFactory {
 
         if (prototype instanceof ManagedType) {
             ManagedClass managedClass = managedClassFactory.create(javaClass);
-            return ((ManagedType)prototype).spawn(managedClass);
+            ClassAnnotationsScan scan = classAnnotationsScanner.scan(javaClass);
+            return ((ManagedType)prototype).spawn(managedClass, scan.typeName());
         }
         else {
             return prototype.spawn(javaType); //delegate to simple constructor
@@ -116,7 +116,7 @@ public class TypeFactory {
         if (hasIdProperty(javaClass) || scan.hasEntity()){
             builder = entityDefinition(javaClass);
         } else {
-            builder = ValueObjectDefinition.ValueObjectDefinitionBuilder.valueObjectDefinition(javaClass);
+            builder = ValueObjectDefinitionBuilder.valueObjectDefinition(javaClass);
         }
 
         if (scan.typeName().isPresent()) {

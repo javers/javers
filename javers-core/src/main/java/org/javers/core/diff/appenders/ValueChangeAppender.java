@@ -1,14 +1,13 @@
 package org.javers.core.diff.appenders;
 
-import org.javers.common.collections.Objects;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.PrimitiveOrValueType;
-
+import java.util.Objects;
 import static org.javers.common.reflection.ReflectionUtil.reflectiveToString;
 
 /**
@@ -31,24 +30,24 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
 
         //special treatment for EmbeddedId - could be ValueObjects without good equals() implementation
         if (isIdProperty(pair, property)) {
-            if (Objects.nullSafeEquals(reflectiveToString(leftValue),
-                                       reflectiveToString(rightValue))){
+            if (Objects.equals(reflectiveToString(leftValue),
+                               reflectiveToString(rightValue))){
                 return null;
             }
         }else {
-            if (Objects.nullSafeEquals(leftValue, rightValue)) {
+            if (Objects.equals(leftValue, rightValue)) {
                 return null;
             }
         }
 
-        return new ValueChange(pair.getGlobalId(), property, leftValue, rightValue);
+        return new ValueChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);
     }
 
     private boolean isIdProperty(NodePair nodePair, Property property){
-        GlobalId globalId = nodePair.getGlobalId();
+        ManagedType managedType = nodePair.getManagedType();
 
-        if (globalId instanceof InstanceId) {
-            return ((InstanceId) globalId).getManagedType().getIdProperty().equals(property);
+        if (managedType instanceof EntityType) {
+            return ((EntityType)managedType).getIdProperty().equals(property);
         }
         return false;
     }

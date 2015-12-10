@@ -7,12 +7,13 @@ import spock.lang.Specification
  */
 class JaversMethodFactoryTest extends Specification {
 
+    //TODO check if this is relevant
     def "should return distinct method keys"() {
         given:
 
         when:
-        def aKey = JaversMethodFactory.methodKey(ReflectionTestClass.class.getMethod("Aa", String.class))
-        def bKey = JaversMethodFactory.methodKey(ReflectionTestClass.class.getMethod("BB", String.class))
+        def aKey = JaversMethodFactory.methodKey(ReflectionTestClass.getMethod("Aa", String))
+        def bKey = JaversMethodFactory.methodKey(ReflectionTestClass.getMethod("BB", String))
 
         println("aKey $aKey")
         println("bKey $bKey")

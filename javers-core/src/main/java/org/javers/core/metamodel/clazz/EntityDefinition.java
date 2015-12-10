@@ -1,7 +1,6 @@
 package org.javers.core.metamodel.clazz;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.type.EntityType;
 
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.List;
 /**
  * Recipe for {@link EntityType}
  *
+ * @see EntityDefinitionBuilder
  * @author bartosz walacik
  */
 public class EntityDefinition  extends ClientsClassDefinition {
@@ -29,9 +29,9 @@ public class EntityDefinition  extends ClientsClassDefinition {
                 .withIdPropertyName(idPropertyName));
     }
 
-    private EntityDefinition(EntityDefinitionBuilder builder) {
+    EntityDefinition(EntityDefinitionBuilder builder) {
         super(builder);
-        this.idPropertyName = builder.idPropertyName;
+        this.idPropertyName = builder.getIdPropertyName();
     }
 
     /**
@@ -52,38 +52,4 @@ public class EntityDefinition  extends ClientsClassDefinition {
         return idPropertyName.get();
     }
 
-    /**
-     * Full recipe for Entity,
-     * allows to set all optional attributes of EntityDefinition:
-     * Id-property, ignoredProperties and typeAlias, for example:
-     * <pre>
-     * EntityDefinitionBuilder.entityDefinition(entity)
-     *    .withIdPropertyName(idPropertyName)
-     *    .withIgnoredProperties(ignoredProperties)
-     *    .withTypeName(typeName)
-     *    .build()
-     *</pre>
-     */
-    public static class EntityDefinitionBuilder extends ClientsClassDefinitionBuilder<EntityDefinitionBuilder>{
-        private Optional<String> idPropertyName = Optional.empty();
-
-        private EntityDefinitionBuilder(Class<?> entity) {
-            super(entity);
-        }
-
-        public static EntityDefinitionBuilder entityDefinition(Class<?> entity) {
-            return new EntityDefinitionBuilder(entity);
-        }
-
-        public EntityDefinitionBuilder withIdPropertyName(String idPropertyName) {
-            Validate.argumentIsNotNull(idPropertyName);
-            this.idPropertyName = Optional.of(idPropertyName);
-            return this;
-        }
-
-        @Override
-        public EntityDefinition build() {
-            return new EntityDefinition(this);
-        }
-    }
 }

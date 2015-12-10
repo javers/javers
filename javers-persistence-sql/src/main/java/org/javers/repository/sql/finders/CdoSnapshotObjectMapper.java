@@ -1,22 +1,18 @@
 package org.javers.repository.sql.finders;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.core.commit.CommitId;
-import org.javers.core.commit.CommitMetadata;
-import org.javers.core.json.GlobalIdRawDTO;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.*;
-import org.joda.time.LocalDateTime;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.GlobalId;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
 
-import static org.javers.core.metamodel.object.SnapshotType.valueOf;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 /**
@@ -26,6 +22,13 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
     private final Optional<GlobalId> providedGlobalId;
     private final JsonConverter jsonConverter;
 
+    private static final String GLOBAL_CDO_ID = "globalId";
+    private static final String COMMIT_METADATA = "commitMetadata";
+    private static final String STATE_NAME = "state";
+    private static final String TYPE_NAME = "type";
+    private static final String CHANGED_NAME = "changedProperties";
+
+
     public CdoSnapshotObjectMapper(JsonConverter jsonConverter, Optional<GlobalId> providedGlobalId) {
         this.jsonConverter = jsonConverter;
         this.providedGlobalId = providedGlobalId;
@@ -33,63 +36,82 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
 
     @Override
     public CdoSnapshot createObject(ResultSet resultSet) throws SQLException {
-        GlobalId usedGlobalId;
+        JsonObject json = new JsonObject();
+
+        json.add(COMMIT_METADATA, assembleCommitMetadata(resultSet));
+        json.add(STATE_NAME, jsonConverter.fromJsonToJsonElement(resultSet.getString(SNAPSHOT_STATE)));
+        json.add(CHANGED_NAME, assembleChangedPropNames(resultSet));
+        json.addProperty(TYPE_NAME, resultSet.getString(SNAPSHOT_TYPE));
+
         if (providedGlobalId.isPresent()){
-            usedGlobalId = providedGlobalId.get();
+            json.add(GLOBAL_CDO_ID, jsonConverter.toJsonElement(providedGlobalId.get()));
         }
         else{
-            GlobalIdRawDTO globalIdRawDTO = assembleGlobalIdRawDTO(resultSet);
-            usedGlobalId = jsonConverter.fromDto(globalIdRawDTO);
+            json.add(GLOBAL_CDO_ID, assembleGlobalId(resultSet));
         }
 
-        CommitMetadata commit = assembleCommitMetadata(resultSet);
-        CdoSnapshotState state = jsonConverter.snapshotStateFromJson(resultSet.getString(SNAPSHOT_STATE), usedGlobalId);
-        List<String> changedPropNames = assembleChangedPropNames(resultSet);
-
-        CdoSnapshotBuilder builder = CdoSnapshotBuilder.cdoSnapshot(usedGlobalId, commit);
-        builder.withType(valueOf(resultSet.getString(SNAPSHOT_TYPE)));
-        builder.withChangedProperties(changedPropNames);
-
-        return builder.withState(state).build();
+        return jsonConverter.fromJson(json, CdoSnapshot.class);
     }
 
-    private List<String> assembleChangedPropNames(ResultSet resultSet) throws SQLException {
+    private JsonElement assembleChangedPropNames(ResultSet resultSet) throws SQLException {
+        JsonObject jsonObject = new JsonObject();
+
         String propNamesJSON = resultSet.getString(SNAPSHOT_CHANGED);
         if (propNamesJSON == null || propNamesJSON.isEmpty()){
-            return Collections.emptyList();
+            return jsonObject;
         }
 
-        return jsonConverter.fromJson(propNamesJSON, List.class);
+        return jsonConverter.fromJsonToJsonElement(propNamesJSON);
     }
 
 
-    private CommitMetadata assembleCommitMetadata(ResultSet resultSet) throws SQLException {
-        String author = resultSet.getString(COMMIT_AUTHOR);
-        LocalDateTime commitDate = new LocalDateTime(resultSet.getTimestamp(COMMIT_COMMIT_DATE));
-        CommitId commitId = CommitId.valueOf(resultSet.getBigDecimal(COMMIT_COMMIT_ID));
-        return new CommitMetadata(author, commitDate, commitId);
+    private JsonElement assembleCommitMetadata(ResultSet resultSet) throws SQLException {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("author",resultSet.getString(COMMIT_AUTHOR));
+        jsonObject.add("commitDate", jsonConverter.toJsonElement(resultSet.getTimestamp(COMMIT_COMMIT_DATE)));
+        jsonObject.addProperty("id", resultSet.getBigDecimal(COMMIT_COMMIT_ID));
+
+        return jsonObject;
     }
 
-    private GlobalIdRawDTO assembleGlobalIdRawDTO(ResultSet resultSet){
-
+    private JsonElement assembleGlobalId(ResultSet resultSet){
         try {
             String fragment = resultSet.getString(GLOBAL_ID_FRAGMENT);
             String localIdJSON = resultSet.getString(GLOBAL_ID_LOCAL_ID);
-            String cdoClass = resultSet.getString(CDO_CLASS_QUALIFIED_NAME);
+            String cdoType = resultSet.getString(CDO_CLASS_QUALIFIED_NAME);
 
-            GlobalIdRawDTO ownerId = null;
+            JsonObject json = assembleOneGlobalId(cdoType, localIdJSON, fragment);
+
             if (resultSet.getLong(GLOBAL_ID_OWNER_ID_FK) > 0){
 
                 String ownerFragment = resultSet.getString("owner_"+GLOBAL_ID_FRAGMENT);
                 String ownerLocalIdJSON = resultSet.getString("owner_"+GLOBAL_ID_LOCAL_ID);
-                String ownerCdoClass = resultSet.getString("owner_"+CDO_CLASS_QUALIFIED_NAME);
+                String ownerCdoType = resultSet.getString("owner_"+CDO_CLASS_QUALIFIED_NAME);
 
-                ownerId = new GlobalIdRawDTO(ownerCdoClass, ownerLocalIdJSON, ownerFragment, null);
+                JsonObject ownerId = assembleOneGlobalId(ownerCdoType, ownerLocalIdJSON, ownerFragment);
+                json.add("ownerId", ownerId);
             }
 
-            return new GlobalIdRawDTO(cdoClass, localIdJSON, fragment, ownerId);
+            return json;
+
         } catch (SQLException e){
             throw new JaversException(JaversExceptionCode.SQL_EXCEPTION, e.getMessage());
         }
+    }
+
+    private JsonObject assembleOneGlobalId(String typeName, String localIdJson, String fragment)
+    throws SQLException
+    {
+        JsonObject json = new JsonObject();
+        if (localIdJson != null){
+            json.addProperty("entity", typeName);
+            json.add("cdoId", jsonConverter.fromJsonToJsonElement(localIdJson));
+        }
+        else{
+            json.addProperty("valueObject", typeName);
+            json.addProperty("fragment", fragment);
+        }
+
+        return json;
     }
 }

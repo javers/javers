@@ -2,10 +2,10 @@ package org.javers.core.cases
 
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.container.ArrayChange
-import org.javers.core.diff.changetype.container.ContainerChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.container.SetChange
 import org.javers.core.diff.changetype.map.MapChange
+import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -56,7 +56,7 @@ class TopLevelContainerTest extends Specification {
         javers.commit("author",container2)
 
 
-        def changes = javers.getChangeHistory(voId,3)
+        def changes = javers.findChanges(QueryBuilder.byGlobalIdDTO(voId).limit(3).build())
 
         then:
         changes[0].propertyName == colType
@@ -68,6 +68,5 @@ class TopLevelContainerTest extends Specification {
         container2 << [ [a:1 , b:2], [1,2], [1,2] as Set, [1].toArray()]
         voId << [unboundedMapId(), unboundedListId(), unboundedSetId(), unboundedArrayId()]
     }
-
 }
 

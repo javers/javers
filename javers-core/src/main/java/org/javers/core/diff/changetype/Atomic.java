@@ -1,7 +1,8 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.common.collections.Objects;
 import org.javers.common.collections.Primitives;
+
+import java.util.Objects;
 
 /**
  * Immutable wrapper for client's Primitives, Values and Id's
@@ -54,7 +55,7 @@ public class Atomic {
         }
 
         Atomic other = (Atomic)obj;
-        return Objects.nullSafeEquals(value, other.value);
+        return Objects.equals(value, other.value);
     }
 
     @Override

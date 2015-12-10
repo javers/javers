@@ -2,7 +2,6 @@ package org.javers.core.graph
 
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
-import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.test.assertion.MultiEdgeAssert
 import org.javers.test.assertion.SingleEdgeAssert
 
@@ -31,7 +30,7 @@ class NodeAssert {
     NodeAssert hasInstanceId(Class expectedSourceClass, def expectedLocalCdoId) {
         actual.globalId.with {
             assert it instanceof InstanceId
-            assert it.managedType.baseJavaClass == expectedSourceClass
+            assert it.typeName == expectedSourceClass.name
             assert it.cdoId == expectedLocalCdoId
             it
         }
@@ -43,18 +42,13 @@ class NodeAssert {
         this
     }
 
-    public NodeAssert hasValueObjectId(Class expectedManagedClass, Object ownerId, String expectedFragment) {
-        ValueObjectId valueObjectId = actual.globalId
-
-        assert valueObjectId.managedType.baseJavaClass == expectedManagedClass
-        assert valueObjectId.cdoId == null
-        assert valueObjectId.fragment == expectedFragment
-        assert (valueObjectId.ownerId as InstanceId).idEquals(ownerId)
+    public NodeAssert hasGlobalIdValue(String expectedValue) {
+        actual.globalId.value() == expectedValue
         this
     }
 
     NodeAssert hasUnboundedValueObjectId(Class expectedSourceClass) {
-        assert actual.globalId.managedType.baseJavaClass == expectedSourceClass
+        assert actual.globalId.typeName == expectedSourceClass.name
         this
     }
 

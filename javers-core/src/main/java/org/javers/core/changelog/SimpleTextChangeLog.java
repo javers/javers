@@ -55,13 +55,13 @@ public class SimpleTextChangeLog extends AbstractTextChangeLog {
 
     @Override
     public void onValueChange(ValueChange valueChange) {
-        appendln("    value changed on '"+valueChange.getProperty().getName()+"' property: '"+ valueChange.getLeft() +
+        appendln("    value changed on '"+valueChange.getPropertyName()+"' property: '"+ valueChange.getLeft() +
                  "' -> '" + valueChange.getRight() + "'");
     }
 
     @Override
     public void onReferenceChange(ReferenceChange referenceChange) {
-        appendln("    reference changed on '" + referenceChange.getProperty().getName() + "' property: '" + referenceChange.getLeft() +
+        appendln("    reference changed on '" + referenceChange.getPropertyName() + "' property: '" + referenceChange.getLeft() +
                 "' -> '" + referenceChange.getRight() + "'");
     }
 
@@ -77,25 +77,25 @@ public class SimpleTextChangeLog extends AbstractTextChangeLog {
 
     @Override
     public void onMapChange(MapChange mapChange) {
-        appendln("    map changed on '" + mapChange.getProperty().getName() + "' property: " +
+        appendln("    map changed on '" + mapChange.getPropertyName() + "' property: " +
                 mapChange.getEntryChanges());
     }
 
     @Override
     public void onArrayChange(ArrayChange arrayChange) {
-        appendln("    array changed on '" + arrayChange.getProperty().getName() + "' property: " +
+        appendln("    array changed on '" + arrayChange.getPropertyName() + "' property: " +
                 arrayChange.getChanges());
     }
 
     @Override
     public void onListChange(ListChange listChange) {
-        appendln("    list changed on '" + listChange.getProperty().getName() + "' property: " +
+        appendln("    list changed on '" + listChange.getPropertyName() + "' property: " +
                 listChange.getChanges());
     }
 
     @Override
     public void onSetChange(SetChange setChange) {
-        appendln("    set changed on '" + setChange.getProperty().getName() + "' property: "+
+        appendln("    set changed on '" + setChange.getPropertyName() + "' property: "+
                  setChange.getChanges());
     }
 

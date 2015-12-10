@@ -3,8 +3,6 @@ package org.javers.core.json;
 import com.google.gson.*;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.date.DateTypeAdapters;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.type.TypeMapper;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -19,8 +17,6 @@ public class JsonConverterBuilder {
 
     private boolean typeSafeValues = false;
     private boolean prettyPrint = true;
-    private TypeMapper typeMapper;
-    private GlobalIdFactory globalIdFactory;
     private final GsonBuilder gsonBuilder;
 
     public JsonConverterBuilder() {
@@ -54,16 +50,6 @@ public class JsonConverterBuilder {
      */
     public JsonConverterBuilder prettyPrint(boolean prettyPrint) {
         this.prettyPrint = prettyPrint;
-        return this;
-    }
-
-    public JsonConverterBuilder typeMapper(TypeMapper typeMapper){
-        this.typeMapper = typeMapper;
-        return this;
-    }
-
-    public JsonConverterBuilder globalIdFactory(GlobalIdFactory globalIdFactory){
-        this.globalIdFactory = globalIdFactory;
         return this;
     }
 
@@ -127,7 +113,7 @@ public class JsonConverterBuilder {
         gsonBuilder.serializeNulls()
                    .setDateFormat(ISO_DATE_TIME_FORMAT);
 
-        return new JsonConverter(typeMapper, globalIdFactory, gsonBuilder.create());
+        return new JsonConverter(gsonBuilder.create());
     }
 
     private void registerJsonTypeAdapterForType(Type targetType, final JsonTypeAdapter adapter) {

@@ -7,7 +7,7 @@ repositories {
 ext {
     springVersion = '4.2.3.RELEASE'
     springBootVersion = '1.3.0.RELEASE'
-    hibernateVersion = '4.3.10.Final'
+    hibernateVersion = '4.3.11.Final'
 }
 
 javadoc {
@@ -25,10 +25,10 @@ dependencies {
     optional 'org.springframework:spring-context:'+springVersion
 
     //should be on application's classpath when using JaversSpringDataAuditable
-    optional 'org.springframework.data:spring-data-commons:1.10.2.RELEASE'
+    optional 'org.springframework.data:spring-data-commons:1.11.1.RELEASE'
 
     //should be on application's classpath when using SpringSecurityAuthorProvider
-    optional 'org.springframework.security:spring-security-core:4.0.2.RELEASE'
+    optional 'org.springframework.security:spring-security-core:4.0.3.RELEASE'
 
     //both should be on application's classpath when using JaversTransactionalDecorator
     optional 'org.hibernate:hibernate-entitymanager:'+hibernateVersion

@@ -57,7 +57,6 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
-        //TODO dependency injection
         globalIdRepository.setJsonConverter(jsonConverter);
         cdoSnapshotRepository.setJsonConverter(jsonConverter);
         finder.setJsonConverter(jsonConverter);

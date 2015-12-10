@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.jql.GlobalIdDTO;
 
@@ -7,17 +8,12 @@ import org.javers.repository.jql.GlobalIdDTO;
  * Global ID of Client's domain object (CDO)
  */
 public abstract class GlobalId {
+    private final String typeName;
 
-    /**
-     * JaversType of client's domain object
-     */
-    public abstract ManagedType getManagedType();
-
-    /**
-     * ID of Client's domain object, should be unique in Class scope,
-     * for example database primary key or any domain identifier like user.login
-     */
-    public abstract Object getCdoId();
+    GlobalId(String typeName) {
+        Validate.argumentIsNotNull(typeName);
+        this.typeName = typeName;
+    }
 
     /**
      * <pre>
@@ -31,6 +27,10 @@ public abstract class GlobalId {
     @Override
     public String toString(){
         return this.value();
+    }
+
+    public boolean isTypeOf(ManagedType managedType){
+        return getTypeName().equals(managedType.getName());
     }
 
     @Override
@@ -55,5 +55,9 @@ public abstract class GlobalId {
     @Override
     public int hashCode() {
         return value().hashCode();
+    }
+
+    public String getTypeName() {
+        return typeName;
     }
 }

@@ -12,12 +12,11 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 public class InstanceId extends GlobalId {
-    private transient final EntityType entity;
     private final Object cdoId;
 
-    private InstanceId(Object cdoId, EntityType entity) {
-        argumentsAreNotNull(cdoId, entity);
-        this.entity = entity;
+    InstanceId(String typeName, Object cdoId) {
+        super(typeName);
+        argumentsAreNotNull(cdoId);
         this.cdoId = cdoId;
     }
 
@@ -26,39 +25,19 @@ public class InstanceId extends GlobalId {
      * @throws JaversException NOT_INSTANCE_OF
      */
     public static InstanceId createFromInstance(Object instance, EntityType entity){
-        return new InstanceId(entity.getIdOf(instance), entity);
-    }
-
-    public static InstanceId createFromId(Object id, EntityType entity){
-        return new InstanceId(id, entity);
-    }
-
-    @Override
-    public EntityType getManagedType() {
-        return entity;
+        return new InstanceId(entity.getName(), entity.getIdOf(instance));
     }
 
     /**
-     * Identifier of (client's) Entity <b>instance</b>, should be unique in Entity scope
+     * Identifier of (client's) Entity <b>instance</b>, should be unique in Entity scope.
+     * For example database primary key or any domain identifier like user.login
      */
-    @Override
     public Object getCdoId() {
         return cdoId;
     }
 
     public String value() {
-        return entity.getName()+"/"+getCdoIdAsString();
-    }
-
-    public boolean idEquals(Object instance) {
-        if (instance == null) {
-            return false;
-        }
-        if (!entity.isInstance(instance)){
-            return false;
-        }
-
-        return cdoId.equals(entity.getIdOf(instance));
+        return getTypeName()+"/"+getCdoIdAsString();
     }
 
     private String getCdoIdAsString(){

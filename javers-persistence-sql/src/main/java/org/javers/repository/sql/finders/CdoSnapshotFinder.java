@@ -43,8 +43,8 @@ public class CdoSnapshotFinder {
         return Optional.of(queryForCdoSnapshots(new SnapshotIdFilter(maxSnapshot.get()), Optional.of(globalId), 1).get(0));
     }
 
-    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, Optional<String> propertyName, int limit) {
-        Optional<Long> classPk = globalIdRepository.findClassPk(givenClass.getBaseJavaClass());
+    public List<CdoSnapshot> getStateHistory(ManagedType managedType, Optional<String> propertyName, int limit) {
+        Optional<Long> classPk = globalIdRepository.findClassPk(managedType.getName());
         if (classPk.isEmpty()){
             return Collections.emptyList();
         }
@@ -55,7 +55,7 @@ public class CdoSnapshotFinder {
     }
 
     public List<CdoSnapshot> getVOStateHistory(EntityType ownerEntity, String fragment, int limit) {
-        Optional<Long> ownerEntityClassPk = globalIdRepository.findClassPk(ownerEntity.getBaseJavaClass());
+        Optional<Long> ownerEntityClassPk = globalIdRepository.findClassPk(ownerEntity.getName());
         if (ownerEntityClassPk.isEmpty()){
             return Collections.emptyList();
         }
@@ -75,7 +75,6 @@ public class CdoSnapshotFinder {
         return queryForCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), propertyName), Optional.of(globalId), limit);
     }
 
-    //TODO dependency injection
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }

@@ -3,11 +3,14 @@ package org.javers.core.metamodel.type
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.MappingStyle
+import org.javers.core.examples.typeNames.AbstractValueObject
+import org.javers.core.examples.typeNames.NewNamedValueObject
+import org.javers.core.examples.typeNames.OldValueObject
 import org.javers.core.metamodel.clazz.EntityDefinition
 import org.javers.core.metamodel.clazz.JaversEntity
-import org.javers.core.metamodel.clazz.JaversEntityWithTypeAlias
+import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.metamodel.clazz.JaversValue
-import org.javers.core.metamodel.clazz.JaversValueObjectWithTypeAlias
+import org.javers.core.examples.typeNames.JaversValueObjectWithTypeAlias
 import org.javers.core.metamodel.clazz.ValueObjectDefinition
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -16,8 +19,8 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.metamodel.clazz.EntityDefinition.EntityDefinitionBuilder.entityDefinition
-import static org.javers.core.metamodel.clazz.ValueObjectDefinition.ValueObjectDefinitionBuilder.valueObjectDefinition
+import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition
+import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.valueObjectDefinition
 
 /**
  * @author Pawel Cierpiatka
@@ -31,8 +34,19 @@ class TypeFactoryTest extends Specification {
     @Shared
     def TypeFactory typeFactory
 
+    def "should use name from @TypeName when inferring from prototype"(){
+        given:
+        def prototype = typeFactory.inferFromAnnotations(AbstractValueObject)
+
+        when:
+        def jType = typeFactory.infer(NewNamedValueObject, org.javers.common.collections.Optional.of(prototype))
+
+        then:
+        jType.name == OldValueObject.name
+    }
+
     @Unroll
-    def "should use name from @TypeAlias for inferred #expectedType.simpleName"(){
+    def "should use name from @TypeName for inferred #expectedType.simpleName"(){
         when:
         def type = typeFactory.inferFromAnnotations(clazz)
 
@@ -42,7 +56,7 @@ class TypeFactoryTest extends Specification {
 
         where:
         expectedType  << [ValueObjectType, EntityType]
-        clazz << [JaversValueObjectWithTypeAlias, JaversEntityWithTypeAlias]
+        clazz << [JaversValueObjectWithTypeAlias, NewEntityWithTypeAlias]
     }
 
     @Unroll

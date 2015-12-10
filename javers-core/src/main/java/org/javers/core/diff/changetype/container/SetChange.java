@@ -12,8 +12,8 @@ import static org.javers.common.validation.Validate.conditionFulfilled;
  */
 public class SetChange extends CollectionChange {
 
-    public SetChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
-        super(affectedCdoId, property, changes);
+    public SetChange(GlobalId affectedCdoId, String propertyName, List<ContainerElementChange> changes) {
+        super(affectedCdoId, propertyName, changes);
         for (ContainerElementChange change: changes){
             conditionFulfilled(change instanceof ValueAddOrRemove, "SetChange constructor failed, expected ValueAddOrRemove");
             conditionFulfilled(change.getIndex() == null, "SetChange constructor failed, expected empty change.index");

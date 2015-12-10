@@ -12,7 +12,7 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class CdoSnapshotStateBuilder {
-    private final Map<Property, Object> properties = new HashMap<>();
+    private final Map<String, Object> properties = new HashMap<>();
 
     private CdoSnapshotStateBuilder(){
     }
@@ -31,7 +31,7 @@ public class CdoSnapshotStateBuilder {
             throw new JaversException(JaversExceptionCode.SNAPSHOT_STATE_VIOLATION);
         }
 
-        properties.put(property, value);
+        properties.put(property.getName(), value);
         return this;
     }
 

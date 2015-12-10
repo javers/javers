@@ -37,10 +37,10 @@ public class NpeFromReflectionUtilCase {
         ValueChange change = diff.getChangesByType(ValueChange.class).get(0);
         ValueObjectId voId = javers.idBuilder()
               .withOwner("1", TestClassWithInterfaceProperty.class)
-              .voId(TestInterface.class, "interfaceProperty");
+              .voId("interfaceProperty");
 
         Assertions.assertThat(change.getAffectedGlobalId()).isEqualTo(voId);
-        Assertions.assertThat(change.getProperty().getName()).isEqualTo("value");
+        Assertions.assertThat(change.getPropertyName()).isEqualTo("value");
         Assertions.assertThat(change.getLeft()).isEqualTo("Foo");
         Assertions.assertThat(change.getRight()).isEqualTo("Bar");
     }

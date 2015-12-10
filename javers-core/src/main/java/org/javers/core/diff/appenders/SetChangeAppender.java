@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static org.javers.common.collections.Objects.nullSafeEquals;
 
 /**
  * @author pawel szymczyk
@@ -23,13 +22,10 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
 
     private final TypeMapper typeMapper;
 
-    private final MapChangeAppender mapChangeAppender;
-
     private final GlobalIdFactory globalIdFactory;
 
-    SetChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
+    SetChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
         this.typeMapper = typeMapper;
-        this.mapChangeAppender = mapChangeAppender;
         this.globalIdFactory = globalIdFactory;
     }
 
@@ -38,7 +34,6 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         return propertyType instanceof SetType;
     }
 
-    //TODO add support for ValueObjects
     private boolean isSupportedContainer(Property property) {
         ContainerType propertyType = typeMapper.getPropertyType(property);
 
@@ -55,7 +50,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         JaversType itemType = typeMapper.getJaversType(setType.getItemType());
         DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
 
-        if (nullSafeEquals(leftRawSet, rightRawSet)) {
+        if (Objects.equals(leftRawSet, rightRawSet)) {
             return Collections.EMPTY_LIST;
         }
 
@@ -89,7 +84,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
                 calculateEntryChanges(setType, leftValues, rightValues, owner);
 
         if (!entryChanges.isEmpty()) {
-            return new SetChange(pair.getGlobalId(), property, entryChanges);
+            return new SetChange(pair.getGlobalId(), property.getName(), entryChanges);
         } else {
             return null;
         }

@@ -27,13 +27,13 @@ class ChangeAssert {
 
     ChangeAssert hasInstanceId(Class expected, Object expectedCdoId) {
         assert actual.affectedGlobalId instanceof InstanceId
-        assert actual.affectedGlobalId.managedType.baseJavaClass == expected
+        assert actual.affectedGlobalId.typeName == expected.name
         assert actual.affectedGlobalId.cdoId == expectedCdoId
         this
     }
 
-    ChangeAssert hasEntityTypeOf(Class<?> entityClass) {
-        actual.affectedGlobalId.managedType.baseJavaClass == entityClass
+    ChangeAssert hasEntityTypeOf(Class entityClass) {
+        actual.affectedGlobalId.typeName == entityClass.name
         this
     }
 
@@ -47,8 +47,8 @@ class ChangeAssert {
         this
     }
 
-    ChangeAssert hasProperty(Property expected) {
-        assert actual.property == expected
+    ChangeAssert hasPropertyName(String expectedPropertyName) {
+        assert actual.propertyName == expectedPropertyName
         this
     }
 

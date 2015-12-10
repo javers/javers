@@ -8,6 +8,7 @@ import org.javers.core.metamodel.property.Property;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author bartosz walacik
@@ -24,7 +25,7 @@ public abstract class ManagedType extends JaversType {
         this.managedClass = managedClass;
     }
 
-    abstract ManagedType spawn(ManagedClass managedClass);
+    abstract ManagedType spawn(ManagedClass managedClass, Optional<String> typeName);
 
     @Override
     protected Type getRawDehydratedType() {
@@ -46,5 +47,9 @@ public abstract class ManagedType extends JaversType {
 
     public List<Property> getProperties() {
         return managedClass.getProperties();
+    }
+
+    public Set<String> getPropertyNames(){
+        return managedClass.getPropertyNames();
     }
 }

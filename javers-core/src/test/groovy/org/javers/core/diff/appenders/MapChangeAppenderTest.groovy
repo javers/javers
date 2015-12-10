@@ -41,14 +41,14 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
         given:
         def left =  dummyUser("1").withPrimitiveMap(null).build()
         def right = dummyUser("1").withPrimitiveMap(["some":1]).build()
-        Property primitiveMap = getEntity(DummyUser).getProperty("primitiveMap")
+        def primitiveMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         when:
         def change =  mapChangeAppender().calculateChanges(realNodePair(left,right),primitiveMap)
 
         then:
         assertThat(change)
-                    .hasProperty(primitiveMap)
+                    .hasPropertyName("primitiveMap")
                     .hasInstanceId(DummyUser, "1")
     }
 

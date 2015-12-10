@@ -77,32 +77,6 @@ class JaversTransactionalDecorator implements Javers {
         return delegate.initial(newDomainObject);
     }
 
-    @Override
-    public String toJson(Diff diff) {
-        return delegate.toJson(diff);
-    }
-
-    @Override
-    @Transactional
-    @Deprecated
-    public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit) {
-        return delegate.getStateHistory(globalId, limit);
-    }
-
-    @Override
-    @Transactional
-    @Deprecated
-    public Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId) {
-        return delegate.getLatestSnapshot(globalId);
-    }
-
-    @Override
-    @Transactional
-    @Deprecated
-    public List<Change> getChangeHistory(GlobalIdDTO globalId, int limit) {
-        return delegate.getChangeHistory(globalId, limit);
-    }
-
     @Transactional
     @Override
     public Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass) {

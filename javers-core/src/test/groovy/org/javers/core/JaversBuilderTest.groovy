@@ -4,10 +4,10 @@ import org.javers.core.diff.DiffFactory
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.appenders.SimpleListChangeAppender
 import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender
+import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.graph.ObjectAccessHook
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
-import org.javers.core.metamodel.property.PropertyScanner
 import org.javers.core.metamodel.type.EntityType
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.metamodel.type.ValueObjectType
@@ -25,9 +25,19 @@ import static org.javers.core.JaversBuilder.javers
  */
 class JaversBuilderTest extends Specification {
 
+    def "should scan given Entity"() {
+        when:
+        def javers = JaversTestBuilder.javersTestAssembly(NewEntityWithTypeAlias)
+        def typeMapper = javers.typeMapper
+
+        then:
+        typeMapper.getJaversManagedType("myName").baseJavaClass == NewEntityWithTypeAlias
+    }
+
+
     def "should manage Entity"() {
         when:
-        Javers javers = javers().registerEntity(DummyEntity).build()
+        def javers = javers().registerEntity(DummyEntity).build()
 
         then:
         javers.getTypeMapping(DummyEntity) instanceof EntityType
@@ -35,16 +45,15 @@ class JaversBuilderTest extends Specification {
 
     def "should manage ValueObject"() {
         when:
-        Javers javers = javers().registerValueObject(DummyNetworkAddress).build()
+        def javers = javers().registerValueObject(DummyNetworkAddress).build()
 
         then:
         javers.getTypeMapping(DummyNetworkAddress) instanceof ValueObjectType
     }
 
-
     def "should create Javers"() {
         when:
-        Javers javers = javers().build()
+        def javers = javers().build()
 
         then:
         javers != null
@@ -53,8 +62,8 @@ class JaversBuilderTest extends Specification {
 
     def "should create multiple Javers instances"() {
         when:
-        Javers javers1 = javers().build()
-        Javers javers2 = javers().build()
+        def javers1 = javers().build()
+        def javers2 = javers().build()
 
         then:
         javers1 != javers2

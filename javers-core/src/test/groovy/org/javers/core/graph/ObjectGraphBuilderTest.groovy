@@ -68,9 +68,8 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .andTargetNode()
                 .hasNoEdges()
                 .hasCdo(user.getDummyAddress())
-                .hasValueObjectId(DummyAddress, user, "dummyAddress")
+                .hasGlobalIdValue(DummyUserDetails.name+"/1#dummyAddress")
     }
-
 
     def "should build two node graph for the same Entity"(){
         given:
@@ -401,8 +400,8 @@ abstract class ObjectGraphBuilderTest extends Specification {
         then:
         assertThat(node).hasGlobalId(idBuilder.unboundedValueObjectId(CategoryVo))
         assertThat(node).hasMultiEdge("children").refersToGlobalIds([
-                idBuilder.withUnboundedOwner(CategoryVo).voId(CategoryVo,"children/0"),
-                idBuilder.withUnboundedOwner(CategoryVo).voId(CategoryVo,"children/1")
+                idBuilder.withUnboundedOwner(CategoryVo).voId("children/0"),
+                idBuilder.withUnboundedOwner(CategoryVo).voId("children/1")
         ])
         assertThat(node).hasMultiEdge("children")
                         .andFirstTargetNode()

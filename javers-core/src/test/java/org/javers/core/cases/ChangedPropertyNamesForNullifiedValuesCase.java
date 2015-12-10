@@ -31,7 +31,7 @@ public class ChangedPropertyNamesForNullifiedValuesCase {
         CdoSnapshot s = javers.getLatestSnapshot("1", SimpleTypes.class).get();
 
         //then
-        Assertions.assertThat(s.getChangedPropertyNames()).containsExactly("shortNumber");
+        Assertions.assertThat(s.getChanged()).containsExactly("shortNumber");
 
         //when
         obj.nullify();
@@ -39,7 +39,7 @@ public class ChangedPropertyNamesForNullifiedValuesCase {
         s = javers.getLatestSnapshot("1", SimpleTypes.class).get();
 
         //then
-        Assertions.assertThat(s.getChangedPropertyNames()).hasSize(11);
+        Assertions.assertThat(s.getChanged()).hasSize(11);
     }
 
     static class SimpleTypes {

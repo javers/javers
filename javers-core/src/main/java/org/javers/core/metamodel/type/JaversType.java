@@ -148,6 +148,7 @@ public abstract class JaversType {
 
      protected PrettyPrintBuilder prettyPrintBuilder(){
          return new PrettyPrintBuilder(this)
-                 .addField("baseType", baseJavaType);
+                 .addField("baseType", baseJavaType)
+                 .addField("typeName", name);
      }
 }

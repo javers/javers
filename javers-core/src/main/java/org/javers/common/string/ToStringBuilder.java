@@ -2,7 +2,9 @@ package org.javers.common.string;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.javers.common.validation.Validate.argumentCheck;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -31,6 +33,10 @@ public class ToStringBuilder {
         } else {
             return type.toString();
         }
+    }
+
+    public static String setToString(Set set){
+        return listToString(new ArrayList(set));
     }
 
     public static String listToString(List list){

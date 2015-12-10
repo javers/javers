@@ -47,6 +47,10 @@ class ManagedClass {
         return Collections.unmodifiableList(managedProperties);
     }
 
+    Set<String> getPropertyNames(){
+        return Collections.unmodifiableSet(propertiesByName.keySet());
+    }
+
     /**
      * returns managed properties subset
      */

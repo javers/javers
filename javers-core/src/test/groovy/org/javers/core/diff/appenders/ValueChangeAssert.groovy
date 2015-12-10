@@ -18,7 +18,7 @@ class ValueChangeAssert {
 
     def hasValueObjectId(Class expected, def expectedOwnerId, String expectedFragment ){
         assert actual.affectedGlobalId instanceof ValueObjectId
-        assert actual.affectedGlobalId.managedType.baseJavaClass == expected
+        assert actual.affectedGlobalId.typeName == expected.name
         assert actual.affectedGlobalId.ownerId == expectedOwnerId
         assert actual.affectedGlobalId.fragment == expectedFragment
         this
@@ -29,8 +29,8 @@ class ValueChangeAssert {
         this
     }
 
-    def hasProperty(Property expected) {
-        assert actual.property == expected
+    def hasPropertyName(String expectedName) {
+        assert actual.propertyName == expectedName
         this
     }
 

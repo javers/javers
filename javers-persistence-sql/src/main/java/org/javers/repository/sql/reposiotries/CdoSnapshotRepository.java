@@ -37,13 +37,12 @@ public class CdoSnapshotRepository {
                 .value(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
                 .value(SNAPSHOT_COMMIT_FK, commitIdPk)
                 .value(SNAPSHOT_STATE, jsonConverter.toJson(cdoSnapshot.getState()))
-                .value(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChangedPropertyNames() ))
+                .value(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChanged() ))
                 .sequence(SNAPSHOT_PK, SNAPSHOT_TABLE_PK_SEQ);
 
         return javersPolyJDBC.queryRunner().insert(query);
     }
 
-    //TODO dependency injection
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }

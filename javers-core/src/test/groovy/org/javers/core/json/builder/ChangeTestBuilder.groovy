@@ -13,7 +13,6 @@ import org.javers.core.diff.changetype.container.SetChange
 import org.javers.core.diff.changetype.map.EntryChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.metamodel.object.InstanceId
-import org.javers.core.metamodel.property.Property
 import org.javers.core.metamodel.type.TypeMapper
 
 /**
@@ -36,42 +35,36 @@ class ChangeTestBuilder {
 
     static MapChange mapChange(Object cdo, String propertyName, List<EntryChange> changes) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.managedType.getProperty(propertyName)
-        new MapChange(globalId, prop, changes)
+        new MapChange(globalId, propertyName, changes)
     }
 
     static ListChange listChange(Object cdo, String propertyName, List<ContainerElementChange> changes) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.managedType.getProperty(propertyName)
-        new ListChange(globalId, prop, changes)
+        new ListChange(globalId, propertyName, changes)
     }
 
     static ArrayChange arrayChange(Object cdo, String propertyName, List<ContainerElementChange> changes) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.managedType.getProperty(propertyName)
-        new ArrayChange(globalId, prop, changes)
+        new ArrayChange(globalId, propertyName, changes)
     }
 
     static SetChange setChange(Object cdo, String propertyName, List<ContainerElementChange> changes) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.managedType.getProperty(propertyName)
-        new SetChange(globalId, prop, changes)
+        new SetChange(globalId, propertyName, changes)
     }
 
     static ValueChange valueChange(Object cdo, String propertyName, oldVal=null, newVal=null) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.managedType.getProperty(propertyName)
-        new ValueChange(globalId, prop, oldVal, newVal)
+        new ValueChange(globalId, propertyName, oldVal, newVal)
     }
 
     static ReferenceChange referenceChanged(Object cdo, String propertyName, Object oldRef , Object newRef) {
         InstanceId globalId = instanceId(cdo)
-        Property prop = globalId.managedType.getProperty(propertyName)
 
         InstanceId oldRefId = instanceId(oldRef)
         InstanceId newRefId = instanceId(newRef)
 
-        new ReferenceChange(globalId,prop, oldRefId, newRefId)
+        new ReferenceChange(globalId, propertyName, oldRefId, newRefId)
     }
 
     private static InstanceId instanceId(Object cdo) {

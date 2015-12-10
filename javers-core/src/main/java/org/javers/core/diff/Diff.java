@@ -99,7 +99,7 @@ public class Diff {
         argumentIsNotNull(propertyName);
         return (List)getChanges(new Predicate<Change>() {
             public boolean apply(Change input) {
-                return input instanceof PropertyChange && ((PropertyChange)input).getProperty().getName().equals(propertyName);
+                return input instanceof PropertyChange && ((PropertyChange)input).getPropertyName().equals(propertyName);
 
             }
         });

@@ -260,32 +260,6 @@ public interface Javers {
     <T> T processChangeList(List<Change> changes, ChangeProcessor<T> changeProcessor);
 
     /**
-     * use: <pre>
-     * javers.getJsonConverter().toJson(diff);
-     * </pre>
-     */
-    @Deprecated
-    String toJson(Diff diff);
-
-    /**
-     * use {@link #findSnapshots(JqlQuery)}
-     */
-    @Deprecated
-    List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit);
-
-    /**
-     * use {@link #findChanges(JqlQuery)}
-     */
-    @Deprecated
-    List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
-
-    /**
-     * use {@link #getLatestSnapshot(Object, Class)}
-     */
-    @Deprecated
-    Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId);
-
-    /**
      * Use JaversTypes, if you want to: <br/>
      * - describe your class in the context of JaVers domain model mapping, <br/>
      * - use JaVers Reflection API to conveniently access your object properties
@@ -341,8 +315,7 @@ public interface Javers {
      * property:name, value:Uncle Bob
      * </pre>
      */
-    <T extends JaversType> T getTypeMapping(Type clientsType);
+    <T extends JaversType> T getTypeMapping(Type userType);
 
     IdBuilder idBuilder();
-
 }

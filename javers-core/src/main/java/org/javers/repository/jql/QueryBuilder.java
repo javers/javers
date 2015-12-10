@@ -30,10 +30,29 @@ public class QueryBuilder {
         addFilter(initialFilter);
     }
 
+    /**
+     * Query for selecting changes (or snapshots) made on
+     * any object (Entity or ValueObject) of given class.
+     * <br/><br/>
+     *
+     * For example, last changes on any object of MyClass.class:
+     * <pre>
+     * javers.findChanges( QueryBuilder.byClass(MyClass.class).build() );
+     * </pre>
+     */
     public static QueryBuilder byClass(Class requiredClass){
         return new QueryBuilder(new ClassFilter(requiredClass));
     }
 
+    /**
+     * Query for selecting changes (or snapshots) made on a concrete Entity instance.
+     * <br/><br/>
+     *
+     * For example, last changes on "bob" Person:
+     * <pre>
+     * javers.findChanges( QueryBuilder.byInstanceId("bob", Person.class).build() );
+     * </pre>
+     */
     public static QueryBuilder byInstanceId(Object localId, Class entityClass){
         Validate.argumentsAreNotNull(localId, entityClass);
         return new QueryBuilder(new IdFilter(instanceId(localId, entityClass)));
@@ -44,7 +63,7 @@ public class QueryBuilder {
      * made on all ValueObjects at given path, owned by any instance of given Entity.
      * <br/><br/>
      *
-     * See Path parameter hints in {@link #byValueObjectId(Object, Class, String)}.
+     * See <b>path</b> parameter hints in {@link #byValueObjectId(Object, Class, String)}.
      */
     public static QueryBuilder byValueObject(Class ownerEntityClass, String path){
         Validate.argumentsAreNotNull(ownerEntityClass, path);

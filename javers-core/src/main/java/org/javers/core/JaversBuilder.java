@@ -19,7 +19,9 @@ import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
 import org.javers.core.metamodel.annotation.AnnotationsModule;
 import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.TypeName;
 import org.javers.core.metamodel.clazz.*;
+import org.javers.core.metamodel.clazz.EntityDefinitionBuilder;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.property.PropertyScannerModule;
 import org.javers.core.metamodel.type.*;
@@ -31,6 +33,7 @@ import org.javers.repository.api.JaversRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +64,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
     private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
+
+    private final Set<Class> classesToScan = new HashSet<>();
 
     private JaversRepository repository;
 
@@ -107,8 +112,13 @@ public class JaversBuilder extends AbstractJaversBuilder {
         // JSON beans & domain aware typeAdapters
         bootJsonConverter();
 
-        // Repository
+        // repository
         bootRepository();
+
+        // clases to scan
+        for (Class c : classesToScan){
+            typeMapper().getJaversType(c);
+        }
 
         Javers javers = getContainerComponent(JaversCore.class);
         return javers;
@@ -117,19 +127,23 @@ public class JaversBuilder extends AbstractJaversBuilder {
     /**
      * @see <a href="http://javers.org/documentation/repository-configuration">http://javers.org/documentation/repository-configuration</a>
      */
-    public JaversBuilder registerJaversRepository(JaversRepository repository){
+    public JaversBuilder registerJaversRepository(JaversRepository repository) {
         argumentsAreNotNull(repository);
         this.repository = repository;
         return this;
     }
 
     /**
-     * Registers an {@link EntityType}.
+     * Registers an {@link EntityType}. <br/>
      * Use @Id annotation to mark exactly one Id-property.
      * <br/><br/>
      *
-     * Optionally, use @Transient or @{@link DiffIgnore} to mark ignored properties.
+     * Optionally, use @Transient or @{@link DiffIgnore} annotations to mark ignored properties.
+     * <br/><br/>
      *
+     * For example, Entities are: Person, Document
+     *
+     * @see #registerEntity(EntityDefinition)
      * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
@@ -138,35 +152,13 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * Registers an {@link EntityType}. <br/>
-     * Use this method if you are not willing to use annotations to mark Id-property
-     * and ignored properties.
-     *
-     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
-     */
-    public JaversBuilder registerEntity(EntityDefinition entityDefinition){
-        argumentIsNotNull(entityDefinition);
-        clientsClassDefinitions.add(entityDefinition);
-        return this;
-    }
-
-    /**
-     * Deprecated since 1.0.6,
-     * use {@link #registerEntity(Class)}  or
-     * {@link #registerEntity(EntityDefinition)}
-     */
-    @Deprecated
-    public JaversBuilder registerEntity(Class<?> entityClass, String idPropertyName){
-        return registerEntity(new EntityDefinition(entityClass, idPropertyName));
-    }
-
-    /**
      * Registers a {@link ValueObjectType}. <br/>
-     * Use @Transient or @{@link DiffIgnore} to mark ignored properties.
+     * Optionally, use @Transient or @{@link DiffIgnore} annotations to mark ignored properties.
      * <br/><br/>
      *
      * For example, ValueObjects are: Address, Point
      *
+     * @see #registerValueObject(ValueObjectDefinition)
      * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
@@ -176,14 +168,100 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * Registers a {@link ValueObjectType}. <br/>
-     * Use this method if you are not willing to use annotations to mark ignored properties.
+     * Registers an {@link EntityType}. <br/>
+     * Use this method if you are not willing to use annotations.
+     * <br/></br/>
      *
+     * Recommended way to create {@link EntityDefinition} is {@link EntityDefinitionBuilder},
+     * for example:
+     * <pre>
+     * javersBuilder.registerEntity(
+     *     EntityDefinitionBuilder.entityDefinition(Person.class)
+     *     .withIdPropertyName("id")
+     *     .withTypeName("Person")
+     *     .withIgnoredProperties("notImportantProperty","transientProperty")
+     *     .build());
+     * </pre>
+     *
+     * For simple cases, you can use {@link EntityDefinition} constructors,
+     * for example:
+     * <pre>
+     * javersBuilder.registerEntity( new EntityDefinition(Person.class, "login") );
+     * </pre>
+     *
+     * @see EntityDefinitionBuilder#entityDefinition(Class)
+     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
+     */
+    public JaversBuilder registerEntity(EntityDefinition entityDefinition){
+        argumentIsNotNull(entityDefinition);
+        clientsClassDefinitions.add(entityDefinition);
+        return this;
+    }
+
+    /**
+     * Registers a {@link ValueObjectType}. <br/>
+     * Use this method if you are not willing to use annotations.
+     * <br/></br/>
+     *
+     * Recommended way to create {@link ValueObjectDefinition} is {@link ValueObjectDefinitionBuilder}.
+     * For example:
+     * <pre>
+     * javersBuilder.registerValueObject(ValueObjectDefinitionBuilder.valueObjectDefinition(Address.class)
+     *     .withIgnoredProperties(ignoredProperties)
+     *     .withTypeName(typeName)
+     *     .build();
+     * </pre>
+     *
+     * For simple cases, you can use {@link ValueObjectDefinition} constructors,
+     * for example:
+     * <pre>
+     * javersBuilder.registerValueObject( new ValueObjectDefinition(Address.class, "ignored") );
+     * </pre>
+     *
+     * @see ValueObjectDefinitionBuilder#valueObjectDefinition(Class)
      * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValueObject(ValueObjectDefinition valueObjectDefinition) {
         argumentIsNotNull(valueObjectDefinition);
         clientsClassDefinitions.add(valueObjectDefinition);
+        return this;
+    }
+
+    /**
+     * <b>Not implemented!</b>
+     * <br/><br/>
+     *
+     * <i>If implemented, allows you to register all your classes with &#64;{@link TypeName} annotation
+     * (within given package) in order to use them in all kinds of JQL queries <br/>
+     * (without getting TYPE_NAME_NOT_FOUND exception).
+     * </i>
+     * <br/><br/>
+     *
+     * If you think that this method should be implemented,
+     * vote here: <a href="https://github.com/javers/javers/issues/263">issue/263</a>
+     */
+    public JaversBuilder scanTypeNames(String packageToScan){
+        throw new RuntimeException("JaversBuilder.scanTypeNames(String packageToScan) is not implemented! " +
+                "If you think that this method should be implemented, " +
+                "vote here: https://github.com/javers/javers/issues/263");
+    }
+
+    /**
+     * Register your class with &#64;{@link TypeName} annotation
+     * in order to use them in all kinds of JQL queries<br/>
+     * (without getting TYPE_NAME_NOT_FOUND exception).
+     * <br/><br/>
+     *
+     * If you think that JaVers should be able to scan all your classes
+     * in given package, vote for this feature: <a href="https://github.com/javers/javers/issues/263">issue/263</a>
+     * <br/><br/>
+     *
+     * Alias for {@link Javers#getTypeMapping(Type)}
+     *
+     * @since 1.4
+     */
+    public JaversBuilder scanTypeName(Class userType){
+        classesToScan.add(userType);
         return this;
     }
 
@@ -373,10 +451,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
         }
     }
 
-    private GlobalIdFactory globalIdFactory(){
-        return getContainerComponent(GlobalIdFactory.class);
-    }
-
     private TypeMapper typeMapper() {
         return getContainerComponent(TypeMapper.class);
     }
@@ -404,8 +478,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new ChangeTypeAdaptersModule(getContainer()));
         addModule(new CommitTypeAdaptersModule(getContainer()));
         jsonConverterBuilder
-                .typeMapper(typeMapper())
-                .globalIdFactory(globalIdFactory())
                 .registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
 
         addComponent(jsonConverterBuilder.build());
