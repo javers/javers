@@ -35,7 +35,7 @@ import static org.javers.core.diff.DiffBuilder.diff;
  */
 public class DiffFactory {
 
-    private final NodeMatcher nodeMatcher;
+    private final NodeMatcher nodeMatcher = new NodeMatcher();
     private final TypeMapper typeMapper;
     private final List<NodeChangeAppender> nodeChangeAppenders;
     private final List<PropertyChangeAppender> propertyChangeAppender;

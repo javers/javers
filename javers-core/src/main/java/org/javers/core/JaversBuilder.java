@@ -232,7 +232,9 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * <br/><br/>
      *
      * <i>If implemented, allows you to register all your classes with &#64;{@link TypeName} annotation
-     * (within given package) in order to be able to use them in broad scope JQL queries.</i>
+     * (within given package) in order to use them in all kinds of JQL queries <br/>
+     * (without getting TYPE_NAME_NOT_FOUND exception).
+     * </i>
      * <br/><br/>
      *
      * If you think that this method should be implemented,
@@ -246,7 +248,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     /**
      * Register your class with &#64;{@link TypeName} annotation
-     * in order to be able to use it in broad scope JQL queries.
+     * in order to use them in all kinds of JQL queries<br/>
+     * (without getting TYPE_NAME_NOT_FOUND exception).
      * <br/><br/>
      *
      * If you think that JaVers should be able to scan all your classes
