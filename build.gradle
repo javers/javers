@@ -12,6 +12,11 @@ buildscript {
 
 apply plugin: 'axion-release'
 
+project.ext.versions = [
+    mongoJavaDriver: '3.0.4',
+    fongo: '2.0.3'
+]
+
 scmVersion {
     tag {
         prefix = 'javers'
