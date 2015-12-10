@@ -100,8 +100,8 @@ public class TypeMapper {
      * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
      * @since 1.4
      */
-    public JaversType getJaversType(String typeName){
-        return getJaversType(state.getClassByTypeName(typeName));
+    public ManagedType getJaversManagedType(String typeName){
+        return getJaversManagedType(state.getClassByTypeName(typeName), ManagedType.class);
     }
 
     /**

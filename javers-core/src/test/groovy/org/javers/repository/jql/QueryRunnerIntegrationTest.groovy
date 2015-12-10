@@ -23,7 +23,7 @@ class QueryRunnerIntegrationTest extends Specification {
 
         then:
         expectedMappedTypes.each {
-            assert typeMapper.getJaversType(it)
+            assert typeMapper.getJaversManagedType(it)
         }
 
         where:

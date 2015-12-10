@@ -49,7 +49,7 @@ public class TypeMapperIntegrationTest extends Specification {
         mapper.getJaversType(clazz) //touch
 
         when:
-        def managedType = mapper.getJaversType(typeName)
+        def managedType = mapper.getJaversManagedType(typeName)
 
         then:
         managedType instanceof ManagedType
@@ -67,7 +67,7 @@ public class TypeMapperIntegrationTest extends Specification {
         def mapper = javersTestAssembly().typeMapper
 
         when:
-        mapper.getJaversType("not.registered")
+        mapper.getJaversManagedType("not.registered")
 
         then:
         JaversException e = thrown()

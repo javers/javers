@@ -75,7 +75,6 @@ public class CdoSnapshotFinder {
         return queryForCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), propertyName), Optional.of(globalId), limit);
     }
 
-    //TODO dependency injection
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }

@@ -140,7 +140,6 @@ public class GlobalIdRepository {
         return polyJdbc.queryRunner().insert(query);
     }
 
-    //TODO dependency injection
     public void setJsonConverter(JsonConverter JSONConverter) {
         this.jsonConverter = JSONConverter;
     }

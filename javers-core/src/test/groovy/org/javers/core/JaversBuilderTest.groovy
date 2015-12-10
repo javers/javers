@@ -8,7 +8,6 @@ import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.graph.ObjectAccessHook
 import org.javers.core.metamodel.property.BeanBasedPropertyScanner
 import org.javers.core.metamodel.property.FieldBasedPropertyScanner
-import org.javers.core.metamodel.property.PropertyScanner
 import org.javers.core.metamodel.type.EntityType
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.metamodel.type.ValueObjectType
@@ -32,7 +31,7 @@ class JaversBuilderTest extends Specification {
         def typeMapper = javers.typeMapper
 
         then:
-        typeMapper.getJaversType("myName").baseJavaClass == NewEntityWithTypeAlias
+        typeMapper.getJaversManagedType("myName").baseJavaClass == NewEntityWithTypeAlias
     }
 
 

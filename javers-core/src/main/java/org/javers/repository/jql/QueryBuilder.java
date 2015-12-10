@@ -120,8 +120,6 @@ public class QueryBuilder {
     }
 
     /**
-     * //TODO
-     *
      * Filters to snapshots with a given property on changed properties list.
      *
      * @see CdoSnapshot#getChanged()

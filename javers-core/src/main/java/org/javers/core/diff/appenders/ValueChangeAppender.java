@@ -31,7 +31,7 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
         //special treatment for EmbeddedId - could be ValueObjects without good equals() implementation
         if (isIdProperty(pair, property)) {
             if (Objects.equals(reflectiveToString(leftValue),
-                                       reflectiveToString(rightValue))){
+                               reflectiveToString(rightValue))){
                 return null;
             }
         }else {

@@ -43,7 +43,6 @@ public class CdoSnapshotRepository {
         return javersPolyJDBC.queryRunner().insert(query);
     }
 
-    //TODO dependency injection
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }

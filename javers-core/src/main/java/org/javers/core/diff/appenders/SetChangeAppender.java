@@ -34,7 +34,6 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         return propertyType instanceof SetType;
     }
 
-    //TODO add support for ValueObjects
     private boolean isSupportedContainer(Property property) {
         ContainerType propertyType = typeMapper.getPropertyType(property);
 
