@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static org.javers.common.collections.Objects.nullSafeEquals;
 
 /**
  * @author pawel szymczyk
@@ -52,7 +51,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         JaversType itemType = typeMapper.getJaversType(setType.getItemType());
         DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
 
-        if (nullSafeEquals(leftRawSet, rightRawSet)) {
+        if (Objects.equals(leftRawSet, rightRawSet)) {
             return Collections.EMPTY_LIST;
         }
 

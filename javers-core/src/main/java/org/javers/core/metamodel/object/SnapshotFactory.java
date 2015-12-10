@@ -2,11 +2,12 @@ package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.Defaults;
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.collections.Objects;
 import org.javers.common.exception.JaversException;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
+
+import java.util.Objects;
 
 import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 import static org.javers.common.exception.JaversExceptionCode.NOT_IMPLEMENTED;
@@ -70,7 +71,7 @@ public class SnapshotFactory {
 
         for (Property property : cdoWrapper.getManagedType().getProperties()) {
             Object propertyVal = cdoWrapper.getPropertyValue(property.getName());
-            if (Objects.nullSafeEquals(propertyVal, Defaults.defaultValue(property.getType()))) {
+            if (Objects.equals(propertyVal, Defaults.defaultValue(property.getType()))) {
                 continue;
             }
             snapshotBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, cdoWrapper.getGlobalId()));

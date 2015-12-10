@@ -1,12 +1,13 @@
 package org.javers.core.diff.appenders;
 
-import org.javers.common.collections.Objects;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ManagedType;
+
+import java.util.Objects;
 
 /**
  * @author bartosz walacik
@@ -24,7 +25,7 @@ class ReferenceChangeAppender extends CorePropertyChangeAppender<ReferenceChange
         GlobalId leftId =  pair.getLeftGlobalId(property);
         GlobalId rightId = pair.getRightGlobalId(property);
 
-        if (Objects.nullSafeEquals(leftId, rightId)) {
+        if (Objects.equals(leftId, rightId)) {
             return null;
         }
 

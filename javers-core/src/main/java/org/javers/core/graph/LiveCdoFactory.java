@@ -22,7 +22,7 @@ public class LiveCdoFactory implements CdoFactory {
     public Cdo create (Object wrappedCdo, OwnerContext owner){
         Object wrappedCdoAccessed = objectAccessHook.access(wrappedCdo);
         GlobalId globalId = globalIdFactory.createId(wrappedCdoAccessed, owner);
-        return new CdoWrapper(wrappedCdo, globalId, typeMapper.getJaversManagedType(wrappedCdo.getClass()));
+        return new CdoWrapper(wrappedCdoAccessed, globalId, typeMapper.getJaversManagedType(wrappedCdoAccessed.getClass()));
     }
 
     @Override

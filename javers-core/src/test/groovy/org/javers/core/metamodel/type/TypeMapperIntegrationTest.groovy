@@ -5,12 +5,7 @@ import org.bson.types.ObjectId
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.cases.MongoStoredEntity
-import org.javers.core.examples.typeNames.AbstractValueObject
-import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
-import org.javers.core.examples.typeNames.NewNamedValueObject
-import org.javers.core.examples.typeNames.NewValueObject
-import org.javers.core.examples.typeNames.NewValueObjectWithTypeAlias
-import org.javers.core.examples.typeNames.OldValueObject
+import org.javers.core.examples.typeNames.*
 import org.javers.core.metamodel.clazz.*
 import org.javers.core.model.*
 import spock.lang.Specification
@@ -25,6 +20,27 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  * @author bartosz walacik
  */
 public class TypeMapperIntegrationTest extends Specification {
+
+    def "should find ValueObject by DuckType when properties match"(){
+      when:
+      def mapper = javersTestAssembly().typeMapper
+      mapper.getJaversType(NamedValueObjectOne) //touch
+      mapper.getJaversType(NamedValueObjectTwo) //touch
+
+      then:
+      mapper.getJaversManagedType(new DuckType("namedValueObject", ["name", "one"] as Set), ManagedType).baseJavaClass == NamedValueObjectOne
+      mapper.getJaversManagedType(new DuckType("namedValueObject", ["name", "two"] as Set), ManagedType).baseJavaClass == NamedValueObjectTwo
+    }
+
+    def "should fallback to last mapped bare typeName when properties does not match"(){
+        when:
+        def mapper = javersTestAssembly().typeMapper
+        mapper.getJaversType(NamedValueObjectOne) //touch
+        mapper.getJaversType(NamedValueObjectTwo) //touch
+
+        then:
+        mapper.getJaversManagedType(new DuckType("namedValueObject", ["name", "another"] as Set), ManagedType).baseJavaClass == NamedValueObjectTwo
+    }
 
     @Unroll
     def "should find #what type by typeName"(){

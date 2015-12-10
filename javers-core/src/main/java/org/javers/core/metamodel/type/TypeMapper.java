@@ -112,13 +112,20 @@ public class TypeMapper {
         return getJaversManagedType(state.getClassByTypeName(globalId.getTypeName()), ManagedType.class);
     }
 
-
     /**
      * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
      * @since 1.4
      */
     public <T extends ManagedType> T getJaversManagedType(String typeName, Class<T> expectedType) {
         return getJaversManagedType(state.getClassByTypeName(typeName), expectedType);
+    }
+
+    /**
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
+     * @since 1.4
+     */
+    public <T extends ManagedType> T getJaversManagedType(DuckType duckType, Class<T> expectedType) {
+        return getJaversManagedType(state.getClassByDuckType(duckType), expectedType);
     }
 
     /**

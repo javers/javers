@@ -10,13 +10,7 @@ import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static org.javers.common.collections.Objects.nullSafeEquals;
+import java.util.*;
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
 
 /**
@@ -75,7 +69,7 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
         Map leftMap =  MapType.mapStatic(leftRawMap, dehydrateFunction, owner);
         Map rightMap = MapType.mapStatic(rightRawMap, dehydrateFunction, owner);
 
-        if (nullSafeEquals(leftMap, rightMap)) {
+        if (Objects.equals(leftMap, rightMap)) {
             return Collections.EMPTY_LIST;
         }
 
@@ -85,7 +79,7 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
             Object leftVal  = leftMap.get(commonKey);
             Object rightVal = rightMap.get(commonKey);
 
-            if (!nullSafeEquals(leftVal, rightVal)){
+            if (!Objects.equals(leftVal, rightVal)){
                 changes.add( new EntryValueChange(commonKey, leftVal, rightVal));
             }
         }

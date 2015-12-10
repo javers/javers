@@ -1,7 +1,6 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Function;
-import org.javers.common.collections.Objects;
 import org.javers.common.exception.JaversException;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.PropertyChange;
@@ -11,6 +10,8 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
+
+import java.util.Objects;
 
 import static org.javers.common.exception.JaversExceptionCode.UNSUPPORTED_OPTIONAL_CONTENT_TYPE;
 
@@ -45,13 +46,13 @@ public class OptionalChangeAppender extends CorePropertyChangeAppender<PropertyC
             GlobalId leftId  =  getAndDehydrate(optionalType, leftOptional, contentType);
             GlobalId rightId = getAndDehydrate(optionalType, rightOptional, contentType);
 
-            if (Objects.nullSafeEquals(leftId, rightId)) {
+            if (Objects.equals(leftId, rightId)) {
                 return null;
             }
             return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId);
         }
         if (contentType instanceof PrimitiveOrValueType) {
-            if (Objects.nullSafeEquals(leftOptional, rightOptional)) {
+            if (Objects.equals(leftOptional, rightOptional)) {
                 return null;
             }
             return new ValueChange(pair.getGlobalId(), property.getName(), leftOptional, rightOptional);

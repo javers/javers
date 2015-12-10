@@ -8,6 +8,7 @@ import org.javers.core.metamodel.property.Property;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author bartosz walacik
@@ -46,5 +47,9 @@ public abstract class ManagedType extends JaversType {
 
     public List<Property> getProperties() {
         return managedClass.getProperties();
+    }
+
+    public Set<String> getPropertyNames(){
+        return managedClass.getPropertyNames();
     }
 }

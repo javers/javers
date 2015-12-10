@@ -39,7 +39,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
         JsonObject json = new JsonObject();
 
         json.add(COMMIT_METADATA, assembleCommitMetadata(resultSet));
-        json.add(STATE_NAME, jsonConverter.fromJson(resultSet.getString(SNAPSHOT_STATE), JsonElement.class));
+        json.add(STATE_NAME, jsonConverter.fromJsonToJsonElement(resultSet.getString(SNAPSHOT_STATE)));
         json.add(CHANGED_NAME, assembleChangedPropNames(resultSet));
         json.addProperty(TYPE_NAME, resultSet.getString(SNAPSHOT_TYPE));
 
@@ -61,7 +61,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
             return jsonObject;
         }
 
-        return jsonConverter.fromJson(propNamesJSON, JsonElement.class);
+        return jsonConverter.fromJsonToJsonElement(propNamesJSON);
     }
 
 
@@ -105,7 +105,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
         JsonObject json = new JsonObject();
         if (localIdJson != null){
             json.addProperty("entity", typeName);
-            json.add("cdoId", jsonConverter.fromJson(localIdJson, JsonElement.class));
+            json.add("cdoId", jsonConverter.fromJsonToJsonElement(localIdJson));
         }
         else{
             json.addProperty("valueObject", typeName);

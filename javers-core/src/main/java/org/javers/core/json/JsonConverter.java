@@ -59,6 +59,10 @@ public class JsonConverter {
         return gson.fromJson(json, expectedType);
     }
 
+    public JsonElement fromJsonToJsonElement(String json){
+        return gson.fromJson(json, JsonElement.class);
+    }
+
     public Object fromJson(String json, Type expectedType) {
         return gson.fromJson(json, expectedType);
     }

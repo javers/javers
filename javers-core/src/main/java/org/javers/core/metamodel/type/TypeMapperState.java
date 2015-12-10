@@ -22,7 +22,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  */
 class TypeMapperState {
     private final Map<Type, JaversType> mappedTypes = new ConcurrentHashMap<>();
-    private final Map<String, Class> mappedTypeNames = new ConcurrentHashMap<>();
+    private final Map<DuckType, Class> mappedTypeNames = new ConcurrentHashMap<>();
     private final TypeFactory typeFactory;
     private final ValueType OBJECT_TYPE = new ValueType(Object.class);
 
@@ -35,22 +35,35 @@ class TypeMapperState {
      * @since 1.4
      */
     Class getClassByTypeName(String typeName) {
-        argumentsAreNotNull(typeName);
+        return getClassByDuckType(new DuckType(typeName));
+    }
 
-        Class javaType = mappedTypeNames.get(typeName);
+    /**
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
+     * @since 1.4
+     */
+    Class getClassByDuckType(DuckType duckType) {
+        argumentsAreNotNull(duckType);
+
+        Class javaType = mappedTypeNames.get(duckType);
         if (javaType != null){
             return javaType;
         }
 
-        synchronized (typeName) {
-            Optional<? extends Class> classForName = parseClass(typeName);
+        synchronized (duckType.getTypeName()) {
+            Optional<? extends Class> classForName = parseClass(duckType.getTypeName());
             if (classForName.isPresent()) {
-                mappedTypeNames.put(typeName, classForName.get());
+                mappedTypeNames.put(duckType, classForName.get());
                 return classForName.get();
             }
         }
 
-        throw new JaversException(JaversExceptionCode.TYPE_NAME_NOT_FOUND, typeName);
+        //try to fallback to bare typeName when properties doesn't match
+        if (!duckType.isBare()){
+            return getClassByDuckType(duckType.bareCopy());
+        }
+
+        throw new JaversException(JaversExceptionCode.TYPE_NAME_NOT_FOUND, duckType.getTypeName());
     }
 
     JaversType getJaversType(Type javaType) {
@@ -127,8 +140,12 @@ class TypeMapperState {
      */
     private void addFullMapping(Type javaType, JaversType newType){
         mappedTypes.put(javaType, newType);
-        mappedTypeNames.put(newType.getName(), ReflectionUtil.extractClass(javaType));
-    //    System.out.println("addFull explicit Mapping " + newType.getName() + " -> " + ReflectionUtil.extractClass(javaType));
+
+        if (newType instanceof ManagedType){
+            ManagedType managedType = (ManagedType)newType;
+            mappedTypeNames.put(new DuckType(managedType.getName()), ReflectionUtil.extractClass(javaType));
+            mappedTypeNames.put(new DuckType(managedType), ReflectionUtil.extractClass(javaType));
+        }
     }
 
     /**
