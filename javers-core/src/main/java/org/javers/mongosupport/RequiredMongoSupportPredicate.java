@@ -9,6 +9,6 @@ public class RequiredMongoSupportPredicate implements Predicate<JaversRepository
 
     @Override
     public boolean apply(JaversRepository repository) {
-        return repository.getClass().getName().equals(JAVERS_MONGO_REPOSITORY_CLASS_NAME);
+        return repository != null && repository.getClass().getName().equals(JAVERS_MONGO_REPOSITORY_CLASS_NAME);
     }
 }
