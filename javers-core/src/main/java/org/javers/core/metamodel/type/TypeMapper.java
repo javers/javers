@@ -43,6 +43,7 @@ public class TypeMapper {
 
         //String & Enum
         registerPrimitiveType(String.class);
+        registerPrimitiveType(CharSequence.class);
         registerPrimitiveType(Enum.class);
 
         //array

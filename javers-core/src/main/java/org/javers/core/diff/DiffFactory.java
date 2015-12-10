@@ -2,6 +2,8 @@ package org.javers.core.diff;
 
 import org.javers.common.collections.Consumer;
 import org.javers.common.collections.Optional;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.JaversCoreConfiguration;
@@ -15,8 +17,10 @@ import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.PrimitiveType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.ValueType;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -40,7 +44,6 @@ public class DiffFactory {
 
     public DiffFactory(TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, LiveGraphFactory graphFactory, JaversCoreConfiguration javersCoreConfiguration) {
         this.typeMapper = typeMapper;
-        this.nodeMatcher = new NodeMatcher();
         this.nodeChangeAppenders = nodeChangeAppenders;
         this.graphFactory = graphFactory;
         this.javersCoreConfiguration = javersCoreConfiguration;
@@ -98,6 +101,11 @@ public class DiffFactory {
     }
 
     private LiveGraph buildGraph(Object handle) {
+        JaversType jType = typeMapper.getJaversType(handle.getClass());
+        if (jType instanceof ValueType || jType instanceof PrimitiveType){
+            throw new JaversException(JaversExceptionCode.COMPARING_TOP_LEVEL_VALUES_NOT_SUPPORTED,
+                    jType.getClass().getSimpleName(), handle.getClass().getSimpleName());
+        }
         return graphFactory.createLiveGraph(handle);
     }
 

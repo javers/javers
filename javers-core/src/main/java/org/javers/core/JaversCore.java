@@ -1,6 +1,7 @@
 package org.javers.core;
 
 import org.javers.common.collections.Optional;
+import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.changelog.ChangeListTraverser;
 import org.javers.core.changelog.ChangeProcessor;
@@ -13,7 +14,9 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.PrimitiveType;
 import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.ValueType;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
@@ -26,6 +29,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 
+import static org.javers.common.exception.JaversExceptionCode.COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
@@ -58,6 +62,12 @@ class JaversCore implements Javers {
     @Override
     public Commit commit(String author, Object currentVersion) {
         argumentsAreNotNull(author, currentVersion);
+
+        JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
+        if (jType instanceof ValueType || jType instanceof PrimitiveType){
+            throw new JaversException(COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED,
+                    jType.getClass().getSimpleName(), currentVersion.getClass().getSimpleName());
+        }
 
         Commit commit = commitFactory.create(author, currentVersion);
 
