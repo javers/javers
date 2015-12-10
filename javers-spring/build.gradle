@@ -18,7 +18,6 @@ dependencies {
     compile project(':javers-persistence-sql')
     compile project(':javers-core')
 
-
     compile 'org.aspectj:aspectjweaver:1.8.6'
     compile 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:1.0.0.Final'
 
@@ -48,7 +47,7 @@ dependencies {
     testCompile group: 'org.spockframework', name: 'spock-spring', version: '1.0-groovy-2.4'
 
     testCompile 'org.springframework.data:spring-data-mongodb:1.8.0.M1'
-    testCompile 'com.github.fakemongo:fongo:2.0.0'
+    testCompile 'com.github.fakemongo:fongo:2.0.1'
     testCompile 'org.mongodb:mongo-java-driver:3.0.1'
 
     testCompile project(':javers-persistence-mongo')
