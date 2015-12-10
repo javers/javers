@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.object;
 
+import org.javers.common.collections.Arrays;
 import org.javers.common.collections.Defaults;
 import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
@@ -7,15 +8,13 @@ import org.javers.core.metamodel.property.Property;
 
 import java.util.*;
 
-import org.javers.common.collections.Arrays;
-
 /**
  * @author bartosz walacik
  */
 public class CdoSnapshotState {
-    private final Map<Property, Object> properties;
+    private final Map<String, Object> properties;
 
-    CdoSnapshotState(Map<Property, Object> state) {
+    CdoSnapshotState(Map<String, Object> state) {
         Validate.argumentIsNotNull(state);
         this.properties = state;
     }
@@ -24,21 +23,30 @@ public class CdoSnapshotState {
         return properties.size();
     }
 
+    /**
+     * returns default values for null primitives
+     */
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
-        Object val = properties.get(property);
+        Object val = properties.get(property.getName());
         if (val == null){
             return Defaults.defaultValue(property.getType());
         }
         return val;
     }
 
-    boolean isNull(Property property) {
-        Validate.argumentIsNotNull(property);
-        return !properties.containsKey(property);
+    public Object getPropertyValue(String propertyName) {
+        Validate.argumentIsNotNull(propertyName);
+        return properties.get(propertyName);
     }
 
-    public Set<Property> getProperties() {
+
+    boolean isNull(String propertyName) {
+        Validate.argumentIsNotNull(propertyName);
+        return !properties.containsKey(propertyName);
+    }
+
+    public Set<String> getProperties() {
         return Collections.unmodifiableSet(properties.keySet());
     }
 
@@ -52,8 +60,8 @@ public class CdoSnapshotState {
             return false;
         }
 
-        for (Property p :  this.properties.keySet()) {
-            if (!propertyEquals(that, p)){
+        for (String pName :  this.properties.keySet()) {
+            if (!propertyEquals(that, pName)){
                 return false;
             }
         }
@@ -61,13 +69,15 @@ public class CdoSnapshotState {
         return true;
     }
 
-    private boolean propertyEquals(CdoSnapshotState that, Property property){
-        Object thisValue = this.getPropertyValue(property);
-        Validate.conditionFulfilled(thisValue != null, "null value at CdoCnapshot property " + property.getName());
+    private boolean propertyEquals(CdoSnapshotState that, String propertyName){
+        Object thisValue = this.getPropertyValue(propertyName);
+        Object thatValue = that.getPropertyValue(propertyName);
 
-        Object thatValue = that.getPropertyValue(property);
+        if (thisValue == null || thatValue == null){
+            return false;
+        }
 
-        if (property.getType().isArray()){
+        if (thisValue.getClass().isArray()){
             return Arrays.equals(thisValue, thatValue);
         }
 
@@ -77,15 +87,15 @@ public class CdoSnapshotState {
     /**
      * List of properties with changed values (when comparing to the previous state)
      */
-    public List<Property> differentValues(CdoSnapshotState previous) {
-        List<Property> different = new ArrayList<>();
+    public List<String> differentValues(CdoSnapshotState previous) {
+        List<String> different = new ArrayList<>();
 
-        for (Property property : properties.keySet()) {
-            if (previous.isNull(property)){
+        for (String propertyName : properties.keySet()) {
+            if (previous.isNull(propertyName)){
                 continue;
             }
-            if (!propertyEquals(previous, property)){
-                different.add(property);
+            if (!propertyEquals(previous, propertyName)){
+                different.add(propertyName);
             }
         }
 

@@ -22,10 +22,8 @@ abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends Cha
     private static final String LEFT_VALUE_FIELD = "leftValue";
     private static final String RIGHT_VALUE_FIELD = "rightValue";
 
-    private final TypeMapper typeMapper;
-
     public ContainerChangeTypeAdapter(TypeMapper typeMapper) {
-        this.typeMapper = typeMapper;
+        super(typeMapper);
     }
 
     @Override

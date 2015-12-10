@@ -7,6 +7,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 
 import java.lang.reflect.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -220,13 +221,21 @@ public class ReflectionUtil {
             return (String) cdoId;
         }
 
+        //TODO far all Values
+        if (cdoId instanceof BigDecimal) {
+            return cdoId.toString();
+        }
+
         if (Primitives.isPrimitiveOrBox(cdoId)){
             return cdoId.toString();
         }
 
         StringBuilder ret = new StringBuilder();
         for (JaversField f : getAllPersistentFields(cdoId.getClass()) ){
-            ret.append( f.invokeEvenIfPrivate(cdoId).toString() );
+            Object val = f.invokeEvenIfPrivate(cdoId);
+            if (val != null) {
+                ret.append(val.toString());
+            }
             ret.append(",");
         }
 

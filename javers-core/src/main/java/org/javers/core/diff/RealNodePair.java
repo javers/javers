@@ -1,11 +1,10 @@
 package org.javers.core.diff;
 
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.List;
 
@@ -14,7 +13,6 @@ import java.util.List;
  *
  * @author bartosz walacik
  */
-//TODO refactor -> extends FakeNodePair???
 public class RealNodePair implements NodePair {
     private final ObjectNode left;
     private final ObjectNode right;
@@ -27,6 +25,11 @@ public class RealNodePair implements NodePair {
     }
 
     @Override
+    public ManagedType getManagedType() {
+        return left.getManagedType();
+    }
+
+    @Override
     public boolean isNullOnBothSides(Property property) {
         return left.getPropertyValue(property) == null &&
                 right.getPropertyValue(property) == null;
@@ -34,26 +37,12 @@ public class RealNodePair implements NodePair {
 
     @Override
     public Object getLeftPropertyValue(Property property) {
-        return getPropertyValueEvenIfMissing(left, property);
+        return left.getPropertyValue(property);
     }
 
     @Override
     public Object getRightPropertyValue(Property property) {
-        return getPropertyValueEvenIfMissing(right, property);
-    }
-
-    /**
-     * Converts JaversException.MISSING_PROPERTY to null value
-     */
-    private Object getPropertyValueEvenIfMissing(ObjectNode source, Property property) {
-        try {
-            return source.getPropertyValue(property);
-        } catch (JaversException e) {
-            if (e.getCode() == JaversExceptionCode.MISSING_PROPERTY) {
-                return null;
-            }
-            throw e;
-        }
+        return right.getPropertyValue(property);
     }
 
     @Override
@@ -73,7 +62,7 @@ public class RealNodePair implements NodePair {
 
     @Override
     public List<Property> getProperties() {
-        return left.getManagedType().getProperties();
+        return getManagedType().getProperties();
     }
 
     @Override

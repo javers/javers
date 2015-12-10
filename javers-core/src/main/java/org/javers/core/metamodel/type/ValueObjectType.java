@@ -43,7 +43,7 @@ public class ValueObjectType extends ManagedType{
     }
 
     @Override
-    ValueObjectType spawn(ManagedClass managedClass) {
-        return new ValueObjectType(managedClass);
+    ValueObjectType spawn(ManagedClass managedClass, Optional<String> typeName) {
+        return new ValueObjectType(managedClass, typeName);
     }
 }

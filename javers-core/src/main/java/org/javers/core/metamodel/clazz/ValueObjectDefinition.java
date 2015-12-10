@@ -6,45 +6,26 @@ import org.javers.core.metamodel.type.ValueObjectType;
 /**
  * Recipe for {@link ValueObjectType}
  *
+ * @see ValueObjectDefinitionBuilder
  * @author bartosz walacik
  */
 public class ValueObjectDefinition extends ClientsClassDefinition {
 
+    /**
+     * Simple recipe for ValueObject
+     */
     public ValueObjectDefinition(Class<?> valueObject) {
         super(valueObject);
     }
 
+    /**
+     * Recipe for ValueObject with ignoredProperties
+     */
     public ValueObjectDefinition(Class<?> valueObject, List<String> ignoredProperties) {
         super(valueObject, ignoredProperties);
     }
 
-    private ValueObjectDefinition(ClientsClassDefinitionBuilder builder) {
+    ValueObjectDefinition(ClientsClassDefinitionBuilder builder) {
         super(builder);
-    }
-
-    /**
-     * Full recipe for ValueObject,
-     * allows to set all optional attributes of ValueObjectDefinition:
-     * ignoredProperties and typeName, for example:
-     * <pre>
-     * ValueObjectDefinitionBuilder.valueObjectDefinition(valueObject)
-     *     .withIgnoredProperties(ignoredProperties)
-     *     .withTypeName(typeName)
-     *     .build()
-     * </pre>
-     */
-    public static class ValueObjectDefinitionBuilder extends ClientsClassDefinitionBuilder<ValueObjectDefinitionBuilder>{
-        private ValueObjectDefinitionBuilder(Class valueObject) {
-            super(valueObject);
-        }
-
-        public static ValueObjectDefinitionBuilder valueObjectDefinition(Class<?> valueObject) {
-            return new ValueObjectDefinitionBuilder(valueObject);
-        }
-
-        @Override
-        public ValueObjectDefinition build() {
-            return new ValueObjectDefinition(this);
-        }
     }
 }

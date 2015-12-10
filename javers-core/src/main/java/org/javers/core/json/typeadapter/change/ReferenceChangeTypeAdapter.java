@@ -6,11 +6,16 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.type.TypeMapper;
 
 class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
 
     private static final String LEFT_REFERENCE_FIELD = "left";
     private static final String RIGHT_REFERENCE_FIELD = "right";
+
+    public ReferenceChangeTypeAdapter(TypeMapper typeMapper) {
+        super(typeMapper);
+    }
 
     @Override
     public ReferenceChange fromJson(JsonElement json, JsonDeserializationContext context) {
@@ -20,7 +25,7 @@ class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
         GlobalId leftRef  = context.deserialize(jsonObject.get(LEFT_REFERENCE_FIELD),  GlobalId.class);
         GlobalId rightRef = context.deserialize(jsonObject.get(RIGHT_REFERENCE_FIELD), GlobalId.class);
 
-        return appendCommitMetadata(jsonObject, context, new ReferenceChange(stub.id, stub.property, leftRef, rightRef));
+        return appendCommitMetadata(jsonObject, context, new ReferenceChange(stub.id, stub.getPropertyName(), leftRef, rightRef));
     }
 
     @Override

@@ -27,12 +27,13 @@ public enum JaversExceptionCode {
 
     ALREADY_BUILT(JaversException.BOOTSTRAP_ERROR + "instance already built, each AbstractJaversBuilder may produce only one target instance"),
 
+    PROPERTY_ACCESS_ERROR("error getting value from property '%s' on target object of type '%s', cause: %s"),
+
     CONTAINER_NOT_READY(JaversException.BOOTSTRAP_ERROR +"pico container is not ready"),
 
     AFFECTED_CDO_IS_NOT_AVAILABLE("affected cdo is not available, you can access it only for freshly generated diffs"),
 
-    MISSING_PROPERTY("Looks like you are comparing two objects with different types. " +
-            "There is no property '%s' in type '%s'."),
+    MISSING_PROPERTY("There is no property '%s' in type '%s'."),
 
     NOT_IMPLEMENTED("not implemented"),
 
@@ -42,7 +43,7 @@ public enum JaversExceptionCode {
 
     GENERIC_TYPE_NOT_PARAMETRIZED(
             "\nexpected actual Class argument in type '%s'. "+
-            "\nJaVers is strongly-typed and needs to know actual Class of elements stored in your collections. "+
+            "\nJaVers needs to know actual Class of elements stored in your collections. "+
             "\nTry at least <Object>. Wildcards (e.g. <?>), unbounded type parameters (e.g. <T>)" +
             " and raw types (e.g. List) are not supported."),
 
@@ -52,6 +53,14 @@ public enum JaversExceptionCode {
     SNAPSHOT_STATE_VIOLATION("snapshots are immutable"),
 
     PROPERTY_NOT_FOUND("property '%s' not found in class '%s'"),
+
+    /** @since 1.4 */
+    TYPE_NAME_NOT_FOUND(
+            "type name '%s' not found. " +
+            "If you are using @TypeName annotation, " +
+            "remember to register this class " +
+            "using JaversBuilder.scanTypeName(Class). " +
+            "See also https://github.com/javers/javers/issues/263"),
 
     MANAGED_CLASS_MAPPING_ERROR("given javaClass '%s' is mapped to %s, expected %s"),
 
@@ -67,7 +76,8 @@ public enum JaversExceptionCode {
 
     CLASS_NOT_FOUND("class not found - '%s'") ,
 
-    CANT_EXTRACT_CHILD_VALUE_OBJECT("error while extracting child ValueObject from '%s'" +
+    CANT_EXTRACT_CHILD_VALUE_OBJECT(
+            "error while extracting child ValueObject from path '%s'" +
             ", invalid property type, expected ValueObjectType, ContainerType<ValueObjectType> or MapType<?,ValueObjectType>, got '%s'"),
 
     CANT_PARSE_COMMIT_ID("can't parse given value {'%s'} to CommitId. " +

@@ -217,7 +217,7 @@ class GraphSnapshotFactoryTest extends Specification {
 
     def "should reuse existing snapshots when nothing changed"() {
         given:
-        def cdo = new SnapshotEntity(listOfEntities:    [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
+        def cdo = new SnapshotEntity(listOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
         def firstCommit = javers.javers().commit("author",cdo)
 
         when:

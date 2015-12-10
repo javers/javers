@@ -8,15 +8,20 @@ import org.javers.core.graph.LiveGraphFactory
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.JsonConverterBuilder
 import org.javers.core.metamodel.annotation.ClassAnnotationsScanner
+import org.javers.core.metamodel.object.CdoWrapper
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.SnapshotFactory
+import org.javers.core.metamodel.property.Property
 import org.javers.core.metamodel.property.PropertyScanner
 import org.javers.core.metamodel.type.TypeFactory
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.snapshot.GraphSnapshotFacade
 import org.javers.repository.api.JaversExtendedRepository
 import org.javers.repository.api.JaversRepository
+import org.javers.repository.jql.QueryRunner
+
+import java.lang.reflect.Type
 
 /**
  * This is just a test builder,
@@ -50,8 +55,17 @@ class JaversTestBuilder {
         javersBuilder.registerJaversRepository(javersRepository).build()
     }
 
+    private JaversTestBuilder (Class classToScan) {
+        javersBuilder = new JaversBuilder()
+        javersBuilder.scanTypeName(classToScan).build()
+    }
+
     static JaversTestBuilder javersTestAssembly(){
         new JaversTestBuilder(MappingStyle.FIELD)
+    }
+
+    static JaversTestBuilder javersTestAssembly(Class classToScan){
+        new JaversTestBuilder(classToScan)
     }
 
     static JaversTestBuilder javersTestAssembly(JaversRepository javersRepository){
@@ -76,6 +90,17 @@ class JaversTestBuilder {
 
     Javers javers() {
         javersBuilder.getContainerComponent(Javers)
+    }
+
+    CdoWrapper createCdoWrapper(Object cdo){
+        def mType = getTypeMapper().getJaversManagedType(cdo.class)
+        def id = idBuilder().instanceId(cdo)
+
+        new CdoWrapper(cdo, id, mType)
+    }
+
+    Property getProperty(Class type, String propName) {
+        getTypeMapper().getJaversManagedType(type).getProperty(propName)
     }
 
     PropertyScanner getPropertyScanner(){
@@ -104,6 +129,10 @@ class JaversTestBuilder {
 
     TypeMapper getTypeMapper(){
         javersBuilder.getContainerComponent(TypeMapper)
+    }
+
+    QueryRunner getQueryRunner(){
+        javersBuilder.getContainerComponent(QueryRunner)
     }
 
     GlobalIdFactory getGlobalIdFactory(){

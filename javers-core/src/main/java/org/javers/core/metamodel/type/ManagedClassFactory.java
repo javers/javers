@@ -20,13 +20,9 @@ import java.util.List;
 class ManagedClassFactory {
     private static final Logger logger = LoggerFactory.getLogger(ManagedClassFactory.class);
     private final PropertyScanner propertyScanner;
-    private final ClassAnnotationsScanner classAnnotationsScanner;
 
-    ManagedClassFactory(PropertyScanner propertyScanner,
-                        ClassAnnotationsScanner classAnnotationsScanner) {
-        Validate.argumentsAreNotNull(propertyScanner);
+    public ManagedClassFactory(PropertyScanner propertyScanner) {
         this.propertyScanner = propertyScanner;
-        this.classAnnotationsScanner = classAnnotationsScanner;
     }
 
     ManagedClass create(Class<?> baseJavaClass){

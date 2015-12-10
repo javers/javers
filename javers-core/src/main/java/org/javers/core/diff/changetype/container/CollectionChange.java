@@ -9,7 +9,7 @@ import java.util.List;
  * @author bartosz walacik
  */
 public abstract class CollectionChange extends ContainerChange {
-    public CollectionChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
-        super(affectedCdoId, property, changes);
+    public CollectionChange(GlobalId affectedCdoId, String propertyName, List<ContainerElementChange> changes) {
+        super(affectedCdoId, propertyName, changes);
     }
 }

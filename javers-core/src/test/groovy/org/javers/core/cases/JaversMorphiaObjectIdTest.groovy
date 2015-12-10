@@ -23,7 +23,7 @@ class JaversMorphiaObjectIdTest extends Specification {
 
         when:
         def diff = javers.compare(entity1, entity2)
-        println("diff: " + javers.toJson(diff))
+        println("diff: " + javers.getJsonConverter().toJson(diff))
 
         then:
         diff.getPropertyChanges("_description").size() == 1

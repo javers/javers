@@ -12,8 +12,8 @@ public final class ValueChange extends PropertyChange {
     private final Atomic left;
     private final Atomic right;
 
-    public ValueChange(GlobalId affectedCdoId, Property property, Object leftValue, Object rightValue) {
-        super(affectedCdoId, property);
+    public ValueChange(GlobalId affectedCdoId, String propertyName, Object leftValue, Object rightValue) {
+        super(affectedCdoId, propertyName);
         this.left = new Atomic(leftValue);
         this.right = new Atomic(rightValue);
     }

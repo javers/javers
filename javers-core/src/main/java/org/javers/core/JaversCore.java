@@ -111,11 +111,6 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public String toJson(Diff diff) {
-        return jsonConverter.toJson(diff);
-    }
-
-    @Override
     public List<CdoSnapshot> findSnapshots(JqlQuery query){
         return queryRunner.queryForSnapshots(query);
     }
@@ -125,35 +120,10 @@ class JaversCore implements Javers {
         return queryRunner.queryForChanges(query);
     }
 
-    /**
-     * TODO: deprecate
-     */
-    @Deprecated
-    @Override
-    public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit) {
-        return queryRunner.queryForSnapshots(QueryBuilder.byGlobalIdDTO(globalId).limit(limit).build());
-    }
-
-    /**
-     * TODO: deprecate
-     */
-    @Deprecated
-    @Override
-    public List<Change> getChangeHistory(GlobalIdDTO globalId, int limit) {
-        return queryRunner.queryForChanges(QueryBuilder.byGlobalIdDTO(globalId).limit(limit).build());
-    }
-
     @Override
     public Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass) {
         Validate.argumentsAreNotNull(localId, entityClass);
         return queryRunner.runQueryForLatestSnapshot(instanceId(localId, entityClass));
-    }
-
-    @Override
-    @Deprecated
-    public Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId){
-        Validate.argumentIsNotNull(globalId);
-        return queryRunner.runQueryForLatestSnapshot(globalId);
     }
 
     @Override

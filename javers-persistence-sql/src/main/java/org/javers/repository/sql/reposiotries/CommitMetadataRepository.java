@@ -69,7 +69,6 @@ public class CommitMetadataRepository {
         return result;
     }
 
-    //TODO dependency injection
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }

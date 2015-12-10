@@ -43,7 +43,7 @@ public class Case250CharSequence {
         ValueChange change = diff.getChangesByType(ValueChange.class).get(0);
 
         assertThat(diff.getChanges()).hasSize(1);
-        assertThat(change.getProperty().getName()).isEqualTo("street");
+        assertThat(change.getPropertyName()).isEqualTo("street");
         assertThat(change.getLeft()).isEqualTo(oldVersion.getStreet());
         assertThat(change.getRight()).isEqualTo(currentVersion.getStreet());
     }

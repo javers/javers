@@ -6,8 +6,13 @@ import com.google.gson.JsonObject;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.NewObject;
+import org.javers.core.metamodel.type.TypeMapper;
 
 class NewObjectTypeAdapter extends ChangeTypeAdapter<NewObject> {
+
+    public NewObjectTypeAdapter(TypeMapper typeMapper) {
+        super(typeMapper);
+    }
 
     @Override
     public NewObject fromJson(JsonElement json, JsonDeserializationContext context) {

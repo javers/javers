@@ -2,11 +2,12 @@ package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.Defaults;
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.collections.Objects;
 import org.javers.common.exception.JaversException;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
+
+import java.util.Objects;
 
 import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 import static org.javers.common.exception.JaversExceptionCode.NOT_IMPLEMENTED;
@@ -26,18 +27,19 @@ public class SnapshotFactory {
     }
 
     public CdoSnapshot createTerminal(GlobalId globalId, CommitMetadata commitMetadata) {
-        return cdoSnapshot(globalId, commitMetadata).withType(TERMINAL).build();
+        ManagedType managedType = typeMapper.getJaversManagedType(globalId);
+        return cdoSnapshot(globalId, commitMetadata, managedType).withType(TERMINAL).build();
     }
 
-    public CdoSnapshot createInitial(Object liveCdo, GlobalId globalId, CommitMetadata commitMetadata) {
-        return createSnapshotState(liveCdo, globalId, commitMetadata)
+    public CdoSnapshot createInitial(CdoWrapper cdoWrapper, CommitMetadata commitMetadata) {
+        return createSnapshotState(cdoWrapper, commitMetadata)
                 .withType(INITIAL)
                 .markAllAsChanged()
                 .build();
     }
 
-    public CdoSnapshot createUpdate(Object liveCdo, CdoSnapshot previous, CommitMetadata commitMetadata) {
-        return createSnapshotState(liveCdo, previous.getGlobalId(), commitMetadata)
+    public CdoSnapshot createUpdate(CdoWrapper cdoWrapper, CdoSnapshot previous, CommitMetadata commitMetadata) {
+        return createSnapshotState(cdoWrapper, commitMetadata)
                 .withType(UPDATE)
                 .markChanged(previous)
                 .build();
@@ -64,15 +66,15 @@ public class SnapshotFactory {
         return  propertyType.map(propertyVal, dehydratorMapFunction, owner);
     }
 
-    private CdoSnapshotBuilder createSnapshotState(Object liveCdo, GlobalId id, CommitMetadata commitMetadata){
-        CdoSnapshotBuilder snapshotBuilder = cdoSnapshot(id, commitMetadata);
+    private CdoSnapshotBuilder createSnapshotState(CdoWrapper cdoWrapper, CommitMetadata commitMetadata){
+        CdoSnapshotBuilder snapshotBuilder = cdoSnapshot(cdoWrapper.getGlobalId(), commitMetadata, cdoWrapper.getManagedType());
 
-        for (Property property : id.getManagedType().getProperties()) {
-            Object propertyVal = property.get(liveCdo);
-            if (Objects.nullSafeEquals(propertyVal, Defaults.defaultValue(property.getType()))) {
+        for (Property property : cdoWrapper.getManagedType().getProperties()) {
+            Object propertyVal = cdoWrapper.getPropertyValue(property.getName());
+            if (Objects.equals(propertyVal, Defaults.defaultValue(property.getType()))) {
                 continue;
             }
-            snapshotBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, id));
+            snapshotBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, cdoWrapper.getGlobalId()));
         }
         return snapshotBuilder;
     }

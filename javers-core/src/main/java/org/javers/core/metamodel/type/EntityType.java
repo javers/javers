@@ -55,8 +55,8 @@ public class EntityType extends ManagedType {
     }
 
     @Override
-    EntityType spawn(ManagedClass managedClass) {
-        return new EntityType(managedClass, Optional.of(idProperty));
+    EntityType spawn(ManagedClass managedClass, Optional<String> typeName) {
+        return new EntityType(managedClass, Optional.of(idProperty), typeName);
     }
 
     public Type getIdPropertyGenericType() {

@@ -47,8 +47,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), neverEquals)
 
         then:
-        ChangeAssert.assertThat(change)
-                    .hasProperty(neverEquals)
+        change.propertyName == 'neverEquals'
     }
 
     def "should set ValueChange metadata"() {
@@ -62,7 +61,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
         then:
         ChangeAssert.assertThat(change)
-                    .hasProperty(sex)
+                    .hasPropertyName('sex')
                     .hasInstanceId(DummyUser, "1")
     }
 
@@ -77,7 +76,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
         then:
         assertThat(change)
-                  .hasProperty(sex)
+                  .hasPropertyName("sex")
                   .hasLeftValue(FEMALE)
                   .hasRightValue(OCCASIONALLY)
     }
@@ -93,7 +92,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
         then:
         assertThat(change)
-                  .hasProperty(age)
+                  .hasPropertyName("age")
                   .hasLeftValue(1)
                   .hasRightValue(2)
     }
@@ -109,7 +108,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
         then:
         assertThat(change)
-                  .hasProperty(largeInt)
+                  .hasPropertyName("largeInt")
                   .haveLeftValueNull()
                   .hasRightValue(5)
     }
@@ -118,14 +117,14 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         given:
         def left =  buildGraph(dummyUser("1").withFlag(true).build())
         def right = buildGraph(dummyUser("1").withFlag(false).build())
-        def flag = getManagedProperty(DummyUser, "flag")
+        def flag = getManagedProperty(DummyUser,"flag")
 
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right),flag)
 
         then:
         assertThat(change)
-                  .hasProperty(flag)
+                  .hasPropertyName("flag")
                   .hasLeftValue(true)
                   .hasRightValue(false)
     }
@@ -141,7 +140,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
         then:
         assertThat(change)
-                  .hasProperty(flag)
+                  .hasPropertyName("bigFlag")
                   .haveLeftValueNull()
                   .hasRightValue(Boolean.TRUE)
     }
@@ -160,7 +159,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
         then:
         assertThat(change)
-                .hasProperty(dobProperty)
+                .hasPropertyName("dob")
                 .hasLeftValue(null)
                 .hasRightValue(dob)
     }
@@ -174,12 +173,13 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def right = buildGraph(rightUser)
         def salaryProperty = getManagedProperty(DummyUserWithValues,"salary")
 
+
         when:
         def change = new ValueChangeAppender().calculateChanges(new RealNodePair(left,right), salaryProperty)
 
         then:
         assertThat(change)
-                .hasProperty(salaryProperty)
+                .hasPropertyName("salary")
                 .hasLeftValue(null)
                 .hasRightValue(salary)
     }
@@ -191,7 +191,8 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
         def left = buildGraph(leftUser)
         def right = buildGraph(rightUser)
         def address = getManagedProperty(DummyUserDetails,"dummyAddress")
-        def street =  getManagedProperty(DummyAddress,"street")
+        def street = getManagedProperty(DummyAddress,"street")
+
 
         when:
         def change = new ValueChangeAppender().calculateChanges(
@@ -202,7 +203,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
                   .hasValueObjectId(DummyAddress, new InstanceIdDTO(DummyUserDetails,1), "dummyAddress")
                   .hasLeftValue("Washington Street")
                   .hasRightValue("Wall Street")
-                  .hasProperty(street)
+                  .hasPropertyName("street")
     }
 
     ObjectNode followEdge(ObjectNode node, Property property) {

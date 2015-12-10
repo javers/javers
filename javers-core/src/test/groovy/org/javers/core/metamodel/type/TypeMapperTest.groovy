@@ -6,7 +6,6 @@ import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
-import org.javers.core.model.SnapshotEntity
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -219,29 +218,5 @@ class TypeMapperTest extends Specification {
 
         then:
         jType instanceof ValueType
-    }
-
-    def "should return child ValueObject for ValueObjectType"() {
-        given:
-        def snapshotEntity = mapper.getJaversType(SnapshotEntity)
-
-        expect:
-        mapper.getChildValueObject(snapshotEntity, "valueObjectRef").baseJavaClass == DummyAddress
-    }
-
-    def "should return child ValueObject for List of ValueObjectType"() {
-        given:
-        def snapshotEntity = mapper.getJaversType(SnapshotEntity)
-
-        expect:
-        mapper.getChildValueObject(snapshotEntity, "listOfValueObjects").baseJavaClass == DummyAddress
-    }
-
-    def "should return child ValueObject for Map with ValueObjectType values"() {
-        given:
-        def snapshotEntity = mapper.getJaversType(SnapshotEntity)
-
-        expect:
-        mapper.getChildValueObject(snapshotEntity, "mapPrimitiveToVO").baseJavaClass == DummyAddress
     }
 }

@@ -19,8 +19,8 @@ import static org.javers.common.string.ToStringBuilder.addEnumField;
 public abstract class ContainerChange extends PropertyChange {
     private final List<ContainerElementChange> changes;
 
-    ContainerChange(GlobalId affectedCdoId, Property property, List<ContainerElementChange> changes) {
-        super(affectedCdoId, property);
+    ContainerChange(GlobalId affectedCdoId, String propertyName, List<ContainerElementChange> changes) {
+        super(affectedCdoId, propertyName);
         Validate.argumentIsNotNull(changes);
         Validate.argumentCheck(!changes.isEmpty(),"changes list should not be empty");
         this.changes = Collections.unmodifiableList(new ArrayList<>(changes));

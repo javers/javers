@@ -1,8 +1,6 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversGetterException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -15,9 +13,7 @@ import org.javers.core.metamodel.type.ValueObjectType;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.javers.common.exception.JaversExceptionCode.MISSING_PROPERTY;
-import static org.javers.common.validation.Validate.argumentIsNotNull;
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
 
 /**
@@ -34,12 +30,12 @@ public class ObjectNode {
     private final Map<Property, Edge> edges = new HashMap<>();
 
     public ObjectNode(Cdo cdo) {
-        argumentIsNotNull(cdo);
+        argumentsAreNotNull(cdo);
         this.cdo = cdo;
     }
 
     ObjectNode(Object cdo, EntityType entity) {
-        this(new CdoWrapper(cdo, createFromInstance(cdo, entity)));
+        this(new CdoWrapper(cdo, createFromInstance(cdo, entity), entity));
     }
 
     /**
@@ -78,11 +74,7 @@ public class ObjectNode {
 
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
-        try {
-            return cdo.getPropertyValue(property);
-        } catch (JaversGetterException e){
-            throw new JaversException(MISSING_PROPERTY, property.getName(), cdo.getManagedType().getName());
-        }
+        return cdo.getPropertyValue(property);
     }
 
     public boolean isNull(Property property){
@@ -112,7 +104,7 @@ public class ObjectNode {
     }
 
     public ManagedType getManagedType() {
-        return cdo.getGlobalId().getManagedType();
+        return cdo.getManagedType();
     }
 
     public Cdo getCdo() {
@@ -131,5 +123,4 @@ public class ObjectNode {
     public int hashCode() {
         return cdo.hashCode();
     }
-
 }
