@@ -145,6 +145,14 @@ public class QueryBuilder {
     }
 
     /**
+     * Alias to {@link #withNewObjectChanges(boolean)} with true
+     */
+    public QueryBuilder withNewObjectChanges() {
+        this.newObjectChanges = true;
+        return this;
+    }
+
+    /**
      * Limits number of snapshots to be read from JaversRepository, default is 100.
      * <br/>
      * Always choose reasonable limits to improve performance of your queries.
