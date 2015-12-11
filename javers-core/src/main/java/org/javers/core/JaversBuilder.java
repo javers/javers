@@ -22,11 +22,12 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.clazz.EntityDefinitionBuilder;
-import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.property.PropertyScannerModule;
 import org.javers.core.metamodel.type.*;
 import org.javers.core.snapshot.GraphSnapshotModule;
 import org.javers.java8support.Java8AddOns;
+import org.javers.mongosupport.MongoLong64JsonDeserializer;
+import org.javers.mongosupport.RequiredMongoSupportPredicate;
 import org.javers.repository.api.InMemoryRepositoryModule;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
@@ -477,6 +478,11 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
         addModule(new ChangeTypeAdaptersModule(getContainer()));
         addModule(new CommitTypeAdaptersModule(getContainer()));
+
+        if (new RequiredMongoSupportPredicate().apply(repository)) {
+            jsonConverterBuilder.registerNativeGsonDeserializer(Long.class, new MongoLong64JsonDeserializer());
+        }
+
         jsonConverterBuilder
                 .registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
 

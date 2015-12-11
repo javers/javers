@@ -47,7 +47,7 @@ dependencies {
     testCompile group: 'org.spockframework', name: 'spock-spring', version: '1.0-groovy-2.4'
 
     testCompile 'org.springframework.data:spring-data-mongodb:1.8.0.M1'
-    testCompile 'com.github.fakemongo:fongo:2.0.1'
+    testCompile "com.github.fakemongo:fongo:$versions.fongo"
     testCompile 'org.mongodb:mongo-java-driver:3.0.1'
 
     testCompile project(':javers-persistence-mongo')
