@@ -56,7 +56,7 @@ class RefactoringExample extends Specification {
       println changes[0]
     }
 
-    def "should be very relaxed about ValueObject types"(){
+    def 'should be very relaxed about ValueObject types'(){
       given:
       def javers = JaversBuilder.javers().build()
       javers.commit('author', new Person(1,new EmailAddress('me@example.com',   false)))
@@ -70,19 +70,13 @@ class RefactoringExample extends Specification {
       then: 'three ValueChanges are expected'
       changes.size() == 3
       changes.count{
-          it.propertyName == 'email' &&
-          it.left == 'me@example.com'
-          it.right == null
+          it.propertyName == 'email' && it.left == 'me@example.com'
       } // == 1
       changes.count{
-          it.propertyName == 'verified' &&
-          it.left == false &&
-          it.right == true
+          it.propertyName == 'verified' && it.right == true
       }
       changes.count{
-          it.propertyName == 'street' &&
-          it.left == 'Green 50' &&
-          it.right == 'Green 55'
+          it.propertyName == 'street' && it.right == 'Green 55'
       }
       changes.each { println it }
     }
