@@ -7,6 +7,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.changetype.PropertyChange;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  *
  * @author bartosz walacik
  */
-public class Diff {
+public class Diff implements Serializable {
+    private static final long serialVersionUID = -7618674739116433849L;
     private final List<Change> changes;
 
     Diff(List<Change> changes) {

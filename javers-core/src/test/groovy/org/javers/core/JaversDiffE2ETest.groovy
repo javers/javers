@@ -1,6 +1,7 @@
 package org.javers.core
 
 import groovy.json.JsonSlurper
+import org.junit.Assert
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.json.DummyPointJsonTypeAdapter
@@ -10,6 +11,7 @@ import org.javers.core.model.DummyPoint
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.PrimitiveEntity
+import org.javers.test.dto.SerializedWrapperDTO
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
@@ -171,5 +173,25 @@ class JaversDiffE2ETest extends Specification {
 
         then:
         DiffAssert.assertThat(diff).hasChanges(0)
+    }
+
+
+    def "Serialization of the Diff object"() {
+        given:
+        def javers = javers().build()
+        def user =  dummyUser("id").withSex(MALE).withAge(35).build();
+        def user2 = dummyUser("id").withSex(MALE).withAge(36).build();
+
+        when:
+        def diff = javers.compare(user, user2)
+        SerializedWrapperDTO wrapper = new SerializedWrapperDTO();
+        wrapper.setDiff(diff);
+
+        then:
+        System.out.println((wrapper.getDiff().getChanges()).get(0))
+        wrapper.getDiff().hasChanges() == true
+        def change = wrapper.getDiff().changes[0]
+        change.left == 35
+        change.right == 36
     }
 }
