@@ -12,6 +12,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 
 import static org.fest.assertions.api.Assertions.assertThat
 
+/**
+ * @author pawelszymczyk
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = [TestApplication.class])
 @ActiveProfiles("test")

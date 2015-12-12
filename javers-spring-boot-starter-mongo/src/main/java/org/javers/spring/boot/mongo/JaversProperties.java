@@ -2,6 +2,9 @@ package org.javers.spring.boot.mongo;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * @author pawelszymczyk
+ */
 @ConfigurationProperties(prefix = "javers")
 public class JaversProperties {
 
@@ -10,6 +13,7 @@ public class JaversProperties {
     private boolean newObjectSnapshot = false;
     private boolean prettyPrint = true;
     private boolean typeSafeValues = false;
+    private String databaseName;
 
     public String getAlgorithm() {
         return algorithm;
@@ -49,5 +53,13 @@ public class JaversProperties {
 
     public void setTypeSafeValues(boolean typeSafeValues) {
         this.typeSafeValues = typeSafeValues;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 }
