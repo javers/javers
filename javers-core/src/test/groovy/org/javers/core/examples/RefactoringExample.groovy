@@ -14,21 +14,21 @@ class RefactoringExample extends Specification {
     {
         given:
         def javers = JaversBuilder.javers().build()
-        javers.commit('author', new Person(1, 'Bob'))
+        javers.commit('author', new Person(id:1, name:'Bob'))
 
         when: '''Refactoring happens here, Person.class is removed,
                  new PersonRefactored.class appears'''
-        javers.commit('author', new PersonRefactored(1, 'Uncle Bob', 'London'))
+        javers.commit('author', new PersonRefactored(id:1, name:'Uncle Bob', city:'London'))
 
         def changes =
-            javers.findChanges( QueryBuilder.byInstanceId(1,PersonRefactored).build() )
+            javers.findChanges( QueryBuilder.byInstanceId(1,PersonRefactored.class).build() )
 
         then: 'one ValueChange is expected'
-        changes.size() == 1
+        assert changes.size() == 1
         with(changes[0]){
-            left == 'Bob'
-            right == 'Uncle Bob'
-            affectedGlobalId.value() == 'Person/1'
+            assert left == 'Bob'
+            assert right == 'Uncle Bob'
+            assert affectedGlobalId.value() == 'Person/1'
         }
         println changes[0]
     }
@@ -38,20 +38,20 @@ class RefactoringExample extends Specification {
     {
       given:
       def javers = JaversBuilder.javers().build()
-      javers.commit('author', new PersonSimple(1,'Bob'))
+      javers.commit('author', new PersonSimple(id:1, name:'Bob'))
 
       when:
-      javers.commit('author', new PersonRetrofitted(1,'Uncle Bob'))
+      javers.commit('author', new PersonRetrofitted(id:1, name:'Uncle Bob'))
 
       def changes =
-          javers.findChanges( QueryBuilder.byInstanceId(1,PersonRetrofitted).build() )
+          javers.findChanges( QueryBuilder.byInstanceId(1,PersonRetrofitted.class).build() )
 
       then: 'one ValueChange is expected'
-      changes.size() == 1
+      assert changes.size() == 1
       with(changes[0]){
-          left == 'Bob'
-          right == 'Uncle Bob'
-          affectedGlobalId.value() == 'org.javers.core.examples.PersonSimple/1'
+          assert left == 'Bob'
+          assert right == 'Uncle Bob'
+          assert affectedGlobalId.value() == 'org.javers.core.examples.PersonSimple/1'
       }
       println changes[0]
     }
@@ -59,25 +59,18 @@ class RefactoringExample extends Specification {
     def 'should be very relaxed about ValueObject types'(){
       given:
       def javers = JaversBuilder.javers().build()
-      javers.commit('author', new Person(1,new EmailAddress('me@example.com',   false)))
-      javers.commit('author', new Person(1,new HomeAddress ('London','Green 50',true)))
-      javers.commit('author', new Person(1,new HomeAddress ('London','Green 55',true)))
+      javers.commit('author', new Person(1,new EmailAddress('me@example.com', false)))
+      javers.commit('author', new Person(1,new HomeAddress ('London','Green 50', true)))
+      javers.commit('author', new Person(1,new HomeAddress ('London','Green 55', true)))
 
       when:
       def changes =
-          javers.findChanges( QueryBuilder.byValueObjectId(1, Person, 'address').build() )
+          javers.findChanges( QueryBuilder.byValueObjectId(1, Person.class, 'address').build() )
 
       then: 'three ValueChanges are expected'
-      changes.size() == 3
-      changes.count{
-          it.propertyName == 'email' && it.left == 'me@example.com'
-      } // == 1
-      changes.count{
-          it.propertyName == 'verified' && it.right == true
-      }
-      changes.count{
-          it.propertyName == 'street' && it.right == 'Green 55'
-      }
+      assert changes.size() == 3
+      assert changes.collect{ it.propertyName }.containsAll( ['street','verified','email'] )
+
       changes.each { println it }
     }
 }

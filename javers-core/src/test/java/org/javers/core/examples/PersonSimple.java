@@ -7,9 +7,4 @@ class PersonSimple {
     private int id;
 
     private String name;
-
-    PersonSimple(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 }

@@ -9,9 +9,4 @@ class PersonRetrofitted {
     private int id;
 
     private String name;
-
-    PersonRetrofitted(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 }
