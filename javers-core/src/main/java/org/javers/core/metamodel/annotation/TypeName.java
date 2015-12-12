@@ -18,6 +18,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * because it gives you freedom of refactoring your package and class names.
  * <br/><br/>
  *
+ * Usage example:
+ * <pre>
+ *{@literal @}TypeName("Person")
+ * class Person {
+ *    {@literal @}Id
+ *     private int id;
+ *     private String name;
+ * }
+ * </pre>
+ *
  * TypeName is an equivalent for org.springframework.data.annotation.TypeAlias
  * from Spring Data.
  *
