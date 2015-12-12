@@ -2,10 +2,14 @@ package org.javers.common.collections;
 
 import org.javers.common.validation.Validate;
 
+import java.io.Serializable;
+
 /**
  * @author bartosz walacik
  */
-public class Optional<T> {
+public class Optional<T> implements Serializable{
+    private static final long serialVersionUID = 72109946687664234L;
+
     private static Optional EMPTY = new Optional();
 
     private T reference;

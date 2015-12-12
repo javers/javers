@@ -2,6 +2,7 @@ package org.javers.core.diff.changetype;
 
 import org.javers.common.collections.Primitives;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -13,7 +14,9 @@ import java.util.Objects;
  *
  * @author bartosz walacik
  */
-public class Atomic {
+public class Atomic implements Serializable {
+    private static final long serialVersionUID = -5379463577581827679L;
+
     private final Object value;
 
     public Atomic(Object value) {

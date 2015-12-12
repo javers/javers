@@ -10,6 +10,8 @@ import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 
+import java.io.Serializable;
+
 import static org.javers.common.string.ToStringBuilder.addFirstField;
 import static org.javers.common.validation.Validate.*;
 
@@ -26,7 +28,8 @@ import static org.javers.common.validation.Validate.*;
  *
  * @author bartosz walacik
  */
-public abstract class Change {
+public abstract class Change implements Serializable {
+    private static final long serialVersionUID = 2522423707490292597L;
 
     private Optional<CommitMetadata> commitMetadata;
     private final GlobalId affectedCdoId;

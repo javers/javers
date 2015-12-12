@@ -27,6 +27,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 public class Diff implements Serializable {
     private static final long serialVersionUID = -7618674739116433849L;
+
     private final List<Change> changes;
 
     Diff(List<Change> changes) {
