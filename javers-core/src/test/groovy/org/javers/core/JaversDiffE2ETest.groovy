@@ -174,7 +174,7 @@ class JaversDiffE2ETest extends Specification {
     }
 
 
-    def "Serialization of the Diff object"() {
+    def "should serialize the Diff object"() {
         given:
         def javers = javers().build()
         def user =  dummyUser("id").withSex(MALE).withAge(35).build();
