@@ -197,7 +197,6 @@ class JaversDiffE2ETest extends Specification {
             it.propertyName == "age"
             it.getAffectedGlobalId().cdoId == "id"
             it.getAffectedGlobalId().typeName == "org.javers.core.model.DummyUser"
-            it.commitMetadata == Optional.empty()
         }
     }
 }
