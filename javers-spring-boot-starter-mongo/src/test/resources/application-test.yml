@@ -1,4 +1,5 @@
 javers:
+  databaseName: test
   algorithm: levenshtein_distance
   mappingStyle: bean
   newObjectSnapshot: false
