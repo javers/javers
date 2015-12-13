@@ -45,6 +45,7 @@ class JaversMongoAutoConfigurationTest {
         assertThat(javersProperties.isNewObjectSnapshot()).isFalse()
         assertThat(javersProperties.isPrettyPrint()).isFalse()
         assertThat(javersProperties.isTypeSafeValues()).isTrue()
+        assertThat(javersProperties.getDatabaseName()).isEqualTo("integrationTest")
     }
 
     @Test
