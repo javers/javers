@@ -7,7 +7,6 @@ import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
-import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
@@ -36,7 +35,7 @@ public class JaversSqlAutoConfiguration {
     public Javers javers() {
         JaversRepository javersRepository = SqlRepositoryBuilder.sqlRepository()
                 .withConnectionProvider(connectionProvider)
-                .withDialect(DialectName.valueOf(javersProperties.getDialect()))
+                .withDialect(DialectName.valueOf(javersProperties.getDialect().toUpperCase()))
                 .build();
 
         return JaversBuilder.javers()

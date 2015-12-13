@@ -7,4 +7,5 @@ dependencies {
 
     testCompile 'org.springframework.boot:spring-boot-starter-test:1.3.0.RELEASE'
     testCompile 'org.springframework.data:spring-data-commons:1.10.2.RELEASE'
+    testCompile 'com.h2database:h2:1.4.187'
 }

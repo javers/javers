@@ -1,5 +1,6 @@
 package org.javers.spring.boot.sql;
 
+import org.javers.repository.sql.DialectName;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "javers")
@@ -10,7 +11,7 @@ public class JaversProperties {
     private boolean newObjectSnapshot = false;
     private boolean prettyPrint = true;
     private boolean typeSafeValues = false;
-    private String dialect;
+    private String dialect = DialectName.H2.name();
 
     public String getAlgorithm() {
         return algorithm;
