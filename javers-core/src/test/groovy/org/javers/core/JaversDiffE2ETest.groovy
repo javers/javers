@@ -172,4 +172,36 @@ class JaversDiffE2ETest extends Specification {
         then:
         DiffAssert.assertThat(diff).hasChanges(0)
     }
+
+
+    def "should serialize the Diff object"() {
+        given:
+        def javers = javers().build()
+        def user =  new DummyUser(name:"id", sex: MALE,   age: 5, stringSet: ["a"])
+        def user2 = new DummyUser(name:"id", sex: FEMALE, age: 6, stringSet: ["b"])
+        def tmpFile = File.createTempFile("serializedDiff", ".ser")
+
+        when:
+        def diff = javers.compare(user, user2)
+
+        //serialize diff
+        new ObjectOutputStream(new FileOutputStream(tmpFile.path)).writeObject(diff)
+
+        //deserialize diff
+        def deserializedDiff = new ObjectInputStream(new FileInputStream(tmpFile.path)).readObject()
+
+        then:
+        List changes = deserializedDiff.changes
+        changes.size() == 3
+
+        def ageChange = changes.find {it.propertyName == "age"}
+        ageChange.left == 5
+        ageChange.right == 6
+        ageChange.affectedGlobalId.cdoId == "id"
+        ageChange.affectedGlobalId.typeName == "org.javers.core.model.DummyUser"
+
+        changes.count{ it.propertyName == "age" } // == 1
+
+        changes.count{ it.propertyName == "stringSet" } // == 1
+    }
 }

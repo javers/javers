@@ -4,10 +4,13 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.jql.GlobalIdDTO;
 
+import java.io.Serializable;
+
 /**
  * Global ID of Client's domain object (CDO)
  */
-public abstract class GlobalId {
+public abstract class GlobalId implements Serializable {
+
     private final String typeName;
 
     GlobalId(String typeName) {
