@@ -15,7 +15,6 @@ import java.util.Objects;
  * @author bartosz walacik
  */
 public class Atomic implements Serializable {
-    private static final long serialVersionUID = -5379463577581827679L;
 
     private final Object value;
 

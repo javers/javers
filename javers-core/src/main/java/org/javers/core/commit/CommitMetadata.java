@@ -6,8 +6,7 @@ import org.joda.time.LocalDateTime;
 
 import java.io.Serializable;
 
-public class CommitMetadata implements Serializable{
-    private static final long serialVersionUID = 5693571850193776897L;
+public class CommitMetadata implements Serializable {
 
     private final String author;
     private final LocalDateTime commitDate;

@@ -16,7 +16,6 @@ import java.math.BigDecimal;
  * @author bartosz walacik
  */
 public final class CommitId implements Comparable<CommitId>, Serializable {
-    private static final long serialVersionUID = -3586180451674844809L;
 
     private final long majorId;
     private final int  minorId;

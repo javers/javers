@@ -9,8 +9,7 @@ import java.io.Serializable;
 /**
  * Global ID of Client's domain object (CDO)
  */
-public abstract class GlobalId implements Serializable{
-    private static final long serialVersionUID = -7686795095406268533L;
+public abstract class GlobalId implements Serializable {
 
     private final String typeName;
 
