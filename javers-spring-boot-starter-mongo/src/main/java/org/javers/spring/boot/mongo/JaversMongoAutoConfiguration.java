@@ -1,5 +1,6 @@
 package org.javers.spring.boot.mongo;
 
+import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -14,8 +15,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
+/**
+ * @author pawelszymczyk
+ */
 @Configuration
+@EnableAspectJAutoProxy
 @EnableConfigurationProperties({JaversProperties.class})
 public class JaversMongoAutoConfiguration {
 
@@ -23,11 +29,11 @@ public class JaversMongoAutoConfiguration {
     private JaversProperties javersProperties;
 
     @Autowired
-    private MongoDatabase mongoDatabase;
+    private MongoClient mongoClient;
 
     @Bean
     public Javers javers() {
-        JaversRepository javersRepository = new MongoRepository(mongoDatabase);
+        JaversRepository javersRepository = new MongoRepository(mongoClient.getDatabase(javersProperties.getDatabaseName()));
 
         return JaversBuilder.javers()
                 .withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
@@ -39,10 +45,6 @@ public class JaversMongoAutoConfiguration {
                 .build();
     }
 
-    @Bean
-    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect() {
-        return new JaversAuditableRepositoryAspect(javers(), authorProvider());
-    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -52,5 +54,10 @@ public class JaversMongoAutoConfiguration {
                 return "unknown";
             }
         };
+    }
+
+    @Bean
+    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider) {
+        return new JaversAuditableRepositoryAspect(javers, authorProvider);
     }
 }
