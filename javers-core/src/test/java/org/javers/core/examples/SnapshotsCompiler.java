@@ -1,5 +1,8 @@
+package org.javers.core.examples;
+
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
+import org.javers.core.examples.model.Person;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.JaversSnapshotsCompiler;
@@ -7,7 +10,7 @@ import org.javers.JaversSnapshotsCompiler;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JaversSnapshotsCompilerTest {
+public class SnapshotsCompiler {
     public static void main(String[] args){
 
         Javers javers = JaversBuilder.javers().build();

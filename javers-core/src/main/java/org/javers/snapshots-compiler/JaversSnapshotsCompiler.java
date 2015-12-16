@@ -16,7 +16,6 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.repository.jql.InstanceIdDTO;
-import org.javers.core.metamodel.property.Property;
 import org.javers.repository.jql.QueryBuilder;
 
 /**
