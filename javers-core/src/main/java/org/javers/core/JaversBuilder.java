@@ -371,6 +371,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     /**
      * Default style is {@link MappingStyle#FIELD}.
+     *
+     * @see <a href="http://javers.org/documentation/domain-configuration/#property-mapping-style">http://javers.org/documentation/domain-configuration/#property-mapping-style</a>
      */
     public JaversBuilder withMappingStyle(MappingStyle mappingStyle) {
         argumentIsNotNull(mappingStyle);
@@ -429,11 +431,11 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * Choose between two algorithms for comparing list: ListCompareAlgorithm.SIMPLE
      * or ListCompareAlgorithm.LEVENSHTEIN_DISTANCE.
      * <br/><br/>
-     * Generally, we recommend using LEVENSHTEIN_DISTANCE, because it’s smarter.
+     * Generally, we recommend using LEVENSHTEIN_DISTANCE, because it's smarter.
      * Hoverer, it can be slow for long lists, so SIMPLE is enabled by default.
      * <br/><br/>
      *
-     * Refer to <a href="http://javers.org/documentation/diff-configuration/#list-algorithms">javers.org/documentation/diff-configuration/#list-algorithms</a>
+     * Refer to <a href="http://javers.org/documentation/diff-configuration/#list-algorithms">http://javers.org/documentation/diff-configuration/#list-algorithms</a>
      * for description of both algorithms
      *
      * @param algorithm ListCompareAlgorithm.SIMPLE is used by default
