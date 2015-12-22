@@ -1,4 +1,4 @@
-package org.javers;
+package org.javers.snapshots;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -101,7 +101,8 @@ public class JaversSnapshotsCompiler {
      * @return
      */
     public Object compileLatestEntityStateForEntity(Object entity) {
-        return compileLatestEntityState(javers.idBuilder().instanceId(entity));
+        InstanceId instanceId = javers.idBuilder().instanceId(entity);
+        return compileLatestEntityState(instanceId);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -111,10 +112,9 @@ public class JaversSnapshotsCompiler {
             return idToEntityMap.get(((InstanceId)snap.getGlobalId()).getCdoId());
 
         Class clientsClass = snap.getManagedType().getBaseJavaClass();
-
         Object instance = clientsClass.newInstance();
         idToEntityMap.put(((InstanceId)snap.getGlobalId()).getCdoId(), instance);
-        //for (Property property : snap.getState().getProperties()) {
+
         for (String propertyName : snap.getState().getProperties()) {
             Object propertyValue = snap.getPropertyValue(propertyName);
             Object propertyValueToSet = propertyValue;
@@ -122,8 +122,10 @@ public class JaversSnapshotsCompiler {
                 try {
                     Method setter = getSetterForProperty(clientsClass, propertyName);
                     Class<?> targetType = setter.getParameterTypes()[0];
-                    if (targetType.isAssignableFrom(java.util.List.class)
-                            || targetType.isAssignableFrom(java.util.Set.class)) {
+
+                    try{
+                        //Try to process property as collection.
+                        // if(targetType.isAssignableFrom(List.class) || targetType.isAssignableFrom(Set.class)) not always defines correctly
                         Collection collection = (Collection) propertyValue;
                         Set toBeDeleted = new HashSet<>();
                         for (Object element : collection.toArray()){
@@ -139,10 +141,14 @@ public class JaversSnapshotsCompiler {
                         for (Object element : toBeDeleted) {
                             collection.remove(element);
                         }
-                    } else if (propertyValue instanceof InstanceId) {
-                        propertyValueToSet = compileEntityForCommitId(
-                                (InstanceId) propertyValue, snap.getCommitId());
                     }
+                    catch (Exception exc) {
+                        if (propertyValue instanceof InstanceId)
+                            propertyValueToSet = compileEntityForCommitId((InstanceId) propertyValue, snap.getCommitId());
+                        else  // some primitive type
+                            propertyValueToSet = propertyValue;
+                    }
+
                     setter.invoke(instance, propertyValueToSet);
                 } catch (Exception exc) {
                     exc.printStackTrace();
