@@ -5,7 +5,7 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.examples.model.Person;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
-import org.javers.JaversSnapshotsCompiler;
+import org.javers.snapshotscompiler.JaversSnapshotsCompiler;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.javers.snapshots;
+package org.javers.snapshotscompiler;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
