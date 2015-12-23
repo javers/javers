@@ -39,8 +39,9 @@ public abstract class AbstractJaversBuilder {
         }
     }
 
-    protected <T> List<T> getComponents(Class<T> ofType){
-        return container.getComponents(ofType);
+    protected <T> List<T> getComponents(Class<T> ofClass){
+        checkIfBuilt();
+        return container.getComponents(ofClass);
     }
 
     protected MutablePicoContainer getContainer() {
@@ -61,7 +62,7 @@ public abstract class AbstractJaversBuilder {
         checkIfBuilt();
         container.removeComponent(classOrInstance);
     }
-    
+
     private void checkIfNotBuilt() {
         if (isBuilt()) {
             throw new JaversException(JaversExceptionCode.ALREADY_BUILT);
