@@ -38,8 +38,9 @@ public abstract class AbstractJaversBuilder {
         }
     }
 
-    protected <T> List<T> getComponents(Class<T> ofType){
-        return container.getComponents(ofType);
+    protected <T> List<T> getComponents(Class<T> ofClass){
+        checkIfBuilt();
+        return container.getComponents(ofClass);
     }
 
     protected MutablePicoContainer getContainer() {
