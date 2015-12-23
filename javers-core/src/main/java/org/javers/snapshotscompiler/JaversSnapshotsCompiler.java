@@ -179,16 +179,16 @@ public class JaversSnapshotsCompiler {
         //List<CdoSnapshot> snapshots = javers.getStateHistory(convertInstanceIdToDTO(instanceId), -1); // load all
         //List<CdoSnapshot> snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(instanceId, instanceId.getgetBaseJavaClass() ).build());
         List<CdoSnapshot> snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(instanceId, instanceId.getClass()).build());
-
-        double commitToBeSearched = commitIdAsDouble(commitId);
-        CdoSnapshot snapFound = null;
-        // since all snapshot are sorted from the highest commit value to the
-        // lowest one
-        for (CdoSnapshot snap : snapshots) {
-            if (commitIdAsDouble(snap.getCommitId()) < (commitToBeSearched + EPS)) {
-                snapFound = snap;
-            }
-        }
+        CdoSnapshot snapFound = (CdoSnapshot)snapshots.get(0);
+//        double commitToBeSearched = commitIdAsDouble(commitId);
+//        CdoSnapshot snapFound = null;
+//        // since all snapshot are sorted from the highest commit value to the
+//        // lowest one
+//        for (CdoSnapshot snap : snapshots) {
+//            if (commitIdAsDouble(snap.getCommitId()) < (commitToBeSearched + EPS)) {
+//                snapFound = snap;
+//            }
+//        }
 
         Object instance = compileEntityInternal(snapFound);
 
