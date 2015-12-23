@@ -2,7 +2,6 @@ package org.javers.core;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.validation.Validate;
 import org.javers.core.pico.InstantiatingModule;
 import org.javers.core.pico.JaversModule;
 import org.picocontainer.DefaultPicoContainer;
@@ -61,7 +60,7 @@ public abstract class AbstractJaversBuilder {
         checkIfBuilt();
         container.removeComponent(classOrInstance);
     }
-    
+
     private void checkIfNotBuilt() {
         if (isBuilt()) {
             throw new JaversException(JaversExceptionCode.ALREADY_BUILT);
