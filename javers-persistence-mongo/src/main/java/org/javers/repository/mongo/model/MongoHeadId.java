@@ -1,11 +1,7 @@
 package org.javers.repository.mongo.model;
 
-import com.mongodb.client.model.Filters;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.javers.core.commit.CommitId;
-
-import javax.print.Doc;
 
 /**
  * @author pawel szymczyk

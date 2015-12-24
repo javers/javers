@@ -6,8 +6,9 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.EntityType;
-import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.List;
@@ -40,36 +41,36 @@ public interface JaversRepository {
      * Snapshots (historical states) of given object
      * in reverse chronological order
      *
-     * @param limit choose reasonable limits
+     * @param queryParams params constraining returned result list (e.g. size limit)
      * @return empty List if object is not versioned
      */
-    List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit);
+    List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams);
 
     /**
      * Snapshots of all ValueObjects owned by given ownerEntity at given path
      */
-    List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, int limit);
+    List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams);
 
     /**
-     * Filtered version of {@link #getStateHistory(GlobalId, int)},
+     * Filtered version of {@link #getStateHistory(GlobalId, QueryParams)},
      * selects snapshots with a change recorded on a given property
      */
-    List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit);
+    List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, QueryParams queryParams);
 
     /**
      * All snapshots of objects within a given managed class,
      * in reverse chronological order
      *
-     * @param limit choose reasonable limits
+     * @param queryParams params constraining returned result list (e.g. size limit)
      * @return empty List if no snapshots found
      */
-    List<CdoSnapshot> getStateHistory(ManagedType givenClass, int limit);
+    List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams);
 
     /**
-     * Filtered version of {@link #getStateHistory(ManagedType, int)},
+     * Filtered version of {@link #getStateHistory(ManagedType, QueryParams)},
      * selects all snapshots with a change recorded on a given property
      */
-    List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, int limit);
+    List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams);
 
     /**
      * Latest snapshot of given object,
@@ -87,5 +88,5 @@ public interface JaversRepository {
      * Called at the end of JaVers bootstrap,
      * good place to put database schema update
      */
-    public void ensureSchema();
+    void ensureSchema();
 }
