@@ -28,7 +28,7 @@ import org.javers.core.snapshot.GraphSnapshotModule;
 import org.javers.java8support.Java8AddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
-import org.javers.repository.api.InMemoryRepositoryModule;
+import org.javers.repository.inmemory.InMemoryRepositoryModule;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 import org.slf4j.Logger;
@@ -121,8 +121,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
             typeMapper().getJaversType(c);
         }
 
-        Javers javers = getContainerComponent(JaversCore.class);
-        return javers;
+        return getContainerComponent(JaversCore.class);
     }
 
     /**
