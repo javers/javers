@@ -11,6 +11,7 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.JaversRepository;
+import org.javers.repository.api.QueryParams;
 import org.javers.repository.sql.finders.CdoSnapshotFinder;
 import org.javers.repository.sql.reposiotries.CdoSnapshotRepository;
 import org.javers.repository.sql.reposiotries.CommitMetadataRepository;
@@ -69,27 +70,27 @@ public class JaversSqlRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
-        return finder.getStateHistory(globalId, Optional.<String>empty(), limit);
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
+        return finder.getStateHistory(globalId, Optional.<String>empty(), queryParams);
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit) {
-        return finder.getStateHistory(globalId, Optional.of(propertyName), limit);
+    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, QueryParams queryParams) {
+        return finder.getStateHistory(globalId, Optional.of(propertyName), queryParams);
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, int limit) {
-        return finder.getStateHistory(givenClass, Optional.<String>empty(), limit);
+    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
+        return finder.getStateHistory(givenClass, Optional.<String>empty(), queryParams);
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, int limit) {
-        return finder.getStateHistory(givenClass, Optional.of(propertyName), limit);
+    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
+        return finder.getStateHistory(givenClass, Optional.of(propertyName), queryParams);
     }
 
     @Override
-    public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, int limit) {
-        return finder.getVOStateHistory(ownerEntity, path, limit);
+    public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
+        return finder.getVOStateHistory(ownerEntity, path, queryParams);
     }
 }

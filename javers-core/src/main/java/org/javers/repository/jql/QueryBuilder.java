@@ -5,6 +5,8 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.api.QueryParams;
+import org.javers.repository.api.QueryParamsBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -170,15 +172,14 @@ public class QueryBuilder {
         return Collections.unmodifiableList(filters);
     }
 
-    protected int getLimit() {
-        return limit;
+    protected QueryParams getQueryParams() {
+        return QueryParamsBuilder.withLimit(limit).build();
     }
 
     public JqlQuery build(){
         if (filters.isEmpty()){
             throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "empty JqlQuery");
         }
-
-        return new JqlQuery(getFilters(), newObjectChanges, getLimit());
+        return new JqlQuery(getFilters(), newObjectChanges, getQueryParams());
     }
 }
