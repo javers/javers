@@ -3,7 +3,6 @@ package org.javers.repository.sql.reposiotries;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
-import org.javers.core.json.JsonConverter;
 import org.javers.repository.sql.PolyUtil;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.PolyJDBC;
@@ -12,6 +11,7 @@ import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
 import java.math.BigDecimal;
+import java.util.TimeZone;
 
 import static org.javers.repository.sql.PolyUtil.queryForOptionalBigDecimal;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
@@ -20,10 +20,7 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
  * @author pawel szymczyk
  */
 public class CommitMetadataRepository {
-
     private final PolyJDBC polyJDBC;
-    private JsonConverter jsonConverter;
-
 
     public CommitMetadataRepository(PolyJDBC polyjdbc) {
         this.polyJDBC = polyjdbc;
@@ -50,7 +47,7 @@ public class CommitMetadataRepository {
     }
 
     private Timestamp toTimestamp(LocalDateTime commitMetadata) {
-        return Timestamp.from(commitMetadata.toDate());
+        return new Timestamp(commitMetadata.toDate(TimeZone.getTimeZone("UTC")));
     }
 
     public CommitId getCommitHeadId() {
@@ -64,12 +61,6 @@ public class CommitMetadataRepository {
                 .select("MAX(" + COMMIT_COMMIT_ID + ")")
                 .from(COMMIT_TABLE_NAME);
 
-        Optional<BigDecimal> result = queryForOptionalBigDecimal(query, polyJDBC);
-
-        return result;
-    }
-
-    public void setJsonConverter(JsonConverter jsonConverter) {
-        this.jsonConverter = jsonConverter;
+        return queryForOptionalBigDecimal(query, polyJDBC);
     }
 }
