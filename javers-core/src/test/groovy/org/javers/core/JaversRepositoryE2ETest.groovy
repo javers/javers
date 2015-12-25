@@ -4,11 +4,13 @@ import org.javers.common.date.FakeDateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.typeNames.*
+import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.core.snapshot.SnapshotsAssert
 import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -548,5 +550,19 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         snapshot.globalId.typeName.endsWith("OldValueObject")
+    }
+
+    def "should use dateProvider.now() as a commitDate"() {
+        given:
+        LocalDateTime now = LocalDateTime.parse('2016-01-01T12:12')
+
+        when:
+        fakeDateProvider.set(now)
+        javers.commit("author", new SnapshotEntity(id: 1))
+        CdoSnapshot snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
+        LocalDateTime commitDate = snapshot.commitMetadata.commitDate
+
+        then:
+        now == commitDate
     }
 }
