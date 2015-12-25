@@ -1,13 +1,17 @@
 package org.javers.core
 
+import org.javers.common.date.DateProvider
+import org.javers.common.date.DefaultDateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.typeNames.*
+import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.core.snapshot.SnapshotsAssert
 import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -541,5 +545,20 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         snapshot.globalId.typeName.endsWith("OldValueObject")
+    }
+
+    def "should return proper date of commit execution"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id: 1))
+
+        when:
+        DateProvider dateProvider = new DefaultDateProvider()
+        LocalDateTime approximateCommitExecutionDate = dateProvider.now()
+        CdoSnapshot snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
+        LocalDateTime commitDateFromDB = snapshot.commitMetadata.commitDate
+
+        then:
+        assert approximateCommitExecutionDate.minusMinutes(1) < commitDateFromDB &&
+            approximateCommitExecutionDate.plusMinutes(1) > commitDateFromDB
     }
 }
