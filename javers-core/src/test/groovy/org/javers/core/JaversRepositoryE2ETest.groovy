@@ -1,5 +1,6 @@
 package org.javers.core
 
+import org.javers.common.date.FakeDateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.typeNames.*
@@ -18,15 +19,21 @@ import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 class JaversRepositoryE2ETest extends Specification {
-
+    FakeDateProvider fakeDateProvider
     Javers javers
 
     def setup() {
-        // InMemoryRepository is used by default
-        javers = javers().build()
+        JaversBuilder javersBuilder = configureJavers(javers())
+        javers = javersBuilder.build()
     }
 
-     def "should support EmbeddedId as Entity Id"(){
+    JaversBuilder configureJavers(JaversBuilder javersBuilder) {
+        // InMemoryRepository is used by default
+        fakeDateProvider = new FakeDateProvider()
+        javersBuilder.withDateTimeProvider(fakeDateProvider)
+    }
+
+    def "should support EmbeddedId as Entity Id"(){
       given:
       def javers = javers().build()
       def cdo  = new DummyEntityWithEmbeddedId(point: new DummyPoint(1,2), someVal: 5)
@@ -123,10 +130,10 @@ class JaversRepositoryE2ETest extends Specification {
         objects << [
                     (1..5).collect{ new SnapshotEntity(id:1,intProperty: it) }
                      + new SnapshotEntity(id:2), //noise
-                    (1..5).collect{ new DummyAddress(city: "London"+it)}
+                    (1..5).collect{ new DummyAddress(city: "London${it}")}
                      + new DummyPoint(1,2), //noise
-                    (1..5).collect{ new SnapshotEntity(id:1,valueObjectRef: new DummyAddress(city: "London"+it)) }
-                     + new SnapshotEntity(id:2,valueObjectRef: new DummyAddress(city: "London"+1)) //noise
+                    (1..5).collect{ new SnapshotEntity(id:1,valueObjectRef: new DummyAddress(city: "London${it}")) }
+                     + new SnapshotEntity(id:2,valueObjectRef: new DummyAddress(city: "London1")) //noise
                    ]
         query   << [QueryBuilder.byInstanceId(1, SnapshotEntity).limit(3).build(),
                     QueryBuilder.byClass(DummyAddress).limit(3).build(),

@@ -1,7 +1,6 @@
 package org.javers.core;
 
 import org.javers.common.collections.Lists;
-import org.javers.common.date.DefaultDateProvider;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.SnapshotFactory;
@@ -21,13 +20,12 @@ public class CoreJaversModule extends InstantiatingModule {
 
     @Override
     protected Collection<Class> getImplementations() {
-        return (Collection) Lists.asList(
+        return Lists.<Class>asList(
                 JaversCore.class,
                 JsonConverterBuilder.class,
                 JaversCoreConfiguration.class,
                 SnapshotFactory.class,
                 GlobalIdFactory.class,
-                DefaultDateProvider.class,
                 QueryRunner.class
         );
     }
