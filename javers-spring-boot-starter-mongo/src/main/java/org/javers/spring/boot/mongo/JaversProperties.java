@@ -13,7 +13,6 @@ public class JaversProperties {
     private boolean newObjectSnapshot = false;
     private boolean prettyPrint = true;
     private boolean typeSafeValues = false;
-    //private String databaseName = "javers_db";
 
     public String getAlgorithm() {
         return algorithm;
