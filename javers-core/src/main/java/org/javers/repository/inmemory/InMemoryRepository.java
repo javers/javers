@@ -15,6 +15,7 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ class InMemoryRepository implements JaversRepository {
             }
         });
 
-        return limit(result, queryParams.getLimit());
+        return applyQueryParams(result, queryParams);
     }
 
     @Override
@@ -63,7 +64,7 @@ class InMemoryRepository implements JaversRepository {
         Validate.argumentIsNotNull(globalId);
 
         if (snapshots.containsKey(globalId)) {
-            return unmodifiableList(limit(snapshots.get(globalId), queryParams.getLimit()));
+            return unmodifiableList(applyQueryParams(snapshots.get(globalId), queryParams));
         }
         return Collections.emptyList();
     }
@@ -79,7 +80,7 @@ class InMemoryRepository implements JaversRepository {
             }
         }
 
-        return limit(filtered, queryParams.getLimit());
+        return applyQueryParams(filtered, queryParams);
     }
 
     @Override
@@ -88,7 +89,7 @@ class InMemoryRepository implements JaversRepository {
 
         if (snapshots.containsKey(globalId)) {
             List<CdoSnapshot> filtered = filterByPropertyName(snapshots.get(globalId), propertyName);
-            return unmodifiableList(limit(filtered, queryParams.getLimit()));
+            return unmodifiableList(applyQueryParams(filtered, queryParams));
         }
         return Collections.emptyList();
     }
@@ -99,7 +100,7 @@ class InMemoryRepository implements JaversRepository {
 
         QueryParams increasedLimitQueryParams = getQueryParamsWithIncreasedLimit(queryParams);
         List<CdoSnapshot> filtered = filterByPropertyName(getStateHistory(givenClass, increasedLimitQueryParams), propertyName);
-        return unmodifiableList(limit(filtered, queryParams.getLimit()));
+        return unmodifiableList(applyQueryParams(filtered, queryParams));
     }
 
     private QueryParams getQueryParamsWithIncreasedLimit(QueryParams queryParams) {
@@ -108,13 +109,37 @@ class InMemoryRepository implements JaversRepository {
             .build();
     }
 
-    private List<CdoSnapshot> limit(List<CdoSnapshot> list, int limit){
-        int size = list.size();
-        if (size <= limit){
-            return list;
-        } else {
-            return list.subList(0, limit);
+    private List<CdoSnapshot> applyQueryParams(List<CdoSnapshot> snapshots, QueryParams queryParams){
+        if (queryParams.isFromSet()) {
+            snapshots = filterOutSnapshotCommitedBefore(snapshots, queryParams.getFrom());
         }
+        if (queryParams.isToSet()) {
+            snapshots = filterOutSnapshotCommitedAfter(snapshots, queryParams.getTo());
+        }
+        return trimResultsToRequestedSize(snapshots, queryParams.getLimit());
+    }
+
+    private List<CdoSnapshot> filterOutSnapshotCommitedBefore(List<CdoSnapshot> snapshots, final LocalDateTime from) {
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(CdoSnapshot snapshot) {
+                LocalDateTime commitDate = snapshot.getCommitMetadata().getCommitDate();
+                return commitDate.compareTo(from) >= 0;
+            }
+        });
+    }
+
+    private List<CdoSnapshot> filterOutSnapshotCommitedAfter(List<CdoSnapshot> snapshots, final LocalDateTime to) {
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(CdoSnapshot snapshot) {
+                LocalDateTime commitDate = snapshot.getCommitMetadata().getCommitDate();
+                return commitDate.compareTo(to) <= 0;
+            }
+        });
+    }
+
+    private List<CdoSnapshot> trimResultsToRequestedSize(List<CdoSnapshot> snapshots, int requestedSize) {
+        int size = snapshots.size();
+        return size <= requestedSize ? snapshots : snapshots.subList(0, requestedSize);
     }
 
     @Override

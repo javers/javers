@@ -11,6 +11,7 @@ import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.json.typeadapter.date.DateTypeAdapters;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.EntityType;
@@ -18,7 +19,9 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.ValueObjectType;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParams;
+import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.mongo.model.MongoHeadId;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +41,7 @@ public class MongoRepository implements JaversRepository {
     private static final int ASC = 1;
     public static final String SNAPSHOTS = "jv_snapshots";
     public static final String COMMIT_ID = "commitMetadata.id";
+    public static final String COMMIT_DATE = "commitMetadata.commitDate";
     public static final String GLOBAL_ID_KEY = "globalId_key";
     public static final String GLOBAL_ID_ENTITY = "globalId.entity";
     public static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
@@ -166,6 +170,14 @@ public class MongoRepository implements JaversRepository {
         return new BasicDBObject (GLOBAL_ID_KEY, id.value());
     }
 
+    private BasicDBObject createFromQuery(LocalDateTime from) {
+        return new BasicDBObject (COMMIT_DATE, new BasicDBObject("$gte", DateTypeAdapters.serialize(from)));
+    }
+
+    private BasicDBObject createToQuery(LocalDateTime to) {
+        return new BasicDBObject (COMMIT_DATE, new BasicDBObject("$lte", DateTypeAdapters.serialize(to)));
+    }
+
     private BasicDBObject createGlobalIdClassQuery(ManagedType givenClass) {
         String cName = givenClass.getName();
 
@@ -222,13 +234,26 @@ public class MongoRepository implements JaversRepository {
         return Filters.eq(OBJECT_ID, document.getObjectId("_id"));
     }
 
-    private MongoCursor<Document> getMongoSnapshotsCursor(Bson idQuery, int limit) {
+    private MongoCursor<Document> getMongoSnapshotsCursor(Bson idQuery, QueryParams queryParams) {
+        Bson query = applyQueryParams(idQuery, queryParams);
+        int limit = queryParams.getLimit();
         return snapshotsCollection()
-                .find(idQuery).sort(new Document(COMMIT_ID, DESC)).limit(limit).iterator();
+                .find(query).sort(new Document(COMMIT_ID, DESC)).limit(limit).iterator();
+    }
+
+    private Bson applyQueryParams(Bson query, QueryParams queryParams) {
+        if (queryParams.isFromSet()) {
+            query = Filters.and(query, createFromQuery(queryParams.getFrom()));
+        }
+        if (queryParams.isToSet()) {
+            query = Filters.and(query, createToQuery(queryParams.getTo()));
+        }
+        return query;
     }
 
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {
-        MongoCursor<Document> mongoLatest = getMongoSnapshotsCursor(idQuery, 1);
+        QueryParams queryParams = QueryParamsBuilder.withLimit(1).build();
+        MongoCursor<Document> mongoLatest = getMongoSnapshotsCursor(idQuery, queryParams);
 
         if (!mongoLatest.hasNext()) {
             return Optional.empty();
@@ -240,8 +265,7 @@ public class MongoRepository implements JaversRepository {
 
     private List<CdoSnapshot> queryForSnapshots(Bson query, QueryParams queryParams) {
         List<CdoSnapshot> snapshots = new ArrayList<>();
-        int limit = queryParams.getLimit();
-        try (MongoCursor<Document> mongoSnapshots = getMongoSnapshotsCursor(query, limit)) {
+        try (MongoCursor<Document> mongoSnapshots = getMongoSnapshotsCursor(query, queryParams)) {
             while (mongoSnapshots.hasNext()) {
                 Document dbObject = mongoSnapshots.next();
                 snapshots.add(readFromDBObject(dbObject));

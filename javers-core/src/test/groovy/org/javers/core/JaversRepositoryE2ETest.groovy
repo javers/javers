@@ -565,4 +565,45 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         now == commitDate
     }
+
+    @Unroll
+    def "should query for Entity snapshots with commit date within a given time range"() {
+        given:
+        objects.each {
+            fakeDateProvider.set(it['date'] as LocalDateTime)
+            javers.commit('author', it['snapshot'])
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+        def commitDates = snapshots.collect({it.commitMetadata.commitDate})
+
+        then:
+        commitDates.sort() == expectedCommitDates.sort()
+
+        where:
+        objects << (1..3).collect {
+            (1..5).collect{[
+                'snapshot': new SnapshotEntity(id: 1, intProperty: it),
+                'date': LocalDateTime.parse("2015-12-01T${it}:00")
+            ]}
+        }
+        query << [
+            QueryBuilder.byInstanceId(1, SnapshotEntity)
+                .from(LocalDateTime.parse('2015-12-01T03:00'))
+                .build(),
+            QueryBuilder.byInstanceId(1, SnapshotEntity)
+                .to(LocalDateTime.parse('2015-12-01T03:00'))
+                .build(),
+            QueryBuilder.byInstanceId(1, SnapshotEntity)
+                .from(LocalDateTime.parse('2015-12-01T02:00'))
+                .to(LocalDateTime.parse('2015-12-01T04:00'))
+                .build()
+        ]
+        expectedCommitDates << [
+            (3..5).collect{LocalDateTime.parse("2015-12-01T${it}:00")},
+            (1..3).collect{LocalDateTime.parse("2015-12-01T${it}:00")},
+            (2..4).collect{LocalDateTime.parse("2015-12-01T${it}:00")}
+        ]
+    }
 }

@@ -87,10 +87,15 @@ public class CdoSnapshotFinder {
         SelectQuery query =  polyJDBC.query().select(snapshotFilter.select());
         snapshotFilter.addFrom(query);
         snapshotFilter.addWhere(query);
+        if (queryParams.isFromSet()) {
+            snapshotFilter.addFromDateCondition(query, queryParams.getFrom());
+        }
+        if (queryParams.isToSet()) {
+            snapshotFilter.addToDateCondition(query, queryParams.getTo());
+        }
         query.orderBy(SNAPSHOT_PK, Order.DESC).limit(queryParams.getLimit());
 
-        return
-        polyJDBC.queryRunner().queryList(query, new CdoSnapshotObjectMapper(jsonConverter, providedGlobalId));
+        return polyJDBC.queryRunner().queryList(query, new CdoSnapshotObjectMapper(jsonConverter, providedGlobalId));
     }
 
     private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk) {
