@@ -10,13 +10,12 @@ import org.javers.core.commit.CommitFactory;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.PrimitiveType;
-import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.metamodel.type.ValueType;
+import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.*;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
@@ -152,5 +151,11 @@ class JaversCore implements Javers {
     @Override
     public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> itemClass) {
         return diffFactory.compareCollections(oldVersion, currentVersion, itemClass);
+    }
+
+    @Override
+    public Property getProperty(PropertyChange propertyChange) {
+        ManagedType managedType = typeMapper.getJaversManagedType(propertyChange.getAffectedGlobalId());
+        return managedType.getProperty(propertyChange.getPropertyName());
     }
 }

@@ -7,6 +7,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.NewObject;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.changetype.container.ListChange;
@@ -318,4 +319,12 @@ public interface Javers {
     <T extends JaversType> T getTypeMapping(Type userType);
 
     IdBuilder idBuilder();
+
+
+    /**
+     * Returns {@link Property} which underlies given {@link PropertyChange}
+     *
+     * @since 1.4.1
+     */
+    Property getProperty(PropertyChange propertyChange);
 }

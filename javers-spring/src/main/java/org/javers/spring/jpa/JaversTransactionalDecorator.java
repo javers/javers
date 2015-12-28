@@ -8,8 +8,10 @@ import org.javers.core.changelog.ChangeProcessor;
 import org.javers.core.commit.Commit;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
@@ -125,5 +127,10 @@ class JaversTransactionalDecorator implements Javers {
                 javersSqlRepository.ensureSchema();
             }
         });
+    }
+
+    @Override
+    public Property getProperty(PropertyChange propertyChange) {
+        return delegate.getProperty(propertyChange);
     }
 }

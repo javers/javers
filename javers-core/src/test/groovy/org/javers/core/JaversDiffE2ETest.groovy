@@ -3,8 +3,11 @@ package org.javers.core
 import groovy.json.JsonSlurper
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
+import org.javers.core.diff.changetype.PropertyChange
+import org.javers.core.examples.model.Person
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
+import org.javers.core.metamodel.property.Property
 import org.javers.core.model.DummyEntityWithEmbeddedId
 import org.javers.core.model.DummyPoint
 import org.javers.core.model.DummyUser
@@ -23,6 +26,21 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  * @author bartosz walacik
  */
 class JaversDiffE2ETest extends Specification {
+
+    def "should extract Property from PropertyChange"(){
+      given:
+      def javers = JaversTestBuilder.newInstance()
+
+      when:
+      def diff = javers.compare(new Person('1','bob'), new Person('1','bobby'))
+      PropertyChange propertyChange = diff.changes[0]
+
+      Property property = javers.getProperty( propertyChange )
+
+      then:
+      property.name == 'name'
+      !property.looksLikeId()
+    }
 
     def "should compare objects with @EmbeddedId using Id reflectiveToString() to match instances"(){
         given:

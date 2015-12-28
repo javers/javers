@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Optional;
 import org.javers.common.collections.Predicate;
+import org.javers.common.exception.JaversException;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
@@ -37,6 +38,9 @@ public abstract class ManagedType extends JaversType {
         return super.prettyPrintBuilder().addMultiField("managedProperties", managedClass.getProperties());
     }
 
+    /**
+     * @throws JaversException PROPERTY_NOT_FOUND
+     */
     public Property getProperty(String propertyName) {
         return managedClass.getProperty(propertyName);
     }
