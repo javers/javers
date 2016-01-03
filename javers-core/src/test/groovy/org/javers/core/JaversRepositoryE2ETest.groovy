@@ -16,6 +16,7 @@ import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.QueryBuilder.byInstanceId
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 import static org.javers.test.builder.DummyUserBuilder.dummyUser
@@ -137,7 +138,7 @@ class JaversRepositoryE2ETest extends Specification {
                     (1..5).collect{ new SnapshotEntity(id:1,valueObjectRef: new DummyAddress(city: "London${it}")) }
                      + new SnapshotEntity(id:2,valueObjectRef: new DummyAddress(city: "London1")) //noise
                    ]
-        query   << [QueryBuilder.byInstanceId(1, SnapshotEntity).limit(3).build(),
+        query   << [byInstanceId(1, SnapshotEntity).limit(3).build(),
                     QueryBuilder.byClass(DummyAddress).limit(3).build(),
                     QueryBuilder.byValueObjectId(1,SnapshotEntity,"valueObjectRef").limit(3).build()
                    ]
@@ -265,7 +266,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         when: "should find snapshots"
         def snapshots = javers.findSnapshots(
-                QueryBuilder.byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
+                byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
 
         then:
         snapshots.size() == 2
@@ -274,7 +275,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         when: "should find changes"
         def changes = javers.findChanges(
-                QueryBuilder.byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
+                byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
 
         then:
         changes.size() == 1
@@ -304,7 +305,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commitShallowDelete("author", anEntity)
 
         when:
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build())
 
         then:
         SnapshotsAssert.assertThat(snapshots)
@@ -326,7 +327,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         when:
         def changes = javers.findChanges(
-            QueryBuilder.byInstanceId(1,SnapshotEntity).andProperty("intProperty").build())
+            byInstanceId(1,SnapshotEntity).andProperty("intProperty").build())
 
         then:
         changes.size() == n-1
@@ -352,7 +353,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("author2", cdo) //v. 2
 
         when:
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build())
 
         then:
         def cdoId = instanceId(1,SnapshotEntity)
@@ -393,7 +394,7 @@ class JaversRepositoryE2ETest extends Specification {
         when:
         user.age = 19
         javers.commit("login", user)
-        def history = javers.findChanges(QueryBuilder.byInstanceId("John", DummyUser).build())
+        def history = javers.findChanges(byInstanceId("John", DummyUser).build())
 
         then:
         with(history[0]) {
@@ -436,7 +437,7 @@ class JaversRepositoryE2ETest extends Specification {
         (1..25).each {
             cdo.intProperty = it
             javers.commit("login", cdo)
-            def snap = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())[0]
+            def snap = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build())[0]
             assert snap.getPropertyValue("intProperty") == it
         }
     }
@@ -461,7 +462,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("author", new OldEntity(id:1, value:5))
         javers.commit("author", new NewEntity(id:1, value:15))
 
-        def changes = javers.findChanges(QueryBuilder.byInstanceId(1, NewEntity).build())
+        def changes = javers.findChanges(byInstanceId(1, NewEntity).build())
 
         then:
         changes.size() == 1
@@ -476,7 +477,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("author", new OldEntityWithTypeAlias(id:1, val:5))
         javers.commit("author", new NewEntityWithTypeAlias(id:1, val:15))
 
-        def changes = javers.findChanges(QueryBuilder.byInstanceId(1, NewEntityWithTypeAlias).build())
+        def changes = javers.findChanges(byInstanceId(1, NewEntityWithTypeAlias).build())
 
         then:
         changes.size() == 1
@@ -567,43 +568,37 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     @Unroll
-    def "should query for Entity snapshots with commit date within a given time range"() {
+    def "should query for Entity snapshots with commit #what"() {
         given:
-        objects.each {
+        def data = (1..5).collect{[
+                    'entity': new SnapshotEntity(id: 1, intProperty: it),
+                    'date': new LocalDateTime(2015,12,1,it,0)
+            ]}
+
+        data.each {
             fakeDateProvider.set(it['date'] as LocalDateTime)
-            javers.commit('author', it['snapshot'])
+            javers.commit('author', it['entity'])
         }
 
         when:
         def snapshots = javers.findSnapshots(query)
-        def commitDates = snapshots.collect({it.commitMetadata.commitDate})
+        def commitDates = snapshots.commitMetadata.commitDate
 
         then:
-        commitDates.sort() == expectedCommitDates.sort()
+        commitDates == expectedCommitDates
 
         where:
-        objects << (1..3).collect {
-            (1..5).collect{[
-                'snapshot': new SnapshotEntity(id: 1, intProperty: it),
-                'date': LocalDateTime.parse("2015-12-01T${it}:00")
-            ]}
-        }
+        what << ['date from','date to','date within given time range']
         query << [
-            QueryBuilder.byInstanceId(1, SnapshotEntity)
-                .from(LocalDateTime.parse('2015-12-01T03:00'))
-                .build(),
-            QueryBuilder.byInstanceId(1, SnapshotEntity)
-                .to(LocalDateTime.parse('2015-12-01T03:00'))
-                .build(),
-            QueryBuilder.byInstanceId(1, SnapshotEntity)
-                .from(LocalDateTime.parse('2015-12-01T02:00'))
-                .to(LocalDateTime.parse('2015-12-01T04:00'))
-                .build()
+            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,12,1,3,0)).build(),
+            byInstanceId(1, SnapshotEntity).to(new LocalDateTime(2015,12,1,3,0)).build(),
+            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,12,1,2,0))
+                                           .to(new LocalDateTime(2015,12,1,4,0)).build()
         ]
         expectedCommitDates << [
-            (3..5).collect{LocalDateTime.parse("2015-12-01T${it}:00")},
-            (1..3).collect{LocalDateTime.parse("2015-12-01T${it}:00")},
-            (2..4).collect{LocalDateTime.parse("2015-12-01T${it}:00")}
+            (5..3).collect{new LocalDateTime(2015,12,1,it,0)},
+            (3..1).collect{new LocalDateTime(2015,12,1,it,0)},
+            (4..2).collect{new LocalDateTime(2015,12,1,it,0)}
         ]
     }
 }

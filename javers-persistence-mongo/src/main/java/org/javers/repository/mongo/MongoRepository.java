@@ -242,11 +242,11 @@ public class MongoRepository implements JaversRepository {
     }
 
     private Bson applyQueryParams(Bson query, QueryParams queryParams) {
-        if (queryParams.isFromSet()) {
-            query = Filters.and(query, createFromQuery(queryParams.getFrom()));
+        if (queryParams.from().isPresent()) {
+            query = Filters.and(query, createFromQuery(queryParams.from().get()));
         }
-        if (queryParams.isToSet()) {
-            query = Filters.and(query, createToQuery(queryParams.getTo()));
+        if (queryParams.to().isPresent()) {
+            query = Filters.and(query, createToQuery(queryParams.to().get()));
         }
         return query;
     }

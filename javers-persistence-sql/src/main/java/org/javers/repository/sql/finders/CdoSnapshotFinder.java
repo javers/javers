@@ -87,11 +87,11 @@ public class CdoSnapshotFinder {
         SelectQuery query =  polyJDBC.query().select(snapshotFilter.select());
         snapshotFilter.addFrom(query);
         snapshotFilter.addWhere(query);
-        if (queryParams.isFromSet()) {
-            snapshotFilter.addFromDateCondition(query, queryParams.getFrom());
+        if (queryParams.from().isPresent()) {
+            snapshotFilter.addFromDateCondition(query, queryParams.from().get());
         }
-        if (queryParams.isToSet()) {
-            snapshotFilter.addToDateCondition(query, queryParams.getTo());
+        if (queryParams.to().isPresent()) {
+            snapshotFilter.addToDateCondition(query, queryParams.to().get());
         }
         query.orderBy(SNAPSHOT_PK, Order.DESC).limit(queryParams.getLimit());
 

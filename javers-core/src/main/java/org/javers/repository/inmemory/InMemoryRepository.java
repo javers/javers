@@ -15,7 +15,6 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,32 +108,16 @@ class InMemoryRepository implements JaversRepository {
             .build();
     }
 
-    private List<CdoSnapshot> applyQueryParams(List<CdoSnapshot> snapshots, QueryParams queryParams){
-        if (queryParams.isFromSet()) {
-            snapshots = filterOutSnapshotCommitedBefore(snapshots, queryParams.getFrom());
+    private List<CdoSnapshot> applyQueryParams(List<CdoSnapshot> snapshots, final QueryParams queryParams){
+        if (queryParams.hasDates()) {
+            snapshots = Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+                public boolean apply(CdoSnapshot snapshot) {
+                    return queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate());
+                }
+            });
         }
-        if (queryParams.isToSet()) {
-            snapshots = filterOutSnapshotCommitedAfter(snapshots, queryParams.getTo());
-        }
+
         return trimResultsToRequestedSize(snapshots, queryParams.getLimit());
-    }
-
-    private List<CdoSnapshot> filterOutSnapshotCommitedBefore(List<CdoSnapshot> snapshots, final LocalDateTime from) {
-        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
-            public boolean apply(CdoSnapshot snapshot) {
-                LocalDateTime commitDate = snapshot.getCommitMetadata().getCommitDate();
-                return commitDate.compareTo(from) >= 0;
-            }
-        });
-    }
-
-    private List<CdoSnapshot> filterOutSnapshotCommitedAfter(List<CdoSnapshot> snapshots, final LocalDateTime to) {
-        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
-            public boolean apply(CdoSnapshot snapshot) {
-                LocalDateTime commitDate = snapshot.getCommitMetadata().getCommitDate();
-                return commitDate.compareTo(to) <= 0;
-            }
-        });
     }
 
     private List<CdoSnapshot> trimResultsToRequestedSize(List<CdoSnapshot> snapshots, int requestedSize) {
