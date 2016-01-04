@@ -104,7 +104,7 @@ class InMemoryRepository implements JaversRepository {
 
     private QueryParams getQueryParamsWithIncreasedLimit(QueryParams queryParams) {
         return QueryParamsBuilder.initializeWith(queryParams)
-            .limit(queryParams.getLimit() * 10)
+            .limit(queryParams.limit() * 10)
             .build();
     }
 
@@ -117,7 +117,7 @@ class InMemoryRepository implements JaversRepository {
             });
         }
 
-        return trimResultsToRequestedSize(snapshots, queryParams.getLimit());
+        return trimResultsToRequestedSize(snapshots, queryParams.limit());
     }
 
     private List<CdoSnapshot> trimResultsToRequestedSize(List<CdoSnapshot> snapshots, int requestedSize) {

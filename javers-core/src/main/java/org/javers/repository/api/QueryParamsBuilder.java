@@ -34,7 +34,7 @@ public class QueryParamsBuilder {
     public static QueryParamsBuilder initializeWith(QueryParams queryParams) {
         Validate.argumentIsNotNull(queryParams);
 
-        QueryParamsBuilder builder = QueryParamsBuilder.withLimit(queryParams.getLimit());
+        QueryParamsBuilder builder = QueryParamsBuilder.withLimit(queryParams.limit());
         if (queryParams.from().isPresent()) {
             builder = builder.from(queryParams.from().get());
         }
@@ -71,9 +71,7 @@ public class QueryParamsBuilder {
     }
 
     private static void checkLimit(int limit) {
-        if (limit <= 0) {
-            throw new IllegalArgumentException("Limit is not a positive number.");
-        }
+        Validate.argumentCheck(limit > 0, "Limit is not a positive number.");
     }
 
     public QueryParams build() {

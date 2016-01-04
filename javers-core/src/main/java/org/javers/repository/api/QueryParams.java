@@ -20,15 +20,15 @@ public class QueryParams {
         this.to = Optional.fromNullable(to);
     }
 
-    public int getLimit() {
+    public int limit() {
         return limit;
     }
 
-    public boolean hasDates(){
-        return from != null || to != null;
+    public boolean hasDates() {
+        return from.isPresent() || to.isPresent();
     }
 
-    public boolean isDateInRange(LocalDateTime date){
+    public boolean isDateInRange(LocalDateTime date) {
         if (from.isPresent() && from.get().isAfter(date)){
             return false;
         }

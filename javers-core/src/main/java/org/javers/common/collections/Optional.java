@@ -61,6 +61,11 @@ public class Optional<T> implements Serializable{
     }
 
     @Override
+    public String toString() {
+        return isPresent() ? String.format("Optional[%s]", this.reference) : "Optional.empty";
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

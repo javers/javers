@@ -236,7 +236,7 @@ public class MongoRepository implements JaversRepository {
 
     private MongoCursor<Document> getMongoSnapshotsCursor(Bson idQuery, QueryParams queryParams) {
         Bson query = applyQueryParams(idQuery, queryParams);
-        int limit = queryParams.getLimit();
+        int limit = queryParams.limit();
         return snapshotsCollection()
                 .find(query).sort(new Document(COMMIT_ID, DESC)).limit(limit).iterator();
     }
