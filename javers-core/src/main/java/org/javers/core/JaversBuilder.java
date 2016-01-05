@@ -1,6 +1,8 @@
 package org.javers.core;
 
 import com.google.gson.TypeAdapter;
+import org.javers.common.date.DateProvider;
+import org.javers.common.date.DefaultDateProvider;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
@@ -28,7 +30,7 @@ import org.javers.core.snapshot.GraphSnapshotModule;
 import org.javers.java8support.Java8AddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
-import org.javers.repository.api.InMemoryRepositoryModule;
+import org.javers.repository.inmemory.InMemoryRepositoryModule;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 import org.slf4j.Logger;
@@ -69,6 +71,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     private final Set<Class> classesToScan = new HashSet<>();
 
     private JaversRepository repository;
+    private DateProvider dateProvider;
 
     public static JaversBuilder javers() {
         return new JaversBuilder();
@@ -113,7 +116,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         // JSON beans & domain aware typeAdapters
         bootJsonConverter();
 
-        // repository
+        bootDateTimeProvider();
         bootRepository();
 
         // clases to scan
@@ -121,8 +124,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
             typeMapper().getJaversType(c);
         }
 
-        Javers javers = getContainerComponent(JaversCore.class);
-        return javers;
+        return getContainerComponent(JaversCore.class);
     }
 
     /**
@@ -443,7 +445,19 @@ public class JaversBuilder extends AbstractJaversBuilder {
     public JaversBuilder withListCompareAlgorithm(ListCompareAlgorithm algorithm) {
         argumentIsNotNull(algorithm);
         coreConfiguration().withListCompareAlgorithm(algorithm);
+        return this;
+    }
 
+  /**
+   * Overriding default dateProvider probably makes sense only in test environments
+   * If you use it in production environment make sure you know what you are doing
+   *
+   * @param dateProvider provider of current date; by default provider returning
+   *                     system date and time is used
+   */
+    public JaversBuilder withDateTimeProvider(DateProvider dateProvider) {
+        argumentIsNotNull(dateProvider);
+        this.dateProvider = dateProvider;
         return this;
     }
 
@@ -489,6 +503,13 @@ public class JaversBuilder extends AbstractJaversBuilder {
                 .registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
 
         addComponent(jsonConverterBuilder.build());
+    }
+
+    private void bootDateTimeProvider() {
+        if (dateProvider == null) {
+            dateProvider = new DefaultDateProvider();
+        }
+        addComponent(dateProvider);
     }
 
     private void bootRepository(){

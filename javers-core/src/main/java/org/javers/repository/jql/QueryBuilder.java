@@ -5,6 +5,9 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.api.QueryParams;
+import org.javers.repository.api.QueryParamsBuilder;
+import org.joda.time.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +26,8 @@ public class QueryBuilder {
     private static int DEFAULT_LIMIT = 100;
 
     private int limit = DEFAULT_LIMIT;
+    private LocalDateTime from;
+    private LocalDateTime to;
     private boolean newObjectChanges;
     private final List<Filter> filters = new ArrayList<>();
 
@@ -162,6 +167,26 @@ public class QueryBuilder {
         return this;
     }
 
+    /**
+     * Limits results to time slice starting with the given point in time
+     * <br/>
+     * When looking for changes (in contrast to snapshots) results can be incomplete.
+     * For objects that were created before given point in time results will lack
+     * first change after that point.
+     */
+    public QueryBuilder from(LocalDateTime from) {
+        this.from = from;
+        return this;
+    }
+
+    /**
+     * Limits results to time slice ending with the given point in time
+     */
+    public QueryBuilder to(LocalDateTime to) {
+        this.to = to;
+        return this;
+    }
+
     protected void addFilter(Filter filter) {
         filters.add(filter);
     }
@@ -170,15 +195,14 @@ public class QueryBuilder {
         return Collections.unmodifiableList(filters);
     }
 
-    protected int getLimit() {
-        return limit;
+    protected QueryParams getQueryParams() {
+        return QueryParamsBuilder.withLimit(limit).from(from).to(to).build();
     }
 
     public JqlQuery build(){
         if (filters.isEmpty()){
             throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "empty JqlQuery");
         }
-
-        return new JqlQuery(getFilters(), newObjectChanges, getLimit());
+        return new JqlQuery(getFilters(), newObjectChanges, getQueryParams());
     }
 }

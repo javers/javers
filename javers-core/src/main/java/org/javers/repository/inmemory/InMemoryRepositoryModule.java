@@ -1,4 +1,4 @@
-package org.javers.repository.api;
+package org.javers.repository.inmemory;
 
 import org.javers.common.collections.Lists;
 import org.javers.core.pico.InstantiatingModule;
@@ -17,8 +17,8 @@ public class InMemoryRepositoryModule extends InstantiatingModule {
 
     @Override
     protected Collection<Class> getImplementations() {
-        return (Collection) Lists.asList(
-                InMemoryRepository.class
+        return Lists.asList(
+            (Class) InMemoryRepository.class
         );
     }
 }

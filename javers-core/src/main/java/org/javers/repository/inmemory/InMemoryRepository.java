@@ -1,4 +1,4 @@
-package org.javers.repository.api;
+package org.javers.repository.inmemory;
 
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
@@ -7,11 +7,14 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
+import org.javers.repository.api.JaversRepository;
+import org.javers.repository.api.QueryParams;
+import org.javers.repository.api.QueryParamsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +39,7 @@ class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getValueObjectStateHistory(final EntityType ownerEntity, final String path, int limit) {
+    public List<CdoSnapshot> getValueObjectStateHistory(final EntityType ownerEntity, final String path, QueryParams queryParams) {
         Validate.argumentsAreNotNull(ownerEntity, path);
 
         List<CdoSnapshot> result =  Lists.positiveFilter(getAll(), new Predicate<CdoSnapshot>() {
@@ -52,21 +55,21 @@ class InMemoryRepository implements JaversRepository {
             }
         });
 
-        return limit(result, limit);
+        return applyQueryParams(result, queryParams);
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
         Validate.argumentIsNotNull(globalId);
 
         if (snapshots.containsKey(globalId)) {
-            return unmodifiableList(limit(snapshots.get(globalId), limit));
+            return unmodifiableList(applyQueryParams(snapshots.get(globalId), queryParams));
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, int limit) {
+    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
         Validate.argumentIsNotNull(givenClass);
         List<CdoSnapshot> filtered = new ArrayList<>();
 
@@ -76,35 +79,50 @@ class InMemoryRepository implements JaversRepository {
             }
         }
 
-        return limit(filtered,limit);
+        return applyQueryParams(filtered, queryParams);
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, final String propertyName, int limit) {
+    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, final String propertyName, QueryParams queryParams) {
         Validate.argumentsAreNotNull(globalId, propertyName);
 
         if (snapshots.containsKey(globalId)) {
             List<CdoSnapshot> filtered = filterByPropertyName(snapshots.get(globalId), propertyName);
-            return unmodifiableList(limit(filtered, limit));
+            return unmodifiableList(applyQueryParams(filtered, queryParams));
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, int limit) {
+    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
         Validate.argumentsAreNotNull(givenClass, propertyName);
 
-        List<CdoSnapshot> filtered = filterByPropertyName(getStateHistory(givenClass, limit * 10), propertyName);
-        return unmodifiableList(limit(filtered, limit));
+        QueryParams increasedLimitQueryParams = getQueryParamsWithIncreasedLimit(queryParams);
+        List<CdoSnapshot> filtered = filterByPropertyName(getStateHistory(givenClass, increasedLimitQueryParams), propertyName);
+        return unmodifiableList(applyQueryParams(filtered, queryParams));
     }
 
-    private List<CdoSnapshot> limit(List<CdoSnapshot> list, int limit){
-        int size = list.size();
-        if (size <= limit){
-            return list;
-        } else {
-            return list.subList(0, limit);
+    private QueryParams getQueryParamsWithIncreasedLimit(QueryParams queryParams) {
+        return QueryParamsBuilder.initializeWith(queryParams)
+            .limit(queryParams.limit() * 10)
+            .build();
+    }
+
+    private List<CdoSnapshot> applyQueryParams(List<CdoSnapshot> snapshots, final QueryParams queryParams){
+        if (queryParams.hasDates()) {
+            snapshots = Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+                public boolean apply(CdoSnapshot snapshot) {
+                    return queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate());
+                }
+            });
         }
+
+        return trimResultsToRequestedSize(snapshots, queryParams.limit());
+    }
+
+    private List<CdoSnapshot> trimResultsToRequestedSize(List<CdoSnapshot> snapshots, int requestedSize) {
+        int size = snapshots.size();
+        return size <= requestedSize ? snapshots : snapshots.subList(0, requestedSize);
     }
 
     @Override

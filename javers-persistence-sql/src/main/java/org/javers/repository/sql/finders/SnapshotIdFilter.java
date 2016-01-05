@@ -1,7 +1,6 @@
 package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Optional;
-import org.javers.core.metamodel.object.GlobalId;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_PK;
 
