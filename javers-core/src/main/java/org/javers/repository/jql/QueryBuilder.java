@@ -158,7 +158,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits number of snapshots to be read from JaversRepository, default is 100.
+     * Limits number of Snapshots to be fetched from JaversRepository, default is 100.
      * <br/>
      * Always choose reasonable limits to improve performance of your queries.
      */
@@ -168,11 +168,32 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits results to time slice starting with the given point in time
+     * Limits Snapshots to be fetched from JaversRepository
+     * to those created after (>=) given date.
+     * <br/><br/>
+     *
+     * <b>Warning!</b> When querying for Changes done
+     * after given point in time, results will lack
+     * in <b>first</b> set of changes after that point.
      * <br/>
-     * When looking for changes (in contrast to snapshots) results can be incomplete.
-     * For objects that were created before given point in time results will lack
-     * first change after that point.
+     *
+     * For example. Consider three commits of some object done in every two days:
+     *
+     * <pre>
+     *     javers.commit(someObject); //Monday
+     *     javers.commit(someObject); //Wednesday
+     *     javers.commit(someObject); //Friday
+     * </pre>
+     *
+     * Query for Snapshots from Wednesday gives you 2 results as expected:
+     * Wednesday's and Friday's Snapshots.
+     * <br/>
+     * But query for Changes from Wednesday gives you only
+     * changes done on Friday.
+     * That's because Changes Query is backed by Snapshots Query
+     * and Changes are calculated as a diff between subsequent Snapshots.
+     *
+     * @see #to(LocalDateTime)
      */
     public QueryBuilder from(LocalDateTime from) {
         this.from = from;
@@ -180,7 +201,11 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits results to time slice ending with the given point in time
+     * Limits Snapshots to be fetched from JaversRepository
+     * to those created before (<=) given date.
+     * <br/><br/>
+     *
+     * See warning described in {@link #from(LocalDateTime)}, the same quirk applies
      */
     public QueryBuilder to(LocalDateTime to) {
         this.to = to;

@@ -4,8 +4,14 @@ import org.javers.common.collections.Optional;
 import org.joda.time.LocalDateTime;
 
 /**
- * Container for parameters used during query execution
- * Use QueryParamsBuilder to build instances of this class
+ * Container for additional query parameters
+ * used for filtering Snapshots to be fetched from database.
+ * <br/>
+ *
+ * Query parameters can't affect query semantic
+ * as they are used by all types of queries.
+ *
+ * @see QueryParamsBuilder
  *
  * @author michal wesolowski
  */
@@ -39,10 +45,17 @@ public class QueryParams {
         return true;
     }
 
+
+    /**
+     * filters results to Snapshots created after given date
+     */
     public Optional<LocalDateTime> from() {
         return from;
     }
 
+    /**
+     * filters results to Snapshots created before given date
+     */
     public Optional<LocalDateTime> to() {
         return to;
     }

@@ -41,7 +41,7 @@ public interface JaversRepository {
      * Snapshots (historical states) of given object
      * in reverse chronological order
      *
-     * @param queryParams params constraining returned result list (e.g. size limit)
+     * @param queryParams parameters constraining returned list (size limit, date from/to)
      * @return empty List if object is not versioned
      */
     List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams);
@@ -61,7 +61,7 @@ public interface JaversRepository {
      * All snapshots of objects within a given managed class,
      * in reverse chronological order
      *
-     * @param queryParams params constraining returned result list (e.g. size limit)
+     * @param queryParams parameters constraining returned list (size limit, date from/to)
      * @return empty List if no snapshots found
      */
     List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams);

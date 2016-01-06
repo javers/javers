@@ -4,6 +4,7 @@ import com.google.gson.TypeAdapter;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
 import org.javers.common.reflection.ReflectionUtil;
+import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
@@ -449,11 +450,11 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
   /**
-   * Overriding default dateProvider probably makes sense only in test environments
-   * If you use it in production environment make sure you know what you are doing
-   *
-   * @param dateProvider provider of current date; by default provider returning
-   *                     system date and time is used
+   * DateProvider providers current date for {@link Commit#getCommitDate()}.
+   * <br/>
+   * By default, now() is used.
+   * <br/>
+   * Overriding default dateProvider probably makes sense only in test environment.
    */
     public JaversBuilder withDateTimeProvider(DateProvider dateProvider) {
         argumentIsNotNull(dateProvider);
