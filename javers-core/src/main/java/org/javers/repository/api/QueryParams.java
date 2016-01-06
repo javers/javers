@@ -17,17 +17,23 @@ import org.joda.time.LocalDateTime;
  */
 public class QueryParams {
     private final int limit;
+    private final int skip;
     private final Optional<LocalDateTime> from;
     private final Optional<LocalDateTime> to;
 
-    QueryParams(int limit, LocalDateTime from, LocalDateTime to) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to) {
         this.limit = limit;
+        this.skip = skip;
         this.from = Optional.fromNullable(from);
         this.to = Optional.fromNullable(to);
     }
 
     public int limit() {
         return limit;
+    }
+
+    public int skip() {
+        return skip;
     }
 
     public boolean hasDates() {
@@ -64,6 +70,7 @@ public class QueryParams {
     public String toString() {
         return "QueryParams{" +
                 "limit=" + limit +
+                ", skip=" + skip +
                 ", from=" + from +
                 ", to=" + to +
                 '}';

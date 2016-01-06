@@ -597,4 +597,39 @@ class JaversRepositoryE2ETest extends Specification {
             (4..2).collect{new LocalDateTime(2015,01,1,it,0)}
         ]
     }
+
+    @Unroll
+    def "should query for Entity snapshots with skipped results"() {
+        given:
+        (19..1).each{
+            javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+        def intPropertyValues = snapshots.collect { it.getPropertyValue("intProperty") }
+
+        then:
+        intPropertyValues == expectedIntPropertyValues
+
+
+        where:
+        query << [
+            byInstanceId(1, SnapshotEntity).skip(0).limit(5).build(),
+            byInstanceId(1, SnapshotEntity).skip(5).limit(5).build(),
+            byInstanceId(1, SnapshotEntity).skip(10).limit(5).build(),
+            byInstanceId(1, SnapshotEntity).skip(15).limit(5).build(),
+            byInstanceId(1, SnapshotEntity).skip(20).limit(5).build(),
+            byInstanceId(1, SnapshotEntity).skip(5).build()
+        ]
+
+        expectedIntPropertyValues << [
+            1..5,
+            6..10,
+            11..15,
+            16..19,
+            [],
+            6..19
+        ]
+    }
 }
