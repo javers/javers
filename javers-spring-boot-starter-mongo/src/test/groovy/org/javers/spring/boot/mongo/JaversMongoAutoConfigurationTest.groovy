@@ -1,7 +1,7 @@
 package org.javers.spring.boot.mongo
+
 import org.javers.core.Javers
 import org.javers.core.metamodel.type.EntityType
-import org.javers.core.metamodel.type.JaversType
 import org.javers.repository.jql.QueryBuilder
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -10,13 +10,11 @@ import org.springframework.boot.test.SpringApplicationConfiguration
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 
-import static org.fest.assertions.api.Assertions.assertThat
-
 /**
  * @author pawelszymczyk
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = [TestApplication.class])
+@RunWith(SpringJUnit4ClassRunner)
+@SpringApplicationConfiguration(classes = [TestApplication])
 @ActiveProfiles("test")
 class JaversMongoAutoConfigurationTest {
 
@@ -24,36 +22,36 @@ class JaversMongoAutoConfigurationTest {
     Javers javers
 
     @Autowired
-    JaversProperties javersProperties;
+    JaversProperties javersProperties
 
     @Test
-    void shouldAutowiredJaversInstance() {
+    void shouldAutowireJaversInstance() {
         //given
-        DummyEntity dummyEntity = new DummyEntity(1);
+        def dummyEntity = new DummyEntity(1)
 
         //when
-        javers.commit("pawel", dummyEntity);
+        javers.commit("pawel", dummyEntity)
 
         //then
-        assertThat(javers.findSnapshots(QueryBuilder.byClass(DummyEntity).build())).hasSize(1)
+        assert javers.findSnapshots(QueryBuilder.byClass(DummyEntity).build()).size() == 1
+    }
+
+    @Test
+    void shoudUseDbNameFromMongoStarter(){
+        assert javers.repository.delegate.mongo.name == "spring-mongo"
     }
 
     @Test
     void shouldReadConfigurationFromYml() {
-        assertThat(javersProperties.getAlgorithm()).isEqualTo("levenshtein_distance")
-        assertThat(javersProperties.getMappingStyle()).isEqualTo("bean")
-        assertThat(javersProperties.isNewObjectSnapshot()).isFalse()
-        assertThat(javersProperties.isPrettyPrint()).isFalse()
-        assertThat(javersProperties.isTypeSafeValues()).isTrue()
-        assertThat(javersProperties.getDatabaseName()).isEqualTo("integrationTest")
+        assert javersProperties.algorithm == "levenshtein_distance"
+        assert javersProperties.mappingStyle == "bean"
+        assert !javersProperties.newObjectSnapshot
+        assert !javersProperties.prettyPrint
+        assert javersProperties.typeSafeValues
     }
 
     @Test
     void shouldReadBeanMappingStyleFromYml() {
-        JaversType mappingType = javers.getTypeMapping(DummyEntity)
-
-        assertThat(mappingType).isInstanceOf(EntityType)
+        assert javers.getTypeMapping(DummyEntity) instanceof EntityType
     }
 }
-
-

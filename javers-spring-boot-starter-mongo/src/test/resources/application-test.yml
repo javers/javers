@@ -1,7 +1,11 @@
 javers:
-  databaseName: integrationTest
   algorithm: levenshtein_distance
   mappingStyle: bean
   newObjectSnapshot: false
   prettyPrint: false
   typeSafeValues: true
+
+spring:
+  data:
+    mongodb:
+      database: spring-mongo

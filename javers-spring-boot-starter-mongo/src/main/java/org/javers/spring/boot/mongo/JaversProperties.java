@@ -13,7 +13,6 @@ public class JaversProperties {
     private boolean newObjectSnapshot = false;
     private boolean prettyPrint = true;
     private boolean typeSafeValues = false;
-    private String databaseName = "javers_db";
 
     public String getAlgorithm() {
         return algorithm;
@@ -53,13 +52,5 @@ public class JaversProperties {
 
     public void setTypeSafeValues(boolean typeSafeValues) {
         this.typeSafeValues = typeSafeValues;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
     }
 }
