@@ -41,7 +41,10 @@ public class JaversMongoAutoConfiguration {
     @Bean
     public Javers javers() {
         logger.info("Starting javers-spring-boot-starter-mongo ...");
-        MongoDatabase mongoDatabase = mongoClient.getDatabase(mongoProperties.getMongoClientDatabase() );
+
+        MongoDatabase mongoDatabase = mongoClient.getDatabase( mongoProperties.getMongoClientDatabase() );
+
+        logger.info("connecting to database: {}", mongoProperties.getMongoClientDatabase());
 
         JaversRepository javersRepository = new MongoRepository(mongoDatabase);
 
