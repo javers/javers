@@ -203,9 +203,6 @@ public class QueryBuilder {
     /**
      * Limits Snapshots to be fetched from JaversRepository
      * to those created before (<=) given date.
-     * <br/><br/>
-     *
-     * See warning described in {@link #from(LocalDateTime)}, the same quirk applies
      */
     public QueryBuilder to(LocalDateTime to) {
         this.to = to;
