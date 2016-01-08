@@ -13,9 +13,9 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.sql.finders.CdoSnapshotFinder;
-import org.javers.repository.sql.reposiotries.CdoSnapshotRepository;
-import org.javers.repository.sql.reposiotries.CommitMetadataRepository;
-import org.javers.repository.sql.reposiotries.GlobalIdRepository;
+import org.javers.repository.sql.repositories.CdoSnapshotRepository;
+import org.javers.repository.sql.repositories.CommitMetadataRepository;
+import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.JaversSchemaManager;
 
 import java.util.List;
