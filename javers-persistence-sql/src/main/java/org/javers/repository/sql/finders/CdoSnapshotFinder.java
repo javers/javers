@@ -8,7 +8,7 @@ import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
-import org.javers.repository.sql.reposiotries.GlobalIdRepository;
+import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
 import org.polyjdbc.core.query.SelectQuery;
