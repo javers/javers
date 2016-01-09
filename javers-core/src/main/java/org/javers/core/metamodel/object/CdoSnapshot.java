@@ -26,7 +26,7 @@ public final class CdoSnapshot extends Cdo {
     private final CdoSnapshotState state;
     private final SnapshotType type;
     private final List<String> changed;
-    private final Long version;
+    private final long version;
 
     /**
      * should be assembled by {@link CdoSnapshotBuilder}
@@ -37,7 +37,7 @@ public final class CdoSnapshot extends Cdo {
                 SnapshotType type,
                 List<String> changed,
                 ManagedType managedType,
-                Long version) {
+                long version) {
         super(globalId, managedType);
         Validate.argumentsAreNotNull(state, commitMetadata, type, managedType);
         this.state = state;
@@ -125,7 +125,7 @@ public final class CdoSnapshot extends Cdo {
         return type;
     }
 
-    public Long getVersion() {
+    public long getVersion() {
         return version;
     }
 }

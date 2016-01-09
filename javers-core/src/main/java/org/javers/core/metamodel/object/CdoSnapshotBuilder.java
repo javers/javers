@@ -26,7 +26,7 @@ public class CdoSnapshotBuilder {
     private boolean markAllAsChanged;
     private List<String> changed = Collections.EMPTY_LIST;
     private ManagedType managedType;
-    private Long version;
+    private long version;
 
     private CdoSnapshotBuilder(GlobalId globalId, ManagedType managedType) {
         Validate.argumentsAreNotNull(globalId, managedType);
@@ -58,8 +58,7 @@ public class CdoSnapshotBuilder {
         return this;
     }
 
-    public CdoSnapshotBuilder withVersion(Long version) {
-        Validate.argumentIsNotNull(version);
+    public CdoSnapshotBuilder withVersion(long version) {
         this.version = version;
         return this;
     }
