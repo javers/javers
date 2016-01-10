@@ -41,4 +41,14 @@ class ReferenceChangeAssert {
         assert actual.right == expected
         this
     }
+    
+    ReferenceChangeAssert hasLeftObject(Object expected) {
+        assert actual.leftObject == expected
+        this
+    }
+    
+    ReferenceChangeAssert hasRightObject(Object expected) {
+        assert actual.rightObject == expected
+        this
+    }
 }
