@@ -89,14 +89,6 @@ abstract class PropertyScannerTest extends Specification {
         assertThat(properties).hasProperty("propertyWithDiffIgnoreAnn").isTransient()
     }
 
-    def "should scan @ShallowReference property"() {
-        when:
-        def properties = propertyScanner.scan(DummyUser)
-
-        then:
-        assertThat(properties).hasProperty("propertyWithShallowReferenceAnn")
-    }
-
     def "should scan set property"() {
         when:
         def properties = propertyScanner.scan(DummyUser)

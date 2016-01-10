@@ -18,10 +18,11 @@ public class ClassAnnotationsScanner {
         this.annotationNamesProvider = annotationNamesProvider;
     }
 
-    public ClientsClassDefinition scanAndInfer(Class javaClass){
+    public ClientsClassDefinition scanAndInfer(Class javaClass) {
         Validate.argumentIsNotNull(javaClass);
 
-        for (Annotation ann : javaClass.getAnnotations()){
+        Annotation[] annotations = javaClass.getAnnotations();
+        for (Annotation ann : annotations) {
             if (annotationNamesProvider.isEntityAlias(ann)) {
                 return new EntityDefinition(javaClass);
             }
@@ -34,9 +35,10 @@ public class ClassAnnotationsScanner {
                 return new ValueDefinition(javaClass);
             }
 
-            if(annotationNamesProvider.isShallowReference(ann)){
+            if (annotationNamesProvider.isShallowReferenceAlias(ann)) {
                 return new ShallowReferenceDefinition(javaClass);
             }
+
         }
 
         return new ValueObjectDefinition(javaClass);

@@ -49,5 +49,7 @@ public class AnnotationNamesProvider {
         return Collections.unmodifiableSet(transientPropertyAliases);
     }
 
-    boolean isShallowReference(Annotation ann){return  shallowReferenceAliases.contains(ann.annotationType().getSimpleName());}
+    boolean isShallowReferenceAlias(Annotation ann){
+        return shallowReferenceAliases.contains(ann.annotationType().getSimpleName());
+    }
 }
