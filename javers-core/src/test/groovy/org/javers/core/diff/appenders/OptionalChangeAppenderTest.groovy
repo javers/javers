@@ -52,11 +52,11 @@ class OptionalChangeAppenderTest extends AbstractDiffAppendersTest {
         ChangeAssert.assertThat(change)
                     .hasInstanceId(SnapshotEntity, 1)
         change instanceof ReferenceChange
-        assertThat( change )
-            hasLeftReference( expectedLeftRef )
-            hasRightReference( expectedRightRef )
-            hasLeftObject( org.javers.common.collections.Optional.empty() )
-            hasRightObject( org.javers.common.collections.Optional.empty() )
+        ReferenceChangeAssert.assertThat( change )
+            .hasLeftReference( expectedLeftRef )
+            .hasRightReference( expectedRightRef )
+            .hasLeftObject( org.javers.common.collections.Optional.empty() )
+            .hasRightObject( org.javers.common.collections.Optional.empty() )
         
         where:
         leftOptional                 | rightOptional                | expectedLeftRef               | expectedRightRef
