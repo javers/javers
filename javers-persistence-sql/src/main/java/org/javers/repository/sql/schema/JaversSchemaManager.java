@@ -122,14 +122,21 @@ public class JaversSchemaManager {
     private boolean columnExists(String tableName, String colName) {
         try {
 
-            DatabaseMetaData meta = connectionProvider.getConnection().getMetaData();
-            ResultSet columns = meta.getColumns(null, null, tableName.toUpperCase(), colName.toUpperCase());
+            Statement stmt = connectionProvider.getConnection().createStatement();
 
-            boolean columnExists = columns.isBeforeFirst();
+            ResultSet res = stmt.executeQuery("select * from " + tableName + " where 1<0");
+            ResultSetMetaData metaData = res.getMetaData();
 
-            columns.close();
+            for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                if (metaData.getColumnName(i).equalsIgnoreCase(colName)) {
+                    return true;
+                }
+            }
 
-            return columnExists;
+            res.close();
+            stmt.close();
+
+            return false;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
