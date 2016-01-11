@@ -10,10 +10,7 @@ import org.polyjdbc.core.util.TheCloser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
+import java.sql.*;
 import java.util.Map;
 
 /**
@@ -45,6 +42,7 @@ public class JaversSchemaManager {
         }
 
         alterCommitIdColumnIfNeeded();
+        addSnapshotVersionColumnIfNeeded();
 
         TheCloser.close(schemaManager, schemaInspector);
     }
@@ -76,7 +74,23 @@ public class JaversSchemaManager {
         }
     }
 
-    private boolean executeSQL(String sql){
+    private void addSnapshotVersionColumnIfNeeded() {
+
+        if (!columnExists("jv_snapshot", "version")) {
+
+            if (dialect instanceof PostgresDialect || dialect instanceof MysqlDialect
+                    || dialect instanceof H2Dialect || dialect instanceof MsSqlDialect) {
+                executeSQL("ALTER TABLE jv_snapshot ADD COLUMN version BIGINT");
+            } else if (dialect instanceof OracleDialect) {
+                executeSQL("ALTER TABLE jv_snapshot ADD version NUMBER(19)");
+            } else {
+                logger.error("\nno DB schema migration script for {} :(\nplease contact with JaVers team, javers@javers.org",
+                        dialect.getCode());
+            }
+        }
+    }
+
+    private boolean executeSQL(String sql) {
         try {
             Statement stmt = connectionProvider.getConnection().createStatement();
 
@@ -105,7 +119,23 @@ public class JaversSchemaManager {
         }
     }
 
-    private void ensureTable(String tableName, Schema schema){
+    private boolean columnExists(String tableName, String colName) {
+        try {
+
+            DatabaseMetaData meta = connectionProvider.getConnection().getMetaData();
+            ResultSet columns = meta.getColumns(null, null, tableName.toUpperCase(), colName.toUpperCase());
+
+            boolean columnExists = columns.isBeforeFirst();
+
+            columns.close();
+
+            return columnExists;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void ensureTable(String tableName, Schema schema) {
         if (schemaInspector.relationExists(tableName)) {
             return;
         }

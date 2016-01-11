@@ -49,7 +49,7 @@ public class FixedSchemaFactory {
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         primaryKey(tableName, SNAPSHOT_PK, schema, relationBuilder);
         relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
-                        .withAttribute().longAttr(VERSION).and()
+                       .withAttribute().longAttr(VERSION).and()
                        .withAttribute().text(SNAPSHOT_STATE).and()
                        .withAttribute().text(SNAPSHOT_CHANGED).and();
         foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);
