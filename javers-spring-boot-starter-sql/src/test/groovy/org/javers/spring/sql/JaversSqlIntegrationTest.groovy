@@ -5,7 +5,7 @@ import org.javers.core.metamodel.type.EntityType
 import org.javers.core.metamodel.type.JaversType
 import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.boot.sql.DummyEntity
-import org.javers.spring.boot.sql.DummyEntityService
+import org.javers.spring.boot.sql.DummyEntityRepository
 import org.javers.spring.boot.sql.TestApplication
 import org.junit.Test;
 import org.junit.runner.RunWith
@@ -28,7 +28,7 @@ public class JaversSqlIntegrationTest {
     Javers javers
 
     @Autowired
-    DummyEntityService dummyEntityService
+    DummyEntityRepository dummyEntityRepository
 
     @Test
     void shouldAutowiredJaversInstance() {
@@ -36,10 +36,10 @@ public class JaversSqlIntegrationTest {
         DummyEntity dummyEntity = new DummyEntity(1, "kaz");
 
         //when
-        dummyEntityService.save(dummyEntity)
+        dummyEntityRepository.save(dummyEntity)
 
         //then
-            assertThat(javers.findSnapshots(QueryBuilder.byClass(DummyEntity).build())).hasSize(1)
+        assertThat(javers.findSnapshots(QueryBuilder.byClass(DummyEntity).build())).hasSize(1)
     }
 
     @Test
