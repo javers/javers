@@ -40,7 +40,33 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         json.globalId.entity == "org.javers.core.model.DummyUser"
         json.globalId.cdoId == "kaz"
         json.type == "INITIAL"
+    }
+
+    def "should serialize snapshot version"() {
+        given:
+        def javers = javersTestAssembly()
+        def dummyUserCdo = javers.createCdoWrapper(new DummyUser(name: "kaz", age: 5))
+        def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata())
+
+        when:
+        def json = new JsonSlurper().parseText(javers.jsonConverter.toJson(snapshot))
+
+        then:
         json.version == 1
+    }
+
+    def "should serialize an updated snapshot version"() {
+        given:
+        def javers = javersTestAssembly()
+        def dummyUserCdo = javers.createCdoWrapper(new DummyUser(name: "kaz", age: 5))
+        def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata())
+        def updatedSnapshot = javers.snapshotFactory.createUpdate(dummyUserCdo, snapshot, someCommitMetadata())
+
+        when:
+        def json = new JsonSlurper().parseText(javers.jsonConverter.toJson(updatedSnapshot))
+
+        then:
+        json.version == 2
     }
 
     def "should serialize state with primitive values in CdoSnapshot"() {
