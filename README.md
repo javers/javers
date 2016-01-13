@@ -37,7 +37,7 @@ Run environment self-test, to check if JaVers is compatible with your JDK versio
 
 ## Guidelines for Bug Reporting
 You can report a Bug or a Feature request to our [github issues](http://github.com/javers/javers/issues/).
-Questions should be asked at [stackoverflow.com](http://stackoverflow.com), we will answer.
+Questions should be asked at [stackoverflow.com](http://stackoverflow.com/questions/tagged/javers?sort=newest), we will answer.
 
 Bug Reports have to contain:
 
@@ -62,7 +62,7 @@ Before you start to work, please read this guidelines:
    The only exception is `package org.javers.java8support`
 1. We are not crazy about **code formatting** standards.
    Use 4 spaces to indent. Don't change formatting of existing code.
-1. We really care about **Clean Code**, **quality** so expect many Code Review comments.
+1. We really care about **Clean Code** and **quality** so expect many Code Review comments.
 1. **Tests** should be written in Spock/Groovy. In tests, Java8 is fine.<br/>
    In JaVers, tests are well-crafted, runnable documentation.<br/>
    Tests should specify and describe functionality, not implementation. <br/>
