@@ -1,4 +1,4 @@
-package org.javers.repository.sql.reposiotries;
+package org.javers.repository.sql.repositories;
 
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;

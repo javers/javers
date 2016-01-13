@@ -1,4 +1,4 @@
-package org.javers.repository.sql.reposiotries;
+package org.javers.repository.sql.repositories;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
