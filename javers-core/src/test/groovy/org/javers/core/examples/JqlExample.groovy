@@ -1,5 +1,6 @@
 package org.javers.core.examples
 
+import org.javers.common.date.FakeDateProvider
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.examples.model.Address
@@ -9,6 +10,7 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
+import org.joda.time.LocalDate
 import spock.lang.Specification
 
 /**
@@ -143,6 +145,34 @@ class JqlExample extends Specification {
         then:
         printChanges(changes)
         assert changes.size() == 4
+    }
+
+    def "should query for changes with time range filter"(){
+      given:
+      def fakeDateProvider = new FakeDateProvider()
+      def javers = JaversBuilder.javers().withDateTimeProvider(fakeDateProvider).build()
+
+      (0..5).each{ i ->
+          def now = new LocalDate(2015+i,01,1)
+          fakeDateProvider.set( now )
+          def bob = new Employee(name:"bob", age:20+i)
+          javers.commit("author", bob)
+          println "comitting bob on $now"
+      }
+
+      when:
+      def changes = javers
+              .findChanges( QueryBuilder.byInstanceId("bob", Employee.class)
+              .from(new LocalDate(2015,12,31))
+              .to  (new LocalDate(2018,01,1)).build() )
+
+      then:
+      assert changes.size() == 2
+
+      println "found changes:"
+      changes.each {
+          println "commitDate: "+ it.commitMetadata.get().commitDate+" "+it
+      }
     }
 
     def "should query for changes with NewObject filter"() {

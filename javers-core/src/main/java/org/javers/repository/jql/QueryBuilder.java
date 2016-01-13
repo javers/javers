@@ -7,6 +7,7 @@ import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
+import static org.joda.time.LocalTime.MIDNIGHT;
 
 /**
  * Fluent API for building {@link JqlQuery},
@@ -201,12 +203,26 @@ public class QueryBuilder {
     }
 
     /**
+     * delegates to {@link #from(LocalDateTime)} with MIDNIGHT
+     */
+    public QueryBuilder from(LocalDate fromDate) {
+        return from(fromDate.toLocalDateTime(MIDNIGHT));
+    }
+
+    /**
      * Limits Snapshots to be fetched from JaversRepository
      * to those created before (<=) given date.
      */
     public QueryBuilder to(LocalDateTime to) {
         this.to = to;
         return this;
+    }
+
+    /**
+     * delegates to {@link #to(LocalDateTime)} with MIDNIGHT
+     */
+    public QueryBuilder to(LocalDate toDate) {
+        return to(toDate.toLocalDateTime(MIDNIGHT));
     }
 
     protected void addFilter(Filter filter) {
