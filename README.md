@@ -70,7 +70,8 @@ Before you start to work, please read this guidelines:
 1. **Commit message** should [mention](https://github.com/blog/957-introducing-issue-mentions) the issue,
    for example:<br/>
    `#299 new Guidelines for Contributors in README.md`
-1. Squash your commits into one and create the **Pull Request**
+1. Before creating the **Pull Request**: merge from master and
+   squash your commits
 1. Apply our **Code Review** comments and commit changes in the next commit.
 Please don't squash Code Review commits, we want to track progress of the Code Review process.    
 
