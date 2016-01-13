@@ -6,7 +6,7 @@
 [![Join the chat at https://gitter.im/javers/javers](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/javers/javers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Ideal for contribution](https://badge.waffle.io/javers/javers.svg?label=ideal%20for%20contribution&title=Ideal for contribution)](http://waffle.io/javers/javers)
 
-JaVers is a lightweight java library for **auditing** changes in your data.
+JaVers is the lightweight Java library for **auditing** changes in your data.
 
 We all use Version Control Systems for source code,
 why not to use specialized framework to provide the audit trail of your Java objects (entities, POJO, data objects)?
@@ -37,7 +37,7 @@ Run environment self-test, to check if JaVers is compatible with your JDK versio
 
 ## Guidelines for Bug Reporting
 You can report a Bug or a Feature request to our [github issues](http://github.com/javers/javers/issues/).
-Questions should be asked at [stackoverflow.com](http://stackoverflow.com), we will answer.
+Questions should be asked at [stackoverflow.com](http://stackoverflow.com/questions/tagged/javers?sort=newest), we will answer.
 
 Bug Reports have to contain:
 
@@ -62,7 +62,7 @@ Before you start to work, please read this guidelines:
    The only exception is `package org.javers.java8support`
 1. We are not crazy about **code formatting** standards.
    Use 4 spaces to indent. Don't change formatting of existing code.
-1. We really care about **Clean Code**, **quality** so expect many Code Review comments.
+1. We really care about **Clean Code** and **quality** so expect many Code Review comments.
 1. **Tests** should be written in Spock/Groovy. In tests, Java8 is fine.<br/>
    In JaVers, tests are well-crafted, runnable documentation.<br/>
    Tests should specify and describe functionality, not implementation. <br/>
@@ -70,7 +70,8 @@ Before you start to work, please read this guidelines:
 1. **Commit message** should [mention](https://github.com/blog/957-introducing-issue-mentions) the issue,
    for example:<br/>
    `#299 new Guidelines for Contributors in README.md`
-1. Squash your commits into one and create the **Pull Request**
+1. Before creating the **Pull Request**: merge from master and
+   squash your commits
 1. Apply our **Code Review** comments and commit changes in the next commit.
 Please don't squash Code Review commits, we want to track progress of the Code Review process.    
 
