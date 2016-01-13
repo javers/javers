@@ -568,16 +568,12 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     @Unroll
-    def "should query for Entity snapshots with commit #what"() {
+    def "should query for Entity snapshots with time range filter - #what"() {
         given:
-        def data = (1..5).collect{[
-                    'entity': new SnapshotEntity(id: 1, intProperty: it),
-                    'date': new LocalDateTime(2015,12,1,it,0)
-            ]}
-
-        data.each {
-            fakeDateProvider.set(it['date'] as LocalDateTime)
-            javers.commit('author', it['entity'])
+        (1..5).each{
+            def entity =  new SnapshotEntity(id: 1, intProperty: it)
+            fakeDateProvider.set( new LocalDateTime(2015,01,1,it,0) )
+            javers.commit('author', entity)
         }
 
         when:
@@ -588,17 +584,17 @@ class JaversRepositoryE2ETest extends Specification {
         commitDates == expectedCommitDates
 
         where:
-        what << ['date from','date to','date within given time range']
+        what << ['date from','date to','date in time range']
         query << [
-            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,12,1,3,0)).build(),
-            byInstanceId(1, SnapshotEntity).to(new LocalDateTime(2015,12,1,3,0)).build(),
-            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,12,1,2,0))
-                                           .to(new LocalDateTime(2015,12,1,4,0)).build()
+            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,01,1,3,0)).build(),
+            byInstanceId(1, SnapshotEntity).to(new LocalDateTime(2015,01,1,3,0)).build(),
+            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,01,1,2,0))
+                                           .to(new LocalDateTime(2015,01,1,4,0)).build()
         ]
         expectedCommitDates << [
-            (5..3).collect{new LocalDateTime(2015,12,1,it,0)},
-            (3..1).collect{new LocalDateTime(2015,12,1,it,0)},
-            (4..2).collect{new LocalDateTime(2015,12,1,it,0)}
+            (5..3).collect{new LocalDateTime(2015,01,1,it,0)},
+            (3..1).collect{new LocalDateTime(2015,01,1,it,0)},
+            (4..2).collect{new LocalDateTime(2015,01,1,it,0)}
         ]
     }
 }
