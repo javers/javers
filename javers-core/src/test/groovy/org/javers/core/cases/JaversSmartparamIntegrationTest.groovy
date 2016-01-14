@@ -32,7 +32,7 @@ class JaversSmartparamIntegrationTest extends Specification{
 
         when:
         Diff diff = javers.compare(entry1, entry2)
-        String jsonText = javers.toJson(diff)
+        String jsonText = javers.jsonConverter.toJson(diff)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)

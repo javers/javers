@@ -4,6 +4,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -14,7 +15,8 @@ import java.math.BigDecimal;
  * @see CommitSeqGenerator
  * @author bartosz walacik
  */
-public final class CommitId implements Comparable<CommitId> {
+public final class CommitId implements Comparable<CommitId>, Serializable {
+
     private final long majorId;
     private final int  minorId;
 

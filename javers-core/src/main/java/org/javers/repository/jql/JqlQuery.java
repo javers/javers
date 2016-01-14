@@ -3,6 +3,7 @@ package org.javers.repository.jql;
 import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
+import org.javers.repository.api.QueryParams;
 
 import java.util.List;
 
@@ -16,15 +17,15 @@ import java.util.List;
  *
  * @author bartosz.walacik
  */
-public class JqlQuery<T> {
+public class JqlQuery {
 
-    private final int limit;
+    private final QueryParams queryParams;
     private final boolean newObjectChanges;
     private final List<Filter> filters;
 
-    JqlQuery(List<Filter> filters, boolean newObjectChanges, int limit) {
+    JqlQuery(List<Filter> filters, boolean newObjectChanges, QueryParams queryParams) {
         Validate.argumentsAreNotNull(filters);
-        this.limit = limit;
+        this.queryParams = queryParams;
         this.filters = filters;
         this.newObjectChanges = newObjectChanges;
     }
@@ -32,18 +33,14 @@ public class JqlQuery<T> {
     @Override
     public String toString() {
         return "JqlQuery{" +
-                "limit=" + limit +
+                "queryParams=" + queryParams +
                 ", filters=" + filters +
                 ", newObjectChanges="+ newObjectChanges +
                 '}';
     }
 
-    /**
-     * choose reasonable limit (number of objects to fetch),
-     * production database could contain more records than you expect
-     */
-    int getLimit() {
-        return limit;
+    QueryParams getQueryParams() {
+        return queryParams;
     }
 
     boolean hasFilter(Class<? extends Filter> ofType){

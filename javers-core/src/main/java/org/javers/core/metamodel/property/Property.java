@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.property;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.JaversMember;
 
 import java.lang.reflect.Type;
@@ -16,7 +18,7 @@ public class Property {
     private transient final JaversMember member;
     private transient final boolean hasTransientAnn;
 
-    Property(JaversMember member, boolean hasTransientAnn){
+    public Property(JaversMember member, boolean hasTransientAnn){
         argumentIsNotNull(member);
         this.member = member;
         this.hasTransientAnn = hasTransientAnn;
@@ -38,12 +40,21 @@ public class Property {
     }
 
     /**
-     * returns property value, even if private
+     * Returns property value, even if private.
+     * <br/>
+     * Converts JaversException.MISSING_PROPERTY to null.
      *
      * @param target invocation target
      */
     public Object get(Object target) {
-        return member.invokeEvenIfPrivate(target);
+        try {
+            return  member.invokeEvenIfPrivate(target);
+        } catch (JaversException e) {
+            if (e.getCode() == JaversExceptionCode.MISSING_PROPERTY) {
+                return null;
+            }
+            throw e;
+        }
     }
 
     public boolean isNull(Object target) {
@@ -75,5 +86,9 @@ public class Property {
     @Override
     public String toString() {
         return member.toString();
+    }
+
+    public JaversMember getMember() {
+        return member;
     }
 }

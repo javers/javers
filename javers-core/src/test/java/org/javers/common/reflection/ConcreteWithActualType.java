@@ -5,9 +5,9 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public class ConcreteWithActualType extends AbstractGeneric<List<String>> {
+public class ConcreteWithActualType extends AbstractGeneric<String, List<String>> {
 
-    public ConcreteWithActualType(List<String> value) {
-        super(value);
+    public ConcreteWithActualType(String s, List<String> value) {
+        super(s, value);
     }
 }

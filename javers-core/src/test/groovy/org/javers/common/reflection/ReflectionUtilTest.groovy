@@ -1,15 +1,11 @@
  package org.javers.common.reflection
+import com.google.common.reflect.TypeToken
+import org.javers.core.model.DummyUser
+import spock.lang.Specification
+import spock.lang.Unroll
 
- import com.google.common.reflect.TypeToken
- import org.javers.core.model.DummyUser
- import spock.lang.Specification
- import spock.lang.Unroll
-
- import java.lang.reflect.Field
-
- import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
-
- /**
+import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
+/**
  * @author Pawel Cierpiatka
  */
 class ReflectionUtilTest extends Specification {
@@ -81,8 +77,8 @@ class ReflectionUtilTest extends Specification {
 
         where:
         memberType | action
-        "Method"   | { ReflectionUtil.getAllMethods(ConcreteWithActualType)[0] }
-        "Field"    | { ReflectionUtil.getAllFields(ConcreteWithActualType)[0] }
+        "Method"   | { ReflectionUtil.getAllMethods(ConcreteWithActualType).find{it.name() == "getValue"} }
+        "Field"    | { ReflectionUtil.getAllFields(ConcreteWithActualType).find{it.name() == "value"} }
     }
 
     def "should return empty list when type is not generic"() {

@@ -17,6 +17,7 @@ class CollectionTypeTest extends Specification{
     class Dummy <T> {
         Set rawType
         Set<?> unboundedWildcardType
+        Set<? extends String> boundedWildcardType
         Set<T> genericType
         Set<String> parametrizedType
         Set<ThreadLocal<String>> nestedParametrizedType
@@ -48,6 +49,20 @@ class CollectionTypeTest extends Specification{
 
         then:
         cType.baseJavaType == new TypeToken<Set<String>>(){}.type
+        cType.genericType == true
+        cType.fullyParametrized == true
+        cType.itemType == String
+    }
+
+    def "should treat wildcards with an upper bound as the type of its upper bound" () {
+        given:
+        def genericWithArgument = getFieldFromClass(Dummy, "boundedWildcardType").genericType
+
+        when:
+        def cType = new ListType(genericWithArgument)
+
+        then:
+        cType.baseJavaType == new TypeToken<Set<? extends String>>(){}.type
         cType.genericType == true
         cType.fullyParametrized == true
         cType.itemType == String

@@ -40,27 +40,28 @@ public class QueryRunner {
         Validate.argumentIsNotNull(query);
 
         if (query.isIdOnlyQuery()){
-            return repository.getStateHistory(fromDto(query.getIdFilter()), query.getLimit());
+            return repository.getStateHistory(fromDto(query.getIdFilter()), query.getQueryParams());
         }
 
         if (query.isIdAndPropertyQuery()){
-            return repository.getPropertyStateHistory(fromDto(query.getIdFilter()), query.getPropertyName(), query.getLimit());
+            return repository.getPropertyStateHistory(fromDto(query.getIdFilter()), query.getPropertyName(), query.getQueryParams());
         }
 
         if (query.isClassOnlyQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getStateHistory(mType, query.getLimit());
+            return repository.getStateHistory(mType, query.getQueryParams());
         }
 
         if (query.isClassAndPropertyQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getPropertyStateHistory(mType, query.getPropertyName(), query.getLimit());
+            return repository.getPropertyStateHistory(mType, query.getPropertyName(), query.getQueryParams());
         }
 
         if (query.isVoOwnerOnlyQuery()) {
             VoOwnerFilter filter = query.getVoOwnerFilter();
-
-            return repository.getValueObjectStateHistory(getOwnerEntity(filter), filter.getPath(), query.getLimit());
+            EntityType ownerEntity = getOwnerEntity(filter);
+            globalIdFactory.touchValueObjectFromPath(ownerEntity, filter.getPath());
+            return repository.getValueObjectStateHistory(ownerEntity, filter.getPath(), query.getQueryParams());
         }
 
         throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForSnapshots: " + query + " is not supported");
@@ -71,29 +72,30 @@ public class QueryRunner {
 
         if (query.isIdOnlyQuery()){
             return repository.getChangeHistory(fromDto(query.getIdFilter()),
-                    query.isNewObjectChanges(), query.getLimit());
+                    query.isNewObjectChanges(), query.getQueryParams());
         }
 
         if (query.isIdAndPropertyQuery()){
             return repository.getPropertyChangeHistory(fromDto(query.getIdFilter()),
-                    query.getPropertyName(), query.isNewObjectChanges(), query.getLimit());
+                    query.getPropertyName(), query.isNewObjectChanges(), query.getQueryParams());
         }
 
         if (query.isClassOnlyQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getChangeHistory(mType, query.isNewObjectChanges(), query.getLimit());
+            return repository.getChangeHistory(mType, query.isNewObjectChanges(), query.getQueryParams());
         }
 
         if (query.isClassAndPropertyQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getPropertyChangeHistory(mType,query.getPropertyName(), query.isNewObjectChanges(), query.getLimit());
+            return repository.getPropertyChangeHistory(mType, query.getPropertyName(), query.isNewObjectChanges(), query.getQueryParams());
         }
 
         if (query.isVoOwnerOnlyQuery()) {
             VoOwnerFilter filter = query.getVoOwnerFilter();
-
-            return repository.getValueObjectChangeHistory(getOwnerEntity(filter),
-                    filter.getPath(), query.isNewObjectChanges(), query.getLimit());
+            EntityType ownerEntity = getOwnerEntity(filter);
+            globalIdFactory.touchValueObjectFromPath(ownerEntity, filter.getPath());
+            return repository.getValueObjectChangeHistory(
+                    ownerEntity, filter.getPath(), query.isNewObjectChanges(), query.getQueryParams());
         }
 
         throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForChanges: " + query + " is not supported");

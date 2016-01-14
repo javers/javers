@@ -6,7 +6,9 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
-import org.javers.repository.sql.reposiotries.GlobalIdRepository;
+import org.javers.repository.api.QueryParams;
+import org.javers.repository.api.QueryParamsBuilder;
+import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
 import org.polyjdbc.core.query.SelectQuery;
@@ -40,55 +42,60 @@ public class CdoSnapshotFinder {
             return Optional.empty();
         }
 
-        return Optional.of(queryForCdoSnapshots(new SnapshotIdFilter(maxSnapshot.get()), Optional.of(globalId), 1).get(0));
+        QueryParams oneItemLimit = QueryParamsBuilder.withLimit(1).build();
+        return Optional.of(queryForCdoSnapshots(new SnapshotIdFilter(maxSnapshot.get()), Optional.of(globalId), oneItemLimit).get(0));
     }
 
-    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, Optional<String> propertyName, int limit) {
-        Optional<Long> classPk = globalIdRepository.findClassPk(givenClass.getBaseJavaClass());
+    public List<CdoSnapshot> getStateHistory(ManagedType managedType, Optional<String> propertyName, QueryParams queryParams) {
+        Optional<Long> classPk = globalIdRepository.findClassPk(managedType.getName());
         if (classPk.isEmpty()){
             return Collections.emptyList();
         }
 
         ManagedClassFilter classFilter = new ManagedClassFilter(classPk.get(), propertyName);
 
-        return queryForCdoSnapshots(classFilter, Optional.<GlobalId>empty(), limit);
+        return queryForCdoSnapshots(classFilter, Optional.<GlobalId>empty(), queryParams);
     }
 
-    public List<CdoSnapshot> getVOStateHistory(EntityType ownerEntity, String fragment, int limit) {
-        Optional<Long> ownerEntityClassPk = globalIdRepository.findClassPk(ownerEntity.getBaseJavaClass());
+    public List<CdoSnapshot> getVOStateHistory(EntityType ownerEntity, String fragment, QueryParams queryParams) {
+        Optional<Long> ownerEntityClassPk = globalIdRepository.findClassPk(ownerEntity.getName());
         if (ownerEntityClassPk.isEmpty()){
             return Collections.emptyList();
         }
 
         VoOwnerEntityFilter voOwnerFilter = new VoOwnerEntityFilter(ownerEntityClassPk.get(), fragment);
 
-        return queryForCdoSnapshots(voOwnerFilter, Optional.<GlobalId>empty(), limit);
+        return queryForCdoSnapshots(voOwnerFilter, Optional.<GlobalId>empty(), queryParams);
     }
 
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, Optional<String> propertyName, int limit) {
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, Optional<String> propertyName, QueryParams queryParams) {
         Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId);
 
         if (globalIdPk.isEmpty()){
             return Collections.emptyList();
         }
 
-        return queryForCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), propertyName), Optional.of(globalId), limit);
+        return queryForCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), propertyName), Optional.of(globalId), queryParams);
     }
 
-    //TODO dependency injection
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }
 
-    private List<CdoSnapshot> queryForCdoSnapshots(SnapshotFilter snapshotFilter, Optional<GlobalId> providedGlobalId, int limit){
+    private List<CdoSnapshot> queryForCdoSnapshots(SnapshotFilter snapshotFilter, Optional<GlobalId> providedGlobalId, QueryParams queryParams){
 
         SelectQuery query =  polyJDBC.query().select(snapshotFilter.select());
         snapshotFilter.addFrom(query);
         snapshotFilter.addWhere(query);
-        query.orderBy(SNAPSHOT_PK, Order.DESC).limit(limit);
+        if (queryParams.from().isPresent()) {
+            snapshotFilter.addFromDateCondition(query, queryParams.from().get());
+        }
+        if (queryParams.to().isPresent()) {
+            snapshotFilter.addToDateCondition(query, queryParams.to().get());
+        }
+        query.orderBy(SNAPSHOT_PK, Order.DESC).limit(queryParams.limit());
 
-        return
-        polyJDBC.queryRunner().queryList(query, new CdoSnapshotObjectMapper(jsonConverter, providedGlobalId));
+        return polyJDBC.queryRunner().queryList(query, new CdoSnapshotObjectMapper(jsonConverter, providedGlobalId));
     }
 
     private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk) {

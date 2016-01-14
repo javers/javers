@@ -4,6 +4,7 @@ import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
+import org.javers.core.examples.model.Person
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
@@ -19,9 +20,9 @@ class JqlExample extends Specification {
         given:
         def javers = JaversBuilder.javers().build()
 
-        javers.commit( "author", new Employee(name:"bob", age:30, salary:1000) )
-        javers.commit( "author", new Employee(name:"bob", age:31, salary:1200) )
-        javers.commit( "author", new Employee(name:"john",age:25) )
+        javers.commit("author", new Employee(name:"bob", age:30, salary:1000) )
+        javers.commit("author", new Employee(name:"bob", age:31, salary:1200) )
+        javers.commit("author", new Employee(name:"john",age:25) )
 
         when:
         def changes = javers.findChanges( QueryBuilder.byInstanceId("bob", Employee.class).build() )
@@ -35,11 +36,11 @@ class JqlExample extends Specification {
         given:
         def javers = JaversBuilder.javers().build()
 
-        javers.commit( "author", new Employee(name:"bob",  postalAddress:  new Address(city:"Paris")))
-        javers.commit( "author", new Employee(name:"bob",  primaryAddress: new Address(city:"London")))
-        javers.commit( "author", new Employee(name:"bob",  primaryAddress: new Address(city:"Paris")))
-        javers.commit( "author", new Employee(name:"lucy", primaryAddress: new Address(city:"New York")))
-        javers.commit( "author", new Employee(name:"lucy", primaryAddress: new Address(city:"Washington")))
+        javers.commit("author", new Employee(name:"bob",  postalAddress:  new Address(city:"Paris")))
+        javers.commit("author", new Employee(name:"bob",  primaryAddress: new Address(city:"London")))
+        javers.commit("author", new Employee(name:"bob",  primaryAddress: new Address(city:"Paris")))
+        javers.commit("author", new Employee(name:"lucy", primaryAddress: new Address(city:"New York")))
+        javers.commit("author", new Employee(name:"lucy", primaryAddress: new Address(city:"Washington")))
 
         when: "query for ValueObject changes by owning Entity instance Id"
         def changes = javers
@@ -58,17 +59,51 @@ class JqlExample extends Specification {
         assert changes.size() == 2
     }
 
+    def "should query for ValueObject changes when stored in a List"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        javers.commit("author",
+                new Person(login: "bob", addresses: [new Address(city: "London"), new Address(city: "Luton")]))
+        javers.commit("author",
+                new Person(login: "bob", addresses: [new Address(city: "Paris"), new Address(city: "Luton")]))
+
+        when:
+        def changes = javers
+                .findChanges(QueryBuilder.byValueObjectId("bob",Person.class, "addresses/0").build())
+
+        then:
+        printChanges(changes)
+        assert changes.size() == 1
+    }
+
+    def "should query for ValueObject changes when stored as Map values"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        javers.commit("author", new Person(login: "bob", addressMap: ["HOME":new Address(city: "Paris")]))
+        javers.commit("author", new Person(login: "bob", addressMap: ["HOME":new Address(city: "London")]))
+
+        when:
+        def changes = javers
+            .findChanges(QueryBuilder.byValueObjectId("bob", Person.class, "addressMap/HOME").build())
+
+        then:
+        printChanges(changes)
+        assert changes.size() == 1
+    }
+
     def "should query for Object changes by its class"() {
         given:
         def javers = JaversBuilder.javers().build()
 
-        javers.commit( "author", new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city: "London")))
-        javers.commit( "author", new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city: "Paris")))
-        javers.commit( "author", new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "New York")))
-        javers.commit( "author", new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Washington")))
+        javers.commit("author", new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city: "London")))
+        javers.commit("author", new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city: "Paris")))
+        javers.commit("author", new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "New York")))
+        javers.commit("author", new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Washington")))
 
         when:
-        def changes = javers.findChanges( QueryBuilder.byClass(DummyAddress.class).build())
+        def changes = javers.findChanges( QueryBuilder.byClass(DummyAddress.class).build() )
 
         then:
         printChanges(changes)

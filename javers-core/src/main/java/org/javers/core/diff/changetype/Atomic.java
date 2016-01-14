@@ -1,7 +1,9 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.common.collections.Objects;
 import org.javers.common.collections.Primitives;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Immutable wrapper for client's Primitives, Values and Id's
@@ -12,7 +14,8 @@ import org.javers.common.collections.Primitives;
  *
  * @author bartosz walacik
  */
-public class Atomic {
+public class Atomic implements Serializable {
+
     private final Object value;
 
     public Atomic(Object value) {
@@ -54,7 +57,7 @@ public class Atomic {
         }
 
         Atomic other = (Atomic)obj;
-        return Objects.nullSafeEquals(value, other.value);
+        return Objects.equals(value, other.value);
     }
 
     @Override

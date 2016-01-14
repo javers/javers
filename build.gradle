@@ -12,6 +12,11 @@ buildscript {
 
 apply plugin: 'axion-release'
 
+project.ext.versions = [
+    mongoJavaDriver: '3.0.4',
+    fongo: '2.0.3'
+]
+
 scmVersion {
     tag {
         prefix = 'javers'
@@ -40,13 +45,13 @@ subprojects {
         testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
         testCompile 'org.apache.commons:commons-lang3:3.3.2'
         testCompile 'ch.qos.logback:logback-classic:1.1.2'
-        testCompile 'cglib:cglib-nodep:3.1'
+        testCompile 'cglib:cglib-nodep:3.2.0'
         testCompile 'org.objenesis:objenesis:2.1'
         testCompile 'org.easytesting:fest-assert-core:2.0M10'
     }
 
     task wrapper(type: Wrapper) {
-        gradleVersion = '2.5'
+        gradleVersion = '2.9'
     }
 
     javadoc {

@@ -1,20 +1,23 @@
-apply plugin:'application'
+apply plugin: 'application'
 mainClassName = "org.javers.core.selftest.Application"
 
 dependencies {
     compile 'joda-time:joda-time:2.3'
     compile 'org.slf4j:slf4j-api:1.7.2'
-    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.google.code.gson:gson:2.5'
     compile 'org.picocontainer:picocontainer:2.14.3'
 
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
     testCompile 'com.google.guava:guava:18.0'
-    testCompile 'org.mongodb.morphia:morphia:0.108'
+    testCompile "org.mongodb:mongo-java-driver:$versions.mongoJavaDriver"
+    testCompile ('org.mongodb.morphia:morphia:0.108') {
+        exclude group: 'org.mongodb', module: 'mongo-java-driver'
+    }
     testCompile 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
 }
 
-task testJar (type: Jar) {
+task testJar(type: Jar) {
     classifier = 'tests'
     from sourceSets.test.output
 }

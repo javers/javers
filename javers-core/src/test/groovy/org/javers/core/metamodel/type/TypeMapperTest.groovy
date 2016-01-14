@@ -6,7 +6,6 @@ import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.model.AbstractDummyUser
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
-import org.javers.core.model.SnapshotEntity
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -191,7 +190,7 @@ class TypeMapperTest extends Specification {
 
     def "should spawn ValueType from mapped superclass"() {
         given:
-        def mapper = new TypeMapper(new TypeFactory(Mock(ManagedClassFactory)))
+        def mapper = JaversTestBuilder.javersTestAssembly().typeMapper
         mapper.registerValueType(AbstractDummyUser)
 
         when:
@@ -219,27 +218,5 @@ class TypeMapperTest extends Specification {
 
         then:
         jType instanceof ValueType
-    }
-
-    def "should return child ValueObject for ValueObjectType"() {
-        given:
-        def snapshotEntity = mapper.getJaversType(SnapshotEntity)
-
-        when:
-        def vo = mapper.getChildValueObject(snapshotEntity, "valueObjectRef")
-
-        then:
-        vo.baseJavaClass == DummyAddress
-    }
-
-    def "should return child ValueObject for List of ValueObjectType"() {
-        given:
-        def snapshotEntity = mapper.getJaversType(SnapshotEntity)
-
-        when:
-        def vo = mapper.getChildValueObject(snapshotEntity, "listOfValueObjects")
-
-        then:
-        vo.baseJavaClass == DummyAddress
     }
 }

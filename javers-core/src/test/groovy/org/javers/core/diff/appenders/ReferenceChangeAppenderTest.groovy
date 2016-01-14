@@ -37,7 +37,7 @@ class ReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         assertThat(change)
                   .hasLeftReference(SnapshotEntity,2)
                   .hasRightReference(null)
-                  .hasProperty(property)
+                  .hasPropertyName("entityRef")
     }
 
     def "should append Entity reference change"() {
@@ -54,9 +54,9 @@ class ReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         ChangeAssert.assertThat(change)
                     .hasInstanceId(SnapshotEntity, 1)
         assertThat(change)
-                  .hasLeftReference(SnapshotEntity,2)
-                  .hasRightReference(SnapshotEntity,3)
-                  .hasProperty(property)
+                   .hasLeftReference(SnapshotEntity,2)
+                   .hasRightReference(SnapshotEntity,3)
+                   .hasPropertyName("entityRef")
     }
 
     def "should NOT append ValueObject reference change"() {

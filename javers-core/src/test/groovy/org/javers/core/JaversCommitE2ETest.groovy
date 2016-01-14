@@ -34,7 +34,7 @@ class JaversCommitE2ETest extends Specification {
         def commit = javers.commit("author",entity)
 
         then:
-        commit.snapshots[0].changed.collect{it.name} as Set == ["dob","intProperty"] as Set
+        commit.snapshots[0].changed as Set == ["dob","intProperty"] as Set
     }
 
     @Unroll

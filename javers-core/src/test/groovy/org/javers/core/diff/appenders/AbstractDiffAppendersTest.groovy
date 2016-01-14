@@ -29,6 +29,6 @@ abstract class AbstractDiffAppendersTest extends AbstractDiffTest {
     }
 
     SetChangeAppender setChangeAppender() {
-        new SetChangeAppender(mapChangeAppender(), javers.typeMapper, javers.globalIdFactory)
+        new SetChangeAppender(javers.typeMapper, javers.globalIdFactory)
     }
 }

@@ -1,13 +1,15 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.collections.Predicate;
+import org.javers.common.exception.JaversException;
 import org.javers.common.string.PrettyPrintBuilder;
-import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author bartosz walacik
@@ -16,16 +18,15 @@ public abstract class ManagedType extends JaversType {
     private final ManagedClass managedClass;
 
     ManagedType(ManagedClass managedClass) {
-        super(managedClass.getClientsClass());
-        Validate.argumentIsNotNull(managedClass);
+        this(managedClass, Optional.<String>empty());
+    }
+
+    ManagedType(ManagedClass managedClass, Optional<String> typeName) {
+        super(managedClass.getBaseJavaClass(), typeName);
         this.managedClass = managedClass;
     }
 
-    ManagedClass getManagedClass() {
-        return managedClass;
-    }
-
-    abstract ManagedType spawn(Class javaType, ManagedClassFactory managedClassFactory);
+    abstract ManagedType spawn(ManagedClass managedClass, Optional<String> typeName);
 
     @Override
     protected Type getRawDehydratedType() {
@@ -37,6 +38,9 @@ public abstract class ManagedType extends JaversType {
         return super.prettyPrintBuilder().addMultiField("managedProperties", managedClass.getProperties());
     }
 
+    /**
+     * @throws JaversException PROPERTY_NOT_FOUND
+     */
     public Property getProperty(String propertyName) {
         return managedClass.getProperty(propertyName);
     }
@@ -47,5 +51,9 @@ public abstract class ManagedType extends JaversType {
 
     public List<Property> getProperties() {
         return managedClass.getProperties();
+    }
+
+    public Set<String> getPropertyNames(){
+        return managedClass.getPropertyNames();
     }
 }

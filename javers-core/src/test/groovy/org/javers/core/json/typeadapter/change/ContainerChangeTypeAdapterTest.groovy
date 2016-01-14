@@ -115,8 +115,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
                                   new ValueAdded  (2, ref2),
                                   new ValueRemoved(3, ref3)]
 
-            def property =  affectedId.managedType.getProperty(propertyName)
-            def change = changeType.newInstance(affectedId, property, elementChanges)
+            def change = changeType.newInstance(affectedId, propertyName, elementChanges)
 
         when:
             def jsonText = javers.jsonConverter.toJson(change)
@@ -163,8 +162,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
                                   new ValueAdded  (2,new LocalDate(2001,1,3)),
                                   new ValueRemoved(3,new LocalDate(2001,1,4))]
 
-            def property =  affectedId.managedType.getProperty(propertyName)
-            def change = changeType.newInstance(affectedId, property, elementChanges)
+            def change = changeType.newInstance(affectedId, propertyName, elementChanges)
 
         when:
             def jsonText = javers.jsonConverter.toJson(change)
@@ -274,8 +272,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
                                   new ValueAdded  (2,20),
                                   new ValueRemoved(3,30)]
 
-            def property =  affectedId.managedType.getProperty(propertyName)
-            def change = changeType.newInstance(affectedId, property, elementChanges)
+            def change = changeType.newInstance(affectedId, propertyName, elementChanges)
 
         when:
             def jsonText = javers.jsonConverter.toJson(change)
@@ -314,9 +311,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
         def affectedId = javers.instanceId(new SnapshotEntity(id:1))
 
         def elementChanges = [new ValueAdded  (20), new ValueRemoved(30)]
-
-        def property =  affectedId.managedType.getProperty("setOfIntegers")
-        def change = new SetChange(affectedId, property, elementChanges)
+        def change = new SetChange(affectedId, "setOfIntegers", elementChanges)
 
         when:
         def jsonText = javers.jsonConverter.toJson(change)

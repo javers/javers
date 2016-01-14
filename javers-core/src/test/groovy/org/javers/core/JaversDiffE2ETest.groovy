@@ -3,8 +3,11 @@ package org.javers.core
 import groovy.json.JsonSlurper
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
+import org.javers.core.diff.changetype.PropertyChange
+import org.javers.core.examples.model.Person
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
+import org.javers.core.metamodel.property.Property
 import org.javers.core.model.DummyEntityWithEmbeddedId
 import org.javers.core.model.DummyPoint
 import org.javers.core.model.DummyUser
@@ -23,6 +26,21 @@ import static org.javers.test.builder.DummyUserBuilder.dummyUser
  * @author bartosz walacik
  */
 class JaversDiffE2ETest extends Specification {
+
+    def "should extract Property from PropertyChange"(){
+      given:
+      def javers = JaversTestBuilder.newInstance()
+
+      when:
+      def diff = javers.compare(new Person('1','bob'), new Person('1','bobby'))
+      PropertyChange propertyChange = diff.changes[0]
+
+      Property property = javers.getProperty( propertyChange )
+
+      then:
+      property.name == 'name'
+      !property.looksLikeId()
+    }
 
     def "should compare objects with @EmbeddedId using Id reflectiveToString() to match instances"(){
         given:
@@ -104,7 +122,7 @@ class JaversDiffE2ETest extends Specification {
 
         when:
         def diff = javers.compare(user, user2)
-        def jsonText = javers.toJson(diff)
+        def jsonText = javers.getJsonConverter().toJson(diff)
         //println("jsonText:\n"+jsonText)
 
         then:
@@ -122,7 +140,7 @@ class JaversDiffE2ETest extends Specification {
 
         when:
         def diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
-        def jsonText = javers.toJson(diff)
+        def jsonText = javers.getJsonConverter().toJson(diff)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -142,7 +160,7 @@ class JaversDiffE2ETest extends Specification {
 
         when:
         def diff = javers.compare(userWithPoint(1,2), userWithPoint(1,3))
-        def jsonText = javers.toJson(diff)
+        def jsonText = javers.getJsonConverter().toJson(diff)
         //println("jsonText:\n"+jsonText)
 
         then:
@@ -171,5 +189,37 @@ class JaversDiffE2ETest extends Specification {
 
         then:
         DiffAssert.assertThat(diff).hasChanges(0)
+    }
+
+
+    def "should serialize the Diff object"() {
+        given:
+        def javers = javers().build()
+        def user =  new DummyUser(name:"id", sex: MALE,   age: 5, stringSet: ["a"])
+        def user2 = new DummyUser(name:"id", sex: FEMALE, age: 6, stringSet: ["b"])
+        def tmpFile = File.createTempFile("serializedDiff", ".ser")
+
+        when:
+        def diff = javers.compare(user, user2)
+
+        //serialize diff
+        new ObjectOutputStream(new FileOutputStream(tmpFile.path)).writeObject(diff)
+
+        //deserialize diff
+        def deserializedDiff = new ObjectInputStream(new FileInputStream(tmpFile.path)).readObject()
+
+        then:
+        List changes = deserializedDiff.changes
+        changes.size() == 3
+
+        def ageChange = changes.find {it.propertyName == "age"}
+        ageChange.left == 5
+        ageChange.right == 6
+        ageChange.affectedGlobalId.cdoId == "id"
+        ageChange.affectedGlobalId.typeName == "org.javers.core.model.DummyUser"
+
+        changes.count{ it.propertyName == "age" } // == 1
+
+        changes.count{ it.propertyName == "stringSet" } // == 1
     }
 }

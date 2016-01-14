@@ -6,21 +6,26 @@ import org.javers.core.metamodel.type.ValueObjectType;
 /**
  * Recipe for {@link ValueObjectType}
  *
+ * @see ValueObjectDefinitionBuilder
  * @author bartosz walacik
  */
 public class ValueObjectDefinition extends ClientsClassDefinition {
 
     /**
-     * Basic definition, all properties of given class will be versioned
+     * Simple recipe for ValueObject
      */
-    public ValueObjectDefinition(Class<?> valueObjectClass) {
-        super(valueObjectClass);
+    public ValueObjectDefinition(Class<?> valueObject) {
+        super(valueObject);
     }
 
     /**
-     * Creates ValueObject, ignores given properties
+     * Recipe for ValueObject with ignoredProperties
      */
-    public ValueObjectDefinition(Class<?> valueObjectClass, List<String> ignoredProperties) {
-        super(valueObjectClass, ignoredProperties);
+    public ValueObjectDefinition(Class<?> valueObject, List<String> ignoredProperties) {
+        super(valueObject, ignoredProperties);
+    }
+
+    ValueObjectDefinition(ClientsClassDefinitionBuilder builder) {
+        super(builder);
     }
 }

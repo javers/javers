@@ -31,67 +31,67 @@ public class JaversExtendedRepository implements JaversRepository {
         this.snapshotDiffer = snapshotDiffer;
     }
 
-    public List<Change> getPropertyChangeHistory(GlobalId globalId, final String propertyName, boolean newObjects, int limit) {
+    public List<Change> getPropertyChangeHistory(GlobalId globalId, final String propertyName, boolean newObjects, QueryParams queryParams) {
         argumentsAreNotNull(globalId, propertyName);
 
-        List<CdoSnapshot> snapshots = getPropertyStateHistory(globalId, propertyName, limit);
+        List<CdoSnapshot> snapshots = getPropertyStateHistory(globalId, propertyName, queryParams);
         List<Change> changes = snapshotDiffer.calculateDiffs(snapshots, newObjects);
 
         return filterByPropertyName(changes, propertyName);
     }
 
-    public List<Change> getPropertyChangeHistory(ManagedType givenClass, final String propertyName, boolean newObjects, int limit) {
+    public List<Change> getPropertyChangeHistory(ManagedType givenClass, final String propertyName, boolean newObjects, QueryParams queryParams) {
         argumentsAreNotNull(givenClass, propertyName);
 
-        List<CdoSnapshot> snapshots = getPropertyStateHistory(givenClass, propertyName, limit);
+        List<CdoSnapshot> snapshots = getPropertyStateHistory(givenClass, propertyName, queryParams);
         List<Change> changes = snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
 
         return filterByPropertyName(changes, propertyName);
     }
 
-    public List<Change> getChangeHistory(GlobalId globalId, boolean newObjects, int limit) {
+    public List<Change> getChangeHistory(GlobalId globalId, boolean newObjects, QueryParams queryParams) {
         argumentsAreNotNull(globalId);
 
-        List<CdoSnapshot> snapshots = getStateHistory(globalId, limit);
+        List<CdoSnapshot> snapshots = getStateHistory(globalId, queryParams);
         return snapshotDiffer.calculateDiffs(snapshots, newObjects);
     }
 
-    public List<Change> getChangeHistory(ManagedType givenClass, boolean newObjects, int limit) {
+    public List<Change> getChangeHistory(ManagedType givenClass, boolean newObjects, QueryParams queryParams) {
         argumentsAreNotNull(givenClass);
 
-        List<CdoSnapshot> snapshots = getStateHistory(givenClass, limit);
+        List<CdoSnapshot> snapshots = getStateHistory(givenClass, queryParams);
         return snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
     }
 
-    public List<Change> getValueObjectChangeHistory(EntityType ownerEntity, String path, boolean newObjects, int limit) {
+    public List<Change> getValueObjectChangeHistory(EntityType ownerEntity, String path, boolean newObjects, QueryParams queryParams) {
         argumentsAreNotNull(ownerEntity, path);
 
-        List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntity, path, limit);
+        List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntity, path, queryParams);
         return snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, int limit) {
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
         argumentIsNotNull(globalId);
-        return delegate.getStateHistory(globalId, limit);
+        return delegate.getStateHistory(globalId, queryParams);
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, int limit) {
+    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, QueryParams queryParams) {
         argumentsAreNotNull(globalId, propertyName);
-        return delegate.getPropertyStateHistory(globalId, propertyName, limit);
+        return delegate.getPropertyStateHistory(globalId, propertyName, queryParams);
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, int limit) {
+    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
         argumentsAreNotNull(givenClass, propertyName);
-        return delegate.getPropertyStateHistory(givenClass, propertyName, limit);
+        return delegate.getPropertyStateHistory(givenClass, propertyName, queryParams);
     }
 
     @Override
-    public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, int limit) {
+    public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
         argumentsAreNotNull(ownerEntity, path);
-        return delegate.getValueObjectStateHistory(ownerEntity, path, limit);
+        return delegate.getValueObjectStateHistory(ownerEntity, path, queryParams);
     }
 
     @Override
@@ -101,8 +101,8 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, int limit) {
-        return delegate.getStateHistory(givenClass, limit);
+    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
+        return delegate.getStateHistory(givenClass, queryParams);
     }
 
     @Override

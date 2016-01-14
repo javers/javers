@@ -4,7 +4,9 @@ import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.joda.time.LocalDateTime;
 
-public class CommitMetadata {
+import java.io.Serializable;
+
+public class CommitMetadata implements Serializable {
 
     private final String author;
     private final LocalDateTime commitDate;

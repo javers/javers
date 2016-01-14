@@ -1,11 +1,13 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Primitives;
+import org.javers.common.collections.*;
+import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.Javers;
+import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
@@ -41,6 +43,7 @@ public class TypeMapper {
 
         //String & Enum
         registerPrimitiveType(String.class);
+        registerPrimitiveType(CharSequence.class);
         registerPrimitiveType(Enum.class);
 
         //array
@@ -91,20 +94,54 @@ public class TypeMapper {
      */
     public JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
-
         return state.getJaversType(javaType);
     }
 
     /**
-     * throws JaversException.MANAGED_CLASS_MAPPING_ERROR if given javaClass is NOT mapped to {@link ManagedType}
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
+     * @since 1.4
+     */
+    public ManagedType getJaversManagedType(String typeName){
+        return getJaversManagedType(state.getClassByTypeName(typeName), ManagedType.class);
+    }
+
+    /**
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
+     * @since 1.4
+     */
+    public ManagedType getJaversManagedType(GlobalId globalId){
+        return getJaversManagedType(state.getClassByTypeName(globalId.getTypeName()), ManagedType.class);
+    }
+
+    /**
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
+     * @since 1.4
+     */
+    public <T extends ManagedType> T getJaversManagedType(String typeName, Class<T> expectedType) {
+        return getJaversManagedType(state.getClassByTypeName(typeName), expectedType);
+    }
+
+    /**
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
+     * @since 1.4
+     */
+    public <T extends ManagedType> T getJaversManagedType(DuckType duckType, Class<T> expectedType) {
+        return getJaversManagedType(state.getClassByDuckType(duckType), expectedType);
+    }
+
+    /**
+     * If given javaClass is mapped to ManagedType, returns its JaversType
+     *
+     * @throws JaversException MANAGED_CLASS_MAPPING_ERROR
      */
     public ManagedType getJaversManagedType(Class javaType) {
         return getJaversManagedType(javaType, ManagedType.class);
     }
 
     /**
-     * if given javaClass is mapped to expected JaversType, returns its JaversType,
-     * otherwise throws JaversException.MANAGED_CLASS_MAPPING_ERROR
+     * If given javaClass is mapped to expected ManagedType, returns its JaversType
+     *
+     * @throws JaversException MANAGED_CLASS_MAPPING_ERROR
      */
     public <T extends ManagedType> T getJaversManagedType(Class javaClass, Class<T> expectedType) {
         JaversType mType = getJaversType(javaClass);
@@ -151,28 +188,6 @@ public class TypeMapper {
     public Type getDehydratedType(Type type) {
         return dehydratedTypeFactory.build(type);
     }
-
-    public ValueObjectType getChildValueObject(EntityType owner, String voPropertyName) {
-        JaversType javersType = getJaversType(owner.getProperty(voPropertyName).getGenericType());
-
-        if (javersType instanceof ValueObjectType) {
-            return (ValueObjectType) javersType;
-        }
-
-        if (javersType instanceof ContainerType) {
-            JaversType contentType  = getJaversType(((ContainerType) javersType).getItemType());
-            if (contentType instanceof ValueObjectType){
-                return (ValueObjectType)contentType;
-            }
-        }
-
-        throw new JaversException(JaversExceptionCode.CANT_EXTRACT_CHILD_VALUE_OBJECT,
-                  owner.getName()+"."+voPropertyName,
-                  javersType);
-
-    }
-
-    //-- private
 
     private void addType(JaversType jType) {
         state.putIfAbsent(jType.getBaseJavaType(), jType);

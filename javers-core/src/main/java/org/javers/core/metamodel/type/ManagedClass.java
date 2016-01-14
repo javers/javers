@@ -15,17 +15,16 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * 
  * @author bartosz walacik
  */
-@Deprecated
-abstract class ManagedClass extends ClientsDomainClass {
-
+class ManagedClass {
+    private final Class<?> baseJavaClass;
     private final Map<String, Property> propertiesByName;
     private final List<Property> managedProperties;
     private final List<Property> transientAnnProperties;
 
-    ManagedClass(Class clientsClass, List<Property> allProperties) {
-        super(clientsClass);
+    ManagedClass(Class baseJavaClass, List<Property> allProperties) {
         argumentsAreNotNull(allProperties);
 
+        this.baseJavaClass = baseJavaClass;
         this.managedProperties = new ArrayList<>();
         this.transientAnnProperties = new ArrayList<>();
         this.propertiesByName = new HashMap<>();
@@ -46,6 +45,10 @@ abstract class ManagedClass extends ClientsDomainClass {
      */
     List<Property> getProperties() {
         return Collections.unmodifiableList(managedProperties);
+    }
+
+    Set<String> getPropertyNames(){
+        return Collections.unmodifiableSet(propertiesByName.keySet());
     }
 
     /**
@@ -71,8 +74,12 @@ abstract class ManagedClass extends ClientsDomainClass {
     Property getProperty(String withName) {
         Validate.argumentIsNotNull(withName);
         if (!propertiesByName.containsKey(withName)){
-            throw new JaversException(PROPERTY_NOT_FOUND, withName, this.getName());
+            throw new JaversException(PROPERTY_NOT_FOUND, withName, baseJavaClass.getName());
         }
         return propertiesByName.get(withName);
+    }
+
+    Class<?> getBaseJavaClass() {
+        return baseJavaClass;
     }
 }

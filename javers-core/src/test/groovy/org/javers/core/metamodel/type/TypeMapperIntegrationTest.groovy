@@ -2,13 +2,12 @@ package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
 import org.bson.types.ObjectId
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.cases.MongoStoredEntity
+import org.javers.core.examples.typeNames.*
 import org.javers.core.metamodel.clazz.*
-import org.javers.core.model.AbstractDummyUser
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyEntityWithEmbeddedId
-import org.javers.core.model.DummyPoint
-import org.javers.core.model.DummyUser
+import org.javers.core.model.*
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -21,6 +20,60 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  * @author bartosz walacik
  */
 public class TypeMapperIntegrationTest extends Specification {
+
+    def "should find ValueObject by DuckType when properties match"(){
+      when:
+      def mapper = javersTestAssembly().typeMapper
+      mapper.getJaversType(NamedValueObjectOne) //touch
+      mapper.getJaversType(NamedValueObjectTwo) //touch
+
+      then:
+      mapper.getJaversManagedType(new DuckType("namedValueObject", ["name", "one"] as Set), ManagedType).baseJavaClass == NamedValueObjectOne
+      mapper.getJaversManagedType(new DuckType("namedValueObject", ["name", "two"] as Set), ManagedType).baseJavaClass == NamedValueObjectTwo
+    }
+
+    def "should fallback to last mapped bare typeName when properties does not match"(){
+        when:
+        def mapper = javersTestAssembly().typeMapper
+        mapper.getJaversType(NamedValueObjectOne) //touch
+        mapper.getJaversType(NamedValueObjectTwo) //touch
+
+        then:
+        mapper.getJaversManagedType(new DuckType("namedValueObject", ["name", "another"] as Set), ManagedType).baseJavaClass == NamedValueObjectTwo
+    }
+
+    @Unroll
+    def "should find #what type by typeName"(){
+        given:
+        def mapper = javersTestAssembly().typeMapper
+        mapper.getJaversType(clazz) //touch
+
+        when:
+        def managedType = mapper.getJaversManagedType(typeName)
+
+        then:
+        managedType instanceof ManagedType
+        managedType.baseJavaClass == clazz
+        managedType.name == typeName
+
+        where:
+        what <<  ["Entity", "ValueObject", "retrofitted ValueObject"]
+        clazz << [NewEntityWithTypeAlias, NewValueObjectWithTypeAlias, NewNamedValueObject]
+        typeName << ["myName","myValueObject", "org.javers.core.examples.typeNames.OldValueObject"]
+    }
+
+    def "should throw TYPE_NAME_NOT_FOUND Exception when TypeName is not found"() {
+        given:
+        def mapper = javersTestAssembly().typeMapper
+
+        when:
+        mapper.getJaversManagedType("not.registered")
+
+        then:
+        JaversException e = thrown()
+        e.code == JaversExceptionCode.TYPE_NAME_NOT_FOUND
+        println e
+    }
 
     @Unroll
     def "should override Entity type inferred form annotations when ValueObject is explicitly registered for #queryClass.simpleName"() {
@@ -47,10 +100,11 @@ public class TypeMapperIntegrationTest extends Specification {
         mapper.registerClientsClass(new EntityDefinition(JpaEmbeddable,"some"))
 
         when:
-        EntityType jType = mapper.getJaversType(JpaEmbeddable)
+        def jType = mapper.getJaversType(JpaEmbeddable)
 
         then:
-        jType.managedClass.idProperty.name == "some"
+        jType.class == EntityType
+        jType.idProperty.name == "some"
     }
 
     def "should map as ValueObject by default"() {
@@ -185,5 +239,6 @@ public class TypeMapperIntegrationTest extends Specification {
         jType.class == ValueType
         jType.baseJavaClass == DummyGenericUser
     }
+
     class DummyGenericUser<T> extends AbstractDummyUser {}
 }

@@ -4,9 +4,9 @@ import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.LiveGraph;
-import org.javers.core.graph.ObjectGraphBuilder;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.CdoWrapper;
 import org.javers.core.metamodel.object.SnapshotFactory;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ class GraphSnapshotFactory {
     }
 
     /**
-     * @param currentVersion outcome from {@link ObjectGraphBuilder#buildGraph(Object)}
+     * @param currentVersion outcome from ObjectGraphBuilder.buildGraph()
      */
     List<CdoSnapshot> create(LiveGraph currentVersion, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata){
         Validate.argumentsAreNotNull(currentVersion, commitMetadata, latestShadowGraph);
@@ -57,13 +57,12 @@ class GraphSnapshotFactory {
     }
 
     private CdoSnapshot createFreshSnapshot(boolean initial, ObjectNode node, CommitMetadata commitMetadata, Optional<CdoSnapshot> previous){
-        Object liveCdo = node.wrappedCdo().get();
+        CdoWrapper cdoWrapper = (CdoWrapper)node.getCdo();
         if (initial){
-            return snapshotFactory.createInitial(liveCdo, node.getGlobalId(), commitMetadata);
+            return snapshotFactory.createInitial(cdoWrapper, commitMetadata);
         }
         else{
-            //we take previous globalId because it could be PersistentGlobalId
-            return snapshotFactory.createUpdate(liveCdo, previous.get(), commitMetadata);
+            return snapshotFactory.createUpdate(cdoWrapper, previous.get(), commitMetadata);
         }
     }
 

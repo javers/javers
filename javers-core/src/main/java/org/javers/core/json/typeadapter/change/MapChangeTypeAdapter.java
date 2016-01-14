@@ -13,8 +13,6 @@ import java.util.List;
 
 class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
 
-    private final TypeMapper typeMapper;
-
     private static final String ENTRY_CHANGES_FIELD = "entryChanges";
     private static final String ENTRY_CHANGE_TYPE_FIELD = "entryChangeType";
     private static final String KEY_FIELD = "key";
@@ -23,7 +21,7 @@ class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
     private static final String RIGHT_VALUE_FIELD = "rightValue";
 
     public MapChangeTypeAdapter(TypeMapper typeMapper) {
-        this.typeMapper = typeMapper;
+        super(typeMapper);
     }
 
     @Override
@@ -34,7 +32,7 @@ class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
         MapType mapType = typeMapper.getPropertyType(stub.property);
         List<EntryChange> changes = parseChanges(jsonObject, context, mapType);
 
-        return appendCommitMetadata(jsonObject, context, new MapChange(stub.id, stub.property, changes));
+        return appendCommitMetadata(jsonObject, context, new MapChange(stub.id, stub.getPropertyName(), changes));
     }
 
     @Override

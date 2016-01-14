@@ -50,7 +50,7 @@ class ArrayChangeAppender extends CorePropertyChangeAppender<ArrayChange>{
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
-            return new ArrayChange(pair.getGlobalId(), property, elementChanges);
+            return new ArrayChange(pair.getGlobalId(), property.getName(), elementChanges);
         }
         else {
             return null;

@@ -1,5 +1,9 @@
 package org.javers.common.reflection;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
@@ -31,8 +35,11 @@ public class JaversMethod extends JaversMember<Method> {
 
         try {
             return getRawMember().invoke(onObject, EMPTY_ARRAY);
-        } catch (Exception e) {
-            throw new RuntimeException("error calling getter {"+ this +"}",e);
+        } catch (IllegalArgumentException ie){
+            throw new JaversException(JaversExceptionCode.MISSING_PROPERTY, this, ie.getClass().getName());
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new JaversException(JaversExceptionCode.PROPERTY_ACCESS_ERROR,
+                    this, onObject.getClass().getSimpleName(), e.getClass().getName()+": "+e.getMessage());
         }
     }
 

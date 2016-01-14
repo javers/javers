@@ -1,9 +1,8 @@
 package org.javers.core.cases
 
+import com.google.gson.reflect.TypeToken
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.JaversBuilder
-import org.javers.core.diff.changetype.container.ListChange
-import org.javers.core.diff.changetype.container.ValueAdded
 import spock.lang.Specification
 
 /**
@@ -17,21 +16,15 @@ import spock.lang.Specification
  */
 class AdvancedTypeResolvingForGenericsTest extends Specification{
 
-    def "should resolve actual field type when inherited from Generic superclass"() {
+    def "should resolve actual types of Generic fields when inherited from Generic superclass"() {
         given:
         def javers = JaversBuilder.javers().build();
 
-        def left = new ConcreteWithActualType([1])
-        def right = new ConcreteWithActualType([1,2])
-
         when:
-        def diff = javers.compare(left, right)
+        def jType = javers.getTypeMapping(ConcreteWithActualType)
 
         then:
-        def change = diff.getChangesByType(ListChange)[0]
-        change.changes[0] instanceof ValueAdded
-        change.changes[0].index == 1
-        change.changes[0].addedValue == 2
-
+        jType.getProperty("id").genericType == String
+        jType.getProperty("value").genericType == new TypeToken<List<String>>(){}.type
     }
 }

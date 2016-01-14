@@ -25,7 +25,7 @@ public class JsonTypeAdapterExample {
         Diff diff = javers.compare(entity1, entity2);
 
         //then
-        String json = javers.toJson(diff);
+        String json = javers.getJsonConverter().toJson(diff);
         Assertions.assertThat(json).contains(id.toString());
 
         System.out.println(json);

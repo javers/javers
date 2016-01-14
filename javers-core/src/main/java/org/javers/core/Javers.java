@@ -7,6 +7,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.NewObject;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.changetype.container.ListChange;
@@ -19,6 +20,7 @@ import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -103,9 +105,31 @@ public interface Javers {
      * Diffs can be converted to JSON with {@link Javers#toJson(Diff)} or pretty-printed with {@link Diff#prettyPrint()}
      * </p>
      *
-     * @see <a href="http://javers.org/documentation/diff-examples/">http://javers.org/documentation/diff-examples</a>
+     * @see <a href="http://javers.org/documentation/diff-examples/">
+     *     http://javers.org/documentation/diff-examples</a>
      */
     Diff compare(Object oldVersion, Object currentVersion);
+
+    /**
+     * Deeply compares two top-level collections.
+     * <br/><br/>
+     *
+     * Introduced due to the lack of possibility to statically
+     * determine type of collection items when two top-level collections are passed as references to
+     * {@link #compare(Object, Object)}.
+     * <br/><br/>
+     *
+     * Usage example:
+     * <pre>
+     * List&lt;Person&gt; oldList = ...
+     * List&lt;Person&gt; newList = ...
+     * Diff diff = javers.compareCollections(oldList, newList, Person.class);
+     * </pre>
+     *
+     * @see <a href="http://javers.org/documentation/diff-examples/#compare-collections">
+     *     Compare top-level collections</a> example
+     */
+    <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> itemClass);
 
     /**
      * Initial diff is a kind of snapshot of given domain object graph.
@@ -237,32 +261,6 @@ public interface Javers {
     <T> T processChangeList(List<Change> changes, ChangeProcessor<T> changeProcessor);
 
     /**
-     * use: <pre>
-     * javers.getJsonConverter().toJson(diff);
-     * </pre>
-     */
-    @Deprecated
-    String toJson(Diff diff);
-
-    /**
-     * use {@link #findSnapshots(JqlQuery)}
-     */
-    @Deprecated
-    List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit);
-
-    /**
-     * use {@link #findChanges(JqlQuery)}
-     */
-    @Deprecated
-    List<Change> getChangeHistory(GlobalIdDTO globalId, int limit);
-
-    /**
-     * use {@link #getLatestSnapshot(Object, Class)}
-     */
-    @Deprecated
-    Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId);
-
-    /**
      * Use JaversTypes, if you want to: <br/>
      * - describe your class in the context of JaVers domain model mapping, <br/>
      * - use JaVers Reflection API to conveniently access your object properties
@@ -318,8 +316,15 @@ public interface Javers {
      * property:name, value:Uncle Bob
      * </pre>
      */
-    <T extends JaversType> T getTypeMapping(Type clientsType);
+    <T extends JaversType> T getTypeMapping(Type userType);
 
     IdBuilder idBuilder();
 
+
+    /**
+     * Returns {@link Property} which underlies given {@link PropertyChange}
+     *
+     * @since 1.4.1
+     */
+    Property getProperty(PropertyChange propertyChange);
 }

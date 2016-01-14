@@ -1,11 +1,8 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.common.collections.Optional;
 import org.polyjdbc.core.query.SelectQuery;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.CDO_CLASS_QUALIFIED_NAME;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_FRAGMENT;
 
 /**
  * @author bartosz.walacik

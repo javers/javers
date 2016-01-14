@@ -7,6 +7,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.changetype.PropertyChange;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  *
  * @author bartosz walacik
  */
-public class Diff {
+public class Diff implements Serializable {
+
     private final List<Change> changes;
 
     Diff(List<Change> changes) {
@@ -99,7 +101,7 @@ public class Diff {
         argumentIsNotNull(propertyName);
         return (List)getChanges(new Predicate<Change>() {
             public boolean apply(Change input) {
-                return input instanceof PropertyChange && ((PropertyChange)input).getProperty().getName().equals(propertyName);
+                return input instanceof PropertyChange && ((PropertyChange)input).getPropertyName().equals(propertyName);
 
             }
         });

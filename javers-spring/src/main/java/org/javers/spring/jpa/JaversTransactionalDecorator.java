@@ -8,8 +8,10 @@ import org.javers.core.changelog.ChangeProcessor;
 import org.javers.core.commit.Commit;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
@@ -23,6 +25,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -67,34 +70,13 @@ class JaversTransactionalDecorator implements Javers {
     }
 
     @Override
+    public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> itemClass) {
+        return delegate.compareCollections(oldVersion, currentVersion, itemClass);
+    }
+
+    @Override
     public Diff initial(Object newDomainObject) {
         return delegate.initial(newDomainObject);
-    }
-
-    @Override
-    public String toJson(Diff diff) {
-        return delegate.toJson(diff);
-    }
-
-    @Override
-    @Transactional
-    @Deprecated
-    public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit) {
-        return delegate.getStateHistory(globalId, limit);
-    }
-
-    @Override
-    @Transactional
-    @Deprecated
-    public Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId) {
-        return delegate.getLatestSnapshot(globalId);
-    }
-
-    @Override
-    @Transactional
-    @Deprecated
-    public List<Change> getChangeHistory(GlobalIdDTO globalId, int limit) {
-        return delegate.getChangeHistory(globalId, limit);
     }
 
     @Transactional
@@ -145,5 +127,10 @@ class JaversTransactionalDecorator implements Javers {
                 javersSqlRepository.ensureSchema();
             }
         });
+    }
+
+    @Override
+    public Property getProperty(PropertyChange propertyChange) {
+        return delegate.getProperty(propertyChange);
     }
 }

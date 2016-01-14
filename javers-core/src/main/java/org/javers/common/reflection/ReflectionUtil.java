@@ -7,9 +7,11 @@ import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 
 import java.lang.reflect.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TimerTask;
 
 /**
  * @author bartosz walacik
@@ -28,6 +30,16 @@ public class ReflectionUtil {
         catch (Throwable ex) {
             // Class or one of its dependencies is not present...
             return false;
+        }
+    }
+
+    public static Object invokeGetter(Object target, String getterName) {
+        Validate.argumentsAreNotNull(target, getterName);
+        try {
+            Method m = target.getClass().getMethod(getterName, new Class[]{});
+            return m.invoke(target, new Object[]{});
+        }catch (Exception e ) {
+            throw new JaversException(e);
         }
     }
 
@@ -125,7 +137,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Makes sense only for {@link ParameterizedType}
+     * Makes sense only for {@link ParameterizedType} and upper-bounded {@link WildcardType}
      */
     public static List<Type> extractActualClassTypeArguments(Type javaType) {
         if (!(javaType instanceof ParameterizedType)) {
@@ -139,6 +151,17 @@ public class ReflectionUtil {
 
             if (t instanceof Class || t instanceof ParameterizedType) {
                 result.add(t);
+            } else if (t instanceof WildcardType) {
+                // If the wildcard type has an explicit upper bound (i.e. not Object), we use that
+                WildcardType wildcardType = (WildcardType) t;
+                if (wildcardType.getLowerBounds().length == 0) {
+                    for (Type type : wildcardType.getUpperBounds()) {
+                        if (type instanceof Class && ((Class<?>) type).equals(Object.class)) {
+                            continue;
+                        }
+                        result.add(type);
+                    }
+                }
             }
         }
 
@@ -149,8 +172,8 @@ public class ReflectionUtil {
      * for example: Map<String, String> -> Map
      */
     public static Class extractClass(Type javaType) {
-        if (javaType instanceof ParameterizedType &&
-                ((ParameterizedType)javaType).getRawType() instanceof Class){
+        if (javaType instanceof ParameterizedType
+                && ((ParameterizedType)javaType).getRawType() instanceof Class){
             return (Class)((ParameterizedType)javaType).getRawType();
         }  else if (javaType instanceof Class) {
             return (Class)javaType;
@@ -198,13 +221,21 @@ public class ReflectionUtil {
             return (String) cdoId;
         }
 
+        //TODO far all Values
+        if (cdoId instanceof BigDecimal) {
+            return cdoId.toString();
+        }
+
         if (Primitives.isPrimitiveOrBox(cdoId)){
             return cdoId.toString();
         }
 
         StringBuilder ret = new StringBuilder();
         for (JaversField f : getAllPersistentFields(cdoId.getClass()) ){
-            ret.append( f.invokeEvenIfPrivate(cdoId).toString() );
+            Object val = f.invokeEvenIfPrivate(cdoId);
+            if (val != null) {
+                ret.append(val.toString());
+            }
             ret.append(",");
         }
 

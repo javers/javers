@@ -18,7 +18,7 @@ class TypeMapperConcurrentTest extends Specification {
       when:
       withPool 100, {
           (1..100).collectParallel {
-                println "calling getJaversType() in thread no. "+it
+                println "calling getJaversManagedType() in thread no. "+it
                 typeMapper.getJaversType(DummyAddress)
           }
       }

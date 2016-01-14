@@ -1,17 +1,24 @@
 package org.javers.common.reflection;
 
-public class AbstractGeneric<T> {
-    private T value;
+import javax.persistence.Id;
 
-    public AbstractGeneric(T value) {
+public class AbstractGeneric<ID, V> {
+
+    @Id
+    private ID id;
+
+    private V value;
+
+    public AbstractGeneric(ID id, V value) {
+        this.id = id;
         this.value = value;
     }
 
-    public T getValue() {
+    public V getValue() {
         return value;
     }
 
-    public void setValue(T value) {
+    public void setValue(V value) {
         this.value = value;
     }
 }

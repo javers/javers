@@ -1,10 +1,6 @@
 package org.javers.repository.jql;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.InstanceId;
-import org.javers.core.metamodel.object.ValueObjectId;
-import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.metamodel.type.ValueObjectType;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
@@ -12,13 +8,13 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 * @author bartosz walacik
 */
 public final class ValueObjectIdDTO extends GlobalIdDTO {
-    private InstanceIdDTO ownerIdDTO;
-    private final String fragment;
+    private final InstanceIdDTO ownerIdDTO;
+    private final String path;
 
-    ValueObjectIdDTO(Class ownerClass, Object ownerLocalId, String fragment) {
-        Validate.argumentsAreNotNull(ownerClass, ownerLocalId, fragment);
+    ValueObjectIdDTO(Class ownerClass, Object ownerLocalId, String path) {
+        Validate.argumentsAreNotNull(ownerClass, ownerLocalId, path);
         ownerIdDTO = instanceId(ownerLocalId, ownerClass);
-        this.fragment = fragment;
+        this.path = path;
     }
 
     public static ValueObjectIdDTO valueObjectId(Object ownerLocalId, Class ownerClass, String fragment){
@@ -26,28 +22,15 @@ public final class ValueObjectIdDTO extends GlobalIdDTO {
     }
 
     @Override
-    public ValueObjectId create(TypeMapper typeMapper) {
-        String voProperty = decodePropertyName();
-
-        InstanceId ownerId = ownerIdDTO.create(typeMapper);
-
-        ValueObjectType valueObject = typeMapper.getChildValueObject(ownerId.getManagedType(), voProperty);
-
-        return new ValueObjectId(valueObject, ownerId, fragment);
-    }
-
-    @Override
     public String value() {
-        return ownerIdDTO.value()+"#"+fragment;
+        return ownerIdDTO.value()+"#"+ path;
     }
 
+    public InstanceIdDTO getOwnerIdDTO() {
+        return ownerIdDTO;
+    }
 
-    private String decodePropertyName() {
-        String[] parts = fragment.split("/");
-
-        if (parts.length>0){
-            return parts[0];
-        }
-        return "";
+    public String getPath() {
+        return path;
     }
 }

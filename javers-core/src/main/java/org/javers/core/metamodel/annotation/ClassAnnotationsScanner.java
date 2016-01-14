@@ -1,7 +1,12 @@
 package org.javers.core.metamodel.annotation;
 
+import org.javers.common.collections.Optional;
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.clazz.*;
+import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.javers.core.metamodel.clazz.ValueDefinition;
+import org.javers.core.metamodel.clazz.ValueObjectDefinition;
 
 import java.lang.annotation.Annotation;
 
@@ -18,29 +23,39 @@ public class ClassAnnotationsScanner {
         this.annotationNamesProvider = annotationNamesProvider;
     }
 
-    public ClientsClassDefinition scanAndInfer(Class javaClass) {
+    public ClassAnnotationsScan scan(Class javaClass){
         Validate.argumentIsNotNull(javaClass);
 
-        Annotation[] annotations = javaClass.getAnnotations();
-        for (Annotation ann : annotations) {
+        Optional<String> typeName = Optional.empty();
+        for (Annotation ann : javaClass.getAnnotations()) {
+            if (annotationNamesProvider.isTypeName(ann)) {
+                typeName = Optional.of((String) ReflectionUtil.invokeGetter(ann, "value"));
+            }
+        }
+
+        boolean hasValue = false;
+        boolean hasValueObject = false;
+        boolean hasEntity = false;
+        boolean hasShallowReference = false;
+
+        //scan class level annotations
+        for (Annotation ann : javaClass.getAnnotations()) {
             if (annotationNamesProvider.isEntityAlias(ann)) {
-                return new EntityDefinition(javaClass);
+                hasEntity = true;
             }
-
-            if (annotationNamesProvider.isValueObjectAlias(ann)) {
-                return new ValueObjectDefinition(javaClass);
-            }
-
             if (annotationNamesProvider.isValueAlias(ann)) {
-                return new ValueDefinition(javaClass);
+                hasValue = true;
             }
 
             if (annotationNamesProvider.isShallowReferenceAlias(ann)) {
-                return new ShallowReferenceDefinition(javaClass);
+                hasShallowReference = true;
             }
 
+            if (annotationNamesProvider.isValueObjectAlias(ann)) {
+                hasValueObject = true;
+            }
         }
 
-        return new ValueObjectDefinition(javaClass);
+        return new ClassAnnotationsScan(hasValue, hasValueObject, hasEntity, hasShallowReference, typeName);
     }
 }

@@ -15,20 +15,20 @@ class ReferenceChangeAssert {
         new ReferenceChangeAssert(actual:actual)
     }
 
-    ReferenceChangeAssert hasProperty(Property expected) {
-        assert actual.property == expected
+    ReferenceChangeAssert hasPropertyName(String expected) {
+        assert actual.propertyName == expected
         this
     }
 
     ReferenceChangeAssert hasLeftReference(Class expectedClass, Object expectedCdoId) {
         assert actual.left.cdoId == expectedCdoId
-        assert actual.left.managedType.baseJavaType == expectedClass
+        assert actual.left.typeName == expectedClass.name
         this
     }
 
     ReferenceChangeAssert hasRightReference(Class expectedClass, Object expectedCdoId) {
         assert actual.right.cdoId == expectedCdoId
-        assert actual.right.managedType.baseJavaType == expectedClass
+        assert actual.right.typeName == expectedClass.name
         this
     }
 

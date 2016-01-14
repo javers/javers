@@ -4,7 +4,7 @@ import com.github.fakemongo.Fongo
 import org.javers.core.JaversTestBuilder
 import org.javers.core.json.JsonConverter
 import org.javers.core.model.DummyUser
-import org.javers.test.builder.DummyUserBuilder
+import org.javers.repository.api.QueryParamsBuilder
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -78,7 +78,7 @@ class MongoRepositoryFongoIntTest extends Specification {
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
         def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
         def commitFactory = javersTestBuilder.commitFactory
-        def id = javersTestBuilder.globalIdFactory.createFromId("kazik", DummyUser)
+        def id = javersTestBuilder.globalIdFactory.createInstanceId("kazik", DummyUser)
 
         //create entity & persist commit
         def kazik = new DummyUser("kazik")
@@ -89,7 +89,7 @@ class MongoRepositoryFongoIntTest extends Specification {
 
         then:
         latest.get().globalId.cdoId == "kazik"
-        latest.get().globalId.managedType.baseJavaClass == DummyUser
+        latest.get().globalId.typeName == DummyUser.name
     }
 
     def "should get last commit by InstanceIdDTO"() {
@@ -110,7 +110,7 @@ class MongoRepositoryFongoIntTest extends Specification {
 
         then:
         latest.get().globalId.cdoId == "kazik"
-        latest.get().globalId.managedType.baseJavaClass == DummyUser
+        latest.get().globalId.typeName == DummyUser.name
     }
 
     def "should get state history"() {
@@ -124,16 +124,17 @@ class MongoRepositoryFongoIntTest extends Specification {
 
         def javers = javersTestBuilder.javers()
 
-        def kazikV1 = DummyUserBuilder.dummyUser("kazik").withAge(12).build()
-        def kazikV2 = DummyUserBuilder.dummyUser("kazik").withAge(13).build()
+        def kazikV1 = dummyUser("kazik").withAge(12).build()
+        def kazikV2 = dummyUser("kazik").withAge(13).build()
 
         javers.commit("andy", kazikV1)
         javers.commit("andy", kazikV2)
 
         def id = javersTestBuilder.javers().idBuilder().instanceId(new DummyUser("kazik"))
+        def queryParams = QueryParamsBuilder.withLimit(2).build()
 
         when:
-        def history = mongoRepository.getStateHistory(id, 2)
+        def history = mongoRepository.getStateHistory(id, queryParams)
 
         then:
         history.size() == 2

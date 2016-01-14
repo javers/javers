@@ -7,6 +7,8 @@ import spock.lang.Specification
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 
+//TODO remove
+@Deprecated
 class InstanceIdDTOTypeAdapterTest extends Specification {
 
     def "should serialize InstanceIdDTO"() {

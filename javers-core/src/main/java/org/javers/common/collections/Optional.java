@@ -2,10 +2,12 @@ package org.javers.common.collections;
 
 import org.javers.common.validation.Validate;
 
+import java.io.Serializable;
+
 /**
  * @author bartosz walacik
  */
-public class Optional<T> {
+public class Optional<T> implements Serializable{
     private static Optional EMPTY = new Optional();
 
     private T reference;
@@ -56,6 +58,11 @@ public class Optional<T> {
 
     public void ifPresent(Consumer<T> consumer) {
         if (reference != null) consumer.consume(reference);
+    }
+
+    @Override
+    public String toString() {
+        return isPresent() ? String.format("Optional[%s]", this.reference) : "Optional.empty";
     }
 
     @Override

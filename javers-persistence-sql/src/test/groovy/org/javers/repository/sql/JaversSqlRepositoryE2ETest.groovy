@@ -1,6 +1,7 @@
 package org.javers.repository.sql
 
 import groovy.sql.Sql
+import org.javers.core.JaversBuilder
 import org.javers.core.JaversRepositoryE2ETest
 import org.javers.core.cases.Case207Arrays
 import org.javers.core.cases.Case208DateTimeTypes
@@ -9,42 +10,40 @@ import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
 
 import java.sql.Connection
-import java.sql.DriverManager
 
-import static org.javers.core.JaversBuilder.javers
-
-class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
+abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     Connection con
     JaversSqlRepository sqlRepository
 
-    protected Connection createConnection() {
-        DriverManager.getConnection( "jdbc:h2:mem:test" )//TRACE_LEVEL_SYSTEM_OUT=2")
-    }
+    protected abstract Connection createConnection()
+
+    protected abstract DialectName getDialect()
 
     Connection getConnection() {
         con
     }
 
-    protected DialectName getDialect() {
-        DialectName.H2
+    @Override
+    def setup() {
+        clearTables()
+        getConnection().commit()
     }
 
     @Override
-    def setup() {
+    JaversBuilder configureJavers(JaversBuilder javersBuilder) {
+        super.configureJavers(javersBuilder)
+        initializeSqlRepository()
+        javersBuilder.registerJaversRepository(sqlRepository)
+    }
+
+    protected void initializeSqlRepository() {
         con = createConnection()
         con.setAutoCommit(false)
-
-        def connectionProvider = { getConnection() } as ConnectionProvider
-
         sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
-                .withConnectionProvider(connectionProvider)
+                .withConnectionProvider({ getConnection() } as ConnectionProvider)
                 .withDialect(getDialect()).build()
-        javers = javers().registerJaversRepository(sqlRepository).build()
-        clearTables()
-
-        getConnection().commit()
     }
 
     def clearTables() {

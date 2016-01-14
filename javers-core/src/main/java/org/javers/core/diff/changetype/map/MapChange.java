@@ -17,8 +17,8 @@ import static org.javers.common.string.ToStringBuilder.addEnumField;
 public class MapChange extends PropertyChange {
     private final List<EntryChange> changes;
 
-    public MapChange(GlobalId affectedCdoId, Property property, List<EntryChange> changes) {
-        super(affectedCdoId, property);
+    public MapChange(GlobalId affectedCdoId, String propertyName, List<EntryChange> changes) {
+        super(affectedCdoId, propertyName);
         Validate.argumentIsNotNull(changes);
         Validate.argumentCheck(!changes.isEmpty(),"changes list should not be empty");
         this.changes = Collections.unmodifiableList(new ArrayList<>(changes));

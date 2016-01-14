@@ -1,6 +1,7 @@
 package org.javers.core;
 
 import org.javers.common.collections.Optional;
+import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.changelog.ChangeListTraverser;
 import org.javers.core.changelog.ChangeProcessor;
@@ -9,11 +10,12 @@ import org.javers.core.commit.CommitFactory;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.*;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
@@ -23,8 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
 
+import static org.javers.common.exception.JaversExceptionCode.COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
@@ -57,6 +61,12 @@ class JaversCore implements Javers {
     @Override
     public Commit commit(String author, Object currentVersion) {
         argumentsAreNotNull(author, currentVersion);
+
+        JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
+        if (jType instanceof ValueType || jType instanceof PrimitiveType){
+            throw new JaversException(COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED,
+                    jType.getClass().getSimpleName(), currentVersion.getClass().getSimpleName());
+        }
 
         Commit commit = commitFactory.create(author, currentVersion);
 
@@ -100,11 +110,6 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public String toJson(Diff diff) {
-        return jsonConverter.toJson(diff);
-    }
-
-    @Override
     public List<CdoSnapshot> findSnapshots(JqlQuery query){
         return queryRunner.queryForSnapshots(query);
     }
@@ -114,35 +119,10 @@ class JaversCore implements Javers {
         return queryRunner.queryForChanges(query);
     }
 
-    /**
-     * TODO: deprecate
-     */
-    @Deprecated
-    @Override
-    public List<CdoSnapshot> getStateHistory(GlobalIdDTO globalId, int limit) {
-        return queryRunner.queryForSnapshots(QueryBuilder.byGlobalIdDTO(globalId).limit(limit).build());
-    }
-
-    /**
-     * TODO: deprecate
-     */
-    @Deprecated
-    @Override
-    public List<Change> getChangeHistory(GlobalIdDTO globalId, int limit) {
-        return queryRunner.queryForChanges(QueryBuilder.byGlobalIdDTO(globalId).limit(limit).build());
-    }
-
     @Override
     public Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass) {
         Validate.argumentsAreNotNull(localId, entityClass);
         return queryRunner.runQueryForLatestSnapshot(instanceId(localId, entityClass));
-    }
-
-    @Override
-    @Deprecated
-    public Optional<CdoSnapshot> getLatestSnapshot(GlobalIdDTO globalId){
-        Validate.argumentIsNotNull(globalId);
-        return queryRunner.runQueryForLatestSnapshot(globalId);
     }
 
     @Override
@@ -166,5 +146,16 @@ class JaversCore implements Javers {
     @Override
     public <T extends JaversType> T getTypeMapping(Type clientsType) {
         return (T) typeMapper.getJaversType(clientsType);
+    }
+
+    @Override
+    public <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> itemClass) {
+        return diffFactory.compareCollections(oldVersion, currentVersion, itemClass);
+    }
+
+    @Override
+    public Property getProperty(PropertyChange propertyChange) {
+        ManagedType managedType = typeMapper.getJaversManagedType(propertyChange.getAffectedGlobalId());
+        return managedType.getProperty(propertyChange.getPropertyName());
     }
 }

@@ -1,6 +1,5 @@
 package org.javers.core.diff.appenders.levenshtein;
 
-import org.javers.common.collections.Objects;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.EqualsFunction;
 import org.javers.core.diff.NodePair;
@@ -11,9 +10,14 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ListType;
+import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.List;
+import java.util.Objects;
+
+import static org.javers.common.collections.Lists.wrapNull;
 
 /**
  * @author kornel kiełczewski
@@ -37,8 +41,8 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
     @Override
     public ListChange calculateChanges(final NodePair pair, final Property property) {
 
-        final List leftList = (List) pair.getLeftPropertyValue(property);
-        final List rightList = (List) pair.getRightPropertyValue(property);
+        final List leftList =  wrapNull( (List) pair.getLeftPropertyValue(property) );
+        final List rightList = wrapNull((List) pair.getRightPropertyValue(property));
 
         EqualsFunction equalsFunction = createDehydratingEqualsFunction(pair, property);
         Backtrack backtrack = new Backtrack(equalsFunction);
@@ -58,7 +62,7 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
             public boolean nullSafeEquals(Object left, Object right) {
                 Object leftDehydrated = globalIdFactory.dehydrate(left, listContentType, owner);
                 Object rightDehydrated = globalIdFactory.dehydrate(right, listContentType, owner);
-                return Objects.nullSafeEquals(leftDehydrated, rightDehydrated);
+                return Objects.equals(leftDehydrated, rightDehydrated);
             }
         };
     }
@@ -70,7 +74,7 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
         if (changes.size() == 0) {
             result = null;
         } else {
-            result = new ListChange(affectedCdoId, property, changes);
+            result = new ListChange(affectedCdoId, property.getName(), changes);
         }
         return result;
     }

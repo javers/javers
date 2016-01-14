@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.core.metamodel.type.ValueObjectType;
+import org.javers.core.metamodel.type.EntityType;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -13,19 +13,15 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  *
  * @author bartosz walacik
  */
-public class ValueObjectId extends UnboundedValueObjectId {
+public class ValueObjectId extends GlobalId {
     private final GlobalId ownerId;
     private final String fragment;
 
-    public ValueObjectId(ValueObjectType valueObject, GlobalId ownerId, String fragment) {
-        super(valueObject);
+    public ValueObjectId(String typeName, GlobalId ownerId, String fragment) {
+        super(typeName);
         argumentsAreNotNull(ownerId, fragment);
         this.ownerId = ownerId;
         this.fragment = fragment;
-    }
-
-    public ValueObjectId(ValueObjectType valueObject, OwnerContext ownerContext) {
-        this(valueObject, ownerContext.getGlobalId(), ownerContext.getPath());
     }
 
     /**
@@ -33,9 +29,12 @@ public class ValueObjectId extends UnboundedValueObjectId {
      * Usually, property name.
      * It works like <i>fragment identifier</i> in URL
      */
-    @Override
     public String getFragment() {
         return fragment;
+    }
+
+    public boolean hasOwnerOfType(EntityType entityType){
+        return ownerId.getTypeName().equals(entityType.getName());
     }
 
     public GlobalId getOwnerId() {

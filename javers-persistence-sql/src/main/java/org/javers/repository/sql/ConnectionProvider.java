@@ -1,6 +1,7 @@
 package org.javers.repository.sql;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Implementation should provide working JDBC connection,
@@ -11,5 +12,5 @@ import java.sql.Connection;
  */
 public interface ConnectionProvider {
     
-    Connection getConnection();
+    Connection getConnection() throws SQLException;
 }

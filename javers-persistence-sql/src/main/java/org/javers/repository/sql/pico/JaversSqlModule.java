@@ -3,8 +3,9 @@ package org.javers.repository.sql.pico;
 import org.javers.core.pico.JaversModule;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.finders.CdoSnapshotFinder;
-import org.javers.repository.sql.reposiotries.CommitMetadataRepository;
-import org.javers.repository.sql.reposiotries.GlobalIdRepository;
+import org.javers.repository.sql.repositories.CdoSnapshotRepository;
+import org.javers.repository.sql.repositories.CommitMetadataRepository;
+import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.FixedSchemaFactory;
 import org.javers.repository.sql.schema.JaversSchemaManager;
 import org.polyjdbc.core.query.QueryRunnerFactory;
@@ -25,7 +26,7 @@ public class JaversSqlModule implements JaversModule {
             QueryRunnerFactory.class,
             GlobalIdRepository.class,
             CommitMetadataRepository.class,
-            org.javers.repository.sql.reposiotries.CdoSnapshotRepository.class,
+            CdoSnapshotRepository.class,
             CdoSnapshotFinder.class};
 
     @Override

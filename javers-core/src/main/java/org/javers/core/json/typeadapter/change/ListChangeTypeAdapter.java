@@ -18,7 +18,7 @@ class ListChangeTypeAdapter extends ContainerChangeTypeAdapter<ListChange> {
 
     @Override
     protected ContainerChange newInstance(PropertyChangeStub stub, List<ContainerElementChange> changes) {
-        return new ListChange(stub.id, stub.property, changes);
+        return new ListChange(stub.id, stub.getPropertyName(), changes);
     }
 
     @Override

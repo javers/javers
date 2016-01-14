@@ -8,6 +8,9 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
+
+import java.io.Serializable;
 
 import static org.javers.common.string.ToStringBuilder.addFirstField;
 import static org.javers.common.validation.Validate.*;
@@ -25,7 +28,7 @@ import static org.javers.common.validation.Validate.*;
  *
  * @author bartosz walacik
  */
-public abstract class Change {
+public abstract class Change implements Serializable {
 
     private Optional<CommitMetadata> commitMetadata;
     private final GlobalId affectedCdoId;
@@ -64,7 +67,10 @@ public abstract class Change {
      * Affected domain object local Id (value under @Id property)
      */
     public Object getAffectedLocalId() {
-        return affectedCdoId.getCdoId();
+        if (affectedCdoId instanceof InstanceId){
+            return ((InstanceId) affectedCdoId).getCdoId();
+        }
+        return null;
     }
 
     /**

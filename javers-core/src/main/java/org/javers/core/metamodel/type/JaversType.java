@@ -1,8 +1,10 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
@@ -27,16 +29,27 @@ public abstract class JaversType {
     private final Type  baseJavaType;
     private final Class baseJavaClass;
     private final List<Type> actualTypeArguments;
+    private final String name;
 
     /**
      * @param baseJavaType Class or ParametrizedType
      */
     JaversType(Type baseJavaType) {
-        Validate .argumentIsNotNull(baseJavaType);
+        this(baseJavaType, Optional.<String>empty());
+    }
+
+    JaversType(Type baseJavaType, Optional<String> name) {
+        Validate.argumentIsNotNull(baseJavaType);
+        Validate.argumentIsNotNull(name);
 
         this.baseJavaType = baseJavaType;
         this.baseJavaClass = extractClass(baseJavaType);
         this.actualTypeArguments = extractActualClassTypeArguments(baseJavaType);
+        if (name.isPresent()) {
+            this.name = name.get();
+        }else {
+            this.name = extractClass(baseJavaType).getName();
+        }
     }
 
     /**
@@ -66,7 +79,7 @@ public abstract class JaversType {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || !(o instanceof JaversType)) return false;
 
         JaversType that = (JaversType) o;
         return baseJavaType.equals(that.baseJavaType);
@@ -122,9 +135,10 @@ public abstract class JaversType {
 
     /**
      * JaversType name, clientsClass.name by default
+     * or value of {@link TypeName} annotation.
      */
      public String getName() {
-        return baseJavaClass.getName();
+        return name;
      }
 
      public boolean isInstance(Object cdo) {
@@ -134,6 +148,7 @@ public abstract class JaversType {
 
      protected PrettyPrintBuilder prettyPrintBuilder(){
          return new PrettyPrintBuilder(this)
-                 .addField("baseType", baseJavaType);
+                 .addField("baseType", baseJavaType)
+                 .addField("typeName", name);
      }
 }

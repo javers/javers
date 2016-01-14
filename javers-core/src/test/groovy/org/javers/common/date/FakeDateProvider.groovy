@@ -1,17 +1,20 @@
-package org.javers.common.date;
+package org.javers.common.date
 
-import org.joda.time.LocalDateTime;
+import org.joda.time.LocalDateTime
 
-public class FakeDateProvider implements DateProvider {
+class FakeDateProvider implements DateProvider {
+    private LocalDateTime localDateTime
 
-    int year
-    int monthOfYear
-    int dayOfMonth
-    int hourOfDay
-    int minuteOfHour
+    FakeDateProvider() {
+        this.localDateTime = localDateTime
+    }
 
     @Override
-    public LocalDateTime now() {
-        return new LocalDateTime(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour)
+    LocalDateTime now() {
+        localDateTime ? localDateTime : LocalDateTime.now()
+    }
+
+    void set(LocalDateTime localDateTime) {
+        this.localDateTime = localDateTime
     }
 }

@@ -23,7 +23,7 @@ public class Employee {
 
     private Employee boss;
 
-    private final List<Employee> subordinates = new ArrayList<>();
+    private List<Employee> subordinates = new ArrayList<>();
 
     private Address primaryAddress;
     private Address postalAddress;
