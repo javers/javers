@@ -15,7 +15,16 @@ public class DummyUserPhone {
     private Category category;
     private String number;
 
+    public DummyUserPhone(Long id, String number, Category category) {
+        this.id = id;
+        this.category = category;
+        this.number = number;
+    }
 
+    public DummyUserPhone(Long id, String number) {
+        this.id = id;
+        this.number = number;
+    }
 
     public Long getId() {
         return id;

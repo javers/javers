@@ -7,7 +7,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Use {@link @ShallowReference} to mark certain classes to be
+ * Use ShallowReference to mark certain classes to be
  * compare only by {@link Id} (would stop building object graph from it).
  * <br/><br/>
  *
