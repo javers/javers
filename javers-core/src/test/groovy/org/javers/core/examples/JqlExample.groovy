@@ -147,7 +147,7 @@ class JqlExample extends Specification {
         assert changes.size() == 4
     }
 
-    def "should query for changes with time range filter"(){
+    def "should query for changes with commitDate filter"(){
       given:
       def fakeDateProvider = new FakeDateProvider()
       def javers = JaversBuilder.javers().withDateTimeProvider(fakeDateProvider).build()
@@ -163,7 +163,7 @@ class JqlExample extends Specification {
       when:
       def changes = javers
               .findChanges( QueryBuilder.byInstanceId("bob", Employee.class)
-              .from(new LocalDate(2015,12,31))
+              .from(new LocalDate(2016,01,1))
               .to  (new LocalDate(2018,01,1)).build() )
 
       then:
