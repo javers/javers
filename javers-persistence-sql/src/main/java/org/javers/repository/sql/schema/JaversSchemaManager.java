@@ -74,15 +74,21 @@ public class JaversSchemaManager {
         }
     }
 
+    /**
+     * JaVers 1.4.2 to 1.4.3 schema migration
+     */
     private void addSnapshotVersionColumnIfNeeded() {
 
         if (!columnExists("jv_snapshot", "version")) {
+            logger.warn("column jv_snapshot.version not exists, running ALTER TABLE ...");
 
-            if (dialect instanceof PostgresDialect || dialect instanceof MysqlDialect
-                    || dialect instanceof H2Dialect || dialect instanceof MsSqlDialect) {
+            if ( dialect instanceof PostgresDialect ||
+                 dialect instanceof MysqlDialect ||
+                 dialect instanceof H2Dialect ||
+                 dialect instanceof MsSqlDialect) {
                 executeSQL("ALTER TABLE jv_snapshot ADD COLUMN version BIGINT");
             } else if (dialect instanceof OracleDialect) {
-                executeSQL("ALTER TABLE jv_snapshot ADD version NUMBER(19)");
+                executeSQL("ALTER TABLE jv_snapshot ADD version NUMBER");
             } else {
                 logger.error("\nno DB schema migration script for {} :(\nplease contact with JaVers team, javers@javers.org",
                         dialect.getCode());
@@ -121,7 +127,6 @@ public class JaversSchemaManager {
 
     private boolean columnExists(String tableName, String colName) {
         try {
-
             Statement stmt = connectionProvider.getConnection().createStatement();
 
             ResultSet res = stmt.executeQuery("select * from " + tableName + " where 1<0");
