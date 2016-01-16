@@ -125,6 +125,12 @@ public final class CdoSnapshot extends Cdo {
         return type;
     }
 
+    /**
+     * Object version number.<br/>
+     * Initial snapshot of given object has version == 1, next has version == 2.
+     *
+     * @since 1.4.3
+     */
     public long getVersion() {
         return version;
     }

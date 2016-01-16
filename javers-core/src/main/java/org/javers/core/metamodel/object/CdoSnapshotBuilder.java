@@ -58,8 +58,8 @@ public class CdoSnapshotBuilder {
         return this;
     }
 
-    public CdoSnapshotBuilder withVersion(long version) {
-        this.version = version;
+    public CdoSnapshotBuilder withVersion(Long version) {
+        this.version = (version == null) ? 0 : version;
         return this;
     }
 
