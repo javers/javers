@@ -27,6 +27,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
     private static final String STATE_NAME = "state";
     private static final String TYPE_NAME = "type";
     private static final String CHANGED_NAME = "changedProperties";
+    private static final String VERSION = "version";
 
 
     public CdoSnapshotObjectMapper(JsonConverter jsonConverter, Optional<GlobalId> providedGlobalId) {
@@ -42,6 +43,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
         json.add(STATE_NAME, jsonConverter.fromJsonToJsonElement(resultSet.getString(SNAPSHOT_STATE)));
         json.add(CHANGED_NAME, assembleChangedPropNames(resultSet));
         json.addProperty(TYPE_NAME, resultSet.getString(SNAPSHOT_TYPE));
+        json.addProperty(VERSION, resultSet.getLong(VERSION));
 
         if (providedGlobalId.isPresent()){
             json.add(GLOBAL_CDO_ID, jsonConverter.toJsonElement(providedGlobalId.get()));
