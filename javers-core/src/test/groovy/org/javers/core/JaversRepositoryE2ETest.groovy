@@ -599,7 +599,7 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     @Unroll
-    def "should query for Entity snapshots with skipped results"() {
+    def "should query for Entity snapshots with skipped results, #what"() {
         given:
         (19..1).each{
             javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
@@ -617,7 +617,6 @@ class JaversRepositoryE2ETest extends Specification {
         query << [
             byInstanceId(1, SnapshotEntity).skip(0).limit(5).build(),
             byInstanceId(1, SnapshotEntity).skip(5).limit(5).build(),
-            byInstanceId(1, SnapshotEntity).skip(10).limit(5).build(),
             byInstanceId(1, SnapshotEntity).skip(15).limit(5).build(),
             byInstanceId(1, SnapshotEntity).skip(20).limit(5).build(),
             byInstanceId(1, SnapshotEntity).skip(5).build()
@@ -626,10 +625,16 @@ class JaversRepositoryE2ETest extends Specification {
         expectedIntPropertyValues << [
             1..5,
             6..10,
-            11..15,
             16..19,
             [],
             6..19
+        ]
+
+        what << ["first page",
+                 "second page",
+                 "last page",
+                 "too much skip page",
+                 "skip without limit"
         ]
     }
 }
