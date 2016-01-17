@@ -147,6 +147,24 @@ class JqlExample extends Specification {
         assert changes.size() == 4
     }
 
+    def "should query for changes with skip filter"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        javers.commit( "author", new Employee(name:"bob", age:29, salary: 900) )
+        javers.commit( "author", new Employee(name:"bob", age:30, salary: 1000) )
+        javers.commit( "author", new Employee(name:"bob", age:31, salary: 1100) )
+        javers.commit( "author", new Employee(name:"bob", age:32, salary: 1200) )
+
+        when:
+        def changes = javers
+            .findChanges( QueryBuilder.byInstanceId("bob", Employee.class).skip(1).build() )
+
+        then:
+        printChanges(changes)
+        assert changes.size() == 4
+    }
+
     def "should query for changes with commitDate filter"(){
       given:
       def fakeDateProvider = new FakeDateProvider()
