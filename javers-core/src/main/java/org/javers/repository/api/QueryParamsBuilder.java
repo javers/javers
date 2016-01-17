@@ -19,10 +19,6 @@ public class QueryParamsBuilder {
 
     /**
      * Initializes builder with a given limit - number of snapshots to be fetched from database.
-     * <br/>
-     *
-     * Always choose the reasonable limit,
-     * production database could contain more records than you expect
      */
     public static QueryParamsBuilder withLimit(int limit) {
         checkLimit(limit);
@@ -55,7 +51,7 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * skips a given number of the latest snapshots
+     * skips a given number of latest snapshots
      */
     public QueryParamsBuilder skip(int skip) {
         Validate.argumentCheck(limit >= 0, "Skip is not a non-negative number.");

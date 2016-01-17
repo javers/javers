@@ -165,7 +165,8 @@ public class QueryBuilder {
     /**
      * Limits number of Snapshots to be fetched from JaversRepository, default is 100.
      * <br/>
-     * Always choose reasonable limits to improve performance of your queries.
+     * Always choose reasonable limits to improve performance of your queries,
+     * production database could contain more records than you expect.
      */
     public QueryBuilder limit(int limit) {
         this.limit = limit;
@@ -173,7 +174,8 @@ public class QueryBuilder {
     }
 
     /**
-     * Skips a given number of the latest snapshots
+     * Sets the number of Snapshots to skip.
+     * Use skip() and limit() for for paging.
      */
     public QueryBuilder skip(int skip) {
         this.skip = skip;

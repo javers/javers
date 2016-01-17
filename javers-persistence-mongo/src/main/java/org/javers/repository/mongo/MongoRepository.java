@@ -236,10 +236,12 @@ public class MongoRepository implements JaversRepository {
 
     private MongoCursor<Document> getMongoSnapshotsCursor(Bson idQuery, QueryParams queryParams) {
         Bson query = applyQueryParams(idQuery, queryParams);
-        int limit = queryParams.limit();
-        int skip = queryParams.skip();
         return snapshotsCollection()
-                .find(query).sort(new Document(COMMIT_ID, DESC)).limit(limit).skip(skip).iterator();
+                .find(query)
+                .sort(new Document(COMMIT_ID, DESC))
+                .limit(queryParams.limit())
+                .skip(queryParams.skip())
+                .iterator();
     }
 
     private Bson applyQueryParams(Bson query, QueryParams queryParams) {
