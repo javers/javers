@@ -5,9 +5,9 @@ import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.metamodel.object.CdoSnapshot
-import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
+import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.test.builder.DummyUserDetailsBuilder
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
@@ -162,7 +162,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         snapshot.version == 5L
     }
 
-    def "should deserialize CdoSnapshot.version to 0 when version field is missing"() {
+    def "should deserialize CdoSnapshot.version to 1 when version field is missing"() {
 
         given:
         def json = new JsonBuilder()
@@ -184,7 +184,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
 
         then:
-        snapshot.version == 0
+        snapshot.version == 1
     }
 
     def "should deserialize CdoSnapshot state with primitive values"() {

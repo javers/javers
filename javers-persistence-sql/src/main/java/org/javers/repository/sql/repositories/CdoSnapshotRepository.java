@@ -31,6 +31,7 @@ public class CdoSnapshotRepository {
     private long insertSnapshot(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot) {
         InsertQuery query = javersPolyJDBC.query().insert().into(SNAPSHOT_TABLE_NAME)
                 .value(SNAPSHOT_TYPE, cdoSnapshot.getType().toString())
+                .value(VERSION, cdoSnapshot.getVersion())
                 .value(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
                 .value(SNAPSHOT_COMMIT_FK, commitIdPk)
                 .value(SNAPSHOT_STATE, jsonConverter.toJson(cdoSnapshot.getState()))
