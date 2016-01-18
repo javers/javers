@@ -11,7 +11,6 @@ public class JaversProperties {
     private boolean newObjectSnapshot = false;
     private boolean prettyPrint = true;
     private boolean typeSafeValues = false;
-    private String dialect = DialectName.H2.name();
 
     public String getAlgorithm() {
         return algorithm;
@@ -53,11 +52,4 @@ public class JaversProperties {
         this.typeSafeValues = typeSafeValues;
     }
 
-    public String getDialect() {
-        return dialect;
-    }
-
-    public void setDialect(String dialect) {
-        this.dialect = dialect;
-    }
 }
