@@ -41,11 +41,11 @@ We'd love to get issues and contributions from you!
 You can report a Bug or a Feature request.
 Questions should be asked at [stackoverflow.com](http://stackoverflow.com/questions/tagged/javers?sort=newest), we will answer.
 Before you create an issue please read our
-[Guidelines for Bug Reporting](CONTRIBUTING.md).
+[Guidelines for Bug Reporting](CONTRIBUTING.md#guidelines-for-bug-reporting).
 
 JaVers is an open source project, we are open to your contributions.
 Before you start, please read our
-[Contributing Guide](CONTRIBUTING.md) and see how to get your changes merged.
+[Contributing Guide](CONTRIBUTING.md#guidelines-for-contributors) and see how to get your changes merged.
 
 ## Team Board
 See on our [Kanban Board](https://waffle.io/javers/javers) what are working on. 
