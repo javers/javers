@@ -4,6 +4,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
+import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
@@ -34,6 +35,7 @@ public class QueryBuilder {
     private LocalDateTime from;
     private LocalDateTime to;
     private boolean newObjectChanges;
+    private CommitId commitId;
     private final List<Filter> filters = new ArrayList<>();
 
     private QueryBuilder(Filter initialFilter) {
@@ -127,6 +129,15 @@ public class QueryBuilder {
     public static QueryBuilder byGlobalIdDTO(GlobalIdDTO globalId){
         Validate.argumentIsNotNull(globalId);
         return new QueryBuilder(new IdFilter(globalId));
+    }
+
+    /**
+     *
+     */
+    public QueryBuilder withCommitId(CommitId commitId) {
+        Validate.argumentIsNotNull(commitId);
+        this.commitId = commitId;
+        return this;
     }
 
     /**
@@ -247,7 +258,12 @@ public class QueryBuilder {
     }
 
     protected QueryParams getQueryParams() {
-        return QueryParamsBuilder.withLimit(limit).skip(skip).from(from).to(to).build();
+        return QueryParamsBuilder
+            .withLimit(limit)
+            .skip(skip)
+            .from(from).to(to)
+            .commitId(commitId)
+            .build();
     }
 
     public JqlQuery build(){

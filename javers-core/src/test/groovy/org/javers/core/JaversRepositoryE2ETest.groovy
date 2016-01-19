@@ -637,4 +637,20 @@ class JaversRepositoryE2ETest extends Specification {
                  "skip without limit"
         ]
     }
+
+    def "should query for Entity snapshot with given commit id"() {
+        given:
+        def commits = (0..10).collect{
+            javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
+        }
+
+        when:
+        def searchedCommitId = commits[7].id
+        def query = byInstanceId(1, SnapshotEntity).withCommitId(searchedCommitId).build()
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.commitId == [searchedCommitId]
+    }
+
 }
