@@ -70,9 +70,6 @@ public class CdoSnapshotBuilder {
 
         if (previous != null) {
             changed = state.differentValues(previous.getState());
-            version = previous.getVersion() + 1;
-        } else {
-            version = 1L;
         }
 
         if (markAllAsChanged){

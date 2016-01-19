@@ -75,7 +75,7 @@ public class JaversSchemaManager {
     }
 
     /**
-     * JaVers 1.4.2 to 1.4.3 schema migration
+     * JaVers 1.4.3 to 1.4.4 schema migration
      */
     private void addSnapshotVersionColumnIfNeeded() {
 

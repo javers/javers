@@ -35,6 +35,7 @@ public class SnapshotFactory {
         return createSnapshotState(cdoWrapper, commitMetadata)
                 .withType(INITIAL)
                 .markAllAsChanged()
+                .withVersion(1L)
                 .build();
     }
 
@@ -42,6 +43,7 @@ public class SnapshotFactory {
         return createSnapshotState(cdoWrapper, commitMetadata)
                 .withType(UPDATE)
                 .markChanged(previous)
+                .withVersion(previous.getVersion()+1)
                 .build();
     }
 
