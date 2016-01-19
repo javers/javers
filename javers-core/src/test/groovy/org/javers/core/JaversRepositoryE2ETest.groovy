@@ -637,4 +637,16 @@ class JaversRepositoryE2ETest extends Specification {
                  "skip without limit"
         ]
     }
+
+    def "should increment Entity snapshot version number"(){
+      when:
+      javers.commit("author", new SnapshotEntity(id: 1, intProperty: 1))
+      javers.commit("author", new SnapshotEntity(id: 1, intProperty: 2))
+
+      then:
+      def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build())
+      snapshots[0].version == 2
+      snapshots[1].version == 1
+
+    }
 }

@@ -26,6 +26,7 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
     static final String INITIAL_NAME_LEGACY = "initial";
     static final String TYPE_NAME = "type";
     static final String CHANGED_NAME = "changedProperties";
+    static final String VERSION = "version";
 
     private TypeMapper typeMapper;
 
@@ -44,6 +45,7 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         JsonObject stateObject = (JsonObject)jsonObject.get(STATE_NAME);
 
         GlobalId cdoId = context.deserialize(jsonObject.get(GLOBAL_CDO_ID), GlobalId.class);
+        Long version = context.deserialize(jsonObject.get(VERSION), Long.class);
         DuckType duckType = new DuckType(cdoId.getTypeName(), extractPropertyNames(stateObject));
 
         ManagedType managedType = typeMapper.getJaversManagedType(duckType, ManagedType.class);
@@ -57,6 +59,7 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
         return builder
                 .withState(snapshotState)
+                .withVersion(version)
                 .withCommitMetadata(commitMetadata)
                 .withChangedProperties(changedProperties)
                 .build();
@@ -106,6 +109,7 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         jsonObject.add(STATE_NAME, context.serialize(snapshot.getState()));
         jsonObject.add(CHANGED_NAME, context.serialize(snapshot.getChanged()));
         jsonObject.add(TYPE_NAME, context.serialize(snapshot.getType().name()));
+        jsonObject.add(VERSION, context.serialize(snapshot.getVersion()));
 
         return jsonObject;
     }
