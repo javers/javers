@@ -1,14 +1,13 @@
 package org.javers.core.diff.changetype;
 
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Property;
 
 import static org.javers.common.string.ToStringBuilder.addField;
 
 import org.javers.common.collections.Optional;
 
 /**
- * changed reference (in *ToOne relation)
+ * Changed reference to Entity or ValueObject (in *ToOne relation)
  *
  * @author bartosz walacik
  */
@@ -23,7 +22,6 @@ public final class ReferenceChange extends PropertyChange {
     	this( affectedCdoId, propertyName, leftReference, rightReference, null, null );
     }
 
-
     public ReferenceChange(GlobalId affectedCdoId, String propertyName, GlobalId leftReference,
                            GlobalId rightReference, Object leftObject, Object rightObject ) {
         super(affectedCdoId, propertyName);
@@ -33,18 +31,38 @@ public final class ReferenceChange extends PropertyChange {
         this.rightObject = Optional.fromNullable(rightObject);
     }
 
+    /**
+     * GlobalId of left (or previous) domain object reference
+     */
     public GlobalId getLeft() {
         return left;
     }
 
+    /**
+     * GlobalId of right (or current) domain object reference
+     */
     public GlobalId getRight() {
         return right;
     }
-    
+
+    /**
+     * Domain object reference at left side of a diff.
+     *<br/><br/>
+     *
+     * <b>Optional</b> - available only for freshly generated diff.
+     * Not available for Changes read from JaversRepository
+     */
     public Optional<Object> getLeftObject() {
     	return leftObject;
     }
-    
+
+    /**
+     * Domain object reference at right side of a diff.
+     *<br/><br/>
+     *
+     * <b>Optional</b> - available only for freshly generated diff.
+     * Not available for Changes read from JaversRepository
+     */
     public Optional<Object> getRightObject() {
     	return rightObject;
     }

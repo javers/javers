@@ -49,7 +49,8 @@ public class OptionalChangeAppender extends CorePropertyChangeAppender<PropertyC
             if (Objects.equals(leftId, rightId)) {
                 return null;
             }
-            return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId);
+            return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId,
+                    pair.getLeftPropertyValue(property), pair.getRightPropertyValue(property));
         }
         if (contentType instanceof PrimitiveOrValueType) {
             if (Objects.equals(leftOptional, rightOptional)) {

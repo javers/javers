@@ -3,12 +3,7 @@ package org.javers.core.diff.appenders
 import org.javers.core.model.DummyAddress
 import org.javers.core.diff.ChangeAssert
 import org.javers.core.model.SnapshotEntity
-
-
 import static ReferenceChangeAssert.assertThat
-import static org.javers.common.collections.Optional.*
-
-
 
 class ReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
 
@@ -41,17 +36,15 @@ class ReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         assertThat(change)
                   .hasLeftReference(SnapshotEntity,2)
                   .hasRightReference(null)
-                  .hasLeftObject(of(entityRef))
-                  .hasRightObject(empty())
+                  .hasLeftObject(entityRef)
+                  .hasRightObject(null)
                   .hasPropertyName("entityRef")
     }
 
     def "should append Entity reference change"() {
         given:
-        def ref2 = new SnapshotEntity(id:2)
-        def ref3 = new SnapshotEntity(id:3)
-        def leftCdo =   new SnapshotEntity(id:1, entityRef: ref2)
-        def rightCdo =  new SnapshotEntity(id:1, entityRef: ref3)
+        def leftCdo =   new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
+        def rightCdo =  new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:3))
         def property = getProperty(SnapshotEntity, "entityRef")
 
         when:
@@ -64,8 +57,8 @@ class ReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         assertThat(change)
                    .hasLeftReference(SnapshotEntity,2)
                    .hasRightReference(SnapshotEntity,3)
-                   .hasLeftObject(of(ref2))
-                   .hasRightObject(of(ref3))
+                   .hasLeftObject(leftCdo.entityRef)
+                   .hasRightObject(rightCdo.entityRef)
                    .hasPropertyName("entityRef")
     }
 

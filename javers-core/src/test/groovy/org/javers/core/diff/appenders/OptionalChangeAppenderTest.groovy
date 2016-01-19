@@ -5,12 +5,9 @@ import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
-
 import static java.util.Optional.*
 import static java.util.Optional.of
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static ReferenceChangeAssert.assertThat
-
 
 /**
  * @author bartosz.walacik
@@ -55,8 +52,8 @@ class OptionalChangeAppenderTest extends AbstractDiffAppendersTest {
         ReferenceChangeAssert.assertThat( change )
             .hasLeftReference( expectedLeftRef )
             .hasRightReference( expectedRightRef )
-            .hasLeftObject( org.javers.common.collections.Optional.empty() )
-            .hasRightObject( org.javers.common.collections.Optional.empty() )
+            .hasLeftObject( leftOptional )
+            .hasRightObject( rightOptional )
         
         where:
         leftOptional                 | rightOptional                | expectedLeftRef               | expectedRightRef
