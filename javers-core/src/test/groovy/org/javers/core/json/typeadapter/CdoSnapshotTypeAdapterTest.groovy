@@ -29,7 +29,6 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         when:
         def jsonText = javers.jsonConverter.toJson(snapshot)
-        println jsonText
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -41,6 +40,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         json.globalId.entity == "org.javers.core.model.DummyUser"
         json.globalId.cdoId == "kaz"
         json.type == "INITIAL"
+        json.version == 1
     }
 
     def "should serialize state with primitive values in CdoSnapshot"() {
@@ -148,8 +148,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
             state {
             }
             changedProperties changed
+            version 5
         }
-        println json.toString()
 
         when:
         def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
@@ -159,6 +159,32 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         snapshot.globalId == instanceId("kaz",DummyUser)
         snapshot.initial == true
         snapshot.changed.collect{it} as Set == ["name", "age"] as Set
+        snapshot.version == 5L
+    }
+
+    def "should deserialize CdoSnapshot.version to 0 when version field is missing"() {
+
+        given:
+        def json = new JsonBuilder()
+        json {
+            commitMetadata {
+                commitId "1.0"
+                author "author"
+                dateTime "2000-01-01T12:00:00"
+            }
+            globalId {
+                entity "org.javers.core.model.DummyUser"
+                cdoId "kaz"
+            }
+            state {
+            }
+        }
+
+        when:
+        def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
+
+        then:
+        snapshot.version == 0
     }
 
     def "should deserialize CdoSnapshot state with primitive values"() {
