@@ -127,7 +127,17 @@ public final class CdoSnapshot extends Cdo {
 
     /**
      * Object version number.<br/>
-     * Initial snapshot of given object has version == 1, next has version == 2.
+     * Initial snapshot of given object has version 1, next has version 2.
+     * <br/><br/>
+     *
+     * <b>Warning!</b> Version field was added in JaVers v. 1.4.4.
+     * All snapshots persisted in JaversRepository before this release
+     * have version 0.
+     * <br/>
+     * If it isn't OK for you, run manual DB update.
+     * See <a href="http://javers.org/documentation/features/#release-notes">release-notes</a>
+     * for v. 1.4.4
+     *
      *
      * @since 1.4.4
      */
