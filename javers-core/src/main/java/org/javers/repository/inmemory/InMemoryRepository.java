@@ -116,13 +116,13 @@ class InMemoryRepository implements JaversRepository {
                 }
             });
         }
-
-        return trimResultsToRequestedSize(snapshots, queryParams.limit());
+        return trimResultsToRequestedSlice(snapshots, queryParams.skip(), queryParams.limit());
     }
 
-    private List<CdoSnapshot> trimResultsToRequestedSize(List<CdoSnapshot> snapshots, int requestedSize) {
-        int size = snapshots.size();
-        return size <= requestedSize ? snapshots : snapshots.subList(0, requestedSize);
+    private List<CdoSnapshot> trimResultsToRequestedSlice(List<CdoSnapshot> snapshots, int from, int size) {
+        int fromIndex = Math.min(from, snapshots.size());
+        int toIndex = Math.min(from + size, snapshots.size());
+        return snapshots.subList(fromIndex, toIndex);
     }
 
     @Override

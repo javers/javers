@@ -25,9 +25,12 @@ import static org.joda.time.LocalTime.MIDNIGHT;
  * @author bartosz.walacik
  */
 public class QueryBuilder {
-    private static int DEFAULT_LIMIT = 100;
+    private static final int DEFAULT_LIMIT = 100;
+    private static final int DEFAULT_SKIP = 0;
+
 
     private int limit = DEFAULT_LIMIT;
+    private int skip = DEFAULT_SKIP;
     private LocalDateTime from;
     private LocalDateTime to;
     private boolean newObjectChanges;
@@ -162,10 +165,20 @@ public class QueryBuilder {
     /**
      * Limits number of Snapshots to be fetched from JaversRepository, default is 100.
      * <br/>
-     * Always choose reasonable limits to improve performance of your queries.
+     * Always choose reasonable limits to improve performance of your queries,
+     * production database could contain more records than you expect.
      */
     public QueryBuilder limit(int limit) {
         this.limit = limit;
+        return this;
+    }
+
+    /**
+     * Sets the number of Snapshots to skip.
+     * Use skip() and limit() for for paging.
+     */
+    public QueryBuilder skip(int skip) {
+        this.skip = skip;
         return this;
     }
 
@@ -234,7 +247,7 @@ public class QueryBuilder {
     }
 
     protected QueryParams getQueryParams() {
-        return QueryParamsBuilder.withLimit(limit).from(from).to(to).build();
+        return QueryParamsBuilder.withLimit(limit).skip(skip).from(from).to(to).build();
     }
 
     public JqlQuery build(){

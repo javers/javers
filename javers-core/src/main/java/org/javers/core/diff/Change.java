@@ -1,8 +1,6 @@
 package org.javers.core.diff;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ReferenceChange;
@@ -55,15 +53,6 @@ public abstract class Change implements Serializable {
     }
 
     /**
-     * use {@link #getAffectedGlobalId()},
-     * left for backward compatibility
-     */
-    @Deprecated
-    public GlobalId getAffectedCdoId() {
-        return affectedCdoId;
-    }
-
-    /**
      * Affected domain object local Id (value under @Id property)
      */
     public Object getAffectedLocalId() {
@@ -76,10 +65,11 @@ public abstract class Change implements Serializable {
     /**
      * Affected domain object (Cdo).
      * Depending on concrete Change type,
-     * it could be new Object, removed Object or new version of changed Object
-     * <br> <br>
+     * it could be new Object, removed Object or new version of changed Object.
+     * <br/><br/>
      *
-     * <b>Optional</b> reference - available only for freshly generated diff
+     * <b>Optional</b> - available only for freshly generated diff.
+     * Not available for Changes read from JaversRepository
      */
     public Optional<Object> getAffectedObject() {
         return affectedCdo;

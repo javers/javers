@@ -147,7 +147,25 @@ class JqlExample extends Specification {
         assert changes.size() == 4
     }
 
-    def "should query for changes with time range filter"(){
+    def "should query for changes with skip filter"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        javers.commit( "author", new Employee(name:"bob", age:29, salary: 900) )
+        javers.commit( "author", new Employee(name:"bob", age:30, salary: 1000) )
+        javers.commit( "author", new Employee(name:"bob", age:31, salary: 1100) )
+        javers.commit( "author", new Employee(name:"bob", age:32, salary: 1200) )
+
+        when:
+        def changes = javers
+            .findChanges( QueryBuilder.byInstanceId("bob", Employee.class).skip(1).build() )
+
+        then:
+        printChanges(changes)
+        assert changes.size() == 4
+    }
+
+    def "should query for changes with commitDate filter"(){
       given:
       def fakeDateProvider = new FakeDateProvider()
       def javers = JaversBuilder.javers().withDateTimeProvider(fakeDateProvider).build()
@@ -163,7 +181,7 @@ class JqlExample extends Specification {
       when:
       def changes = javers
               .findChanges( QueryBuilder.byInstanceId("bob", Employee.class)
-              .from(new LocalDate(2015,12,31))
+              .from(new LocalDate(2016,01,1))
               .to  (new LocalDate(2018,01,1)).build() )
 
       then:

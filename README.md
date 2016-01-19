@@ -35,46 +35,17 @@ Run environment self-test, to check if JaVers is compatible with your JDK versio
 ./gradlew javers-core:run
 ```
 
-## Guidelines for Bug Reporting
-You can report a Bug or a Feature request to our [github issues](http://github.com/javers/javers/issues/).
+## Issues and Contributing
+We'd love to get issues and contributions from you!
+
+You can report a Bug or a Feature request.
 Questions should be asked at [stackoverflow.com](http://stackoverflow.com/questions/tagged/javers?sort=newest), we will answer.
-
-Bug Reports have to contain:
-
-1. Clear description of your **expectations versus reality**
-1. **Runnable test case** which isolates the bug and allows us to easily reproduce it on our laptops.
-   You can push this test case to your fork of this repository. 
-
-## Guidelines for Contributors
+Before you create an issue please read our
+[Guidelines for Bug Reporting](CONTRIBUTING.md#guidelines-for-bug-reporting).
 
 JaVers is an open source project, we are open to your contributions.
-
-In fact, if you need a new Feature,
-the best way is to contribute a Pull Request. Otherwise you can only wait ...
-
-Before you start to work, please read this guidelines:
-
-1. Create the **issue** with full description of a new Feature
-1. **Consult** the design with JaVers team.
-   You can chat with us on [gitter](https://gitter.im/javers/javers)
-1. Source code should be written in **Java7**.
-   Please don't import Java8 types like `java.util.Optional`.
-   The only exception is `package org.javers.java8support`
-1. We are not crazy about **code formatting** standards.
-   Use 4 spaces to indent. Don't change formatting of existing code.
-1. We really care about **Clean Code** and **quality** so expect many Code Review comments.
-1. **Tests** should be written in Spock/Groovy. In tests, Java8 is fine.<br/>
-   In JaVers, tests are well-crafted, runnable documentation.<br/>
-   Tests should specify and describe functionality, not implementation. <br/>
-   We **fight Mocks**, **Stubs** are allowed but discouraged.
-1. **Commit message** should [mention](https://github.com/blog/957-introducing-issue-mentions) the issue,
-   for example:<br/>
-   `#299 new Guidelines for Contributors in README.md`
-1. Before creating the **Pull Request**: merge from master and
-   squash your commits
-1. Apply our **Code Review** comments and commit changes in the next commit.
-Please don't squash Code Review commits, we want to track progress of the Code Review process.    
-
+Before you start, please read our
+[Contributing Guide](CONTRIBUTING.md#guidelines-for-contributors) and see how to get your changes merged.
 
 ## Team Board
 See on our [Kanban Board](https://waffle.io/javers/javers) what are working on. 
