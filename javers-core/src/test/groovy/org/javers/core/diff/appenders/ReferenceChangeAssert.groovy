@@ -32,13 +32,23 @@ class ReferenceChangeAssert {
         this
     }
 
-    ReferenceChangeAssert hasLeftReference(GlobalId expected) {
+    ReferenceChangeAssert hasLeftReference(Object expected) {
         assert actual.left == expected
         this
     }
 
-    ReferenceChangeAssert hasRightReference(GlobalId expected) {
+    ReferenceChangeAssert hasRightReference(Object expected) {
         assert actual.right == expected
+        this
+    }
+    
+    ReferenceChangeAssert hasLeftObject(Object expected) {
+        assert actual.leftObject == expected
+        this
+    }
+    
+    ReferenceChangeAssert hasRightObject(Object expected) {
+        assert actual.rightObject == expected
         this
     }
 }

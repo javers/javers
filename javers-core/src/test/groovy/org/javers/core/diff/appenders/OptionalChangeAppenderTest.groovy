@@ -9,6 +9,8 @@ import spock.lang.Unroll
 import static java.util.Optional.*
 import static java.util.Optional.of
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static ReferenceChangeAssert.assertThat
+
 
 /**
  * @author bartosz.walacik
@@ -50,9 +52,12 @@ class OptionalChangeAppenderTest extends AbstractDiffAppendersTest {
         ChangeAssert.assertThat(change)
                     .hasInstanceId(SnapshotEntity, 1)
         change instanceof ReferenceChange
-        change.left == expectedLeftRef
-        change.right == expectedRightRef
-
+        ReferenceChangeAssert.assertThat( change )
+            .hasLeftReference( expectedLeftRef )
+            .hasRightReference( expectedRightRef )
+            .hasLeftObject( org.javers.common.collections.Optional.empty() )
+            .hasRightObject( org.javers.common.collections.Optional.empty() )
+        
         where:
         leftOptional                 | rightOptional                | expectedLeftRef               | expectedRightRef
         empty()                      | of(new SnapshotEntity(id:2)) | null                          | instanceId(2, SnapshotEntity)
