@@ -40,12 +40,12 @@ public class TypeFactory {
             return new CustomType(def.getBaseJavaClass());
         } else if (def instanceof EntityDefinition) {
             return createEntity((EntityDefinition) def);
-        } else if (def instanceof ValueObjectDefinition) {
+        } else if (def instanceof ValueObjectDefinition){
             return createValueObject((ValueObjectDefinition) def);
         } else if (def instanceof ValueDefinition) {
             return new ValueType(def.getBaseJavaClass());
         } else {
-            throw new IllegalArgumentException("unsupported definition " + def.getClass().getSimpleName());
+           throw new IllegalArgumentException("unsupported definition " + def.getClass().getSimpleName());
         }
     }
 
@@ -69,20 +69,18 @@ public class TypeFactory {
         }
 
     }
-
-
-
     JaversType infer(Type javaType, Optional<JaversType> prototype) {
         JaversType jType;
 
         if (prototype.isPresent()) {
             jType = spawnFromPrototype(javaType, prototype.get());
             logger.info("javersType of {} inferred as {} from prototype {}",
-                    javaType, jType.getClass().getSimpleName(), prototype.get());
-        } else {
+                        javaType, jType.getClass().getSimpleName(), prototype.get());
+        }
+        else {
             jType = inferFromAnnotations(javaType);
             logger.info("javersType of {} inferred as {}",
-                    javaType, jType.getClass().getSimpleName());
+                        javaType, jType.getClass().getSimpleName());
         }
 
         return jType;
@@ -103,7 +101,8 @@ public class TypeFactory {
             ManagedClass managedClass = managedClassFactory.create(javaClass);
             ClassAnnotationsScan scan = classAnnotationsScanner.scan(javaClass);
             return ((ManagedType) prototype).spawn(managedClass, scan.typeName());
-        } else {
+        }
+        else {
             return prototype.spawn(javaType); //delegate to simple constructor
         }
     }
@@ -112,8 +111,8 @@ public class TypeFactory {
         Class javaClass = extractClass(javaType);
         ClassAnnotationsScan scan = classAnnotationsScanner.scan(javaClass);
 
-        if (scan.hasValue()) {
-            return create(new ValueDefinition(javaClass));
+        if (scan.hasValue()){
+            return create( new ValueDefinition(javaClass) );
         }
 
         ClientsClassDefinitionBuilder builder;
@@ -143,7 +142,7 @@ public class TypeFactory {
     }
 
     private boolean hasIdProperty(Class<?> javaClass) {
-        for (Property property : propertyScanner.scan(javaClass)) {
+        for (Property property : propertyScanner.scan(javaClass))  {
             if (property.looksLikeId()) {
                 return true;
             }
