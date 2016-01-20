@@ -4,12 +4,14 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
+import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +36,7 @@ public class QueryBuilder {
     private LocalDateTime from;
     private LocalDateTime to;
     private boolean newObjectChanges;
+    private CommitId commitId;
     private final List<Filter> filters = new ArrayList<>();
 
     private QueryBuilder(Filter initialFilter) {
@@ -238,6 +241,29 @@ public class QueryBuilder {
         return to(toDate.toLocalDateTime(MIDNIGHT));
     }
 
+    /**
+     * Limits Snapshots to be fetched from JaversRepository
+     * to that with a given commit id.
+     * <br/><br/>
+     *
+     * <b>Warning!</b> Using withCommitId filter when querying
+     * for Changes makes no sense because the result will
+     * always be empty.
+     */
+    public QueryBuilder withCommitId(CommitId commitId) {
+        Validate.argumentIsNotNull(commitId);
+        this.commitId = commitId;
+        return this;
+    }
+
+    /**
+     * delegates to {@link #withCommitId(CommitId)}
+     */
+    public QueryBuilder withCommitId(BigDecimal commitId) {
+        Validate.argumentIsNotNull(commitId);
+        return withCommitId(CommitId.valueOf(commitId));
+    }
+
     protected void addFilter(Filter filter) {
         filters.add(filter);
     }
@@ -247,7 +273,12 @@ public class QueryBuilder {
     }
 
     protected QueryParams getQueryParams() {
-        return QueryParamsBuilder.withLimit(limit).skip(skip).from(from).to(to).build();
+        return QueryParamsBuilder
+            .withLimit(limit)
+            .skip(skip)
+            .from(from).to(to)
+            .commitId(commitId)
+            .build();
     }
 
     public JqlQuery build(){

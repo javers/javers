@@ -170,14 +170,6 @@ public class MongoRepository implements JaversRepository {
         return new BasicDBObject (GLOBAL_ID_KEY, id.value());
     }
 
-    private BasicDBObject createFromQuery(LocalDateTime from) {
-        return new BasicDBObject (COMMIT_DATE, new BasicDBObject("$gte", DateTypeAdapters.serialize(from)));
-    }
-
-    private BasicDBObject createToQuery(LocalDateTime to) {
-        return new BasicDBObject (COMMIT_DATE, new BasicDBObject("$lte", DateTypeAdapters.serialize(to)));
-    }
-
     private BasicDBObject createGlobalIdClassQuery(ManagedType givenClass) {
         String cName = givenClass.getName();
 
@@ -246,12 +238,30 @@ public class MongoRepository implements JaversRepository {
 
     private Bson applyQueryParams(Bson query, QueryParams queryParams) {
         if (queryParams.from().isPresent()) {
-            query = Filters.and(query, createFromQuery(queryParams.from().get()));
+            query = addFromDateFiler(query, queryParams.from().get());
         }
         if (queryParams.to().isPresent()) {
-            query = Filters.and(query, createToQuery(queryParams.to().get()));
+            query = addToDateFilter(query, queryParams.to().get());
+        }
+        if (queryParams.commitId().isPresent()) {
+            query = addCommitIdFilter(query, queryParams.commitId().get());
         }
         return query;
+    }
+
+    private Bson addFromDateFiler(Bson query, LocalDateTime from) {
+        Bson filter = new BasicDBObject(COMMIT_DATE, new BasicDBObject("$gte", DateTypeAdapters.serialize(from)));
+        return Filters.and(query, filter);
+    }
+
+    private Bson addToDateFilter(Bson query, LocalDateTime to) {
+        Bson filter = new BasicDBObject(COMMIT_DATE, new BasicDBObject("$lte", DateTypeAdapters.serialize(to)));
+        return Filters.and(query, filter);
+    }
+
+    private Bson addCommitIdFilter(Bson query, CommitId commitId) {
+        Bson filter = new BasicDBObject(COMMIT_ID, commitId.valueAsNumber().doubleValue());
+        return Filters.and(query, filter);
     }
 
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {
