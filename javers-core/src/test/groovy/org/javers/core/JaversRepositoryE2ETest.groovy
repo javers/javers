@@ -16,6 +16,7 @@ import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.QueryBuilder.byClass
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
@@ -650,35 +651,26 @@ class JaversRepositoryE2ETest extends Specification {
 
     }
 
-    def "should query for Entity snapshot with given commit id in a form of CommitId"() {
+    @Unroll
+    def "should query for Entity snapshot with given commit id"() {
         given:
-        def commits = (0..10).collect{
-            javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
-        }
+        def commits = (0..10).collect { javers.commit("author", new SnapshotEntity(id: 1, intProperty: it)) }
+        def searchedCommitId = commits[7].id
 
         when:
-        def searchedCommitId = commits[7].id
-        def query = byInstanceId(1, SnapshotEntity).withCommitId(searchedCommitId).build()
+        def query = createQuery(searchedCommitId)
         def snapshots = javers.findSnapshots(query)
 
         then:
         snapshots.commitId == [searchedCommitId]
-    }
 
-    def "should query for Entity snapshot with given commit id in a form of BidDecimal"() {
-        given:
-        def commits = (0..10).collect{
-            javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
-        }
-
-        when:
-        def searchedCommitId = commits[7].id
-        def searchedCommitIdAsBidDecimal = searchedCommitId.valueAsNumber()
-        def query = byInstanceId(1, SnapshotEntity).withCommitId(searchedCommitIdAsBidDecimal).build()
-        def snapshots = javers.findSnapshots(query)
-
-        then:
-        snapshots.commitId == [searchedCommitId]
+        where:
+        createQuery << [
+            { commitId -> byClass(SnapshotEntity).withCommitId(commitId).build() },
+            { commitId -> byInstanceId(1, SnapshotEntity).withCommitId(commitId).build() },
+            { commitId -> byClass(SnapshotEntity).withCommitId(commitId.valueAsNumber()).build() },
+            { commitId -> byInstanceId(1, SnapshotEntity).withCommitId(commitId.valueAsNumber()).build() }
+        ]
     }
 
 }
