@@ -30,7 +30,7 @@ public class ClassAnnotationsScan {
 
     public boolean hasEntity() { return hasEntity; }
 
-    public boolean isHasShallowReference() { return hasShallowReference; }
+    public boolean hasShallowReference() { return hasShallowReference; }
 
     public Optional<String> typeName() {
         return typeName;

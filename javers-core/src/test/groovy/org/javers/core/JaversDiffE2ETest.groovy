@@ -4,15 +4,20 @@ import groovy.json.JsonSlurper
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.PropertyChange
+import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.examples.model.Person
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.metamodel.property.Property
+import org.javers.core.model.Category
 import org.javers.core.model.DummyEntityWithEmbeddedId
 import org.javers.core.model.DummyPoint
 import org.javers.core.model.DummyUser
+
 import org.javers.core.model.DummyUserDetails
+import org.javers.core.model.ShallowPhone
 import org.javers.core.model.PrimitiveEntity
+import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
 
 import static org.javers.core.JaversBuilder.javers
@@ -221,5 +226,29 @@ class JaversDiffE2ETest extends Specification {
         changes.count{ it.propertyName == "age" } // == 1
 
         changes.count{ it.propertyName == "stringSet" } // == 1
+    }
+
+    def "should compare ShallowReferences using regular ReferenceChange"() {
+        given:
+        def javers = javers().build()
+        def left =  new SnapshotEntity(id:1, shallowPhone: new ShallowPhone(1))
+        def right = new SnapshotEntity(id:1, shallowPhone: new ShallowPhone(2))
+
+        when:
+        ReferenceChange change = javers.compare(left, right).changes.find{it instanceof  ReferenceChange}
+
+        then:
+        change.left.value() == ShallowPhone.name+"/1"
+        change.right.value() == ShallowPhone.name+"/2"
+    }
+
+    def "should not compare properties when class is mapped as ShallowReference"() {
+        given:
+        def javers = javers().build()
+        def left =  new SnapshotEntity(id:1, shallowPhone: new ShallowPhone(1, "123", new Category(1)))
+        def right = new SnapshotEntity(id:1, shallowPhone: new ShallowPhone(1, "321", new Category(2)))
+
+        expect:
+        javers.compare(left, right).hasChanges() == false
     }
 }

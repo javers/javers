@@ -116,7 +116,7 @@ public class TypeFactory {
         }
 
         ClientsClassDefinitionBuilder builder;
-        if (scan.isHasShallowReference()) {
+        if (scan.hasShallowReference()) {
             builder = createShallowReferenceEntity(javaClass);
         } else if (hasIdProperty(javaClass) || scan.hasEntity()) {
             builder = entityDefinition(javaClass);

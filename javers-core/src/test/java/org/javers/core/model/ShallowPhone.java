@@ -8,22 +8,20 @@ import javax.persistence.Id;
  * @author akrystian
  */
 @ShallowReference
-public class DummyUserPhone {
+public class ShallowPhone {
     @Id
     private Long id;
-
-    private Category category;
     private String number;
+    private Category category;
 
-    public DummyUserPhone(Long id, String number, Category category) {
+    public ShallowPhone(Long id, String number, Category category) {
         this.id = id;
-        this.category = category;
         this.number = number;
+        this.category = category;
     }
 
-    public DummyUserPhone(Long id, String number) {
+    public ShallowPhone(Long id) {
         this.id = id;
-        this.number = number;
     }
 
     public Long getId() {
@@ -33,7 +31,6 @@ public class DummyUserPhone {
     public void setId(Long id) {
         this.id = id;
     }
-
 
     public String getNumber() {
         return number;

@@ -14,18 +14,10 @@ import java.util.Set;
  */
 public class SnapshotEntity {
 
-    public Optional<Integer> getOptionalInteger() {
-        return optionalInteger;
-    }
-
-    public void setOptionalInteger(Optional<Integer> optionalInteger) {
-        this.optionalInteger = optionalInteger;
-    }
-
-    public enum DummyEnum { val1, val2, val3 }
-
     @Id
     private int id = 1;
+
+    public enum DummyEnum { val1, val2, val3 }
 
     private LocalDate dob;
 
@@ -61,8 +53,10 @@ public class SnapshotEntity {
     private Map<String,DummyAddress> mapPrimitiveToVO;
     private Map<String,SnapshotEntity> mapPrimitiveToEntity;
     private Map<SnapshotEntity, SnapshotEntity> mapOfEntities;
-    private Map<Object,Object> polymorficMap;
+    private Map<Object, Object> polymorficMap;
     private Map<String,EnumSet<DummyEnum>> mapOfGenericValues;
+
+    private ShallowPhone shallowPhone;
 
     @Id
     public int getId() {
@@ -300,4 +294,13 @@ public class SnapshotEntity {
     public void setMapOfGenericValues(Map<String,EnumSet<DummyEnum>> mapOfGenericValues) {
         this.mapOfGenericValues = mapOfGenericValues;
     }
+
+    public Optional<Integer> getOptionalInteger() {
+        return optionalInteger;
+    }
+
+    public void setOptionalInteger(Optional<Integer> optionalInteger) {
+        this.optionalInteger = optionalInteger;
+    }
+
 }
