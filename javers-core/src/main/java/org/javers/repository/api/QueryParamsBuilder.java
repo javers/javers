@@ -1,6 +1,7 @@
 package org.javers.repository.api;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.commit.CommitId;
 import org.joda.time.LocalDateTime;
 
 /**
@@ -11,6 +12,7 @@ public class QueryParamsBuilder {
     private int skip;
     private LocalDateTime from;
     private LocalDateTime to;
+    private CommitId commitId;
 
     private QueryParamsBuilder(int limit) {
         this.limit = limit;
@@ -32,11 +34,15 @@ public class QueryParamsBuilder {
         Validate.argumentIsNotNull(queryParams);
 
         QueryParamsBuilder builder = QueryParamsBuilder.withLimit(queryParams.limit());
+        builder.skip(queryParams.skip());
         if (queryParams.from().isPresent()) {
             builder = builder.from(queryParams.from().get());
         }
         if (queryParams.to().isPresent()) {
             builder = builder.to(queryParams.to().get());
+        }
+        if (queryParams.commitId().isPresent()) {
+            builder = builder.commitId(queryParams.commitId().get());
         }
         return builder;
     }
@@ -75,11 +81,19 @@ public class QueryParamsBuilder {
         return this;
     }
 
+    /*
+     * limits results to Snapshot with a given commit id
+     */
+    public QueryParamsBuilder commitId(CommitId commitId) {
+        this.commitId = commitId;
+        return this;
+    }
+
     private static void checkLimit(int limit) {
         Validate.argumentCheck(limit > 0, "Limit is not a positive number.");
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to);
+        return new QueryParams(limit, skip, from, to, commitId);
     }
 }

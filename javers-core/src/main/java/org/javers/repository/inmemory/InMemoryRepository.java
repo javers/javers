@@ -109,14 +109,29 @@ class InMemoryRepository implements JaversRepository {
     }
 
     private List<CdoSnapshot> applyQueryParams(List<CdoSnapshot> snapshots, final QueryParams queryParams){
+        if (queryParams.commitId().isPresent()) {
+            snapshots = filterSnapshotsByCommitId(snapshots, queryParams.commitId().get());
+        }
         if (queryParams.hasDates()) {
-            snapshots = Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
-                public boolean apply(CdoSnapshot snapshot) {
-                    return queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate());
-                }
-            });
+            snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
         }
         return trimResultsToRequestedSlice(snapshots, queryParams.skip(), queryParams.limit());
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByCommitId(List<CdoSnapshot> snapshots, final CommitId commitId) {
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(CdoSnapshot snapshot) {
+                return commitId.equals(snapshot.getCommitId());
+            }
+        });
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByCommitDate(List<CdoSnapshot> snapshots, final QueryParams queryParams) {
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(CdoSnapshot snapshot) {
+                return queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate());
+            }
+        });
     }
 
     private List<CdoSnapshot> trimResultsToRequestedSlice(List<CdoSnapshot> snapshots, int from, int size) {

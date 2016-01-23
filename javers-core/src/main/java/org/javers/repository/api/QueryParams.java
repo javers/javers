@@ -1,6 +1,7 @@
 package org.javers.repository.api;
 
 import org.javers.common.collections.Optional;
+import org.javers.core.commit.CommitId;
 import org.joda.time.LocalDateTime;
 
 /**
@@ -20,12 +21,14 @@ public class QueryParams {
     private final int skip;
     private final Optional<LocalDateTime> from;
     private final Optional<LocalDateTime> to;
+    private final Optional<CommitId> commitId;
 
-    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId) {
         this.limit = limit;
         this.skip = skip;
         this.from = Optional.fromNullable(from);
         this.to = Optional.fromNullable(to);
+        this.commitId = Optional.fromNullable(commitId);
     }
 
     public int limit() {
@@ -51,7 +54,6 @@ public class QueryParams {
         return true;
     }
 
-
     /**
      * filters results to Snapshots created after given date
      */
@@ -66,6 +68,13 @@ public class QueryParams {
         return to;
     }
 
+    /*
+     * filters results to Snapshot with a given commit id
+     */
+    public Optional<CommitId> commitId() {
+        return commitId;
+    }
+
     @Override
     public String toString() {
         return "QueryParams{" +
@@ -73,6 +82,7 @@ public class QueryParams {
                 ", skip=" + skip +
                 ", from=" + from +
                 ", to=" + to +
-                '}';
+                ", commitId=" + commitId +
+                "}";
     }
 }

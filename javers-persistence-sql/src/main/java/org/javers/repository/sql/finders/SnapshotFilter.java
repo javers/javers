@@ -1,6 +1,7 @@
 package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Optional;
+import org.javers.core.commit.CommitId;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.SelectQuery;
@@ -56,6 +57,11 @@ abstract class SnapshotFilter {
     void addToDateCondition(SelectQuery query, LocalDateTime to) {
         query.append(" AND " + COMMIT_COMMIT_DATE + " <= :commitToDate")
             .withArgument("commitToDate", new Timestamp(new Date(to.toDateTime(DateTimeZone.UTC).getMillis())));
+    }
+
+    void addCommitIdCondition(SelectQuery query, CommitId commitId) {
+        query.append(" AND " + COMMIT_COMMIT_ID + " = :commitId")
+            .withArgument("commitId", commitId.valueAsNumber());
     }
 
     void addFrom(SelectQuery query) {
