@@ -151,7 +151,7 @@ public class TypeMapper {
         } else {
             throw new JaversException(JaversExceptionCode.MANAGED_CLASS_MAPPING_ERROR,
                     javaClass,
-                    mType.getName(),
+                    mType.getClass().getSimpleName(),
                     expectedType.getSimpleName());
         }
     }
