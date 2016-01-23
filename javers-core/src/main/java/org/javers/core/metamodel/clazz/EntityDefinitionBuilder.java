@@ -20,6 +20,7 @@ import org.javers.common.validation.Validate;
  */
 public class EntityDefinitionBuilder extends ClientsClassDefinitionBuilder<EntityDefinitionBuilder>{
     private Optional<String> idPropertyName = Optional.empty();
+    private boolean shallowReference;
 
     EntityDefinitionBuilder(Class<?> entity) {
         super(entity);
@@ -35,6 +36,11 @@ public class EntityDefinitionBuilder extends ClientsClassDefinitionBuilder<Entit
         return this;
     }
 
+    public EntityDefinitionBuilder withShallowReference(){
+        this.shallowReference = true;
+        return this;
+    }
+
     @Override
     public EntityDefinition build() {
         return new EntityDefinition(this);
@@ -42,5 +48,9 @@ public class EntityDefinitionBuilder extends ClientsClassDefinitionBuilder<Entit
 
     public Optional<String> getIdPropertyName() {
         return idPropertyName;
+    }
+
+    public boolean isShallowReference() {
+        return shallowReference;
     }
 }

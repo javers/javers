@@ -30,6 +30,11 @@ class JaversAnnotationsNamesSpace implements AnnotationsNameSpace {
     }
 
     @Override
+    public Set<String> getShallowReferenceAliases() {
+        return Sets.asSet(ShallowReference.class.getSimpleName());
+    }
+
+    @Override
     public Set<String> getTypeNameAliases() {
         return Sets.asSet(TypeName.class.getSimpleName());
     }

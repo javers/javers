@@ -3,15 +3,15 @@ package org.javers.core.metamodel.property
 /**
  * @author pawel szymczyk
  */
-class PropertiesAssert {
-    private List<Property> actual
+class PropertyScanAssert {
+    private PropertyScan actual
 
-    private PropertiesAssert(List<Property> actual) {
+    private PropertyScanAssert(PropertyScan actual) {
         this.actual = actual
     }
 
-    static PropertiesAssert assertThat(List<Property> actual) {
-        new PropertiesAssert(actual)
+    static PropertyScanAssert assertThat(PropertyScan actual) {
+        new PropertyScanAssert(actual)
     }
 
     PropertyAssert hasProperty(String withName) {
@@ -26,7 +26,7 @@ class PropertiesAssert {
     }
 
     Property getProperty(String withName) {
-        def found = actual.grep{it.name == withName}
+        def found = actual.properties.grep{it.name == withName}
         assert found.size() <= 1
         found.size() == 1 ? found[0] : null
     }

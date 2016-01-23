@@ -19,7 +19,7 @@ class BeanBasedPropertyScanner implements PropertyScanner {
     }
 
     @Override
-    public List<Property> scan(Class<?> managedClass) {
+    public PropertyScan scan(Class<?> managedClass) {
         List<JaversMethod> getters = ReflectionUtil.findAllPersistentGetters(managedClass);
         List<Property> beanProperties = new ArrayList<>();
 
@@ -29,6 +29,6 @@ class BeanBasedPropertyScanner implements PropertyScanner {
 
             beanProperties.add(new Property(getter, hasTransientAnn));
         }
-        return beanProperties;
+        return new PropertyScan(beanProperties);
     }
 }

@@ -9,7 +9,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static org.javers.core.metamodel.property.PropertiesAssert.assertThat
+import static PropertyScanAssert.assertThat
 
 /**
  * @author pawel szymczyk

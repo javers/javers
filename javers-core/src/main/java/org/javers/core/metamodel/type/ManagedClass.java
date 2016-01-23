@@ -4,9 +4,7 @@ import org.javers.common.collections.Predicate;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
-
 import java.util.*;
-
 import static org.javers.common.exception.JaversExceptionCode.PROPERTY_NOT_FOUND;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -19,23 +17,20 @@ class ManagedClass {
     private final Class<?> baseJavaClass;
     private final Map<String, Property> propertiesByName;
     private final List<Property> managedProperties;
-    private final List<Property> transientAnnProperties;
+    private final List<Property> looksLikeId;
 
-    ManagedClass(Class baseJavaClass, List<Property> allProperties) {
-        argumentsAreNotNull(allProperties);
+    ManagedClass(Class baseJavaClass, List<Property> allProperties, List<Property> looksLikeId) {
+        argumentsAreNotNull(baseJavaClass, allProperties, looksLikeId);
 
         this.baseJavaClass = baseJavaClass;
         this.managedProperties = new ArrayList<>();
-        this.transientAnnProperties = new ArrayList<>();
         this.propertiesByName = new HashMap<>();
+        this.looksLikeId = looksLikeId;
 
         for (Property property : allProperties) {
-            if (property.isHasTransientAnn()){
-                this.transientAnnProperties.add(property);
-            }else {
+            if (!property.hasTransientAnn()){
                 this.managedProperties.add(property);
             }
-
             propertiesByName.put(property.getName(),property);
         }
     }
@@ -43,8 +38,12 @@ class ManagedClass {
     /**
      * returns all managed properties
      */
-    List<Property> getProperties() {
+    List<Property> getManagedProperties() {
         return Collections.unmodifiableList(managedProperties);
+    }
+
+    List<Property> getLooksLikeId() {
+        return Collections.unmodifiableList(looksLikeId);
     }
 
     Set<String> getPropertyNames(){
@@ -54,7 +53,7 @@ class ManagedClass {
     /**
      * returns managed properties subset
      */
-    List<Property> getProperties(Predicate<Property> query) {
+    List<Property> getManagedProperties(Predicate<Property> query) {
         List<Property> retProperties = new ArrayList<>();
 
         for (Property property : managedProperties) {

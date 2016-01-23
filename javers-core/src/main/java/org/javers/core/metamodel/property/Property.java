@@ -65,7 +65,7 @@ public class Property {
         return member.propertyName();
     }
 
-    public boolean isHasTransientAnn() {
+    public boolean hasTransientAnn() {
         return hasTransientAnn;
     }
 

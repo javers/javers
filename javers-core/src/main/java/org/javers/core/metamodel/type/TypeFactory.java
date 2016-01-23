@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import java.lang.reflect.Type;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
-import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -21,8 +20,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class TypeFactory {
     private static final Logger logger = getLogger(TypeFactory.class);
 
-    private PropertyScanner propertyScanner;
-    private ClassAnnotationsScanner classAnnotationsScanner;
+    private final PropertyScanner propertyScanner;
+    private final ClassAnnotationsScanner classAnnotationsScanner;
     private final ManagedClassFactory managedClassFactory;
 
     public TypeFactory(ManagedClassFactory managedClassFactory, ClassAnnotationsScanner classAnnotationsScanner, PropertyScanner propertyScanner) {
@@ -46,16 +45,20 @@ public class TypeFactory {
     }
 
     EntityType createEntity(Class<?> javaType) {
-        return (EntityType) create(new EntityDefinition(javaType));
+        return createEntity(new EntityDefinition(javaType));
     }
 
-    ValueObjectType createValueObject(ValueObjectDefinition definition) {
-        ManagedClass managedClass = managedClassFactory.create(definition);
-        return new ValueObjectType(managedClass, definition.getTypeName());
+    private ValueObjectType createValueObject(ValueObjectDefinition definition) {
+        return new ValueObjectType(managedClassFactory.create(definition), definition.getTypeName());
     }
 
-    EntityType createEntity(EntityDefinition definition) {
-        ManagedClass managedClass = managedClassFactory.create(definition);
+    private EntityType createEntity(EntityDefinition definition) {
+        ManagedClass managedClass;
+        if (definition.isShallowReference()){
+            managedClass = managedClassFactory.createShallowReferenceManagedClass(definition);
+        } else {
+            managedClass = managedClassFactory.create(definition);
+        }
 
         if (definition.hasCustomId()) {
             Property idProperty = managedClass.getProperty(definition.getIdPropertyName());
@@ -63,9 +66,9 @@ public class TypeFactory {
         } else {
             return new EntityType(managedClass, Optional.<Property>empty(), definition.getTypeName());
         }
-
     }
-    JaversType infer(Type javaType, Optional<JaversType> prototype){
+
+    JaversType infer(Type javaType, Optional<JaversType> prototype) {
         JaversType jType;
 
         if (prototype.isPresent()) {
@@ -96,7 +99,7 @@ public class TypeFactory {
         if (prototype instanceof ManagedType) {
             ManagedClass managedClass = managedClassFactory.create(javaClass);
             ClassAnnotationsScan scan = classAnnotationsScanner.scan(javaClass);
-            return ((ManagedType)prototype).spawn(managedClass, scan.typeName());
+            return ((ManagedType) prototype).spawn(managedClass, scan.typeName());
         }
         else {
             return prototype.spawn(javaType); //delegate to simple constructor
@@ -112,9 +115,11 @@ public class TypeFactory {
         }
 
         ClientsClassDefinitionBuilder builder;
-
-        if (hasIdProperty(javaClass) || scan.hasEntity()){
-            builder = entityDefinition(javaClass);
+        if (hasIdProperty(javaClass) || scan.hasEntity()) {
+            builder = EntityDefinitionBuilder.entityDefinition(javaClass);
+            if (scan.hasShallowReference()) {
+                ((EntityDefinitionBuilder)builder).withShallowReference();
+            }
         } else {
             builder = ValueObjectDefinitionBuilder.valueObjectDefinition(javaClass);
         }
@@ -127,12 +132,6 @@ public class TypeFactory {
     }
 
     private boolean hasIdProperty(Class<?> javaClass) {
-        for (Property property : propertyScanner.scan(javaClass))  {
-            if (property.looksLikeId()) {
-                return true;
-            }
-        }
-        return false;
+        return propertyScanner.scan(javaClass).hasId();
     }
 }
-

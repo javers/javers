@@ -6,7 +6,6 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.property.Property;
 
@@ -117,11 +116,9 @@ public class EntityType extends ManagedType {
      * @throws JaversException ENTITY_WITHOUT_ID
      */
     private Property findDefaultIdProperty() {
-        for (Property p : getProperties()) {
-            if (p.looksLikeId()) {
-                return p;
-            }
+        if (getManagedClass().getLooksLikeId().isEmpty()) {
+            throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID, getName());
         }
-        throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID, getName());
+        return getManagedClass().getLooksLikeId().get(0);
     }
 }

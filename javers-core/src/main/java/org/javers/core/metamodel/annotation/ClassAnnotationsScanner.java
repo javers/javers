@@ -3,6 +3,11 @@ package org.javers.core.metamodel.annotation;
 import org.javers.common.collections.Optional;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.javers.core.metamodel.clazz.ValueDefinition;
+import org.javers.core.metamodel.clazz.ValueObjectDefinition;
+
 import java.lang.annotation.Annotation;
 
 /**
@@ -31,6 +36,7 @@ public class ClassAnnotationsScanner {
         boolean hasValue = false;
         boolean hasValueObject = false;
         boolean hasEntity = false;
+        boolean hasShallowReference = false;
 
         //scan class level annotations
         for (Annotation ann : javaClass.getAnnotations()) {
@@ -40,11 +46,16 @@ public class ClassAnnotationsScanner {
             if (annotationNamesProvider.isValueAlias(ann)) {
                 hasValue = true;
             }
+
+            if (annotationNamesProvider.isShallowReferenceAlias(ann)) {
+                hasShallowReference = true;
+            }
+
             if (annotationNamesProvider.isValueObjectAlias(ann)) {
                 hasValueObject = true;
             }
         }
 
-        return new ClassAnnotationsScan(hasValue, hasValueObject, hasEntity, typeName);
+        return new ClassAnnotationsScan(hasValue, hasValueObject, hasEntity, hasShallowReference, typeName);
     }
 }
