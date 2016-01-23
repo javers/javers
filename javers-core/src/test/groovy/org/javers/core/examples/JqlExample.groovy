@@ -193,6 +193,31 @@ class JqlExample extends Specification {
       }
     }
 
+    def "should query for snapshots with commitId filter"(){
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        javers.commit( "author", new Employee(name:"bob", age:29, salary: 900) )
+        def secondCommit =
+            javers.commit( "author", new Employee(name:"bob", age:30, salary: 1000) )
+        javers.commit( "author", new Employee(name:"bob", age:31, salary: 1100) )
+
+        when:
+        def snapshots = javers
+            .findSnapshots( QueryBuilder.byInstanceId("bob", Employee.class)
+            .withCommitId(secondCommit.id).build() )
+
+        then:
+        assert snapshots.size() == 1
+
+        println "found snapshots:"
+        snapshots.each {
+            println "commit ${it.commitMetadata.id}: ${it} (" +
+                "age: ${it.getPropertyValue('age')}, " +
+                "salary: ${it.getPropertyValue('salary')})"
+        }
+    }
+
     def "should query for changes with NewObject filter"() {
         given:
         def javers = JaversBuilder.javers().build()
