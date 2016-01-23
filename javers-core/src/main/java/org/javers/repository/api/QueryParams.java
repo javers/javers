@@ -69,7 +69,7 @@ public class QueryParams {
     }
 
     /*
-     * filters results to Snapshot with a given commit id
+     * filters results to Snapshots with a given commitId
      */
     public Optional<CommitId> commitId() {
         return commitId;

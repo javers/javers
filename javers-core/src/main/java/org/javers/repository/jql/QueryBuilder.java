@@ -243,7 +243,7 @@ public class QueryBuilder {
 
     /**
      * Limits Snapshots to be fetched from JaversRepository
-     * to that with a given commit id.
+     * to those with a given commitId.
      * <br/><br/>
      *
      * <b>Warning!</b> Using withCommitId filter when querying

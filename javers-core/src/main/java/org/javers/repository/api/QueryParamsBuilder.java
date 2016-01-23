@@ -82,7 +82,7 @@ public class QueryParamsBuilder {
     }
 
     /*
-     * limits results to Snapshot with a given commit id
+     * limits results to Snapshots with a given commitId
      */
     public QueryParamsBuilder commitId(CommitId commitId) {
         this.commitId = commitId;
