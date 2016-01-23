@@ -6,8 +6,6 @@ package org.javers.common.exception;
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 public enum JaversExceptionCode {
-    SHALLOW_REFERENCE_WITHOUT_ID (JaversException.BOOTSTRAP_ERROR + "Class '%s' mapped as ShallowReference Entity has no Id property. Use @Id annotation to mark unique and not-null ShallowReference Entity identifier"),
-
     CLASS_EXTRACTION_ERROR(JaversException.BOOTSTRAP_ERROR + "Don't know how to extract Class from type '%s'.") ,
 
     COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED("Committing top-level %ss like '%s' is not supported. You can commit only Entity or ValueObject instance."),
