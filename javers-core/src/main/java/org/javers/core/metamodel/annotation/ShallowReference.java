@@ -7,9 +7,13 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Use ShallowReference to mark certain classes to be
- * compare only by {@link Id} (would stop building object graph from it).
+ * Use ShallowReference to mark certain Entities as compared only by Id.
  * <br/><br/>
+ *
+ * When ShallowReference is enabled for given Entity,
+ * all its properties except idProperty are ignored.
+ * <br/>
+ * It stops building Object Graph from objects of this Entity.
  *
  * @author akrystian
  */

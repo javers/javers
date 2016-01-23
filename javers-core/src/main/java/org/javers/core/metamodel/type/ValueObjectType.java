@@ -3,6 +3,7 @@ package org.javers.core.metamodel.type;
 import org.javers.common.collections.Optional;
 import org.javers.core.metamodel.property.Property;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,9 +35,8 @@ public class ValueObjectType extends ManagedType{
     }
 
     public ValueObjectType(Class baseJavaClass, List<Property> allProperties){
-        this(new ManagedClass(baseJavaClass, allProperties));
+        this(new ManagedClass(baseJavaClass, allProperties, Collections.<Property>emptyList()));
     }
-
 
     ValueObjectType(ManagedClass valueObject, Optional<String> typeName) {
         super(valueObject, typeName);

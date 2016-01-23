@@ -1,8 +1,6 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.annotation.ClassAnnotationsScan;
 import org.javers.core.metamodel.annotation.ClassAnnotationsScanner;
@@ -12,11 +10,8 @@ import org.javers.core.metamodel.property.PropertyScanner;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
-import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -25,8 +20,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class TypeFactory {
     private static final Logger logger = getLogger(TypeFactory.class);
 
-    private PropertyScanner propertyScanner;
-    private ClassAnnotationsScanner classAnnotationsScanner;
+    private final PropertyScanner propertyScanner;
+    private final ClassAnnotationsScanner classAnnotationsScanner;
     private final ManagedClassFactory managedClassFactory;
 
     public TypeFactory(ManagedClassFactory managedClassFactory, ClassAnnotationsScanner classAnnotationsScanner, PropertyScanner propertyScanner) {
@@ -50,16 +45,20 @@ public class TypeFactory {
     }
 
     EntityType createEntity(Class<?> javaType) {
-        return (EntityType) create(new EntityDefinition(javaType));
+        return createEntity(new EntityDefinition(javaType));
     }
 
-    ValueObjectType createValueObject(ValueObjectDefinition definition) {
-        ManagedClass managedClass = managedClassFactory.create(definition);
-        return new ValueObjectType(managedClass, definition.getTypeName());
+    private ValueObjectType createValueObject(ValueObjectDefinition definition) {
+        return new ValueObjectType(managedClassFactory.create(definition), definition.getTypeName());
     }
 
-    EntityType createEntity(EntityDefinition definition) {
-        ManagedClass managedClass = managedClassFactory.create(definition);
+    private EntityType createEntity(EntityDefinition definition) {
+        ManagedClass managedClass;
+        if (definition.isShallowReference()){
+            managedClass = managedClassFactory.createShallowReferenceManagedClass(definition);
+        } else {
+            managedClass = managedClassFactory.create(definition);
+        }
 
         if (definition.hasCustomId()) {
             Property idProperty = managedClass.getProperty(definition.getIdPropertyName());
@@ -67,8 +66,8 @@ public class TypeFactory {
         } else {
             return new EntityType(managedClass, Optional.<Property>empty(), definition.getTypeName());
         }
-
     }
+
     JaversType infer(Type javaType, Optional<JaversType> prototype) {
         JaversType jType;
 
@@ -116,10 +115,11 @@ public class TypeFactory {
         }
 
         ClientsClassDefinitionBuilder builder;
-        if (scan.hasShallowReference()) {
-            builder = createShallowReferenceEntity(javaClass);
-        } else if (hasIdProperty(javaClass) || scan.hasEntity()) {
-            builder = entityDefinition(javaClass);
+        if (hasIdProperty(javaClass) || scan.hasEntity()) {
+            builder = EntityDefinitionBuilder.entityDefinition(javaClass);
+            if (scan.hasShallowReference()) {
+                ((EntityDefinitionBuilder)builder).withShallowReference();
+            }
         } else {
             builder = ValueObjectDefinitionBuilder.valueObjectDefinition(javaClass);
         }
@@ -131,42 +131,7 @@ public class TypeFactory {
         return create(builder.build());
     }
 
-    private ClientsClassDefinitionBuilder createShallowReferenceEntity(Class javaClass) {
-        Property idProperty = findIdProperty(javaClass);
-        if (idProperty == null) {
-            throw new JaversException(JaversExceptionCode.SHALLOW_REFERENCE_WITHOUT_ID, javaClass.getName());
-        }
-        return entityDefinition(javaClass)
-                .withIdPropertyName(idProperty.getName())
-                .withIgnoredProperties(getPropertyNamesWithoutIdProperty(javaClass));
-    }
-
     private boolean hasIdProperty(Class<?> javaClass) {
-        for (Property property : propertyScanner.scan(javaClass))  {
-            if (property.looksLikeId()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Property findIdProperty(Class<?> javaClass) {
-        for (Property property : propertyScanner.scan(javaClass)) {
-            if (property.looksLikeId()) {
-                return property;
-            }
-        }
-        return null;
-    }
-
-    private List<String> getPropertyNamesWithoutIdProperty(Class<?> javaClass) {
-        List<String> propertiesNames = new ArrayList<>();
-        for (Property property : propertyScanner.scan(javaClass)) {
-            if (!property.looksLikeId()) {
-                propertiesNames.add(property.getName());
-            }
-        }
-        return propertiesNames;
+        return propertyScanner.scan(javaClass).hasId();
     }
 }
-
