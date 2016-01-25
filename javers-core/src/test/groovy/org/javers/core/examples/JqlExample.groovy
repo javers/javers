@@ -197,7 +197,7 @@ class JqlExample extends Specification {
         given:
         def javers = JaversBuilder.javers().build()
 
-        javers.commit( "author", new Employee(name:"bob", age: 29, salary:900) )
+        javers.commit( "author", new Employee(name:"bob", age:29, salary:900) )
         def secondCommit = javers.commit( "author", new Employee(name:"bob", age:30, salary:1000) )
         javers.commit( "author", new Employee(name:"bob", age:31, salary:1100) )
 
@@ -211,7 +211,7 @@ class JqlExample extends Specification {
 
         println "found snapshot:"
         with (snapshots[0]) {
-            println "commit ${commitMetadata.id}: (" +
+            println "commit ${commitMetadata.id}: $globalId (" +
                 "age: ${getPropertyValue('age')}, " +
                 "salary: ${getPropertyValue('salary')})"
         }
