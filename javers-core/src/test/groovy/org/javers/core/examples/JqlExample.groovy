@@ -197,10 +197,9 @@ class JqlExample extends Specification {
         given:
         def javers = JaversBuilder.javers().build()
 
-        javers.commit( "author", new Employee(name:"bob", age:29, salary: 900) )
-        def secondCommit =
-            javers.commit( "author", new Employee(name:"bob", age:30, salary: 1000) )
-        javers.commit( "author", new Employee(name:"bob", age:31, salary: 1100) )
+        javers.commit( "author", new Employee(name:"bob", age: 9, salary:900) )
+        def secondCommit = javers.commit( "author", new Employee(name:"bob", age:30, salary:1000) )
+        javers.commit( "author", new Employee(name:"bob", age:31, salary:1100) )
 
         when:
         def snapshots = javers
@@ -210,11 +209,11 @@ class JqlExample extends Specification {
         then:
         assert snapshots.size() == 1
 
-        println "found snapshots:"
-        snapshots.each {
-            println "commit ${it.commitMetadata.id}: ${it} (" +
-                "age: ${it.getPropertyValue('age')}, " +
-                "salary: ${it.getPropertyValue('salary')})"
+        println "found snapshot:"
+        with (snapshots[0]) {
+            println "commit ${commitMetadata.id}: (" +
+                "age: ${getPropertyValue('age')}, " +
+                "salary: ${getPropertyValue('salary')})"
         }
     }
 
