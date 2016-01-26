@@ -47,6 +47,7 @@ public class MongoRepository implements JaversRepository {
     public static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
     public static final String GLOBAL_ID_FRAGMENT = "globalId.fragment";
     public static final String GLOBAL_ID_VALUE_OBJECT = "globalId.valueObject";
+    public static final String SNAPSHOT_VERSION = "version";
     public static final String CHANGED_PROPERTIES = "changedProperties";
     public static final String OBJECT_ID = "_id";
 
@@ -246,6 +247,9 @@ public class MongoRepository implements JaversRepository {
         if (queryParams.commitId().isPresent()) {
             query = addCommitIdFilter(query, queryParams.commitId().get());
         }
+        if (queryParams.version().isPresent()) {
+            query = addVersionFilter(query, queryParams.version().get());
+        }
         return query;
     }
 
@@ -261,6 +265,11 @@ public class MongoRepository implements JaversRepository {
 
     private Bson addCommitIdFilter(Bson query, CommitId commitId) {
         Bson filter = new BasicDBObject(COMMIT_ID, commitId.valueAsNumber().doubleValue());
+        return Filters.and(query, filter);
+    }
+
+    private Bson addVersionFilter(Bson query, Long version) {
+        Bson filter = new BasicDBObject(SNAPSHOT_VERSION, version);
         return Filters.and(query, filter);
     }
 

@@ -112,6 +112,9 @@ class InMemoryRepository implements JaversRepository {
         if (queryParams.commitId().isPresent()) {
             snapshots = filterSnapshotsByCommitId(snapshots, queryParams.commitId().get());
         }
+        if (queryParams.version().isPresent()) {
+            snapshots = filterSnapshotsByVersion(snapshots, queryParams.version().get());
+        }
         if (queryParams.hasDates()) {
             snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
         }
@@ -122,6 +125,14 @@ class InMemoryRepository implements JaversRepository {
         return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
             public boolean apply(CdoSnapshot snapshot) {
                 return commitId.equals(snapshot.getCommitId());
+            }
+        });
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByVersion(List<CdoSnapshot> snapshots, final Long version) {
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(CdoSnapshot snapshot) {
+                return version == snapshot.getVersion();
             }
         });
     }

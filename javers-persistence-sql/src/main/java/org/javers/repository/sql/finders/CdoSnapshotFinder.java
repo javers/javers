@@ -96,6 +96,9 @@ public class CdoSnapshotFinder {
         if (queryParams.commitId().isPresent()) {
             snapshotFilter.addCommitIdCondition(query, queryParams.commitId().get());
         }
+        if (queryParams.version().isPresent()) {
+            snapshotFilter.addVersionCondition(query, queryParams.version().get());
+        }
         query.orderBy(SNAPSHOT_PK, Order.DESC).limit(queryParams.limit(), queryParams.skip());
 
         return polyJDBC.queryRunner().queryList(query, new CdoSnapshotObjectMapper(jsonConverter, providedGlobalId));
