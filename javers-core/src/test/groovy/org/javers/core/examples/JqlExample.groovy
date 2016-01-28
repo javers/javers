@@ -14,9 +14,6 @@ import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
 import spock.lang.Specification
 
-import static org.javers.repository.jql.QueryBuilder.byClass
-import static org.javers.repository.jql.QueryBuilder.byInstanceId
-
 /**
  * @author bartosz.walacik
  */
@@ -216,13 +213,7 @@ class JqlExample extends Specification {
         assert snapshots[0].getPropertyValue("age") == 22
 
         println "found snapshot:"
-        with (snapshots[0]) {
-            println "commit ${commitMetadata.id}: " +
-                "id:$globalId, " +
-                "ver:${version} (" +
-                "age: ${getPropertyValue('age')}, " +
-                "salary: ${getPropertyValue('salary')})"
-        }
+        println snapshots[0]
     }
 
     def "should query for snapshots with version filter"(){
@@ -240,19 +231,12 @@ class JqlExample extends Specification {
                 .withVersion(4).build() )
 
         then:
-        snapshots.size() == 1
-        snapshots[0].getPropertyValue("age") == 24
+        assert snapshots.size() == 1
+        assert snapshots[0].getPropertyValue("age") == 24
 
         println "found snapshot:"
-        with (snapshots[0]) {
-            println "commit ${commitMetadata.id}: " +
-                    "id:$globalId, " +
-                    "ver:${version} (" +
-                    "age: ${getPropertyValue('age')}, " +
-                    "salary: ${getPropertyValue('salary')})"
-        }
+        println snapshots[0]
     }
-
 
     def "should query for changes with NewObject filter"() {
         given:
