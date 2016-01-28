@@ -37,6 +37,7 @@ public class QueryBuilder {
     private LocalDateTime to;
     private boolean newObjectChanges;
     private CommitId commitId;
+    private Long version;
     private final List<Filter> filters = new ArrayList<>();
 
     private QueryBuilder(Filter initialFilter) {
@@ -264,6 +265,21 @@ public class QueryBuilder {
         return withCommitId(CommitId.valueOf(commitId));
     }
 
+    /**
+     * Limits Snapshots to be fetched from JaversRepository
+     * to those with a given version.
+     * <br/><br/>
+     *
+     * <b>Warning!</b> Using withVersion filter when querying
+     * for Changes makes no sense because the result will
+     * always be empty.
+     */
+    public QueryBuilder withVersion(long version) {
+        Validate.argumentCheck(version > 0, "Version is not a positive number.");
+        this.version = version;
+        return this;
+    }
+
     protected void addFilter(Filter filter) {
         filters.add(filter);
     }
@@ -278,6 +294,7 @@ public class QueryBuilder {
             .skip(skip)
             .from(from).to(to)
             .commitId(commitId)
+            .version(version)
             .build();
     }
 

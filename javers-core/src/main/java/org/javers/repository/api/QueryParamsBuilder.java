@@ -13,6 +13,7 @@ public class QueryParamsBuilder {
     private LocalDateTime from;
     private LocalDateTime to;
     private CommitId commitId;
+    private Long version;
 
     private QueryParamsBuilder(int limit) {
         this.limit = limit;
@@ -89,11 +90,19 @@ public class QueryParamsBuilder {
         return this;
     }
 
+    /*
+     * limits results to Snapshots with a given version
+     */
+    public QueryParamsBuilder version(Long version) {
+        this.version = version;
+        return this;
+    }
+
     private static void checkLimit(int limit) {
         Validate.argumentCheck(limit > 0, "Limit is not a positive number.");
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to, commitId);
+        return new QueryParams(limit, skip, from, to, commitId, version);
     }
 }

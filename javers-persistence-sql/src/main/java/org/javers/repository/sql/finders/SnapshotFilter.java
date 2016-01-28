@@ -64,6 +64,11 @@ abstract class SnapshotFilter {
             .withArgument("commitId", commitId.valueAsNumber());
     }
 
+    void addVersionCondition(SelectQuery query, Long version) {
+        query.append(" AND " + SNAPSHOT_VERSION + " = :version")
+            .withArgument("version", version);
+    }
+
     void addFrom(SelectQuery query) {
         query.from(COMMIT_WITH_SNAPSHOT);
     }
