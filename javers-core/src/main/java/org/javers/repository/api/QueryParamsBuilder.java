@@ -45,6 +45,9 @@ public class QueryParamsBuilder {
         if (queryParams.commitId().isPresent()) {
             builder = builder.commitId(queryParams.commitId().get());
         }
+        if (queryParams.version().isPresent()) {
+            builder = builder.version(queryParams.version().get());
+        }
         return builder;
     }
 
