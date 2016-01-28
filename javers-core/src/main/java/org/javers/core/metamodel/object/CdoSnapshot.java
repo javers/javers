@@ -144,4 +144,15 @@ public final class CdoSnapshot extends Cdo {
     public long getVersion() {
         return version;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+            .append("commit ").append(getCommitMetadata().getId()).append(": ")
+            .append("id:").append(getGlobalId()).append(", ")
+            .append("version:").append(getVersion()).append(", ")
+            .append(getState());
+        return stringBuilder.toString();
+    }
 }

@@ -109,4 +109,23 @@ public class CdoSnapshotState {
     public int hashCode() {
         return properties.hashCode();
     }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("(");
+        String prefix = "";
+        for (String propertyKey : getSortedPropertyKeys()) {
+            stringBuilder.append(prefix).append(propertyKey).append(":").append(getPropertyValue(propertyKey));
+            prefix = ", ";
+        }
+        stringBuilder.append(")");
+        return stringBuilder.toString();
+    }
+
+    private List<String> getSortedPropertyKeys() {
+        List<String> propertyList = new ArrayList<>(properties.keySet());
+        Collections.sort(propertyList);
+        return propertyList;
+    }
 }
