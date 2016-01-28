@@ -676,7 +676,7 @@ class JaversRepositoryE2ETest extends Specification {
     @Unroll
     def "should query for Entity snapshot with given version"() {
         given:
-        (1..10).collect { javers.commit("author", new SnapshotEntity(id: 1, intProperty: it)) }
+        (1..10).each { javers.commit("author", new SnapshotEntity(id: 1, intProperty: it)) }
 
         when:
         def snapshots = javers.findSnapshots(query)
