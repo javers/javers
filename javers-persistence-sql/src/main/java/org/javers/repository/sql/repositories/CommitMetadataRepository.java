@@ -47,7 +47,7 @@ public class CommitMetadataRepository {
     }
 
     private Timestamp toTimestamp(LocalDateTime commitMetadata) {
-        return new Timestamp(commitMetadata.toDate(TimeZone.getTimeZone("UTC")));
+        return new Timestamp(commitMetadata.toDate());
     }
 
     public CommitId getCommitHeadId() {
