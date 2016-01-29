@@ -692,4 +692,18 @@ class JaversRepositoryE2ETest extends Specification {
         ]
     }
 
+    def "should serialize and deserialize commitDate as local datetime"(){
+        given:
+        def now = new LocalDateTime()
+        fakeDateProvider.set( now )
+        println now
+
+        when:
+        javers.commit("author", new SnapshotEntity(id: 1))
+        def snapshots = javers.findSnapshots(byClass(SnapshotEntity).build())
+        println snapshots[0].commitMetadata.commitDate
+
+        then:
+        snapshots[0].commitMetadata.commitDate == now
+    }
 }

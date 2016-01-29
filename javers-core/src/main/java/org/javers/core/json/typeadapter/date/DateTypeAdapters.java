@@ -26,6 +26,10 @@ public class DateTypeAdapters {
         return ISO_DATE_TIME_FORMATTER.print(date);
     }
 
+    public static String serializeToLocal(java.util.Date date) {
+        return serialize(new DateTime(date.getTime()));
+    }
+
     public static String serialize(java.util.Date date) {
         return serialize(new DateTime(date.getTime(), DateTimeZone.UTC));
     }
