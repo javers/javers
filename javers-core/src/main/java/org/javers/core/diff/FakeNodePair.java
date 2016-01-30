@@ -43,7 +43,7 @@ class FakeNodePair implements NodePair {
 
     @Override
     public Object getLeftPropertyValue(Property property) {
-        return Defaults.defaultValue(property.getType());
+        return Defaults.defaultValue(property.getGenericType());
     }
 
     @Override

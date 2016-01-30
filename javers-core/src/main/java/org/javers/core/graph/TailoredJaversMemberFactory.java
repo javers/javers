@@ -16,6 +16,6 @@ abstract class TailoredJaversMemberFactory {
      protected abstract JaversMember create(Property primaryProperty, Class<?> genericItemClass);
 
      protected ParameterizedType parametrizedType(Property property, Class<?> itemClass) {
-          return new ParametrizedDehydratedType(property.getType(), Lists.asList((Type) itemClass));
+          return new ParametrizedDehydratedType(property.getRawType(), Lists.asList((Type) itemClass));
      }
 }

@@ -71,7 +71,7 @@ class ReflectionUtilTest extends Specification {
         def member = action.call()
 
         then:
-        member.genericType == new TypeToken<List<String>>(){}.type
+        member.genericResolvedType == new TypeToken<List<String>>(){}.type
 
         println member
 

@@ -21,8 +21,8 @@ class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
         JsonObject jsonObject = (JsonObject) json;
         PropertyChangeStub stub = deserializeStub(jsonObject, context);
 
-        Object leftValue  = context.deserialize(jsonObject.get(LEFT_VALUE_FIELD),  stub.property.getType());
-        Object rightValue = context.deserialize(jsonObject.get(RIGHT_VALUE_FIELD), stub.property.getType());
+        Object leftValue  = context.deserialize(jsonObject.get(LEFT_VALUE_FIELD),  stub.property.getGenericType());
+        Object rightValue = context.deserialize(jsonObject.get(RIGHT_VALUE_FIELD), stub.property.getGenericType());
 
         return appendCommitMetadata(jsonObject, context, new ValueChange(stub.id, stub.getPropertyName(), leftValue, rightValue));
     }

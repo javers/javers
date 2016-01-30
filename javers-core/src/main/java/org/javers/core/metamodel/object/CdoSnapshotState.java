@@ -30,7 +30,7 @@ public class CdoSnapshotState {
         Validate.argumentIsNotNull(property);
         Object val = properties.get(property.getName());
         if (val == null){
-            return Defaults.defaultValue(property.getType());
+            return Defaults.defaultValue(property.getGenericType());
         }
         return val;
     }

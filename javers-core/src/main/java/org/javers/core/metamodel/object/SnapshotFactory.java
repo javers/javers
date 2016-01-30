@@ -73,7 +73,7 @@ public class SnapshotFactory {
 
         for (Property property : cdoWrapper.getManagedType().getProperties()) {
             Object propertyVal = cdoWrapper.getPropertyValue(property.getName());
-            if (Objects.equals(propertyVal, Defaults.defaultValue(property.getType()))) {
+            if (Objects.equals(propertyVal, Defaults.defaultValue(property.getGenericType()))) {
                 continue;
             }
             snapshotBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, cdoWrapper.getGlobalId()));

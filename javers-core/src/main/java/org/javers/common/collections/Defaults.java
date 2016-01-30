@@ -2,6 +2,7 @@ package org.javers.common.collections;
 
 import org.javers.common.validation.Validate;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,9 +39,9 @@ public final class Defaults {
      * {@code void}, null is returned.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T defaultValue(Class<T> type) {
+    public static Object defaultValue(Type type) {
         Validate.argumentIsNotNull(type);
 
-        return (T) DEFAULTS.get(type);
+        return DEFAULTS.get(type);
     }
 }

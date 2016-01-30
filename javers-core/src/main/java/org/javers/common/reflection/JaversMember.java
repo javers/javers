@@ -36,13 +36,13 @@ public abstract class JaversMember<T extends Member> {
 
     protected abstract Type getRawGenericType();
 
-    public abstract Class<?> getType();
+    public abstract Class<?> getRawType();
 
     public T getRawMember() {
         return rawMember;
     }
 
-    public Type getGenericType(){
+    public Type getGenericResolvedType(){
         if (resolvedReturnType.isPresent()){
             return resolvedReturnType.get();
         }
