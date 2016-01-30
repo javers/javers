@@ -11,7 +11,7 @@ import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.json.typeadapter.date.DateTypeAdapters;
+import org.javers.core.json.typeadapter.date.DateTypeCoreAdapters;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.EntityType;
@@ -254,12 +254,12 @@ public class MongoRepository implements JaversRepository {
     }
 
     private Bson addFromDateFiler(Bson query, LocalDateTime from) {
-        Bson filter = new BasicDBObject(COMMIT_DATE, new BasicDBObject("$gte", DateTypeAdapters.serialize(from)));
+        Bson filter = new BasicDBObject(COMMIT_DATE, new BasicDBObject("$gte", DateTypeCoreAdapters.serialize(from)));
         return Filters.and(query, filter);
     }
 
     private Bson addToDateFilter(Bson query, LocalDateTime to) {
-        Bson filter = new BasicDBObject(COMMIT_DATE, new BasicDBObject("$lte", DateTypeAdapters.serialize(to)));
+        Bson filter = new BasicDBObject(COMMIT_DATE, new BasicDBObject("$lte", DateTypeCoreAdapters.serialize(to)));
         return Filters.and(query, filter);
     }
 

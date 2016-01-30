@@ -14,12 +14,12 @@ class JavaUtilDateTypeAdapter extends BasicStringTypeAdapter<Date> {
 
     @Override
     public String serialize(Date sourceValue) {
-        return DateTypeAdapters.serialize(sourceValue);
+        return DateTypeCoreAdapters.serialize(sourceValue);
     }
 
     @Override
     public Date deserialize(String serializedValue) {
-        return DateTypeAdapters.deserialize(serializedValue).toDate(DateTypeAdapters.UTC);
+        return DateTypeCoreAdapters.deserialize(serializedValue).toDate(DateTypeCoreAdapters.UTC);
     }
 
     @Override

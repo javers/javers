@@ -14,12 +14,12 @@ class JavaSqlDateTypeAdapter extends BasicStringTypeAdapter<Date> {
 
     @Override
     public String serialize(Date sourceValue) {
-        return DateTypeAdapters.serialize(sourceValue);
+        return DateTypeCoreAdapters.serialize(sourceValue);
     }
 
     @Override
     public Date deserialize(String serializedValue) {
-        return new Date(DateTypeAdapters.deserialize(serializedValue).toDate(DateTypeAdapters.UTC).getTime());
+        return new Date(DateTypeCoreAdapters.deserialize(serializedValue).toDate(DateTypeCoreAdapters.UTC).getTime());
     }
 
     @Override

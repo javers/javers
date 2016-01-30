@@ -20,6 +20,7 @@ import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
+import org.javers.core.json.typeadapter.util.UtilTypeAdapters;
 import org.javers.core.metamodel.annotation.AnnotationsModule;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
@@ -97,6 +98,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         if (ReflectionUtil.isJava8runtime()){
             new Java8AddOns().beforeAssemble(this);
         }
+        new UtilTypeAdapters().beforeAssemble(this);
     }
 
     public Javers build() {
