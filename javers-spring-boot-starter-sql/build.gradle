@@ -1,4 +1,5 @@
 dependencies {
+    compile project(':javers-core')
     compile project(':javers-spring')
     compile project(':javers-persistence-sql')
 
