@@ -25,11 +25,14 @@ public class Property {
     }
 
     public Type getGenericType() {
-        return member.getGenericType();
+        return member.getGenericResolvedType();
     }
 
-    public Class<?> getType() {
-        return member.getType();
+    /**
+     * use getGenericType() when possible, see JaversMember.resolvedReturnType
+     */
+    public Class<?> getRawType() {
+        return member.getRawType();
     }
 
     /**

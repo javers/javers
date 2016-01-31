@@ -2,7 +2,6 @@ package org.javers.repository.sql
 
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
-
 import java.sql.Connection
 import java.sql.DriverManager
 

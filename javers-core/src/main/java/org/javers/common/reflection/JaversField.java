@@ -23,7 +23,7 @@ public class JaversField extends JaversMember<Field> {
     }
 
     @Override
-    public Class<?> getType() {
+    public Class<?> getRawType() {
         return getRawMember().getType();
     }
 
@@ -43,6 +43,6 @@ public class JaversField extends JaversMember<Field> {
 
     @Override
     public String toString() {
-        return "Field " + typeName(getGenericType())+" " + name() +"; //declared in: " +getDeclaringClass().getSimpleName();
+        return "Field " + typeName(getGenericResolvedType())+" " + name() +"; //declared in: " +getDeclaringClass().getSimpleName();
     }
 }

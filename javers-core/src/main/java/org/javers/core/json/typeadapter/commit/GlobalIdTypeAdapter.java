@@ -2,7 +2,6 @@ package org.javers.core.json.typeadapter.commit;
 
 import com.google.gson.*;
 import org.javers.common.collections.Lists;
-import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.EntityType;
@@ -66,7 +65,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
         EntityType entity = parseEntity(jsonObject);
 
         JsonElement cdoIdElement = jsonObject.get(CDO_ID_FIELD);
-        Object cdoId = context.deserialize(cdoIdElement, entity.getIdProperty().getType());
+        Object cdoId = context.deserialize(cdoIdElement, entity.getIdProperty().getGenericType());
 
         return globalIdFactory.createInstanceId(cdoId, entity);
     }
