@@ -51,12 +51,12 @@ abstract class SnapshotFilter {
 
     void addFromDateCondition(SelectQuery query, LocalDateTime from) {
         query.append(" AND " + COMMIT_COMMIT_DATE + " >= :commitFromDate")
-            .withArgument("commitFromDate", new Timestamp(new Date(from.toDateTime(DateTimeZone.UTC).getMillis())));
+            .withArgument("commitFromDate", new Timestamp(from.toDate()));
     }
 
     void addToDateCondition(SelectQuery query, LocalDateTime to) {
         query.append(" AND " + COMMIT_COMMIT_DATE + " <= :commitToDate")
-            .withArgument("commitToDate", new Timestamp(new Date(to.toDateTime(DateTimeZone.UTC).getMillis())));
+            .withArgument("commitToDate", new Timestamp(to.toDate()));
     }
 
     void addCommitIdCondition(SelectQuery query, CommitId commitId) {

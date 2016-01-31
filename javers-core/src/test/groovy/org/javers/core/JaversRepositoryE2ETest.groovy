@@ -4,7 +4,6 @@ import org.javers.common.date.FakeDateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.typeNames.*
-import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.core.snapshot.SnapshotsAssert
@@ -554,18 +553,18 @@ class JaversRepositoryE2ETest extends Specification {
         snapshot.globalId.typeName.endsWith("OldValueObject")
     }
 
-    def "should use dateProvider.now() as a commitDate"() {
+    def '''should use dateProvider.now() as a commitDate and
+           should serialize and deserialize commitDate as local datetime'''() {
         given:
-        LocalDateTime now = LocalDateTime.parse('2016-01-01T12:12')
+        def now = LocalDateTime.parse('2016-01-01T12:12')
+        fakeDateProvider.set(now)
 
         when:
-        fakeDateProvider.set(now)
         javers.commit("author", new SnapshotEntity(id: 1))
-        CdoSnapshot snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
-        LocalDateTime commitDate = snapshot.commitMetadata.commitDate
+        def snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
 
         then:
-        now == commitDate
+        snapshot.commitMetadata.commitDate == now
     }
 
     @Unroll
@@ -691,5 +690,4 @@ class JaversRepositoryE2ETest extends Specification {
             byInstanceId(1, SnapshotEntity).withVersion(5).build()
         ]
     }
-
 }
