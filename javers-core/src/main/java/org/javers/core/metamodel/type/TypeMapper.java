@@ -1,11 +1,9 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.*;
-import org.javers.common.collections.Optional;
+import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
@@ -16,10 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -55,10 +53,6 @@ public class TypeMapper {
         registerValueType(BigDecimal.class);
         registerValueType(Date.class);
         registerValueType(ThreadLocal.class);
-        registerValueType(URI.class);
-        registerValueType(URL.class);
-        registerValueType(Path.class);
-
 
         //Collections
         addType(new SetType(Set.class));

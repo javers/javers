@@ -4,7 +4,6 @@ import org.javers.core.json.BasicStringTypeAdapter;
 
 import java.sql.Time;
 
-
 /**
  * Serializes java.sql.Time to JSON String using ISO date format yyyy-MM-dd'T'HH:mm:ss.SSS
  *
@@ -14,12 +13,12 @@ class JavaSqlTimeTypeAdapter extends BasicStringTypeAdapter<Time> {
 
     @Override
     public String serialize(Time sourceValue) {
-        return DateTypeAdapters.serialize(sourceValue);
+        return DateTypeCoreAdapters.serialize(sourceValue);
     }
 
     @Override
     public Time deserialize(String serializedValue) {
-        return new Time(DateTypeAdapters.deserialize(serializedValue).toDate(DateTypeAdapters.UTC).getTime());
+        return new Time(DateTypeCoreAdapters.deserialize(serializedValue).toDate(DateTypeCoreAdapters.UTC).getTime());
     }
 
     @Override

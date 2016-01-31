@@ -13,7 +13,7 @@ import java.util.TimeZone;
 /**
  * @author bartosz.walacik
  */
-public class DateTypeAdapters {
+public class DateTypeCoreAdapters {
     public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static final DateTimeFormatter ISO_DATE_TIME_FORMATTER = ISODateTimeFormat.dateHourMinuteSecondMillis();
     private static final DateTimeFormatter ISO_DATE_TIME_FORMATTER_LEGACY = ISODateTimeFormat.dateHourMinuteSecond();

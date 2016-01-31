@@ -17,12 +17,12 @@ class LocalDateTimeTypeAdapter extends BasicStringTypeAdapter<LocalDateTime> {
 
     @Override
     public String serialize(LocalDateTime sourceValue) {
-        return DateTypeAdapters.serialize(sourceValue);
+        return DateTypeCoreAdapters.serialize(sourceValue);
     }
 
     @Override
     public LocalDateTime deserialize(String serializedValue) {
-        return DateTypeAdapters.deserialize(serializedValue);
+        return DateTypeCoreAdapters.deserialize(serializedValue);
     }
 
     @Override
