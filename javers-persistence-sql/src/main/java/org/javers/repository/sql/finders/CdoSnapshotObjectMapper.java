@@ -6,7 +6,7 @@ import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.json.typeadapter.date.DateTypeAdapters;
+import org.javers.core.json.typeadapter.date.DateTypeCoreAdapters;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
@@ -71,7 +71,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
     private JsonElement assembleCommitMetadata(ResultSet resultSet) throws SQLException {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("author",resultSet.getString(COMMIT_AUTHOR));
-        jsonObject.addProperty("commitDate", DateTypeAdapters.serializeToLocal( resultSet.getTimestamp(COMMIT_COMMIT_DATE)));
+        jsonObject.addProperty("commitDate", DateTypeCoreAdapters.serializeToLocal( resultSet.getTimestamp(COMMIT_COMMIT_DATE)));
         jsonObject.addProperty("id", resultSet.getBigDecimal(COMMIT_COMMIT_ID));
 
         return jsonObject;
