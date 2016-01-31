@@ -191,7 +191,8 @@ public class QueryBuilder {
      * to those created after (>=) given date.
      * <br/><br/>
      *
-     * <b>Warning!</b> When querying for Changes done
+     * <h2>Important for Changes query</h2>
+     * When querying for Changes done
      * after given point in time, results will lack
      * in <b>first</b> set of changes after that point.
      * <br/>
@@ -211,6 +212,16 @@ public class QueryBuilder {
      * changes done on Friday.
      * That's because Changes Query is backed by Snapshots Query
      * and Changes are calculated as a diff between subsequent Snapshots.
+     *
+     * <h2>CommitDate is local datetime</h2>
+     * Please remember that commitDate is persisted as LocalDateTime
+     * (without information about time zone and daylight saving time).
+     * <br/
+     * It may affects your query results. For example,
+     * once a year when DST ends,
+     * one hour is repeated (clock goes back from 3 am to 2 am).
+     * Looking just on the commitDate we
+     * can't distinct in which <i>iteration</i> of the hour, given commit was made.
      *
      * @see #to(LocalDateTime)
      */
