@@ -9,10 +9,8 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 /**
