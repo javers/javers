@@ -8,7 +8,7 @@ import java.sql.DriverManager
 class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
 
     Connection createConnection() {
-        DriverManager.getConnection( "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1" )
+        DriverManager.getConnection( "jdbc:h2:mem:test" )
     }
 
     DialectName getDialect() {

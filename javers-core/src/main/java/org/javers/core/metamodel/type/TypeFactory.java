@@ -73,12 +73,12 @@ public class TypeFactory {
 
         if (prototype.isPresent()) {
             jType = spawnFromPrototype(javaType, prototype.get());
-            logger.info("javersType of {} inferred as {} from prototype {}",
+            logger.debug("javersType of {} inferred as {} from prototype {}",
                         javaType, jType.getClass().getSimpleName(), prototype.get());
         }
         else {
             jType = inferFromAnnotations(javaType);
-            logger.info("javersType of {} inferred as {}",
+            logger.debug("javersType of {} inferred as {}",
                         javaType, jType.getClass().getSimpleName());
         }
 
@@ -86,7 +86,7 @@ public class TypeFactory {
     }
 
     ValueType inferIdPropertyTypeAsValue(Type idPropertyGenericType) {
-        logger.info("javersType of [{}] inferred as ValueType, it's used as id-property type",
+        logger.debug("javersType of [{}] inferred as ValueType, it's used as id-property type",
                 idPropertyGenericType);
 
         return new ValueType(idPropertyGenericType);
