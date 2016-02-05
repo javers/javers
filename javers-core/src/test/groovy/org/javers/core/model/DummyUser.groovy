@@ -19,6 +19,9 @@ class DummyUser extends AbstractDummyUser {
     @DiffIgnore
     int propertyWithDiffIgnoreAnn
 
+    DummyIgnoredType propertyWithDiffIgnoredType
+    IgnoredSubType propertyWithDiffIgnoredSubtype
+
     //primitives and primitive boxes
     boolean flag
     Boolean bigFlag

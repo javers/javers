@@ -14,6 +14,8 @@ import org.javers.core.examples.typeNames.JaversValueObjectWithTypeAlias
 import org.javers.core.metamodel.clazz.ValueObjectDefinition
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
+import org.javers.core.model.DummyIgnoredType
+import org.javers.core.model.IgnoredSubType
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -95,6 +97,27 @@ class TypeFactoryTest extends Specification {
         vo instanceof ValueObjectType
         vo.baseJavaClass == DummyAddress
         vo.properties.size() > 2
+    }
+
+    def "should ignore properties with @DiffIgnored type"(){
+        when:
+        EntityType entity = typeFactory.inferFromAnnotations(DummyUser)
+
+        then:
+        !entity.propertyNames.contains("propertyWithDiffIgnoredType")
+        !entity.propertyNames.contains("propertyWithDiffIgnoredSubtype")
+    }
+
+    def "should map @DiffIgnored type as IgnoredType"(){
+        expect:
+        typeFactory.inferFromAnnotations(DummyIgnoredType) instanceof IgnoredType
+
+    }
+
+    def "should map subtype of @DiffIgnored type as IgnoredType"(){
+        expect:
+        typeFactory.inferFromAnnotations(IgnoredSubType) instanceof IgnoredType
+
     }
 
     def "should map as ValueObjectType by default"(){
