@@ -13,7 +13,6 @@ import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.model.DummyUser.dummyUser
-import static org.javers.core.model.DummyUserDetails.dummyUserDetails
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 
 /**
@@ -87,7 +86,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     def "should serialize state with value object in CdoSnapshot"() {
         given:
         def javers = javersTestAssembly()
-        def dummyUserDetails = dummyUserDetails(1).withAddress("London", "St John Street")
+        def dummyUserDetails = DummyUserDetails.dummyUserDetails(1).withAddress("London", "St John Street")
 
         def cdoWrapper = javers.createCdoWrapper( dummyUserDetails )
         def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
