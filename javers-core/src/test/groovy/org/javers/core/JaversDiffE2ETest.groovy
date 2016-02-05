@@ -23,9 +23,9 @@ import spock.lang.Specification
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
+import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUserWithPoint.userWithPoint
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
  * @author bartosz walacik
@@ -63,7 +63,7 @@ class JaversDiffE2ETest extends Specification {
     def "should create NewObject for all nodes in initial diff"() {
         given:
         def javers = JaversTestBuilder.newInstance()
-        DummyUser left = dummyUser("kazik").withDetails().build()
+        DummyUser left = dummyUser().withDetails()
 
         when:
         def diff = javers.initial(left)
@@ -105,8 +105,8 @@ class JaversDiffE2ETest extends Specification {
 
     def "should create valueChange with Enum" () {
         given:
-        def user =  dummyUser("id").withSex(FEMALE).build();
-        def user2 = dummyUser("id").withSex(MALE).build();
+        def user =  dummyUser().withSex(FEMALE)
+        def user2 = dummyUser().withSex(MALE)
         def javers = JaversTestBuilder.newInstance()
 
         when:
@@ -121,14 +121,13 @@ class JaversDiffE2ETest extends Specification {
 
     def "should serialize whole Diff"() {
         given:
-        def user =  dummyUser("id").withSex(FEMALE).build();
-        def user2 = dummyUser("id").withSex(MALE).withDetails(1).build();
+        def user =  dummyUser().withSex(FEMALE)
+        def user2 = dummyUser().withSex(MALE).withDetails()
         def javers = JaversTestBuilder.newInstance()
 
         when:
         def diff = javers.compare(user, user2)
         def jsonText = javers.getJsonConverter().toJson(diff)
-        //println("jsonText:\n"+jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)

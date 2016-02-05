@@ -7,7 +7,7 @@ import org.joda.time.LocalDate
 import spock.lang.Unroll
 
 import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import static org.javers.core.model.DummyUser.dummyUser
 
 /**
  * @author pawel szymczyk
@@ -18,8 +18,8 @@ class SetChangeAppenderTest extends AbstractDiffAppendersTest {
     def "should append #changesCount changes when left set is #leftSet and right set is #rightSet"() {
 
         when:
-        def leftNode = buildGraph(dummyUser().withStringsSet(leftSet as Set).build())
-        def rightNode = buildGraph(dummyUser().withStringsSet(rightSet as Set).build())
+        def leftNode = buildGraph(dummyUser().withStringsSet(leftSet as Set))
+        def rightNode = buildGraph(dummyUser().withStringsSet(rightSet as Set))
 
         def change = setChangeAppender().calculateChanges(
                 new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "stringSet"))
@@ -45,8 +45,8 @@ class SetChangeAppenderTest extends AbstractDiffAppendersTest {
     def "should not append changes when left set #leftSet and right set #rightSet are equal"() {
 
         when:
-        def leftNode = buildGraph(dummyUser().withStringsSet(leftSet as Set).build())
-        def rightNode = buildGraph(dummyUser().withStringsSet(rightSet as Set).build())
+        def leftNode = buildGraph(dummyUser().withStringsSet(leftSet as Set))
+        def rightNode = buildGraph(dummyUser().withStringsSet(rightSet as Set))
 
         def change = setChangeAppender().calculateChanges(
                 new RealNodePair(leftNode, rightNode), getProperty(DummyUser, "stringSet"))

@@ -8,7 +8,7 @@ import org.javers.core.metamodel.object.Cdo
 import org.javers.core.metamodel.object.InstanceId
 import spock.lang.Specification
 
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import static org.javers.core.model.DummyUser.dummyUser
 
 
 abstract class ObjectNodeTest extends Specification {
@@ -17,7 +17,7 @@ abstract class ObjectNodeTest extends Specification {
 
     def "should hold Entity reference"() {
         given:
-        def cdo = dummyUser().build()
+        def cdo = dummyUser()
         def entity = typeFactory.createEntity(DummyUser)
 
         when:
@@ -30,7 +30,7 @@ abstract class ObjectNodeTest extends Specification {
     
     def "should hold GlobalId"() {
         given:
-        def cdo = dummyUser().withName("Mad Kaz").build()
+        def cdo = dummyUser("Mad Kaz")
         def entity = typeFactory.createEntity(DummyUser)
 
         when:
@@ -42,7 +42,7 @@ abstract class ObjectNodeTest extends Specification {
     
     def "should hold Cdo reference"() {
         given:
-        def cdo = dummyUser().build()
+        def cdo = dummyUser()
         def entity = typeFactory.createEntity(DummyUser)
 
         when:

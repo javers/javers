@@ -19,7 +19,6 @@ import static org.javers.repository.jql.QueryBuilder.byClass
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 class JaversRepositoryE2ETest extends Specification {
     FakeDateProvider fakeDateProvider
@@ -388,7 +387,7 @@ class JaversRepositoryE2ETest extends Specification {
 
     def "should compare Entity properties with latest from repository"() {
         given:
-        def user = dummyUser("John").withAge(18).build()
+        def user = new DummyUser(name:"John",age:18)
         javers.commit("login", user)
 
         when:

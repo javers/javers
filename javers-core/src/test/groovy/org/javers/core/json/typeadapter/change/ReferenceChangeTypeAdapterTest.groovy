@@ -4,16 +4,15 @@ import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.ReferenceChange
-import org.javers.core.json.JsonConverter
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.builder.ChangeTestBuilder.referenceChanged
+import static org.javers.core.model.DummyUser.dummyUser
+import static org.javers.core.model.DummyUserDetails.dummyUserDetails
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
-import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
 /**
  * @author bartosz walacik
@@ -22,14 +21,14 @@ class ReferenceChangeTypeAdapterTest extends Specification {
 
     def "should serialize ReferenceChange" () {
         given:
-            JsonConverter jsonConverter = javersTestAssembly().jsonConverter
-            ReferenceChange change = referenceChanged(dummyUser().build(),
+            def jsonConverter = javersTestAssembly().jsonConverter
+            def change = referenceChanged(dummyUser(),
                                                       "dummyUserDetails",
-                                                      dummyUserDetails(1).build(),
-                                                      dummyUserDetails(2).build())
+                                                      dummyUserDetails(1),
+                                                      dummyUserDetails(2))
 
         when:
-            String jsonText = jsonConverter.toJson(change)
+            def jsonText = jsonConverter.toJson(change)
             //println(jsonText)
 
         then:
@@ -45,7 +44,7 @@ class ReferenceChangeTypeAdapterTest extends Specification {
 
     def "should deserialize ReferenceChange"() {
         given:
-            JsonConverter jsonConverter = javersTestAssembly().jsonConverter
+            def jsonConverter = javersTestAssembly().jsonConverter
             def json = new JsonBuilder()
             json
             {
@@ -77,12 +76,11 @@ class ReferenceChangeTypeAdapterTest extends Specification {
 
     def "should be nullSafe when writing leftId & rightId for ReferenceChange" () {
         given:
-        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
-        ReferenceChange change = referenceChanged(dummyUser().build(),
-                                                  "dummyUserDetails",null, null)
+        def jsonConverter = javersTestAssembly().jsonConverter
+        def change = referenceChanged(dummyUser(),"dummyUserDetails",null, null)
 
         when:
-        String jsonText = jsonConverter.toJson(change)
+        def jsonText = jsonConverter.toJson(change)
         //println(jsonText)
 
         then:
