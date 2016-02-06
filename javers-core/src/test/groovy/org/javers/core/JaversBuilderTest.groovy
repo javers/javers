@@ -6,8 +6,8 @@ import org.javers.core.diff.appenders.SimpleListChangeAppender
 import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.graph.ObjectAccessHook
-import org.javers.core.metamodel.property.BeanBasedPropertyScanner
-import org.javers.core.metamodel.property.FieldBasedPropertyScanner
+import org.javers.core.metamodel.scanner.BeanBasedPropertyScanner
+import org.javers.core.metamodel.scanner.FieldBasedPropertyScanner
 import org.javers.core.metamodel.type.EntityType
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.metamodel.type.ValueObjectType

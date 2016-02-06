@@ -30,7 +30,7 @@ import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.value
 class TypeFactoryTest extends Specification {
 
     def setupSpec() {
-        typeFactory = javersTestAssembly(MappingStyle.FIELD).typeSpawningFactory
+        typeFactory = javersTestAssembly(MappingStyle.FIELD).getContainerComponent(TypeFactory)
     }
 
     @Shared
@@ -111,13 +111,6 @@ class TypeFactoryTest extends Specification {
     def "should map @DiffIgnored type as IgnoredType"(){
         expect:
         typeFactory.inferFromAnnotations(DummyIgnoredType) instanceof IgnoredType
-
-    }
-
-    def "should map subtype of @DiffIgnored type as IgnoredType"(){
-        expect:
-        typeFactory.inferFromAnnotations(IgnoredSubType) instanceof IgnoredType
-
     }
 
     def "should map as ValueObjectType by default"(){

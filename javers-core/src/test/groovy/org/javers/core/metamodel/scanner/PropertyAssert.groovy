@@ -1,4 +1,6 @@
-package org.javers.core.metamodel.property
+package org.javers.core.metamodel.scanner
+
+import org.javers.core.metamodel.property.Property
 
 import java.lang.reflect.Type
 

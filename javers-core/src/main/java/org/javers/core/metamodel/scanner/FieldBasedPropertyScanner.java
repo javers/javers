@@ -1,8 +1,8 @@
-package org.javers.core.metamodel.property;
+package org.javers.core.metamodel.scanner;
 
 import org.javers.common.reflection.JaversField;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.metamodel.annotation.AnnotationNamesProvider;
+import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
 import java.util.List;

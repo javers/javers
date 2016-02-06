@@ -1,6 +1,7 @@
-package org.javers.core.metamodel.property
+package org.javers.core.metamodel.scanner
 
 import com.google.gson.reflect.TypeToken
+import org.javers.core.metamodel.property.PropertyScannerEntity
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails

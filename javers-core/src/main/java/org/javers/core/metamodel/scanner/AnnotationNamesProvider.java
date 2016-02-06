@@ -1,4 +1,4 @@
-package org.javers.core.metamodel.annotation;
+package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Lists;
 
@@ -11,21 +11,21 @@ import java.util.Set;
 /**
  * @author bartosz walacik
  */
-public class AnnotationNamesProvider {
+class AnnotationNamesProvider {
     private final Set<String> entityAliases = new HashSet<>();
     private final Set<String> typeNameAliases = new HashSet<>();
     private final Set<String> valueObjectAliases = new HashSet<>();
     private final Set<String> valueAliases = new HashSet<>();
     private final Set<String> transientPropertyAliases = new HashSet<>();
-
-
     private final Set<String> shallowReferenceAliases = new HashSet<>();
+    private final Set<String> ignoredTypeAliases = new HashSet<>();
+
     private final List<AnnotationsNameSpace> namesProviders = Lists.immutableListOf(
             new JaversAnnotationsNamesSpace(),
             new JPAAnnotationsNameSpace());
 
 
-    public AnnotationNamesProvider() {
+    AnnotationNamesProvider() {
 
         for (AnnotationsNameSpace provider : namesProviders){
             entityAliases.addAll(provider.getEntityAliases());
@@ -34,6 +34,7 @@ public class AnnotationNamesProvider {
             transientPropertyAliases.addAll(provider.getTransientPropertyAliases());
             shallowReferenceAliases.addAll(provider.getShallowReferenceAliases());
             typeNameAliases.addAll(provider.getTypeNameAliases());
+            ignoredTypeAliases.addAll(provider.getIgnoredTypeAliases());
         }
     }
 
@@ -51,6 +52,10 @@ public class AnnotationNamesProvider {
 
     boolean isValueAlias(Annotation ann){
         return valueAliases.contains(ann.annotationType().getSimpleName());
+    }
+
+    boolean isIgnoredTypeAliase(Annotation ann) {
+        return ignoredTypeAliases.contains(ann.annotationType().getSimpleName());
     }
 
     public Set<String> getTransientAliases() {

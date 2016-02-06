@@ -1,4 +1,4 @@
-package org.javers.core.metamodel.annotation;
+package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Sets;
 
@@ -38,7 +38,7 @@ class JPAAnnotationsNameSpace implements AnnotationsNameSpace {
     public Set<String> getShallowReferenceAliases() { return Collections.emptySet(); }
 
     @Override
-    public Set<String> getTransientTypeAliases() {
+    public Set<String> getIgnoredTypeAliases() {
         return Collections.emptySet();
     }
 }

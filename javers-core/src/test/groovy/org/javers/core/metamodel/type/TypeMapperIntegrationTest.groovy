@@ -240,5 +240,14 @@ public class TypeMapperIntegrationTest extends Specification {
         jType.baseJavaClass == DummyGenericUser
     }
 
+    def "should map subtype of @DiffIgnored type as IgnoredType"(){
+        given:
+        def mapper = javersTestAssembly().typeMapper
+        mapper.getJaversType(DummyIgnoredType)
+
+        expect:
+        mapper.getJaversType(IgnoredSubType) instanceof IgnoredType
+    }
+
     class DummyGenericUser<T> extends AbstractDummyUser {}
 }

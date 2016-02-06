@@ -1,4 +1,4 @@
-package org.javers.core.metamodel.annotation;
+package org.javers.core.metamodel.scanner;
 
 import java.util.Set;
 
@@ -15,7 +15,7 @@ interface AnnotationsNameSpace {
 
     Set<String> getTransientPropertyAliases();
 
-    Set<String> getTransientTypeAliases();
+    Set<String> getIgnoredTypeAliases();
 
     Set<String> getShallowReferenceAliases();
 

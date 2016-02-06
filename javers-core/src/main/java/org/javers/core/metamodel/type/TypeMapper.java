@@ -27,7 +27,6 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class TypeMapper {
-    private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
     private final TypeMapperState state;
     private final DehydratedTypeFactory dehydratedTypeFactory = new DehydratedTypeFactory(this);
 

@@ -1,8 +1,9 @@
-package org.javers.core.metamodel.property
+package org.javers.core.metamodel.scanner
 
 import org.javers.core.JaversBuilder
 import org.javers.core.MappingStyle
 import spock.lang.Specification
+
 import static org.javers.core.JaversBuilder.javers
 
 /**

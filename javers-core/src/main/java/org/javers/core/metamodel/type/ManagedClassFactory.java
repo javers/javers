@@ -5,35 +5,54 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.property.PropertyScan;
-import org.javers.core.metamodel.property.PropertyScanner;
+import org.javers.core.metamodel.scanner.ClassScan;
+import org.javers.core.metamodel.scanner.ClassScanner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author bartosz walacik
  */
 class ManagedClassFactory {
-    private final PropertyScanner propertyScanner;
+    private final ClassScanner classScanner;
+    //private final TypeMapper typeMapper;
 
-    public ManagedClassFactory(PropertyScanner propertyScanner) {
-        this.propertyScanner = propertyScanner;
+
+    public ManagedClassFactory(ClassScanner classScanner) {
+        this.classScanner = classScanner;
     }
 
     ManagedClass create(Class<?> baseJavaClass){
-        PropertyScan scan = propertyScanner.scan(baseJavaClass);
+        ClassScan scan = classScanner.scan(baseJavaClass);
         return new ManagedClass(baseJavaClass, scan.getProperties(), scan.getLooksLikeId());
     }
 
     ManagedClass create(ClientsClassDefinition def){
-        PropertyScan scan = propertyScanner.scan(def.getBaseJavaClass());
+        ClassScan scan = classScanner.scan(def.getBaseJavaClass());
         List<Property> filtered = filterIgnored(scan.getProperties(), def);
+        filtered = filterIgnoredType(filtered);
         return new ManagedClass(def.getBaseJavaClass(), filtered, scan.getLooksLikeId());
     }
 
     ManagedClass createShallowReferenceManagedClass(EntityDefinition def){
-        PropertyScan scan = propertyScanner.scan(def.getBaseJavaClass());
+        ClassScan scan = classScanner.scan(def.getBaseJavaClass());
         return new ManagedClass(def.getBaseJavaClass(), Collections.<Property>emptyList(), scan.getLooksLikeId());
+    }
+
+    private List<Property> filterIgnoredType(List<Property> properties){
+        Iterator<Property> it = properties.iterator();
+
+        while (it.hasNext()) {
+            Property property = it.next();
+            //if (typeMapper.getPropertyType(property) instanceof IgnoredType) {
+            if (false) {
+                it.remove();
+            }
+        }
+        return properties;
     }
 
     private List<Property> filterIgnored(List<Property> properties, ClientsClassDefinition definition){

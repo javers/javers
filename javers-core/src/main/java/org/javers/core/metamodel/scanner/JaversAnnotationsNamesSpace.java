@@ -1,6 +1,7 @@
-package org.javers.core.metamodel.annotation;
+package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Sets;
+import org.javers.core.metamodel.annotation.*;
 
 import java.util.Set;
 
@@ -40,7 +41,7 @@ class JaversAnnotationsNamesSpace implements AnnotationsNameSpace {
     }
 
     @Override
-    public Set<String> getTransientTypeAliases() {
+    public Set<String> getIgnoredTypeAliases() {
         return Sets.asSet(DiffIgnore.class.getSimpleName());
     }
 }

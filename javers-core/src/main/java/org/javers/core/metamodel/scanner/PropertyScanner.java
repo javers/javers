@@ -1,10 +1,10 @@
-package org.javers.core.metamodel.property;
+package org.javers.core.metamodel.scanner;
 
 /**
  * Managed class property propertyScanner
  *
  * @author pawel szymczyk
  */
-public interface PropertyScanner {
+interface PropertyScanner {
     PropertyScan scan(Class<?> managedClass);
 }

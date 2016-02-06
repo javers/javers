@@ -11,6 +11,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 /**
  * Domain object's data property, getter or field
  */
+//TODO move to another package
 public class Property {
     public static final String ID_ANN = "Id";
     public static final String EMBEDDED_ID_ANN = "EmbeddedId";

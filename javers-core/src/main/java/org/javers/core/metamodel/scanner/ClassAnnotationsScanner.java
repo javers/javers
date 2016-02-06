@@ -1,12 +1,8 @@
-package org.javers.core.metamodel.annotation;
+package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Optional;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.clazz.ClientsClassDefinition;
-import org.javers.core.metamodel.clazz.EntityDefinition;
-import org.javers.core.metamodel.clazz.ValueDefinition;
-import org.javers.core.metamodel.clazz.ValueObjectDefinition;
 
 import java.lang.annotation.Annotation;
 
@@ -15,11 +11,11 @@ import java.lang.annotation.Annotation;
  *
  * @author bartosz walacik
  */
-public class ClassAnnotationsScanner {
+class ClassAnnotationsScanner {
 
     private final AnnotationNamesProvider annotationNamesProvider;
 
-    public ClassAnnotationsScanner(AnnotationNamesProvider annotationNamesProvider) {
+    ClassAnnotationsScanner(AnnotationNamesProvider annotationNamesProvider) {
         this.annotationNamesProvider = annotationNamesProvider;
     }
 
@@ -34,6 +30,7 @@ public class ClassAnnotationsScanner {
         }
 
         boolean hasValue = false;
+        boolean hasIgnored = false;
         boolean hasValueObject = false;
         boolean hasEntity = false;
         boolean hasShallowReference = false;
@@ -51,11 +48,20 @@ public class ClassAnnotationsScanner {
                 hasShallowReference = true;
             }
 
+            if (annotationNamesProvider.isIgnoredTypeAliase(ann)) {
+                hasIgnored = true;
+            }
+
             if (annotationNamesProvider.isValueObjectAlias(ann)) {
                 hasValueObject = true;
             }
         }
 
-        return new ClassAnnotationsScan(hasValue, hasValueObject, hasEntity, hasShallowReference, typeName);
+        return new ClassAnnotationsScan(hasValue,
+                                        hasValueObject,
+                                        hasEntity,
+                                        hasShallowReference,
+                                        hasIgnored,
+                                        typeName);
     }
 }

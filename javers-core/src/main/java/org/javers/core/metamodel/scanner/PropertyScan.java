@@ -1,6 +1,7 @@
-package org.javers.core.metamodel.property;
+package org.javers.core.metamodel.scanner;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * @author bartosz.walacik
  */
-public class PropertyScan {
+class PropertyScan {
     private final List<Property> properties;
     private final List<Property> looksLikeId;
 

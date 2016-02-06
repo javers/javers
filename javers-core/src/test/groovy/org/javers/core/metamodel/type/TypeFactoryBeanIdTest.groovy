@@ -10,6 +10,6 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 class TypeFactoryBeanIdTest extends TypeFactoryIdTest {
 
     def setup() {
-        typeFactory = javersTestAssembly(MappingStyle.BEAN).typeSpawningFactory
+        typeFactory = javersTestAssembly(MappingStyle.BEAN).getContainerComponent(TypeFactory)
     }
 }
