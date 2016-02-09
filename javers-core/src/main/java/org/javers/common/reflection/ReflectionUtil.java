@@ -65,7 +65,7 @@ public class ReflectionUtil {
     public static Object newInstance(Class clazz, ArgumentResolver resolver){
         Validate.argumentIsNotNull(clazz);
         for (Constructor constructor : clazz.getDeclaredConstructors()) {
-            if (isPrivate(constructor)) {
+            if (isPrivate(constructor) || isProtected(constructor)) {
                 continue;
             }
 
@@ -155,6 +155,10 @@ public class ReflectionUtil {
 
     private static boolean isPrivate(Member member){
         return Modifier.isPrivate(member.getModifiers());
+    }
+
+    private static boolean isProtected(Member member){
+        return Modifier.isProtected(member.getModifiers());
     }
 
     /**

@@ -40,7 +40,7 @@ public class TypeMapper {
      * for TypeMapperConcurrentTest only, no better idea how to writhe this test
      * without additional constructor
      */
-    TypeMapper(TypeFactory typeFactory ) {
+    protected TypeMapper(TypeFactory typeFactory ) {
         this.state = new TypeMapperState(typeFactory);
         registerCoreTypes();
     }
