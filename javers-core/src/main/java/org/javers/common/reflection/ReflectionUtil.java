@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TimerTask;
 
 /**
  * @author bartosz walacik
@@ -30,6 +29,18 @@ public class ReflectionUtil {
         catch (Throwable ex) {
             // Class or one of its dependencies is not present...
             return false;
+        }
+    }
+
+    /**
+     * throws RuntimeException if class is not found
+     */
+    public static Class classForName(String className) {
+        try {
+            return Class.forName(className, false, Javers.class.getClassLoader());
+        }
+        catch (Throwable ex) {
+            throw new RuntimeException(ex);
         }
     }
 

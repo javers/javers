@@ -21,6 +21,14 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  */
 public class TypeMapperIntegrationTest extends Specification {
 
+    def "should map groovy.lang.MetaClass as IgnoredType"(){
+        when:
+        def mapper = javersTestAssembly().typeMapper
+
+        then:
+        mapper.getJaversType(MetaClass) instanceof IgnoredType
+    }
+
     def "should find ValueObject by DuckType when properties match"(){
       when:
       def mapper = javersTestAssembly().typeMapper

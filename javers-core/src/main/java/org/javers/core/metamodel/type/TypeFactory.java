@@ -22,9 +22,11 @@ class TypeFactory {
     private final ClassScanner classScanner;
     private final ManagedClassFactory managedClassFactory;
 
-    public TypeFactory(ClassScanner classScanner, ManagedClassFactory managedClassFactory) {
+    public TypeFactory(ClassScanner classScanner, TypeMapper typeMapper) {
         this.classScanner = classScanner;
-        this.managedClassFactory = managedClassFactory;
+
+        //Pico doesn't support cycles, so manual construction
+        this.managedClassFactory = new ManagedClassFactory(classScanner, typeMapper);
     }
 
     JaversType create(ClientsClassDefinition def) {

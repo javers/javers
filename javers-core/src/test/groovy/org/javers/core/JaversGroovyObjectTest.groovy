@@ -28,7 +28,7 @@ class JaversGroovyObjectTest extends Specification {
 
         then:
         def jtype = javers.getTypeMapping(GPerson)
-        jtype.properties*.name == ['id','name']
+        jtype.properties.name as Set == ['id','name'] as Set
 
         changes.size() == 1
         changes[0].propertyName == 'name'

@@ -1,6 +1,7 @@
 package org.javers.core.graph
 
 import org.javers.core.MappingStyle
+import org.javers.core.metamodel.type.TypeFactoryTest
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
@@ -10,6 +11,6 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 class ObjectNodeBeanTest extends ObjectNodeTest{
 
     def setup() {
-        typeFactory = javersTestAssembly(MappingStyle.BEAN).typeSpawningFactory
+        createEntity = TypeFactoryTest.entityCreator(MappingStyle.BEAN)
     }
 }

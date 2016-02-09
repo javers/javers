@@ -9,18 +9,16 @@ import java.util.Collection;
 /**
  * @author bartosz.walacik
  */
-public class TypeModule extends InstantiatingModule {
+public class TypeMapperModule extends InstantiatingModule {
 
-    public TypeModule(MutablePicoContainer container) {
+    public TypeMapperModule(MutablePicoContainer container) {
         super(container);
     }
 
     @Override
     protected Collection<Class> getImplementations() {
         return (Collection) Lists.asList(
-                TypeMapper.class,
-                TypeFactory.class,
-                ManagedClassFactory.class
+                TypeMapper.class
         );
     }
 }

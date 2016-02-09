@@ -12,8 +12,6 @@ import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.SnapshotFactory
 import org.javers.core.metamodel.property.Property
-import org.javers.core.metamodel.scanner.ClassAnnotationsScanner
-import org.javers.core.metamodel.type.TypeFactory
 import org.javers.core.metamodel.type.TypeMapper
 import org.javers.core.snapshot.GraphSnapshotFacade
 import org.javers.repository.api.JaversExtendedRepository
@@ -98,10 +96,6 @@ class JaversTestBuilder {
 
     Property getProperty(Class type, String propName) {
         getTypeMapper().getJaversManagedType(type).getProperty(propName)
-    }
-
-    ClassAnnotationsScanner getClassAnnotationsScanner(){
-        javersBuilder.getContainerComponent(ClassAnnotationsScanner)
     }
 
     SnapshotFactory getSnapshotFactory() {

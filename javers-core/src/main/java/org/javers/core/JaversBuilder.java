@@ -26,6 +26,7 @@ import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.scanner.ScannerModule;
 import org.javers.core.metamodel.type.*;
 import org.javers.core.snapshot.GraphSnapshotModule;
+import org.javers.groovysupport.GroovyAddOns;
 import org.javers.java8support.Java8AddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
@@ -94,6 +95,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         if (ReflectionUtil.isJava8runtime()){
             new Java8AddOns().beforeAssemble(this);
         }
+        new GroovyAddOns().beforeAssemble(this);
         new UtilTypeAdapters().beforeAssemble(this);
     }
 
@@ -498,7 +500,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private void bootManagedTypeModule() {
-        addModule(new TypeModule(getContainer()));
+        addModule(new TypeMapperModule(getContainer()));
         mapRegisteredClasses();
     }
 

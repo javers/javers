@@ -1,16 +1,6 @@
-package org.javers.core.metamodel.annotation
+package org.javers.core.metamodel.scanner
 
-import org.javers.core.JaversTestBuilder
-import org.javers.core.metamodel.clazz.EntityDefinition
-import org.javers.core.metamodel.clazz.JaversEntity
-import org.javers.core.metamodel.clazz.JaversValue
-import org.javers.core.metamodel.clazz.JaversValueObject
-import org.javers.core.metamodel.clazz.JpaEmbeddable
-import org.javers.core.metamodel.clazz.JpaEntity
-import org.javers.core.metamodel.clazz.JpaMappedSuperclass
-import org.javers.core.metamodel.clazz.NotAnnotatedClass
-import org.javers.core.metamodel.clazz.ValueDefinition
-import org.javers.core.metamodel.clazz.ValueObjectDefinition
+import org.javers.core.metamodel.clazz.*
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -19,7 +9,7 @@ import spock.lang.Unroll
  */
 class ClassAnnotationsScannerTest extends Specification {
 
-    def scanner = JaversTestBuilder.javersTestAssembly().classAnnotationsScanner
+    def scanner = new ClassAnnotationsScanner(new AnnotationNamesProvider())
 
     @Unroll
     def "should map #annotation.name to Entity"() {

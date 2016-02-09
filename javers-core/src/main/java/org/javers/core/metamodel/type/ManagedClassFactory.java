@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Lists;
+import org.javers.common.collections.Predicate;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
@@ -18,11 +20,11 @@ import java.util.List;
  */
 class ManagedClassFactory {
     private final ClassScanner classScanner;
-    //private final TypeMapper typeMapper;
+    private final TypeMapper typeMapper;
 
-
-    public ManagedClassFactory(ClassScanner classScanner) {
+    public ManagedClassFactory(ClassScanner classScanner, TypeMapper typeMapper) {
         this.classScanner = classScanner;
+        this.typeMapper = typeMapper;
     }
 
     ManagedClass create(Class<?> baseJavaClass){
@@ -33,7 +35,7 @@ class ManagedClassFactory {
     ManagedClass create(ClientsClassDefinition def){
         ClassScan scan = classScanner.scan(def.getBaseJavaClass());
         List<Property> filtered = filterIgnored(scan.getProperties(), def);
-        filtered = filterIgnoredType(filtered);
+        filtered = filterIgnoredType(filtered, def.getBaseJavaClass());
         return new ManagedClass(def.getBaseJavaClass(), filtered, scan.getLooksLikeId());
     }
 
@@ -42,17 +44,15 @@ class ManagedClassFactory {
         return new ManagedClass(def.getBaseJavaClass(), Collections.<Property>emptyList(), scan.getLooksLikeId());
     }
 
-    private List<Property> filterIgnoredType(List<Property> properties){
-        Iterator<Property> it = properties.iterator();
-
-        while (it.hasNext()) {
-            Property property = it.next();
-            //if (typeMapper.getPropertyType(property) instanceof IgnoredType) {
-            if (false) {
-                it.remove();
+    private List<Property> filterIgnoredType(List<Property> properties, final Class<?> currentClass){
+        return Lists.negativeFilter(properties, new Predicate<Property>() {
+            public boolean apply(Property p) {
+                if (p.getRawType() == currentClass){
+                    return false; //prevents stackoverflow
+                }
+                return typeMapper.getPropertyType(p) instanceof IgnoredType;
             }
-        }
-        return properties;
+        });
     }
 
     private List<Property> filterIgnored(List<Property> properties, ClientsClassDefinition definition){
