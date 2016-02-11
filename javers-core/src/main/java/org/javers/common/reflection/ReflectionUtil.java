@@ -5,18 +5,21 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
+import org.slf4j.Logger;
 
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TimerTask;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author bartosz walacik
  */
 public class ReflectionUtil {
+    private static final Logger logger = getLogger(ReflectionUtil.class);
 
     public static boolean isJava8runtime(){
         return isClassPresent("java.time.LocalDate");
@@ -30,6 +33,18 @@ public class ReflectionUtil {
         catch (Throwable ex) {
             // Class or one of its dependencies is not present...
             return false;
+        }
+    }
+
+    /**
+     * throws RuntimeException if class is not found
+     */
+    public static Class classForName(String className) {
+        try {
+            return Class.forName(className, false, Javers.class.getClassLoader());
+        }
+        catch (Throwable ex) {
+            throw new RuntimeException(ex);
         }
     }
 
@@ -50,14 +65,20 @@ public class ReflectionUtil {
     public static Object newInstance(Class clazz, ArgumentResolver resolver){
         Validate.argumentIsNotNull(clazz);
         for (Constructor constructor : clazz.getDeclaredConstructors()) {
-            if (isPrivate(constructor)) {
+            if (isPrivate(constructor) || isProtected(constructor)) {
                 continue;
             }
 
             Class [] types = constructor.getParameterTypes();
             Object[] params = new Object[types.length];
             for (int i=0; i<types.length; i++){
-                params[i] = resolver.resolve(types[i]);
+                try {
+                    params[i] = resolver.resolve(types[i]);
+                } catch (JaversException e){
+                    logger.error("failed to create new instance of "+clazz.getName()+", argument resolver for arg["+i+"] " +
+                                 types[i].getName() + " thrown exception: "+e.getMessage());
+                    throw e;
+                }
             }
             try {
                 constructor.setAccessible(true);
@@ -134,6 +155,10 @@ public class ReflectionUtil {
 
     private static boolean isPrivate(Member member){
         return Modifier.isPrivate(member.getModifiers());
+    }
+
+    private static boolean isProtected(Member member){
+        return Modifier.isProtected(member.getModifiers());
     }
 
     /**

@@ -8,17 +8,17 @@ import org.javers.core.metamodel.object.Cdo
 import org.javers.core.metamodel.object.InstanceId
 import spock.lang.Specification
 
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import static org.javers.core.model.DummyUser.dummyUser
 
 
 abstract class ObjectNodeTest extends Specification {
 
-    protected TypeFactory typeFactory
+    protected def createEntity
 
     def "should hold Entity reference"() {
         given:
-        def cdo = dummyUser().build()
-        def entity = typeFactory.createEntity(DummyUser)
+        def cdo = dummyUser()
+        def entity = createEntity(DummyUser)
 
         when:
         def wrapper = new ObjectNode(cdo, entity)
@@ -30,8 +30,8 @@ abstract class ObjectNodeTest extends Specification {
     
     def "should hold GlobalId"() {
         given:
-        def cdo = dummyUser().withName("Mad Kaz").build()
-        def entity = typeFactory.createEntity(DummyUser)
+        def cdo = dummyUser("Mad Kaz")
+        def entity = createEntity(DummyUser)
 
         when:
         ObjectNode wrapper = new ObjectNode(cdo, entity)
@@ -42,8 +42,8 @@ abstract class ObjectNodeTest extends Specification {
     
     def "should hold Cdo reference"() {
         given:
-        def cdo = dummyUser().build()
-        def entity = typeFactory.createEntity(DummyUser)
+        def cdo = dummyUser()
+        def entity = createEntity(DummyUser)
 
         when:
         def wrapper = new ObjectNode(cdo, entity)
@@ -56,7 +56,7 @@ abstract class ObjectNodeTest extends Specification {
     def "should throw exception when Entity without id"() {
         given:
         def cdo = new DummyUser()
-        def entity = typeFactory.createEntity(DummyUser)
+        def entity = createEntity(DummyUser)
 
         when:
         new ObjectNode(cdo, entity)
@@ -69,8 +69,8 @@ abstract class ObjectNodeTest extends Specification {
     
     def "should delegate equals() and hashCode() to CDO"() {
         when:
-        def first = new ObjectNode(new DummyUser("Mad Kax"), typeFactory.createEntity(DummyUser))
-        def second = new ObjectNode(new DummyUser("Mad Kax"), typeFactory.createEntity(DummyUser))
+        def first = new ObjectNode(new DummyUser("Mad Kax"), createEntity(DummyUser))
+        def second = new ObjectNode(new DummyUser("Mad Kax"), createEntity(DummyUser))
 
         then:
         first.hashCode() == second.hashCode()
@@ -80,8 +80,8 @@ abstract class ObjectNodeTest extends Specification {
     
     def "should not be equal when different CDO ids"() {
         when:
-        def first = new ObjectNode(new DummyUser("stach"), typeFactory.createEntity(DummyUser))
-        def second = new ObjectNode(new DummyUser("Mad Kaz 1"), typeFactory.createEntity(DummyUser))
+        def first = new ObjectNode(new DummyUser("stach"), createEntity(DummyUser))
+        def second = new ObjectNode(new DummyUser("Mad Kaz 1"), createEntity(DummyUser))
 
         then:
         first != second
@@ -90,7 +90,7 @@ abstract class ObjectNodeTest extends Specification {
     
     def "should have reflexive equals method"() {
         when:
-        def objectNode = new ObjectNode(new DummyUser("Mad Kax"), typeFactory.createEntity(DummyUser))
+        def objectNode = new ObjectNode(new DummyUser("Mad Kax"), createEntity(DummyUser))
 
         then:
         objectNode == objectNode
@@ -99,9 +99,9 @@ abstract class ObjectNodeTest extends Specification {
     
     def "should have symmetric and transitive equals method"() {
         when:
-        ObjectNode first = new ObjectNode(new DummyUser("Mad Kax"), typeFactory.createEntity(DummyUser))
-        ObjectNode second = new ObjectNode(new DummyUser("Mad Kax"), typeFactory.createEntity(DummyUser))
-        ObjectNode third = new ObjectNode(new DummyUser("Mad Kax"), typeFactory.createEntity(DummyUser))
+        ObjectNode first = new ObjectNode(new DummyUser("Mad Kax"), createEntity(DummyUser))
+        ObjectNode second = new ObjectNode(new DummyUser("Mad Kax"), createEntity(DummyUser))
+        ObjectNode third = new ObjectNode(new DummyUser("Mad Kax"), createEntity(DummyUser))
 
         then:
         first == second
@@ -112,7 +112,7 @@ abstract class ObjectNodeTest extends Specification {
     
     def "should return false when equals method has null arg"() {
         when:
-        ObjectNode first = new ObjectNode(new DummyUser("Mad Kax"), typeFactory.createEntity(DummyUser))
+        ObjectNode first = new ObjectNode(new DummyUser("Mad Kax"), createEntity(DummyUser))
 
         then:
         first != null

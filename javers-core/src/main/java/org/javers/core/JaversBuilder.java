@@ -21,20 +21,18 @@ import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
 import org.javers.core.json.typeadapter.util.UtilTypeAdapters;
-import org.javers.core.metamodel.annotation.AnnotationsModule;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.TypeName;
+import org.javers.core.metamodel.annotation.*;
 import org.javers.core.metamodel.clazz.*;
-import org.javers.core.metamodel.clazz.EntityDefinitionBuilder;
-import org.javers.core.metamodel.property.PropertyScannerModule;
+import org.javers.core.metamodel.scanner.ScannerModule;
 import org.javers.core.metamodel.type.*;
 import org.javers.core.snapshot.GraphSnapshotModule;
+import org.javers.groovysupport.GroovyAddOns;
 import org.javers.java8support.Java8AddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
-import org.javers.repository.inmemory.InMemoryRepositoryModule;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
+import org.javers.repository.inmemory.InMemoryRepositoryModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,12 +90,12 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new CommitFactoryModule(getContainer()));
         addModule(new GraphSnapshotModule(getContainer()));
         addModule(new GraphFactoryModule(getContainer()));
-        addModule(new AnnotationsModule(getContainer()));
 
         // bootstrap phase 2: add-ons
         if (ReflectionUtil.isJava8runtime()){
             new Java8AddOns().beforeAssemble(this);
         }
+        new GroovyAddOns().beforeAssemble(this);
         new UtilTypeAdapters().beforeAssemble(this);
     }
 
@@ -111,8 +109,9 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     protected Javers assembleJaversInstance(){
-        addModule(new DiffAppendersModule(getContainer(), coreConfiguration()));
+        addModule(new DiffAppendersModule(coreConfiguration(), getContainer()));
         addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
+        addModule(new ScannerModule(coreConfiguration(), getContainer()));
 
         bootManagedTypeModule();
 
@@ -175,7 +174,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     /**
      * Registers an {@link EntityType}. <br/>
-     * Use this method if you are not willing to use annotations.
+     * Use this method if you are not willing to use {@link Entity} annotation.
      * <br/></br/>
      *
      * Recommended way to create {@link EntityDefinition} is {@link EntityDefinitionBuilder},
@@ -206,7 +205,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     /**
      * Registers a {@link ValueObjectType}. <br/>
-     * Use this method if you are not willing to use annotations.
+     * Use this method if you are not willing to use {@link ValueObject} annotations.
      * <br/></br/>
      *
      * Recommended way to create {@link ValueObjectDefinition} is {@link ValueObjectDefinitionBuilder}.
@@ -275,13 +274,30 @@ public class JaversBuilder extends AbstractJaversBuilder {
      * Registers a simple value type (see {@link ValueType}).
      * <br/><br/>
      *
-     * For example, values are: BigDecimal, LocalDateTime
+     * For example, values are: BigDecimal, LocalDateTime.
+     * <br/><br/>
+     *
+     * Use this method if you are not willing to use {@link Value} annotation.
      *
      * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValue(Class<?> valueClass) {
         argumentIsNotNull(valueClass);
         clientsClassDefinitions.add(new ValueDefinition(valueClass));
+        return this;
+    }
+
+    /**
+     * Marks given class as ignored by JaVers.
+     * <br/><br/>
+     *
+     * Use this method if you are not willing to use {@link DiffIgnore} annotation.
+     *
+     * @see DiffIgnore
+     */
+    public JaversBuilder registerIgnoredClass(Class<?> ignoredClass) {
+        argumentIsNotNull(ignoredClass);
+        clientsClassDefinitions.add(new IgnoredTypeDefinition(ignoredClass));
         return this;
     }
 
@@ -484,8 +500,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     private void bootManagedTypeModule() {
-        addModule(new PropertyScannerModule(getContainer(), coreConfiguration()));
-        addModule(new TypeModule(getContainer()));
+        addModule(new TypeMapperModule(getContainer()));
         mapRegisteredClasses();
     }
 

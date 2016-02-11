@@ -5,14 +5,28 @@ import org.javers.core.JaversBuilder
 import org.javers.core.MappingStyle
 import org.javers.core.diff.Diff
 import org.javers.core.model.DummyUser
-import org.javers.core.model.ListContainer
-import org.javers.core.model.SetContainer
 import spock.lang.Specification
 import spock.lang.Unroll
+
+class SetContainer {
+    Set<DummyUser> dummyUsers
+
+    SetContainer(Set<DummyUser> dummyUsers) {
+        this.dummyUsers = dummyUsers
+    }
+}
+
+class ListContainer {
+    List<DummyUser> dummyUsers
+
+    ListContainer(List<DummyUser> dummyUsers) {
+        this.dummyUsers = dummyUsers
+    }
+}
+
 /**
  * @author pawelszymczyk
  */
-
 class BeanScanning extends ComparingWrappedAndNonWrappedCollectionsTest {
 
     @Override

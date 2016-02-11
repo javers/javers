@@ -4,9 +4,8 @@ import org.javers.core.diff.appenders.AbstractDiffAppendersTest
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
-
 import static org.javers.core.diff.appenders.ContainerChangeAssert.assertThat
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import static org.javers.core.model.DummyUser.dummyUser
 
 class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
 
@@ -41,8 +40,8 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
     @Unroll
     def "should find #changeDesc element at the beginning of the list"() {
         given:
-        def leftNode =  dummyUser().withIntegerList(leftList).build()
-        def rightNode = dummyUser().withIntegerList(rightList).build()
+        def leftNode =  dummyUser().withIntegerList(leftList)
+        def rightNode = dummyUser().withIntegerList(rightList)
 
         when:
         def change = levenshteinListChangeAppender().calculateChanges(
@@ -62,8 +61,8 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
     def "should recognise that integer lists as equal"() {
 
         when:
-        def leftNode = dummyUser().withIntegerList([1, 2, 3]).build()
-        def rightNode = dummyUser().withIntegerList([1, 2, 3]).build()
+        def leftNode = dummyUser().withIntegerList([1, 2, 3])
+        def rightNode = dummyUser().withIntegerList([1, 2, 3])
 
         def change = levenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
@@ -75,8 +74,8 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
     def "should find added element at the end of the list"() {
 
         when:
-        def leftNode = dummyUser().withIntegerList([1, 2, 3]).build()
-        def rightNode = dummyUser().withIntegerList([1, 2, 3, 4]).build()
+        def leftNode = dummyUser().withIntegerList([1, 2, 3])
+        def rightNode = dummyUser().withIntegerList([1, 2, 3, 4])
 
         def change = levenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
@@ -90,8 +89,8 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
     def "should find added element in the middle of the list"() {
 
         when:
-        def leftNode = dummyUser().withIntegerList([1, 2, 3]).build()
-        def rightNode = dummyUser().withIntegerList([1, 2, 4, 3]).build()
+        def leftNode = dummyUser().withIntegerList([1, 2, 3])
+        def rightNode = dummyUser().withIntegerList([1, 2, 4, 3])
 
         def change = levenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
@@ -105,8 +104,8 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
     def "should find removed element in the middle of the list"() {
 
         when:
-        def leftNode = dummyUser().withIntegerList([1, 2, 4, 3]).build()
-        def rightNode = dummyUser().withIntegerList([1, 2, 3]).build()
+        def leftNode = dummyUser().withIntegerList([1, 2, 4, 3])
+        def rightNode = dummyUser().withIntegerList([1, 2, 3])
 
         def change = levenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
@@ -120,8 +119,8 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
     def "should find removed element at the end of the list"() {
 
         when:
-        def leftNode =   dummyUser().withIntegerList([1, 2, 3]).build()
-        def rightNode =  dummyUser().withIntegerList([1, 2]).build()
+        def leftNode =   dummyUser().withIntegerList([1, 2, 3])
+        def rightNode =  dummyUser().withIntegerList([1, 2])
 
         def change = levenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
@@ -135,8 +134,8 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
     def "should find changed element in the middle of the list"() {
 
         when:
-        def leftNode = dummyUser().withIntegerList([1, 2, 4, 3]).build()
-        def rightNode = dummyUser().withIntegerList([1, 2, 5, 3]).build()
+        def leftNode = dummyUser().withIntegerList([1, 2, 4, 3])
+        def rightNode = dummyUser().withIntegerList([1, 2, 5, 3])
 
         def change = levenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
@@ -150,8 +149,8 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should find changed element at the end of the list"() {
         when:
-        def leftNode = dummyUser().withIntegerList([0, 1, 2, 4]).build()
-        def rightNode = dummyUser().withIntegerList([0, 1, 2, 5]).build()
+        def leftNode = dummyUser().withIntegerList([0, 1, 2, 4])
+        def rightNode = dummyUser().withIntegerList([0, 1, 2, 5])
 
         def change = levenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))
@@ -164,8 +163,8 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should not fail on nulls"(){
       given:
-      def leftNode = dummyUser().withIntegerList(null).build()
-      def rightNode = dummyUser().withIntegerList([5]).build()
+      def leftNode = dummyUser().withIntegerList(null)
+      def rightNode = dummyUser().withIntegerList([5])
 
       when:
       def change = levenshteinListChangeAppender().calculateChanges(
@@ -179,8 +178,8 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should find changed and added element"() {
         when:
-        def leftNode = dummyUser().withIntegerList([0, 1, 2, 4]).build()
-        def rightNode = dummyUser().withIntegerList([0, 1, 3, 5, 6]).build()
+        def leftNode = dummyUser().withIntegerList([0, 1, 2, 4])
+        def rightNode = dummyUser().withIntegerList([0, 1, 3, 5, 6])
 
         def change = levenshteinListChangeAppender().calculateChanges(
                 realNodePair(leftNode, rightNode), getProperty(DummyUser, "integerList"))

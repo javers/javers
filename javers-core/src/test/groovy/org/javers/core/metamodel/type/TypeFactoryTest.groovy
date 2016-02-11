@@ -3,16 +3,14 @@ package org.javers.core.metamodel.type
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.MappingStyle
-import org.javers.core.examples.typeNames.AbstractValueObject
-import org.javers.core.examples.typeNames.NewNamedValueObject
-import org.javers.core.examples.typeNames.OldValueObject
+import org.javers.core.examples.typeNames.*
 import org.javers.core.metamodel.clazz.EntityDefinition
 import org.javers.core.metamodel.clazz.JaversEntity
-import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.metamodel.clazz.JaversValue
-import org.javers.core.examples.typeNames.JaversValueObjectWithTypeAlias
 import org.javers.core.metamodel.clazz.ValueObjectDefinition
+import org.javers.core.metamodel.scanner.ClassScanner
 import org.javers.core.model.DummyAddress
+import org.javers.core.model.DummyIgnoredType
 import org.javers.core.model.DummyUser
 import spock.lang.Shared
 import spock.lang.Specification
@@ -27,8 +25,19 @@ import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.value
  */
 class TypeFactoryTest extends Specification {
 
+    static def entityCreator(MappingStyle mappingStyle){
+        def typeFactory = create(mappingStyle)
+        return { clazz -> typeFactory.createEntity(clazz)}
+    }
+
+    static TypeFactory create(MappingStyle mappingStyle){
+        def javersTestAssembly = javersTestAssembly(mappingStyle)
+        def classScanner = javersTestAssembly.getContainerComponent(ClassScanner)
+        new TypeFactory(classScanner, javersTestAssembly.typeMapper)
+    }
+
     def setupSpec() {
-        typeFactory = javersTestAssembly(MappingStyle.FIELD).typeSpawningFactory
+        typeFactory = create(MappingStyle.FIELD)
     }
 
     @Shared
@@ -95,6 +104,20 @@ class TypeFactoryTest extends Specification {
         vo instanceof ValueObjectType
         vo.baseJavaClass == DummyAddress
         vo.properties.size() > 2
+    }
+
+    def "should ignore properties with @DiffIgnored type"(){
+        when:
+        EntityType entity = typeFactory.inferFromAnnotations(DummyUser)
+
+        then:
+        !entity.propertyNames.contains("propertyWithDiffIgnoredType")
+        !entity.propertyNames.contains("propertyWithDiffIgnoredSubtype")
+    }
+
+    def "should map @DiffIgnored type as IgnoredType"(){
+        expect:
+        typeFactory.inferFromAnnotations(DummyIgnoredType) instanceof IgnoredType
     }
 
     def "should map as ValueObjectType by default"(){

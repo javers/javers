@@ -1,11 +1,10 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.GraphPair
 import org.javers.core.model.DummyUser
 
 import static org.javers.core.diff.ChangeAssert.assertThat
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import static org.javers.core.model.DummyUser.dummyUser
 
 /**
  * @author Maciej Zasada
@@ -14,8 +13,8 @@ class ObjectRemovedAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append ObjectRemoved to diff"() {
         given:
-        def cdoLeft = dummyUser().withName("removed").build()
-        def cdoRight = dummyUser().withName("1").build()
+        def cdoLeft = dummyUser("removed")
+        def cdoRight = dummyUser("1")
         def left =  buildLiveGraph(cdoLeft)
         def right = buildLiveGraph(cdoRight)
 
@@ -33,8 +32,8 @@ class ObjectRemovedAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append 2 ObjectRemoved to diff"() {
         given:
-        def left =  buildLiveGraph(dummyUser().withName("removed").withDetails(5).build())
-        def right = buildLiveGraph(dummyUser().withName("1").build())
+        def left =  buildLiveGraph(dummyUser("removed").withDetails(5))
+        def right = buildLiveGraph(dummyUser("1"))
 
         when:
         def changes = new ObjectRemovedAppender().getChangeSet(new GraphPair(left, right))
@@ -47,8 +46,8 @@ class ObjectRemovedAppenderTest extends AbstractDiffAppendersTest {
 
     def "should do nothing when graph has same node set"() {
         given:
-        def left =  buildLiveGraph(dummyUser().withName("1").build())
-        def right = buildLiveGraph(dummyUser().withName("1").build())
+        def left =  buildLiveGraph(dummyUser("1"))
+        def right = buildLiveGraph(dummyUser("1"))
 
         when:
         def changes = new ObjectRemovedAppender().getChangeSet(new GraphPair(left, right))

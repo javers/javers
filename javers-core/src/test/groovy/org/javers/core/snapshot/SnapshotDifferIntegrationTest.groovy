@@ -14,8 +14,8 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
+import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
  * @author bartosz walacik
@@ -97,8 +97,8 @@ class SnapshotDifferIntegrationTest extends Specification {
         change.commitMetadata.get().id.majorId == 2
 
         where:
-        oldCdo <<  [dummyUser("kaz").withAge(5).build(), dummyUser("kaz").withDetails(1)]
-        newCdo <<  [dummyUser("kaz").withAge(6).build(), dummyUser("kaz").withDetails(2)]
+        oldCdo <<  [dummyUser("kaz").withAge(5), dummyUser("kaz").withDetails(1)]
+        newCdo <<  [dummyUser("kaz").withAge(6), dummyUser("kaz").withDetails(2)]
         expectedChangeType << [ValueChange, ReferenceChange]
         expectedChangedProperty << ["age","dummyUserDetails"]
         expectedLeftValue <<  [5, instanceId(1,DummyUserDetails)]

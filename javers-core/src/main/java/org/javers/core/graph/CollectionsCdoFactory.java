@@ -6,7 +6,7 @@ import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoWrapper;
 import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.property.PropertyScanner;
+import org.javers.core.metamodel.scanner.ClassScanner;
 import org.javers.core.metamodel.type.ValueObjectType;
 
 /**
@@ -14,16 +14,16 @@ import org.javers.core.metamodel.type.ValueObjectType;
  */
 public class CollectionsCdoFactory {
 
-    private final PropertyScanner propertyScanner;
+    private final ClassScanner classScanner;
     private final TailoredJaversMemberFactory memberGenericTypeInjector;
 
-    public CollectionsCdoFactory(PropertyScanner propertyScanner, TailoredJaversMemberFactory memberGenericTypeInjector) {
-        this.propertyScanner = propertyScanner;
+    public CollectionsCdoFactory(ClassScanner classScanner, TailoredJaversMemberFactory memberGenericTypeInjector) {
+        this.classScanner = classScanner;
         this.memberGenericTypeInjector = memberGenericTypeInjector;
     }
 
     public Cdo createCdo(final CollectionWrapper wrapper, final Class<?> clazz) {
-        Property primaryProperty = propertyScanner.scan(wrapper.getClass()).getFirst();
+        Property primaryProperty = classScanner.scan(wrapper.getClass()).getProperties().get(0);
         JaversMember javersMember = memberGenericTypeInjector.create(primaryProperty, clazz);
         Property fixedProperty = new Property(javersMember, false);
         ValueObjectType valueObject = new ValueObjectType(wrapper.getClass(), Lists.asList(fixedProperty));

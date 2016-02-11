@@ -15,9 +15,9 @@ import static DummyUserWithValues.dummyUserWithDate
 import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
+import static org.javers.core.model.DummyUser.dummyUser
+import static org.javers.core.model.DummyUserDetails.dummyUserDetails
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithSalary
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
-import static org.javers.test.builder.DummyUserDetailsBuilder.dummyUserDetails
 
 /**
  * @author bartosz walacik
@@ -52,8 +52,8 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should set ValueChange metadata"() {
         given:
-        def left =  buildGraph(dummyUser("1").withSex(FEMALE).build())
-        def right = buildGraph(dummyUser("1").withSex(OCCASIONALLY).build())
+        def left =  buildGraph(dummyUser("1").withSex(FEMALE))
+        def right = buildGraph(dummyUser("1").withSex(OCCASIONALLY))
         def sex = getManagedProperty(DummyUser,"sex")
 
         when:
@@ -67,8 +67,8 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append Enum valueChange" () {
         given:
-        def left =  buildGraph(dummyUser("1").withSex(FEMALE).build())
-        def right = buildGraph(dummyUser("1").withSex(OCCASIONALLY).build())
+        def left =  buildGraph(dummyUser("1").withSex(FEMALE))
+        def right = buildGraph(dummyUser("1").withSex(OCCASIONALLY))
         def sex = getManagedProperty(DummyUser,"sex")
 
         when:
@@ -83,8 +83,8 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append int valueChange" () {
         given:
-        def left =  buildGraph(dummyUser("1").withAge(1).build())
-        def right = buildGraph(dummyUser("1").withAge(2).build())
+        def left =  buildGraph(dummyUser("1").withAge(1))
+        def right = buildGraph(dummyUser("1").withAge(2))
         def age = getManagedProperty(DummyUser,"age")
 
         when:
@@ -99,8 +99,8 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append Integer valueChange" () {
         given:
-        def left =  buildGraph(dummyUser("1").build())
-        def right = buildGraph(dummyUser("1").withInteger(5).build())
+        def left =  buildGraph(dummyUser("1"))
+        def right = buildGraph(dummyUser("1").withInteger(5))
         def largeInt = getManagedProperty(DummyUser,"largeInt")
 
         when:
@@ -115,8 +115,8 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append boolean valueChange" () {
         given:
-        def left =  buildGraph(dummyUser("1").withFlag(true).build())
-        def right = buildGraph(dummyUser("1").withFlag(false).build())
+        def left =  buildGraph(dummyUser("1").withFlag(true))
+        def right = buildGraph(dummyUser("1").withFlag(false))
         def flag = getManagedProperty(DummyUser,"flag")
 
         when:
@@ -131,8 +131,8 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append Boolean valueChange" () {
         given:
-        def left =  buildGraph(dummyUser("1").build())
-        def right = buildGraph(dummyUser("1").withBoxedFlag(true).build())
+        def left =  buildGraph(dummyUser("1"))
+        def right = buildGraph(dummyUser("1").withBoxedFlag(true))
         def flag = getManagedProperty(DummyUser,"bigFlag")
 
         when:
@@ -186,8 +186,8 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should create fragment valueChange for embedded ValueObject" () {
         given:
-        def leftUser =  dummyUserDetails(1).withAddress("Boston","Washington Street").build();
-        def rightUser = dummyUserDetails(1).withAddress("Boston","Wall Street").build();
+        def leftUser =  dummyUserDetails(1).withAddress("Boston","Washington Street")
+        def rightUser = dummyUserDetails(1).withAddress("Boston","Wall Street")
         def left = buildGraph(leftUser)
         def right = buildGraph(rightUser)
         def address = getManagedProperty(DummyUserDetails,"dummyAddress")

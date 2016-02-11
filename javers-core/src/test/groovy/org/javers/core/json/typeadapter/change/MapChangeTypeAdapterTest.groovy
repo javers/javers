@@ -9,6 +9,7 @@ import org.javers.core.diff.changetype.map.EntryAdded
 import org.javers.core.diff.changetype.map.EntryRemoved
 import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.map.MapChange
+import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
@@ -19,7 +20,6 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.JaversTestBuilder.javersTestAssemblyTypeSafe
 import static org.javers.core.json.builder.ChangeTestBuilder.mapChange
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
  * @author bartosz walacik
@@ -250,7 +250,7 @@ class MapChangeTypeAdapterTest extends Specification {
                             new EntryRemoved("some",2),
                             new EntryValueChange("mod",3,4)]
 
-        def change = mapChange(dummyUser("kaz").build(),"valueMap",entryChanges)
+        def change = mapChange(DummyUser.dummyUser("kaz"),"valueMap",entryChanges)
 
         when:
         def jsonText = jsonConverter.toJson(change)

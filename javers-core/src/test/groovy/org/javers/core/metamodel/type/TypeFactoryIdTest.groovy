@@ -6,13 +6,15 @@ import org.javers.core.metamodel.clazz.EntityDefinition
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyEntityWithEmbeddedId
 import org.javers.core.model.DummyUser
+import spock.lang.Shared
 import spock.lang.Specification
 
 /**
  * @author bartosz walacik
  */
 abstract class TypeFactoryIdTest extends Specification {
-    protected TypeFactory typeFactory
+    @Shared
+    TypeFactory typeFactory
 
     def "should use @EmbeddedId property"(){
         when:

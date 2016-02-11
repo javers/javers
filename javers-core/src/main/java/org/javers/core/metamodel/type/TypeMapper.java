@@ -7,10 +7,9 @@ import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.scanner.ClassScanner;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -27,13 +26,26 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class TypeMapper {
-    private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
     private final TypeMapperState state;
     private final DehydratedTypeFactory dehydratedTypeFactory = new DehydratedTypeFactory(this);
 
-    public TypeMapper(TypeFactory typeFactory) {
+    public TypeMapper(ClassScanner classScanner) {
+        //Pico doesn't support cycles, so manual construction
+        TypeFactory typeFactory = new TypeFactory(classScanner, this);
         this.state = new TypeMapperState(typeFactory);
+        registerCoreTypes();
+    }
 
+    /**
+     * for TypeMapperConcurrentTest only, no better idea how to writhe this test
+     * without additional constructor
+     */
+    protected TypeMapper(TypeFactory typeFactory ) {
+        this.state = new TypeMapperState(typeFactory);
+        registerCoreTypes();
+    }
+
+    private void registerCoreTypes(){
         //primitives & boxes
         for (Class primitiveOrBox : Primitives.getPrimitiveAndBoxTypes()) {
             registerPrimitiveType(primitiveOrBox);
