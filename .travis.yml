@@ -18,7 +18,7 @@ before_script:
   - mysql -e 'create database travis_ci_test;' -u root
 
 script:
-  - "./gradlew check -i"
-  - "./gradlew integrationTest -i"
+  - "./gradlew check"
+  - "./gradlew integrationTest"
 
 sudo: false
