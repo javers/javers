@@ -1,49 +1,42 @@
 package org.javers.repository.sql
 
 import groovy.sql.Sql
-import org.javers.core.JaversBuilder
 import org.javers.core.JaversRepositoryE2ETest
 import org.javers.core.cases.Case207Arrays
 import org.javers.core.cases.Case208DateTimeTypes
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
+import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryBuilder
 
 import java.sql.Connection
 
 abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
-    Connection con
-    JaversSqlRepository sqlRepository
+    private Connection connection
 
     protected abstract Connection createConnection()
 
     protected abstract DialectName getDialect()
 
-    Connection getConnection() {
-        con
+    protected Connection getConnection() {
+        connection
     }
 
     @Override
     def setup() {
         clearTables()
-        getConnection().commit()
+        connection.commit()
     }
 
     @Override
-    JaversBuilder configureJavers(JaversBuilder javersBuilder) {
-        super.configureJavers(javersBuilder)
-        initializeSqlRepository()
-        javersBuilder.registerJaversRepository(sqlRepository)
-    }
-
-    protected void initializeSqlRepository() {
-        con = createConnection()
-        con.setAutoCommit(false)
-        sqlRepository = SqlRepositoryBuilder
-                .sqlRepository()
-                .withConnectionProvider({ getConnection() } as ConnectionProvider)
-                .withDialect(getDialect()).build()
+    protected JaversRepository prepareJaversRepository() {
+        connection = createConnection()
+        connection.setAutoCommit(false)
+        return SqlRepositoryBuilder
+            .sqlRepository()
+            .withConnectionProvider({ connection } as ConnectionProvider)
+            .withDialect(getDialect()).build()
     }
 
     def clearTables() {
@@ -54,19 +47,19 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     }
 
     def cleanup() {
-        getConnection().rollback()
-        getConnection().close()
+        connection.rollback()
+        connection.close()
     }
 
     def execute(String sql) {
-        def stmt = getConnection().createStatement()
+        def stmt = connection.createStatement()
         stmt.executeUpdate(sql)
         stmt.close()
     }
 
     def "should select Head using max CommitId and not table PK"(){
         given:
-        def sql = new Sql(getConnection())
+        def sql = new Sql(connection)
         [
                 [3, 3.00],
                 [2, 11.02],
@@ -76,7 +69,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         }
 
         when:
-        def head = sqlRepository.headId
+        def head = repository.headId
         println head
 
         then:
@@ -90,7 +83,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
         when:
         javers.commit("author", anEntity)
-        getConnection().rollback()
+        connection.rollback()
         def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         then:
@@ -98,7 +91,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
         when:
         javers.commit("author", anEntity)
-        getConnection().commit()
+        connection.commit()
         snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         then:

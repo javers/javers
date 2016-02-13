@@ -7,6 +7,9 @@ import org.javers.core.examples.typeNames.*
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.core.snapshot.SnapshotsAssert
+import org.javers.repository.api.JaversRepository
+import org.javers.repository.api.SnapshotDescriptor
+import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
@@ -21,18 +24,18 @@ import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValue
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
 class JaversRepositoryE2ETest extends Specification {
-    FakeDateProvider fakeDateProvider
-    Javers javers
+    protected FakeDateProvider fakeDateProvider
+    protected JaversRepository repository
+    protected Javers javers
 
     def setup() {
-        JaversBuilder javersBuilder = configureJavers(javers())
-        javers = javersBuilder.build()
+        fakeDateProvider = new FakeDateProvider()
+        repository = prepareJaversRepository()
+        javers = javers().withDateTimeProvider(fakeDateProvider).registerJaversRepository(repository).build()
     }
 
-    JaversBuilder configureJavers(JaversBuilder javersBuilder) {
-        // InMemoryRepository is used by default
-        fakeDateProvider = new FakeDateProvider()
-        javersBuilder.withDateTimeProvider(fakeDateProvider)
+    protected JaversRepository prepareJaversRepository() {
+        return new InMemoryRepository();
     }
 
     def "should support EmbeddedId as Entity Id"(){
@@ -689,4 +692,47 @@ class JaversRepositoryE2ETest extends Specification {
             byInstanceId(1, SnapshotEntity).withVersion(5).build()
         ]
     }
+
+    def "should retrieve snapshots with specified descriptors"() {
+        given:
+        (1..10).each {
+            javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
+            javers.commit("author", new SnapshotEntity(id: 2, intProperty: it))
+            javers.commit("author", new SnapshotEntity(id: 3, intProperty: it))
+        }
+
+        def snapshotDescriptors = [
+            new SnapshotDescriptor(javers.idBuilder().instanceId(new SnapshotEntity(id: 1)), 3),
+            new SnapshotDescriptor(javers.idBuilder().instanceId(new SnapshotEntity(id: 3)), 7),
+            new SnapshotDescriptor(javers.idBuilder().instanceId(new SnapshotEntity(id: 2)), 1),
+            new SnapshotDescriptor(javers.idBuilder().instanceId(new SnapshotEntity(id: 1)), 10)
+        ]
+
+        when:
+        def snapshots = repository.getSnapshots(snapshotDescriptors)
+
+        then:
+        assert snapshots.size() == snapshotDescriptors.size()
+        snapshotDescriptors.each { desc ->
+            assert snapshots.find( { snap -> snap.globalId == desc.globalId && snap.version == desc.version } ) != null
+        }
+    }
+
+    def "should cope with query for 1000 different snapshots"() {
+        given:
+        (1..1000).each {
+            javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
+        }
+
+        def snapshotDescriptors = (1..1000).collect {
+            new SnapshotDescriptor(javers.idBuilder().instanceId(new SnapshotEntity(id: 1)), it)
+        }
+
+        when:
+        def snapshots = repository.getSnapshots(snapshotDescriptors)
+
+        then:
+        assert snapshots.size() == snapshotDescriptors.size()
+    }
+
 }

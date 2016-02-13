@@ -8,7 +8,7 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 /**
  * @author bartosz.walacik
  */
-class ManagedClassFilter extends SnapshotFilter {
+class ManagedClassFilter extends PrimaryKeySnapshotFilter {
     ManagedClassFilter(long classPk, Optional<String> propertyName) {
         super(classPk, "g." + GLOBAL_ID_CLASS_FK, propertyName);
     }
@@ -19,24 +19,11 @@ class ManagedClassFilter extends SnapshotFilter {
 
     @Override
     String select() {
-        return BASE_FIELDS + ", " +
-                "g." + GLOBAL_ID_LOCAL_ID + ", " +
-                "g." + GLOBAL_ID_FRAGMENT + ", " +
-                "g." + GLOBAL_ID_OWNER_ID_FK + ", " +
-                "g_c." + CDO_CLASS_QUALIFIED_NAME + ", " +
-                "o." + GLOBAL_ID_LOCAL_ID + " owner_" + GLOBAL_ID_LOCAL_ID + ", " +
-                "o." + GLOBAL_ID_FRAGMENT + " owner_" + GLOBAL_ID_FRAGMENT + ", " +
-                "o_c." + CDO_CLASS_QUALIFIED_NAME + " owner_" + CDO_CLASS_QUALIFIED_NAME;
+        return BASE_AND_GLOBAL_ID_FIELDS;
     }
 
     @Override
     void addFrom(SelectQuery query) {
-        final String JOIN_GLOBAL_ID_TO_SNAPSHOT
-                = " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
-                " INNER JOIN " + CDO_CLASS_TABLE_NAME + " g_c ON g_c." + CDO_CLASS_PK + " = g." + GLOBAL_ID_CLASS_FK +
-                " LEFT OUTER JOIN " + GLOBAL_ID_TABLE_NAME + " o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK +
-                " LEFT OUTER JOIN " + CDO_CLASS_TABLE_NAME + " o_c ON o_c." + CDO_CLASS_PK + " = o." + GLOBAL_ID_CLASS_FK;
-
-        query.from(COMMIT_WITH_SNAPSHOT + JOIN_GLOBAL_ID_TO_SNAPSHOT);
+        query.from(COMMIT_WITH_SNAPSHOT_GLOBAL_ID);
     }
 }

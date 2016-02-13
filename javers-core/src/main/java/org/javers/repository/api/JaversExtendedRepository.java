@@ -14,6 +14,7 @@ import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.snapshot.SnapshotDiffer;
 
+import java.util.Collection;
 import java.util.List;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -98,6 +99,12 @@ public class JaversExtendedRepository implements JaversRepository {
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         argumentIsNotNull(globalId);
         return delegate.getLatest(globalId);
+    }
+
+    @Override
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotDescriptor> descriptors) {
+        argumentIsNotNull(descriptors);
+        return delegate.getSnapshots(descriptors);
     }
 
     @Override
