@@ -26,9 +26,12 @@ public class SnapshotFactory {
         this.globalIdFactory = globalIdFactory;
     }
 
-    public CdoSnapshot createTerminal(GlobalId globalId, CommitMetadata commitMetadata) {
+    public CdoSnapshot createTerminal(GlobalId globalId, CdoSnapshot previous, CommitMetadata commitMetadata) {
         ManagedType managedType = typeMapper.getJaversManagedType(globalId);
-        return cdoSnapshot(globalId, commitMetadata, managedType).withType(TERMINAL).build();
+        return cdoSnapshot(globalId, commitMetadata, managedType)
+                .withType(TERMINAL)
+                .withVersion(previous.getVersion()+1)
+                .build();
     }
 
     public CdoSnapshot createInitial(CdoWrapper cdoWrapper, CommitMetadata commitMetadata) {
