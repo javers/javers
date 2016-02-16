@@ -45,14 +45,15 @@ public class CommitFactory {
     public Commit createTerminalByGlobalId(String author, GlobalId removedId){
         Validate.argumentsAreNotNull(author, removedId);
 
-        if (javersRepository.getLatest(removedId).isEmpty()){
+        Optional<CdoSnapshot> previousSnapshot = javersRepository.getLatest(removedId);
+        if (previousSnapshot.isEmpty()){
             throw new JaversException(JaversExceptionCode.CANT_DELETE_OBJECT_NOT_FOUND,removedId.value());
         }
 
         CommitMetadata commitMetadata = nextCommit(author);
 
         CdoSnapshot terminalSnapshot =
-                snapshotFactory.createTerminal(removedId, commitMetadata);
+                snapshotFactory.createTerminal(removedId, previousSnapshot.get(), commitMetadata);
 
         Diff diff = diffFactory.singleTerminal(removedId, commitMetadata);
 
