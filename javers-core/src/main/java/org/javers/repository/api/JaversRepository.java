@@ -82,7 +82,7 @@ public interface JaversRepository {
     /**
      * Snapshots with specified globalId and version
      */
-    List<CdoSnapshot> getSnapshots(Collection<SnapshotDescriptor> descriptors);
+    List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers);
 
     void persist(Commit commit);
 

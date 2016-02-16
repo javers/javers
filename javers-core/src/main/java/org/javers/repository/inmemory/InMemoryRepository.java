@@ -16,7 +16,7 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
-import org.javers.repository.api.SnapshotDescriptor;
+import org.javers.repository.api.SnapshotIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,23 +166,23 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getSnapshots(Collection<SnapshotDescriptor> descriptors) {
-        List<SnapshotDescriptor> validDescriptors = getValidDescriptors(descriptors);
-        return Lists.transform(validDescriptors, new Function<SnapshotDescriptor, CdoSnapshot>() {
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        List<SnapshotIdentifier> persistedIdentifiers = getPersistedIdentifiers(snapshotIdentifiers);
+        return Lists.transform(persistedIdentifiers, new Function<SnapshotIdentifier, CdoSnapshot>() {
             @Override
-            public CdoSnapshot apply(SnapshotDescriptor descriptor) {
-                List<CdoSnapshot> objectSnapshots = snapshots.get(descriptor.getGlobalId());
-                return objectSnapshots.get(objectSnapshots.size() - ((int)descriptor.getVersion()));
+            public CdoSnapshot apply(SnapshotIdentifier snapshotIdentifier) {
+                List<CdoSnapshot> objectSnapshots = snapshots.get(snapshotIdentifier.getGlobalId());
+                return objectSnapshots.get(objectSnapshots.size() - ((int)snapshotIdentifier.getVersion()));
             }
         });
     }
 
-    private List<SnapshotDescriptor> getValidDescriptors(Collection<SnapshotDescriptor> descriptors) {
-        return Lists.positiveFilter(new ArrayList<>(descriptors), new Predicate<SnapshotDescriptor>() {
+    private List<SnapshotIdentifier> getPersistedIdentifiers(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        return Lists.positiveFilter(new ArrayList<>(snapshotIdentifiers), new Predicate<SnapshotIdentifier>() {
             @Override
-            public boolean apply(SnapshotDescriptor descriptor) {
-                return snapshots.containsKey(descriptor.getGlobalId()) &&
-                    descriptor.getVersion() <= snapshots.get(descriptor.getGlobalId()).size();
+            public boolean apply(SnapshotIdentifier snapshotIdentifier) {
+                return snapshots.containsKey(snapshotIdentifier.getGlobalId()) &&
+                    snapshotIdentifier.getVersion() <= snapshots.get(snapshotIdentifier.getGlobalId()).size();
             }
         });
     }

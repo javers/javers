@@ -3,11 +3,11 @@ package org.javers.repository.api;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.GlobalId;
 
-public final class SnapshotDescriptor {
+public final class SnapshotIdentifier {
     final GlobalId globalId;
     final long version;
 
-    public SnapshotDescriptor(GlobalId globalId, long version) {
+    public SnapshotIdentifier(GlobalId globalId, long version) {
         Validate.argumentIsNotNull(globalId);
         Validate.argumentCheck(version > 0, "Version is not a positive number.");
         this.globalId = globalId;

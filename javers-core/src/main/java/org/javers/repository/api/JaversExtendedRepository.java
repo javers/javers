@@ -102,9 +102,9 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getSnapshots(Collection<SnapshotDescriptor> descriptors) {
-        argumentIsNotNull(descriptors);
-        return delegate.getSnapshots(descriptors);
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        argumentIsNotNull(snapshotIdentifiers);
+        return delegate.getSnapshots(snapshotIdentifiers);
     }
 
     @Override

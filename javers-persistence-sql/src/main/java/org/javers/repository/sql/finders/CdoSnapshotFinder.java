@@ -8,7 +8,7 @@ import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
-import org.javers.repository.api.SnapshotDescriptor;
+import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
@@ -48,8 +48,8 @@ public class CdoSnapshotFinder {
         return Optional.of(queryForCdoSnapshots(new SnapshotIdFilter(maxSnapshot.get()), Optional.of(globalId), Optional.of(oneItemLimit)).get(0));
     }
 
-    public List<CdoSnapshot> getSnapshots(Collection<SnapshotDescriptor> descriptors) {
-        return queryForCdoSnapshots(new SnapshotDescriptorsFilter(globalIdRepository, descriptors), Optional.<GlobalId>empty(), Optional.<QueryParams>empty());
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        return queryForCdoSnapshots(new SnapshotIdentifiersFilter(globalIdRepository, snapshotIdentifiers), Optional.<GlobalId>empty(), Optional.<QueryParams>empty());
     }
 
     public List<CdoSnapshot> getStateHistory(ManagedType managedType, Optional<String> propertyName, QueryParams queryParams) {

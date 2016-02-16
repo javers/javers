@@ -1,6 +1,7 @@
 package org.javers.repository.mongo;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -22,7 +23,7 @@ import org.javers.core.metamodel.type.ValueObjectType;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
-import org.javers.repository.api.SnapshotDescriptor;
+import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.mongo.model.MongoHeadId;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -80,7 +81,7 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        return queryForSnapshots(createIdQuery(globalId), queryParams);
+        return queryForSnapshots(createIdQuery(globalId), Optional.of(queryParams));
     }
 
     @Override
@@ -89,8 +90,8 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getSnapshots(Collection<SnapshotDescriptor> descriptors) {
-        return getSnapshots(createSnapshotDescriptorsQuery(descriptors));
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        return queryForSnapshots(createSnapshotIdentifiersQuery(snapshotIdentifiers), Optional.<QueryParams>empty());
     }
 
     @Override
@@ -98,7 +99,7 @@ public class MongoRepository implements JaversRepository {
         BasicDBObject query = new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ownerEntity.getName());
         query.append(GLOBAL_ID_FRAGMENT, path);
 
-        return queryForSnapshots(query, queryParams);
+        return queryForSnapshots(query, Optional.of(queryParams));
     }
 
     @Override
@@ -107,7 +108,7 @@ public class MongoRepository implements JaversRepository {
 
         query.append(CHANGED_PROPERTIES, propertyName);
 
-        return queryForSnapshots(query, queryParams);
+        return queryForSnapshots(query, Optional.of(queryParams));
     }
 
     @Override
@@ -116,13 +117,13 @@ public class MongoRepository implements JaversRepository {
 
         query.append(CHANGED_PROPERTIES, propertyName);
 
-        return queryForSnapshots(query, queryParams);
+        return queryForSnapshots(query, Optional.of(queryParams));
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
         BasicDBObject query = createGlobalIdClassQuery(givenClass);
-        return queryForSnapshots(query, queryParams);
+        return queryForSnapshots(query, Optional.of(queryParams));
     }
 
     @Override
@@ -180,13 +181,17 @@ public class MongoRepository implements JaversRepository {
         return new BasicDBObject (GLOBAL_ID_KEY, id.value());
     }
 
-    private Bson createSnapshotDescriptorsQuery(Collection<SnapshotDescriptor> descriptors) {
-        Collection<Bson> descFilters = Lists.transform(new ArrayList<>(descriptors), new Function<SnapshotDescriptor, Bson>() {
+    private Bson createVersionQuery(Long version) {
+        return new BasicDBObject(SNAPSHOT_VERSION, version);
+    }
+
+    private Bson createSnapshotIdentifiersQuery(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        Collection<Bson> descFilters = Lists.transform(new ArrayList<>(snapshotIdentifiers), new Function<SnapshotIdentifier, Bson>() {
             @Override
-            public Bson apply(SnapshotDescriptor descriptor) {
+            public Bson apply(SnapshotIdentifier snapshotIdentifier) {
                 return Filters.and(
-                    createIdQuery(descriptor.getGlobalId()),
-                    createVersionQuery(descriptor.getVersion())
+                    createIdQuery(snapshotIdentifier.getGlobalId()),
+                    createVersionQuery(snapshotIdentifier.getVersion())
                 );
             }
         });
@@ -249,74 +254,61 @@ public class MongoRepository implements JaversRepository {
         return Filters.eq(OBJECT_ID, document.getObjectId("_id"));
     }
 
-    private MongoCursor<Document> getMongoSnapshotsCursor(Bson query) {
-        return snapshotsCollection()
-            .find(query)
-            .sort(new Document(COMMIT_ID, DESC))
-            .iterator();
+    private MongoCursor<Document> getMongoSnapshotsCursor(Bson query, Optional<QueryParams> queryParams) {
+        FindIterable<Document> findIterable = snapshotsCollection()
+            .find(applyQueryParams(query, queryParams))
+            .sort(new Document(COMMIT_ID, DESC));
+        return applyQueryParams(findIterable, queryParams).iterator();
     }
 
-    private MongoCursor<Document> getMongoSnapshotsCursor(Bson idQuery, QueryParams queryParams) {
-        Bson query = applyQueryParams(idQuery, queryParams);
-        return snapshotsCollection()
-                .find(query)
-                .sort(new Document(COMMIT_ID, DESC))
-                .limit(queryParams.limit())
-                .skip(queryParams.skip())
-                .iterator();
-    }
-
-    private Bson applyQueryParams(Bson query, QueryParams queryParams) {
-        if (queryParams.from().isPresent()) {
-            query = addFromDateFiler(query, queryParams.from().get());
-        }
-        if (queryParams.to().isPresent()) {
-            query = addToDateFilter(query, queryParams.to().get());
-        }
-        if (queryParams.commitId().isPresent()) {
-            query = addCommitIdFilter(query, queryParams.commitId().get());
-        }
-        if (queryParams.version().isPresent()) {
-            query = addVersionFilter(query, queryParams.version().get());
+    private Bson applyQueryParams(Bson query, Optional<QueryParams> queryParams) {
+        if (queryParams.isPresent()) {
+            QueryParams params = queryParams.get();
+            if (params.from().isPresent()) {
+                query = addFromDateFiler(query, params.from().get());
+            }
+            if (params.to().isPresent()) {
+                query = addToDateFilter(query, params.to().get());
+            }
+            if (params.commitId().isPresent()) {
+                query = addCommitIdFilter(query, params.commitId().get());
+            }
+            if (params.version().isPresent()) {
+                query = addVersionFilter(query, params.version().get());
+            }
         }
         return query;
     }
 
-    private Bson addFromDateFiler(Bson query, LocalDateTime from) {
-        return Filters.and(query, createFromDateQuery(from));
+    private FindIterable<Document> applyQueryParams(FindIterable<Document> findIterable, Optional<QueryParams> queryParams) {
+        if (queryParams.isPresent()) {
+            QueryParams params = queryParams.get();
+            findIterable = findIterable
+                .limit(params.limit())
+                .skip(params.skip());
+        }
+        return  findIterable;
     }
 
-    private Bson createFromDateQuery(LocalDateTime from) {
-        return Filters.gte(COMMIT_DATE, DateTypeCoreAdapters.serialize(from));
+    private Bson addFromDateFiler(Bson query, LocalDateTime from) {
+        return Filters.and(query, Filters.gte(COMMIT_DATE, DateTypeCoreAdapters.serialize(from)));
     }
 
     private Bson addToDateFilter(Bson query, LocalDateTime to) {
-        return Filters.and(query, createToDateQuery(to));
-    }
-
-    private Bson createToDateQuery(LocalDateTime to) {
-        return Filters.lte(COMMIT_DATE, DateTypeCoreAdapters.serialize(to));
+        return Filters.and(query, Filters.lte(COMMIT_DATE, DateTypeCoreAdapters.serialize(to)));
     }
 
     private Bson addCommitIdFilter(Bson query, CommitId commitId) {
-        return Filters.and(query, createCommitIdQuery(commitId));
-    }
-
-    private Bson createCommitIdQuery(CommitId commitId) {
-        return new BasicDBObject(COMMIT_ID, commitId.valueAsNumber().doubleValue());
+        return Filters.and(query, new BasicDBObject(COMMIT_ID, commitId.valueAsNumber().doubleValue()));
     }
 
     private Bson addVersionFilter(Bson query, Long version) {
         return Filters.and(query, createVersionQuery(version));
     }
 
-    private Bson createVersionQuery(Long version) {
-        return new BasicDBObject(SNAPSHOT_VERSION, version);
-    }
-
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {
         QueryParams queryParams = QueryParamsBuilder.withLimit(1).build();
-        MongoCursor<Document> mongoLatest = getMongoSnapshotsCursor(idQuery, queryParams);
+        MongoCursor<Document> mongoLatest = getMongoSnapshotsCursor(idQuery, Optional.of(queryParams));
 
         if (!mongoLatest.hasNext()) {
             return Optional.empty();
@@ -326,18 +318,7 @@ public class MongoRepository implements JaversRepository {
         return Optional.of(readFromDBObject(dbObject));
     }
 
-    private List<CdoSnapshot> getSnapshots(Bson query) {
-        List<CdoSnapshot> snapshots = new ArrayList<>();
-        try (MongoCursor<Document> mongoSnapshots = getMongoSnapshotsCursor(query)) {
-            while (mongoSnapshots.hasNext()) {
-                Document dbObject = mongoSnapshots.next();
-                snapshots.add(readFromDBObject(dbObject));
-            }
-            return snapshots;
-        }
-    }
-
-    private List<CdoSnapshot> queryForSnapshots(Bson query, QueryParams queryParams) {
+    private List<CdoSnapshot> queryForSnapshots(Bson query, Optional<QueryParams> queryParams) {
         List<CdoSnapshot> snapshots = new ArrayList<>();
         try (MongoCursor<Document> mongoSnapshots = getMongoSnapshotsCursor(query, queryParams)) {
             while (mongoSnapshots.hasNext()) {
