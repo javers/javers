@@ -6,13 +6,12 @@ import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.json.typeadapter.date.DateTypeCoreAdapters;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 /**
@@ -27,6 +26,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
     private static final String STATE_NAME = "state";
     private static final String TYPE_NAME = "type";
     private static final String CHANGED_NAME = "changedProperties";
+    private static final String VERSION = "version";
 
 
     public CdoSnapshotObjectMapper(JsonConverter jsonConverter, Optional<GlobalId> providedGlobalId) {
@@ -42,6 +42,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
         json.add(STATE_NAME, jsonConverter.fromJsonToJsonElement(resultSet.getString(SNAPSHOT_STATE)));
         json.add(CHANGED_NAME, assembleChangedPropNames(resultSet));
         json.addProperty(TYPE_NAME, resultSet.getString(SNAPSHOT_TYPE));
+        json.addProperty(VERSION, resultSet.getLong(VERSION));
 
         if (providedGlobalId.isPresent()){
             json.add(GLOBAL_CDO_ID, jsonConverter.toJsonElement(providedGlobalId.get()));
@@ -68,7 +69,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
     private JsonElement assembleCommitMetadata(ResultSet resultSet) throws SQLException {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("author",resultSet.getString(COMMIT_AUTHOR));
-        jsonObject.add("commitDate", jsonConverter.toJsonElement(resultSet.getTimestamp(COMMIT_COMMIT_DATE)));
+        jsonObject.addProperty("commitDate", DateTypeCoreAdapters.serializeToLocal( resultSet.getTimestamp(COMMIT_COMMIT_DATE)));
         jsonObject.addProperty("id", resultSet.getBigDecimal(COMMIT_COMMIT_ID));
 
         return jsonObject;

@@ -80,7 +80,7 @@ class CustomPropertyComparatorE2ETest extends Specification {
         then:
         diff.changes.size() == 1
         with(diff.changes[0]) {
-            affectedCdoId instanceof UnboundedValueObjectId
+            affectedGlobalId instanceof UnboundedValueObjectId
             propertyName == "multimap"
             changes[0].key == "a"
             changes[0].leftValue == 1

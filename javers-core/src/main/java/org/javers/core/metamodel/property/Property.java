@@ -11,6 +11,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 /**
  * Domain object's data property, getter or field
  */
+//TODO move to another package
 public class Property {
     public static final String ID_ANN = "Id";
     public static final String EMBEDDED_ID_ANN = "EmbeddedId";
@@ -25,11 +26,14 @@ public class Property {
     }
 
     public Type getGenericType() {
-        return member.getGenericType();
+        return member.getGenericResolvedType();
     }
 
-    public Class<?> getType() {
-        return member.getType();
+    /**
+     * use getGenericType() when possible, see JaversMember.resolvedReturnType
+     */
+    public Class<?> getRawType() {
+        return member.getRawType();
     }
 
     /**
@@ -65,7 +69,7 @@ public class Property {
         return member.propertyName();
     }
 
-    public boolean isHasTransientAnn() {
+    public boolean hasTransientAnn() {
         return hasTransientAnn;
     }
 

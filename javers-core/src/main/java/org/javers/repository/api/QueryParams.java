@@ -1,6 +1,7 @@
 package org.javers.repository.api;
 
 import org.javers.common.collections.Optional;
+import org.javers.core.commit.CommitId;
 import org.joda.time.LocalDateTime;
 
 /**
@@ -17,17 +18,27 @@ import org.joda.time.LocalDateTime;
  */
 public class QueryParams {
     private final int limit;
+    private final int skip;
     private final Optional<LocalDateTime> from;
     private final Optional<LocalDateTime> to;
+    private final Optional<CommitId> commitId;
+    private final Optional<Long> version;
 
-    QueryParams(int limit, LocalDateTime from, LocalDateTime to) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId, Long version) {
         this.limit = limit;
+        this.skip = skip;
         this.from = Optional.fromNullable(from);
         this.to = Optional.fromNullable(to);
+        this.commitId = Optional.fromNullable(commitId);
+        this.version = Optional.fromNullable(version);
     }
 
     public int limit() {
         return limit;
+    }
+
+    public int skip() {
+        return skip;
     }
 
     public boolean hasDates() {
@@ -45,7 +56,6 @@ public class QueryParams {
         return true;
     }
 
-
     /**
      * filters results to Snapshots created after given date
      */
@@ -60,12 +70,29 @@ public class QueryParams {
         return to;
     }
 
+    /*
+     * filters results to Snapshots with a given commitId
+     */
+    public Optional<CommitId> commitId() {
+        return commitId;
+    }
+
+    /*
+     * filters results to Snapshots with a given version
+     */
+    public Optional<Long> version() {
+        return version;
+    }
+
     @Override
     public String toString() {
         return "QueryParams{" +
                 "limit=" + limit +
+                ", skip=" + skip +
                 ", from=" + from +
                 ", to=" + to +
-                '}';
+                ", commitId=" + commitId +
+                ", version=" + version +
+                "}";
     }
 }

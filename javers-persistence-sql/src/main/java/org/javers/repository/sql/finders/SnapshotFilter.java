@@ -1,6 +1,7 @@
 package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Optional;
+import org.javers.core.commit.CommitId;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.SelectQuery;
@@ -21,6 +22,7 @@ abstract class SnapshotFilter {
     static final String BASE_FIELDS =
             SNAPSHOT_STATE + ", " +
             SNAPSHOT_TYPE + ", " +
+            SNAPSHOT_VERSION + ", " +
             SNAPSHOT_CHANGED + ", " +
             COMMIT_AUTHOR + ", " +
             COMMIT_COMMIT_DATE + ", " +
@@ -49,12 +51,22 @@ abstract class SnapshotFilter {
 
     void addFromDateCondition(SelectQuery query, LocalDateTime from) {
         query.append(" AND " + COMMIT_COMMIT_DATE + " >= :commitFromDate")
-            .withArgument("commitFromDate", new Timestamp(new Date(from.toDateTime(DateTimeZone.UTC).getMillis())));
+            .withArgument("commitFromDate", new Timestamp(from.toDate()));
     }
 
     void addToDateCondition(SelectQuery query, LocalDateTime to) {
         query.append(" AND " + COMMIT_COMMIT_DATE + " <= :commitToDate")
-            .withArgument("commitToDate", new Timestamp(new Date(to.toDateTime(DateTimeZone.UTC).getMillis())));
+            .withArgument("commitToDate", new Timestamp(to.toDate()));
+    }
+
+    void addCommitIdCondition(SelectQuery query, CommitId commitId) {
+        query.append(" AND " + COMMIT_COMMIT_ID + " = :commitId")
+            .withArgument("commitId", commitId.valueAsNumber());
+    }
+
+    void addVersionCondition(SelectQuery query, Long version) {
+        query.append(" AND " + SNAPSHOT_VERSION + " = :version")
+            .withArgument("version", version);
     }
 
     void addFrom(SelectQuery query) {

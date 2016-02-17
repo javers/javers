@@ -15,7 +15,7 @@ class TailoredJaversMethodFactory extends TailoredJaversMemberFactory {
     public JaversMethod create(final Property primaryProperty, final Class<?> genericItemClass) {
         return new JaversMethod((Method) primaryProperty.getMember().getRawMember(), null) {
             @Override
-            public Type getGenericType() {
+            public Type getGenericResolvedType() {
                 return parametrizedType(primaryProperty, genericItemClass);
             }
 

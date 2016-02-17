@@ -26,6 +26,7 @@ public class CdoSnapshotBuilder {
     private boolean markAllAsChanged;
     private List<String> changed = Collections.EMPTY_LIST;
     private ManagedType managedType;
+    private long version;
 
     private CdoSnapshotBuilder(GlobalId globalId, ManagedType managedType) {
         Validate.argumentsAreNotNull(globalId, managedType);
@@ -57,12 +58,17 @@ public class CdoSnapshotBuilder {
         return this;
     }
 
+    public CdoSnapshotBuilder withVersion(Long version) {
+        this.version = (version == null) ? 0 : version;
+        return this;
+    }
+
     public CdoSnapshot build() {
         if (state == null) {
             state = stateBuilder.build();
         }
 
-        if (previous != null){
+        if (previous != null) {
             changed = state.differentValues(previous.getState());
         }
 
@@ -70,7 +76,7 @@ public class CdoSnapshotBuilder {
             changed = new ArrayList<>(state.getProperties());
         }
 
-        return new CdoSnapshot(globalId, commitMetadata, state, type, changed, managedType);
+        return new CdoSnapshot(globalId, commitMetadata, state, type, changed, managedType, version);
     }
 
     public CdoSnapshotBuilder withType(SnapshotType type) {

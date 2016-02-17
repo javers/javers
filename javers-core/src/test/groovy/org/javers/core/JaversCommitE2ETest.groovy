@@ -4,7 +4,6 @@ import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.commit.CommitAssert
 import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
@@ -13,9 +12,9 @@ import spock.lang.Unroll
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.JaversBuilder.javers
+import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
  * @author bartosz walacik
@@ -144,11 +143,11 @@ class JaversCommitE2ETest extends Specification {
     def "should support new object reference, deep in the graph"() {
         given:
         def javers = javers().build()
-        DummyUser user = dummyUser().withDetails(1).build()
+        def user = dummyUser().withDetails()
         javers.commit("some.login", user)
 
         when:
-        user.dummyUserDetails.dummyAddress = new DummyAddress("Tokyo")
+        user.withAddress("Tokyo")
         def commit = javers.commit("some.login", user)
 
         then:
@@ -168,7 +167,7 @@ class JaversCommitE2ETest extends Specification {
     def "should generate only ReferenceChange for removed objects"() {
         given:
         def javers = javers().build()
-        DummyUser user = dummyUser().withDetails(5).withAddress("Tokyo").build()
+        def user = dummyUser().withDetails(5).withAddress("Tokyo")
         javers.commit("some.login", user)
 
         when:
@@ -187,7 +186,7 @@ class JaversCommitE2ETest extends Specification {
     def "should support new object added to List, deep in the graph"() {
         given:
         def javers = javers().build()
-        DummyUser user = dummyUser().withDetails(5).withAddresses(new DummyAddress("London"),new DummyAddress("Paris")).build()
+        def user = dummyUser().withDetails(5).withAddresses(new DummyAddress("London"),new DummyAddress("Paris"))
         javers.commit("some.login", user)
 
         when:
@@ -207,7 +206,7 @@ class JaversCommitE2ETest extends Specification {
     def "should support object removed from List, deep in the graph"() {
         given:
         def javers = javers().build()
-        DummyUser user = dummyUser().withDetails(5).withAddresses(new DummyAddress("London"),new DummyAddress("Paris")).build()
+        def user = dummyUser().withDetails(5).withAddresses(new DummyAddress("London"),new DummyAddress("Paris"))
         javers.commit("some.login", user)
 
         when:

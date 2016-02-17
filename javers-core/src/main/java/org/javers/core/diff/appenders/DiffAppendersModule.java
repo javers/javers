@@ -3,7 +3,7 @@ package org.javers.core.diff.appenders;
 import org.javers.common.collections.Lists;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.diff.changetype.container.ListChange;
-import org.javers.core.pico.InstantiatingModule;
+import org.javers.core.pico.LateInstantiatingModule;
 import org.picocontainer.MutablePicoContainer;
 
 import java.util.Collection;
@@ -11,12 +11,12 @@ import java.util.Collection;
 /**
  * @author bartosz walacik
  */
-public class DiffAppendersModule extends InstantiatingModule {
+public class DiffAppendersModule extends LateInstantiatingModule {
 
     private final Class<? extends CorePropertyChangeAppender<ListChange>> listChangeAppender;
 
-    public DiffAppendersModule(MutablePicoContainer container, JaversCoreConfiguration javersCoreConfiguration) {
-        super(container);
+    public DiffAppendersModule(JaversCoreConfiguration javersCoreConfiguration, MutablePicoContainer container) {
+        super(javersCoreConfiguration, container);
         this.listChangeAppender = javersCoreConfiguration.getListCompareAlgorithm().getAppenderClass();
     }
 

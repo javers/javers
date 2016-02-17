@@ -4,16 +4,20 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
+import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
+import static org.joda.time.LocalTime.MIDNIGHT;
 
 /**
  * Fluent API for building {@link JqlQuery},
@@ -23,12 +27,17 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId;
  * @author bartosz.walacik
  */
 public class QueryBuilder {
-    private static int DEFAULT_LIMIT = 100;
+    private static final int DEFAULT_LIMIT = 100;
+    private static final int DEFAULT_SKIP = 0;
+
 
     private int limit = DEFAULT_LIMIT;
+    private int skip = DEFAULT_SKIP;
     private LocalDateTime from;
     private LocalDateTime to;
     private boolean newObjectChanges;
+    private CommitId commitId;
+    private Long version;
     private final List<Filter> filters = new ArrayList<>();
 
     private QueryBuilder(Filter initialFilter) {
@@ -160,10 +169,20 @@ public class QueryBuilder {
     /**
      * Limits number of Snapshots to be fetched from JaversRepository, default is 100.
      * <br/>
-     * Always choose reasonable limits to improve performance of your queries.
+     * Always choose reasonable limits to improve performance of your queries,
+     * production database could contain more records than you expect.
      */
     public QueryBuilder limit(int limit) {
         this.limit = limit;
+        return this;
+    }
+
+    /**
+     * Sets the number of Snapshots to skip.
+     * Use skip() and limit() for for paging.
+     */
+    public QueryBuilder skip(int skip) {
+        this.skip = skip;
         return this;
     }
 
@@ -172,7 +191,8 @@ public class QueryBuilder {
      * to those created after (>=) given date.
      * <br/><br/>
      *
-     * <b>Warning!</b> When querying for Changes done
+     * <h2>Important for Changes query</h2>
+     * When querying for Changes done
      * after given point in time, results will lack
      * in <b>first</b> set of changes after that point.
      * <br/>
@@ -193,6 +213,16 @@ public class QueryBuilder {
      * That's because Changes Query is backed by Snapshots Query
      * and Changes are calculated as a diff between subsequent Snapshots.
      *
+     * <h2>CommitDate is local datetime</h2>
+     * Please remember that commitDate is persisted as LocalDateTime
+     * (without information about time zone and daylight saving time).
+     * <br/
+     * It may affects your query results. For example,
+     * once a year when DST ends,
+     * one hour is repeated (clock goes back from 3 am to 2 am).
+     * Looking just on the commitDate we
+     * can't distinct in which <i>iteration</i> of the hour, given commit was made.
+     *
      * @see #to(LocalDateTime)
      */
     public QueryBuilder from(LocalDateTime from) {
@@ -201,11 +231,63 @@ public class QueryBuilder {
     }
 
     /**
+     * delegates to {@link #from(LocalDateTime)} with MIDNIGHT
+     */
+    public QueryBuilder from(LocalDate fromDate) {
+        return from(fromDate.toLocalDateTime(MIDNIGHT));
+    }
+
+    /**
      * Limits Snapshots to be fetched from JaversRepository
      * to those created before (<=) given date.
      */
     public QueryBuilder to(LocalDateTime to) {
         this.to = to;
+        return this;
+    }
+
+    /**
+     * delegates to {@link #to(LocalDateTime)} with MIDNIGHT
+     */
+    public QueryBuilder to(LocalDate toDate) {
+        return to(toDate.toLocalDateTime(MIDNIGHT));
+    }
+
+    /**
+     * Limits Snapshots to be fetched from JaversRepository
+     * to those with a given commitId.
+     * <br/><br/>
+     *
+     * <b>Warning!</b> Using withCommitId filter when querying
+     * for Changes makes no sense because the result will
+     * always be empty.
+     */
+    public QueryBuilder withCommitId(CommitId commitId) {
+        Validate.argumentIsNotNull(commitId);
+        this.commitId = commitId;
+        return this;
+    }
+
+    /**
+     * delegates to {@link #withCommitId(CommitId)}
+     */
+    public QueryBuilder withCommitId(BigDecimal commitId) {
+        Validate.argumentIsNotNull(commitId);
+        return withCommitId(CommitId.valueOf(commitId));
+    }
+
+    /**
+     * Limits Snapshots to be fetched from JaversRepository
+     * to those with a given version.
+     * <br/><br/>
+     *
+     * <b>Warning!</b> Using withVersion filter when querying
+     * for Changes makes no sense because the result will
+     * always be empty.
+     */
+    public QueryBuilder withVersion(long version) {
+        Validate.argumentCheck(version > 0, "Version is not a positive number.");
+        this.version = version;
         return this;
     }
 
@@ -218,7 +300,13 @@ public class QueryBuilder {
     }
 
     protected QueryParams getQueryParams() {
-        return QueryParamsBuilder.withLimit(limit).from(from).to(to).build();
+        return QueryParamsBuilder
+            .withLimit(limit)
+            .skip(skip)
+            .from(from).to(to)
+            .commitId(commitId)
+            .version(version)
+            .build();
     }
 
     public JqlQuery build(){

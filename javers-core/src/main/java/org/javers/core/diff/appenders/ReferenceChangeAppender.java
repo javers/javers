@@ -22,13 +22,14 @@ class ReferenceChangeAppender extends CorePropertyChangeAppender<ReferenceChange
 
     @Override
     public ReferenceChange calculateChanges(NodePair pair, Property property) {
-        GlobalId leftId =  pair.getLeftGlobalId(property);
+        GlobalId leftId = pair.getLeftGlobalId(property);
         GlobalId rightId = pair.getRightGlobalId(property);
 
         if (Objects.equals(leftId, rightId)) {
             return null;
         }
 
-        return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId);
+        return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId,
+            pair.getLeftPropertyValue(property), pair.getRightPropertyValue(property));
     }
 }

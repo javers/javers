@@ -1,16 +1,17 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Lists;
+import org.javers.common.collections.Predicate;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.annotation.ClassAnnotationsScanner;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.property.PropertyScanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.javers.core.metamodel.scanner.ClassScan;
+import org.javers.core.metamodel.scanner.ClassScanner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,26 +19,40 @@ import java.util.List;
  * @author bartosz walacik
  */
 class ManagedClassFactory {
-    private static final Logger logger = LoggerFactory.getLogger(ManagedClassFactory.class);
-    private final PropertyScanner propertyScanner;
+    private final ClassScanner classScanner;
+    private final TypeMapper typeMapper;
 
-    public ManagedClassFactory(PropertyScanner propertyScanner) {
-        this.propertyScanner = propertyScanner;
+    public ManagedClassFactory(ClassScanner classScanner, TypeMapper typeMapper) {
+        this.classScanner = classScanner;
+        this.typeMapper = typeMapper;
     }
 
     ManagedClass create(Class<?> baseJavaClass){
-        Validate.argumentIsNotNull(baseJavaClass);
-        List<Property> properties = propertyScanner.scan(baseJavaClass);
-
-        return new ManagedClass(baseJavaClass, properties);
+        ClassScan scan = classScanner.scan(baseJavaClass);
+        return new ManagedClass(baseJavaClass, scan.getProperties(), scan.getLooksLikeId());
     }
 
     ManagedClass create(ClientsClassDefinition def){
-        Validate.argumentIsNotNull(def);
-        List<Property> properties = propertyScanner.scan(def.getBaseJavaClass());
-        List<Property> filteredProperties = filterIgnored(properties, def);
+        ClassScan scan = classScanner.scan(def.getBaseJavaClass());
+        List<Property> filtered = filterIgnored(scan.getProperties(), def);
+        filtered = filterIgnoredType(filtered, def.getBaseJavaClass());
+        return new ManagedClass(def.getBaseJavaClass(), filtered, scan.getLooksLikeId());
+    }
 
-        return new ManagedClass(def.getBaseJavaClass(), filteredProperties);
+    ManagedClass createShallowReferenceManagedClass(EntityDefinition def){
+        ClassScan scan = classScanner.scan(def.getBaseJavaClass());
+        return new ManagedClass(def.getBaseJavaClass(), Collections.<Property>emptyList(), scan.getLooksLikeId());
+    }
+
+    private List<Property> filterIgnoredType(List<Property> properties, final Class<?> currentClass){
+        return Lists.negativeFilter(properties, new Predicate<Property>() {
+            public boolean apply(Property p) {
+                if (p.getRawType() == currentClass){
+                    return false; //prevents stackoverflow
+                }
+                return typeMapper.getPropertyType(p) instanceof IgnoredType;
+            }
+        });
     }
 
     private List<Property> filterIgnored(List<Property> properties, ClientsClassDefinition definition){
@@ -64,4 +79,3 @@ class ManagedClassFactory {
         throw new JaversException(JaversExceptionCode.PROPERTY_NOT_FOUND, ignoredName, clientsClass.getName());
     }
 }
-

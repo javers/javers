@@ -30,7 +30,7 @@ public class CdoSnapshotState {
         Validate.argumentIsNotNull(property);
         Object val = properties.get(property.getName());
         if (val == null){
-            return Defaults.defaultValue(property.getType());
+            return Defaults.defaultValue(property.getGenericType());
         }
         return val;
     }
@@ -108,5 +108,24 @@ public class CdoSnapshotState {
     @Override
     public int hashCode() {
         return properties.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("(");
+        String prefix = "";
+        for (String propertyKey : getSortedPropertyKeys()) {
+            stringBuilder.append(prefix).append(propertyKey).append(":").append(getPropertyValue(propertyKey));
+            prefix = ", ";
+        }
+        stringBuilder.append(")");
+        return stringBuilder.toString();
+    }
+
+    private List<String> getSortedPropertyKeys() {
+        List<String> propertyList = new ArrayList<>(properties.keySet());
+        Collections.sort(propertyList);
+        return propertyList;
     }
 }

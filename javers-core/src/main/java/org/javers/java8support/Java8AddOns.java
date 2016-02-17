@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Java8AddOns implements JaversBuilderPlugin {
-    private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(Java8AddOns.class);
 
     @Override
     public void beforeAssemble(JaversBuilder javersBuilder) {

@@ -3,16 +3,22 @@ language: java
 jdk:
   - oraclejdk8
 
-services:
-  - mongodb
+addons:
+  apt:
+    sources:
+      - mongodb-upstart
+      - mongodb-3.2-precise
+    packages:
+      - mongodb-org-server
+      - mongodb-org-shell
 
 before_script:
+  - sleep 15 #mongo may not be responded directly
   - psql -c 'create database travis_ci_test;' -U postgres
   - mysql -e 'create database travis_ci_test;' -u root
-  - mongo mydb_test --eval 'db.addUser("travis", "test");'
 
 script:
-  - "./gradlew check"
-  - "./gradlew integrationTest"
+  - "./gradlew check -i"
+  - "./gradlew integrationTest -i"
 
 sudo: false

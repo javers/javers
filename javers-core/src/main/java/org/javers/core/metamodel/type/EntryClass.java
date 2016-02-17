@@ -4,7 +4,7 @@ import org.javers.common.validation.Validate;
 
 /**
  * Map content type.
- * <p/>
+ * <br/><br/>
  *
  * Holds actual key and value Class arguments of Map Type
  *

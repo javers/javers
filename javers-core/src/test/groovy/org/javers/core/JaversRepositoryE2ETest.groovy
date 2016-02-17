@@ -4,7 +4,6 @@ import org.javers.common.date.FakeDateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.typeNames.*
-import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.core.snapshot.SnapshotsAssert
@@ -16,10 +15,10 @@ import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.QueryBuilder.byClass
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 class JaversRepositoryE2ETest extends Specification {
     FakeDateProvider fakeDateProvider
@@ -388,7 +387,7 @@ class JaversRepositoryE2ETest extends Specification {
 
     def "should compare Entity properties with latest from repository"() {
         given:
-        def user = dummyUser("John").withAge(18).build()
+        def user = new DummyUser(name:"John",age:18)
         javers.commit("login", user)
 
         when:
@@ -553,31 +552,27 @@ class JaversRepositoryE2ETest extends Specification {
         snapshot.globalId.typeName.endsWith("OldValueObject")
     }
 
-    def "should use dateProvider.now() as a commitDate"() {
+    def '''should use dateProvider.now() as a commitDate and
+           should serialize and deserialize commitDate as local datetime'''() {
         given:
-        LocalDateTime now = LocalDateTime.parse('2016-01-01T12:12')
+        def now = LocalDateTime.parse('2016-01-01T12:12')
+        fakeDateProvider.set(now)
 
         when:
-        fakeDateProvider.set(now)
         javers.commit("author", new SnapshotEntity(id: 1))
-        CdoSnapshot snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
-        LocalDateTime commitDate = snapshot.commitMetadata.commitDate
+        def snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
 
         then:
-        now == commitDate
+        snapshot.commitMetadata.commitDate == now
     }
 
     @Unroll
-    def "should query for Entity snapshots with commit #what"() {
+    def "should query for Entity snapshots with time range filter - #what"() {
         given:
-        def data = (1..5).collect{[
-                    'entity': new SnapshotEntity(id: 1, intProperty: it),
-                    'date': new LocalDateTime(2015,12,1,it,0)
-            ]}
-
-        data.each {
-            fakeDateProvider.set(it['date'] as LocalDateTime)
-            javers.commit('author', it['entity'])
+        (1..5).each{
+            def entity =  new SnapshotEntity(id: 1, intProperty: it)
+            fakeDateProvider.set( new LocalDateTime(2015,01,1,it,0) )
+            javers.commit('author', entity)
         }
 
         when:
@@ -588,17 +583,110 @@ class JaversRepositoryE2ETest extends Specification {
         commitDates == expectedCommitDates
 
         where:
-        what << ['date from','date to','date within given time range']
+        what << ['date from','date to','date in time range']
         query << [
-            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,12,1,3,0)).build(),
-            byInstanceId(1, SnapshotEntity).to(new LocalDateTime(2015,12,1,3,0)).build(),
-            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,12,1,2,0))
-                                           .to(new LocalDateTime(2015,12,1,4,0)).build()
+            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,01,1,3,0)).build(),
+            byInstanceId(1, SnapshotEntity).to(new LocalDateTime(2015,01,1,3,0)).build(),
+            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,01,1,2,0))
+                                           .to(new LocalDateTime(2015,01,1,4,0)).build()
         ]
         expectedCommitDates << [
-            (5..3).collect{new LocalDateTime(2015,12,1,it,0)},
-            (3..1).collect{new LocalDateTime(2015,12,1,it,0)},
-            (4..2).collect{new LocalDateTime(2015,12,1,it,0)}
+            (5..3).collect{new LocalDateTime(2015,01,1,it,0)},
+            (3..1).collect{new LocalDateTime(2015,01,1,it,0)},
+            (4..2).collect{new LocalDateTime(2015,01,1,it,0)}
+        ]
+    }
+
+    @Unroll
+    def "should query for Entity snapshots with skipped results, #what"() {
+        given:
+        (19..1).each{
+            javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+        def intPropertyValues = snapshots.collect { it.getPropertyValue("intProperty") }
+
+        then:
+        intPropertyValues == expectedIntPropertyValues
+
+
+        where:
+        query << [
+            byInstanceId(1, SnapshotEntity).skip(0).limit(5).build(),
+            byInstanceId(1, SnapshotEntity).skip(5).limit(5).build(),
+            byInstanceId(1, SnapshotEntity).skip(15).limit(5).build(),
+            byInstanceId(1, SnapshotEntity).skip(20).limit(5).build(),
+            byInstanceId(1, SnapshotEntity).skip(5).build()
+        ]
+
+        expectedIntPropertyValues << [
+            1..5,
+            6..10,
+            16..19,
+            [],
+            6..19
+        ]
+
+        what << ["first page",
+                 "second page",
+                 "last page",
+                 "too much skip page",
+                 "skip without limit"
+        ]
+    }
+
+    def "should increment Entity snapshot version number"(){
+      when:
+      javers.commit("author", new SnapshotEntity(id: 1, intProperty: 1))
+      javers.commit("author", new SnapshotEntity(id: 1, intProperty: 2))
+
+      then:
+      def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build())
+      snapshots[0].version == 2
+      snapshots[1].version == 1
+
+    }
+
+    @Unroll
+    def "should query for Entity snapshot with given commit id"() {
+        given:
+        def commits = (0..10).collect { javers.commit("author", new SnapshotEntity(id: 1, intProperty: it)) }
+        def searchedCommitId = commits[7].id
+
+        when:
+        def query = createQuery(searchedCommitId)
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.commitId == [searchedCommitId]
+
+        where:
+        createQuery << [
+            { commitId -> byClass(SnapshotEntity).withCommitId(commitId).build() },
+            { commitId -> byInstanceId(1, SnapshotEntity).withCommitId(commitId).build() },
+            { commitId -> byClass(SnapshotEntity).withCommitId(commitId.valueAsNumber()).build() },
+            { commitId -> byInstanceId(1, SnapshotEntity).withCommitId(commitId.valueAsNumber()).build() }
+        ]
+    }
+
+    @Unroll
+    def "should query for Entity snapshot with given version"() {
+        given:
+        (1..10).each { javers.commit("author", new SnapshotEntity(id: 1, intProperty: it)) }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.size() == 1
+        snapshots[0].getPropertyValue('intProperty') == 5
+
+        where:
+        query << [
+            byClass(SnapshotEntity).withVersion(5).build(),
+            byInstanceId(1, SnapshotEntity).withVersion(5).build()
         ]
     }
 }

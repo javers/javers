@@ -11,7 +11,7 @@ import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.json.typeadapter.date.DateTypeAdapters;
+import org.javers.core.json.typeadapter.date.DateTypeCoreAdapters;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.EntityType;
@@ -47,6 +47,7 @@ public class MongoRepository implements JaversRepository {
     public static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
     public static final String GLOBAL_ID_FRAGMENT = "globalId.fragment";
     public static final String GLOBAL_ID_VALUE_OBJECT = "globalId.valueObject";
+    public static final String SNAPSHOT_VERSION = "version";
     public static final String CHANGED_PROPERTIES = "changedProperties";
     public static final String OBJECT_ID = "_id";
 
@@ -170,14 +171,6 @@ public class MongoRepository implements JaversRepository {
         return new BasicDBObject (GLOBAL_ID_KEY, id.value());
     }
 
-    private BasicDBObject createFromQuery(LocalDateTime from) {
-        return new BasicDBObject (COMMIT_DATE, new BasicDBObject("$gte", DateTypeAdapters.serialize(from)));
-    }
-
-    private BasicDBObject createToQuery(LocalDateTime to) {
-        return new BasicDBObject (COMMIT_DATE, new BasicDBObject("$lte", DateTypeAdapters.serialize(to)));
-    }
-
     private BasicDBObject createGlobalIdClassQuery(ManagedType givenClass) {
         String cName = givenClass.getName();
 
@@ -236,19 +229,48 @@ public class MongoRepository implements JaversRepository {
 
     private MongoCursor<Document> getMongoSnapshotsCursor(Bson idQuery, QueryParams queryParams) {
         Bson query = applyQueryParams(idQuery, queryParams);
-        int limit = queryParams.limit();
         return snapshotsCollection()
-                .find(query).sort(new Document(COMMIT_ID, DESC)).limit(limit).iterator();
+                .find(query)
+                .sort(new Document(COMMIT_ID, DESC))
+                .limit(queryParams.limit())
+                .skip(queryParams.skip())
+                .iterator();
     }
 
     private Bson applyQueryParams(Bson query, QueryParams queryParams) {
         if (queryParams.from().isPresent()) {
-            query = Filters.and(query, createFromQuery(queryParams.from().get()));
+            query = addFromDateFiler(query, queryParams.from().get());
         }
         if (queryParams.to().isPresent()) {
-            query = Filters.and(query, createToQuery(queryParams.to().get()));
+            query = addToDateFilter(query, queryParams.to().get());
+        }
+        if (queryParams.commitId().isPresent()) {
+            query = addCommitIdFilter(query, queryParams.commitId().get());
+        }
+        if (queryParams.version().isPresent()) {
+            query = addVersionFilter(query, queryParams.version().get());
         }
         return query;
+    }
+
+    private Bson addFromDateFiler(Bson query, LocalDateTime from) {
+        Bson filter = new BasicDBObject(COMMIT_DATE, new BasicDBObject("$gte", DateTypeCoreAdapters.serialize(from)));
+        return Filters.and(query, filter);
+    }
+
+    private Bson addToDateFilter(Bson query, LocalDateTime to) {
+        Bson filter = new BasicDBObject(COMMIT_DATE, new BasicDBObject("$lte", DateTypeCoreAdapters.serialize(to)));
+        return Filters.and(query, filter);
+    }
+
+    private Bson addCommitIdFilter(Bson query, CommitId commitId) {
+        Bson filter = new BasicDBObject(COMMIT_ID, commitId.valueAsNumber().doubleValue());
+        return Filters.and(query, filter);
+    }
+
+    private Bson addVersionFilter(Bson query, Long version) {
+        Bson filter = new BasicDBObject(SNAPSHOT_VERSION, version);
+        return Filters.and(query, filter);
     }
 
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {

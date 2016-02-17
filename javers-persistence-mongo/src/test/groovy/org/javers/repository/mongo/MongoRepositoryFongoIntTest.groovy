@@ -8,7 +8,7 @@ import org.javers.repository.api.QueryParamsBuilder
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import static org.javers.core.model.DummyUser.dummyUser
 
 /**
  * @author pawel szymczyk
@@ -28,8 +28,8 @@ class MongoRepositoryFongoIntTest extends Specification {
         def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
         def commitFactory = javersTestBuilder.commitFactory
 
-        def kazikV1 = dummyUser("Kazik").withAge(1).build()
-        def kazikV2 = dummyUser("Kazik").withAge(2).build()
+        def kazikV1 = dummyUser("Kazik").withAge(1)
+        def kazikV2 = dummyUser("Kazik").withAge(2)
 
         def commit1 = commitFactory.create("author", kazikV1)
         def commit2 = commitFactory.create("author", kazikV2)
@@ -124,8 +124,8 @@ class MongoRepositoryFongoIntTest extends Specification {
 
         def javers = javersTestBuilder.javers()
 
-        def kazikV1 = dummyUser("kazik").withAge(12).build()
-        def kazikV2 = dummyUser("kazik").withAge(13).build()
+        def kazikV1 = dummyUser("kazik").withAge(12)
+        def kazikV2 = dummyUser("kazik").withAge(13)
 
         javers.commit("andy", kazikV1)
         javers.commit("andy", kazikV2)

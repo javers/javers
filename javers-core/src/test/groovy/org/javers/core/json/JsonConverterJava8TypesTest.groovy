@@ -29,7 +29,7 @@ class JsonConverterJava8TypesTest extends Specification {
     def localDate = LocalDateTime.of(2001,01,31,15,14,13,85*1000_000)
 
     @Unroll
-    def "should convert #expectedType (#givenValue) to and from JSON in ISO format"(){
+    def "should convert #expectedType (#givenValue) to and from JSON"(){
         expect:
         jsonConverter.toJson( givenValue ) == expectedJson
         jsonConverter.fromJson( expectedJson, expectedType ) == givenValue

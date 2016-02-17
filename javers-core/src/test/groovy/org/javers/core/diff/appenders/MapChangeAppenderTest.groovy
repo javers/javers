@@ -1,19 +1,16 @@
 package org.javers.core.diff.appenders
 
-import org.javers.core.diff.AbstractDiffTest
-import org.javers.core.diff.RealNodePair
 import org.javers.core.diff.changetype.map.EntryAddOrRemove
 import org.javers.core.diff.changetype.map.EntryAdded
 import org.javers.core.diff.changetype.map.EntryRemoved
 import org.javers.core.diff.changetype.map.EntryValueChange
-import org.javers.core.model.DummyUser
 import org.javers.core.metamodel.property.Property
-import org.javers.core.graph.ObjectNode
+import org.javers.core.model.DummyUser
 import org.joda.time.LocalDateTime
 import spock.lang.Unroll
-import static org.javers.core.diff.ChangeAssert.*
 
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
+import static org.javers.core.diff.ChangeAssert.assertThat
+import static org.javers.core.model.DummyUser.dummyUser
 
 /**
  * @author bartosz walacik
@@ -23,9 +20,9 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
     @Unroll
     def "should not append mapChanges when maps are #what" () {
         given:
-        def left =  dummyUser("1").withPrimitiveMap(leftMap).build()
-        def right = dummyUser("1").withPrimitiveMap(rightMap).build()
-        Property valueMap = getEntity(DummyUser).getProperty("primitiveMap")
+        def left =  dummyUser("1").withPrimitiveMap(leftMap)
+        def right = dummyUser("1").withPrimitiveMap(rightMap)
+        def valueMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         expect:
         def change = mapChangeAppender().calculateChanges(realNodePair(left,right),valueMap)
@@ -39,8 +36,8 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should set MapChange metadata"() {
         given:
-        def left =  dummyUser("1").withPrimitiveMap(null).build()
-        def right = dummyUser("1").withPrimitiveMap(["some":1]).build()
+        def left =  dummyUser("1").withPrimitiveMap(null)
+        def right = dummyUser("1").withPrimitiveMap(["some":1])
         def primitiveMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         when:
@@ -55,8 +52,8 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
     @Unroll
     def "should append #changeType.simpleName when left map is #leftMap and rightMap is #rightMap"() {
         given:
-        def left =  dummyUser("1").withPrimitiveMap(leftMap).build()
-        def right = dummyUser("1").withPrimitiveMap(rightMap).build()
+        def left =  dummyUser("1").withPrimitiveMap(leftMap)
+        def right = dummyUser("1").withPrimitiveMap(rightMap)
         Property primitiveMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         expect:
@@ -74,8 +71,8 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append EntryValueChanged when Primitive value is changed"() {
         given:
-        def left =  dummyUser("1").withPrimitiveMap(["some":1,"other":2] ).build()
-        def right = dummyUser("1").withPrimitiveMap(["some":2,"other":2]).build()
+        def left =  dummyUser("1").withPrimitiveMap(["some":1,"other":2] )
+        def right = dummyUser("1").withPrimitiveMap(["some":2,"other":2])
         Property primitiveMap = getEntity(DummyUser).getProperty("primitiveMap")
 
         when:
@@ -94,8 +91,8 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
         def dayTwo = new LocalDateTime(2000,1,1,12,2)
 
         given:
-        def left =  dummyUser("1").withValueMap(["some":dayOne, "other":dayTwo] ).build()
-        def right = dummyUser("1").withValueMap(["some":dayTwo, "other":dayTwo]).build()
+        def left =  dummyUser("1").withValueMap(["some":dayOne, "other":dayTwo] )
+        def right = dummyUser("1").withValueMap(["some":dayTwo, "other":dayTwo])
         Property valueMap = getEntity(DummyUser).getProperty("valueMap")
 
         when:

@@ -8,13 +8,12 @@ import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.javers.test.builder.DummyUserDetailsBuilder
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
  * @author pawel szymczyk
@@ -29,7 +28,6 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         when:
         def jsonText = javers.jsonConverter.toJson(snapshot)
-        println jsonText
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
@@ -41,16 +39,17 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         json.globalId.entity == "org.javers.core.model.DummyUser"
         json.globalId.cdoId == "kaz"
         json.type == "INITIAL"
+        json.version == 1
     }
 
     def "should serialize state with primitive values in CdoSnapshot"() {
         given:
         def javers = javersTestAssembly()
-        def dummyUser = dummyUser("kaz")
-                .withAge(1)
-                .withFlag(true)
-                .withCharacter('a' as char)
-                .build()
+        def dummyUser = new DummyUser(
+                name:'kaz',
+                age:1,
+                flag:true,
+                _char:'a')
 
         def dummyUserCdo = javers.createCdoWrapper( dummyUser )
         def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata())
@@ -72,10 +71,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     def "should serialize state with entity in CdoSnapshot"() {
         given:
         def javers = javersTestAssembly()
-        def dummyUser = dummyUser("kaz")
-                .withDetails()
-                .build()
-
+        def dummyUser = dummyUser("kaz").withDetails()
         def cdoWrapper = javers.createCdoWrapper( dummyUser )
         def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
 
@@ -90,7 +86,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     def "should serialize state with value object in CdoSnapshot"() {
         given:
         def javers = javersTestAssembly()
-        def dummyUserDetails = DummyUserDetailsBuilder.dummyUserDetails(1).withAddress("London", "St John Street").build()
+        def dummyUserDetails = DummyUserDetails.dummyUserDetails(1).withAddress("London", "St John Street")
 
         def cdoWrapper = javers.createCdoWrapper( dummyUserDetails )
         def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
@@ -106,12 +102,11 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     def "should serialize state with collections in CdoSnapshots"() {
         given:
         def javers = javersTestAssembly()
-        def dummyUser = dummyUser("kaz")
-                .withIntArray(1, 2)
-                .withIntegerList(3, 4)
-                .withStringsSet("5", "6")
-                .withPrimitiveMap([time: new LocalDateTime(2000, 1, 1, 12, 0)])
-                .build()
+        def dummyUser = new DummyUser(name: "kaz",
+                intArray: [1, 2],
+                integerList: [3, 4],
+                stringSet: ["5", "6"] as Set,
+                primitiveMap: [time: new LocalDateTime(2000, 1, 1, 12, 0)] )
 
         def cdoWrapper = javers.createCdoWrapper( dummyUser )
         def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
@@ -148,8 +143,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
             state {
             }
             changedProperties changed
+            version 5
         }
-        println json.toString()
 
         when:
         def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
@@ -159,6 +154,32 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         snapshot.globalId == instanceId("kaz",DummyUser)
         snapshot.initial == true
         snapshot.changed.collect{it} as Set == ["name", "age"] as Set
+        snapshot.version == 5L
+    }
+
+    def "should deserialize CdoSnapshot.version to 0 when version field is missing"() {
+
+        given:
+        def json = new JsonBuilder()
+        json {
+            commitMetadata {
+                commitId "1.0"
+                author "author"
+                dateTime "2000-01-01T12:00:00"
+            }
+            globalId {
+                entity "org.javers.core.model.DummyUser"
+                cdoId "kaz"
+            }
+            state {
+            }
+        }
+
+        when:
+        def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
+
+        then:
+        snapshot.version == 0
     }
 
     def "should deserialize CdoSnapshot state with primitive values"() {

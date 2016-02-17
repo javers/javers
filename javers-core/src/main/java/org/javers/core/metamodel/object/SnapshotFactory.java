@@ -35,6 +35,7 @@ public class SnapshotFactory {
         return createSnapshotState(cdoWrapper, commitMetadata)
                 .withType(INITIAL)
                 .markAllAsChanged()
+                .withVersion(1L)
                 .build();
     }
 
@@ -42,6 +43,7 @@ public class SnapshotFactory {
         return createSnapshotState(cdoWrapper, commitMetadata)
                 .withType(UPDATE)
                 .markChanged(previous)
+                .withVersion(previous.getVersion()+1)
                 .build();
     }
 
@@ -71,7 +73,7 @@ public class SnapshotFactory {
 
         for (Property property : cdoWrapper.getManagedType().getProperties()) {
             Object propertyVal = cdoWrapper.getPropertyValue(property.getName());
-            if (Objects.equals(propertyVal, Defaults.defaultValue(property.getType()))) {
+            if (Objects.equals(propertyVal, Defaults.defaultValue(property.getGenericType()))) {
                 continue;
             }
             snapshotBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, cdoWrapper.getGlobalId()));

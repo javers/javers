@@ -35,7 +35,7 @@ public abstract class ManagedType extends JaversType {
 
     @Override
     protected PrettyPrintBuilder prettyPrintBuilder() {
-        return super.prettyPrintBuilder().addMultiField("managedProperties", managedClass.getProperties());
+        return super.prettyPrintBuilder().addMultiField("managedProperties", managedClass.getManagedProperties());
     }
 
     /**
@@ -46,14 +46,18 @@ public abstract class ManagedType extends JaversType {
     }
 
     public List<Property> getProperties(Predicate<Property> query) {
-        return managedClass.getProperties(query);
+        return managedClass.getManagedProperties(query);
     }
 
     public List<Property> getProperties() {
-        return managedClass.getProperties();
+        return managedClass.getManagedProperties();
     }
 
     public Set<String> getPropertyNames(){
         return managedClass.getPropertyNames();
+    }
+
+    ManagedClass getManagedClass() {
+        return managedClass;
     }
 }

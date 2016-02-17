@@ -39,6 +39,7 @@ public class FixedSchemaFactory {
     public static final String SNAPSHOT_COMMIT_FK =    "commit_fk";
     public static final String SNAPSHOT_GLOBAL_ID_FK = "global_id_fk";
     public static final String SNAPSHOT_TYPE =         "type";
+    public static final String SNAPSHOT_VERSION =      "version";
     public static final String SNAPSHOT_TABLE_PK_SEQ = "jv_snapshot_pk_seq";
     public static final String SNAPSHOT_STATE =        "state";
     public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v.1.2
@@ -48,6 +49,7 @@ public class FixedSchemaFactory {
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         primaryKey(tableName, SNAPSHOT_PK, schema, relationBuilder);
         relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
+                       .withAttribute().longAttr(SNAPSHOT_VERSION).and()
                        .withAttribute().text(SNAPSHOT_STATE).and()
                        .withAttribute().text(SNAPSHOT_CHANGED).and();
         foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);

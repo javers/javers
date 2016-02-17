@@ -3,9 +3,7 @@ package org.javers.core.diff.appenders
 import org.javers.core.model.DummyAddress
 import org.javers.core.diff.ChangeAssert
 import org.javers.core.model.SnapshotEntity
-
 import static ReferenceChangeAssert.assertThat
-
 
 class ReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
 
@@ -25,7 +23,8 @@ class ReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should compare null refs safely"() {
         given:
-        def leftCdo =   new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
+        def entityRef = new SnapshotEntity(id: 2)
+        def leftCdo =   new SnapshotEntity(id:1, entityRef: entityRef)
         def rightCdo =  new SnapshotEntity(id:1, entityRef: null)
         def property = getProperty(SnapshotEntity, "entityRef")
 
@@ -37,6 +36,8 @@ class ReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         assertThat(change)
                   .hasLeftReference(SnapshotEntity,2)
                   .hasRightReference(null)
+                  .hasLeftObject(entityRef)
+                  .hasRightObject(null)
                   .hasPropertyName("entityRef")
     }
 
@@ -56,6 +57,8 @@ class ReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         assertThat(change)
                    .hasLeftReference(SnapshotEntity,2)
                    .hasRightReference(SnapshotEntity,3)
+                   .hasLeftObject(leftCdo.entityRef)
+                   .hasRightObject(rightCdo.entityRef)
                    .hasPropertyName("entityRef")
     }
 

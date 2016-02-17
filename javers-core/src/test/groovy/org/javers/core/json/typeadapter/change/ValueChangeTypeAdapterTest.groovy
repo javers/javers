@@ -5,8 +5,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
-import org.javers.core.json.typeadapter.date.DateTypeAdapters
-import org.javers.core.json.typeadapter.date.LocalDateTimeTypeAdapter
+import org.javers.core.json.typeadapter.date.DateTypeCoreAdapters
 import org.javers.core.model.DummyUser
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
@@ -16,7 +15,6 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
-import static org.javers.test.builder.DummyUserBuilder.dummyUser
 
 /**
  * @author bartosz walacik
@@ -26,7 +24,7 @@ class ValueChangeTypeAdapterTest extends Specification {
     def "should serialize ValueChange" () {
         given:
         JsonConverter jsonConverter = javersTestAssembly().jsonConverter
-        ValueChange change = valueChange(dummyUser("kaz").build(),"flag",true,false)
+        ValueChange change = valueChange(new DummyUser(name:"kaz"),"flag",true,false)
 
         when:
         String jsonText = jsonConverter.toJson(change)
@@ -79,7 +77,7 @@ class ValueChangeTypeAdapterTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.left ==  null
-        json.right == DateTypeAdapters.serialize(dob)
+        json.right == DateTypeCoreAdapters.serialize(dob)
     }
 
     def "should deserialize ValueChange with Values using custom TypeAdapter"() {
@@ -109,7 +107,7 @@ class ValueChangeTypeAdapterTest extends Specification {
     def "should be nullSafe when writing ValueChange" () {
         given:
         JsonConverter jsonConverter = javersTestAssembly().jsonConverter
-        ValueChange change = valueChange(dummyUser("kaz").build(),"bigFlag",null, null)
+        ValueChange change = valueChange(new DummyUser(name:"kaz"),"bigFlag",null, null)
 
         when:
         String jsonText = jsonConverter.toJson(change)

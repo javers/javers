@@ -109,20 +109,46 @@ class InMemoryRepository implements JaversRepository {
     }
 
     private List<CdoSnapshot> applyQueryParams(List<CdoSnapshot> snapshots, final QueryParams queryParams){
-        if (queryParams.hasDates()) {
-            snapshots = Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
-                public boolean apply(CdoSnapshot snapshot) {
-                    return queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate());
-                }
-            });
+        if (queryParams.commitId().isPresent()) {
+            snapshots = filterSnapshotsByCommitId(snapshots, queryParams.commitId().get());
         }
-
-        return trimResultsToRequestedSize(snapshots, queryParams.limit());
+        if (queryParams.version().isPresent()) {
+            snapshots = filterSnapshotsByVersion(snapshots, queryParams.version().get());
+        }
+        if (queryParams.hasDates()) {
+            snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
+        }
+        return trimResultsToRequestedSlice(snapshots, queryParams.skip(), queryParams.limit());
     }
 
-    private List<CdoSnapshot> trimResultsToRequestedSize(List<CdoSnapshot> snapshots, int requestedSize) {
-        int size = snapshots.size();
-        return size <= requestedSize ? snapshots : snapshots.subList(0, requestedSize);
+    private List<CdoSnapshot> filterSnapshotsByCommitId(List<CdoSnapshot> snapshots, final CommitId commitId) {
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(CdoSnapshot snapshot) {
+                return commitId.equals(snapshot.getCommitId());
+            }
+        });
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByVersion(List<CdoSnapshot> snapshots, final Long version) {
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(CdoSnapshot snapshot) {
+                return version == snapshot.getVersion();
+            }
+        });
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByCommitDate(List<CdoSnapshot> snapshots, final QueryParams queryParams) {
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(CdoSnapshot snapshot) {
+                return queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate());
+            }
+        });
+    }
+
+    private List<CdoSnapshot> trimResultsToRequestedSlice(List<CdoSnapshot> snapshots, int from, int size) {
+        int fromIndex = Math.min(from, snapshots.size());
+        int toIndex = Math.min(from + size, snapshots.size());
+        return snapshots.subList(fromIndex, toIndex);
     }
 
     @Override

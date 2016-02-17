@@ -59,6 +59,29 @@ class SnapshotFactoryTest extends Specification{
         updateSnapshot.changed == ["arrayOfIntegers"]
     }
 
+    def "should update the version of the snapshot"() {
+        given:
+        def cdoWrapper = javers.createCdoWrapper(new SnapshotEntity(id: 1))
+        def prevSnapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+
+        when:
+        def updateSnapshot = snapshotFactory.createUpdate(cdoWrapper, prevSnapshot, someCommitMetadata())
+
+        then:
+        updateSnapshot.version == 2L
+    }
+
+    def "should initialize the version of the first snapshot"() {
+        given:
+        def cdoWrapper = javers.createCdoWrapper(new SnapshotEntity(id: 1))
+
+        when:
+        def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+
+        then:
+        snapshot.version == 1L
+    }
+
     def "should mark changed and added properties of update snapshot"() {
         given:
         def ref = new SnapshotEntity(id:2)
