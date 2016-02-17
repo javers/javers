@@ -7,7 +7,7 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_GLOBA
 /**
  * @author bartosz.walacik
  */
-class GlobalIdFilter extends SnapshotFilter {
+class GlobalIdFilter extends PrimaryKeySnapshotFilter {
 
     GlobalIdFilter(long globalIdPk, Optional<String> propertyName) {
         super(globalIdPk, SNAPSHOT_GLOBAL_ID_FK, propertyName);

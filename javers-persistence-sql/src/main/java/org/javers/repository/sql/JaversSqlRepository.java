@@ -12,12 +12,14 @@ import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParams;
+import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.sql.finders.CdoSnapshotFinder;
 import org.javers.repository.sql.repositories.CdoSnapshotRepository;
 import org.javers.repository.sql.repositories.CommitMetadataRepository;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.JaversSchemaManager;
 
+import java.util.Collection;
 import java.util.List;
 
 public class JaversSqlRepository implements JaversRepository {
@@ -39,6 +41,11 @@ public class JaversSqlRepository implements JaversRepository {
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         return finder.getLatest(globalId);
+    }
+
+    @Override
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        return finder.getSnapshots(snapshotIdentifiers);
     }
 
     @Override
