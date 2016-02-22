@@ -46,11 +46,18 @@ class ManagedClassFactory {
 
     private List<Property> filterIgnoredType(List<Property> properties, final Class<?> currentClass){
         return Lists.negativeFilter(properties, new Predicate<Property>() {
-            public boolean apply(Property p) {
-                if (p.getRawType() == currentClass){
-                    return false; //prevents stackoverflow
+            public boolean apply(Property property) {
+                if (property.getRawType() == currentClass){
+                    return false;
                 }
-                return typeMapper.getPropertyType(p) instanceof IgnoredType;
+                //prevents stackoverflow
+                if (typeMapper.contains(property.getGenericType())){
+                    return typeMapper.getPropertyType(property) instanceof IgnoredType;
+                }
+                System.out.println("property = " + property);
+                System.out.println(".. "+classScanner.scan(property.getRawType()).hasIgnoredAnn());
+
+                return classScanner.scan(property.getRawType()).hasIgnoredAnn();
             }
         });
     }
