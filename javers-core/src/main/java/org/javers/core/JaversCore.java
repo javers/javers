@@ -19,7 +19,6 @@ import org.javers.core.metamodel.type.*;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
-import org.javers.repository.jql.QueryBuilder;
 import org.javers.repository.jql.QueryRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
