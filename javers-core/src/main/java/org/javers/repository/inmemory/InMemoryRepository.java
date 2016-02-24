@@ -1,5 +1,6 @@
 package org.javers.repository.inmemory;
 
+import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.common.collections.Predicate;
@@ -15,6 +16,7 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
+import org.javers.repository.api.SnapshotIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +30,7 @@ import static java.util.Collections.unmodifiableList;
  *
  * @author bartosz walacik
  */
-class InMemoryRepository implements JaversRepository {
+public class InMemoryRepository implements JaversRepository {
     private static final Logger logger = LoggerFactory.getLogger(InMemoryRepository.class);
 
     private Map<GlobalId, LinkedList<CdoSnapshot>> snapshots = new ConcurrentHashMap<>();
@@ -161,6 +163,28 @@ class InMemoryRepository implements JaversRepository {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        List<SnapshotIdentifier> persistedIdentifiers = getPersistedIdentifiers(snapshotIdentifiers);
+        return Lists.transform(persistedIdentifiers, new Function<SnapshotIdentifier, CdoSnapshot>() {
+            @Override
+            public CdoSnapshot apply(SnapshotIdentifier snapshotIdentifier) {
+                List<CdoSnapshot> objectSnapshots = snapshots.get(snapshotIdentifier.getGlobalId());
+                return objectSnapshots.get(objectSnapshots.size() - ((int)snapshotIdentifier.getVersion()));
+            }
+        });
+    }
+
+    private List<SnapshotIdentifier> getPersistedIdentifiers(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        return Lists.positiveFilter(new ArrayList<>(snapshotIdentifiers), new Predicate<SnapshotIdentifier>() {
+            @Override
+            public boolean apply(SnapshotIdentifier snapshotIdentifier) {
+                return snapshots.containsKey(snapshotIdentifier.getGlobalId()) &&
+                    snapshotIdentifier.getVersion() <= snapshots.get(snapshotIdentifier.getGlobalId()).size();
+            }
+        });
     }
 
     @Override
