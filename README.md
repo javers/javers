@@ -9,7 +9,7 @@
 JaVers is the lightweight Java library for **auditing** changes in your data.
 
 We all use Version Control Systems for source code,
-why not to use a specialized framework to provide
+so why not use a specialized framework to provide
 an audit trail of your Java objects (entities, POJO, data objects)?
 
 ## Check out our site
