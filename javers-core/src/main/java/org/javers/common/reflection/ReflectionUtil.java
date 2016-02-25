@@ -7,6 +7,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.slf4j.Logger;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -207,9 +208,18 @@ public class ReflectionUtil {
         throw new JaversException(JaversExceptionCode.CLASS_EXTRACTION_ERROR, javaType);
     }
 
-    /**
-     *
-     */
+    public static boolean isAnnotationPresentInHierarchy(Class<?> clazz, Class<? extends Annotation> ann){
+        Class<?> current = clazz;
+
+        while (current != null && current != Object.class){
+            if (current.isAnnotationPresent(ann)){
+                return true;
+            }
+            current = current.getSuperclass();
+        }
+        return false;
+    }
+
     public static int calculateHierarchyDistance(Class<?> clazz, Class<?> parent) {
         Class<?> current = clazz;
         int distance = 0;

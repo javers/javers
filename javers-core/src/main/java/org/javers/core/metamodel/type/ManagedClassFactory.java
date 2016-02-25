@@ -4,6 +4,8 @@ import org.javers.common.collections.Lists;
 import org.javers.common.collections.Predicate;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.reflection.ReflectionUtil;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.javers.core.metamodel.property.Property;
@@ -46,11 +48,17 @@ class ManagedClassFactory {
 
     private List<Property> filterIgnoredType(List<Property> properties, final Class<?> currentClass){
         return Lists.negativeFilter(properties, new Predicate<Property>() {
-            public boolean apply(Property p) {
-                if (p.getRawType() == currentClass){
-                    return false; //prevents stackoverflow
+            public boolean apply(Property property) {
+                if (property.getRawType() == currentClass){
+                    return false;
                 }
-                return typeMapper.getPropertyType(p) instanceof IgnoredType;
+                //prevents stackoverflow
+                if (typeMapper.contains(property.getRawType()) ||
+                    typeMapper.contains(property.getGenericType())) {
+                    return typeMapper.getJaversType(property.getRawType()) instanceof IgnoredType;
+                }
+
+                return ReflectionUtil.isAnnotationPresentInHierarchy(property.getRawType(), DiffIgnore.class);
             }
         });
     }

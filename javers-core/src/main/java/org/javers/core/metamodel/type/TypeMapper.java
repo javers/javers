@@ -199,4 +199,7 @@ public class TypeMapper {
         state.putIfAbsent(jType.getBaseJavaType(), jType);
     }
 
+    boolean contains(Type javaType){
+        return state.contains(javaType);
+    }
 }
