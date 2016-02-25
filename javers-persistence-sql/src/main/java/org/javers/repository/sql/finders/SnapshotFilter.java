@@ -1,26 +1,25 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitId;
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
-import java.util.Date;
-
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
-/**
- * yes, assembling SQL using SnapshotFilters classes is tricky,
- * any better ideas how to deal with it without code repetition?
- */
 abstract class SnapshotFilter {
     static final String COMMIT_WITH_SNAPSHOT
-            = SNAPSHOT_TABLE_NAME + " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK;
+        = SNAPSHOT_TABLE_NAME + " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK;
+
+    static final String COMMIT_WITH_SNAPSHOT_GLOBAL_ID =
+        COMMIT_WITH_SNAPSHOT +
+            " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
+            " INNER JOIN " + CDO_CLASS_TABLE_NAME + " g_c ON g_c." + CDO_CLASS_PK + " = g." + GLOBAL_ID_CLASS_FK +
+            " LEFT OUTER JOIN " + GLOBAL_ID_TABLE_NAME + " o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK +
+            " LEFT OUTER JOIN " + CDO_CLASS_TABLE_NAME + " o_c ON o_c." + CDO_CLASS_PK + " = o." + GLOBAL_ID_CLASS_FK;
 
     static final String BASE_FIELDS =
-            SNAPSHOT_STATE + ", " +
+        SNAPSHOT_STATE + ", " +
             SNAPSHOT_TYPE + ", " +
             SNAPSHOT_VERSION + ", " +
             SNAPSHOT_CHANGED + ", " +
@@ -28,26 +27,21 @@ abstract class SnapshotFilter {
             COMMIT_COMMIT_DATE + ", " +
             COMMIT_COMMIT_ID;
 
-    final long primaryKey;
-    final String pkFieldName;
-    final Optional<String> propertyName;
+    static final String BASE_AND_GLOBAL_ID_FIELDS =
+        BASE_FIELDS + ", " +
+            "g." + GLOBAL_ID_LOCAL_ID + ", " +
+            "g." + GLOBAL_ID_FRAGMENT + ", " +
+            "g." + GLOBAL_ID_OWNER_ID_FK + ", " +
+            "g_c." + CDO_CLASS_QUALIFIED_NAME + ", " +
+            "o." + GLOBAL_ID_LOCAL_ID + " owner_" + GLOBAL_ID_LOCAL_ID + ", " +
+            "o." + GLOBAL_ID_FRAGMENT + " owner_" + GLOBAL_ID_FRAGMENT + ", " +
+            "o_c." + CDO_CLASS_QUALIFIED_NAME + " owner_" + CDO_CLASS_QUALIFIED_NAME;
 
-    public SnapshotFilter(long primaryKey, String pkFieldName, Optional<String> propertyName) {
-        this.primaryKey = primaryKey;
-        this.pkFieldName = pkFieldName;
-        this.propertyName = propertyName;
-    }
+    abstract String select();
 
-    void addWhere(SelectQuery query) {
-        if (propertyName.isPresent()) {
-            query.where(pkFieldName + " = :pk " +
-                        " AND " + SNAPSHOT_CHANGED + " like '%\"" + propertyName.get() + "\"%'")
-                 .withArgument("pk", primaryKey);
-        } else {
-            query.where(pkFieldName + " = :pk")
-                 .withArgument("pk", primaryKey);
-        }
-    }
+    abstract void addFrom(SelectQuery query);
+
+    abstract  void addWhere(SelectQuery query);
 
     void addFromDateCondition(SelectQuery query, LocalDateTime from) {
         query.append(" AND " + COMMIT_COMMIT_DATE + " >= :commitFromDate")
@@ -69,11 +63,4 @@ abstract class SnapshotFilter {
             .withArgument("version", version);
     }
 
-    void addFrom(SelectQuery query) {
-        query.from(COMMIT_WITH_SNAPSHOT);
-    }
-
-    String select(){
-        return BASE_FIELDS;
-    }
 }
