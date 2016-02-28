@@ -7,6 +7,9 @@ dependencies {
     compile 'com.google.code.gson:gson:2.5'
     compile 'org.picocontainer:picocontainer:2.14.3'
 
+    //should be on application's classpath when using custom guava comparators
+    optional 'com.google.guava:guava:18.0'
+
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
     testCompile 'com.google.guava:guava:18.0'
     testCompile "org.mongodb:mongo-java-driver:$versions.mongoJavaDriver"

@@ -21,12 +21,29 @@ import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
 import org.javers.core.json.typeadapter.util.UtilTypeAdapters;
-import org.javers.core.metamodel.annotation.*;
-import org.javers.core.metamodel.clazz.*;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.Entity;
+import org.javers.core.metamodel.annotation.TypeName;
+import org.javers.core.metamodel.annotation.Value;
+import org.javers.core.metamodel.annotation.ValueObject;
+import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.CustomDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinitionBuilder;
+import org.javers.core.metamodel.clazz.IgnoredTypeDefinition;
+import org.javers.core.metamodel.clazz.ValueDefinition;
+import org.javers.core.metamodel.clazz.ValueObjectDefinition;
+import org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder;
 import org.javers.core.metamodel.scanner.ScannerModule;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.CustomType;
+import org.javers.core.metamodel.type.EntityType;
+import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.TypeMapperModule;
+import org.javers.core.metamodel.type.ValueObjectType;
+import org.javers.core.metamodel.type.ValueType;
 import org.javers.core.snapshot.GraphSnapshotModule;
 import org.javers.groovysupport.GroovyAddOns;
+import org.javers.guava.GuavaAddOns;
 import org.javers.java8support.Java8AddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
@@ -97,6 +114,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         }
         new GroovyAddOns().beforeAssemble(this);
         new UtilTypeAdapters().beforeAssemble(this);
+        new GuavaAddOns().beforeAssemble(this);
     }
 
     public Javers build() {
