@@ -66,6 +66,10 @@ class TypeMapperState {
         throw new JaversException(JaversExceptionCode.TYPE_NAME_NOT_FOUND, duckType.getTypeName());
     }
 
+    boolean contains(Type javaType){
+        return mappedTypes.get(javaType) != null;
+    }
+
     JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
 
