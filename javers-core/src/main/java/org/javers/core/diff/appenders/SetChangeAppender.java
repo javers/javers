@@ -54,16 +54,16 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
             return Collections.EMPTY_LIST;
         }
 
-        Set<GlobalId> leftSet = (Set) setType.map(leftRawSet, dehydrateFunction, owner);
-        Set<GlobalId> rightSet = (Set) setType.map(rightRawSet, dehydrateFunction, owner);
+        Set leftSet = (Set) setType.map(leftRawSet, dehydrateFunction, owner);
+        Set rightSet = (Set) setType.map(rightRawSet, dehydrateFunction, owner);
 
         List<ContainerElementChange> changes = new ArrayList<>();
 
-        for (Object globalCdoId : Sets.difference(leftSet, rightSet)) {
-            changes.add(new ValueRemoved(globalCdoId));
+        for (Object valueOrId : Sets.difference(leftSet, rightSet)) {
+            changes.add(new ValueRemoved(valueOrId));
         }
-        for (Object globalCdoId : Sets.difference(rightSet, leftSet)) {
-            changes.add(new ValueAdded(globalCdoId));
+        for (Object valueOrId : Sets.difference(rightSet, leftSet)) {
+            changes.add(new ValueAdded(valueOrId));
         }
 
         return changes;
