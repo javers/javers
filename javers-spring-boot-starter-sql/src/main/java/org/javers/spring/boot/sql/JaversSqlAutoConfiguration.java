@@ -50,7 +50,7 @@ public class JaversSqlAutoConfiguration {
                 (SessionFactoryImplementor)entityManagerFactory.unwrap(SessionFactory.class);
 
         Dialect hibernateDialect = sessionFactory.getDialect();
-        logger.info("detected Hibernate dialect: " + hibernateDialect);
+        logger.info("detected Hibernate dialect: " + hibernateDialect.getClass().getSimpleName());
 
         return dialectMapper.map(hibernateDialect);
     }
