@@ -90,6 +90,8 @@ public enum JaversExceptionCode {
 
     SQL_EXCEPTION("SqlException: %s"),
 
+    UNSUPPORTED_SQL_DIALECT("dialect '%s' is not supported by JaVers"),
+
     MALFORMED_JQL("Invalid JQL query, %s"),
 
     UNSUPPORTED_OPTIONAL_CONTENT_TYPE("%s is not supported as Optional<> content type"),
