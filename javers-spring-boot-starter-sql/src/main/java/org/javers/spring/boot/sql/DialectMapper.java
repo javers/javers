@@ -1,27 +1,30 @@
 package org.javers.spring.boot.sql;
 
-import org.javers.common.collections.Function;
+import org.hibernate.dialect.*;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.repository.sql.DialectName;
-import org.springframework.orm.jpa.vendor.Database;
 
-import java.util.HashMap;
-import java.util.Map;
+public class DialectMapper {
 
-public class DialectMapper implements Function<Database, DialectName> {
+    public DialectName map(Dialect hibernateDialect) {
 
-    private static final Map<Database, DialectName> mapping = new HashMap() {
-        {
-            put(Database.DEFAULT, DialectName.H2);
-            put(Database.H2, DialectName.H2);
-            put(Database.SQL_SERVER, DialectName.MSSQL);
-            put(Database.ORACLE, DialectName.ORACLE);
-            put(Database.MYSQL, DialectName.MYSQL);
-            put(Database.POSTGRESQL, DialectName.POSTGRES);
+        if (hibernateDialect instanceof SQLServerDialect) {
+            return DialectName.MSSQL;
         }
-    };
+        if (hibernateDialect instanceof H2Dialect){
+            return DialectName.H2;
+        }
+        if (hibernateDialect instanceof Oracle8iDialect){
+            return DialectName.ORACLE;
+        }
+        if (hibernateDialect instanceof PostgreSQL81Dialect){
+            return DialectName.POSTGRES;
+        }
+        if (hibernateDialect instanceof MySQLDialect){
+            return DialectName.MYSQL;
+        }
 
-    @Override
-    public DialectName apply(Database hibernateDialectName) {
-        return mapping.get(hibernateDialectName);
+        throw new JaversException(JaversExceptionCode.UNSUPPORTED_SQL_DIALECT, hibernateDialect.getClass().getSimpleName());
     }
 }
