@@ -3,13 +3,12 @@ package org.javers.core.metamodel.type;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
-
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 
 /**
@@ -41,17 +40,18 @@ public class MapType extends EnumerableType {
         Map<Object, Object> sourceMap = (Map) sourceMap_;
         Map<Object, Object> targetMap = new HashMap(sourceMap.size());
 
-        MapEnumeratorContext enumeratorContext = new MapEnumeratorContext();
-        owner.setEnumeratorContext(enumeratorContext);
+        MapEnumeratorContext enumerator = new MapEnumeratorContext();
+        EnumerationAwareOwnerContext enumerationOwnerContext =
+                new EnumerationAwareOwnerContext(enumerator, owner);
 
         for (Map.Entry<?, ?> entry : sourceMap.entrySet()) {
             //key
-            enumeratorContext.switchToKey();
-            Object mappedKey = mapFunction.apply(entry.getKey(), owner);
+            enumerator.switchToKey();
+            Object mappedKey = mapFunction.apply(entry.getKey(), enumerationOwnerContext);
 
             //value
-            enumeratorContext.switchToValue(mappedKey);
-            Object mappedValue = mapFunction.apply(entry.getValue(), owner);
+            enumerator.switchToValue(mappedKey);
+            Object mappedValue = mapFunction.apply(entry.getValue(), enumerationOwnerContext);
 
             targetMap.put(mappedKey, mappedValue);
         }

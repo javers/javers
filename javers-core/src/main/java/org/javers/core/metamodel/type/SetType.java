@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.EnumeratorContext;
 import org.javers.core.metamodel.object.OwnerContext;
 
@@ -22,12 +23,13 @@ public class SetType extends CollectionType{
         Set sourceSet = toNotNullSet(sourceSet_);
         Set targetSet = new HashSet(sourceSet.size());
 
-        SetEnumeratorContext enumeratorContext = new SetEnumeratorContext();
-        owner.setEnumeratorContext(enumeratorContext);
+        SetEnumeratorContext enumerator = new SetEnumeratorContext();
+        EnumerationAwareOwnerContext enumerationOwnerContext =
+                new EnumerationAwareOwnerContext(enumerator, owner);
 
         for (Object sourceVal : sourceSet) {
-            targetSet.add(mapFunction.apply(sourceVal, owner));
-            enumeratorContext.nextId();
+            targetSet.add(mapFunction.apply(sourceVal, enumerationOwnerContext));
+            enumerator.next(sourceVal);
         }
         return Collections.unmodifiableSet(targetSet);
     }
@@ -43,13 +45,13 @@ public class SetType extends CollectionType{
 
     private class SetEnumeratorContext implements EnumeratorContext {
         int randomId = 0;
+
         @Override
         public String getPath() {
-            return "random_"+randomId;
+            return "random_"+(randomId++);
         }
 
-        void nextId(){
-            randomId++;
+        public void next(Object sourceVal) {
         }
     }
 }

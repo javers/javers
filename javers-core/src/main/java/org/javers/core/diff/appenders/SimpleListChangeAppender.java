@@ -6,6 +6,7 @@ import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ListType;
@@ -40,7 +41,7 @@ public class SimpleListChangeAppender extends CorePropertyChangeAppender<ListCha
         List rightList = (List) pair.getRightPropertyValue(property);
 
         ListType listType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new OwnerContext(pair.getGlobalId(), property.getName());
+        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
         MapContentType mapContentType = typeMapper.getMapContentType(listType);
 
         List<EntryChange> entryChanges =

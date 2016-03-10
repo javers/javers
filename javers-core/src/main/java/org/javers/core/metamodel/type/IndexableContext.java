@@ -12,11 +12,6 @@ class IndexableContext implements EnumeratorContext {
 
     @Override
     public String getPath() {
-        return ""+index;
+        return ""+(index++);
     }
-
-    void incIndex() {
-        this.index++;
-    }
-
 }

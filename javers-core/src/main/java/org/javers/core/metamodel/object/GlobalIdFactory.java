@@ -30,9 +30,9 @@ public class GlobalIdFactory {
     }
 
     /**
-     * @param owner for bounded ValueObjects, optional
+     * @param ownerContext for bounded ValueObjects, optional
      */
-    public GlobalId createId(Object targetCdo, OwnerContext owner) {
+    public GlobalId createId(Object targetCdo, OwnerContext ownerContext) {
         Validate.argumentsAreNotNull(targetCdo);
 
         targetCdo = objectAccessHook.access(targetCdo);
@@ -42,12 +42,12 @@ public class GlobalIdFactory {
             return InstanceId.createFromInstance(targetCdo, (EntityType) targetManagedType);
         }
 
-        if (targetManagedType instanceof ValueObjectType && hasNoOwner(owner)) {
+        if (targetManagedType instanceof ValueObjectType && !hasOwner(ownerContext)) {
             return new UnboundedValueObjectId(targetManagedType.getName());
         }
 
-        if (targetManagedType instanceof ValueObjectType && hasOwner(owner)) {
-            return new ValueObjectId(targetManagedType.getName(), owner.getGlobalId(), owner.getPath());
+        if (targetManagedType instanceof ValueObjectType && hasOwner(ownerContext)) {
+            return new ValueObjectId(targetManagedType.getName(), ownerContext.getOwnerId(), ownerContext.getPath());
         }
 
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
@@ -118,10 +118,6 @@ public class GlobalIdFactory {
     }
 
     private boolean hasOwner(OwnerContext context) {
-        return (context != null && context.getGlobalId() != null);
-    }
-
-    private boolean hasNoOwner(OwnerContext context) {
-        return (context == null || context.getGlobalId() == null);
+        return context != null && context.getOwnerId() != null;
     }
 }

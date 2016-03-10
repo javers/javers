@@ -5,6 +5,7 @@ import org.javers.common.collections.Function;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
@@ -37,7 +38,7 @@ public class OptionalType extends CollectionType {
             return java.util.Optional.empty();
         }
 
-        Object applied = mapFunction.apply(sourceOptional.get(), owner);
+        Object applied = mapFunction.apply(sourceOptional.get(), EnumerationAwareOwnerContext.just(owner));
 
         return java.util.Optional.of( applied );
     }

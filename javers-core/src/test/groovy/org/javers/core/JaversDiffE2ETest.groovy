@@ -8,6 +8,7 @@ import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.examples.model.Person
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
+import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
 import spock.lang.Specification
@@ -187,7 +188,6 @@ class JaversDiffE2ETest extends Specification {
         DiffAssert.assertThat(diff).hasChanges(0)
     }
 
-
     def "should serialize the Diff object"() {
         given:
         def javers = javers().build()
@@ -251,5 +251,39 @@ class JaversDiffE2ETest extends Specification {
 
         expect:
         javers.compare(left, right).changes.size() == 0
+    }
+
+    class SetValueObject {
+        String some
+        SnapshotEntity ref
+    }
+
+    class ValueObjectHolder {
+        @Id int id
+        Set<SetValueObject> valueObjects
+    }
+
+    def "should follow and deeply compare entities referenced from ValueObjects inside Set"(){
+      given:
+      def javers = javers().build()
+      def left = new ValueObjectHolder(id:1, valueObjects:
+                [new SetValueObject(some:'a'),
+                 new SetValueObject(some:'b', ref: new SnapshotEntity(id:1, intProperty:5))
+                ])
+      def right= new ValueObjectHolder(id:1, valueObjects:
+                [new SetValueObject(some:'b', ref: new SnapshotEntity(id:1, intProperty:6)),
+                 new SetValueObject(some:'a')
+                ])
+
+      when:
+      def changes = javers.compare(left, right).changes
+
+      then:
+      changes.size() == 1
+      with(changes[0]) {
+          affectedGlobalId == instanceId(SnapshotEntity, 1)
+          left == 5
+          right == 6
+      }
     }
 }

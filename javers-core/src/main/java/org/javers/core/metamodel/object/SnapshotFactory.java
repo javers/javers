@@ -86,7 +86,7 @@ public class SnapshotFactory {
 
     private Object dehydrateProperty(Property property, Object propertyVal, GlobalId id){
         JaversType propertyType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new OwnerContext(id, property.getName());
+        OwnerContext owner = new PropertyOwnerContext(id, property.getName());
 
         if (propertyType instanceof EnumerableType) {
             return extractAndDehydrateEnumerable(propertyVal, (EnumerableType) propertyType, owner);

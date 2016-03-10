@@ -2,7 +2,6 @@ package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.MapContentType;
 import org.javers.core.metamodel.type.MapEnumeratorContext;
 
@@ -20,13 +19,13 @@ public class DehydrateMapFunction implements EnumerableFunction {
     }
 
     @Override
-    public Object apply(Object input, OwnerContext enumerationAwareOwnerContext) {
-        MapEnumeratorContext mapContext =  enumerationAwareOwnerContext.getEnumeratorContext();
-        if (mapContext.isKey()){
-            return globalIdFactory.dehydrate(input, mapContentType.getKeyType(), enumerationAwareOwnerContext);
+    public Object apply(Object input, EnumerationAwareOwnerContext context) {
+        MapEnumeratorContext enumerator =  context.getEnumeratorContext();
+        if (enumerator.isKey()){
+            return globalIdFactory.dehydrate(input, mapContentType.getKeyType(), context);
         }
         else {
-            return globalIdFactory.dehydrate(input, mapContentType.getValueType(), enumerationAwareOwnerContext);
+            return globalIdFactory.dehydrate(input, mapContentType.getValueType(), context);
         }
     }
 }

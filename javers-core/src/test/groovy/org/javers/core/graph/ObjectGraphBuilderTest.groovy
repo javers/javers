@@ -366,19 +366,43 @@ abstract class ObjectGraphBuilderTest extends Specification {
                ]
     }
 
-    def "should assign proper ids to ValueObjects in multi edge"() {
+    def "should assign proper hashes to ValueObjects in Set multi edge"() {
         given:
         def graphBuilder = newBuilder()
-        def dummyUserDetails = dummyUserDetails(5)
-                .withAddresses(new DummyAddress("warszawa", "mokotowska"))
-                .withAddresses(new DummyAddress("warszawa", "wolska"))
+        def user = new SnapshotEntity(id:1, setOfValueObjects:[
+                 new DummyAddress("warszawa", "mokotowska"),
+                 new DummyAddress("warszawa", "wolska")
+        ])
+
+        when:
+        def node = graphBuilder.buildGraph(user).root()
+
+        then:
+        def edge = node.getEdge("setOfValueObjects")
+        println "\nreferences:"
+        edge.references.each {
+            println it.globalId.value()
+        }
+
+        assertThat(node).hasMultiEdge("setOfValueObjects").refersToGlobalIds(
+                [new ValueObjectIdDTO(DummyUserDetails, 5, "setOfValueObjects/000"),
+                 new ValueObjectIdDTO(DummyUserDetails, 5, "setOfValueObjects/111")
+                ])
+    }
+
+    def "should assign proper indexes to ValueObjects in List multi edge"() {
+        given:
+        def graphBuilder = newBuilder()
+        def dummyUserDetails = new DummyUserDetails(id:5, addressList:
+                [new DummyAddress("warszawa", "mokotowska"),
+                 new DummyAddress("warszawa", "wolska")])
 
         when:
         def node = graphBuilder.buildGraph(dummyUserDetails).root()
 
         then:
         assertThat(node).hasMultiEdge("addressList").refersToGlobalIds(
-                [new ValueObjectIdDTO(DummyUserDetails,5,"addressList/0"),
+                [new ValueObjectIdDTO(DummyUserDetails, 5,"addressList/0"),
                  new ValueObjectIdDTO(DummyUserDetails, 5,"addressList/1")
                 ])
     }
