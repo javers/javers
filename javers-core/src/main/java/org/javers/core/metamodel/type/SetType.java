@@ -3,9 +3,7 @@ package org.javers.core.metamodel.type;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
-import org.javers.core.metamodel.object.EnumeratorContext;
 import org.javers.core.metamodel.object.OwnerContext;
-
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,13 +21,9 @@ public class SetType extends CollectionType{
         Set sourceSet = toNotNullSet(sourceSet_);
         Set targetSet = new HashSet(sourceSet.size());
 
-        SetEnumeratorContext enumerator = new SetEnumeratorContext();
-        EnumerationAwareOwnerContext enumerationOwnerContext =
-                new EnumerationAwareOwnerContext(enumerator, owner);
-
+        EnumerationAwareOwnerContext enumerationContext = new SetEnumerationOwnerContext(owner);
         for (Object sourceVal : sourceSet) {
-            targetSet.add(mapFunction.apply(sourceVal, enumerationOwnerContext));
-            enumerator.next(sourceVal);
+            targetSet.add(mapFunction.apply(sourceVal, enumerationContext));
         }
         return Collections.unmodifiableSet(targetSet);
     }
@@ -43,15 +37,12 @@ public class SetType extends CollectionType{
         }
     }
 
-    private class SetEnumeratorContext implements EnumeratorContext {
-        int randomId = 0;
-
-        @Override
-        public String getPath() {
-            return "random_"+(randomId++);
-        }
-
-        public void next(Object sourceVal) {
+    /**
+     * marker class
+     */
+    public static class SetEnumerationOwnerContext extends EnumerationAwareOwnerContext {
+        SetEnumerationOwnerContext(OwnerContext ownerContext) {
+            super(ownerContext);
         }
     }
 }

@@ -10,10 +10,11 @@ import org.javers.core.json.JsonConverterBuilder
 import org.javers.core.metamodel.object.CdoWrapper
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
-import org.javers.core.metamodel.object.SnapshotFactory
+import org.javers.core.model.DummyAddress
+import org.javers.core.snapshot.ObjectHasher
+import org.javers.core.snapshot.SnapshotFactory
 import org.javers.core.metamodel.property.Property
 import org.javers.core.metamodel.type.TypeMapper
-import org.javers.core.snapshot.GraphSnapshotFacade
 import org.javers.repository.api.JaversExtendedRepository
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryRunner
@@ -102,10 +103,6 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(SnapshotFactory)
     }
 
-    GraphSnapshotFacade getGraphSnapshotFacade() {
-        javersBuilder.getContainerComponent(GraphSnapshotFacade)
-    }
-
     JaversExtendedRepository getJaversRepository(){
         javersBuilder.getContainerComponent(JaversExtendedRepository)
     }
@@ -140,6 +137,14 @@ class JaversTestBuilder {
 
     JsonConverterBuilder getJsonConverterBuilder() {
         javersBuilder.getContainerComponent(JsonConverterBuilder)
+    }
+
+    ObjectHasher getObjectHasher(){
+        javersBuilder.getContainerComponent(ObjectHasher)
+    }
+
+    String addressHash(String city){
+        getObjectHasher().hash(new DummyAddress(city))
     }
 
     def getContainerComponent(Class type) {

@@ -22,9 +22,7 @@ public class ListType extends CollectionType{
         List sourceList = (List)sourceList_;
         List targetList = new ArrayList(sourceList.size());
 
-        EnumerationAwareOwnerContext enumerationContext =
-                new EnumerationAwareOwnerContext(new IndexableContext(), owner);
-
+        EnumerationAwareOwnerContext enumerationContext = new IndexableEnumerationOwnerContext(owner);
         for (Object sourceVal : sourceList){
             targetList.add(mapFunction.apply(sourceVal, enumerationContext));
         }

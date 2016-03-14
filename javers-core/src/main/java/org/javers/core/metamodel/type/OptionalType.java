@@ -38,7 +38,7 @@ public class OptionalType extends CollectionType {
             return java.util.Optional.empty();
         }
 
-        Object applied = mapFunction.apply(sourceOptional.get(), EnumerationAwareOwnerContext.just(owner));
+        Object applied = mapFunction.apply(sourceOptional.get(), new EnumerationAwareOwnerContext(owner));
 
         return java.util.Optional.of( applied );
     }

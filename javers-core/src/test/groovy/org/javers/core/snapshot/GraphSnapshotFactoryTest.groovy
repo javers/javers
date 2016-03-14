@@ -130,11 +130,11 @@ class GraphSnapshotFactoryTest extends Specification {
         def snapshots = graphSnapshotFactory.create(node, ShadowGraph.EMPTY, someCommitMetadata())
 
         then:
-        assertThat(snapshots).hasSize(3)
-                             .hasSnapshot(instanceId(1, SnapshotEntity))
-                             .hasSnapshot(valueObjectId(1, SnapshotEntity,"setOfValueObjects/random_0"))
-                             .hasSnapshot(valueObjectId(1, SnapshotEntity,"setOfValueObjects/random_1"))
-
+        assertThat(snapshots)
+                .hasSize(3)
+                .hasSnapshot(instanceId(1, SnapshotEntity))
+                .hasSnapshot(valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London")))
+                .hasSnapshot(valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London City")))
     }
 
     @Unroll

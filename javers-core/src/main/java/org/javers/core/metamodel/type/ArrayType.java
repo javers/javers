@@ -43,9 +43,7 @@ public class ArrayType extends ContainerType {
             targetArray = new Object[len];
         }
 
-        EnumerationAwareOwnerContext enumerationContext =
-            new EnumerationAwareOwnerContext(new IndexableContext(), owner);
-
+        EnumerationAwareOwnerContext enumerationContext = new IndexableEnumerationOwnerContext(owner);
         for (int i=0; i<len; i++){
             Object sourceVal = Array.get(sourceArray,i);
             Array.set(targetArray, i, mapFunction.apply(sourceVal, enumerationContext));

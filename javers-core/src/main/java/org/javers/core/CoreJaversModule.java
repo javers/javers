@@ -3,7 +3,6 @@ package org.javers.core;
 import org.javers.common.collections.Lists;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.SnapshotFactory;
 import org.javers.core.pico.InstantiatingModule;
 import org.javers.repository.jql.QueryRunner;
 import org.picocontainer.MutablePicoContainer;
@@ -24,7 +23,6 @@ public class CoreJaversModule extends InstantiatingModule {
                 JaversCore.class,
                 JsonConverterBuilder.class,
                 JaversCoreConfiguration.class,
-                SnapshotFactory.class,
                 GlobalIdFactory.class,
                 QueryRunner.class
         );

@@ -7,7 +7,6 @@ import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoWrapper;
-import org.javers.core.metamodel.object.SnapshotFactory;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -5,10 +5,12 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.metamodel.type.*;
+import org.javers.core.snapshot.ObjectHasher;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.jql.UnboundedValueObjectIdDTO;
 import org.javers.repository.jql.ValueObjectIdDTO;
+import org.picocontainer.PicoContainer;
 
 /**
  * @author bartosz walacik
@@ -18,11 +20,14 @@ public class GlobalIdFactory {
     private final TypeMapper typeMapper;
     private ObjectAccessHook objectAccessHook;
     private final GlobalIdPathParser pathParser;
+    private ObjectHasher objectHasher;
+    private final PicoContainer picoContainer;
 
-    public GlobalIdFactory(TypeMapper typeMapper, ObjectAccessHook objectAccessHook) {
+    public GlobalIdFactory(TypeMapper typeMapper, ObjectAccessHook objectAccessHook, PicoContainer container) {
         this.typeMapper = typeMapper;
         this.objectAccessHook = objectAccessHook;
         this.pathParser = new GlobalIdPathParser(typeMapper);
+        this.picoContainer = container;
     }
 
     public GlobalId createId(Object targetCdo) {
@@ -47,7 +52,11 @@ public class GlobalIdFactory {
         }
 
         if (targetManagedType instanceof ValueObjectType && hasOwner(ownerContext)) {
-            return new ValueObjectId(targetManagedType.getName(), ownerContext.getOwnerId(), ownerContext.getPath());
+            String path = ownerContext.getPath();
+            if (ownerContext instanceof SetType.SetEnumerationOwnerContext) {
+                path += "/" + getObjectHasher().hash(targetCdo);
+            }
+            return new ValueObjectId(targetManagedType.getName(), ownerContext.getOwnerId(), path);
         }
 
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
@@ -114,6 +123,17 @@ public class GlobalIdFactory {
             return createId(item, context);
         } else {
             return item;
+        }
+    }
+
+    //pico can't resolve cycles
+    private ObjectHasher getObjectHasher(){
+        if (objectHasher != null){
+            return objectHasher;
+        }
+        synchronized (this) {
+            objectHasher = picoContainer.getComponent(ObjectHasher.class);
+            return objectHasher;
         }
     }
 

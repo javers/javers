@@ -1,15 +1,14 @@
 package org.javers.core.graph
 
 import org.javers.core.IdBuilder
-import org.javers.repository.jql.ValueObjectIdDTO
-import org.javers.core.metamodel.type.TypeMapper
+import org.javers.core.JaversTestBuilder
 import org.javers.core.model.*
+import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static NodeAssert.assertThat
-import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUserDetails.dummyUserDetails
 
@@ -18,12 +17,10 @@ import static org.javers.core.model.DummyUserDetails.dummyUserDetails
  */
 abstract class ObjectGraphBuilderTest extends Specification {
 
-    @Shared TypeMapper mapper
-    @Shared LiveCdoFactory liveCdoFactory
-    @Shared IdBuilder idBuilder = javersTestAssembly().idBuilder()
+    @Shared JaversTestBuilder javers
 
     ObjectGraphBuilder newBuilder(){
-        new ObjectGraphBuilder(mapper, liveCdoFactory)
+        new ObjectGraphBuilder(javers.typeMapper, javers.liveCdoFactory)
     }
 
     def "should build one node graph from Entity"(){
@@ -370,8 +367,8 @@ abstract class ObjectGraphBuilderTest extends Specification {
         given:
         def graphBuilder = newBuilder()
         def user = new SnapshotEntity(id:1, setOfValueObjects:[
-                 new DummyAddress("warszawa", "mokotowska"),
-                 new DummyAddress("warszawa", "wolska")
+                 new DummyAddress("London"),
+                 new DummyAddress("London City")
         ])
 
         when:
@@ -385,8 +382,8 @@ abstract class ObjectGraphBuilderTest extends Specification {
         }
 
         assertThat(node).hasMultiEdge("setOfValueObjects").refersToGlobalIds(
-                [new ValueObjectIdDTO(DummyUserDetails, 5, "setOfValueObjects/000"),
-                 new ValueObjectIdDTO(DummyUserDetails, 5, "setOfValueObjects/111")
+                [new ValueObjectIdDTO(SnapshotEntity, 1, "setOfValueObjects/"+javers.addressHash("London")),
+                 new ValueObjectIdDTO(SnapshotEntity, 1, "setOfValueObjects/"+javers.addressHash("London City"))
                 ])
     }
 
@@ -409,6 +406,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should support cycles on ValueObjects"() {
         given:
+        IdBuilder idBuilder = javers.idBuilder()
         ObjectGraphBuilder graphBuilder = newBuilder()
 
         def child1 = new CategoryVo("child1")

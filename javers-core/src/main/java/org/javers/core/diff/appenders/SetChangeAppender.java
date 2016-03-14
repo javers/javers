@@ -14,8 +14,6 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.SetType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -24,9 +22,6 @@ import java.util.*;
  * @author pawel szymczyk
  */
 class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
-
-    private static final Logger logger = LoggerFactory.getLogger(SetChangeAppender.class);
-
     private final TypeMapper typeMapper;
 
     private final GlobalIdFactory globalIdFactory;

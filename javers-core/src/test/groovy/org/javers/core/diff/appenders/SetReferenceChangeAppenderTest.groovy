@@ -68,8 +68,8 @@ public class SetReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                 .hasSize(2)
-                .hasValueAdded(valueObjectId(1, SnapshotEntity, "setOfValueObjects/63573625e"))
-                .hasValueRemoved(valueObjectId(1, SnapshotEntity, "setOfValueObjects/1......"))
+                .hasValueAdded(valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("Paris")))
+                .hasValueRemoved(valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("Tokyo")))
     }
 }
 

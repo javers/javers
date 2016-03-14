@@ -280,10 +280,8 @@ class JaversDiffE2ETest extends Specification {
 
       then:
       changes.size() == 1
-      with(changes[0]) {
-          affectedGlobalId == instanceId(SnapshotEntity, 1)
-          left == 5
-          right == 6
-      }
+      changes[0].affectedGlobalId.value() == SnapshotEntity.getName()+"/1"
+      changes[0].left == 5
+      changes[0].right == 6
     }
 }

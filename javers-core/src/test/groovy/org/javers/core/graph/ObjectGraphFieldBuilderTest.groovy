@@ -10,8 +10,6 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 class ObjectGraphFieldBuilderTest extends ObjectGraphBuilderTest {
 
     def setupSpec() {
-        def javers = javersTestAssembly(MappingStyle.FIELD)
-        mapper = javers.typeMapper
-        liveCdoFactory = javers.liveCdoFactory
+        javers = javersTestAssembly(MappingStyle.FIELD)
     }
 }
