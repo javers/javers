@@ -40,6 +40,8 @@ public enum JaversExceptionCode {
 
     SET_OF_VO_DIFF_NOT_IMPLEMENTED("diff for Set of ValueObjects is not supported"),
 
+    MULTISET_OF_VO_DIFF_NOT_IMPLEMENTED("diff for Multiset of ValueObjects is not supported"),
+
     GENERIC_TYPE_NOT_PARAMETRIZED(
             "\nexpected actual Class argument in type '%s'. "+
             "\nJaVers needs to know actual Class of elements stored in your collections. "+

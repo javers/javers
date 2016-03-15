@@ -34,6 +34,7 @@ import org.javers.core.metamodel.clazz.IgnoredTypeDefinition;
 import org.javers.core.metamodel.clazz.ValueDefinition;
 import org.javers.core.metamodel.clazz.ValueObjectDefinition;
 import org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder;
+import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.scanner.ScannerModule;
 import org.javers.core.metamodel.type.CustomType;
 import org.javers.core.metamodel.type.EntityType;
@@ -114,7 +115,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         }
         new GroovyAddOns().beforeAssemble(this);
         new UtilTypeAdapters().beforeAssemble(this);
-        new GuavaAddOns().beforeAssemble(this);
+
     }
 
     public Javers build() {
@@ -132,6 +133,9 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new ScannerModule(coreConfiguration(), getContainer()));
 
         bootManagedTypeModule();
+
+        // after assembly add-ons
+        new GuavaAddOns(typeMapper(), getContainerComponent(GlobalIdFactory.class)).afterAssemble(this);
 
         // JSON beans & domain aware typeAdapters
         bootJsonConverter();

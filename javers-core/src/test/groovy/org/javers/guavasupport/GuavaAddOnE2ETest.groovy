@@ -2,7 +2,6 @@ package org.javers.guavasupport
 
 import com.google.common.collect.HashMultiset
 import com.google.common.collect.Lists
-import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -30,11 +29,11 @@ class GuavaAddOnE2ETest extends Specification {
         changes.size() == extpectedChanges
 
         where:
-        leftList                                   | rightList                                | extpectedChanges
-        Lists.asList(new DummyAddress("New York")) | Lists.asList(new DummyAddress("Boston")) | 2
-        Lists.asList("New York")                   | Lists.asList("Boston")                   | 2
-        Lists.asList("New York")                   | Lists.asList("New York", "New York")     | 1
-        Collections.emptyList()                    | Lists.asList("New York")                 | 1
+        leftList                 | rightList                            | extpectedChanges
+        Lists.asList("New York") | Lists.asList("Boston")               | 2
+        Lists.asList("New York") | Lists.asList("New York", "New York") | 1
+        Collections.emptyList()  | Lists.asList("New York")             | 1
+        Lists.asList("New York") | Collections.emptyList()              | 1
     }
 
     @Unroll
@@ -53,6 +52,7 @@ class GuavaAddOnE2ETest extends Specification {
         where:
         leftList                           | rightList
         Lists.asList("New York")           | Lists.asList("New York")
+        Collections.emptyList()            | Collections.emptyList()
         Lists.asList("New York", "Boston") | Lists.asList("Boston", "New York")
     }
 }
