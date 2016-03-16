@@ -18,7 +18,9 @@ import org.javers.spring.jpa.TransactionalJaversBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +35,7 @@ import javax.persistence.EntityManagerFactory;
 @Configuration
 @EnableAspectJAutoProxy
 @EnableConfigurationProperties(value = {JaversProperties.class, JpaProperties.class})
+@AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
 public class JaversSqlAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversSqlAutoConfiguration.class);
 

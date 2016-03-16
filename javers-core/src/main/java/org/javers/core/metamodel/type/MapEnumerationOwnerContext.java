@@ -1,16 +1,21 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.core.metamodel.object.EnumeratorContext;
+import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
+import org.javers.core.metamodel.object.OwnerContext;
 
 /**
-* @author bartosz walacik
-*/
-public class MapEnumeratorContext implements EnumeratorContext {
+ * @author bartosz.walacik
+ */
+public class MapEnumerationOwnerContext extends EnumerationAwareOwnerContext {
     private Object key;
     private boolean isKey;
 
+    MapEnumerationOwnerContext(OwnerContext ownerContext) {
+        super(ownerContext);
+    }
+
     @Override
-    public String getPath() {
+    public String getEnumeratorContextPath() {
         if (key != null) {
             return key.toString();
         }

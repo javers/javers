@@ -5,6 +5,7 @@ import org.javers.core.model.SnapshotEntity
 
 import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
 /**
  * @author wioleta.gozdzik
@@ -55,9 +56,9 @@ public class SetReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         !change
     }
 
-    def "should NOT support Set of ValueObjects"() {
+    def "should support Set of ValueObjects for added/removed objects"() {
         given:
-        def leftCdo =  new SnapshotEntity(setOfValueObjects: [new DummyAddress("London")])
+        def leftCdo =  new SnapshotEntity(setOfValueObjects: [new DummyAddress("London"), new DummyAddress("Tokyo")])
         def rightCdo = new SnapshotEntity(setOfValueObjects: [new DummyAddress("Paris"), new DummyAddress("London")])
 
         when:
@@ -65,7 +66,10 @@ public class SetReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "setOfValueObjects"))
 
         then:
-        !change
+        assertThat(change)
+                .hasSize(2)
+                .hasValueAdded(valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("Paris")))
+                .hasValueRemoved(valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("Tokyo")))
     }
 }
 

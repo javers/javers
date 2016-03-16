@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
@@ -21,22 +22,10 @@ public class ListType extends CollectionType{
         List sourceList = (List)sourceList_;
         List targetList = new ArrayList(sourceList.size());
 
-        IndexableContext indexableContext = new IndexableContext();
-        owner.setEnumeratorContext(indexableContext);
-
+        EnumerationAwareOwnerContext enumerationContext = new IndexableEnumerationOwnerContext(owner);
         for (Object sourceVal : sourceList){
-            targetList.add(mapFunction.apply(sourceVal, owner));
-            indexableContext.incIndex();
+            targetList.add(mapFunction.apply(sourceVal, enumerationContext));
         }
         return Collections.unmodifiableList(targetList);
-    }
-
-    private List toNotNullList(Object sourceList) {
-        if (sourceList == null) {
-            return Collections.emptyList();
-        }
-        else{
-            return (List)sourceList;
-        }
     }
 }

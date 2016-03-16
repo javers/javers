@@ -9,14 +9,16 @@ import java.util.Collection;
 /**
  * @author bartosz walacik
  */
-public class GraphSnapshotModule extends InstantiatingModule {
-    public GraphSnapshotModule(MutablePicoContainer container) {
+public class SnapshotModule extends InstantiatingModule {
+    public SnapshotModule(MutablePicoContainer container) {
         super(container);
     }
 
     @Override
     protected Collection<Class> getImplementations() {
         return (Collection) Lists.asList(
+                SnapshotFactory.class,
+                ObjectHasher.class,
                 GraphSnapshotFacade.class,
                 GraphSnapshotFactory.class,
                 SnapshotDiffer.class,

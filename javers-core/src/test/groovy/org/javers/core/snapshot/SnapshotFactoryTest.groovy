@@ -7,7 +7,6 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.metamodel.object.CdoSnapshot
-import org.javers.core.metamodel.object.SnapshotFactory
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.PrimitiveEntity
 import org.javers.core.model.SnapshotEntity
@@ -260,8 +259,10 @@ class SnapshotFactoryTest extends Specification{
 
     @Unroll
     def "should record Set of #propertyType"() {
-        when:
+        given:
         def cdoWrapper = javers.createCdoWrapper(cdo)
+
+        when:
         CdoSnapshot snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
 
         then:
@@ -280,8 +281,8 @@ class SnapshotFactoryTest extends Specification{
         expectedVal << [[1, 2] as Set,
                         [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)] as Set,
                         [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)] as Set,
-                        [valueObjectId(1, SnapshotEntity, "setOfValueObjects/random_0"),
-                         valueObjectId(1, SnapshotEntity, "setOfValueObjects/random_1")] as Set
+                        [valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London")),
+                         valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London City"))] as Set
                        ]
     }
 

@@ -1,14 +1,19 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Sets;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.container.*;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.diff.changetype.container.ContainerElementChange;
+import org.javers.core.diff.changetype.container.SetChange;
+import org.javers.core.diff.changetype.container.ValueAdded;
+import org.javers.core.diff.changetype.container.ValueRemoved;
+import org.javers.core.metamodel.object.DehydrateContainerFunction;
+import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.SetType;
+import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.*;
 
@@ -17,9 +22,6 @@ import java.util.*;
  * @author pawel szymczyk
  */
 class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
-
-    private static final Logger logger = LoggerFactory.getLogger(SetChangeAppender.class);
-
     private final TypeMapper typeMapper;
 
     private final GlobalIdFactory globalIdFactory;
@@ -32,17 +34,6 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
     @Override
     public boolean supports(JaversType propertyType) {
         return propertyType instanceof SetType;
-    }
-
-    private boolean isSupportedContainer(Property property) {
-        ContainerType propertyType = typeMapper.getPropertyType(property);
-
-        if (typeMapper.isValueObject(propertyType.getItemType())) {
-            logger.error("could not diff " + property +", "+
-                         JaversExceptionCode.SET_OF_VO_DIFF_NOT_IMPLEMENTED.getMessage() );
-            return false;
-        }
-        return true;
     }
 
     private List<ContainerElementChange> calculateEntryChanges(SetType setType, Set leftRawSet, Set rightRawSet, OwnerContext owner) {
@@ -74,12 +65,8 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         Set leftValues = (Set) pair.getLeftPropertyValue(property);
         Set rightValues = (Set) pair.getRightPropertyValue(property);
 
-        if (!isSupportedContainer(property)) {
-            return null; //TODO ADD SUPPORT
-        }
-
         SetType setType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new OwnerContext(pair.getGlobalId(), property.getName());
+        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
         List<ContainerElementChange> entryChanges =
                 calculateEntryChanges(setType, leftValues, rightValues, owner);
 

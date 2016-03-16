@@ -25,7 +25,7 @@ import org.javers.core.metamodel.annotation.*;
 import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.scanner.ScannerModule;
 import org.javers.core.metamodel.type.*;
-import org.javers.core.snapshot.GraphSnapshotModule;
+import org.javers.core.snapshot.SnapshotModule;
 import org.javers.groovysupport.GroovyAddOns;
 import org.javers.java8support.Java8AddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
@@ -88,7 +88,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new CoreJaversModule(getContainer()));
         addModule(new DiffFactoryModule());
         addModule(new CommitFactoryModule(getContainer()));
-        addModule(new GraphSnapshotModule(getContainer()));
+        addModule(new SnapshotModule(getContainer()));
         addModule(new GraphFactoryModule(getContainer()));
 
         // bootstrap phase 2: add-ons
