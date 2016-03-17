@@ -1,12 +1,9 @@
 package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Optional;
-import org.javers.core.commit.CommitId;
-import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.SelectQuery;
-import org.polyjdbc.core.type.Timestamp;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_CHANGED;
 
 class PrimaryKeySnapshotFilter extends SnapshotFilter  {
     final long primaryKey;

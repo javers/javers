@@ -53,24 +53,12 @@ public class CdoSnapshotFinder {
     }
 
     public List<CdoSnapshot> getStateHistory(ManagedType managedType, Optional<String> propertyName, QueryParams queryParams) {
-        Optional<Long> classPk = globalIdRepository.findClassPk(managedType.getName());
-        if (classPk.isEmpty()){
-            return Collections.emptyList();
-        }
-
-        ManagedClassFilter classFilter = new ManagedClassFilter(classPk.get(), propertyName);
-
+        ManagedClassFilter classFilter = new ManagedClassFilter(managedType.getName(), propertyName);
         return queryForCdoSnapshots(classFilter, Optional.<GlobalId>empty(), Optional.of(queryParams));
     }
 
     public List<CdoSnapshot> getVOStateHistory(EntityType ownerEntity, String fragment, QueryParams queryParams) {
-        Optional<Long> ownerEntityClassPk = globalIdRepository.findClassPk(ownerEntity.getName());
-        if (ownerEntityClassPk.isEmpty()){
-            return Collections.emptyList();
-        }
-
-        VoOwnerEntityFilter voOwnerFilter = new VoOwnerEntityFilter(ownerEntityClassPk.get(), fragment);
-
+        VoOwnerEntityFilter voOwnerFilter = new VoOwnerEntityFilter(ownerEntity.getName(), fragment);
         return queryForCdoSnapshots(voOwnerFilter, Optional.<GlobalId>empty(), Optional.of(queryParams));
     }
 
