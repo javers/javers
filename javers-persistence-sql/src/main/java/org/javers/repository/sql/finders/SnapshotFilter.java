@@ -21,6 +21,7 @@ abstract class SnapshotFilter {
             SNAPSHOT_TYPE + ", " +
             SNAPSHOT_VERSION + ", " +
             SNAPSHOT_CHANGED + ", " +
+            SNAPSHOT_MANAGED_TYPE + ", " +
             COMMIT_AUTHOR + ", " +
             COMMIT_COMMIT_DATE + ", " +
             COMMIT_COMMIT_ID;
@@ -29,11 +30,10 @@ abstract class SnapshotFilter {
         BASE_FIELDS + ", " +
             "g." + GLOBAL_ID_LOCAL_ID + ", " +
             "g." + GLOBAL_ID_FRAGMENT + ", " +
-            "g." + GLOBAL_ID_CLASS_QUALIFIED_NAME + ", " +
             "g." + GLOBAL_ID_OWNER_ID_FK + ", " +
             "o." + GLOBAL_ID_LOCAL_ID + " owner_" + GLOBAL_ID_LOCAL_ID + ", " +
             "o." + GLOBAL_ID_FRAGMENT + " owner_" + GLOBAL_ID_FRAGMENT + ", " +
-            "o." + GLOBAL_ID_CLASS_QUALIFIED_NAME + " owner_" + GLOBAL_ID_CLASS_QUALIFIED_NAME;
+            "o." + GLOBAL_ID_TYPE_NAME + " owner_" + GLOBAL_ID_TYPE_NAME;
 
     abstract String select();
 

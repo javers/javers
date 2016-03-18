@@ -18,7 +18,7 @@ public class FixedSchemaFactory {
     public static final String GLOBAL_ID_PK =         "global_id_pk";
     public static final String GLOBAL_ID_LOCAL_ID =   "local_id";
     public static final String GLOBAL_ID_FRAGMENT =   "fragment";     //since v.1.2
-    public static final String GLOBAL_ID_CLASS_QUALIFIED_NAME = "qualified_name";
+    public static final String GLOBAL_ID_TYPE_NAME =  "type_name";
     public static final String GLOBAL_ID_OWNER_ID_FK ="owner_id_fk";  //since v.1.2
     public static final String GLOBAL_ID_PK_SEQ =     "jv_global_id_pk_seq";
 
@@ -38,6 +38,7 @@ public class FixedSchemaFactory {
     public static final String SNAPSHOT_TABLE_PK_SEQ = "jv_snapshot_pk_seq";
     public static final String SNAPSHOT_STATE =        "state";
     public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v.1.2
+    public static final String SNAPSHOT_MANAGED_TYPE = "managed_type";
 
     private Schema snapshotTableSchema(Dialect dialect, String tableName){
         Schema schema = new Schema(dialect);
@@ -46,7 +47,8 @@ public class FixedSchemaFactory {
         relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
                        .withAttribute().longAttr(SNAPSHOT_VERSION).and()
                        .withAttribute().text(SNAPSHOT_STATE).and()
-                       .withAttribute().text(SNAPSHOT_CHANGED).and();
+                       .withAttribute().text(SNAPSHOT_CHANGED).and()
+                       .withAttribute().string(SNAPSHOT_MANAGED_TYPE).withMaxLength(200).and();
         foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);
         foreignKey(tableName, SNAPSHOT_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder, schema);
         relationBuilder.build();
@@ -79,7 +81,7 @@ public class FixedSchemaFactory {
         relationBuilder
                 .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(200).and()
                 .withAttribute().string(GLOBAL_ID_FRAGMENT).withMaxLength(200).and()
-                .withAttribute().string(GLOBAL_ID_CLASS_QUALIFIED_NAME).withMaxLength(200).and();
+                .withAttribute().string(GLOBAL_ID_TYPE_NAME).withMaxLength(200).and();
         foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);
         relationBuilder.build();
 

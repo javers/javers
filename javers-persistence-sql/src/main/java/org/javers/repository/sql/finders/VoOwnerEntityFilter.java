@@ -2,7 +2,7 @@ package org.javers.repository.sql.finders;
 
 import org.polyjdbc.core.query.SelectQuery;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_CLASS_QUALIFIED_NAME;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_TYPE_NAME;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_FRAGMENT;
 
 /**
@@ -30,7 +30,7 @@ public class VoOwnerEntityFilter extends SnapshotFilter {
 
     @Override
     void addWhere(SelectQuery query) {
-        query.where("o." + GLOBAL_ID_CLASS_QUALIFIED_NAME + " = :ownerTypeName").withArgument("ownerTypeName", ownerTypeName)
+        query.where("o." + GLOBAL_ID_TYPE_NAME + " = :ownerTypeName").withArgument("ownerTypeName", ownerTypeName)
              .append(" AND g." + GLOBAL_ID_FRAGMENT + " = :fragment").withArgument("fragment", fragment);
     }
 

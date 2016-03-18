@@ -30,7 +30,6 @@ public class GlobalIdRepository {
 
     public long getOrInsertId(GlobalId globalId) {
         Optional<Long> pk = findGlobalIdPk(globalId);
-
         return pk.isPresent() ? pk.get() : insert(globalId);
     }
 
@@ -62,22 +61,23 @@ public class GlobalIdRepository {
             if (ownerFk.isEmpty()){
                 return Optional.empty();
             }
-            query.where(GLOBAL_ID_FRAGMENT + " = :fragment " +
-                        "AND " + GLOBAL_ID_OWNER_ID_FK + " = :ownerFk "+
-                        "AND " + GLOBAL_ID_CLASS_QUALIFIED_NAME + " = :voQualifiedName ")
-                 .withArgument("fragment", valueObjectId.getFragment())
-                 .withArgument("voQualifiedName", valueObjectId.getTypeName())
-                 .withArgument("ownerFk", ownerFk.get());
+            query
+                .where(GLOBAL_ID_FRAGMENT + " = :fragment ")
+                .withArgument("fragment", valueObjectId.getFragment())
+                .append("AND " + GLOBAL_ID_OWNER_ID_FK + " = :ownerFk ")
+                .withArgument("ownerFk", ownerFk.get());
         }
         else if (globalId instanceof InstanceId){
-            query.where(GLOBAL_ID_LOCAL_ID + " = :localId " +
-                        "AND " + GLOBAL_ID_CLASS_QUALIFIED_NAME + " = :qualifiedName ")
-                 .withArgument("localId", jsonConverter.toJson(((InstanceId)globalId).getCdoId()))
-                 .withArgument("qualifiedName", globalId.getTypeName());
+            query
+                .where(GLOBAL_ID_LOCAL_ID + " = :localId ")
+                .withArgument("localId", jsonConverter.toJson(((InstanceId)globalId).getCdoId()))
+                .append("AND " + GLOBAL_ID_TYPE_NAME + " = :qualifiedName ")
+                .withArgument("qualifiedName", globalId.getTypeName());
         }
         else if (globalId instanceof UnboundedValueObjectId){
-            query.where(GLOBAL_ID_CLASS_QUALIFIED_NAME + " = :qualifiedName ")
-                 .withArgument("qualifiedName", globalId.getTypeName());
+            query
+                .where(GLOBAL_ID_TYPE_NAME + " = :qualifiedName ")
+                .withArgument("qualifiedName", globalId.getTypeName());
         }
 
         return queryForOptionalLong(query, polyJdbc);
@@ -85,10 +85,9 @@ public class GlobalIdRepository {
 
     private long insert(GlobalId globalId) {
         InsertQuery query = polyJdbc.query()
-                .insert()
-                .into(GLOBAL_ID_TABLE_NAME);
+            .insert()
+            .into(GLOBAL_ID_TABLE_NAME);
 
-        query.value(GLOBAL_ID_CLASS_QUALIFIED_NAME, globalId.getTypeName());
 
         if (globalId instanceof ValueObjectId) {
             ValueObjectId valueObjectId  = (ValueObjectId) globalId;
@@ -96,8 +95,13 @@ public class GlobalIdRepository {
             query.value(GLOBAL_ID_FRAGMENT, valueObjectId.getFragment())
                  .value(GLOBAL_ID_OWNER_ID_FK, ownerFk);
         }
-        else if (globalId instanceof InstanceId){
-           query.value(GLOBAL_ID_LOCAL_ID, jsonConverter.toJson(((InstanceId)globalId).getCdoId()));
+        else if (globalId instanceof InstanceId) {
+           query.value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName())
+                .value(GLOBAL_ID_LOCAL_ID, jsonConverter.toJson(((InstanceId)globalId).getCdoId()));
+
+        }
+        else if (globalId instanceof UnboundedValueObjectId) {
+            query.value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName());
         }
 
         query.sequence(GLOBAL_ID_PK, GLOBAL_ID_PK_SEQ);

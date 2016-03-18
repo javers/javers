@@ -81,7 +81,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
         try {
             String fragment = resultSet.getString(GLOBAL_ID_FRAGMENT);
             String localIdJSON = resultSet.getString(GLOBAL_ID_LOCAL_ID);
-            String cdoType = resultSet.getString(GLOBAL_ID_CLASS_QUALIFIED_NAME);
+            String cdoType = resultSet.getString(SNAPSHOT_MANAGED_TYPE);
 
             JsonObject json = assembleOneGlobalId(cdoType, localIdJSON, fragment);
 
@@ -89,7 +89,7 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
 
                 String ownerFragment = resultSet.getString("owner_"+GLOBAL_ID_FRAGMENT);
                 String ownerLocalIdJSON = resultSet.getString("owner_"+GLOBAL_ID_LOCAL_ID);
-                String ownerCdoType = resultSet.getString("owner_"+GLOBAL_ID_CLASS_QUALIFIED_NAME);
+                String ownerCdoType = resultSet.getString("owner_"+ GLOBAL_ID_TYPE_NAME);
 
                 JsonObject ownerId = assembleOneGlobalId(ownerCdoType, ownerLocalIdJSON, ownerFragment);
                 json.add("ownerId", ownerId);
