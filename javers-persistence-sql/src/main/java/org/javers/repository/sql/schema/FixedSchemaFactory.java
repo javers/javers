@@ -49,8 +49,8 @@ public class FixedSchemaFactory {
                        .withAttribute().text(SNAPSHOT_STATE).and()
                        .withAttribute().text(SNAPSHOT_CHANGED).and()
                        .withAttribute().string(SNAPSHOT_MANAGED_TYPE).withMaxLength(200).and();
-        foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);
-        foreignKey(tableName, SNAPSHOT_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder, schema);
+        foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder);
+        foreignKey(tableName, SNAPSHOT_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
         columnIndex(tableName, SNAPSHOT_GLOBAL_ID_FK, schema);
@@ -82,7 +82,7 @@ public class FixedSchemaFactory {
                 .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(200).and()
                 .withAttribute().string(GLOBAL_ID_FRAGMENT).withMaxLength(200).and()
                 .withAttribute().string(GLOBAL_ID_TYPE_NAME).withMaxLength(200).and();
-        foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder, schema);
+        foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder);
         relationBuilder.build();
 
         columnIndex(tableName, GLOBAL_ID_LOCAL_ID, schema);
@@ -90,7 +90,7 @@ public class FixedSchemaFactory {
         return schema;
     }
 
-    private void foreignKey(String tableName, String fkColName, String targetTableName, String targetPkColName, RelationBuilder relationBuilder, Schema schema){
+    private void foreignKey(String tableName, String fkColName, String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
         relationBuilder
                 .withAttribute().longAttr(fkColName).and()
                 .foreignKey(tableName + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName).and();
