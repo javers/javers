@@ -124,13 +124,13 @@ public class JaversSchemaManager {
     //TODO this is just a draft, NOT TESTED YET
     private void populateSnapshotManagedType() {
         String updateStmt =
-            "UPDATE jv_snapshot snapshot " +
-            "  SET snapshot.managed_type = (SELECT cdo_class.qualified_name" +
-            "                                 FROM jv_cdo_class cdo_class," +
-            "                                      jv_global_id global_id" +
-            "                                 WHERE cdo_class.cdo_class_pk = global_id.cdo_class_fk" +
-            "                                   AND global_id.global_id_pk = snapshot.global_id_fk" +
-            "                              )";
+            "UPDATE jv_snapshot" +
+            "  SET managed_type = (SELECT qualified_name" +
+            "                      FROM jv_cdo_class," +
+            "                           jv_global_id" +
+            "                      WHERE cdo_class_pk = cdo_class_fk " +
+            "                      AND   global_id_pk = global_id_fk" +
+            "                     )";
         executeSQL(updateStmt);
     }
 
@@ -156,12 +156,12 @@ public class JaversSchemaManager {
     //TODO this is just a draft, NOT TESTED YET
     private void populateGlobalIdTypeName() {
         String updateStmt =
-            "UPDATE jv_global_id global_id " +
-            "  SET global_id.type_name = (SELECT cdo_class.qualified_name" +
-            "                               FROM jv_cdo_class cdo_class" +
-            "                               WHERE cdo_class.cdo_class_pk = global_id.cdo_class_fk" +
-            "                            )" +
-            "  WHERE global_id.owner_id_fk IS NULL";
+            "UPDATE jv_global_id " +
+            "  SET type_name = (SELECT qualified_name" +
+            "                   FROM jv_cdo_class" +
+            "                   WHERE cdo_class_pk = cdo_class_fk" +
+            "                   )" +
+            "  WHERE owner_id_fk IS NULL";
         executeSQL(updateStmt);
     }
 
