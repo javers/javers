@@ -15,12 +15,6 @@ public class JaversCoreConfiguration {
     private boolean newObjectsSnapshot = false;
 
     /**
-     * loads javers-default.properties
-     */
-    public JaversCoreConfiguration() {
-    }
-
-    /**
      * @return never returns null
      */
     public MappingStyle getMappingStyle() {
@@ -50,11 +44,4 @@ public class JaversCoreConfiguration {
         this.listCompareAlgorithm = algorithm;
         return this;
     }
-
-    /*@Override
-    protected void assemble() {
-        mappingStyle = getEnumProperty("core.mappingStyle", MappingStyle.class);
-
-        newObjectsSnapshot = getBooleanProperty("core.diff.newObjectsSnapshot");
-    }*/
 }
