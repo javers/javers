@@ -26,13 +26,6 @@ public class PropertyConfiguration {
     }
 
     /**
-     * assembles modeled properties from {@link #properties} bag
-     * @throws JaversException if required property is not found
-     * @throws JaversException if property (like enum) cann't be assembled
-     */
-    //protected abstract void assemble();
-
-    /**
      * assembles mandatory enum property from {@link #properties} bag
      * @throws JaversException UNDEFINED_PROPERTY
      * @throws JaversException MALFORMED_PROPERTY
