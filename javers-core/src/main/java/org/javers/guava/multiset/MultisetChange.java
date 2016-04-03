@@ -1,4 +1,4 @@
-package org.javers.guava;
+package org.javers.guava.multiset;
 
 import org.javers.core.diff.changetype.container.CollectionChange;
 import org.javers.core.diff.changetype.container.ContainerElementChange;

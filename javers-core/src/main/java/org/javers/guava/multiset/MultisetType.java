@@ -1,4 +1,4 @@
-package org.javers.guava;
+package org.javers.guava.multiset;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;

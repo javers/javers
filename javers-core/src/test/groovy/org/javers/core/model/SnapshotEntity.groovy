@@ -1,5 +1,6 @@
 package org.javers.core.model
 
+import com.google.common.collect.Multimap
 import com.google.common.collect.Multiset
 import org.joda.time.LocalDate
 
@@ -45,6 +46,7 @@ class SnapshotEntity {
     Optional<DummyAddress> optionalValueObject
 
     Multiset<String> multiSetValueObject
+    Multimap<String,String> multiMapValueObject
 
     Map<String, Integer> mapOfPrimitives
     Map<LocalDate,BigDecimal> mapOfValues

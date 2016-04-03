@@ -1,4 +1,4 @@
-package org.javers.guava;
+package org.javers.guava.multiset;
 
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
@@ -31,13 +31,13 @@ import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_P
  *
  * @author akrystian
  */
-public class CustomMultisetComparator implements CustomPropertyComparator<Multiset , MultisetChange>{
-    private static final Logger logger = LoggerFactory.getLogger(CustomMultisetComparator.class);
+public class MultisetComparator implements CustomPropertyComparator<Multiset , MultisetChange>{
+    private static final Logger logger = LoggerFactory.getLogger(MultisetComparator.class);
 
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
 
-    CustomMultisetComparator(TypeMapper typeMapper, GlobalIdFactory globalIdFactory){
+    public MultisetComparator(TypeMapper typeMapper, GlobalIdFactory globalIdFactory){
         this.typeMapper = typeMapper;
         this.globalIdFactory = globalIdFactory;
     }

@@ -21,12 +21,12 @@ public class MapEnumeratorContext implements EnumeratorContext {
         return isKey;
     }
 
-    void switchToValue(Object key) {
+    public void switchToValue(Object key) {
         this.key = key;
         this.isKey = false;
     }
 
-    void switchToKey() {
+    public void switchToKey() {
         this.key = null;
         this.isKey = true;
     }

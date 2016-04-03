@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.type;
 
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
@@ -9,7 +10,8 @@ import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScanner;
-import org.javers.guava.MultisetType;
+import org.javers.guava.multimap.MultimapType;
+import org.javers.guava.multiset.MultisetType;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
@@ -82,6 +84,9 @@ public class TypeMapper {
 
         if (ReflectionUtil.isClassPresent("com.google.common.collect.Multiset")){
             addType(new MultisetType(Multiset.class));
+        }
+        if (ReflectionUtil.isClassPresent("com.google.common.collect.Multimap")){
+            addType(new MultimapType(Multimap.class));
         }
     }
 
