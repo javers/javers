@@ -107,16 +107,8 @@ public class JaversSchemaManager {
         if (!columnExists("jv_snapshot", "managed_type")) {
             logger.warn("column jv_snapshot.managed_type not exists, running ALTER TABLE ...");
 
-            if ( dialect instanceof PostgresDialect ||
-                dialect instanceof MysqlDialect ||
-                dialect instanceof H2Dialect ||
-                dialect instanceof MsSqlDialect) {
-                executeSQL("ALTER TABLE jv_snapshot ADD COLUMN managed_type VARCHAR(200)");
-            } else if (dialect instanceof OracleDialect) {
-                executeSQL("ALTER TABLE jv_snapshot ADD managed_type VARCHAR2(200)");
-            } else {
-                handleUnsupportedDialect();
-            }
+            addStringColumn("jv_snapshot", "managed_type", 200);
+
             populateSnapshotManagedType();
         }
     }
@@ -140,16 +132,8 @@ public class JaversSchemaManager {
         if (!columnExists("jv_global_id", "type_name")) {
             logger.warn("column jv_global_id.type_name not exists, running ALTER TABLE ...");
 
-            if ( dialect instanceof PostgresDialect ||
-                dialect instanceof MysqlDialect ||
-                dialect instanceof H2Dialect ||
-                dialect instanceof MsSqlDialect) {
-                executeSQL("ALTER TABLE jv_global_id ADD COLUMN type_name VARCHAR(200)");
-            } else if (dialect instanceof OracleDialect) {
-                executeSQL("ALTER TABLE jv_global_id ADD type_name VARCHAR2(200)");
-            } else {
-                handleUnsupportedDialect();
-            }
+            addStringColumn("jv_global_id", "type_name", 200);
+
             populateGlobalIdTypeName();
         }
     }
@@ -238,6 +222,18 @@ public class JaversSchemaManager {
         }
         logger.info("creating javers table {} ...", tableName);
         schemaManager.create(schema);
+    }
+
+    private void addStringColumn(String tableName, String colName, int len){
+        logger.warn("column "+tableName+"."+colName+" not exists, running ALTER TABLE ...");
+
+        String sqlType = dialect.types().string(len);
+
+        if (dialect instanceof OracleDialect) {
+            executeSQL("ALTER TABLE "+tableName+" ADD "+colName+" "+sqlType);
+        } else {
+            executeSQL("ALTER TABLE "+tableName+" ADD COLUMN "+colName+" "+sqlType);
+        }
     }
 
     public void dropSchema(){
