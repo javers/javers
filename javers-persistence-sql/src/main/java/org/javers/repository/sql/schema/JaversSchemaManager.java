@@ -131,7 +131,8 @@ public class JaversSchemaManager {
             "                      WHERE cdo_class_pk = cdo_class_fk " +
             "                      AND   global_id_pk = global_id_fk" +
             "                     )";
-        executeSQL(updateStmt);
+        int cnt = executeUpdate(updateStmt);
+        logger.info("populate jv_snapshot.managed_type - " + cnt +" row(s) updated");
     }
 
     //TODO this is just a draft, NOT TESTED YET
@@ -162,7 +163,9 @@ public class JaversSchemaManager {
             "                   WHERE cdo_class_pk = cdo_class_fk" +
             "                   )" +
             "  WHERE owner_id_fk IS NULL";
-        executeSQL(updateStmt);
+        int cnt = executeUpdate(updateStmt);
+
+        logger.info("populate jv_global_id.type_name - " + cnt +" row(s) updated");
     }
 
     private boolean executeSQL(String sql) {
@@ -173,6 +176,19 @@ public class JaversSchemaManager {
             stmt.close();
 
             return b;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private int executeUpdate(String sql) {
+        try {
+            Statement stmt = connectionProvider.getConnection().createStatement();
+
+            int cnt = stmt.executeUpdate(sql);
+            stmt.close();
+
+            return cnt;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
