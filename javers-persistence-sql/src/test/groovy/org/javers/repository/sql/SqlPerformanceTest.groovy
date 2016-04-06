@@ -103,7 +103,6 @@ class SqlPerformanceTest extends Specification{
         execute("delete  from jv_snapshot")
         execute("delete  from jv_commit")
         execute("delete  from jv_global_id")
-        execute("delete  from jv_cdo_class")
     }
 
     def execute(String sql){

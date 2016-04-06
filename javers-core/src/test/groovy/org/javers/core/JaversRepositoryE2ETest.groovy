@@ -735,4 +735,15 @@ class JaversRepositoryE2ETest extends Specification {
         assert snapshots.size() == snapshotIdentifiers.size()
     }
 
+    def "should treat refactored VOs as different versions of the same client's domain object"(){
+        given:
+        javers.commit('author', new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5, 5)))
+        javers.commit('author', new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5, 10)))
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byValueObject(EntityWithRefactoredValueObject,'value').build())
+
+        then:
+        snapshots.version == [2, 1]
+    }
 }

@@ -36,9 +36,9 @@ class GraphSnapshotFactory {
         for (ObjectNode node : currentVersion.nodes()) {
             boolean initial = isInitial(node, latestShadowGraph);
 
-           Optional<CdoSnapshot> existing = latestShadowGraph.get(node.getGlobalId());
+            Optional<CdoSnapshot> existing = latestShadowGraph.get(node.getGlobalId());
 
-           CdoSnapshot fresh = createFreshSnapshot(initial, node, commitMetadata, existing);
+            CdoSnapshot fresh = createFreshSnapshot(initial, node, commitMetadata, existing);
 
             if (existing.isEmpty()) {
                 result.add(fresh); //when insert
