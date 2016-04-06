@@ -105,8 +105,6 @@ public class JaversSchemaManager {
     //TODO this is just a draft, NOT TESTED YET
     private void addSnapshotManagedTypeColumnIfNeeded() {
         if (!columnExists("jv_snapshot", "managed_type")) {
-            logger.warn("column jv_snapshot.managed_type not exists, running ALTER TABLE ...");
-
             addStringColumn("jv_snapshot", "managed_type", 200);
 
             populateSnapshotManagedType();
@@ -130,8 +128,6 @@ public class JaversSchemaManager {
     //TODO this is just a draft, NOT TESTED YET
     private void addGlobalIdTypeNameColumnIfNeeded() {
         if (!columnExists("jv_global_id", "type_name")) {
-            logger.warn("column jv_global_id.type_name not exists, running ALTER TABLE ...");
-
             addStringColumn("jv_global_id", "type_name", 200);
 
             populateGlobalIdTypeName();
