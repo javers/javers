@@ -7,7 +7,8 @@ import org.polyjdbc.core.query.SelectQuery;
 
 import java.util.Collection;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_GLOBAL_ID_FK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_VERSION;
 
 class SnapshotIdentifiersFilter extends SnapshotFilter {
     private final Collection<SnapshotIdentifier> snapshotIdentifiers;

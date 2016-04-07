@@ -2,15 +2,18 @@ package org.javers.repository.sql.finders;
 
 import org.polyjdbc.core.query.SelectQuery;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_TYPE_NAME;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_FRAGMENT;
 
 /**
  * @author bartosz.walacik
  */
-public class VoOwnerEntityFilter extends ManagedClassFilter {
+public class VoOwnerEntityFilter extends SnapshotFilter {
+    final String ownerTypeName;
     final String fragment;
-    VoOwnerEntityFilter(long ownerEntityClassPk, String fragment) {
-        super(ownerEntityClassPk, "o." + GLOBAL_ID_CLASS_FK);
+
+    VoOwnerEntityFilter(String ownerTypeName, String fragment) {
+        this.ownerTypeName = ownerTypeName;
         this.fragment = fragment;
     }
 
@@ -20,11 +23,15 @@ public class VoOwnerEntityFilter extends ManagedClassFilter {
     }
 
     @Override
+    void addFrom(SelectQuery query) {
+        query.from(COMMIT_WITH_SNAPSHOT_GLOBAL_ID);
+    }
+
+
+    @Override
     void addWhere(SelectQuery query) {
-        query.where(pkFieldName + " = :pk"+
-                    " AND g." + GLOBAL_ID_FRAGMENT + " = :fragment")
-             .withArgument("pk", primaryKey)
-             .withArgument("fragment", fragment);
+        query.where("o." + GLOBAL_ID_TYPE_NAME + " = :ownerTypeName").withArgument("ownerTypeName", ownerTypeName)
+             .append(" AND g." + GLOBAL_ID_FRAGMENT + " = :fragment").withArgument("fragment", fragment);
     }
 
 }

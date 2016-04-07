@@ -11,7 +11,6 @@ import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
 import java.math.BigDecimal;
-import java.util.TimeZone;
 
 import static org.javers.repository.sql.PolyUtil.queryForOptionalBigDecimal;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
