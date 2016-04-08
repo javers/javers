@@ -14,8 +14,7 @@ import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.snapshot.SnapshotDiffer;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -36,7 +35,7 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(globalId, propertyName);
 
         List<CdoSnapshot> snapshots = getPropertyStateHistory(globalId, propertyName, queryParams);
-        List<Change> changes = snapshotDiffer.calculateDiffs(snapshots, newObjects);
+        List<Change> changes = getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
 
         return filterByPropertyName(changes, propertyName);
     }
@@ -45,7 +44,7 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(givenClass, propertyName);
 
         List<CdoSnapshot> snapshots = getPropertyStateHistory(givenClass, propertyName, queryParams);
-        List<Change> changes = snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
+        List<Change> changes = getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
 
         return filterByPropertyName(changes, propertyName);
     }
@@ -54,21 +53,21 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(globalId);
 
         List<CdoSnapshot> snapshots = getStateHistory(globalId, queryParams);
-        return snapshotDiffer.calculateDiffs(snapshots, newObjects);
+        return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
     }
 
     public List<Change> getChangeHistory(ManagedType givenClass, boolean newObjects, QueryParams queryParams) {
         argumentsAreNotNull(givenClass);
 
         List<CdoSnapshot> snapshots = getStateHistory(givenClass, queryParams);
-        return snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
+        return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
     }
 
     public List<Change> getValueObjectChangeHistory(EntityType ownerEntity, String path, boolean newObjects, QueryParams queryParams) {
         argumentsAreNotNull(ownerEntity, path);
 
         List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntity, path, queryParams);
-        return snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
+        return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
     }
 
     @Override
@@ -137,5 +136,62 @@ public class JaversExtendedRepository implements JaversRepository {
                 return input instanceof PropertyChange && ((PropertyChange) input).getPropertyName().equals(propertyName);
             }
         });
+    }
+
+    private List<CdoSnapshot> skipInitial(List<CdoSnapshot> snapshots) {
+        return Lists.negativeFilter(snapshots, new Predicate<CdoSnapshot>() {
+            @Override
+            public boolean apply(CdoSnapshot snapshot) {
+                return snapshot.isInitial();
+            }
+        });
+    }
+
+    private List<CdoSnapshot> skipTerminal(List<CdoSnapshot> snapshots) {
+        return Lists.negativeFilter(snapshots, new Predicate<CdoSnapshot>() {
+            @Override
+            public boolean apply(CdoSnapshot snapshot) {
+                return snapshot.isTerminal();
+            }
+        });
+    }
+
+    private List<Change> getChangesIntroducedBySnapshots(List<CdoSnapshot> snapshots) {
+        Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots = preparePreviousSnapshots(snapshots);
+        return snapshotDiffer.calculateDiffs(snapshots, previousSnapshots);
+    }
+
+    private Map<SnapshotIdentifier, CdoSnapshot> preparePreviousSnapshots(List<CdoSnapshot> snapshots) {
+        Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots = new HashMap<>();
+        populatePreviousSnapshotsWithSnapshots(previousSnapshots, snapshots);
+        List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers =
+            determineMissingPreviousSnapshotIdentifiers(previousSnapshots, snapshots);
+        supplyMissingPreviousSnapshots(previousSnapshots, missingPreviousSnapshotIdentifiers);
+        return previousSnapshots;
+    }
+
+    private void populatePreviousSnapshotsWithSnapshots(Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots, List<CdoSnapshot> snapshots) {
+        for (CdoSnapshot snapshot : snapshots) {
+            SnapshotIdentifier nextSnapshotIdentifier = SnapshotIdentifier.from(snapshot).next();
+            previousSnapshots.put(nextSnapshotIdentifier, snapshot);
+        }
+    }
+
+    private List<SnapshotIdentifier> determineMissingPreviousSnapshotIdentifiers(Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots, List<CdoSnapshot> snapshots) {
+        List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers = new ArrayList<>();
+        for (CdoSnapshot snapshot : skipInitial(skipTerminal(snapshots))) {
+            SnapshotIdentifier previousSnapshotIdentifier = SnapshotIdentifier.from(snapshot).previous();
+            if (!previousSnapshots.containsKey(previousSnapshotIdentifier)) {
+                missingPreviousSnapshotIdentifiers.add(previousSnapshotIdentifier);
+            }
+        }
+        return missingPreviousSnapshotIdentifiers;
+    }
+
+    private void supplyMissingPreviousSnapshots(Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots, List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers) {
+        List<CdoSnapshot> missingPreviousSnapshots = getSnapshots(missingPreviousSnapshotIdentifiers);
+        for (CdoSnapshot snapshot: missingPreviousSnapshots) {
+            previousSnapshots.put(SnapshotIdentifier.from(snapshot).next(), snapshot);
+        }
     }
 }

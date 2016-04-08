@@ -145,7 +145,7 @@ class JqlExample extends Specification {
 
         then:
         printChanges(changes)
-        assert changes.size() == 4
+        assert changes.size() == 6
     }
 
     def "should query for changes with skip filter"() {
@@ -186,7 +186,7 @@ class JqlExample extends Specification {
               .to  (new LocalDate(2018,01,1)).build() )
 
       then:
-      assert changes.size() == 2
+      assert changes.size() == 3
 
       println "found changes:"
       changes.each {
