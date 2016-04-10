@@ -137,6 +137,7 @@ class TypeMapperTest extends Specification {
         List | ListType
         Map  | MapType
         Optional | OptionalType
+        Collection | CollectionType
     }
 
     @Unroll
@@ -167,6 +168,7 @@ class TypeMapperTest extends Specification {
 
         where:
         givenJavaType                             | expectedJaversType
+        new TypeToken<Collection<String>>(){}.type| CollectionType
         new TypeToken<Set<String>>(){}.type       | SetType
         new TypeToken<HashSet<String>>(){}.type   | SetType
         new TypeToken<List<String>>(){}.type      | ListType
