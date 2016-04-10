@@ -40,7 +40,7 @@ class EdgeBuilder {
     }
 
     private OwnerContext createOwnerContext(ObjectNode parentNode, Property property) {
-        return new OwnerContext(parentNode.getGlobalId(), property.getName());
+        return new PropertyOwnerContext(parentNode.getGlobalId(), property.getName());
     }
 
     MultiEdge createMultiEdge(Property containerProperty, EnumerableType enumerableType, ObjectNode node) {
@@ -68,11 +68,11 @@ class EdgeBuilder {
         }
 
         @Override
-        public Object apply(Object input, OwnerContext enumerationAwareOwnerContext) {
+        public Object apply(Object input, EnumerationAwareOwnerContext context) {
             if (!isManagedPosition(input)){
                 return input;
             }
-            ObjectNode objectNode = buildNodeStubOrReuse(asCdo(input, enumerationAwareOwnerContext));
+            ObjectNode objectNode = buildNodeStubOrReuse(asCdo(input, context));
             multiEdge.addReferenceNode(objectNode);
             return input;
         }

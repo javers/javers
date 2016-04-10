@@ -42,7 +42,7 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.TypeMapperModule;
 import org.javers.core.metamodel.type.ValueObjectType;
 import org.javers.core.metamodel.type.ValueType;
-import org.javers.core.snapshot.GraphSnapshotModule;
+import org.javers.core.snapshot.SnapshotModule;
 import org.javers.groovysupport.GroovyAddOns;
 import org.javers.guava.GuavaAddOns;
 import org.javers.java8support.Java8AddOns;
@@ -106,7 +106,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new CoreJaversModule(getContainer()));
         addModule(new DiffFactoryModule());
         addModule(new CommitFactoryModule(getContainer()));
-        addModule(new GraphSnapshotModule(getContainer()));
+        addModule(new SnapshotModule(getContainer()));
         addModule(new GraphFactoryModule(getContainer()));
 
         // bootstrap phase 2: add-ons
@@ -115,7 +115,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
         }
         new GroovyAddOns().beforeAssemble(this);
         new UtilTypeAdapters().beforeAssemble(this);
-
     }
 
     public Javers build() {

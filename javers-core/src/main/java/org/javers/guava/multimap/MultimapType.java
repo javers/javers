@@ -8,7 +8,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.type.EnumerableType;
-import org.javers.core.metamodel.type.MapEnumeratorContext;
+import org.javers.core.metamodel.type.MapEnumerationOwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -36,18 +36,17 @@ public class MultimapType extends EnumerableType{
         Multimap sourceMultimap = toNotNullMultimap(sourceMultimap_);
         Multimap targetMultimap = HashMultimap.create();
 
-        MapEnumeratorContext enumeratorContext = new MapEnumeratorContext();
-        owner.setEnumeratorContext(enumeratorContext);
+        MapEnumerationOwnerContext enumeratorContext = new MultimapEnumerationOwnerContext(owner);
 
         Collection<Map.Entry<?, ?>> entries = sourceMultimap.entries();
         for (Map.Entry<?, ?> entry : entries){
             //key
             enumeratorContext.switchToKey();
-            Object mappedKey = mapFunction.apply(entry.getKey(), owner);
+            Object mappedKey = mapFunction.apply(entry.getKey(), enumeratorContext);
 
             //value
             enumeratorContext.switchToValue(mappedKey);
-            Object mappedValue = mapFunction.apply(entry.getValue(), owner);
+            Object mappedValue = mapFunction.apply(entry.getValue(), enumeratorContext);
 
             targetMultimap.put(mappedKey, mappedValue);
         }
@@ -89,5 +88,14 @@ public class MultimapType extends EnumerableType{
             return getActualTypeArguments().get(1);
         }
         throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
+    }
+
+    /**
+     * marker class
+     */
+    public static class MultimapEnumerationOwnerContext extends MapEnumerationOwnerContext{
+        MultimapEnumerationOwnerContext(OwnerContext ownerContext) {
+            super(ownerContext);
+        }
     }
 }

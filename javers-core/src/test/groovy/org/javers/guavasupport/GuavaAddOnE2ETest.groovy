@@ -7,7 +7,6 @@ import org.javers.guava.multimap.MultimapChange
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static com.google.common.collect.Lists.asList
 import static org.javers.core.JaversBuilder.javers
 /**
  * @author akrystian
@@ -30,11 +29,11 @@ class GuavaAddOnE2ETest extends Specification {
         changes.size() == extpectedChanges
 
         where:
-        leftList                | rightList                      | extpectedChanges
-        asList("New York")      | asList("Boston")               | 2
-        asList("New York")      | asList("New York", "New York") | 1
-        Collections.emptyList() | asList("New York")             | 1
-        asList("New York")      | Collections.emptyList()        | 1
+        leftList                | rightList                | extpectedChanges
+        ["New York"]            | ["Boston"]               | 2
+        ["New York"]            | ["New York", "New York"] | 1
+        Collections.emptyList() | ["New York"]             | 1
+        ["New York"]            | Collections.emptyList()  | 1
     }
 
     @Unroll
@@ -51,10 +50,10 @@ class GuavaAddOnE2ETest extends Specification {
         diff.changes.size() == 0
 
         where:
-        leftList                     | rightList
-        asList("New York")           | asList("New York")
-        Collections.emptyList()      | Collections.emptyList()
-        asList("New York", "Boston") | asList("Boston", "New York")
+        leftList                | rightList
+        ["New York"]            | ["New York"]
+        Collections.emptyList() | Collections.emptyList()
+        ["New York", "Boston"]  | ["Boston", "New York"]
     }
 
     @Unroll
@@ -73,12 +72,12 @@ class GuavaAddOnE2ETest extends Specification {
         changes.size() == extpectedChanges
 
         where:
-        leftList << [createMultiMap(asList("New York"), asList("New York City")),
-                     createMultiMap(asList("New York", "New York"), asList("New York City", "Buffalo")),
+        leftList << [createMultiMap(["New York"], ["New York City"]),
+                     createMultiMap(["New York", "New York"], ["New York City", "Buffalo"]),
                      HashMultimap.create()]
-        rightList << [createMultiMap(asList("New York"), asList("Buffalo")),
-                      createMultiMap(asList("New York", "New York", "Alabama"), asList("New York City", "Buffalo", "Akron")),
-                      createMultiMap(asList("New York"), asList("Buffalo"))]
+        rightList << [createMultiMap(["New York"], ["Buffalo"]),
+                      createMultiMap(["New York", "New York", "Alabama"], ["New York City", "Buffalo", "Akron"]),
+                      createMultiMap(["New York"], ["Buffalo"])]
         extpectedChanges << [2, 1, 1]
     }
 
@@ -96,11 +95,11 @@ class GuavaAddOnE2ETest extends Specification {
         diff.changes.size() == 0
 
         where:
-        leftList << [createMultiMap(asList("New York"), asList("Buffalo")),
-                     createMultiMap(asList("New York", "New York"), asList("Buffalo", "New York City")),
+        leftList << [createMultiMap(["New York"], ["Buffalo"]),
+                     createMultiMap(["New York", "New York"], ["Buffalo", "New York City"]),
                      HashMultimap.create()]
-        rightList << [createMultiMap(asList("New York"), asList("Buffalo")),
-                      createMultiMap(asList("New York", "New York"), asList("Buffalo", "New York City")),
+        rightList << [createMultiMap(["New York"], ["Buffalo"]),
+                      createMultiMap(["New York", "New York"], ["Buffalo", "New York City"]),
                       HashMultimap.create()]
 
     }

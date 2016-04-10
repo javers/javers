@@ -1,5 +1,6 @@
 package org.javers.spring.sql
 
+import org.javers.repository.sql.DialectName
 import org.javers.spring.boot.sql.JaversProperties
 import org.javers.spring.boot.sql.TestApplication
 import org.junit.Test
@@ -20,6 +21,9 @@ import static org.fest.assertions.api.Assertions.assertThat
 public class JaversSqlAutoConfigurationTest {
 
     @Autowired
+    DialectName dialectName;
+
+    @Autowired
     JaversProperties javersProperties;
 
     @Test
@@ -29,5 +33,6 @@ public class JaversSqlAutoConfigurationTest {
         assertThat(javersProperties.isNewObjectSnapshot()).isFalse()
         assertThat(javersProperties.isPrettyPrint()).isFalse()
         assertThat(javersProperties.isTypeSafeValues()).isTrue()
+        assertThat(dialectName).isEqualTo(DialectName.H2)
     }
 }

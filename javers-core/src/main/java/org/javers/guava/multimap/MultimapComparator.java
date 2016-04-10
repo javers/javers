@@ -13,6 +13,7 @@ import org.javers.core.metamodel.object.DehydrateMapFunction;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -25,6 +26,10 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * Compares Multimap.
+ * <p>
+ * It's automatically registered, if Guava Multiset and Multimap dependency will be detected on class path.
+ *
  * @author akrystian
  */
 public class MultimapComparator implements CustomPropertyComparator<Multimap, MultimapChange>{
@@ -55,7 +60,7 @@ public class MultimapComparator implements CustomPropertyComparator<Multimap, Mu
         }
 
         MultimapType multimapType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new OwnerContext(affectedId, property.getName());
+        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
 
         List<EntryChange> entryChanges = calculateEntryChanges(multimapType, left, right, owner);
         if (!entryChanges.isEmpty()){

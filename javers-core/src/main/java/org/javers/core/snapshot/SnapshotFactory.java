@@ -1,9 +1,10 @@
-package org.javers.core.metamodel.object;
+package org.javers.core.snapshot;
 
 import org.javers.common.collections.Defaults;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.exception.JaversException;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
@@ -35,7 +36,8 @@ public class SnapshotFactory {
     }
 
     public CdoSnapshot createInitial(CdoWrapper cdoWrapper, CommitMetadata commitMetadata) {
-        return createSnapshotState(cdoWrapper, commitMetadata)
+        return initSnapshotBuilder(cdoWrapper, commitMetadata)
+                .withState(createSnapshotState(cdoWrapper))
                 .withType(INITIAL)
                 .markAllAsChanged()
                 .withVersion(1L)
@@ -43,11 +45,24 @@ public class SnapshotFactory {
     }
 
     public CdoSnapshot createUpdate(CdoWrapper cdoWrapper, CdoSnapshot previous, CommitMetadata commitMetadata) {
-        return createSnapshotState(cdoWrapper, commitMetadata)
+        return initSnapshotBuilder(cdoWrapper, commitMetadata)
+                .withState(createSnapshotState(cdoWrapper))
                 .withType(UPDATE)
                 .markChanged(previous)
                 .withVersion(previous.getVersion()+1)
                 .build();
+    }
+
+    public CdoSnapshotState createSnapshotState(CdoWrapper cdoWrapper){
+        CdoSnapshotStateBuilder stateBuilder = CdoSnapshotStateBuilder.cdoSnapshotState();
+        for (Property property : cdoWrapper.getManagedType().getProperties()) {
+            Object propertyVal = cdoWrapper.getPropertyValue(property.getName());
+            if (Objects.equals(propertyVal, Defaults.defaultValue(property.getGenericType()))) {
+                continue;
+            }
+            stateBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, cdoWrapper.getGlobalId()));
+        }
+        return stateBuilder.build();
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
@@ -71,22 +86,13 @@ public class SnapshotFactory {
         return  propertyType.map(propertyVal, dehydratorMapFunction, owner);
     }
 
-    private CdoSnapshotBuilder createSnapshotState(CdoWrapper cdoWrapper, CommitMetadata commitMetadata){
-        CdoSnapshotBuilder snapshotBuilder = cdoSnapshot(cdoWrapper.getGlobalId(), commitMetadata, cdoWrapper.getManagedType());
-
-        for (Property property : cdoWrapper.getManagedType().getProperties()) {
-            Object propertyVal = cdoWrapper.getPropertyValue(property.getName());
-            if (Objects.equals(propertyVal, Defaults.defaultValue(property.getGenericType()))) {
-                continue;
-            }
-            snapshotBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, cdoWrapper.getGlobalId()));
-        }
-        return snapshotBuilder;
+    private CdoSnapshotBuilder initSnapshotBuilder(CdoWrapper cdoWrapper, CommitMetadata commitMetadata){
+        return cdoSnapshot(cdoWrapper.getGlobalId(), commitMetadata, cdoWrapper.getManagedType());
     }
 
     private Object dehydrateProperty(Property property, Object propertyVal, GlobalId id){
         JaversType propertyType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new OwnerContext(id, property.getName());
+        OwnerContext owner = new PropertyOwnerContext(id, property.getName());
 
         if (propertyType instanceof EnumerableType) {
             return extractAndDehydrateEnumerable(propertyVal, (EnumerableType) propertyType, owner);

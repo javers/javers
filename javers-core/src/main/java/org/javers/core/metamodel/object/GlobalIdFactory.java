@@ -5,10 +5,12 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.metamodel.type.*;
+import org.javers.core.snapshot.ObjectHasher;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.jql.UnboundedValueObjectIdDTO;
 import org.javers.repository.jql.ValueObjectIdDTO;
+import org.picocontainer.PicoContainer;
 
 /**
  * @author bartosz walacik
@@ -18,11 +20,14 @@ public class GlobalIdFactory {
     private final TypeMapper typeMapper;
     private ObjectAccessHook objectAccessHook;
     private final GlobalIdPathParser pathParser;
+    private ObjectHasher objectHasher;
+    private final PicoContainer picoContainer;
 
-    public GlobalIdFactory(TypeMapper typeMapper, ObjectAccessHook objectAccessHook) {
+    public GlobalIdFactory(TypeMapper typeMapper, ObjectAccessHook objectAccessHook, PicoContainer container) {
         this.typeMapper = typeMapper;
         this.objectAccessHook = objectAccessHook;
         this.pathParser = new GlobalIdPathParser(typeMapper);
+        this.picoContainer = container;
     }
 
     public GlobalId createId(Object targetCdo) {
@@ -30,9 +35,9 @@ public class GlobalIdFactory {
     }
 
     /**
-     * @param owner for bounded ValueObjects, optional
+     * @param ownerContext for bounded ValueObjects, optional
      */
-    public GlobalId createId(Object targetCdo, OwnerContext owner) {
+    public GlobalId createId(Object targetCdo, OwnerContext ownerContext) {
         Validate.argumentsAreNotNull(targetCdo);
 
         targetCdo = objectAccessHook.access(targetCdo);
@@ -42,12 +47,16 @@ public class GlobalIdFactory {
             return InstanceId.createFromInstance(targetCdo, (EntityType) targetManagedType);
         }
 
-        if (targetManagedType instanceof ValueObjectType && hasNoOwner(owner)) {
+        if (targetManagedType instanceof ValueObjectType && !hasOwner(ownerContext)) {
             return new UnboundedValueObjectId(targetManagedType.getName());
         }
 
-        if (targetManagedType instanceof ValueObjectType && hasOwner(owner)) {
-            return new ValueObjectId(targetManagedType.getName(), owner.getGlobalId(), owner.getPath());
+        if (targetManagedType instanceof ValueObjectType && hasOwner(ownerContext)) {
+            String path = ownerContext.getPath();
+            if (ownerContext instanceof SetType.SetEnumerationOwnerContext) {
+                path += "/" + getObjectHasher().hash(targetCdo);
+            }
+            return new ValueObjectId(targetManagedType.getName(), ownerContext.getOwnerId(), path);
         }
 
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
@@ -117,11 +126,18 @@ public class GlobalIdFactory {
         }
     }
 
-    private boolean hasOwner(OwnerContext context) {
-        return (context != null && context.getGlobalId() != null);
+    //pico can't resolve cycles
+    private ObjectHasher getObjectHasher(){
+        if (objectHasher != null){
+            return objectHasher;
+        }
+        synchronized (this) {
+            objectHasher = picoContainer.getComponent(ObjectHasher.class);
+            return objectHasher;
+        }
     }
 
-    private boolean hasNoOwner(OwnerContext context) {
-        return (context == null || context.getGlobalId() == null);
+    private boolean hasOwner(OwnerContext context) {
+        return context != null && context.getOwnerId() != null;
     }
 }

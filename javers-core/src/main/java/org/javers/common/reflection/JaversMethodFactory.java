@@ -1,10 +1,9 @@
 package org.javers.common.reflection;
 
-import java.io.UnsupportedEncodingException;
+import org.javers.common.string.ShaDigest;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,26 +52,10 @@ class JaversMethodFactory {
     }
 
     public static int methodKey(Method m){
-        int key = shaDigest(m.getName());
+        int key = ShaDigest.shortDigest(m.getName());
         for (Class c : m.getParameterTypes()) {
             key += c.hashCode();
         }
         return key;
-    }
-
-    private static int shaDigest(String text){
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            digest.update(text.getBytes("UTF-8"));
-            byte[] hashBytes = digest.digest();
-
-            int result = 0;
-            for (int i=0; i<hashBytes.length; i++){
-                result += Math.abs(hashBytes[i]) * (i+1);
-            }
-            return result;
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

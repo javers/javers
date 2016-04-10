@@ -13,7 +13,7 @@ import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.SnapshotFactory;
+import org.javers.core.snapshot.SnapshotFactory;
 import org.javers.core.snapshot.GraphSnapshotFacade;
 import org.javers.core.snapshot.ShadowGraph;
 import org.javers.repository.api.JaversExtendedRepository;

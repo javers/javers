@@ -16,7 +16,7 @@ public class DehydrateContainerFunction implements EnumerableFunction {
     }
 
     @Override
-    public Object apply(Object input, OwnerContext enumerationAwareOwnerContext) {
-        return globalIdFactory.dehydrate(input, itemType, enumerationAwareOwnerContext);
+    public Object apply(Object input, EnumerationAwareOwnerContext ownerContext) {
+        return globalIdFactory.dehydrate(input, itemType, ownerContext);
     }
 }

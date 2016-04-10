@@ -12,6 +12,7 @@ import org.javers.core.metamodel.object.DehydrateContainerFunction;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -67,7 +68,7 @@ public class MultisetComparator implements CustomPropertyComparator<Multiset , M
         }
 
         MultisetType multisetType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new OwnerContext(affectedId, property.getName());
+        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
 
         List<ContainerElementChange> entryChanges = calculateEntryChanges(multisetType, left, right, owner);
         if (!entryChanges.isEmpty()){

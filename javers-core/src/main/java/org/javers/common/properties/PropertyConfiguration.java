@@ -1,9 +1,10 @@
 package org.javers.common.properties;
 
-import java.util.Properties;
 import org.javers.common.exception.JaversException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Properties;
 
 /**
  * @author bartosz walacik
@@ -24,13 +25,6 @@ public class PropertyConfiguration {
         logger.debug("reading properties file - "+classpathName);
         properties = PropertiesUtil.getProperties(classpathName);
     }
-
-    /**
-     * assembles modeled properties from {@link #properties} bag
-     * @throws JaversException if required property is not found
-     * @throws JaversException if property (like enum) cann't be assembled
-     */
-    //protected abstract void assemble();
 
     /**
      * assembles mandatory enum property from {@link #properties} bag

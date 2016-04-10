@@ -15,7 +15,7 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
  * @author bartosz walacik
  */
 abstract class AbstractDiffTest extends Specification {
-    @Shared protected JaversTestBuilder javers = javersTestAssembly()
+    @Shared JaversTestBuilder javers = javersTestAssembly()
 
     ObjectNode buildGraph(def any) {
         javers.createLiveGraph(any).root()

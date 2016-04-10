@@ -41,17 +41,16 @@ public class MapType extends EnumerableType {
         Map<Object, Object> sourceMap = (Map) sourceMap_;
         Map<Object, Object> targetMap = new HashMap(sourceMap.size());
 
-        MapEnumeratorContext enumeratorContext = new MapEnumeratorContext();
-        owner.setEnumeratorContext(enumeratorContext);
+        MapEnumerationOwnerContext mapEnumerationContext = new MapEnumerationOwnerContext(owner);
 
         for (Map.Entry<?, ?> entry : sourceMap.entrySet()) {
             //key
-            enumeratorContext.switchToKey();
-            Object mappedKey = mapFunction.apply(entry.getKey(), owner);
+            mapEnumerationContext.switchToKey();
+            Object mappedKey = mapFunction.apply(entry.getKey(), mapEnumerationContext);
 
             //value
-            enumeratorContext.switchToValue(mappedKey);
-            Object mappedValue = mapFunction.apply(entry.getValue(), owner);
+            mapEnumerationContext.switchToValue(mappedKey);
+            Object mappedValue = mapFunction.apply(entry.getValue(), mapEnumerationContext);
 
             targetMap.put(mappedKey, mappedValue);
         }

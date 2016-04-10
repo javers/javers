@@ -7,6 +7,7 @@ import org.javers.core.diff.changetype.container.ArrayChange;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ class ArrayChangeAppender extends CorePropertyChangeAppender<ArrayChange>{
         Map rightMap = Arrays.asMap(pair.getRightPropertyValue(property));
 
         ArrayType arrayType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new OwnerContext(pair.getGlobalId(), property.getName());
+        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
         MapContentType mapContentType = typeMapper.getMapContentType(arrayType);
 
         List<EntryChange> entryChanges =

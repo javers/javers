@@ -5,7 +5,7 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.EnumeratorContext;
+import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.type.CollectionType;
 
@@ -26,12 +26,9 @@ public class MultisetType extends CollectionType{
         Multiset sourceMultiset = toNotNullMultiset(sourceMultiset_);
         Multiset targetMultiset = HashMultiset.create();
 
-        SetEnumeratorContext enumeratorContext = new SetEnumeratorContext();
-        owner.setEnumeratorContext(enumeratorContext);
-
+        EnumerationAwareOwnerContext enumeratorContext = new MultisetEnumerationOwnerContext(owner);
         for (Object sourceVal : sourceMultiset) {
-            targetMultiset.add(mapFunction.apply(sourceVal, owner));
-            enumeratorContext.nextId();
+            targetMultiset.add(mapFunction.apply(sourceVal, enumeratorContext));
         }
         return Multisets.unmodifiableMultiset(targetMultiset);
     }
@@ -45,15 +42,12 @@ public class MultisetType extends CollectionType{
         }
     }
 
-    private class SetEnumeratorContext implements EnumeratorContext{
-        int randomId = 0;
-        @Override
-        public String getPath() {
-            return "random_"+randomId;
-        }
-
-        void nextId(){
-            randomId++;
+    /**
+     * marker class
+     */
+    public static class MultisetEnumerationOwnerContext extends EnumerationAwareOwnerContext{
+        MultisetEnumerationOwnerContext(OwnerContext ownerContext) {
+            super(ownerContext);
         }
     }
 }
