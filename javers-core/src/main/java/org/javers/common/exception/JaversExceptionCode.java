@@ -38,8 +38,6 @@ public enum JaversExceptionCode {
 
     SNAPSHOT_NOT_FOUND("snapshot '%s' not found in JaversRepository"),
 
-    SET_OF_VO_DIFF_NOT_IMPLEMENTED("diff for Set of ValueObjects is not supported"),
-
     GENERIC_TYPE_NOT_PARAMETRIZED(
             "\nexpected actual Class argument in type '%s'. "+
             "\nJaVers needs to know actual Class of elements stored in your collections. "+
@@ -84,7 +82,7 @@ public enum JaversExceptionCode {
 
     CANT_DELETE_OBJECT_NOT_FOUND("failed to delete object {'%s'}, "+
             "it doesn't exists in JaversRepository"),
-    
+
     CANT_FIND_COMMIT_HEAD_ID("can't find commit head id in JaversRepository"),
     CANT_SAVE_ALREADY_PERSISTED_COMMIT("can't save already persisted commit '%s'"),
 
