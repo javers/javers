@@ -750,6 +750,7 @@ class JaversRepositoryE2ETest extends Specification {
     @Unroll
     def "should find all changes introduced by all snapshots specified in query (limit: #limit)"() {
         given:
+        javers.commit("author", new SnapshotEntity(id: 1))
         (1..100).each {
             def entity = new SnapshotEntity(id: 1, intProperty: it)
             javers.commit("author", entity)

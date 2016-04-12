@@ -180,9 +180,9 @@ public class JaversExtendedRepository implements JaversRepository {
     private List<SnapshotIdentifier> determineMissingPreviousSnapshotIdentifiers(Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots, List<CdoSnapshot> snapshots) {
         List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers = new ArrayList<>();
         for (CdoSnapshot snapshot : skipInitial(skipTerminal(snapshots))) {
-            SnapshotIdentifier previousSnapshotIdentifier = SnapshotIdentifier.from(snapshot).previous();
-            if (!previousSnapshots.containsKey(previousSnapshotIdentifier)) {
-                missingPreviousSnapshotIdentifiers.add(previousSnapshotIdentifier);
+            SnapshotIdentifier snapshotIdentifier = SnapshotIdentifier.from(snapshot);
+            if (!previousSnapshots.containsKey(snapshotIdentifier)) {
+                missingPreviousSnapshotIdentifiers.add(snapshotIdentifier.previous());
             }
         }
         return missingPreviousSnapshotIdentifiers;
