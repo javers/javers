@@ -26,7 +26,7 @@ public class SnapshotDiffer {
 
     /**
      * Calculates changes introduced by a collection of snapshots. This method expects that
-     * for every non-initial and non-terminal snapshot there is an entry in the previousSnapshots param.
+     * the previousSnapshots map contains predecessors of all non-initial and non-terminal snapshots.
      */
     public List<Change> calculateDiffs(List<CdoSnapshot> snapshots, Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots) {
         Validate.argumentsAreNotNull(snapshots);
@@ -39,7 +39,7 @@ public class SnapshotDiffer {
             } else if (snapshot.isTerminal()) {
                 addTerminalChanges(changes, snapshot);
             } else {
-                CdoSnapshot previousSnapshot = previousSnapshots.get(SnapshotIdentifier.from(snapshot));
+                CdoSnapshot previousSnapshot = previousSnapshots.get(SnapshotIdentifier.from(snapshot).previous());
                 addChanges(changes, previousSnapshot, snapshot);
             }
         }

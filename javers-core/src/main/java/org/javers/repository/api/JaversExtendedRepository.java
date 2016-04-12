@@ -164,34 +164,31 @@ public class JaversExtendedRepository implements JaversRepository {
     private Map<SnapshotIdentifier, CdoSnapshot> preparePreviousSnapshots(List<CdoSnapshot> snapshots) {
         Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots = new HashMap<>();
         populatePreviousSnapshotsWithSnapshots(previousSnapshots, snapshots);
-        List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers =
-            determineMissingPreviousSnapshotIdentifiers(previousSnapshots, snapshots);
-        supplyMissingPreviousSnapshots(previousSnapshots, missingPreviousSnapshotIdentifiers);
+        List<CdoSnapshot> missingPreviousSnapshots = getMissingPreviousSnapshots(snapshots, previousSnapshots);
+        populatePreviousSnapshotsWithSnapshots(previousSnapshots, missingPreviousSnapshots);
         return previousSnapshots;
     }
 
     private void populatePreviousSnapshotsWithSnapshots(Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots, List<CdoSnapshot> snapshots) {
         for (CdoSnapshot snapshot : snapshots) {
-            SnapshotIdentifier nextSnapshotIdentifier = SnapshotIdentifier.from(snapshot).next();
-            previousSnapshots.put(nextSnapshotIdentifier, snapshot);
+            previousSnapshots.put(SnapshotIdentifier.from(snapshot), snapshot);
         }
+    }
+
+    private List<CdoSnapshot> getMissingPreviousSnapshots(List<CdoSnapshot> snapshots, Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots) {
+        List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers =
+            determineMissingPreviousSnapshotIdentifiers(previousSnapshots, snapshots);
+        return getSnapshots(missingPreviousSnapshotIdentifiers);
     }
 
     private List<SnapshotIdentifier> determineMissingPreviousSnapshotIdentifiers(Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots, List<CdoSnapshot> snapshots) {
         List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers = new ArrayList<>();
         for (CdoSnapshot snapshot : skipInitial(skipTerminal(snapshots))) {
-            SnapshotIdentifier snapshotIdentifier = SnapshotIdentifier.from(snapshot);
-            if (!previousSnapshots.containsKey(snapshotIdentifier)) {
-                missingPreviousSnapshotIdentifiers.add(snapshotIdentifier.previous());
+            SnapshotIdentifier previousSnapshotIdentifier = SnapshotIdentifier.from(snapshot).previous();
+            if (!previousSnapshots.containsKey(previousSnapshotIdentifier)) {
+                missingPreviousSnapshotIdentifiers.add(previousSnapshotIdentifier);
             }
         }
         return missingPreviousSnapshotIdentifiers;
-    }
-
-    private void supplyMissingPreviousSnapshots(Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots, List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers) {
-        List<CdoSnapshot> missingPreviousSnapshots = getSnapshots(missingPreviousSnapshotIdentifiers);
-        for (CdoSnapshot snapshot: missingPreviousSnapshots) {
-            previousSnapshots.put(SnapshotIdentifier.from(snapshot).next(), snapshot);
-        }
     }
 }
