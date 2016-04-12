@@ -748,14 +748,18 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     @Unroll
-    def "should find all changes introduced by all snapshots specified in query"() {
+    def "should find all changes introduced by all snapshots specified in query (limit: #limit)"() {
         given:
         (1..100).each {
-            javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
+            def entity = new SnapshotEntity(id: 1, intProperty: it)
+            javers.commit("author", entity)
+
+            entity.dob = new LocalDate()
+            javers.commit("author", entity)
         }
 
         when:
-        def query = byInstanceId(1, SnapshotEntity).limit(limit).build()
+        def query = byInstanceId(1, SnapshotEntity).andProperty('intProperty').limit(limit).build()
         def snapshots = javers.findSnapshots(query)
         def changes = javers.findChanges(query)
 
@@ -767,7 +771,7 @@ class JaversRepositoryE2ETest extends Specification {
         assert changes.last().right == snapshots.last().state.getPropertyValue('intProperty')
 
         where:
-        limit << [1, 50, 99]
+        limit << [1, 50, 99, 200]
     }
 
 }

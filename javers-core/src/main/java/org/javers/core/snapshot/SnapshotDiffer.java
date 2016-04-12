@@ -25,8 +25,8 @@ public class SnapshotDiffer {
     }
 
     /**
-     * Calculates changes introduced by collection of snapshots. This method expects that
-     * for every non-initial and non-terminal snapshot there is an entry in previousSnapshots param.
+     * Calculates changes introduced by a collection of snapshots. This method expects that
+     * for every non-initial and non-terminal snapshot there is an entry in the previousSnapshots param.
      */
     public List<Change> calculateDiffs(List<CdoSnapshot> snapshots, Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots) {
         Validate.argumentsAreNotNull(snapshots);
