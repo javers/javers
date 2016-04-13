@@ -119,7 +119,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .and()
                 .hasSingleEdge("parent")
                 .andTargetNode()
-                .hasValueObjectId("org.javers.core.model.CategoryVo/#parent#parent")
+                .hasValueObjectId("org.javers.core.model.CategoryVo/#parent/parent")
     }
 
     def "should build three nodes linear graph from Entities"() {
