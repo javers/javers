@@ -13,8 +13,8 @@ import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 
 /**
- * Commits all arguments passed to advised methods only if the method exits normally
- * (i.e. no Exception has been thrown).
+ * Commits all arguments passed to advised methods
+ * (only if the method exits normally, i.e. no Exception has been thrown).
  *
  * Spring @Transactional attributes (like noRollbackFor or noRollbackForClassName)
  * have no effects on this aspect.
