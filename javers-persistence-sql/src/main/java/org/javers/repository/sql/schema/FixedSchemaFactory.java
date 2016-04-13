@@ -17,9 +17,9 @@ public class FixedSchemaFactory {
     public static final String GLOBAL_ID_TABLE_NAME = "jv_global_id";
     public static final String GLOBAL_ID_PK =         "global_id_pk";
     public static final String GLOBAL_ID_LOCAL_ID =   "local_id";
-    public static final String GLOBAL_ID_FRAGMENT =   "fragment";     //since v.1.2
-    public static final String GLOBAL_ID_TYPE_NAME =  "type_name";
-    public static final String GLOBAL_ID_OWNER_ID_FK ="owner_id_fk";  //since v.1.2
+    public static final String GLOBAL_ID_FRAGMENT =   "fragment";     //since 1.2
+    public static final String GLOBAL_ID_TYPE_NAME =  "type_name";    //since 2.0
+    public static final String GLOBAL_ID_OWNER_ID_FK ="owner_id_fk";  //since 1.2
     public static final String GLOBAL_ID_PK_SEQ =     "jv_global_id_pk_seq";
 
     public static final String COMMIT_TABLE_NAME =    "jv_commit";
@@ -37,8 +37,8 @@ public class FixedSchemaFactory {
     public static final String SNAPSHOT_VERSION =      "version";
     public static final String SNAPSHOT_TABLE_PK_SEQ = "jv_snapshot_pk_seq";
     public static final String SNAPSHOT_STATE =        "state";
-    public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v.1.2
-    public static final String SNAPSHOT_MANAGED_TYPE = "managed_type";
+    public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v 1.2
+    public static final String SNAPSHOT_MANAGED_TYPE = "managed_type";       //since 2.0
 
     private Schema snapshotTableSchema(Dialect dialect, String tableName){
         Schema schema = new Schema(dialect);
