@@ -13,19 +13,18 @@ import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 
 /**
- * Creates three @AfterReturning advices.
+ * Commits all arguments passed to advised methods only if the method exits normally
+ * (i.e. no Exception has been thrown).
+ *
+ * Spring @Transactional attributes (like noRollbackFor or noRollbackForClassName)
+ * have no effects on this aspect.
  * <br/><br/>
  *
- * Commits all arguments passed to methods with @JaversAuditable annotation only if the method exits normally, e.g. no
- * Throwable has been thrown. If the method is also annotated with @Transactional and the noRollbackFor or
- * noRollbackForClassName are used, no commit will be done as the method still throws a Throwable. A manual
- * {@link Javers#commit(String, Object)} can be used instead.
- * <br/><br/>
- *
- * For spring-data Repositories with @JaversSpringDataAuditable annotation: <br/>
- * - commits all arguments passed to save() methods,  <br/>
- * - commits delete of arguments passed to delete() methods.  <br/>
- * - commits only when a method exits normally without a Throwable having been thrown.
+ * Creates the following @AfterReturning pointcuts:
+ * <ul>
+ *    <li/>any method annotated with @JaversAuditable
+ *    <li/>all save() and delete() methods of CrudRepositories with (class-level) @JaversSpringDataAuditable
+ * </ul>
  */
 @Aspect
 public class JaversAuditableRepositoryAspect {
