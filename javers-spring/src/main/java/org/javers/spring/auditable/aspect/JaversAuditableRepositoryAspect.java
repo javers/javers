@@ -1,29 +1,31 @@
 package org.javers.spring.auditable.aspect;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.javers.common.collections.Optional;
 import org.javers.core.Javers;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 
 /**
- * Creates three @After advices.
+ * Creates three @AfterReturning advices.
  * <br/><br/>
  *
- * Commits all arguments passed to methods with @JaversAuditable annotation.
+ * Commits all arguments passed to methods with @JaversAuditable annotation only if the method exits normally, e.g. no
+ * Throwable has been thrown. If the method is also annotated with @Transactional and the noRollbackFor or
+ * noRollbackForClassName are used, no commit will be done as the method still throws a Throwable. A manual
+ * {@link Javers#commit(String, Object)} can be used instead.
  * <br/><br/>
  *
  * For spring-data Repositories with @JaversSpringDataAuditable annotation: <br/>
  * - commits all arguments passed to save() methods,  <br/>
  * - commits delete of arguments passed to delete() methods.  <br/>
+ * - commits only when a method exits normally without a Throwable having been thrown.
  */
 @Aspect
 public class JaversAuditableRepositoryAspect {
@@ -43,17 +45,17 @@ public class JaversAuditableRepositoryAspect {
         this.javersCommitAdvice = javersCommitAdvice;
     }
 
-    @After("@annotation(org.javers.spring.annotation.JaversAuditable)")
+    @AfterReturning("@annotation(org.javers.spring.annotation.JaversAuditable)")
     public void commitAdvice(JoinPoint pjp) {
         javersCommitAdvice.commitMethodArguments(pjp);
     }
 
-    @After("execution(public * delete(..)) && this(org.springframework.data.repository.CrudRepository)")
+    @AfterReturning("execution(public * delete(..)) && this(org.springframework.data.repository.CrudRepository)")
     public void onDeleteExecuted(JoinPoint pjp)  {
         onVersionEvent(pjp, deleteHandler);
     }
 
-    @After("execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)")
+    @AfterReturning("execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)")
     public void onSaveExecuted(JoinPoint pjp) {
         onVersionEvent(pjp, saveHandler);
     }
@@ -92,5 +94,4 @@ public class JaversAuditableRepositoryAspect {
     private void applyVersionChange(RepositoryMetadata metadata, Object domainObject, AuditChangeHandler handler) {
         handler.handle(metadata, domainObject);
     }
-
 }
