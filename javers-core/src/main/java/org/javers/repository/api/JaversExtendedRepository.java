@@ -1,5 +1,6 @@
 package org.javers.repository.api;
 
+import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.common.collections.Predicate;
@@ -25,10 +26,16 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class JaversExtendedRepository implements JaversRepository {
     private final JaversRepository delegate;
     private final SnapshotDiffer snapshotDiffer;
+    private final PreviousSnapshotsCalculator previousSnapshotsCalculator;
 
     public JaversExtendedRepository(JaversRepository delegate, SnapshotDiffer snapshotDiffer) {
         this.delegate = delegate;
         this.snapshotDiffer = snapshotDiffer;
+        previousSnapshotsCalculator = new PreviousSnapshotsCalculator(new Function<Collection<SnapshotIdentifier>, List<CdoSnapshot>>() {
+            public List<CdoSnapshot> apply(Collection<SnapshotIdentifier> input) {
+                return getSnapshots(input);
+            }
+        });
     }
 
     public List<Change> getPropertyChangeHistory(GlobalId globalId, final String propertyName, boolean newObjects, QueryParams queryParams) {
@@ -147,48 +154,7 @@ public class JaversExtendedRepository implements JaversRepository {
         });
     }
 
-    private List<CdoSnapshot> skipTerminal(List<CdoSnapshot> snapshots) {
-        return Lists.negativeFilter(snapshots, new Predicate<CdoSnapshot>() {
-            @Override
-            public boolean apply(CdoSnapshot snapshot) {
-                return snapshot.isTerminal();
-            }
-        });
-    }
-
     private List<Change> getChangesIntroducedBySnapshots(List<CdoSnapshot> snapshots) {
-        Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots = preparePreviousSnapshots(snapshots);
-        return snapshotDiffer.calculateDiffs(snapshots, previousSnapshots);
-    }
-
-    private Map<SnapshotIdentifier, CdoSnapshot> preparePreviousSnapshots(List<CdoSnapshot> snapshots) {
-        Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots = new HashMap<>();
-        populatePreviousSnapshotsWithSnapshots(previousSnapshots, snapshots);
-        List<CdoSnapshot> missingPreviousSnapshots = getMissingPreviousSnapshots(snapshots, previousSnapshots);
-        populatePreviousSnapshotsWithSnapshots(previousSnapshots, missingPreviousSnapshots);
-        return previousSnapshots;
-    }
-
-    private void populatePreviousSnapshotsWithSnapshots(Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots, List<CdoSnapshot> snapshots) {
-        for (CdoSnapshot snapshot : snapshots) {
-            previousSnapshots.put(SnapshotIdentifier.from(snapshot), snapshot);
-        }
-    }
-
-    private List<CdoSnapshot> getMissingPreviousSnapshots(List<CdoSnapshot> snapshots, Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots) {
-        List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers =
-            determineMissingPreviousSnapshotIdentifiers(previousSnapshots, snapshots);
-        return getSnapshots(missingPreviousSnapshotIdentifiers);
-    }
-
-    private List<SnapshotIdentifier> determineMissingPreviousSnapshotIdentifiers(Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots, List<CdoSnapshot> snapshots) {
-        List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers = new ArrayList<>();
-        for (CdoSnapshot snapshot : skipInitial(skipTerminal(snapshots))) {
-            SnapshotIdentifier previousSnapshotIdentifier = SnapshotIdentifier.from(snapshot).previous();
-            if (!previousSnapshots.containsKey(previousSnapshotIdentifier)) {
-                missingPreviousSnapshotIdentifiers.add(previousSnapshotIdentifier);
-            }
-        }
-        return missingPreviousSnapshotIdentifiers;
+        return snapshotDiffer.calculateDiffs(snapshots, previousSnapshotsCalculator.calculate(snapshots));
     }
 }
