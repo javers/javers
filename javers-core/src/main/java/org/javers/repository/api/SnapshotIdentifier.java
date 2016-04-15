@@ -51,4 +51,9 @@ public final class SnapshotIdentifier {
     public int hashCode() {
         return Objects.hash(globalId, version);
     }
+
+    @Override
+    public String toString() {
+        return "SnapshotIdentifier{id:" + globalId.value() +", ver:" + version + "}";
+    }
 }
