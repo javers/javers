@@ -84,10 +84,11 @@ public class JaversSchemaManager {
 
             if ( dialect instanceof PostgresDialect ||
                  dialect instanceof MysqlDialect ||
-                 dialect instanceof H2Dialect ||
-                 dialect instanceof MsSqlDialect) {
+                 dialect instanceof H2Dialect ) {
                 executeSQL("ALTER TABLE jv_snapshot ADD COLUMN version BIGINT");
-            } else if (dialect instanceof OracleDialect) {
+            } else
+            if (dialect instanceof OracleDialect ||
+                dialect instanceof MsSqlDialect) {
                 executeSQL("ALTER TABLE jv_snapshot ADD version NUMBER");
             } else {
                 logger.error("\nno DB schema migration script for {} :(\nplease contact with JaVers team, javers@javers.org",
