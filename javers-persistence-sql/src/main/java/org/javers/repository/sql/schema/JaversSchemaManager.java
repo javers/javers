@@ -227,7 +227,8 @@ public class JaversSchemaManager {
 
         String sqlType = dialect.types().string(len);
 
-        if (dialect instanceof OracleDialect) {
+        if (dialect instanceof OracleDialect ||
+            dialect instanceof MsSqlDialect) {
             executeSQL("ALTER TABLE "+tableName+" ADD "+colName+" "+sqlType);
         } else {
             executeSQL("ALTER TABLE "+tableName+" ADD COLUMN "+colName+" "+sqlType);
