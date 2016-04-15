@@ -746,4 +746,33 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         snapshots.version == [2, 1]
     }
+
+    @Unroll
+    def "should find all changes introduced by all snapshots specified in query (limit: #limit)"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id: 1))
+        (1..100).each {
+            def entity = new SnapshotEntity(id: 1, intProperty: it)
+            javers.commit("author", entity)
+
+            entity.dob = new LocalDate()
+            javers.commit("author", entity)
+        }
+
+        when:
+        def query = byInstanceId(1, SnapshotEntity).andProperty('intProperty').limit(limit).build()
+        def snapshots = javers.findSnapshots(query)
+        def changes = javers.findChanges(query)
+
+        then:
+        assert snapshots.size() == changes.size()
+        assert changes.first().left == snapshots.first().state.getPropertyValue('intProperty') - 1
+        assert changes.first().right == snapshots.first().state.getPropertyValue('intProperty')
+        assert changes.last().left == snapshots.last().state.getPropertyValue('intProperty') - 1
+        assert changes.last().right == snapshots.last().state.getPropertyValue('intProperty')
+
+        where:
+        limit << [1, 50, 99, 200]
+    }
+
 }
