@@ -78,22 +78,21 @@ public class JaversSchemaManager {
      * JaVers 1.4.3 to 1.4.4 schema migration
      */
     private void addSnapshotVersionColumnIfNeeded() {
-
         if (!columnExists("jv_snapshot", "version")) {
-            logger.warn("column jv_snapshot.version not exists, running ALTER TABLE ...");
+            addLongColumn("jv_snapshot", "version");
+        }
+    }
 
-            if ( dialect instanceof PostgresDialect ||
-                 dialect instanceof MysqlDialect ||
-                 dialect instanceof H2Dialect ) {
-                executeSQL("ALTER TABLE jv_snapshot ADD COLUMN version BIGINT");
-            } else
-            if (dialect instanceof OracleDialect ||
+    private void addLongColumn(String tableName, String colName){
+        logger.warn("column "+tableName+"."+colName+" not exists, running ALTER TABLE ...");
+
+        String sqlType = dialect.types().bigint(0);
+
+        if (dialect instanceof OracleDialect ||
                 dialect instanceof MsSqlDialect) {
-                executeSQL("ALTER TABLE jv_snapshot ADD version NUMBER");
-            } else {
-                logger.error("\nno DB schema migration script for {} :(\nplease contact with JaVers team, javers@javers.org",
-                        dialect.getCode());
-            }
+            executeSQL("ALTER TABLE "+tableName+" ADD "+colName+" "+sqlType);
+        } else {
+            executeSQL("ALTER TABLE "+tableName+" ADD COLUMN "+colName+" "+sqlType);
         }
     }
 
