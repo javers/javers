@@ -113,6 +113,45 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
+    def "should query for nested ValueObject changes"(){
+      given:
+      def user = new DummyUserDetails(id:1, dummyAddress:
+              new DummyAddress(networkAddress: new DummyNetworkAddress(address: "a")))
+
+      javers.commit("author", user)
+      user.dummyAddress.networkAddress.address = "b"
+      javers.commit("author", user)
+
+      when:
+      def changes = javers.findChanges(QueryBuilder.byValueObjectId(1, DummyUserDetails,
+              "dummyAddress/networkAddress").build())
+
+      then:
+      changes.size() == 1
+      changes[0].left == "a"
+      changes[0].right == "b"
+    }
+
+    def "should query for changes on nested ValueObjects stored in a list"(){
+        given:
+        def user = new DummyUserDetails(
+            id:1,
+            addressList: [new DummyAddress(networkAddress: new DummyNetworkAddress(address: "a"))])
+
+        javers.commit("author", user)
+        user.addressList[0].networkAddress.address = "b"
+        javers.commit("author", user)
+
+        when:
+        def changes = javers.findChanges(QueryBuilder.byValueObjectId(1, DummyUserDetails,
+                "addressList/0/networkAddress").build())
+
+        then:
+        changes.size() == 1
+        changes[0].left == "a"
+        changes[0].right == "b"
+    }
+
     @Unroll
     def "should query for #what snapshot by GlobalId with limit"() {
         given:

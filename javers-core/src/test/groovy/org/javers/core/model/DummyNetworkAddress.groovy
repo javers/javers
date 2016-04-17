@@ -12,6 +12,6 @@ class DummyNetworkAddress {
         IPv6
     }
 
-    String addres
+    String address
     Version version
 }
