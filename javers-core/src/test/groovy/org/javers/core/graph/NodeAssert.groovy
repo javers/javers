@@ -42,6 +42,11 @@ class NodeAssert {
         this
     }
 
+    public NodeAssert hasOwnerId(String value){
+        assert actual.globalId.ownerId.value() == value
+        this
+    }
+
     public NodeAssert hasGlobalIdValue(String expectedValue) {
         actual.globalId.value() == expectedValue
         this

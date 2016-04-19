@@ -221,26 +221,25 @@ class JqlExample extends Specification {
         assert javers.findSnapshots(query).size() == 1
     }
 
-    def "should query for snapshots with version filter"(){
+    def "should query for changes (and snapshots) with version filter"(){
         given:
         def javers = JaversBuilder.javers().build()
 
         (1..5).each {
             javers.commit("author", new Employee(name: "john",age: 20+it))
-            javers.commit("author", new Employee(name: "bob", age: 20+it, salary: 900 + it*100))
+            javers.commit("author", new Employee(name: "bob", age: 20+it))
         }
 
         when:
-        def snapshots = javers
-                .findSnapshots( QueryBuilder.byInstanceId("bob", Employee.class)
-                .withVersion(4).build() )
+        def query = QueryBuilder.byInstanceId("bob", Employee.class).withVersion(4).build()
+        def changes = javers.findChanges( query )
 
         then:
-        assert snapshots.size() == 1
-        assert snapshots[0].getPropertyValue("age") == 24
-
-        println "found snapshot:"
-        println snapshots[0]
+        printChanges(changes)
+        assert changes.size() == 1
+        assert changes[0].left == 23
+        assert changes[0].right == 24
+        assert javers.findSnapshots(query).size() == 1
     }
 
     def "should query for changes with NewObject filter"() {
