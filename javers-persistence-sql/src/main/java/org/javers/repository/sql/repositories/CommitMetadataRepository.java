@@ -11,6 +11,7 @@ import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import static org.javers.repository.sql.PolyUtil.queryForOptionalBigDecimal;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
@@ -25,7 +26,13 @@ public class CommitMetadataRepository {
         this.polyJDBC = polyjdbc;
     }
 
-    public long save(String author, LocalDateTime date, CommitId commitId) {
+    public long save(String author, Map<String, String> properties, LocalDateTime date, CommitId commitId) {
+        long commitPk = insertCommit(author, date, commitId);
+        insertCommitProperties(commitPk, properties);
+        return commitPk;
+    }
+
+    private long insertCommit(String author, LocalDateTime date, CommitId commitId) {
         InsertQuery query = polyJDBC.query().insert().into(COMMIT_TABLE_NAME)
                 .value(COMMIT_AUTHOR, author)
                 .value(COMMIT_COMMIT_DATE, toTimestamp(date))
@@ -33,6 +40,16 @@ public class CommitMetadataRepository {
                 .sequence(COMMIT_PK, COMMIT_PK_SEQ);
 
         return polyJDBC.queryRunner().insert(query);
+    }
+
+    private void insertCommitProperties(long commitPk, Map<String, String> properties) {
+        for (Map.Entry<String, String> property : properties.entrySet()) {
+            InsertQuery query = polyJDBC.query().insert().into(COMMIT_PROPERTY_TABLE_NAME)
+                .value(COMMIT_PROPERTY_COMMIT_FK, commitPk)
+                .value(COMMIT_PROPERTY_KEY, property.getKey())
+                .value(COMMIT_PROPERTY_VALUE, property.getValue());
+            polyJDBC.queryRunner().insert(query);
+        }
     }
 
     public boolean isPersisted(Commit commit) {
@@ -62,4 +79,5 @@ public class CommitMetadataRepository {
 
         return queryForOptionalBigDecimal(query, polyJDBC);
     }
+
 }

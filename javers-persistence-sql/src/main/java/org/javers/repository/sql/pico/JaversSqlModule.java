@@ -3,6 +3,8 @@ package org.javers.repository.sql.pico;
 import org.javers.core.pico.JaversModule;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.finders.CdoSnapshotFinder;
+import org.javers.repository.sql.finders.CdoSnapshotsEnricher;
+import org.javers.repository.sql.finders.CommitPropertyFinder;
 import org.javers.repository.sql.repositories.CdoSnapshotRepository;
 import org.javers.repository.sql.repositories.CommitMetadataRepository;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
@@ -27,7 +29,10 @@ public class JaversSqlModule implements JaversModule {
             GlobalIdRepository.class,
             CommitMetadataRepository.class,
             CdoSnapshotRepository.class,
-            CdoSnapshotFinder.class};
+            CdoSnapshotFinder.class,
+            CdoSnapshotsEnricher.class,
+            CommitPropertyFinder.class
+    };
 
     @Override
     public Collection<Class> getComponents() {

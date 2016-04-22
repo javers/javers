@@ -22,7 +22,8 @@ public class CommitTypeAdaptersModule extends InstantiatingModule {
                 CommitIdTypeAdapter.class,
                 InstanceIdDTOTypeAdapter.class,
                 JsonElementFakeAdapter.class,
-                CdoSnapshotStateTypeAdapter.class
+                CdoSnapshotStateTypeAdapter.class,
+                CommitMetadataTypeAdapter.class
         );
     }
 }

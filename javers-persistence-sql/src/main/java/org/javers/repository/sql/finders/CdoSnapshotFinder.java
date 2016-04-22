@@ -26,9 +26,11 @@ public class CdoSnapshotFinder {
     private final PolyJDBC polyJDBC;
     private JsonConverter jsonConverter;
     private GlobalIdRepository globalIdRepository;
+    private CdoSnapshotsEnricher snapshotEnricher;
 
-    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, PolyJDBC polyJDBC) {
+    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, CdoSnapshotsEnricher snapshotEnricher, PolyJDBC polyJDBC) {
         this.globalIdRepository = globalIdRepository;
+        this.snapshotEnricher = snapshotEnricher;
         this.polyJDBC = polyJDBC;
     }
 
@@ -45,21 +47,21 @@ public class CdoSnapshotFinder {
         }
 
         QueryParams oneItemLimit = QueryParamsBuilder.withLimit(1).build();
-        return Optional.of(queryForCdoSnapshots(new SnapshotIdFilter(maxSnapshot.get()), Optional.of(globalId), Optional.of(oneItemLimit)).get(0));
+        return Optional.of(fetchCdoSnapshots(new SnapshotIdFilter(maxSnapshot.get()), Optional.of(globalId), Optional.of(oneItemLimit)).get(0));
     }
 
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return queryForCdoSnapshots(new SnapshotIdentifiersFilter(globalIdRepository, snapshotIdentifiers), Optional.<GlobalId>empty(), Optional.<QueryParams>empty());
+        return fetchCdoSnapshots(new SnapshotIdentifiersFilter(globalIdRepository, snapshotIdentifiers), Optional.<GlobalId>empty(), Optional.<QueryParams>empty());
     }
 
     public List<CdoSnapshot> getStateHistory(ManagedType managedType, Optional<String> propertyName, QueryParams queryParams) {
         ManagedClassFilter classFilter = new ManagedClassFilter(managedType.getName(), propertyName);
-        return queryForCdoSnapshots(classFilter, Optional.<GlobalId>empty(), Optional.of(queryParams));
+        return fetchCdoSnapshots(classFilter, Optional.<GlobalId>empty(), Optional.of(queryParams));
     }
 
     public List<CdoSnapshot> getVOStateHistory(EntityType ownerEntity, String fragment, QueryParams queryParams) {
         VoOwnerEntityFilter voOwnerFilter = new VoOwnerEntityFilter(ownerEntity.getName(), fragment);
-        return queryForCdoSnapshots(voOwnerFilter, Optional.<GlobalId>empty(), Optional.of(queryParams));
+        return fetchCdoSnapshots(voOwnerFilter, Optional.<GlobalId>empty(), Optional.of(queryParams));
     }
 
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, Optional<String> propertyName, QueryParams queryParams) {
@@ -69,15 +71,19 @@ public class CdoSnapshotFinder {
             return Collections.emptyList();
         }
 
-        return queryForCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), propertyName), Optional.of(globalId), Optional.of(queryParams));
+        return fetchCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), propertyName), Optional.of(globalId), Optional.of(queryParams));
     }
 
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }
 
-    private List<CdoSnapshot> queryForCdoSnapshots(SnapshotFilter snapshotFilter, Optional<GlobalId> providedGlobalId, Optional<QueryParams> queryParams){
+    private List<CdoSnapshot> fetchCdoSnapshots(SnapshotFilter snapshotFilter, Optional<GlobalId> providedGlobalId, Optional<QueryParams> queryParams){
+        List<CdoSnapshotDTO> snapshotDTOs = queryForCdoSnapshotDTOs(snapshotFilter, providedGlobalId, queryParams);
+        return snapshotEnricher.enrichSnapshots(snapshotDTOs);
+    }
 
+    private List<CdoSnapshotDTO> queryForCdoSnapshotDTOs(SnapshotFilter snapshotFilter, Optional<GlobalId> providedGlobalId, Optional<QueryParams> queryParams) {
         SelectQuery query =  polyJDBC.query().select(snapshotFilter.select());
         snapshotFilter.addFrom(query);
         snapshotFilter.addWhere(query);
@@ -85,8 +91,7 @@ public class CdoSnapshotFinder {
             applyQueryParams(snapshotFilter, queryParams.get(), query);
         }
         query.orderBy(SNAPSHOT_PK, Order.DESC);
-
-        return polyJDBC.queryRunner().queryList(query, new CdoSnapshotObjectMapper(jsonConverter, providedGlobalId));
+        return polyJDBC.queryRunner().queryList(query, new CdoSnapshotDTOMapper(jsonConverter, providedGlobalId));
     }
 
     private void applyQueryParams(SnapshotFilter snapshotFilter, QueryParams queryParams, SelectQuery query) {

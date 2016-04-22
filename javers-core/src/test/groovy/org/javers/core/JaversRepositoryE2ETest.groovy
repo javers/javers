@@ -814,4 +814,35 @@ class JaversRepositoryE2ETest extends Specification {
         limit << [1, 50, 99, 200]
     }
 
+    def "should return empty map of commit properties if snapshot was commited without properties"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id :1))
+
+        when:
+        def snapshot = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build()).first()
+
+        then:
+        assert snapshot.commitMetadata.properties.isEmpty()
+    }
+
+    def "should return committed properties"() {
+        given:
+        def commitProperties = [
+            "tenant": "ACME",
+            "sessionId": "1234567890",
+            "device": "smartwatch",
+            "yet another property key": "yet another property value",
+        ]
+        javers.commit("author", commitProperties, new SnapshotEntity(id :1))
+
+        when:
+        def snapshot = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build()).first()
+
+        then:
+        assert snapshot.commitMetadata.properties["tenant"] == "ACME"
+        assert snapshot.commitMetadata.properties["sessionId"] == "1234567890"
+        assert snapshot.commitMetadata.properties["device"] == "smartwatch"
+        assert snapshot.commitMetadata.properties["yet another property key"] == "yet another property value"
+    }
+
 }

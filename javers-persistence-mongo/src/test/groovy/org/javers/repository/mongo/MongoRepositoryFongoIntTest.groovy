@@ -31,8 +31,8 @@ class MongoRepositoryFongoIntTest extends Specification {
         def kazikV1 = dummyUser("Kazik").withAge(1)
         def kazikV2 = dummyUser("Kazik").withAge(2)
 
-        def commit1 = commitFactory.create("author", kazikV1)
-        def commit2 = commitFactory.create("author", kazikV2)
+        def commit1 = commitFactory.create("author", [:], kazikV1)
+        def commit2 = commitFactory.create("author", [:], kazikV2)
 
         when:
         mongoRepository.persist(commit1)
@@ -61,7 +61,7 @@ class MongoRepositoryFongoIntTest extends Specification {
 
         when:
         //persist
-        mongoRepository.persist(commitFactory.create("andy", kazik))
+        mongoRepository.persist(commitFactory.create("andy", [:], kazik))
 
         //get last snapshot
         def latest = mongoRepository.getLatest(id)
@@ -82,7 +82,7 @@ class MongoRepositoryFongoIntTest extends Specification {
 
         //create entity & persist commit
         def kazik = new DummyUser("kazik")
-        mongoRepository.persist(commitFactory.create("andy", kazik))
+        mongoRepository.persist(commitFactory.create("andy", [:], kazik))
 
         when:
         def latest = mongoRepository.getLatest(id)
@@ -103,7 +103,7 @@ class MongoRepositoryFongoIntTest extends Specification {
 
         //create entity & persist commit
         def kazik = new DummyUser("kazik")
-        mongoRepository.persist(commitFactory.create("andy", kazik))
+        mongoRepository.persist(commitFactory.create("andy", [:], kazik))
 
         when:
         def latest = mongoRepository.getLatest(id)

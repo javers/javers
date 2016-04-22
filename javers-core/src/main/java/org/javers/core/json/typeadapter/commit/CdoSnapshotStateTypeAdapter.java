@@ -20,7 +20,7 @@ public class CdoSnapshotStateTypeAdapter extends JsonTypeAdapterTemplate<CdoSnap
 
     @Override
     public CdoSnapshotState fromJson(JsonElement json, JsonDeserializationContext jsonDeserializationContext) {
-        throw new UnsupportedOperationException("use CdoSnapshotStateSerializer");
+        throw new UnsupportedOperationException("use CdoSnapshotStateDeserializer");
     }
 
     @Override

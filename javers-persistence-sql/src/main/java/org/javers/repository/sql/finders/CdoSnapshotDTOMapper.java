@@ -19,7 +19,7 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 /**
  * @author bartosz.walacik
  */
-class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
+class CdoSnapshotDTOMapper implements ObjectMapper<CdoSnapshotDTO> {
     private final Optional<GlobalId> providedGlobalId;
     private final JsonConverter jsonConverter;
 
@@ -31,13 +31,13 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
     private static final String VERSION = "version";
 
 
-    public CdoSnapshotObjectMapper(JsonConverter jsonConverter, Optional<GlobalId> providedGlobalId) {
+    public CdoSnapshotDTOMapper(JsonConverter jsonConverter, Optional<GlobalId> providedGlobalId) {
         this.jsonConverter = jsonConverter;
         this.providedGlobalId = providedGlobalId;
     }
 
     @Override
-    public CdoSnapshot createObject(ResultSet resultSet) throws SQLException {
+    public CdoSnapshotDTO createObject(ResultSet resultSet) throws SQLException {
         JsonObject json = new JsonObject();
 
         json.add(COMMIT_METADATA, assembleCommitMetadata(resultSet));
@@ -53,7 +53,10 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
             json.add(GLOBAL_CDO_ID, assembleGlobalId(resultSet));
         }
 
-        return jsonConverter.fromJson(json, CdoSnapshot.class);
+        CdoSnapshot snapshot = jsonConverter.fromJson(json, CdoSnapshot.class);
+        long commitPK = resultSet.getLong(COMMIT_PK);
+
+        return new CdoSnapshotDTO(snapshot, commitPK);
     }
 
     private JsonElement assembleChangedPropNames(ResultSet resultSet) throws SQLException {
