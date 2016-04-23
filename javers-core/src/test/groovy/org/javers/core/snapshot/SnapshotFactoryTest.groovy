@@ -286,15 +286,14 @@ class SnapshotFactoryTest extends Specification{
                        ]
     }
 
-    def "should throw exception when property Type is not fully parametrized"() {
+    def "should handle property with not parametrized type"() {
         when:
         def cdo = new SnapshotEntity(nonParametrizedMap:  ["a":1])
         def cdoWrapper = javers.createCdoWrapper(cdo)
-        snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def snap = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
 
         then:
-        def e = thrown(JaversException)
-        e.code == JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
+        snap.getPropertyValue("nonParametrizedMap") == ["a":1]
     }
 
     @Unroll

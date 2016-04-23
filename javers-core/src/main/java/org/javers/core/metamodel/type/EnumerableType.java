@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
+import org.javers.common.collections.Optional;
 import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
@@ -12,14 +13,9 @@ import java.util.List;
  */
 public abstract class EnumerableType extends JaversType {
 
-    public EnumerableType(Type baseJavaType) {
-        super(baseJavaType);
+    public EnumerableType(Type baseJavaType, int expectedArgs) {
+        super(baseJavaType, Optional.<String>empty(), expectedArgs);
     }
-
-    /**
-     * returns true if Enumerable is generic Type and all its arguments are actual Classes
-     */
-    public abstract boolean isFullyParametrized();
 
     /**
      * Returns new instance of Enumerable with items from sourceEnumerable mapped by mapFunction.

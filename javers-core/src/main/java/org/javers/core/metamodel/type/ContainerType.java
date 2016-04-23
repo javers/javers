@@ -1,10 +1,7 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.exception.JaversException;
-
 import java.lang.reflect.Type;
 
-import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 
 /**
@@ -15,25 +12,18 @@ import static org.javers.common.reflection.ReflectionUtil.extractClass;
 public abstract class ContainerType extends EnumerableType {
 
     ContainerType(Type baseJavaType) {
-        super(baseJavaType);
+        super(baseJavaType, 1);
     }
 
     /**
      * never returns null
-     *
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     public Type getItemType(){
-        if (isFullyParametrized()) {
-            return getActualTypeArguments().get(0);
-        }
-        throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
+        return getConcreteClassTypeArguments().get(0);
     }
 
     /**
      * never returns null
-     *
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     public Class getItemClass(){
         return extractClass(getItemType());

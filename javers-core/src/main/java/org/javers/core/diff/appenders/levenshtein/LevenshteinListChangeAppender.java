@@ -10,6 +10,7 @@ import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ListType;
+import org.javers.core.metamodel.type.SetType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.List;
@@ -49,7 +50,12 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
         final BacktrackSteps[][] steps = backtrack.evaluateSteps(leftList, rightList);
         final List<ContainerElementChange> changes = stepsToChanges.convert(steps, leftList, rightList);
 
-        return getListChange(pair.getGlobalId(), property, changes);
+        ListChange result = getListChange(pair.getGlobalId(), property, changes);
+        if (result != null) {
+            ListType listType = typeMapper.getPropertyType(property);
+            renderNotParametrizedWarningIfNeeded(listType.getItemType(), "item", "List", property);
+        }
+        return result;
     }
 
     private EqualsFunction createDehydratingEqualsFunction(NodePair pair, Property property){

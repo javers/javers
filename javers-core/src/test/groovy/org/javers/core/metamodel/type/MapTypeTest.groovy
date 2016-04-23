@@ -1,13 +1,11 @@
 package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
-import org.javers.common.exception.JaversException
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.lang.reflect.Type
 
-import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
 /**
@@ -19,39 +17,26 @@ class MapTypeTest extends Specification{
     
     class Dummy <T> {
         Map                  noGeneric
-        Map<?, String>       wildcardGeneric
-        Map<String, T>       parametrizedGeneric
+        Map<?, ?>       wildcardGeneric
+        Map<T, T>       parametrizedGeneric
         Map<String, Integer> genericWithArgument
         Map<String, EnumSet<DummyEnum>> mapWithNestedParametrizedType
     }
 
     @Unroll
-    def "should not be fully parametrized if baseJavaType is not #geneticKind"(){
+    def "should replace non-concrete type parameters with Object for type: #genericKind"(){
         given:
-        Type noGeneric = getFieldFromClass(Dummy, geneticKind).genericType
+        def genericType = getFieldFromClass(Dummy, genericKind).genericType
 
         when:
-        MapType mType = new MapType(noGeneric)
+        def mType = new MapType(genericType)
 
         then:
-        mType.fullyParametrized == false
-
-        when:
-        mType.getKeyType()
-
-        then:
-        def e = thrown(JaversException)
-        e.code == GENERIC_TYPE_NOT_PARAMETRIZED;
-
-        when:
-        mType.getValueType()
-
-        then:
-        e = thrown(JaversException)
-        e.code == GENERIC_TYPE_NOT_PARAMETRIZED;
+        mType.getKeyType() == Object
+        mType.getValueType() == Object
 
         where:
-        geneticKind << ["noGeneric","wildcardGeneric","parametrizedGeneric"]
+        genericKind << ["noGeneric","wildcardGeneric","parametrizedGeneric"]
     }
 
     def "should return key & value Class if baseJavaType is generic with actual Class argument"(){
