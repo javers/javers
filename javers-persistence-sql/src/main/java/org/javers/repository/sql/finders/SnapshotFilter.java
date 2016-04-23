@@ -8,6 +8,7 @@ import org.polyjdbc.core.type.Timestamp;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 abstract class SnapshotFilter {
+
     static final String COMMIT_WITH_SNAPSHOT
         = SNAPSHOT_TABLE_NAME + " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK;
 
@@ -60,6 +61,14 @@ abstract class SnapshotFilter {
     void addVersionCondition(SelectQuery query, Long version) {
         query.append(" AND " + SNAPSHOT_VERSION + " = :version")
             .withArgument("version", version);
+    }
+
+    void addCommitPropertyCondition(SelectQuery query, String serializedProperty) {
+        // workaround for PolyJDBC aggressive argument replacement. It removes virtually all colons, even in strings.
+        serializedProperty = serializedProperty.replace(":", "_");
+        // backslashes escaping
+        serializedProperty = serializedProperty.replace("\\", "\\\\");
+        query.append(" AND " + COMMIT_PROPERTIES + " LIKE '%" + serializedProperty + "%'");
     }
 
 }

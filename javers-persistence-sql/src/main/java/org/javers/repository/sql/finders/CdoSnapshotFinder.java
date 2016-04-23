@@ -1,5 +1,6 @@
 package org.javers.repository.sql.finders;
 
+import com.google.common.collect.ImmutableMap;
 import org.javers.common.collections.Optional;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -17,6 +18,7 @@ import org.polyjdbc.core.query.SelectQuery;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
@@ -102,7 +104,30 @@ public class CdoSnapshotFinder {
         if (queryParams.version().isPresent()) {
             snapshotFilter.addVersionCondition(query, queryParams.version().get());
         }
+        if (queryParams.hasCommitProperties()) {
+            addCommitPropertyConditions(snapshotFilter, query, queryParams.commitProperties().get());
+        }
         query.limit(queryParams.limit(), queryParams.skip());
+    }
+
+    private void addCommitPropertyConditions(SnapshotFilter snapshotFilter, SelectQuery query, Map<String, String> commitProperties) {
+        for (Map.Entry<String, String> commitProperty : commitProperties.entrySet()) {
+            String serializedProperty = prepareSerializedCommitProperty(commitProperty.getKey(), commitProperty.getValue());
+            snapshotFilter.addCommitPropertyCondition(query, serializedProperty);
+        }
+    }
+
+    private String prepareSerializedCommitProperty(String propertyName, String propertyValue) {
+        String serializedProperty = jsonConverter.toJson(ImmutableMap.of(propertyName, propertyValue));
+        return removeOuterCurlyBraces(serializedProperty);
+    }
+
+    private String removeOuterCurlyBraces(String serializedProperty) {
+        if (serializedProperty.startsWith("{") && serializedProperty.endsWith("}")) {
+            return serializedProperty.substring(1, serializedProperty.length() - 1).trim();
+        } else {
+            return serializedProperty;
+        }
     }
 
     private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk) {
