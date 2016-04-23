@@ -36,15 +36,6 @@ public class Validate {
     }
 
     /**
-     * @deprecated every time when an argument should be null a fairy dies ...
-     */
-    public static void argumentShouldBeNull(Object argument, String message) {
-        if(argument != null) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-
-    /**
      * @throws  IllegalArgumentException
      */
     public static void argumentCheck(boolean argumentCondition, String message) {
