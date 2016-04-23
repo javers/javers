@@ -48,7 +48,7 @@ public class CdoSnapshotsEnricher {
             if (!commitsProperties.containsKey(commitPropertyDTO.getCommitPK())) {
                 commitsProperties.put(commitPropertyDTO.getCommitPK(), new HashMap<String, String>());
             }
-            commitsProperties.get(commitPropertyDTO.getCommitPK()).put(commitPropertyDTO.getKey(), commitPropertyDTO.getValue());
+            commitsProperties.get(commitPropertyDTO.getCommitPK()).put(commitPropertyDTO.getName(), commitPropertyDTO.getValue());
         }
         return commitsProperties;
     }

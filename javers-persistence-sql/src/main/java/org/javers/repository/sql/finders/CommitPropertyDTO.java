@@ -2,12 +2,12 @@ package org.javers.repository.sql.finders;
 
 class CommitPropertyDTO {
     private long commitPK;
-    private String key;
+    private String name;
     private String value;
 
-    public CommitPropertyDTO(long commitPK, String key, String value) {
+    public CommitPropertyDTO(long commitPK, String name, String value) {
         this.commitPK = commitPK;
-        this.key = key;
+        this.name = name;
         this.value = value;
     }
 
@@ -15,8 +15,8 @@ class CommitPropertyDTO {
         return commitPK;
     }
 
-    public String getKey() {
-        return key;
+    public String getName() {
+        return name;
     }
 
     public String getValue() {

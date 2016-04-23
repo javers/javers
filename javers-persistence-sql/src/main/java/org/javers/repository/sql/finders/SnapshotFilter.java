@@ -5,6 +5,8 @@ import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
+import java.util.Map;
+
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 abstract class SnapshotFilter {
@@ -60,6 +62,17 @@ abstract class SnapshotFilter {
     void addVersionCondition(SelectQuery query, Long version) {
         query.append(" AND " + SNAPSHOT_VERSION + " = :version")
             .withArgument("version", version);
+    }
+
+    void addCommitPropertyCondition(SelectQuery query, String propertyName, String propertyValue) {
+        query.append(" AND EXISTS (" +
+            "SELECT * FROM " + COMMIT_PROPERTY_TABLE_NAME +
+            " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
+            " AND " + COMMIT_PROPERTY_NAME + " = :propertyName_" + propertyName +
+            " AND " + COMMIT_PROPERTY_VALUE + " = :propertyValue_" + propertyName +
+            ")")
+            .withArgument("propertyName_" + propertyName, propertyName)
+            .withArgument("propertyValue_" + propertyName, propertyValue);
     }
 
 }

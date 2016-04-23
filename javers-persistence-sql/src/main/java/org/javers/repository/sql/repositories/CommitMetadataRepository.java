@@ -46,7 +46,7 @@ public class CommitMetadataRepository {
         for (Map.Entry<String, String> property : properties.entrySet()) {
             InsertQuery query = polyJDBC.query().insert().into(COMMIT_PROPERTY_TABLE_NAME)
                 .value(COMMIT_PROPERTY_COMMIT_FK, commitPk)
-                .value(COMMIT_PROPERTY_KEY, property.getKey())
+                .value(COMMIT_PROPERTY_NAME, property.getKey())
                 .value(COMMIT_PROPERTY_VALUE, property.getValue());
             polyJDBC.queryRunner().insert(query);
         }

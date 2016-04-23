@@ -13,7 +13,7 @@ public class CommitPropertyDTOMapper implements ObjectMapper<CommitPropertyDTO> 
     public CommitPropertyDTO createObject(ResultSet resultSet) throws SQLException {
         return new CommitPropertyDTO(
             resultSet.getLong(COMMIT_PROPERTY_COMMIT_FK),
-            resultSet.getString(COMMIT_PROPERTY_KEY),
+            resultSet.getString(COMMIT_PROPERTY_NAME),
             resultSet.getString(COMMIT_PROPERTY_VALUE)
         );
     }

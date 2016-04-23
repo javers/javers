@@ -17,6 +17,7 @@ import org.polyjdbc.core.query.SelectQuery;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
@@ -107,7 +108,16 @@ public class CdoSnapshotFinder {
         if (queryParams.version().isPresent()) {
             snapshotFilter.addVersionCondition(query, queryParams.version().get());
         }
+        if (queryParams.hasCommitProperties()) {
+            addCommitPropertyConditions(snapshotFilter, query, queryParams.commitProperties().get());
+        }
         query.limit(queryParams.limit(), queryParams.skip());
+    }
+
+    private void addCommitPropertyConditions(SnapshotFilter snapshotFilter, SelectQuery query, Map<String, String> commitProperties) {
+        for (Map.Entry<String, String> commitProperty : commitProperties.entrySet()) {
+            snapshotFilter.addCommitPropertyCondition(query, commitProperty.getKey(), commitProperty.getValue());
+        }
     }
 
     private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk) {

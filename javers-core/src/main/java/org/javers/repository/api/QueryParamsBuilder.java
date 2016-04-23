@@ -4,6 +4,9 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import org.joda.time.LocalDateTime;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author michal wesolowski
  */
@@ -14,6 +17,7 @@ public class QueryParamsBuilder {
     private LocalDateTime to;
     private CommitId commitId;
     private Long version;
+    private Map<String, String> commitProperties = new HashMap<>();
 
     private QueryParamsBuilder(int limit) {
         this.limit = limit;
@@ -94,6 +98,14 @@ public class QueryParamsBuilder {
     }
 
     /*
+     * filters results to Snapshots with all given commit properties
+     */
+    public QueryParamsBuilder commitProperties(Map<String, String> commitProperties) {
+        this.commitProperties = commitProperties;
+        return this;
+    }
+
+    /*
      * limits results to Snapshots with a given version
      */
     public QueryParamsBuilder version(Long version) {
@@ -106,6 +118,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to, commitId, version);
+        return new QueryParams(limit, skip, from, to, commitId, commitProperties, version);
     }
 }

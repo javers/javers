@@ -12,9 +12,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 import static org.joda.time.LocalTime.MIDNIGHT;
@@ -38,6 +36,7 @@ public class QueryBuilder {
     private boolean newObjectChanges;
     private CommitId commitId;
     private Long version;
+    private Map<String, String> commitProperties = new HashMap<>();
     private final List<Filter> filters = new ArrayList<>();
 
     private QueryBuilder(Filter initialFilter) {
@@ -191,28 +190,6 @@ public class QueryBuilder {
      * to those created after (>=) given date.
      * <br/><br/>
      *
-     * <h2>Important for Changes query</h2>
-     * When querying for Changes done
-     * after given point in time, results will lack
-     * in <b>first</b> set of changes after that point.
-     * <br/>
-     *
-     * For example. Consider three commits of some object done in every two days:
-     *
-     * <pre>
-     *     javers.commit(someObject); //Monday
-     *     javers.commit(someObject); //Wednesday
-     *     javers.commit(someObject); //Friday
-     * </pre>
-     *
-     * Query for Snapshots from Wednesday gives you 2 results as expected:
-     * Wednesday's and Friday's Snapshots.
-     * <br/>
-     * But query for Changes from Wednesday gives you only
-     * changes done on Friday.
-     * That's because Changes Query is backed by Snapshots Query
-     * and Changes are calculated as a diff between subsequent Snapshots.
-     *
      * <h2>CommitDate is local datetime</h2>
      * Please remember that commitDate is persisted as LocalDateTime
      * (without information about time zone and daylight saving time).
@@ -256,11 +233,6 @@ public class QueryBuilder {
     /**
      * Limits Snapshots to be fetched from JaversRepository
      * to those with a given commitId.
-     * <br/><br/>
-     *
-     * <b>Warning!</b> Using withCommitId filter when querying
-     * for Changes makes no sense because the result will
-     * always be empty.
      */
     public QueryBuilder withCommitId(CommitId commitId) {
         Validate.argumentIsNotNull(commitId);
@@ -278,12 +250,17 @@ public class QueryBuilder {
 
     /**
      * Limits Snapshots to be fetched from JaversRepository
+     * to those with a given commit property.
+     */
+    public QueryBuilder withCommitProperty(String name, String value) {
+        Validate.argumentsAreNotNull(name, value);
+        this.commitProperties.put(name, value);
+        return this;
+    }
+
+    /**
+     * Limits Snapshots to be fetched from JaversRepository
      * to those with a given version.
-     * <br/><br/>
-     *
-     * <b>Warning!</b> Using withVersion filter when querying
-     * for Changes makes no sense because the result will
-     * always be empty.
      */
     public QueryBuilder withVersion(long version) {
         Validate.argumentCheck(version > 0, "Version is not a positive number.");
@@ -306,6 +283,7 @@ public class QueryBuilder {
             .from(from).to(to)
             .commitId(commitId)
             .version(version)
+            .commitProperties(commitProperties)
             .build();
     }
 

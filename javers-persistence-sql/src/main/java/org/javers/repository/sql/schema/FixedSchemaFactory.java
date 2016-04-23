@@ -32,7 +32,7 @@ public class FixedSchemaFactory {
 
     public static final String COMMIT_PROPERTY_TABLE_NAME = "jv_commit_property";
     public static final String COMMIT_PROPERTY_COMMIT_FK =  "commit_fk";
-    public static final String COMMIT_PROPERTY_KEY =        "property_key";
+    public static final String COMMIT_PROPERTY_NAME =       "property_name";
     public static final String COMMIT_PROPERTY_VALUE =      "property_value";
 
     public static final String SNAPSHOT_TABLE_NAME =   "jv_snapshot";
@@ -84,14 +84,14 @@ public class FixedSchemaFactory {
         Schema schema = new Schema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         relationBuilder
-            .primaryKey(tableName + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_KEY).and()
-            .withAttribute().string(COMMIT_PROPERTY_KEY).withMaxLength(200).and()
+            .primaryKey(tableName + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
+            .withAttribute().string(COMMIT_PROPERTY_NAME).withMaxLength(200).and()
             .withAttribute().string(COMMIT_PROPERTY_VALUE).withMaxLength(200).and();
         foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
         columnsIndex(tableName, schema, COMMIT_PROPERTY_COMMIT_FK);
-        columnsIndex(tableName, schema, COMMIT_PROPERTY_KEY, COMMIT_PROPERTY_VALUE);
+        columnsIndex(tableName, schema, COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE);
 
         return schema;
     }

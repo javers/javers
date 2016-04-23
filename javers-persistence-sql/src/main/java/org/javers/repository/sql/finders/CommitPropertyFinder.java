@@ -18,7 +18,7 @@ public class CommitPropertyFinder {
 
     List<CommitPropertyDTO> findPropertiesOfCommits(List<Long> commitPKs) {
         SelectQuery query = polyJDBC.query()
-            .select(COMMIT_PROPERTY_COMMIT_FK + ", " + COMMIT_PROPERTY_KEY + ", " + COMMIT_PROPERTY_VALUE)
+            .select(COMMIT_PROPERTY_COMMIT_FK + ", " + COMMIT_PROPERTY_NAME + ", " + COMMIT_PROPERTY_VALUE)
             .from(COMMIT_PROPERTY_TABLE_NAME)
             .where(COMMIT_PROPERTY_COMMIT_FK + " in (" + Joiner.on(",").join(commitPKs) + ")");
         return polyJDBC.queryRunner().queryList(query, new CommitPropertyDTOMapper());

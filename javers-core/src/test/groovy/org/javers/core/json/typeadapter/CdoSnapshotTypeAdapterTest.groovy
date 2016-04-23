@@ -128,7 +128,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     def "should deserialize CdoSnapshot"() {
         given:
         def changed = ["name", "age"]
-        def commitProperties = ["key" : "value"]
+        def commitProperties = ["name" : "value"]
         def json = new JsonBuilder()
         json {
             commitMetadata {
@@ -154,7 +154,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         then:
         snapshot.commitMetadata.id.value() == "1.0"
         snapshot.commitMetadata.author == "author"
-        snapshot.commitMetadata.properties == ["key" : "value"]
+        snapshot.commitMetadata.properties == ["name" : "value"]
         snapshot.commitMetadata.commitDate == new LocalDateTime(2000,1,1,12,0)
         snapshot.globalId == instanceId("kaz",DummyUser)
         snapshot.initial == true
