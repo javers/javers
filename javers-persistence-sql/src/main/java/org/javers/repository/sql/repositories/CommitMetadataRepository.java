@@ -3,6 +3,7 @@ package org.javers.repository.sql.repositories;
 import org.javers.common.collections.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
+import org.javers.core.json.JsonConverter;
 import org.javers.repository.sql.PolyUtil;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.PolyJDBC;
@@ -11,6 +12,7 @@ import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import static org.javers.repository.sql.PolyUtil.queryForOptionalBigDecimal;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
@@ -20,14 +22,16 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
  */
 public class CommitMetadataRepository {
     private final PolyJDBC polyJDBC;
+    private JsonConverter jsonConverter;
 
     public CommitMetadataRepository(PolyJDBC polyjdbc) {
         this.polyJDBC = polyjdbc;
     }
 
-    public long save(String author, LocalDateTime date, CommitId commitId) {
+    public long save(String author, Map<String, String> properties, LocalDateTime date, CommitId commitId) {
         InsertQuery query = polyJDBC.query().insert().into(COMMIT_TABLE_NAME)
                 .value(COMMIT_AUTHOR, author)
+                .value(COMMIT_PROPERTIES, jsonConverter.toJson(properties))
                 .value(COMMIT_COMMIT_DATE, toTimestamp(date))
                 .value(COMMIT_COMMIT_ID, commitId.valueAsNumber())
                 .sequence(COMMIT_PK, COMMIT_PK_SEQ);
@@ -61,5 +65,9 @@ public class CommitMetadataRepository {
                 .from(COMMIT_TABLE_NAME);
 
         return queryForOptionalBigDecimal(query, polyJDBC);
+    }
+
+    public void setJsonConverter(JsonConverter jsonConverter) {
+        this.jsonConverter = jsonConverter;
     }
 }

@@ -22,6 +22,7 @@ import org.javers.repository.jql.JqlQuery;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -45,7 +46,7 @@ public interface Javers {
      * Persists a current state of a given domain object graph
      * in JaVers repository.
      * <br/><br/>
-     * 
+     *
      * JaVers applies commit() to given object and all objects navigable from it.
      * You can capture a state of an arbitrary complex object graph with a single commit() call.
      *
@@ -54,10 +55,12 @@ public interface Javers {
      */
     Commit commit(String author, Object currentVersion);
 
+    Commit commit(String author, Map<String, String> properties, Object currentVersion);
+
     /**
      * Marks given object as deleted.
      * <br/><br/>
-     * 
+     *
      * Unlike {@link Javers#commit(String, Object)}, this method is shallow
      * and affects only given object.
      * <br/><br/>
@@ -69,11 +72,15 @@ public interface Javers {
      */
     Commit commitShallowDelete(String author, Object deleted);
 
+    Commit commitShallowDelete(String author, Map<String, String> properties, Object deleted);
+
     /**
      * The same like {@link #commitShallowDelete(String,Object)}
      * but deleted object is selected using globalId
      */
     Commit commitShallowDeleteById(String author, GlobalIdDTO globalId);
+
+    Commit commitShallowDeleteById(String author, Map<String, String> properties, GlobalIdDTO globalId);
 
     /**
      * <h2>Deep compare</h2>

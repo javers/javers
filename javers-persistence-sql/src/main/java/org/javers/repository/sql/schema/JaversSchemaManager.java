@@ -3,7 +3,6 @@ package org.javers.repository.sql.schema;
 import org.javers.repository.sql.ConnectionProvider;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.dialect.*;
-import org.polyjdbc.core.query.UpdateQuery;
 import org.polyjdbc.core.schema.SchemaInspector;
 import org.polyjdbc.core.schema.SchemaManager;
 import org.polyjdbc.core.schema.model.Schema;
@@ -46,6 +45,7 @@ public class JaversSchemaManager {
         addSnapshotVersionColumnIfNeeded();
         addSnapshotManagedTypeColumnIfNeeded();
         addGlobalIdTypeNameColumnIfNeeded();
+        addCommitPropertiesColumnIfNeeded();
 
         TheCloser.close(schemaManager, schemaInspector);
     }
@@ -108,7 +108,7 @@ public class JaversSchemaManager {
      */
     private void addSnapshotManagedTypeColumnIfNeeded() {
         if (!columnExists("jv_snapshot", "managed_type")) {
-            addStringColumn("jv_snapshot", "managed_type", 200);
+            addColumn("jv_snapshot", "managed_type", dialect.types().string(200));
 
             populateSnapshotManagedType();
         }
@@ -119,9 +119,18 @@ public class JaversSchemaManager {
      */
     private void addGlobalIdTypeNameColumnIfNeeded() {
         if (!columnExists("jv_global_id", "type_name")) {
-            addStringColumn("jv_global_id", "type_name", 200);
+            addColumn("jv_global_id", "type_name", dialect.types().string(200));
 
             populateGlobalIdTypeName();
+        }
+    }
+
+    /**
+     * JaVers 1.6.x to 2.0 schema migration
+     */
+    private void addCommitPropertiesColumnIfNeeded() {
+        if (!columnExists("jv_commit", "properties")) {
+            addColumn("jv_commit", "properties", dialect.types().text());;
         }
     }
 
@@ -223,16 +232,14 @@ public class JaversSchemaManager {
         schemaManager.create(schema);
     }
 
-    private void addStringColumn(String tableName, String colName, int len){
+    private void addColumn(String tableName, String colName, String columnType){
         logger.warn("column "+tableName+"."+colName+" not exists, running ALTER TABLE ...");
-
-        String sqlType = dialect.types().string(len);
 
         if (dialect instanceof OracleDialect ||
             dialect instanceof MsSqlDialect) {
-            executeSQL("ALTER TABLE "+tableName+" ADD "+colName+" "+sqlType);
+            executeSQL("ALTER TABLE "+tableName+" ADD "+colName+" "+columnType);
         } else {
-            executeSQL("ALTER TABLE "+tableName+" ADD COLUMN "+colName+" "+sqlType);
+            executeSQL("ALTER TABLE "+tableName+" ADD COLUMN "+colName+" "+columnType);
         }
     }
 

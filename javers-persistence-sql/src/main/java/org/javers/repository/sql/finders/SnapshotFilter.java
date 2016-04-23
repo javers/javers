@@ -22,6 +22,7 @@ abstract class SnapshotFilter {
             SNAPSHOT_VERSION + ", " +
             SNAPSHOT_CHANGED + ", " +
             SNAPSHOT_MANAGED_TYPE + ", " +
+            COMMIT_PROPERTIES + ", " +
             COMMIT_AUTHOR + ", " +
             COMMIT_COMMIT_DATE + ", " +
             COMMIT_COMMIT_ID;
