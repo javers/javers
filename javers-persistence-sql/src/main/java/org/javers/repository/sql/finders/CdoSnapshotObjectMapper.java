@@ -67,10 +67,10 @@ class CdoSnapshotObjectMapper implements ObjectMapper<CdoSnapshot> {
         return jsonConverter.fromJsonToJsonElement(propNamesJSON);
     }
 
-
     private JsonElement assembleCommitMetadata(ResultSet resultSet) throws SQLException {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("author",resultSet.getString(COMMIT_AUTHOR));
+        jsonObject.add(COMMIT_PROPERTIES, jsonConverter.fromJsonToJsonElement(resultSet.getString(COMMIT_PROPERTIES)));
         jsonObject.addProperty("commitDate", DateTypeCoreAdapters.serializeToLocal( resultSet.getTimestamp(COMMIT_COMMIT_DATE)));
         jsonObject.addProperty("id", resultSet.getBigDecimal(COMMIT_COMMIT_ID));
 

@@ -46,4 +46,15 @@ public class Collections {
             throw new IllegalArgumentException("expected Array or Collection, got "+arrayOrCollection.getClass());
         }
     }
+
+    public static <E> boolean allMatch(Collection<E> collection, Predicate<E> predicate) {
+        Validate.argumentsAreNotNull(collection, predicate);
+
+        for (E element : collection) {
+            if (!predicate.apply(element)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -1,7 +1,4 @@
 package org.javers.repository.sql
-
-import org.javers.core.json.JsonConverter
-
 /**
  * @author bartosz walacik
  */

@@ -25,6 +25,7 @@ public class FixedSchemaFactory {
     public static final String COMMIT_TABLE_NAME =    "jv_commit";
     public static final String COMMIT_PK =            "commit_pk";
     public static final String COMMIT_AUTHOR =        "author";
+    public static final String COMMIT_PROPERTIES =    "properties";
     public static final String COMMIT_COMMIT_DATE =   "commit_date";
     public static final String COMMIT_COMMIT_ID =     "commit_id";
     public static final String COMMIT_PK_SEQ =        "jv_commit_pk_seq";
@@ -65,6 +66,7 @@ public class FixedSchemaFactory {
         primaryKey(COMMIT_PK,schema,relationBuilder);
         relationBuilder
                 .withAttribute().string(COMMIT_AUTHOR).withMaxLength(200).and()
+                .withAttribute().text(COMMIT_PROPERTIES).and()
                 .withAttribute().timestamp(COMMIT_COMMIT_DATE).and()
                 .withAttribute().number(COMMIT_COMMIT_ID).withIntegerPrecision(12).withDecimalPrecision(2).and()
                 .build();

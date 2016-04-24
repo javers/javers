@@ -814,4 +814,78 @@ class JaversRepositoryE2ETest extends Specification {
         limit << [1, 50, 99, 200]
     }
 
+    def "should return empty map of commit properties if snapshot was commited without properties"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id :1))
+
+        when:
+        def snapshot = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build()).first()
+
+        then:
+        assert snapshot.commitMetadata.properties.isEmpty()
+    }
+
+    def "should return committed properties"() {
+        given:
+        def commitProperties = [
+            "tenant": "ACME",
+            "sessionId": "1234567890",
+            "device": "smartwatch",
+            "yet another property name": "yet another property value",
+        ]
+        javers.commit("author", commitProperties, new SnapshotEntity(id :1))
+
+        when:
+        def snapshot = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build()).first()
+
+        then:
+        assert snapshot.commitMetadata.properties["tenant"] == "ACME"
+        assert snapshot.commitMetadata.properties["sessionId"] == "1234567890"
+        assert snapshot.commitMetadata.properties["device"] == "smartwatch"
+        assert snapshot.commitMetadata.properties["yet another property name"] == "yet another property value"
+    }
+
+    @Unroll
+    def "should retrieve snapshots with specified commit properties"() {
+        given:
+        javers.commit("author", [ "tenant" : "ACME", "browser": "IE" ], new SnapshotEntity(id: 1))
+        javers.commit("author", [ "tenant" : "Dunder Mifflin", "browser": "IE" ], new SnapshotEntity(id: 2))
+        javers.commit("author", [ "tenant" : "ACME", "browser": "Safari" ], new SnapshotEntity(id: 3))
+        javers.commit("author", [ "tenant" : "Dunder Mifflin", "browser": "Safari" ], new SnapshotEntity(id: 4))
+        javers.commit("author", [ "tenant" : "Dunder Mifflin", "browser": "Chrome" ], new SnapshotEntity(id: 5))
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        assert snapshots*.getPropertyValue("id") as Set == expectedSnapshotIds as Set
+
+        where:
+        query << [
+            byClass(SnapshotEntity.class).withCommitProperty("tenant", "Dunder Mifflin").build(),
+            byClass(SnapshotEntity.class).withCommitProperty("browser", "Safari").build(),
+            byClass(SnapshotEntity.class).withCommitProperty("tenant", "ACME").withCommitProperty("browser", "IE").build(),
+            byClass(SnapshotEntity.class).withCommitProperty("tenant", "ACME").withCommitProperty("browser", "Chrome").build()
+        ]
+        expectedSnapshotIds << [
+            [2, 4, 5],
+            [3, 4],
+            [1],
+            []
+        ]
+    }
+
+    def "should handle special characters in commit properties filter"() {
+        given:
+        javers.commit("author", [ "specialCharacters" : "" ], new SnapshotEntity(id: 1))
+        javers.commit("author", [ "specialCharacters" : "!@#\$%^&*()-_=+[{]};:'\"\\|`~,<.>/?§£" ], new SnapshotEntity(id: 2))
+
+        when:
+        def snapshots = javers.findSnapshots(byClass(SnapshotEntity.class).withCommitProperty("specialCharacters", "!@#\$%^&*()-_=+[{]};:'\"\\|`~,<.>/?§£").build())
+
+        then:
+        assert snapshots.size() == 1
+        assert snapshots[0].getPropertyValue("id") == 2
+    }
+
 }

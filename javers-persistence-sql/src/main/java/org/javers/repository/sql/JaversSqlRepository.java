@@ -54,7 +54,7 @@ public class JaversSqlRepository implements JaversRepository {
             throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT, commit.getId());
         }
 
-        long commitPk = commitRepository.save(commit.getAuthor(), commit.getCommitDate(), commit.getId());
+        long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getId());
         cdoSnapshotRepository.save(commitPk, commit.getSnapshots());
     }
 
@@ -67,6 +67,7 @@ public class JaversSqlRepository implements JaversRepository {
     public void setJsonConverter(JsonConverter jsonConverter) {
         globalIdRepository.setJsonConverter(jsonConverter);
         cdoSnapshotRepository.setJsonConverter(jsonConverter);
+        commitRepository.setJsonConverter(jsonConverter);
         finder.setJsonConverter(jsonConverter);
     }
 
