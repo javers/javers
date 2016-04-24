@@ -12,6 +12,8 @@ import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.polyjdbc.core.PolyJDBC;
+import org.polyjdbc.core.dialect.Dialect;
+import org.polyjdbc.core.dialect.MysqlDialect;
 import org.polyjdbc.core.query.Order;
 import org.polyjdbc.core.query.SelectQuery;
 
@@ -26,12 +28,14 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 public class CdoSnapshotFinder {
 
     private final PolyJDBC polyJDBC;
+    private final Dialect dialect;
     private JsonConverter jsonConverter;
     private GlobalIdRepository globalIdRepository;
 
-    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, PolyJDBC polyJDBC) {
+    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, PolyJDBC polyJDBC, Dialect dialect) {
         this.globalIdRepository = globalIdRepository;
         this.polyJDBC = polyJDBC;
+        this.dialect = dialect;
     }
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
@@ -119,7 +123,9 @@ public class CdoSnapshotFinder {
 
     private String prepareSerializedCommitProperty(String propertyName, String propertyValue) {
         String serializedProperty = jsonConverter.toJson(ImmutableMap.of(propertyName, propertyValue));
-        return removeOuterCurlyBraces(serializedProperty);
+        serializedProperty = removeOuterCurlyBraces(serializedProperty);
+        serializedProperty = escapeBackslashes(serializedProperty);
+        return serializedProperty;
     }
 
     private String removeOuterCurlyBraces(String serializedProperty) {
@@ -128,6 +134,15 @@ public class CdoSnapshotFinder {
         } else {
             return serializedProperty;
         }
+    }
+
+    private String escapeBackslashes(String serializedProperty) {
+        if (dialect instanceof MysqlDialect) {
+            serializedProperty = serializedProperty.replace("\\", "\\\\\\\\");
+        } else {
+            serializedProperty = serializedProperty.replace("\\", "\\\\");
+        }
+        return serializedProperty;
     }
 
     private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk) {

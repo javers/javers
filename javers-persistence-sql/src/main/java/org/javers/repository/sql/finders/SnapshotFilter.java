@@ -64,10 +64,8 @@ abstract class SnapshotFilter {
     }
 
     void addCommitPropertyCondition(SelectQuery query, String serializedProperty) {
-        // workaround for PolyJDBC aggressive argument replacement. It removes virtually all colons, even in strings.
+        // Workaround for PolyJDBC aggressive argument replacement. It removes virtually all colons, even in strings.
         serializedProperty = serializedProperty.replace(":", "_");
-        // backslashes escaping
-        serializedProperty = serializedProperty.replace("\\", "\\\\");
         query.append(" AND " + COMMIT_PROPERTIES + " LIKE '%" + serializedProperty + "%'");
     }
 
