@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
-import static org.javers.core.metamodel.type.JaversType.DEFAULT_TYPE_PARAMETER;
 
 /**
  * @author bartosz walacik

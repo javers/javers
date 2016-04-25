@@ -1,8 +1,6 @@
 package org.javers.core.cases
 
 import org.javers.core.JaversBuilder
-import org.javers.core.diff.ListCompareAlgorithm
-import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.metamodel.annotation.Id
 import spock.lang.Specification
 

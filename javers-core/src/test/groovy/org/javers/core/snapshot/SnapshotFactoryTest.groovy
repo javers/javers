@@ -1,8 +1,6 @@
 package org.javers.core.snapshot
 
 import org.javers.common.collections.Arrays
-import org.javers.common.exception.JaversException
-import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.JaversTestBuilder
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata

@@ -6,8 +6,6 @@ import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.annotation.TypeName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
@@ -29,8 +27,6 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public abstract class JaversType {
-    private static final Logger logger = LoggerFactory.getLogger(JaversType.class);
-
     public static final Class DEFAULT_TYPE_PARAMETER = Object.class;
 
     private final Type  baseJavaType;

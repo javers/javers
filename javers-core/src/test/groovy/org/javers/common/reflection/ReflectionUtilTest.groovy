@@ -3,21 +3,14 @@ package org.javers.common.reflection
 import com.google.common.reflect.TypeToken
 import org.javers.core.metamodel.annotation.DiffIgnore
 import org.javers.core.model.DummyIgnoredType
-import org.javers.core.model.DummyUser
 import org.javers.core.model.IgnoredSubType
 import spock.lang.Specification
 import spock.lang.Unroll
-
-import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
 
 /**
  * @author Pawel Cierpiatka
  */
 class ReflectionUtilTest extends Specification {
-    class ReflectionTestModel {
-        List<DummyUser> dummyUserList
-        Set noGenericSet
-    }
 
     def "should detect annotations in a given class and it superclass"(){
         expect:

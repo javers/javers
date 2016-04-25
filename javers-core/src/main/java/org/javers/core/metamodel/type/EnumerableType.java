@@ -5,7 +5,6 @@ import org.javers.common.collections.Optional;
 import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
-import java.util.List;
 
 /**
  * Collection or Array or Map

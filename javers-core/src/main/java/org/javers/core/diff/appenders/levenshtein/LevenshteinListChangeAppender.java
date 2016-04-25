@@ -10,7 +10,6 @@ import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ListType;
-import org.javers.core.metamodel.type.SetType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.List;

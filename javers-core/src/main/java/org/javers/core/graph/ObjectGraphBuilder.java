@@ -138,8 +138,6 @@ class ObjectGraphBuilder {
 
     /**
      * is Set, List or Array of ManagedClasses
-     *
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
      */
     private boolean isContainerOfManagedTypes(JaversType javersType){
         if (! (javersType instanceof ContainerType)) {
@@ -155,8 +153,6 @@ class ObjectGraphBuilder {
 
     /**
      * is Map with ManagedClass on Key or Value position
-     *
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED if property type is not fully parametrized
      */
     private boolean isMapWithManagedTypes(EnumerableType enumerableType) {
         if (! (enumerableType instanceof MapType)) {
