@@ -6,10 +6,7 @@ import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author bartosz walacik
@@ -18,11 +15,6 @@ public class CollectionType extends ContainerType {
 
     public CollectionType(Type baseJavaType) {
         super(baseJavaType);
-    }
-
-    @Override
-    public boolean isFullyParametrized() {
-        return getActualTypeArguments().size() == 1;
     }
 
     @Override

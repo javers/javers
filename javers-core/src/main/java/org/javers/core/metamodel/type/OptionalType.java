@@ -24,11 +24,6 @@ public class OptionalType extends CollectionType {
     }
 
     @Override
-    public boolean isFullyParametrized() {
-        return getActualTypeArguments().size() == 1;
-    }
-
-    @Override
     public Object map(Object sourceOptional_, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentsAreNotNull(sourceOptional_, mapFunction);
 
