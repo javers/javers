@@ -38,16 +38,6 @@ public enum JaversExceptionCode {
 
     SNAPSHOT_NOT_FOUND("snapshot '%s' not found in JaversRepository"),
 
-    /**
-     * JaVers needs to know actual Class of elements stored in your Collections and Maps. <br/>
-     * Wildcards (e.g. Set&lt;?&gt;), unbounded type parameters (e.g. Set&lt;T&gt;) <br/>
-     * or missing parameters (e.g. Set) are defaulted to Object.class.
-     * <br/><br/>
-     * For Collections of Values it's a reasonable guess <br/>
-     * but for Collections of Entities or ValueObjects you should use fully parametrized types (e.g. Set&lt;Person&gt;).
-     */
-    GENERIC_TYPE_NOT_PARAMETRIZED("warning"),
-
     //graph & snapshot
     VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY("found ValueObject on KEY position in Map property '%s'. Please change the key class mapping to Value or Entity"),
 
