@@ -18,6 +18,7 @@ import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.QueryBuilder.anyDomainObject
 import static org.javers.repository.jql.QueryBuilder.byClass
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
@@ -774,16 +775,33 @@ class JaversRepositoryE2ETest extends Specification {
         assert snapshots.size() == snapshotIdentifiers.size()
     }
 
-    def "should query for snapshots made by a given author"() {
+    @Unroll
+    def "should query for #what snapshot committed by a given author"() {
         given:
-        (1..10).each { javers.commit("author_${it % 2}", new SnapshotEntity(id: 1, intProperty: it)) }
+        (1..4).each {
+            def author = it % 2 == 0 ? "Jim" : "Pam";
+            javers.commit(author, new SnapshotEntity(id: it))
+            javers.commit(author, new DummyUserDetails(id: it))
+        }
 
         when:
-        def query = byClass(SnapshotEntity).byAuthor("author_0").build()
-        def snaphots = javers.findSnapshots(query)
+        def snapshots = javers.findSnapshots(query)
 
         then:
-        snaphots*.getPropertyValue('intProperty').sort() == [2, 4, 6, 8, 10]
+        snapshots*.globalId == expectedResult
+
+        where:
+        what << ["Entity", "any"]
+        query << [
+            byClass(SnapshotEntity).byAuthor("Jim").build(),
+            anyDomainObject().byAuthor("Jim").build()
+        ]
+        expectedResult << [
+            [instanceId(4, SnapshotEntity), instanceId(2, SnapshotEntity)],
+            [instanceId(4, DummyUserDetails), instanceId(4, SnapshotEntity),
+             instanceId(2, DummyUserDetails), instanceId(2, SnapshotEntity)]
+        ]
+
     }
 
 }

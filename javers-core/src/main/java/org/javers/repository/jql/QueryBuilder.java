@@ -46,6 +46,19 @@ public class QueryBuilder {
     }
 
     /**
+     * Query for selecting changes (or snapshots) made on any object.
+     * <br/><br/>
+     *
+     * For example, last committed changes can be fetched with:
+     * <pre>
+     * javers.findChanges( QueryBuilder.anyDomainObject().build() );
+     * </pre>
+     */
+    public static QueryBuilder anyDomainObject(){
+        return new QueryBuilder(new AnyDomainObjectFilter());
+    }
+
+    /**
      * Query for selecting changes (or snapshots) made on
      * any object (Entity or ValueObject) of given class.
      * <br/><br/>

@@ -91,6 +91,11 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
+    public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
+        return queryForSnapshots(new BasicDBObject(), Optional.of(queryParams));
+    }
+
+    @Override
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
         return queryForSnapshots(createSnapshotIdentifiersQuery(snapshotIdentifiers), Optional.<QueryParams>empty());
     }
