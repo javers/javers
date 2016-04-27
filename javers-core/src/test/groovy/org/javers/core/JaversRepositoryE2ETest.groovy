@@ -774,4 +774,16 @@ class JaversRepositoryE2ETest extends Specification {
         assert snapshots.size() == snapshotIdentifiers.size()
     }
 
+    def "should query for snapshots made by a given author"() {
+        given:
+        (1..10).each { javers.commit("author_${it % 2}", new SnapshotEntity(id: 1, intProperty: it)) }
+
+        when:
+        def query = byClass(SnapshotEntity).byAuthor("author_0").build()
+        def snaphots = javers.findSnapshots(query)
+
+        then:
+        snaphots*.getPropertyValue('intProperty').sort() == [2, 4, 6, 8, 10]
+    }
+
 }

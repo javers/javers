@@ -114,6 +114,9 @@ public class CdoSnapshotFinder {
         if (queryParams.version().isPresent()) {
             snapshotFilter.addVersionCondition(query, queryParams.version().get());
         }
+        if (queryParams.author().isPresent()) {
+            snapshotFilter.addAuthorCondition(query, queryParams.author().get());
+        }
         query.limit(queryParams.limit(), queryParams.skip());
     }
 

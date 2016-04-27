@@ -14,6 +14,7 @@ public class QueryParamsBuilder {
     private LocalDateTime to;
     private CommitId commitId;
     private Long version;
+    private String author;
 
     private QueryParamsBuilder(int limit) {
         this.limit = limit;
@@ -101,11 +102,19 @@ public class QueryParamsBuilder {
         return this;
     }
 
+    /*
+     * limits results to Snapshots committed by a given author
+     */
+    public QueryParamsBuilder author(String author) {
+        this.author = author;
+        return this;
+    }
+
     private static void checkLimit(int limit) {
         Validate.argumentCheck(limit > 0, "Limit is not a positive number.");
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to, commitId, version);
+        return new QueryParams(limit, skip, from, to, commitId, version, author);
     }
 }
