@@ -251,6 +251,8 @@ public class QueryBuilder {
     /**
      * Limits Snapshots to be fetched from JaversRepository
      * to those with a given commit property.
+     * If this method is called multiple times limits Snapshots
+     * to be fetched to those with all given commit properties.
      */
     public QueryBuilder withCommitProperty(String name, String value) {
         Validate.argumentsAreNotNull(name, value);

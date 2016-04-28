@@ -121,9 +121,7 @@ public class InMemoryRepository implements JaversRepository {
         if (queryParams.hasDates()) {
             snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
         }
-        if (queryParams.hasCommitProperties()) {
-            snapshots = filterSnapshotsByCommitProperties(snapshots, queryParams.commitProperties().get());
-        }
+        snapshots = filterSnapshotsByCommitProperties(snapshots, queryParams.commitProperties());
         return trimResultsToRequestedSlice(snapshots, queryParams.skip(), queryParams.limit());
     }
 

@@ -4,6 +4,7 @@ import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitId;
 import org.joda.time.LocalDateTime;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -84,12 +85,9 @@ public class QueryParams {
     /*
      * filters results to Snapshots with all given commit properties
      */
-    public Optional<Map<String, String>> commitProperties() {
-        return commitProperties;
-    }
-
-    public boolean hasCommitProperties() {
-        return commitProperties.isPresent() && !commitProperties.get().isEmpty();
+    public Map<String, String> commitProperties() {
+        return commitProperties.isPresent() ?
+            commitProperties.get() : Collections.<String, String>emptyMap();
     }
 
     /*

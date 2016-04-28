@@ -3,7 +3,7 @@ package org.javers.repository.sql.pico;
 import org.javers.core.pico.JaversModule;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.finders.CdoSnapshotFinder;
-import org.javers.repository.sql.finders.CdoSnapshotsEnricher;
+import org.javers.repository.sql.finders.CdoSnapshotsBuilder;
 import org.javers.repository.sql.finders.CommitPropertyFinder;
 import org.javers.repository.sql.repositories.CdoSnapshotRepository;
 import org.javers.repository.sql.repositories.CommitMetadataRepository;
@@ -30,7 +30,7 @@ public class JaversSqlModule implements JaversModule {
             CommitMetadataRepository.class,
             CdoSnapshotRepository.class,
             CdoSnapshotFinder.class,
-            CdoSnapshotsEnricher.class,
+            CdoSnapshotsBuilder.class,
             CommitPropertyFinder.class
     };
 

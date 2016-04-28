@@ -281,9 +281,7 @@ public class MongoRepository implements JaversRepository {
             if (params.version().isPresent()) {
                 query = addVersionFilter(query, params.version().get());
             }
-            if (params.hasCommitProperties()) {
-                query = addCommitPropertiesFilter(query, params.commitProperties().get());
-            }
+            query = addCommitPropertiesFilter(query, params.commitProperties());
         }
         return query;
     }

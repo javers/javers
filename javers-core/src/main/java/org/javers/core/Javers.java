@@ -55,7 +55,7 @@ public interface Javers {
      */
     Commit commit(String author, Object currentVersion);
 
-    Commit commit(String author, Map<String, String> properties, Object currentVersion);
+    Commit commit(String author, Object currentVersion, Map<String, String> properties);
 
     /**
      * Marks given object as deleted.

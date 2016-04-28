@@ -5,7 +5,10 @@ import org.javers.common.validation.Validate;
 import org.joda.time.LocalDateTime;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Collections.unmodifiableMap;
 
 public class CommitMetadata implements Serializable {
 
@@ -18,7 +21,7 @@ public class CommitMetadata implements Serializable {
         Validate.argumentsAreNotNull(author, properties, commitDate, id);
 
         this.author = author;
-        this.properties = properties;
+        this.properties = new HashMap<>(properties);
         this.commitDate = commitDate;
         this.id = id;
     }
@@ -28,7 +31,7 @@ public class CommitMetadata implements Serializable {
     }
 
     public Map<String, String> getProperties() {
-        return properties;
+        return unmodifiableMap(properties);
     }
 
     public LocalDateTime getCommitDate() {

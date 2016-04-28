@@ -61,11 +61,11 @@ class JaversCore implements Javers {
 
     @Override
     public Commit commit(String author, Object currentVersion) {
-        return commit(author, Collections.<String, String>emptyMap(), currentVersion);
+        return commit(author, currentVersion, Collections.<String, String>emptyMap());
     }
 
     @Override
-    public Commit commit(String author, Map<String, String> properties, Object currentVersion) {
+    public Commit commit(String author, Object currentVersion, Map<String, String> properties) {
         argumentsAreNotNull(author, properties, currentVersion);
 
         JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
