@@ -55,8 +55,8 @@ class JaversTransactionalDecorator implements Javers {
 
     @Override
     @Transactional
-    public Commit commit(String author, Object currentVersion, Map<String, String> properties) {
-        return delegate.commit(author, currentVersion, properties);
+    public Commit commit(String author, Object currentVersion, Map<String, String> commitProperties) {
+        return delegate.commit(author, currentVersion, commitProperties);
     }
 
     @Override
@@ -67,8 +67,8 @@ class JaversTransactionalDecorator implements Javers {
 
     @Override
     @Transactional
-    public Commit commitShallowDelete(String author, Map<String, String> properties, Object deleted) {
-        return delegate.commitShallowDelete(author, properties, deleted);
+    public Commit commitShallowDelete(String author, Object deleted, Map<String, String> properties) {
+        return delegate.commitShallowDelete(author, deleted, properties);
     }
 
 
@@ -80,8 +80,8 @@ class JaversTransactionalDecorator implements Javers {
 
     @Override
     @Transactional
-    public Commit commitShallowDeleteById(String author, Map<String, String> properties, GlobalIdDTO globalId) {
-        return delegate.commitShallowDeleteById(author, properties, globalId);
+    public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties) {
+        return delegate.commitShallowDeleteById(author, globalId, properties);
     }
 
     @Override

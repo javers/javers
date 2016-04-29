@@ -249,10 +249,11 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits Snapshots to be fetched from JaversRepository
+     * Limits snapshots (or changes) to be fetched from JaversRepository
      * to those with a given commit property.
-     * If this method is called multiple times limits Snapshots
-     * to be fetched to those with all given commit properties.
+     * <br/>
+     * If this method is called multiple times,
+     * all given properties must match with persisted commit properties.
      */
     public QueryBuilder withCommitProperty(String name, String value) {
         Validate.argumentsAreNotNull(name, value);
@@ -261,8 +262,8 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits Snapshots to be fetched from JaversRepository
-     * to those with a given version.
+     * Limits snapshots (or changes) to be fetched from JaversRepository
+     * to those with a given snapshot version.
      */
     public QueryBuilder withVersion(long version) {
         Validate.argumentCheck(version > 0, "Version is not a positive number.");

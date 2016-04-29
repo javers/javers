@@ -18,6 +18,7 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
+import org.javers.repository.jql.QueryBuilder;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -51,11 +52,21 @@ public interface Javers {
      * You can capture a state of an arbitrary complex object graph with a single commit() call.
      *
      * @see <a href="http://javers.org/documentation/repository-examples/">http://javers.org/documentation/repository-examples</a>
+     * @param author current user
      * @param currentVersion standalone object or handle to an object graph
      */
     Commit commit(String author, Object currentVersion);
 
-    Commit commit(String author, Object currentVersion, Map<String, String> properties);
+    /**
+     * Variant of {@link #commit(String, Object)} with commitProperties.
+     * <br/>
+     * You can pass arbitrary commit properties and
+     * use them in JQL to search for snapshots or changes.
+     *
+     * @see QueryBuilder#withCommitProperty(String, String)
+     * @param commitProperties for example ["channel":"web", "locale":"pl-PL"]
+     */
+    Commit commit(String author, Object currentVersion, Map<String, String> commitProperties);
 
     /**
      * Marks given object as deleted.
@@ -66,13 +77,19 @@ public interface Javers {
      * <br/><br/>
      *
      * This method doesn't delete anything from JaVers repository.
-     * It just persists 'terminal snapshot' of given object.
+     * It just persists 'terminal snapshot' of a given object.
      *
      * @param deleted object to be marked as deleted
      */
     Commit commitShallowDelete(String author, Object deleted);
 
-    Commit commitShallowDelete(String author, Map<String, String> properties, Object deleted);
+    /**
+     * Variant of {@link #commitShallowDelete(String, Object)} with commitProperties.
+     * <br/>
+     *
+     * See {@link #commit(String, Object, Map)} for commitProperties description.
+     */
+    Commit commitShallowDelete(String author, Object deleted, Map<String, String> commitProperties);
 
     /**
      * The same like {@link #commitShallowDelete(String,Object)}
@@ -80,7 +97,13 @@ public interface Javers {
      */
     Commit commitShallowDeleteById(String author, GlobalIdDTO globalId);
 
-    Commit commitShallowDeleteById(String author, Map<String, String> properties, GlobalIdDTO globalId);
+    /**
+     * Variant of {@link #commitShallowDeleteById(String, GlobalIdDTO)} with commitProperties.
+     * <br/>
+     *
+     * See {@link #commit(String, Object, Map)} for commitProperties description.
+     */
+    Commit commitShallowDeleteById(String author, GlobalIdDTO globalId, Map<String, String> commitProperties);
 
     /**
      * <h2>Deep compare</h2>

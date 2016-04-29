@@ -65,8 +65,8 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public Commit commit(String author, Object currentVersion, Map<String, String> properties) {
-        argumentsAreNotNull(author, properties, currentVersion);
+    public Commit commit(String author, Object currentVersion, Map<String, String> commitProperties) {
+        argumentsAreNotNull(author, commitProperties, currentVersion);
 
         JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
         if (jType instanceof ValueType || jType instanceof PrimitiveType){
@@ -74,7 +74,7 @@ class JaversCore implements Javers {
                 jType.getClass().getSimpleName(), currentVersion.getClass().getSimpleName());
         }
 
-        Commit commit = commitFactory.create(author, properties, currentVersion);
+        Commit commit = commitFactory.create(author, commitProperties, currentVersion);
 
         repository.persist(commit);
         logger.info(commit.toString());
@@ -83,11 +83,11 @@ class JaversCore implements Javers {
 
     @Override
     public Commit commitShallowDelete(String author, Object deleted) {
-        return commitShallowDelete(author, Collections.<String, String>emptyMap(), deleted);
+        return commitShallowDelete(author, deleted, Collections.<String, String>emptyMap());
     }
 
     @Override
-    public Commit commitShallowDelete(String author, Map<String, String> properties, Object deleted) {
+    public Commit commitShallowDelete(String author, Object deleted, Map<String, String> properties) {
         argumentsAreNotNull(author, properties, deleted);
 
         Commit commit = commitFactory.createTerminal(author, properties, deleted);
@@ -99,12 +99,12 @@ class JaversCore implements Javers {
 
     @Override
     public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId) {
-        return  commitShallowDeleteById(author, Collections.<String, String>emptyMap(), globalId);
+        return  commitShallowDeleteById(author, globalId, Collections.<String, String>emptyMap());
     }
 
 
     @Override
-    public Commit commitShallowDeleteById(String author, Map<String, String> properties, GlobalIdDTO globalId) {
+    public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties) {
         argumentsAreNotNull(author, properties, globalId);
 
         Commit commit = commitFactory.createTerminalByGlobalId(author, properties, globalIdFactory.createFromDto(globalId));
