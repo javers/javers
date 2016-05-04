@@ -9,11 +9,14 @@ import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -58,9 +61,15 @@ public class JaversMongoAutoConfiguration {
                 .build();
     }
 
-    @Bean
+    @Bean(name = "authorProvider")
+    @ConditionalOnClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
+    public AuthorProvider springSecurityAuthorProvider() {
+        return new SpringSecurityAuthorProvider();
+    }
+
+    @Bean(name = "authorProvider")
     @ConditionalOnMissingBean
-    public AuthorProvider authorProvider() {
+    public AuthorProvider unknownAuthorProvider() {
         return new AuthorProvider() {
             public String provide() {
                 return "unknown";

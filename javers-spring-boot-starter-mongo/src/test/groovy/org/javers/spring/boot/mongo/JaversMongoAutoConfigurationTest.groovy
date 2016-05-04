@@ -3,6 +3,8 @@ package org.javers.spring.boot.mongo
 import org.javers.core.Javers
 import org.javers.core.metamodel.type.EntityType
 import org.javers.repository.jql.QueryBuilder
+import org.javers.spring.auditable.AuthorProvider
+import org.javers.spring.auditable.SpringSecurityAuthorProvider
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,6 +25,9 @@ class JaversMongoAutoConfigurationTest {
 
     @Autowired
     JaversProperties javersProperties
+
+    @Autowired
+    AuthorProvider provider
 
     @Test
     void shouldAutowireJaversInstance() {
@@ -54,4 +59,10 @@ class JaversMongoAutoConfigurationTest {
     void shouldReadBeanMappingStyleFromYml() {
         assert javers.getTypeMapping(DummyEntity) instanceof EntityType
     }
+
+    @Test
+    void shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath() {
+        assert provider instanceof SpringSecurityAuthorProvider
+    }
+
 }

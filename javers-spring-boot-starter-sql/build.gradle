@@ -9,4 +9,5 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testCompile 'org.springframework.data:spring-data-commons:1.10.2.RELEASE'
     testCompile 'com.h2database:h2:1.4.187'
+    testCompile 'org.springframework.security:spring-security-core:4.0.3.RELEASE'
 }
