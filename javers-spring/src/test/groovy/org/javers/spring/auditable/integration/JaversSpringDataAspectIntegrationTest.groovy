@@ -46,7 +46,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
 
         snapshots.size() == 1
         snapshots[0].initial
-        snapshots[0].commitMetadata.author == "unknown"
+        snapshots[0].commitMetadata.author == "unauthenticated"
     }
 
     def "should create a new version when creating few objects via audited repository"() {
