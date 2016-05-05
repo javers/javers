@@ -6,6 +6,7 @@ import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -55,21 +56,13 @@ public class JaversSpringMongoApplicationConfig {
     }
 
     /**
-     * Required by Repository auto-audit aspect. <br/><br/>
+     * Required by auto-audit aspect. <br/><br/>
      *
-     * Returns mock implementation for testing.
-     * <br/>
-     * Provide real implementation,
-     * when using Spring Security you can use
-     * {@link org.javers.spring.auditable.SpringSecurityAuthorProvider}.
+     * Creates {@link SpringSecurityAuthorProvider} instance,
+     * suitable when using Spring Security
      */
     @Bean
     public AuthorProvider authorProvider() {
-        return new AuthorProvider() {
-            @Override
-            public String provide() {
-                return "unknown";
-            }
-        };
+        return new SpringSecurityAuthorProvider();
     }
 }
