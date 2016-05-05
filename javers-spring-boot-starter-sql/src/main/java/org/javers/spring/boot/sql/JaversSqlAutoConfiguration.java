@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -82,6 +83,7 @@ public class JaversSqlAutoConfiguration {
 
 
     @Bean(name = "authorProvider")
+    @ConditionalOnMissingBean
     @ConditionalOnClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
     public AuthorProvider springSecurityAuthorProvider() {
         return new SpringSecurityAuthorProvider();
@@ -89,6 +91,7 @@ public class JaversSqlAutoConfiguration {
 
     @Bean(name = "authorProvider")
     @ConditionalOnMissingBean
+    @ConditionalOnMissingClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
     public AuthorProvider unknownAuthorProvider() {
         return new AuthorProvider() {
             public String provide() {

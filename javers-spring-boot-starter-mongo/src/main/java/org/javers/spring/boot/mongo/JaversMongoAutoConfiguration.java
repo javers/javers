@@ -62,6 +62,7 @@ public class JaversMongoAutoConfiguration {
     }
 
     @Bean(name = "authorProvider")
+    @ConditionalOnMissingBean
     @ConditionalOnClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
     public AuthorProvider springSecurityAuthorProvider() {
         return new SpringSecurityAuthorProvider();
@@ -69,6 +70,7 @@ public class JaversMongoAutoConfiguration {
 
     @Bean(name = "authorProvider")
     @ConditionalOnMissingBean
+    @ConditionalOnMissingClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
     public AuthorProvider unknownAuthorProvider() {
         return new AuthorProvider() {
             public String provide() {
