@@ -133,7 +133,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Filters to snapshots with a given property on changed properties list.
+     * Filters to snapshots (or changes) with a given property on changed properties list.
      *
      * @see CdoSnapshot#getChanged()
      */
@@ -166,7 +166,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits number of Snapshots to be fetched from JaversRepository, default is 100.
+     * Limits number of snapshots to be fetched from JaversRepository, default is 100.
      * <br/>
      * Always choose reasonable limits to improve performance of your queries,
      * production database could contain more records than you expect.
@@ -177,7 +177,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Sets the number of Snapshots to skip.
+     * Sets the number of snapshots to skip.
      * Use skip() and limit() for for paging.
      */
     public QueryBuilder skip(int skip) {
@@ -186,14 +186,15 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits Snapshots to be fetched from JaversRepository
+     * Limits snapshots (or changes) to be fetched from JaversRepository
      * to those created after (>=) given date.
      * <br/><br/>
      *
      * <h2>CommitDate is local datetime</h2>
      * Please remember that commitDate is persisted as LocalDateTime
      * (without information about time zone and daylight saving time).
-     * <br/
+     * <br/><br/>
+     *
      * It may affects your query results. For example,
      * once a year when DST ends,
      * one hour is repeated (clock goes back from 3 am to 2 am).
@@ -215,7 +216,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits Snapshots to be fetched from JaversRepository
+     * Limits snapshots (or changes) to be fetched from JaversRepository
      * to those created before (<=) given date.
      */
     public QueryBuilder to(LocalDateTime to) {
@@ -231,7 +232,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits Snapshots to be fetched from JaversRepository
+     * Limits snapshots (or changes) to be fetched from JaversRepository
      * to those with a given commitId.
      */
     public QueryBuilder withCommitId(CommitId commitId) {
