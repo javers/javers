@@ -6,8 +6,6 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 public class CdoSnapshotSerialized {
-    private Object commitPK;
-
     //commitMetadata
     private Map<String, String> commitProperties;
     private String commitAuthor;
@@ -27,11 +25,6 @@ public class CdoSnapshotSerialized {
     private String ownerGlobalIdFragment;
     private String ownerGlobalIdLocalId;
     private String ownerGlobalIdTypeName;
-
-    public CdoSnapshotSerialized withCommitPK(Object commitPK) {
-        this.commitPK = commitPK;
-        return this;
-    }
 
     public CdoSnapshotSerialized withCommitProperties(Map<String, String> commitProperties) {
         this.commitProperties = commitProperties;
@@ -101,10 +94,6 @@ public class CdoSnapshotSerialized {
     public CdoSnapshotSerialized withOwnerGlobalIdTypeName(String ownerGlobalIdTypeName) {
         this.ownerGlobalIdTypeName = ownerGlobalIdTypeName;
         return this;
-    }
-
-    public Object getCommitPK() {
-        return commitPK;
     }
 
     public Map<String, String> getCommitProperties() {

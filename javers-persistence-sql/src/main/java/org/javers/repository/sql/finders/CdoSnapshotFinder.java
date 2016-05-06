@@ -1,6 +1,7 @@
 package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Optional;
+import org.javers.common.collections.Pair;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -77,22 +78,22 @@ public class CdoSnapshotFinder {
     }
 
     private List<CdoSnapshot> fetchCdoSnapshots(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams){
-        List<CdoSnapshotSerialized> serializedSnapshots = queryForCdoSnapshotDTOs(snapshotFilter, queryParams);
+        List<Pair<CdoSnapshotSerialized,Long>> serializedSnapshots = queryForCdoSnapshotDTOs(snapshotFilter, queryParams);
 
         List<CommitPropertyDTO> commitPropertyDTOs =
-                commitPropertyFinder.findCommitPropertiesOfSnaphots(serializedSnapshots);
+                commitPropertyFinder.findCommitPropertiesOfSnaphots(Pair.collectRightAsSet(serializedSnapshots));
 
         cdoSnapshotsEnricher.enrichWithCommitProperties(serializedSnapshots, commitPropertyDTOs);
 
         List<CdoSnapshot> result = new ArrayList<>();
-        for (CdoSnapshotSerialized serializedSnapshot : serializedSnapshots) {
-            result.add(jsonConverter.fromSerializedSnapshot(serializedSnapshot));
+        for (Pair<CdoSnapshotSerialized,Long> serializedSnapshot : serializedSnapshots) {
+            result.add(jsonConverter.fromSerializedSnapshot(serializedSnapshot.left()));
         }
 
         return result;
     }
 
-    private List<CdoSnapshotSerialized> queryForCdoSnapshotDTOs(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams) {
+    private List<Pair<CdoSnapshotSerialized,Long>> queryForCdoSnapshotDTOs(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams) {
         SelectQuery query =  polyJDBC.query().select(snapshotFilter.select());
         snapshotFilter.addFrom(query);
         snapshotFilter.addWhere(query);
