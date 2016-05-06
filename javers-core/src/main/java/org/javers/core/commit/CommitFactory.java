@@ -13,12 +13,13 @@ import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.snapshot.SnapshotFactory;
 import org.javers.core.snapshot.GraphSnapshotFacade;
 import org.javers.core.snapshot.ShadowGraph;
+import org.javers.core.snapshot.SnapshotFactory;
 import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author bartosz walacik
@@ -42,55 +43,38 @@ public class CommitFactory {
         this.snapshotFactory = snapshotFactory;
     }
 
-    public Commit createTerminalByGlobalId(String author, GlobalId removedId){
-        Validate.argumentsAreNotNull(author, removedId);
-
+    public Commit createTerminalByGlobalId(String author, Map<String, String> properties, GlobalId removedId){
+        Validate.argumentsAreNotNull(author, properties, removedId);
         Optional<CdoSnapshot> previousSnapshot = javersRepository.getLatest(removedId);
         if (previousSnapshot.isEmpty()){
             throw new JaversException(JaversExceptionCode.CANT_DELETE_OBJECT_NOT_FOUND,removedId.value());
         }
-
-        CommitMetadata commitMetadata = nextCommit(author);
-
-        CdoSnapshot terminalSnapshot =
-                snapshotFactory.createTerminal(removedId, previousSnapshot.get(), commitMetadata);
-
+        CommitMetadata commitMetadata = nextCommit(author, properties);
+        CdoSnapshot terminalSnapshot = snapshotFactory.createTerminal(removedId, previousSnapshot.get(), commitMetadata);
         Diff diff = diffFactory.singleTerminal(removedId, commitMetadata);
-
         return new Commit(commitMetadata, Lists.asList(terminalSnapshot), diff);
     }
 
-    public Commit createTerminal(String author, Object removed){
-        Validate.argumentsAreNotNull(author, removed);
-
+    public Commit createTerminal(String author, Map<String, String> properties, Object removed){
+        Validate.argumentsAreNotNull(author, properties, removed);
         Cdo removedCdo = liveGraphFactory.createCdo(removed);
-
-        return createTerminalByGlobalId(author, removedCdo.getGlobalId());
+        return createTerminalByGlobalId(author, properties, removedCdo.getGlobalId());
     }
 
-    public Commit create(String author, Object currentVersion){
+    public Commit create(String author, Map<String, String> properties, Object currentVersion){
         Validate.argumentsAreNotNull(author, currentVersion);
-
-        CommitMetadata commitMetadata = nextCommit(author);
-
+        CommitMetadata commitMetadata = nextCommit(author, properties);
         LiveGraph currentGraph = liveGraphFactory.createLiveGraph(currentVersion);
         ShadowGraph latestShadowGraph = graphSnapshotFacade.createLatestShadow(currentGraph);
-
-        //capture current state
-        List<CdoSnapshot> snapshots =
-                graphSnapshotFacade.createGraphSnapshot(currentGraph, latestShadowGraph, commitMetadata);
-
-        //do diff
+        List<CdoSnapshot> snapshots = graphSnapshotFacade.createGraphSnapshot(currentGraph, latestShadowGraph, commitMetadata);
         Diff diff = diffFactory.create(latestShadowGraph, currentGraph, Optional.of(commitMetadata));
-
         return new Commit(commitMetadata, snapshots, diff);
     }
 
-    private CommitMetadata nextCommit(String author){
+    private CommitMetadata nextCommit(String author, Map<String, String> properties){
         CommitId head = javersRepository.getHeadId();
         CommitId newId = commitSeqGenerator.nextId(head);
-
-        return new CommitMetadata(author, dateProvider.now(), newId);
+        return new CommitMetadata(author, properties, dateProvider.now(), newId);
     }
 
 }

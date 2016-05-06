@@ -29,7 +29,10 @@ public class SnapshotFactory {
 
     public CdoSnapshot createTerminal(GlobalId globalId, CdoSnapshot previous, CommitMetadata commitMetadata) {
         ManagedType managedType = typeMapper.getJaversManagedType(globalId);
-        return cdoSnapshot(globalId, commitMetadata, managedType)
+        return cdoSnapshot()
+                .withGlobalId(globalId)
+                .withManagedType(managedType)
+                .withCommitMetadata(commitMetadata)
                 .withType(TERMINAL)
                 .withVersion(previous.getVersion()+1)
                 .build();
@@ -86,8 +89,11 @@ public class SnapshotFactory {
         return  propertyType.map(propertyVal, dehydratorMapFunction, owner);
     }
 
-    private CdoSnapshotBuilder initSnapshotBuilder(CdoWrapper cdoWrapper, CommitMetadata commitMetadata){
-        return cdoSnapshot(cdoWrapper.getGlobalId(), commitMetadata, cdoWrapper.getManagedType());
+    private CdoSnapshotBuilder initSnapshotBuilder(CdoWrapper cdoWrapper, CommitMetadata commitMetadata) {
+        return cdoSnapshot()
+                .withGlobalId(cdoWrapper.getGlobalId())
+                .withCommitMetadata(commitMetadata)
+                .withManagedType(cdoWrapper.getManagedType());
     }
 
     private Object dehydrateProperty(Property property, Object propertyVal, GlobalId id){

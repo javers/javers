@@ -25,7 +25,9 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.javers.common.exception.JaversExceptionCode.COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -59,15 +61,20 @@ class JaversCore implements Javers {
 
     @Override
     public Commit commit(String author, Object currentVersion) {
-        argumentsAreNotNull(author, currentVersion);
+        return commit(author, currentVersion, Collections.<String, String>emptyMap());
+    }
+
+    @Override
+    public Commit commit(String author, Object currentVersion, Map<String, String> commitProperties) {
+        argumentsAreNotNull(author, commitProperties, currentVersion);
 
         JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
         if (jType instanceof ValueType || jType instanceof PrimitiveType){
             throw new JaversException(COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED,
-                    jType.getClass().getSimpleName(), currentVersion.getClass().getSimpleName());
+                jType.getClass().getSimpleName(), currentVersion.getClass().getSimpleName());
         }
 
-        Commit commit = commitFactory.create(author, currentVersion);
+        Commit commit = commitFactory.create(author, commitProperties, currentVersion);
 
         repository.persist(commit);
         logger.info(commit.toString());
@@ -76,9 +83,14 @@ class JaversCore implements Javers {
 
     @Override
     public Commit commitShallowDelete(String author, Object deleted) {
-        argumentsAreNotNull(author, deleted);
+        return commitShallowDelete(author, deleted, Collections.<String, String>emptyMap());
+    }
 
-        Commit commit = commitFactory.createTerminal(author, deleted);
+    @Override
+    public Commit commitShallowDelete(String author, Object deleted, Map<String, String> properties) {
+        argumentsAreNotNull(author, properties, deleted);
+
+        Commit commit = commitFactory.createTerminal(author, properties, deleted);
 
         repository.persist(commit);
         logger.info(commit.toString());
@@ -87,9 +99,15 @@ class JaversCore implements Javers {
 
     @Override
     public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId) {
-        argumentsAreNotNull(author, globalId);
+        return  commitShallowDeleteById(author, globalId, Collections.<String, String>emptyMap());
+    }
 
-        Commit commit = commitFactory.createTerminalByGlobalId(author, globalIdFactory.createFromDto(globalId));
+
+    @Override
+    public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties) {
+        argumentsAreNotNull(author, properties, globalId);
+
+        Commit commit = commitFactory.createTerminalByGlobalId(author, properties, globalIdFactory.createFromDto(globalId));
 
         repository.persist(commit);
         logger.info(commit.toString());

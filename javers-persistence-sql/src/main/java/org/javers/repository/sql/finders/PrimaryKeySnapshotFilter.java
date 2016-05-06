@@ -17,16 +17,6 @@ class PrimaryKeySnapshotFilter extends SnapshotFilter  {
     }
 
     @Override
-    String select() {
-        return BASE_FIELDS;
-    }
-
-    @Override
-    void addFrom(SelectQuery query) {
-        query.from(COMMIT_WITH_SNAPSHOT);
-    }
-
-    @Override
     void addWhere(SelectQuery query) {
         if (propertyName.isPresent()) {
             query.where(pkFieldName + " = :pk " +

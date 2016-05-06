@@ -47,6 +47,7 @@ public class MongoRepository implements JaversRepository {
     public static final String SNAPSHOTS = "jv_snapshots";
     public static final String COMMIT_ID = "commitMetadata.id";
     public static final String COMMIT_DATE = "commitMetadata.commitDate";
+    public static final String COMMIT_PROPERTIES = "commitMetadata.properties";
     public static final String GLOBAL_ID_KEY = "globalId_key";
     public static final String GLOBAL_ID_ENTITY = "globalId.entity";
     public static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
@@ -185,6 +186,10 @@ public class MongoRepository implements JaversRepository {
         return new BasicDBObject(SNAPSHOT_VERSION, version);
     }
 
+    private Bson createCommitPropertyQuery(String propertyName, String propertyValue) {
+        return new BasicDBObject(COMMIT_PROPERTIES + "." + propertyName, propertyValue);
+    }
+
     private Bson createSnapshotIdentifiersQuery(Collection<SnapshotIdentifier> snapshotIdentifiers) {
         Collection<Bson> descFilters = Lists.transform(new ArrayList<>(snapshotIdentifiers), new Function<SnapshotIdentifier, Bson>() {
             @Override
@@ -276,6 +281,7 @@ public class MongoRepository implements JaversRepository {
             if (params.version().isPresent()) {
                 query = addVersionFilter(query, params.version().get());
             }
+            query = addCommitPropertiesFilter(query, params.commitProperties());
         }
         return query;
     }
@@ -304,6 +310,13 @@ public class MongoRepository implements JaversRepository {
 
     private Bson addVersionFilter(Bson query, Long version) {
         return Filters.and(query, createVersionQuery(version));
+    }
+
+    private Bson addCommitPropertiesFilter(Bson query, Map<String, String> commitProperties) {
+        for (Map.Entry<String, String> commitProperty : commitProperties.entrySet()) {
+            query = Filters.and(query, createCommitPropertyQuery(commitProperty.getKey(), commitProperty.getValue()));
+        }
+        return query;
     }
 
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {

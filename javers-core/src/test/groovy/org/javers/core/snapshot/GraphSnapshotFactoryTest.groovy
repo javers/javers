@@ -29,7 +29,7 @@ class GraphSnapshotFactoryTest extends Specification {
     }
 
     CommitMetadata someCommitMetadata(){
-        new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0))
+        new CommitMetadata("kazik", [:], LocalDateTime.now(), new CommitId(1, 0))
     }
 
     def "should not mark snapshot as initial even if not present in previous commit but committed before"() {
@@ -232,7 +232,7 @@ class GraphSnapshotFactoryTest extends Specification {
     def "should reuse existing root snapshot when not changed"() {
         given:
         def cdo = new SnapshotEntity(listOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
-        def firstCommit = javers.commitFactory.create("author",cdo)
+        def firstCommit = javers.commitFactory.create("author",[:],cdo)
         javers.javersRepository.persist(firstCommit)
 
         when:
@@ -250,7 +250,7 @@ class GraphSnapshotFactoryTest extends Specification {
     def "should reuse existing ref snapshots when not changed"() {
         given:
         def cdo = new SnapshotEntity(listOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
-        def firstCommit = javers.commitFactory.create("author",cdo)
+        def firstCommit = javers.commitFactory.create("author",[:],cdo)
         javers.javersRepository.persist(firstCommit)
 
         when:

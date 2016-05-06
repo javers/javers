@@ -3,6 +3,7 @@ package org.javers.repository.sql.schema;
 import org.polyjdbc.core.dialect.Dialect;
 import org.polyjdbc.core.schema.model.RelationBuilder;
 import org.polyjdbc.core.schema.model.Schema;
+import org.polyjdbc.core.util.StringUtils;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -29,6 +30,11 @@ public class FixedSchemaFactory {
     public static final String COMMIT_COMMIT_ID =     "commit_id";
     public static final String COMMIT_PK_SEQ =        "jv_commit_pk_seq";
 
+    public static final String COMMIT_PROPERTY_TABLE_NAME = "jv_commit_property";
+    public static final String COMMIT_PROPERTY_COMMIT_FK =  "commit_fk";
+    public static final String COMMIT_PROPERTY_NAME =       "property_name";
+    public static final String COMMIT_PROPERTY_VALUE =      "property_value";
+
     public static final String SNAPSHOT_TABLE_NAME =   "jv_snapshot";
     public static final String SNAPSHOT_PK =           "snapshot_pk";
     public static final String SNAPSHOT_COMMIT_FK =    "commit_fk";
@@ -53,8 +59,8 @@ public class FixedSchemaFactory {
         foreignKey(tableName, SNAPSHOT_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
-        columnIndex(tableName, SNAPSHOT_GLOBAL_ID_FK, schema);
-        columnIndex(tableName, SNAPSHOT_COMMIT_FK, schema);
+        columnsIndex(tableName, schema, SNAPSHOT_GLOBAL_ID_FK);
+        columnsIndex(tableName, schema, SNAPSHOT_COMMIT_FK);
 
         return schema;
     }
@@ -69,7 +75,23 @@ public class FixedSchemaFactory {
                 .withAttribute().number(COMMIT_COMMIT_ID).withIntegerPrecision(12).withDecimalPrecision(2).and()
                 .build();
 
-        columnIndex(tableName, COMMIT_COMMIT_ID, schema);
+        columnsIndex(tableName, schema, COMMIT_COMMIT_ID);
+
+        return schema;
+    }
+
+    private Schema commitPropertiesTableSchema(Dialect dialect, String tableName) {
+        Schema schema = new Schema(dialect);
+        RelationBuilder relationBuilder = schema.addRelation(tableName);
+        relationBuilder
+            .primaryKey(tableName + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
+            .withAttribute().string(COMMIT_PROPERTY_NAME).withMaxLength(200).and()
+            .withAttribute().string(COMMIT_PROPERTY_VALUE).withMaxLength(200).and();
+        foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder);
+        relationBuilder.build();
+
+        columnsIndex(tableName, schema, COMMIT_PROPERTY_COMMIT_FK);
+        columnsIndex(tableName, schema, COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE);
 
         return schema;
     }
@@ -85,7 +107,7 @@ public class FixedSchemaFactory {
         foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder);
         relationBuilder.build();
 
-        columnIndex(tableName, GLOBAL_ID_LOCAL_ID, schema);
+        columnsIndex(tableName, schema, GLOBAL_ID_LOCAL_ID);
 
         return schema;
     }
@@ -96,8 +118,13 @@ public class FixedSchemaFactory {
                 .foreignKey(tableName + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName).and();
     }
 
-    private void columnIndex(String tableName, String colName, Schema schema){
-        schema.addIndex(tableName+"_"+ colName +"_idx").indexing(colName).on(tableName).build();
+    private void columnsIndex(String tableName, Schema schema, String... colNames){
+        String concatenatedColumnNames = StringUtils.concatenate('_', (Object[]) colNames);
+        schema
+            .addIndex(tableName + "_" + concatenatedColumnNames + "_idx")
+            .indexing(colNames)
+            .on(tableName)
+            .build();
     }
 
     private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder) {
@@ -111,6 +138,7 @@ public class FixedSchemaFactory {
 
         schema.put(GLOBAL_ID_TABLE_NAME, globalIdTableSchema(dialect, GLOBAL_ID_TABLE_NAME));
         schema.put(COMMIT_TABLE_NAME,    commitTableSchema(dialect, COMMIT_TABLE_NAME));
+        schema.put(COMMIT_PROPERTY_TABLE_NAME, commitPropertiesTableSchema(dialect, COMMIT_PROPERTY_TABLE_NAME));
         schema.put(SNAPSHOT_TABLE_NAME,  snapshotTableSchema(dialect, SNAPSHOT_TABLE_NAME));
 
         return schema;

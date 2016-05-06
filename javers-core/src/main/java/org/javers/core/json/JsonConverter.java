@@ -1,6 +1,8 @@
 package org.javers.core.json;
 
 import com.google.gson.*;
+import org.javers.core.json.typeadapter.commit.CdoSnapshotAssembler;
+import org.javers.core.metamodel.object.CdoSnapshot;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
@@ -40,11 +42,13 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 public class JsonConverter {
-    private Gson gson;
+    private final Gson gson;
+    private final CdoSnapshotAssembler cdoSnapshotAssembler;
 
     JsonConverter(Gson gson) {
         argumentsAreNotNull(gson);
         this.gson = gson;
+        this.cdoSnapshotAssembler = new CdoSnapshotAssembler(this);
     }
 
     public String toJson(Object value) {
@@ -59,15 +63,19 @@ public class JsonConverter {
         return gson.fromJson(json, expectedType);
     }
 
-    public JsonElement fromJsonToJsonElement(String json){
-        return gson.fromJson(json, JsonElement.class);
-    }
-
     public Object fromJson(String json, Type expectedType) {
         return gson.fromJson(json, expectedType);
     }
 
+    public JsonElement fromJsonToJsonElement(String json){
+        return gson.fromJson(json, JsonElement.class);
+    }
+
     public <T> T fromJson(JsonElement json, Class<T> expectedType) {
         return gson.fromJson(json, expectedType);
+    }
+
+    public CdoSnapshot fromSerializedSnapshot(CdoSnapshotSerialized cdoSnapshotSerialized) {
+        return fromJson(cdoSnapshotAssembler.assemble(cdoSnapshotSerialized), CdoSnapshot.class);
     }
 }
