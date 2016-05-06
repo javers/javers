@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Optional;
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
@@ -9,10 +10,10 @@ import org.javers.core.metamodel.annotation.TypeName;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.javers.common.reflection.ReflectionUtil.extractActualClassTypeArguments;
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -26,9 +27,11 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public abstract class JaversType {
+    public static final Class DEFAULT_TYPE_PARAMETER = Object.class;
+
     private final Type  baseJavaType;
     private final Class baseJavaClass;
-    private final List<Type> actualTypeArguments;
+    private final List<Type> concreteTypeArguments;
     private final String name;
 
     /**
@@ -39,12 +42,17 @@ public abstract class JaversType {
     }
 
     JaversType(Type baseJavaType, Optional<String> name) {
+        this(baseJavaType, name, 0);
+    }
+
+    JaversType(Type baseJavaType, Optional<String> name, int expectedArgs) {
         Validate.argumentIsNotNull(baseJavaType);
         Validate.argumentIsNotNull(name);
 
         this.baseJavaType = baseJavaType;
         this.baseJavaClass = extractClass(baseJavaType);
-        this.actualTypeArguments = extractActualClassTypeArguments(baseJavaType);
+        this.concreteTypeArguments = Collections.unmodifiableList(
+                buildListOfConcreteTypeArguments(baseJavaType, expectedArgs));
         if (name.isPresent()) {
             this.name = name.get();
         }else {
@@ -96,23 +104,46 @@ public abstract class JaversType {
     }
 
     /**
-     * For generic types, returns a list of actual Class (or generic Class) arguments.
-     * For example, for Set&lt;String&gt, returns [String.class].
-     * <p/>
-     *
-     * For raw types like Set, returns empty List.
-     * <p/>
-     *
-     * Skips unbounded type parameters like
-     * &lt;E&gt;, &lt;?&gt;.
-     * <p/>
+     * For generic types, returns a list of actual Class arguments.
+     * For example, for Set&lt;String&gt, returns String.
+     * Non-concrete (like ?) or missing type arguments like are defaulted to Object.
+     * <br/><br/>
      *
      * For array, returns List with {@link Class#getComponentType()}
-     * <p/>
      */
-     public List<Type> getActualTypeArguments(){
-         return Collections.unmodifiableList(actualTypeArguments);
-     }
+    public List<Type> getConcreteClassTypeArguments() {
+        return concreteTypeArguments;
+    }
+
+    private static List<Type> buildListOfConcreteTypeArguments(Type baseJavaType, int expectedSize) {
+
+        List<Type> allTypeArguments = ReflectionUtil.getAllTypeArguments(baseJavaType);
+
+        List<Type> concreteTypeArguments = new ArrayList<>(expectedSize);
+
+        for (int i=0; i<expectedSize; i++) {
+            Type existingArgument = null;
+            if (!allTypeArguments.isEmpty() && i<allTypeArguments.size()){
+                existingArgument = allTypeArguments.get(i);
+            }
+            concreteTypeArguments.add(getActualClassTypeArgument(existingArgument, baseJavaType));
+        }
+
+        return concreteTypeArguments;
+    }
+
+    private static Type getActualClassTypeArgument(Type existingArgument, Type baseJavaType) {
+        if (existingArgument == null) {
+             return DEFAULT_TYPE_PARAMETER;
+        }
+
+        Optional<Type> concreteType = ReflectionUtil.isConcreteType(existingArgument);
+        if (concreteType.isPresent()) {
+            return concreteType.get();
+        } else {
+            return DEFAULT_TYPE_PARAMETER;
+        }
+    }
 
     /**
      * Type for JSON representation.

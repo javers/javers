@@ -1,5 +1,7 @@
 package org.javers.common.reflection;
 
+import org.javers.common.collections.Lists;
+import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
@@ -163,35 +165,32 @@ public class ReflectionUtil {
     }
 
     /**
-     * Makes sense only for {@link ParameterizedType} and upper-bounded {@link WildcardType}
+     * Makes sense for {@link ParameterizedType}
      */
-    public static List<Type> extractActualClassTypeArguments(Type javaType) {
+    public static List<Type> getAllTypeArguments(Type javaType) {
         if (!(javaType instanceof ParameterizedType)) {
             return Collections.emptyList();
         }
 
-        ParameterizedType parameterizedType = (ParameterizedType)javaType;
+        return Lists.immutableListOf(((ParameterizedType) javaType).getActualTypeArguments());
+    }
 
-        List<Type> result = new ArrayList<>();
-        for (Type t : parameterizedType.getActualTypeArguments() ) {
-
-            if (t instanceof Class || t instanceof ParameterizedType) {
-                result.add(t);
-            } else if (t instanceof WildcardType) {
-                // If the wildcard type has an explicit upper bound (i.e. not Object), we use that
-                WildcardType wildcardType = (WildcardType) t;
-                if (wildcardType.getLowerBounds().length == 0) {
-                    for (Type type : wildcardType.getUpperBounds()) {
-                        if (type instanceof Class && ((Class<?>) type).equals(Object.class)) {
-                            continue;
-                        }
-                        result.add(type);
+    public static Optional<Type> isConcreteType(Type javaType){
+        if (javaType instanceof Class || javaType instanceof ParameterizedType) {
+            return Optional.of(javaType);
+        } else if (javaType instanceof WildcardType) {
+            // If the wildcard type has an explicit upper bound (i.e. not Object), we use that
+            WildcardType wildcardType = (WildcardType) javaType;
+            if (wildcardType.getLowerBounds().length == 0) {
+                for (Type type : wildcardType.getUpperBounds()) {
+                    if (type instanceof Class && ((Class<?>) type).equals(Object.class)) {
+                        continue;
                     }
+                    return Optional.of(type);
                 }
             }
         }
-
-        return Collections.unmodifiableList(result);
+        return Optional.empty();
     }
 
     /**

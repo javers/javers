@@ -9,6 +9,7 @@ import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,14 +59,10 @@ public class JaversMongoAutoConfiguration {
                 .build();
     }
 
-    @Bean
+    @Bean(name = "authorProvider")
     @ConditionalOnMissingBean
-    public AuthorProvider authorProvider() {
-        return new AuthorProvider() {
-            public String provide() {
-                return "unknown";
-            }
-        };
+    public AuthorProvider springSecurityAuthorProvider() {
+        return new SpringSecurityAuthorProvider();
     }
 
     @Bean

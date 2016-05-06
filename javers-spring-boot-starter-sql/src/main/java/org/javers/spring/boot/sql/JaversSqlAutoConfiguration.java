@@ -12,6 +12,7 @@ import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
@@ -79,14 +80,10 @@ public class JaversSqlAutoConfiguration {
     }
 
 
-    @Bean
+    @Bean(name = "authorProvider")
     @ConditionalOnMissingBean
-    public AuthorProvider authorProvider() {
-        return new AuthorProvider() {
-            public String provide() {
-                return "unknown";
-            }
-        };
+    public AuthorProvider springSecurityAuthorProvider() {
+        return new SpringSecurityAuthorProvider();
     }
 
     @Bean

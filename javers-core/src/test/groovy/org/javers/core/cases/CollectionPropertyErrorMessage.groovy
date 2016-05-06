@@ -16,7 +16,7 @@ class CollectionPropertyErrorMessage extends Specification {
         Collection<Person> friends
     }
 
-    def "should not fail for raw Collection properties"(){
+    def "should not fail for raw collection properties"(){
       given:
       def javers = JaversBuilder.javers().build()
       def person1 = new Person(friends: [])

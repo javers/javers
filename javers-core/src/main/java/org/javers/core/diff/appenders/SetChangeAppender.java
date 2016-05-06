@@ -71,6 +71,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
                 calculateEntryChanges(setType, leftValues, rightValues, owner);
 
         if (!entryChanges.isEmpty()) {
+            renderNotParametrizedWarningIfNeeded(setType.getItemType(), "item", "Set", property);
             return new SetChange(pair.getGlobalId(), property.getName(), entryChanges);
         } else {
             return null;

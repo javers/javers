@@ -21,12 +21,7 @@ public class ArrayType extends ContainerType {
     }
 
     @Override
-    public boolean isFullyParametrized() {
-        return true;
-    }
-
-    @Override
-    public List<Type> getActualTypeArguments() {
+    public List<Type> getConcreteClassTypeArguments() {
         return (List)Lists.immutableListOf( getBaseJavaClass().getComponentType() );
     }
 

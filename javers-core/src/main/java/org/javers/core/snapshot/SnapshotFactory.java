@@ -10,7 +10,6 @@ import org.javers.core.metamodel.type.*;
 
 import java.util.Objects;
 
-import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 import static org.javers.common.exception.JaversExceptionCode.NOT_IMPLEMENTED;
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 import static org.javers.core.metamodel.object.SnapshotType.*;
@@ -69,10 +68,6 @@ public class SnapshotFactory {
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
-        if (!propertyType.isFullyParametrized()){
-            throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, propertyType.getBaseJavaType().toString());
-        }
-
         EnumerableFunction dehydratorMapFunction;
         if (propertyType instanceof ContainerType) {
             JaversType itemType = typeMapper.getJaversType( ((ContainerType)propertyType).getItemClass() );

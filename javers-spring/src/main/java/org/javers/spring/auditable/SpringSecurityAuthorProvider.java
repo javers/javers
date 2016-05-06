@@ -4,7 +4,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * @author bartosz walacik
+ * Returns a current user name from Spring Security context
  */
 public class SpringSecurityAuthorProvider implements AuthorProvider {
     @Override

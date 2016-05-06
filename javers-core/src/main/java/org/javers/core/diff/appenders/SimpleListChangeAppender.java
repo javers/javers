@@ -49,6 +49,7 @@ public class SimpleListChangeAppender extends CorePropertyChangeAppender<ListCha
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
+            renderNotParametrizedWarningIfNeeded(listType.getItemType(), "item", "List", property);
             return  new ListChange(pair.getGlobalId(), property.getName(), elementChanges);
         }
         else {
