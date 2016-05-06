@@ -50,7 +50,9 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
 
         ManagedType managedType = typeMapper.getJaversManagedType(duckType, ManagedType.class);
 
-        CdoSnapshotBuilder builder = cdoSnapshot(cdoId, managedType);
+        CdoSnapshotBuilder builder = cdoSnapshot()
+                .withGlobalId(cdoId)
+                .withManagedType(managedType);
         deserializeType(jsonObject, builder);
 
         CdoSnapshotState snapshotState = deserializeSnapshotState(context, stateObject, managedType);

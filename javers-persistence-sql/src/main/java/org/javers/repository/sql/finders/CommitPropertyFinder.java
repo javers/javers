@@ -1,16 +1,13 @@
 package org.javers.repository.sql.finders;
 
 import com.google.common.base.Joiner;
+import org.javers.core.json.CdoSnapshotSerialized;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import java.util.*;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CommitPropertyFinder {
@@ -21,22 +18,9 @@ public class CommitPropertyFinder {
         this.polyJDBC = polyJDBC;
     }
 
-    List<CommitPropertyDTO> findCommitPropertiesOfSnaphots(List<CdoSnapshotDTO> snapshotDTOs) {
-        List<Long> commitPKs = getCommitPKs(snapshotDTOs);
-        return findPropertiesOfCommits(commitPKs);
-    }
+    List<CommitPropertyDTO> findCommitPropertiesOfSnaphots(List<CdoSnapshotSerialized> snapshotDTOs) {
+        Collection<Long> commitPKs = getCommitPKs(snapshotDTOs);
 
-    private List<Long> getCommitPKs(List<CdoSnapshotDTO> snapshotDTOs) {
-        List<Long> commitPKs = new ArrayList<>();
-        for (CdoSnapshotDTO snapshotDTO : snapshotDTOs) {
-            if (!commitPKs.contains(snapshotDTO.getCommitPK())) {
-                commitPKs.add(snapshotDTO.getCommitPK());
-            }
-        }
-        return  commitPKs;
-    }
-
-    List<CommitPropertyDTO> findPropertiesOfCommits(List<Long> commitPKs) {
         if (commitPKs.isEmpty()) {
             return Collections.emptyList();
         }
@@ -57,4 +41,11 @@ public class CommitPropertyFinder {
         });
     }
 
+    private Collection<Long> getCommitPKs(List<CdoSnapshotSerialized> snapshots) {
+        Set<Long> commitPKs = new HashSet<>();
+        for (CdoSnapshotSerialized snapshot : snapshots) {
+            commitPKs.add((Long)snapshot.getCommitPK());
+        }
+        return commitPKs;
+    }
 }

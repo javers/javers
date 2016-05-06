@@ -5,21 +5,21 @@ class CommitPropertyDTO {
     private String name;
     private String value;
 
-    public CommitPropertyDTO(long commitPK, String name, String value) {
+    CommitPropertyDTO(long commitPK, String name, String value) {
         this.commitPK = commitPK;
         this.name = name;
         this.value = value;
     }
 
-    public long getCommitPK() {
+    long getCommitPK() {
         return commitPK;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public String getValue() {
+    String getValue() {
         return value;
     }
 }

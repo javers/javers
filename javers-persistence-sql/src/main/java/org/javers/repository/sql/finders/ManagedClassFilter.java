@@ -19,16 +19,6 @@ class ManagedClassFilter extends SnapshotFilter {
     }
 
     @Override
-    String select() {
-        return BASE_AND_GLOBAL_ID_FIELDS;
-    }
-
-    @Override
-    void addFrom(SelectQuery query) {
-        query.from(COMMIT_WITH_SNAPSHOT_GLOBAL_ID);
-    }
-
-    @Override
     void addWhere(SelectQuery query) {
         query.where(SNAPSHOT_MANAGED_TYPE + " = :managedType ").withArgument("managedType", managedType);
         if (propertyName.isPresent()) {

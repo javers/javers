@@ -5,8 +5,6 @@ import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
-import java.util.Map;
-
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 abstract class SnapshotFilter {
@@ -18,7 +16,7 @@ abstract class SnapshotFilter {
             " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
             " LEFT OUTER JOIN " + GLOBAL_ID_TABLE_NAME + " o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK;
 
-    static final String BASE_FIELDS =
+    private static final String BASE_FIELDS =
         SNAPSHOT_STATE + ", " +
             SNAPSHOT_TYPE + ", " +
             SNAPSHOT_VERSION + ", " +
@@ -34,13 +32,18 @@ abstract class SnapshotFilter {
             "g." + GLOBAL_ID_LOCAL_ID + ", " +
             "g." + GLOBAL_ID_FRAGMENT + ", " +
             "g." + GLOBAL_ID_OWNER_ID_FK + ", " +
+            //"g." + GLOBAL_ID_TYPE_NAME + ", " +
             "o." + GLOBAL_ID_LOCAL_ID + " owner_" + GLOBAL_ID_LOCAL_ID + ", " +
             "o." + GLOBAL_ID_FRAGMENT + " owner_" + GLOBAL_ID_FRAGMENT + ", " +
             "o." + GLOBAL_ID_TYPE_NAME + " owner_" + GLOBAL_ID_TYPE_NAME;
 
-    abstract String select();
+    String select() {
+        return BASE_AND_GLOBAL_ID_FIELDS;
+    }
 
-    abstract void addFrom(SelectQuery query);
+    void addFrom(SelectQuery query) {
+        query.from(COMMIT_WITH_SNAPSHOT_GLOBAL_ID);
+    }
 
     abstract  void addWhere(SelectQuery query);
 
@@ -74,5 +77,4 @@ abstract class SnapshotFilter {
             .withArgument("propertyName_" + propertyName, propertyName)
             .withArgument("propertyValue_" + propertyName, propertyValue);
     }
-
 }

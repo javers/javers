@@ -14,7 +14,6 @@ import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.sql.finders.CdoSnapshotFinder;
-import org.javers.repository.sql.finders.CdoSnapshotsBuilder;
 import org.javers.repository.sql.repositories.CdoSnapshotRepository;
 import org.javers.repository.sql.repositories.CommitMetadataRepository;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
@@ -29,17 +28,13 @@ public class JaversSqlRepository implements JaversRepository {
     private final GlobalIdRepository globalIdRepository;
     private final CdoSnapshotRepository cdoSnapshotRepository;
     private final CdoSnapshotFinder finder;
-    private final CdoSnapshotsBuilder cdoSnapshotsBuilder;
     private final JaversSchemaManager schemaManager;
 
-    public JaversSqlRepository(CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository,
-                               CdoSnapshotRepository cdoSnapshotRepository, CdoSnapshotFinder finder,
-                               CdoSnapshotsBuilder cdoSnapshotsBuilder, JaversSchemaManager schemaManager) {
+    public JaversSqlRepository(CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository, CdoSnapshotRepository cdoSnapshotRepository, CdoSnapshotFinder finder, JaversSchemaManager schemaManager) {
         this.commitRepository = commitRepository;
         this.globalIdRepository = globalIdRepository;
         this.cdoSnapshotRepository = cdoSnapshotRepository;
         this.finder = finder;
-        this.cdoSnapshotsBuilder = cdoSnapshotsBuilder;
         this.schemaManager = schemaManager;
     }
 
@@ -72,7 +67,7 @@ public class JaversSqlRepository implements JaversRepository {
     public void setJsonConverter(JsonConverter jsonConverter) {
         globalIdRepository.setJsonConverter(jsonConverter);
         cdoSnapshotRepository.setJsonConverter(jsonConverter);
-        cdoSnapshotsBuilder.setJsonConverter(jsonConverter);
+        finder.setJsonConverter(jsonConverter);
     }
 
     @Override

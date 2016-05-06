@@ -11,9 +11,9 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CdoSnapshotRepository {
 
-    private PolyJDBC javersPolyJDBC;
+    private final PolyJDBC javersPolyJDBC;
     private JsonConverter jsonConverter;
-    private GlobalIdRepository globalIdRepository;
+    private final GlobalIdRepository globalIdRepository;
 
     public CdoSnapshotRepository(PolyJDBC javersPolyJDBC, GlobalIdRepository globalIdRepository) {
         this.javersPolyJDBC = javersPolyJDBC;

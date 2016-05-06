@@ -18,17 +18,6 @@ public class VoOwnerEntityFilter extends SnapshotFilter {
     }
 
     @Override
-    String select() {
-        return BASE_AND_GLOBAL_ID_FIELDS;
-    }
-
-    @Override
-    void addFrom(SelectQuery query) {
-        query.from(COMMIT_WITH_SNAPSHOT_GLOBAL_ID);
-    }
-
-
-    @Override
     void addWhere(SelectQuery query) {
         query.where("o." + GLOBAL_ID_TYPE_NAME + " = :ownerTypeName").withArgument("ownerTypeName", ownerTypeName)
              .append(" AND g." + GLOBAL_ID_FRAGMENT + " = :fragment").withArgument("fragment", fragment);
