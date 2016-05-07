@@ -1,22 +1,22 @@
-package org.javers.repository.sql
+package org.javers.repository.jql
 
 import org.javers.core.metamodel.annotation.Id
 import org.joda.time.LocalDate
 
-class MigrationEntity {
+class NewPerformanceEntity {
 
     @Id
     int id
 
-    List<MigrationEntity> refs = []
+    List<NewPerformanceEntity> refs = []
 
     List<Integer> intList = [1, 2, 3, 4, 5, 6, 7, 8, 10]
 
-    String str1 = "MigrationEntity.str1"
-    String str2 = "MigrationEntity.str2"
-    String str3 = "MigrationEntity.str3"
-    String str4 = "MigrationEntity.str4"
-    String str5 = "MigrationEntity.str5"
+    String str1 = "NewPerformanceEntity.str1"
+    String str2 = "NewPerformanceEntity.str2"
+    String str3 = "NewPerformanceEntity.str3"
+    String str4 = "NewPerformanceEntity.str4"
+    String str5 = "NewPerformanceEntity.str5"
 
     LocalDate date1 = new LocalDate(2001, 1, 1)
     LocalDate date2 = new LocalDate(2001, 1, 2)
@@ -38,12 +38,12 @@ class MigrationEntity {
         }
     }
 
-    static MigrationEntity produce(int startingId, int n){
-        def root = new MigrationEntity(id:startingId)
+    static NewPerformanceEntity produce(int startingId, int n){
+        def root = new NewPerformanceEntity(id:startingId)
 
         def range = startingId+1..startingId+n
         def children = range.collect{
-            new MigrationEntity(id: it)
+            new NewPerformanceEntity(id: it)
         }
 
         root.refs = children
