@@ -83,7 +83,6 @@ public interface JaversRepository {
      * Snapshots of all objects in reverse chronological order
      *
      * @param queryParams parameters constraining returned list (size limit, date from/to)
-     * @return list of snapshots in reverse chronological order
      */
     List<CdoSnapshot> getSnapshots(QueryParams queryParams);
 

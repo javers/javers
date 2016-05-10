@@ -76,7 +76,7 @@ public class JqlQuery {
         return newObjectChanges;
     }
 
-    boolean isAnyDomainObjectQuery() {
+    boolean isAnyDomainObjectOnlyQuery() {
         return hasFilter(AnyDomainObjectFilter.class) && filters.size() == 1;
     }
 

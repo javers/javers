@@ -49,7 +49,7 @@ public class QueryBuilder {
      * Query for selecting changes (or snapshots) made on any object.
      * <br/><br/>
      *
-     * For example, last committed changes can be fetched with:
+     * For example, last changes committed on any object can be fetched with:
      * <pre>
      * javers.findChanges( QueryBuilder.anyDomainObject().build() );
      * </pre>
@@ -305,6 +305,10 @@ public class QueryBuilder {
         return this;
     }
 
+    /**
+     * Limits Snapshots to be fetched from JaversRepository
+     * to those with a given commit author.
+     */
     public QueryBuilder byAuthor(String author) {
         Validate.argumentIsNotNull(author);
         this.author = author;
