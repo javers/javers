@@ -47,6 +47,7 @@ public class MongoRepository implements JaversRepository {
     public static final String SNAPSHOTS = "jv_snapshots";
     public static final String COMMIT_ID = "commitMetadata.id";
     public static final String COMMIT_DATE = "commitMetadata.commitDate";
+    public static final String COMMIT_AUTHOR = "commitMetadata.author";
     public static final String GLOBAL_ID_KEY = "globalId_key";
     public static final String GLOBAL_ID_ENTITY = "globalId.entity";
     public static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
@@ -87,6 +88,11 @@ public class MongoRepository implements JaversRepository {
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         return getLatest(createIdQuery(globalId));
+    }
+
+    @Override
+    public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
+        return queryForSnapshots(new BasicDBObject(), Optional.of(queryParams));
     }
 
     @Override
@@ -276,6 +282,9 @@ public class MongoRepository implements JaversRepository {
             if (params.version().isPresent()) {
                 query = addVersionFilter(query, params.version().get());
             }
+            if (params.author().isPresent()) {
+                query = addAuthorFilter(query, params.author().get());
+            }
         }
         return query;
     }
@@ -304,6 +313,10 @@ public class MongoRepository implements JaversRepository {
 
     private Bson addVersionFilter(Bson query, Long version) {
         return Filters.and(query, createVersionQuery(version));
+    }
+
+    private Bson addAuthorFilter(Bson query, String author) {
+        return Filters.and(query, new BasicDBObject(COMMIT_AUTHOR, author));
     }
 
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {

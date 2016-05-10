@@ -80,6 +80,13 @@ public interface JaversRepository {
     Optional<CdoSnapshot> getLatest(GlobalId globalId);
 
     /**
+     * Snapshots of all objects in reverse chronological order
+     *
+     * @param queryParams parameters constraining returned list (size limit, date from/to)
+     */
+    List<CdoSnapshot> getSnapshots(QueryParams queryParams);
+
+    /**
      * Snapshots with specified globalId and version
      */
     List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers);

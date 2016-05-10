@@ -39,6 +39,10 @@ public class QueryRunner {
     public List<CdoSnapshot> queryForSnapshots(JqlQuery query){
         Validate.argumentIsNotNull(query);
 
+        if (query.isAnyDomainObjectOnlyQuery()) {
+            return repository.getSnapshots(query.getQueryParams());
+        }
+
         if (query.isIdOnlyQuery()){
             return repository.getStateHistory(fromDto(query.getIdFilter()), query.getQueryParams());
         }
@@ -69,6 +73,10 @@ public class QueryRunner {
 
     public List<Change> queryForChanges(JqlQuery query) {
         Validate.argumentIsNotNull(query);
+
+        if (query.isAnyDomainObjectOnlyQuery()) {
+            return repository.getChanges(query.isNewObjectChanges(), query.getQueryParams());
+        }
 
         if (query.isIdOnlyQuery()){
             return repository.getChangeHistory(fromDto(query.getIdFilter()),

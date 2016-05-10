@@ -48,6 +48,10 @@ public class CdoSnapshotFinder {
         return Optional.of(queryForCdoSnapshots(new SnapshotIdFilter(maxSnapshot.get()), Optional.of(globalId), Optional.of(oneItemLimit)).get(0));
     }
 
+    public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
+        return queryForCdoSnapshots(new AnySnapshotFilter(), Optional.<GlobalId>empty(), Optional.of(queryParams));
+    }
+
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
         return queryForCdoSnapshots(new SnapshotIdentifiersFilter(globalIdRepository, snapshotIdentifiers), Optional.<GlobalId>empty(), Optional.<QueryParams>empty());
     }
@@ -113,6 +117,9 @@ public class CdoSnapshotFinder {
         }
         if (queryParams.version().isPresent()) {
             snapshotFilter.addVersionCondition(query, queryParams.version().get());
+        }
+        if (queryParams.author().isPresent()) {
+            snapshotFilter.addAuthorCondition(query, queryParams.author().get());
         }
         query.limit(queryParams.limit(), queryParams.skip());
     }
