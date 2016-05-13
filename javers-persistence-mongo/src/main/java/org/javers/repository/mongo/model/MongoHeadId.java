@@ -8,7 +8,7 @@ import org.javers.core.commit.CommitId;
  */
 public class MongoHeadId {
     public static final String COLLECTION_NAME = "jv_head_id";
-    public static final String KEY = "id";
+    private static final String KEY = "id";
 
     private final String id;
 

@@ -1,13 +1,11 @@
 package org.javers.repository.jql
 
 import org.javers.core.Javers
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.math.RoundingMode
 
-@Ignore
-class NewPerformanceTest extends Specification{
+class NewPerformanceTest extends Specification {
 
     static int n = 10000
     Javers javers
@@ -20,11 +18,11 @@ class NewPerformanceTest extends Specification{
 
         when:
         n.times {
-            def root =  NewPerformanceEntity.produce(it * 100, 2)
-            javers.commit("author", root, [os:"android", country:"pl"] )
+            def root = NewPerformanceEntity.produce(it * 100, 2)
+            javers.commit("author", root, [os: "android", country: "pl"])
 
             root.change()
-            javers.commit("author", root, [os:"a"+it, country:"de"])
+            javers.commit("author", root, [os: "a" + it, country: "de"])
 
             commitDatabase()
         }
@@ -33,6 +31,7 @@ class NewPerformanceTest extends Specification{
         stop(n)
     }
 
+//    @Ignore
     def "should query - standard queries"() {
         given:
         start()
@@ -46,14 +45,14 @@ class NewPerformanceTest extends Specification{
 
         def n = 30
         n.times {
-            def id = n*100
+            def id = n * 100
             javers.findSnapshots(QueryBuilder.byInstanceId(id, NewPerformanceEntity).build()).size() == 2
             javers.findSnapshots(QueryBuilder.byValueObjectId(id, NewPerformanceEntity, 'vo').build()).size() == 2
             javers.findSnapshots(QueryBuilder.byValueObjectId(id, NewPerformanceEntity, 'anotherVo').build()).size() == 2
         }
 
         then:
-        stop(n*3 + 5)
+        stop(n * 3 + 5)
     }
 
     def "should query - new query by property"() {
@@ -64,32 +63,32 @@ class NewPerformanceTest extends Specification{
         int n = 10
 
         n.times {
-            assert javers.findSnapshots(QueryBuilder.byClass(NewPerformanceEntity).withCommitProperty("os", "a"+it).build()).size() == 3
-            assert javers.findSnapshots(QueryBuilder.byClass(AnotherValueObject).withCommitProperty("os", "a"+it).build()).size() == 3
-            assert javers.findSnapshots(QueryBuilder.byValueObject(NewPerformanceEntity,"vo").withCommitProperty("os", "a"+it).build()).size() == 3
+            assert javers.findSnapshots(QueryBuilder.byClass(NewPerformanceEntity).withCommitProperty("os", "a" + it).build()).size() == 3
+            assert javers.findSnapshots(QueryBuilder.byClass(AnotherValueObject).withCommitProperty("os", "a" + it).build()).size() == 3
+            assert javers.findSnapshots(QueryBuilder.byValueObject(NewPerformanceEntity, "vo").withCommitProperty("os", "a" + it).build()).size() == 3
         }
 
         then:
-        stop(n*3)
+        stop(n * 3)
     }
 
     void start() {
         start = System.currentTimeMillis()
     }
 
-    boolean stop(int times){
+    boolean stop(int times) {
         def stop = System.currentTimeMillis()
 
-        def opAvg = (stop-start)/times
+        def opAvg = (stop - start) / times
 
-        println "total time: "+ round(stop-start)+" ms"
-        println "op avg:     "+ round(opAvg)+" ms"
+        println "total time: " + round(stop - start) + " ms"
+        println "op avg:     " + round(opAvg) + " ms"
 
         true
     }
 
-    String round(def what){
-        new BigDecimal(what).setScale(2,RoundingMode.HALF_UP).toString()
+    String round(def what) {
+        new BigDecimal(what).setScale(2, RoundingMode.HALF_UP).toString()
     }
 
     void clearDatabase() {

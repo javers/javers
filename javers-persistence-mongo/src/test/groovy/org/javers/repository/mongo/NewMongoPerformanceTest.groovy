@@ -10,7 +10,7 @@ import static org.javers.core.JaversBuilder.javers
 class NewMongoPerformanceTest extends NewPerformanceTest {
 
     def setup() {
-        def mongoRepository = new MongoRepository( new MongoClient().getDatabase("j_int_test") )
+        def mongoRepository = new MongoRepository(new MongoClient().getDatabase("j_int_test"))
         javers = javers().registerJaversRepository(mongoRepository).build()
     }
 }

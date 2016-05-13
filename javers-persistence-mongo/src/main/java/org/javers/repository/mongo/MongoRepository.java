@@ -1,5 +1,6 @@
 package org.javers.repository.mongo;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -44,18 +45,18 @@ public class MongoRepository implements JaversRepository {
 
     private static final int DESC = -1;
     private static final int ASC = 1;
-    public static final String SNAPSHOTS = "jv_snapshots";
-    public static final String COMMIT_ID = "commitMetadata.id";
-    public static final String COMMIT_DATE = "commitMetadata.commitDate";
-    public static final String COMMIT_PROPERTIES = "commitMetadata.properties";
-    public static final String GLOBAL_ID_KEY = "globalId_key";
-    public static final String GLOBAL_ID_ENTITY = "globalId.entity";
-    public static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
-    public static final String GLOBAL_ID_FRAGMENT = "globalId.fragment";
-    public static final String GLOBAL_ID_VALUE_OBJECT = "globalId.valueObject";
-    public static final String SNAPSHOT_VERSION = "version";
-    public static final String CHANGED_PROPERTIES = "changedProperties";
-    public static final String OBJECT_ID = "_id";
+    private static final String SNAPSHOTS = "jv_snapshots";
+    private static final String COMMIT_ID = "commitMetadata.id";
+    private static final String COMMIT_DATE = "commitMetadata.commitDate";
+    private static final String COMMIT_PROPERTIES = "commitMetadata.properties";
+    private static final String GLOBAL_ID_KEY = "globalId_key";
+    private static final String GLOBAL_ID_ENTITY = "globalId.entity";
+    private static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
+    private static final String GLOBAL_ID_FRAGMENT = "globalId.fragment";
+    private static final String GLOBAL_ID_VALUE_OBJECT = "globalId.valueObject";
+    private static final String SNAPSHOT_VERSION = "version";
+    private static final String CHANGED_PROPERTIES = "changedProperties";
+    private static final String OBJECT_ID = "_id";
 
     private MongoDatabase mongo;
     private JsonConverter jsonConverter;
@@ -152,6 +153,8 @@ public class MongoRepository implements JaversRepository {
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
+        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC));
+        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".value", ASC));
         headCollection();
 
         //schema migration script from JaVers 1.1 to 1.2
@@ -187,7 +190,10 @@ public class MongoRepository implements JaversRepository {
     }
 
     private Bson createCommitPropertyQuery(String propertyName, String propertyValue) {
-        return new BasicDBObject(COMMIT_PROPERTIES + "." + propertyName, propertyValue);
+        BasicDBList queryList = new BasicDBList();
+        queryList.add(new BasicDBObject(COMMIT_PROPERTIES + ".key", propertyName));
+        queryList.add(new BasicDBObject(COMMIT_PROPERTIES + ".value", propertyValue));
+        return new BasicDBObject("$and", queryList);
     }
 
     private Bson createSnapshotIdentifiersQuery(Collection<SnapshotIdentifier> snapshotIdentifiers) {
