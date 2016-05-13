@@ -153,6 +153,7 @@ public class MongoRepository implements JaversRepository {
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
+        //TODO: below indexes should be replaced with one compound index
         snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC));
         snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".value", ASC));
         headCollection();
@@ -190,10 +191,9 @@ public class MongoRepository implements JaversRepository {
     }
 
     private Bson createCommitPropertyQuery(String propertyName, String propertyValue) {
-        BasicDBList queryList = new BasicDBList();
-        queryList.add(new BasicDBObject(COMMIT_PROPERTIES + ".key", propertyName));
-        queryList.add(new BasicDBObject(COMMIT_PROPERTIES + ".value", propertyValue));
-        return new BasicDBObject("$and", queryList);
+        return Filters.and(new BasicDBObject(COMMIT_PROPERTIES + ".key", propertyName),
+                           new BasicDBObject(COMMIT_PROPERTIES + ".value", propertyValue)
+        );
     }
 
     private Bson createSnapshotIdentifiersQuery(Collection<SnapshotIdentifier> snapshotIdentifiers) {
