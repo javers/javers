@@ -1,6 +1,5 @@
 package org.javers.repository.mongo;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -153,9 +152,7 @@ public class MongoRepository implements JaversRepository {
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
-        //TODO: below indexes should be replaced with one compound index
-        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC));
-        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".value", ASC));
+        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC));
         headCollection();
 
         //schema migration script from JaVers 1.1 to 1.2
@@ -188,12 +185,6 @@ public class MongoRepository implements JaversRepository {
 
     private Bson createVersionQuery(Long version) {
         return new BasicDBObject(SNAPSHOT_VERSION, version);
-    }
-
-    private Bson createCommitPropertyQuery(String propertyName, String propertyValue) {
-        return Filters.and(new BasicDBObject(COMMIT_PROPERTIES + ".key", propertyName),
-                           new BasicDBObject(COMMIT_PROPERTIES + ".value", propertyValue)
-        );
     }
 
     private Bson createSnapshotIdentifiersQuery(Collection<SnapshotIdentifier> snapshotIdentifiers) {
@@ -275,6 +266,7 @@ public class MongoRepository implements JaversRepository {
     private Bson applyQueryParams(Bson query, Optional<QueryParams> queryParams) {
         if (queryParams.isPresent()) {
             QueryParams params = queryParams.get();
+
             if (params.from().isPresent()) {
                 query = addFromDateFiler(query, params.from().get());
             }
@@ -287,7 +279,9 @@ public class MongoRepository implements JaversRepository {
             if (params.version().isPresent()) {
                 query = addVersionFilter(query, params.version().get());
             }
-            query = addCommitPropertiesFilter(query, params.commitProperties());
+            if (!params.commitProperties().isEmpty()) {
+                query = addCommitPropertiesFilter(query, params.commitProperties());
+            }
         }
         return query;
     }
@@ -319,10 +313,17 @@ public class MongoRepository implements JaversRepository {
     }
 
     private Bson addCommitPropertiesFilter(Bson query, Map<String, String> commitProperties) {
+
+        List<Bson> propertyFilters = new ArrayList();
         for (Map.Entry<String, String> commitProperty : commitProperties.entrySet()) {
-            query = Filters.and(query, createCommitPropertyQuery(commitProperty.getKey(), commitProperty.getValue()));
+            BasicDBObject propertyFilter = new BasicDBObject(COMMIT_PROPERTIES,
+                    new BasicDBObject("$elemMatch",
+                            new BasicDBObject("key", commitProperty.getKey()).append(
+                                              "value", commitProperty.getValue())));
+            propertyFilters.add(propertyFilter);
         }
-        return query;
+
+        return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
     }
 
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {

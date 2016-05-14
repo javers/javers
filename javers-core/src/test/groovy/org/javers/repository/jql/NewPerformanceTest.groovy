@@ -1,10 +1,12 @@
 package org.javers.repository.jql
 
 import org.javers.core.Javers
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.math.RoundingMode
 
+@Ignore
 class NewPerformanceTest extends Specification {
 
     static int n = 10000
@@ -22,7 +24,7 @@ class NewPerformanceTest extends Specification {
             javers.commit("author", root, [os: "android", country: "pl"])
 
             root.change()
-            javers.commit("author", root, [os: "a" + it, country: "de"])
+            javers.commit("author", root, [os: "a" + it, lang: "pl", country: "de"])
 
             commitDatabase()
         }
@@ -31,7 +33,6 @@ class NewPerformanceTest extends Specification {
         stop(n)
     }
 
-//    @Ignore
     def "should query - standard queries"() {
         given:
         start()
@@ -63,9 +64,18 @@ class NewPerformanceTest extends Specification {
         int n = 10
 
         n.times {
-            assert javers.findSnapshots(QueryBuilder.byClass(NewPerformanceEntity).withCommitProperty("os", "a" + it).build()).size() == 3
-            assert javers.findSnapshots(QueryBuilder.byClass(AnotherValueObject).withCommitProperty("os", "a" + it).build()).size() == 3
-            assert javers.findSnapshots(QueryBuilder.byValueObject(NewPerformanceEntity, "vo").withCommitProperty("os", "a" + it).build()).size() == 3
+            assert javers.findSnapshots(QueryBuilder.byClass(NewPerformanceEntity)
+                    .withCommitProperty("os", "a" + it)
+                    .build()).size() == 3
+            assert javers.findSnapshots(QueryBuilder.byClass(AnotherValueObject)
+                    .withCommitProperty("lang", "pl")
+                    .withCommitProperty("os", "a" + it)
+                    .build()).size() == 3
+            assert javers.findSnapshots(QueryBuilder.byValueObject(NewPerformanceEntity, "vo")
+                    .withCommitProperty("country", "de")
+                    .withCommitProperty("lang", "pl")
+                    .withCommitProperty("os", "a" + it)
+                    .build()).size() == 3
         }
 
         then:
