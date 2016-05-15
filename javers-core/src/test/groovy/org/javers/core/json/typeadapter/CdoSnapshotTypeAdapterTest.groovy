@@ -5,9 +5,9 @@ import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.metamodel.object.CdoSnapshot
-import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
+import org.javers.repository.jql.ValueObjectIdDTO
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
@@ -128,7 +128,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     def "should deserialize CdoSnapshot"() {
         given:
         def changed = ["name", "age"]
-        def commitProperties = ["name" : "value"]
+        def commitProperties = [["key" : "os", "value" : "Solaris"]]
         def json = new JsonBuilder()
         json {
             commitMetadata {
@@ -154,7 +154,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         then:
         snapshot.commitMetadata.id.value() == "1.0"
         snapshot.commitMetadata.author == "author"
-        snapshot.commitMetadata.properties == ["name" : "value"]
+        snapshot.commitMetadata.properties == ["os" : "Solaris"]
         snapshot.commitMetadata.commitDate == new LocalDateTime(2000,1,1,12,0)
         snapshot.globalId == instanceId("kaz",DummyUser)
         snapshot.initial == true

@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.core.json.JsonConverter;
+
 import static org.javers.core.json.typeadapter.commit.CdoSnapshotTypeAdapter.*;
 import static org.javers.core.json.typeadapter.commit.CommitMetadataTypeAdapter.*;
 import static org.javers.core.json.typeadapter.commit.GlobalIdTypeAdapter.*;
@@ -68,7 +69,7 @@ public class CdoSnapshotAssembler {
     private JsonElement assembleCommitMetadata(CdoSnapshotSerialized snapshot) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty(AUTHOR, snapshot.getCommitAuthor());
-        jsonObject.add(PROPERTIES, jsonConverter.toJsonElement(snapshot.getCommitProperties()));
+        jsonObject.add(PROPERTIES, CommitPropertiesConverter.toJson(snapshot.getCommitProperties()));
         jsonObject.add(COMMIT_DATE, jsonConverter.toJsonElement(snapshot.getCommitDate()));
         jsonObject.add(COMMIT_ID, jsonConverter.toJsonElement(snapshot.getCommitId()));
 
