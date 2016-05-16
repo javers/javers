@@ -44,6 +44,11 @@ public class JaversSqlRepository implements JaversRepository {
     }
 
     @Override
+    public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
+        return finder.getSnapshots(queryParams);
+    }
+
+    @Override
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
         return finder.getSnapshots(snapshotIdentifiers);
     }

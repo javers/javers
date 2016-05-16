@@ -67,6 +67,11 @@ abstract class SnapshotFilter {
             .withArgument("version", version);
     }
 
+    void addAuthorCondition(SelectQuery query, String author) {
+        query.append(" AND " + COMMIT_AUTHOR + " = :author")
+            .withArgument("author", author);
+    }
+
     void addCommitPropertyCondition(SelectQuery query, String propertyName, String propertyValue) {
         query.append(" AND EXISTS (" +
             "SELECT * FROM " + COMMIT_PROPERTY_TABLE_NAME +

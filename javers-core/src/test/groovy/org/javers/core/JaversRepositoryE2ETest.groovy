@@ -18,6 +18,7 @@ import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.QueryBuilder.anyDomainObject
 import static org.javers.repository.jql.QueryBuilder.byClass
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
@@ -814,6 +815,34 @@ class JaversRepositoryE2ETest extends Specification {
         limit << [1, 50, 99, 200]
     }
 
+    @Unroll
+    def "should query for #what snapshot committed by a given author"() {
+        given:
+        (1..4).each {
+            def author = it % 2 == 0 ? "Jim" : "Pam";
+            javers.commit(author, new SnapshotEntity(id: it))
+            javers.commit(author, new DummyUserDetails(id: it))
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots*.globalId == expectedResult
+
+        where:
+        what << ["Entity", "any"]
+        query << [
+            byClass(SnapshotEntity).byAuthor("Jim").build(),
+            anyDomainObject().byAuthor("Jim").build()
+        ]
+        expectedResult << [
+            [instanceId(4, SnapshotEntity), instanceId(2, SnapshotEntity)],
+            [instanceId(4, DummyUserDetails), instanceId(4, SnapshotEntity),
+             instanceId(2, DummyUserDetails), instanceId(2, SnapshotEntity)]
+        ]
+    }
+
     def "should return empty map of commit properties if snapshot was commited without properties"() {
         given:
         javers.commit("author", new SnapshotEntity(id :1))
@@ -877,8 +906,8 @@ class JaversRepositoryE2ETest extends Specification {
 
     def "should handle special characters in commit properties filter"() {
         given:
-        javers.commit("author", new SnapshotEntity(id: 1), [ "specialCharacters" : "" ])
-        javers.commit("author", new SnapshotEntity(id: 2), [ "specialCharacters" : "!@#\$%^&*()-_=+[{]};:'\"\\|`~,<.>/?§£" ])
+        javers.commit("author", new SnapshotEntity(id: 1), ["specialCharacters": ""])
+        javers.commit("author", new SnapshotEntity(id: 2), ["specialCharacters": "!@#\$%^&*()-_=+[{]};:'\"\\|`~,<.>/?§£"])
 
         when:
         def snapshots = javers.findSnapshots(byClass(SnapshotEntity).withCommitProperty("specialCharacters", "!@#\$%^&*()-_=+[{]};:'\"\\|`~,<.>/?§£").build())

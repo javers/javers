@@ -57,47 +57,54 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     public List<Change> getChangeHistory(GlobalId globalId, boolean newObjects, QueryParams queryParams) {
-        argumentsAreNotNull(globalId);
+        argumentsAreNotNull(globalId, queryParams);
 
         List<CdoSnapshot> snapshots = getStateHistory(globalId, queryParams);
         return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
     }
 
     public List<Change> getChangeHistory(ManagedType givenClass, boolean newObjects, QueryParams queryParams) {
-        argumentsAreNotNull(givenClass);
+        argumentsAreNotNull(givenClass, queryParams);
 
         List<CdoSnapshot> snapshots = getStateHistory(givenClass, queryParams);
         return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
     }
 
     public List<Change> getValueObjectChangeHistory(EntityType ownerEntity, String path, boolean newObjects, QueryParams queryParams) {
-        argumentsAreNotNull(ownerEntity, path);
+        argumentsAreNotNull(ownerEntity, path, queryParams);
 
         List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntity, path, queryParams);
         return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
     }
 
+    public List<Change> getChanges(boolean newObjects, QueryParams queryParams) {
+        argumentsAreNotNull(queryParams);
+
+        List<CdoSnapshot> snapshots = getSnapshots(queryParams);
+        return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
+    }
+
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        argumentIsNotNull(globalId);
+        argumentsAreNotNull(globalId, queryParams);
         return delegate.getStateHistory(globalId, queryParams);
     }
 
     @Override
     public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, QueryParams queryParams) {
-        argumentsAreNotNull(globalId, propertyName);
+        argumentsAreNotNull(globalId, propertyName, queryParams);
         return delegate.getPropertyStateHistory(globalId, propertyName, queryParams);
     }
 
     @Override
     public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
-        argumentsAreNotNull(givenClass, propertyName);
+        argumentsAreNotNull(givenClass, propertyName, queryParams);
         return delegate.getPropertyStateHistory(givenClass, propertyName, queryParams);
     }
 
     @Override
     public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
-        argumentsAreNotNull(ownerEntity, path);
+        argumentsAreNotNull(ownerEntity, path, queryParams);
         return delegate.getValueObjectStateHistory(ownerEntity, path, queryParams);
     }
 
@@ -105,6 +112,12 @@ public class JaversExtendedRepository implements JaversRepository {
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         argumentIsNotNull(globalId);
         return delegate.getLatest(globalId);
+    }
+
+    @Override
+    public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
+        argumentsAreNotNull(queryParams);
+        return delegate.getSnapshots(queryParams);
     }
 
     @Override

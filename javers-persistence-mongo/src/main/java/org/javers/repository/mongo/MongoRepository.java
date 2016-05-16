@@ -44,9 +44,11 @@ public class MongoRepository implements JaversRepository {
 
     private static final int DESC = -1;
     private static final int ASC = 1;
+
     private static final String SNAPSHOTS = "jv_snapshots";
     private static final String COMMIT_ID = "commitMetadata.id";
     private static final String COMMIT_DATE = "commitMetadata.commitDate";
+    private static final String COMMIT_AUTHOR = "commitMetadata.author";
     private static final String COMMIT_PROPERTIES = "commitMetadata.properties";
     private static final String GLOBAL_ID_KEY = "globalId_key";
     private static final String GLOBAL_ID_ENTITY = "globalId.entity";
@@ -88,6 +90,11 @@ public class MongoRepository implements JaversRepository {
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         return getLatest(createIdQuery(globalId));
+    }
+
+    @Override
+    public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
+        return queryForSnapshots(new BasicDBObject(), Optional.of(queryParams));
     }
 
     @Override
@@ -279,6 +286,9 @@ public class MongoRepository implements JaversRepository {
             if (params.version().isPresent()) {
                 query = addVersionFilter(query, params.version().get());
             }
+            if (params.author().isPresent()) {
+                query = addAuthorFilter(query, params.author().get());
+            }
             if (!params.commitProperties().isEmpty()) {
                 query = addCommitPropertiesFilter(query, params.commitProperties());
             }
@@ -314,16 +324,20 @@ public class MongoRepository implements JaversRepository {
 
     private Bson addCommitPropertiesFilter(Bson query, Map<String, String> commitProperties) {
 
-        List<Bson> propertyFilters = new ArrayList();
+        List<Bson> propertyFilters = new ArrayList<>();
         for (Map.Entry<String, String> commitProperty : commitProperties.entrySet()) {
             BasicDBObject propertyFilter = new BasicDBObject(COMMIT_PROPERTIES,
-                    new BasicDBObject("$elemMatch",
-                            new BasicDBObject("key", commitProperty.getKey()).append(
-                                              "value", commitProperty.getValue())));
+                new BasicDBObject("$elemMatch",
+                    new BasicDBObject("key", commitProperty.getKey()).append(
+                        "value", commitProperty.getValue())));
             propertyFilters.add(propertyFilter);
         }
 
         return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
+    }
+
+    private Bson addAuthorFilter(Bson query, String author) {
+        return Filters.and(query, new BasicDBObject(COMMIT_AUTHOR, author));
     }
 
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {

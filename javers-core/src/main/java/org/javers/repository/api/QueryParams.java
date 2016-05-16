@@ -26,15 +26,17 @@ public class QueryParams {
     private final Optional<LocalDateTime> to;
     private final Optional<CommitId> commitId;
     private final Optional<Long> version;
+    private final Optional<String> author;
     private final Optional<Map<String, String>> commitProperties;
 
-    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId, Map<String, String> commitProperties, Long version) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId, Long version, String author, Map<String, String> commitProperties) {
         this.limit = limit;
         this.skip = skip;
         this.from = Optional.fromNullable(from);
         this.to = Optional.fromNullable(to);
         this.commitId = Optional.fromNullable(commitId);
         this.version = Optional.fromNullable(version);
+        this.author = Optional.fromNullable(author);
         this.commitProperties = Optional.fromNullable(commitProperties);
     }
 
@@ -95,6 +97,13 @@ public class QueryParams {
      */
     public Optional<Long> version() {
         return version;
+    }
+
+    /*
+     * filters results to Snapshots committed by a given author
+     */
+    public Optional<String> author() {
+        return author;
     }
 
     @Override

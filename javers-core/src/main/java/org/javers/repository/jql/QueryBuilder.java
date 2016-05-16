@@ -36,11 +36,25 @@ public class QueryBuilder {
     private boolean newObjectChanges;
     private CommitId commitId;
     private Long version;
+    private String author;
     private Map<String, String> commitProperties = new HashMap<>();
     private final List<Filter> filters = new ArrayList<>();
 
     private QueryBuilder(Filter initialFilter) {
         addFilter(initialFilter);
+    }
+
+    /**
+     * Query for selecting changes (or snapshots) made on any object.
+     * <br/><br/>
+     *
+     * For example, last changes committed on any object can be fetched with:
+     * <pre>
+     * javers.findChanges( QueryBuilder.anyDomainObject().build() );
+     * </pre>
+     */
+    public static QueryBuilder anyDomainObject(){
+        return new QueryBuilder(new AnyDomainObjectFilter());
     }
 
     /**
@@ -272,6 +286,16 @@ public class QueryBuilder {
         return this;
     }
 
+    /**
+     * Limits Snapshots to be fetched from JaversRepository
+     * to those with a given commit author.
+     */
+    public QueryBuilder byAuthor(String author) {
+        Validate.argumentIsNotNull(author);
+        this.author = author;
+        return this;
+    }
+
     protected void addFilter(Filter filter) {
         filters.add(filter);
     }
@@ -287,6 +311,7 @@ public class QueryBuilder {
             .from(from).to(to)
             .commitId(commitId)
             .version(version)
+            .author(author)
             .commitProperties(commitProperties)
             .build();
     }

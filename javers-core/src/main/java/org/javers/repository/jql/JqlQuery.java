@@ -76,6 +76,10 @@ public class JqlQuery {
         return newObjectChanges;
     }
 
+    boolean isAnyDomainObjectOnlyQuery() {
+        return hasFilter(AnyDomainObjectFilter.class) && filters.size() == 1;
+    }
+
     boolean isIdOnlyQuery(){
         return hasFilter(IdFilter.class) && filters.size() == 1;
     }
