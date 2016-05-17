@@ -113,6 +113,23 @@ class JqlExample extends Specification {
         assert changes.size() == 2
     }
 
+    def "should query for any domain object changes"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        javers.commit("author", new Employee(name:"bob", age:30) )
+        javers.commit("author", new Employee(name:"bob", age:31) )
+        javers.commit("author", new DummyUserDetails(id:1, someValue:"old") )
+        javers.commit("author", new DummyUserDetails(id:1, someValue:"new") )
+
+        when:
+        def changes = javers.findChanges( QueryBuilder.anyDomainObject().build() )
+
+        then:
+        printChanges(changes)
+        assert changes.size() == 2
+    }
+
     def "should query for changes (and snapshots) with property filter"() {
         given:
         def javers = JaversBuilder.javers().build()
@@ -168,6 +185,25 @@ class JqlExample extends Specification {
         printChanges(changes)
         assert changes.size() == 4
         assert javers.findSnapshots(query).size() == 3
+    }
+
+    def "should query for changes (and snapshots) with author filter"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        javers.commit( "Jim", new Employee(name:"bob", age:29, salary: 900) )
+        javers.commit( "Pam", new Employee(name:"bob", age:30, salary: 1000) )
+        javers.commit( "Jim", new Employee(name:"bob", age:31, salary: 1100) )
+        javers.commit( "Pam", new Employee(name:"bob", age:32, salary: 1200) )
+
+        when:
+        def query = QueryBuilder.byInstanceId("bob", Employee.class).byAuthor("Pam").build()
+        def changes = javers.findChanges( query )
+
+        then:
+        printChanges(changes)
+        assert changes.size() == 4
+        assert javers.findSnapshots(query).size() == 2
     }
 
     def "should query for changes (and snapshots) with commitDate filter"(){
