@@ -6,10 +6,10 @@ import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -28,20 +28,14 @@ public class QueryBuilder {
     private static final int DEFAULT_LIMIT = 100;
     private static final int DEFAULT_SKIP = 0;
 
-
-    private int limit = DEFAULT_LIMIT;
-    private int skip = DEFAULT_SKIP;
-    private LocalDateTime from;
-    private LocalDateTime to;
-    private boolean newObjectChanges;
-    private CommitId commitId;
-    private Long version;
-    private String author;
-    private Map<String, String> commitProperties = new HashMap<>();
     private final List<Filter> filters = new ArrayList<>();
+    private final QueryParamsBuilder queryParamsBuilder;
 
     private QueryBuilder(Filter initialFilter) {
         addFilter(initialFilter);
+        queryParamsBuilder = QueryParamsBuilder
+                .withLimit(DEFAULT_LIMIT)
+                .skip(DEFAULT_SKIP);
     }
 
     /**
@@ -85,7 +79,7 @@ public class QueryBuilder {
         return new QueryBuilder(new IdFilter(instanceId(localId, entityClass)));
     }
 
-    /**
+    /**ń
      * Query for selecting changes (or snapshots)
      * made on all ValueObjects at given path, owned by any instance of given Entity.
      * <br/><br/>
@@ -153,7 +147,7 @@ public class QueryBuilder {
      */
     public QueryBuilder andProperty(String propertyName) {
         Validate.argumentIsNotNull(propertyName);
-        addFilter(new PropertyFilter(propertyName));
+        queryParamsBuilder.changedProperty(propertyName);
         return this;
     }
 
@@ -167,7 +161,7 @@ public class QueryBuilder {
      * and initial property value on the right.
      */
     public QueryBuilder withNewObjectChanges(boolean newObjectChanges) {
-        this.newObjectChanges = newObjectChanges;
+        queryParamsBuilder.newObjectChanges(true);
         return this;
     }
 
@@ -175,7 +169,29 @@ public class QueryBuilder {
      * Alias to {@link #withNewObjectChanges(boolean)} with true
      */
     public QueryBuilder withNewObjectChanges() {
-        this.newObjectChanges = true;
+        queryParamsBuilder.newObjectChanges(true);
+        return this;
+    }
+
+    /**
+     * Optional filter for {@link #byInstanceId(Object, Class)} queries.
+     * Can be used with both changes and snapshots queries.
+     * <br/><br/>
+     *
+     * When enabled, selects all ValueObjects changes (or snapshots) owned by selected Entity versions.
+     */
+    public QueryBuilder withChildValueObjects(boolean withChildValueObjects) {
+        //TODO
+        if (true) throw new NotImplementedException();
+        queryParamsBuilder.childValueObjects(withChildValueObjects);
+        return this;
+    }
+
+    /**
+     * Alias to {@link #withChildValueObjects(boolean)} with true
+     */
+    public QueryBuilder withChildValueObjects() {
+        queryParamsBuilder.childValueObjects(true);
         return this;
     }
 
@@ -186,7 +202,7 @@ public class QueryBuilder {
      * production database could contain more records than you expect.
      */
     public QueryBuilder limit(int limit) {
-        this.limit = limit;
+        queryParamsBuilder.limit(limit);
         return this;
     }
 
@@ -195,7 +211,7 @@ public class QueryBuilder {
      * Use skip() and limit() for for paging.
      */
     public QueryBuilder skip(int skip) {
-        this.skip = skip;
+        queryParamsBuilder.skip(skip);
         return this;
     }
 
@@ -218,7 +234,7 @@ public class QueryBuilder {
      * @see #to(LocalDateTime)
      */
     public QueryBuilder from(LocalDateTime from) {
-        this.from = from;
+        queryParamsBuilder.from(from);
         return this;
     }
 
@@ -234,7 +250,7 @@ public class QueryBuilder {
      * to those created before (<=) given date.
      */
     public QueryBuilder to(LocalDateTime to) {
-        this.to = to;
+        queryParamsBuilder.to(to);
         return this;
     }
 
@@ -251,7 +267,7 @@ public class QueryBuilder {
      */
     public QueryBuilder withCommitId(CommitId commitId) {
         Validate.argumentIsNotNull(commitId);
-        this.commitId = commitId;
+        queryParamsBuilder.commitId(commitId);
         return this;
     }
 
@@ -260,7 +276,8 @@ public class QueryBuilder {
      */
     public QueryBuilder withCommitId(BigDecimal commitId) {
         Validate.argumentIsNotNull(commitId);
-        return withCommitId(CommitId.valueOf(commitId));
+        queryParamsBuilder.commitId(CommitId.valueOf(commitId));
+        return this;
     }
 
     /**
@@ -272,7 +289,7 @@ public class QueryBuilder {
      */
     public QueryBuilder withCommitProperty(String name, String value) {
         Validate.argumentsAreNotNull(name, value);
-        this.commitProperties.put(name, value);
+        queryParamsBuilder.commitProperty(name, value);
         return this;
     }
 
@@ -282,7 +299,7 @@ public class QueryBuilder {
      */
     public QueryBuilder withVersion(long version) {
         Validate.argumentCheck(version > 0, "Version is not a positive number.");
-        this.version = version;
+        queryParamsBuilder.version(version);
         return this;
     }
 
@@ -292,7 +309,7 @@ public class QueryBuilder {
      */
     public QueryBuilder byAuthor(String author) {
         Validate.argumentIsNotNull(author);
-        this.author = author;
+        queryParamsBuilder.author(author);
         return this;
     }
 
@@ -304,22 +321,10 @@ public class QueryBuilder {
         return Collections.unmodifiableList(filters);
     }
 
-    protected QueryParams getQueryParams() {
-        return QueryParamsBuilder
-            .withLimit(limit)
-            .skip(skip)
-            .from(from).to(to)
-            .commitId(commitId)
-            .version(version)
-            .author(author)
-            .commitProperties(commitProperties)
-            .build();
-    }
-
     public JqlQuery build(){
         if (filters.isEmpty()){
             throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "empty JqlQuery");
         }
-        return new JqlQuery(getFilters(), newObjectChanges, getQueryParams());
+        return new JqlQuery(getFilters(), queryParamsBuilder.build());
     }
 }

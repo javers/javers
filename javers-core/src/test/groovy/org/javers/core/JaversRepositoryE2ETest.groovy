@@ -13,6 +13,7 @@ import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -917,4 +918,34 @@ class JaversRepositoryE2ETest extends Specification {
         assert snapshots[0].getPropertyValue("id") == 2
     }
 
+    @Ignore
+    def "should query for child ValueObject snapshots and changes by InstanceId"() {
+        given:
+        def objects = [
+            new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London")) ,
+            new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London 2")) ,
+            new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London 2",
+                                                                      networkAddress: new DummyNetworkAddress(address: "v2"))) ,
+            new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris")) ,
+            new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris 2")) //noise
+        ]
+        objects.each {
+            javers.commit("author", it)
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).withChildValueObjects().build())
+
+        then:
+        snapshots.size() == 4
+        snapshots.each {
+            println it
+        }
+    }
+
+    @Ignore
+    def "should query for child ValueObject snapshots and changes by Entity class"() {
+        expect:
+        false
+    }
 }
