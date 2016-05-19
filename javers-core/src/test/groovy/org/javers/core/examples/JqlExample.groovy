@@ -206,6 +206,34 @@ class JqlExample extends Specification {
         assert javers.findSnapshots(query).size() == 2
     }
 
+    def "should query for changes (and snapshots) with commit property filters"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        def bob = new Employee(name: "bob", age: 29, position: "Assistant", salary: 900)
+        javers.commit( "author", bob, ["tenant": "ACME", "event": "hire"] )
+        bob = new Employee(name: "bob", age: 30, position: "Assistant", salary: 900)
+        javers.commit( "author", bob, ["tenant": "ACME", "event": "birthday"] )
+        bob = new Employee(name: "bob", age: 30, position: "Specialist", salary: 1600)
+        javers.commit( "author", bob, ["tenant": "ACME", "event": "promotion"] )
+
+        def pam = new Employee(name: "pam", age: 27, position: "Secretary", salary: 1300)
+        javers.commit( "author", pam, ["tenant": "Dunder Mifflin", "event": "hire"] )
+        pam = new Employee(name: "pam", age: 27, position: "Saleswoman", salary: 1700)
+        javers.commit( "author", pam, ["tenant": "Dunder Mifflin", "event": "promotion"] )
+
+        when:
+        def query = QueryBuilder.anyDomainObject()
+            .withCommitProperty("tenant", "ACME")
+            .withCommitProperty("event", "promotion").build()
+        def changes = javers.findChanges( query )
+
+        then:
+        printChanges(changes)
+        assert changes.size() == 2
+        assert javers.findSnapshots(query).size() == 1
+    }
+
     def "should query for changes (and snapshots) with commitDate filter"(){
       given:
       def fakeDateProvider = new FakeDateProvider()
