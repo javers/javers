@@ -44,18 +44,20 @@ public class MongoRepository implements JaversRepository {
 
     private static final int DESC = -1;
     private static final int ASC = 1;
-    public static final String SNAPSHOTS = "jv_snapshots";
-    public static final String COMMIT_ID = "commitMetadata.id";
-    public static final String COMMIT_DATE = "commitMetadata.commitDate";
-    public static final String COMMIT_AUTHOR = "commitMetadata.author";
-    public static final String GLOBAL_ID_KEY = "globalId_key";
-    public static final String GLOBAL_ID_ENTITY = "globalId.entity";
-    public static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
-    public static final String GLOBAL_ID_FRAGMENT = "globalId.fragment";
-    public static final String GLOBAL_ID_VALUE_OBJECT = "globalId.valueObject";
-    public static final String SNAPSHOT_VERSION = "version";
-    public static final String CHANGED_PROPERTIES = "changedProperties";
-    public static final String OBJECT_ID = "_id";
+
+    private static final String SNAPSHOTS = "jv_snapshots";
+    private static final String COMMIT_ID = "commitMetadata.id";
+    private static final String COMMIT_DATE = "commitMetadata.commitDate";
+    private static final String COMMIT_AUTHOR = "commitMetadata.author";
+    private static final String COMMIT_PROPERTIES = "commitMetadata.properties";
+    private static final String GLOBAL_ID_KEY = "globalId_key";
+    private static final String GLOBAL_ID_ENTITY = "globalId.entity";
+    private static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
+    private static final String GLOBAL_ID_FRAGMENT = "globalId.fragment";
+    private static final String GLOBAL_ID_VALUE_OBJECT = "globalId.valueObject";
+    private static final String SNAPSHOT_VERSION = "version";
+    private static final String CHANGED_PROPERTIES = "changedProperties";
+    private static final String OBJECT_ID = "_id";
 
     private MongoDatabase mongo;
     private JsonConverter jsonConverter;
@@ -157,6 +159,7 @@ public class MongoRepository implements JaversRepository {
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
+        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC));
         headCollection();
 
         //schema migration script from JaVers 1.1 to 1.2
@@ -270,6 +273,7 @@ public class MongoRepository implements JaversRepository {
     private Bson applyQueryParams(Bson query, Optional<QueryParams> queryParams) {
         if (queryParams.isPresent()) {
             QueryParams params = queryParams.get();
+
             if (params.from().isPresent()) {
                 query = addFromDateFiler(query, params.from().get());
             }
@@ -284,6 +288,9 @@ public class MongoRepository implements JaversRepository {
             }
             if (params.author().isPresent()) {
                 query = addAuthorFilter(query, params.author().get());
+            }
+            if (!params.commitProperties().isEmpty()) {
+                query = addCommitPropertiesFilter(query, params.commitProperties());
             }
         }
         return query;
@@ -313,6 +320,20 @@ public class MongoRepository implements JaversRepository {
 
     private Bson addVersionFilter(Bson query, Long version) {
         return Filters.and(query, createVersionQuery(version));
+    }
+
+    private Bson addCommitPropertiesFilter(Bson query, Map<String, String> commitProperties) {
+
+        List<Bson> propertyFilters = new ArrayList<>();
+        for (Map.Entry<String, String> commitProperty : commitProperties.entrySet()) {
+            BasicDBObject propertyFilter = new BasicDBObject(COMMIT_PROPERTIES,
+                new BasicDBObject("$elemMatch",
+                    new BasicDBObject("key", commitProperty.getKey()).append(
+                        "value", commitProperty.getValue())));
+            propertyFilters.add(propertyFilter);
+        }
+
+        return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
     }
 
     private Bson addAuthorFilter(Bson query, String author) {

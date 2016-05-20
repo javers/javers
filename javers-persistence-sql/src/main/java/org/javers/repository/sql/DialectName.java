@@ -1,6 +1,7 @@
 package org.javers.repository.sql;
 
-import org.polyjdbc.core.dialect.*;
+import org.polyjdbc.core.dialect.Dialect;
+import org.polyjdbc.core.dialect.DialectRegistry;
 
 /**
  * Proper JDBC driver .jar should be provided on the classpath

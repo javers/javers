@@ -52,14 +52,33 @@ public class GlobalIdFactory {
         }
 
         if (targetManagedType instanceof ValueObjectType && hasOwner(ownerContext)) {
-            String path = ownerContext.getPath();
+            String pathFromRoot = createPathFromRoot(ownerContext.getOwnerId(), ownerContext.getPath());
+
             if (ownerContext instanceof SetType.SetEnumerationOwnerContext) {
-                path += "/" + getObjectHasher().hash(targetCdo);
+                pathFromRoot += "/" + getObjectHasher().hash(targetCdo);
             }
-            return new ValueObjectId(targetManagedType.getName(), ownerContext.getOwnerId(), path);
+            return new ValueObjectId(targetManagedType.getName(), getRootOwnerId(ownerContext), pathFromRoot);
         }
 
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
+    }
+
+    private GlobalId getRootOwnerId(OwnerContext ownerContext) {
+        GlobalId rootOwnerId;
+        if (ownerContext.getOwnerId() instanceof ValueObjectId){
+            rootOwnerId = ((ValueObjectId)ownerContext.getOwnerId()).getOwnerId();
+        } else{
+            rootOwnerId = ownerContext.getOwnerId();
+        }
+        return rootOwnerId;
+    }
+
+    private String createPathFromRoot(GlobalId parentId, String fragment) {
+        if (parentId instanceof ValueObjectId){
+           return ((ValueObjectId)parentId).getFragment()+"/"+fragment;
+        } else{
+           return fragment;
+        }
     }
 
     public UnboundedValueObjectId createUnboundedValueObjectId(Class valueObjectClass){

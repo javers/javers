@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.unmodifiableList;
+import static org.javers.common.collections.Collections.allMatch;
 
 /**
  * Fake impl of JaversRepository
@@ -123,6 +124,7 @@ public class InMemoryRepository implements JaversRepository {
         if (queryParams.hasDates()) {
             snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
         }
+        snapshots = filterSnapshotsByCommitProperties(snapshots, queryParams.commitProperties());
         return trimResultsToRequestedSlice(snapshots, queryParams.skip(), queryParams.limit());
     }
 
@@ -154,6 +156,21 @@ public class InMemoryRepository implements JaversRepository {
         return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
             public boolean apply(CdoSnapshot snapshot) {
                 return queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate());
+            }
+        });
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByCommitProperties(List<CdoSnapshot> snapshots, final Map<String, String> commitProperties) {
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(final CdoSnapshot snapshot) {
+                return allMatch(commitProperties.entrySet(), new Predicate<Map.Entry<String, String>>() {
+                    @Override
+                    public boolean apply(Map.Entry<String, String> commitProperty) {
+                        Map<String, String> actualCommitProperties = snapshot.getCommitMetadata().getProperties();
+                        return actualCommitProperties.containsKey(commitProperty.getKey()) &&
+                            actualCommitProperties.get(commitProperty.getKey()).equals(commitProperty.getValue());
+                    }
+                });
             }
         });
     }

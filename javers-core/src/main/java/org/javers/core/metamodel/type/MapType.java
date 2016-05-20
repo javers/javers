@@ -27,7 +27,7 @@ public class MapType extends EnumerableType {
         Validate.argumentIsNotNull(mapFunction);
 
         if (sourceMap_ == null) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
 
         Map<Object, Object> sourceMap = (Map) sourceMap_;

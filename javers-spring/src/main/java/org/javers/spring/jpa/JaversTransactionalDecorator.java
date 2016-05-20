@@ -27,6 +27,7 @@ import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Transactional wrapper for core JaVers instance.
@@ -54,14 +55,33 @@ class JaversTransactionalDecorator implements Javers {
 
     @Override
     @Transactional
+    public Commit commit(String author, Object currentVersion, Map<String, String> commitProperties) {
+        return delegate.commit(author, currentVersion, commitProperties);
+    }
+
+    @Override
+    @Transactional
     public Commit commitShallowDelete(String author, Object deleted) {
         return delegate.commitShallowDelete(author, deleted);
     }
 
     @Override
     @Transactional
+    public Commit commitShallowDelete(String author, Object deleted, Map<String, String> properties) {
+        return delegate.commitShallowDelete(author, deleted, properties);
+    }
+
+
+    @Override
+    @Transactional
     public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId) {
         return delegate.commitShallowDeleteById(author, globalId);
+    }
+
+    @Override
+    @Transactional
+    public Commit commitShallowDeleteById(String author, GlobalIdDTO globalId, Map<String, String> properties) {
+        return delegate.commitShallowDeleteById(author, globalId, properties);
     }
 
     @Override

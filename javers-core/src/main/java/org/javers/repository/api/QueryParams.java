@@ -4,6 +4,9 @@ import org.javers.common.collections.Optional;
 import org.javers.core.commit.CommitId;
 import org.joda.time.LocalDateTime;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * Container for additional query parameters
  * used for filtering Snapshots to be fetched from database.
@@ -24,8 +27,9 @@ public class QueryParams {
     private final Optional<CommitId> commitId;
     private final Optional<Long> version;
     private final Optional<String> author;
+    private final Optional<Map<String, String>> commitProperties;
 
-    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId, Long version, String author) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId, Long version, String author, Map<String, String> commitProperties) {
         this.limit = limit;
         this.skip = skip;
         this.from = Optional.fromNullable(from);
@@ -33,6 +37,7 @@ public class QueryParams {
         this.commitId = Optional.fromNullable(commitId);
         this.version = Optional.fromNullable(version);
         this.author = Optional.fromNullable(author);
+        this.commitProperties = Optional.fromNullable(commitProperties);
     }
 
     public int limit() {
@@ -80,6 +85,14 @@ public class QueryParams {
     }
 
     /*
+     * filters results to Snapshots with all given commit properties
+     */
+    public Map<String, String> commitProperties() {
+        return commitProperties.isPresent() ?
+            commitProperties.get() : Collections.<String, String>emptyMap();
+    }
+
+    /*
      * filters results to Snapshots with a given version
      */
     public Optional<Long> version() {
@@ -101,6 +114,7 @@ public class QueryParams {
                 ", from=" + from +
                 ", to=" + to +
                 ", commitId=" + commitId +
+                ", commitProperties=" + commitProperties +
                 ", version=" + version +
                 "}";
     }

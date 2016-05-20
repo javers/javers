@@ -43,6 +43,8 @@ public class JaversSchemaManager {
 
         alterCommitIdColumnIfNeeded();
         addSnapshotVersionColumnIfNeeded();
+        addSnapshotManagedTypeColumnIfNeeded();
+        addGlobalIdTypeNameColumnIfNeeded();
 
         TheCloser.close(schemaManager, schemaInspector);
     }
@@ -68,10 +70,14 @@ public class JaversSchemaManager {
                 executeSQL("ALTER TABLE jv_commit ALTER COLUMN commit_id numeric(12,2)");
                 executeSQL("CREATE INDEX jv_commit_commit_id_idx ON jv_commit (commit_id)");
             } else {
-                logger.error("\nno DB schema migration script for {} :(\nplease contact with JaVers team, javers@javers.org",
-                        dialect.getCode());
+                handleUnsupportedDialect();
             }
         }
+    }
+
+    private void handleUnsupportedDialect() {
+        logger.error("\nno DB schema migration script for {} :(\nplease contact with JaVers team, javers@javers.org",
+                dialect.getCode());
     }
 
     /**
@@ -96,6 +102,54 @@ public class JaversSchemaManager {
         }
     }
 
+    /**
+     * JaVers 1.6.x to 2.0 schema migration
+     */
+    private void addSnapshotManagedTypeColumnIfNeeded() {
+        if (!columnExists("jv_snapshot", "managed_type")) {
+            addStringColumn("jv_snapshot", "managed_type", 200);
+
+            populateSnapshotManagedType();
+        }
+    }
+
+    /**
+     * JaVers 1.6.x to 2.0 schema migration
+     */
+    private void addGlobalIdTypeNameColumnIfNeeded() {
+        if (!columnExists("jv_global_id", "type_name")) {
+            addStringColumn("jv_global_id", "type_name", 200);
+
+            populateGlobalIdTypeName();
+        }
+    }
+
+    private void populateSnapshotManagedType() {
+        String updateStmt =
+                "UPDATE jv_snapshot" +
+                        "  SET managed_type = (SELECT qualified_name" +
+                        "                      FROM jv_cdo_class," +
+                        "                           jv_global_id" +
+                        "                      WHERE cdo_class_pk = cdo_class_fk " +
+                        "                      AND   global_id_pk = global_id_fk" +
+                        "                     )";
+        int cnt = executeUpdate(updateStmt);
+        logger.info("populate jv_snapshot.managed_type - " + cnt +" row(s) updated");
+    }
+
+    private void populateGlobalIdTypeName() {
+        String updateStmt =
+            "UPDATE jv_global_id " +
+            "  SET type_name = (SELECT qualified_name" +
+            "                   FROM jv_cdo_class" +
+            "                   WHERE cdo_class_pk = cdo_class_fk" +
+            "                   )" +
+            "  WHERE owner_id_fk IS NULL";
+        int cnt = executeUpdate(updateStmt);
+
+        logger.info("populate jv_global_id.type_name - " + cnt +" row(s) updated");
+    }
+
     private boolean executeSQL(String sql) {
         try {
             Statement stmt = connectionProvider.getConnection().createStatement();
@@ -104,6 +158,19 @@ public class JaversSchemaManager {
             stmt.close();
 
             return b;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private int executeUpdate(String sql) {
+        try {
+            Statement stmt = connectionProvider.getConnection().createStatement();
+
+            int cnt = stmt.executeUpdate(sql);
+            stmt.close();
+
+            return cnt;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -153,6 +220,19 @@ public class JaversSchemaManager {
         }
         logger.info("creating javers table {} ...", tableName);
         schemaManager.create(schema);
+    }
+
+    private void addStringColumn(String tableName, String colName, int len){
+        logger.warn("column "+tableName+"."+colName+" not exists, running ALTER TABLE ...");
+
+        String sqlType = dialect.types().string(len);
+
+        if (dialect instanceof OracleDialect ||
+            dialect instanceof MsSqlDialect) {
+            executeSQL("ALTER TABLE "+tableName+" ADD "+colName+" "+sqlType);
+        } else {
+            executeSQL("ALTER TABLE "+tableName+" ADD COLUMN "+colName+" "+sqlType);
+        }
     }
 
     public void dropSchema(){

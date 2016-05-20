@@ -11,9 +11,9 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CdoSnapshotRepository {
 
-    private PolyJDBC javersPolyJDBC;
+    private final PolyJDBC javersPolyJDBC;
     private JsonConverter jsonConverter;
-    private GlobalIdRepository globalIdRepository;
+    private final GlobalIdRepository globalIdRepository;
 
     public CdoSnapshotRepository(PolyJDBC javersPolyJDBC, GlobalIdRepository globalIdRepository) {
         this.javersPolyJDBC = javersPolyJDBC;
@@ -36,6 +36,7 @@ public class CdoSnapshotRepository {
                 .value(SNAPSHOT_VERSION, cdoSnapshot.getVersion())
                 .value(SNAPSHOT_STATE, jsonConverter.toJson(cdoSnapshot.getState()))
                 .value(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChanged() ))
+                .value(SNAPSHOT_MANAGED_TYPE, cdoSnapshot.getManagedType().getName())
                 .sequence(SNAPSHOT_PK, SNAPSHOT_TABLE_PK_SEQ);
 
         return javersPolyJDBC.queryRunner().insert(query);

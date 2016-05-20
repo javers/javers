@@ -324,6 +324,6 @@ class SnapshotFactoryTest extends Specification{
     }
 
     def someCommitMetadata(){
-        new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0))
+        new CommitMetadata("kazik", [:], LocalDateTime.now(), new CommitId(1, 0))
     }
 }

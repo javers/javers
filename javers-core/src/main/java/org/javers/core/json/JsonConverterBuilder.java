@@ -13,7 +13,7 @@ import java.util.List;
  * @see JsonConverter
  */
 public class JsonConverterBuilder {
-    public static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+    private static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     private boolean typeSafeValues = false;
     private boolean prettyPrint = true;

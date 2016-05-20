@@ -106,6 +106,10 @@ public class Employee {
         this.salary = salary;
     }
 
+    public void setAge(int age) {
+        this.age = age;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Employee)) {

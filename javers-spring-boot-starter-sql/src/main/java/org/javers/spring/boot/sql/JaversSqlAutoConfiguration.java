@@ -12,6 +12,7 @@ import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.MockAuthorProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
@@ -20,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -79,11 +82,18 @@ public class JaversSqlAutoConfiguration {
                 .build();
     }
 
+    @Bean(name = "authorProvider")
+    @ConditionalOnMissingBean
+    @ConditionalOnClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
+    public AuthorProvider springSecurityAuthorProvider() {
+        return new SpringSecurityAuthorProvider();
+    }
 
     @Bean(name = "authorProvider")
     @ConditionalOnMissingBean
-    public AuthorProvider springSecurityAuthorProvider() {
-        return new SpringSecurityAuthorProvider();
+    @ConditionalOnMissingClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
+    public AuthorProvider unknownAuthorProvider() {
+        return new MockAuthorProvider();
     }
 
     @Bean

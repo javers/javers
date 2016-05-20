@@ -7,7 +7,8 @@ import org.polyjdbc.core.query.SelectQuery;
 
 import java.util.Collection;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_GLOBAL_ID_FK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_VERSION;
 
 class SnapshotIdentifiersFilter extends SnapshotFilter {
     private final Collection<SnapshotIdentifier> snapshotIdentifiers;
@@ -16,16 +17,6 @@ class SnapshotIdentifiersFilter extends SnapshotFilter {
     public SnapshotIdentifiersFilter(GlobalIdRepository globalIdRepository, Collection<SnapshotIdentifier> snapshotIdentifiers) {
         this.globalIdRepository = globalIdRepository;
         this.snapshotIdentifiers = snapshotIdentifiers;
-    }
-
-    @Override
-    String select() {
-        return BASE_AND_GLOBAL_ID_FIELDS;
-    }
-
-    @Override
-    void addFrom(SelectQuery query) {
-        query.from(COMMIT_WITH_SNAPSHOT_GLOBAL_ID);
     }
 
     @Override
