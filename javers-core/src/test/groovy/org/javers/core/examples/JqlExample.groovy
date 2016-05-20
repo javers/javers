@@ -210,16 +210,17 @@ class JqlExample extends Specification {
         given:
         def javers = JaversBuilder.javers().build()
 
-        def bob = new Employee(name: "bob", age: 29, position: "Assistant", salary: 900)
+        def bob = new Employee(name: "bob", position: "Assistant", salary: 900)
         javers.commit( "author", bob, ["tenant": "ACME", "event": "hire"] )
-        bob = new Employee(name: "bob", age: 30, position: "Assistant", salary: 900)
         javers.commit( "author", bob, ["tenant": "ACME", "event": "birthday"] )
-        bob = new Employee(name: "bob", age: 30, position: "Specialist", salary: 1600)
+        bob.position = "Specialist"
+        bob.salary = 1600
         javers.commit( "author", bob, ["tenant": "ACME", "event": "promotion"] )
 
-        def pam = new Employee(name: "pam", age: 27, position: "Secretary", salary: 1300)
+        def pam = new Employee(name: "pam", position: "Secretary", salary: 1300)
         javers.commit( "author", pam, ["tenant": "Dunder Mifflin", "event": "hire"] )
-        pam = new Employee(name: "pam", age: 27, position: "Saleswoman", salary: 1700)
+        bob.position = "Saleswoman"
+        bob.salary = 1700
         javers.commit( "author", pam, ["tenant": "Dunder Mifflin", "event": "promotion"] )
 
         when:
