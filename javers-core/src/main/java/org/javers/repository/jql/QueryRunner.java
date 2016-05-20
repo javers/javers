@@ -44,23 +44,13 @@ public class QueryRunner {
         }
 
         if (query.isIdQuery()){
-            if (query.hasChangedPropertyFilter()) {
-                return repository.getPropertyStateHistory(fromDto(query.getIdFilter()), query.getChangedProperty(), query.getQueryParams());
-            }
-            else {
-                return repository.getStateHistory(fromDto(query.getIdFilter()), query.getQueryParams());
-            }
+            return repository.getStateHistory(fromDto(query.getIdFilter()), query.getQueryParams());
         }
 
         if (query.isClassQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
 
-            if (query.hasChangedPropertyFilter()) {
-                return repository.getPropertyStateHistory(mType, query.getChangedProperty(), query.getQueryParams());
-            }
-            else {
-                return repository.getStateHistory(mType, query.getQueryParams());
-            }
+            return repository.getStateHistory(mType, query.getQueryParams());
         }
 
         if (query.isVoOwnerQuery()) {
@@ -81,23 +71,12 @@ public class QueryRunner {
         }
 
         if (query.isIdQuery()){
-            if (query.hasChangedPropertyFilter()) {
-                return repository.getPropertyChangeHistory(fromDto(query.getIdFilter()),
-                        query.getChangedProperty(), query.getQueryParams());
-            } else {
-                return repository.getChangeHistory(fromDto(query.getIdFilter()), query.getQueryParams());
-            }
+            return repository.getChangeHistory(fromDto(query.getIdFilter()), query.getQueryParams());
         }
 
         if (query.isClassQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-
-            if (query.hasChangedPropertyFilter()) {
-                return repository.getPropertyChangeHistory(mType, query.getChangedProperty(), query.getQueryParams());
-            }
-            else {
-                return repository.getChangeHistory(mType, query.getQueryParams());
-            }
+            return repository.getChangeHistory(mType, query.getQueryParams());
         }
 
         if (query.isVoOwnerQuery()) {

@@ -61,8 +61,8 @@ public class CdoSnapshotFinder {
         return fetchCdoSnapshots(new SnapshotIdentifiersFilter(globalIdRepository, snapshotIdentifiers), Optional.<QueryParams>empty());
     }
 
-    public List<CdoSnapshot> getStateHistory(ManagedType managedType, Optional<String> propertyName, QueryParams queryParams) {
-        ManagedClassFilter classFilter = new ManagedClassFilter(managedType.getName(), propertyName);
+    public List<CdoSnapshot> getStateHistory(ManagedType managedType, QueryParams queryParams) {
+        ManagedClassFilter classFilter = new ManagedClassFilter(managedType.getName(), queryParams.changedProperty());
         return fetchCdoSnapshots(classFilter, Optional.of(queryParams));
     }
 
@@ -71,14 +71,14 @@ public class CdoSnapshotFinder {
         return fetchCdoSnapshots(voOwnerFilter, Optional.of(queryParams));
     }
 
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, Optional<String> propertyName, QueryParams queryParams) {
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
         Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId);
 
         if (globalIdPk.isEmpty()){
             return Collections.emptyList();
         }
 
-        return fetchCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), propertyName), Optional.of(queryParams));
+        return fetchCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), queryParams.changedProperty()), Optional.of(queryParams));
     }
 
     private List<CdoSnapshot> fetchCdoSnapshots(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams){

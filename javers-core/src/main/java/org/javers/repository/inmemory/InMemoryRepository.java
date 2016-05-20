@@ -85,26 +85,6 @@ public class InMemoryRepository implements JaversRepository {
         return applyQueryParams(filtered, queryParams);
     }
 
-    @Override
-    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, final String propertyName, QueryParams queryParams) {
-        Validate.argumentsAreNotNull(globalId, propertyName, queryParams);
-
-        if (snapshots.containsKey(globalId)) {
-            List<CdoSnapshot> filtered = filterByPropertyName(snapshots.get(globalId), propertyName);
-            return unmodifiableList(applyQueryParams(filtered, queryParams));
-        }
-        return Collections.emptyList();
-    }
-
-    @Override
-    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
-        Validate.argumentsAreNotNull(givenClass, propertyName, queryParams);
-
-        QueryParams increasedLimitQueryParams = getQueryParamsWithIncreasedLimit(queryParams);
-        List<CdoSnapshot> filtered = filterByPropertyName(getStateHistory(givenClass, increasedLimitQueryParams), propertyName);
-        return unmodifiableList(applyQueryParams(filtered, queryParams));
-    }
-
     private QueryParams getQueryParamsWithIncreasedLimit(QueryParams queryParams) {
         return QueryParamsBuilder.initializeWith(queryParams)
             .limit(queryParams.limit() * 10)
@@ -123,6 +103,9 @@ public class InMemoryRepository implements JaversRepository {
         }
         if (queryParams.hasDates()) {
             snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
+        }
+        if (queryParams.changedProperty().isPresent()){
+            snapshots = filterByPropertyName(snapshots, queryParams.changedProperty().get());
         }
         snapshots = filterSnapshotsByCommitProperties(snapshots, queryParams.commitProperties());
         return trimResultsToRequestedSlice(snapshots, queryParams.skip(), queryParams.limit());

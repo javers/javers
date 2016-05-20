@@ -111,24 +111,6 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, QueryParams queryParams) {
-        BasicDBObject query = createIdQuery(globalId);
-
-        query.append(CHANGED_PROPERTIES, propertyName);
-
-        return queryForSnapshots(query, Optional.of(queryParams));
-    }
-
-    @Override
-    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
-        BasicDBObject query = createGlobalIdClassQuery(givenClass);
-
-        query.append(CHANGED_PROPERTIES, propertyName);
-
-        return queryForSnapshots(query, Optional.of(queryParams));
-    }
-
-    @Override
     public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
         BasicDBObject query = createGlobalIdClassQuery(givenClass);
         return queryForSnapshots(query, Optional.of(queryParams));
@@ -292,6 +274,9 @@ public class MongoRepository implements JaversRepository {
             if (!params.commitProperties().isEmpty()) {
                 query = addCommitPropertiesFilter(query, params.commitProperties());
             }
+            if (params.changedProperty().isPresent()) {
+                query = addChangedPropertyFilter(query, params.changedProperty().get());
+            }
         }
         return query;
     }
@@ -316,6 +301,10 @@ public class MongoRepository implements JaversRepository {
 
     private Bson addCommitIdFilter(Bson query, CommitId commitId) {
         return Filters.and(query, new BasicDBObject(COMMIT_ID, commitId.valueAsNumber().doubleValue()));
+    }
+
+    private Bson addChangedPropertyFilter(Bson query, String changedProperty){
+        return Filters.and(query, new BasicDBObject(CHANGED_PROPERTIES, changedProperty));
     }
 
     private Bson addVersionFilter(Bson query, Long version) {

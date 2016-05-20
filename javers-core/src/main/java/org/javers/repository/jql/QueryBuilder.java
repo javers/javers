@@ -79,7 +79,7 @@ public class QueryBuilder {
         return new QueryBuilder(new IdFilter(instanceId(localId, entityClass)));
     }
 
-    /**ń
+    /**
      * Query for selecting changes (or snapshots)
      * made on all ValueObjects at given path, owned by any instance of given Entity.
      * <br/><br/>

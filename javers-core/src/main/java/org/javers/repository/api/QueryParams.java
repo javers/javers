@@ -104,7 +104,7 @@ public class QueryParams {
     /**
      * filters results to Snapshots with a given property on changed properties list
      */
-    public Optional<String >changedProperty(){
+    public Optional<String> changedProperty(){
         return changedProperty;
     }
 
