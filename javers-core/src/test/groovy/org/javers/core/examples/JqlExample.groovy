@@ -211,7 +211,6 @@ class JqlExample extends Specification {
         def javers = JaversBuilder.javers().build()
 
         def bob = new Employee(name: "bob", position: "Assistant", salary: 900)
-        javers.commit( "author", bob, ["tenant": "ACME", "event": "hire"] )
         javers.commit( "author", bob, ["tenant": "ACME", "event": "birthday"] )
         bob.position = "Specialist"
         bob.salary = 1600
