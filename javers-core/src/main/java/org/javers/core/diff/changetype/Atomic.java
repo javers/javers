@@ -27,8 +27,7 @@ public class Atomic implements Serializable {
     }
 
     /**
-     * true if value is not null and is primitive, box or String
-     * @return
+     * @return true if value is not null and is primitive, box or String
      */
     public boolean isJsonBasicType() {
         if(isNull()) {
