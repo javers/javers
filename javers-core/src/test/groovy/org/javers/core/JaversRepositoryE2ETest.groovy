@@ -775,6 +775,17 @@ class JaversRepositoryE2ETest extends Specification {
         assert snapshots.size() == snapshotIdentifiers.size()
     }
 
+    def "should cope with query for snapshots with empty collection of snapshot ids"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id: 1, intProperty: 1))
+
+        when:
+        def snapshots = repository.getSnapshots([])
+
+        then:
+        assert snapshots.size() == 0
+    }
+
     def "should treat refactored VOs as different versions of the same client's domain object"(){
         given:
         javers.commit('author', new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5, 5)))

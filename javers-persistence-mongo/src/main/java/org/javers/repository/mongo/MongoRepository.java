@@ -29,10 +29,7 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.javers.common.validation.Validate.conditionFulfilled;
 
@@ -99,7 +96,8 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return queryForSnapshots(createSnapshotIdentifiersQuery(snapshotIdentifiers), Optional.<QueryParams>empty());
+        return snapshotIdentifiers.isEmpty() ? Collections.<CdoSnapshot>emptyList() :
+            queryForSnapshots(createSnapshotIdentifiersQuery(snapshotIdentifiers), Optional.<QueryParams>empty());
     }
 
     @Override
