@@ -132,7 +132,7 @@ public interface Javers {
      * In order to use data auditing feature, call {@link #commit(String, Object)}.
      *
      * <p>
-     * Diffs can be converted to JSON with {@link Javers#toJson(Diff)} or pretty-printed with {@link Diff#prettyPrint()}
+     * Diffs can be converted to JSON with {@link JsonConverter#toJson(Object)} or pretty-printed with {@link Diff#prettyPrint()}
      * </p>
      *
      * @see <a href="http://javers.org/documentation/diff-examples/">
@@ -157,7 +157,7 @@ public interface Javers {
      * </pre>
      *
      * @see <a href="http://javers.org/documentation/diff-examples/#compare-collections">
-     *     Compare top-level collections</a> example
+     *     Compare top-level collections example</a>
      */
     <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> itemClass);
 

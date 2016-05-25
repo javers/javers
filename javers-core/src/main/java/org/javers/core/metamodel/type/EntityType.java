@@ -24,7 +24,7 @@ import java.lang.reflect.Type;
  * Example:
  * <pre>
  *     class Person {
- *         @Id
+ *        {@literal @}Id
  *         private int    personId;
  *         private String firstName;
  *         private String lastName;

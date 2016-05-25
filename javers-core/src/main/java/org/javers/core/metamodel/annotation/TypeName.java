@@ -39,8 +39,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface TypeName {
     /**
      * The type name to be used when comparing and persisting
-     *
-     * @return
      */
     String value();
 }
