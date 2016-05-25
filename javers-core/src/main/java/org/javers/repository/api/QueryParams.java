@@ -28,11 +28,11 @@ public class QueryParams {
     private final Optional<Long> version;
     private final Optional<String> author;
     private final Optional<Map<String, String>> commitProperties;
-    private final boolean childValueObjects;
+    private final boolean aggregate;
     private final boolean newObjectChanges;
     private final Optional<String> changedProperty;
 
-    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId, Long version, String author, Map<String, String> commitProperties, boolean childValueObjects, boolean newObjectChanges, String changedProperty) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty) {
         this.limit = limit;
         this.skip = skip;
         this.from = Optional.fromNullable(from);
@@ -41,7 +41,7 @@ public class QueryParams {
         this.version = Optional.fromNullable(version);
         this.author = Optional.fromNullable(author);
         this.commitProperties = Optional.fromNullable(commitProperties);
-        this.childValueObjects = childValueObjects;
+        this.aggregate = aggregate;
         this.newObjectChanges = newObjectChanges;
         this.changedProperty = Optional.fromNullable(changedProperty);
     }
@@ -123,10 +123,10 @@ public class QueryParams {
     }
 
     /**
-     * When enabled, selects all ValueObjects owned by selected Entity versions.
+     * When enabled, selects all ValueObjects owned by selected Entities.
      */
-    public boolean childValueObjects() {
-        return childValueObjects;
+    public boolean isAggregate() {
+        return aggregate;
     }
 
     public boolean newObjectChanges() {

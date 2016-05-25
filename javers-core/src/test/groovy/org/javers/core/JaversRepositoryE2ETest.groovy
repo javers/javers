@@ -929,34 +929,68 @@ class JaversRepositoryE2ETest extends Specification {
         assert snapshots[0].getPropertyValue("id") == 2
     }
 
-    @Ignore
-    def "should query for child ValueObject snapshots and changes by InstanceId"() {
+    def "should query for aggregate (with child ValueObject) snapshots and changes by InstanceId"() {
         given:
+        def london1v1 = new DummyAddress(city: "London", networkAddress: new DummyNetworkAddress(address: "v1"))
+        def london2v1 = new DummyAddress(city: "London 2", networkAddress: new DummyNetworkAddress(address: "v1"))
+        def london2v2 = new DummyAddress(city: "London 2", networkAddress: new DummyNetworkAddress(address: "v2"))
+
         def objects = [
-            new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London")) ,
-            new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London 2")) ,
-            new SnapshotEntity(id:1, valueObjectRef: new DummyAddress(city: "London 2",
-                                                                      networkAddress: new DummyNetworkAddress(address: "v2"))) ,
-            new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris")) ,
+            new SnapshotEntity(id:1, valueObjectRef: london1v1),
+            new SnapshotEntity(id:1, valueObjectRef: london2v1),
+            new SnapshotEntity(id:1, valueObjectRef: london2v2) ,
+            new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris")) , //noise
             new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris 2")) //noise
         ]
         objects.each {
             javers.commit("author", it)
         }
 
-        when:
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).withChildValueObjects().build())
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).aggregate().build()
+
+        when: "snapshots query"
+        def snapshots = javers.findSnapshots(query)
 
         then:
-        snapshots.size() == 4
-        snapshots.each {
+        snapshots.size() == 5
+
+        when: "changes query"
+        def changes = javers.findChanges(query)
+
+        then:
+        changes.each {
             println it
         }
+        changes.size() == 2
     }
 
     @Ignore
-    def "should query for child ValueObject snapshots and changes by Entity class"() {
-        expect:
-        false
+    def "should query for aggregate (with child ValueObject) snapshots and changes by Entity type"() {
+        given:
+        def london = new DummyAddress(city: "London")
+        def paris =  new DummyAddress(city: "Paris")
+        def paris2 = new DummyAddress(city: "Paris",
+                networkAddress: new DummyNetworkAddress(address: "v2"))
+
+        def objects = [
+                new SnapshotEntity(id: 1, valueObjectRef: london),
+                new SnapshotEntity(id: 1, valueObjectRef: paris),
+                new SnapshotEntity(id: 1, valueObjectRef: paris2),
+                new SnapshotEntity(id: 1, valueObjectRef: paris2, listOfValueObjects: [london]),
+                new SnapshotEntity(id: 1, valueObjectRef: paris2, listOfValueObjects: [london, paris]),
+                new DummyUserDetails(id: 1, dummyAddress: paris)
+        ]
+        objects.each {
+            javers.commit("author", it)
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).aggregate().build())
+
+        then:
+        snapshots.each {
+            println it
+        }
+        snapshots.size() == 4
     }
 }

@@ -32,10 +32,10 @@ public class JqlQuery {
     }
 
     private void validate(){
-        if (queryParams.childValueObjects()) {
+        if (queryParams.isAggregate()) {
             if (!(isClassQuery() || isInstanceIdQuery())) {
                 throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
-                        "childValueObjects filter can be enabled only for byClass and byInstanceId queries");
+                        "aggregate filter can be enabled only for byClass and byInstanceId queries");
             }
         }
     }

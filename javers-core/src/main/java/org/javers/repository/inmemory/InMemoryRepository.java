@@ -10,6 +10,7 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
@@ -65,10 +66,29 @@ public class InMemoryRepository implements JaversRepository {
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
         Validate.argumentsAreNotNull(globalId, queryParams);
 
-        if (snapshots.containsKey(globalId)) {
-            return unmodifiableList(applyQueryParams(snapshots.get(globalId), queryParams));
+        List<CdoSnapshot> filtered = new ArrayList<>();
+
+        for (CdoSnapshot snapshot : getAll()) {
+            if (snapshot.getGlobalId().equals(globalId)) {
+                filtered.add(snapshot);
+            }
+            if (queryParams.isAggregate() && isParent(globalId, snapshot.getGlobalId())){
+                filtered.add(snapshot);
+            }
         }
-        return Collections.emptyList();
+
+        return applyQueryParams(filtered, queryParams);
+    }
+
+    private boolean isParent(GlobalId parentCandidate, GlobalId childCandidate) {
+        if (! (parentCandidate instanceof InstanceId && childCandidate instanceof ValueObjectId)){
+            return false;
+        }
+
+        InstanceId parent = (InstanceId)parentCandidate;
+        ValueObjectId child = (ValueObjectId)childCandidate;
+
+        return child.getOwnerId().equals(parent);
     }
 
     @Override

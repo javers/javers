@@ -174,24 +174,30 @@ public class QueryBuilder {
     }
 
     /**
-     * Optional filter for {@link #byInstanceId(Object, Class)} queries.
+     * Optional filter for Entity queries ({@link #byInstanceId(Object, Class)} and {@link #byClass(Class)}).
      * Can be used with both changes and snapshots queries.
      * <br/><br/>
      *
-     * When enabled, selects all ValueObjects changes (or snapshots) owned by selected Entity versions.
+     * When enabled, all child ValueObjects owned by selected Entities are included in a query scope.
+     * In other words, snapshots (or changes) of whole aggregates are selected.
+     * <br/><br/>
+     *
+     * Note that we are using <i>aggregate</i> term in the context of DDD.
+     * Please do not confuse it with SQL aggregate functions.
+     * In JQL aggregate means: an Entity with its child ValueObjects.
      */
-    public QueryBuilder withChildValueObjects(boolean withChildValueObjects) {
+    public QueryBuilder aggregate(boolean aggregate) {
         //TODO
         if (true) throw new NotImplementedException();
-        queryParamsBuilder.childValueObjects(withChildValueObjects);
+        queryParamsBuilder.aggregate(aggregate);
         return this;
     }
 
     /**
-     * Alias to {@link #withChildValueObjects(boolean)} with true
+     * Alias to {@link #aggregate(boolean)} with true
      */
-    public QueryBuilder withChildValueObjects() {
-        queryParamsBuilder.childValueObjects(true);
+    public QueryBuilder aggregate() {
+        queryParamsBuilder.aggregate(true);
         return this;
     }
 

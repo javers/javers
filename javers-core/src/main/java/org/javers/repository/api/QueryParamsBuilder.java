@@ -18,7 +18,7 @@ public class QueryParamsBuilder {
     private CommitId commitId;
     private Long version;
     private String author;
-    private boolean childValueObjects;
+    private boolean aggregate;
     private boolean newObjectChanges;
     private Map<String, String> commitProperties = new HashMap<>();
     private String changedProperty;
@@ -59,8 +59,8 @@ public class QueryParamsBuilder {
         return builder;
     }
 
-    public QueryParamsBuilder childValueObjects(boolean childValueObjects) {
-        this.childValueObjects = childValueObjects;
+    public QueryParamsBuilder aggregate(boolean aggregate) {
+        this.aggregate = aggregate;
         return this;
     }
 
@@ -146,6 +146,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to, commitId, version, author, commitProperties, childValueObjects, newObjectChanges, changedProperty);
+        return new QueryParams(limit, skip, from, to, commitId, version, author, commitProperties, aggregate, newObjectChanges, changedProperty);
     }
 }
