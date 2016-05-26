@@ -13,15 +13,12 @@ import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.QueryBuilder
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
-import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.repository.jql.QueryBuilder.anyDomainObject
-import static org.javers.repository.jql.QueryBuilder.byClass
-import static org.javers.repository.jql.QueryBuilder.byInstanceId
+import static org.javers.repository.jql.QueryBuilder.*
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
@@ -952,6 +949,10 @@ class JaversRepositoryE2ETest extends Specification {
         def snapshots = javers.findSnapshots(query)
 
         then:
+        snapshots.each {
+            assert it.globalId == instanceId(1, SnapshotEntity) ||
+                    it.globalId.ownerId == instanceId(1, SnapshotEntity)
+        }
         snapshots.size() == 5
 
         when: "changes query"
@@ -964,7 +965,6 @@ class JaversRepositoryE2ETest extends Specification {
         changes.size() == 2
     }
 
-    @Ignore
     def "should query for aggregate (with child ValueObject) snapshots and changes by Entity type"() {
         given:
         def london = new DummyAddress(city: "London")
@@ -978,19 +978,31 @@ class JaversRepositoryE2ETest extends Specification {
                 new SnapshotEntity(id: 1, valueObjectRef: paris2),
                 new SnapshotEntity(id: 1, valueObjectRef: paris2, listOfValueObjects: [london]),
                 new SnapshotEntity(id: 1, valueObjectRef: paris2, listOfValueObjects: [london, paris]),
-                new DummyUserDetails(id: 1, dummyAddress: paris)
+                new DummyUserDetails(id: 1, dummyAddress: paris) //noise
         ]
         objects.each {
             javers.commit("author", it)
         }
 
-        when:
-        def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).aggregate().build())
+        def query = QueryBuilder.byClass(SnapshotEntity).aggregate().build()
+
+        when: "snapshots query"
+        def snapshots = javers.findSnapshots(query)
 
         then:
         snapshots.each {
+            assert it.globalId.typeName == SnapshotEntity.name ||
+                   it.globalId.ownerId.typeName == SnapshotEntity.name
+        }
+        snapshots.size() == 9
+
+        when: "changes query"
+        def changes = javers.findChanges(query)
+
+        then:
+        changes.each {
             println it
         }
-        snapshots.size() == 4
+        changes.size() == 4
     }
 }

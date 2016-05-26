@@ -100,9 +100,23 @@ public class InMemoryRepository implements JaversRepository {
             if (snapshot.getGlobalId().isTypeOf(givenClass)) {
                 filtered.add(snapshot);
             }
+            if (queryParams.isAggregate() && isParent(givenClass, snapshot.getGlobalId())){
+                filtered.add(snapshot);
+            }
         }
 
         return applyQueryParams(filtered, queryParams);
+    }
+
+    private boolean isParent(ManagedType parentCandidate, GlobalId childCandidate) {
+        if (! (parentCandidate instanceof EntityType && childCandidate instanceof ValueObjectId)){
+            return false;
+        }
+
+        EntityType parent = (EntityType)parentCandidate;
+        ValueObjectId child = (ValueObjectId)childCandidate;
+
+        return child.getOwnerId().getTypeName().equals(parent.getName());
     }
 
     private QueryParams getQueryParamsWithIncreasedLimit(QueryParams queryParams) {
