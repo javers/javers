@@ -1,11 +1,14 @@
 package org.javers.hibernate.integration.config;
 
+import com.google.common.collect.ImmutableMap;
 import org.javers.core.Javers;
+import org.javers.core.commit.Commit;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.spring.annotation.JaversAuditable;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +22,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.util.Map;
 import java.util.Properties;
 
 public class HibernateConfig {
@@ -74,7 +78,7 @@ public class HibernateConfig {
      */
     @Bean
     public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect(Javers javers) {
-        return new JaversAuditableRepositoryAspect(javers, authorProvider());
+        return new JaversAuditableRepositoryAspect(javers, authorProvider(), commitPropertiesProvider());
     }
 
     /**
@@ -92,6 +96,16 @@ public class HibernateConfig {
             @Override
             public String provide() {
                 return "unknown";
+            }
+        };
+    }
+
+    @Bean
+    public CommitPropertiesProvider commitPropertiesProvider() {
+        return new CommitPropertiesProvider() {
+            @Override
+            public Map<String, String> provide() {
+                return ImmutableMap.of("key", "ok");
             }
         };
     }

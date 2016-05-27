@@ -2,6 +2,7 @@ package org.javers.spring.auditable.aspect;
 
 import org.javers.core.Javers;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.springframework.data.repository.core.RepositoryMetadata;
 
 /**
@@ -10,17 +11,19 @@ import org.springframework.data.repository.core.RepositoryMetadata;
 abstract class AbstractAuditChangeHandler implements AuditChangeHandler {
     protected final Javers javers;
     protected final AuthorProvider authorProvider;
+    protected final CommitPropertiesProvider commitPropertiesProvider;
 
-    public AbstractAuditChangeHandler(Javers javers, AuthorProvider authorProvider) {
+    AbstractAuditChangeHandler(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this.javers = javers;
         this.authorProvider = authorProvider;
+        this.commitPropertiesProvider = commitPropertiesProvider;
     }
 
-    protected boolean isDomainClass(RepositoryMetadata metadata, Object o) {
+    boolean isDomainClass(RepositoryMetadata metadata, Object o) {
         return metadata.getDomainType().isAssignableFrom(o.getClass());
     }
 
-    protected boolean isIdClass(RepositoryMetadata metadata, Object o) {
+    boolean isIdClass(RepositoryMetadata metadata, Object o) {
         return metadata.getIdType().isAssignableFrom(o.getClass());
     }
 }
