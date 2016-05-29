@@ -7,6 +7,7 @@ buildscript {
     dependencies {
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
         classpath 'pl.allegro.tech.build:axion-release-plugin:0.9.5'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
     }
 }
 
@@ -24,6 +25,7 @@ subprojects {
     apply plugin: 'groovy'
     apply plugin: 'signing'
     apply plugin: 'propdeps'
+    apply plugin: 'com.jfrog.bintray'
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
@@ -89,64 +91,55 @@ subprojects {
         sign configurations.archives
     }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+    install.repositories.mavenInstaller.pom.project {
+        name 'JaVers'
 
-                def username = project.ext.has('sonatypeUser') ? project.ext.sonatypeUser : ''
-                def password = project.ext.has('sonatypePassword') ? project.ext.sonatypePassword : ''
+        packaging 'jar'
 
-                repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-                    authentication(userName: username, password: password)
-                }
+        description 'JaVers object auditing and diff framework'
+        url 'http://javers.org'
+        inceptionYear '2013'
 
-                snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-                    authentication(userName: username, password: password)
-                }
+        scm {
+            connection 'scm:git:https://github.com/javers/javers.git'
+            url 'https://github.com/javers/javers'
+        }
 
-                /*addFilter('javers-core') {artifact, file ->
-                    artifact.name == 'javers-core'
-                }
-                addFilter('javers-persistence-mongo') {artifact, file ->
-                    artifact.name == 'javers-persistence-mongo'
-                }
-                addFilter('javers-spring') {artifact, file ->
-                    artifact.name == 'javers-spring'
-                }*/
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            }
+        }
 
-                pom.project {
-                    name 'javers-parent'
+        developers {
+            developer {
+                name 'Bartosz Walacik'
+            }
+            developer {
+                name 'Pawel Szymczyk'
+            }
+            developer {
+                name 'Michal Wesolowski'
+            }
+        }
+    }
 
-                    packaging 'jar'
 
-                    description 'JaVers object auditing and diff framework'
-                    url 'http://javers.org'
-                    inceptionYear '2013'
-
-                    scm {
-                        connection 'scm:git:https://github.com/javers/javers.git'
-                        url 'https://github.com/javers/javers'
-                    }
-
-                    licenses {
-                        license {
-                            name 'The Apache Software License, Version 2.0'
-                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            name 'Bartosz Walacik'
-                        }
-                        developer {
-                            name 'Pawel Szymczyk'
-                        }
-                    }
-
+    bintray {
+        user = project.ext.has('bintrayUser') ? project.ext.bintrayUser : ''
+        key = project.ext.has('bintrayKey') ? project.ext.bintrayKey : ''
+        configurations = ['archives']
+        publish = true
+        pkg {
+            repo = 'maven'
+            name = 'javers'
+            version {
+                gpg {
+                    sign = true
                 }
             }
         }
     }
+
 }
