@@ -129,17 +129,12 @@ subprojects {
     bintray {
         user = project.ext.has('bintrayUser') ? project.ext.bintrayUser : ''
         key = project.ext.has('bintrayKey') ? project.ext.bintrayKey : ''
+
         configurations = ['archives']
         publish = true
         pkg {
             repo = 'maven'
             name = 'javers'
-            version {
-                gpg {
-                    sign = true
-                }
-            }
         }
     }
-
 }
