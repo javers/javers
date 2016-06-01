@@ -30,18 +30,6 @@ class JaversMongoAutoConfigurationTest {
     AuthorProvider provider
 
     @Test
-    void shouldAutowireJaversInstance() {
-        //given
-        def dummyEntity = new DummyEntity(1)
-
-        //when
-        javers.commit("pawel", dummyEntity)
-
-        //then
-        assert javers.findSnapshots(QueryBuilder.byClass(DummyEntity).build()).size() == 1
-    }
-
-    @Test
     void shoudUseDbNameFromMongoStarter(){
         assert javers.repository.delegate.mongo.name == "spring-mongo"
     }
@@ -64,5 +52,4 @@ class JaversMongoAutoConfigurationTest {
     void shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath() {
         assert provider instanceof SpringSecurityAuthorProvider
     }
-
 }

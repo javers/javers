@@ -4,24 +4,31 @@ import org.aspectj.lang.JoinPoint;
 import org.javers.core.Javers;
 import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
+
+import java.util.Map;
 
 /**
  * @author Pawel Szymczyk
  */
-public class JaversCommitAdvice {
+class JaversCommitAdvice {
 
     private final Javers javers;
     private final AuthorProvider authorProvider;
+    private final CommitPropertiesProvider commitPropertiesProvider;
 
-    public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider) {
+    JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this.javers = javers;
         this.authorProvider = authorProvider;
+        this.commitPropertiesProvider = commitPropertiesProvider;
     }
 
-    public void commitMethodArguments(JoinPoint pjp) {
+    void commitMethodArguments(JoinPoint pjp) {
         String author = authorProvider.provide();
+        Map<String, String> props = commitPropertiesProvider.provide();
+
         for (Object arg : AspectUtil.collectArguments(pjp)) {
-            javers.commit(author, arg);
+            javers.commit(author, arg, props);
         }
     }
 }
