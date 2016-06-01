@@ -46,6 +46,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
 
         snapshots.size() == 1
         snapshots[0].initial
+        snapshots[0].commitMetadata.properties["key"] == "ok"
         snapshots[0].commitMetadata.author == "unauthenticated"
     }
 

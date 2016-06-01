@@ -8,6 +8,8 @@ import org.javers.core.Javers;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.EmptyPropertiesProvider;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
@@ -32,10 +34,14 @@ public class JaversAuditableRepositoryAspect {
     private final AuditChangeHandler deleteHandler;
     private final JaversCommitAdvice javersCommitAdvice;
 
+    public JaversAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        this(new OnSaveAuditChangeHandler(javers, authorProvider, commitPropertiesProvider),
+             new OnDeleteAuditChangeHandler(javers, authorProvider, commitPropertiesProvider),
+             new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider) );
+    }
+
     public JaversAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider) {
-        this(new OnSaveAuditChangeHandler(javers, authorProvider),
-             new OnDeleteAuditChangeHandler(javers, authorProvider),
-             new JaversCommitAdvice(javers,authorProvider) );
+        this(javers, authorProvider, new EmptyPropertiesProvider());
     }
 
     JaversAuditableRepositoryAspect(AuditChangeHandler saveHandler, AuditChangeHandler deleteHandler, JaversCommitAdvice javersCommitAdvice) {

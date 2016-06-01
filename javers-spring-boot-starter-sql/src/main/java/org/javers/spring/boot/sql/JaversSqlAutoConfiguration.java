@@ -11,9 +11,7 @@ import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
-import org.javers.spring.auditable.AuthorProvider;
-import org.javers.spring.auditable.MockAuthorProvider;
-import org.javers.spring.auditable.SpringSecurityAuthorProvider;
+import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
@@ -49,7 +47,10 @@ public class JaversSqlAutoConfiguration {
     private JaversProperties javersProperties;
 
     @Autowired
-    EntityManagerFactory entityManagerFactory;
+    private EntityManagerFactory entityManagerFactory;
+
+    @Autowired
+    private CommitPropertiesProvider commitPropertiesProvider;
 
     @Bean
     public DialectName javersSqlDialectName(){
@@ -96,6 +97,12 @@ public class JaversSqlAutoConfiguration {
         return new MockAuthorProvider();
     }
 
+    @Bean(name = "commitPropertiesProvider")
+    @ConditionalOnMissingBean
+    public CommitPropertiesProvider commitPropertiesProvider() {
+        return new EmptyPropertiesProvider();
+    }
+
     @Bean
     @ConditionalOnMissingBean
     public ConnectionProvider jpaConnectionProvider() {
@@ -103,7 +110,7 @@ public class JaversSqlAutoConfiguration {
     }
 
     @Bean
-    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider) {
-        return new JaversAuditableRepositoryAspect(javers, authorProvider);
+    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
     }
 }

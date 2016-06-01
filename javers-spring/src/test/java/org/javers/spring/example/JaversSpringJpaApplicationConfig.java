@@ -1,5 +1,6 @@
 package org.javers.spring.example;
 
+import com.google.common.collect.ImmutableMap;
 import org.javers.core.Javers;
 import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
 import org.javers.repository.sql.ConnectionProvider;
@@ -7,6 +8,8 @@ import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.EmptyPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -68,7 +72,7 @@ public class JaversSpringJpaApplicationConfig {
      */
     @Bean
     public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect() {
-        return new JaversAuditableRepositoryAspect(javers(), authorProvider());
+        return new JaversAuditableRepositoryAspect(javers(), authorProvider(), commitPropertiesProvider());
     }
 
     /**
@@ -80,6 +84,20 @@ public class JaversSpringJpaApplicationConfig {
     @Bean
     public AuthorProvider authorProvider() {
         return new SpringSecurityAuthorProvider();
+    }
+
+    /**
+     * Optional for auto-audit aspect. <br/>
+     * @see CommitPropertiesProvider
+     */
+    @Bean
+    public CommitPropertiesProvider commitPropertiesProvider() {
+        return new CommitPropertiesProvider() {
+            @Override
+            public Map<String, String> provide() {
+                return ImmutableMap.of("key", "ok");
+            }
+        };
     }
 
     /**
