@@ -134,7 +134,7 @@ subprojects {
         publish = true
         pkg {
             repo = 'maven'
-            name = project.name
+            name = "org.javers:${project.name}"
         }
     }
 }
