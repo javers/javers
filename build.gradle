@@ -134,7 +134,7 @@ subprojects {
         publish = true
         pkg {
             repo = 'maven'
-            name = 'javers'
+            name = project.name
         }
     }
 }
