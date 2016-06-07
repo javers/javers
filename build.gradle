@@ -125,7 +125,6 @@ subprojects {
         }
     }
 
-
     bintray {
         user = project.ext.has('bintrayUser') ? project.ext.bintrayUser : ''
         key = project.ext.has('bintrayKey') ? project.ext.bintrayKey : ''
@@ -134,7 +133,15 @@ subprojects {
         publish = true
         pkg {
             repo = 'maven'
-            name = "org.javers:${project.name}"
+            name = 'javers'
+            version {
+                mavenCentralSync {
+                    sync = true
+                    user = project.ext.has('sonatypeUser') ? project.ext.sonatypeUser : ''
+                    password = project.ext.has('sonatypePassword') ? project.ext.sonatypePassword : ''
+                    close = '1'
+                }
+            }
         }
     }
 }
