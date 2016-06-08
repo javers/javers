@@ -6,9 +6,9 @@ import org.polyjdbc.core.query.SelectQuery;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_CHANGED;
 
 class PrimaryKeySnapshotFilter extends SnapshotFilter  {
-    final long primaryKey;
-    final String pkFieldName;
-    final Optional<String> propertyName;
+    private final long primaryKey;
+    private final String pkFieldName;
+    private final Optional<String> propertyName;
 
     public PrimaryKeySnapshotFilter(long primaryKey, String pkFieldName, Optional<String> propertyName) {
         this.primaryKey = primaryKey;

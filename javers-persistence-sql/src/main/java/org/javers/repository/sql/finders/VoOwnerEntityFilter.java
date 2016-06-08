@@ -9,8 +9,8 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_FRAG
  * @author bartosz.walacik
  */
 public class VoOwnerEntityFilter extends SnapshotFilter {
-    final String ownerTypeName;
-    final String fragment;
+    private final String ownerTypeName;
+    private final String fragment;
 
     VoOwnerEntityFilter(String ownerTypeName, String fragment) {
         this.ownerTypeName = ownerTypeName;

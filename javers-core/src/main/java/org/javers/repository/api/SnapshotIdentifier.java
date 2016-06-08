@@ -8,8 +8,8 @@ import java.util.Objects;
 
 public final class SnapshotIdentifier {
 
-    final GlobalId globalId;
-    final long version;
+    private final GlobalId globalId;
+    private final long version;
 
     public SnapshotIdentifier(GlobalId globalId, long version) {
         Validate.argumentIsNotNull(globalId);
