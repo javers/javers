@@ -78,7 +78,7 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
         Map rightMap = MapType.mapStatic(rightRawMap, dehydrateFunction, owner);
 
         if (Objects.equals(leftMap, rightMap)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         List<EntryChange> changes = new ArrayList<>();

@@ -13,7 +13,7 @@ import java.util.List;
  */
 public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefinitionBuilder> {
     private Class<?> clazz;
-    private List<String> ignoredProperties = Collections.EMPTY_LIST;
+    private List<String> ignoredProperties = Collections.emptyList();
     private Optional<String> typeName = Optional.empty();
 
     ClientsClassDefinitionBuilder(Class<?> clazz) {
