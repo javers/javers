@@ -51,7 +51,7 @@ public class Atomic implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Atomic)) {
+        if (!(obj instanceof Atomic)) {
             return false;
         }
 
