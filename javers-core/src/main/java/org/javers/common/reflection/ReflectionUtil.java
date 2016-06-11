@@ -200,6 +200,8 @@ public class ReflectionUtil {
         if (javaType instanceof ParameterizedType
                 && ((ParameterizedType)javaType).getRawType() instanceof Class){
             return (Class)((ParameterizedType)javaType).getRawType();
+        }  else if (javaType instanceof GenericArrayType) {
+            return Object[].class;
         }  else if (javaType instanceof Class) {
             return (Class)javaType;
         }

@@ -480,7 +480,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ]
     }
 
-    @Unroll
     def "should ignore empty Optional"() {
         given:
         def graphBuilder = newBuilder()
@@ -491,5 +490,17 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
         then:
         assertThat(node).hasNoEdges()
+    }
+
+    def "should support generic arrays"() {
+        given:
+        def graphBuilder = newBuilder()
+
+        when:
+        GenericArrayContainer<String> cdo = new GenericArrayContainer(["a", "b"] as String[])
+        def node = graphBuilder.buildGraph(cdo).root()
+
+        then:
+        assert node.getCdo().getPropertyValue("array") == ["a", "b"] as String[]
     }
 }
