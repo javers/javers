@@ -37,20 +37,12 @@ public enum JaversExceptionCode {
     NOT_IMPLEMENTED("not implemented"),
 
     SNAPSHOT_NOT_FOUND("snapshot '%s' not found in JaversRepository"),
-
-    SET_OF_VO_DIFF_NOT_IMPLEMENTED("diff for Set of ValueObjects is not supported"),
-
-    VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MULTIMAP_KEY("found ValueObject on KEY position in Multimap property '%s'. Please change the key class mapping to Value or Entity"),
-
-    GENERIC_TYPE_NOT_PARAMETRIZED(
-            "\nexpected actual Class argument in type '%s'. "+
-            "\nJaVers needs to know actual Class of elements stored in your collections. "+
-            "\nTry at least <Object>. Wildcards (e.g. <?>), unbounded type parameters (e.g. <T>)" +
-            " and raw types (e.g. List) are not supported."),
-
+    
     //graph & snapshot
     VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY("found ValueObject on KEY position in Map property '%s'. Please change the key class mapping to Value or Entity"),
 
+    VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MULTIMAP_KEY("found ValueObject on KEY position in Multimap property '%s'. Please change the key class mapping to Value or Entity"),
+    
     SNAPSHOT_STATE_VIOLATION("snapshots are immutable"),
 
     PROPERTY_NOT_FOUND("property '%s' not found in class '%s'"),
@@ -86,7 +78,7 @@ public enum JaversExceptionCode {
 
     CANT_DELETE_OBJECT_NOT_FOUND("failed to delete object {'%s'}, "+
             "it doesn't exists in JaversRepository"),
-    
+
     CANT_FIND_COMMIT_HEAD_ID("can't find commit head id in JaversRepository"),
     CANT_SAVE_ALREADY_PERSISTED_COMMIT("can't save already persisted commit '%s'"),
 
@@ -103,7 +95,7 @@ public enum JaversExceptionCode {
 
     private final String message;
 
-    private JaversExceptionCode(String message) {
+    JaversExceptionCode(String message) {
         this.message = message;
     }
 

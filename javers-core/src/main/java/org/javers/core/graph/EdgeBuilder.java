@@ -61,7 +61,7 @@ class EdgeBuilder {
     }
 
     private class MultiEdgeContainerBuilderFunction implements EnumerableFunction {
-        final MultiEdge multiEdge;
+        private final MultiEdge multiEdge;
 
         public MultiEdgeContainerBuilderFunction(MultiEdge multiEdge) {
             this.multiEdge = multiEdge;

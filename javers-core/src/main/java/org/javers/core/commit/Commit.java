@@ -9,6 +9,7 @@ import org.joda.time.LocalDateTime;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JaVers commit is similar notion to GIT <i>commit</i> or SVN <i>revision</i>.
@@ -51,6 +52,10 @@ public final class Commit {
 
     public String getAuthor() {
         return commitMetadata.getAuthor();
+    }
+
+    public Map<String, String> getProperties() {
+        return commitMetadata.getProperties();
     }
 
     Diff getDiff() {

@@ -1,17 +1,23 @@
 package org.javers.spring.example;
 
 import com.github.fakemongo.Fongo;
+import com.google.common.collect.ImmutableMap;
 import com.mongodb.client.MongoDatabase;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.EmptyPropertiesProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
+import java.util.Map;
 
 /**
  * @author bartosz walacik
@@ -51,24 +57,30 @@ public class JaversSpringMongoApplicationConfig {
      */
     @Bean
     public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect() {
-        return new JaversAuditableRepositoryAspect(javers(), authorProvider());
+        return new JaversAuditableRepositoryAspect(javers(), authorProvider(), commitPropertiesProvider());
     }
 
     /**
-     * Required by Repository auto-audit aspect. <br/><br/>
+     * Required by auto-audit aspect. <br/><br/>
      *
-     * Returns mock implementation for testing.
-     * <br/>
-     * Provide real implementation,
-     * when using Spring Security you can use
-     * {@link org.javers.spring.auditable.SpringSecurityAuthorProvider}.
+     * Creates {@link SpringSecurityAuthorProvider} instance,
+     * suitable when using Spring Security
      */
     @Bean
     public AuthorProvider authorProvider() {
-        return new AuthorProvider() {
+        return new SpringSecurityAuthorProvider();
+    }
+
+    /**
+     * Optional for auto-audit aspect. <br/>
+     * @see CommitPropertiesProvider
+     */
+    @Bean
+    public CommitPropertiesProvider commitPropertiesProvider() {
+        return new CommitPropertiesProvider() {
             @Override
-            public String provide() {
-                return "unknown";
+            public Map<String, String> provide() {
+                return ImmutableMap.of("key", "ok");
             }
         };
     }

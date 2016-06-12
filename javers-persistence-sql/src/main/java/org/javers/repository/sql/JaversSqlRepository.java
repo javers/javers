@@ -44,6 +44,11 @@ public class JaversSqlRepository implements JaversRepository {
     }
 
     @Override
+    public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
+        return finder.getSnapshots(queryParams);
+    }
+
+    @Override
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
         return finder.getSnapshots(snapshotIdentifiers);
     }
@@ -54,7 +59,7 @@ public class JaversSqlRepository implements JaversRepository {
             throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT, commit.getId());
         }
 
-        long commitPk = commitRepository.save(commit.getAuthor(), commit.getCommitDate(), commit.getId());
+        long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getId());
         cdoSnapshotRepository.save(commitPk, commit.getSnapshots());
     }
 

@@ -1,8 +1,6 @@
 package org.javers.core.snapshot
 
 import org.javers.common.collections.Arrays
-import org.javers.common.exception.JaversException
-import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.JaversTestBuilder
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
@@ -286,15 +284,14 @@ class SnapshotFactoryTest extends Specification{
                        ]
     }
 
-    def "should throw exception when property Type is not fully parametrized"() {
+    def "should handle property with not parametrized type"() {
         when:
         def cdo = new SnapshotEntity(nonParametrizedMap:  ["a":1])
         def cdoWrapper = javers.createCdoWrapper(cdo)
-        snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def snap = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
 
         then:
-        def e = thrown(JaversException)
-        e.code == JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
+        snap.getPropertyValue("nonParametrizedMap") == ["a":1]
     }
 
     @Unroll
@@ -327,6 +324,6 @@ class SnapshotFactoryTest extends Specification{
     }
 
     def someCommitMetadata(){
-        new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0))
+        new CommitMetadata("kazik", [:], LocalDateTime.now(), new CommitId(1, 0))
     }
 }

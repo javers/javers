@@ -15,10 +15,7 @@ import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -69,6 +66,7 @@ public class TypeMapper {
         registerValueType(ThreadLocal.class);
 
         //Collections
+        addType(new CollectionType(Collection.class)); //only for exception handling
         addType(new SetType(Set.class));
         addType(new ListType(List.class));
 

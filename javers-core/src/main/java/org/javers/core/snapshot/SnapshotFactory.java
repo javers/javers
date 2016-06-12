@@ -10,7 +10,6 @@ import org.javers.core.metamodel.type.*;
 
 import java.util.Objects;
 
-import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 import static org.javers.common.exception.JaversExceptionCode.NOT_IMPLEMENTED;
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 import static org.javers.core.metamodel.object.SnapshotType.*;
@@ -29,7 +28,10 @@ public class SnapshotFactory {
 
     public CdoSnapshot createTerminal(GlobalId globalId, CdoSnapshot previous, CommitMetadata commitMetadata) {
         ManagedType managedType = typeMapper.getJaversManagedType(globalId);
-        return cdoSnapshot(globalId, commitMetadata, managedType)
+        return cdoSnapshot()
+                .withGlobalId(globalId)
+                .withManagedType(managedType)
+                .withCommitMetadata(commitMetadata)
                 .withType(TERMINAL)
                 .withVersion(previous.getVersion()+1)
                 .build();
@@ -66,10 +68,6 @@ public class SnapshotFactory {
     }
 
     private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
-        if (!propertyType.isFullyParametrized()){
-            throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, propertyType.getBaseJavaType().toString());
-        }
-
         EnumerableFunction dehydratorMapFunction;
         if (propertyType instanceof ContainerType) {
             JaversType itemType = typeMapper.getJaversType( ((ContainerType)propertyType).getItemClass() );
@@ -86,8 +84,11 @@ public class SnapshotFactory {
         return  propertyType.map(propertyVal, dehydratorMapFunction, owner);
     }
 
-    private CdoSnapshotBuilder initSnapshotBuilder(CdoWrapper cdoWrapper, CommitMetadata commitMetadata){
-        return cdoSnapshot(cdoWrapper.getGlobalId(), commitMetadata, cdoWrapper.getManagedType());
+    private CdoSnapshotBuilder initSnapshotBuilder(CdoWrapper cdoWrapper, CommitMetadata commitMetadata) {
+        return cdoSnapshot()
+                .withGlobalId(cdoWrapper.getGlobalId())
+                .withCommitMetadata(commitMetadata)
+                .withManagedType(cdoWrapper.getManagedType());
     }
 
     private Object dehydrateProperty(Property property, Object propertyVal, GlobalId id){

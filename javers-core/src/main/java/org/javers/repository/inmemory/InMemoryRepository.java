@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.unmodifiableList;
+import static org.javers.common.collections.Collections.allMatch;
 
 /**
  * Fake impl of JaversRepository
@@ -42,7 +43,7 @@ public class InMemoryRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getValueObjectStateHistory(final EntityType ownerEntity, final String path, QueryParams queryParams) {
-        Validate.argumentsAreNotNull(ownerEntity, path);
+        Validate.argumentsAreNotNull(ownerEntity, path, queryParams);
 
         List<CdoSnapshot> result =  Lists.positiveFilter(getAll(), new Predicate<CdoSnapshot>() {
             @Override
@@ -62,7 +63,7 @@ public class InMemoryRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        Validate.argumentIsNotNull(globalId);
+        Validate.argumentsAreNotNull(globalId, queryParams);
 
         if (snapshots.containsKey(globalId)) {
             return unmodifiableList(applyQueryParams(snapshots.get(globalId), queryParams));
@@ -72,7 +73,7 @@ public class InMemoryRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
-        Validate.argumentIsNotNull(givenClass);
+        Validate.argumentsAreNotNull(givenClass, queryParams);
         List<CdoSnapshot> filtered = new ArrayList<>();
 
         for (CdoSnapshot snapshot : getAll()) {
@@ -86,7 +87,7 @@ public class InMemoryRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, final String propertyName, QueryParams queryParams) {
-        Validate.argumentsAreNotNull(globalId, propertyName);
+        Validate.argumentsAreNotNull(globalId, propertyName, queryParams);
 
         if (snapshots.containsKey(globalId)) {
             List<CdoSnapshot> filtered = filterByPropertyName(snapshots.get(globalId), propertyName);
@@ -97,7 +98,7 @@ public class InMemoryRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
-        Validate.argumentsAreNotNull(givenClass, propertyName);
+        Validate.argumentsAreNotNull(givenClass, propertyName, queryParams);
 
         QueryParams increasedLimitQueryParams = getQueryParamsWithIncreasedLimit(queryParams);
         List<CdoSnapshot> filtered = filterByPropertyName(getStateHistory(givenClass, increasedLimitQueryParams), propertyName);
@@ -117,9 +118,13 @@ public class InMemoryRepository implements JaversRepository {
         if (queryParams.version().isPresent()) {
             snapshots = filterSnapshotsByVersion(snapshots, queryParams.version().get());
         }
+        if (queryParams.author().isPresent()) {
+            snapshots = filterSnapshotsByAuthor(snapshots, queryParams.author().get());
+        }
         if (queryParams.hasDates()) {
             snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
         }
+        snapshots = filterSnapshotsByCommitProperties(snapshots, queryParams.commitProperties());
         return trimResultsToRequestedSlice(snapshots, queryParams.skip(), queryParams.limit());
     }
 
@@ -139,10 +144,33 @@ public class InMemoryRepository implements JaversRepository {
         });
     }
 
+    private List<CdoSnapshot> filterSnapshotsByAuthor(List<CdoSnapshot> snapshots, final String author) {
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(CdoSnapshot snapshot) {
+                return author.equals(snapshot.getCommitMetadata().getAuthor());
+            }
+        });
+    }
+
     private List<CdoSnapshot> filterSnapshotsByCommitDate(List<CdoSnapshot> snapshots, final QueryParams queryParams) {
         return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
             public boolean apply(CdoSnapshot snapshot) {
                 return queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate());
+            }
+        });
+    }
+
+    private List<CdoSnapshot> filterSnapshotsByCommitProperties(List<CdoSnapshot> snapshots, final Map<String, String> commitProperties) {
+        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
+            public boolean apply(final CdoSnapshot snapshot) {
+                return allMatch(commitProperties.entrySet(), new Predicate<Map.Entry<String, String>>() {
+                    @Override
+                    public boolean apply(Map.Entry<String, String> commitProperty) {
+                        Map<String, String> actualCommitProperties = snapshot.getCommitMetadata().getProperties();
+                        return actualCommitProperties.containsKey(commitProperty.getKey()) &&
+                            actualCommitProperties.get(commitProperty.getKey()).equals(commitProperty.getValue());
+                    }
+                });
             }
         });
     }
@@ -163,6 +191,13 @@ public class InMemoryRepository implements JaversRepository {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
+        Validate.argumentIsNotNull(queryParams);
+
+        return unmodifiableList(applyQueryParams(getAll(), queryParams));
     }
 
     @Override

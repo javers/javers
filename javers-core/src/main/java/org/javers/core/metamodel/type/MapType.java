@@ -1,7 +1,6 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
 
@@ -10,20 +9,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
-
 /**
  * @author bartosz walacik
  */
 public class MapType extends EnumerableType {
 
     public MapType(Type baseJavaType) {
-        super(baseJavaType);
-    }
-
-    @Override
-    public boolean isFullyParametrized() {
-        return getActualTypeArguments().size() == 2;
+        super(baseJavaType, 2);
     }
 
     @Override
@@ -35,7 +27,7 @@ public class MapType extends EnumerableType {
         Validate.argumentIsNotNull(mapFunction);
 
         if (sourceMap_ == null) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
 
         Map<Object, Object> sourceMap = (Map) sourceMap_;
@@ -65,24 +57,15 @@ public class MapType extends EnumerableType {
 
     /**
      * never returns null
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     public Type getKeyType() {
-        if (isFullyParametrized()) {
-            return getActualTypeArguments().get(0);
-        }
-        throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
+        return getConcreteClassTypeArguments().get(0);
     }
 
     /**
      * never returns null
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     public Type getValueType() {
-        if (isFullyParametrized()) {
-            return getActualTypeArguments().get(1);
-        }
-        throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
+        return getConcreteClassTypeArguments().get(1);
     }
-
 }

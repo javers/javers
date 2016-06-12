@@ -43,6 +43,6 @@ public class ValueObjectId extends GlobalId {
 
     @Override
     public String value() {
-        return getOwnerId().value()+"#"+fragment;
+        return getOwnerId().value() +"#"+ fragment;
     }
 }

@@ -8,7 +8,7 @@ import org.polyjdbc.core.type.Timestamp;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 abstract class SnapshotFilter {
-    static final String COMMIT_WITH_SNAPSHOT
+    private static final String COMMIT_WITH_SNAPSHOT
         = SNAPSHOT_TABLE_NAME + " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK;
 
     static final String COMMIT_WITH_SNAPSHOT_GLOBAL_ID =
@@ -16,12 +16,13 @@ abstract class SnapshotFilter {
             " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
             " LEFT OUTER JOIN " + GLOBAL_ID_TABLE_NAME + " o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK;
 
-    static final String BASE_FIELDS =
+    private static final String BASE_FIELDS =
         SNAPSHOT_STATE + ", " +
             SNAPSHOT_TYPE + ", " +
             SNAPSHOT_VERSION + ", " +
             SNAPSHOT_CHANGED + ", " +
             SNAPSHOT_MANAGED_TYPE + ", " +
+            COMMIT_PK + ", " +
             COMMIT_AUTHOR + ", " +
             COMMIT_COMMIT_DATE + ", " +
             COMMIT_COMMIT_ID;
@@ -31,13 +32,18 @@ abstract class SnapshotFilter {
             "g." + GLOBAL_ID_LOCAL_ID + ", " +
             "g." + GLOBAL_ID_FRAGMENT + ", " +
             "g." + GLOBAL_ID_OWNER_ID_FK + ", " +
+            //"g." + GLOBAL_ID_TYPE_NAME + ", " +
             "o." + GLOBAL_ID_LOCAL_ID + " owner_" + GLOBAL_ID_LOCAL_ID + ", " +
             "o." + GLOBAL_ID_FRAGMENT + " owner_" + GLOBAL_ID_FRAGMENT + ", " +
             "o." + GLOBAL_ID_TYPE_NAME + " owner_" + GLOBAL_ID_TYPE_NAME;
 
-    abstract String select();
+    String select() {
+        return BASE_AND_GLOBAL_ID_FIELDS;
+    }
 
-    abstract void addFrom(SelectQuery query);
+    void addFrom(SelectQuery query) {
+        query.from(COMMIT_WITH_SNAPSHOT_GLOBAL_ID);
+    }
 
     abstract  void addWhere(SelectQuery query);
 
@@ -61,4 +67,19 @@ abstract class SnapshotFilter {
             .withArgument("version", version);
     }
 
+    void addAuthorCondition(SelectQuery query, String author) {
+        query.append(" AND " + COMMIT_AUTHOR + " = :author")
+            .withArgument("author", author);
+    }
+
+    void addCommitPropertyCondition(SelectQuery query, String propertyName, String propertyValue) {
+        query.append(" AND EXISTS (" +
+            "SELECT * FROM " + COMMIT_PROPERTY_TABLE_NAME +
+            " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
+            " AND " + COMMIT_PROPERTY_NAME + " = :propertyName_" + propertyName +
+            " AND " + COMMIT_PROPERTY_VALUE + " = :propertyValue_" + propertyName +
+            ")")
+            .withArgument("propertyName_" + propertyName, propertyName)
+            .withArgument("propertyValue_" + propertyName, propertyValue);
+    }
 }

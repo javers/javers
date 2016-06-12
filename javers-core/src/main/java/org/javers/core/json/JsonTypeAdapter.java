@@ -24,7 +24,7 @@ import java.util.List;
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
  * <p/>
  *
- * For implementation example see {@link org.javers.core.json.typeadapter.joda.LocalDateTimeTypeAdapter}.
+ * For implementation example see {@link org.javers.core.json.typeadapter.date.LocalDateTimeTypeAdapter}.
  * <p/>
  *
  * @param <T> user type, mapped to {@link ValueType} or {@link CustomType}

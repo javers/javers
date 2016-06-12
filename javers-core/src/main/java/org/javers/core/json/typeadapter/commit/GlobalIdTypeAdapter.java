@@ -18,11 +18,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     private static final Logger logger = getLogger(GlobalIdTypeAdapter.class);
 
-    private static final String ENTITY_FIELD = "entity";
-    private static final String CDO_ID_FIELD = "cdoId";
-    private static final String OWNER_ID_FIELD = "ownerId";
-    private static final String VALUE_OBJECT_FIELD = "valueObject";
-    private static final String FRAGMENT_FIELD = "fragment";
+    static final String ENTITY_FIELD = "entity";
+    static final String CDO_ID_FIELD = "cdoId";
+    static final String OWNER_ID_FIELD = "ownerId";
+    static final String VALUE_OBJECT_FIELD = "valueObject";
+    static final String FRAGMENT_FIELD = "fragment";
 
     private final GlobalIdFactory globalIdFactory;
     private final TypeMapper typeMapper;

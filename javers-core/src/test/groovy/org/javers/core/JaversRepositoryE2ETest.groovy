@@ -18,6 +18,7 @@ import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.repository.jql.QueryBuilder.anyDomainObject
 import static org.javers.repository.jql.QueryBuilder.byClass
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
@@ -111,6 +112,45 @@ class JaversRepositoryE2ETest extends Specification {
         changes.each {
             assert it.affectedGlobalId == valueObjectId(1,SnapshotEntity,"valueObjectRef")
         }
+    }
+
+    def "should query for nested ValueObject changes"(){
+      given:
+      def user = new DummyUserDetails(id:1, dummyAddress:
+              new DummyAddress(networkAddress: new DummyNetworkAddress(address: "a")))
+
+      javers.commit("author", user)
+      user.dummyAddress.networkAddress.address = "b"
+      javers.commit("author", user)
+
+      when:
+      def changes = javers.findChanges(QueryBuilder.byValueObjectId(1, DummyUserDetails,
+              "dummyAddress/networkAddress").build())
+
+      then:
+      changes.size() == 1
+      changes[0].left == "a"
+      changes[0].right == "b"
+    }
+
+    def "should query for changes on nested ValueObjects stored in a list"(){
+        given:
+        def user = new DummyUserDetails(
+            id:1,
+            addressList: [new DummyAddress(networkAddress: new DummyNetworkAddress(address: "a"))])
+
+        javers.commit("author", user)
+        user.addressList[0].networkAddress.address = "b"
+        javers.commit("author", user)
+
+        when:
+        def changes = javers.findChanges(QueryBuilder.byValueObjectId(1, DummyUserDetails,
+                "addressList/0/networkAddress").build())
+
+        then:
+        changes.size() == 1
+        changes[0].left == "a"
+        changes[0].right == "b"
     }
 
     @Unroll
@@ -735,6 +775,17 @@ class JaversRepositoryE2ETest extends Specification {
         assert snapshots.size() == snapshotIdentifiers.size()
     }
 
+    def "should cope with query for snapshots with empty collection of snapshot ids"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id: 1, intProperty: 1))
+
+        when:
+        def snapshots = repository.getSnapshots([])
+
+        then:
+        assert snapshots.size() == 0
+    }
+
     def "should treat refactored VOs as different versions of the same client's domain object"(){
         given:
         javers.commit('author', new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5, 5)))
@@ -746,4 +797,135 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         snapshots.version == [2, 1]
     }
+
+    @Unroll
+    def "should find all changes introduced by all snapshots specified in query (limit: #limit)"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id: 1))
+        (1..100).each {
+            def entity = new SnapshotEntity(id: 1, intProperty: it)
+            javers.commit("author", entity)
+
+            entity.dob = new LocalDate()
+            javers.commit("author", entity)
+        }
+
+        when:
+        def query = byInstanceId(1, SnapshotEntity).andProperty('intProperty').limit(limit).build()
+        def snapshots = javers.findSnapshots(query)
+        def changes = javers.findChanges(query)
+
+        then:
+        assert snapshots.size() == changes.size()
+        assert changes.first().left == snapshots.first().state.getPropertyValue('intProperty') - 1
+        assert changes.first().right == snapshots.first().state.getPropertyValue('intProperty')
+        assert changes.last().left == snapshots.last().state.getPropertyValue('intProperty') - 1
+        assert changes.last().right == snapshots.last().state.getPropertyValue('intProperty')
+
+        where:
+        limit << [1, 50, 99, 200]
+    }
+
+    @Unroll
+    def "should query for #what snapshot committed by a given author"() {
+        given:
+        (1..4).each {
+            def author = it % 2 == 0 ? "Jim" : "Pam";
+            javers.commit(author, new SnapshotEntity(id: it))
+            javers.commit(author, new DummyUserDetails(id: it))
+        }
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots*.globalId == expectedResult
+
+        where:
+        what << ["Entity", "any"]
+        query << [
+            byClass(SnapshotEntity).byAuthor("Jim").build(),
+            anyDomainObject().byAuthor("Jim").build()
+        ]
+        expectedResult << [
+            [instanceId(4, SnapshotEntity), instanceId(2, SnapshotEntity)],
+            [instanceId(4, DummyUserDetails), instanceId(4, SnapshotEntity),
+             instanceId(2, DummyUserDetails), instanceId(2, SnapshotEntity)]
+        ]
+    }
+
+    def "should return empty map of commit properties if snapshot was commited without properties"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id :1))
+
+        when:
+        def snapshot = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build()).first()
+
+        then:
+        assert snapshot.commitMetadata.properties.isEmpty()
+    }
+
+    def "should return committed properties"() {
+        given:
+        def commitProperties = [
+            "tenant": "ACME",
+            "sessionId": "1234567890",
+            "device": "smartwatch",
+            "yet another property name": "yet another property value",
+        ]
+        javers.commit("author", new SnapshotEntity(id :1), commitProperties)
+
+        when:
+        def snapshot = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build()).first()
+
+        then:
+        assert snapshot.commitMetadata.properties["tenant"] == "ACME"
+        assert snapshot.commitMetadata.properties["sessionId"] == "1234567890"
+        assert snapshot.commitMetadata.properties["device"] == "smartwatch"
+        assert snapshot.commitMetadata.properties["yet another property name"] == "yet another property value"
+    }
+
+    @Unroll
+    def "should retrieve snapshots with specified commit properties"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id: 1), [ "tenant" : "ACME", "browser": "IE" ])
+        javers.commit("author", new SnapshotEntity(id: 2), [ "tenant" : "Dunder Mifflin", "browser": "IE" ])
+        javers.commit("author", new SnapshotEntity(id: 3), [ "tenant" : "ACME", "browser": "Safari" ])
+        javers.commit("author", new SnapshotEntity(id: 4), [ "tenant" : "Dunder Mifflin", "browser": "Safari" ])
+        javers.commit("author", new SnapshotEntity(id: 5), [ "tenant" : "Dunder Mifflin", "browser": "Chrome" ])
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        assert snapshots*.getPropertyValue("id") as Set == expectedSnapshotIds as Set
+
+        where:
+        query << [
+            byClass(SnapshotEntity).withCommitProperty("tenant", "Dunder Mifflin").build(),
+            byClass(SnapshotEntity).withCommitProperty("browser", "Safari").build(),
+            byClass(SnapshotEntity).withCommitProperty("tenant", "ACME").withCommitProperty("browser", "IE").build(),
+            byClass(SnapshotEntity).withCommitProperty("tenant", "ACME").withCommitProperty("browser", "Chrome").build()
+        ]
+        expectedSnapshotIds << [
+            [2, 4, 5],
+            [3, 4],
+            [1],
+            []
+        ]
+    }
+
+    def "should handle special characters in commit properties filter"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id: 1), ["specialCharacters": ""])
+        javers.commit("author", new SnapshotEntity(id: 2), ["specialCharacters": "!@#\$%^&*()-_=+[{]};:'\"\\|`~,<.>/?§£"])
+
+        when:
+        def snapshots = javers.findSnapshots(byClass(SnapshotEntity).withCommitProperty("specialCharacters", "!@#\$%^&*()-_=+[{]};:'\"\\|`~,<.>/?§£").build())
+
+        then:
+        assert snapshots.size() == 1
+        assert snapshots[0].getPropertyValue("id") == 2
+    }
+
 }

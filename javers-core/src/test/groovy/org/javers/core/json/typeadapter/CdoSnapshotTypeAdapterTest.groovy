@@ -5,9 +5,9 @@ import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.metamodel.object.CdoSnapshot
-import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
+import org.javers.repository.jql.ValueObjectIdDTO
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
@@ -128,12 +128,14 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     def "should deserialize CdoSnapshot"() {
         given:
         def changed = ["name", "age"]
+        def commitProperties = [["key" : "os", "value" : "Solaris"]]
         def json = new JsonBuilder()
         json {
             commitMetadata {
                 id "1.0"
                 author "author"
-                dateTime "2000-01-01T12:00:00"
+                properties commitProperties
+                commitDate "2000-01-01T12:00:00"
             }
             globalId {
                 entity "org.javers.core.model.DummyUser"
@@ -151,6 +153,9 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         snapshot.commitMetadata.id.value() == "1.0"
+        snapshot.commitMetadata.author == "author"
+        snapshot.commitMetadata.properties == ["os" : "Solaris"]
+        snapshot.commitMetadata.commitDate == new LocalDateTime(2000,1,1,12,0)
         snapshot.globalId == instanceId("kaz",DummyUser)
         snapshot.initial == true
         snapshot.changed.collect{it} as Set == ["name", "age"] as Set
@@ -163,9 +168,9 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def json = new JsonBuilder()
         json {
             commitMetadata {
-                commitId "1.0"
+                id "1.0"
                 author "author"
-                dateTime "2000-01-01T12:00:00"
+                commitDate "2000-01-01T12:00:00"
             }
             globalId {
                 entity "org.javers.core.model.DummyUser"
@@ -188,9 +193,9 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def json = new JsonBuilder()
         json {
             commitMetadata {
-                commitId "1.0"
+                id "1.0"
                 author "author"
-                dateTime "2000-01-01T12:00:00"
+                commitDate "2000-01-01T12:00:00"
             }
             globalId {
                 entity "org.javers.core.model.DummyUser"
@@ -222,9 +227,9 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def json = new JsonBuilder()
         json {
             commitMetadata {
-                commitId "1.0"
+                id "1.0"
                 author "author"
-                dateTime "2000-01-01T12:00:00"
+                commitDate "2000-01-01T12:00:00"
             }
             globalId {
                 entity "org.javers.core.model.DummyUser"
@@ -253,9 +258,9 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def json = new JsonBuilder()
         json {
             commitMetadata {
-                commitId "1.0"
+                id "1.0"
                 author "author"
-                dateTime "2000-01-01T12:00:00"
+                commitDate "2000-01-01T12:00:00"
             }
             globalId {
                 entity "org.javers.core.model.DummyUserDetails"
@@ -289,9 +294,9 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def ids = [1, 2]
         json {
             commitMetadata {
-                commitId "1.0"
+                id "1.0"
                 author "author"
-                dateTime "2000-01-01T12:00:00"
+                commitDate "2000-01-01T12:00:00"
             }
             globalId {
                 entity "org.javers.core.model.DummyUser"
@@ -332,6 +337,6 @@ class CdoSnapshotTypeAdapterTest extends Specification {
     }
 
     CommitMetadata someCommitMetadata(){
-        new CommitMetadata("kazik", LocalDateTime.now(), new CommitId(1, 0))
+        new CommitMetadata("kazik", [:], LocalDateTime.now(), new CommitId(1, 0))
     }
 }

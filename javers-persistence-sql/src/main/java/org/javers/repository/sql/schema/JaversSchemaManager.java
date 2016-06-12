@@ -3,7 +3,6 @@ package org.javers.repository.sql.schema;
 import org.javers.repository.sql.ConnectionProvider;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.dialect.*;
-import org.polyjdbc.core.query.UpdateQuery;
 import org.polyjdbc.core.schema.SchemaInspector;
 import org.polyjdbc.core.schema.SchemaManager;
 import org.polyjdbc.core.schema.model.Schema;
@@ -85,24 +84,27 @@ public class JaversSchemaManager {
      * JaVers 1.4.3 to 1.4.4 schema migration
      */
     private void addSnapshotVersionColumnIfNeeded() {
-
         if (!columnExists("jv_snapshot", "version")) {
-            logger.warn("column jv_snapshot.version not exists, running ALTER TABLE ...");
-
-            if ( dialect instanceof PostgresDialect ||
-                 dialect instanceof MysqlDialect ||
-                 dialect instanceof H2Dialect ||
-                 dialect instanceof MsSqlDialect) {
-                executeSQL("ALTER TABLE jv_snapshot ADD COLUMN version BIGINT");
-            } else if (dialect instanceof OracleDialect) {
-                executeSQL("ALTER TABLE jv_snapshot ADD version NUMBER");
-            } else {
-                handleUnsupportedDialect();
-            }
+            addLongColumn("jv_snapshot", "version");
         }
     }
 
-    //TODO this is just a draft, NOT TESTED YET
+    private void addLongColumn(String tableName, String colName){
+        logger.warn("column "+tableName+"."+colName+" not exists, running ALTER TABLE ...");
+
+        String sqlType = dialect.types().bigint(0);
+
+        if (dialect instanceof OracleDialect ||
+                dialect instanceof MsSqlDialect) {
+            executeSQL("ALTER TABLE "+tableName+" ADD "+colName+" "+sqlType);
+        } else {
+            executeSQL("ALTER TABLE "+tableName+" ADD COLUMN "+colName+" "+sqlType);
+        }
+    }
+
+    /**
+     * JaVers 1.6.x to 2.0 schema migration
+     */
     private void addSnapshotManagedTypeColumnIfNeeded() {
         if (!columnExists("jv_snapshot", "managed_type")) {
             addStringColumn("jv_snapshot", "managed_type", 200);
@@ -111,21 +113,9 @@ public class JaversSchemaManager {
         }
     }
 
-    //TODO this is just a draft, NOT TESTED YET
-    private void populateSnapshotManagedType() {
-        String updateStmt =
-            "UPDATE jv_snapshot" +
-            "  SET managed_type = (SELECT qualified_name" +
-            "                      FROM jv_cdo_class," +
-            "                           jv_global_id" +
-            "                      WHERE cdo_class_pk = cdo_class_fk " +
-            "                      AND   global_id_pk = global_id_fk" +
-            "                     )";
-        int cnt = executeUpdate(updateStmt);
-        logger.info("populate jv_snapshot.managed_type - " + cnt +" row(s) updated");
-    }
-
-    //TODO this is just a draft, NOT TESTED YET
+    /**
+     * JaVers 1.6.x to 2.0 schema migration
+     */
     private void addGlobalIdTypeNameColumnIfNeeded() {
         if (!columnExists("jv_global_id", "type_name")) {
             addStringColumn("jv_global_id", "type_name", 200);
@@ -134,7 +124,19 @@ public class JaversSchemaManager {
         }
     }
 
-    //TODO this is just a draft, NOT TESTED YET
+    private void populateSnapshotManagedType() {
+        String updateStmt =
+                "UPDATE jv_snapshot" +
+                        "  SET managed_type = (SELECT qualified_name" +
+                        "                      FROM jv_cdo_class," +
+                        "                           jv_global_id" +
+                        "                      WHERE cdo_class_pk = cdo_class_fk " +
+                        "                      AND   global_id_pk = global_id_fk" +
+                        "                     )";
+        int cnt = executeUpdate(updateStmt);
+        logger.info("populate jv_snapshot.managed_type - " + cnt +" row(s) updated");
+    }
+
     private void populateGlobalIdTypeName() {
         String updateStmt =
             "UPDATE jv_global_id " +
@@ -225,7 +227,8 @@ public class JaversSchemaManager {
 
         String sqlType = dialect.types().string(len);
 
-        if (dialect instanceof OracleDialect) {
+        if (dialect instanceof OracleDialect ||
+            dialect instanceof MsSqlDialect) {
             executeSQL("ALTER TABLE "+tableName+" ADD "+colName+" "+sqlType);
         } else {
             executeSQL("ALTER TABLE "+tableName+" ADD COLUMN "+colName+" "+sqlType);

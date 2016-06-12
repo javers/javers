@@ -105,8 +105,10 @@ abstract class ObjectGraphBuilderTest extends Specification {
       def cat1 = new CategoryVo()
       def cat2 = new CategoryVo()
       def cat3 = new CategoryVo()
+      def cat4 = new CategoryVo()
       cat1.parent = cat2
       cat2.parent = cat3
+      cat3.parent = cat4
 
       when:
       def node = graphBuilder.buildGraph(cat1).root()
@@ -119,7 +121,13 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .and()
                 .hasSingleEdge("parent")
                 .andTargetNode()
-                .hasValueObjectId("org.javers.core.model.CategoryVo/#parent#parent")
+                .hasValueObjectId("org.javers.core.model.CategoryVo/#parent/parent")
+                .hasOwnerId("org.javers.core.model.CategoryVo/")
+                . and()
+                .hasSingleEdge("parent")
+                .andTargetNode()
+                .hasValueObjectId("org.javers.core.model.CategoryVo/#parent/parent/parent")
+                .hasOwnerId("org.javers.core.model.CategoryVo/")
     }
 
     def "should build three nodes linear graph from Entities"() {

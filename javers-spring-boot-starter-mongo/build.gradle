@@ -9,4 +9,5 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testCompile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     testCompile "com.github.fakemongo:fongo:$fongoVersion"
+    testCompile 'org.springframework.security:spring-security-core:4.0.3.RELEASE'
 }

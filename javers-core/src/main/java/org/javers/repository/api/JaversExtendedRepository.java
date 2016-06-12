@@ -1,5 +1,6 @@
 package org.javers.repository.api;
 
+import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.common.collections.Predicate;
@@ -14,8 +15,7 @@ import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.snapshot.SnapshotDiffer;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -26,17 +26,23 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class JaversExtendedRepository implements JaversRepository {
     private final JaversRepository delegate;
     private final SnapshotDiffer snapshotDiffer;
+    private final PreviousSnapshotsCalculator previousSnapshotsCalculator;
 
     public JaversExtendedRepository(JaversRepository delegate, SnapshotDiffer snapshotDiffer) {
         this.delegate = delegate;
         this.snapshotDiffer = snapshotDiffer;
+        previousSnapshotsCalculator = new PreviousSnapshotsCalculator(new Function<Collection<SnapshotIdentifier>, List<CdoSnapshot>>() {
+            public List<CdoSnapshot> apply(Collection<SnapshotIdentifier> input) {
+                return getSnapshots(input);
+            }
+        });
     }
 
     public List<Change> getPropertyChangeHistory(GlobalId globalId, final String propertyName, boolean newObjects, QueryParams queryParams) {
         argumentsAreNotNull(globalId, propertyName);
 
         List<CdoSnapshot> snapshots = getPropertyStateHistory(globalId, propertyName, queryParams);
-        List<Change> changes = snapshotDiffer.calculateDiffs(snapshots, newObjects);
+        List<Change> changes = getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
 
         return filterByPropertyName(changes, propertyName);
     }
@@ -45,53 +51,60 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(givenClass, propertyName);
 
         List<CdoSnapshot> snapshots = getPropertyStateHistory(givenClass, propertyName, queryParams);
-        List<Change> changes = snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
+        List<Change> changes = getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
 
         return filterByPropertyName(changes, propertyName);
     }
 
     public List<Change> getChangeHistory(GlobalId globalId, boolean newObjects, QueryParams queryParams) {
-        argumentsAreNotNull(globalId);
+        argumentsAreNotNull(globalId, queryParams);
 
         List<CdoSnapshot> snapshots = getStateHistory(globalId, queryParams);
-        return snapshotDiffer.calculateDiffs(snapshots, newObjects);
+        return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
     }
 
     public List<Change> getChangeHistory(ManagedType givenClass, boolean newObjects, QueryParams queryParams) {
-        argumentsAreNotNull(givenClass);
+        argumentsAreNotNull(givenClass, queryParams);
 
         List<CdoSnapshot> snapshots = getStateHistory(givenClass, queryParams);
-        return snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
+        return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
     }
 
     public List<Change> getValueObjectChangeHistory(EntityType ownerEntity, String path, boolean newObjects, QueryParams queryParams) {
-        argumentsAreNotNull(ownerEntity, path);
+        argumentsAreNotNull(ownerEntity, path, queryParams);
 
         List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntity, path, queryParams);
-        return snapshotDiffer.calculateMultiDiffs(snapshots, newObjects);
+        return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
+    }
+
+    public List<Change> getChanges(boolean newObjects, QueryParams queryParams) {
+        argumentsAreNotNull(queryParams);
+
+        List<CdoSnapshot> snapshots = getSnapshots(queryParams);
+        return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        argumentIsNotNull(globalId);
+        argumentsAreNotNull(globalId, queryParams);
         return delegate.getStateHistory(globalId, queryParams);
     }
 
     @Override
     public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, QueryParams queryParams) {
-        argumentsAreNotNull(globalId, propertyName);
+        argumentsAreNotNull(globalId, propertyName, queryParams);
         return delegate.getPropertyStateHistory(globalId, propertyName, queryParams);
     }
 
     @Override
     public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
-        argumentsAreNotNull(givenClass, propertyName);
+        argumentsAreNotNull(givenClass, propertyName, queryParams);
         return delegate.getPropertyStateHistory(givenClass, propertyName, queryParams);
     }
 
     @Override
     public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
-        argumentsAreNotNull(ownerEntity, path);
+        argumentsAreNotNull(ownerEntity, path, queryParams);
         return delegate.getValueObjectStateHistory(ownerEntity, path, queryParams);
     }
 
@@ -99,6 +112,12 @@ public class JaversExtendedRepository implements JaversRepository {
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         argumentIsNotNull(globalId);
         return delegate.getLatest(globalId);
+    }
+
+    @Override
+    public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
+        argumentsAreNotNull(queryParams);
+        return delegate.getSnapshots(queryParams);
     }
 
     @Override
@@ -137,5 +156,18 @@ public class JaversExtendedRepository implements JaversRepository {
                 return input instanceof PropertyChange && ((PropertyChange) input).getPropertyName().equals(propertyName);
             }
         });
+    }
+
+    private List<CdoSnapshot> skipInitial(List<CdoSnapshot> snapshots) {
+        return Lists.negativeFilter(snapshots, new Predicate<CdoSnapshot>() {
+            @Override
+            public boolean apply(CdoSnapshot snapshot) {
+                return snapshot.isInitial();
+            }
+        });
+    }
+
+    private List<Change> getChangesIntroducedBySnapshots(List<CdoSnapshot> snapshots) {
+        return snapshotDiffer.calculateDiffs(snapshots, previousSnapshotsCalculator.calculate(snapshots));
     }
 }

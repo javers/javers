@@ -10,22 +10,12 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_MANAG
  * @author bartosz.walacik
  */
 class ManagedClassFilter extends SnapshotFilter {
-    final String managedType;
-    final Optional<String> propertyName;
+    private final String managedType;
+    private final Optional<String> propertyName;
 
     ManagedClassFilter(String managedType, Optional<String> propertyName) {
         this.managedType = managedType;
         this.propertyName = propertyName;
-    }
-
-    @Override
-    String select() {
-        return BASE_AND_GLOBAL_ID_FIELDS;
-    }
-
-    @Override
-    void addFrom(SelectQuery query) {
-        query.from(COMMIT_WITH_SNAPSHOT_GLOBAL_ID);
     }
 
     @Override

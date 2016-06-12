@@ -18,10 +18,12 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
+import org.javers.repository.jql.QueryBuilder;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -45,35 +47,63 @@ public interface Javers {
      * Persists a current state of a given domain object graph
      * in JaVers repository.
      * <br/><br/>
-     * 
+     *
      * JaVers applies commit() to given object and all objects navigable from it.
      * You can capture a state of an arbitrary complex object graph with a single commit() call.
      *
      * @see <a href="http://javers.org/documentation/repository-examples/">http://javers.org/documentation/repository-examples</a>
+     * @param author current user
      * @param currentVersion standalone object or handle to an object graph
      */
     Commit commit(String author, Object currentVersion);
 
     /**
+     * Variant of {@link #commit(String, Object)} with commitProperties.
+     * <br/>
+     * You can pass arbitrary commit properties and
+     * use them in JQL to search for snapshots or changes.
+     *
+     * @see QueryBuilder#withCommitProperty(String, String)
+     * @param commitProperties for example ["channel":"web", "locale":"pl-PL"]
+     */
+    Commit commit(String author, Object currentVersion, Map<String, String> commitProperties);
+
+    /**
      * Marks given object as deleted.
      * <br/><br/>
-     * 
+     *
      * Unlike {@link Javers#commit(String, Object)}, this method is shallow
      * and affects only given object.
      * <br/><br/>
      *
      * This method doesn't delete anything from JaVers repository.
-     * It just persists 'terminal snapshot' of given object.
+     * It just persists 'terminal snapshot' of a given object.
      *
      * @param deleted object to be marked as deleted
      */
     Commit commitShallowDelete(String author, Object deleted);
 
     /**
+     * Variant of {@link #commitShallowDelete(String, Object)} with commitProperties.
+     * <br/>
+     *
+     * See {@link #commit(String, Object, Map)} for commitProperties description.
+     */
+    Commit commitShallowDelete(String author, Object deleted, Map<String, String> commitProperties);
+
+    /**
      * The same like {@link #commitShallowDelete(String,Object)}
      * but deleted object is selected using globalId
      */
     Commit commitShallowDeleteById(String author, GlobalIdDTO globalId);
+
+    /**
+     * Variant of {@link #commitShallowDeleteById(String, GlobalIdDTO)} with commitProperties.
+     * <br/>
+     *
+     * See {@link #commit(String, Object, Map)} for commitProperties description.
+     */
+    Commit commitShallowDeleteById(String author, GlobalIdDTO globalId, Map<String, String> commitProperties);
 
     /**
      * <h2>Deep compare</h2>
@@ -102,7 +132,7 @@ public interface Javers {
      * In order to use data auditing feature, call {@link #commit(String, Object)}.
      *
      * <p>
-     * Diffs can be converted to JSON with {@link Javers#toJson(Diff)} or pretty-printed with {@link Diff#prettyPrint()}
+     * Diffs can be converted to JSON with {@link JsonConverter#toJson(Object)} or pretty-printed with {@link Diff#prettyPrint()}
      * </p>
      *
      * @see <a href="http://javers.org/documentation/diff-examples/">
@@ -127,7 +157,7 @@ public interface Javers {
      * </pre>
      *
      * @see <a href="http://javers.org/documentation/diff-examples/#compare-collections">
-     *     Compare top-level collections</a> example
+     *     Compare top-level collections example</a>
      */
     <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> itemClass);
 
@@ -168,6 +198,12 @@ public interface Javers {
      * Last changes on Address ValueObject owned by any Person:
      * <pre>
      * javers.findChanges( QueryBuilder.byValueObject(Person.class, "address").build() );
+     * </pre>
+     *
+     * Last changes on nested ValueObject
+     * (when Address is a ValueObject nested in PersonDetails ValueObject):
+     * <pre>
+     * javers.findChanges( QueryBuilder.byValueObject(Person.class, "personDetails/address").build() );
      * </pre>
      *
      * <b>Querying for any object changes by its class</b><br/><br/>

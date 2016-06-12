@@ -98,7 +98,7 @@ class MapChangeTypeAdapterTest extends Specification {
                         commitMetadata {
                             author "kazik"
                             commitDate "2001-12-01T22:23:03"
-                            commitId "1.0"
+                            id "1.0"
                         }
                         property "mapOfValues"
                         entryChanges ([

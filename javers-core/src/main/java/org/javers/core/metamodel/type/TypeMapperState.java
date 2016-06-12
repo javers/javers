@@ -176,7 +176,7 @@ class TypeMapperState {
             }
 
             //just to better speed
-            if (distancePair.getDistance() == 1) {
+            if (distancePair.getDistance() == 0) {
                 return distancePair.getJaversType();
             }
 

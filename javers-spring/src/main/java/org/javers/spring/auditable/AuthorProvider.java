@@ -1,11 +1,14 @@
 package org.javers.spring.auditable;
 
 /**
- * Implementation has to be thread-safe and has to provide
- * an author (typically a user login), to current user session.
+ * Should provide a commit author, typically a user name taken from a current user session.
  * <br/><br/>
  *
- * See {@link SpringSecurityAuthorProvider} - implementation for Spring Security
+ * Implementation has to be thread-safe.
+ * <br/><br/>
+ *
+ * See {@link SpringSecurityAuthorProvider} - implementation for Spring Security<br/>
+ * See {@link CommitPropertiesProvider}
  *
  * @author Pawel Szymczyk
  */

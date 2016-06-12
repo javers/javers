@@ -1,5 +1,6 @@
 package org.javers.spring.example;
 
+import com.google.common.collect.ImmutableMap;
 import org.javers.core.Javers;
 import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
 import org.javers.repository.sql.ConnectionProvider;
@@ -7,6 +8,9 @@ import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.EmptyPropertiesProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
@@ -26,6 +30,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -67,24 +72,30 @@ public class JaversSpringJpaApplicationConfig {
      */
     @Bean
     public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect() {
-        return new JaversAuditableRepositoryAspect(javers(), authorProvider());
+        return new JaversAuditableRepositoryAspect(javers(), authorProvider(), commitPropertiesProvider());
     }
 
     /**
-     * Required by Repository auto-audit aspect. <br/><br/>
+     * Required by auto-audit aspect. <br/><br/>
      *
-     * Returns mock implementation for testing.
-     * <br/>
-     * Provide real implementation,
-     * when using Spring Security you can use
-     * {@link org.javers.spring.auditable.SpringSecurityAuthorProvider}.
+     * Creates {@link SpringSecurityAuthorProvider} instance,
+     * suitable when using Spring Security
      */
     @Bean
     public AuthorProvider authorProvider() {
-        return new AuthorProvider() {
+        return new SpringSecurityAuthorProvider();
+    }
+
+    /**
+     * Optional for auto-audit aspect. <br/>
+     * @see CommitPropertiesProvider
+     */
+    @Bean
+    public CommitPropertiesProvider commitPropertiesProvider() {
+        return new CommitPropertiesProvider() {
             @Override
-            public String provide() {
-                return "unknown";
+            public Map<String, String> provide() {
+                return ImmutableMap.of("key", "ok");
             }
         };
     }

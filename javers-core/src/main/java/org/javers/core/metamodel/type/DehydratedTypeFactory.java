@@ -33,7 +33,7 @@ class DehydratedTypeFactory {
         }
 
         if (javersType instanceof ArrayType){
-            Type dehydratedItemType = build( javersType.getActualTypeArguments().get(0) );
+            Type dehydratedItemType = build( javersType.getConcreteClassTypeArguments().get(0) );
             if (dehydratedItemType == GlobalId.class){
                 return GLOBAL_ID_ARRAY_TYPE;
             }
@@ -44,7 +44,7 @@ class DehydratedTypeFactory {
     }
 
     private List<Type> extractAndDehydrateTypeArguments(JaversType genericType){
-        return Lists.transform(genericType.getActualTypeArguments(), new Function<Type, Type>() {
+        return Lists.transform(genericType.getConcreteClassTypeArguments(), new Function<Type, Type>() {
                 public Type apply(Type typeArgument) {
                     return build(typeArgument);
                 }
