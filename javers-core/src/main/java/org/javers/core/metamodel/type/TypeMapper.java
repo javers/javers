@@ -1,7 +1,5 @@
 package org.javers.core.metamodel.type;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
@@ -83,10 +81,10 @@ public class TypeMapper {
         }
 
         if (ReflectionUtil.isClassPresent("com.google.common.collect.Multiset")){
-            addType(new MultisetType(Multiset.class));
+            addType(new MultisetType());
         }
         if (ReflectionUtil.isClassPresent("com.google.common.collect.Multimap")){
-            addType(new MultimapType(Multimap.class));
+            addType(new MultimapType());
         }
     }
 

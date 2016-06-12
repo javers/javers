@@ -21,8 +21,8 @@ import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_P
  */
 public class MultimapType extends EnumerableType{
 
-    public MultimapType(Type baseJavaType){
-        super(baseJavaType);
+    public MultimapType(){
+        super(Multimap.class);
     }
 
     @Override

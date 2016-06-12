@@ -40,8 +40,6 @@ public enum JaversExceptionCode {
 
     SET_OF_VO_DIFF_NOT_IMPLEMENTED("diff for Set of ValueObjects is not supported"),
 
-    MULTISET_OF_VO_DIFF_NOT_IMPLEMENTED("diff for Multiset of ValueObjects is not supported"),
-
     VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MULTIMAP_KEY("found ValueObject on KEY position in Multimap property '%s'. Please change the key class mapping to Value or Entity"),
 
     GENERIC_TYPE_NOT_PARAMETRIZED(

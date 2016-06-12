@@ -1,4 +1,5 @@
 package org.javers.guavasupport
+
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.HashMultiset
 import com.google.common.collect.Multimap
@@ -8,6 +9,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
+
 /**
  * @author akrystian
  */
@@ -29,11 +31,11 @@ class GuavaAddOnE2ETest extends Specification {
         changes.size() == extpectedChanges
 
         where:
-        leftList                | rightList                | extpectedChanges
-        ["New York"]            | ["Boston"]               | 2
-        ["New York"]            | ["New York", "New York"] | 1
-        Collections.emptyList() | ["New York"]             | 1
-        ["New York"]            | Collections.emptyList()  | 1
+        leftList     | rightList                | extpectedChanges
+        ["New York"] | ["Boston"]               | 2
+        ["New York"] | ["New York", "New York"] | 1
+        []           | ["New York"]             | 1
+        ["New York"] | []                       | 1
     }
 
     @Unroll
@@ -50,10 +52,10 @@ class GuavaAddOnE2ETest extends Specification {
         diff.changes.size() == 0
 
         where:
-        leftList                | rightList
-        ["New York"]            | ["New York"]
-        Collections.emptyList() | Collections.emptyList()
-        ["New York", "Boston"]  | ["Boston", "New York"]
+        leftList               | rightList
+        ["New York"]           | ["New York"]
+        []                     | []
+        ["New York", "Boston"] | ["Boston", "New York"]
     }
 
     @Unroll

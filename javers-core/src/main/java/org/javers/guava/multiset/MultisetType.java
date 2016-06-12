@@ -9,15 +9,13 @@ import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.type.CollectionType;
 
-import java.lang.reflect.Type;
-
 /**
  * @author akrystian
  */
 public class MultisetType extends CollectionType{
 
-    public MultisetType(Type baseJavaType) {
-        super(baseJavaType);
+    public MultisetType() {
+        super(Multiset.class);
     }
 
     @Override

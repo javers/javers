@@ -2,8 +2,6 @@ package org.javers.guava.multiset;
 
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
 import org.javers.core.diff.changetype.container.ValueRemoved;
@@ -19,11 +17,8 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
 
 /**
  * Compares Multiset.
@@ -43,27 +38,9 @@ public class MultisetComparator implements CustomPropertyComparator<Multiset , M
         this.globalIdFactory = globalIdFactory;
     }
 
-    private boolean isSupportedContainer(Property property){
-        JaversType propertyType = typeMapper.getPropertyType(property);
-        if (typeMapper.isValueObject(getItemType(propertyType))){
-            logger.error("could not diff " + property + ", " +
-                    JaversExceptionCode.MULTISET_OF_VO_DIFF_NOT_IMPLEMENTED.getMessage());
-            return false;
-        }
-        return true;
-    }
-
-    public Type getItemType(JaversType propertyType){
-        List<Type> actualTypeArguments = propertyType.getActualTypeArguments();
-        if (actualTypeArguments.size() == 1){
-            return propertyType.getActualTypeArguments().get(0);
-        }
-        throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, propertyType.getBaseJavaType().toString());
-    }
-
     @Override
     public MultisetChange compare(Multiset left, Multiset right, GlobalId affectedId, Property property){
-        if (!isSupportedContainer(property) || left.equals(right)){
+        if (left.equals(right)){
             return null;
         }
 
