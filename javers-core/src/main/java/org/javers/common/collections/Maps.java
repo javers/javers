@@ -14,7 +14,7 @@ public class Maps {
      */
     public static <K,V> Set<K> commonKeys(Map<K,V> left, Map<K,V> right) {
         if (left == null || right == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
         return Sets.intersection(left.keySet(),right.keySet());
@@ -25,7 +25,7 @@ public class Maps {
      */
     public static <K,V> Set<K> keysDifference(Map<K,V> left, Map<K,V> right) {
         if (left == null){
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
         if (right == null){

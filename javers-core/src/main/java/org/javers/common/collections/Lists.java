@@ -11,7 +11,7 @@ public class Lists {
 
     public static List wrapNull(List list){
         if (list == null){
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return list;
     }
