@@ -101,7 +101,7 @@ public class EntityType extends ManagedType {
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
-        if (o == null || !(o instanceof EntityType)) {return false;}
+        if (!(o instanceof EntityType)) {return false;}
 
         EntityType that = (EntityType) o;
         return super.equals(that) && idProperty.equals(that.idProperty);
