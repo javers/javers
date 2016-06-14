@@ -480,7 +480,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ]
     }
 
-    @Unroll
     def "should ignore empty Optional"() {
         given:
         def graphBuilder = newBuilder()

@@ -39,11 +39,6 @@ public class ObjectNode {
     }
 
     /**
-     * @return never returns null
-     */
-    //Cdo getCdo();
-
-    /**
      * @return returns {@link Optional#EMPTY} for snapshots
      */
     public Optional<Object> wrappedCdo() {
