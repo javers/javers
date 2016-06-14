@@ -1,9 +1,9 @@
 package org.javers.core.model;
 
-public class GenericArrayContainer<T> {
+public class GenericArrayContainerInJava<T> {
     final private T[] array;
 
-    public GenericArrayContainer(T[] array) {
+    public GenericArrayContainerInJava(T[] array) {
         this.array = array;
     }
 
