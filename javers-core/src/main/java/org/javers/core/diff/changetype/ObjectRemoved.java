@@ -5,8 +5,6 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
 
-import java.util.Objects;
-
 /**
  * primitive or Value Object changed
  *
@@ -30,13 +28,13 @@ public final class ObjectRemoved extends Change {
         }
         if (obj instanceof ObjectRemoved) {
             ObjectRemoved that = (ObjectRemoved) obj;
-            return Objects.equals(this.getAffectedGlobalId(), that.getAffectedGlobalId());
+            return super.equals(that);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAffectedGlobalId());
+        return super.hashCode();
     }
 }

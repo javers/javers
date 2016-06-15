@@ -5,8 +5,6 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
 
-import java.util.Objects;
-
 /**
  * new CDO added to graph
  *
@@ -30,13 +28,13 @@ public final class NewObject extends Change {
         }
         if (obj instanceof NewObject) {
             NewObject that = (NewObject) obj;
-            return Objects.equals(this.getAffectedGlobalId(), that.getAffectedGlobalId());
+            return super.equals(that);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAffectedGlobalId());
+        return super.hashCode();
     }
 }

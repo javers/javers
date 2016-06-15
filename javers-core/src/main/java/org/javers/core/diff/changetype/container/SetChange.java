@@ -27,15 +27,13 @@ public final class SetChange extends CollectionChange {
         }
         if (obj instanceof SetChange) {
             SetChange that = (SetChange) obj;
-            return Objects.equals(this.getAffectedGlobalId(), that.getAffectedGlobalId())
-                    && Objects.equals(this.getPropertyName(), that.getPropertyName())
-                    && Objects.equals(this.getChanges(), that.getChanges());
+            return super.equals(that);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAffectedGlobalId(), getPropertyName(), getChanges());
+        return Objects.hash(super.hashCode());
     }
 }

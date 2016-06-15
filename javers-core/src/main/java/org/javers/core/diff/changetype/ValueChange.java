@@ -39,8 +39,7 @@ public final class ValueChange extends PropertyChange {
         }
         if (obj instanceof ValueChange) {
             ValueChange that = (ValueChange) obj;
-            return Objects.equals(this.getAffectedGlobalId(), that.getAffectedGlobalId())
-                    && Objects.equals(this.getPropertyName(), that.getPropertyName())
+            return super.equals(that)
                     && Objects.equals(this.getLeft(), that.getLeft())
                     && Objects.equals(this.getRight(), that.getRight());
         }
@@ -49,6 +48,6 @@ public final class ValueChange extends PropertyChange {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAffectedGlobalId(), getPropertyName(), getLeft(), getRight());
+        return Objects.hash(super.hashCode(), getLeft(), getRight());
     }
 }

@@ -2,6 +2,7 @@ package org.javers.core.diff.changetype.map;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.changetype.PropertyChange;
+import org.javers.core.diff.changetype.container.ContainerChange;
 import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.ArrayList;
@@ -49,8 +50,7 @@ public final class MapChange extends PropertyChange {
         }
         if (obj instanceof MapChange) {
             MapChange that = (MapChange) obj;
-            return Objects.equals(this.getAffectedGlobalId(), that.getAffectedGlobalId())
-                    && Objects.equals(this.getPropertyName(), that.getPropertyName())
+            return super.equals(that)
                     && Objects.equals(this.changes, that.changes);
         }
         return false;
@@ -58,6 +58,6 @@ public final class MapChange extends PropertyChange {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAffectedGlobalId(), getPropertyName(), changes);
+        return Objects.hash(super.hashCode(), this.changes);
     }
 }
