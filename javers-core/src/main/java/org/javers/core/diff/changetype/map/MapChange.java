@@ -3,18 +3,18 @@ package org.javers.core.diff.changetype.map;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static org.javers.common.string.ToStringBuilder.addEnumField;
 
 /**
  * @author bartosz walacik
  */
-public class MapChange extends PropertyChange {
+public final class MapChange extends PropertyChange {
     private final List<EntryChange> changes;
 
     public MapChange(GlobalId affectedCdoId, String propertyName, List<EntryChange> changes) {
@@ -40,5 +40,24 @@ public class MapChange extends PropertyChange {
             changesAsString.append(c);
         }
         return super.fieldsToString() + addEnumField("entryChanges", changesAsString);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof MapChange) {
+            MapChange that = (MapChange) obj;
+            return Objects.equals(this.getAffectedGlobalId(), that.getAffectedGlobalId())
+                    && Objects.equals(this.getPropertyName(), that.getPropertyName())
+                    && Objects.equals(this.changes, that.changes);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getAffectedGlobalId(), getPropertyName(), changes);
     }
 }

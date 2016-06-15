@@ -1,7 +1,8 @@
 package org.javers.core.diff.changetype;
 
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Property;
+
+import java.util.Objects;
 
 import static org.javers.common.string.ToStringBuilder.addField;
 
@@ -29,5 +30,25 @@ public final class ValueChange extends PropertyChange {
     @Override
     protected String fieldsToString() {
         return super.fieldsToString() + addField("oldVal", getLeft()) + addField("newVal", getRight());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof ValueChange) {
+            ValueChange that = (ValueChange) obj;
+            return Objects.equals(this.getAffectedGlobalId(), that.getAffectedGlobalId())
+                    && Objects.equals(this.getPropertyName(), that.getPropertyName())
+                    && Objects.equals(this.getLeft(), that.getLeft())
+                    && Objects.equals(this.getRight(), that.getRight());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getAffectedGlobalId(), getPropertyName(), getLeft(), getRight());
     }
 }
