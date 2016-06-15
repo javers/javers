@@ -2,6 +2,9 @@ package org.javers.core.diff.changetype;
 
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
+
+import java.util.Objects;
+
 import static org.javers.common.string.ToStringBuilder.addField;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -26,5 +29,23 @@ public abstract class PropertyChange extends Change {
     @Override
     protected String fieldsToString() {
         return super.fieldsToString() + addField("property", propertyName);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof ObjectRemoved) {
+            PropertyChange that = (PropertyChange) o;
+            return super.equals(that) &&
+                    Objects.equals(this.propertyName, that.propertyName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), propertyName);
     }
 }
