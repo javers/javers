@@ -1,6 +1,7 @@
 package org.javers.repository.sql.schema;
 
 import org.polyjdbc.core.dialect.Dialect;
+import org.polyjdbc.core.dialect.DialectRegistry;
 import org.polyjdbc.core.schema.model.RelationBuilder;
 import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.util.StringUtils;
@@ -120,11 +121,19 @@ public class FixedSchemaFactory {
 
     private void columnsIndex(String tableName, Schema schema, String... colNames){
         String concatenatedColumnNames = StringUtils.concatenate('_', (Object[]) colNames);
+        String indexName = tableName + "_" + concatenatedColumnNames + "_idx";
+        if (schema.getDialect().getCode().equals(DialectRegistry.ORACLE.name()))
+        {
+            if (indexName.length() > 30)
+            {
+                indexName = indexName.substring(0, 31);
+            }
+        }
         schema
-            .addIndex(tableName + "_" + concatenatedColumnNames + "_idx")
-            .indexing(colNames)
-            .on(tableName)
-            .build();
+                .addIndex(indexName)
+                .indexing(colNames)
+                .on(tableName)
+                .build();
     }
 
     private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder) {
