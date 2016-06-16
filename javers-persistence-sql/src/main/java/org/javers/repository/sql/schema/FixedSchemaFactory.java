@@ -1,8 +1,6 @@
 package org.javers.repository.sql.schema;
 
 import org.polyjdbc.core.dialect.Dialect;
-import org.polyjdbc.core.dialect.DialectRegistry;
-import org.polyjdbc.core.dialect.H2Dialect;
 import org.polyjdbc.core.dialect.OracleDialect;
 import org.polyjdbc.core.schema.model.RelationBuilder;
 import org.polyjdbc.core.schema.model.Schema;
