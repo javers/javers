@@ -33,6 +33,7 @@ public class GuavaAddOns{
     public GuavaAddOns(TypeMapper typeMapper, GlobalIdFactory globalIdFactory){
         this.typeMapper = typeMapper;
         this.globalIdFactory = globalIdFactory;
+
     }
 
     public void afterAssemble(JaversBuilder javersBuilder){

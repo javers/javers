@@ -17,6 +17,7 @@ import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.guava.GuavaCollectionsComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ import java.util.Objects;
  *
  * @author akrystian
  */
-public class MultimapComparator implements CustomPropertyComparator<Multimap, MultimapChange>{
+public class MultimapComparator extends GuavaCollectionsComparator implements CustomPropertyComparator<Multimap, MultimapChange>{
     private static final Logger logger = LoggerFactory.getLogger(MultimapComparator.class);
 
     private final TypeMapper typeMapper;
@@ -64,6 +65,8 @@ public class MultimapComparator implements CustomPropertyComparator<Multimap, Mu
 
         List<EntryChange> entryChanges = calculateEntryChanges(multimapType, left, right, owner);
         if (!entryChanges.isEmpty()){
+            renderNotParametrizedWarningIfNeeded(multimapType.getKeyType(), "key", "Map", property);
+            renderNotParametrizedWarningIfNeeded(multimapType.getValueType(), "value", "Map", property);
             return new MultimapChange(affectedId, property.getName(), entryChanges);
         }else{
             return null;
@@ -123,4 +126,5 @@ public class MultimapComparator implements CustomPropertyComparator<Multimap, Mu
         MultiMapContentType multiMapContentType = new MultiMapContentType(keyType, valueType);
         return new DehydrateMapFunction(globalIdFactory, multiMapContentType);
     }
+
 }

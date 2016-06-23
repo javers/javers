@@ -119,7 +119,6 @@ public class JaversBuilder extends AbstractJaversBuilder {
         addModule(new DiffAppendersModule(coreConfiguration(), getContainer()));
         addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
         addModule(new ScannerModule(coreConfiguration(), getContainer()));
-
         bootManagedTypeModule();
 
         // after assembly add-ons

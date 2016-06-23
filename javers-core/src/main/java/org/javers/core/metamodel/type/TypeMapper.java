@@ -79,10 +79,10 @@ public class TypeMapper {
         }
 
         if (ReflectionUtil.isClassPresent("com.google.common.collect.Multiset")){
-            addType(new MultisetType());
+            addType(MultisetType.getInstance());
         }
         if (ReflectionUtil.isClassPresent("com.google.common.collect.Multimap")){
-            addType(new MultimapType());
+            addType(MultimapType.getInstance());
         }
     }
 

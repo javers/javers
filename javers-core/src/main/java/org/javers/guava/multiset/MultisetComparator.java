@@ -14,8 +14,7 @@ import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.javers.guava.GuavaCollectionsComparator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,16 +26,17 @@ import java.util.List;
  *
  * @author akrystian
  */
-public class MultisetComparator implements CustomPropertyComparator<Multiset , MultisetChange>{
-    private static final Logger logger = LoggerFactory.getLogger(MultisetComparator.class);
+public class MultisetComparator extends GuavaCollectionsComparator implements CustomPropertyComparator<Multiset , MultisetChange> {
 
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
+
 
     public MultisetComparator(TypeMapper typeMapper, GlobalIdFactory globalIdFactory){
         this.typeMapper = typeMapper;
         this.globalIdFactory = globalIdFactory;
     }
+
 
     @Override
     public MultisetChange compare(Multiset left, Multiset right, GlobalId affectedId, Property property){
@@ -49,6 +49,7 @@ public class MultisetComparator implements CustomPropertyComparator<Multiset , M
 
         List<ContainerElementChange> entryChanges = calculateEntryChanges(multisetType, left, right, owner);
         if (!entryChanges.isEmpty()){
+            renderNotParametrizedWarningIfNeeded(multisetType.getItemType(), "item", "Set", property);
             return new MultisetChange(affectedId, property.getName(), entryChanges);
         } else {
             return null;
@@ -73,6 +74,4 @@ public class MultisetComparator implements CustomPropertyComparator<Multiset , M
         }
         return changes;
     }
-
-
 }

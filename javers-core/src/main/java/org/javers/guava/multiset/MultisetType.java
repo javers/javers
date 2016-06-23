@@ -9,13 +9,19 @@ import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.type.CollectionType;
 
+import java.lang.reflect.Type;
+
 /**
  * @author akrystian
  */
 public class MultisetType extends CollectionType{
 
-    public MultisetType() {
-        super(Multiset.class);
+    public static MultisetType getInstance(){
+        return  new MultisetType(Multiset.class);
+    }
+
+    public MultisetType(Type baseJavaType) {
+        super(baseJavaType);
     }
 
     @Override
@@ -43,7 +49,7 @@ public class MultisetType extends CollectionType{
     /**
      * marker class
      */
-    public static class MultisetEnumerationOwnerContext extends EnumerationAwareOwnerContext{
+    public static class MultisetEnumerationOwnerContext extends EnumerationAwareOwnerContext {
         MultisetEnumerationOwnerContext(OwnerContext ownerContext) {
             super(ownerContext);
         }

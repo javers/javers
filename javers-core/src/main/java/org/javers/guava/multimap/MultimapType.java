@@ -4,7 +4,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.type.EnumerableType;
@@ -14,21 +13,21 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
 
-import static org.javers.common.exception.JaversExceptionCode.GENERIC_TYPE_NOT_PARAMETRIZED;
+
 
 /**
  * @author akrystian
  */
 public class MultimapType extends EnumerableType{
 
-    public MultimapType(){
-        super(Multimap.class);
+    public static MultimapType getInstance(){
+        return new MultimapType(Multimap.class);
     }
 
-    @Override
-    public boolean isFullyParametrized(){
-        return getActualTypeArguments().size() == 2;
+    public MultimapType(Type baseJavaType) {
+        super(baseJavaType, 2);
     }
+
 
     @Override
     public Object map(Object sourceMultimap_, EnumerableFunction mapFunction, OwnerContext owner){
@@ -36,7 +35,7 @@ public class MultimapType extends EnumerableType{
         Multimap sourceMultimap = toNotNullMultimap(sourceMultimap_);
         Multimap targetMultimap = HashMultimap.create();
 
-        MapEnumerationOwnerContext enumeratorContext = new MultimapEnumerationOwnerContext(owner);
+        MapEnumerationOwnerContext enumeratorContext = new MapEnumerationOwnerContext(owner);
 
         Collection<Map.Entry<?, ?>> entries = sourceMultimap.entries();
         for (Map.Entry<?, ?> entry : entries){
@@ -69,33 +68,15 @@ public class MultimapType extends EnumerableType{
     /**
      * never returns null
      *
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     public Type getKeyType(){
-        if (isFullyParametrized()){
-            return getActualTypeArguments().get(0);
-        }
-        throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
+            return getConcreteClassTypeArguments().get(0);
     }
 
     /**
      * never returns null
-     *
-     * @throws JaversException GENERIC_TYPE_NOT_PARAMETRIZED
      */
     public Type getValueType(){
-        if (isFullyParametrized()){
-            return getActualTypeArguments().get(1);
-        }
-        throw new JaversException(GENERIC_TYPE_NOT_PARAMETRIZED, getBaseJavaType().toString());
-    }
-
-    /**
-     * marker class
-     */
-    public static class MultimapEnumerationOwnerContext extends MapEnumerationOwnerContext{
-        MultimapEnumerationOwnerContext(OwnerContext ownerContext) {
-            super(ownerContext);
-        }
+            return getConcreteClassTypeArguments().get(1);
     }
 }
