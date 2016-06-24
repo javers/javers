@@ -26,5 +26,6 @@ deploy:
   script: "./gradlew bintray"
   on:
     tags: true
+    all_branches: true
 
 sudo: false
