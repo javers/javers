@@ -93,7 +93,7 @@ public class EntityType extends ManagedType {
 
         Object cdoId = getIdProperty().get(instance);
         if (cdoId == null) {
-            throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, getName());
+            throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, getName(), getIdProperty().getName());
         }
         return cdoId;
     }
