@@ -186,16 +186,18 @@ public class QueryBuilder {
      * Note that we are using <i>aggregate</i> term in the context of DDD.
      * Please do not confuse it with SQL aggregate functions.
      * In JQL aggregate means: an Entity with its child ValueObjects.
+     *
+     * @since 2.1
      */
     public QueryBuilder aggregate(boolean aggregate) {
-        //TODO
-        if (true) throw new NotImplementedException();
         queryParamsBuilder.aggregate(aggregate);
         return this;
     }
 
     /**
      * Alias to {@link #aggregate(boolean)} with true
+     *
+     * @since 2.1
      */
     public QueryBuilder aggregate() {
         queryParamsBuilder.aggregate(true);

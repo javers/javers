@@ -11,6 +11,7 @@ import org.bson.conversions.Bson;
 import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
+import org.javers.common.string.RegexEscape;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -81,7 +82,13 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        return queryForSnapshots(createIdQuery(globalId), Optional.of(queryParams));
+        Bson query;
+        if (queryParams.isAggregate()){
+            query = createIdQueryWithAggregate(globalId);
+        } else {
+            query = createIdQuery(globalId);
+        }
+        return queryForSnapshots(query, Optional.of(queryParams));
     }
 
     @Override
@@ -110,7 +117,7 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
-        BasicDBObject query = createGlobalIdClassQuery(givenClass);
+        Bson query = createManagedTypeQuery(givenClass, queryParams.isAggregate());
         return queryForSnapshots(query, Optional.of(queryParams));
     }
 
@@ -135,12 +142,15 @@ public class MongoRepository implements JaversRepository {
         //ensures collections and indexes
         MongoCollection<Document> snapshots = snapshotsCollection();
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_KEY, ASC));
-        snapshots.createIndex(new BasicDBObject(GLOBAL_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
         snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC));
+
         headCollection();
+
+        //schema migration script from JaVers 2.0 to 2.1
+        dropIndexIfExists(snapshots, GLOBAL_ID_ENTITY);
 
         //schema migration script from JaVers 1.1 to 1.2
         Document doc = snapshots.find().first();
@@ -166,8 +176,12 @@ public class MongoRepository implements JaversRepository {
         }
     }
 
-    private BasicDBObject createIdQuery(GlobalId id) {
-        return new BasicDBObject (GLOBAL_ID_KEY, id.value());
+    private Bson createIdQuery(GlobalId id) {
+        return new BasicDBObject(GLOBAL_ID_KEY, id.value());
+    }
+
+    private Bson createIdQueryWithAggregate(GlobalId id) {
+        return Filters.or(createIdQuery(id), prefixQuery(GLOBAL_ID_KEY, id.value() + "#"));
     }
 
     private Bson createVersionQuery(Long version) {
@@ -187,16 +201,17 @@ public class MongoRepository implements JaversRepository {
         return Filters.or(descFilters);
     }
 
-    private BasicDBObject createGlobalIdClassQuery(ManagedType givenClass) {
-        String cName = givenClass.getName();
+    private Bson createManagedTypeQuery(ManagedType managedType, boolean aggregate) {
+        if (managedType instanceof ValueObjectType) {
+            return new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, managedType.getName());
+        }
 
-        BasicDBObject query = null;
-        if (givenClass instanceof EntityType) {
-            query = new BasicDBObject(GLOBAL_ID_ENTITY, cName);
+        Bson query = prefixQuery(GLOBAL_ID_KEY, managedType.getName()+"/");
+
+        if (!aggregate) { //only entities, without child value objects
+            query = Filters.and(query, Filters.exists(GLOBAL_ID_ENTITY));
         }
-        if (givenClass instanceof ValueObjectType) {
-            query = new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, cName);
-        }
+
         return query;
     }
 
@@ -350,12 +365,31 @@ public class MongoRepository implements JaversRepository {
         }
     }
 
-    private <T> T getOne(MongoCursor<T> mongoCursor){
+    private static <T> T getOne(MongoCursor<T> mongoCursor){
         try{
             return mongoCursor.next();
         }
         finally {
             mongoCursor.close();
+        }
+    }
+
+    //enables index range scan
+    private static Bson prefixQuery(String fieldName, String prefix){
+        return Filters.regex(fieldName, "^" + RegexEscape.escape(prefix) + ".*");
+    }
+
+    private static void dropIndexIfExists(MongoCollection<Document> col, String fieldName){
+        for (Document d : col.listIndexes()) {
+            if (d.get("key", Document.class).containsKey(fieldName)) {
+                logger.warn("Schema migration. Dropping index: "+fieldName +" ...");
+
+                try {
+                    col.dropIndex(fieldName);
+                }catch (Exception swallowed){} //because not implemented in Fongo
+
+                return;
+            }
         }
     }
 }
