@@ -32,13 +32,13 @@ public class GraphPair {
 
         this.rightGraph = currentGraph;
 
-        this.onlyOnLeft = Collections.EMPTY_SET;
+        this.onlyOnLeft = Collections.emptySet();
         this.onlyOnRight = rightGraph.nodes();
     }
 
     private class EmptyGraph implements ObjectGraph {
         public Set<ObjectNode> nodes() {
-            return  Collections.EMPTY_SET;
+            return  Collections.emptySet();
         }
         public ObjectNode root() {
             throw new RuntimeException("not implemented");

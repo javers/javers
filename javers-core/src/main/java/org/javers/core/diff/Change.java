@@ -3,12 +3,14 @@ package org.javers.core.diff;
 import org.javers.common.collections.Optional;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import static org.javers.common.string.ToStringBuilder.addFirstField;
 import static org.javers.common.validation.Validate.*;
@@ -108,5 +110,22 @@ public abstract class Change implements Serializable {
         }
 
         this.commitMetadata = Optional.of(commitMetadata);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof Change) {
+            Change that = (Change) obj;
+            return Objects.equals(this.affectedCdoId, that.affectedCdoId);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.affectedCdoId);
     }
 }

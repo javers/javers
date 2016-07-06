@@ -39,11 +39,6 @@ public class ObjectNode {
     }
 
     /**
-     * @return never returns null
-     */
-    //Cdo getCdo();
-
-    /**
      * @return returns {@link Optional#EMPTY} for snapshots
      */
     public Optional<Object> wrappedCdo() {
@@ -64,7 +59,7 @@ public class ObjectNode {
         Edge edge = getEdge(property); //could be null for snapshots
 
         //TODO this is ugly, how to move this logic to Cdo implementations?
-        if (edge != null && edge instanceof SingleEdge){
+        if (edge instanceof SingleEdge){
             return ((SingleEdge)edge).getReference().getGlobalId();
         }
         else {

@@ -52,7 +52,7 @@ public class CdoSnapshotState {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof CdoSnapshotState)) return false;
+        if (!(o instanceof CdoSnapshotState)) return false;
 
         CdoSnapshotState that = (CdoSnapshotState) o;
 

@@ -46,6 +46,7 @@ public class QueryBuilder {
      * <pre>
      * javers.findChanges( QueryBuilder.anyDomainObject().build() );
      * </pre>
+     * @since 2.0
      */
     public static QueryBuilder anyDomainObject(){
         return new QueryBuilder(new AnyDomainObjectFilter());
@@ -292,6 +293,7 @@ public class QueryBuilder {
      * <br/>
      * If this method is called multiple times,
      * all given properties must match with persisted commit properties.
+     * @since 2.0
      */
     public QueryBuilder withCommitProperty(String name, String value) {
         Validate.argumentsAreNotNull(name, value);
@@ -312,6 +314,7 @@ public class QueryBuilder {
     /**
      * Limits Snapshots to be fetched from JaversRepository
      * to those with a given commit author.
+     * @since 2.0
      */
     public QueryBuilder byAuthor(String author) {
         Validate.argumentIsNotNull(author);

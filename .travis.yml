@@ -21,4 +21,11 @@ script:
   - "./gradlew check"
   - "./gradlew integrationTest"
 
+deploy:
+  provider: script
+  script: "./gradlew bintray"
+  on:
+    tags: true
+    all_branches: true
+
 sudo: false

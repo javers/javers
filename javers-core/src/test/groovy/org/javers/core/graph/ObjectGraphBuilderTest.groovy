@@ -326,7 +326,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
     }
 
     @Unroll
-    def "should build graph with #containerType<#managedClass> MultiEdge"() {
+    def "should build graph with #containerType<#managedType> MultiEdge"() {
         given:
         ObjectGraphBuilder graphBuilder = newBuilder()
 
@@ -337,7 +337,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         assertThat(node).hasMultiEdge(propertyName).ofSize(2)
 
         where:
-        getManagedType  << ["ValueObject"] * 3 + ["Entity"] *3
+        managedType  << ["ValueObject"] * 3 + ["Entity"] *3
         containerType << ["Set","Array", "List"] * 2
         propertyName <<  ["setOfValueObjects","arrayOfValueObjects","listOfValueObjects", "setOfEntities","arrayOfEntities", "listOfEntities"]
         cdo << [
@@ -461,7 +461,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
 
     @Unroll
-    def "should build graph with Optional<#managedClass> SingleEdge"() {
+    def "should build graph with Optional<#managedType> SingleEdge"() {
         given:
         def graphBuilder = newBuilder()
 
@@ -472,7 +472,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         assertThat(node).hasMultiEdge(propertyName).ofSize(1)
 
         where:
-        getManagedType  << ["ValueObject", "Entity"]
+        managedType  << ["ValueObject", "Entity"]
         propertyName <<  ["optionalValueObject", "optionalEntity"]
         cdo << [
                 new SnapshotEntity(optionalValueObject:  Optional.of(new DummyAddress("London"))) ,
@@ -480,7 +480,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ]
     }
 
-    @Unroll
     def "should ignore empty Optional"() {
         given:
         def graphBuilder = newBuilder()

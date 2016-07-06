@@ -23,7 +23,7 @@ class DiffBuilder {
     }
 
     public static Diff empty() {
-        return new Diff(Collections.EMPTY_LIST);
+        return new Diff(Collections.<Change>emptyList());
     }
 
     public DiffBuilder addChange(Change change, Optional<Object> affectedCdo) {

@@ -87,7 +87,7 @@ public abstract class JaversType {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || !(o instanceof JaversType)) return false;
+        if (!(o instanceof JaversType)) return false;
 
         JaversType that = (JaversType) o;
         return baseJavaType.equals(that.baseJavaType);

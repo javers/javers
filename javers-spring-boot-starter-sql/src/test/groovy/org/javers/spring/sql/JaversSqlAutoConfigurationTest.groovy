@@ -17,8 +17,8 @@ import static org.fest.assertions.api.Assertions.assertThat
 /**
  * @author pawelszymczyk
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = [TestApplication.class])
+@RunWith(SpringJUnit4ClassRunner)
+@SpringApplicationConfiguration(classes = [TestApplication])
 @ActiveProfiles("integrationTest")
 public class JaversSqlAutoConfigurationTest {
 

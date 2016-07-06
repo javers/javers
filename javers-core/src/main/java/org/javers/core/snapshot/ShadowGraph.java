@@ -15,7 +15,7 @@ import java.util.Set;
 public class ShadowGraph implements ObjectGraph {
     private final Set<ObjectNode> snapshots;
 
-    public static ShadowGraph EMPTY = new ShadowGraph(Collections.EMPTY_SET);
+    public static ShadowGraph EMPTY = new ShadowGraph(Collections.<ObjectNode>emptySet());
 
     ShadowGraph(Set<ObjectNode> snapshots) {
         this.snapshots = snapshots;

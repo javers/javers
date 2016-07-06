@@ -54,6 +54,18 @@ class JaversAuditableAspectIntegrationTest extends Specification {
         javers.findSnapshots(QueryBuilder.byInstanceId(o2.id, DummyObject).build()).size() == 1
     }
 
+    def "should commit with properties provided by CommitPropertiesProvider"(){
+        given:
+        def o = new DummyObject()
+
+        when:
+        repository.save(o)
+
+        then:
+        def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())[0]
+        snapshot.commitMetadata.properties["key"] == "ok"
+    }
+
     def "should commit iterable argument when method is annotated with @JaversAuditable"() {
         given:
         def objects = [new DummyObject(), new DummyObject()]

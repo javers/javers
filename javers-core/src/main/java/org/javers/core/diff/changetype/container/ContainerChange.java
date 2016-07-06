@@ -3,11 +3,11 @@ package org.javers.core.diff.changetype.container;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static org.javers.common.string.ToStringBuilder.addEnumField;
 
@@ -42,5 +42,23 @@ public abstract class ContainerChange extends PropertyChange {
             changesAsString.append(c);
         }
         return super.fieldsToString() + addEnumField("containerChanges", changesAsString);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof ContainerChange) {
+            ContainerChange that = (ContainerChange) obj;
+            return super.equals(that)
+                    && Objects.equals(this.changes, that.changes);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), changes);
     }
 }

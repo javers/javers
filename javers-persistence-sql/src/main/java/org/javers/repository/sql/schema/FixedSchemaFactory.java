@@ -1,6 +1,7 @@
 package org.javers.repository.sql.schema;
 
 import org.polyjdbc.core.dialect.Dialect;
+import org.polyjdbc.core.dialect.OracleDialect;
 import org.polyjdbc.core.schema.model.RelationBuilder;
 import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.util.StringUtils;
@@ -45,6 +46,24 @@ public class FixedSchemaFactory {
     public static final String SNAPSHOT_STATE =        "state";
     public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v 1.2
     public static final String SNAPSHOT_MANAGED_TYPE = "managed_type";       //since 2.0
+
+    private final static int ORACLE_MAX_NAME_LEN = 30;
+    private final Dialect dialect;
+
+    public FixedSchemaFactory(Dialect dialect) {
+        this.dialect = dialect;
+    }
+
+    Map<String, Schema> allTablesSchema(Dialect dialect) {
+        Map<String, Schema> schema = new TreeMap<>();
+
+        schema.put(GLOBAL_ID_TABLE_NAME, globalIdTableSchema(dialect, GLOBAL_ID_TABLE_NAME));
+        schema.put(COMMIT_TABLE_NAME,    commitTableSchema(dialect, COMMIT_TABLE_NAME));
+        schema.put(COMMIT_PROPERTY_TABLE_NAME, commitPropertiesTableSchema(dialect, COMMIT_PROPERTY_TABLE_NAME));
+        schema.put(SNAPSHOT_TABLE_NAME,  snapshotTableSchema(dialect, SNAPSHOT_TABLE_NAME));
+
+        return schema;
+    }
 
     private Schema snapshotTableSchema(Dialect dialect, String tableName){
         Schema schema = new Schema(dialect);
@@ -120,27 +139,21 @@ public class FixedSchemaFactory {
 
     private void columnsIndex(String tableName, Schema schema, String... colNames){
         String concatenatedColumnNames = StringUtils.concatenate('_', (Object[]) colNames);
-        schema
-            .addIndex(tableName + "_" + concatenatedColumnNames + "_idx")
-            .indexing(colNames)
-            .on(tableName)
-            .build();
+        String indexName = tableName + "_" + concatenatedColumnNames + "_idx";
+        if (dialect instanceof OracleDialect &&
+            indexName.length() > ORACLE_MAX_NAME_LEN)
+        {
+            indexName = indexName.substring(0, ORACLE_MAX_NAME_LEN);
+        }
+        schema.addIndex(indexName)
+              .indexing(colNames)
+              .on(tableName)
+              .build();
     }
 
     private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder) {
         relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
                 .primaryKey("jv_"+pkColName).using(pkColName).and();
         schema.addSequence("jv_"+pkColName+"_seq").build();
-    }
-
-    public Map<String, Schema> allTablesSchema(Dialect dialect) {
-        Map<String, Schema> schema = new TreeMap<>();
-
-        schema.put(GLOBAL_ID_TABLE_NAME, globalIdTableSchema(dialect, GLOBAL_ID_TABLE_NAME));
-        schema.put(COMMIT_TABLE_NAME,    commitTableSchema(dialect, COMMIT_TABLE_NAME));
-        schema.put(COMMIT_PROPERTY_TABLE_NAME, commitPropertiesTableSchema(dialect, COMMIT_PROPERTY_TABLE_NAME));
-        schema.put(SNAPSHOT_TABLE_NAME,  snapshotTableSchema(dialect, SNAPSHOT_TABLE_NAME));
-
-        return schema;
     }
 }

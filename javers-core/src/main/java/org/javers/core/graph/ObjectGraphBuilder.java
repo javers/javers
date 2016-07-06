@@ -1,7 +1,6 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.Predicate;
-import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.property.Property;

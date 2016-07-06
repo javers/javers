@@ -42,7 +42,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
 
         if (Objects.equals(leftRawSet, rightRawSet)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         Set leftSet = (Set) setType.map(leftRawSet, dehydrateFunction, owner);
