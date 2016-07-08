@@ -13,6 +13,7 @@ class NewPerformanceTest extends Specification {
     Javers javers
     def start
 
+    @Ignore
     def "should init database - insert and updates"() {
         given:
         clearDatabase()
@@ -33,7 +34,7 @@ class NewPerformanceTest extends Specification {
         stop(n)
     }
 
-    def "should query - standard queries"() {
+    def "should query - standard queries by Type"() {
         given:
         start()
 
@@ -44,16 +45,25 @@ class NewPerformanceTest extends Specification {
         javers.findSnapshots(QueryBuilder.byValueObject(NewPerformanceEntity, 'vo').limit(100).build()).size() == 100
         javers.findSnapshots(QueryBuilder.byValueObject(NewPerformanceEntity, 'anotherVo').limit(100).build()).size() == 100
 
+        then:
+        stop(5)
+    }
+
+    def "should query - standard queries by Id"() {
+        given:
+        start()
+
+        when:
         def n = 30
         n.times {
             def id = n * 100
-            javers.findSnapshots(QueryBuilder.byInstanceId(id, NewPerformanceEntity).build()).size() == 2
-            javers.findSnapshots(QueryBuilder.byValueObjectId(id, NewPerformanceEntity, 'vo').build()).size() == 2
-            javers.findSnapshots(QueryBuilder.byValueObjectId(id, NewPerformanceEntity, 'anotherVo').build()).size() == 2
+            assert javers.findSnapshots(QueryBuilder.byInstanceId(id, NewPerformanceEntity).build()).size() == 2
+            assert javers.findSnapshots(QueryBuilder.byValueObjectId(id, NewPerformanceEntity, 'vo').build()).size() == 2
+            assert javers.findSnapshots(QueryBuilder.byValueObjectId(id, NewPerformanceEntity, 'anotherVo').build()).size() == 2
         }
 
         then:
-        stop(n * 3 + 5)
+        stop(n * 3)
     }
 
     def "should query - new query by property"() {
@@ -80,6 +90,22 @@ class NewPerformanceTest extends Specification {
 
         then:
         stop(n * 3)
+    }
+
+    def "should query - new Aggregate queries by Id"() {
+        given:
+        start()
+
+        when:
+        def n = 30
+        n.times {
+            def id = n * 100
+            def query = QueryBuilder.byInstanceId(id, NewPerformanceEntity).aggregate().build()
+            assert javers.findSnapshots(query).size() == 6
+        }
+
+        then:
+        stop(n * 3 + 5)
     }
 
     void start() {

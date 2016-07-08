@@ -10,8 +10,6 @@ public class RegexEscape {
         String escaped = literal;
         for (int i=0; i<TO_ESCAPE.length(); i++) {
             char c = TO_ESCAPE.charAt(i);
-            System.out.println("escaping " + c);
-
             escaped = escaped.replace(c+"", "\\"+c);
         }
         return escaped;
