@@ -8,11 +8,9 @@ import org.polyjdbc.core.type.Timestamp;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 abstract class SnapshotFilter {
-    private static final String COMMIT_WITH_SNAPSHOT
-        = SNAPSHOT_TABLE_NAME + " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK;
-
     static final String COMMIT_WITH_SNAPSHOT_GLOBAL_ID =
-        COMMIT_WITH_SNAPSHOT +
+            SNAPSHOT_TABLE_NAME +
+            " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK +
             " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
             " LEFT OUTER JOIN " + GLOBAL_ID_TABLE_NAME + " o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK;
 

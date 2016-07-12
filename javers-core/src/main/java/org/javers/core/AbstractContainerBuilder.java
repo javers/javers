@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author bartosz walacik
  */
-public abstract class AbstractJaversBuilder {
+public abstract class AbstractContainerBuilder {
 
     private MutablePicoContainer container;
 

@@ -40,8 +40,12 @@ public class ToStringBuilder {
     }
 
     public static String listToString(List list){
+        return "[" + join(list) + "]";
+    }
+
+    public static String join(List list){
         if (list == null || list.size() == 0){
-            return "[]";
+            return "";
         }
 
         StringBuilder out = new StringBuilder();
@@ -53,8 +57,7 @@ public class ToStringBuilder {
                 out.append( ","+list.get(i) );
             }
         }
-
-        return "[" + out.toString() + "]";
+        return out.toString();
     }
 
     public static String toStringSimple(Object... fieldsMap){

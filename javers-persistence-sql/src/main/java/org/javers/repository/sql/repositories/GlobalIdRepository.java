@@ -12,6 +12,9 @@ import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
 
+import java.util.List;
+
+import static org.javers.repository.sql.PolyUtil.queryForLongList;
 import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
@@ -43,7 +46,7 @@ public class GlobalIdRepository {
             return Optional.of(foundPk);
         }
 
-        Optional<Long> fresh = findGlobalIdPkRaw(globalId);
+        Optional<Long> fresh = findGlobalIdPkInDB(globalId);
         if (fresh.isPresent()){
             globalIdPkCache.put(globalId, fresh.get());
         }
@@ -51,7 +54,14 @@ public class GlobalIdRepository {
         return fresh;
     }
 
-    private Optional<Long> findGlobalIdPkRaw(GlobalId globalId) {
+    public List<Long> findChildGlobalIdPks(Long globalIdPk) {
+        SelectQuery query = polyJdbc.query().select(GLOBAL_ID_PK).from(GLOBAL_ID_TABLE_NAME)
+                    .where(GLOBAL_ID_OWNER_ID_FK + " = :ownerFk ")
+                    .withArgument("ownerFk", globalIdPk);
+        return queryForLongList(query, polyJdbc);
+    }
+
+    private Optional<Long> findGlobalIdPkInDB(GlobalId globalId) {
 
         SelectQuery query = polyJdbc.query().select(GLOBAL_ID_PK).from(GLOBAL_ID_TABLE_NAME);
 

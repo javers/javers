@@ -1,6 +1,6 @@
 package org.javers.repository.sql;
 
-import org.javers.core.AbstractJaversBuilder;
+import org.javers.core.AbstractContainerBuilder;
 import org.javers.repository.sql.pico.JaversSqlModule;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.PolyJDBCBuilder;
@@ -13,7 +13,7 @@ import java.sql.SQLException;
 /**
  * @author bartosz walacik
  */
-public class SqlRepositoryBuilder extends AbstractJaversBuilder {
+public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     private static final Logger logger = LoggerFactory.getLogger(SqlRepositoryBuilder.class);
 
     private DialectName dialectName;

@@ -78,7 +78,14 @@ public class CdoSnapshotFinder {
             return Collections.emptyList();
         }
 
-        return fetchCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), queryParams.changedProperty()), Optional.of(queryParams));
+        if (queryParams.isAggregate()) {
+            List<Long> ids = globalIdRepository.findChildGlobalIdPks(globalIdPk.get());
+            ids.add(globalIdPk.get());
+            return fetchCdoSnapshots(new GlobalIdFilter(ids, queryParams.changedProperty()), Optional.of(queryParams));
+        }
+        else {
+            return fetchCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), queryParams.changedProperty()), Optional.of(queryParams));
+        }
     }
 
     private List<CdoSnapshot> fetchCdoSnapshots(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams){
