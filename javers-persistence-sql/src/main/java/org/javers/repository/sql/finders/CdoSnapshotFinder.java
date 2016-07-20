@@ -62,7 +62,7 @@ public class CdoSnapshotFinder {
     }
 
     public List<CdoSnapshot> getStateHistory(ManagedType managedType, QueryParams queryParams) {
-        ManagedClassFilter classFilter = new ManagedClassFilter(managedType.getName(), queryParams.changedProperty());
+        ManagedClassFilter classFilter = new ManagedClassFilter(managedType.getName(), queryParams.isAggregate());
         return fetchCdoSnapshots(classFilter, Optional.of(queryParams));
     }
 
@@ -77,15 +77,7 @@ public class CdoSnapshotFinder {
         if (globalIdPk.isEmpty()){
             return Collections.emptyList();
         }
-
-        if (queryParams.isAggregate()) {
-            List<Long> ids = globalIdRepository.findChildGlobalIdPks(globalIdPk.get());
-            ids.add(globalIdPk.get());
-            return fetchCdoSnapshots(new GlobalIdFilter(ids, queryParams.changedProperty()), Optional.of(queryParams));
-        }
-        else {
-            return fetchCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), queryParams.changedProperty()), Optional.of(queryParams));
-        }
+        return fetchCdoSnapshots(new GlobalIdFilter(globalIdPk.get(), queryParams.isAggregate()), Optional.of(queryParams));
     }
 
     private List<CdoSnapshot> fetchCdoSnapshots(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams){
@@ -109,36 +101,10 @@ public class CdoSnapshotFinder {
         snapshotFilter.addFrom(query);
         snapshotFilter.addWhere(query);
         if (queryParams.isPresent()) {
-            applyQueryParams(snapshotFilter, queryParams.get(), query);
+            snapshotFilter.applyQueryParams(query, queryParams.get());
         }
         query.orderBy(SNAPSHOT_PK, Order.DESC);
         return polyJDBC.queryRunner().queryList(query, cdoSnapshotMapper);
-    }
-
-    private void applyQueryParams(SnapshotFilter snapshotFilter, QueryParams queryParams, SelectQuery query) {
-        if (queryParams.from().isPresent()) {
-            snapshotFilter.addFromDateCondition(query, queryParams.from().get());
-        }
-        if (queryParams.to().isPresent()) {
-            snapshotFilter.addToDateCondition(query, queryParams.to().get());
-        }
-        if (queryParams.commitId().isPresent()) {
-            snapshotFilter.addCommitIdCondition(query, queryParams.commitId().get());
-        }
-        if (queryParams.version().isPresent()) {
-            snapshotFilter.addVersionCondition(query, queryParams.version().get());
-        }
-        if (queryParams.author().isPresent()) {
-            snapshotFilter.addAuthorCondition(query, queryParams.author().get());
-        }
-        addCommitPropertyConditions(snapshotFilter, query, queryParams.commitProperties());
-        query.limit(queryParams.limit(), queryParams.skip());
-    }
-
-    private void addCommitPropertyConditions(SnapshotFilter snapshotFilter, SelectQuery query, Map<String, String> commitProperties) {
-        for (Map.Entry<String, String> commitProperty : commitProperties.entrySet()) {
-            snapshotFilter.addCommitPropertyCondition(query, commitProperty.getKey(), commitProperty.getValue());
-        }
     }
 
     private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk) {

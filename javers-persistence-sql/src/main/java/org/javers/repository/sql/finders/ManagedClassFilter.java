@@ -3,26 +3,35 @@ package org.javers.repository.sql.finders;
 import org.javers.common.collections.Optional;
 import org.polyjdbc.core.query.SelectQuery;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_CHANGED;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_MANAGED_TYPE;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 /**
  * @author bartosz.walacik
  */
 class ManagedClassFilter extends SnapshotFilter {
     private final String managedType;
-    private final Optional<String> propertyName;
+    private final boolean aggregate;
 
-    ManagedClassFilter(String managedType, Optional<String> propertyName) {
+    ManagedClassFilter(String managedType, boolean aggregate) {
         this.managedType = managedType;
-        this.propertyName = propertyName;
+        this.aggregate = aggregate;
     }
 
     @Override
     void addWhere(SelectQuery query) {
-        query.where(SNAPSHOT_MANAGED_TYPE + " = :managedType ").withArgument("managedType", managedType);
-        if (propertyName.isPresent()) {
-            query.append(" AND " + SNAPSHOT_CHANGED + " like '%\"" + propertyName.get() + "\"%'");
+        if (!aggregate) {
+            query.where(SNAPSHOT_MANAGED_TYPE + " = :managedType");
         }
+        else {
+            query.where(
+            "(    " + SNAPSHOT_MANAGED_TYPE + " = :managedType "+
+            "  OR g.owner_id_fk in ( "+
+            "     select g1." + GLOBAL_ID_PK + " from " + SNAPSHOT_TABLE_NAME + " s1 "+
+            "     INNER JOIN " + GLOBAL_ID_TABLE_NAME + " g1 ON g1." + GLOBAL_ID_PK + "= s1."+ SNAPSHOT_GLOBAL_ID_FK +
+            "     and  s1.managed_type = :managedType)"+
+            ")");
+        }
+        query.withArgument("managedType", managedType);
     }
 }
+

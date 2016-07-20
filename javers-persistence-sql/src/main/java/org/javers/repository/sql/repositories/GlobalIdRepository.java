@@ -54,13 +54,6 @@ public class GlobalIdRepository {
         return fresh;
     }
 
-    public List<Long> findChildGlobalIdPks(Long globalIdPk) {
-        SelectQuery query = polyJdbc.query().select(GLOBAL_ID_PK).from(GLOBAL_ID_TABLE_NAME)
-                    .where(GLOBAL_ID_OWNER_ID_FK + " = :ownerFk ")
-                    .withArgument("ownerFk", globalIdPk);
-        return queryForLongList(query, polyJdbc);
-    }
-
     private Optional<Long> findGlobalIdPkInDB(GlobalId globalId) {
 
         SelectQuery query = polyJdbc.query().select(GLOBAL_ID_PK).from(GLOBAL_ID_TABLE_NAME);

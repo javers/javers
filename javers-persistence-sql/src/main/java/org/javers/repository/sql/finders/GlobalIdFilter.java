@@ -1,21 +1,27 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.common.collections.Optional;
+import org.polyjdbc.core.query.SelectQuery;
 
-import java.util.List;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_OWNER_ID_FK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_PK;
 
-import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_GLOBAL_ID_FK;
+class GlobalIdFilter extends SnapshotFilter  {
+    private final long globalIdPk;
+    private final boolean aggregate;
 
-/**
- * @author bartosz.walacik
- */
-class GlobalIdFilter extends PrimaryKeySnapshotFilter {
-
-    GlobalIdFilter(long globalIdPk, Optional<String> propertyName) {
-        super(globalIdPk, SNAPSHOT_GLOBAL_ID_FK, propertyName);
+    public GlobalIdFilter(long globalIdPk, boolean aggregate) {
+        this.globalIdPk = globalIdPk;
+        this.aggregate = aggregate;
     }
 
-    GlobalIdFilter(List<Long> globalIdPks, Optional<String> propertyName) {
-        super(globalIdPks, SNAPSHOT_GLOBAL_ID_FK, propertyName);
+    @Override
+    void addWhere(SelectQuery query) {
+        if (!aggregate) {
+            query.where("g." + GLOBAL_ID_PK + " = " + globalIdPk);
+        }
+        else {
+            query.where( "(    g." + GLOBAL_ID_PK + " = " + globalIdPk +
+                         "  OR g." + GLOBAL_ID_OWNER_ID_FK + " = " + globalIdPk + ")");
+        }
     }
 }

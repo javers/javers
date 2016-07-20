@@ -1,14 +1,17 @@
 package org.javers.repository.sql.finders;
 
 import org.javers.core.commit.CommitId;
+import org.javers.repository.api.QueryParams;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
+import java.util.Map;
+
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 abstract class SnapshotFilter {
-    static final String COMMIT_WITH_SNAPSHOT_GLOBAL_ID =
+    static final String FROM_COMMIT_WITH_SNAPSHOT =
             SNAPSHOT_TABLE_NAME +
             " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK +
             " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
@@ -30,7 +33,6 @@ abstract class SnapshotFilter {
             "g." + GLOBAL_ID_LOCAL_ID + ", " +
             "g." + GLOBAL_ID_FRAGMENT + ", " +
             "g." + GLOBAL_ID_OWNER_ID_FK + ", " +
-            //"g." + GLOBAL_ID_TYPE_NAME + ", " +
             "o." + GLOBAL_ID_LOCAL_ID + " owner_" + GLOBAL_ID_LOCAL_ID + ", " +
             "o." + GLOBAL_ID_FRAGMENT + " owner_" + GLOBAL_ID_FRAGMENT + ", " +
             "o." + GLOBAL_ID_TYPE_NAME + " owner_" + GLOBAL_ID_TYPE_NAME;
@@ -40,22 +42,51 @@ abstract class SnapshotFilter {
     }
 
     void addFrom(SelectQuery query) {
-        query.from(COMMIT_WITH_SNAPSHOT_GLOBAL_ID);
+        query.from(FROM_COMMIT_WITH_SNAPSHOT);
     }
 
     abstract  void addWhere(SelectQuery query);
 
-    void addFromDateCondition(SelectQuery query, LocalDateTime from) {
+    void applyQueryParams(SelectQuery query, QueryParams queryParams) {
+        if (queryParams.changedProperty().isPresent()){
+            addChangedPropertyCondition(query, queryParams.changedProperty().get());
+        }
+        if (queryParams.from().isPresent()) {
+            addFromDateCondition(query, queryParams.from().get());
+        }
+        if (queryParams.to().isPresent()) {
+            addToDateCondition(query, queryParams.to().get());
+        }
+        if (queryParams.commitId().isPresent()) {
+            addCommitIdCondition(query, queryParams.commitId().get());
+        }
+        if (queryParams.version().isPresent()) {
+            addVersionCondition(query, queryParams.version().get());
+        }
+        if (queryParams.author().isPresent()) {
+            addAuthorCondition(query, queryParams.author().get());
+        }
+        if (queryParams.commitProperties().size() > 0) {
+            addCommitPropertyConditions(query, queryParams.commitProperties());
+        }
+        query.limit(queryParams.limit(), queryParams.skip());
+    }
+
+    private void addChangedPropertyCondition(SelectQuery query, String changedProperty) {
+        query.append(" AND " + SNAPSHOT_CHANGED + " like '%\"" + changedProperty +"\"%'");
+    }
+
+    private void addFromDateCondition(SelectQuery query, LocalDateTime from) {
         query.append(" AND " + COMMIT_COMMIT_DATE + " >= :commitFromDate")
             .withArgument("commitFromDate", new Timestamp(from.toDate()));
     }
 
-    void addToDateCondition(SelectQuery query, LocalDateTime to) {
+    private void addToDateCondition(SelectQuery query, LocalDateTime to) {
         query.append(" AND " + COMMIT_COMMIT_DATE + " <= :commitToDate")
             .withArgument("commitToDate", new Timestamp(to.toDate()));
     }
 
-    void addCommitIdCondition(SelectQuery query, CommitId commitId) {
+    private void addCommitIdCondition(SelectQuery query, CommitId commitId) {
         query.append(" AND " + COMMIT_COMMIT_ID + " = :commitId")
             .withArgument("commitId", commitId.valueAsNumber());
     }
@@ -65,12 +96,18 @@ abstract class SnapshotFilter {
             .withArgument("version", version);
     }
 
-    void addAuthorCondition(SelectQuery query, String author) {
+    private void addAuthorCondition(SelectQuery query, String author) {
         query.append(" AND " + COMMIT_AUTHOR + " = :author")
             .withArgument("author", author);
     }
 
-    void addCommitPropertyCondition(SelectQuery query, String propertyName, String propertyValue) {
+    private void addCommitPropertyConditions(SelectQuery query, Map<String, String> commitProperties) {
+        for (Map.Entry<String, String> commitProperty : commitProperties.entrySet()) {
+            addCommitPropertyCondition(query, commitProperty.getKey(), commitProperty.getValue());
+        }
+    }
+
+    private void addCommitPropertyCondition(SelectQuery query, String propertyName, String propertyValue) {
         query.append(" AND EXISTS (" +
             "SELECT * FROM " + COMMIT_PROPERTY_TABLE_NAME +
             " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +

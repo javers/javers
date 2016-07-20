@@ -156,7 +156,7 @@ public class MongoRepository implements JaversRepository {
 
         Bson query = prefixQuery(GLOBAL_ID_KEY, managedType.getName()+"/");
 
-        if (!aggregate) { //only entities, without child value objects
+        if (!aggregate) { //only for EntityTypes entities
             query = Filters.and(query, Filters.exists(GLOBAL_ID_ENTITY));
         }
 
