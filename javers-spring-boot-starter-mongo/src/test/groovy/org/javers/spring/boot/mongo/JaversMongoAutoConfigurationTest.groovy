@@ -31,7 +31,7 @@ class JaversMongoAutoConfigurationTest {
 
     @Test
     void shoudUseDbNameFromMongoStarter(){
-        assert javers.repository.delegate.mongo.name == "spring-mongo"
+        assert javers.repository.delegate.mongoSchemaManager.mongo.name == "spring-mongo"
     }
 
     @Test
