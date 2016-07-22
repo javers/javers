@@ -36,7 +36,7 @@ public abstract class PropertyChange extends Change {
         if (this == o) {
             return true;
         }
-        if (o instanceof ObjectRemoved) {
+        if (o instanceof PropertyChange) {
             PropertyChange that = (PropertyChange) o;
             return super.equals(that) &&
                     Objects.equals(this.propertyName, that.propertyName);
