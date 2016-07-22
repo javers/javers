@@ -51,11 +51,5 @@ JaVers is an open source project, so we are open to your contributions.
 Before you start, please read our
 [Contributing Guide](CONTRIBUTING.md#guidelines-for-contributors) and see how to get your changes merged.
 
-## Team Board
-Check out our [Kanban Board](https://waffle.io/javers/javers) to see what we're working on. 
-
-## CI status
-[![Build Status](https://travis-ci.org/javers/javers.png?branch=master)](https://travis-ci.org/javers/javers)
-
 ## License
 JaVers is licensed under Apache License Version 2.0, see the LICENSE file.
