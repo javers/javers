@@ -324,6 +324,36 @@ class JqlExample extends Specification {
         assert changes[4] instanceof NewObject
     }
 
+    def "should query for aggregate changes by Entity instance Id and class"(){
+      given:
+      def javers = JaversBuilder.javers().build()
+
+      def bob = new Employee(name:"bob", age:30, salary: 1000,
+              primaryAddress: new Address(city:"Paris"),
+              postalAddress: new Address(city:"Paris"))
+      javers.commit("author", bob)
+
+      bob.age = 31
+      bob.primaryAddress.city = "London"
+      javers.commit("author", bob)
+
+      when: "aggregate query by instance Id"
+      def query = QueryBuilder.byInstanceId("bob", Employee.class).aggregate().build()
+      def changes = javers.findChanges( query )
+
+      then:
+      printChanges(changes)
+      assert changes.size() == 2
+
+      when: "aggregate query by Entity class"
+      query = QueryBuilder.byClass(Employee.class).aggregate().build()
+      changes = javers.findChanges( query )
+
+      then:
+      printChanges(changes)
+      assert changes.size() == 2
+    }
+
     def printChanges(def changes){
         println "changes:"
         def i = 0
