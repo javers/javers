@@ -1,5 +1,7 @@
 package org.javers.core.diff.changetype.container;
 
+import java.util.Objects;
+
 import org.javers.core.diff.changetype.Atomic;
 
 /**
@@ -27,6 +29,25 @@ public class ElementValueChange extends ContainerElementChange {
     @Override
     public String toString() {
         return "("+ getIndex() + ").'"+getLeftValue()+"'>>'"+getRightValue()+"'";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof ElementValueChange) {
+            ElementValueChange that = (ElementValueChange) obj;
+            return super.equals(that)
+                    && Objects.equals(this.getLeftValue(), that.getLeftValue())
+                    && Objects.equals(this.getRightValue(), that.getRightValue());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getLeftValue(), getRightValue());
     }
 
 }
