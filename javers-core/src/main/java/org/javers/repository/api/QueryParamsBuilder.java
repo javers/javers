@@ -18,7 +18,10 @@ public class QueryParamsBuilder {
     private CommitId commitId;
     private Long version;
     private String author;
+    private boolean aggregate;
+    private boolean newObjectChanges;
     private Map<String, String> commitProperties = new HashMap<>();
+    private String changedProperty;
 
     private QueryParamsBuilder(int limit) {
         this.limit = limit;
@@ -56,6 +59,11 @@ public class QueryParamsBuilder {
         return builder;
     }
 
+    public QueryParamsBuilder withChildValueObjects(boolean aggregate) {
+        this.aggregate = aggregate;
+        return this;
+    }
+
     /**
      * @see #withLimit(int)
      */
@@ -66,7 +74,7 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * skips a given number of latest snapshots
+     * @see QueryParams#skip()
      */
     public QueryParamsBuilder skip(int skip) {
         Validate.argumentCheck(limit >= 0, "Skip is not a non-negative number.");
@@ -75,7 +83,7 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * limits results to Snapshots created after given date
+     * @see QueryParams#from()
      */
     public QueryParamsBuilder from(LocalDateTime from) {
         this.from = from;
@@ -83,39 +91,50 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * limits results to Snapshots created before given date
+     * @see QueryParams#to()
      */
     public QueryParamsBuilder to(LocalDateTime to) {
         this.to = to;
         return this;
     }
 
-    /*
-     * limits results to Snapshots with a given commitId
+    /**
+     * @see QueryParams#commitId()
      */
     public QueryParamsBuilder commitId(CommitId commitId) {
         this.commitId = commitId;
         return this;
     }
 
-    /*
-     * filters results to Snapshots with all given commit properties
+    /**
+     * @see QueryParams#commitProperties()
      */
-    public QueryParamsBuilder commitProperties(Map<String, String> commitProperties) {
-        this.commitProperties = commitProperties;
+    public QueryParamsBuilder commitProperty(String name, String value) {
+        this.commitProperties.put(name, value);
         return this;
     }
 
-    /*
-     * limits results to Snapshots with a given version
+    /**
+     * @see QueryParams#version()
      */
     public QueryParamsBuilder version(Long version) {
         this.version = version;
         return this;
     }
 
-    /*
-     * limits results to Snapshots committed by a given author
+
+    public QueryParamsBuilder newObjectChanges(boolean newObjectChanges) {
+        this.newObjectChanges = newObjectChanges;
+        return this;
+    }
+
+    public QueryParamsBuilder changedProperty(String propertyName) {
+        this.changedProperty = propertyName;
+        return this;
+    }
+
+    /**
+     * @see QueryParams#author()
      */
     public QueryParamsBuilder author(String author) {
         this.author = author;
@@ -127,6 +146,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to, commitId, version, author, commitProperties);
+        return new QueryParams(limit, skip, from, to, commitId, version, author, commitProperties, aggregate, newObjectChanges, changedProperty);
     }
 }

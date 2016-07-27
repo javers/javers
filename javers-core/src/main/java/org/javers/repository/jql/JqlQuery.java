@@ -1,6 +1,8 @@
 package org.javers.repository.jql;
 
 import org.javers.common.collections.Optional;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.repository.api.QueryParams;
@@ -20,14 +22,22 @@ import java.util.List;
 public class JqlQuery {
 
     private final QueryParams queryParams;
-    private final boolean newObjectChanges;
     private final List<Filter> filters;
 
-    JqlQuery(List<Filter> filters, boolean newObjectChanges, QueryParams queryParams) {
+    JqlQuery(List<Filter> filters, QueryParams queryParams) {
         Validate.argumentsAreNotNull(filters);
         this.queryParams = queryParams;
         this.filters = filters;
-        this.newObjectChanges = newObjectChanges;
+        validate();
+    }
+
+    private void validate(){
+        if (queryParams.isAggregate()) {
+            if (!(isClassQuery() || isInstanceIdQuery())) {
+                throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
+                        "aggregate filter can be enabled only for byClass and byInstanceId queries");
+            }
+        }
     }
 
     @Override
@@ -35,7 +45,6 @@ public class JqlQuery {
         return "JqlQuery{" +
                 "queryParams=" + queryParams +
                 ", filters=" + filters +
-                ", newObjectChanges="+ newObjectChanges +
                 '}';
     }
 
@@ -55,8 +64,8 @@ public class JqlQuery {
         return getFilter(IdFilter.class).get().getGlobalId();
     }
 
-    String getPropertyName(){
-        return getFilter(PropertyFilter.class).get().getPropertyName();
+    String getChangedProperty(){
+        return queryParams.changedProperty().get();
     }
 
     VoOwnerFilter getVoOwnerFilter() {
@@ -73,30 +82,30 @@ public class JqlQuery {
     }
 
     public boolean isNewObjectChanges() {
-        return newObjectChanges;
+        return queryParams.newObjectChanges();
     }
 
-    boolean isAnyDomainObjectOnlyQuery() {
-        return hasFilter(AnyDomainObjectFilter.class) && filters.size() == 1;
+    boolean isAnyDomainObjectQuery() {
+        return hasFilter(AnyDomainObjectFilter.class);
     }
 
-    boolean isIdOnlyQuery(){
-        return hasFilter(IdFilter.class) && filters.size() == 1;
+    boolean isIdQuery(){
+        return hasFilter(IdFilter.class);
     }
 
-    boolean isIdAndPropertyQuery(){
-        return hasFilter(IdFilter.class) && hasFilter(PropertyFilter.class);
+    boolean hasChangedPropertyFilter(){
+        return queryParams.changedProperty().isPresent();
     }
 
-    boolean isClassOnlyQuery() {
-        return hasFilter(ClassFilter.class) && filters.size() == 1;
+    boolean isClassQuery() {
+        return hasFilter(ClassFilter.class);
     }
 
-    boolean isClassAndPropertyQuery(){
-        return hasFilter(ClassFilter.class) && hasFilter(PropertyFilter.class);
+    boolean isInstanceIdQuery() {
+        return hasFilter(IdFilter.class)  && getIdFilter() instanceof InstanceIdDTO;
     }
 
-    boolean isVoOwnerOnlyQuery(){
-        return hasFilter(VoOwnerFilter.class) && filters.size() == 1;
+    boolean isVoOwnerQuery(){
+        return hasFilter(VoOwnerFilter.class);
     }
 }

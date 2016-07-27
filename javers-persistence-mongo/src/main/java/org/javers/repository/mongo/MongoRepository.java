@@ -11,6 +11,7 @@ import org.bson.conversions.Bson;
 import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
+import org.javers.common.string.RegexEscape;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -26,46 +27,28 @@ import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.mongo.model.MongoHeadId;
 import org.joda.time.LocalDateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 import static org.javers.common.validation.Validate.conditionFulfilled;
+import static org.javers.repository.mongo.MongoSchemaManager.*;
 
 /**
  * @author pawel szymczyk
  */
 public class MongoRepository implements JaversRepository {
-    private static final Logger logger = LoggerFactory.getLogger(MongoRepository.class);
 
     private static final int DESC = -1;
-    private static final int ASC = 1;
-
-    private static final String SNAPSHOTS = "jv_snapshots";
-    private static final String COMMIT_ID = "commitMetadata.id";
-    private static final String COMMIT_DATE = "commitMetadata.commitDate";
-    private static final String COMMIT_AUTHOR = "commitMetadata.author";
-    private static final String COMMIT_PROPERTIES = "commitMetadata.properties";
-    private static final String GLOBAL_ID_KEY = "globalId_key";
-    private static final String GLOBAL_ID_ENTITY = "globalId.entity";
-    private static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
-    private static final String GLOBAL_ID_FRAGMENT = "globalId.fragment";
-    private static final String GLOBAL_ID_VALUE_OBJECT = "globalId.valueObject";
-    private static final String SNAPSHOT_VERSION = "version";
-    private static final String CHANGED_PROPERTIES = "changedProperties";
-    private static final String OBJECT_ID = "_id";
-
-    private MongoDatabase mongo;
+    private final MongoSchemaManager mongoSchemaManager;
     private JsonConverter jsonConverter;
 
     public MongoRepository(MongoDatabase mongo) {
-        this.mongo = mongo;
+        this(mongo, null);
     }
 
     MongoRepository(MongoDatabase mongo, JsonConverter jsonConverter) {
-        this.mongo = mongo;
         this.jsonConverter = jsonConverter;
+        this.mongoSchemaManager = new MongoSchemaManager(mongo);
     }
 
     @Override
@@ -81,7 +64,13 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        return queryForSnapshots(createIdQuery(globalId), Optional.of(queryParams));
+        Bson query;
+        if (queryParams.isAggregate()){
+            query = createIdQueryWithAggregate(globalId);
+        } else {
+            query = createIdQuery(globalId);
+        }
+        return queryForSnapshots(query, Optional.of(queryParams));
     }
 
     @Override
@@ -109,26 +98,8 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, QueryParams queryParams) {
-        BasicDBObject query = createIdQuery(globalId);
-
-        query.append(CHANGED_PROPERTIES, propertyName);
-
-        return queryForSnapshots(query, Optional.of(queryParams));
-    }
-
-    @Override
-    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
-        BasicDBObject query = createGlobalIdClassQuery(givenClass);
-
-        query.append(CHANGED_PROPERTIES, propertyName);
-
-        return queryForSnapshots(query, Optional.of(queryParams));
-    }
-
-    @Override
     public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
-        BasicDBObject query = createGlobalIdClassQuery(givenClass);
+        Bson query = createManagedTypeQuery(givenClass, queryParams.isAggregate());
         return queryForSnapshots(query, Optional.of(queryParams));
     }
 
@@ -150,42 +121,15 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public void ensureSchema() {
-        //ensures collections and indexes
-        MongoCollection<Document> snapshots = snapshotsCollection();
-        snapshots.createIndex(new BasicDBObject(GLOBAL_ID_KEY, ASC));
-        snapshots.createIndex(new BasicDBObject(GLOBAL_ID_ENTITY, ASC));
-        snapshots.createIndex(new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, ASC));
-        snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
-        snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
-        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC));
-        headCollection();
-
-        //schema migration script from JaVers 1.1 to 1.2
-        Document doc = snapshots.find().first();
-        if (doc != null) {
-            Object stringCommitId = ((Map)doc.get("commitMetadata")).get("id");
-            if (stringCommitId instanceof String) {
-                logger.info("executing db migration script, from JaVers 1.1 to 1.2 ...");
-
-                Document update = new Document("eval",
-                    "function() { \n"+
-                            "    db.jv_snapshots.find().forEach( \n"+
-                            "      function(snapshot) { \n"+
-                            "        snapshot.commitMetadata.id = Number(snapshot.commitMetadata.id); \n"+
-                            "        db.jv_snapshots.save(snapshot); } \n" +
-                            "    ); "+
-                            "    return 'ok'; \n"+
-                            "}"
-                    );
-
-                Document ret = mongo.runCommand(update);
-                logger.info("result: \n "+ ret.toJson());
-            }
-        }
+        mongoSchemaManager.ensureSchema();
     }
 
-    private BasicDBObject createIdQuery(GlobalId id) {
-        return new BasicDBObject (GLOBAL_ID_KEY, id.value());
+    private Bson createIdQuery(GlobalId id) {
+        return new BasicDBObject(GLOBAL_ID_KEY, id.value());
+    }
+
+    private Bson createIdQueryWithAggregate(GlobalId id) {
+        return Filters.or(createIdQuery(id), prefixQuery(GLOBAL_ID_KEY, id.value() + "#"));
     }
 
     private Bson createVersionQuery(Long version) {
@@ -205,16 +149,17 @@ public class MongoRepository implements JaversRepository {
         return Filters.or(descFilters);
     }
 
-    private BasicDBObject createGlobalIdClassQuery(ManagedType givenClass) {
-        String cName = givenClass.getName();
+    private Bson createManagedTypeQuery(ManagedType managedType, boolean aggregate) {
+        if (managedType instanceof ValueObjectType) {
+            return new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, managedType.getName());
+        }
 
-        BasicDBObject query = null;
-        if (givenClass instanceof EntityType) {
-            query = new BasicDBObject(GLOBAL_ID_ENTITY, cName);
+        Bson query = prefixQuery(GLOBAL_ID_KEY, managedType.getName()+"/");
+
+        if (!aggregate) { //only for EntityTypes entities
+            query = Filters.and(query, Filters.exists(GLOBAL_ID_ENTITY));
         }
-        if (givenClass instanceof ValueObjectType) {
-            query = new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, cName);
-        }
+
         return query;
     }
 
@@ -230,11 +175,11 @@ public class MongoRepository implements JaversRepository {
     }
 
     private MongoCollection<Document> snapshotsCollection() {
-        return mongo.getCollection(SNAPSHOTS);
+        return mongoSchemaManager.snapshotsCollection();
     }
 
     private MongoCollection<Document> headCollection() {
-        return mongo.getCollection(MongoHeadId.COLLECTION_NAME);
+        return mongoSchemaManager.headCollection();
     }
 
     private void persistSnapshots(Commit commit) {
@@ -290,6 +235,9 @@ public class MongoRepository implements JaversRepository {
             if (!params.commitProperties().isEmpty()) {
                 query = addCommitPropertiesFilter(query, params.commitProperties());
             }
+            if (params.changedProperty().isPresent()) {
+                query = addChangedPropertyFilter(query, params.changedProperty().get());
+            }
         }
         return query;
     }
@@ -314,6 +262,10 @@ public class MongoRepository implements JaversRepository {
 
     private Bson addCommitIdFilter(Bson query, CommitId commitId) {
         return Filters.and(query, new BasicDBObject(COMMIT_ID, commitId.valueAsNumber().doubleValue()));
+    }
+
+    private Bson addChangedPropertyFilter(Bson query, String changedProperty){
+        return Filters.and(query, new BasicDBObject(CHANGED_PROPERTIES, changedProperty));
     }
 
     private Bson addVersionFilter(Bson query, Long version) {
@@ -361,12 +313,17 @@ public class MongoRepository implements JaversRepository {
         }
     }
 
-    private <T> T getOne(MongoCursor<T> mongoCursor){
+    private static <T> T getOne(MongoCursor<T> mongoCursor){
         try{
             return mongoCursor.next();
         }
         finally {
             mongoCursor.close();
         }
+    }
+
+    //enables index range scan
+    private static Bson prefixQuery(String fieldName, String prefix){
+        return Filters.regex(fieldName, "^" + RegexEscape.escape(prefix) + ".*");
     }
 }

@@ -38,43 +38,28 @@ public class JaversExtendedRepository implements JaversRepository {
         });
     }
 
-    public List<Change> getPropertyChangeHistory(GlobalId globalId, final String propertyName, boolean newObjects, QueryParams queryParams) {
-        argumentsAreNotNull(globalId, propertyName);
-
-        List<CdoSnapshot> snapshots = getPropertyStateHistory(globalId, propertyName, queryParams);
-        List<Change> changes = getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
-
-        return filterByPropertyName(changes, propertyName);
-    }
-
-    public List<Change> getPropertyChangeHistory(ManagedType givenClass, final String propertyName, boolean newObjects, QueryParams queryParams) {
-        argumentsAreNotNull(givenClass, propertyName);
-
-        List<CdoSnapshot> snapshots = getPropertyStateHistory(givenClass, propertyName, queryParams);
-        List<Change> changes = getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
-
-        return filterByPropertyName(changes, propertyName);
-    }
-
-    public List<Change> getChangeHistory(GlobalId globalId, boolean newObjects, QueryParams queryParams) {
+    public List<Change> getChangeHistory(GlobalId globalId, QueryParams queryParams) {
         argumentsAreNotNull(globalId, queryParams);
 
         List<CdoSnapshot> snapshots = getStateHistory(globalId, queryParams);
-        return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
+        List<Change> changes = getChangesIntroducedBySnapshots(queryParams.newObjectChanges() ? snapshots : skipInitial(snapshots));
+
+        return filterByPropertyName(changes, queryParams);
     }
 
-    public List<Change> getChangeHistory(ManagedType givenClass, boolean newObjects, QueryParams queryParams) {
+    public List<Change> getChangeHistory(ManagedType givenClass, QueryParams queryParams) {
         argumentsAreNotNull(givenClass, queryParams);
 
         List<CdoSnapshot> snapshots = getStateHistory(givenClass, queryParams);
-        return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
+        List<Change> changes = getChangesIntroducedBySnapshots(queryParams.newObjectChanges() ? snapshots : skipInitial(snapshots));
+        return filterByPropertyName(changes, queryParams);
     }
 
-    public List<Change> getValueObjectChangeHistory(EntityType ownerEntity, String path, boolean newObjects, QueryParams queryParams) {
+    public List<Change> getValueObjectChangeHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
         argumentsAreNotNull(ownerEntity, path, queryParams);
 
         List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntity, path, queryParams);
-        return getChangesIntroducedBySnapshots(newObjects ? snapshots : skipInitial(snapshots));
+        return getChangesIntroducedBySnapshots(queryParams.newObjectChanges() ? snapshots : skipInitial(snapshots));
     }
 
     public List<Change> getChanges(boolean newObjects, QueryParams queryParams) {
@@ -88,18 +73,6 @@ public class JaversExtendedRepository implements JaversRepository {
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
         argumentsAreNotNull(globalId, queryParams);
         return delegate.getStateHistory(globalId, queryParams);
-    }
-
-    @Override
-    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, QueryParams queryParams) {
-        argumentsAreNotNull(globalId, propertyName, queryParams);
-        return delegate.getPropertyStateHistory(globalId, propertyName, queryParams);
-    }
-
-    @Override
-    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
-        argumentsAreNotNull(givenClass, propertyName, queryParams);
-        return delegate.getPropertyStateHistory(givenClass, propertyName, queryParams);
     }
 
     @Override
@@ -150,10 +123,15 @@ public class JaversExtendedRepository implements JaversRepository {
         delegate.ensureSchema();
     }
 
-    private List<Change> filterByPropertyName(List<Change> changes, final String propertyName) {
+    private List<Change> filterByPropertyName(List<Change> changes, final QueryParams queryParams) {
+        if (queryParams.changedProperty().isEmpty()){
+            return changes;
+        }
+
         return Lists.positiveFilter(changes, new Predicate<Change>() {
             public boolean apply(Change input) {
-                return input instanceof PropertyChange && ((PropertyChange) input).getPropertyName().equals(propertyName);
+                return input instanceof PropertyChange &&
+                        ((PropertyChange) input).getPropertyName().equals(queryParams.changedProperty().get());
             }
         });
     }

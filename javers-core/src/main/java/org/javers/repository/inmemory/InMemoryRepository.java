@@ -10,6 +10,7 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
@@ -65,10 +66,29 @@ public class InMemoryRepository implements JaversRepository {
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
         Validate.argumentsAreNotNull(globalId, queryParams);
 
-        if (snapshots.containsKey(globalId)) {
-            return unmodifiableList(applyQueryParams(snapshots.get(globalId), queryParams));
+        List<CdoSnapshot> filtered = new ArrayList<>();
+
+        for (CdoSnapshot snapshot : getAll()) {
+            if (snapshot.getGlobalId().equals(globalId)) {
+                filtered.add(snapshot);
+            }
+            if (queryParams.isAggregate() && isParent(globalId, snapshot.getGlobalId())){
+                filtered.add(snapshot);
+            }
         }
-        return Collections.emptyList();
+
+        return applyQueryParams(filtered, queryParams);
+    }
+
+    private boolean isParent(GlobalId parentCandidate, GlobalId childCandidate) {
+        if (! (parentCandidate instanceof InstanceId && childCandidate instanceof ValueObjectId)){
+            return false;
+        }
+
+        InstanceId parent = (InstanceId)parentCandidate;
+        ValueObjectId child = (ValueObjectId)childCandidate;
+
+        return child.getOwnerId().equals(parent);
     }
 
     @Override
@@ -80,29 +100,23 @@ public class InMemoryRepository implements JaversRepository {
             if (snapshot.getGlobalId().isTypeOf(givenClass)) {
                 filtered.add(snapshot);
             }
+            if (queryParams.isAggregate() && isParent(givenClass, snapshot.getGlobalId())){
+                filtered.add(snapshot);
+            }
         }
 
         return applyQueryParams(filtered, queryParams);
     }
 
-    @Override
-    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, final String propertyName, QueryParams queryParams) {
-        Validate.argumentsAreNotNull(globalId, propertyName, queryParams);
-
-        if (snapshots.containsKey(globalId)) {
-            List<CdoSnapshot> filtered = filterByPropertyName(snapshots.get(globalId), propertyName);
-            return unmodifiableList(applyQueryParams(filtered, queryParams));
+    private boolean isParent(ManagedType parentCandidate, GlobalId childCandidate) {
+        if (! (parentCandidate instanceof EntityType && childCandidate instanceof ValueObjectId)){
+            return false;
         }
-        return Collections.emptyList();
-    }
 
-    @Override
-    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
-        Validate.argumentsAreNotNull(givenClass, propertyName, queryParams);
+        EntityType parent = (EntityType)parentCandidate;
+        ValueObjectId child = (ValueObjectId)childCandidate;
 
-        QueryParams increasedLimitQueryParams = getQueryParamsWithIncreasedLimit(queryParams);
-        List<CdoSnapshot> filtered = filterByPropertyName(getStateHistory(givenClass, increasedLimitQueryParams), propertyName);
-        return unmodifiableList(applyQueryParams(filtered, queryParams));
+        return child.getOwnerId().getTypeName().equals(parent.getName());
     }
 
     private QueryParams getQueryParamsWithIncreasedLimit(QueryParams queryParams) {
@@ -123,6 +137,9 @@ public class InMemoryRepository implements JaversRepository {
         }
         if (queryParams.hasDates()) {
             snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
+        }
+        if (queryParams.changedProperty().isPresent()){
+            snapshots = filterByPropertyName(snapshots, queryParams.changedProperty().get());
         }
         snapshots = filterSnapshotsByCommitProperties(snapshots, queryParams.commitProperties());
         return trimResultsToRequestedSlice(snapshots, queryParams.skip(), queryParams.limit());

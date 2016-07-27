@@ -24,7 +24,7 @@ public enum JaversExceptionCode {
 
     CLASSPATH_RESOURCE_NOT_FOUND(JaversException.BOOTSTRAP_ERROR + "classpath resource '%s' could not be found"),
 
-    ALREADY_BUILT(JaversException.BOOTSTRAP_ERROR + "instance already built, each AbstractJaversBuilder may produce only one target instance"),
+    ALREADY_BUILT(JaversException.BOOTSTRAP_ERROR + "instance already built, each AbstractContainerBuilder may produce only one target instance"),
 
     PROPERTY_ACCESS_ERROR("error getting value from property '%s' on target object of type '%s', cause: %s"),
 

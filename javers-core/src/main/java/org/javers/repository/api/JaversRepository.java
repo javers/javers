@@ -53,12 +53,6 @@ public interface JaversRepository {
     List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams);
 
     /**
-     * Filtered version of {@link #getStateHistory(GlobalId, QueryParams)},
-     * selects snapshots with a change recorded on a given property
-     */
-    List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, QueryParams queryParams);
-
-    /**
      * All snapshots of objects within a given managed class,
      * in reverse chronological order
      *
@@ -66,12 +60,6 @@ public interface JaversRepository {
      * @return empty List if no snapshots found
      */
     List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams);
-
-    /**
-     * Filtered version of {@link #getStateHistory(ManagedType, QueryParams)},
-     * selects all snapshots with a change recorded on a given property
-     */
-    List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams);
 
     /**
      * Latest snapshot of given object,

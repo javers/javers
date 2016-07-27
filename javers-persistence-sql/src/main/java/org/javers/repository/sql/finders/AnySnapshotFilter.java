@@ -11,7 +11,7 @@ public class AnySnapshotFilter extends SnapshotFilter {
 
     @Override
     void addFrom(SelectQuery query) {
-        query.from(COMMIT_WITH_SNAPSHOT_GLOBAL_ID);
+        query.from(FROM_COMMIT_WITH_SNAPSHOT);
     }
 
     @Override

@@ -63,7 +63,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @see <a href="http://javers.org/documentation/domain-configuration/">http://javers.org/documentation/domain-configuration</a>
  * @author bartosz walacik
  */
-public class JaversBuilder extends AbstractJaversBuilder {
+public class JaversBuilder extends AbstractContainerBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
     private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
