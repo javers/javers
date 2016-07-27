@@ -1,5 +1,7 @@
 package org.javers.core.diff.changetype.map;
 
+import java.util.Objects;
+
 import org.javers.common.string.ToStringBuilder;
 import org.javers.core.diff.changetype.Atomic;
 
@@ -37,5 +39,24 @@ public class EntryValueChange extends EntryChange {
     @Override
     public String toString() {
         return ToStringBuilder.toString(this, getKey(), getLeftValue()+"'>>'"+ getRightValue());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof EntryValueChange) {
+            EntryValueChange that = (EntryValueChange) obj;
+            return super.equals(that)
+                    && Objects.equals(this.leftValue, that.leftValue)
+                    && Objects.equals(this.rightValue, that.rightValue);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), leftValue, rightValue);
     }
 }
