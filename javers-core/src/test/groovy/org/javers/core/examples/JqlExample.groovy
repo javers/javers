@@ -324,7 +324,7 @@ class JqlExample extends Specification {
         assert changes[4] instanceof NewObject
     }
 
-    def "should query for aggregate changes by Entity instance Id and class"(){
+    def "should query for changes made on Entity and its ValueObjects by InstanceId and Class"(){
       given:
       def javers = JaversBuilder.javers().build()
 
@@ -337,16 +337,16 @@ class JqlExample extends Specification {
       bob.primaryAddress.city = "London"
       javers.commit("author", bob)
 
-      when: "aggregate query by instance Id"
-      def query = QueryBuilder.byInstanceId("bob", Employee.class).aggregate().build()
+      when: "query by instance Id"
+      def query = QueryBuilder.byInstanceId("bob", Employee.class).withChildValueObjects().build()
       def changes = javers.findChanges( query )
 
       then:
       printChanges(changes)
       assert changes.size() == 2
 
-      when: "aggregate query by Entity class"
-      query = QueryBuilder.byClass(Employee.class).aggregate().build()
+      when: "query by Entity class"
+      query = QueryBuilder.byClass(Employee.class).withChildValueObjects().build()
       changes = javers.findChanges( query )
 
       then:

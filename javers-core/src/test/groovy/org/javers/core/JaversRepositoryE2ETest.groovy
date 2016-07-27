@@ -926,7 +926,7 @@ class JaversRepositoryE2ETest extends Specification {
         assert snapshots[0].getPropertyValue("id") == 2
     }
 
-    def "should query for aggregate (with child ValueObject) snapshots and changes by InstanceId"() {
+    def "should query withChildValueObjects for snapshots and changes by InstanceId"() {
         given:
         def london1v1 = new DummyAddress(city: "London", networkAddress: new DummyNetworkAddress(address: "v1"))
         def london2v1 = new DummyAddress(city: "London 2", networkAddress: new DummyNetworkAddress(address: "v1"))
@@ -943,7 +943,7 @@ class JaversRepositoryE2ETest extends Specification {
             javers.commit("author", it)
         }
 
-        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).aggregate().build()
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).withChildValueObjects().build()
 
         when: "snapshots query"
         def snapshots = javers.findSnapshots(query)
@@ -965,7 +965,7 @@ class JaversRepositoryE2ETest extends Specification {
         changes.size() == 2
     }
 
-    def "should query for aggregate (with child ValueObject) snapshots and changes by Entity type"() {
+    def "should query withChildValueObjects for snapshots and changes by Entity type"() {
         given:
         def london = new DummyAddress(city: "London")
         def paris =  new DummyAddress(city: "Paris")
@@ -984,7 +984,7 @@ class JaversRepositoryE2ETest extends Specification {
             javers.commit("author", it)
         }
 
-        def query = QueryBuilder.byClass(SnapshotEntity).aggregate().build()
+        def query = QueryBuilder.byClass(SnapshotEntity).withChildValueObjects().build()
 
         when: "snapshots query"
         def snapshots = javers.findSnapshots(query)

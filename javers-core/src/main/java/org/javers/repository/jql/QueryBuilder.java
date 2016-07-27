@@ -9,7 +9,6 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -180,27 +179,21 @@ public class QueryBuilder {
      * <br/><br/>
      *
      * When enabled, all child ValueObjects owned by selected Entities are included in a query scope.
-     * In other words, snapshots (or changes) of whole aggregates are selected.
-     * <br/><br/>
-     *
-     * Note that we are using <i>aggregate</i> term in the context of DDD.
-     * Please do not confuse it with SQL aggregate functions.
-     * In JQL aggregate means: an Entity with its child ValueObjects.
      *
      * @since 2.1
      */
-    public QueryBuilder aggregate(boolean aggregate) {
-        queryParamsBuilder.aggregate(aggregate);
+    public QueryBuilder withChildValueObjects(boolean aggregate) {
+        queryParamsBuilder.withChildValueObjects(aggregate);
         return this;
     }
 
     /**
-     * Alias to {@link #aggregate(boolean)} with true
+     * Alias to {@link #withChildValueObjects(boolean)} with true
      *
      * @since 2.1
      */
-    public QueryBuilder aggregate() {
-        queryParamsBuilder.aggregate(true);
+    public QueryBuilder withChildValueObjects() {
+        queryParamsBuilder.withChildValueObjects(true);
         return this;
     }
 

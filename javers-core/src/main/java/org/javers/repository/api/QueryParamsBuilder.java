@@ -59,7 +59,7 @@ public class QueryParamsBuilder {
         return builder;
     }
 
-    public QueryParamsBuilder aggregate(boolean aggregate) {
+    public QueryParamsBuilder withChildValueObjects(boolean aggregate) {
         this.aggregate = aggregate;
         return this;
     }

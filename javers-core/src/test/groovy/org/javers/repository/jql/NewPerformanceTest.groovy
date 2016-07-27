@@ -100,7 +100,7 @@ class NewPerformanceTest extends Specification {
         def n = 30
         n.times {
             def id = n * 100
-            def query = QueryBuilder.byInstanceId(id, NewPerformanceEntity).aggregate().build()
+            def query = QueryBuilder.byInstanceId(id, NewPerformanceEntity).withChildValueObjects().build()
             assert javers.findSnapshots(query).size() == 6
         }
 
