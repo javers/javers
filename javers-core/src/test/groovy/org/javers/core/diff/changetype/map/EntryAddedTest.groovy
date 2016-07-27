@@ -6,25 +6,19 @@ class EntryAddedTest extends Specification {
 
     def "should recognise instances are equal"() {
         given:
-        def left = new EntryAdded("key", "value");
+        def left = new EntryAdded("key", "value")
         def right = new EntryAdded("key", "value")
 
-        when:
-        def equal = left.equals(right);
-
-        then:
-        equal
+        expect:
+        left.equals(right);
     }
 
     def "should recognise instances are unequal"() {
         given:
-        def left = new EntryAdded("key", "value");
+        def left = new EntryAdded("key", "value")
         def right = new EntryAdded("key", "difference")
 
-        when:
-        def equal = left.equals(right);
-
-        then:
-        !equal
+        expect:
+        !left.equals(right)
     }
 }

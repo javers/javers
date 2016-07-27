@@ -37,13 +37,13 @@ public abstract  class EntryAddOrRemove extends EntryChange {
         if (obj instanceof EntryAddOrRemove) {
             EntryAddOrRemove that = (EntryAddOrRemove) obj;
             return super.equals(that)
-                    && Objects.equals(this.getWrappedValue(), that.getWrappedValue());
+                    && Objects.equals(this.value, that.value);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getWrappedValue());
+        return Objects.hash(super.hashCode(), value);
     }
 }

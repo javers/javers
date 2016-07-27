@@ -9,11 +9,8 @@ class EntryValueChangeTest extends Specification {
         def left = new EntryValueChange("key", "a", "b");
         def right = new EntryValueChange("key", "a", "b")
 
-        when:
-        def equal = left.equals(right);
-
-        then:
-        equal
+        expect:
+        left.equals(right);
     }
 
     def "should recognise instances are unequal"() {
@@ -21,10 +18,7 @@ class EntryValueChangeTest extends Specification {
         def left = new EntryValueChange("key", "a", "b");
         def right = new EntryValueChange("key", "a", "c")
 
-        when:
-        def equal = left.equals(right);
-
-        then:
-        !equal
+        expect:
+        !left.equals(right);
     }
 }

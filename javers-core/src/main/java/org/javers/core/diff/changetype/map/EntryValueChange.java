@@ -49,14 +49,14 @@ public class EntryValueChange extends EntryChange {
         if (obj instanceof EntryValueChange) {
             EntryValueChange that = (EntryValueChange) obj;
             return super.equals(that)
-                    && Objects.equals(this.getWrappedLeftValue(), that.getWrappedLeftValue())
-                    && Objects.equals(this.getWrappedRightValue(), that.getWrappedRightValue());
+                    && Objects.equals(this.leftValue, that.leftValue)
+                    && Objects.equals(this.rightValue, that.rightValue);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getWrappedLeftValue(), getWrappedRightValue());
+        return Objects.hash(super.hashCode(), leftValue, rightValue);
     }
 }
