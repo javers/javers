@@ -92,7 +92,7 @@ public class JaversSqlAutoConfiguration {
 
     @Bean(name = "authorProvider")
     @ConditionalOnMissingBean
-    @ConditionalOnMissingClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
+    @ConditionalOnMissingClass({"org.springframework.security.core.context.SecurityContextHolder"})
     public AuthorProvider unknownAuthorProvider() {
         return new MockAuthorProvider();
     }
