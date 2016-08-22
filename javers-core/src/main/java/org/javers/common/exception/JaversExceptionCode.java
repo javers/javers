@@ -88,8 +88,11 @@ public enum JaversExceptionCode {
 
     UNSUPPORTED_OPTIONAL_CONTENT_TYPE("%s is not supported as Optional<> content type"),
 
-    RUNTIME_EXCEPTION("uncategorized runtime exception. %s")
-    ;
+    RUNTIME_EXCEPTION("uncategorized runtime exception. %s"),
+
+    COULD_NOT_EXTRACT_SPRING_DATA_REPOSITORY_INTERFACE_FROM_GIVEN_CLASS("could not extract Spring Data Repository interface from class:  %s. " +
+            "Extracted interfaces: %s"),
+    COULD_NOT_EXTRACT_TYPE_ARGUMENTS_FROM_SPRING_DATA_REPOSITORY_INTERFACE("could not extract type arguments from Spring Data Repository interface:  %s. Arguments: %s");
 
     private final String message;
 

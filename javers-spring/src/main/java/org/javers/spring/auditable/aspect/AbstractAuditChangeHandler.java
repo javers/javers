@@ -3,7 +3,6 @@ package org.javers.spring.auditable.aspect;
 import org.javers.core.Javers;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.springframework.data.repository.core.RepositoryMetadata;
 
 /**
  * Created by gessnerfl on 22.02.15.
@@ -19,11 +18,11 @@ abstract class AbstractAuditChangeHandler implements AuditChangeHandler {
         this.commitPropertiesProvider = commitPropertiesProvider;
     }
 
-    boolean isDomainClass(RepositoryMetadata metadata, Object o) {
+    boolean isDomainClass(SpringDataRepositoryMetadata metadata, Object o) {
         return metadata.getDomainType().isAssignableFrom(o.getClass());
     }
 
-    boolean isIdClass(RepositoryMetadata metadata, Object o) {
+    boolean isIdClass(SpringDataRepositoryMetadata metadata, Object o) {
         return metadata.getIdType().isAssignableFrom(o.getClass());
     }
 }
