@@ -99,6 +99,10 @@ public class Lists {
     }
 
     public static <T> String asString(List<T> list) {
+        if (list.isEmpty()) {
+            return "";
+        }
+
         StringBuilder sb = new StringBuilder();
         for (T s : list) {
             sb.append(s);
