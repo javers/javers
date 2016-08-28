@@ -41,6 +41,7 @@ public class MongoRepository implements JaversRepository {
     private static final int DESC = -1;
     private final MongoSchemaManager mongoSchemaManager;
     private JsonConverter jsonConverter;
+    private final MapKeyDotReplacer mapKeyDotReplacer = new MapKeyDotReplacer();
 
     public MongoRepository(MongoDatabase mongo) {
         this(mongo, null);
@@ -164,12 +165,13 @@ public class MongoRepository implements JaversRepository {
     }
 
     private CdoSnapshot readFromDBObject(Document dbObject) {
-        return jsonConverter.fromJson(dbObject.toJson(), CdoSnapshot.class);
+        return jsonConverter.fromJson(mapKeyDotReplacer.back(dbObject).toJson(), CdoSnapshot.class);
     }
 
     private Document writeToDBObject(CdoSnapshot snapshot){
         conditionFulfilled(jsonConverter != null, "MongoRepository: jsonConverter is null");
         Document dbObject = Document.parse(jsonConverter.toJson(snapshot));
+        dbObject = mapKeyDotReplacer.replaceInSnapshotState(dbObject);
         dbObject.append(GLOBAL_ID_KEY,snapshot.getGlobalId().value());
         return dbObject;
     }
