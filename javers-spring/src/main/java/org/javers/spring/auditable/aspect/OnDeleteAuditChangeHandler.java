@@ -3,7 +3,6 @@ package org.javers.spring.auditable.aspect;
 import org.javers.core.Javers;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.springframework.data.repository.core.RepositoryMetadata;
 
 import java.util.Map;
 
@@ -18,7 +17,7 @@ class OnDeleteAuditChangeHandler extends AbstractAuditChangeHandler {
     }
 
     @Override
-    public void handle(RepositoryMetadata repositoryMetadata, Object domainObject) {
+    public void handle(SpringDataRepositoryMetadata repositoryMetadata, Object domainObject) {
         Map<String, String> props = commitPropertiesProvider.provide();
         String author = authorProvider.provide();
 

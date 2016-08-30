@@ -3,7 +3,6 @@ package org.javers.spring.auditable.aspect;
 import org.javers.core.Javers;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.springframework.data.repository.core.RepositoryMetadata;
 
 /**
  * Created by gessnerfl on 22.02.15.
@@ -14,7 +13,7 @@ class OnSaveAuditChangeHandler extends AbstractAuditChangeHandler {
     }
 
     @Override
-    public void handle(RepositoryMetadata repositoryMetadata, Object domainObject) {
+    public void handle(SpringDataRepositoryMetadata repositoryMetadata, Object domainObject) {
         javers.commit(authorProvider.provide(), domainObject, commitPropertiesProvider.provide());
     }
 }

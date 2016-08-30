@@ -2,6 +2,7 @@ package org.javers.common.reflection;
 
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
+import org.javers.common.collections.Predicate;
 import org.javers.common.collections.Primitives;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
@@ -282,5 +283,14 @@ public class ReflectionUtil {
             ret.delete(ret.length()-1, ret.length());
             return ret.toString();
         }
+    }
+
+    public static List<Type> getGenericInterfaces(Class clazz) {
+        return Lists.positiveFilter(Lists.asList(clazz.getGenericInterfaces()), new Predicate<Type>() {
+            @Override
+            public boolean apply(Type input) {
+                return input instanceof ParameterizedType;
+            }
+        });
     }
 }

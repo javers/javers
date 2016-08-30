@@ -97,4 +97,18 @@ public class Lists {
         difference.removeAll(second);
         return difference;
     }
+
+    public static <T> String asString(List<T> list) {
+        if (list.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (T s : list) {
+            sb.append(s);
+            sb.append(", ");
+        }
+
+        return sb.substring(0, sb.length() - 2);
+    }
 }

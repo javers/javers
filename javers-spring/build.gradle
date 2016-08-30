@@ -18,9 +18,6 @@ dependencies {
     //should be on application's classpath
     optional "org.springframework:spring-context:$springVersion"
 
-    //should be on application's classpath when using JaversSpringDataAuditable
-    optional 'org.springframework.data:spring-data-commons:1.11.1.RELEASE'
-
     //should be on application's classpath when using SpringSecurityAuthorProvider
     optional 'org.springframework.security:spring-security-core:4.0.3.RELEASE'
 

@@ -1,7 +1,5 @@
 package org.javers.spring.auditable.aspect;
 
-import org.springframework.data.repository.core.RepositoryMetadata;
-
 /**
  * Created by gessnerfl on 22.02.15.
  */
@@ -14,5 +12,5 @@ interface AuditChangeHandler {
      * @param repositoryMetadata the metadata of the spring data repository
      * @param domainObject the domain object
      */
-    void handle(RepositoryMetadata repositoryMetadata, Object domainObject);
+    void handle(SpringDataRepositoryMetadata repositoryMetadata, Object domainObject);
 }

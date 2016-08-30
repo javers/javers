@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 @JaversSpringDataAuditable
-interface DummyAuditedJpaCrudRepository extends JpaRepository<DummyObject, String> {
+interface DummyAuditedJpaCrudRepository extends JpaRepository<DummyObject, String>, Serializable {
 
 }
