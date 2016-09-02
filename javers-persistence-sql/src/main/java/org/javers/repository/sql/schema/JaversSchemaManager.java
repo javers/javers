@@ -1,6 +1,7 @@
 package org.javers.repository.sql.schema;
 
 import org.javers.repository.sql.ConnectionProvider;
+import org.javers.repository.sql.pico.TableNameManager;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.dialect.*;
 import org.polyjdbc.core.schema.SchemaInspector;
@@ -25,12 +26,14 @@ public class JaversSchemaManager {
     private final FixedSchemaFactory schemaFactory;
     private final PolyJDBC polyJDBC;
     private final ConnectionProvider connectionProvider;
+    private final TableNameManager tableNameManager;
 
-    public JaversSchemaManager(Dialect dialect, FixedSchemaFactory schemaFactory, PolyJDBC polyJDBC, ConnectionProvider connectionProvider) {
+    public JaversSchemaManager(Dialect dialect, FixedSchemaFactory schemaFactory, PolyJDBC polyJDBC, ConnectionProvider connectionProvider, TableNameManager tableNameManager) {
         this.dialect = dialect;
         this.schemaFactory = schemaFactory;
         this.polyJDBC = polyJDBC;
         this.connectionProvider = connectionProvider;
+        this.tableNameManager = tableNameManager;
     }
 
     public void ensureSchema() {
@@ -54,21 +57,21 @@ public class JaversSchemaManager {
      */
     private void alterCommitIdColumnIfNeeded() {
 
-        if (getTypeOf("jv_commit", "commit_id") == Types.VARCHAR){
+        if (getTypeOf(tableNameManager.getCommitTableNameWithSchema(), "commit_id") == Types.VARCHAR){
             logger.info("migrating db schema from JaVers 1.3.15 to 1.3.16 ...");
 
             if (dialect instanceof PostgresDialect){
-                executeSQL("ALTER TABLE jv_commit ALTER COLUMN commit_id TYPE numeric(12,2) USING commit_id::numeric");
+                executeSQL("ALTER TABLE "+ tableNameManager.getCommitTableNameWithSchema()+" ALTER COLUMN commit_id TYPE numeric(12,2) USING commit_id::numeric");
             } else if (dialect instanceof H2Dialect){
-                executeSQL("ALTER TABLE jv_commit ALTER COLUMN commit_id numeric(12,2)");
+                executeSQL("ALTER TABLE "+ tableNameManager.getCommitTableNameWithSchema()+" ALTER COLUMN commit_id numeric(12,2)");
             } else if (dialect instanceof MysqlDialect){
-                executeSQL("ALTER TABLE jv_commit MODIFY commit_id numeric(12,2)");
+                executeSQL("ALTER TABLE "+ tableNameManager.getCommitTableNameWithSchema()+" MODIFY commit_id numeric(12,2)");
             } else if (dialect instanceof OracleDialect){
-                executeSQL("ALTER TABLE jv_commit MODIFY commit_id number(12,2)");
+                executeSQL("ALTER TABLE "+ tableNameManager.getCommitTableNameWithSchema()+" MODIFY commit_id number(12,2)");
             } else if (dialect instanceof MsSqlDialect) {
-                executeSQL("drop index jv_commit_commit_id_idx on jv_commit");
-                executeSQL("ALTER TABLE jv_commit ALTER COLUMN commit_id numeric(12,2)");
-                executeSQL("CREATE INDEX jv_commit_commit_id_idx ON jv_commit (commit_id)");
+                executeSQL("drop index jv_commit_commit_id_idx on "+ tableNameManager.getCommitTableNameWithSchema());
+                executeSQL("ALTER TABLE "+ tableNameManager.getCommitTableNameWithSchema()+" ALTER COLUMN commit_id numeric(12,2)");
+                executeSQL("CREATE INDEX jv_commit_commit_id_idx ON "+ tableNameManager.getCommitTableNameWithSchema()+" (commit_id)");
             } else {
                 handleUnsupportedDialect();
             }
@@ -84,8 +87,8 @@ public class JaversSchemaManager {
      * JaVers 1.4.3 to 1.4.4 schema migration
      */
     private void addSnapshotVersionColumnIfNeeded() {
-        if (!columnExists("jv_snapshot", "version")) {
-            addLongColumn("jv_snapshot", "version");
+        if (!columnExists(tableNameManager.getSnapshotTableNameWithSchema(), "version")) {
+            addLongColumn(tableNameManager.getSnapshotTableNameWithSchema(), "version");
         }
     }
 
@@ -106,8 +109,8 @@ public class JaversSchemaManager {
      * JaVers 1.6.x to 2.0 schema migration
      */
     private void addSnapshotManagedTypeColumnIfNeeded() {
-        if (!columnExists("jv_snapshot", "managed_type")) {
-            addStringColumn("jv_snapshot", "managed_type", 200);
+        if (!columnExists(tableNameManager.getSnapshotTableNameWithSchema(), "managed_type")) {
+            addStringColumn(tableNameManager.getSnapshotTableNameWithSchema(), "managed_type", 200);
 
             populateSnapshotManagedType();
         }
@@ -117,8 +120,8 @@ public class JaversSchemaManager {
      * JaVers 1.6.x to 2.0 schema migration
      */
     private void addGlobalIdTypeNameColumnIfNeeded() {
-        if (!columnExists("jv_global_id", "type_name")) {
-            addStringColumn("jv_global_id", "type_name", 200);
+        if (!columnExists(tableNameManager.getGlobalIdTableNameWithSchema(), "type_name")) {
+            addStringColumn(tableNameManager.getGlobalIdTableNameWithSchema(), "type_name", 200);
 
             populateGlobalIdTypeName();
         }
@@ -126,10 +129,9 @@ public class JaversSchemaManager {
 
     private void populateSnapshotManagedType() {
         String updateStmt =
-                "UPDATE jv_snapshot" +
+                "UPDATE " + tableNameManager.getSnapshotTableNameWithSchema() +
                         "  SET managed_type = (SELECT qualified_name" +
-                        "                      FROM jv_cdo_class," +
-                        "                           jv_global_id" +
+                        "                      FROM "+ tableNameManager.getCdoClassTableNameWithSchema()+"," + tableNameManager.getGlobalIdTableNameWithSchema() +
                         "                      WHERE cdo_class_pk = cdo_class_fk " +
                         "                      AND   global_id_pk = global_id_fk" +
                         "                     )";
@@ -139,9 +141,9 @@ public class JaversSchemaManager {
 
     private void populateGlobalIdTypeName() {
         String updateStmt =
-            "UPDATE jv_global_id " +
+            "UPDATE "+ tableNameManager.getGlobalIdTableNameWithSchema()+
             "  SET type_name = (SELECT qualified_name" +
-            "                   FROM jv_cdo_class" +
+            "                   FROM " + tableNameManager.getCdoClassTableNameWithSchema() +
             "                   WHERE cdo_class_pk = cdo_class_fk" +
             "                   )" +
             "  WHERE owner_id_fk IS NULL";
@@ -215,11 +217,13 @@ public class JaversSchemaManager {
     }
 
     private void ensureTable(String tableName, Schema schema) {
+
         if (schemaInspector.relationExists(tableName)) {
             return;
         }
         logger.info("creating javers table {} ...", tableName);
         schemaManager.create(schema);
+
     }
 
     private void addStringColumn(String tableName, String colName, int len){

@@ -29,7 +29,8 @@ public class JaversSqlModule implements JaversModule {
             CommitMetadataRepository.class,
             CdoSnapshotRepository.class,
             CdoSnapshotFinder.class,
-            CommitPropertyFinder.class
+            CommitPropertyFinder.class,
+            TableNameManager.class
     };
 
     @Override

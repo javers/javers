@@ -1,8 +1,13 @@
 package org.javers.repository.sql.finders;
 
+import org.javers.repository.sql.pico.TableNameManager;
 import org.polyjdbc.core.query.SelectQuery;
 
 public class AnySnapshotFilter extends SnapshotFilter {
+
+    public AnySnapshotFilter(TableNameManager tableNameManager) {
+        super(tableNameManager);
+    }
 
     @Override
     String select() {
@@ -11,7 +16,7 @@ public class AnySnapshotFilter extends SnapshotFilter {
 
     @Override
     void addFrom(SelectQuery query) {
-        query.from(FROM_COMMIT_WITH_SNAPSHOT);
+        query.from(getFromCommitWithSnapshot());
     }
 
     @Override

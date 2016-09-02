@@ -6,10 +6,13 @@ import org.javers.repository.sql.JaversSqlRepositoryE2ETest
 import java.sql.Connection
 import java.sql.DriverManager
 
-class OracleIntegrationTest extends JaversSqlRepositoryE2ETest {
+/**
+ * Created by ianagius on 30/09/2016.
+ */
+class OracleIntegrationWithSchemaTest extends JaversSqlRepositoryE2ETest {
 
     Connection createConnection() {
-       DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "polly", "polly");
+        DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "polly", "polly");
     }
 
     DialectName getDialect() {
@@ -17,6 +20,6 @@ class OracleIntegrationTest extends JaversSqlRepositoryE2ETest {
     }
 
     String getSchema() {
-        return null
+        return "public"
     }
 }

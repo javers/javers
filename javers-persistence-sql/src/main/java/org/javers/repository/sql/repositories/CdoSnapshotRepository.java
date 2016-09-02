@@ -2,6 +2,7 @@ package org.javers.repository.sql.repositories;
 
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.sql.pico.TableNameManager;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 
@@ -14,10 +15,12 @@ public class CdoSnapshotRepository {
     private final PolyJDBC javersPolyJDBC;
     private JsonConverter jsonConverter;
     private final GlobalIdRepository globalIdRepository;
+    private final TableNameManager tableNameManager;
 
-    public CdoSnapshotRepository(PolyJDBC javersPolyJDBC, GlobalIdRepository globalIdRepository) {
+    public CdoSnapshotRepository(PolyJDBC javersPolyJDBC, GlobalIdRepository globalIdRepository, TableNameManager tableNameManager) {
         this.javersPolyJDBC = javersPolyJDBC;
         this.globalIdRepository = globalIdRepository;
+        this.tableNameManager = tableNameManager;
     }
 
     public void save(long commitIdPk, List<CdoSnapshot> cdoSnapshots) {
@@ -29,7 +32,7 @@ public class CdoSnapshotRepository {
     }
 
     private long insertSnapshot(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot) {
-        InsertQuery query = javersPolyJDBC.query().insert().into(SNAPSHOT_TABLE_NAME)
+        InsertQuery query = javersPolyJDBC.query().insert().into(tableNameManager.getSnapshotTableNameWithSchema())
                 .value(SNAPSHOT_TYPE, cdoSnapshot.getType().toString())
                 .value(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
                 .value(SNAPSHOT_COMMIT_FK, commitIdPk)
@@ -37,7 +40,7 @@ public class CdoSnapshotRepository {
                 .value(SNAPSHOT_STATE, jsonConverter.toJson(cdoSnapshot.getState()))
                 .value(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChanged() ))
                 .value(SNAPSHOT_MANAGED_TYPE, cdoSnapshot.getManagedType().getName())
-                .sequence(SNAPSHOT_PK, SNAPSHOT_TABLE_PK_SEQ);
+                .sequence(SNAPSHOT_PK, tableNameManager.getSnapshotTablePkSeqWithSchema());
 
         return javersPolyJDBC.queryRunner().insert(query);
     }

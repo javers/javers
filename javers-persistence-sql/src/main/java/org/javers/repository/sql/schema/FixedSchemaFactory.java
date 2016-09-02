@@ -1,5 +1,6 @@
 package org.javers.repository.sql.schema;
 
+import org.javers.repository.sql.pico.TableNameManager;
 import org.polyjdbc.core.dialect.Dialect;
 import org.polyjdbc.core.dialect.OracleDialect;
 import org.polyjdbc.core.schema.model.RelationBuilder;
@@ -47,20 +48,25 @@ public class FixedSchemaFactory {
     public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v 1.2
     public static final String SNAPSHOT_MANAGED_TYPE = "managed_type";       //since 2.0
 
-    private final static int ORACLE_MAX_NAME_LEN = 30;
-    private final Dialect dialect;
+    public static final String CDO_CLASS_TABLE_NAME = "jv_cdo_class";
 
-    public FixedSchemaFactory(Dialect dialect) {
+    private final static int ORACLE_MAX_NAME_LEN = 30;
+
+    private final Dialect dialect;
+    private final TableNameManager tableNameManager;
+
+    public FixedSchemaFactory(Dialect dialect, TableNameManager tableNameManager) {
         this.dialect = dialect;
+        this.tableNameManager = tableNameManager;
     }
 
     Map<String, Schema> allTablesSchema(Dialect dialect) {
         Map<String, Schema> schema = new TreeMap<>();
 
-        schema.put(GLOBAL_ID_TABLE_NAME, globalIdTableSchema(dialect, GLOBAL_ID_TABLE_NAME));
-        schema.put(COMMIT_TABLE_NAME,    commitTableSchema(dialect, COMMIT_TABLE_NAME));
-        schema.put(COMMIT_PROPERTY_TABLE_NAME, commitPropertiesTableSchema(dialect, COMMIT_PROPERTY_TABLE_NAME));
-        schema.put(SNAPSHOT_TABLE_NAME,  snapshotTableSchema(dialect, SNAPSHOT_TABLE_NAME));
+        schema.put(GLOBAL_ID_TABLE_NAME, globalIdTableSchema(dialect, tableNameManager.getGlobalIdTableNameWithSchema()));
+        schema.put(COMMIT_TABLE_NAME,    commitTableSchema(dialect, tableNameManager.getCommitTableNameWithSchema()));
+        schema.put(COMMIT_PROPERTY_TABLE_NAME, commitPropertiesTableSchema(dialect, tableNameManager.getCommitPropertyTableNameWithSchema()));
+        schema.put(SNAPSHOT_TABLE_NAME,  snapshotTableSchema(dialect, tableNameManager.getSnapshotTableNameWithSchema()));
 
         return schema;
     }
@@ -74,8 +80,8 @@ public class FixedSchemaFactory {
                        .withAttribute().text(SNAPSHOT_STATE).and()
                        .withAttribute().text(SNAPSHOT_CHANGED).and()
                        .withAttribute().string(SNAPSHOT_MANAGED_TYPE).withMaxLength(200).and();
-        foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder);
-        foreignKey(tableName, SNAPSHOT_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder);
+        foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, tableNameManager.getGlobalIdTableNameWithSchema(), GLOBAL_ID_PK, relationBuilder);
+        foreignKey(tableName, SNAPSHOT_COMMIT_FK, tableNameManager.getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
         columnsIndex(tableName, schema, SNAPSHOT_GLOBAL_ID_FK);
@@ -103,10 +109,10 @@ public class FixedSchemaFactory {
         Schema schema = new Schema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName);
         relationBuilder
-            .primaryKey(tableName + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
+            .primaryKey(normaliseSchemaTableName(tableName) + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
             .withAttribute().string(COMMIT_PROPERTY_NAME).withMaxLength(200).and()
             .withAttribute().string(COMMIT_PROPERTY_VALUE).withMaxLength(200).and();
-        foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder);
+        foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, tableNameManager.getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
         columnsIndex(tableName, schema, COMMIT_PROPERTY_COMMIT_FK);
@@ -123,7 +129,7 @@ public class FixedSchemaFactory {
                 .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(200).and()
                 .withAttribute().string(GLOBAL_ID_FRAGMENT).withMaxLength(200).and()
                 .withAttribute().string(GLOBAL_ID_TYPE_NAME).withMaxLength(200).and();
-        foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder);
+        foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, tableNameManager.getGlobalIdTableNameWithSchema(), GLOBAL_ID_PK, relationBuilder);
         relationBuilder.build();
 
         columnsIndex(tableName, schema, GLOBAL_ID_LOCAL_ID);
@@ -134,12 +140,12 @@ public class FixedSchemaFactory {
     private void foreignKey(String tableName, String fkColName, String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
         relationBuilder
                 .withAttribute().longAttr(fkColName).and()
-                .foreignKey(tableName + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName).and();
+                .foreignKey(normaliseSchemaTableName(tableName) + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName).and();
     }
 
     private void columnsIndex(String tableName, Schema schema, String... colNames){
         String concatenatedColumnNames = StringUtils.concatenate('_', (Object[]) colNames);
-        String indexName = tableName + "_" + concatenatedColumnNames + "_idx";
+        String indexName = normaliseSchemaTableName(tableName) + "_" + concatenatedColumnNames + "_idx";
         if (dialect instanceof OracleDialect &&
             indexName.length() > ORACLE_MAX_NAME_LEN)
         {
@@ -154,6 +160,17 @@ public class FixedSchemaFactory {
     private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder) {
         relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
                 .primaryKey("jv_"+pkColName).using(pkColName).and();
-        schema.addSequence("jv_"+pkColName+"_seq").build();
+        schema.addSequence(tableNameManager.getSequenceNameWithSchema(pkColName)).build();
     }
+
+    /**
+     * Since table names might have a schema name with a '.' attached to them, we are normalising the name by replacing
+     * '.' with '_'. Example: schema1.table_name becomes schema1_table_name.
+     * @return
+     */
+    private String normaliseSchemaTableName(String schemaTableName) {
+        return schemaTableName.replace('.','_');
+    }
+
+
 }

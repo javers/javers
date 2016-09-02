@@ -19,6 +19,8 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     protected abstract DialectName getDialect()
 
+    protected abstract String getSchema();
+
     protected Connection getConnection() {
         connection
     }
@@ -34,9 +36,11 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         connection = createConnection()
         connection.setAutoCommit(false)
         return SqlRepositoryBuilder
-            .sqlRepository()
-            .withConnectionProvider({ connection } as ConnectionProvider)
-            .withDialect(getDialect()).build()
+                .sqlRepository()
+                .withConnectionProvider({ connection } as ConnectionProvider)
+                .withDialect(getDialect())
+                .withSchema(getSchema())
+                .build()
     }
 
     def clearTables() {

@@ -6,7 +6,10 @@ import org.javers.repository.sql.JaversSqlRepositoryE2ETest
 import java.sql.Connection
 import java.sql.DriverManager
 
-class PostgreSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
+/**
+ * Created by ianagius on 30/09/2016.
+ */
+class PostgreSqlIntegrationWithSchemaTest extends JaversSqlRepositoryE2ETest {
 
     Connection createConnection() {
         DriverManager.getConnection("jdbc:postgresql://localhost:5432/travis_ci_test", "postgres", "");
@@ -17,6 +20,6 @@ class PostgreSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
     }
 
     String getSchema() {
-        return null
+        return "public"
     }
 }
