@@ -1,4 +1,4 @@
-package org.javers.spring.auditable.aspect;
+package org.javers.spring.auditable.aspect.springdata;
 
 import org.javers.core.Javers;
 import org.javers.spring.auditable.AuthorProvider;
@@ -13,7 +13,7 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId;
  * Created by gessnerfl on 22.02.15.
  */
 class OnDeleteAuditChangeHandler extends AbstractAuditChangeHandler {
-    public OnDeleteAuditChangeHandler(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+    OnDeleteAuditChangeHandler(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         super(javers, authorProvider, commitPropertiesProvider);
     }
 

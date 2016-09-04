@@ -9,7 +9,8 @@ import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.*;
-import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
+import org.javers.spring.auditable.aspect.JaversAuditableAspect;
+import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +82,12 @@ public class JaversMongoAutoConfiguration {
     }
 
     @Bean
-    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
-        return new JaversAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider());
+    public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider) {
+        return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider());
+    }
+
+    @Bean
+    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider) {
+        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider());
     }
 }

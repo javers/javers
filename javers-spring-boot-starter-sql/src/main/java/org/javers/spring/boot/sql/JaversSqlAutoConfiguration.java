@@ -12,7 +12,8 @@ import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.*;
-import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
+import org.javers.spring.auditable.aspect.JaversAuditableAspect;
+import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
 import org.slf4j.Logger;
@@ -110,7 +111,12 @@ public class JaversSqlAutoConfiguration {
     }
 
     @Bean
-    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
-        return new JaversAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
+    public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider());
+    }
+
+    @Bean
+    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider());
     }
 }

@@ -1,4 +1,4 @@
-package org.javers.spring.auditable.aspect;
+package org.javers.spring.auditable.aspect.springdata;
 
 import org.javers.core.Javers;
 import org.javers.spring.auditable.AuthorProvider;

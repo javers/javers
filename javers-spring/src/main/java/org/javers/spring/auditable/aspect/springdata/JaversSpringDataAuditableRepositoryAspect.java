@@ -1,4 +1,4 @@
-package org.javers.spring.auditable.aspect;
+package org.javers.spring.auditable.aspect.springdata;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -14,45 +14,23 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 
-/**
- * Commits all arguments passed to advised methods
- * (only if the method exits normally, i.e. no Exception has been thrown).
- *
- * Spring @Transactional attributes (like noRollbackFor or noRollbackForClassName)
- * have no effects on this aspect.
- * <br/><br/>
- *
- * Creates the following @AfterReturning pointcuts:
- * <ul>
- *    <li/>any method annotated with @JaversAuditable
- *    <li/>all save() and delete() methods of CrudRepositories with (class-level) @JaversSpringDataAuditable
- * </ul>
- */
 @Aspect
-public class JaversAuditableRepositoryAspect {
+public class JaversSpringDataAuditableRepositoryAspect {
     private final AuditChangeHandler saveHandler;
     private final AuditChangeHandler deleteHandler;
-    private final JaversCommitAdvice javersCommitAdvice;
 
-    public JaversAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+    public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this(new OnSaveAuditChangeHandler(javers, authorProvider, commitPropertiesProvider),
-             new OnDeleteAuditChangeHandler(javers, authorProvider, commitPropertiesProvider),
-             new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider) );
+                new OnDeleteAuditChangeHandler(javers, authorProvider, commitPropertiesProvider));
     }
 
-    public JaversAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider) {
+    public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider) {
         this(javers, authorProvider, new EmptyPropertiesProvider());
     }
 
-    JaversAuditableRepositoryAspect(AuditChangeHandler saveHandler, AuditChangeHandler deleteHandler, JaversCommitAdvice javersCommitAdvice) {
+    JaversSpringDataAuditableRepositoryAspect(AuditChangeHandler saveHandler, AuditChangeHandler deleteHandler) {
         this.saveHandler = saveHandler;
         this.deleteHandler = deleteHandler;
-        this.javersCommitAdvice = javersCommitAdvice;
-    }
-
-    @AfterReturning("@annotation(org.javers.spring.annotation.JaversAuditable)")
-    public void commitAdvice(JoinPoint pjp) {
-        javersCommitAdvice.commitMethodArguments(pjp);
     }
 
     @AfterReturning("execution(public * delete(..)) && this(org.springframework.data.repository.CrudRepository)")

@@ -6,7 +6,8 @@ import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.AuthorProvider;
-import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
+import org.javers.spring.auditable.aspect.JaversAuditableAspect;
+import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
 import org.springframework.context.annotation.Bean;
@@ -33,8 +34,13 @@ public class JaversSpringBootConfig {
     }
 
     @Bean
-    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect() {
-        return new JaversAuditableRepositoryAspect(javers(), authorProvider());
+    public JaversAuditableAspect javersAuditableAspect() {
+        return new JaversAuditableAspect(javers(), authorProvider());
+    }
+
+    @Bean
+    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
+        return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider());
     }
 
     @Bean
