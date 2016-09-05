@@ -37,25 +37,19 @@ import java.lang.reflect.Type;
 public class EntityType extends ManagedType {
     private final Property idProperty;
 
-    EntityType(ManagedClass entity, Optional<Property> idProperty, Optional<String> typeName) {
+    EntityType(ManagedClass entity, Property idProperty, Optional<String> typeName) {
         super(entity, typeName);
         Validate.argumentIsNotNull(idProperty);
-
-        if (idProperty.isEmpty()) {
-            this.idProperty = findDefaultIdProperty();
-        }
-        else {
-            this.idProperty = idProperty.get();
-        }
+        this.idProperty = idProperty;
     }
 
-    EntityType(ManagedClass entity, Optional<Property> idProperty) {
+    EntityType(ManagedClass entity, Property idProperty) {
         this(entity, idProperty, Optional.<String>empty());
     }
 
     @Override
     EntityType spawn(ManagedClass managedClass, Optional<String> typeName) {
-        return new EntityType(managedClass, Optional.of(idProperty), typeName);
+        return new EntityType(managedClass, idProperty, typeName);
     }
 
     public Type getIdPropertyGenericType() {
@@ -110,15 +104,5 @@ public class EntityType extends ManagedType {
     @Override
     public int hashCode() {
         return super.hashCode() + idProperty.hashCode();
-    }
-
-    /**
-     * @throws JaversException ENTITY_WITHOUT_ID
-     */
-    private Property findDefaultIdProperty() {
-        if (getManagedClass().getLooksLikeId().isEmpty()) {
-            throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID, getName());
-        }
-        return getManagedClass().getLooksLikeId().get(0);
     }
 }

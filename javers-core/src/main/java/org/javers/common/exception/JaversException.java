@@ -17,7 +17,7 @@ public class JaversException extends RuntimeException {
     }
 
     public JaversException(JaversExceptionCode code, Object... arguments) {
-        super(code.name() + " " + String.format(code.getMessage(), arguments));
+        super(code.name() + ": " + String.format(code.getMessage(), arguments));
         this.code = code;
     }
 
@@ -27,6 +27,6 @@ public class JaversException extends RuntimeException {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName()+": "+ getMessage();
+        return this.getClass().getSimpleName()+" "+ getMessage();
     }
 }

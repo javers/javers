@@ -10,6 +10,8 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScanner;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -23,6 +25,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class TypeMapper {
+    private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
+
     private final TypeMapperState state;
     private final DehydratedTypeFactory dehydratedTypeFactory = new DehydratedTypeFactory(this);
 
@@ -162,7 +166,12 @@ public class TypeMapper {
 
     public <T extends JaversType> T getPropertyType(Property property){
         argumentIsNotNull(property);
-        return (T) getJaversType(property.getGenericType());
+        try {
+            return (T) getJaversType(property.getGenericType());
+        }catch (JaversException e) {
+            logger.error("Can't calculate JaversType for property: {}", property);
+            throw e;
+        }
     }
 
     private void registerPrimitiveType(Class<?> primitiveClass) {

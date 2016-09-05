@@ -7,13 +7,11 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
-import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScan;
 import org.javers.core.metamodel.scanner.ClassScanner;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,11 +37,6 @@ class ManagedClassFactory {
         List<Property> filtered = filterIgnored(scan.getProperties(), def);
         filtered = filterIgnoredType(filtered, def.getBaseJavaClass());
         return new ManagedClass(def.getBaseJavaClass(), filtered, scan.getLooksLikeId());
-    }
-
-    ManagedClass createShallowReferenceManagedClass(EntityDefinition def){
-        ClassScan scan = classScanner.scan(def.getBaseJavaClass());
-        return new ManagedClass(def.getBaseJavaClass(), Collections.<Property>emptyList(), scan.getLooksLikeId());
     }
 
     private List<Property> filterIgnoredType(List<Property> properties, final Class<?> currentClass){
