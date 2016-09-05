@@ -14,6 +14,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 
+/**
+ *  Commits all arguments passed to save() and delete() methods
+ *  of Spring Data CrudRepositories with (class-level) @JaversSpringDataAuditable.
+ */
 @Aspect
 public class JaversSpringDataAuditableRepositoryAspect {
     private final AuditChangeHandler saveHandler;
