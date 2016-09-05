@@ -65,7 +65,6 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         }
     }
 
-
     def "should create a new version on update via audited repository"() {
         setup:
         def o = new DummyObject("foo")
