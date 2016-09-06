@@ -47,7 +47,8 @@ public class JaversSpringDataAuditableRepositoryAspect {
         onVersionEvent(pjp, saveHandler);
     }
 
-    private void onVersionEvent(JoinPoint pjp, AuditChangeHandler handler) {
+
+    protected final void onVersionEvent(JoinPoint pjp, AuditChangeHandler handler) {
         Optional<Class> versionedInterface = getRepositoryInterface(pjp);
         if (versionedInterface.isEmpty()){
             return;
@@ -80,5 +81,13 @@ public class JaversSpringDataAuditableRepositoryAspect {
 
     private void applyVersionChange(RepositoryMetadata metadata, Object domainObject, AuditChangeHandler handler) {
         handler.handle(metadata, domainObject);
+    }
+
+    protected final AuditChangeHandler getSaveHandler() {
+        return saveHandler;
+    }
+
+    protected final AuditChangeHandler getDeleteHandler() {
+        return deleteHandler;
     }
 }

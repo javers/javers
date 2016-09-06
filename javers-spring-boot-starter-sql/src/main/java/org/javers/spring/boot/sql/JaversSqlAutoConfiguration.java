@@ -111,12 +111,14 @@ public class JaversSqlAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider());
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
-        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider());
+        return new JaversSpringDataJpaAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider());
     }
 }
