@@ -82,6 +82,7 @@ public class JaversSqlAutoConfiguration {
                 .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
                 .withPrettyPrint(javersProperties.isPrettyPrint())
                 .withTypeSafeValues(javersProperties.isTypeSafeValues())
+                .scanTypeNames(javersProperties.getPackageToScan())
                 .build();
     }
 
@@ -119,5 +120,5 @@ public class JaversSqlAutoConfiguration {
     @Bean
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider());
-    }
+}
 }

@@ -9,11 +9,15 @@ import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.slf4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -49,6 +53,53 @@ public class ReflectionUtil {
         catch (Throwable ex) {
             throw new RuntimeException(ex);
         }
+    }
+    
+	public static Class<?>[] getClasses(String packageName) {
+		ClassLoader classLoader = Javers.class.getClassLoader();
+		assert classLoader != null;
+		Enumeration<URL> resources;
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		try {
+			String path = packageName.replace('.', '/');
+			resources = classLoader.getResources(path);
+			List<File> dirs = new ArrayList<File>();
+			while (resources.hasMoreElements()) {
+				URL resource = (URL) resources.nextElement();
+				dirs.add(new File(resource.getFile()));
+			}
+			for (File directory : dirs) {
+				classes.addAll(findClasses(directory, packageName));
+			}
+		} catch (Throwable ex) {
+			throw new RuntimeException(ex);
+		}
+		return classes.toArray(new Class[classes.size()]);
+	}
+    
+    /**
+     * Recursive method used to find all classes in a given directory and subdirs.
+     *
+     * @param directory   The base directory
+     * @param packageName The package name for classes found inside the base directory
+     * @return The classes
+     * @throws ClassNotFoundException
+     */
+    private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+        List<Class<?>> classes = new ArrayList<Class<?>>();
+        if (!directory.exists()) {
+            return classes;
+        }
+        File[] files = directory.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                assert !file.getName().contains(".");
+                classes.addAll(findClasses(file, packageName + "." + file.getName()));
+            } else if (file.getName().endsWith(".class")) {
+                classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+            }
+        }
+        return classes;
     }
 
     public static Object invokeGetter(Object target, String getterName) {
@@ -93,7 +144,7 @@ public class ReflectionUtil {
         throw new JaversException(JaversExceptionCode.NO_PUBLIC_CONSTRUCTOR,clazz.getName());
     }
 
-    public static List<JaversField> getAllPersistentFields(Class methodSource) {
+    public static List<JaversField> getAllPersistentFields(Class<? extends Object> methodSource) {
         List<JaversField> result = new ArrayList<>();
         for(JaversField field : getAllFields(methodSource)) {
             if (isPersistentField(field.getRawMember())) {
@@ -196,14 +247,14 @@ public class ReflectionUtil {
     /**
      * for example: Map<String, String> -> Map
      */
-    public static Class extractClass(Type javaType) {
+    public static Class<Object[]> extractClass(Type javaType) {
         if (javaType instanceof ParameterizedType
                 && ((ParameterizedType)javaType).getRawType() instanceof Class){
-            return (Class)((ParameterizedType)javaType).getRawType();
+            return (Class<Object[]>)((ParameterizedType)javaType).getRawType();
         }  else if (javaType instanceof GenericArrayType) {
             return Object[].class;
         }  else if (javaType instanceof Class) {
-            return (Class)javaType;
+            return (Class<Object[]>)javaType;
         }
 
         throw new JaversException(JaversExceptionCode.CLASS_EXTRACTION_ERROR, javaType);
