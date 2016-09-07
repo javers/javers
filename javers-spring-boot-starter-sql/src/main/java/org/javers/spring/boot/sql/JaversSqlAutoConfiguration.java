@@ -64,7 +64,8 @@ public class JaversSqlAutoConfiguration {
         return dialectMapper.map(hibernateDialect);
     }
 
-    @Bean
+    @Bean(name = "javers")
+    @ConditionalOnMissingBean
     public Javers javers(ConnectionProvider connectionProvider) {
         JaversSqlRepository sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()

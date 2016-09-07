@@ -41,7 +41,8 @@ public class JaversMongoAutoConfiguration {
     @Autowired
     private MongoProperties mongoProperties; //from spring-boot-starter-data-mongodb
 
-    @Bean
+    @Bean(name = "javers")
+    @ConditionalOnMissingBean
     public Javers javers() {
         logger.info("Starting javers-spring-boot-starter-mongo ...");
 
