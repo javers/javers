@@ -59,7 +59,6 @@ public class JaversMongoAutoConfiguration {
                 .withPrettyPrint(javersProperties.isPrettyPrint())
                 .withTypeSafeValues(javersProperties.isTypeSafeValues())
                 .registerJaversRepository(javersRepository)
-                .scanTypeNames(javersProperties.getPackageToScan())
                 .build();
     }
 

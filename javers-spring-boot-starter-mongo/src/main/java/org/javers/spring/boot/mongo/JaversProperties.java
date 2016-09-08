@@ -13,7 +13,6 @@ public class JaversProperties {
     private boolean newObjectSnapshot = false;
     private boolean prettyPrint = true;
     private boolean typeSafeValues = false;
-    private String packageToScan = "";
 
     public String getAlgorithm() {
         return algorithm;
@@ -54,12 +53,4 @@ public class JaversProperties {
     public void setTypeSafeValues(boolean typeSafeValues) {
         this.typeSafeValues = typeSafeValues;
     }
-
-	public String getPackageToScan() {
-		return packageToScan;
-	}
-
-	public void setPackageToScan(String packageToScan) {
-		this.packageToScan = packageToScan;
-	}
 }

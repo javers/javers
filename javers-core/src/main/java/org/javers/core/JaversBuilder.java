@@ -36,7 +36,6 @@ import org.javers.repository.inmemory.InMemoryRepositoryModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
@@ -247,14 +246,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * vote here: <a href="https://github.com/javers/javers/issues/263">issue/263</a>
      */
     public JaversBuilder scanTypeNames(String packageToScan){
-    	if(packageToScan.isEmpty())
-    		return this;
-    	Class<?>[] list = ReflectionUtil.getClasses(packageToScan);
-    	for (Class<?> c : list) {
-    		if(c.isAnnotationPresent(TypeName.class))
-    			scanTypeName(c);
-    	}
-    	return this;
+        throw new RuntimeException("JaversBuilder.scanTypeNames(String packageToScan) is not implemented! " +
+                "If you think that this method should be implemented, " +
+                "vote here: https://github.com/javers/javers/issues/263");
     }
 
     /**
@@ -271,7 +265,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * @since 1.4
      */
-    public JaversBuilder scanTypeName(Class<?> userType){
+    public JaversBuilder scanTypeName(Class userType){
         classesToScan.add(userType);
         return this;
     }
