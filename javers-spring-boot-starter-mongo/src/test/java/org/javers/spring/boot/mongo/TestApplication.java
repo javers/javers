@@ -29,7 +29,7 @@ public class TestApplication {
         return new CommitPropertiesProvider() {
             @Override
             public Map<String, String> provide() {
-                Map props = new HashMap();
+                Map<String, String> props = new HashMap<String, String>();
                 props.put("key", "ok");
                 return props;
             }

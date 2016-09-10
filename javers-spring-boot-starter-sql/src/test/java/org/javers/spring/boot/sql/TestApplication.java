@@ -1,14 +1,13 @@
 package org.javers.spring.boot.sql;
 
-import com.google.common.collect.Maps;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author pawelszymczyk
@@ -22,7 +21,7 @@ public class TestApplication {
         return new CommitPropertiesProvider() {
             @Override
             public Map<String, String> provide() {
-                Map props = new HashMap();
+                Map<String, String> props = new HashMap<String, String>();
                 props.put("key", "ok");
                 return props;
             }
