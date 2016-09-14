@@ -241,7 +241,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     	if(packagesToScan==null || packagesToScan.trim().isEmpty())
     		return this;
 		
-		Class<?>[] list = ReflectionUtil.getClasses(TypeName.class, packagesToScan);
+		Class<?>[] list = ReflectionUtil.getClasses(TypeName.class, packagesToScan.split(","));
 		for (Class<?> c : list) {
 			scanTypeName(c);
 		}
