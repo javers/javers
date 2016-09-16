@@ -16,6 +16,9 @@ import java.sql.SQLException;
 public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     private static final Logger logger = LoggerFactory.getLogger(SqlRepositoryBuilder.class);
 
+    public static String SCHEMA_NAME = "";
+    public static final String SCHEMA_TABLE_SEP = ".";
+
     private DialectName dialectName;
     private ConnectionProvider connectionProvider;
 
@@ -33,6 +36,20 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
     public SqlRepositoryBuilder withConnectionProvider(ConnectionProvider connectionProvider){
         this.connectionProvider = connectionProvider;
+        return this;
+    }
+
+    /**
+     * This function sets a schema to be used for creation and updating tables. When passing a schema name make sure
+     * that the schema has been created in the database before running JaVers.
+     *
+     * Example: CREATE SCHEMA my_schema_name AUTHORIZATION my_db;
+     *
+     * @param schemaName
+     * @return
+     */
+    public SqlRepositoryBuilder withSchema(String schemaName){
+        SCHEMA_NAME = schemaName;
         return this;
     }
 

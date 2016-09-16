@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.Map;
 
+import static org.javers.repository.sql.SqlRepositoryBuilder.SCHEMA_NAME;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+
 /**
  * @author bartosz walacik
  */
@@ -54,21 +57,21 @@ public class JaversSchemaManager {
      */
     private void alterCommitIdColumnIfNeeded() {
 
-        if (getTypeOf("jv_commit", "commit_id") == Types.VARCHAR){
+        if (getTypeOf(getCommitTableName(), "commit_id") == Types.VARCHAR){
             logger.info("migrating db schema from JaVers 1.3.15 to 1.3.16 ...");
 
             if (dialect instanceof PostgresDialect){
-                executeSQL("ALTER TABLE jv_commit ALTER COLUMN commit_id TYPE numeric(12,2) USING commit_id::numeric");
+                executeSQL("ALTER TABLE "+getCommitTableName()+" ALTER COLUMN commit_id TYPE numeric(12,2) USING commit_id::numeric");
             } else if (dialect instanceof H2Dialect){
-                executeSQL("ALTER TABLE jv_commit ALTER COLUMN commit_id numeric(12,2)");
+                executeSQL("ALTER TABLE "+getCommitTableName()+" ALTER COLUMN commit_id numeric(12,2)");
             } else if (dialect instanceof MysqlDialect){
-                executeSQL("ALTER TABLE jv_commit MODIFY commit_id numeric(12,2)");
+                executeSQL("ALTER TABLE "+getCommitTableName()+" MODIFY commit_id numeric(12,2)");
             } else if (dialect instanceof OracleDialect){
-                executeSQL("ALTER TABLE jv_commit MODIFY commit_id number(12,2)");
+                executeSQL("ALTER TABLE "+getCommitTableName()+" MODIFY commit_id number(12,2)");
             } else if (dialect instanceof MsSqlDialect) {
-                executeSQL("drop index jv_commit_commit_id_idx on jv_commit");
-                executeSQL("ALTER TABLE jv_commit ALTER COLUMN commit_id numeric(12,2)");
-                executeSQL("CREATE INDEX jv_commit_commit_id_idx ON jv_commit (commit_id)");
+                executeSQL("drop index jv_commit_commit_id_idx on "+getCommitTableName());
+                executeSQL("ALTER TABLE "+getCommitTableName()+" ALTER COLUMN commit_id numeric(12,2)");
+                executeSQL("CREATE INDEX jv_commit_commit_id_idx ON "+getCommitTableName()+" (commit_id)");
             } else {
                 handleUnsupportedDialect();
             }
@@ -84,8 +87,8 @@ public class JaversSchemaManager {
      * JaVers 1.4.3 to 1.4.4 schema migration
      */
     private void addSnapshotVersionColumnIfNeeded() {
-        if (!columnExists("jv_snapshot", "version")) {
-            addLongColumn("jv_snapshot", "version");
+        if (!columnExists(getSnapshotTableName(), "version")) {
+            addLongColumn(getSnapshotTableName(), "version");
         }
     }
 
@@ -106,8 +109,8 @@ public class JaversSchemaManager {
      * JaVers 1.6.x to 2.0 schema migration
      */
     private void addSnapshotManagedTypeColumnIfNeeded() {
-        if (!columnExists("jv_snapshot", "managed_type")) {
-            addStringColumn("jv_snapshot", "managed_type", 200);
+        if (!columnExists(getSnapshotTableName(), "managed_type")) {
+            addStringColumn(getSnapshotTableName(), "managed_type", 200);
 
             populateSnapshotManagedType();
         }
@@ -117,8 +120,8 @@ public class JaversSchemaManager {
      * JaVers 1.6.x to 2.0 schema migration
      */
     private void addGlobalIdTypeNameColumnIfNeeded() {
-        if (!columnExists("jv_global_id", "type_name")) {
-            addStringColumn("jv_global_id", "type_name", 200);
+        if (!columnExists(getGlobalIdTableName(), "type_name")) {
+            addStringColumn(getGlobalIdTableName(), "type_name", 200);
 
             populateGlobalIdTypeName();
         }
@@ -126,10 +129,9 @@ public class JaversSchemaManager {
 
     private void populateSnapshotManagedType() {
         String updateStmt =
-                "UPDATE jv_snapshot" +
+                "UPDATE " + getSnapshotTableName() +
                         "  SET managed_type = (SELECT qualified_name" +
-                        "                      FROM jv_cdo_class," +
-                        "                           jv_global_id" +
+                        "                      FROM "+getCdoClassTableName()+"," + getGlobalIdTableName() +
                         "                      WHERE cdo_class_pk = cdo_class_fk " +
                         "                      AND   global_id_pk = global_id_fk" +
                         "                     )";
@@ -139,9 +141,9 @@ public class JaversSchemaManager {
 
     private void populateGlobalIdTypeName() {
         String updateStmt =
-            "UPDATE jv_global_id " +
+            "UPDATE "+getGlobalIdTableName()+
             "  SET type_name = (SELECT qualified_name" +
-            "                   FROM jv_cdo_class" +
+            "                   FROM " + getCdoClassTableName() +
             "                   WHERE cdo_class_pk = cdo_class_fk" +
             "                   )" +
             "  WHERE owner_id_fk IS NULL";
@@ -214,12 +216,49 @@ public class JaversSchemaManager {
         }
     }
 
+    /**
+     * Important: This function has been modified to bypass PolyJDBC relationExists() check when we are using a user
+     * defined Schema. This is required since PolyJDBC doest not support custom schemas yet.
+     *
+     * @param tableName
+     * @param schema
+     */
     private void ensureTable(String tableName, Schema schema) {
-        if (schemaInspector.relationExists(tableName)) {
-            return;
+
+        if ((SCHEMA_NAME == null) || (SCHEMA_NAME.isEmpty()))
+        {
+            //continue normal operation with no Schema specified
+            if (schemaInspector.relationExists(tableName)) {
+                return;
+            }
+            logger.info("creating javers table {} ...", tableName);
+            schemaManager.create(schema);
+        } else {
+            //make select statement to see if table exists
+            try {
+                PreparedStatement preparedStatement = connectionProvider.getConnection()
+                                                                        .prepareStatement("SELECT EXISTS " +
+                                                                                                  "(SELECT * " +
+                                                                                                  "FROM INFORMATION_SCHEMA.TABLES " +
+                                                                                                  "WHERE TABLE_SCHEMA = ? " +
+                                                                                                  "AND TABLE_NAME = ?)");
+                preparedStatement.setString(1, SCHEMA_NAME);
+                preparedStatement.setString(2, tableName);
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                if (resultSet.next()) {
+                    if (resultSet.getBoolean(1)) {
+                        return;
+                    }
+                    logger.info("creating javers table {} ...", tableName);
+                    schemaManager.create(schema);
+                }
+
+            }
+            catch(SQLException e) {
+                logger.error("Exception {} thrown while checking if table {} exists", e, tableName);
+            }
         }
-        logger.info("creating javers table {} ...", tableName);
-        schemaManager.create(schema);
     }
 
     private void addStringColumn(String tableName, String colName, int len){

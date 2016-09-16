@@ -110,7 +110,7 @@ public class CdoSnapshotFinder {
     private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk) {
         SelectQuery query = polyJDBC.query()
             .select("MAX(" + SNAPSHOT_PK + ")")
-            .from(SNAPSHOT_TABLE_NAME)
+            .from(getSnapshotTableName())
             .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
             .withArgument("globalIdPk", globalIdPk);
 
