@@ -12,10 +12,10 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 abstract class SnapshotFilter {
     static final String FROM_COMMIT_WITH_SNAPSHOT =
-            SNAPSHOT_TABLE_NAME +
-            " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK +
-            " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
-            " LEFT OUTER JOIN " + GLOBAL_ID_TABLE_NAME + " o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK;
+            getSnapshotTableName() +
+            " INNER JOIN " + getCommitTableName() + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK +
+            " INNER JOIN " + getGlobalIdTableName() + " g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
+            " LEFT OUTER JOIN " + getGlobalIdTableName() + " o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK;
 
     private static final String BASE_FIELDS =
         SNAPSHOT_STATE + ", " +
@@ -109,7 +109,7 @@ abstract class SnapshotFilter {
 
     private void addCommitPropertyCondition(SelectQuery query, String propertyName, String propertyValue) {
         query.append(" AND EXISTS (" +
-            "SELECT * FROM " + COMMIT_PROPERTY_TABLE_NAME +
+            "SELECT * FROM " + getCommitPropertyTableName() +
             " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
             " AND " + COMMIT_PROPERTY_NAME + " = :propertyName_" + propertyName +
             " AND " + COMMIT_PROPERTY_VALUE + " = :propertyValue_" + propertyName +

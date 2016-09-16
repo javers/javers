@@ -33,18 +33,18 @@ public class CommitMetadataRepository {
     }
 
     private long insertCommit(String author, LocalDateTime date, CommitId commitId) {
-        InsertQuery query = polyJDBC.query().insert().into(COMMIT_TABLE_NAME)
+        InsertQuery query = polyJDBC.query().insert().into(getCommitTableName())
                 .value(COMMIT_AUTHOR, author)
                 .value(COMMIT_COMMIT_DATE, toTimestamp(date))
                 .value(COMMIT_COMMIT_ID, commitId.valueAsNumber())
-                .sequence(COMMIT_PK, COMMIT_PK_SEQ);
+                .sequence(COMMIT_PK, getCommitPkSeq());
 
         return polyJDBC.queryRunner().insert(query);
     }
 
     private void insertCommitProperties(long commitPk, Map<String, String> properties) {
         for (Map.Entry<String, String> property : properties.entrySet()) {
-            InsertQuery query = polyJDBC.query().insert().into(COMMIT_PROPERTY_TABLE_NAME)
+            InsertQuery query = polyJDBC.query().insert().into(getCommitPropertyTableName())
                 .value(COMMIT_PROPERTY_COMMIT_FK, commitPk)
                 .value(COMMIT_PROPERTY_NAME, property.getKey())
                 .value(COMMIT_PROPERTY_VALUE, property.getValue());
@@ -55,7 +55,7 @@ public class CommitMetadataRepository {
     public boolean isPersisted(Commit commit) {
         SelectQuery selectQuery = polyJDBC.query()
                 .select("count(*)")
-                .from(COMMIT_TABLE_NAME)
+                .from(getCommitTableName())
                 .where(COMMIT_COMMIT_ID + " = :id")
                 .withArgument("id", commit.getId().valueAsNumber());
 
@@ -75,7 +75,7 @@ public class CommitMetadataRepository {
     private Optional<BigDecimal> selectMaxCommitId() {
         SelectQuery query = polyJDBC.query()
                 .select("MAX(" + COMMIT_COMMIT_ID + ")")
-                .from(COMMIT_TABLE_NAME);
+                .from(getCommitTableName());
 
         return queryForOptionalBigDecimal(query, polyJDBC);
     }

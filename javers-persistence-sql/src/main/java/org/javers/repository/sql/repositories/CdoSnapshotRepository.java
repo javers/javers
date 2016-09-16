@@ -29,7 +29,7 @@ public class CdoSnapshotRepository {
     }
 
     private long insertSnapshot(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot) {
-        InsertQuery query = javersPolyJDBC.query().insert().into(SNAPSHOT_TABLE_NAME)
+        InsertQuery query = javersPolyJDBC.query().insert().into(getSnapshotTableName())
                 .value(SNAPSHOT_TYPE, cdoSnapshot.getType().toString())
                 .value(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
                 .value(SNAPSHOT_COMMIT_FK, commitIdPk)
@@ -37,7 +37,7 @@ public class CdoSnapshotRepository {
                 .value(SNAPSHOT_STATE, jsonConverter.toJson(cdoSnapshot.getState()))
                 .value(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChanged() ))
                 .value(SNAPSHOT_MANAGED_TYPE, cdoSnapshot.getManagedType().getName())
-                .sequence(SNAPSHOT_PK, SNAPSHOT_TABLE_PK_SEQ);
+                .sequence(SNAPSHOT_PK, getSnapshotTablePkSeq());
 
         return javersPolyJDBC.queryRunner().insert(query);
     }

@@ -56,7 +56,7 @@ public class GlobalIdRepository {
 
     private Optional<Long> findGlobalIdPkInDB(GlobalId globalId) {
 
-        SelectQuery query = polyJdbc.query().select(GLOBAL_ID_PK).from(GLOBAL_ID_TABLE_NAME);
+        SelectQuery query = polyJdbc.query().select(GLOBAL_ID_PK).from(getGlobalIdTableName());
 
         if (globalId instanceof ValueObjectId) {
             ValueObjectId valueObjectId  = (ValueObjectId) globalId;
@@ -89,7 +89,7 @@ public class GlobalIdRepository {
     private long insert(GlobalId globalId) {
         InsertQuery query = polyJdbc.query()
             .insert()
-            .into(GLOBAL_ID_TABLE_NAME);
+            .into(getGlobalIdTableName());
 
 
         if (globalId instanceof ValueObjectId) {
@@ -107,7 +107,7 @@ public class GlobalIdRepository {
             query.value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName());
         }
 
-        query.sequence(GLOBAL_ID_PK, GLOBAL_ID_PK_SEQ);
+        query.sequence(GLOBAL_ID_PK, getGlobalIdPkSeq());
 
         return polyJdbc.queryRunner().insert(query);
     }
