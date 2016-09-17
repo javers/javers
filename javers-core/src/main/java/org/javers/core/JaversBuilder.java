@@ -73,6 +73,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private JaversRepository repository;
     private DateProvider dateProvider;
+    private long bootStart = System.currentTimeMillis();
 
     public static JaversBuilder javers() {
         return new JaversBuilder();
@@ -105,7 +106,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
         Javers javers = assembleJaversInstance();
         repository.ensureSchema();
 
-        logger.info("JaVers instance is up & ready");
+        long boot = System.currentTimeMillis() - bootStart;
+        logger.info("JaVers instance started in {} ms", boot);
         return javers;
     }
 
@@ -245,10 +247,15 @@ public class JaversBuilder extends AbstractContainerBuilder {
             return this;
         }
 
-		List<Class<?>> scan = ReflectionUtil.findClasses(TypeName.class, packagesToScan.split(","));
+        long start = System.currentTimeMillis();
+        logger.info("scanning package(s): {}", packagesToScan);
+        List<Class<?>> scan = ReflectionUtil.findClasses(TypeName.class, packagesToScan.replaceAll(" ","").split(","));
 		for (Class<?> c : scan) {
 			scanTypeName(c);
 		}
+		long delta = System.currentTimeMillis() - start;
+        logger.info("found {} ManagedClasse(s) with @TypeName in {} ms", scan.size(), delta);
+
 		return this;
     }
 

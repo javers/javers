@@ -5,6 +5,7 @@ import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.appenders.SimpleListChangeAppender
 import org.javers.core.diff.appenders.levenshtein.LevenshteinListChangeAppender
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
+import org.javers.core.examples.typeNames.NewValueObjectWithTypeAlias
 import org.javers.core.graph.ObjectAccessHook
 import org.javers.core.metamodel.scanner.BeanBasedPropertyScanner
 import org.javers.core.metamodel.scanner.FieldBasedPropertyScanner
@@ -25,7 +26,16 @@ import static org.javers.core.JaversBuilder.javers
  */
 class JaversBuilderTest extends Specification {
 
-    def "should scan given Entity"() {
+    def "should scan Entities with @TypeName when packegaToScan is given"() {
+        when:
+        def javers = JaversTestBuilder.javersTestAssembly("org.zonk, org.javers.core.examples.typeNames")
+        def typeMapper = javers.typeMapper
+
+        then:
+        typeMapper.getJaversManagedType("myValueObject").baseJavaClass == NewValueObjectWithTypeAlias
+    }
+
+    def "should scan given Entity when requested explicitly"() {
         when:
         def javers = JaversTestBuilder.javersTestAssembly(NewEntityWithTypeAlias)
         def typeMapper = javers.typeMapper
@@ -33,7 +43,6 @@ class JaversBuilderTest extends Specification {
         then:
         typeMapper.getJaversManagedType("myName").baseJavaClass == NewEntityWithTypeAlias
     }
-
 
     def "should manage Entity"() {
         when:
@@ -58,7 +67,6 @@ class JaversBuilderTest extends Specification {
         then:
         javers != null
     }
-
 
     def "should create multiple Javers instances"() {
         when:
