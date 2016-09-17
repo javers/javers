@@ -1,16 +1,40 @@
 package org.javers.common.reflection
 
 import com.google.common.reflect.TypeToken
+import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.metamodel.annotation.DiffIgnore
+import org.javers.core.metamodel.annotation.Entity
+import org.javers.core.metamodel.clazz.JaversEntity
+import org.javers.core.metamodel.clazz.JpaMappedSuperclass
 import org.javers.core.model.DummyIgnoredType
 import org.javers.core.model.IgnoredSubType
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import javax.persistence.MappedSuperclass
+
 /**
  * @author Pawel Cierpiatka
  */
 class ReflectionUtilTest extends Specification {
+
+    def "should scan classes in a given package (with a given annotation)"(){
+        given:
+        def scan = ReflectionUtil.findClasses(MappedSuperclass, 'org.javers.core.metamodel.clazz')
+
+        expect:
+        scan.size() == 1
+        scan[0] == JpaMappedSuperclass
+    }
+
+    def "should scan classes in a given packages (with a given annotation)"(){
+        given:
+        def scan = ReflectionUtil.findClasses(Entity, 'org.javers.core.metamodel.clazz', 'org.javers.core.examples.typeNames')
+
+        expect:
+        scan.contains(JaversEntity)
+        scan.contains(NewEntityWithTypeAlias)
+    }
 
     def "should detect annotations in a given class and it superclass"(){
         expect:

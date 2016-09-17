@@ -4,6 +4,7 @@ import com.google.gson.TypeAdapter;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
 import org.javers.common.reflection.ReflectionUtil;
+import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
@@ -237,12 +238,15 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * (within given comma separated list of packages) in order to use them in all kinds of JQL queries <br/>
      * (without getting TYPE_NAME_NOT_FOUND exception).
      */
-    public JaversBuilder scanTypeNames(String packagesToScan){
-    	if(packagesToScan==null || packagesToScan.trim().isEmpty())
-    		return this;
-		
-		Class<?>[] list = ReflectionUtil.getClasses(TypeName.class, packagesToScan.split(","));
-		for (Class<?> c : list) {
+    public JaversBuilder scanTypeNames(String packagesToScan) {
+        Validate.argumentIsNotNull(packagesToScan);
+
+        if (packagesToScan == null || packagesToScan.trim().isEmpty()) {
+            return this;
+        }
+
+		List<Class<?>> scan = ReflectionUtil.findClasses(TypeName.class, packagesToScan.split(","));
+		for (Class<?> c : scan) {
 			scanTypeName(c);
 		}
 		return this;

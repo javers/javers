@@ -12,7 +12,8 @@ public class JaversException extends RuntimeException {
     private final JaversExceptionCode code;
 
     public JaversException(Throwable throwable) {
-        super(RUNTIME_EXCEPTION.getMessage(), throwable);
+        super(String.format(RUNTIME_EXCEPTION.getMessage(),
+                "Cause: " + throwable.getClass().getName() + " - " + throwable.getMessage()), throwable);
         this.code = RUNTIME_EXCEPTION;
     }
 
