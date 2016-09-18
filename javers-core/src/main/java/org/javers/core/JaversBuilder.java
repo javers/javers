@@ -238,14 +238,15 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * (without getting TYPE_NAME_NOT_FOUND exception).
      */
     public JaversBuilder scanTypeNames(String packagesToScan){
-    	if(packagesToScan==null || packagesToScan.trim().isEmpty())
-    		return this;
-		
-		Class<?>[] list = ReflectionUtil.getClasses(TypeName.class, packagesToScan.split(","));
-		for (Class<?> c : list) {
-			scanTypeName(c);
-		}
-		return this;
+        if(packagesToScan==null || packagesToScan.trim().isEmpty()) {
+            return this;
+        }
+        
+        List<Class<?>> list = ReflectionUtil.getClasses(TypeName.class, packagesToScan.split(","));
+        for (Class<?> c : list) {
+            scanTypeName(c);
+        }
+        return this;
     }
 
     /**

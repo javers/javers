@@ -185,7 +185,7 @@ public class ReflectionUtil {
         return Lists.immutableListOf(((ParameterizedType) javaType).getActualTypeArguments());
     }
     
-    public static Class<?>[] getClasses(Class<?> annotation, String... paths) {
+    public static List<Class<?>> getClasses(Class<?> annotation, String... paths) {
     	List<String> names = new FastClasspathScanner(paths).scan().getNamesOfClassesWithAnnotation(annotation);
     	List<Class<?>> classes = new ArrayList<Class<?>>();
     	for (String c : names) {
@@ -197,7 +197,7 @@ public class ReflectionUtil {
 			}
     		classes.add(classType);
     	}
-    	return null;
+    	return classes;
     }
 
     public static Optional<Type> isConcreteType(Type javaType){

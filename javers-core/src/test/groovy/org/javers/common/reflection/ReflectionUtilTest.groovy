@@ -18,6 +18,17 @@ class ReflectionUtilTest extends Specification {
         ReflectionUtil.isAnnotationPresentInHierarchy(IgnoredSubType, DiffIgnore)
         !ReflectionUtil.isAnnotationPresentInHierarchy(ArrayList, DiffIgnore)
     }
+    
+    def "should instantiate via public constructor with ArgumentsResolver"() {
+        given:
+
+        when:
+        def list = ReflectionUtil.getClasses(TypeName.class, ""org.javers.core.examples.typeNames"")
+
+        then:
+        list instanceof List<Class<?>>
+        list.size() == 8
+    }
 
     def "should instantiate via public constructor with ArgumentsResolver"() {
         given:
