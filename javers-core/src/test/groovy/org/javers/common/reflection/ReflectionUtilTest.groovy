@@ -23,7 +23,7 @@ class ReflectionUtilTest extends Specification {
         given:
 
         when:
-        def list = ReflectionUtil.getClasses(TypeName.class, "org.javers.core.examples.typeNames"")
+        def list = ReflectionUtil.getClasses(TypeName.class, "org.javers.core.examples.typeNames")
 
         then:
         list instanceof List<Class<?>>
