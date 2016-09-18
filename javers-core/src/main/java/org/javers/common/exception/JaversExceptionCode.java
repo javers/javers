@@ -15,6 +15,8 @@ public enum JaversExceptionCode {
     ENTITY_WITHOUT_ID ("Class '%s' mapped as Entity has no Id property. Use @Id annotation to mark unique and not-null Entity identifier"),
 
     ENTITY_INSTANCE_WITH_NULL_ID("Found Entity instance '%s' with null idProperty '%s'"),
+    
+    CANT_FIND_CLASS_WITH_TYPENAME("Can't extract type for '%s' class with @TypeName annotation during scanTypeNames()"),
 
     NOT_INSTANCE_OF(JaversException.BOOTSTRAP_ERROR + "expected instance of '%s', got instance of '%s'"),
 

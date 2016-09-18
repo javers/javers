@@ -1,5 +1,22 @@
 package org.javers.common.reflection;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
@@ -9,14 +26,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.slf4j.Logger;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.slf4j.LoggerFactory.getLogger;
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 
 /**
  * @author bartosz walacik
@@ -173,6 +183,21 @@ public class ReflectionUtil {
         }
 
         return Lists.immutableListOf(((ParameterizedType) javaType).getActualTypeArguments());
+    }
+    
+    public static List<Class<?>> getClasses(Class<?> annotation, String... paths) {
+    	List<String> names = new FastClasspathScanner(paths).scan().getNamesOfClassesWithAnnotation(annotation);
+    	List<Class<?>> classes = new ArrayList<Class<?>>();
+    	for (String c : names) {
+    		Class<?> classType;
+			try {
+				classType = Class.forName(c);
+			} catch (ClassNotFoundException e) {
+				throw new JaversException(JaversExceptionCode.CANT_FIND_CLASS_WITH_TYPENAME, c);
+			}
+    		classes.add(classType);
+    	}
+    	return classes;
     }
 
     public static Optional<Type> isConcreteType(Type javaType){

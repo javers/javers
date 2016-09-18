@@ -25,6 +25,16 @@ import static org.javers.core.JaversBuilder.javers
  */
 class JaversBuilderTest extends Specification {
 
+    def "should scan given Package"() {
+        when:
+        def javers = JaversTestBuilder.javersTestAssembly("org.javers.core.examples.typeNames")
+        def typeMapper = javers.typeMapper
+
+        then:
+        typeMapper.getJaversManagedType("myName").baseJavaClass == NewEntityWithTypeAlias
+        typeMapper.getJaversManagedType("org.javers.core.examples.typeNames.OldEntity").baseJavaClass == NewEntity
+    }
+
     def "should scan given Entity"() {
         when:
         def javers = JaversTestBuilder.javersTestAssembly(NewEntityWithTypeAlias)
@@ -33,7 +43,6 @@ class JaversBuilderTest extends Specification {
         then:
         typeMapper.getJaversManagedType("myName").baseJavaClass == NewEntityWithTypeAlias
     }
-
 
     def "should manage Entity"() {
         when:

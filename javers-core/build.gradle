@@ -6,6 +6,8 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.2'
     compile 'com.google.code.gson:gson:2.5'
     compile 'org.picocontainer:picocontainer:2.14.3'
+	compile group: 'io.github.lukehutch', name: 'fast-classpath-scanner', version: '2.0.3'
+
 
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
     testCompile 'com.google.guava:guava:18.0'

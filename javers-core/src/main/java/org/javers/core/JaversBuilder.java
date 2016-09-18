@@ -233,22 +233,20 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * <b>Not implemented!</b>
-     * <br/><br/>
-     *
-     * <i>If implemented, allows you to register all your classes with &#64;{@link TypeName} annotation
-     * (within given package) in order to use them in all kinds of JQL queries <br/>
+     * Allows you to register all your classes with &#64;{@link TypeName} annotation
+     * (within given comma separated list of packages) in order to use them in all kinds of JQL queries <br/>
      * (without getting TYPE_NAME_NOT_FOUND exception).
-     * </i>
-     * <br/><br/>
-     *
-     * If you think that this method should be implemented,
-     * vote here: <a href="https://github.com/javers/javers/issues/263">issue/263</a>
      */
-    public JaversBuilder scanTypeNames(String packageToScan){
-        throw new RuntimeException("JaversBuilder.scanTypeNames(String packageToScan) is not implemented! " +
-                "If you think that this method should be implemented, " +
-                "vote here: https://github.com/javers/javers/issues/263");
+    public JaversBuilder scanTypeNames(String packagesToScan){
+        if(packagesToScan==null || packagesToScan.trim().isEmpty()) {
+            return this;
+        }
+        
+        List<Class<?>> list = ReflectionUtil.getClasses(TypeName.class, packagesToScan.split(","));
+        for (Class<?> c : list) {
+            scanTypeName(c);
+        }
+        return this;
     }
 
     /**
