@@ -50,8 +50,7 @@ public enum JaversExceptionCode {
             "type name '%s' not found. " +
             "If you are using @TypeName annotation, " +
             "remember to register this class " +
-            "using JaversBuilder.scanTypeName(Class). " +
-            "See also https://github.com/javers/javers/issues/263"),
+            "using JaversBuilder.withPackagesToScan(String) or JaversBuilder.scanTypeName(Class)"),
 
     MANAGED_CLASS_MAPPING_ERROR("given javaClass '%s' is mapped to %s, expected %s"),
 

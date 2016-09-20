@@ -1,5 +1,6 @@
 package org.javers.common.reflection;
 
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
@@ -46,8 +47,8 @@ public class ReflectionUtil {
         try {
             return Class.forName(className, false, Javers.class.getClassLoader());
         }
-        catch (Throwable ex) {
-            throw new RuntimeException(ex);
+        catch (ClassNotFoundException ex) {
+            throw new JaversException(ex);
         }
     }
 
@@ -173,6 +174,16 @@ public class ReflectionUtil {
         }
 
         return Lists.immutableListOf(((ParameterizedType) javaType).getActualTypeArguments());
+    }
+    
+    public static List<Class<?>> findClasses(Class<? extends Annotation> annotation, String... packages) {
+        Validate.argumentsAreNotNull(annotation, packages);
+    	List<String> names = new FastClasspathScanner(packages).scan().getNamesOfClassesWithAnnotation(annotation);
+    	List<Class<?>> classes = new ArrayList<>();
+    	for (String className : names) {
+            classes.add(classForName(className));
+        }
+    	return classes;
     }
 
     public static Optional<Type> isConcreteType(Type javaType){

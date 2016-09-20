@@ -50,9 +50,6 @@ public class JaversSqlAutoConfiguration {
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
-    @Autowired
-    private CommitPropertiesProvider commitPropertiesProvider;
-
     @Bean
     public DialectName javersSqlDialectName(){
         SessionFactoryImplementor sessionFactory =
@@ -82,6 +79,7 @@ public class JaversSqlAutoConfiguration {
                 .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
                 .withPrettyPrint(javersProperties.isPrettyPrint())
                 .withTypeSafeValues(javersProperties.isTypeSafeValues())
+                .withPackagesToScan(javersProperties.getPackagesToScan())
                 .build();
     }
 
