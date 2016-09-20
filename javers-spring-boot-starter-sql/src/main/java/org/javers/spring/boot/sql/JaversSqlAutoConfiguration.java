@@ -79,7 +79,7 @@ public class JaversSqlAutoConfiguration {
                 .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
                 .withPrettyPrint(javersProperties.isPrettyPrint())
                 .withTypeSafeValues(javersProperties.isTypeSafeValues())
-                .scanTypeNames(javersProperties.getPackagesToScan())
+                .withPackagesToScan(javersProperties.getPackagesToScan())
                 .build();
     }
 

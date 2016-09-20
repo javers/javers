@@ -236,13 +236,15 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
+     * Comma separated list of packages.<br/>
      * Allows you to register all your classes with &#64;{@link TypeName} annotation
-     * (within given comma separated list of packages) in order to use them in all kinds of JQL queries <br/>
+     * in order to use them in all kinds of JQL queries<br/>
      * (without getting TYPE_NAME_NOT_FOUND exception).
+     *
+     * @param packagesToScan e.g. "my.company.domain.person, my.company.domain.finance"
+     * @since 2.3
      */
-    public JaversBuilder scanTypeNames(String packagesToScan) {
-        Validate.argumentIsNotNull(packagesToScan);
-
+    public JaversBuilder withPackagesToScan(String packagesToScan) {
         if (packagesToScan == null || packagesToScan.trim().isEmpty()) {
             return this;
         }
@@ -261,15 +263,14 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     /**
      * Register your class with &#64;{@link TypeName} annotation
-     * in order to use them in all kinds of JQL queries<br/>
-     * (without getting TYPE_NAME_NOT_FOUND exception).
+     * in order to use it in all kinds of JQL queries.
      * <br/><br/>
      *
-     * If you think that JaVers should be able to scan all your classes
-     * in given package, vote for this feature: <a href="https://github.com/javers/javers/issues/263">issue/263</a>
+     * You can also use {@link #withPackagesToScan(String)}
+     * to scan all your classes.
      * <br/><br/>
      *
-     * Alias for {@link Javers#getTypeMapping(Type)}
+     * Technically, this method is the convenient alias for {@link Javers#getTypeMapping(Type)}
      *
      * @since 1.4
      */

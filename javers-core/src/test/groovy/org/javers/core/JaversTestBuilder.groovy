@@ -58,7 +58,7 @@ class JaversTestBuilder {
 
     private JaversTestBuilder (String packagesToScan) {
         javersBuilder = new JaversBuilder()
-        javersBuilder.scanTypeNames(packagesToScan).build()
+        javersBuilder.withPackagesToScan(packagesToScan).build()
     }
 
     static JaversTestBuilder javersTestAssembly(){
