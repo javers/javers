@@ -161,7 +161,7 @@ public class QueryBuilder {
      * and initial property value on the right.
      */
     public QueryBuilder withNewObjectChanges(boolean newObjectChanges) {
-        queryParamsBuilder.newObjectChanges(true);
+        queryParamsBuilder.newObjectChanges(newObjectChanges);
         return this;
     }
 
