@@ -140,16 +140,7 @@ subprojects {
     }
 
     test {
-        testLogging {
-            // set options for log level LIFECYCLE
-            events "failed"
-            exceptionFormat "full"
-
-            // set options for log level DEBUG
-            info {
-                events "started", "skipped", "failed"
-                exceptionFormat "full"
-            }
-        }
+        testLogging.showStandardStreams = true
+        testLogging.exceptionFormat = 'full'
     }
 }
