@@ -6,10 +6,13 @@ import org.javers.repository.sql.JaversSqlRepositoryE2ETest
 import java.sql.Connection
 import java.sql.DriverManager
 
-class MsSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
+/**
+ * Created by ianagius on 30/09/2016.
+ */
+class MsSqlIntegrationWithSchemaTest extends JaversSqlRepositoryE2ETest {
 
     Connection createConnection() {
-       DriverManager.getConnection("jdbc:sqlserver://localhost:1433;DatabaseName=polly", "polly", "polly");
+        DriverManager.getConnection("jdbc:sqlserver://localhost:1433;DatabaseName=polly", "polly", "polly");
     }
 
     DialectName getDialect() {
@@ -17,6 +20,6 @@ class MsSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
     }
 
     String getSchema() {
-        return null
+        return "travis_ci_test"
     }
 }

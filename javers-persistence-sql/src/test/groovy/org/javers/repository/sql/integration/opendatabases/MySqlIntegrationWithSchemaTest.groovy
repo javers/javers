@@ -6,17 +6,20 @@ import org.javers.repository.sql.JaversSqlRepositoryE2ETest
 import java.sql.Connection
 import java.sql.DriverManager
 
-class PostgreSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
+/**
+ * Created by ianagius on 30/09/2016.
+ */
+class MySqlIntegrationWithSchemaTest extends JaversSqlRepositoryE2ETest {
 
     Connection createConnection() {
-        DriverManager.getConnection("jdbc:postgresql://localhost:5432/travis_ci_test", "postgres", "");
+        DriverManager.getConnection("jdbc:mysql://localhost/travis_ci_test", "travis", "");
     }
 
     DialectName getDialect() {
-        DialectName.POSTGRES
+        DialectName.MYSQL
     }
 
     String getSchema() {
-        return null
+        return "travis_ci_test"
     }
 }

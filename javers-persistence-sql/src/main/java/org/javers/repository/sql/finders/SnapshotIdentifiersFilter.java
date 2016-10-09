@@ -2,6 +2,7 @@ package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Optional;
 import org.javers.repository.api.SnapshotIdentifier;
+import org.javers.repository.sql.pico.TableNameManager;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.polyjdbc.core.query.SelectQuery;
 
@@ -14,7 +15,8 @@ class SnapshotIdentifiersFilter extends SnapshotFilter {
     private final Collection<SnapshotIdentifier> snapshotIdentifiers;
     private final GlobalIdRepository globalIdRepository;
 
-    public SnapshotIdentifiersFilter(GlobalIdRepository globalIdRepository, Collection<SnapshotIdentifier> snapshotIdentifiers) {
+    public SnapshotIdentifiersFilter(TableNameManager tableNameManager, GlobalIdRepository globalIdRepository, Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        super(tableNameManager);
         this.globalIdRepository = globalIdRepository;
         this.snapshotIdentifiers = snapshotIdentifiers;
     }
