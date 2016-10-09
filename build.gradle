@@ -140,7 +140,7 @@ subprojects {
     }
 
     test {
-        testLogging.showStandardStreams = true
         testLogging.exceptionFormat = 'full'
+        testLogging.showStackTraces = true
     }
 }
