@@ -11,7 +11,7 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
-import org.javers.repository.sql.pico.TableNameManager;
+import org.javers.repository.sql.schema.TableNameProvider;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
@@ -30,14 +30,14 @@ public class CdoSnapshotFinder {
     private final CdoSnapshotMapper cdoSnapshotMapper;
     private final CdoSnapshotsEnricher cdoSnapshotsEnricher = new CdoSnapshotsEnricher();
     private JsonConverter jsonConverter;
-    private final TableNameManager tableNameManager;
+    private final TableNameProvider tableNameProvider;
 
-    public CdoSnapshotFinder(PolyJDBC polyJDBC, GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, TableNameManager tableNameManager) {
+    public CdoSnapshotFinder(PolyJDBC polyJDBC, GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, TableNameProvider tableNameProvider) {
         this.polyJDBC = polyJDBC;
         this.globalIdRepository = globalIdRepository;
         this.commitPropertyFinder = commitPropertyFinder;
         this.cdoSnapshotMapper = new CdoSnapshotMapper();
-        this.tableNameManager = tableNameManager;
+        this.tableNameProvider = tableNameProvider;
     }
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
@@ -53,24 +53,24 @@ public class CdoSnapshotFinder {
         }
 
         QueryParams oneItemLimit = QueryParamsBuilder.withLimit(1).build();
-        return Optional.of(fetchCdoSnapshots(new SnapshotIdFilter(tableNameManager, maxSnapshot.get()), Optional.of(oneItemLimit)).get(0));
+        return Optional.of(fetchCdoSnapshots(new SnapshotIdFilter(tableNameProvider, maxSnapshot.get()), Optional.of(oneItemLimit)).get(0));
     }
 
     public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
-        return fetchCdoSnapshots(new AnySnapshotFilter(tableNameManager), Optional.of(queryParams));
+        return fetchCdoSnapshots(new AnySnapshotFilter(tableNameProvider), Optional.of(queryParams));
     }
 
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return fetchCdoSnapshots(new SnapshotIdentifiersFilter(tableNameManager, globalIdRepository, snapshotIdentifiers), Optional.<QueryParams>empty());
+        return fetchCdoSnapshots(new SnapshotIdentifiersFilter(tableNameProvider, globalIdRepository, snapshotIdentifiers), Optional.<QueryParams>empty());
     }
 
     public List<CdoSnapshot> getStateHistory(ManagedType managedType, QueryParams queryParams) {
-        ManagedClassFilter classFilter = new ManagedClassFilter(tableNameManager, managedType.getName(), queryParams.isAggregate());
+        ManagedClassFilter classFilter = new ManagedClassFilter(tableNameProvider, managedType.getName(), queryParams.isAggregate());
         return fetchCdoSnapshots(classFilter, Optional.of(queryParams));
     }
 
     public List<CdoSnapshot> getVOStateHistory(EntityType ownerEntity, String fragment, QueryParams queryParams) {
-        VoOwnerEntityFilter voOwnerFilter = new VoOwnerEntityFilter(tableNameManager, ownerEntity.getName(), fragment);
+        VoOwnerEntityFilter voOwnerFilter = new VoOwnerEntityFilter(tableNameProvider, ownerEntity.getName(), fragment);
         return fetchCdoSnapshots(voOwnerFilter, Optional.of(queryParams));
     }
 
@@ -80,7 +80,7 @@ public class CdoSnapshotFinder {
         if (globalIdPk.isEmpty()){
             return Collections.emptyList();
         }
-        return fetchCdoSnapshots(new GlobalIdFilter(tableNameManager, globalIdPk.get(), queryParams.isAggregate()), Optional.of(queryParams));
+        return fetchCdoSnapshots(new GlobalIdFilter(tableNameProvider, globalIdPk.get(), queryParams.isAggregate()), Optional.of(queryParams));
     }
 
     private List<CdoSnapshot> fetchCdoSnapshots(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams) {
@@ -113,7 +113,7 @@ public class CdoSnapshotFinder {
     private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk) {
         SelectQuery query = polyJDBC.query()
             .select("MAX(" + SNAPSHOT_PK + ")")
-            .from(tableNameManager.getSnapshotTableNameWithSchema())
+            .from(tableNameProvider.getSnapshotTableNameWithSchema())
             .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
             .withArgument("globalIdPk", globalIdPk);
 

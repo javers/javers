@@ -1,12 +1,12 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.repository.sql.pico.TableNameManager;
+import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.query.SelectQuery;
 
-public class AnySnapshotFilter extends SnapshotFilter {
+class AnySnapshotFilter extends SnapshotFilter {
 
-    public AnySnapshotFilter(TableNameManager tableNameManager) {
-        super(tableNameManager);
+    AnySnapshotFilter(TableNameProvider tableNameProvider) {
+        super(tableNameProvider);
     }
 
     @Override

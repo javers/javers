@@ -16,8 +16,7 @@ import java.sql.SQLException;
 public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     private static final Logger logger = LoggerFactory.getLogger(SqlRepositoryBuilder.class);
 
-    private String schemaName = "";
-
+    private String schemaName;
     private DialectName dialectName;
     private ConnectionProvider connectionProvider;
 
@@ -43,13 +42,12 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
      * that the schema has been created in the database before running JaVers. If schemaName is null or empty, the default
      * schema is used instead.
      *
-     * Example: CREATE SCHEMA my_schema_name AUTHORIZATION my_db;
-     *
-     * @param schemaName
-     * @return
+     * @since 2.4
      */
     public SqlRepositoryBuilder withSchema(String schemaName) {
-        this.schemaName = schemaName;
+        if (schemaName != null && !schemaName.isEmpty()) {
+            this.schemaName = schemaName;
+        }
         return this;
     }
 

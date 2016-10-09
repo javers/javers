@@ -17,6 +17,6 @@ class OracleIntegrationTest extends JaversSqlRepositoryE2ETest {
     }
 
     String getSchema() {
-        return null
+        return "public"
     }
 }

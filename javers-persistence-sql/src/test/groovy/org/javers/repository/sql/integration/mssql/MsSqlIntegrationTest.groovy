@@ -17,6 +17,6 @@ class MsSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
     }
 
     String getSchema() {
-        return null
+        return "public"
     }
 }

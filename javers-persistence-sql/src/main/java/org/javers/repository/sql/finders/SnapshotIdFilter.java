@@ -1,6 +1,6 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.repository.sql.pico.TableNameManager;
+import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.query.SelectQuery;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_PK;
@@ -12,8 +12,8 @@ class SnapshotIdFilter extends SnapshotFilter {
 
     private final long snapshotPK;
 
-    SnapshotIdFilter(TableNameManager tableNameManager, long snapshotPK) {
-        super(tableNameManager);
+    SnapshotIdFilter(TableNameProvider tableNameProvider, long snapshotPK) {
+        super(tableNameProvider);
         this.snapshotPK = snapshotPK;
     }
 

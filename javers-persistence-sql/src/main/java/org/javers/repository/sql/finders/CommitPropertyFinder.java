@@ -1,7 +1,7 @@
 package org.javers.repository.sql.finders;
 
 import com.google.common.base.Joiner;
-import org.javers.repository.sql.pico.TableNameManager;
+import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
@@ -17,11 +17,11 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 public class CommitPropertyFinder {
 
     private final PolyJDBC polyJDBC;
-    private final TableNameManager tableNameManager;
+    private final TableNameProvider tableNameProvider;
 
-    public CommitPropertyFinder(PolyJDBC polyJDBC, TableNameManager tableNameManager) {
+    public CommitPropertyFinder(PolyJDBC polyJDBC, TableNameProvider tableNameProvider) {
         this.polyJDBC = polyJDBC;
-        this.tableNameManager = tableNameManager;
+        this.tableNameProvider = tableNameProvider;
     }
 
     List<CommitPropertyDTO> findCommitPropertiesOfSnaphots(Collection<Long> commitPKs) {
@@ -31,7 +31,7 @@ public class CommitPropertyFinder {
 
         SelectQuery query = polyJDBC.query()
             .select(COMMIT_PROPERTY_COMMIT_FK + ", " + COMMIT_PROPERTY_NAME + ", " + COMMIT_PROPERTY_VALUE)
-            .from(tableNameManager.getCommitPropertyTableNameWithSchema())
+            .from(tableNameProvider.getCommitPropertyTableNameWithSchema())
             .where(COMMIT_PROPERTY_COMMIT_FK + " in (" + Joiner.on(",").join(commitPKs) + ")");
         return polyJDBC.queryRunner().queryList(query, new ObjectMapper<CommitPropertyDTO>() {
             @Override

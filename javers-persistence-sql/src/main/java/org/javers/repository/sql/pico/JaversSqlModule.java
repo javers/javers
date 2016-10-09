@@ -9,6 +9,7 @@ import org.javers.repository.sql.repositories.CommitMetadataRepository;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.FixedSchemaFactory;
 import org.javers.repository.sql.schema.JaversSchemaManager;
+import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.query.QueryRunnerFactory;
 
 import java.util.Arrays;
@@ -30,7 +31,7 @@ public class JaversSqlModule implements JaversModule {
             CdoSnapshotRepository.class,
             CdoSnapshotFinder.class,
             CommitPropertyFinder.class,
-            TableNameManager.class
+            TableNameProvider.class
     };
 
     @Override
