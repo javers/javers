@@ -44,10 +44,14 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     }
 
     def clearTables() {
-        execute("delete  from jv_snapshot")
-        execute("delete  from jv_commit")
-        execute("delete  from jv_commit_property")
-        execute("delete  from jv_global_id")
+        execute("delete  from ${schemaPrefix()}jv_snapshot")
+        execute("delete  from ${schemaPrefix()}jv_commit")
+        execute("delete  from ${schemaPrefix()}jv_commit_property")
+        execute("delete  from ${schemaPrefix()}jv_global_id")
+    }
+
+    String schemaPrefix() {
+        getSchema() ? getSchema() + "." : ""
     }
 
     def cleanup() {
@@ -69,7 +73,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
                 [2, 11.02],
                 [1, 11.01]
         ].each {
-            sql.execute 'insert into jv_commit (commit_pk, commit_id) values (?,?)', it
+            sql.execute "insert into ${schemaPrefix()}jv_commit (commit_pk, commit_id) values (?,?)", it
         }
 
         when:
