@@ -26,20 +26,32 @@ public abstract class SchemaNameAware {
         return tableNameProvider.getCommitPropertyTableNameWithSchema();
     }
 
-    public DBObjectName getGlobalIdTableName() {
+    protected DBObjectName getGlobalIdTableName() {
         return tableNameProvider.getGlobalIdTableName();
     }
 
-    public DBObjectName getCommitTableName() {
+    protected DBObjectName getCommitTableName() {
         return tableNameProvider.getCommitTableName();
     }
 
-    public DBObjectName getCommitPropertyTableName() {
+    protected DBObjectName getCommitPropertyTableName() {
         return tableNameProvider.getCommitPropertyTableName();
     }
 
-    public DBObjectName getSnapshotTableName() {
+    protected DBObjectName getSnapshotTableName() {
         return tableNameProvider.getSnapshotTableName();
+    }
+
+    protected String getCommitPkSeqWithSchema(){
+        return tableNameProvider.getCommitPkSeqWithSchema();
+    }
+
+    protected String getSnapshotTablePkSeqWithSchema(){
+        return tableNameProvider.getSnapshotTablePkSeqWithSchema();
+    }
+
+    protected String getGlobalIdPkSeqWithSchema() {
+        return tableNameProvider.getGlobalIdPkSeqWithSchema();
     }
 
     protected String getSequenceNameWithSchema(String pkColName){
