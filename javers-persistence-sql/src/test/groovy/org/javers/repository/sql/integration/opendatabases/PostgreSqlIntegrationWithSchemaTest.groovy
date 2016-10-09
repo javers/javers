@@ -6,6 +6,6 @@ package org.javers.repository.sql.integration.opendatabases
 class PostgreSqlIntegrationWithSchemaTest extends PostgreSqlIntegrationTest {
 
     String getSchema() {
-        return "some"
+        return "j_some"
     }
 }
