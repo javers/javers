@@ -37,10 +37,12 @@ public enum JaversExceptionCode {
     NOT_IMPLEMENTED("not implemented"),
 
     SNAPSHOT_NOT_FOUND("snapshot '%s' not found in JaversRepository"),
-
+    
     //graph & snapshot
     VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY("found ValueObject on KEY position in Map property '%s'. Please change the key class mapping to Value or Entity"),
 
+    VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MULTIMAP_KEY("found ValueObject on KEY position in Multimap property '%s'. Please change the key class mapping to Value or Entity"),
+    
     SNAPSHOT_STATE_VIOLATION("snapshots are immutable"),
 
     PROPERTY_NOT_FOUND("property '%s' not found in class '%s'"),

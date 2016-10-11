@@ -24,10 +24,17 @@ import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
 import org.javers.core.json.typeadapter.util.UtilTypeAdapters;
 import org.javers.core.metamodel.annotation.*;
 import org.javers.core.metamodel.clazz.*;
+import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.scanner.ScannerModule;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.CustomType;
+import org.javers.core.metamodel.type.EntityType;
+import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.TypeMapperModule;
+import org.javers.core.metamodel.type.ValueObjectType;
+import org.javers.core.metamodel.type.ValueType;
 import org.javers.core.snapshot.SnapshotModule;
 import org.javers.groovysupport.GroovyAddOns;
+import org.javers.guava.GuavaAddOns;
 import org.javers.java8support.Java8AddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
@@ -115,8 +122,10 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addModule(new DiffAppendersModule(coreConfiguration(), getContainer()));
         addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
         addModule(new ScannerModule(coreConfiguration(), getContainer()));
-
         bootManagedTypeModule();
+
+        // after assembly add-ons
+        new GuavaAddOns(typeMapper(), getContainerComponent(GlobalIdFactory.class)).afterAssemble(this);
 
         // JSON beans & domain aware typeAdapters
         bootJsonConverter();
