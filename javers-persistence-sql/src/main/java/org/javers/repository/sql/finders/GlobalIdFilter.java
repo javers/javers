@@ -1,5 +1,6 @@
 package org.javers.repository.sql.finders;
 
+import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.query.SelectQuery;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_OWNER_ID_FK;
@@ -9,7 +10,8 @@ class GlobalIdFilter extends SnapshotFilter  {
     private final long globalIdPk;
     private final boolean aggregate;
 
-    public GlobalIdFilter(long globalIdPk, boolean aggregate) {
+    GlobalIdFilter(TableNameProvider tableNameProvider, long globalIdPk, boolean aggregate) {
+        super(tableNameProvider);
         this.globalIdPk = globalIdPk;
         this.aggregate = aggregate;
     }

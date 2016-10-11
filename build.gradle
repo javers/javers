@@ -138,4 +138,9 @@ subprojects {
             }
         }
     }
+
+    test {
+        testLogging.exceptionFormat = 'full'
+        testLogging.showStackTraces = true
+    }
 }

@@ -1,8 +1,7 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.common.collections.Optional;
+import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.query.SelectQuery;
-
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 /**
@@ -12,7 +11,8 @@ class ManagedClassFilter extends SnapshotFilter {
     private final String managedType;
     private final boolean aggregate;
 
-    ManagedClassFilter(String managedType, boolean aggregate) {
+    ManagedClassFilter(TableNameProvider tableNameProvider, String managedType, boolean aggregate) {
+        super(tableNameProvider);
         this.managedType = managedType;
         this.aggregate = aggregate;
     }
@@ -26,8 +26,8 @@ class ManagedClassFilter extends SnapshotFilter {
             query.where(
             "(    " + SNAPSHOT_MANAGED_TYPE + " = :managedType "+
             "  OR g.owner_id_fk in ( "+
-            "     select g1." + GLOBAL_ID_PK + " from " + SNAPSHOT_TABLE_NAME + " s1 "+
-            "     INNER JOIN " + GLOBAL_ID_TABLE_NAME + " g1 ON g1." + GLOBAL_ID_PK + "= s1."+ SNAPSHOT_GLOBAL_ID_FK +
+            "     select g1." + GLOBAL_ID_PK + " from " + getSnapshotTableNameWithSchema() + " s1 "+
+            "     INNER JOIN " + getGlobalIdTableNameWithSchema() + " g1 ON g1." + GLOBAL_ID_PK + "= s1."+ SNAPSHOT_GLOBAL_ID_FK +
             "     and  s1.managed_type = :managedType)"+
             ")");
         }

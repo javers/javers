@@ -8,17 +8,16 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.repository.sql.schema.SchemaNameAware;
+import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
 
-import java.util.List;
-
-import static org.javers.repository.sql.PolyUtil.queryForLongList;
 import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
-public class GlobalIdRepository {
+public class GlobalIdRepository extends SchemaNameAware {
 
     private PolyJDBC polyJdbc;
     private JsonConverter jsonConverter;
@@ -27,7 +26,8 @@ public class GlobalIdRepository {
             .maximumSize(1000)
             .build();
 
-    public GlobalIdRepository(PolyJDBC javersPolyjdbc) {
+    public GlobalIdRepository(PolyJDBC javersPolyjdbc, TableNameProvider tableNameProvider) {
+        super(tableNameProvider);
         this.polyJdbc = javersPolyjdbc;
     }
 
@@ -56,7 +56,7 @@ public class GlobalIdRepository {
 
     private Optional<Long> findGlobalIdPkInDB(GlobalId globalId) {
 
-        SelectQuery query = polyJdbc.query().select(GLOBAL_ID_PK).from(GLOBAL_ID_TABLE_NAME);
+        SelectQuery query = polyJdbc.query().select(GLOBAL_ID_PK).from(getGlobalIdTableNameWithSchema());
 
         if (globalId instanceof ValueObjectId) {
             ValueObjectId valueObjectId  = (ValueObjectId) globalId;
@@ -89,7 +89,7 @@ public class GlobalIdRepository {
     private long insert(GlobalId globalId) {
         InsertQuery query = polyJdbc.query()
             .insert()
-            .into(GLOBAL_ID_TABLE_NAME);
+            .into(getGlobalIdTableNameWithSchema());
 
 
         if (globalId instanceof ValueObjectId) {
@@ -107,7 +107,7 @@ public class GlobalIdRepository {
             query.value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName());
         }
 
-        query.sequence(GLOBAL_ID_PK, GLOBAL_ID_PK_SEQ);
+        query.sequence(GLOBAL_ID_PK, getGlobalIdPkSeqWithSchema());
 
         return polyJdbc.queryRunner().insert(query);
     }

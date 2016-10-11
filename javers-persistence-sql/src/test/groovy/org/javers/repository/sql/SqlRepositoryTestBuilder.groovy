@@ -1,4 +1,5 @@
 package org.javers.repository.sql
+
 /**
  * @author bartosz walacik
  */

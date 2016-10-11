@@ -2,6 +2,8 @@ package org.javers.repository.sql.finders;
 
 import org.javers.core.commit.CommitId;
 import org.javers.repository.api.QueryParams;
+import org.javers.repository.sql.schema.SchemaNameAware;
+import org.javers.repository.sql.schema.TableNameProvider;
 import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
@@ -10,12 +12,11 @@ import java.util.Map;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
-abstract class SnapshotFilter {
-    static final String FROM_COMMIT_WITH_SNAPSHOT =
-            SNAPSHOT_TABLE_NAME +
-            " INNER JOIN " + COMMIT_TABLE_NAME + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK +
-            " INNER JOIN " + GLOBAL_ID_TABLE_NAME + " g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
-            " LEFT OUTER JOIN " + GLOBAL_ID_TABLE_NAME + " o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK;
+abstract class SnapshotFilter extends SchemaNameAware {
+
+    SnapshotFilter(TableNameProvider tableNameProvider) {
+        super(tableNameProvider);
+    }
 
     private static final String BASE_FIELDS =
         SNAPSHOT_STATE + ", " +
@@ -37,12 +38,19 @@ abstract class SnapshotFilter {
             "o." + GLOBAL_ID_FRAGMENT + " owner_" + GLOBAL_ID_FRAGMENT + ", " +
             "o." + GLOBAL_ID_TYPE_NAME + " owner_" + GLOBAL_ID_TYPE_NAME;
 
+    protected String getFromCommitWithSnapshot() {
+        return getSnapshotTableNameWithSchema() +
+            " INNER JOIN " + getCommitTableNameWithSchema() + " ON " + COMMIT_PK + " = " + SNAPSHOT_COMMIT_FK +
+            " INNER JOIN " + getGlobalIdTableNameWithSchema() + " g ON g." + GLOBAL_ID_PK + " = " + SNAPSHOT_GLOBAL_ID_FK +
+            " LEFT OUTER JOIN " + getGlobalIdTableNameWithSchema() + " o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK;
+    }
+
     String select() {
         return BASE_AND_GLOBAL_ID_FIELDS;
     }
 
     void addFrom(SelectQuery query) {
-        query.from(FROM_COMMIT_WITH_SNAPSHOT);
+        query.from(getFromCommitWithSnapshot());
     }
 
     abstract  void addWhere(SelectQuery query);
@@ -109,7 +117,7 @@ abstract class SnapshotFilter {
 
     private void addCommitPropertyCondition(SelectQuery query, String propertyName, String propertyValue) {
         query.append(" AND EXISTS (" +
-            "SELECT * FROM " + COMMIT_PROPERTY_TABLE_NAME +
+            "SELECT * FROM " + getCommitPropertyTableNameWithSchema() +
             " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
             " AND " + COMMIT_PROPERTY_NAME + " = :propertyName_" + propertyName +
             " AND " + COMMIT_PROPERTY_VALUE + " = :propertyValue_" + propertyName +
