@@ -27,6 +27,11 @@ public class JaversSpringDataAuditableRepositoryAspect {
         this(new OnSaveAuditChangeHandler(javers, authorProvider, commitPropertiesProvider),
                 new OnDeleteAuditChangeHandler(javers, authorProvider, commitPropertiesProvider));
     }
+    
+    public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider,OnSaveAuditChangeHandler onSaveAuditChangeHandler) {
+        this(onSaveAuditChangeHandler,
+                new OnDeleteAuditChangeHandler(javers, authorProvider, commitPropertiesProvider));
+    }
 
     public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider) {
         this(javers, authorProvider, new EmptyPropertiesProvider());
