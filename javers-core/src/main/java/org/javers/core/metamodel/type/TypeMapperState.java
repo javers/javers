@@ -163,13 +163,18 @@ class TypeMapperState {
      */
     private JaversType infer(Type javaType, boolean asShallowReference) {
         argumentIsNotNull(javaType);
-        JaversType prototype = findNearestAncestor(javaType);
-        JaversType newType = typeFactory.infer(javaType, Optional.fromNullable(prototype), asShallowReference);
 
-        return newType;
+        if (asShallowReference) {
+            return typeFactory.inferFromAnnotations(javaType, true);
+        } else {
+            Optional<JaversType> prototype = findNearestAncestor(javaType);
+            return prototype.isPresent() ?
+                typeFactory.spawnFromPrototype(javaType, prototype.get()) :
+                typeFactory.inferFromAnnotations(javaType, false);
+        }
     }
 
-    private JaversType findNearestAncestor(Type javaType) {
+    private Optional<JaversType> findNearestAncestor(Type javaType) {
         Class javaClass = extractClass(javaType);
         List<DistancePair> distances = new ArrayList<>();
 
@@ -178,12 +183,12 @@ class TypeMapperState {
 
             //this is due too spoiled Java Array reflection API
             if (javaClass.isArray()) {
-                return getJaversType(Object[].class, false);
+                return Optional.of(getJaversType(Object[].class, false));
             }
 
             //just to better speed
             if (distancePair.getDistance() == 0) {
-                return distancePair.getJaversType();
+                return Optional.of(distancePair.getJaversType());
             }
 
             distances.add(distancePair);
@@ -192,10 +197,10 @@ class TypeMapperState {
         Collections.sort(distances);
 
         if (distances.get(0).isMax()) {
-            return null;
+            return Optional.empty();
         }
 
-        return distances.get(0).getJaversType();
+        return Optional.of(distances.get(0).getJaversType());
     }
 
     private Optional<? extends Class> parseClass(String qualifiedName){
