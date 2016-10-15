@@ -70,23 +70,29 @@ class TypeMapperState {
         return mappedTypes.containsKey(javaType.toString());
     }
 
-    JaversType getJaversType(Type javaType) {
+    JaversType getJaversType(Type javaType, final boolean asShallowReference) {
         argumentIsNotNull(javaType);
 
         if (javaType == Object.class) {
             return OBJECT_TYPE;
         }
 
-        JaversType jType = getFromMap(javaType);
-        if (jType != null) {
-            return jType;
-        }
-
-        return computeIfAbsent(javaType, new Function<Type, JaversType>() {
-            public JaversType apply(Type type) {
-                return infer(type);
+        if (asShallowReference) {
+            synchronized (javaType) {
+                return infer(javaType, true);
             }
-        });
+        } else {
+            JaversType jType = getFromMap(javaType);
+            if (jType != null) {
+                return jType;
+            }
+
+            return computeIfAbsent(javaType, new Function<Type, JaversType>() {
+                public JaversType apply(Type type) {
+                    return infer(type, false);
+                }
+            });
+        }
     }
 
     void putIfAbsent(Type javaType, final JaversType jType) {
@@ -155,10 +161,10 @@ class TypeMapperState {
     /**
      * must be called within synchronized block
      */
-    private JaversType infer(Type javaType) {
+    private JaversType infer(Type javaType, boolean asShallowReference) {
         argumentIsNotNull(javaType);
         JaversType prototype = findNearestAncestor(javaType);
-        JaversType newType = typeFactory.infer(javaType, Optional.fromNullable(prototype));
+        JaversType newType = typeFactory.infer(javaType, Optional.fromNullable(prototype), asShallowReference);
 
         return newType;
     }
@@ -172,7 +178,7 @@ class TypeMapperState {
 
             //this is due too spoiled Java Array reflection API
             if (javaClass.isArray()) {
-                return getJaversType(Object[].class);
+                return getJaversType(Object[].class, false);
             }
 
             //just to better speed

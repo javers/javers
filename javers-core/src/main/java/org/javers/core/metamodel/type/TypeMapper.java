@@ -101,8 +101,12 @@ public class TypeMapper {
      * or infers new one using default mapping
      */
     public JaversType getJaversType(Type javaType) {
+        return getJaversType(javaType, false);
+    }
+
+    public JaversType getJaversType(Type javaType, boolean asShallowReference) {
         argumentIsNotNull(javaType);
-        return state.getJaversType(javaType);
+        return state.getJaversType(javaType, asShallowReference);
     }
 
     /**
@@ -142,8 +146,14 @@ public class TypeMapper {
      *
      * @throws JaversException MANAGED_CLASS_MAPPING_ERROR
      */
-    public ManagedType getJaversManagedType(Class javaType) {
-        return getJaversManagedType(javaType, ManagedType.class);
+    public ManagedType getJaversManagedType(Class javaClass) {
+        return getJaversManagedType(javaClass, ManagedType.class);
+    }
+
+    public ShallowReferenceType getShallowReferenceType(Class javaClass) {
+        JaversType mType = getJaversType(javaClass, true);
+        checkExpectedType(javaClass, ShallowReferenceType.class, mType);
+        return (ShallowReferenceType) mType;
     }
 
     /**
@@ -153,21 +163,23 @@ public class TypeMapper {
      */
     public <T extends ManagedType> T getJaversManagedType(Class javaClass, Class<T> expectedType) {
         JaversType mType = getJaversType(javaClass);
+        checkExpectedType(javaClass, expectedType, mType);
+        return (T) mType;
+    }
 
-        if (expectedType.isAssignableFrom(mType.getClass())) {
-            return (T) mType;
-        } else {
+    private <T> void checkExpectedType(Class javaClass, Class<T> expectedType, JaversType mType) {
+        if (!expectedType.isAssignableFrom(mType.getClass())) {
             throw new JaversException(JaversExceptionCode.MANAGED_CLASS_MAPPING_ERROR,
-                    javaClass,
-                    mType.getClass().getSimpleName(),
-                    expectedType.getSimpleName());
+                javaClass,
+                mType.getClass().getSimpleName(),
+                expectedType.getSimpleName());
         }
     }
 
-    public <T extends JaversType> T getPropertyType(Property property){
+    public <T extends JaversType> T getPropertyType(Property property) {
         argumentIsNotNull(property);
         try {
-            return (T) getJaversType(property.getGenericType());
+            return (T) getJaversType(property.getGenericType(), property.hasShallowReferenceAnn());
         }catch (JaversException e) {
             logger.error("Can't calculate JaversType for property: {}", property);
             throw e;

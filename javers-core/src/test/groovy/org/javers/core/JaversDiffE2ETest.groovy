@@ -243,6 +243,64 @@ class JaversDiffE2ETest extends Specification {
         javers.compare(left, right).hasChanges() == false
     }
 
+    def "should use ReferenceChange when property field is annotated as ShallowReferences"() {
+        given:
+        def javers = javers().withMappingStyle(MappingStyle.FIELD).build()
+        def left =  new PhoneWithShallowCategoryField(1, "123", new Category(1, "old shallow"), new Category(3, "deep"))
+        def right = new PhoneWithShallowCategoryField(1, "123", new Category(2, "new shallow"), new Category(3, "deep"))
+
+        when:
+        ReferenceChange change = javers.compare(left, right).changes.find{it instanceof  ReferenceChange}
+
+        then:
+        change.left.value() == Category.name+"/1"
+        change.right.value() == Category.name+"/2"
+    }
+
+    def "should not compare properties when field is annotated as ShallowReference"() {
+        given:
+        def javers = javers().withMappingStyle(MappingStyle.FIELD).build()
+        def left =  new PhoneWithShallowCategoryField(1, "123", new Category(1, "old shallow"), new Category(2, "old deep"));
+        def right = new PhoneWithShallowCategoryField(1, "123", new Category(1, "new shallow"), new Category(2, "new deep"));
+
+        when:
+        def changes = javers.compare(left, right).changes
+
+        then:
+        changes.size() == 1
+        changes[0].left == "old deep"
+        changes[0].right == "new deep"
+    }
+
+    def "should use ReferenceChange when property getter is annotated as ShallowReferences"() {
+        given:
+        def javers = javers().withMappingStyle(MappingStyle.BEAN).build()
+        def left =  new PhoneWithShallowCategoryGetter(1, "123", new Category(1, "shallow"), new Category(3, "deep"))
+        def right = new PhoneWithShallowCategoryGetter(1, "123", new Category(2, "shallow"), new Category(3, "deep"))
+
+        when:
+        ReferenceChange change = javers.compare(left, right).changes.find{it instanceof  ReferenceChange}
+
+        then:
+        change.left.value() == Category.name+"/1"
+        change.right.value() == Category.name+"/2"
+    }
+
+    def "should not compare properties when getter is annotated as ShallowReference"() {
+        given:
+        def javers = javers().withMappingStyle(MappingStyle.BEAN).build()
+        def left =  new PhoneWithShallowCategoryGetter(1, "123", new Category(1, "old shallow"), new Category(2, "old deep"));
+        def right = new PhoneWithShallowCategoryGetter(1, "123", new Category(1, "new shallow"), new Category(2, "new deep"));
+
+        when:
+        def changes = javers.compare(left, right).changes
+
+        then:
+        changes.size() == 1
+        changes[0].left == "old deep"
+        changes[0].right == "new deep"
+    }
+
     def "should ignore properties with @DiffIgnore or @Transient"(){
         given:
         def javers = javers().build()

@@ -54,15 +54,19 @@ class AnnotationNamesProvider {
         return valueAliases.contains(ann.annotationType().getSimpleName());
     }
 
-    boolean isIgnoredTypeAliase(Annotation ann) {
+    boolean isIgnoredTypeAlias(Annotation ann) {
         return ignoredTypeAliases.contains(ann.annotationType().getSimpleName());
     }
 
-    public Set<String> getTransientAliases() {
+    Set<String> getTransientAliases() {
         return Collections.unmodifiableSet(transientPropertyAliases);
     }
 
     boolean isShallowReferenceAlias(Annotation ann){
         return shallowReferenceAliases.contains(ann.annotationType().getSimpleName());
+    }
+
+    Set<String> getShallowReferenceAliases() {
+        return Collections.unmodifiableSet(shallowReferenceAliases);
     }
 }

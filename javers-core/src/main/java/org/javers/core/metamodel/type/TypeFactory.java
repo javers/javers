@@ -57,15 +57,19 @@ class TypeFactory {
     }
 
     JaversType infer(Type javaType, Optional<JaversType> prototype) {
+        return infer(javaType, prototype, false);
+    }
+
+    JaversType infer(Type javaType, Optional<JaversType> prototype, boolean asShallowReference) {
         JaversType jType;
 
-        if (prototype.isPresent()) {
+        if (!asShallowReference && prototype.isPresent()) {
             jType = spawnFromPrototype(javaType, prototype.get());
             logger.debug("javersType of {} spawned as {} from prototype {}",
                     javaType, jType.getClass().getSimpleName(), prototype.get());
         }
         else {
-            jType = inferFromAnnotations(javaType);
+            jType = inferFromAnnotations(javaType, asShallowReference);
             logger.debug("javersType of {} inferred as {}",
                     javaType, jType.getClass().getSimpleName());
         }
@@ -95,22 +99,26 @@ class TypeFactory {
     }
 
     JaversType inferFromAnnotations(Type javaType) {
+        return inferFromAnnotations(javaType, false);
+    }
+
+    private JaversType inferFromAnnotations(Type javaType, boolean asShallowReference) {
         Class javaClass = extractClass(javaType);
         ClassScan scan = classScanner.scan(javaClass);
 
-        if (scan.hasValueAnn()){
-            return create( new ValueDefinition(javaClass) );
+        if (scan.hasValueAnn()) {
+            return create(new ValueDefinition(javaClass));
         }
 
-        if (scan.hasIgnoredAnn()){
-            return create( new IgnoredTypeDefinition(javaClass) );
+        if (scan.hasIgnoredAnn()) {
+            return create(new IgnoredTypeDefinition(javaClass));
         }
 
         ClientsClassDefinitionBuilder builder;
         if (scan.hasIdProperty() || scan.hasEntityAnn()) {
             builder = EntityDefinitionBuilder.entityDefinition(javaClass);
-            if (scan.hasShallowReferenceAnn()) {
-                ((EntityDefinitionBuilder)builder).withShallowReference();
+            if (scan.hasShallowReferenceAnn() || asShallowReference) {
+                ((EntityDefinitionBuilder) builder).withShallowReference();
             }
         } else {
             builder = ValueObjectDefinitionBuilder.valueObjectDefinition(javaClass);
