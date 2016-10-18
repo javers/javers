@@ -48,7 +48,7 @@ class ClassAnnotationsScanner {
                 hasShallowReference = true;
             }
 
-            if (annotationNamesProvider.isIgnoredTypeAliase(ann)) {
+            if (annotationNamesProvider.isIgnoredTypeAlias(ann)) {
                 hasIgnored = true;
             }
 

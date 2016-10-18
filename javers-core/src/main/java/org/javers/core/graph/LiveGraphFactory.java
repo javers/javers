@@ -40,7 +40,7 @@ public class LiveGraphFactory {
     }
 
     public Cdo createCdo(Object cdo){
-        return liveCdoFactory.create(cdo, null);
+        return liveCdoFactory.create(cdo, null, false);
     }
 
     private Object wrapTopLevelContainer(Object handle){

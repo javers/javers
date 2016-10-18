@@ -25,6 +25,7 @@ class TypeMapperConcurrentTest extends Specification {
 
       then:
       //no better idea how to test thread-safety without Mocks
-      1 * typeFactory.infer(DummyAddress, _) >> Stub(ValueObjectType)
+      1 * typeFactory.inferFromAnnotations(DummyAddress, _) >> Stub(ValueObjectType)
+      0 * typeFactory.spawnFromPrototype(DummyAddress, _)
     }
 }

@@ -48,7 +48,7 @@ class TypeFactoryTest extends Specification {
         def prototype = typeFactory.inferFromAnnotations(AbstractValueObject)
 
         when:
-        def jType = typeFactory.infer(NewNamedValueObject, org.javers.common.collections.Optional.of(prototype))
+        def jType = typeFactory.spawnFromPrototype(NewNamedValueObject, prototype)
 
         then:
         jType.name == OldValueObject.name

@@ -18,11 +18,13 @@ public class Property {
 
     private transient final JaversMember member;
     private transient final boolean hasTransientAnn;
+    private transient final boolean hasShallowReferenceAnn;
 
-    public Property(JaversMember member, boolean hasTransientAnn){
+    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn){
         argumentIsNotNull(member);
         this.member = member;
         this.hasTransientAnn = hasTransientAnn;
+        this.hasShallowReferenceAnn = hasShallowReferenceAnn;
     }
 
     public Type getGenericType() {
@@ -71,6 +73,10 @@ public class Property {
 
     public boolean hasTransientAnn() {
         return hasTransientAnn;
+    }
+
+    public boolean hasShallowReferenceAnn() {
+        return hasShallowReferenceAnn;
     }
 
     @Override

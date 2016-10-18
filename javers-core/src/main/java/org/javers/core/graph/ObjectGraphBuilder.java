@@ -41,7 +41,7 @@ class ObjectGraphBuilder {
     public LiveGraph buildGraph(Object handle) {
         argumentIsNotNull(handle);
 
-        Cdo cdo = edgeBuilder.asCdo(handle, null);
+        Cdo cdo = edgeBuilder.asCdo(handle, null, false);
         // logger.debug("building objectGraph for handle [{}] ...",cdo);
 
         return buildGraphFromCdo(cdo);
