@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
+import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
@@ -8,14 +9,14 @@ import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScanner;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -61,11 +62,9 @@ public class TypeMapper {
         addType(new ArrayType(Object[].class));
 
         //well known Value types
-        registerValueType(LocalDateTime.class);
-        registerValueType(LocalDate.class);
-        registerValueType(BigDecimal.class);
-        registerValueType(Date.class);
-        registerValueType(ThreadLocal.class);
+        for (Class valueType : WellKnownValueTypes.getValueTypes()) {
+            registerValueType(valueType);
+        }
 
         //Collections
         addType(new CollectionType(Collection.class)); //only for exception handling

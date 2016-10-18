@@ -4,6 +4,7 @@ import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
 import org.javers.common.collections.Primitives;
+import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -12,7 +13,6 @@ import org.slf4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -268,12 +268,7 @@ public class ReflectionUtil {
             return (String) cdoId;
         }
 
-        //TODO far all Values
-        if (cdoId instanceof BigDecimal) {
-            return cdoId.toString();
-        }
-
-        if (Primitives.isPrimitiveOrBox(cdoId)){
+        if (WellKnownValueTypes.isValueType(cdoId) || Primitives.isPrimitiveOrBox(cdoId)){
             return cdoId.toString();
         }
 
@@ -293,5 +288,14 @@ public class ReflectionUtil {
             ret.delete(ret.length()-1, ret.length());
             return ret.toString();
         }
+    }
+
+    public static boolean isAssignableFromAny(Class clazz, Class<?>[] assignableFrom) {
+        for (Class<?> standardPrimitive : assignableFrom) {
+            if (standardPrimitive.isAssignableFrom(clazz)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
