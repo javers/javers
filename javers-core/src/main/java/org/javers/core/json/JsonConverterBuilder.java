@@ -3,6 +3,7 @@ package org.javers.core.json;
 import com.google.gson.*;
 import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.date.DateTypeCoreAdapters;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -21,6 +22,7 @@ public class JsonConverterBuilder {
 
     public JsonConverterBuilder() {
         this.gsonBuilder = new GsonBuilder();
+        this.gsonBuilder.setExclusionStrategies(new SkipFieldExclusionStrategy());
     }
 
     /**
@@ -134,6 +136,17 @@ public class JsonConverterBuilder {
 
         registerNativeGsonSerializer(targetType, jsonSerializer);
         registerNativeGsonDeserializer(targetType, jsonDeserializer);
+    }
+
+    private static class SkipFieldExclusionStrategy implements ExclusionStrategy {
+
+        public boolean shouldSkipClass(Class<?> clazz) {
+            return clazz.getAnnotation(DiffIgnore.class) != null;
+        }
+
+        public boolean shouldSkipField(FieldAttributes field) {
+            return field.getAnnotation(DiffIgnore.class) != null;
+        }
     }
 
 }
