@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.scanner.ClassScan;
@@ -55,6 +56,23 @@ class TypeFactory {
         return new ValueObjectType(managedClassFactory.create(definition), definition.getTypeName());
     }
 
+    JaversType infer(Type javaType, Optional<JaversType> prototype) {
+        JaversType jType;
+
+        if (prototype.isPresent()) {
+            jType = spawnFromPrototype(javaType, prototype.get());
+            logger.debug("javersType of {} spawned as {} from prototype {}",
+                    javaType, jType.getClass().getSimpleName(), prototype.get());
+        }
+        else {
+            jType = inferFromAnnotations(javaType);
+            logger.debug("javersType of {} inferred as {}",
+                    javaType, jType.getClass().getSimpleName());
+        }
+
+        return jType;
+    }
+
     ValueType inferIdPropertyTypeAsValue(Type idPropertyGenericType) {
         logger.debug("javersType of {} inferred as ValueType, it's used as id-property type",
                 idPropertyGenericType);
@@ -62,7 +80,7 @@ class TypeFactory {
         return new ValueType(idPropertyGenericType);
     }
 
-    JaversType spawnFromPrototype(Type javaType, JaversType prototype) {
+    private JaversType spawnFromPrototype(Type javaType, JaversType prototype) {
         Validate.argumentsAreNotNull(javaType, prototype);
         Class javaClass = extractClass(javaType);
 
@@ -77,10 +95,6 @@ class TypeFactory {
     }
 
     JaversType inferFromAnnotations(Type javaType) {
-        return inferFromAnnotations(javaType, false);
-    }
-
-    JaversType inferFromAnnotations(Type javaType, boolean asShallowReference) {
         Class javaClass = extractClass(javaType);
         ClassScan scan = classScanner.scan(javaClass);
 
@@ -95,7 +109,7 @@ class TypeFactory {
         ClientsClassDefinitionBuilder builder;
         if (scan.hasIdProperty() || scan.hasEntityAnn()) {
             builder = EntityDefinitionBuilder.entityDefinition(javaClass);
-            if (scan.hasShallowReferenceAnn() || asShallowReference) {
+            if (scan.hasShallowReferenceAnn()) {
                 ((EntityDefinitionBuilder) builder).withShallowReference();
             }
         } else {
