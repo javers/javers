@@ -8,6 +8,7 @@ import org.javers.core.Javers;
 import org.javers.repository.api.QueryParams;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * JaversRepository query.
@@ -56,8 +57,8 @@ public class JqlQuery {
         return getFilter(ofType).isPresent();
     }
 
-    Class getClassFilter(){
-        return getFilter(ClassFilter.class).get().getRequiredClass();
+    Set<Class> getClassFilter(){
+        return getFilter(ClassFilter.class).get().getRequiredClasses();
     }
 
     GlobalIdDTO getIdFilter() {

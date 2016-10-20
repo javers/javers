@@ -297,6 +297,35 @@ class JaversRepositoryE2ETest extends Specification {
                    ]
     }
 
+    @Unroll
+    def "should query for snapshots by multiple classes"() {
+        given:
+        javers.commit("author", new DummyUser(name: "Alice", dummyUserDetails: new DummyUserDetails(id: 66)))
+        javers.commit("author", new DummyUser(name: "Bob"))
+        javers.commit("author", new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "Berlin")))
+        javers.commit("author", new SnapshotEntity(id: 2))
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.size() == expectedGlobalIds.size()
+        snapshots.every { snapshot -> snapshot.globalId in expectedGlobalIds }
+
+        where:
+        query << [
+            QueryBuilder.byClass(DummyUser, SnapshotEntity).build(),
+            QueryBuilder.byClass(DummyUserDetails, DummyAddress).build(),
+            QueryBuilder.byClass(DummyUser, DummyUserDetails, SnapshotEntity, DummyAddress).build(),
+        ]
+        expectedGlobalIds << [
+            [instanceId("Alice", DummyUser), instanceId("Bob", DummyUser), instanceId(1, SnapshotEntity), instanceId(2, SnapshotEntity)],
+            [instanceId(66, DummyUserDetails), valueObjectId(1, SnapshotEntity, "valueObjectRef")],
+            [instanceId("Alice", DummyUser), instanceId("Bob", DummyUser), instanceId(1, SnapshotEntity), instanceId(2, SnapshotEntity),
+             instanceId(66, DummyUserDetails), valueObjectId(1, SnapshotEntity, "valueObjectRef")],
+        ]
+    }
+
     def "should query for Entity snapshots and changes by GlobalId and changed property"() {
         given:
         javers.commit("author", new SnapshotEntity(id:1, intProperty: 4))

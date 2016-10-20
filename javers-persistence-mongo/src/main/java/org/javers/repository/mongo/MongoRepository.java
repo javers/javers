@@ -99,8 +99,8 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
-        Bson query = createManagedTypeQuery(givenClass, queryParams.isAggregate());
+    public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
+        Bson query = createManagedTypeQuery(givenClasses, queryParams.isAggregate());
         return queryForSnapshots(query, Optional.of(queryParams));
     }
 
@@ -150,18 +150,28 @@ public class MongoRepository implements JaversRepository {
         return Filters.or(descFilters);
     }
 
-    private Bson createManagedTypeQuery(ManagedType managedType, boolean aggregate) {
-        if (managedType instanceof ValueObjectType) {
-            return new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, managedType.getName());
+    private Bson createManagedTypeQuery(Set<ManagedType> managedTypes, boolean aggregate) {
+        List<Bson> classFilters = new ArrayList<>();
+        for (ManagedType managedType : managedTypes) {
+            if (managedType instanceof ValueObjectType) {
+                classFilters.add(createValueObjectTypeQuery(managedType));
+            } else {
+                classFilters.add(createEntityTypeQuery(aggregate, managedType));
+            }
         }
+        return Filters.or(classFilters);
+    }
 
-        Bson query = prefixQuery(GLOBAL_ID_KEY, managedType.getName()+"/");
+    private Bson createValueObjectTypeQuery(ManagedType managedType) {
+        return new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, managedType.getName());
+    }
 
-        if (!aggregate) { //only for EntityTypes entities
-            query = Filters.and(query, Filters.exists(GLOBAL_ID_ENTITY));
+    private Bson createEntityTypeQuery(boolean aggregate, ManagedType managedType) {
+        Bson entityTypeQuery = prefixQuery(GLOBAL_ID_KEY, managedType.getName() + "/");
+        if (!aggregate) {
+            entityTypeQuery = Filters.and(entityTypeQuery, Filters.exists(GLOBAL_ID_ENTITY));
         }
-
-        return query;
+        return entityTypeQuery;
     }
 
     private CdoSnapshot readFromDBObject(Document dbObject) {

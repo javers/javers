@@ -1,6 +1,8 @@
 package org.javers.repository.jql;
 
+import org.javers.common.collections.Function;
 import org.javers.common.collections.Optional;
+import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -14,6 +16,7 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Adapter from a JqlQuery to JaversRepository API
@@ -48,9 +51,8 @@ public class QueryRunner {
         }
 
         if (query.isClassQuery()){
-            ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-
-            return repository.getStateHistory(mType, query.getQueryParams());
+            Set<ManagedType> mTypes = getJaversManagedTypes(query.getClassFilter());
+            return repository.getStateHistory(mTypes, query.getQueryParams());
         }
 
         if (query.isVoOwnerQuery()) {
@@ -75,8 +77,8 @@ public class QueryRunner {
         }
 
         if (query.isClassQuery()){
-            ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getChangeHistory(mType, query.getQueryParams());
+            Set<ManagedType> mTypes = getJaversManagedTypes(query.getClassFilter());
+            return repository.getChangeHistory(mTypes, query.getQueryParams());
         }
 
         if (query.isVoOwnerQuery()) {
@@ -88,6 +90,15 @@ public class QueryRunner {
         }
 
         throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForChanges: " + query + " is not supported");
+    }
+
+    private Set<ManagedType> getJaversManagedTypes(Set<Class> classes) {
+        return Sets.transform(classes, new Function<Class, ManagedType>() {
+            @Override
+            public ManagedType apply(Class javaClass) {
+                return typeMapper.getJaversManagedType(javaClass);
+            }
+        });
     }
 
     private GlobalId fromDto(GlobalIdDTO globalIdDTO) {
