@@ -155,16 +155,16 @@ public class TypeMapper {
         JaversType mType = getJaversType(javaClass);
 
         if (expectedType.isAssignableFrom(mType.getClass())) {
-        return (T) mType;
+            return (T) mType;
         } else {
             throw new JaversException(JaversExceptionCode.MANAGED_CLASS_MAPPING_ERROR,
-                javaClass,
-                mType.getClass().getSimpleName(),
-                expectedType.getSimpleName());
+                    javaClass,
+                    mType.getClass().getSimpleName(),
+                    expectedType.getSimpleName());
         }
     }
 
-    public <T extends JaversType> T getPropertyType(Property property) {
+    public <T extends JaversType> T getPropertyType(Property property){
         argumentIsNotNull(property);
         try {
             return (T) getJaversType(property.getGenericType());

@@ -77,17 +77,17 @@ class TypeMapperState {
             return OBJECT_TYPE;
         }
 
-            JaversType jType = getFromMap(javaType);
-            if (jType != null) {
-                return jType;
-            }
-
-            return computeIfAbsent(javaType, new Function<Type, JaversType>() {
-                public JaversType apply(Type type) {
-                return infer(type);
-                }
-            });
+        JaversType jType = getFromMap(javaType);
+        if (jType != null) {
+            return jType;
         }
+
+        return computeIfAbsent(javaType, new Function<Type, JaversType>() {
+            public JaversType apply(Type type) {
+                return infer(type);
+            }
+        });
+    }
 
     void putIfAbsent(Type javaType, final JaversType jType) {
         computeIfAbsent(javaType, new Function<Type, JaversType>() {

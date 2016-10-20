@@ -98,19 +98,19 @@ class TypeFactory {
         Class javaClass = extractClass(javaType);
         ClassScan scan = classScanner.scan(javaClass);
 
-        if (scan.hasValueAnn()) {
-            return create(new ValueDefinition(javaClass));
+        if (scan.hasValueAnn()){
+            return create( new ValueDefinition(javaClass) );
         }
 
-        if (scan.hasIgnoredAnn()) {
-            return create(new IgnoredTypeDefinition(javaClass));
+        if (scan.hasIgnoredAnn()){
+            return create( new IgnoredTypeDefinition(javaClass) );
         }
 
         ClientsClassDefinitionBuilder builder;
         if (scan.hasIdProperty() || scan.hasEntityAnn()) {
             builder = EntityDefinitionBuilder.entityDefinition(javaClass);
             if (scan.hasShallowReferenceAnn()) {
-                ((EntityDefinitionBuilder) builder).withShallowReference();
+                ((EntityDefinitionBuilder)builder).withShallowReference();
             }
         } else {
             builder = ValueObjectDefinitionBuilder.valueObjectDefinition(javaClass);
