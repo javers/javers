@@ -23,15 +23,12 @@ public class LiveCdoFactory implements CdoFactory {
     public CdoWrapper create(Object wrappedCdo, OwnerContext owner, boolean shallowReference) {
         Object wrappedCdoAccessed = objectAccessHook.access(wrappedCdo);
         GlobalId globalId = globalIdFactory.createId(wrappedCdoAccessed, owner);
-        ManagedType managedType = getManagedType(wrappedCdoAccessed, shallowReference);
-        return new CdoWrapper(wrappedCdoAccessed, globalId, managedType);
-    }
+        ManagedType managedType = typeMapper.getJaversManagedType(wrappedCdoAccessed.getClass());
 
-    private ManagedType getManagedType(Object wrappedCdoAccessed, boolean shallowReference) {
-        Class javaClass = wrappedCdoAccessed.getClass();
-        return shallowReference ?
-            typeMapper.getShallowReferenceType(javaClass) :
-            typeMapper.getJaversManagedType(javaClass);
+        if (shallowReference) {
+            return new ShallowCdoWrapper(wrappedCdoAccessed, globalId, managedType);
+        }
+        return new CdoWrapper(wrappedCdoAccessed, globalId, managedType);
     }
 
     @Override

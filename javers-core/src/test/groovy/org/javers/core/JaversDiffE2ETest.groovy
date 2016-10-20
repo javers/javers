@@ -251,11 +251,11 @@ class JaversDiffE2ETest extends Specification {
     def "should use ReferenceChange when #propType is annotated as ShallowReferences"() {
         given:
         def javers = javers().withMappingStyle(mapping).build()
-        def left =  new PhoneWithShallowCategory(1, new Category(1, "old shallow"))
-        def right = new PhoneWithShallowCategory(1, new Category(2, "new shallow"))
+        def left =  new PhoneWithShallowCategory(id:1, shallowCategory:new Category(1, "old shallow"))
+        def right = new PhoneWithShallowCategory(id:1, shallowCategory:new Category(2, "new shallow"))
 
         when:
-        def changes = javers.compare(left, right).changes
+        def changes = javers.compare(left, right).getChangesByType(ReferenceChange)
 
         then:
         changes.size() == 1
@@ -272,8 +272,8 @@ class JaversDiffE2ETest extends Specification {
     def "should not compare properties when #propType is annotated as ShallowReference"() {
         given:
         def javers = javers().withMappingStyle(mapping).build()
-        def left =  new PhoneWithShallowCategory(1, new Category(1, "old shallow"), new Category(2, "old deep"))
-        def right = new PhoneWithShallowCategory(1, new Category(1, "new shallow"), new Category(2, "new deep"))
+        def left =  new PhoneWithShallowCategory(id:1, shallowCategory:new Category(1, "old shallow"), deepCategory:new Category(2, "old deep"))
+        def right = new PhoneWithShallowCategory(id:1, shallowCategory:new Category(1, "new shallow"), deepCategory:new Category(2, "new deep"))
 
         when:
         def changes = javers.compare(left, right).changes
