@@ -29,14 +29,10 @@ class EdgeBuilder {
     SingleEdge buildSingleEdge(ObjectNode node, Property singleRef) {
         Object rawReference = node.getPropertyValue(singleRef);
 
-        Cdo cdo = asCdo(rawReference, createOwnerContext(node, singleRef), singleRef.hasShallowReferenceAnn());
+        Cdo cdo = cdoFactory.create(rawReference, createOwnerContext(node, singleRef), singleRef.hasShallowReferenceAnn());
         ObjectNode referencedNode = buildNodeStubOrReuse(cdo);
 
         return new SingleEdge(singleRef, referencedNode);
-    }
-
-    Cdo asCdo(Object target, OwnerContext owner, boolean shallowReference){
-        return cdoFactory.create(target, owner, shallowReference);
     }
 
     private OwnerContext createOwnerContext(ObjectNode parentNode, Property property) {
@@ -72,7 +68,7 @@ class EdgeBuilder {
             if (!isManagedPosition(input)){
                 return input;
             }
-            ObjectNode objectNode = buildNodeStubOrReuse(asCdo(input, context, false));
+            ObjectNode objectNode = buildNodeStubOrReuse(cdoFactory.create(input, context));
             multiEdge.addReferenceNode(objectNode);
             return input;
         }

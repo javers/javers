@@ -21,7 +21,7 @@ public class ObjectHasher {
     }
 
     public String hash(Object object) {
-        CdoWrapper cdo = liveCdoFactory.create(object, null, false);
+        CdoWrapper cdo = liveCdoFactory.create(object, null);
 
         CdoSnapshotState state = snapshotFactory.createSnapshotState(cdo);
 

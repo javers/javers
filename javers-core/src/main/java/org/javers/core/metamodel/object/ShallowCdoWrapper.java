@@ -15,7 +15,7 @@ public class ShallowCdoWrapper extends CdoWrapper {
 
     public ShallowCdoWrapper(Object wrappedCdo, GlobalId globalId, ManagedType managedType) {
         super(wrappedCdo, globalId, managedType);
-        Validate.argumentCheck(managedType instanceof EntityType, "EntityType expected, got "+managedType.getClass().getSimpleName());
+        Validate.argumentCheck(managedType instanceof EntityType, "expected EntityType, got "+managedType.getClass().getSimpleName());
         entityType = (EntityType) managedType;
     }
 
