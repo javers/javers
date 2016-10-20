@@ -23,7 +23,7 @@ public class ShallowCdoWrapper extends CdoWrapper {
     public Object getPropertyValue(Property property) {
         argumentIsNotNull(property);
 
-        if (entityType.getIdProperty().equals(property)){
+        if (isId(property)){
             return super.getPropertyValue(property);
         }
         return null;
@@ -33,9 +33,13 @@ public class ShallowCdoWrapper extends CdoWrapper {
     public boolean isNull(Property property) {
         argumentIsNotNull(property);
 
-        if (entityType.getIdProperty().equals(property)){
+        if (isId(property)){
             return super.isNull(property);
         }
         return true;
+    }
+
+    private boolean isId(Property property){
+        return entityType.getIdProperty().equals(property);
     }
 }
