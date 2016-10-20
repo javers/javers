@@ -27,6 +27,10 @@ public class Property {
         this.hasShallowReferenceAnn = hasShallowReferenceAnn;
     }
 
+    public Property(JaversMember member, boolean hasTransientAnn){
+        this(member, hasTransientAnn, false);
+    }
+
     public Type getGenericType() {
         return member.getGenericResolvedType();
     }
