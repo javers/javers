@@ -16,6 +16,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import org.javers.common.collections.Optional
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition
 import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.valueObjectDefinition
@@ -48,7 +49,7 @@ class TypeFactoryTest extends Specification {
         def prototype = typeFactory.inferFromAnnotations(AbstractValueObject)
 
         when:
-        def jType = typeFactory.spawnFromPrototype(NewNamedValueObject, prototype)
+        def jType = typeFactory.infer(NewNamedValueObject, Optional.of(prototype))
 
         then:
         jType.name == OldValueObject.name
