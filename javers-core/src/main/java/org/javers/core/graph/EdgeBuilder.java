@@ -26,13 +26,20 @@ class EdgeBuilder {
     /**
      * @return node stub, could be redundant so check reuse context
      */
-    SingleEdge buildSingleEdge(ObjectNode node, Property singleRef) {
+    AbstractSingleEdge buildSingleEdge(ObjectNode node, Property singleRef) {
         Object rawReference = node.getPropertyValue(singleRef);
+        Cdo cdo = cdoFactory.create(rawReference, createOwnerContext(node, singleRef));
 
-        Cdo cdo = cdoFactory.create(rawReference, createOwnerContext(node, singleRef), singleRef.hasShallowReferenceAnn());
-        ObjectNode referencedNode = buildNodeStubOrReuse(cdo);
+        if (!isShallowReference(singleRef, cdo)){
+            ObjectNode targetNode = buildNodeStubOrReuse(cdo);
+            return new SingleEdge(singleRef, targetNode);
+        }
+        return new ShallowSingleEdge(singleRef, cdo);
+    }
 
-        return new SingleEdge(singleRef, referencedNode);
+    private boolean isShallowReference(Property reference, Cdo target){
+        return (reference.hasShallowReferenceAnn() ||
+                target.getManagedType() instanceof ShallowReferenceType);
     }
 
     private OwnerContext createOwnerContext(ObjectNode parentNode, Property property) {

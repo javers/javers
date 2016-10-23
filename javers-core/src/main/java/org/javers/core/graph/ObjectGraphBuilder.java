@@ -79,7 +79,7 @@ class ObjectGraphBuilder {
                 continue;
             }
 
-            SingleEdge edge = edgeBuilder.buildSingleEdge(node, singleRef);
+            AbstractSingleEdge edge = edgeBuilder.buildSingleEdge(node, singleRef);
 
             node.addEdge(edge);
         }

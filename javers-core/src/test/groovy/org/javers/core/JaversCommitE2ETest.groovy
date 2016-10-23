@@ -5,10 +5,13 @@ import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.commit.CommitAssert
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserDetails
+import org.javers.core.model.PhoneWithShallowCategory
+import org.javers.core.model.ShallowPhone
 import org.javers.core.model.SnapshotEntity
 import org.joda.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
+import org.javers.core.model.*
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.JaversBuilder.javers
@@ -20,6 +23,38 @@ import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
  * @author bartosz walacik
  */
 class JaversCommitE2ETest extends Specification {
+
+    def "should not commit snapshot of ShallowReference Entity"() {
+        given:
+        def javers = javers().build()
+        def entity =  new SnapshotEntity(id:1, shallowPhone:new ShallowPhone(1, "123", new Category(1, "some")))
+
+        when:
+        def commit = javers.commit("", entity)
+
+        then:
+        commit.snapshots.each {
+            println it.toString()
+            println ".. props:"+ it.state.properties
+        }
+        commit.snapshots.size() == 1
+    }
+
+    def "should not commit snapshot of ShallowReference property"() {
+        given:
+        def javers = javers().build()
+        def entity =  new PhoneWithShallowCategory(id:1, shallowCategory:new Category(1, "old shallow"))
+
+        when:
+        def commit = javers.commit("", entity)
+
+        then:
+        commit.snapshots.each {
+            println it.toString()
+            println ".. props:"+ it.state.properties
+        }
+        commit.snapshots.size() == 1
+    }
 
     def "should mark changed properties"() {
         given:

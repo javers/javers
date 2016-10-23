@@ -33,7 +33,7 @@ public class OpBoxCaseClassExtractionError extends Specification {
         ParamPrototype<? extends ParamType> paramPrototype
     }
 
-    def "should not fail when spawning ShalowReference type from prototype"(){
+    def "should not fail when spawning ShallowReferenceType from prototype"(){
         given:
         def javers = JaversBuilder.javers().build();
         def d1 = new DataSource(name: "name", paramPrototype: new ParamPrototype(name:"p1"))
@@ -43,7 +43,7 @@ public class OpBoxCaseClassExtractionError extends Specification {
         def diff = javers.compare(d1, d2)
 
         then:
-        diff.changes.size() == 3
+        diff.changes.size() == 1
     }
 
     def "should allow defining ShallowReference in JaversBuilder"(){

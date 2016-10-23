@@ -207,6 +207,6 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
     }
 
     ObjectNode followEdge(ObjectNode node, Property property) {
-        node.getEdge(property).reference;
+        node.getEdge(property).referencedNode
     }
 }

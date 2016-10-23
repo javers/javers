@@ -1,6 +1,7 @@
 package org.javers.core.graph;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
 /**
@@ -10,19 +11,17 @@ import org.javers.core.metamodel.property.Property;
  *
  * @author bartosz walacik
  */
-class SingleEdge extends Edge {
+class SingleEdge extends AbstractSingleEdge {
+    private final ObjectNode referencedNode;
 
-    private ObjectNode reference;
-
-    public SingleEdge(Property property, ObjectNode reference) {
+    SingleEdge(Property property, ObjectNode referencedNode) {
         super(property);
-        Validate.argumentIsNotNull(reference);
-
-        this.reference = reference;
+        Validate.argumentsAreNotNull(referencedNode);
+        this.referencedNode = referencedNode;
     }
 
-    public ObjectNode getReference() {
-        return reference;
+    @Override
+    public GlobalId getReference() {
+        return referencedNode.getGlobalId();
     }
-
 }
