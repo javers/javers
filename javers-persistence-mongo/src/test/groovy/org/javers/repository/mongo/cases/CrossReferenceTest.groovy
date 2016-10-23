@@ -23,8 +23,8 @@ class CrossReferenceTest extends Specification {
         CrossReferenceObjectA a
     }
 
+    @Value
     class CrossReferenceObjectA {
-
         @OneToMany
         List<CrossReferenceObjectB> bList
 
@@ -33,6 +33,7 @@ class CrossReferenceTest extends Specification {
         List<CrossReferenceObjectB> bListIgnored
     }
 
+    @Value
     public class CrossReferenceObjectB {
         public int value;
         public CrossReferenceObjectA a
@@ -49,7 +50,7 @@ class CrossReferenceTest extends Specification {
         mongoDb = new Fongo("myDb").getDatabase("test")
     }
 
-    def "should not throw StackOverflowError exception"() {
+    def "should not throw StackOverflowError exception for ValueType cross references"() {
         given:
         def javers = JaversBuilder.javers()
                 .registerJaversRepository(new MongoRepository(mongoDb))
@@ -59,14 +60,14 @@ class CrossReferenceTest extends Specification {
         def host = new CrossReferenceHost()
         host.id = 1
         host.a = new CrossReferenceObjectA()
-        host.a.bList = [new CrossReferenceObjectB(1, host.a),
-                        new CrossReferenceObjectB(2, host.a),
-                        new CrossReferenceObjectB(3, host.a)]
+        host.a.bListIgnored = [new CrossReferenceObjectB(1, host.a),
+                               new CrossReferenceObjectB(2, host.a),
+                               new CrossReferenceObjectB(3, host.a)]
 
         def commit = javers.commit("author", host)
+        println commit
 
         then:
         commit
-        println commit
     }
 }

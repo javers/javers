@@ -148,5 +148,4 @@ public class JsonConverterBuilder {
             return field.getAnnotation(DiffIgnore.class) != null;
         }
     }
-
 }
