@@ -16,14 +16,14 @@ class SingleEdgeAssert {
     }
 
      SingleEdgeAssert refersToCdoWithId(Object expectedCdoId) {
-        Assertions.assertThat(actual.getReference()).isNotNull()
-        Assertions.assertThat(actual.getReference().getGlobalId().getCdoId())
+        Assertions.assertThat(actual.reference).isNotNull()
+        Assertions.assertThat(actual.reference.getCdoId())
                 .isEqualTo(expectedCdoId)
         return this
     }
 
      NodeAssert andTargetNode() {
-        Assertions.assertThat(actual.getReference()).isNotNull()
-        return NodeAssert.assertThat(actual.getReference())
+        Assertions.assertThat(actual.reference).isNotNull()
+        return NodeAssert.assertThat(actual.referencedNode)
     }
 }

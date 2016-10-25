@@ -59,8 +59,8 @@ public class ObjectNode {
         Edge edge = getEdge(property); //could be null for snapshots
 
         //TODO this is ugly, how to move this logic to Cdo implementations?
-        if (edge instanceof SingleEdge){
-            return ((SingleEdge)edge).getReference().getGlobalId();
+        if (edge instanceof AbstractSingleEdge){
+            return ((AbstractSingleEdge)edge).getReference();
         }
         else {
             return (GlobalId)getPropertyValue(property);

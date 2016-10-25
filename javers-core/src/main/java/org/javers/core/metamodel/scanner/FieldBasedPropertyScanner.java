@@ -25,7 +25,8 @@ class FieldBasedPropertyScanner implements PropertyScanner {
 
         for (JaversField field : fields) {
             boolean hasTransientAnn = field.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
-            propertyList.add(new Property(field, hasTransientAnn));
+            boolean hasShallowReferenceAnn = field.hasAnyAnnotation(annotationNamesProvider.getShallowReferenceAliases());
+            propertyList.add(new Property(field, hasTransientAnn, hasShallowReferenceAnn));
         }
         return new PropertyScan(propertyList);
     }

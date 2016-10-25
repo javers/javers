@@ -1,6 +1,7 @@
 package org.javers.core.graph;
 
 import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 /**
@@ -19,10 +20,12 @@ public class LiveCdoFactory implements CdoFactory {
     }
 
     @Override
-    public CdoWrapper create (Object wrappedCdo, OwnerContext owner){
+    public CdoWrapper create(Object wrappedCdo, OwnerContext owner) {
         Object wrappedCdoAccessed = objectAccessHook.access(wrappedCdo);
         GlobalId globalId = globalIdFactory.createId(wrappedCdoAccessed, owner);
-        return new CdoWrapper(wrappedCdoAccessed, globalId, typeMapper.getJaversManagedType(wrappedCdoAccessed.getClass()));
+        ManagedType managedType = typeMapper.getJaversManagedType(wrappedCdoAccessed.getClass());
+
+        return new CdoWrapper(wrappedCdoAccessed, globalId, managedType);
     }
 
     @Override

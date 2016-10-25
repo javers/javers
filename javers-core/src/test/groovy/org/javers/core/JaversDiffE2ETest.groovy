@@ -5,6 +5,7 @@ import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.PropertyChange
 import org.javers.core.diff.changetype.ReferenceChange
+import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.model.Person
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
@@ -12,8 +13,11 @@ import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
+import static org.javers.core.MappingStyle.BEAN
+import static org.javers.core.MappingStyle.FIELD
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
 import static org.javers.core.model.DummyUser.dummyUser
@@ -241,6 +245,48 @@ class JaversDiffE2ETest extends Specification {
 
         expect:
         javers.compare(left, right).hasChanges() == false
+    }
+
+    @Unroll
+    def "should use ReferenceChange when #propType is annotated as ShallowReferences"() {
+        given:
+        def javers = javers().withMappingStyle(mapping).build()
+        def left =  new PhoneWithShallowCategory(id:1, shallowCategory:new Category(1, "old shallow"))
+        def right = new PhoneWithShallowCategory(id:1, shallowCategory:new Category(2, "new shallow"))
+
+        when:
+        def changes = javers.compare(left, right).getChangesByType(ReferenceChange)
+
+        then:
+        changes.size() == 1
+        changes[0] instanceof ReferenceChange
+        changes[0].left.value() == Category.name+"/1"
+        changes[0].right.value() == Category.name+"/2"
+
+        where:
+        propType << ["field", "getter"]
+        mapping <<  [FIELD, BEAN]
+    }
+
+    @Unroll
+    def "should not compare properties when #propType is annotated as ShallowReference"() {
+        given:
+        def javers = javers().withMappingStyle(mapping).build()
+        def left =  new PhoneWithShallowCategory(id:1, shallowCategory:new Category(1, "old shallow"), deepCategory:new Category(2, "old deep"))
+        def right = new PhoneWithShallowCategory(id:1, shallowCategory:new Category(1, "new shallow"), deepCategory:new Category(2, "new deep"))
+
+        when:
+        def changes = javers.compare(left, right).changes
+
+        then:
+        changes.size() == 1
+        changes[0] instanceof ValueChange
+        changes[0].left == "old deep"
+        changes[0].right == "new deep"
+
+        where:
+        propType << ["field", "getter"]
+        mapping <<  [FIELD, BEAN]
     }
 
     def "should ignore properties with @DiffIgnore or @Transient"(){
