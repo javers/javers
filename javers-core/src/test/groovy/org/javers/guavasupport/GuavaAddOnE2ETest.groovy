@@ -203,6 +203,31 @@ class GuavaAddOnE2ETest extends Specification {
                      HashMultimap.create()]
     }
 
+
+    @Unroll
+    def "should detect value changes in map of ValueObjects "() {
+        def javers = org.javers.core.JaversBuilder.javers().build()
+        given:
+        def left = new SnapshotEntity(mapPrimitiveToVO: leftMap)
+        def right = new SnapshotEntity(mapPrimitiveToVO: rightMap)
+
+        when:
+        def diff = javers.compare(left, right)
+
+        then:
+        println diff
+        diff.changes.size() == extpectedChanges
+
+        where:
+        leftMap << [["New York" : new DummyAddress(city: "New York", street: "Maple St")],
+                    ["New York" : new DummyAddress(city: "New York", street: "Maple St"),"Alabama": new DummyAddress(city: "Buffalo", street: "Maple St")],
+                    [:]]
+        rightMap << [["New York":new DummyAddress(city: "New York", street: "Troy Ave")],
+                     ["New York":new DummyAddress(city: "New York", street: "Maple St"),"Toronto":  new DummyAddress(city: "Buffalo", street: "Maple St")],
+                     ["New York":new DummyAddress(city: "New York", street: "Maple St")]]
+        extpectedChanges << [2, 1, 1]
+    }
+
     private <K, V> Multimap createMultiMap(List<K> keys, List<V> values) {
         def hashMultimap = HashMultimap.create()
         for (int i = 0; i < keys.size(); i++) {

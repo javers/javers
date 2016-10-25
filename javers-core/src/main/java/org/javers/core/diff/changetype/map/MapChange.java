@@ -2,7 +2,6 @@ package org.javers.core.diff.changetype.map;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.diff.changetype.container.ContainerChange;
 import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.ArrayList;
@@ -15,7 +14,7 @@ import static org.javers.common.string.ToStringBuilder.addEnumField;
 /**
  * @author bartosz walacik
  */
-public final class MapChange extends PropertyChange {
+public class MapChange extends PropertyChange {
     private final List<EntryChange> changes;
 
     public MapChange(GlobalId affectedCdoId, String propertyName, List<EntryChange> changes) {
