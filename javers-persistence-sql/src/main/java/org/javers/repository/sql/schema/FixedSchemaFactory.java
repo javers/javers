@@ -1,6 +1,7 @@
 package org.javers.repository.sql.schema;
 
 import org.polyjdbc.core.dialect.Dialect;
+import org.polyjdbc.core.dialect.OracleDialect;
 import org.polyjdbc.core.schema.model.RelationBuilder;
 import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.util.StringUtils;
@@ -13,7 +14,7 @@ import java.util.TreeMap;
  *
  * @author bartosz walacik
  */
-public class FixedSchemaFactory {
+public class FixedSchemaFactory extends SchemaNameAware {
 
     public static final String GLOBAL_ID_TABLE_NAME = "jv_global_id";
     public static final String GLOBAL_ID_PK =         "global_id_pk";
@@ -46,17 +47,38 @@ public class FixedSchemaFactory {
     public static final String SNAPSHOT_CHANGED =      "changed_properties"; //since v 1.2
     public static final String SNAPSHOT_MANAGED_TYPE = "managed_type";       //since 2.0
 
-    private Schema snapshotTableSchema(Dialect dialect, String tableName){
+    private final static int ORACLE_MAX_NAME_LEN = 30;
+
+    private final Dialect dialect;
+
+    public FixedSchemaFactory(Dialect dialect, TableNameProvider tableNameProvider) {
+        super(tableNameProvider);
+        this.dialect = dialect;
+    }
+
+    Map<String, Schema> allTablesSchema(Dialect dialect) {
+        Map<String, Schema> schema = new TreeMap<>();
+
+        schema.put(GLOBAL_ID_TABLE_NAME, globalIdTableSchema(dialect));
+        schema.put(COMMIT_TABLE_NAME,    commitTableSchema(dialect));
+        schema.put(COMMIT_PROPERTY_TABLE_NAME, commitPropertiesTableSchema(dialect));
+        schema.put(SNAPSHOT_TABLE_NAME,  snapshotTableSchema(dialect));
+
+        return schema;
+    }
+
+    private Schema snapshotTableSchema(Dialect dialect){
+        DBObjectName tableName = getSnapshotTableName();
         Schema schema = new Schema(dialect);
-        RelationBuilder relationBuilder = schema.addRelation(tableName);
+        RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
         primaryKey(SNAPSHOT_PK, schema, relationBuilder);
         relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
                        .withAttribute().longAttr(SNAPSHOT_VERSION).and()
                        .withAttribute().text(SNAPSHOT_STATE).and()
                        .withAttribute().text(SNAPSHOT_CHANGED).and()
                        .withAttribute().string(SNAPSHOT_MANAGED_TYPE).withMaxLength(200).and();
-        foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder);
-        foreignKey(tableName, SNAPSHOT_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder);
+        foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, getGlobalIdTableNameWithSchema(), GLOBAL_ID_PK, relationBuilder);
+        foreignKey(tableName, SNAPSHOT_COMMIT_FK, getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
         columnsIndex(tableName, schema, SNAPSHOT_GLOBAL_ID_FK);
@@ -65,9 +87,10 @@ public class FixedSchemaFactory {
         return schema;
     }
 
-    private Schema commitTableSchema(Dialect dialect, String tableName) {
+    private Schema commitTableSchema(Dialect dialect) {
+        DBObjectName tableName = getCommitTableName();
         Schema schema = new Schema(dialect);
-        RelationBuilder relationBuilder = schema.addRelation(tableName);
+        RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
         primaryKey(COMMIT_PK,schema,relationBuilder);
         relationBuilder
                 .withAttribute().string(COMMIT_AUTHOR).withMaxLength(200).and()
@@ -80,14 +103,15 @@ public class FixedSchemaFactory {
         return schema;
     }
 
-    private Schema commitPropertiesTableSchema(Dialect dialect, String tableName) {
+    private Schema commitPropertiesTableSchema(Dialect dialect) {
+        DBObjectName tableName = getCommitPropertyTableName();
         Schema schema = new Schema(dialect);
-        RelationBuilder relationBuilder = schema.addRelation(tableName);
+        RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
         relationBuilder
-            .primaryKey(tableName + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
+            .primaryKey(tableName.localName() + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
             .withAttribute().string(COMMIT_PROPERTY_NAME).withMaxLength(200).and()
             .withAttribute().string(COMMIT_PROPERTY_VALUE).withMaxLength(200).and();
-        foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, COMMIT_TABLE_NAME, COMMIT_PK, relationBuilder);
+        foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
         columnsIndex(tableName, schema, COMMIT_PROPERTY_COMMIT_FK);
@@ -96,15 +120,16 @@ public class FixedSchemaFactory {
         return schema;
     }
 
-    private Schema globalIdTableSchema(Dialect dialect, String tableName){
+    private Schema globalIdTableSchema(Dialect dialect){
+        DBObjectName tableName = getGlobalIdTableName();
         Schema schema = new Schema(dialect);
-        RelationBuilder relationBuilder = schema.addRelation(tableName);
+        RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
         primaryKey(GLOBAL_ID_PK, schema,relationBuilder);
         relationBuilder
                 .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(200).and()
                 .withAttribute().string(GLOBAL_ID_FRAGMENT).withMaxLength(200).and()
                 .withAttribute().string(GLOBAL_ID_TYPE_NAME).withMaxLength(200).and();
-        foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, GLOBAL_ID_TABLE_NAME, GLOBAL_ID_PK, relationBuilder);
+        foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, getGlobalIdTableNameWithSchema(), GLOBAL_ID_PK, relationBuilder);
         relationBuilder.build();
 
         columnsIndex(tableName, schema, GLOBAL_ID_LOCAL_ID);
@@ -112,35 +137,29 @@ public class FixedSchemaFactory {
         return schema;
     }
 
-    private void foreignKey(String tableName, String fkColName, String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
+    private void foreignKey(DBObjectName tableName, String fkColName, String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
         relationBuilder
                 .withAttribute().longAttr(fkColName).and()
-                .foreignKey(tableName + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName).and();
+                .foreignKey(tableName.localName() + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName).and();
     }
 
-    private void columnsIndex(String tableName, Schema schema, String... colNames){
+    private void columnsIndex(DBObjectName tableName, Schema schema, String... colNames){
         String concatenatedColumnNames = StringUtils.concatenate('_', (Object[]) colNames);
-        schema
-            .addIndex(tableName + "_" + concatenatedColumnNames + "_idx")
-            .indexing(colNames)
-            .on(tableName)
-            .build();
+        String indexName = tableName.localName() + "_" + concatenatedColumnNames + "_idx";
+        if (dialect instanceof OracleDialect &&
+            indexName.length() > ORACLE_MAX_NAME_LEN)
+        {
+            indexName = indexName.substring(0, ORACLE_MAX_NAME_LEN);
+        }
+        schema.addIndex(indexName)
+              .indexing(colNames)
+              .on(tableName.nameWithSchema())
+              .build();
     }
 
     private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder) {
         relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
                 .primaryKey("jv_"+pkColName).using(pkColName).and();
-        schema.addSequence("jv_"+pkColName+"_seq").build();
-    }
-
-    public Map<String, Schema> allTablesSchema(Dialect dialect) {
-        Map<String, Schema> schema = new TreeMap<>();
-
-        schema.put(GLOBAL_ID_TABLE_NAME, globalIdTableSchema(dialect, GLOBAL_ID_TABLE_NAME));
-        schema.put(COMMIT_TABLE_NAME,    commitTableSchema(dialect, COMMIT_TABLE_NAME));
-        schema.put(COMMIT_PROPERTY_TABLE_NAME, commitPropertiesTableSchema(dialect, COMMIT_PROPERTY_TABLE_NAME));
-        schema.put(SNAPSHOT_TABLE_NAME,  snapshotTableSchema(dialect, SNAPSHOT_TABLE_NAME));
-
-        return schema;
+        schema.addSequence(getSequenceNameWithSchema(pkColName)).build();
     }
 }

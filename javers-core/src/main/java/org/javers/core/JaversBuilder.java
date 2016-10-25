@@ -4,6 +4,7 @@ import com.google.gson.TypeAdapter;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
 import org.javers.common.reflection.ReflectionUtil;
+import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
@@ -70,7 +71,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @see <a href="http://javers.org/documentation/domain-configuration/">http://javers.org/documentation/domain-configuration</a>
  * @author bartosz walacik
  */
-public class JaversBuilder extends AbstractJaversBuilder {
+public class JaversBuilder extends AbstractContainerBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
     private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
@@ -79,6 +80,7 @@ public class JaversBuilder extends AbstractJaversBuilder {
 
     private JaversRepository repository;
     private DateProvider dateProvider;
+    private long bootStart = System.currentTimeMillis();
 
     public static JaversBuilder javers() {
         return new JaversBuilder();
@@ -111,7 +113,8 @@ public class JaversBuilder extends AbstractJaversBuilder {
         Javers javers = assembleJaversInstance();
         repository.ensureSchema();
 
-        logger.info("JaVers instance is up & ready");
+        long boot = System.currentTimeMillis() - bootStart;
+        logger.info("JaVers instance started in {} ms", boot);
         return javers;
     }
 
@@ -242,35 +245,41 @@ public class JaversBuilder extends AbstractJaversBuilder {
     }
 
     /**
-     * <b>Not implemented!</b>
-     * <br/><br/>
-     *
-     * <i>If implemented, allows you to register all your classes with &#64;{@link TypeName} annotation
-     * (within given package) in order to use them in all kinds of JQL queries <br/>
+     * Comma separated list of packages.<br/>
+     * Allows you to register all your classes with &#64;{@link TypeName} annotation
+     * in order to use them in all kinds of JQL queries<br/>
      * (without getting TYPE_NAME_NOT_FOUND exception).
-     * </i>
-     * <br/><br/>
      *
-     * If you think that this method should be implemented,
-     * vote here: <a href="https://github.com/javers/javers/issues/263">issue/263</a>
+     * @param packagesToScan e.g. "my.company.domain.person, my.company.domain.finance"
+     * @since 2.3
      */
-    public JaversBuilder scanTypeNames(String packageToScan){
-        throw new RuntimeException("JaversBuilder.scanTypeNames(String packageToScan) is not implemented! " +
-                "If you think that this method should be implemented, " +
-                "vote here: https://github.com/javers/javers/issues/263");
+    public JaversBuilder withPackagesToScan(String packagesToScan) {
+        if (packagesToScan == null || packagesToScan.trim().isEmpty()) {
+            return this;
+        }
+
+        long start = System.currentTimeMillis();
+        logger.info("scanning package(s): {}", packagesToScan);
+        List<Class<?>> scan = ReflectionUtil.findClasses(TypeName.class, packagesToScan.replaceAll(" ","").split(","));
+		for (Class<?> c : scan) {
+			scanTypeName(c);
+		}
+		long delta = System.currentTimeMillis() - start;
+        logger.info("found {} ManagedClasse(s) with @TypeName in {} ms", scan.size(), delta);
+
+		return this;
     }
 
     /**
      * Register your class with &#64;{@link TypeName} annotation
-     * in order to use them in all kinds of JQL queries<br/>
-     * (without getting TYPE_NAME_NOT_FOUND exception).
+     * in order to use it in all kinds of JQL queries.
      * <br/><br/>
      *
-     * If you think that JaVers should be able to scan all your classes
-     * in given package, vote for this feature: <a href="https://github.com/javers/javers/issues/263">issue/263</a>
+     * You can also use {@link #withPackagesToScan(String)}
+     * to scan all your classes.
      * <br/><br/>
      *
-     * Alias for {@link Javers#getTypeMapping(Type)}
+     * Technically, this method is the convenient alias for {@link Javers#getTypeMapping(Type)}
      *
      * @since 1.4
      */

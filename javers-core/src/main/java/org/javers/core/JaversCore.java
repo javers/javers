@@ -12,6 +12,7 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.annotation.TypeName;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.property.Property;
@@ -163,6 +164,14 @@ class JaversCore implements Javers {
     @Override
     public <T extends JaversType> T getTypeMapping(Type clientsType) {
         return (T) typeMapper.getJaversType(clientsType);
+    }
+
+    /**
+     * @see TypeName
+     * @since 2.3
+     */
+    public <T extends ManagedType> T getTypeMapping(String typeName) {
+        return (T) typeMapper.getJaversManagedType(typeName);
     }
 
     @Override

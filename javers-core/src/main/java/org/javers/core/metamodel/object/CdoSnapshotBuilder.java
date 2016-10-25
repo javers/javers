@@ -23,7 +23,7 @@ public class CdoSnapshotBuilder {
     private CdoSnapshotStateBuilder stateBuilder = cdoSnapshotState();
     private CdoSnapshot previous;
     private boolean markAllAsChanged;
-    private List<String> changed = Collections.EMPTY_LIST;
+    private List<String> changed = Collections.emptyList();
     private ManagedType managedType;
     private long version;
 

@@ -12,12 +12,13 @@ public class JaversException extends RuntimeException {
     private final JaversExceptionCode code;
 
     public JaversException(Throwable throwable) {
-        super(RUNTIME_EXCEPTION.getMessage(), throwable);
+        super(String.format(RUNTIME_EXCEPTION.getMessage(),
+                "Cause: " + throwable.getClass().getName() + " - " + throwable.getMessage()), throwable);
         this.code = RUNTIME_EXCEPTION;
     }
 
     public JaversException(JaversExceptionCode code, Object... arguments) {
-        super(code.name() + " " + String.format(code.getMessage(), arguments));
+        super(code.name() + ": " + String.format(code.getMessage(), arguments));
         this.code = code;
     }
 
@@ -27,6 +28,6 @@ public class JaversException extends RuntimeException {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName()+": "+ getMessage();
+        return this.getClass().getSimpleName()+" "+ getMessage();
     }
 }

@@ -1,15 +1,24 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.common.collections.Optional;
+import org.javers.repository.sql.schema.TableNameProvider;
+import org.polyjdbc.core.query.SelectQuery;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_PK;
 
 /**
  * @author bartosz.walacik
  */
-class SnapshotIdFilter extends PrimaryKeySnapshotFilter {
+class SnapshotIdFilter extends SnapshotFilter {
 
-    SnapshotIdFilter(long snapshotId) {
-        super(snapshotId, SNAPSHOT_PK, Optional.<String>empty());
+    private final long snapshotPK;
+
+    SnapshotIdFilter(TableNameProvider tableNameProvider, long snapshotPK) {
+        super(tableNameProvider);
+        this.snapshotPK = snapshotPK;
+    }
+
+    @Override
+    void addWhere(SelectQuery query) {
+        query.where(SNAPSHOT_PK + " = "+ snapshotPK);
     }
 }

@@ -15,4 +15,8 @@ class MySqlIntegrationTest extends JaversSqlRepositoryE2ETest {
     DialectName getDialect() {
         DialectName.MYSQL
     }
+
+    String getSchema() {
+        return null
+    }
 }

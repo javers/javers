@@ -1,7 +1,6 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.Predicate;
-import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.property.Property;
@@ -26,10 +25,12 @@ class ObjectGraphBuilder {
     private boolean built;
     private final EdgeBuilder edgeBuilder;
     private final NodeReuser nodeReuser = new NodeReuser();
+    private final CdoFactory cdoFactory;
 
     public ObjectGraphBuilder(TypeMapper typeMapper, CdoFactory cdoFactory) {
         Validate.argumentsAreNotNull(typeMapper, cdoFactory);
         this.typeMapper = typeMapper;
+        this.cdoFactory = cdoFactory;
         this.edgeBuilder = new EdgeBuilder(typeMapper, nodeReuser, cdoFactory);
     }
 
@@ -42,7 +43,7 @@ class ObjectGraphBuilder {
     public LiveGraph buildGraph(Object handle) {
         argumentIsNotNull(handle);
 
-        Cdo cdo = edgeBuilder.asCdo(handle, null);
+        Cdo cdo = cdoFactory.create(handle, null);
         // logger.debug("building objectGraph for handle [{}] ...",cdo);
 
         return buildGraphFromCdo(cdo);
@@ -78,7 +79,7 @@ class ObjectGraphBuilder {
                 continue;
             }
 
-            SingleEdge edge = edgeBuilder.buildSingleEdge(node, singleRef);
+            AbstractSingleEdge edge = edgeBuilder.buildSingleEdge(node, singleRef);
 
             node.addEdge(edge);
         }
@@ -166,5 +167,4 @@ class ObjectGraphBuilder {
 
         return keyType instanceof ManagedType || valueType instanceof ManagedType;
     }
-
 }

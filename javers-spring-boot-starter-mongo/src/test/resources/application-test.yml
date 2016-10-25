@@ -4,6 +4,7 @@ javers:
   newObjectSnapshot: false
   prettyPrint: false
   typeSafeValues: true
+  packagesToScan: org.javers.spring.boot
 
 spring:
   data:

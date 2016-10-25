@@ -10,7 +10,7 @@ import org.javers.core.metamodel.object.GlobalId;
  *
  * @author bartosz walacik
  */
-public class ObjectRemoved extends Change {
+public final class ObjectRemoved extends Change {
     public ObjectRemoved(GlobalId removed, Optional<Object> removedCdo) {
         super(removed);
         setAffectedCdo(removedCdo);
@@ -19,5 +19,22 @@ public class ObjectRemoved extends Change {
     public ObjectRemoved(GlobalId removed, Optional<Object> removedCdo, CommitMetadata commitMetadata) {
         this(removed, removedCdo);
         bindToCommit(commitMetadata);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof ObjectRemoved) {
+            ObjectRemoved that = (ObjectRemoved) obj;
+            return super.equals(that);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

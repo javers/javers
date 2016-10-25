@@ -28,8 +28,11 @@ public class QueryParams {
     private final Optional<Long> version;
     private final Optional<String> author;
     private final Optional<Map<String, String>> commitProperties;
+    private final boolean aggregate;
+    private final boolean newObjectChanges;
+    private final Optional<String> changedProperty;
 
-    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId, Long version, String author, Map<String, String> commitProperties) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty) {
         this.limit = limit;
         this.skip = skip;
         this.from = Optional.fromNullable(from);
@@ -38,12 +41,18 @@ public class QueryParams {
         this.version = Optional.fromNullable(version);
         this.author = Optional.fromNullable(author);
         this.commitProperties = Optional.fromNullable(commitProperties);
+        this.aggregate = aggregate;
+        this.newObjectChanges = newObjectChanges;
+        this.changedProperty = Optional.fromNullable(changedProperty);
     }
 
     public int limit() {
         return limit;
     }
 
+    /**
+     * skips a given number of latest snapshots
+     */
     public int skip() {
         return skip;
     }
@@ -77,14 +86,14 @@ public class QueryParams {
         return to;
     }
 
-    /*
+    /**
      * filters results to Snapshots with a given commitId
      */
     public Optional<CommitId> commitId() {
         return commitId;
     }
 
-    /*
+    /**
      * filters results to Snapshots with all given commit properties
      */
     public Map<String, String> commitProperties() {
@@ -92,18 +101,36 @@ public class QueryParams {
             commitProperties.get() : Collections.<String, String>emptyMap();
     }
 
-    /*
+    /**
+     * filters results to Snapshots with a given property on changed properties list
+     */
+    public Optional<String> changedProperty(){
+        return changedProperty;
+    }
+
+    /**
      * filters results to Snapshots with a given version
      */
     public Optional<Long> version() {
         return version;
     }
 
-    /*
+    /**
      * filters results to Snapshots committed by a given author
      */
     public Optional<String> author() {
         return author;
+    }
+
+    /**
+     * When enabled, selects all ValueObjects owned by selected Entities.
+     */
+    public boolean isAggregate() {
+        return aggregate;
+    }
+
+    public boolean newObjectChanges() {
+        return newObjectChanges;
     }
 
     @Override

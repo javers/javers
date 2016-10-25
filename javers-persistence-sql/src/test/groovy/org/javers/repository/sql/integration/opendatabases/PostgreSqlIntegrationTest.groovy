@@ -15,4 +15,8 @@ class PostgreSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
     DialectName getDialect() {
         DialectName.POSTGRES
     }
+
+    String getSchema() {
+        return null
+    }
 }

@@ -1,8 +1,6 @@
 package org.javers.core.model;
 
 import javax.persistence.Id;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Pawel Cierpiatka

@@ -3,6 +3,8 @@
 
 ## What is JaVers
 
+[![Build Status](https://travis-ci.org/javers/javers.svg?branch=master)](https://travis-ci.org/javers/javers/)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core)
 [![Join the chat at https://gitter.im/javers/javers](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/javers/javers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Ideal for contribution](https://badge.waffle.io/javers/javers.svg?label=ideal%20for%20contribution&title=Ideal for contribution)](http://waffle.io/javers/javers)
 
@@ -48,12 +50,6 @@ Before you create an issue please read our
 JaVers is an open source project, so we are open to your contributions.
 Before you start, please read our
 [Contributing Guide](CONTRIBUTING.md#guidelines-for-contributors) and see how to get your changes merged.
-
-## Team Board
-Check out our [Kanban Board](https://waffle.io/javers/javers) to see what we're working on. 
-
-## CI status
-[![Build Status](https://travis-ci.org/javers/javers.png?branch=master)](https://travis-ci.org/javers/javers)
 
 ## License
 JaVers is licensed under Apache License Version 2.0, see the LICENSE file.

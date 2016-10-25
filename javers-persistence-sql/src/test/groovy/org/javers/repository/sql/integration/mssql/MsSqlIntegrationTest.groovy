@@ -15,4 +15,8 @@ class MsSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
     DialectName getDialect() {
         DialectName.MSSQL
     }
+
+    String getSchema() {
+        return "public"
+    }
 }

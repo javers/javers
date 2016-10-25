@@ -82,22 +82,12 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        return finder.getStateHistory(globalId, Optional.<String>empty(), queryParams);
-    }
-
-    @Override
-    public List<CdoSnapshot> getPropertyStateHistory(GlobalId globalId, String propertyName, QueryParams queryParams) {
-        return finder.getStateHistory(globalId, Optional.of(propertyName), queryParams);
+        return finder.getStateHistory(globalId, queryParams);
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
-        return finder.getStateHistory(givenClass, Optional.<String>empty(), queryParams);
-    }
-
-    @Override
-    public List<CdoSnapshot> getPropertyStateHistory(ManagedType givenClass, String propertyName, QueryParams queryParams) {
-        return finder.getStateHistory(givenClass, Optional.of(propertyName), queryParams);
+        return finder.getStateHistory(givenClass, queryParams);
     }
 
     @Override

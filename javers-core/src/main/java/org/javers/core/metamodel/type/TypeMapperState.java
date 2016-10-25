@@ -21,7 +21,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz.walacik
  */
 class TypeMapperState {
-    private final Map<Type, JaversType> mappedTypes = new ConcurrentHashMap<>();
+    private final Map<String, JaversType> mappedTypes = new ConcurrentHashMap<>();
     private final Map<DuckType, Class> mappedTypeNames = new ConcurrentHashMap<>();
     private final TypeFactory typeFactory;
     private final ValueType OBJECT_TYPE = new ValueType(Object.class);
@@ -67,7 +67,7 @@ class TypeMapperState {
     }
 
     boolean contains(Type javaType){
-        return mappedTypes.get(javaType) != null;
+        return mappedTypes.containsKey(javaType.toString());
     }
 
     JaversType getJaversType(Type javaType) {
@@ -77,7 +77,7 @@ class TypeMapperState {
             return OBJECT_TYPE;
         }
 
-        JaversType jType = mappedTypes.get(javaType);
+        JaversType jType = getFromMap(javaType);
         if (jType != null) {
             return jType;
         }
@@ -110,7 +110,7 @@ class TypeMapperState {
 
         synchronized (javaType) {
             //map.contains double check
-            JaversType mappedType = mappedTypes.get(javaType);
+            JaversType mappedType = getFromMap(javaType);
             if (mappedType != null) {
                 return mappedType;
             }
@@ -143,7 +143,7 @@ class TypeMapperState {
      * must be called within synchronized block
      */
     private void addFullMapping(Type javaType, JaversType newType){
-        mappedTypes.put(javaType, newType);
+        putToMap(javaType, newType);
 
         if (newType instanceof ManagedType){
             ManagedType managedType = (ManagedType)newType;
@@ -199,5 +199,13 @@ class TypeMapperState {
         catch (ClassNotFoundException e){
             return Optional.empty();
         }
+    }
+
+    private JaversType getFromMap(Type javaType) {
+        return mappedTypes.get(javaType.toString());
+    }
+
+    private void putToMap(Type javaType, JaversType javersType) {
+        mappedTypes.put(javaType.toString(), javersType);
     }
 }

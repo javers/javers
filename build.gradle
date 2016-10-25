@@ -23,7 +23,6 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'java'
     apply plugin: 'groovy'
-    apply plugin: 'signing'
     apply plugin: 'propdeps'
     apply plugin: 'com.jfrog.bintray'
 
@@ -86,11 +85,6 @@ subprojects {
         }
     }
 
-    signing {
-        required { gradle.taskGraph.hasTask("uploadArchives") }
-        sign configurations.archives
-    }
-
     install.repositories.mavenInstaller.pom.project {
         name 'JaVers'
 
@@ -126,8 +120,8 @@ subprojects {
     }
 
     bintray {
-        user = project.ext.has('bintrayUser') ? project.ext.bintrayUser : ''
-        key = project.ext.has('bintrayKey') ? project.ext.bintrayKey : ''
+        user = project.ext.has('bintrayUser') ? project.ext.bintrayUser : System.getenv('bintrayUser')
+        key = project.ext.has('bintrayKey') ? project.ext.bintrayKey : System.getenv('bintrayKey')
 
         configurations = ['archives']
         publish = true
@@ -136,12 +130,17 @@ subprojects {
             name = 'javers'
             version {
                 mavenCentralSync {
+                    user = project.ext.has('sonatypeUser') ? project.ext.sonatypeUser : System.getenv('sonatypeUser')
+                    password = project.ext.has('sonatypePassword') ? project.ext.sonatypePassword : System.getenv('sonatypePassword')
                     sync = true
-                    user = project.ext.has('sonatypeUser') ? project.ext.sonatypeUser : ''
-                    password = project.ext.has('sonatypePassword') ? project.ext.sonatypePassword : ''
                     close = '1'
                 }
             }
         }
+    }
+
+    test {
+        testLogging.exceptionFormat = 'full'
+        testLogging.showStackTraces = true
     }
 }

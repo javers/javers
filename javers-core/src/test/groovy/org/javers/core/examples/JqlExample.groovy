@@ -324,6 +324,36 @@ class JqlExample extends Specification {
         assert changes[4] instanceof NewObject
     }
 
+    def "should query for changes made on Entity and its ValueObjects by InstanceId and Class"(){
+      given:
+      def javers = JaversBuilder.javers().build()
+
+      def bob = new Employee(name:"bob", age:30, salary: 1000,
+              primaryAddress: new Address(city:"Paris"),
+              postalAddress: new Address(city:"Paris"))
+      javers.commit("author", bob)
+
+      bob.age = 31
+      bob.primaryAddress.city = "London"
+      javers.commit("author", bob)
+
+      when: "query by instance Id"
+      def query = QueryBuilder.byInstanceId("bob", Employee.class).withChildValueObjects().build()
+      def changes = javers.findChanges( query )
+
+      then:
+      printChanges(changes)
+      assert changes.size() == 2
+
+      when: "query by Entity class"
+      query = QueryBuilder.byClass(Employee.class).withChildValueObjects().build()
+      changes = javers.findChanges( query )
+
+      then:
+      printChanges(changes)
+      assert changes.size() == 2
+    }
+
     def printChanges(def changes){
         println "changes:"
         def i = 0

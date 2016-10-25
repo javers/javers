@@ -1,6 +1,7 @@
 package org.javers.spring.boot.mongo
 
 import org.javers.core.Javers
+import org.javers.core.metamodel.type.EntityType
 import org.javers.repository.jql.QueryBuilder
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,5 +34,11 @@ public class JaversMongoStarterIntegrationTest {
         assert snapshots.size() == 1
         assert snapshots[0].commitMetadata.properties["key"] == "ok"
         assert snapshots[0].commitMetadata.author == "unauthenticated"
+    }
+
+    @Test
+    void "should scan given packages for classes with @TypeName"() {
+        //expect
+        assert javers.getTypeMapping("AnotherEntity") instanceof EntityType
     }
 }

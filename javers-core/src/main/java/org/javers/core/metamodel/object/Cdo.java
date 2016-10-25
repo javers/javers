@@ -39,7 +39,7 @@ public abstract class Cdo {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof Cdo)) {
+        if (!(o instanceof Cdo)) {
             return false;
         }
 

@@ -15,6 +15,9 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
         DialectName.H2
     }
 
+    String getSchema() {
+        return null
+    }
 
     def "should persist over 100 snapshots with proper sequence of primary keys"() {
         given:

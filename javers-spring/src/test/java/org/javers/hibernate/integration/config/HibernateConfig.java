@@ -2,14 +2,14 @@ package org.javers.hibernate.integration.config;
 
 import com.google.common.collect.ImmutableMap;
 import org.javers.core.Javers;
-import org.javers.core.commit.Commit;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.spring.annotation.JaversAuditable;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
+import org.javers.spring.auditable.aspect.JaversAuditableAspect;
+import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
@@ -68,17 +68,14 @@ public class HibernateConfig {
         return dataSource;
     }
 
-
-    /**
-     * Enables Repository auto-audit aspect. <br/>
-     * <p>
-     * Use {@link JaversSpringDataAuditable}
-     * to annotate Spring Data Repositories
-     * or {@link JaversAuditable} for ordinary Repositories.
-     */
     @Bean
-    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect(Javers javers) {
-        return new JaversAuditableRepositoryAspect(javers, authorProvider(), commitPropertiesProvider());
+    public JaversAuditableAspect javersAuditableAspect(Javers javers) {
+        return new JaversAuditableAspect(javers, authorProvider(), commitPropertiesProvider());
+    }
+
+    @Bean
+    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers) {
+        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider(), commitPropertiesProvider());
     }
 
     /**

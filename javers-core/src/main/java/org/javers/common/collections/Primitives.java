@@ -1,5 +1,7 @@
 package org.javers.common.collections;
 
+import org.javers.common.reflection.ReflectionUtil;
+
 /**
  * @author bartosz walacik
  */
@@ -34,19 +36,10 @@ public class Primitives {
     }
 
     public static boolean isJsonBasicType(Class clazz) {
-        return isAssignableFromAny(clazz, JSON_BASIC_TYPES);
+        return ReflectionUtil.isAssignableFromAny(clazz, JSON_BASIC_TYPES);
     }
 
-    public static boolean isPrimitiveOrBox(Class clazz) {
-        return isAssignableFromAny(clazz, PRIMITIVE_TYPES);
-    }
-
-    private static boolean isAssignableFromAny(Class clazz, Class<?>[] assignableFrom) {
-        for (Class<?> standardPrimitive : assignableFrom) {
-            if (standardPrimitive.isAssignableFrom(clazz)) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean isPrimitiveOrBox(Class clazz) {
+        return ReflectionUtil.isAssignableFromAny(clazz, PRIMITIVE_TYPES);
     }
 }

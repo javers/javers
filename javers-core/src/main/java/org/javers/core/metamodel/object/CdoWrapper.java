@@ -1,12 +1,10 @@
 package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.Optional;
-import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.ManagedType;
 
-import static org.javers.common.validation.Validate.argumentCheck;
-import static org.javers.common.validation.Validate.argumentsAreNotNull;
+import static org.javers.common.validation.Validate.*;
 
 /**
  * Wrapper for live client's domain object (aka CDO)
@@ -26,13 +24,14 @@ public class CdoWrapper extends Cdo {
 
     @Override
     public Object getPropertyValue(String propertyName) {
-        Validate.argumentIsNotNull(propertyName);
+        argumentIsNotNull(propertyName);
         Property property = getManagedType().getProperty(propertyName);
-        return property.get(wrappedCdo);
+        return getPropertyValue(property);
     }
 
     @Override
     public Object getPropertyValue(Property property) {
+        argumentIsNotNull(property);
         return property.get(wrappedCdo);
     }
 
@@ -46,6 +45,7 @@ public class CdoWrapper extends Cdo {
 
     @Override
     public boolean isNull(Property property) {
+        argumentIsNotNull(property);
         return property.isNull(wrappedCdo);
     }
 }

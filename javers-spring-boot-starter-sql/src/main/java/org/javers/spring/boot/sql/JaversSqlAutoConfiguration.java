@@ -12,7 +12,8 @@ import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
 import org.javers.spring.auditable.*;
-import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
+import org.javers.spring.auditable.aspect.JaversAuditableAspect;
+import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
 import org.slf4j.Logger;
@@ -49,9 +50,6 @@ public class JaversSqlAutoConfiguration {
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
-    @Autowired
-    private CommitPropertiesProvider commitPropertiesProvider;
-
     @Bean
     public DialectName javersSqlDialectName(){
         SessionFactoryImplementor sessionFactory =
@@ -63,7 +61,8 @@ public class JaversSqlAutoConfiguration {
         return dialectMapper.map(hibernateDialect);
     }
 
-    @Bean
+    @Bean(name = "javers")
+    @ConditionalOnMissingBean
     public Javers javers(ConnectionProvider connectionProvider) {
         JaversSqlRepository sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
@@ -80,6 +79,7 @@ public class JaversSqlAutoConfiguration {
                 .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
                 .withPrettyPrint(javersProperties.isPrettyPrint())
                 .withTypeSafeValues(javersProperties.isTypeSafeValues())
+                .withPackagesToScan(javersProperties.getPackagesToScan())
                 .build();
     }
 
@@ -92,7 +92,7 @@ public class JaversSqlAutoConfiguration {
 
     @Bean(name = "authorProvider")
     @ConditionalOnMissingBean
-    @ConditionalOnMissingClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
+    @ConditionalOnMissingClass({"org.springframework.security.core.context.SecurityContextHolder"})
     public AuthorProvider unknownAuthorProvider() {
         return new MockAuthorProvider();
     }
@@ -110,7 +110,12 @@ public class JaversSqlAutoConfiguration {
     }
 
     @Bean
-    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
-        return new JaversAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
+    public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider());
+    }
+
+    @Bean
+    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider());
     }
 }

@@ -35,6 +35,10 @@ class ManagedClass {
         }
     }
 
+    ManagedClass createShallowReference(){
+        return new ManagedClass(baseJavaClass, Collections.<Property>emptyList(), getLooksLikeId());
+    }
+
     /**
      * returns all managed properties
      */

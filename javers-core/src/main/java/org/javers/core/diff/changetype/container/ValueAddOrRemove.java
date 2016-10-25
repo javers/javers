@@ -1,5 +1,7 @@
 package org.javers.core.diff.changetype.container;
 
+import java.util.Objects;
+
 import org.javers.core.diff.changetype.Atomic;
 
 /**
@@ -21,6 +23,24 @@ public abstract class ValueAddOrRemove extends ContainerElementChange {
 
     public Object getValue() {
         return value.unwrap();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof ValueAddOrRemove) {
+            ValueAddOrRemove that = (ValueAddOrRemove) obj;
+            return super.equals(that)
+                    && Objects.equals(this.getValue(), that.getValue());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getValue());
     }
 
 }

@@ -36,11 +36,13 @@ dependencies {
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile "org.springframework:spring-test:$springVersion"
 
+    testCompile "org.springframework.boot:spring-boot-test:$springBootVersion"
     testCompile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+
     testCompile "org.spockframework:spock-core:$spockVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
 
-    testCompile 'org.springframework.data:spring-data-mongodb:1.8.0.M1'
+    testCompile 'org.springframework.data:spring-data-mongodb:1.9.2.RELEASE'
     testCompile "com.github.fakemongo:fongo:$fongoVersion"
     testCompile "org.mongodb:mongo-java-driver:$mongoJavaDriverVersion"
 

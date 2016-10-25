@@ -15,4 +15,8 @@ class OracleIntegrationTest extends JaversSqlRepositoryE2ETest {
     DialectName getDialect() {
         DialectName.ORACLE
     }
+
+    String getSchema() {
+        return "public"
+    }
 }

@@ -8,9 +8,9 @@ import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.javers.spring.auditable.EmptyPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
-import org.javers.spring.auditable.aspect.JaversAuditableRepositoryAspect;
+import org.javers.spring.auditable.aspect.JaversAuditableAspect;
+import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -49,15 +49,25 @@ public class JaversSpringMongoApplicationConfig {
     }
 
     /**
-     * Enables Repository auto-audit aspect. <br/>
+     * Enables auto-audit aspect for ordinary repositories.<br/>
      *
-     * Use {@link org.javers.spring.annotation.JaversSpringDataAuditable}
-     * to annotate Spring Data Repositories
-     * or {@link org.javers.spring.annotation.JaversAuditable} for ordinary Repositories.
+     * Use {@link org.javers.spring.annotation.JaversAuditable}
+     * to mark data writing methods that you want to audit.
      */
     @Bean
-    public JaversAuditableRepositoryAspect javersAuditableRepositoryAspect() {
-        return new JaversAuditableRepositoryAspect(javers(), authorProvider(), commitPropertiesProvider());
+    public JaversAuditableAspect javersAuditableAspect() {
+        return new JaversAuditableAspect(javers(), authorProvider(), commitPropertiesProvider());
+    }
+
+    /**
+     * Enables auto-audit aspect for Spring Data repositories. <br/>
+     *
+     * Use {@link org.javers.spring.annotation.JaversSpringDataAuditable}
+     * to annotate CrudRepositories you want to audit.
+     */
+    @Bean
+    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
+        return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(), commitPropertiesProvider());
     }
 
     /**

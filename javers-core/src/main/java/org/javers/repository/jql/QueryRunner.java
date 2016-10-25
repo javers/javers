@@ -39,29 +39,21 @@ public class QueryRunner {
     public List<CdoSnapshot> queryForSnapshots(JqlQuery query){
         Validate.argumentIsNotNull(query);
 
-        if (query.isAnyDomainObjectOnlyQuery()) {
+        if (query.isAnyDomainObjectQuery()) {
             return repository.getSnapshots(query.getQueryParams());
         }
 
-        if (query.isIdOnlyQuery()){
+        if (query.isIdQuery()){
             return repository.getStateHistory(fromDto(query.getIdFilter()), query.getQueryParams());
         }
 
-        if (query.isIdAndPropertyQuery()){
-            return repository.getPropertyStateHistory(fromDto(query.getIdFilter()), query.getPropertyName(), query.getQueryParams());
-        }
-
-        if (query.isClassOnlyQuery()){
+        if (query.isClassQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
+
             return repository.getStateHistory(mType, query.getQueryParams());
         }
 
-        if (query.isClassAndPropertyQuery()){
-            ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getPropertyStateHistory(mType, query.getPropertyName(), query.getQueryParams());
-        }
-
-        if (query.isVoOwnerOnlyQuery()) {
+        if (query.isVoOwnerQuery()) {
             VoOwnerFilter filter = query.getVoOwnerFilter();
             EntityType ownerEntity = getOwnerEntity(filter);
             globalIdFactory.touchValueObjectFromPath(ownerEntity, filter.getPath());
@@ -74,36 +66,25 @@ public class QueryRunner {
     public List<Change> queryForChanges(JqlQuery query) {
         Validate.argumentIsNotNull(query);
 
-        if (query.isAnyDomainObjectOnlyQuery()) {
+        if (query.isAnyDomainObjectQuery()) {
             return repository.getChanges(query.isNewObjectChanges(), query.getQueryParams());
         }
 
-        if (query.isIdOnlyQuery()){
-            return repository.getChangeHistory(fromDto(query.getIdFilter()),
-                    query.isNewObjectChanges(), query.getQueryParams());
+        if (query.isIdQuery()){
+            return repository.getChangeHistory(fromDto(query.getIdFilter()), query.getQueryParams());
         }
 
-        if (query.isIdAndPropertyQuery()){
-            return repository.getPropertyChangeHistory(fromDto(query.getIdFilter()),
-                    query.getPropertyName(), query.isNewObjectChanges(), query.getQueryParams());
-        }
-
-        if (query.isClassOnlyQuery()){
+        if (query.isClassQuery()){
             ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getChangeHistory(mType, query.isNewObjectChanges(), query.getQueryParams());
+            return repository.getChangeHistory(mType, query.getQueryParams());
         }
 
-        if (query.isClassAndPropertyQuery()){
-            ManagedType mType = typeMapper.getJaversManagedType(query.getClassFilter());
-            return repository.getPropertyChangeHistory(mType, query.getPropertyName(), query.isNewObjectChanges(), query.getQueryParams());
-        }
-
-        if (query.isVoOwnerOnlyQuery()) {
+        if (query.isVoOwnerQuery()) {
             VoOwnerFilter filter = query.getVoOwnerFilter();
             EntityType ownerEntity = getOwnerEntity(filter);
             globalIdFactory.touchValueObjectFromPath(ownerEntity, filter.getPath());
             return repository.getValueObjectChangeHistory(
-                    ownerEntity, filter.getPath(), query.isNewObjectChanges(), query.getQueryParams());
+                    ownerEntity, filter.getPath(), query.getQueryParams());
         }
 
         throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForChanges: " + query + " is not supported");

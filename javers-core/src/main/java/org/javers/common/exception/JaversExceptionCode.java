@@ -14,7 +14,7 @@ public enum JaversExceptionCode {
 
     ENTITY_WITHOUT_ID ("Class '%s' mapped as Entity has no Id property. Use @Id annotation to mark unique and not-null Entity identifier"),
 
-    ENTITY_INSTANCE_WITH_NULL_ID("Found Entity instance of class '%s' with null id"),
+    ENTITY_INSTANCE_WITH_NULL_ID("Found Entity instance '%s' with null idProperty '%s'"),
 
     NOT_INSTANCE_OF(JaversException.BOOTSTRAP_ERROR + "expected instance of '%s', got instance of '%s'"),
 
@@ -24,7 +24,7 @@ public enum JaversExceptionCode {
 
     CLASSPATH_RESOURCE_NOT_FOUND(JaversException.BOOTSTRAP_ERROR + "classpath resource '%s' could not be found"),
 
-    ALREADY_BUILT(JaversException.BOOTSTRAP_ERROR + "instance already built, each AbstractJaversBuilder may produce only one target instance"),
+    ALREADY_BUILT(JaversException.BOOTSTRAP_ERROR + "instance already built, each AbstractContainerBuilder may produce only one target instance"),
 
     PROPERTY_ACCESS_ERROR("error getting value from property '%s' on target object of type '%s', cause: %s"),
 
@@ -52,8 +52,7 @@ public enum JaversExceptionCode {
             "type name '%s' not found. " +
             "If you are using @TypeName annotation, " +
             "remember to register this class " +
-            "using JaversBuilder.scanTypeName(Class). " +
-            "See also https://github.com/javers/javers/issues/263"),
+            "using JaversBuilder.withPackagesToScan(String) or JaversBuilder.scanTypeName(Class)"),
 
     MANAGED_CLASS_MAPPING_ERROR("given javaClass '%s' is mapped to %s, expected %s"),
 

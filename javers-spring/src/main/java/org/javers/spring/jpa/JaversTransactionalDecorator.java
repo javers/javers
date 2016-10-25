@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @author bartosz walacik
  */
-class JaversTransactionalDecorator implements Javers {
+public class JaversTransactionalDecorator implements Javers {
     private final Javers delegate;
     private final JaversSqlRepository javersSqlRepository;
 

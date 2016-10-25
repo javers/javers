@@ -18,9 +18,7 @@ import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.repository.jql.QueryBuilder.anyDomainObject
-import static org.javers.repository.jql.QueryBuilder.byClass
-import static org.javers.repository.jql.QueryBuilder.byInstanceId
+import static org.javers.repository.jql.QueryBuilder.*
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
@@ -928,4 +926,83 @@ class JaversRepositoryE2ETest extends Specification {
         assert snapshots[0].getPropertyValue("id") == 2
     }
 
+    def "should query withChildValueObjects for snapshots and changes by InstanceId"() {
+        given:
+        def london1v1 = new DummyAddress(city: "London", networkAddress: new DummyNetworkAddress(address: "v1"))
+        def london2v1 = new DummyAddress(city: "London 2", networkAddress: new DummyNetworkAddress(address: "v1"))
+        def london2v2 = new DummyAddress(city: "London 2", networkAddress: new DummyNetworkAddress(address: "v2"))
+
+        def objects = [
+            new SnapshotEntity(id:1, valueObjectRef: london1v1),
+            new SnapshotEntity(id:1, valueObjectRef: london2v1),
+            new SnapshotEntity(id:1, valueObjectRef: london2v2) ,
+            new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris")) , //noise
+            new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris 2")) //noise
+        ]
+        objects.each {
+            javers.commit("author", it)
+        }
+
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).withChildValueObjects().build()
+
+        when: "snapshots query"
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.each {
+            assert it.globalId == instanceId(1, SnapshotEntity) ||
+                    it.globalId.ownerId == instanceId(1, SnapshotEntity)
+        }
+        snapshots.size() == 5
+
+        when: "changes query"
+        def changes = javers.findChanges(query)
+
+        then:
+        changes.each {
+            println it
+        }
+        changes.size() == 2
+    }
+
+    def "should query withChildValueObjects for snapshots and changes by Entity type"() {
+        given:
+        def london = new DummyAddress(city: "London")
+        def paris =  new DummyAddress(city: "Paris")
+        def paris2 = new DummyAddress(city: "Paris",
+                networkAddress: new DummyNetworkAddress(address: "v2"))
+
+        def objects = [
+                new SnapshotEntity(id: 1, valueObjectRef: london),
+                new SnapshotEntity(id: 1, valueObjectRef: paris),
+                new SnapshotEntity(id: 1, valueObjectRef: paris2),
+                new SnapshotEntity(id: 1, valueObjectRef: paris2, listOfValueObjects: [london]),
+                new SnapshotEntity(id: 1, valueObjectRef: paris2, listOfValueObjects: [london, paris]),
+                new DummyUserDetails(id: 1, dummyAddress: paris) //noise
+        ]
+        objects.each {
+            javers.commit("author", it)
+        }
+
+        def query = QueryBuilder.byClass(SnapshotEntity).withChildValueObjects().build()
+
+        when: "snapshots query"
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.each {
+            assert it.globalId.typeName == SnapshotEntity.name ||
+                   it.globalId.ownerId.typeName == SnapshotEntity.name
+        }
+        snapshots.size() == 9
+
+        when: "changes query"
+        def changes = javers.findChanges(query)
+
+        then:
+        changes.each {
+            println it
+        }
+        changes.size() == 4
+    }
 }
