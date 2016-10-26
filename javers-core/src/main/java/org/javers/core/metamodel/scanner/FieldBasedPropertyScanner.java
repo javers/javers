@@ -2,6 +2,7 @@ package org.javers.core.metamodel.scanner;
 
 import org.javers.common.reflection.JaversField;
 import org.javers.common.reflection.ReflectionUtil;
+import org.javers.core.metamodel.annotation.IgnoreDeclaredProperties;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
@@ -23,9 +24,17 @@ class FieldBasedPropertyScanner implements PropertyScanner {
         List<JaversField> fields = ReflectionUtil.getAllPersistentFields(managedClass);
         List<Property> propertyList = new ArrayList<>(fields.size());
 
-        for (JaversField field : fields) {
-            boolean hasTransientAnn = field.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
-            propertyList.add(new Property(field, hasTransientAnn));
+        final IgnoreDeclaredProperties ignoreDeclaredPropertiesAnnotation = managedClass.getAnnotation(IgnoreDeclaredProperties.class);
+
+        if (ignoreDeclaredPropertiesAnnotation != null) {
+            for (JaversField field : fields) {
+                propertyList.add(new Property(field, true));
+            }
+        } else {
+            for (JaversField field : fields) {
+                boolean hasTransientAnn = field.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
+                propertyList.add(new Property(field, hasTransientAnn));
+            }
         }
         return new PropertyScan(propertyList);
     }

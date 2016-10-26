@@ -3,6 +3,7 @@ package org.javers.core.metamodel.scanner;
 import org.javers.common.collections.Sets;
 import org.javers.core.metamodel.annotation.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
