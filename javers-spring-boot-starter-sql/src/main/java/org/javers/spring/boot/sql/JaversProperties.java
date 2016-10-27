@@ -11,6 +11,8 @@ public class JaversProperties {
     private boolean prettyPrint = true;
     private boolean typeSafeValues = false;
     private String packagesToScan = "";
+    private boolean auditableAspectEnabled = true;
+    private boolean springDataAuditableRepositoryAspectEnabled = true;
 
     public String getAlgorithm() {
         return algorithm;
@@ -60,4 +62,19 @@ public class JaversProperties {
 		this.packagesToScan = packagesToScan;
 	}
 
+    public boolean isAuditableAspectEnabled() {
+        return auditableAspectEnabled;
+    }
+
+    public void setAuditableAspectEnabled(boolean auditableAspectEnabled) {
+        this.auditableAspectEnabled = auditableAspectEnabled;
+    }
+
+    public boolean isSpringDataAuditableRepositoryAspectEnabled() {
+        return springDataAuditableRepositoryAspectEnabled;
+    }
+
+    public void setSpringDataAuditableRepositoryAspectEnabled(boolean springDataAuditableRepositoryAspectEnabled) {
+        this.springDataAuditableRepositoryAspectEnabled = springDataAuditableRepositoryAspectEnabled;
+    }
 }
