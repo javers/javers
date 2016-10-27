@@ -16,6 +16,7 @@ import org.joda.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import static groovyx.gpars.GParsPool.withPool
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.QueryBuilder.*
@@ -1004,5 +1005,26 @@ class JaversRepositoryE2ETest extends Specification {
             println it
         }
         changes.size() == 4
+    }
+
+    def "should provide cluster-friendly commitId generator"(){
+        given:
+        def threads = 10
+        def javersRepo = new InMemoryRepository()
+        when:
+        withPool threads, {
+            (1..threads).collectParallel {
+                def javers = JaversBuilder.javers()
+                        .registerJaversRepository(javersRepo)
+                        .withCommitIdGenerator(CommitIdGenerator.RANDOM)
+                        .build()
+                javers.commit("author", new SnapshotEntity(id: it))
+            }
+        }
+
+        then:
+        def javers = JaversBuilder.javers().registerJaversRepository(javersRepo).build()
+        def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject().build())
+        (snapshots.collect{it -> it.commitId} as Set).size() == threads
     }
 }

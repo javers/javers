@@ -8,11 +8,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * Consists of two parts : <br>
- * majorId = PREVIOUS.majorId + 1  <br>
- * minorId = shortSequence <br>
- *
  * @see CommitSeqGenerator
+ * @see DistributedCommitSeqGenerator
  * @author bartosz walacik
  */
 public final class CommitId implements Comparable<CommitId>, Serializable {
