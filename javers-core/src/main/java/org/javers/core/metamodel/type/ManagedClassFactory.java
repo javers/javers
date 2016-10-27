@@ -6,6 +6,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.IgnoreDeclaredProperties;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScan;
@@ -40,6 +41,12 @@ class ManagedClassFactory {
     }
 
     private List<Property> filterIgnoredType(List<Property> properties, final Class<?> currentClass){
+
+        IgnoreDeclaredProperties annotation = currentClass.getAnnotation(IgnoreDeclaredProperties.class);
+        if (annotation != null) {
+            return new ArrayList<>();
+        }
+
         return Lists.negativeFilter(properties, new Predicate<Property>() {
             public boolean apply(Property property) {
                 if (property.getRawType() == currentClass){
