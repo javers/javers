@@ -95,7 +95,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         relationBuilder
                 .withAttribute().string(COMMIT_AUTHOR).withMaxLength(200).and()
                 .withAttribute().timestamp(COMMIT_COMMIT_DATE).and()
-                .withAttribute().number(COMMIT_COMMIT_ID).withIntegerPrecision(12).withDecimalPrecision(2).and()
+                .withAttribute().number(COMMIT_COMMIT_ID).withIntegerPrecision(22).withDecimalPrecision(2).and()
                 .build();
 
         columnsIndex(tableName, schema, COMMIT_COMMIT_ID);
