@@ -1,11 +1,12 @@
 package org.javers.repository.sql.finders;
 
-import com.google.common.base.Joiner;
 import org.javers.common.collections.Function;
 import org.javers.common.collections.Sets;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.query.SelectQuery;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
@@ -42,12 +43,12 @@ class ManagedClassFilter extends SnapshotFilter {
     }
 
     private String getCondition() {
-        Set<String> managedTypesInApostrophes = Sets.transform(managedTypes, new Function<String, String>() {
+        Set<String> managedTypesInQuotes = Sets.transform(managedTypes, new Function<String, String>() {
             @Override
             public String apply(String managedType) {
                 return "'" + managedType + "'";
             }
         });
-        return SNAPSHOT_MANAGED_TYPE + " in (" + Joiner.on(",").join(managedTypesInApostrophes) + ")";
+        return SNAPSHOT_MANAGED_TYPE + " in (" + ToStringBuilder.join(new ArrayList<>(managedTypesInQuotes)) + ")";
     }
 }
