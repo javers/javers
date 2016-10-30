@@ -13,6 +13,7 @@ import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * JaversRepository is responsible for persisting {@link Commit}s calculated by Javers core.
@@ -53,13 +54,13 @@ public interface JaversRepository {
     List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams);
 
     /**
-     * All snapshots of objects within a given managed class,
+     * All snapshots of objects within given managed classes,
      * in reverse chronological order
      *
      * @param queryParams parameters constraining returned list (size limit, date from/to)
      * @return empty List if no snapshots found
      */
-    List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams);
+    List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams);
 
     /**
      * Latest snapshot of given object,

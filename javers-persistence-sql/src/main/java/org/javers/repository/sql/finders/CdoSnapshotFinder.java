@@ -1,7 +1,9 @@
 package org.javers.repository.sql.finders;
 
+import org.javers.common.collections.Function;
 import org.javers.common.collections.Optional;
 import org.javers.common.collections.Pair;
+import org.javers.common.collections.Sets;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -11,8 +13,8 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
-import org.javers.repository.sql.schema.TableNameProvider;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
+import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
 import org.polyjdbc.core.query.SelectQuery;
@@ -64,8 +66,14 @@ public class CdoSnapshotFinder {
         return fetchCdoSnapshots(new SnapshotIdentifiersFilter(tableNameProvider, globalIdRepository, snapshotIdentifiers), Optional.<QueryParams>empty());
     }
 
-    public List<CdoSnapshot> getStateHistory(ManagedType managedType, QueryParams queryParams) {
-        ManagedClassFilter classFilter = new ManagedClassFilter(tableNameProvider, managedType.getName(), queryParams.isAggregate());
+    public List<CdoSnapshot> getStateHistory(Set<ManagedType> managedTypes, QueryParams queryParams) {
+        Set<String> managedTypeNames = Sets.transform(managedTypes, new Function<ManagedType, String>() {
+            @Override
+            public String apply(ManagedType managedType) {
+                return managedType.getName();
+            }
+        });
+        ManagedClassFilter classFilter = new ManagedClassFilter(tableNameProvider, managedTypeNames, queryParams.isAggregate());
         return fetchCdoSnapshots(classFilter, Optional.of(queryParams));
     }
 
