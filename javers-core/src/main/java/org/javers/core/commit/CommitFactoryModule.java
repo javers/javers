@@ -18,7 +18,9 @@ public class CommitFactoryModule extends InstantiatingModule {
     protected Collection<Class> getImplementations() {
         return (Collection)Lists.asList(
                 CommitFactory.class,
-                CommitSeqGenerator.class
+                CommitSeqGenerator.class,
+                CommitIdFactory.class,
+                DistributedCommitSeqGenerator.class
         );
     }
 }

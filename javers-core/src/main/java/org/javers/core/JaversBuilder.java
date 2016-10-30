@@ -411,6 +411,21 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
+     * Default is {@link CommitIdGenerator#SYNCHRONIZED_SEQUENCE}
+     * <br/><br/>
+     *
+     * If your application is distributed, use cluster-friendly {@link CommitIdGenerator#RANDOM}
+     * (when more than one JaVers instance writes to a shared database).
+     *
+     * @since 2.6
+     */
+    public JaversBuilder withCommitIdGenerator(CommitIdGenerator commitIdGenerator) {
+        argumentIsNotNull(commitIdGenerator);
+        coreConfiguration().withCommitIdGenerator(commitIdGenerator);
+        return this;
+    }
+
+    /**
      * When enabled, {@link Javers#compare(Object oldVersion, Object currentVersion)}
      * generates additional 'Snapshots' of new objects (objects added in currentVersion graph).
      * <br/>

@@ -52,10 +52,12 @@ public class JaversSchemaManager extends SchemaNameAware {
 
     /**
      * JaVers 1.3.15 to 1.3.16 schema migration
+     * JaVers 2.5 to 2.6 schema migration
      */
     private void alterCommitIdColumnIfNeeded() {
 
-        if (getTypeOf(getCommitTableNameWithSchema(), "commit_id") == Types.VARCHAR) {
+        ColumnType commitIdColType = getTypeOf(getCommitTableNameWithSchema(), "commit_id");
+        if (commitIdColType.type == Types.VARCHAR) {
             logger.info("migrating db schema from JaVers 1.3.15 to 1.3.16 ...");
 
             if (dialect instanceof PostgresDialect) {
@@ -69,6 +71,25 @@ public class JaversSchemaManager extends SchemaNameAware {
             } else if (dialect instanceof MsSqlDialect) {
                 executeSQL("drop index jv_commit_commit_id_idx on " + getCommitTableNameWithSchema());
                 executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id numeric(12,2)");
+                executeSQL("CREATE INDEX jv_commit_commit_id_idx ON " + getCommitTableNameWithSchema() + " (commit_id)");
+            } else {
+                handleUnsupportedDialect();
+            }
+        }
+
+        if (commitIdColType.precision == 12) {
+            logger.info("migrating db schema from JaVers 2.5 to 2.6 ...");
+            if (dialect instanceof PostgresDialect) {
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id TYPE numeric(22,2)");
+            } else if (dialect instanceof H2Dialect) {
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id numeric(22,2)");
+            } else if (dialect instanceof MysqlDialect) {
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY commit_id numeric(22,2)");
+            } else if (dialect instanceof OracleDialect) {
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY commit_id number(22,2)");
+            } else if (dialect instanceof MsSqlDialect) {
+                executeSQL("drop index jv_commit_commit_id_idx on " + getCommitTableNameWithSchema());
+                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id numeric(22,2)");
                 executeSQL("CREATE INDEX jv_commit_commit_id_idx ON " + getCommitTableNameWithSchema() + " (commit_id)");
             } else {
                 handleUnsupportedDialect();
@@ -176,17 +197,18 @@ public class JaversSchemaManager extends SchemaNameAware {
         }
     }
 
-    private int getTypeOf(String tableName, String colName) {
+    private ColumnType getTypeOf(String tableName, String colName) {
         try {
             Statement stmt = connectionProvider.getConnection().createStatement();
 
             ResultSet res = stmt.executeQuery("select " + colName + " from " + tableName + " where 1<0");
             int colType = res.getMetaData().getColumnType(1);
+            int colPrec = res.getMetaData().getPrecision(1);
 
             stmt.close();
             res.close();
 
-            return colType;
+            return new ColumnType(colType, colPrec);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -239,5 +261,15 @@ public class JaversSchemaManager extends SchemaNameAware {
 
     public void dropSchema() {
         throw new RuntimeException("not implemented");
+    }
+
+    static class ColumnType {
+        final int type;
+        final int precision;
+
+        ColumnType(int type, int precision) {
+            this.type = type;
+            this.precision = precision;
+        }
     }
 }

@@ -14,9 +14,30 @@ public class JaversCoreConfiguration {
 
     private boolean newObjectsSnapshot = false;
 
-    /**
-     * @return never returns null
-     */
+    private CommitIdGenerator commitIdGenerator = CommitIdGenerator.SYNCHRONIZED_SEQUENCE;
+
+    JaversCoreConfiguration withMappingStyle(MappingStyle mappingStyle) {
+        Validate.argumentIsNotNull(mappingStyle);
+        this.mappingStyle = mappingStyle;
+        return this;
+    }
+
+    JaversCoreConfiguration withCommitIdGenerator(CommitIdGenerator commitIdGenerator) {
+        Validate.argumentIsNotNull(commitIdGenerator);
+        this.commitIdGenerator = commitIdGenerator;
+        return this;
+    }
+
+    JaversCoreConfiguration withNewObjectsSnapshot(boolean newObjectsSnapshot) {
+        this.newObjectsSnapshot = newObjectsSnapshot;
+        return this;
+    }
+
+    JaversCoreConfiguration withListCompareAlgorithm(ListCompareAlgorithm algorithm) {
+        this.listCompareAlgorithm = algorithm;
+        return this;
+    }
+
     public MappingStyle getMappingStyle() {
         return mappingStyle;
     }
@@ -29,19 +50,7 @@ public class JaversCoreConfiguration {
         return newObjectsSnapshot;
     }
 
-    public JaversCoreConfiguration withMappingStyle(MappingStyle mappingStyle) {
-        Validate.argumentIsNotNull(mappingStyle);
-        this.mappingStyle = mappingStyle;
-        return this;
-    }
-
-    public JaversCoreConfiguration withNewObjectsSnapshot(boolean newObjectsSnapshot) {
-        this.newObjectsSnapshot = newObjectsSnapshot;
-        return this;
-    }
-
-    public JaversCoreConfiguration withListCompareAlgorithm(ListCompareAlgorithm algorithm) {
-        this.listCompareAlgorithm = algorithm;
-        return this;
+    public CommitIdGenerator getCommitIdGenerator() {
+        return commitIdGenerator;
     }
 }
