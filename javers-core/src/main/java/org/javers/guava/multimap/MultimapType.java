@@ -29,13 +29,12 @@ public class MultimapType extends EnumerableType{
     }
 
 
-    @Override
-    public Object map(Object sourceMultimap_, EnumerableFunction mapFunction, OwnerContext owner){
+    public static Multimap mapStatic(Object sourceMultimap_, EnumerableFunction mapFunction, OwnerContext owner){
         Validate.argumentIsNotNull(mapFunction);
         Multimap sourceMultimap = toNotNullMultimap(sourceMultimap_);
         Multimap targetMultimap = HashMultimap.create();
 
-        MapEnumerationOwnerContext enumeratorContext = new MapEnumerationOwnerContext(owner);
+        MultimapEnumerationOwnerContext enumeratorContext = new MultimapEnumerationOwnerContext(owner);
 
         Collection<Map.Entry<?, ?>> entries = sourceMultimap.entries();
         for (Map.Entry<?, ?> entry : entries){
@@ -45,14 +44,20 @@ public class MultimapType extends EnumerableType{
 
             //value
             enumeratorContext.switchToValue(mappedKey);
-            Object mappedValue = mapFunction.apply(entry.getValue(), enumeratorContext);
+            Object value = entry.getValue();
+            Object mappedValue = mapFunction.apply(value, enumeratorContext);
 
             targetMultimap.put(mappedKey, mappedValue);
         }
         return Multimaps.unmodifiableMultimap(targetMultimap);
     }
 
-    private Multimap toNotNullMultimap(Object sourceMap){
+    @Override
+    public Multimap map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
+        return mapStatic(sourceMap_, mapFunction, owner);
+    }
+
+    private static Multimap toNotNullMultimap(Object sourceMap){
         if (sourceMap == null){
             return HashMultimap.create();
         }else{
@@ -78,5 +83,14 @@ public class MultimapType extends EnumerableType{
      */
     public Type getValueType(){
             return getConcreteClassTypeArguments().get(1);
+    }
+
+    /**
+     * marker class
+     */
+    public static class MultimapEnumerationOwnerContext extends MapEnumerationOwnerContext{
+        MultimapEnumerationOwnerContext(OwnerContext ownerContext) {
+            super(ownerContext);
+        }
     }
 }

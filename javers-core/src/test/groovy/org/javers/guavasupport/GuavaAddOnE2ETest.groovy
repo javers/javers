@@ -1,14 +1,18 @@
 package org.javers.guavasupport
+
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.HashMultiset
 import com.google.common.collect.Multimap
+import org.javers.core.diff.Change
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import org.javers.guava.multimap.MultimapChange
+import org.javers.guava.multiset.MultisetChange
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
+
 /**
  * @author akrystian
  */
@@ -29,16 +33,17 @@ class GuavaAddOnE2ETest extends Specification {
         def diff = javers.compare(left, right)
 
         then:
-        diff.changes.size() == 1
-        def changes = diff.changes[0].changes
-        changes.size() == extpectedChanges
+        diff.changes.size() == extpectedChanges
+        def actualContainerChanges = getContainerChanges(diff.changes)
+        actualContainerChanges.size() == 1
+        actualContainerChanges[0].changes.size() == expectedContainerChanges
 
         where:
-        leftList     | rightList                | extpectedChanges
-        ["New York"] | ["Boston"]               | 2
-        ["New York"] | ["New York", "New York"] | 1
-        []           | ["New York"]             | 1
-        ["New York"] | []                       | 1
+        leftList     | rightList                | extpectedChanges | expectedContainerChanges
+        ["New York"] | ["Boston"]               | 1                | 2
+        ["New York"] | ["New York", "New York"] | 1                | 1
+        []           | ["New York"]             | 1                | 1
+        ["New York"] | []                       | 1                | 1
     }
 
     @Unroll
@@ -68,18 +73,19 @@ class GuavaAddOnE2ETest extends Specification {
 
         when:
         def diff = javers.compare(left, right)
-        
+
         then:
-        diff.changes.size() == 1
-        def changes = diff.changes
-       changes.size() == extpectedChanges
+        diff.changes.size() == extpectedChanges
+        def actualContainerChanges = getContainerChanges(diff.changes)
+        actualContainerChanges.size() == 1
+        actualContainerChanges[0].changes.size() == expectedContainerChanges
 
         where:
-        leftList                             | rightList                                                                | extpectedChanges
-        [new DummyAddress(city: "New York")] | [new DummyAddress(city: "Buffalo")]                                      | 2
-        [new DummyAddress(city: "New York")] | [new DummyAddress(city: "New York"), new DummyAddress(city: "New York")] | 1
-        []                                   | [new DummyAddress(city: "New York")]                                     | 1
-        [new DummyAddress(city: "New York")] | []                                                                       | 1
+        leftList                             | rightList                                                                | extpectedChanges | expectedContainerChanges
+        [new DummyAddress(city: "New York")] | [new DummyAddress(city: "Buffalo")]                                      | 3                | 2
+        [new DummyAddress(city: "New York")] | [new DummyAddress(city: "New York"), new DummyAddress(city: "New York")] | 1                | 1
+        []                                   | [new DummyAddress(city: "New York")]                                     | 2                | 1
+        [new DummyAddress(city: "New York")] | []                                                                       | 2                | 1
     }
 
     @Unroll
@@ -104,7 +110,7 @@ class GuavaAddOnE2ETest extends Specification {
     }
 
 
-    @Unroll 
+    @Unroll
     def "should detect value changes in Multimap of primitives "() {
         given:
         def left = new SnapshotEntity(multiMapOfPrimitives: HashMultimap.create(leftList))
@@ -128,7 +134,7 @@ class GuavaAddOnE2ETest extends Specification {
         extpectedChanges << [2, 1, 1]
     }
 
-    @Unroll 
+    @Unroll
     def "should detect value changes in Multimap of ValueObjects "() {
         given:
         def left = new SnapshotEntity(multiMapValueObject: HashMultimap.create(leftList))
@@ -138,21 +144,25 @@ class GuavaAddOnE2ETest extends Specification {
         def diff = javers.compare(left, right)
 
         then:
-        diff.changes.size() == 1
-        def changes = ((MultimapChange) diff.changes[0]).entryChanges
-        changes.size() == extpectedChanges
+        println leftList.toString() + "|| " + rightList.toString()
+        diff.changes.size() == extpectedChanges
+        def actualContainerChanges = getContainerChanges(diff.changes)
+        actualContainerChanges.size() == 1
+        actualContainerChanges[0].entryChanges.size() == expectedContainerChanges
 
         where:
-        leftList << [createMultiMap(["New York"], [new DummyAddress(city: "New York", street: "Maple St")]),
-                     createMultiMap(["New York", "New York"], [new DummyAddress(city: "New York", street: "Maple St"), new DummyAddress(city: "Buffalo", street: "Maple St")]),
+        leftList << [createMultiMap(["New York"], [new DummyAddress(city: "New York City")]),
+                     createMultiMap(["New York", "New York"], [new DummyAddress(city: "New York City"), new DummyAddress(city: "Buffalo")]),
                      HashMultimap.create()]
-        rightList << [createMultiMap(["New York"], [new DummyAddress(city: "New York", street: "Troy Ave")]),
-                      createMultiMap(["New York", "New York", "Alabama"], [new DummyAddress(city: "New York", street: "Maple St"), new DummyAddress(city: "Buffalo", street: "Maple St"), new DummyAddress(city: "Akron", street: "S Main St")]),
-                      createMultiMap(["New York"], [new DummyAddress(city: "New York", street: "Maple St")])]
-        extpectedChanges << [2, 1, 1]
+        rightList << [createMultiMap(["New York"], [new DummyAddress(city: "Buffalo")]),
+                      createMultiMap(["New York", "New York", "Alabama"], [new DummyAddress(city: "New York City"),
+                                                                           new DummyAddress(city: "Buffalo"), new DummyAddress(city: "Akron")]),
+                      createMultiMap(["New York"], [new DummyAddress(city: "New York City")])]
+        extpectedChanges << [3, 2, 2]
+        expectedContainerChanges << [2, 1, 1]
     }
 
-    @Unroll 
+    @Unroll
     def "should not detect value changes in Multimap of primitives"() {
         given:
         def left = new SnapshotEntity(multiMapOfPrimitives: HashMultimap.create(leftList))
@@ -195,38 +205,14 @@ class GuavaAddOnE2ETest extends Specification {
                              [new DummyAddress(city: "New York", street: "Maple St"), new DummyAddress(city: "Buffalo", street: "Maple St")]),
                      HashMultimap.create()]
         rightList << [createMultiMap(
-                             ["New York"],
-                             [new DummyAddress(city: "New York", street: "Maple St")]),
-                     createMultiMap(
-                             ["New York", "New York"],
-                             [new DummyAddress(city: "New York", street: "Maple St"), new DummyAddress(city: "Buffalo", street: "Maple St")]),
-                     HashMultimap.create()]
+                              ["New York"],
+                              [new DummyAddress(city: "New York", street: "Maple St")]),
+                      createMultiMap(
+                              ["New York", "New York"],
+                              [new DummyAddress(city: "New York", street: "Maple St"), new DummyAddress(city: "Buffalo", street: "Maple St")]),
+                      HashMultimap.create()]
     }
 
-
-    @Unroll
-    def "should detect value changes in map of ValueObjects "() {
-        def javers = org.javers.core.JaversBuilder.javers().build()
-        given:
-        def left = new SnapshotEntity(mapPrimitiveToVO: leftMap)
-        def right = new SnapshotEntity(mapPrimitiveToVO: rightMap)
-
-        when:
-        def diff = javers.compare(left, right)
-
-        then:
-        println diff
-        diff.changes.size() == extpectedChanges
-
-        where:
-        leftMap << [["New York" : new DummyAddress(city: "New York", street: "Maple St")],
-                    ["New York" : new DummyAddress(city: "New York", street: "Maple St"),"Alabama": new DummyAddress(city: "Buffalo", street: "Maple St")],
-                    [:]]
-        rightMap << [["New York":new DummyAddress(city: "New York", street: "Troy Ave")],
-                     ["New York":new DummyAddress(city: "New York", street: "Maple St"),"Toronto":  new DummyAddress(city: "Buffalo", street: "Maple St")],
-                     ["New York":new DummyAddress(city: "New York", street: "Maple St")]]
-        extpectedChanges << [2, 1, 1]
-    }
 
     private <K, V> Multimap createMultiMap(List<K> keys, List<V> values) {
         def hashMultimap = HashMultimap.create()
@@ -234,5 +220,10 @@ class GuavaAddOnE2ETest extends Specification {
             hashMultimap.put(keys[i], values[i])
         }
         hashMultimap
+    }
+
+    private Collection<Change> getContainerChanges(final Collection<Change> changes) {
+        def result = changes.findAll { it instanceof MultimapChange || it instanceof MultisetChange }
+        result
     }
 }

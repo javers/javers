@@ -4,6 +4,7 @@ import org.javers.common.collections.EnumerableFunction;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
+import org.javers.guava.multimap.MultimapType;
 
 /**
  * @author bartosz walacik
@@ -53,7 +54,7 @@ class EdgeBuilder {
         Object container = node.getPropertyValue(containerProperty);
 
         EnumerableFunction edgeBuilder = null;
-        if (enumerableType instanceof MapType){
+        if (enumerableType instanceof MapType || enumerableType instanceof MultimapType){
             edgeBuilder = new MultiEdgeMapBuilderFunction(multiEdge);
         } else if (enumerableType instanceof ContainerType){
             edgeBuilder = new MultiEdgeContainerBuilderFunction(multiEdge);

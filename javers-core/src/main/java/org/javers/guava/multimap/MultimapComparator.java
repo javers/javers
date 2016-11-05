@@ -22,9 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Compares Multimap.
@@ -73,16 +71,11 @@ public class MultimapComparator extends GuavaCollectionsComparator implements Cu
         }
     }
 
-    private List<EntryChange> calculateEntryChanges(MultimapType multisetType, Multimap left, Multimap right, OwnerContext owner){
-        DehydrateMapFunction dehydrateFunction = getDehydrateMapFunction(multisetType);
+    private List<EntryChange> calculateEntryChanges(MultimapType multimapType, Multimap left, Multimap right, OwnerContext owner){
+        DehydrateMapFunction dehydrateFunction = getDehydrateMapFunction(multimapType);
 
-        Multimap leftMultimap = (Multimap) multisetType.map(left, dehydrateFunction, owner);
-        Multimap rightMultimap = (Multimap) multisetType.map(right, dehydrateFunction, owner);
-
-
-        if (Objects.equals(leftMultimap, rightMultimap)){
-            return Collections.EMPTY_LIST;
-        }
+        Multimap leftMultimap = multimapType.map(left, dehydrateFunction, owner);
+        Multimap rightMultimap = multimapType.map(right, dehydrateFunction, owner);
 
         List<EntryChange> changes = new ArrayList<>();
 
@@ -90,7 +83,8 @@ public class MultimapComparator extends GuavaCollectionsComparator implements Cu
             Multiset leftVal = HashMultiset.create(leftMultimap.get(commonKey));
             Multiset rightVal = HashMultiset.create(rightMultimap.get(commonKey));
 
-            if (!Objects.equals(leftVal, rightVal)){
+            Multiset differences = Multisets.difference(leftVal, rightVal);
+            if (differences.size() > 0){
                 calculateValueChanges(changes, commonKey, leftVal, rightVal);
             }
         }
@@ -119,9 +113,9 @@ public class MultimapComparator extends GuavaCollectionsComparator implements Cu
         }
     }
 
-    private DehydrateMapFunction getDehydrateMapFunction(MultimapType multisetType){
-        JaversType keyType = typeMapper.getJaversType(multisetType.getKeyType());
-        JaversType valueType = typeMapper.getJaversType(multisetType.getValueType());
+    private DehydrateMapFunction getDehydrateMapFunction(MultimapType multimapType){
+        JaversType keyType = typeMapper.getJaversType(multimapType.getKeyType());
+        JaversType valueType = typeMapper.getJaversType(multimapType.getValueType());
 
         MultiMapContentType multiMapContentType = new MultiMapContentType(keyType, valueType);
         return new DehydrateMapFunction(globalIdFactory, multiMapContentType);
