@@ -9,4 +9,12 @@ import org.javers.core.metamodel.annotation.IgnoreDeclaredProperties
 class DummyIgnoredPropertiesType extends DummyUser{
     private int propertyThatShouldBeIgnored
     private int anotherIgnored
+
+    int getPropertyThatShouldBeIgnored() {
+        return propertyThatShouldBeIgnored
+    }
+
+    int getAnotherIgnored() {
+        return anotherIgnored
+    }
 }

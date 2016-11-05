@@ -91,9 +91,9 @@ abstract class PropertyScannerTest extends Specification {
         assertThat(properties).hasProperty("propertyWithDiffIgnoreAnn").isTransient()
     }
 
-    def "should scan all properties of classes marked as @IgnoreAllProperties as transient"() {
+    def "should scan all properties of classes marked as @IgnoreDeclaredProperties as transient"() {
         when:
-        def properties = propertyScanner.scan(DummyIgnoredPropertiesType)
+        def properties = propertyScanner.scan(DummyIgnoredPropertiesType, true)
 
         then:
         assertThat(properties).hasProperty("propertyThatShouldBeIgnored").isTransient()
