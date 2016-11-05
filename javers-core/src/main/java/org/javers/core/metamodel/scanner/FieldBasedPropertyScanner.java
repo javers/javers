@@ -2,7 +2,6 @@ package org.javers.core.metamodel.scanner;
 
 import org.javers.common.reflection.JaversField;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.metamodel.annotation.IgnoreDeclaredProperties;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
@@ -20,21 +19,15 @@ class FieldBasedPropertyScanner implements PropertyScanner {
     }
 
     @Override
-    public PropertyScan scan(Class<?> managedClass) {
-        final IgnoreDeclaredProperties ignoreDeclaredPropertiesAnnotation = managedClass.getAnnotation(IgnoreDeclaredProperties.class);
+    public PropertyScan scan(Class<?> managedClass, ClassAnnotationsScan classScan) {
         List<JaversField> fields = ReflectionUtil.getAllPersistentFields(managedClass);
         List<Property> propertyList = new ArrayList<>(fields.size());
 
-        if (ignoreDeclaredPropertiesAnnotation != null) {
-            for (JaversField field : fields) {
-                propertyList.add(new Property(field, true));
-            }
-        } else {
-            for (JaversField field : fields) {
-                boolean hasTransientAnn = field.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
-                boolean hasShallowReferenceAnn = field.hasAnyAnnotation(annotationNamesProvider.getShallowReferenceAliases());
-                propertyList.add(new Property(field, hasTransientAnn, hasShallowReferenceAnn));
-            }
+        for (JaversField field : fields) {
+            boolean isIgnoredInType = classScan.hasIgnoreDeclaredProperties() && field.getDeclaringClass().equals(managedClass);
+            boolean hasTransientAnn = field.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
+            boolean hasShallowReferenceAnn = field.hasAnyAnnotation(annotationNamesProvider.getShallowReferenceAliases());
+            propertyList.add(new Property(field, hasTransientAnn || isIgnoredInType, hasShallowReferenceAnn));
         }
         return new PropertyScan(propertyList);
     }

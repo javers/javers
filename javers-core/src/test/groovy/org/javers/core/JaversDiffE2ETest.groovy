@@ -304,33 +304,21 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         javers.compare(left, right).changes.size() == 0
     }
 
-    def "should ignore all properties of a class with @IgnoreAllProperties"(){
+    def "should ignore properties declared in a class with @IgnoreDeclaredProperties"(){
         given:
         def javers = javers().build()
-        def left =  new DummyIgnoredPropertiesType('name', 1, 1, 5)
-        def right = new DummyIgnoredPropertiesType('name', 2, 2, 10)
-
-        expect:
-        javers.compare(left, right).changes.size() == 0
-    }
-
-    def "should append one newobject with correct entity type, when it is annotated with @IgnoreAllProperties"() {
-
-        given:
-        def cdoRight = dummyIgnoredPropertiesType('nameChange', 10)
-        def left =  buildLiveGraph(dummyUser('name'))
-        def right = buildLiveGraph(cdoRight)
+        def left =  new DummyIgnoredPropertiesType(name:"bob", age: 15, propertyThatShouldBeIgnored: 1, anotherIgnored: 1)
+        def right = new DummyIgnoredPropertiesType(name:"bob", age: 16, propertyThatShouldBeIgnored: 2, anotherIgnored: 2)
 
         when:
-        def changes = new NewObjectAppender().getChangeSet(new GraphPair(left, right))
+
+        println javers.getTypeMapping(DummyIgnoredPropertiesType).prettyPrint()
+
+        def diff = javers.compare(left, right)
 
         then:
-        changes.size() == 1
-        assertThat(changes[0])
-                .isNewObject()
-                .hasCdoId("nameChange")
-                .hasEntityTypeOf(DummyIgnoredPropertiesType)
-                .hasAffectedCdo(cdoRight)
+        diff.changes.size() == 1
+        diff.changes[0].propertyName == "age"
     }
 
     class SetValueObject {

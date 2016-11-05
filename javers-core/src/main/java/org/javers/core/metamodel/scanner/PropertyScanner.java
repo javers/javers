@@ -6,5 +6,5 @@ package org.javers.core.metamodel.scanner;
  * @author pawel szymczyk
  */
 interface PropertyScanner {
-    PropertyScan scan(Class<?> managedClass);
+    PropertyScan scan(Class<?> managedClass, ClassAnnotationsScan classScan);
 }
