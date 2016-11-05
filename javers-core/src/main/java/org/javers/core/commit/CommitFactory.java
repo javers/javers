@@ -27,20 +27,20 @@ import java.util.Map;
 public class CommitFactory {
     private final DiffFactory diffFactory;
     private final JaversExtendedRepository javersRepository;
-    private final CommitSeqGenerator commitSeqGenerator;
     private final DateProvider dateProvider;
     private final GraphSnapshotFacade graphSnapshotFacade;
     private final LiveGraphFactory liveGraphFactory;
     private final SnapshotFactory snapshotFactory;
+    private final CommitIdFactory commitIdFactory;
 
-    public CommitFactory(DiffFactory diffFactory, JaversExtendedRepository javersRepository, CommitSeqGenerator commitSeqGenerator, DateProvider dateProvider, GraphSnapshotFacade graphSnapshotFacade, LiveGraphFactory liveGraphFactory, SnapshotFactory snapshotFactory) {
+    public CommitFactory(DiffFactory diffFactory, JaversExtendedRepository javersRepository, DateProvider dateProvider, GraphSnapshotFacade graphSnapshotFacade, LiveGraphFactory liveGraphFactory, SnapshotFactory snapshotFactory, CommitIdFactory commitIdFactory) {
         this.diffFactory = diffFactory;
         this.javersRepository = javersRepository;
-        this.commitSeqGenerator = commitSeqGenerator;
         this.dateProvider = dateProvider;
         this.graphSnapshotFacade = graphSnapshotFacade;
         this.liveGraphFactory = liveGraphFactory;
         this.snapshotFactory = snapshotFactory;
+        this.commitIdFactory = commitIdFactory;
     }
 
     public Commit createTerminalByGlobalId(String author, Map<String, String> properties, GlobalId removedId){
@@ -72,9 +72,6 @@ public class CommitFactory {
     }
 
     private CommitMetadata nextCommit(String author, Map<String, String> properties){
-        CommitId head = javersRepository.getHeadId();
-        CommitId newId = commitSeqGenerator.nextId(head);
-        return new CommitMetadata(author, properties, dateProvider.now(), newId);
+        return new CommitMetadata(author, properties, dateProvider.now(), commitIdFactory.nextId());
     }
-
 }

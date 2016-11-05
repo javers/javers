@@ -1,24 +1,36 @@
 package org.javers.repository.jql;
 
+import org.javers.common.collections.Function;
+import org.javers.common.collections.Sets;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
+
+import java.util.Set;
 
 /**
  * @author bartosz.walacik
  */
 class ClassFilter extends Filter {
-    private final Class requiredClass;
+    private final Set<Class> requiredClasses;
 
-    ClassFilter(Class aClass) {
-        Validate.argumentIsNotNull(aClass);
-        this.requiredClass = aClass;
+    ClassFilter(Set<Class> requiredClasses) {
+        Validate.argumentIsNotNull(requiredClasses);
+        this.requiredClasses = requiredClasses;
     }
 
-    public Class getRequiredClass() {
-        return requiredClass;
+    public Set<Class> getRequiredClasses() {
+        return requiredClasses;
     }
 
     @Override
     public String toString() {
-        return "class=" + requiredClass.getName();
+        return "classes=" + ToStringBuilder.setToString(
+            Sets.transform(requiredClasses, new Function<Class, String>() {
+                @Override
+                public String apply(Class javaClass) {
+                    return javaClass.getName();
+                }
+            })
+        );
     }
 }

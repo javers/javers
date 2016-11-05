@@ -1,5 +1,6 @@
 package org.javers.repository.jql;
 
+import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -53,7 +54,7 @@ public class QueryBuilder {
 
     /**
      * Query for selecting changes (or snapshots) made on
-     * any object (Entity or ValueObject) of given class.
+     * any object (Entity or ValueObject) of given classes.
      * <br/><br/>
      *
      * For example, last changes on any object of MyClass.class:
@@ -61,8 +62,8 @@ public class QueryBuilder {
      * javers.findChanges( QueryBuilder.byClass(MyClass.class).build() );
      * </pre>
      */
-    public static QueryBuilder byClass(Class requiredClass){
-        return new QueryBuilder(new ClassFilter(requiredClass));
+    public static QueryBuilder byClass(Class... requiredClasses){
+        return new QueryBuilder(new ClassFilter(Sets.asSet(requiredClasses)));
     }
 
     /**
@@ -174,7 +175,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Optional filter for Entity queries ({@link #byInstanceId(Object, Class)} and {@link #byClass(Class)}).
+     * Optional filter for Entity queries ({@link #byInstanceId(Object, Class)} and {@link #byClass(Class...)}).
      * Can be used with both changes and snapshots queries.
      * <br/><br/>
      *

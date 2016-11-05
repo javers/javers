@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -84,11 +85,13 @@ public class JaversMongoAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "javers.auditableAspectEnabled", havingValue = "true", matchIfMissing = true)
     public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider) {
         return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider());
     }
 
     @Bean
+    @ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider) {
         return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider());
     }

@@ -2,14 +2,15 @@ package org.javers.core.commit;
 
 /**
  * Generates unique and monotonically increasing commit identifiers. <br>
- * Thread safe
+ * Thread safe. Should not be used in distributed applications.
  *
+ * @see DistributedCommitSeqGenerator
  * @author bartosz walacik
  */
 class CommitSeqGenerator {
     private HandedOutIds handedOut = new HandedOutIds();
 
-    public synchronized CommitId nextId(CommitId head)
+    synchronized CommitId nextId(CommitId head)
     {
         Long major = getHeadMajorId(head) + 1;
 

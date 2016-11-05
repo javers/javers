@@ -21,6 +21,7 @@ import org.javers.repository.sql.schema.JaversSchemaManager;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class JaversSqlRepository implements JaversRepository {
 
@@ -86,8 +87,8 @@ public class JaversSqlRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
-        return finder.getStateHistory(givenClass, queryParams);
+    public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
+        return finder.getStateHistory(givenClasses, queryParams);
     }
 
     @Override

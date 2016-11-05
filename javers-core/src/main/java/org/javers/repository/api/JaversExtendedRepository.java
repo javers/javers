@@ -47,10 +47,10 @@ public class JaversExtendedRepository implements JaversRepository {
         return filterByPropertyName(changes, queryParams);
     }
 
-    public List<Change> getChangeHistory(ManagedType givenClass, QueryParams queryParams) {
-        argumentsAreNotNull(givenClass, queryParams);
+    public List<Change> getChangeHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
+        argumentsAreNotNull(givenClasses, queryParams);
 
-        List<CdoSnapshot> snapshots = getStateHistory(givenClass, queryParams);
+        List<CdoSnapshot> snapshots = getStateHistory(givenClasses, queryParams);
         List<Change> changes = getChangesIntroducedBySnapshots(queryParams.newObjectChanges() ? snapshots : skipInitial(snapshots));
         return filterByPropertyName(changes, queryParams);
     }
@@ -100,8 +100,8 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
-        return delegate.getStateHistory(givenClass, queryParams);
+    public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
+        return delegate.getStateHistory(givenClasses, queryParams);
     }
 
     @Override

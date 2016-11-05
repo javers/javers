@@ -92,16 +92,18 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     @Override
-    public List<CdoSnapshot> getStateHistory(ManagedType givenClass, QueryParams queryParams) {
-        Validate.argumentsAreNotNull(givenClass, queryParams);
+    public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
+        Validate.argumentsAreNotNull(givenClasses, queryParams);
         List<CdoSnapshot> filtered = new ArrayList<>();
 
         for (CdoSnapshot snapshot : getAll()) {
-            if (snapshot.getGlobalId().isTypeOf(givenClass)) {
-                filtered.add(snapshot);
-            }
-            if (queryParams.isAggregate() && isParent(givenClass, snapshot.getGlobalId())){
-                filtered.add(snapshot);
+            for (ManagedType givenClass : givenClasses) {
+                if (snapshot.getGlobalId().isTypeOf(givenClass)) {
+                    filtered.add(snapshot);
+                }
+                if (queryParams.isAggregate() && isParent(givenClass, snapshot.getGlobalId())){
+                    filtered.add(snapshot);
+                }
             }
         }
 

@@ -16,6 +16,7 @@ import org.joda.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import static groovyx.gpars.GParsPool.withPool
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.QueryBuilder.*
@@ -295,6 +296,35 @@ class JaversRepositoryE2ETest extends Specification {
                      new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "London"))],
                     [new DummyAddress(city:"London"), new DummyAddress(city:"Paris")]
                    ]
+    }
+
+    @Unroll
+    def "should query for snapshots by multiple classes"() {
+        given:
+        javers.commit("author", new DummyUser(name: "Alice", dummyUserDetails: new DummyUserDetails(id: 66)))
+        javers.commit("author", new DummyUser(name: "Bob"))
+        javers.commit("author", new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "Berlin")))
+        javers.commit("author", new SnapshotEntity(id: 2))
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.size() == expectedGlobalIds.size()
+        snapshots.every { snapshot -> snapshot.globalId in expectedGlobalIds }
+
+        where:
+        query << [
+            QueryBuilder.byClass(DummyUser, SnapshotEntity).build(),
+            QueryBuilder.byClass(DummyUserDetails, DummyAddress).build(),
+            QueryBuilder.byClass(DummyUser, DummyUserDetails, SnapshotEntity, DummyAddress).build(),
+        ]
+        expectedGlobalIds << [
+            [instanceId("Alice", DummyUser), instanceId("Bob", DummyUser), instanceId(1, SnapshotEntity), instanceId(2, SnapshotEntity)],
+            [instanceId(66, DummyUserDetails), valueObjectId(1, SnapshotEntity, "valueObjectRef")],
+            [instanceId("Alice", DummyUser), instanceId("Bob", DummyUser), instanceId(1, SnapshotEntity), instanceId(2, SnapshotEntity),
+             instanceId(66, DummyUserDetails), valueObjectId(1, SnapshotEntity, "valueObjectRef")],
+        ]
     }
 
     def "should query for Entity snapshots and changes by GlobalId and changed property"() {
@@ -1004,5 +1034,26 @@ class JaversRepositoryE2ETest extends Specification {
             println it
         }
         changes.size() == 4
+    }
+
+    def "should provide cluster-friendly commitId generator"(){
+        given:
+        def threads = 10
+        def javersRepo = new InMemoryRepository()
+        when:
+        withPool threads, {
+            (1..threads).collectParallel {
+                def javers = JaversBuilder.javers()
+                        .registerJaversRepository(javersRepo)
+                        .withCommitIdGenerator(CommitIdGenerator.RANDOM)
+                        .build()
+                javers.commit("author", new SnapshotEntity(id: it))
+            }
+        }
+
+        then:
+        def javers = JaversBuilder.javers().registerJaversRepository(javersRepo).build()
+        def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject().build())
+        (snapshots.collect{it -> it.commitId} as Set).size() == threads
     }
 }
