@@ -3,6 +3,7 @@ package org.javers.core.metamodel.scanner
 import com.google.gson.reflect.TypeToken
 import org.javers.core.metamodel.property.PropertyScannerEntity
 import org.javers.core.model.DummyAddress
+import org.javers.core.model.DummyIgnoredPropertiesType
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.joda.time.LocalDateTime
@@ -88,6 +89,14 @@ abstract class PropertyScannerTest extends Specification {
 
         then:
         assertThat(properties).hasProperty("propertyWithDiffIgnoreAnn").isTransient()
+    }
+
+    def "should scan all properties of classes marked as @IgnoreAllProperties as transient"() {
+        when:
+        def properties = propertyScanner.scan(DummyIgnoredPropertiesType)
+
+        then:
+        assertThat(properties).hasProperty("propertyThatShouldBeIgnored").isTransient()
     }
 
     def "should scan set property"() {
