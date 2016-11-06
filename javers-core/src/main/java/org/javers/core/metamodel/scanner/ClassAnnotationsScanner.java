@@ -34,6 +34,7 @@ class ClassAnnotationsScanner {
         boolean hasValueObject = false;
         boolean hasEntity = false;
         boolean hasShallowReference = false;
+        boolean hasIgnoreDeclaredProperties = false;
 
         //scan class level annotations
         for (Annotation ann : javaClass.getAnnotations()) {
@@ -55,6 +56,10 @@ class ClassAnnotationsScanner {
             if (annotationNamesProvider.isValueObjectAlias(ann)) {
                 hasValueObject = true;
             }
+
+            if (annotationNamesProvider.isIgnoreDeclaredPropertiesAlias(ann)){
+                hasIgnoreDeclaredProperties = true;
+            }
         }
 
         return new ClassAnnotationsScan(hasValue,
@@ -62,6 +67,7 @@ class ClassAnnotationsScanner {
                                         hasEntity,
                                         hasShallowReference,
                                         hasIgnored,
+                                        hasIgnoreDeclaredProperties,
                                         typeName);
     }
 }

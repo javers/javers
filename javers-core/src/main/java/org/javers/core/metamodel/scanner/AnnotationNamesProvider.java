@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Lists;
+import org.javers.core.metamodel.annotation.IgnoreDeclaredProperties;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
@@ -64,6 +65,10 @@ class AnnotationNamesProvider {
 
     boolean isShallowReferenceAlias(Annotation ann){
         return shallowReferenceAliases.contains(ann.annotationType().getSimpleName());
+    }
+
+    public boolean isIgnoreDeclaredPropertiesAlias(Annotation ann) {
+        return IgnoreDeclaredProperties.class.getSimpleName().equals( ann.annotationType().getSimpleName() );
     }
 
     Set<String> getShallowReferenceAliases() {

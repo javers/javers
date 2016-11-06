@@ -40,6 +40,7 @@ class ManagedClassFactory {
     }
 
     private List<Property> filterIgnoredType(List<Property> properties, final Class<?> currentClass){
+
         return Lists.negativeFilter(properties, new Predicate<Property>() {
             public boolean apply(Property property) {
                 if (property.getRawType() == currentClass){

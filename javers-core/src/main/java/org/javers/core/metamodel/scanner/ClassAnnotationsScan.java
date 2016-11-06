@@ -11,6 +11,7 @@ class ClassAnnotationsScan {
     private final boolean hasEntity;
     private final boolean hasIgnored;
     private final boolean hasShallowReference;
+    private final boolean hasIgnoreDeclaredProperties;
     private final Optional<String> typeName;
 
     ClassAnnotationsScan(boolean hasValue,
@@ -18,6 +19,7 @@ class ClassAnnotationsScan {
                          boolean hasEntity,
                          boolean hasShallowReference,
                          boolean hasIgnored,
+                         boolean hasIgnoreDeclaredProperties,
                          Optional<String> typeName) {
         this.hasValue = hasValue;
         this.hasIgnored = hasIgnored;
@@ -25,6 +27,7 @@ class ClassAnnotationsScan {
         this.hasEntity = hasEntity;
         this.hasShallowReference = hasShallowReference;
         this.typeName = typeName;
+        this.hasIgnoreDeclaredProperties = hasIgnoreDeclaredProperties;
     }
 
     public boolean hasValue() {
@@ -45,5 +48,9 @@ class ClassAnnotationsScan {
 
     public boolean hasIgnored() {
         return hasIgnored;
+    }
+
+    public boolean hasIgnoreDeclaredProperties() {
+        return hasIgnoreDeclaredProperties;
     }
 }
