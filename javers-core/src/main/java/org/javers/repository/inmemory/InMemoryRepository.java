@@ -35,11 +35,15 @@ import static org.javers.common.collections.Collections.allMatch;
 public class InMemoryRepository implements JaversRepository {
     private static final Logger logger = LoggerFactory.getLogger(InMemoryRepository.class);
 
-    private Map<GlobalId, LinkedList<CdoSnapshot>> snapshots = new ConcurrentHashMap<>();
-
     private CommitId head;
+    private final CdoSnapshotStore store;
 
     public InMemoryRepository() {
+        store = new InMemoryStore();
+    }
+
+    public InMemoryRepository(CdoSnapshotStore store) {
+        this.store = store;
     }
 
     @Override
@@ -204,9 +208,9 @@ public class InMemoryRepository implements JaversRepository {
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         Validate.argumentsAreNotNull(globalId);
 
-        if (snapshots.containsKey(globalId)) {
-            LinkedList<CdoSnapshot> states = snapshots.get(globalId);
-            return Optional.of(states.peek());
+        if (store.contains(globalId)) {
+            List<CdoSnapshot> states = store.load(globalId);
+            return Optional.of(states.get(0));
         }
 
         return Optional.empty();
@@ -225,7 +229,7 @@ public class InMemoryRepository implements JaversRepository {
         return Lists.transform(persistedIdentifiers, new Function<SnapshotIdentifier, CdoSnapshot>() {
             @Override
             public CdoSnapshot apply(SnapshotIdentifier snapshotIdentifier) {
-                List<CdoSnapshot> objectSnapshots = snapshots.get(snapshotIdentifier.getGlobalId());
+                List<CdoSnapshot> objectSnapshots = store.load(snapshotIdentifier.getGlobalId());
                 return objectSnapshots.get(objectSnapshots.size() - ((int)snapshotIdentifier.getVersion()));
             }
         });
@@ -235,8 +239,8 @@ public class InMemoryRepository implements JaversRepository {
         return Lists.positiveFilter(new ArrayList<>(snapshotIdentifiers), new Predicate<SnapshotIdentifier>() {
             @Override
             public boolean apply(SnapshotIdentifier snapshotIdentifier) {
-                return snapshots.containsKey(snapshotIdentifier.getGlobalId()) &&
-                    snapshotIdentifier.getVersion() <= snapshots.get(snapshotIdentifier.getGlobalId()).size();
+                return store.contains(snapshotIdentifier.getGlobalId()) &&
+                    snapshotIdentifier.getVersion() <= store.load(snapshotIdentifier.getGlobalId()).size();
             }
         });
     }
@@ -246,7 +250,7 @@ public class InMemoryRepository implements JaversRepository {
         Validate.argumentsAreNotNull(commit);
         List<CdoSnapshot> snapshots = commit.getSnapshots();
         for (CdoSnapshot s : snapshots){
-            persist(s);
+            store.persist(s);
         }
         logger.debug("{} snapshot(s) persisted", snapshots.size());
         head = commit.getId();
@@ -270,10 +274,7 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     private List<CdoSnapshot> getAll(){
-        List<CdoSnapshot> all = new ArrayList<>();
-        for (LinkedList<CdoSnapshot> snapshotsList : snapshots.values()) {
-            all.addAll(snapshotsList);
-        }
+        List<CdoSnapshot> all = store.loadAll();
 
         Collections.sort(all, new Comparator<CdoSnapshot>() {
             @Override
@@ -282,16 +283,6 @@ public class InMemoryRepository implements JaversRepository {
             }
         });
         return all;
-    }
-
-    private synchronized void persist(CdoSnapshot snapshot) {
-        LinkedList<CdoSnapshot> states = snapshots.get(snapshot.getGlobalId());
-        if (states == null){
-            states = new LinkedList<>();
-            snapshots.put(snapshot.getGlobalId(), states);
-        }
-
-        states.push(snapshot);
     }
 
     @Override
