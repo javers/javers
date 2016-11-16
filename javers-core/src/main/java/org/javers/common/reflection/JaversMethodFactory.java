@@ -32,6 +32,9 @@ class JaversMethodFactory {
         while (clazz != null) {
             context.addTypeSubstitutions(clazz);
             for (Method m : clazz.getDeclaredMethods()) {
+                if (m.isBridge()) {
+                    continue;
+                }
                 int methodKey = methodKey(m);
                 if (added.contains(methodKey)) {
                     // System.out.println("filtered inheritance duplicate" +m);
