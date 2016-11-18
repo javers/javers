@@ -6,6 +6,5 @@ class BeanBasedScannerTest extends PropertyScannerTest {
 
     def setupSpec() {
         propertyScanner = new BeanBasedPropertyScanner(new AnnotationNamesProvider())
-
     }
 }

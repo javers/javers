@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author pawel szymczyk
  */
-class BeanBasedPropertyScanner implements PropertyScanner {
+class BeanBasedPropertyScanner extends PropertyScanner {
 
     private final AnnotationNamesProvider annotationNamesProvider;
 
@@ -19,14 +19,15 @@ class BeanBasedPropertyScanner implements PropertyScanner {
     }
 
     @Override
-    public PropertyScan scan(Class<?> managedClass) {
+    public PropertyScan scan(Class<?> managedClass, boolean ignoreDeclaredProperties) {
         List<JaversMethod> getters = ReflectionUtil.findAllPersistentGetters(managedClass);
         List<Property> beanProperties = new ArrayList<>();
 
         for (JaversMethod getter : getters) {
+            boolean isIgnoredInType = ignoreDeclaredProperties && getter.getDeclaringClass().equals(managedClass);
             boolean hasTransientAnn = getter.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
             boolean hasShallowReferenceAnn = getter.hasAnyAnnotation(annotationNamesProvider.getShallowReferenceAliases());
-            beanProperties.add(new Property(getter, hasTransientAnn, hasShallowReferenceAnn));
+            beanProperties.add(new Property(getter, hasTransientAnn || isIgnoredInType, hasShallowReferenceAnn));
         }
         return new PropertyScan(beanProperties);
     }

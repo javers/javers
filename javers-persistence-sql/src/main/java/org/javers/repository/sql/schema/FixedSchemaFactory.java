@@ -110,7 +110,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         relationBuilder
             .primaryKey(tableName.localName() + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
             .withAttribute().string(COMMIT_PROPERTY_NAME).withMaxLength(200).and()
-            .withAttribute().string(COMMIT_PROPERTY_VALUE).withMaxLength(200).and();
+            .withAttribute().string(COMMIT_PROPERTY_VALUE).withMaxLength(600).and();
         foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
         relationBuilder.build();
 

@@ -1,7 +1,10 @@
 package org.javers.core
 
 import groovy.json.JsonSlurper
+import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.DiffAssert
+import org.javers.core.diff.GraphPair
+import org.javers.core.diff.appenders.NewObjectAppender
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.PropertyChange
 import org.javers.core.diff.changetype.ReferenceChange
@@ -12,7 +15,6 @@ import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
-import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
@@ -21,13 +23,16 @@ import static org.javers.core.MappingStyle.FIELD
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
 import static org.javers.core.model.DummyUser.dummyUser
+import static org.javers.core.model.DummyIgnoredPropertiesType.dummyIgnoredPropertiesType;
 import static org.javers.core.model.DummyUserWithPoint.userWithPoint
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
+
+import static org.javers.core.diff.ChangeAssert.assertThat
 
 /**
  * @author bartosz walacik
  */
-class JaversDiffE2ETest extends Specification {
+class JaversDiffE2ETest extends AbstractDiffTest {
 
     def "should extract Property from PropertyChange"(){
       given:
@@ -297,6 +302,23 @@ class JaversDiffE2ETest extends Specification {
 
         expect:
         javers.compare(left, right).changes.size() == 0
+    }
+
+    def "should ignore properties declared in a class with @IgnoreDeclaredProperties"(){
+        given:
+        def javers = javers().build()
+        def left =  new DummyIgnoredPropertiesType(name:"bob", age: 15, propertyThatShouldBeIgnored: 1, anotherIgnored: 1)
+        def right = new DummyIgnoredPropertiesType(name:"bob", age: 16, propertyThatShouldBeIgnored: 2, anotherIgnored: 2)
+
+        when:
+
+        println javers.getTypeMapping(DummyIgnoredPropertiesType).prettyPrint()
+
+        def diff = javers.compare(left, right)
+
+        then:
+        diff.changes.size() == 1
+        diff.changes[0].propertyName == "age"
     }
 
     class SetValueObject {

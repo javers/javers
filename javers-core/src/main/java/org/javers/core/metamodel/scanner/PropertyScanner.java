@@ -5,6 +5,10 @@ package org.javers.core.metamodel.scanner;
  *
  * @author pawel szymczyk
  */
-interface PropertyScanner {
-    PropertyScan scan(Class<?> managedClass);
+abstract class PropertyScanner {
+    abstract public PropertyScan scan(Class<?> managedClass, boolean ignoreDeclaredProperties);
+
+    public PropertyScan scan(Class<?> managedClass) {
+        return scan(managedClass, false);
+    }
 }
