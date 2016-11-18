@@ -1,5 +1,6 @@
 package org.javers.core.json
 
+import groovy.json.JsonOutput
 import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.type.ValueType
 import spock.lang.Shared
@@ -32,7 +33,7 @@ class JsonConverterUtilTypesTest extends Specification{
                          '"PLN"',
                          '"http://example.com"',
                          '"http://example.com"',
-                         '"/tmp/file.txt"'
+                         JsonOutput.toJson(new File('/tmp/file.txt').toString())
         ]
     }
 }
