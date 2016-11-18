@@ -4,16 +4,12 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
-import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.exception.JaversException;
 import org.javers.core.diff.changetype.map.EntryAdded;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.EntryRemoved;
 import org.javers.core.diff.custom.CustomPropertyComparator;
-import org.javers.core.metamodel.object.DehydrateMapFunction;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.OwnerContext;
-import org.javers.core.metamodel.object.PropertyOwnerContext;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -24,10 +20,13 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
+
 /**
- * Compares Multimap.
- * <p>
- * It's automatically registered, if Guava Multiset and Multimap dependency will be detected on class path.
+ * Compares Guava Multimaps.
+ * <br/>
+ *
+ * It's automatically registered, if Guava is detected on a classpath.
  *
  * @author akrystian
  */
@@ -44,9 +43,8 @@ public class MultimapComparator extends GuavaCollectionsComparator implements Cu
 
     private boolean isSupportedContainer(Property property){
         JaversType propertyType = typeMapper.getPropertyType(property);
-        if (typeMapper.isValueObject(((MultimapType) propertyType).getKeyType())){
-            logger.error("could not diff " + property + ", " +
-                    JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MULTIMAP_KEY.getMessage());
+        if (typeMapper.isValueObject(((MultimapType) propertyType).getKeyType())) {
+            logger.error(new JaversException(VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY, propertyType).getMessage());
             return false;
         }
         return true;
@@ -120,5 +118,4 @@ public class MultimapComparator extends GuavaCollectionsComparator implements Cu
         MultiMapContentType multiMapContentType = new MultiMapContentType(keyType, valueType);
         return new DehydrateMapFunction(globalIdFactory, multiMapContentType);
     }
-
 }
