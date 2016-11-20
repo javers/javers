@@ -8,6 +8,7 @@ import org.javers.common.exception.JaversException;
 import org.javers.core.diff.changetype.map.EntryAdded;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.EntryRemoved;
+import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
@@ -30,7 +31,7 @@ import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NO
  *
  * @author akrystian
  */
-public class MultimapComparator extends GuavaCollectionsComparator implements CustomPropertyComparator<Multimap, MultimapChange>{
+public class MultimapComparator extends GuavaCollectionsComparator implements CustomPropertyComparator<Multimap, MapChange>{
     private static final Logger logger = LoggerFactory.getLogger(MultimapComparator.class);
 
     private final TypeMapper typeMapper;
@@ -51,7 +52,7 @@ public class MultimapComparator extends GuavaCollectionsComparator implements Cu
     }
 
     @Override
-    public MultimapChange compare(Multimap left, Multimap right, GlobalId affectedId, Property property){
+    public MapChange compare(Multimap left, Multimap right, GlobalId affectedId, Property property){
         if (!isSupportedContainer(property) || left.equals(right)){
             return null;
         }
@@ -63,7 +64,7 @@ public class MultimapComparator extends GuavaCollectionsComparator implements Cu
         if (!entryChanges.isEmpty()){
             renderNotParametrizedWarningIfNeeded(multimapType.getKeyType(), "key", "Map", property);
             renderNotParametrizedWarningIfNeeded(multimapType.getValueType(), "value", "Map", property);
-            return new MultimapChange(affectedId, property.getName(), entryChanges);
+            return new MapChange(affectedId, property.getName(), entryChanges);
         }else{
             return null;
         }

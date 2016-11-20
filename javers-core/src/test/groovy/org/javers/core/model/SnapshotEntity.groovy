@@ -49,6 +49,7 @@ class SnapshotEntity {
     Multimap<String,String> multiMapOfPrimitives
 
     Multiset<DummyAddress> multiSetValueObject
+    Multiset<SnapshotEntity> multiSetOfEntities
     Multimap<String, DummyAddress> multiMapValueObject
 
 

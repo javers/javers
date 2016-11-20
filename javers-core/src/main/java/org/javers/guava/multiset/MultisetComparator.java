@@ -3,6 +3,7 @@ package org.javers.guava.multiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
+import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
 import org.javers.core.diff.changetype.container.ValueRemoved;
 import org.javers.core.diff.custom.CustomPropertyComparator;
@@ -20,13 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Compares Multiset.
- * <p>
- * It's automatically registered, if Guava Multiset dependency will be detected on class path.
+ * Compares Multisets.
+ * <br/>
+ *
+ * It's automatically registered, if Guava is detected on the classpath.
  *
  * @author akrystian
  */
-public class MultisetComparator extends GuavaCollectionsComparator implements CustomPropertyComparator<Multiset , MultisetChange> {
+public class MultisetComparator extends GuavaCollectionsComparator implements CustomPropertyComparator<Multiset , SetChange> {
 
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
@@ -37,9 +39,8 @@ public class MultisetComparator extends GuavaCollectionsComparator implements Cu
         this.globalIdFactory = globalIdFactory;
     }
 
-
     @Override
-    public MultisetChange compare(Multiset left, Multiset right, GlobalId affectedId, Property property){
+    public SetChange compare(Multiset left, Multiset right, GlobalId affectedId, Property property){
         if (left.equals(right)){
             return null;
         }
@@ -50,7 +51,7 @@ public class MultisetComparator extends GuavaCollectionsComparator implements Cu
         List<ContainerElementChange> entryChanges = calculateEntryChanges(multisetType, left, right, owner);
         if (!entryChanges.isEmpty()){
             renderNotParametrizedWarningIfNeeded(multisetType.getItemType(), "item", "Set", property);
-            return new MultisetChange(affectedId, property.getName(), entryChanges);
+            return new SetChange(affectedId, property.getName(), entryChanges);
         } else {
             return null;
         }
