@@ -42,11 +42,11 @@ class GuavaAddOnE2ETest extends Specification {
         diff.changes[0].changes.size() == expectedContainerChanges
 
         where:
-        leftList     | rightList                | expectedContainerChanges
-        ["New York"] | ["Boston"]               | 2
-        ["New York"] | ["New York", "New York"] | 1
-        []           | ["New York"]             | 1
-        ["New York"] | []                       | 1
+        leftList     | rightList                          | expectedContainerChanges
+        ["New York"] | ["Boston"]                         | 2
+        ["New York"] | ["New York", "New York", "Boston"] | 2
+        []           | ["New York"]                       | 1
+        ["New York"] | []                                 | 1
     }
 
     @Unroll
@@ -133,8 +133,6 @@ class GuavaAddOnE2ETest extends Specification {
         diff.getChangesByType(NewObject).size == 1
     }
 
-//todo
-
     def "should not detect changes if Multisets of ValueObjects are the same"() {
         given:
         def left = new SnapshotEntity(multiSetValueObject: HashMultiset.create(leftList))
@@ -166,17 +164,17 @@ class GuavaAddOnE2ETest extends Specification {
 
         then:
         diff.changes.size() == 1
-        def changes = diff.getChangesByType(MapChange)[0].entryChanges
-        changes.size() == extpectedChanges
+        diff.changes[0].entryChanges.size() == extpectedChanges
 
         where:
-        leftList << [createMultiMap(["New York"], ["New York City"]),
-                     createMultiMap(["New York", "New York"], ["New York City", "Buffalo"]),
-                     HashMultimap.create()]
-        rightList << [createMultiMap(["New York"], ["Buffalo"]),
-                      createMultiMap(["New York", "New York", "Alabama"], ["New York City", "Buffalo", "Akron"]),
-                      createMultiMap(["New York"], ["Buffalo"])]
-        extpectedChanges << [2, 1, 1]
+        leftList << [createMultiMap( "New York": ["City"] ),
+                     createMultiMap( "New York": ["City"] ),
+                     createMultiMap( [:])]
+        rightList <<[createMultiMap( "New York": ["Buffalo"] ),
+                     createMultiMap( "New York": ["City", "Buffalo", "London"] ),
+                     createMultiMap( "New York": ["City"]) ]
+
+        extpectedChanges << [2, 2, 1]
     }
 
     @Unroll
@@ -189,26 +187,26 @@ class GuavaAddOnE2ETest extends Specification {
         def diff = javers.compare(left, right)
 
         then:
-        println leftList.toString() + "|| " + rightList.toString()
         diff.changes.size() == extpectedChanges
         def actualContainerChanges = getContainerChanges(diff.changes)
         actualContainerChanges.size() == 1
         actualContainerChanges[0].entryChanges.size() == expectedContainerChanges
 
         where:
-        leftList << [createMultiMap(["New York"], [new DummyAddress(city: "New York City")]),
-                     createMultiMap(["New York", "New York"], [new DummyAddress(city: "New York City"), new DummyAddress(city: "Buffalo")]),
-                     HashMultimap.create()]
-        rightList << [createMultiMap(["New York"], [new DummyAddress(city: "Buffalo")]),
-                      createMultiMap(["New York", "New York", "Alabama"], [new DummyAddress(city: "New York City"),
-                                                                           new DummyAddress(city: "Buffalo"), new DummyAddress(city: "Akron")]),
-                      createMultiMap(["New York"], [new DummyAddress(city: "New York City")])]
+        leftList << [ createMultiMap(["NY" : [new DummyAddress("City")]]),
+                      createMultiMap(["NY" : [new DummyAddress("City")]]),
+                      HashMultimap.create()]
+        rightList << [createMultiMap(["NY" : [new DummyAddress("Buffalo")]]),
+                      createMultiMap(["NY" : [new DummyAddress("City"),
+                                              new DummyAddress("Buffalo"),
+                                              new DummyAddress("London")]]),
+                      createMultiMap(["NY" : [new DummyAddress("City")]])]
         extpectedChanges << [3, 2, 2]
-        expectedContainerChanges << [2, 1, 1]
+        expectedContainerChanges << [2, 2, 1]
     }
 
     @Unroll
-    def "should not detect value changes in Multimap of primitives"() {
+    def "should not detect changes if Multimaps of primitives are the same"() {
         given:
         def left = new SnapshotEntity(multiMapOfPrimitives: HashMultimap.create(leftList))
         def right = new SnapshotEntity(multiMapOfPrimitives: HashMultimap.create(rightList))
@@ -220,17 +218,18 @@ class GuavaAddOnE2ETest extends Specification {
         diff.changes.size() == 0
 
         where:
-        leftList << [createMultiMap(["New York"], ["Buffalo"]),
-                     createMultiMap(["New York", "New York"], ["Buffalo", "New York City"]),
+        leftList << [createMultiMap(["New York" : ["Buffalo"]]),
+                     createMultiMap(["New York" : ["Buffalo", "City"],
+                                     "London"   : ["City"]]),
                      HashMultimap.create()]
-        rightList << [createMultiMap(["New York"], ["Buffalo"]),
-                      createMultiMap(["New York", "New York"], ["Buffalo", "New York City"]),
-                      HashMultimap.create()]
-
+       rightList << [createMultiMap(["New York" : ["Buffalo"]]),
+                     createMultiMap(["New York" : ["Buffalo", "City"],
+                                     "London"   : ["City"]]),
+                     HashMultimap.create()]
     }
 
     @Unroll
-    def "should not detect value changes in Multimap of ValueObjects"() {
+    def "should not detect changes if Multimaps of ValueObjects are the same"() {
         given:
         def left = new SnapshotEntity(multiMapValueObject: HashMultimap.create(leftList))
         def right = new SnapshotEntity(multiMapValueObject: HashMultimap.create(rightList))
@@ -242,27 +241,22 @@ class GuavaAddOnE2ETest extends Specification {
         diff.changes.size() == 0
 
         where:
-        leftList << [createMultiMap(
-                             ["New York"],
-                             [new DummyAddress(city: "New York", street: "Maple St")]),
-                     createMultiMap(
-                             ["New York", "New York"],
-                             [new DummyAddress(city: "New York", street: "Maple St"), new DummyAddress(city: "Buffalo", street: "Maple St")]),
-                     HashMultimap.create()]
-        rightList << [createMultiMap(
-                              ["New York"],
-                              [new DummyAddress(city: "New York", street: "Maple St")]),
-                      createMultiMap(
-                              ["New York", "New York"],
-                              [new DummyAddress(city: "New York", street: "Maple St"), new DummyAddress(city: "Buffalo", street: "Maple St")]),
-                      HashMultimap.create()]
+        leftList <<  [createMultiMap([:]),
+                      createMultiMap(["NY" : [new DummyAddress("City"),
+                                              new DummyAddress("Buffalo"),
+                                              new DummyAddress("London")]])]
+        rightList << [createMultiMap([:]),
+                      createMultiMap(["NY" : [new DummyAddress("City"),
+                                              new DummyAddress("Buffalo"),
+                                              new DummyAddress("London")]])]
     }
 
+    //todo "should follow Entities stored in Multimaps when building ObjectGraph"
 
-    private <K, V> Multimap createMultiMap(List<K> keys, List<V> values) {
+    private <K, V> Multimap createMultiMap(Map<K, List<V>> source) {
         def hashMultimap = HashMultimap.create()
-        for (int i = 0; i < keys.size(); i++) {
-            hashMultimap.put(keys[i], values[i])
+        source.keySet().forEach { k ->
+            source[k].forEach{v -> hashMultimap.put(k,v)}
         }
         hashMultimap
     }
