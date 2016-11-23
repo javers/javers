@@ -2,6 +2,7 @@ package org.javers.core.diff.changetype.map;
 
 import org.javers.core.diff.changetype.Atomic;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -9,7 +10,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 /**
  * @author bartosz walacik
  */
-public abstract class EntryChange {
+public abstract class EntryChange implements Serializable {
     private final Atomic key;
 
     EntryChange(Object key) {
