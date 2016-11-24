@@ -19,7 +19,7 @@ public class MapType extends EnumerableType {
     }
 
     @Override
-    public Map map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
+    public Object map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
         return mapStatic(sourceMap_, mapFunction, owner);
     }
 

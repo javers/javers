@@ -4,6 +4,9 @@ import com.google.common.collect.Multimap;
 import org.javers.common.collections.Collections;
 import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
+import org.javers.core.diff.NodePair;
+import org.javers.core.diff.appenders.CorePropertyChangeAppender;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.map.EntryAdded;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.EntryRemoved;
@@ -13,7 +16,6 @@ import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.guava.GuavaCollectionsComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +35,7 @@ import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NO
  *
  * @author akrystian
  */
-public class MultimapComparator extends GuavaCollectionsComparator implements CustomPropertyComparator<Multimap, MapChange>{
+public class MultimapComparator extends CorePropertyChangeAppender implements CustomPropertyComparator<Multimap, MapChange>{
     private static final Logger logger = LoggerFactory.getLogger(MultimapComparator.class);
 
     private final TypeMapper typeMapper;
@@ -131,5 +133,15 @@ public class MultimapComparator extends GuavaCollectionsComparator implements Cu
 
         MultiMapContentType multiMapContentType = new MultiMapContentType(keyType, valueType);
         return new DehydrateMapFunction(globalIdFactory, multiMapContentType);
+    }
+
+    @Override
+    public boolean supports(JaversType propertyType) {
+        return  propertyType instanceof MultimapType;
+    }
+
+    @Override
+    public PropertyChange calculateChanges(NodePair pair, Property supportedProperty){
+        return null;//TODO
     }
 }

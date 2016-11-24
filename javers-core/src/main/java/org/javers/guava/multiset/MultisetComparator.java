@@ -2,6 +2,9 @@ package org.javers.guava.multiset;
 
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
+import org.javers.core.diff.NodePair;
+import org.javers.core.diff.appenders.CorePropertyChangeAppender;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
@@ -15,7 +18,6 @@ import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.guava.GuavaCollectionsComparator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,7 @@ import java.util.List;
  *
  * @author akrystian
  */
-public class MultisetComparator extends GuavaCollectionsComparator implements CustomPropertyComparator<Multiset , SetChange> {
+public class MultisetComparator extends CorePropertyChangeAppender implements CustomPropertyComparator<Multiset , SetChange> {
 
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
@@ -74,5 +76,15 @@ public class MultisetComparator extends GuavaCollectionsComparator implements Cu
             changes.add(new ValueAdded(globalCdoId));
         }
         return changes;
+    }
+
+    @Override
+    public boolean supports(JaversType propertyType) {
+        return  propertyType instanceof MultisetType;
+    }
+
+    @Override
+    public PropertyChange calculateChanges(NodePair pair, Property supportedProperty){
+        return null; //TODO
     }
 }

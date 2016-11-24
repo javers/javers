@@ -6,8 +6,8 @@ import com.google.common.collect.Multimaps;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
-import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.MapEnumerationOwnerContext;
+import org.javers.core.metamodel.type.MapType;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -18,20 +18,21 @@ import java.util.Map;
 /**
  * @author akrystian
  */
-public class MultimapType extends EnumerableType{
+public class MultimapType extends MapType{
 
     public static MultimapType getInstance(){
         return new MultimapType(Multimap.class);
     }
 
     public MultimapType(Type baseJavaType) {
-        super(baseJavaType, 2);
+        super(baseJavaType);
     }
 
 
-    public static Multimap mapStatic(Object sourceMultimap_, EnumerableFunction mapFunction, OwnerContext owner){
+    @Override
+    public Multimap map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentIsNotNull(mapFunction);
-        Multimap sourceMultimap = toNotNullMultimap(sourceMultimap_);
+        Multimap sourceMultimap = toNotNullMultimap(sourceMap_);
         Multimap targetMultimap = HashMultimap.create();
 
         MultimapEnumerationOwnerContext enumeratorContext = new MultimapEnumerationOwnerContext(owner);
@@ -50,11 +51,6 @@ public class MultimapType extends EnumerableType{
             targetMultimap.put(mappedKey, mappedValue);
         }
         return Multimaps.unmodifiableMultimap(targetMultimap);
-    }
-
-    @Override
-    public Multimap map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
-        return mapStatic(sourceMap_, mapFunction, owner);
     }
 
     private static Multimap toNotNullMultimap(Object sourceMap){

@@ -5,7 +5,6 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
-import org.javers.guava.multimap.MultimapType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,14 +163,7 @@ class ObjectGraphBuilder {
             JaversType valueType = typeMapper.getJaversType(mapType.getValueType());
 
             return keyType instanceof ManagedType || valueType instanceof ManagedType;
-        } else  if (enumerableType instanceof MultimapType){
-            MultimapType mapType = (MultimapType)enumerableType;
-
-            JaversType keyType = typeMapper.getJaversType(mapType.getKeyType());
-            JaversType valueType = typeMapper.getJaversType(mapType.getValueType());
-
-            return keyType instanceof ManagedType || valueType instanceof ManagedType;
-        } else{
+     } else{
             return false;
         }
 
