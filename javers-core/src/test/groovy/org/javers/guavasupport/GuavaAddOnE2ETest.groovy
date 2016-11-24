@@ -193,16 +193,23 @@ class GuavaAddOnE2ETest extends Specification {
         actualContainerChanges[0].entryChanges.size() == expectedContainerChanges
 
         where:
-        leftList << [ createMultiMap(["NY" : [new DummyAddress("City")]]),
-                      createMultiMap(["NY" : [new DummyAddress("City")]]),
-                      HashMultimap.create()]
-        rightList << [createMultiMap(["NY" : [new DummyAddress("Buffalo")]]),
-                      createMultiMap(["NY" : [new DummyAddress("City"),
-                                              new DummyAddress("Buffalo"),
-                                              new DummyAddress("London")]]),
-                      createMultiMap(["NY" : [new DummyAddress("City")]])]
-        extpectedChanges << [3, 2, 2]
-        expectedContainerChanges << [2, 2, 1]
+        leftList << [
+                createMultiMap(["NY": [new DummyAddress("City")]]),
+                createMultiMap(["NY": [new DummyAddress("City")]]),
+                HashMultimap.create(),
+                createMultiMap(["NY": [new DummyAddress("City"),
+                                       new DummyAddress("Buffalo"),
+                                       new DummyAddress("London")]]),
+        ]
+        rightList << [createMultiMap(["NY": [new DummyAddress("Buffalo")]]),
+                      createMultiMap(["NY": [new DummyAddress("City"),
+                                             new DummyAddress("Buffalo"),
+                                             new DummyAddress("London")]]),
+                      createMultiMap(["NY": [new DummyAddress("City")]]),
+                      createMultiMap(["NY": [new DummyAddress("City")]])
+        ]
+        extpectedChanges << [3, 3, 2, 3]
+        expectedContainerChanges << [2, 2, 1, 2]
     }
 
     @Unroll

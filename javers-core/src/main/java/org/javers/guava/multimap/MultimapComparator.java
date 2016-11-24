@@ -1,9 +1,8 @@
 package org.javers.guava.multimap;
 
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
+import org.javers.common.collections.Collections;
+import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
 import org.javers.core.diff.changetype.map.EntryAdded;
 import org.javers.core.diff.changetype.map.EntryChange;
@@ -19,7 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
 
@@ -72,43 +74,54 @@ public class MultimapComparator extends GuavaCollectionsComparator implements Cu
 
     private List<EntryChange> calculateEntryChanges(MultimapType multimapType, Multimap left, Multimap right, OwnerContext owner){
         DehydrateMapFunction dehydrateFunction = getDehydrateMapFunction(multimapType);
-
         Multimap leftMultimap = multimapType.map(left, dehydrateFunction, owner);
         Multimap rightMultimap = multimapType.map(right, dehydrateFunction, owner);
 
         List<EntryChange> changes = new ArrayList<>();
 
         for (Object commonKey : Multimaps.commonKeys(leftMultimap, rightMultimap)){
-            Multiset leftVal = HashMultiset.create(leftMultimap.get(commonKey));
-            Multiset rightVal = HashMultiset.create(rightMultimap.get(commonKey));
-
-            Multiset differences = Multisets.difference(leftVal, rightVal);
-            if (differences.size() > 0){
-                calculateValueChanges(changes, commonKey, leftVal, rightVal);
+            Set leftValues = (Set)leftMultimap.get(commonKey);
+            Set rightValues =(Set) rightMultimap.get(commonKey);
+            final Collection difference = Sets.xor(leftValues, rightValues);
+            if (difference.size() > 0){
+                calculateValueChanges(changes, commonKey, leftValues, rightValues);
             }
         }
 
-        for (Object addedKey : Multimaps.keysDifference(rightMultimap, leftMultimap)){
-            for (Object addedValue : rightMultimap.get(addedKey)){
-                changes.add(new EntryAdded(addedKey, addedValue));
-            }
-        }
-
-        for (Object removedKey : Multimaps.keysDifference(leftMultimap, rightMultimap)){
-            for (Object removedValue : leftMultimap.get(removedKey)){
-                changes.add(new EntryRemoved(removedKey, removedValue));
-            }
-        }
+        calculateKeyChanges(leftMultimap, rightMultimap, changes);
 
         return changes;
     }
 
-    private void calculateValueChanges(List<EntryChange> changes, Object commonKey, Multiset leftVal, Multiset rightVal){
-        for (Object addedValue : Multisets.difference(leftVal, rightVal)){
-            changes.add(new EntryRemoved(commonKey, addedValue));
+    private void calculateKeyChanges(Multimap leftMultimap, Multimap rightMultimap, List<EntryChange> changes){
+        for (Object addedKey : Multimaps.keysDifference(rightMultimap, leftMultimap)){
+            Collection difference = Collections.difference(rightMultimap.get(addedKey), leftMultimap.get(addedKey));
+            for (Object addedValue : difference){
+                changes.add(new EntryAdded(addedKey, addedValue));
+            }
         }
-        for (Object removedValue : Multisets.difference(rightVal, leftVal)){
-            changes.add(new EntryAdded(commonKey, removedValue));
+        for (Object removedKey : Multimaps.keysDifference(leftMultimap, rightMultimap)){
+            for (Object removedValue : Collections.difference(leftMultimap.get(removedKey), rightMultimap.get(removedKey))){
+                changes.add(new EntryRemoved(removedKey, removedValue));
+            }
+        }
+    }
+
+    private void calculateValueChanges(List<EntryChange> changes, Object commonKey, Collection leftVal, Collection rightVal){
+        if (Objects.equals(leftVal, rightVal)){
+            return;
+        }
+        final Collection valuesRemoved = Collections.difference(leftVal, rightVal);
+        if(valuesRemoved.size() > 0){
+            for (Object addedValue : valuesRemoved){
+                changes.add( new EntryRemoved(commonKey, addedValue));
+            }
+        }
+        final Collection valuesAdded = Collections.difference(rightVal, leftVal);
+        if(valuesAdded.size() > 0){
+            for (Object addedValue : valuesAdded){
+                changes.add( new EntryAdded(commonKey, addedValue));
+            }
         }
     }
 
