@@ -95,4 +95,23 @@ public class JaversSqlRepository implements JaversRepository {
     public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
         return finder.getVOStateHistory(ownerEntity, path, queryParams);
     }
+
+    /**
+     * JaversSqlRepository uses the cache for globalId primary keys.
+     * This cache is non-transactional.
+     * <br/><br/>
+     * If a SQL transaction encounters errors and must be rolled back,
+     * then cache modifications should be rolled back as well.
+     * <br/><br/>
+     * JaVers can't do this automatically because it's unaware of SQL transactions.
+     * <br/><br/>
+     * To avoid DB integrity constraint violation errors,
+     * call evictCache() every time you roll back a SQL transaction.
+     * Second option is disabling the cache using {@link SqlRepositoryBuilder#withGlobalIdCacheDisabled()}
+     *
+     * @since 2.7.2
+     */
+    public void evictCache() {
+        globalIdRepository.evictCache();
+    }
 }

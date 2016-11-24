@@ -16,9 +16,11 @@ import java.sql.SQLException;
 public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     private static final Logger logger = LoggerFactory.getLogger(SqlRepositoryBuilder.class);
 
-    private String schemaName;
     private DialectName dialectName;
     private ConnectionProvider connectionProvider;
+
+    private String schemaName;
+    private boolean globalIdCacheDisabled;
 
     public SqlRepositoryBuilder() {
     }
@@ -51,11 +53,25 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         return this;
     }
 
+    /**
+     * See {@link JaversSqlRepository#evictCache()}
+     *
+     * @since 2.7.2
+     */
+    public SqlRepositoryBuilder withGlobalIdCacheDisabled() {
+        globalIdCacheDisabled = true;
+        return this;
+    }
+
     public JaversSqlRepository build() {
         logger.info("starting up SQL repository module ...");
         bootContainer();
 
-        PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect(), schemaName)
+        SqlRepositoryConfiguration config =
+                new SqlRepositoryConfiguration(globalIdCacheDisabled, schemaName);
+        addComponent(config);
+
+        PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect(), config.getSchemaName())
                 .usingManagedConnections(new org.polyjdbc.core.transaction.ConnectionProvider() {
                     @Override
                     public Connection getConnection() throws SQLException {
