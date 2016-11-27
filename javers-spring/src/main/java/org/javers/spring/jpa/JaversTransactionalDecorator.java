@@ -17,6 +17,7 @@ import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -38,6 +39,9 @@ import java.util.Map;
 public class JaversTransactionalDecorator implements Javers {
     private final Javers delegate;
     private final JaversSqlRepository javersSqlRepository;
+
+	@Value("${javers.auto.schema.create:true}")
+	private boolean autoSchemaCreate = true;
 
     @Autowired
     protected PlatformTransactionManager txManager;
@@ -139,14 +143,16 @@ public class JaversTransactionalDecorator implements Javers {
 
     @PostConstruct
     public void ensureSchema() {
-        Validate.argumentIsNotNull(txManager,"TransactionManager is null");
-        TransactionTemplate tmpl = new TransactionTemplate(txManager);
-        tmpl.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                javersSqlRepository.ensureSchema();
-            }
-        });
+		if(autoSchemaCreate){
+		    Validate.argumentIsNotNull(txManager,"TransactionManager is null");
+		    TransactionTemplate tmpl = new TransactionTemplate(txManager);
+		    tmpl.execute(new TransactionCallbackWithoutResult() {
+		        @Override
+		        protected void doInTransactionWithoutResult(TransactionStatus status) {
+		            javersSqlRepository.ensureSchema();
+		        }
+		    });
+		}
     }
 
     @Override
