@@ -43,6 +43,10 @@ public class GlobalIdRepository extends SchemaNameAware {
         globalIdPkCache.invalidateAll();
     }
 
+    public int getGlobalIdPkCacheSize() {
+        return (int)globalIdPkCache.size();
+    }
+
     /**
      * cached
      */

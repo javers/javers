@@ -30,13 +30,15 @@ public class JaversSqlRepository implements JaversRepository {
     private final CdoSnapshotRepository cdoSnapshotRepository;
     private final CdoSnapshotFinder finder;
     private final JaversSchemaManager schemaManager;
+    private final SqlRepositoryConfiguration sqlRepositoryConfiguration;
 
-    public JaversSqlRepository(CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository, CdoSnapshotRepository cdoSnapshotRepository, CdoSnapshotFinder finder, JaversSchemaManager schemaManager) {
+    public JaversSqlRepository(CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository, CdoSnapshotRepository cdoSnapshotRepository, CdoSnapshotFinder finder, JaversSchemaManager schemaManager, SqlRepositoryConfiguration sqlRepositoryConfiguration) {
         this.commitRepository = commitRepository;
         this.globalIdRepository = globalIdRepository;
         this.cdoSnapshotRepository = cdoSnapshotRepository;
         this.finder = finder;
         this.schemaManager = schemaManager;
+        this.sqlRepositoryConfiguration = sqlRepositoryConfiguration;
     }
 
     @Override
@@ -109,9 +111,24 @@ public class JaversSqlRepository implements JaversRepository {
      * call evictCache() every time you roll back a SQL transaction.
      * Second option is disabling the cache using {@link SqlRepositoryBuilder#withGlobalIdCacheDisabled()}
      *
+     *
      * @since 2.7.2
      */
     public void evictCache() {
         globalIdRepository.evictCache();
+    }
+
+    /**
+     * @since 2.7.2
+     */
+    public int getGlobalIdPkCacheSize(){
+        return globalIdRepository.getGlobalIdPkCacheSize();
+    }
+
+    /**
+     * @since 2.7.2
+     */
+    public SqlRepositoryConfiguration getConfiguration() {
+        return sqlRepositoryConfiguration;
     }
 }
