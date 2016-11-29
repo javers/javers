@@ -162,7 +162,8 @@ public class JaversTransactionalDecorator implements Javers {
         if (javersSqlRepository.getConfiguration().isGlobalIdCacheDisabled()) {
             return;
         }
-        if(TransactionSynchronizationManager.isActualTransactionActive()) {
+        if(TransactionSynchronizationManager.isSynchronizationActive() &&
+           TransactionSynchronizationManager.isActualTransactionActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
                 @Override
                 public void afterCompletion(int status) {
