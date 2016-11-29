@@ -8,6 +8,7 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.repository.sql.SqlRepositoryConfiguration;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.PolyJDBC;
@@ -19,16 +20,18 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class GlobalIdRepository extends SchemaNameAware {
 
-    private PolyJDBC polyJdbc;
+    private final PolyJDBC polyJdbc;
     private JsonConverter jsonConverter;
+    private final boolean disableCache;
 
     private Cache<GlobalId, Long> globalIdPkCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
             .build();
 
-    public GlobalIdRepository(PolyJDBC javersPolyjdbc, TableNameProvider tableNameProvider) {
+    public GlobalIdRepository(PolyJDBC javersPolyjdbc, TableNameProvider tableNameProvider, SqlRepositoryConfiguration configuration) {
         super(tableNameProvider);
         this.polyJdbc = javersPolyjdbc;
+        this.disableCache = configuration.isGlobalIdCacheDisabled();
     }
 
     public long getOrInsertId(GlobalId globalId) {
@@ -36,10 +39,22 @@ public class GlobalIdRepository extends SchemaNameAware {
         return pk.isPresent() ? pk.get() : insert(globalId);
     }
 
+    public void evictCache() {
+        globalIdPkCache.invalidateAll();
+    }
+
+    public int getGlobalIdPkCacheSize() {
+        return (int)globalIdPkCache.size();
+    }
+
     /**
      * cached
      */
     public Optional<Long> findGlobalIdPk(GlobalId globalId) {
+        if (disableCache){
+            return findGlobalIdPkInDB(globalId);
+        }
+
         Long foundPk = globalIdPkCache.getIfPresent(globalId);
 
         if (foundPk != null){
@@ -115,5 +130,4 @@ public class GlobalIdRepository extends SchemaNameAware {
     public void setJsonConverter(JsonConverter JSONConverter) {
         this.jsonConverter = JSONConverter;
     }
-
 }

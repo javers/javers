@@ -5,22 +5,22 @@ import org.javers.common.collections.Optional;
 /**
  * @author bartosz.walacik
  */
-public class DBObjectName {
+class DBObjectName {
     private final String SCHEMA_TABLE_SEP = ".";
 
     private final Optional<String> schemaName;
     private final String localName;
 
-    public DBObjectName(Optional<String> schemaName, String localName) {
+    DBObjectName(Optional<String> schemaName, String localName) {
         this.schemaName = schemaName;
         this.localName = localName;
     }
 
-    public String localName() {
+    String localName() {
         return localName;
     }
 
-    public String nameWithSchema() {
+    String nameWithSchema() {
         if (schemaName.isEmpty()) {
             return localName;
         }

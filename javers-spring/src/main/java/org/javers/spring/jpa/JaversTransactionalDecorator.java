@@ -16,11 +16,12 @@ import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.sql.JaversSqlRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.support.*;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
@@ -36,6 +37,8 @@ import java.util.Map;
  * @author bartosz walacik
  */
 public class JaversTransactionalDecorator implements Javers {
+    private static final Logger logger = LoggerFactory.getLogger(JaversTransactionalDecorator.class);
+
     private final Javers delegate;
     private final JaversSqlRepository javersSqlRepository;
 
@@ -50,12 +53,14 @@ public class JaversTransactionalDecorator implements Javers {
     @Override
     @Transactional
     public Commit commit(String author, Object currentVersion) {
+        registerRollbackListener();
         return delegate.commit(author, currentVersion);
     }
 
     @Override
     @Transactional
     public Commit commit(String author, Object currentVersion, Map<String, String> commitProperties) {
+        registerRollbackListener();
         return delegate.commit(author, currentVersion, commitProperties);
     }
 
@@ -70,7 +75,6 @@ public class JaversTransactionalDecorator implements Javers {
     public Commit commitShallowDelete(String author, Object deleted, Map<String, String> properties) {
         return delegate.commitShallowDelete(author, deleted, properties);
     }
-
 
     @Override
     @Transactional
@@ -152,5 +156,23 @@ public class JaversTransactionalDecorator implements Javers {
     @Override
     public Property getProperty(PropertyChange propertyChange) {
         return delegate.getProperty(propertyChange);
+    }
+
+    private void registerRollbackListener() {
+        if (javersSqlRepository.getConfiguration().isGlobalIdCacheDisabled()) {
+            return;
+        }
+        if(TransactionSynchronizationManager.isSynchronizationActive() &&
+           TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
+                @Override
+                public void afterCompletion(int status) {
+                    if (TransactionSynchronization.STATUS_ROLLED_BACK == status) {
+                        logger.info("evicting javersSqlRepository local cache due to transaction rollback");
+                        javersSqlRepository.evictCache();
+                    }
+                }
+            });
+        }
     }
 }

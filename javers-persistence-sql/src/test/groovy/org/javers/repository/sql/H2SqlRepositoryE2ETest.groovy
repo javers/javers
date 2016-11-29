@@ -33,6 +33,4 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
         then:
         intPropertyValues == 1..150
     }
-
-
 }

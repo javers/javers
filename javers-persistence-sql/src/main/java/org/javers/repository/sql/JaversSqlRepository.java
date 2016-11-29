@@ -30,13 +30,15 @@ public class JaversSqlRepository implements JaversRepository {
     private final CdoSnapshotRepository cdoSnapshotRepository;
     private final CdoSnapshotFinder finder;
     private final JaversSchemaManager schemaManager;
+    private final SqlRepositoryConfiguration sqlRepositoryConfiguration;
 
-    public JaversSqlRepository(CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository, CdoSnapshotRepository cdoSnapshotRepository, CdoSnapshotFinder finder, JaversSchemaManager schemaManager) {
+    public JaversSqlRepository(CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository, CdoSnapshotRepository cdoSnapshotRepository, CdoSnapshotFinder finder, JaversSchemaManager schemaManager, SqlRepositoryConfiguration sqlRepositoryConfiguration) {
         this.commitRepository = commitRepository;
         this.globalIdRepository = globalIdRepository;
         this.cdoSnapshotRepository = cdoSnapshotRepository;
         this.finder = finder;
         this.schemaManager = schemaManager;
+        this.sqlRepositoryConfiguration = sqlRepositoryConfiguration;
     }
 
     @Override
@@ -94,5 +96,38 @@ public class JaversSqlRepository implements JaversRepository {
     @Override
     public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
         return finder.getVOStateHistory(ownerEntity, path, queryParams);
+    }
+
+    /**
+     * JaversSqlRepository uses the cache for GlobalId primary keys.
+     * This cache is non-transactional.
+     * <br/><br/>
+     *
+     * If a SQL transaction encounters errors and must be rolled back,
+     * then cache modifications should be rolled back as well.
+     * <br/><br/>
+     *
+     * JaVers does this automatically in <code>JaversTransactionalDecorator</code>.
+     * If you are using <code>javers-spring-boot-starter-sql</code>
+     * (or directly <code>javers-spring</code>) you don't need to call this method.
+     *
+     * @since 2.7.2
+     */
+    public void evictCache() {
+        globalIdRepository.evictCache();
+    }
+
+    /**
+     * @since 2.7.2
+     */
+    public int getGlobalIdPkCacheSize(){
+        return globalIdRepository.getGlobalIdPkCacheSize();
+    }
+
+    /**
+     * @since 2.7.2
+     */
+    public SqlRepositoryConfiguration getConfiguration() {
+        return sqlRepositoryConfiguration;
     }
 }
