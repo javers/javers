@@ -99,18 +99,17 @@ public class JaversSqlRepository implements JaversRepository {
     }
 
     /**
-     * JaversSqlRepository uses the cache for globalId primary keys.
+     * JaversSqlRepository uses the cache for GlobalId primary keys.
      * This cache is non-transactional.
      * <br/><br/>
+     *
      * If a SQL transaction encounters errors and must be rolled back,
      * then cache modifications should be rolled back as well.
      * <br/><br/>
-     * JaVers can't do this automatically because it's unaware of SQL transactions.
-     * <br/><br/>
-     * To avoid DB integrity constraint violation errors,
-     * call evictCache() every time you roll back a SQL transaction.
-     * Second option is disabling the cache using {@link SqlRepositoryBuilder#withGlobalIdCacheDisabled()}
      *
+     * JaVers does this automatically in <code>JaversTransactionalDecorator</code>.
+     * If you are using <code>javers-spring-boot-starter-sql</code>
+     * (or directly <code>javers-spring</code>) you don't need to call this method.
      *
      * @since 2.7.2
      */
