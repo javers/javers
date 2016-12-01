@@ -46,13 +46,14 @@ class SnapshotEntity {
     Optional<DummyAddress> optionalValueObject
 
     Multiset<String> multiSetOfPrimitives
-    Multimap<String,String> multiMapOfPrimitives
-
     Multiset<DummyAddress> multiSetValueObject
     Multiset<SnapshotEntity> multiSetOfEntities
-    Multimap<String, DummyAddress> multiMapValueObject
 
-
+    Multimap<String,String> multiMapOfPrimitives
+    Multimap<String, DummyAddress> multimapPrimitiveToValueObject
+    Multimap<String, SnapshotEntity> multiMapPrimitiveToEntity
+    Multimap<SnapshotEntity, SnapshotEntity> multiMapEntityToEntity
+    Multimap<DummyAddress, DummyAddress> multimapValueObjectToValueObject //not suppored
 
     Map<String, Integer> mapOfPrimitives
     Map<LocalDate,BigDecimal> mapOfValues

@@ -7,14 +7,14 @@ import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
-import org.javers.core.metamodel.type.CollectionType;
+import org.javers.core.metamodel.type.SetType;
 
 import java.lang.reflect.Type;
 
 /**
  * @author akrystian
  */
-public class MultisetType extends CollectionType{
+public class MultisetType extends SetType{
 
     public static MultisetType getInstance(){
         return  new MultisetType(Multiset.class);
@@ -42,7 +42,7 @@ public class MultisetType extends CollectionType{
             return HashMultiset.create();
         }
         else{
-            return (HashMultiset)sourceSet;
+            return (Multiset)sourceSet;
         }
     }
 

@@ -23,27 +23,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Compares Multisets.
+ * Compares Guava Multisets.
  * <br/>
  *
  * It's automatically registered, if Guava is detected on the classpath.
  *
  * @author akrystian
  */
-public class MultisetComparator extends CorePropertyChangeAppender implements CustomPropertyComparator<Multiset , SetChange> {
+public class MultisetChangeAppender extends CorePropertyChangeAppender implements CustomPropertyComparator<Multiset, SetChange> {
 
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
 
 
-    public MultisetComparator(TypeMapper typeMapper, GlobalIdFactory globalIdFactory){
+    public MultisetChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory){
         this.typeMapper = typeMapper;
         this.globalIdFactory = globalIdFactory;
     }
 
     @Override
     public SetChange compare(Multiset left, Multiset right, GlobalId affectedId, Property property){
-        if (left.equals(right)){
+        if (left != null && left.equals(right)){
             return null;
         }
 
@@ -85,6 +85,8 @@ public class MultisetComparator extends CorePropertyChangeAppender implements Cu
 
     @Override
     public PropertyChange calculateChanges(NodePair pair, Property supportedProperty){
-        return null; //TODO
+        Multiset leftRawMultiset =  (Multiset)pair.getLeftPropertyValue(supportedProperty);
+        Multiset rightRawMulitset = (Multiset)pair.getRightPropertyValue(supportedProperty);
+        return compare(leftRawMultiset,rightRawMulitset,pair.getGlobalId(),supportedProperty);
     }
 }

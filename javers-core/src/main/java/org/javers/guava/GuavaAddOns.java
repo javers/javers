@@ -6,8 +6,8 @@ import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.JaversBuilder;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.guava.multimap.MultimapComparator;
-import org.javers.guava.multiset.MultisetComparator;
+import org.javers.guava.multimap.MultimapChangeAppender;
+import org.javers.guava.multiset.MultisetChangeAppender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class GuavaAddOns{
             return;
         }
         logger.info("loading Guava add-ons ...");
-        javersBuilder.registerCustomComparator(new MultisetComparator(typeMapper, globalIdFactory), Multiset.class);
-        javersBuilder.registerCustomComparator(new MultimapComparator(typeMapper, globalIdFactory), Multimap.class);
+        javersBuilder.registerCustomComparator(new MultisetChangeAppender(typeMapper, globalIdFactory), Multiset.class);
+        javersBuilder.registerCustomComparator(new MultimapChangeAppender(typeMapper, globalIdFactory), Multimap.class);
     }
 }

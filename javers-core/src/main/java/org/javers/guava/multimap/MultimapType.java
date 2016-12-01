@@ -1,6 +1,5 @@
 package org.javers.guava.multimap;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import org.javers.common.collections.EnumerableFunction;
@@ -13,6 +12,8 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
 
+import static org.javers.guava.multimap.Multimaps.createEmptyMultimap;
+import static org.javers.guava.multimap.Multimaps.toNotNullMultimap;
 
 
 /**
@@ -33,7 +34,7 @@ public class MultimapType extends MapType{
     public Multimap map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentIsNotNull(mapFunction);
         Multimap sourceMultimap = toNotNullMultimap(sourceMap_);
-        Multimap targetMultimap = HashMultimap.create();
+        Multimap targetMultimap = createEmptyMultimap(sourceMap_);
 
         MultimapEnumerationOwnerContext enumeratorContext = new MultimapEnumerationOwnerContext(owner);
 
@@ -53,13 +54,7 @@ public class MultimapType extends MapType{
         return Multimaps.unmodifiableMultimap(targetMultimap);
     }
 
-    private static Multimap toNotNullMultimap(Object sourceMap){
-        if (sourceMap == null){
-            return HashMultimap.create();
-        }else{
-            return (HashMultimap) sourceMap;
-        }
-    }
+
 
     @Override
     public boolean isEmpty(Object container){
