@@ -107,7 +107,8 @@ public class JaversSqlRepository implements JaversRepository {
      * then cache modifications should be rolled back as well.
      * <br/><br/>
      *
-     * JaVers does this automatically in <code>JaversTransactionalDecorator</code>.
+     * JaVers does this automatically in <code>JaversTransactionalDecorator</code>
+     * from <code>javers-spring</code> module.
      * If you are using <code>javers-spring-boot-starter-sql</code>
      * (or directly <code>javers-spring</code>) you don't need to call this method.
      *
