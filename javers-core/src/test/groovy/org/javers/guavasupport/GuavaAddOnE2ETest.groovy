@@ -215,7 +215,8 @@ class GuavaAddOnE2ETest extends Specification {
 
     def "should not support Map<ValueObject,?>"() {
         given:
-        def left = new SnapshotEntity(multimapValueObjectToValueObject: HashMultimap.create(create([(new DummyAddress("City")): [new DummyAddress("City")]])))
+        def left = new SnapshotEntity(multimapValueObjectToValueObject: HashMultimap.
+                create(create([(new DummyAddress("City")): [new DummyAddress("City")]])))
         def right = new SnapshotEntity()
 
         when:
@@ -294,7 +295,8 @@ class GuavaAddOnE2ETest extends Specification {
 
         where:
         leftList <<  [ create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]]) ]
-        rightList << [ create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:2), new SnapshotEntity(id:3)]]) ]
+        rightList << [ create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:2),
+                                      new SnapshotEntity(id:3)]]) ]
     }
 
     def "should follow Entities stored in Multimap when building ObjectGraph"(){
