@@ -47,7 +47,7 @@ public class CommitFactory {
         Validate.argumentsAreNotNull(author, properties, removedId);
         Optional<CdoSnapshot> previousSnapshot = javersRepository.getLatest(removedId);
         if (previousSnapshot.isEmpty()){
-            throw new JaversException(JaversExceptionCode.CANT_DELETE_OBJECT_NOT_FOUND,removedId.value());
+           return null; 
         }
         CommitMetadata commitMetadata = nextCommit(author, properties);
         CdoSnapshot terminalSnapshot = snapshotFactory.createTerminal(removedId, previousSnapshot.get(), commitMetadata);

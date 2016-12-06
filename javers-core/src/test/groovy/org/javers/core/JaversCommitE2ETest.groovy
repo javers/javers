@@ -95,19 +95,6 @@ class JaversCommitE2ETest extends Specification {
         opType << ["using object instance","using globalId"]
     }
 
-    def "should fail when deleting non existing object"() {
-        given:
-        def javers = javers().build()
-        def anEntity = new SnapshotEntity(id:1)
-
-        when:
-        javers.commitShallowDelete("some.login", anEntity)
-
-        then:
-        JaversException exception = thrown()
-        exception.code == JaversExceptionCode.CANT_DELETE_OBJECT_NOT_FOUND
-    }
-
     def "should create initial commit for new objects"() {
         given:
         def javers = javers().build()
