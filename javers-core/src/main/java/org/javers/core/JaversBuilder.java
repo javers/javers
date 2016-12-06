@@ -4,7 +4,6 @@ import com.google.gson.TypeAdapter;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
@@ -24,7 +23,6 @@ import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
 import org.javers.core.json.typeadapter.util.UtilTypeAdapters;
 import org.javers.core.metamodel.annotation.*;
 import org.javers.core.metamodel.clazz.*;
-import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.scanner.ScannerModule;
 import org.javers.core.metamodel.type.CustomType;
 import org.javers.core.metamodel.type.EntityType;
@@ -123,9 +121,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
         addModule(new ScannerModule(coreConfiguration(), getContainer()));
         bootManagedTypeModule();
-
-        // after assembly add-ons
-        new GuavaAddOns(typeMapper(), getContainerComponent(GlobalIdFactory.class)).afterAssemble(this);
+        addModule(new GuavaAddOns(coreConfiguration(),getContainer(),this));
 
         // JSON beans & domain aware typeAdapters
         bootJsonConverter();
