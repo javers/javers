@@ -34,8 +34,6 @@ public class GlobalIdFactory {
         return createId(targetCdo, null);
     }
 
-
-
     /**
      * @param ownerContext for bounded ValueObjects, optional
      */
