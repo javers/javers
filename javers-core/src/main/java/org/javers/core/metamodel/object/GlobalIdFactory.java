@@ -34,6 +34,8 @@ public class GlobalIdFactory {
         return createId(targetCdo, null);
     }
 
+
+
     /**
      * @param ownerContext for bounded ValueObjects, optional
      */
@@ -84,6 +86,12 @@ public class GlobalIdFactory {
     public UnboundedValueObjectId createUnboundedValueObjectId(Class valueObjectClass){
         ValueObjectType valueObject = typeMapper.getJaversManagedType(valueObjectClass, ValueObjectType.class);
         return new UnboundedValueObjectId(valueObject.getName());
+    }
+
+    public InstanceId createInstanceId(Object instance){
+        Validate.argumentIsNotNull(instance);
+        EntityType entityType = typeMapper.getJaversManagedType(instance.getClass(), EntityType.class);
+        return createInstanceId(entityType.getIdOf(instance), entityType);
     }
 
     public InstanceId createInstanceId(Object localId, EntityType entity){

@@ -4,8 +4,9 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.*;
 
 /**
- * @author bartosz walacik
+ * @deprecated since 2.7.3
  */
+@Deprecated
 public class IdBuilder {
     private final GlobalIdFactory globalIdFactory;
 
@@ -33,7 +34,7 @@ public class IdBuilder {
     public InstanceId instanceId(Object instance){
         Validate.argumentsAreNotNull(instance);
 
-        return (InstanceId)globalIdFactory.createId(instance, null);
+        return globalIdFactory.createInstanceId(instance);
     }
 
     public UnboundedValueObjectId unboundedValueObjectId(Class valueObjectClass){

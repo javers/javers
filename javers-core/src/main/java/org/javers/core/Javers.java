@@ -354,8 +354,11 @@ public interface Javers {
      */
     <T extends JaversType> T getTypeMapping(Type userType);
 
+    /**
+     * @deprecated since 2.7.3
+     */
+    @Deprecated
     IdBuilder idBuilder();
-
 
     /**
      * Returns {@link Property} which underlies given {@link PropertyChange}
