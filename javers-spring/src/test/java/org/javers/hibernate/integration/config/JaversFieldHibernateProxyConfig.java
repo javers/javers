@@ -9,6 +9,7 @@ import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
 import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -28,7 +29,8 @@ public class JaversFieldHibernateProxyConfig extends HibernateConfig{
      * Creates JaVers instance with {@link JaversSqlRepository}
      */
     @Bean
-    public Javers javers(JpaHibernateConnectionProvider jpaHibernateConnectionProvider) {
+    public Javers javers(JpaHibernateConnectionProvider jpaHibernateConnectionProvider,
+                         PlatformTransactionManager txManager) {
         JaversSqlRepository sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(jpaHibernateConnectionProvider)
@@ -37,6 +39,7 @@ public class JaversFieldHibernateProxyConfig extends HibernateConfig{
 
         return TransactionalJaversBuilder
                 .javers()
+                .withTxManager(txManager)
                 .registerJaversRepository(sqlRepository)
                 .withObjectAccessHook(new HibernateUnproxyObjectAccessHook())
                 .build();

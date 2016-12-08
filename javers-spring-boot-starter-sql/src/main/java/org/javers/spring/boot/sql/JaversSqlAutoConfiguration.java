@@ -30,6 +30,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -64,7 +65,8 @@ public class JaversSqlAutoConfiguration {
 
     @Bean(name = "javers")
     @ConditionalOnMissingBean
-    public Javers javers(ConnectionProvider connectionProvider) {
+    public Javers javers(ConnectionProvider connectionProvider,
+                         PlatformTransactionManager transactionManager) {
         JaversSqlRepository sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(connectionProvider)
@@ -73,6 +75,7 @@ public class JaversSqlAutoConfiguration {
 
         return TransactionalJaversBuilder
                 .javers()
+                .withTxManager(transactionManager)
                 .registerJaversRepository(sqlRepository)
                 .withObjectAccessHook(new HibernateUnproxyObjectAccessHook())
                 .withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))

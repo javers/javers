@@ -49,7 +49,7 @@ public class JaversSpringJpaApplicationConfig {
      * Creates JaVers instance with {@link JaversSqlRepository}
      */
     @Bean
-    public Javers javers() {
+    public Javers javers(PlatformTransactionManager txManager) {
         JaversSqlRepository sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(jpaConnectionProvider())
@@ -58,6 +58,7 @@ public class JaversSpringJpaApplicationConfig {
 
         return TransactionalJaversBuilder
                 .javers()
+                .withTxManager(txManager)
                 .withObjectAccessHook(new HibernateUnproxyObjectAccessHook())
                 .registerJaversRepository(sqlRepository)
                 .build();
@@ -70,8 +71,8 @@ public class JaversSpringJpaApplicationConfig {
      * to mark data writing methods that you want to audit.
      */
     @Bean
-    public JaversAuditableAspect javersAuditableAspect() {
-        return new JaversAuditableAspect(javers(), authorProvider(), commitPropertiesProvider());
+    public JaversAuditableAspect javersAuditableAspect(Javers javers) {
+        return new JaversAuditableAspect(javers, authorProvider(), commitPropertiesProvider());
     }
 
     /**
@@ -81,8 +82,8 @@ public class JaversSpringJpaApplicationConfig {
      * to annotate CrudRepositories you want to audit.
      */
     @Bean
-    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
-        return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(), commitPropertiesProvider());
+    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers) {
+        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider(), commitPropertiesProvider());
     }
 
     /**
