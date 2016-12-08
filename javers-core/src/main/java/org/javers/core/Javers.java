@@ -355,7 +355,7 @@ public interface Javers {
     <T extends JaversType> T getTypeMapping(Type userType);
 
     /**
-     * @deprecated since 2.7.3
+     * @deprecated since 2.8.0
      */
     @Deprecated
     IdBuilder idBuilder();

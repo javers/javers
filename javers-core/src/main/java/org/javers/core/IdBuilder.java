@@ -4,7 +4,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.*;
 
 /**
- * @deprecated since 2.7.3
+ * @deprecated since 2.8.0
  */
 @Deprecated
 public class IdBuilder {

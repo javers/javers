@@ -88,7 +88,7 @@ public class QueryBuilder {
      * <pre>
      * javers.findChanges( QueryBuilder.byInstanceId(new Person("bob")).build() );
      * </pre>
-     * @Since 2.7.3
+     * @Since 2.8.0
      */
     public static QueryBuilder byInstance(Object instance){
         Validate.argumentsAreNotNull(instance);
