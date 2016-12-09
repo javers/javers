@@ -8,6 +8,7 @@ import org.javers.spring.repository.jpa.DummyAuditedJpaCrudRepository
 import org.javers.spring.repository.jpa.DummyNoAuditJpaCrudRepository
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
+import org.springframework.dao.EmptyResultDataAccessException
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -32,6 +33,20 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         javers = context.getBean(Javers)
         repository = context.getBean(DummyAuditedJpaCrudRepository)
         noAuditRepository = context.getBean(DummyNoAuditJpaCrudRepository)
+    }
+
+    def "should not fail on JaVers aspect when deleting an object which not exists in JaVers repository"(){
+        when:
+        repository.delete("a")
+
+        then:
+        thrown(EmptyResultDataAccessException)
+
+        when:
+        repository.delete(new DummyObject(id:"a"))
+
+        then:
+        notThrown(Exception)
     }
 
     def "should create a new version on create via audited repository"() {

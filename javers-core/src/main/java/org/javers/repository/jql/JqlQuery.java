@@ -65,6 +65,10 @@ public class JqlQuery {
         return getFilter(IdFilter.class).get().getGlobalId();
     }
 
+    Object getInstanceFilter() {
+        return getFilter(InstanceFilter.class).get().getInstance();
+    }
+
     String getChangedProperty(){
         return queryParams.changedProperty().get();
     }
@@ -82,7 +86,7 @@ public class JqlQuery {
         return Optional.empty();
     }
 
-    public boolean isNewObjectChanges() {
+    boolean isNewObjectChanges() {
         return queryParams.newObjectChanges();
     }
 
@@ -92,6 +96,10 @@ public class JqlQuery {
 
     boolean isIdQuery(){
         return hasFilter(IdFilter.class);
+    }
+
+    boolean isInstanceQuery(){
+        return hasFilter(InstanceFilter.class);
     }
 
     boolean hasChangedPropertyFilter(){

@@ -86,6 +86,12 @@ public class GlobalIdFactory {
         return new UnboundedValueObjectId(valueObject.getName());
     }
 
+    public InstanceId createInstanceId(Object instance){
+        Validate.argumentIsNotNull(instance);
+        EntityType entityType = typeMapper.getJaversManagedType(instance.getClass(), EntityType.class);
+        return createInstanceId(entityType.getIdOf(instance), entityType);
+    }
+
     public InstanceId createInstanceId(Object localId, EntityType entity){
         return new InstanceId(entity.getName(), localId);
     }

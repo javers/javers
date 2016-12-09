@@ -81,6 +81,21 @@ public class QueryBuilder {
     }
 
     /**
+     * Query for selecting changes (or snapshots) made on a concrete Entity instance.
+     * <br/><br/>
+     *
+     * For example, last changes on "bob" Person:
+     * <pre>
+     * javers.findChanges( QueryBuilder.byInstanceId(new Person("bob")).build() );
+     * </pre>
+     * @Since 2.8.0
+     */
+    public static QueryBuilder byInstance(Object instance){
+        Validate.argumentsAreNotNull(instance);
+        return new QueryBuilder(new InstanceFilter(instance));
+    }
+
+    /**
      * Query for selecting changes (or snapshots)
      * made on all ValueObjects at given path, owned by any instance of given Entity.
      * <br/><br/>

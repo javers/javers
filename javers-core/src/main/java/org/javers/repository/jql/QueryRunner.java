@@ -50,6 +50,10 @@ public class QueryRunner {
             return repository.getStateHistory(fromDto(query.getIdFilter()), query.getQueryParams());
         }
 
+        if (query.isInstanceQuery()){
+            return repository.getStateHistory(fromInstance(query.getInstanceFilter()), query.getQueryParams());
+        }
+
         if (query.isClassQuery()){
             Set<ManagedType> mTypes = getJaversManagedTypes(query.getClassFilter());
             return repository.getStateHistory(mTypes, query.getQueryParams());
@@ -74,6 +78,10 @@ public class QueryRunner {
 
         if (query.isIdQuery()){
             return repository.getChangeHistory(fromDto(query.getIdFilter()), query.getQueryParams());
+        }
+
+        if (query.isInstanceQuery()){
+            return repository.getChangeHistory(fromInstance(query.getInstanceFilter()), query.getQueryParams());
         }
 
         if (query.isClassQuery()){
@@ -103,6 +111,10 @@ public class QueryRunner {
 
     private GlobalId fromDto(GlobalIdDTO globalIdDTO) {
         return globalIdFactory.createFromDto(globalIdDTO);
+    }
+
+    private GlobalId fromInstance(Object instance) {
+        return globalIdFactory.createInstanceId(instance);
     }
 
     private EntityType getOwnerEntity(VoOwnerFilter filter){

@@ -327,6 +327,17 @@ class JaversRepositoryE2ETest extends Specification {
         ]
     }
 
+    def "should query for Entity snapshots and changes by given instance"() {
+        given:
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 4))
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 5))
+        javers.commit("author", new SnapshotEntity(id:2, intProperty: 4))
+
+        expect:
+        javers.findSnapshots(byInstance(new SnapshotEntity(id:1)).build()).size() == 2
+        javers.findChanges(byInstance(new SnapshotEntity(id:1)).build()).size() == 1
+    }
+
     def "should query for Entity snapshots and changes by GlobalId and changed property"() {
         given:
         javers.commit("author", new SnapshotEntity(id:1, intProperty: 4))
