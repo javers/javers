@@ -87,7 +87,9 @@ public enum JaversExceptionCode {
 
     UNSUPPORTED_OPTIONAL_CONTENT_TYPE("%s is not supported as Optional<> content type"),
 
-    RUNTIME_EXCEPTION("uncategorized runtime exception. %s")
+    RUNTIME_EXCEPTION("uncategorized runtime exception. %s"),
+
+    TRANSACTION_MANAGER_NOT_SET("Can't create javers bean due to missing configuration. Since javers-spring 2.8.0, transactionManager bean should be explicitly provided in TransactionalJaversBuilder.withTxManager(). See example at http://javers.org/documentation/spring-integration/#spring-jpa-example")
     ;
 
     private final String message;

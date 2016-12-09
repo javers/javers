@@ -12,6 +12,9 @@ import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.transaction.Transactional;
 
 /**
  * @author bartosz.walacik
@@ -20,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 public class JaversSpringBootConfig {
 
     @Bean
-    public Javers javers() {
+    public Javers javers(PlatformTransactionManager txManager) {
         JaversSqlRepository sqlRepository = SqlRepositoryBuilder
                 .sqlRepository()
                 .withConnectionProvider(jpaConnectionProvider())
@@ -29,18 +32,19 @@ public class JaversSpringBootConfig {
 
         return TransactionalJaversBuilder
                 .javers()
+                .withTxManager(txManager)
                 .registerJaversRepository(sqlRepository)
                 .build();
     }
 
     @Bean
-    public JaversAuditableAspect javersAuditableAspect() {
-        return new JaversAuditableAspect(javers(), authorProvider());
+    public JaversAuditableAspect javersAuditableAspect(Javers javers) {
+        return new JaversAuditableAspect(javers, authorProvider());
     }
 
     @Bean
-    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
-        return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider());
+    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers) {
+        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider());
     }
 
     @Bean

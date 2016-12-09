@@ -42,12 +42,13 @@ public class JaversTransactionalDecorator implements Javers {
     private final Javers delegate;
     private final JaversSqlRepository javersSqlRepository;
 
-    @Autowired
-    protected PlatformTransactionManager txManager;
+    private final PlatformTransactionManager txManager;
 
-    JaversTransactionalDecorator(Javers delegate, JaversSqlRepository javersSqlRepository) {
+    JaversTransactionalDecorator(Javers delegate, JaversSqlRepository javersSqlRepository, PlatformTransactionManager txManager) {
+        Validate.argumentsAreNotNull(delegate, javersSqlRepository, txManager);
         this.delegate = delegate;
         this.javersSqlRepository = javersSqlRepository;
+        this.txManager = txManager;
     }
 
     @Override
@@ -143,7 +144,6 @@ public class JaversTransactionalDecorator implements Javers {
 
     @PostConstruct
     public void ensureSchema() {
-        Validate.argumentIsNotNull(txManager,"TransactionManager is null");
         TransactionTemplate tmpl = new TransactionTemplate(txManager);
         tmpl.execute(new TransactionCallbackWithoutResult() {
             @Override
