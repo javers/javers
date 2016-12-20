@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -120,8 +121,10 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addModule(new DiffAppendersModule(coreConfiguration(), getContainer()));
         addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
         addModule(new ScannerModule(coreConfiguration(), getContainer()));
+        addModule(new GuavaAddOns(coreConfiguration(),getContainer()));
         bootManagedTypeModule();
-        addModule(new GuavaAddOns(coreConfiguration(),getContainer(),this));
+
+        registerCustomComparators();
 
         // JSON beans & domain aware typeAdapters
         bootJsonConverter();
@@ -571,5 +574,11 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
        //JaversExtendedRepository can be created after users calls JaversBuilder.registerJaversRepository()
         addComponent(JaversExtendedRepository.class);
+    }
+
+    private void registerCustomComparators(){
+        for(Map.Entry<Class,Class> entry : getComparatorModuleMappings().entrySet()){
+            registerCustomComparator((CustomPropertyComparator)getContainerComponent(entry.getKey()),entry.getValue());
+        }
     }
 }
