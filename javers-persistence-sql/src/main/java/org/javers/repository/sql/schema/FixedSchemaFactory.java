@@ -116,11 +116,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         relationBuilder.build();
 
         columnsIndex(tableName, schema, COMMIT_PROPERTY_COMMIT_FK);
-        if (dialect instanceof MysqlDialect) {
-            
-        } else {
-            columnsIndex(tableName, schema, COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE);
-        }
+        columnsIndex(tableName, schema, COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE);
 
         return schema;
     }
