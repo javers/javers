@@ -8,6 +8,7 @@ import org.polyjdbc.core.util.StringUtils;
 
 import java.util.Map;
 import java.util.TreeMap;
+import org.polyjdbc.core.dialect.MysqlDialect;
 
 /**
  * non-configurable schema factory, gives you schema with default table names
@@ -115,7 +116,11 @@ public class FixedSchemaFactory extends SchemaNameAware {
         relationBuilder.build();
 
         columnsIndex(tableName, schema, COMMIT_PROPERTY_COMMIT_FK);
-        columnsIndex(tableName, schema, COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE);
+        if (dialect instanceof MysqlDialect) {
+            
+        } else {
+            columnsIndex(tableName, schema, COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE);
+        }
 
         return schema;
     }
@@ -150,6 +155,13 @@ public class FixedSchemaFactory extends SchemaNameAware {
             indexName.length() > ORACLE_MAX_NAME_LEN)
         {
             indexName = indexName.substring(0, ORACLE_MAX_NAME_LEN);
+        }
+        // Add index prefix length
+        if (dialect instanceof MysqlDialect
+                && tableName.equals(COMMIT_PROPERTY_TABLE_NAME)) {
+            String colName = colNames[1];
+            colName = colName + "(255)";
+            colNames[1] = colName;
         }
         schema.addIndex(indexName)
               .indexing(colNames)
