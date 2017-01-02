@@ -115,14 +115,17 @@ public class FixedSchemaFactory extends SchemaNameAware {
         foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
-        String valueColName = COMMIT_PROPERTY_VALUE;
-        // Add index prefix length
-        if (dialect instanceof MysqlDialect) {
-            valueColName +=  "(200)";
-        }
-
         columnsIndex(tableName, schema, COMMIT_PROPERTY_COMMIT_FK);
-        columnsIndex(tableName, schema, COMMIT_PROPERTY_NAME, valueColName);
+
+        // Add index prefix length for MySql
+        if (dialect instanceof MysqlDialect) {
+            columnsIndex(tableName, schema, new IndexedCols(
+                    new String[]{COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE},
+                    new int[]{0, 200}));
+        }
+        else {
+            columnsIndex(tableName, schema, COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE);
+        }
 
         return schema;
     }
@@ -151,22 +154,56 @@ public class FixedSchemaFactory extends SchemaNameAware {
     }
 
     private void columnsIndex(DBObjectName tableName, Schema schema, String... colNames){
-        String concatenatedColumnNames = StringUtils.concatenate('_', (Object[]) colNames);
-        String indexName = tableName.localName() + "_" + concatenatedColumnNames + "_idx";
+        columnsIndex(tableName, schema, new IndexedCols(colNames));
+    }
+
+    private void columnsIndex(DBObjectName tableName, Schema schema, IndexedCols indexedCols){
+        String indexName = tableName.localName() + "_" + indexedCols.concatenatedColNames() + "_idx";
         if (dialect instanceof OracleDialect &&
-            indexName.length() > ORACLE_MAX_NAME_LEN)
+                indexName.length() > ORACLE_MAX_NAME_LEN)
         {
             indexName = indexName.substring(0, ORACLE_MAX_NAME_LEN);
         }
         schema.addIndex(indexName)
-              .indexing(colNames)
-              .on(tableName.nameWithSchema())
-              .build();
+                .indexing(indexedCols.indexedColNames())
+                .on(tableName.nameWithSchema())
+                .build();
     }
 
     private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder) {
         relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
                 .primaryKey("jv_"+pkColName).using(pkColName).and();
         schema.addSequence(getSequenceNameWithSchema(pkColName)).build();
+    }
+
+    private static class IndexedCols {
+        private final String[] colNames;
+        private final int[] prefixLengths;
+
+        IndexedCols(String... colNames) {
+            this.colNames = colNames;
+            this.prefixLengths = new int[colNames.length];
+        }
+
+        IndexedCols(String[] colNames, int[] prefixLengths) {
+            this.colNames = colNames;
+            this.prefixLengths = prefixLengths;
+        }
+
+        String concatenatedColNames() {
+            return StringUtils.concatenate('_', (Object[]) colNames);
+        }
+
+        String[] indexedColNames() {
+            String[] indexedNames = new String[colNames.length];
+
+            for (int i=0; i<colNames.length; i++) {
+                indexedNames[i] = colNames[i];
+                if (prefixLengths[i] > 0) {
+                    indexedNames[i] += "("+prefixLengths+")";
+                }
+            }
+            return indexedNames;
+        }
     }
 }
