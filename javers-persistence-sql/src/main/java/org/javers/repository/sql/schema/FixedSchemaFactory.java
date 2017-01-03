@@ -200,7 +200,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
             for (int i=0; i<colNames.length; i++) {
                 indexedNames[i] = colNames[i];
                 if (prefixLengths[i] > 0) {
-                    indexedNames[i] += "("+prefixLengths+")";
+                    indexedNames[i] += "("+prefixLengths[i]+")";
                 }
             }
             return indexedNames;
