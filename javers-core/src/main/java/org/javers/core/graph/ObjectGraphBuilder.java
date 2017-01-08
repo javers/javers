@@ -60,7 +60,7 @@ class ObjectGraphBuilder {
             buildEdges(stub); //edgeBuilder should append new stubs to queue
         }
 
-        logger.info("{} graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
+        logger.debug("{} graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
                 edgeBuilder.graphType(),
                 nodeReuser.nodesCount(), nodeReuser.entitiesCount(), nodeReuser.voCount());
         switchToBuilt();
