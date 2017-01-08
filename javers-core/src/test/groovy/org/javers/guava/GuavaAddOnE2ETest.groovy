@@ -14,7 +14,6 @@ import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.JaversBuilder.javers
@@ -29,7 +28,6 @@ class GuavaAddOnE2ETest extends Specification {
         javers = javers().build()
     }
 
-    @Unroll
     def "should detect changes in Multiset of primitives"() {
         given:
         def left = new SnapshotEntity(multiSetOfPrimitives: HashMultiset.create(leftList))
@@ -51,9 +49,6 @@ class GuavaAddOnE2ETest extends Specification {
         ["New York"] | []                                 | 1
     }
 
-
-
-    @Unroll
     def "should not detect changes if Multisets of primitives are the same"() {
         given:
         def left = new SnapshotEntity(multiSetOfPrimitives: HashMultiset.create(leftList))
@@ -72,7 +67,6 @@ class GuavaAddOnE2ETest extends Specification {
         ["New York", "New York"] | ["New York", "New York"]
     }
 
-    @Unroll
     def "should detect changes in Multiset of ValueObjects"() {
         given:
         def left = new SnapshotEntity(multiSetValueObject: HashMultiset.create(leftList))
@@ -97,8 +91,12 @@ class GuavaAddOnE2ETest extends Specification {
 
     def "should detect changes in Multiset of Entities"() {
         given:
-        def left = new SnapshotEntity(multiSetOfEntities: HashMultiset.create(leftList))
-        def right = new SnapshotEntity(multiSetOfEntities: HashMultiset.create(rightList))
+        def left = new SnapshotEntity(multiSetOfEntities: HashMultiset.create(
+                [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]
+        ))
+        def right = new SnapshotEntity(multiSetOfEntities: HashMultiset.create(
+                [new SnapshotEntity(id:2), new SnapshotEntity(id:2), new SnapshotEntity(id:3)]
+        ))
 
         when:
         def diff = javers.compare(left, right)
@@ -111,16 +109,12 @@ class GuavaAddOnE2ETest extends Specification {
             it instanceof ValueAdded
             it.addedValue.value() == SnapshotEntity.name + '/' + 2
         }
-
-        where:
-        leftList <<  [ [new SnapshotEntity(id:2), new SnapshotEntity(id:3)] ]
-        rightList << [ [new SnapshotEntity(id:2), new SnapshotEntity(id:2), new SnapshotEntity(id:3)] ]
     }
 
     def "should not detect changes if Multisets of ValueObjects are the same"() {
         given:
         def left = new SnapshotEntity(multiSetValueObject: HashMultiset.create(leftList))
-        def right = new SnapshotEntity(multiSetValueObject: HashMultiset.create(rightList))
+        def right = new SnapshotEntity(multiSetValueObject: HashMultiset.create(leftList))
 
         when:
         def diff = javers.compare(left, right)
@@ -132,12 +126,8 @@ class GuavaAddOnE2ETest extends Specification {
         leftList <<  [[new DummyAddress(city: "New York"),
                        new DummyAddress(city: "New York"),
                        new DummyAddress(city: "Buffalo")] ]
-        rightList << [[new DummyAddress(city: "New York"),
-                       new DummyAddress(city: "New York"),
-                       new DummyAddress(city: "Buffalo")] ]
     }
 
-    @Unroll
     def "should detect value changes in Multimap of primitives "() {
         given:
         def left = new SnapshotEntity(multiMapOfPrimitives: HashMultimap.create(leftList))
@@ -161,7 +151,6 @@ class GuavaAddOnE2ETest extends Specification {
         extpectedChanges << [2, 2, 1]
     }
 
-    @Unroll
     def "should detect value changes in Multimap of ValueObjects "() {
         given:
         def left = new SnapshotEntity(multimapPrimitiveToValueObject: HashMultimap.create(leftList))
@@ -206,14 +195,12 @@ class GuavaAddOnE2ETest extends Specification {
         then:
         def e = thrown(JaversException)
         e.code == VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
-
     }
 
-    @Unroll
     def "should not detect changes if Multimaps of primitives are the same"() {
         given:
         def left = new SnapshotEntity(multiMapOfPrimitives: HashMultimap.create(leftList))
-        def right = new SnapshotEntity(multiMapOfPrimitives: HashMultimap.create(rightList))
+        def right = new SnapshotEntity(multiMapOfPrimitives: HashMultimap.create(leftList))
 
         when:
         def diff = javers.compare(left, right)
@@ -222,21 +209,15 @@ class GuavaAddOnE2ETest extends Specification {
         diff.changes.size() == 0
 
         where:
-        leftList << [
-                MultimapBuilder.create(["New York": ["Buffalo"]]),
-                MultimapBuilder.create(["New York"       : [
-                             "Buffalo", "City"], "London": ["City"]]),
-                HashMultimap.create()]
-       rightList << [MultimapBuilder.create(["New York": ["Buffalo"]]),
-                     MultimapBuilder.create(["New York": ["Buffalo", "City"], "London": ["City"]]),
-                     HashMultimap.create()]
+        leftList <<  [MultimapBuilder.create(["New York": ["Buffalo"]]),
+                      MultimapBuilder.create(["New York": ["Buffalo", "City"], "London": ["City"]]),
+                      HashMultimap.create()]
     }
 
-    @Unroll
     def "should not detect changes if Multimaps of ValueObjects are the same"() {
         given:
         def left = new SnapshotEntity(multimapPrimitiveToValueObject: HashMultimap.create(leftList))
-        def right = new SnapshotEntity(multimapPrimitiveToValueObject: HashMultimap.create(rightList))
+        def right = new SnapshotEntity(multimapPrimitiveToValueObject: HashMultimap.create(leftList))
 
         when:
         def diff = this.javers.compare(left, right)
@@ -246,10 +227,6 @@ class GuavaAddOnE2ETest extends Specification {
 
         where:
         leftList <<  [MultimapBuilder.create([:]),
-                      MultimapBuilder.create(["NY": [new DummyAddress("City"),
-                                                     new DummyAddress("Buffalo"),
-                                                     new DummyAddress("London")]])]
-        rightList << [MultimapBuilder.create([:]),
                       MultimapBuilder.create(["NY": [new DummyAddress("City"),
                                                      new DummyAddress("Buffalo"),
                                                      new DummyAddress("London")]])]
@@ -276,7 +253,8 @@ class GuavaAddOnE2ETest extends Specification {
 
         where:
         leftList <<  [MultimapBuilder.create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]]) ]
-        rightList << [MultimapBuilder.create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:2),
+        rightList << [MultimapBuilder.create(["NY": [new SnapshotEntity(id:2),
+                                                     new SnapshotEntity(id:2),
                                                      new SnapshotEntity(id:3)]]) ]
     }
 
@@ -294,8 +272,8 @@ class GuavaAddOnE2ETest extends Specification {
 
         then:
         diff.changes.size() == 2
-        diff.getChangesByType(ReferenceChange).size == 1
-        diff.getChangesByType(NewObject).size == 1
+        diff.getChangesByType(ReferenceChange).size() == 1
+        diff.getChangesByType(NewObject).size() == 1
     }
 
     def "should follow (and compare) Entities stored in Multimap when building ObjectGraph"(){
@@ -311,8 +289,8 @@ class GuavaAddOnE2ETest extends Specification {
 
         then:
         diff.changes.size() == 2
-        diff.getChangesByType(ReferenceChange).size == 1
-        diff.getChangesByType(NewObject).size == 1
+        diff.getChangesByType(ReferenceChange).size() == 1
+        diff.getChangesByType(NewObject).size() == 1
     }
 
     private static Collection<Change> getContainerChanges(final Collection<Change> changes) {

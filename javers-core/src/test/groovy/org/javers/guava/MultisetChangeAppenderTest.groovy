@@ -5,7 +5,6 @@ import com.google.common.collect.TreeMultiset
 import org.javers.core.JaversTestBuilder
 import org.javers.core.diff.RealNodePair
 import org.javers.core.diff.appenders.AbstractDiffAppendersTest
-import org.javers.core.diff.appenders.ContainerChangeAssert
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
@@ -23,29 +22,30 @@ class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
     }
 
     @Unroll
-    def "should append #changesCount changes when left multiset is #leftList and right set is #rightList"() {
+    def "should append changes when left multiset is #leftList and right set is #rightList (even if Multisets' impl differs)"() {
 
         when:
         def leftNode = buildGraph(new SnapshotEntity(multiSetOfPrimitives: HashMultiset.create(leftList)))
-        def rightNode = buildGraph(new SnapshotEntity(multiSetOfPrimitives: HashMultiset.create(rightList)))
+        def rightNode = buildGraph(new SnapshotEntity(multiSetOfPrimitives: TreeMultiset.create(rightList)))
 
         def change = multisetChangeAppender().calculateChanges(
                 new RealNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetOfPrimitives"))
 
         then:
-        change.changes.size() == changesCount
+        change.addedValues == added
+        change.removedValues == removed
         change.changes.each {
             assert it.index == null
         }
 
         where:
-        leftList             | rightList            || changesCount
-        []                   | ["1", "2"]           || 2
-        ["1", "2"]           | ["1", "2", "3", "4"] || 2
-        ["1", "2"]           | ["2", "1", "3"]      || 1
-        ["1", "2"]           | []                   || 2
-        ["1", "2", "3", "4"] | ["1"]                || 3
-        ["2", "1", "3"]      | ["1", "2"]           || 1
+        leftList             | rightList            || added      | removed
+        []                   | ["1", "2"]           || ["1", "2"] | []
+        ["1", "2"]           | ["1", "2", "3", "4"] || ["3", "4"] | []
+        ["1", "2"]           | ["2", "1", "3"]      || ["3"]      | []
+        ["1", "2"]           | []                   || []         | ["1", "2"]
+        ["1", "2", "3", "4"] | ["1"]                || []         | ["2", "3", "4"]
+        ["2", "1", "3"]      | ["1", "2"]           || []         | ["3"]
     }
 
     @Unroll
@@ -78,16 +78,15 @@ class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
                 .calculateChanges(new RealNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetValueObject"))
 
         then:
-        ContainerChangeAssert.assertThat(change)
-                .hasSize(1)
-                .hasValueAdded(expectedVal)
+        change.valueAddedChanges.size() == 1
+        change.changes[0].addedValue == valueObjectId(1, SnapshotEntity, "multiSetValueObject/4057abef011cfffbdbaa632f49dcef56")
+
         where:
         leftList <<  [[new DummyAddress(city: "New York"),
                        new DummyAddress(city: "New York")] ]
         rightList << [[new DummyAddress(city: "New York"),
                        new DummyAddress(city: "New York"),
                        new DummyAddress(city: "Buffalo")] ]
-        expectedVal << [valueObjectId(1, SnapshotEntity, "multiSetValueObject/4057abef011cfffbdbaa632f49dcef56")]
     }
 
     def "should append ValueRemoved in Multiset of Values"() {
@@ -100,41 +99,14 @@ class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
                 .calculateChanges(new RealNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetValueObject"))
 
         then:
-        ContainerChangeAssert.assertThat(change)
-                .hasSize(1)
-                .hasValueRemoved(expectedVal)
+        change.valueRemovedChanges.size() == 1
+        change.changes[0].removedValue == valueObjectId(1, SnapshotEntity, "multiSetValueObject/4057abef011cfffbdbaa632f49dcef56")
+
         where:
         leftList <<  [[new DummyAddress(city: "New York"),
                        new DummyAddress(city: "New York"),
                        new DummyAddress(city: "Buffalo")] ]
         rightList << [[new DummyAddress(city: "New York"),
                        new DummyAddress(city: "New York")] ]
-        expectedVal << [valueObjectId(1, SnapshotEntity, "multiSetValueObject/4057abef011cfffbdbaa632f49dcef56")]
     }
-
-    def "should append #changesCount changes for different multiset implementations"(){
-        given:
-        def leftNode = buildGraph(new SnapshotEntity(multiSetOfPrimitives: HashMultiset.create(leftList)))
-        def rightNode = buildGraph(new SnapshotEntity(multiSetOfPrimitives: TreeMultiset.create(rightList)))
-
-        when:
-        def change = multisetChangeAppender().calculateChanges(
-                new RealNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetOfPrimitives"))
-
-        then:
-        change.changes.size() == changesCount
-        change.changes.each {
-            assert it.index == null
-        }
-
-        where:
-        leftList             | rightList            || changesCount
-        []                   | ["1", "2"]           || 2
-        ["1", "2"]           | ["1", "2", "3", "4"] || 2
-        ["1", "2"]           | ["2", "1", "3"]      || 1
-        ["1", "2"]           | []                   || 2
-        ["1", "2", "3", "4"] | ["1"]                || 3
-        ["2", "1", "3"]      | ["1", "2"]           || 1
-    }
-
 }
