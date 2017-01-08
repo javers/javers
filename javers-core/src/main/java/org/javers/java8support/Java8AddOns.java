@@ -1,16 +1,29 @@
 package org.javers.java8support;
 
+import org.javers.common.collections.Lists;
+import org.javers.common.reflection.ReflectionUtil;
+import org.javers.core.ConditionalTypesPlugin;
 import org.javers.core.JaversBuilder;
-import org.javers.core.JaversBuilderPlugin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.OptionalType;
 
-public class Java8AddOns implements JaversBuilderPlugin {
-    private static final Logger logger = LoggerFactory.getLogger(Java8AddOns.class);
+import java.util.Collection;
+import java.util.List;
+
+public class Java8AddOns extends ConditionalTypesPlugin {
+
+    @Override
+    public boolean shouldBeActivated() {
+        return ReflectionUtil.isJava8runtime();
+    }
+
+    @Override
+    public Collection<JaversType> getNewTypes() {
+        return (List)Lists.asList(new OptionalType());
+    }
 
     @Override
     public void beforeAssemble(JaversBuilder javersBuilder) {
-        logger.info("loading Java8 add-ons ...");
         javersBuilder.registerValueTypeAdapter(new LocalDateTypeAdapter());
         javersBuilder.registerValueTypeAdapter(new LocalDateTimeTypeAdapter());
         javersBuilder.registerValueTypeAdapter(new LocalTimeTypeAdapter());

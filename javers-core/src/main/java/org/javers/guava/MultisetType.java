@@ -1,4 +1,4 @@
-package org.javers.guava.multiset;
+package org.javers.guava;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -7,6 +7,7 @@ import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.type.CollectionType;
 import org.javers.core.metamodel.type.SetType;
 
 import java.lang.reflect.Type;
@@ -14,7 +15,7 @@ import java.lang.reflect.Type;
 /**
  * @author akrystian
  */
-public class MultisetType extends SetType{
+public class MultisetType extends CollectionType{
 
     public static MultisetType getInstance(){
         return  new MultisetType(Multiset.class);

@@ -1,25 +1,31 @@
-package org.javers.guava.multimap
+package org.javers.guava
 
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.reflect.TypeToken
 import org.javers.common.exception.JaversException
+import org.javers.core.JaversTestBuilder
 import org.javers.core.diff.appenders.AbstractDiffAppendersTest
+import org.javers.core.diff.appenders.MapChangeAssert
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
 
-import static org.javers.core.diff.appenders.MapChangeAssert.getAssertThat
-import static org.javers.guavasupport.MultimapBuilder.create
+import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
+import static org.javers.guava.MultimapBuilder.create
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
-import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 
 /**
  * @author akrystian
  */
 class MultimapChangeAppenderTest extends AbstractDiffAppendersTest {
+
+    MultimapChangeAppender multimapChangeAppender() {
+        def javers = JaversTestBuilder.javersTestAssembly()
+        new MultimapChangeAppender(javers.typeMapper, javers.globalIdFactory)
+    }
 
     @Unroll
     def "should append EntryAdded for #what"() {
@@ -28,7 +34,7 @@ class MultimapChangeAppenderTest extends AbstractDiffAppendersTest {
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, property))
 
         then:
-        assertThat(change).hasSize(1)
+        MapChangeAssert.assertThat(change).hasSize(1)
                 .hasEntryAdded(expectedKey, expectedVal)
 
         where:
@@ -53,7 +59,7 @@ class MultimapChangeAppenderTest extends AbstractDiffAppendersTest {
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, property))
 
         then:
-        assertThat(change).hasSize(1)
+        MapChangeAssert.assertThat(change).hasSize(1)
                 .hasEntryRemoved(expectedKey, expectedVal)
 
         where:
@@ -90,7 +96,7 @@ class MultimapChangeAppenderTest extends AbstractDiffAppendersTest {
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "multiMapEntityToEntity"))
 
         then:
-        assertThat(change).hasSize(2)
+        MapChangeAssert.assertThat(change).hasSize(2)
                 .hasEntryRemoved(instanceId(10, SnapshotEntity), instanceId(5, SnapshotEntity))
                 .hasEntryAdded(instanceId(12, SnapshotEntity), instanceId(5, SnapshotEntity))
     }
@@ -108,7 +114,7 @@ class MultimapChangeAppenderTest extends AbstractDiffAppendersTest {
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, "multiMapEntityToEntity"))
 
         then:
-        assertThat(change).hasSize(2)
+        MapChangeAssert.assertThat(change).hasSize(2)
                 .hasEntryRemoved(instanceId(10, SnapshotEntity), instanceId(5, SnapshotEntity))
                 .hasEntryAdded(instanceId(12, SnapshotEntity), instanceId(5, SnapshotEntity))
     }

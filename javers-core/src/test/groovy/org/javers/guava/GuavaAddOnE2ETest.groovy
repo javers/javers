@@ -1,4 +1,4 @@
-package org.javers.guavasupport
+package org.javers.guava
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.HashMultiset
@@ -18,7 +18,7 @@ import spock.lang.Unroll
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.JaversBuilder.javers
-import static org.javers.guavasupport.MultimapBuilder.create
+
 /**
  * @author akrystian
  */
@@ -117,25 +117,6 @@ class GuavaAddOnE2ETest extends Specification {
         rightList << [ [new SnapshotEntity(id:2), new SnapshotEntity(id:2), new SnapshotEntity(id:3)] ]
     }
 
-    def "should follow Entities stored in Multisets when building ObjectGraph"(){
-        given:
-        def left = new SnapshotEntity(multiSetOfEntities: HashMultiset.create(
-              [new SnapshotEntity(id:2)]
-        ))
-        def right = new SnapshotEntity(multiSetOfEntities: HashMultiset.create(
-              [new SnapshotEntity(id:2, entityRef: new SnapshotEntity(id:3))]
-        ))
-
-        when:
-        def diff = javers.compare(left, right)
-        println diff.prettyPrint()
-
-        then:
-        diff.changes.size() == 2
-        diff.getChangesByType(ReferenceChange).size == 1
-        diff.getChangesByType(NewObject).size == 1
-    }
-
     def "should not detect changes if Multisets of ValueObjects are the same"() {
         given:
         def left = new SnapshotEntity(multiSetValueObject: HashMultiset.create(leftList))
@@ -170,12 +151,12 @@ class GuavaAddOnE2ETest extends Specification {
         diff.changes[0].entryChanges.size() == extpectedChanges
 
         where:
-        leftList << [create( "New York": ["City"] ),
-                     create( "New York": ["City"] ),
-                     create( [:])]
-        rightList <<[create( "New York": ["Buffalo"] ),
-                     create( "New York": ["City", "Buffalo", "London"] ),
-                     create( "New York": ["City"]) ]
+        leftList << [MultimapBuilder.create( "New York": ["City"] ),
+                     MultimapBuilder.create( "New York": ["City"] ),
+                     MultimapBuilder.create( [:])]
+        rightList <<[MultimapBuilder.create( "New York": ["Buffalo"] ),
+                     MultimapBuilder.create( "New York": ["City", "Buffalo", "London"] ),
+                     MultimapBuilder.create( "New York": ["City"]) ]
 
         extpectedChanges << [2, 2, 1]
     }
@@ -196,19 +177,19 @@ class GuavaAddOnE2ETest extends Specification {
 
         where:
         leftList << [
-                create(["NY": [new DummyAddress("City")]]),
-                create(["NY": [new DummyAddress("City")]]),
+                MultimapBuilder.create(["NY": [new DummyAddress("City")]]),
+                MultimapBuilder.create(["NY": [new DummyAddress("City")]]),
                 HashMultimap.create(),
-                create(["NY": [new DummyAddress("City"),
-                                       new DummyAddress("Buffalo"),
-                                       new DummyAddress("London")]]),
+                MultimapBuilder.create(["NY": [new DummyAddress("City"),
+                                               new DummyAddress("Buffalo"),
+                                               new DummyAddress("London")]]),
         ]
-        rightList << [create(["NY": [new DummyAddress("Buffalo")]]),
-                      create(["NY": [new DummyAddress("City"),
-                                             new DummyAddress("Buffalo"),
-                                             new DummyAddress("London")]]),
-                      create(["NY": [new DummyAddress("City")]]),
-                      create(["NY": [new DummyAddress("City")]])
+        rightList << [MultimapBuilder.create(["NY": [new DummyAddress("Buffalo")]]),
+                      MultimapBuilder.create(["NY": [new DummyAddress("City"),
+                                                     new DummyAddress("Buffalo"),
+                                                     new DummyAddress("London")]]),
+                      MultimapBuilder.create(["NY": [new DummyAddress("City")]]),
+                      MultimapBuilder.create(["NY": [new DummyAddress("City")]])
         ]
         expectedContainerChanges << [2, 2, 1, 2]
     }
@@ -216,7 +197,7 @@ class GuavaAddOnE2ETest extends Specification {
     def "should not support Map<ValueObject,?>"() {
         given:
         def left = new SnapshotEntity(multimapValueObjectToValueObject: HashMultimap.
-                create(create([(new DummyAddress("City")): [new DummyAddress("City")]])))
+                create(MultimapBuilder.create([(new DummyAddress("City")): [new DummyAddress("City")]])))
         def right = new SnapshotEntity()
 
         when:
@@ -242,12 +223,12 @@ class GuavaAddOnE2ETest extends Specification {
 
         where:
         leftList << [
-                     create(["New York" : ["Buffalo"]]),
-                     create(["New York" : [
-                             "Buffalo", "City"], "London" : ["City"]]),
-                     HashMultimap.create()]
-       rightList << [create(["New York" : ["Buffalo"]]),
-                     create(["New York" : ["Buffalo", "City"], "London" : ["City"]]),
+                MultimapBuilder.create(["New York": ["Buffalo"]]),
+                MultimapBuilder.create(["New York"       : [
+                             "Buffalo", "City"], "London": ["City"]]),
+                HashMultimap.create()]
+       rightList << [MultimapBuilder.create(["New York": ["Buffalo"]]),
+                     MultimapBuilder.create(["New York": ["Buffalo", "City"], "London": ["City"]]),
                      HashMultimap.create()]
     }
 
@@ -264,14 +245,14 @@ class GuavaAddOnE2ETest extends Specification {
         diff.changes.size() == 0
 
         where:
-        leftList <<  [create([:]),
-                      create(["NY" : [new DummyAddress("City"),
-                                              new DummyAddress("Buffalo"),
-                                              new DummyAddress("London")]])]
-        rightList << [create([:]),
-                      create(["NY" : [new DummyAddress("City"),
-                                              new DummyAddress("Buffalo"),
-                                              new DummyAddress("London")]])]
+        leftList <<  [MultimapBuilder.create([:]),
+                      MultimapBuilder.create(["NY": [new DummyAddress("City"),
+                                                     new DummyAddress("Buffalo"),
+                                                     new DummyAddress("London")]])]
+        rightList << [MultimapBuilder.create([:]),
+                      MultimapBuilder.create(["NY": [new DummyAddress("City"),
+                                                     new DummyAddress("Buffalo"),
+                                                     new DummyAddress("London")]])]
     }
 
     def "should detect changes in Multimap of Entities"() {
@@ -294,15 +275,35 @@ class GuavaAddOnE2ETest extends Specification {
         }
 
         where:
-        leftList <<  [ create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]]) ]
-        rightList << [ create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:2),
-                                      new SnapshotEntity(id:3)]]) ]
+        leftList <<  [MultimapBuilder.create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]]) ]
+        rightList << [MultimapBuilder.create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:2),
+                                                     new SnapshotEntity(id:3)]]) ]
     }
 
-    def "should follow Entities stored in Multimap when building ObjectGraph"(){
+    def "should follow (and compare) Entities stored in Multisets when building ObjectGraph"(){
         given:
-        def left = new SnapshotEntity(multiMapPrimitiveToEntity: leftList)
-        def right = new SnapshotEntity(multiMapPrimitiveToEntity: rightList)
+        def left = new SnapshotEntity(multiSetOfEntities: HashMultiset.create(
+                [new SnapshotEntity(id:2)]
+        ))
+        def right = new SnapshotEntity(multiSetOfEntities: HashMultiset.create(
+                [new SnapshotEntity(id:2, entityRef: new SnapshotEntity(id:3))]
+        ))
+
+        when:
+        def diff = javers.compare(left, right)
+
+        then:
+        diff.changes.size() == 2
+        diff.getChangesByType(ReferenceChange).size == 1
+        diff.getChangesByType(NewObject).size == 1
+    }
+
+    def "should follow (and compare) Entities stored in Multimap when building ObjectGraph"(){
+        given:
+        def left = new SnapshotEntity(multiMapPrimitiveToEntity:
+                MultimapBuilder.create(["NY": [new SnapshotEntity(id:2)]]))
+        def right = new SnapshotEntity(multiMapPrimitiveToEntity:
+                MultimapBuilder.create(["NY": [new SnapshotEntity(id:2, entityRef: new SnapshotEntity(id:3))]]))
 
         when:
         def diff = javers.compare(left, right)
@@ -310,14 +311,9 @@ class GuavaAddOnE2ETest extends Specification {
 
         then:
         diff.changes.size() == 2
-        diff.getChangesByType(MapChange).size == 1
+        diff.getChangesByType(ReferenceChange).size == 1
         diff.getChangesByType(NewObject).size == 1
-
-        where:
-        leftList << [ create(["NY": [new SnapshotEntity(id:3)]]) ]
-        rightList <<  [ create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]]) ]
     }
-
 
     private static Collection<Change> getContainerChanges(final Collection<Change> changes) {
         changes.findAll { it instanceof MapChange || it instanceof SetChange }

@@ -60,7 +60,7 @@ class ObjectGraphBuilder {
             buildEdges(stub); //edgeBuilder should append new stubs to queue
         }
 
-        logger.debug("{} graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
+        logger.info("{} graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
                 edgeBuilder.graphType(),
                 nodeReuser.nodesCount(), nodeReuser.entitiesCount(), nodeReuser.voCount());
         switchToBuilt();
@@ -153,11 +153,11 @@ class ObjectGraphBuilder {
     }
 
     /**
-     * is Map with ManagedClass on Key or Value position
+     * is Map (or Multimap) with ManagedClass on Key or Value position
      */
     private boolean isMapWithManagedTypes(EnumerableType enumerableType) {
-        if (enumerableType instanceof MapType){
-            MapType mapType = (MapType)enumerableType;
+        if (enumerableType instanceof KeyValueType){
+            KeyValueType mapType = (KeyValueType)enumerableType;
 
             JaversType keyType = typeMapper.getJaversType(mapType.getKeyType());
             JaversType valueType = typeMapper.getJaversType(mapType.getValueType());

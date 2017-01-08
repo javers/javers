@@ -1,22 +1,19 @@
-package org.javers.guava.multimap;
+package org.javers.guava;
 
 import com.google.common.collect.Multimap;
 import org.javers.common.exception.JaversException;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.CorePropertyChangeAppender;
-import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.map.EntryAdded;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.EntryRemoved;
 import org.javers.core.diff.changetype.map.MapChange;
-import org.javers.core.diff.custom.CustomPropertyComparator;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.DehydrateMapFunction;
+import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.MapContentType;
-import org.javers.core.metamodel.type.MapType;
-import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.metamodel.type.ValueObjectType;
+import org.javers.core.metamodel.type.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,30 +31,41 @@ import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NO
  *
  * @author akrystian
  */
-public class MultimapChangeAppender extends CorePropertyChangeAppender implements CustomPropertyComparator<Multimap, MapChange>{
+class MultimapChangeAppender extends CorePropertyChangeAppender<MapChange>{
 
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
 
-    public MultimapChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory){
+    MultimapChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory){
         this.typeMapper = typeMapper;
         this.globalIdFactory = globalIdFactory;
     }
 
     @Override
-    public MapChange compare(Multimap left, Multimap right, GlobalId affectedId, Property property){
-        if (!isSupportedContainer(property) || (left != null && left.equals(right))){
-            return null;
+    public boolean supports(JaversType propertyType) {
+        if (!(propertyType instanceof MultimapType)){
+            return false;
         }
+        MapContentType mapContentType = typeMapper.getMapContentType((KeyValueType) propertyType);
+        if (mapContentType.getKeyType() instanceof ValueObjectType){
+            throw new JaversException(VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY, propertyType);
+        }
+        return true;
+    }
+
+    @Override
+    public MapChange calculateChanges(NodePair pair, Property property){
+        Multimap left =  (Multimap)pair.getLeftPropertyValue(property);
+        Multimap right = (Multimap)pair.getRightPropertyValue(property);
 
         MultimapType multimapType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
+        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
 
         List<EntryChange> entryChanges = calculateChanges(multimapType, left, right, owner);
         if (!entryChanges.isEmpty()){
             renderNotParametrizedWarningIfNeeded(multimapType.getKeyType(), "key", "Map", property);
             renderNotParametrizedWarningIfNeeded(multimapType.getValueType(), "value", "Map", property);
-            return new MapChange(affectedId, property.getName(), entryChanges);
+            return new MapChange(pair.getGlobalId(), property.getName(), entryChanges);
         }else{
             return null;
         }
@@ -141,29 +149,5 @@ public class MultimapChangeAppender extends CorePropertyChangeAppender implement
 
         MultiMapContentType multiMapContentType = new MultiMapContentType(keyType, valueType);
         return new DehydrateMapFunction(globalIdFactory, multiMapContentType);
-    }
-
-    @Override
-    public boolean supports(JaversType propertyType) {
-        if (!(propertyType instanceof MultimapType)){
-            return false;
-        }
-        MapContentType mapContentType = typeMapper.getMapContentType((MapType)propertyType);
-        if (mapContentType.getKeyType() instanceof ValueObjectType){
-            throw new JaversException(VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY, propertyType);
-        }
-        return true;
-    }
-
-    private boolean isSupportedContainer(Property property){
-        MultimapType multimapType = typeMapper.getPropertyType(property);
-        return supports(multimapType);
-    }
-
-    @Override
-    public PropertyChange calculateChanges(NodePair pair, Property supportedProperty){
-        Multimap leftRawMultimap =  (Multimap)pair.getLeftPropertyValue(supportedProperty);
-        Multimap rightRawMultimap = (Multimap)pair.getRightPropertyValue(supportedProperty);
-        return compare(leftRawMultimap,rightRawMultimap,pair.getGlobalId(),supportedProperty);
     }
 }

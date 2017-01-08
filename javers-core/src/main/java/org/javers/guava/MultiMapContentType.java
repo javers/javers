@@ -1,4 +1,4 @@
-package org.javers.guava.multimap;
+package org.javers.guava;
 
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.MapContentType;
@@ -6,7 +6,7 @@ import org.javers.core.metamodel.type.MapContentType;
 /**
  * @author akrystian
  */
-public class MultiMapContentType extends MapContentType{
+class MultiMapContentType extends MapContentType{
     public MultiMapContentType(JaversType keyType, JaversType valueType){
         super(keyType, valueType);
     }

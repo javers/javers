@@ -2,16 +2,13 @@ package org.javers.core;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.core.pico.CustomComparatorModule;
 import org.javers.core.pico.InstantiatingModule;
 import org.javers.core.pico.JaversModule;
 import org.picocontainer.DefaultPicoContainer;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.behaviors.Caching;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author bartosz walacik
@@ -19,16 +16,10 @@ import java.util.Map;
 public abstract class AbstractContainerBuilder {
 
     private MutablePicoContainer container;
-    private Map<Class,Class> comparatorModuleMappings = new HashMap<>();
-
 
     protected <T> T getContainerComponent(Class<T> ofClass) {
         checkIfBuilt();
         return container.getComponent(ofClass);
-    }
-
-    public Map<Class, Class> getComparatorModuleMappings(){
-        return comparatorModuleMappings;
     }
 
     protected void bootContainer() {
@@ -38,11 +29,6 @@ public abstract class AbstractContainerBuilder {
     protected void addModule(InstantiatingModule module) {
         checkIfBuilt();
         module.instantiateAndBindComponents();
-    }
-
-    protected void addModule(CustomComparatorModule module){
-        addModule((InstantiatingModule)module);
-        comparatorModuleMappings.putAll(module.getCustomComparatorMappings());
     }
 
     protected void addModule(JaversModule module) {

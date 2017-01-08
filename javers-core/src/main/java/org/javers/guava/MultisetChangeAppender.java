@@ -1,20 +1,14 @@
-package org.javers.guava.multiset;
+package org.javers.guava;
 
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.CorePropertyChangeAppender;
-import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
 import org.javers.core.diff.changetype.container.ValueRemoved;
-import org.javers.core.diff.custom.CustomPropertyComparator;
-import org.javers.core.metamodel.object.DehydrateContainerFunction;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.OwnerContext;
-import org.javers.core.metamodel.object.PropertyOwnerContext;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -30,30 +24,34 @@ import java.util.List;
  *
  * @author akrystian
  */
-public class MultisetChangeAppender extends CorePropertyChangeAppender implements CustomPropertyComparator<Multiset, SetChange> {
+class MultisetChangeAppender extends CorePropertyChangeAppender<SetChange> {
 
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
 
 
-    public MultisetChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory){
+    MultisetChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory){
         this.typeMapper = typeMapper;
         this.globalIdFactory = globalIdFactory;
     }
 
     @Override
-    public SetChange compare(Multiset left, Multiset right, GlobalId affectedId, Property property){
-        if (left != null && left.equals(right)){
-            return null;
-        }
+    public boolean supports(JaversType propertyType) {
+        return  propertyType instanceof MultisetType;
+    }
+
+    @Override
+    public SetChange calculateChanges(NodePair pair, Property property){
+        Multiset left =  (Multiset)pair.getLeftPropertyValue(property);
+        Multiset right = (Multiset)pair.getRightPropertyValue(property);
 
         MultisetType multisetType = typeMapper.getPropertyType(property);
-        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
+        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
 
         List<ContainerElementChange> entryChanges = calculateEntryChanges(multisetType, left, right, owner);
         if (!entryChanges.isEmpty()){
             renderNotParametrizedWarningIfNeeded(multisetType.getItemType(), "item", "Set", property);
-            return new SetChange(affectedId, property.getName(), entryChanges);
+            return new SetChange(pair.getGlobalId(), property.getName(), entryChanges);
         } else {
             return null;
         }
@@ -76,17 +74,5 @@ public class MultisetChangeAppender extends CorePropertyChangeAppender implement
             changes.add(new ValueAdded(globalCdoId));
         }
         return changes;
-    }
-
-    @Override
-    public boolean supports(JaversType propertyType) {
-        return  propertyType instanceof MultisetType;
-    }
-
-    @Override
-    public PropertyChange calculateChanges(NodePair pair, Property supportedProperty){
-        Multiset leftRawMultiset =  (Multiset)pair.getLeftPropertyValue(supportedProperty);
-        Multiset rightRawMulitset = (Multiset)pair.getRightPropertyValue(supportedProperty);
-        return compare(leftRawMultiset,rightRawMulitset,pair.getGlobalId(),supportedProperty);
     }
 }

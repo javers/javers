@@ -1,7 +1,7 @@
 package org.javers.core.json.typeadapter.util;
 
+import org.javers.core.ConditionalTypesPlugin;
 import org.javers.core.JaversBuilder;
-import org.javers.core.JaversBuilderPlugin;
 
 import java.net.URI;
 import java.net.URL;
@@ -10,7 +10,12 @@ import java.util.Currency;
 /**
  * @author bartosz.walacik
  */
-public class UtilTypeAdapters implements JaversBuilderPlugin {
+public class UtilTypeAdapters extends ConditionalTypesPlugin {
+
+    @Override
+    public boolean shouldBeActivated() {
+        return true;
+    }
 
     @Override
     public void beforeAssemble(JaversBuilder javersBuilder) {

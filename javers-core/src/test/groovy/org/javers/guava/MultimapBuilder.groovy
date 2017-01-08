@@ -1,17 +1,16 @@
-package org.javers.guavasupport
+package org.javers.guava
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
+
 /**
  * @author akrystian
  */
 class MultimapBuilder {
 
     /**
-     * Create multimap from Map<K, List<V>>.
-     * @param source
-     * @return
+     * Creates multimap from Map<K, List<V>>.
      */
-    public static <K, V> Multimap create(Map<K, List<V>> source) {
+     static <K, V> Multimap create(Map<K, List<V>> source) {
         def multimap = ArrayListMultimap.create()
         def set = source.keySet()
         set.forEach { k ->

@@ -1,34 +1,33 @@
-package org.javers.guava.multimap;
+package org.javers.guava;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.type.KeyValueType;
 import org.javers.core.metamodel.type.MapEnumerationOwnerContext;
-import org.javers.core.metamodel.type.MapType;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
 
-import static org.javers.guava.multimap.Multimaps.createEmptyMultimap;
-import static org.javers.guava.multimap.Multimaps.toNotNullMultimap;
+import static org.javers.guava.Multimaps.createEmptyMultimap;
+import static org.javers.guava.Multimaps.toNotNullMultimap;
 
 
 /**
  * @author akrystian
  */
-public class MultimapType extends MapType{
+public class MultimapType extends KeyValueType {
 
     public static MultimapType getInstance(){
         return new MultimapType(Multimap.class);
     }
 
     public MultimapType(Type baseJavaType) {
-        super(baseJavaType);
+        super(baseJavaType,2);
     }
-
 
     @Override
     public Multimap map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
@@ -59,21 +58,6 @@ public class MultimapType extends MapType{
     @Override
     public boolean isEmpty(Object container){
         return container == null || ((Multimap) container).isEmpty();
-    }
-
-    /**
-     * never returns null
-     *
-     */
-    public Type getKeyType(){
-            return getConcreteClassTypeArguments().get(0);
-    }
-
-    /**
-     * never returns null
-     */
-    public Type getValueType(){
-            return getConcreteClassTypeArguments().get(1);
     }
 
     /**

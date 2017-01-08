@@ -1,19 +1,26 @@
-package org.javers.guava.multiset
+package org.javers.guava
+
 import com.google.common.collect.HashMultiset
 import com.google.common.collect.TreeMultiset
+import org.javers.core.JaversTestBuilder
 import org.javers.core.diff.RealNodePair
 import org.javers.core.diff.appenders.AbstractDiffAppendersTest
+import org.javers.core.diff.appenders.ContainerChangeAssert
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
 
-import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
+
 /**
  * @author akrystian
  */
 class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
 
+    MultisetChangeAppender multisetChangeAppender() {
+        def javers = JaversTestBuilder.javersTestAssembly()
+        new MultisetChangeAppender(javers.typeMapper, javers.globalIdFactory)
+    }
 
     @Unroll
     def "should append #changesCount changes when left multiset is #leftList and right set is #rightList"() {
@@ -71,7 +78,7 @@ class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
                 .calculateChanges(new RealNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetValueObject"))
 
         then:
-        assertThat(change)
+        ContainerChangeAssert.assertThat(change)
                 .hasSize(1)
                 .hasValueAdded(expectedVal)
         where:
@@ -93,7 +100,7 @@ class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
                 .calculateChanges(new RealNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetValueObject"))
 
         then:
-        assertThat(change)
+        ContainerChangeAssert.assertThat(change)
                 .hasSize(1)
                 .hasValueRemoved(expectedVal)
         where:

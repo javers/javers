@@ -1,10 +1,9 @@
 package org.javers.common.properties;
 
+import java.util.Properties;
 import org.javers.common.exception.JaversException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
 
 /**
  * @author bartosz walacik

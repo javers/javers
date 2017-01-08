@@ -1,4 +1,4 @@
-package org.javers.guava.multimap;
+package org.javers.guava;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * @author akrystian
  */
-public class Multimaps{
+class Multimaps{
     /**
      * null args are allowed
      */
