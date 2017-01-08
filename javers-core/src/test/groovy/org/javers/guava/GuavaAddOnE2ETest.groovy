@@ -183,20 +183,6 @@ class GuavaAddOnE2ETest extends Specification {
         expectedContainerChanges << [2, 2, 1, 2]
     }
 
-    def "should not support Map<ValueObject,?>"() {
-        given:
-        def left = new SnapshotEntity(multimapValueObjectToValueObject: HashMultimap.
-                create(MultimapBuilder.create([(new DummyAddress("City")): [new DummyAddress("City")]])))
-        def right = new SnapshotEntity()
-
-        when:
-        javers.compare(left, right)
-
-        then:
-        def e = thrown(JaversException)
-        e.code == VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
-    }
-
     def "should not detect changes if Multimaps of primitives are the same"() {
         given:
         def left = new SnapshotEntity(multiMapOfPrimitives: HashMultimap.create(leftList))

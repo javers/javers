@@ -1,5 +1,7 @@
 package org.javers.core.diff.changetype.map;
 
+import org.javers.common.collections.Lists;
+import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalId;
@@ -24,11 +26,28 @@ public class MapChange extends PropertyChange {
         this.changes = Collections.unmodifiableList(new ArrayList<>(changes));
     }
 
-    /**
-     * @return unmodifiable list
-     */
     public List<EntryChange> getEntryChanges() {
         return changes;
+    }
+
+    public List<EntryAdded> getEntryAddedChanges() {
+        return filterChanges(EntryAdded.class);
+    }
+
+    public List<EntryRemoved> getEntryRemovedChanges() {
+        return filterChanges(EntryRemoved.class);
+    }
+
+    public List<EntryValueChange> getEntryValueChanges() {
+        return filterChanges(EntryValueChange.class);
+    }
+
+    private <T extends EntryChange> List<T> filterChanges(final Class<T> ofType) {
+        return (List) Lists.positiveFilter(changes, new Predicate<EntryChange>() {
+            public boolean apply(EntryChange input) {
+                return ofType.isAssignableFrom(input.getClass());
+            }
+        });
     }
 
     @Override

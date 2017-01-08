@@ -6,7 +6,7 @@ import org.javers.common.string.ToStringBuilder;
 import org.javers.core.diff.changetype.Atomic;
 
 /**
- * entry value changed, when value is simple type
+ * entry value changed, when value is a simple type
  *
  * @author bartosz walacik
  */

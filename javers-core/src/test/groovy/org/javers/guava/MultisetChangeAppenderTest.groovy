@@ -32,20 +32,20 @@ class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
                 new RealNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "multiSetOfPrimitives"))
 
         then:
-        change.addedValues == added
+        new ArrayList(change.addedValues).sort() == added.sort()
         change.removedValues == removed
         change.changes.each {
             assert it.index == null
         }
 
         where:
-        leftList             | rightList            || added      | removed
-        []                   | ["1", "2"]           || ["1", "2"] | []
-        ["1", "2"]           | ["1", "2", "3", "4"] || ["3", "4"] | []
-        ["1", "2"]           | ["2", "1", "3"]      || ["3"]      | []
-        ["1", "2"]           | []                   || []         | ["1", "2"]
-        ["1", "2", "3", "4"] | ["1"]                || []         | ["2", "3", "4"]
-        ["2", "1", "3"]      | ["1", "2"]           || []         | ["3"]
+        leftList             | rightList            || added           | removed
+        []                   | ["2", "1", "2"]      || ["2", "1", "2"] | []
+        ["1", "2"]           | ["1", "2", "3", "4"] || ["3", "4"]      | []
+        ["1", "2"]           | ["2", "1", "3"]      || ["3"]           | []
+        ["1", "2"]           | []                   || []              | ["1", "2"]
+        ["1", "2", "3", "4"] | ["1"]                || []              | ["2", "3", "4"]
+        ["2", "1", "3"]      | ["1", "2"]           || []              | ["3"]
     }
 
     @Unroll
