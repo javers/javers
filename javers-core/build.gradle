@@ -3,7 +3,7 @@ mainClassName = "org.javers.core.selftest.Application"
 
 dependencies {
     compile 'joda-time:joda-time:2.3'
-    compile 'org.slf4j:slf4j-api:1.7.2'
+    compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'com.google.code.gson:gson:2.5'
     compile 'org.picocontainer:picocontainer:2.14.3'
     compile 'io.github.lukehutch:fast-classpath-scanner:2.0.3'
