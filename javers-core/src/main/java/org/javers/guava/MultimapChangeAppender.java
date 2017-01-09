@@ -63,8 +63,8 @@ class MultimapChangeAppender extends CorePropertyChangeAppender<MapChange>{
 
         List<EntryChange> entryChanges = calculateChanges(multimapType, left, right, owner);
         if (!entryChanges.isEmpty()){
-            renderNotParametrizedWarningIfNeeded(multimapType.getKeyType(), "key", "Map", property);
-            renderNotParametrizedWarningIfNeeded(multimapType.getValueType(), "value", "Map", property);
+            renderNotParametrizedWarningIfNeeded(multimapType.getKeyType(), "key", "Multimap", property);
+            renderNotParametrizedWarningIfNeeded(multimapType.getValueType(), "value", "Multimap", property);
             return new MapChange(pair.getGlobalId(), property.getName(), entryChanges);
         }else{
             return null;
@@ -73,6 +73,7 @@ class MultimapChangeAppender extends CorePropertyChangeAppender<MapChange>{
 
     private List<EntryChange> calculateChanges(MultimapType multimapType, Multimap left, Multimap right, OwnerContext owner){
         DehydrateMapFunction dehydrateFunction = getDehydrateMapFunction(multimapType);
+
         Multimap leftMultimap = multimapType.map(left, dehydrateFunction, owner);
         Multimap rightMultimap = multimapType.map(right, dehydrateFunction, owner);
 

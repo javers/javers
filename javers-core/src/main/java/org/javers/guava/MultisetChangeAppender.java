@@ -50,7 +50,7 @@ class MultisetChangeAppender extends CorePropertyChangeAppender<SetChange> {
 
         List<ContainerElementChange> entryChanges = calculateEntryChanges(multisetType, left, right, owner);
         if (!entryChanges.isEmpty()){
-            renderNotParametrizedWarningIfNeeded(multisetType.getItemType(), "item", "Set", property);
+            renderNotParametrizedWarningIfNeeded(multisetType.getItemType(), "item", "Multiset", property);
             return new SetChange(pair.getGlobalId(), property.getName(), entryChanges);
         } else {
             return null;
@@ -61,8 +61,8 @@ class MultisetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         JaversType itemType = typeMapper.getJaversType(multisetType.getItemType());
         DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
 
-        Multiset<GlobalId> leftMultiset = (Multiset) multisetType.map(left,dehydrateFunction,owner);
-        Multiset<GlobalId> rightMultiset = (Multiset) multisetType.map(right,dehydrateFunction,owner);
+        Multiset leftMultiset = (Multiset) multisetType.map(left,dehydrateFunction,owner);
+        Multiset rightMultiset = (Multiset) multisetType.map(right,dehydrateFunction,owner);
 
         List<ContainerElementChange> changes = new ArrayList<>();
 
