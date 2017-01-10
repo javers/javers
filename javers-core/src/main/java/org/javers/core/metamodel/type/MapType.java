@@ -12,14 +12,14 @@ import java.util.Map;
 /**
  * @author bartosz walacik
  */
-public class MapType extends EnumerableType {
+public class MapType extends KeyValueType {
 
     public MapType(Type baseJavaType) {
         super(baseJavaType, 2);
     }
 
     @Override
-    public Map map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
+    public Object map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
         return mapStatic(sourceMap_, mapFunction, owner);
     }
 
@@ -53,19 +53,5 @@ public class MapType extends EnumerableType {
     @Override
     public boolean isEmpty(Object map) {
         return map == null || ((Map)map).isEmpty();
-    }
-
-    /**
-     * never returns null
-     */
-    public Type getKeyType() {
-        return getConcreteClassTypeArguments().get(0);
-    }
-
-    /**
-     * never returns null
-     */
-    public Type getValueType() {
-        return getConcreteClassTypeArguments().get(1);
     }
 }

@@ -31,19 +31,10 @@ public class CollectionType extends ContainerType {
         }
 
         Set targetSet = new HashSet(sourceCol.size());
-        EnumerationAwareOwnerContext enumerationContext = new CollectionEnumerationOwnerContext(owner);
+        EnumerationAwareOwnerContext enumerationContext = new EnumerationAwareOwnerContext(owner);
         for (Object sourceVal : sourceCol) {
             targetSet.add(mapFunction.apply(sourceVal, enumerationContext));
         }
         return Collections.unmodifiableSet(targetSet);
-    }
-
-    /**
-     * marker class
-     */
-    public static class CollectionEnumerationOwnerContext extends EnumerationAwareOwnerContext {
-        CollectionEnumerationOwnerContext(OwnerContext ownerContext) {
-            super(ownerContext);
-        }
     }
 }

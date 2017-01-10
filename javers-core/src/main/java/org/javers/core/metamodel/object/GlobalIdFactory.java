@@ -6,6 +6,8 @@ import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.metamodel.type.*;
 import org.javers.core.snapshot.ObjectHasher;
+import org.javers.guava.MultimapType;
+import org.javers.guava.MultisetType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.jql.UnboundedValueObjectIdDTO;
@@ -54,7 +56,7 @@ public class GlobalIdFactory {
         if (targetManagedType instanceof ValueObjectType && hasOwner(ownerContext)) {
             String pathFromRoot = createPathFromRoot(ownerContext.getOwnerId(), ownerContext.getPath());
 
-            if (ownerContext instanceof SetType.SetEnumerationOwnerContext) {
+            if (ownerContext.requiresObjectHasher()) {
                 pathFromRoot += "/" + getObjectHasher().hash(targetCdo);
             }
             return new ValueObjectId(targetManagedType.getName(), getRootOwnerId(ownerContext), pathFromRoot);

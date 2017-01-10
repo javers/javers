@@ -55,7 +55,7 @@ public class Lists {
                 result.add(element);
             }
         }
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
     /**

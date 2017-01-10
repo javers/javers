@@ -153,18 +153,20 @@ class ObjectGraphBuilder {
     }
 
     /**
-     * is Map with ManagedClass on Key or Value position
+     * is Map (or Multimap) with ManagedClass on Key or Value position
      */
     private boolean isMapWithManagedTypes(EnumerableType enumerableType) {
-        if (! (enumerableType instanceof MapType)) {
+        if (enumerableType instanceof KeyValueType){
+            KeyValueType mapType = (KeyValueType)enumerableType;
+
+            JaversType keyType = typeMapper.getJaversType(mapType.getKeyType());
+            JaversType valueType = typeMapper.getJaversType(mapType.getValueType());
+
+            return keyType instanceof ManagedType || valueType instanceof ManagedType;
+     } else{
             return false;
         }
 
-        MapType mapType = (MapType)enumerableType;
 
-        JaversType keyType = typeMapper.getJaversType(mapType.getKeyType());
-        JaversType valueType = typeMapper.getJaversType(mapType.getValueType());
-
-        return keyType instanceof ManagedType || valueType instanceof ManagedType;
     }
 }

@@ -53,7 +53,7 @@ class EdgeBuilder {
         Object container = node.getPropertyValue(containerProperty);
 
         EnumerableFunction edgeBuilder = null;
-        if (enumerableType instanceof MapType){
+        if (enumerableType instanceof KeyValueType){
             edgeBuilder = new MultiEdgeMapBuilderFunction(multiEdge);
         } else if (enumerableType instanceof ContainerType){
             edgeBuilder = new MultiEdgeContainerBuilderFunction(multiEdge);

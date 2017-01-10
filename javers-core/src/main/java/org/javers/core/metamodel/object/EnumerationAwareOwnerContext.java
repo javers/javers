@@ -5,9 +5,16 @@ package org.javers.core.metamodel.object;
  */
 public class EnumerationAwareOwnerContext implements OwnerContext {
     private final OwnerContext propertyOwner;
+    private final boolean requiresObjectHasher;
 
     public EnumerationAwareOwnerContext(OwnerContext ownerContext) {
         this.propertyOwner = ownerContext;
+        this.requiresObjectHasher = false;
+    }
+
+    public EnumerationAwareOwnerContext(OwnerContext propertyOwner, boolean requiresObjectHasher) {
+        this.propertyOwner = propertyOwner;
+        this.requiresObjectHasher = requiresObjectHasher;
     }
 
     @Override
@@ -26,5 +33,10 @@ public class EnumerationAwareOwnerContext implements OwnerContext {
 
     protected String getEnumeratorContextPath() {
         return "";
+    }
+
+    @Override
+    public boolean requiresObjectHasher() {
+        return requiresObjectHasher;
     }
 }

@@ -1,10 +1,10 @@
 package org.javers.core;
 
 import com.google.gson.TypeAdapter;
+import org.javers.common.collections.Sets;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
@@ -26,8 +26,10 @@ import org.javers.core.metamodel.annotation.*;
 import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.scanner.ScannerModule;
 import org.javers.core.metamodel.type.*;
+import org.javers.core.pico.AddOnsModule;
 import org.javers.core.snapshot.SnapshotModule;
 import org.javers.groovysupport.GroovyAddOns;
+import org.javers.guava.GuavaAddOns;
 import org.javers.java8support.Java8AddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
@@ -38,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,6 +74,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private final Set<Class> classesToScan = new HashSet<>();
 
+    private final Set<ConditionalTypesPlugin> conditionalTypesPlugins;
+
     private JaversRepository repository;
     private DateProvider dateProvider;
     private long bootStart = System.currentTimeMillis();
@@ -85,20 +90,17 @@ public class JaversBuilder extends AbstractContainerBuilder {
     protected JaversBuilder() {
         logger.debug("starting up JaVers ...");
 
-        // bootstrap phase 1: core beans
+        //conditional plugins
+        conditionalTypesPlugins = Sets.asSet(
+                new GroovyAddOns(),
+                new Java8AddOns(),
+                new GuavaAddOns(),
+                new UtilTypeAdapters()
+        );
+
+        // bootstrap phase 1: container & core
         bootContainer();
         addModule(new CoreJaversModule(getContainer()));
-        addModule(new DiffFactoryModule());
-        addModule(new CommitFactoryModule(getContainer()));
-        addModule(new SnapshotModule(getContainer()));
-        addModule(new GraphFactoryModule(getContainer()));
-
-        // bootstrap phase 2: add-ons
-        if (ReflectionUtil.isJava8runtime()){
-            new Java8AddOns().beforeAssemble(this);
-        }
-        new GroovyAddOns().beforeAssemble(this);
-        new UtilTypeAdapters().beforeAssemble(this);
     }
 
     public Javers build() {
@@ -112,22 +114,33 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     protected Javers assembleJaversInstance(){
+        // bootstrap phase 2: main modules
+        addModule(new DiffFactoryModule());
+        addModule(new CommitFactoryModule(getContainer()));
+        addModule(new SnapshotModule(getContainer()));
+        addModule(new GraphFactoryModule(getContainer()));
         addModule(new DiffAppendersModule(coreConfiguration(), getContainer()));
         addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
         addModule(new ScannerModule(coreConfiguration(), getContainer()));
 
+        // bootstrap phase 3: add-on modules
+        Set<JaversType> additionalTypes = bootAddOns();
+
+        // bootstrap phase 4: TypeMapper
         bootManagedTypeModule();
 
-        // JSON beans & domain aware typeAdapters
+        // bootstrap phase 5: JSON beans & domain aware typeAdapters
         bootJsonConverter();
 
         bootDateTimeProvider();
-        bootRepository();
 
-        // clases to scan
+        // clases to scan & additionalTypes
         for (Class c : classesToScan){
             typeMapper().getJaversType(c);
         }
+        typeMapper().addTypes(additionalTypes);
+
+        bootRepository();
 
         return getContainerComponent(JaversCore.class);
     }
@@ -521,6 +534,25 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private JsonConverterBuilder jsonConverterBuilder(){
         return getContainerComponent(JsonConverterBuilder.class);
+    }
+
+    private Set<JaversType> bootAddOns() {
+        Set<JaversType> additionalTypes = new HashSet<>();
+
+        for (ConditionalTypesPlugin plugin : conditionalTypesPlugins) {
+            if (plugin.shouldBeActivated()){
+                logger.info("loading "+plugin.getClass().getSimpleName()+" ...");
+
+                plugin.beforeAssemble(this);
+
+                additionalTypes.addAll(plugin.getNewTypes());
+
+                AddOnsModule addOnsModule = new AddOnsModule(getContainer(), (Collection)plugin.getPropertyChangeAppenders());
+                addModule(addOnsModule);
+            }
+        }
+
+        return additionalTypes;
     }
 
     private void bootManagedTypeModule() {

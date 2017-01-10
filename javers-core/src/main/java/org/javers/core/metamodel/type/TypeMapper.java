@@ -4,7 +4,7 @@ import org.javers.common.collections.Primitives;
 import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.reflection.ReflectionUtil;
+import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
@@ -73,14 +73,9 @@ public class TypeMapper {
 
         //& Maps
         addType(new MapType(Map.class));
-
-        // bootstrap phase 2: add-ons
-        if (ReflectionUtil.isJava8runtime()){
-            addType(new OptionalType());
-        }
     }
 
-    public MapContentType getMapContentType(MapType mapType){
+    public MapContentType getMapContentType(KeyValueType mapType){
         JaversType keyType = getJaversType(mapType.getKeyType());
         JaversType valueType = getJaversType(mapType.getValueType());
         return new MapContentType(keyType, valueType);
@@ -185,10 +180,6 @@ public class TypeMapper {
         addType(new ValueType(valueCLass));
     }
 
-    public void registerCustomType(Class<?> customCLass) {
-        addType(new CustomType(customCLass));
-    }
-
     public boolean isValueObject(Type type) {
         JaversType jType  = getJaversType(type);
         return  jType instanceof ValueObjectType;
@@ -201,8 +192,16 @@ public class TypeMapper {
         return dehydratedTypeFactory.build(type);
     }
 
-    private void addType(JaversType jType) {
+    public void addType(JaversType jType) {
+        Validate.argumentIsNotNull(jType);
         state.putIfAbsent(jType.getBaseJavaType(), jType);
+    }
+
+    public void addTypes(Collection<JaversType> jTypes) {
+        Validate.argumentIsNotNull(jTypes);
+        for (JaversType t : jTypes) {
+            addType(t);
+        }
     }
 
     boolean contains(Type javaType){

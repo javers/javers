@@ -10,8 +10,12 @@ public class MapEnumerationOwnerContext extends EnumerationAwareOwnerContext {
     private Object key;
     private boolean isKey;
 
-    MapEnumerationOwnerContext(OwnerContext ownerContext) {
-        super(ownerContext);
+    public MapEnumerationOwnerContext(OwnerContext ownerContext) {
+        super(ownerContext, false);
+    }
+
+    public MapEnumerationOwnerContext(OwnerContext ownerContext, boolean requiresObjectHasher) {
+        super(ownerContext, requiresObjectHasher);
     }
 
     @Override
@@ -26,12 +30,12 @@ public class MapEnumerationOwnerContext extends EnumerationAwareOwnerContext {
         return isKey;
     }
 
-    void switchToValue(Object key) {
+    public void switchToValue(Object key) {
         this.key = key;
         this.isKey = false;
     }
 
-    void switchToKey() {
+    public void switchToKey() {
         this.key = null;
         this.isKey = true;
     }

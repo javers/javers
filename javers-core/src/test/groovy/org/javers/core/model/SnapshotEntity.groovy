@@ -1,5 +1,7 @@
 package org.javers.core.model
 
+import com.google.common.collect.Multimap
+import com.google.common.collect.Multiset
 import org.joda.time.LocalDate
 
 import javax.persistence.Id
@@ -42,6 +44,16 @@ class SnapshotEntity {
     Optional<LocalDate> optionalDate
     Optional<SnapshotEntity> optionalEntity
     Optional<DummyAddress> optionalValueObject
+
+    Multiset<String> multiSetOfPrimitives
+    Multiset<DummyAddress> multiSetValueObject
+    Multiset<SnapshotEntity> multiSetOfEntities
+
+    Multimap<String,String> multiMapOfPrimitives
+    Multimap<String, DummyAddress> multimapPrimitiveToValueObject
+    Multimap<String, SnapshotEntity> multiMapPrimitiveToEntity
+    Multimap<SnapshotEntity, SnapshotEntity> multiMapEntityToEntity
+    Multimap<DummyAddress, DummyAddress> multimapValueObjectToValueObject //not suppored
 
     Map<String, Integer> mapOfPrimitives
     Map<LocalDate,BigDecimal> mapOfValues
