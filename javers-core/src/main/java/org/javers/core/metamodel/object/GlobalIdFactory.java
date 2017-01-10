@@ -56,9 +56,7 @@ public class GlobalIdFactory {
         if (targetManagedType instanceof ValueObjectType && hasOwner(ownerContext)) {
             String pathFromRoot = createPathFromRoot(ownerContext.getOwnerId(), ownerContext.getPath());
 
-            if (ownerContext instanceof SetType.SetEnumerationOwnerContext ||
-                    ownerContext instanceof MultisetType.MultisetEnumerationOwnerContext ||
-                    ownerContext instanceof MultimapType.MultimapEnumerationOwnerContext) {
+            if (ownerContext.requiresObjectHasher()) {
                 pathFromRoot += "/" + getObjectHasher().hash(targetCdo);
             }
             return new ValueObjectId(targetManagedType.getName(), getRootOwnerId(ownerContext), pathFromRoot);

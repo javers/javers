@@ -8,4 +8,6 @@ public interface OwnerContext {
     GlobalId getOwnerId();
 
     String getPath();
+
+    boolean requiresObjectHasher();
 }

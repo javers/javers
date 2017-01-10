@@ -31,7 +31,7 @@ public class MultisetType extends CollectionType{
         Multiset sourceMultiset = toNotNullMultiset(sourceMultiset_);
         Multiset targetMultiset = HashMultiset.create();
 
-        EnumerationAwareOwnerContext enumeratorContext = new MultisetEnumerationOwnerContext(owner);
+        EnumerationAwareOwnerContext enumeratorContext = new EnumerationAwareOwnerContext(owner, true);
         for (Object sourceVal : sourceMultiset) {
             targetMultiset.add(mapFunction.apply(sourceVal, enumeratorContext));
         }
@@ -44,15 +44,6 @@ public class MultisetType extends CollectionType{
         }
         else{
             return (Multiset)sourceSet;
-        }
-    }
-
-    /**
-     * marker class
-     */
-    public static class MultisetEnumerationOwnerContext extends EnumerationAwareOwnerContext {
-        MultisetEnumerationOwnerContext(OwnerContext ownerContext) {
-            super(ownerContext);
         }
     }
 }

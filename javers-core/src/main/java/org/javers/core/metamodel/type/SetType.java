@@ -21,7 +21,7 @@ public class SetType extends CollectionType{
         Set sourceSet = toNotNullSet(sourceSet_);
         Set targetSet = new HashSet(sourceSet.size());
 
-        EnumerationAwareOwnerContext enumerationContext = new SetEnumerationOwnerContext(owner);
+        EnumerationAwareOwnerContext enumerationContext = new EnumerationAwareOwnerContext(owner, true);
         for (Object sourceVal : sourceSet) {
             targetSet.add(mapFunction.apply(sourceVal, enumerationContext));
         }
@@ -34,15 +34,6 @@ public class SetType extends CollectionType{
         }
         else{
             return (Set)sourceSet;
-        }
-    }
-
-    /**
-     * marker class
-     */
-    public static class SetEnumerationOwnerContext extends EnumerationAwareOwnerContext {
-        SetEnumerationOwnerContext(OwnerContext ownerContext) {
-            super(ownerContext);
         }
     }
 }

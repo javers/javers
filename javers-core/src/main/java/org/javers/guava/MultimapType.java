@@ -35,7 +35,7 @@ public class MultimapType extends KeyValueType {
         Multimap sourceMultimap = toNotNullMultimap(sourceMap_);
         Multimap targetMultimap = createEmptyMultimap(sourceMap_);
 
-        MultimapEnumerationOwnerContext enumeratorContext = new MultimapEnumerationOwnerContext(owner);
+        MapEnumerationOwnerContext enumeratorContext = new MapEnumerationOwnerContext(owner, true);
 
         Collection<Map.Entry<?, ?>> entries = sourceMultimap.entries();
         for (Map.Entry<?, ?> entry : entries){
@@ -53,19 +53,8 @@ public class MultimapType extends KeyValueType {
         return Multimaps.unmodifiableMultimap(targetMultimap);
     }
 
-
-
     @Override
     public boolean isEmpty(Object container){
         return container == null || ((Multimap) container).isEmpty();
-    }
-
-    /**
-     * marker class
-     */
-    public static class MultimapEnumerationOwnerContext extends MapEnumerationOwnerContext{
-        MultimapEnumerationOwnerContext(OwnerContext ownerContext) {
-            super(ownerContext);
-        }
     }
 }

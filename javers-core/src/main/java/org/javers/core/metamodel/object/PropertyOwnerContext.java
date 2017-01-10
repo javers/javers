@@ -26,4 +26,9 @@ public class PropertyOwnerContext implements OwnerContext {
     public String getPropertyName() {
         return propertyName;
     }
+
+    @Override
+    public boolean requiresObjectHasher() {
+        return false;
+    }
 }

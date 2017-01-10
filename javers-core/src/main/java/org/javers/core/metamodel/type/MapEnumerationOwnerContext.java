@@ -11,7 +11,11 @@ public class MapEnumerationOwnerContext extends EnumerationAwareOwnerContext {
     private boolean isKey;
 
     public MapEnumerationOwnerContext(OwnerContext ownerContext) {
-        super(ownerContext);
+        super(ownerContext, false);
+    }
+
+    public MapEnumerationOwnerContext(OwnerContext ownerContext, boolean requiresObjectHasher) {
+        super(ownerContext, requiresObjectHasher);
     }
 
     @Override
