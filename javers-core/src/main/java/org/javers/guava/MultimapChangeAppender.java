@@ -148,7 +148,7 @@ class MultimapChangeAppender extends CorePropertyChangeAppender<MapChange>{
         JaversType keyType = typeMapper.getJaversType(multimapType.getKeyType());
         JaversType valueType = typeMapper.getJaversType(multimapType.getValueType());
 
-        MultiMapContentType multiMapContentType = new MultiMapContentType(keyType, valueType);
+        MapContentType multiMapContentType = new MapContentType(keyType, valueType);
         return new DehydrateMapFunction(globalIdFactory, multiMapContentType);
     }
 }
