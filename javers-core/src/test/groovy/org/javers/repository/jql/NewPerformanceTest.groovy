@@ -13,7 +13,6 @@ class NewPerformanceTest extends Specification {
     Javers javers
     def start
 
-    @Ignore
     def "should init database - insert and updates"() {
         given:
         clearDatabase()
@@ -34,6 +33,7 @@ class NewPerformanceTest extends Specification {
         stop(n)
     }
 
+    @Ignore
     def "should query - standard queries by Type"() {
         given:
         start()
@@ -49,6 +49,7 @@ class NewPerformanceTest extends Specification {
         stop(5)
     }
 
+    @Ignore
     def "should query - standard queries by Id"() {
         given:
         start()
@@ -66,6 +67,7 @@ class NewPerformanceTest extends Specification {
         stop(n * 3)
     }
 
+    @Ignore
     def "should query - new query by property"() {
         given:
         start()
@@ -92,6 +94,7 @@ class NewPerformanceTest extends Specification {
         stop(n * 3)
     }
 
+    @Ignore
     def "should query - new Aggregate queries by Id"() {
         given:
         start()

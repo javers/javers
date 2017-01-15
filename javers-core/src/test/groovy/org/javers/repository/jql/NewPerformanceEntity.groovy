@@ -10,7 +10,7 @@ class NewPerformanceEntity {
 
     List<NewPerformanceEntity> refs = []
 
-    List<Integer> intList = [1, 2, 3, 4, 5, 6, 7, 8, 10]
+    List<Integer> intList = new ArrayList((1..100))
 
     String str1 = "NewPerformanceEntity.str1"
     String str2 = "NewPerformanceEntity.str2"

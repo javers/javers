@@ -1,5 +1,6 @@
 package org.javers.repository.mongo;
 
+import com.google.gson.JsonObject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -31,25 +32,41 @@ import org.joda.time.LocalDateTime;
 import java.util.*;
 
 import static org.javers.common.validation.Validate.conditionFulfilled;
+import static org.javers.repository.mongo.DocumentConverter.fromDocument;
+import static org.javers.repository.mongo.DocumentConverter.toDocument;
 import static org.javers.repository.mongo.MongoSchemaManager.*;
 
 /**
  * @author pawel szymczyk
  */
 public class MongoRepository implements JaversRepository {
+    private final static int DEFAULT_CACHE_SIZE = 5000;
 
     private static final int DESC = -1;
     private final MongoSchemaManager mongoSchemaManager;
     private JsonConverter jsonConverter;
     private final MapKeyDotReplacer mapKeyDotReplacer = new MapKeyDotReplacer();
+    private final LatestSnapshotCache cache;
 
     public MongoRepository(MongoDatabase mongo) {
-        this(mongo, null);
+        this(mongo, null, DEFAULT_CACHE_SIZE);
     }
 
-    MongoRepository(MongoDatabase mongo, JsonConverter jsonConverter) {
+    /**
+     * @param cacheSize Size of the latest snapshots cache, default is 5000. Set 0 to disable.
+     */
+    public MongoRepository(MongoDatabase mongo, int cacheSize) {
+        this(mongo, null, cacheSize);
+    }
+
+    MongoRepository(MongoDatabase mongo, JsonConverter jsonConverter, int cacheSize) {
         this.jsonConverter = jsonConverter;
         this.mongoSchemaManager = new MongoSchemaManager(mongo);
+        cache = new LatestSnapshotCache(cacheSize, new Function<GlobalId, Optional<CdoSnapshot>>() {
+            public Optional<CdoSnapshot> apply(GlobalId input) {
+                return getLatest(createIdQuery(input));
+            }
+        });
     }
 
     @Override
@@ -76,7 +93,7 @@ public class MongoRepository implements JaversRepository {
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        return getLatest(createIdQuery(globalId));
+        return cache.getLatest(globalId);
     }
 
     @Override
@@ -175,12 +192,12 @@ public class MongoRepository implements JaversRepository {
     }
 
     private CdoSnapshot readFromDBObject(Document dbObject) {
-        return jsonConverter.fromJson(mapKeyDotReplacer.back(dbObject).toJson(), CdoSnapshot.class);
+        return jsonConverter.fromJson(fromDocument(mapKeyDotReplacer.back(dbObject)), CdoSnapshot.class);
     }
 
     private Document writeToDBObject(CdoSnapshot snapshot){
         conditionFulfilled(jsonConverter != null, "MongoRepository: jsonConverter is null");
-        Document dbObject = Document.parse(jsonConverter.toJson(snapshot));
+        Document dbObject = toDocument((JsonObject)jsonConverter.toJsonElement(snapshot));
         dbObject = mapKeyDotReplacer.replaceInSnapshotState(dbObject);
         dbObject.append(GLOBAL_ID_KEY,snapshot.getGlobalId().value());
         return dbObject;
@@ -198,6 +215,7 @@ public class MongoRepository implements JaversRepository {
         MongoCollection<Document> collection = snapshotsCollection();
         for (CdoSnapshot snapshot: commit.getSnapshots()) {
             collection.insertOne(writeToDBObject(snapshot));
+            cache.put(snapshot);
         }
     }
 
@@ -305,13 +323,12 @@ public class MongoRepository implements JaversRepository {
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {
         QueryParams queryParams = QueryParamsBuilder.withLimit(1).build();
         MongoCursor<Document> mongoLatest = getMongoSnapshotsCursor(idQuery, Optional.of(queryParams));
-
-        if (!mongoLatest.hasNext()) {
+        Optional<Document> doc = getOne(mongoLatest);
+        if (doc.isEmpty()) {
             return Optional.empty();
         }
 
-        Document dbObject = getOne(mongoLatest);
-        return Optional.of(readFromDBObject(dbObject));
+        return Optional.of(readFromDBObject(doc.get()));
     }
 
     private List<CdoSnapshot> queryForSnapshots(Bson query, Optional<QueryParams> queryParams) {
@@ -325,9 +342,12 @@ public class MongoRepository implements JaversRepository {
         }
     }
 
-    private static <T> T getOne(MongoCursor<T> mongoCursor){
+    private static <T> Optional<T> getOne(MongoCursor<T> mongoCursor){
         try{
-            return mongoCursor.next();
+            if (!mongoCursor.hasNext()) {
+                return Optional.empty();
+            }
+            return Optional.of(mongoCursor.next());
         }
         finally {
             mongoCursor.close();

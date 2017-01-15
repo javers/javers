@@ -25,7 +25,7 @@ class MongoRepositoryFongoIntTest extends Specification {
 
         given:
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
+        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter, 100)
         def commitFactory = javersTestBuilder.commitFactory
 
         def kazikV1 = dummyUser("Kazik").withAge(1)
@@ -53,7 +53,7 @@ class MongoRepositoryFongoIntTest extends Specification {
 
         given:
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
+        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter, 100)
         def commitFactory = javersTestBuilder.commitFactory
 
         def kazik = new DummyUser("kazik")
@@ -76,7 +76,7 @@ class MongoRepositoryFongoIntTest extends Specification {
         given:
         //create components
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
+        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter, 100)
         def commitFactory = javersTestBuilder.commitFactory
         def id = javersTestBuilder.globalIdFactory.createInstanceId("kazik", DummyUser)
 
@@ -97,7 +97,7 @@ class MongoRepositoryFongoIntTest extends Specification {
         given:
         //create components
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter)
+        def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter, 100)
         def commitFactory = javersTestBuilder.commitFactory
         def id = javersTestBuilder.javers().idBuilder().instanceId(new DummyUser("kazik"))
 
@@ -116,7 +116,7 @@ class MongoRepositoryFongoIntTest extends Specification {
     def "should get state history"() {
 
         given:
-        def mongoRepository = new MongoRepository(mongoDb, Stub(JsonConverter))
+        def mongoRepository = new MongoRepository(mongoDb)
 
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly(mongoRepository)
 

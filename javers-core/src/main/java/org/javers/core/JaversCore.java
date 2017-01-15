@@ -67,6 +67,8 @@ class JaversCore implements Javers {
 
     @Override
     public Commit commit(String author, Object currentVersion, Map<String, String> commitProperties) {
+        long start = System.currentTimeMillis();
+
         argumentsAreNotNull(author, commitProperties, currentVersion);
 
         JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
@@ -76,9 +78,12 @@ class JaversCore implements Javers {
         }
 
         Commit commit = commitFactory.create(author, commitProperties, currentVersion);
+        long stop_f = System.currentTimeMillis();
 
         repository.persist(commit);
-        logger.info(commit.toString());
+        long stop = System.currentTimeMillis();
+
+        logger.info(commit.toString()+", done in "+ (stop-start)+ " millis (factory:{}, persist:{})",(stop_f-start), (stop-stop_f));
         return commit;
     }
 
