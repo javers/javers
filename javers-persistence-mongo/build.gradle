@@ -1,8 +1,8 @@
 dependencies {
     compile project(':javers-core')
     compile "org.mongodb:mongo-java-driver:$mongoJavaDriverVersion"
+    compile "com.google.guava:guava:$guavaVersion"
 
-    testCompile 'com.google.guava:guava:18.0'
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile "com.github.fakemongo:fongo:$fongoVersion"
