@@ -97,7 +97,7 @@ class JaversCore implements Javers {
         argumentsAreNotNull(author, properties, deleted);
 
         Commit commit = commitFactory.createTerminal(author, properties, deleted);
-
+        if (commit == null) return null;
         repository.persist(commit);
         logger.info(commit.toString());
         return commit;
@@ -114,6 +114,7 @@ class JaversCore implements Javers {
         argumentsAreNotNull(author, properties, globalId);
 
         Commit commit = commitFactory.createTerminalByGlobalId(author, properties, globalIdFactory.createFromDto(globalId));
+        if (commit == null) return null;
 
         repository.persist(commit);
         logger.info(commit.toString());
