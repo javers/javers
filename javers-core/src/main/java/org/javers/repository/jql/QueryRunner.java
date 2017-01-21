@@ -1,6 +1,5 @@
 package org.javers.repository.jql;
 
-import org.javers.common.collections.Function;
 import org.javers.common.collections.Optional;
 import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
@@ -101,12 +100,7 @@ public class QueryRunner {
     }
 
     private Set<ManagedType> getJaversManagedTypes(Set<Class> classes) {
-        return Sets.transform(classes, new Function<Class, ManagedType>() {
-            @Override
-            public ManagedType apply(Class javaClass) {
-                return typeMapper.getJaversManagedType(javaClass);
-            }
-        });
+        return Sets.transform(classes, javaClass -> typeMapper.getJaversManagedType(javaClass));
     }
 
     private GlobalId fromDto(GlobalIdDTO globalIdDTO) {

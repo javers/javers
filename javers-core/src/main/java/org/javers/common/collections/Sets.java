@@ -3,6 +3,9 @@ package org.javers.common.collections;
 import org.javers.common.validation.Validate;
 
 import java.util.*;
+import java.util.Collections;
+import java.util.function.Function;
+import java.util.stream.Collector;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_SET;
@@ -66,14 +69,8 @@ public class Sets {
     }
 
     public static <F, T> Set<T> transform(Set<F> input, Function<F, T> transformation) {
-        Validate.argumentIsNotNull(input);
-        Validate.argumentIsNotNull(transformation);
-
-        Set<T> result = new HashSet<>();
-        for (F element : input) {
-            result.add(transformation.apply(element));
-        }
-        return result;
+        Validate.argumentsAreNotNull(input, transformation);
+        return input.stream().map(transformation::apply).collect(toImmutableSet());
     }
 
     private static <E> Set<E> nullSafe(Set<E> set) {
@@ -100,5 +97,12 @@ public class Sets {
         }
 
         return result;
+    }
+
+    public static <t> Collector<t, Set<t>, Set<t>> toImmutableSet() {
+        return Collector.of(HashSet::new, Set::add, (left, right) -> {
+            left.addAll(right);
+            return left;
+        }, Collections::unmodifiableSet);
     }
 }

@@ -92,7 +92,7 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
             }
         }
 
-        for (Object addedKey : Maps.keysDifference(rightMap,leftMap)) {
+        for (Object addedKey : Maps.keysDifference(rightMap, leftMap)) {
             Object addedValue  = rightMap.get(addedKey);
             changes.add( new EntryAdded(addedKey, addedValue));
         }

@@ -1,6 +1,5 @@
 package org.javers.core.diff.appenders;
 
-import org.javers.common.collections.Function;
 import org.javers.common.exception.JaversException;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.PropertyChange;
@@ -63,10 +62,6 @@ public class OptionalChangeAppender extends CorePropertyChangeAppender<PropertyC
     }
 
     private GlobalId getAndDehydrate(OptionalType optionalType, Object optional, final JaversType contentType){
-         return (GlobalId) optionalType.mapAndGet(optional, new Function() {
-             public Object apply(Object input) {
-                 return globalIdFactory.dehydrate(input, contentType, null);
-             }
-         });
+         return (GlobalId) optionalType.mapAndGet(optional, input -> globalIdFactory.dehydrate(input, contentType, null));
     }
 }

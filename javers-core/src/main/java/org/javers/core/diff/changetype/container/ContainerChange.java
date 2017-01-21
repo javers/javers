@@ -1,8 +1,6 @@
 package org.javers.core.diff.changetype.container;
 
-import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Predicate;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalId;
@@ -34,35 +32,19 @@ public abstract class ContainerChange extends PropertyChange {
     }
 
     public List<ValueAdded> getValueAddedChanges() {
-        return (List)Lists.positiveFilter(changes, new Predicate<ContainerElementChange>() {
-            public boolean apply(ContainerElementChange input) {
-                return input instanceof ValueAdded;
-            }
-        });
+        return (List)Lists.positiveFilter(changes, input -> input instanceof ValueAdded);
     }
 
     public List<ValueRemoved> getValueRemovedChanges() {
-        return (List)Lists.positiveFilter(changes, new Predicate<ContainerElementChange>() {
-            public boolean apply(ContainerElementChange input) {
-                return input instanceof ValueRemoved;
-            }
-        });
+        return (List)Lists.positiveFilter(changes, input -> input instanceof ValueRemoved);
     }
 
     public List<?> getAddedValues() {
-        return Lists.transform(getValueAddedChanges(), new Function<ValueAdded, Object>() {
-            public Object apply(ValueAdded input) {
-                return input.getAddedValue();
-            }
-        });
+        return Lists.transform(getValueAddedChanges(), input -> input.getAddedValue());
     }
 
     public List<?> getRemovedValues() {
-        return Lists.transform(getValueRemovedChanges(), new Function<ValueRemoved, Object>() {
-            public Object apply(ValueRemoved input) {
-                return input.getRemovedValue();
-            }
-        });
+        return Lists.transform(getValueRemovedChanges(), input -> input.getRemovedValue());
     }
 
     @Override

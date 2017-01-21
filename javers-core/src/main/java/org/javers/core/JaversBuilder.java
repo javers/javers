@@ -569,7 +569,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addModule(new ChangeTypeAdaptersModule(getContainer()));
         addModule(new CommitTypeAdaptersModule(getContainer()));
 
-        if (new RequiredMongoSupportPredicate().apply(repository)) {
+        if (new RequiredMongoSupportPredicate().test(repository)) {
             jsonConverterBuilder.registerNativeGsonDeserializer(Long.class, new MongoLong64JsonDeserializer());
         }
 

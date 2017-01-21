@@ -1,8 +1,14 @@
 package org.javers.repository.api;
 
-import org.javers.common.collections.Function;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import java.util.*;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import static org.javers.common.collections.Lists.toImmutableList;
 
 class PreviousSnapshotsCalculator {
 
@@ -42,15 +48,11 @@ class PreviousSnapshotsCalculator {
     }
 
     private List<SnapshotIdentifier> determineMissingPreviousSnapshotIdentifiers(Map<SnapshotIdentifier, CdoSnapshot> previousSnapshots, List<CdoSnapshot> snapshots) {
-        List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers = new ArrayList<>();
-        for (CdoSnapshot snapshot : snapshots) {
-            if (snapshot.isInitial() || snapshot.isTerminal()) continue;
-
-            SnapshotIdentifier previousSnapshotIdentifier = SnapshotIdentifier.from(snapshot).previous();
-            if (!previousSnapshots.containsKey(previousSnapshotIdentifier)) {
-                missingPreviousSnapshotIdentifiers.add(previousSnapshotIdentifier);
-            }
-        }
+        List<SnapshotIdentifier> missingPreviousSnapshotIdentifiers = snapshots.stream()
+                .filter(snapshot -> !(snapshot.isInitial() || snapshot.isTerminal()))
+                .map(snapshot -> SnapshotIdentifier.from(snapshot).previous())
+                .filter(previousSnapshotIdentifier -> !previousSnapshots.containsKey(previousSnapshotIdentifier))
+                .collect(toImmutableList());
         return missingPreviousSnapshotIdentifiers;
     }
 }

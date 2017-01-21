@@ -1,16 +1,17 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Function;
 import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
-
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.function.Function;
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -82,27 +83,15 @@ class TypeMapperState {
             return jType;
         }
 
-        return computeIfAbsent(javaType, new Function<Type, JaversType>() {
-            public JaversType apply(Type type) {
-                return infer(type);
-            }
-        });
+        return computeIfAbsent(javaType, type -> infer(type));
     }
 
     void putIfAbsent(Type javaType, final JaversType jType) {
-        computeIfAbsent(javaType, new Function<Type, JaversType>() {
-            public JaversType apply(Type ignored) {
-                return jType;
-            }
-        });
+        computeIfAbsent(javaType, ignored -> jType);
     }
 
     void computeIfAbsent(final ClientsClassDefinition def) {
-        computeIfAbsent(def.getBaseJavaClass(), new Function<Type, JaversType>() {
-            public JaversType apply(Type ignored) {
-                return typeFactory.create(def);
-            }
-        });
+        computeIfAbsent(def.getBaseJavaClass(), ignored -> typeFactory.create(def));
     }
 
     //synchronizes on map Key (javaType) only for map writes

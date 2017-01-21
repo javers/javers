@@ -1,9 +1,7 @@
 package org.javers.repository.api;
 
-import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Optional;
-import org.javers.common.collections.Predicate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.diff.Change;
@@ -31,11 +29,7 @@ public class JaversExtendedRepository implements JaversRepository {
     public JaversExtendedRepository(JaversRepository delegate, SnapshotDiffer snapshotDiffer) {
         this.delegate = delegate;
         this.snapshotDiffer = snapshotDiffer;
-        previousSnapshotsCalculator = new PreviousSnapshotsCalculator(new Function<Collection<SnapshotIdentifier>, List<CdoSnapshot>>() {
-            public List<CdoSnapshot> apply(Collection<SnapshotIdentifier> input) {
-                return getSnapshots(input);
-            }
-        });
+        previousSnapshotsCalculator = new PreviousSnapshotsCalculator(input -> getSnapshots(input));
     }
 
     public List<Change> getChangeHistory(GlobalId globalId, QueryParams queryParams) {
@@ -128,21 +122,12 @@ public class JaversExtendedRepository implements JaversRepository {
             return changes;
         }
 
-        return Lists.positiveFilter(changes, new Predicate<Change>() {
-            public boolean apply(Change input) {
-                return input instanceof PropertyChange &&
-                        ((PropertyChange) input).getPropertyName().equals(queryParams.changedProperty().get());
-            }
-        });
+        return Lists.positiveFilter(changes, input -> input instanceof PropertyChange &&
+                ((PropertyChange) input).getPropertyName().equals(queryParams.changedProperty().get()));
     }
 
     private List<CdoSnapshot> skipInitial(List<CdoSnapshot> snapshots) {
-        return Lists.negativeFilter(snapshots, new Predicate<CdoSnapshot>() {
-            @Override
-            public boolean apply(CdoSnapshot snapshot) {
-                return snapshot.isInitial();
-            }
-        });
+        return Lists.negativeFilter(snapshots, snapshot -> snapshot.isInitial());
     }
 
     private List<Change> getChangesIntroducedBySnapshots(List<CdoSnapshot> snapshots) {

@@ -32,7 +32,7 @@ public class CollectionChangeFakeAppender extends CorePropertyChangeAppender<Pro
             logger.warn("Collections: " + property + "\n"+
                         "are not equals but can't be compared. " +
                         "Raw Collection properties are not supported. Expected Set, List or any of their subclasses. "+
-                        "JaVers uses different algorithms for comparing Sets and Lists and needs to know (statically) which one to apply.");
+                        "JaVers uses different algorithms for comparing Sets and Lists and needs to know (statically) which one to test.");
         }
 
         return null;

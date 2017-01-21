@@ -1,8 +1,6 @@
 package org.javers.core.diff;
 
-import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Predicate;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.changetype.PropertyChange;
@@ -12,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -41,13 +40,11 @@ public class Diff implements Serializable {
     public <C extends Change> List getObjectsByChangeType(final Class<C> type) {
         argumentIsNotNull(type);
 
-        return Lists.transform(getChangesByType(type), new Function<C, Object>() {
-            public Object apply(C input) {
-                if (input.getAffectedObject().isEmpty()){
-                    throw new JaversException(JaversExceptionCode.AFFECTED_CDO_IS_NOT_AVAILABLE);
-                }
-                return input.getAffectedObject().get();
+        return Lists.transform(getChangesByType(type), input -> {
+            if (input.getAffectedObject().isEmpty()) {
+                throw new JaversException(JaversExceptionCode.AFFECTED_CDO_IS_NOT_AVAILABLE);
             }
+            return input.getAffectedObject().get();
         });
     }
 
@@ -59,13 +56,11 @@ public class Diff implements Serializable {
      */
     public List getObjectsWithChangedProperty(String propertyName){
         argumentIsNotNull(propertyName);
-        return Lists.transform(getPropertyChanges(propertyName), new Function<PropertyChange, Object>() {
-            public Object apply(PropertyChange input) {
-                if (input.getAffectedObject().isEmpty()){
-                    throw new JaversException(JaversExceptionCode.AFFECTED_CDO_IS_NOT_AVAILABLE);
-                }
-                return input.getAffectedObject().get();
+        return Lists.transform(getPropertyChanges(propertyName), input -> {
+            if (input.getAffectedObject().isEmpty()){
+                throw new JaversException(JaversExceptionCode.AFFECTED_CDO_IS_NOT_AVAILABLE);
             }
+            return input.getAffectedObject().get();
         });
     }
 
@@ -87,11 +82,7 @@ public class Diff implements Serializable {
 
     public <C extends Change> List<C> getChangesByType(final Class<C> type) {
         argumentIsNotNull(type);
-        return (List)getChanges(new Predicate<Change>() {
-            public boolean apply(Change input) {
-                return type.isAssignableFrom(input.getClass());
-            }
-        });
+        return (List)getChanges(input -> type.isAssignableFrom(input.getClass()));
     }
 
     /**
@@ -99,12 +90,7 @@ public class Diff implements Serializable {
      */
     public List<PropertyChange> getPropertyChanges(final String propertyName) {
         argumentIsNotNull(propertyName);
-        return (List)getChanges(new Predicate<Change>() {
-            public boolean apply(Change input) {
-                return input instanceof PropertyChange && ((PropertyChange)input).getPropertyName().equals(propertyName);
-
-            }
-        });
+        return (List)getChanges(input -> input instanceof PropertyChange && ((PropertyChange)input).getPropertyName().equals(propertyName));
     }
 
     public boolean hasChanges() {

@@ -1,6 +1,5 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
 import org.javers.core.metamodel.object.GlobalId;
 
@@ -44,10 +43,6 @@ class DehydratedTypeFactory {
     }
 
     private List<Type> extractAndDehydrateTypeArguments(JaversType genericType){
-        return Lists.transform(genericType.getConcreteClassTypeArguments(), new Function<Type, Type>() {
-                public Type apply(Type typeArgument) {
-                    return build(typeArgument);
-                }
-        });
+        return Lists.transform(genericType.getConcreteClassTypeArguments(), typeArgument -> build(typeArgument));
     }
 }

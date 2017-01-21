@@ -1,6 +1,5 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.common.collections.Function;
 import org.javers.common.collections.Optional;
 import org.javers.common.collections.Pair;
 import org.javers.common.collections.Sets;
@@ -67,12 +66,7 @@ public class CdoSnapshotFinder {
     }
 
     public List<CdoSnapshot> getStateHistory(Set<ManagedType> managedTypes, QueryParams queryParams) {
-        Set<String> managedTypeNames = Sets.transform(managedTypes, new Function<ManagedType, String>() {
-            @Override
-            public String apply(ManagedType managedType) {
-                return managedType.getName();
-            }
-        });
+        Set<String> managedTypeNames = Sets.transform(managedTypes, managedType -> managedType.getName());
         ManagedClassFilter classFilter = new ManagedClassFilter(tableNameProvider, managedTypeNames, queryParams.isAggregate());
         return fetchCdoSnapshots(classFilter, Optional.of(queryParams));
     }
