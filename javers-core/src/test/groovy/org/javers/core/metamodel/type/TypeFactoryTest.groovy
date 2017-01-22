@@ -16,7 +16,6 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import org.javers.common.collections.Optional
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition
 import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.valueObjectDefinition

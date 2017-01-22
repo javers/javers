@@ -1,6 +1,6 @@
 package org.javers.spring.jpa;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.IdBuilder;
 import org.javers.core.Javers;

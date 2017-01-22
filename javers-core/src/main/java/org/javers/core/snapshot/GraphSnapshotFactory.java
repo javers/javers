@@ -1,6 +1,6 @@
 package org.javers.core.snapshot;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.LiveGraph;
@@ -40,7 +40,7 @@ class GraphSnapshotFactory {
 
             CdoSnapshot fresh = createFreshSnapshot(initial, node, commitMetadata, existing);
 
-            if (existing.isEmpty()) {
+            if (!existing.isPresent()) {
                 result.add(fresh); //when insert
                 continue;
             }

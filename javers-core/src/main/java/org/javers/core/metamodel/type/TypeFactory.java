@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.scanner.ClassScan;

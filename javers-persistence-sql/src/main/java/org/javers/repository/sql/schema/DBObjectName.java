@@ -1,6 +1,6 @@
 package org.javers.repository.sql.schema;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 
 /**
  * @author bartosz.walacik
@@ -21,9 +21,7 @@ class DBObjectName {
     }
 
     String nameWithSchema() {
-        if (schemaName.isEmpty()) {
-            return localName;
-        }
-        return schemaName.get() + SCHEMA_TABLE_SEP + localName;
+        return schemaName.map(n -> n + SCHEMA_TABLE_SEP + localName)
+                         .orElse(localName);
     }
 }

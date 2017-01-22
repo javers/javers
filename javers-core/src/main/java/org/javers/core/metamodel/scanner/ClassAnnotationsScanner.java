@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.scanner;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
 

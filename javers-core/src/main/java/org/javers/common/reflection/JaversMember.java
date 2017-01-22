@@ -1,6 +1,6 @@
 package org.javers.common.reflection;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.validation.Validate;
 
 import java.lang.annotation.Annotation;
@@ -31,7 +31,7 @@ public abstract class JaversMember<T extends Member> {
     public JaversMember(T rawMember, Type resolvedReturnType) {
         Validate.argumentIsNotNull(rawMember);
         this.rawMember = rawMember;
-        this.resolvedReturnType = Optional.fromNullable(resolvedReturnType);
+        this.resolvedReturnType = Optional.ofNullable(resolvedReturnType);
     }
 
     protected abstract Type getRawGenericType();

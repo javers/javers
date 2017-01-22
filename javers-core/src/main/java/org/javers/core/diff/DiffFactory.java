@@ -1,7 +1,5 @@
 package org.javers.core.diff;
 
-import org.javers.common.collections.Consumer;
-import org.javers.common.collections.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -21,11 +19,10 @@ import org.javers.core.metamodel.type.PrimitiveType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.core.metamodel.type.ValueType;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.javers.core.diff.DiffBuilder.diff;
 
 /**
@@ -48,11 +45,7 @@ public class DiffFactory {
         this.javersCoreConfiguration = javersCoreConfiguration;
 
         //sort by priority
-        Collections.sort(propertyChangeAppender, new Comparator<PropertyChangeAppender>() {
-            public int compare(PropertyChangeAppender p1, PropertyChangeAppender p2) {
-                return ((Integer)p1.priority()).compareTo(p2.priority());
-            }
-        });
+        Collections.sort(propertyChangeAppender, (p1, p2) -> ((Integer)p1.priority()).compareTo(p2.priority()));
         this.propertyChangeAppender = propertyChangeAppender;
     }
 
@@ -82,7 +75,7 @@ public class DiffFactory {
         Validate.argumentsAreNotNull(removedId, commitMetadata);
 
         DiffBuilder diff = diff();
-        diff.addChange(new ObjectRemoved(removedId, Optional.empty(), commitMetadata));
+        diff.addChange(new ObjectRemoved(removedId, empty(), of(commitMetadata)));
 
         return diff.build();
     }
@@ -96,7 +89,7 @@ public class DiffFactory {
         ObjectGraph currentGraph = buildGraph(newDomainObject);
 
         GraphPair graphPair = new GraphPair(currentGraph);
-        return createAndAppendChanges(graphPair, Optional.<CommitMetadata>empty());
+        return createAndAppendChanges(graphPair, empty());
     }
 
     private LiveGraph buildGraph(Object handle) {
@@ -160,12 +153,7 @@ public class DiffFactory {
             final Change change = appender.calculateChanges(pair, property);
             if (change != null) {
                 diff.addChange(change, pair.getRight().wrappedCdo());
-
-                commitMetadata.ifPresent(new Consumer<CommitMetadata>() {
-                    public void consume(CommitMetadata cm) {
-                        change.bindToCommit(cm);
-                    }
-                });
+                commitMetadata.ifPresent(cm -> change.bindToCommit(cm));
             }
             break;
         }

@@ -1,6 +1,6 @@
 package org.javers.repository.sql.repositories;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.repository.sql.PolyUtil;
@@ -73,7 +73,8 @@ public class CommitMetadataRepository extends SchemaNameAware {
     public CommitId getCommitHeadId() {
         Optional<BigDecimal> maxCommitId = selectMaxCommitId();
 
-        return maxCommitId.isEmpty() ? null : CommitId.valueOf(maxCommitId.get());
+        return maxCommitId.map(max -> CommitId.valueOf(maxCommitId.get()))
+                          .orElse(null);
     }
 
     private Optional<BigDecimal> selectMaxCommitId() {

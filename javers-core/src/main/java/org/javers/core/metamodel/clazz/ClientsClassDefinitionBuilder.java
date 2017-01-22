@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.clazz;
 
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.validation.Validate;
 
 import java.util.Collections;

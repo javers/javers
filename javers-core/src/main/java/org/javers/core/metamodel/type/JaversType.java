@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;

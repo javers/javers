@@ -1,6 +1,6 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.javers.repository.sql.repositories.GlobalIdRepository;

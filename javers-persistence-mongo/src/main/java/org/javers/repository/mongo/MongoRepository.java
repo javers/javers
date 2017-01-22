@@ -9,7 +9,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.string.RegexEscape;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -297,7 +297,7 @@ public class MongoRepository implements JaversRepository {
             new BasicDBObject(COMMIT_PROPERTIES,
                 new BasicDBObject("$elemMatch",
                         new BasicDBObject("key", commitProperty.getKey()).append(
-                                "value", commitProperty.getValue())))
+                                          "value", commitProperty.getValue())))
         ).collect(toImmutableList());
         return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
     }
@@ -309,12 +309,8 @@ public class MongoRepository implements JaversRepository {
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {
         QueryParams queryParams = QueryParamsBuilder.withLimit(1).build();
         MongoCursor<Document> mongoLatest = getMongoSnapshotsCursor(idQuery, Optional.of(queryParams));
-        Optional<Document> doc = getOne(mongoLatest);
-        if (doc.isEmpty()) {
-            return Optional.empty();
-        }
 
-        return Optional.of(readFromDBObject(doc.get()));
+        return getOne(mongoLatest).map(d -> readFromDBObject(d));
     }
 
     private List<CdoSnapshot> queryForSnapshots(Bson query, Optional<QueryParams> queryParams) {

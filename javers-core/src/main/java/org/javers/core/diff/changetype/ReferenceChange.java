@@ -1,6 +1,8 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
+
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.Objects;
@@ -17,19 +19,19 @@ public final class ReferenceChange extends PropertyChange {
     private final GlobalId right;
     private transient final Optional<Object> leftObject;
     private transient final Optional<Object> rightObject;
-    
+
     public ReferenceChange(GlobalId affectedCdoId, String propertyName, GlobalId leftReference,
-            GlobalId rightReference ){
-    	this( affectedCdoId, propertyName, leftReference, rightReference, null, null );
+                           GlobalId rightReference, Object leftObject, Object rightObject) {
+        this(affectedCdoId, propertyName, leftReference, rightReference, leftObject, rightObject, Optional.empty());
     }
 
     public ReferenceChange(GlobalId affectedCdoId, String propertyName, GlobalId leftReference,
-                           GlobalId rightReference, Object leftObject, Object rightObject ) {
-        super(affectedCdoId, propertyName);
+                           GlobalId rightReference, Object leftObject, Object rightObject, Optional<CommitMetadata> commitMetadata ) {
+        super(affectedCdoId, propertyName, commitMetadata);
         this.left = leftReference;
         this.right = rightReference;
-        this.leftObject = Optional.fromNullable(leftObject);
-        this.rightObject = Optional.fromNullable(rightObject);
+        this.leftObject = Optional.ofNullable(leftObject);
+        this.rightObject = Optional.ofNullable(rightObject);
     }
 
     /**

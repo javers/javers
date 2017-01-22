@@ -2,7 +2,7 @@ package org.javers.repository.mongo;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 

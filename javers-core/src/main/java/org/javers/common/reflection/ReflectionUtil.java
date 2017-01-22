@@ -2,7 +2,7 @@ package org.javers.common.reflection;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.collections.Primitives;
 import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;

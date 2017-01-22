@@ -1,7 +1,7 @@
 package org.javers.core.commit;
 
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.date.DateProvider;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
@@ -46,11 +46,11 @@ public class CommitFactory {
     public Commit createTerminalByGlobalId(String author, Map<String, String> properties, GlobalId removedId){
         Validate.argumentsAreNotNull(author, properties, removedId);
         Optional<CdoSnapshot> previousSnapshot = javersRepository.getLatest(removedId);
-        if (previousSnapshot.isEmpty()){
-            throw new JaversException(JaversExceptionCode.CANT_DELETE_OBJECT_NOT_FOUND,removedId.value());
-        }
+
         CommitMetadata commitMetadata = nextCommit(author, properties);
-        CdoSnapshot terminalSnapshot = snapshotFactory.createTerminal(removedId, previousSnapshot.get(), commitMetadata);
+        CdoSnapshot terminalSnapshot = previousSnapshot
+                .map(prev -> snapshotFactory.createTerminal(removedId, prev, commitMetadata))
+                .orElseThrow(() -> new JaversException(JaversExceptionCode.CANT_DELETE_OBJECT_NOT_FOUND, removedId.value()));
         Diff diff = diffFactory.singleTerminal(removedId, commitMetadata);
         return new Commit(commitMetadata, Lists.asList(terminalSnapshot), diff);
     }

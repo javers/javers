@@ -1,6 +1,6 @@
 package org.javers.core.snapshot;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.diff.ObjectGraph;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;

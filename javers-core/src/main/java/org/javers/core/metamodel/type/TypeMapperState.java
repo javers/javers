@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
@@ -147,7 +147,7 @@ class TypeMapperState {
     private JaversType infer(Type javaType) {
         argumentIsNotNull(javaType);
         JaversType prototype = findNearestAncestor(javaType);
-        JaversType newType = typeFactory.infer(javaType, Optional.fromNullable(prototype));
+        JaversType newType = typeFactory.infer(javaType, Optional.ofNullable(prototype));
 
         return newType;
     }

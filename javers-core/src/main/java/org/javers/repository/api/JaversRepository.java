@@ -1,6 +1,6 @@
 package org.javers.repository.api;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;

@@ -1,6 +1,6 @@
 package org.javers.core.snapshot;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
@@ -15,6 +15,9 @@ import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 
 import java.util.*;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 public class SnapshotDiffer {
 
@@ -51,14 +54,13 @@ public class SnapshotDiffer {
         Diff diff = diffFactory.create(shadowGraph(emptySnapshot), shadowGraph(initialSnapshot),
             commitMetadata(initialSnapshot));
         NewObject newObjectChange =
-            new NewObject(initialSnapshot.getGlobalId(), Optional.empty(), initialSnapshot.getCommitMetadata());
+            new NewObject(initialSnapshot.getGlobalId(), empty(), of(initialSnapshot.getCommitMetadata()));
         changes.addAll(diff.getChanges());
         changes.add(newObjectChange);
     }
 
     private void addTerminalChanges(List<Change> changes, CdoSnapshot terminalSnapshot) {
-        changes.add(new ObjectRemoved(terminalSnapshot.getGlobalId(),
-            Optional.empty(), terminalSnapshot.getCommitMetadata()));
+        changes.add(new ObjectRemoved(terminalSnapshot.getGlobalId(), empty(), of(terminalSnapshot.getCommitMetadata())));
     }
 
     private void addChanges(List<Change> changes, CdoSnapshot previousSnapshot, CdoSnapshot currentSnapshot) {
@@ -72,6 +74,6 @@ public class SnapshotDiffer {
     }
 
     private Optional<CommitMetadata> commitMetadata(CdoSnapshot snapshot) {
-        return Optional.of(snapshot.getCommitMetadata());
+        return of(snapshot.getCommitMetadata());
     }
 }

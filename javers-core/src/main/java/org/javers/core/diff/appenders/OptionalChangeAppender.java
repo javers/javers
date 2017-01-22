@@ -11,6 +11,7 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.javers.common.exception.JaversExceptionCode.UNSUPPORTED_OPTIONAL_CONTENT_TYPE;
 
@@ -38,12 +39,12 @@ public class OptionalChangeAppender extends CorePropertyChangeAppender<PropertyC
         OptionalType optionalType = typeMapper.getPropertyType(property);
         JaversType contentType = typeMapper.getJaversType(optionalType.getItemType());
 
-        Object leftOptional =  optionalType.normalize(pair.getLeftPropertyValue(property));
-        Object rightOptional = optionalType.normalize(pair.getRightPropertyValue(property));
+        Optional leftOptional =  normalize((Optional) pair.getLeftPropertyValue(property));
+        Optional rightOptional = normalize((Optional) pair.getRightPropertyValue(property));
 
         if (contentType instanceof ManagedType){
-            GlobalId leftId  =  getAndDehydrate(optionalType, leftOptional, contentType);
-            GlobalId rightId = getAndDehydrate(optionalType, rightOptional, contentType);
+            GlobalId leftId  =  getAndDehydrate(leftOptional, contentType);
+            GlobalId rightId = getAndDehydrate(rightOptional, contentType);
 
             if (Objects.equals(leftId, rightId)) {
                 return null;
@@ -52,7 +53,7 @@ public class OptionalChangeAppender extends CorePropertyChangeAppender<PropertyC
                     pair.getLeftPropertyValue(property), pair.getRightPropertyValue(property));
         }
         if (contentType instanceof PrimitiveOrValueType) {
-            if (Objects.equals(leftOptional, rightOptional)) {
+            if (leftOptional.equals(rightOptional)) {
                 return null;
             }
             return new ValueChange(pair.getGlobalId(), property.getName(), leftOptional, rightOptional);
@@ -61,7 +62,16 @@ public class OptionalChangeAppender extends CorePropertyChangeAppender<PropertyC
         throw new JaversException(UNSUPPORTED_OPTIONAL_CONTENT_TYPE, contentType);
     }
 
-    private GlobalId getAndDehydrate(OptionalType optionalType, Object optional, final JaversType contentType){
-         return (GlobalId) optionalType.mapAndGet(optional, input -> globalIdFactory.dehydrate(input, contentType, null));
+    private GlobalId getAndDehydrate(Optional optional, final JaversType contentType){
+         return (GlobalId) optional
+                 .map(o -> globalIdFactory.dehydrate(o, contentType, null))
+                 .orElse(null);
+    }
+
+    private Optional normalize(Optional optional) {
+        if (optional == null) {
+            return Optional.empty();
+        }
+        return optional;
     }
 }

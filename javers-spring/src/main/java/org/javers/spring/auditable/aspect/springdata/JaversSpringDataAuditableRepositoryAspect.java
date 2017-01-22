@@ -3,7 +3,7 @@ package org.javers.spring.auditable.aspect.springdata;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.Javers;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.javers.spring.auditable.AspectUtil;
@@ -49,14 +49,12 @@ public class JaversSpringDataAuditableRepositoryAspect {
 
     private void onVersionEvent(JoinPoint pjp, AuditChangeHandler handler) {
         Optional<Class> versionedInterface = getRepositoryInterface(pjp);
-        if (versionedInterface.isEmpty()){
-            return;
-        }
 
-        RepositoryMetadata metadata = getMetadata(versionedInterface.get());
-        Iterable<Object> domainObjects = AspectUtil.collectArguments(pjp);
-
-        applyVersionChanges(metadata, domainObjects, handler);
+        versionedInterface.ifPresent(versioned -> {
+            RepositoryMetadata metadata = getMetadata(versioned);
+            Iterable<Object> domainObjects = AspectUtil.collectArguments(pjp);
+            applyVersionChanges(metadata, domainObjects, handler);
+        });
     }
 
     private RepositoryMetadata getMetadata(Class versionedInterface) {

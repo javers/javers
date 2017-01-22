@@ -1,6 +1,6 @@
 package org.javers.repository.sql.schema;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.repository.sql.SqlRepositoryConfiguration;
 import org.polyjdbc.core.PolyJDBC;
 

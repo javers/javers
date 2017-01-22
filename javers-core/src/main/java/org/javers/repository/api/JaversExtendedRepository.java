@@ -1,7 +1,7 @@
 package org.javers.repository.api;
 
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.diff.Change;
@@ -118,7 +118,7 @@ public class JaversExtendedRepository implements JaversRepository {
     }
 
     private List<Change> filterByPropertyName(List<Change> changes, final QueryParams queryParams) {
-        if (queryParams.changedProperty().isEmpty()){
+        if (!queryParams.changedProperty().isPresent()){
             return changes;
         }
 
