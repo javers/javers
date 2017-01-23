@@ -7,7 +7,7 @@ import javax.persistence.Id;
  */
 public class PrimitiveEntity {
     @Id
-    private String   id;
+    private String   id = "a";
     private int      intField;
     private long     longField;
     private double   doubleField;
