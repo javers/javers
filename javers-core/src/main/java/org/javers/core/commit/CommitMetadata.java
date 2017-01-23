@@ -44,6 +44,6 @@ public class CommitMetadata implements Serializable {
 
     @Override
     public String toString() {
-        return ToStringBuilder.toString(this, "author", author, "properties", properties, "date", commitDate, "id", id);
+        return ToStringBuilder.toString(this, "author", author, "properties", properties, "util", commitDate, "id", id);
     }
 }

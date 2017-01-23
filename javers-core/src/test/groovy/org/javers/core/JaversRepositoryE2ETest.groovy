@@ -665,7 +665,7 @@ class JaversRepositoryE2ETest extends Specification {
         commitDates == expectedCommitDates
 
         where:
-        what << ['date from','date to','date in time range']
+        what << ['util from','util to','util in time range']
         query << [
             byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,01,1,3,0)).build(),
             byInstanceId(1, SnapshotEntity).to(new LocalDateTime(2015,01,1,3,0)).build(),

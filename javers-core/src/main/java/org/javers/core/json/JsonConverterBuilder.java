@@ -2,8 +2,9 @@ package org.javers.core.json;
 
 import com.google.gson.*;
 import org.javers.common.validation.Validate;
-import org.javers.core.json.typeadapter.date.DateTypeCoreAdapters;
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.java8support.Java8TypeAdapters;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -105,7 +106,8 @@ public class JsonConverterBuilder {
     }
 
     public JsonConverter build() {
-        registerJsonTypeAdapters(DateTypeCoreAdapters.adapters());
+        registerJsonTypeAdapters(UtilTypeCoreAdapters.adapters());
+        registerJsonTypeAdapters(Java8TypeAdapters.adapters());
 
         registerJsonTypeAdapter(new AtomicTypeAdapter(typeSafeValues));
 

@@ -6,7 +6,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import java.util.logging.Logger
+import java.time.ZoneId
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
@@ -23,9 +23,27 @@ class JsonConverterDateTimeTest extends Specification {
     long time = 1443807427050
 
     @Unroll
+    def "should convert joda.LocalDateTime and java8.LocalDateTime in the same way from given json #asJson"(){
+      when:
+      def jodaTime =  jsonConverter.fromJson(asJson, org.joda.time.LocalDateTime)
+      def java8Time = jsonConverter.fromJson(asJson, java.time.LocalDateTime)
+
+      then:
+      jodaTime.toDateTime(DateTimeZone.default).getMillis() == java8Time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+      where:
+      asJson << [
+                '"2015-10-02T17:37:07.050"',
+                '"2015-10-02T17:37:07.05"',
+                '"2015-10-02T17:37:07.0"',
+                '"2015-10-02T17:37:07"'
+              ]
+    }
+
+    @Unroll
     def "should convert #expectedType to and from JSON (#expectedJson) in ISO format"() {
         expect:
-        logger.info ( "date "+givenValue.toString() +" converted to:" + jsonConverter.toJson(givenValue)+", expected:"+expectedJson)
+        logger.info ( "util "+givenValue.toString() +" converted to:" + jsonConverter.toJson(givenValue)+", expected:"+expectedJson)
         jsonConverter.toJson(givenValue) == expectedJson
         jsonConverter.fromJson(expectedJson, expectedType) == givenValue
         jsonConverter.fromJson(jsonConverter.toJson(givenValue), expectedType) == givenValue

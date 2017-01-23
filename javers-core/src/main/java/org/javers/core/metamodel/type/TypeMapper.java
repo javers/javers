@@ -70,6 +70,7 @@ public class TypeMapper {
         addType(new CollectionType(Collection.class)); //only for exception handling
         addType(new SetType(Set.class));
         addType(new ListType(List.class));
+        addType(new OptionalType());
 
         //& Maps
         addType(new MapType(Map.class));

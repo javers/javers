@@ -23,8 +23,8 @@ class JaversSmartparamIntegrationTest extends Specification{
                                      .withTypeSafeValues(true)
                                      .build()
 
-        def entry1 = new DummyParameterEntry(["date":new LocalDate(2014,01,10)])
-        def entry2 = new DummyParameterEntry(["date":new LocalDate(2014,01,12),
+        def entry1 = new DummyParameterEntry(["util":new LocalDate(2014,01,10)])
+        def entry2 = new DummyParameterEntry(["util":new LocalDate(2014,01,12),
                                               "rate":new BigDecimal(10),
                                               "int" :1,
                                               "String":"str",
@@ -52,7 +52,7 @@ class JaversSmartparamIntegrationTest extends Specification{
 
         with(sortedEntryChanges[1]) {
             entryChangeType == "EntryValueChange"
-            key == "date"
+            key == "util"
             leftValue.typeAlias == "LocalDate"
             leftValue.value == "2014-01-10"
             rightValue.value == "2014-01-12"

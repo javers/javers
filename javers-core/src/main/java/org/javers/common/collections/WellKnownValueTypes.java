@@ -5,6 +5,9 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URL;
+import java.util.Currency;
 import java.util.Date;
 import java.util.UUID;
 
@@ -19,6 +22,9 @@ public class WellKnownValueTypes {
             Date.class,
             ThreadLocal.class,
             UUID.class,
+            Currency.class,
+            URI.class,
+            URL.class
     };
 
     public static Class<?>[] getValueTypes() {

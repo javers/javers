@@ -235,7 +235,7 @@ public class QueryBuilder {
 
     /**
      * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those created after (>=) given date.
+     * to those created after (>=) given util.
      * <br/><br/>
      *
      * <h2>CommitDate is local datetime</h2>
@@ -265,7 +265,7 @@ public class QueryBuilder {
 
     /**
      * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those created before (<=) given date.
+     * to those created before (<=) given util.
      */
     public QueryBuilder to(LocalDateTime to) {
         queryParamsBuilder.to(to);

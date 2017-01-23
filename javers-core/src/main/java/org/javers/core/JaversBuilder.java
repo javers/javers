@@ -30,7 +30,7 @@ import org.javers.core.pico.AddOnsModule;
 import org.javers.core.snapshot.SnapshotModule;
 import org.javers.groovysupport.GroovyAddOns;
 import org.javers.guava.GuavaAddOns;
-import org.javers.java8support.Java8AddOns;
+import org.javers.jodasupport.JodaAddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
 import org.javers.repository.api.JaversExtendedRepository;
@@ -93,7 +93,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         //conditional plugins
         conditionalTypesPlugins = Sets.asSet(
                 new GroovyAddOns(),
-                new Java8AddOns(),
+                new JodaAddOns(),
                 new GuavaAddOns(),
                 new UtilTypeAdapters()
         );
@@ -505,7 +505,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
   /**
-   * DateProvider providers current date for {@link Commit#getCommitDate()}.
+   * DateProvider providers current util for {@link Commit#getCommitDate()}.
    * <br/>
    * By default, now() is used.
    * <br/>

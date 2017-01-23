@@ -14,7 +14,7 @@ import org.javers.common.string.RegexEscape;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.json.typeadapter.date.DateTypeCoreAdapters;
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.EntityType;
@@ -273,11 +273,11 @@ public class MongoRepository implements JaversRepository {
     }
 
     private Bson addFromDateFiler(Bson query, LocalDateTime from) {
-        return Filters.and(query, Filters.gte(COMMIT_DATE, DateTypeCoreAdapters.serialize(from)));
+        return Filters.and(query, Filters.gte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(from)));
     }
 
     private Bson addToDateFilter(Bson query, LocalDateTime to) {
-        return Filters.and(query, Filters.lte(COMMIT_DATE, DateTypeCoreAdapters.serialize(to)));
+        return Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(to)));
     }
 
     private Bson addCommitIdFilter(Bson query, CommitId commitId) {
