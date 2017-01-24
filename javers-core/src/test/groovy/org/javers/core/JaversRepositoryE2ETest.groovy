@@ -60,10 +60,18 @@ class JaversRepositoryE2ETest extends Specification {
       s.ByteField = 10
       s.ShortField = 10
       s.BooleanField = true
+      s.IntegerList = [10,11]
+      s.LongList = [10,11]
+      s.DoubleList = [1.1, 1.2]
+      s.FloatList = [1.1,1.2]
+      s.ByteList = [10,11]
+      s.ShortList = [10,11]
+      s.BooleanList = [true,false]
+
       javers.commit("author",s)
 
       then:
-      javers.findChanges(QueryBuilder.anyDomainObject().build()).size() == 15
+      javers.findChanges(QueryBuilder.anyDomainObject().build()).size() == 22
     }
 
     def "should support EmbeddedId as Entity Id"(){
