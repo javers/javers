@@ -58,6 +58,10 @@ class DocumentConverter {
             if (jsonPrimitive.isNumber()) {
                 return jsonElement.getAsNumber();
             }
+
+            if (jsonPrimitive.isBoolean()) {
+                return jsonElement.getAsBoolean();
+            }
         }
 
         if (jsonElement instanceof JsonArray) {
@@ -86,6 +90,10 @@ class DocumentConverter {
 
         if (dbObject instanceof Number) {
             return new JsonPrimitive((Number)dbObject);
+        }
+
+        if (dbObject instanceof Boolean) {
+            return new JsonPrimitive((Boolean) dbObject);
         }
 
         if (dbObject instanceof List) {

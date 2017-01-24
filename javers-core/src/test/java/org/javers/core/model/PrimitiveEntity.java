@@ -1,7 +1,6 @@
 package org.javers.core.model;
 
 import javax.persistence.Id;
-import java.util.List;
 
 /**
  * @author bartosz walacik
@@ -25,12 +24,4 @@ public class PrimitiveEntity {
     private Byte     ByteField;
     private Short    ShortField;
     private Boolean  BooleanField;
-
-    private List<Integer>  IntegerList;
-    private List<Long>     LongList;
-    private List<Double>   DoubleList;
-    private List<Float>    FloatList;
-    private List<Byte>     ByteList;
-    private List<Short>    ShortList;
-    private List<Boolean>  BooleanList;
 }

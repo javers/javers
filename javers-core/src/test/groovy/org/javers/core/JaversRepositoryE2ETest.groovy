@@ -40,7 +40,6 @@ class JaversRepositoryE2ETest extends Specification {
 
     def "should persist various primitive types"(){
       given:
-      def javers = javers().build()
       def s = new PrimitiveEntity(id:1)
 
       when:
@@ -60,23 +59,14 @@ class JaversRepositoryE2ETest extends Specification {
       s.ByteField = 10
       s.ShortField = 10
       s.BooleanField = true
-      s.IntegerList = [10,11]
-      s.LongList = [10,11]
-      s.DoubleList = [1.1, 1.2]
-      s.FloatList = [1.1,1.2]
-      s.ByteList = [10,11]
-      s.ShortList = [10,11]
-      s.BooleanList = [true,false]
-
       javers.commit("author",s)
 
       then:
-      javers.findChanges(QueryBuilder.anyDomainObject().build()).size() == 22
+      javers.findChanges(QueryBuilder.anyDomainObject().build()).size() == 15
     }
 
     def "should support EmbeddedId as Entity Id"(){
       given:
-      def javers = javers().build()
       def cdo  = new DummyEntityWithEmbeddedId(point: new DummyPoint(1,2), someVal: 5)
 
       when:
@@ -89,7 +79,6 @@ class JaversRepositoryE2ETest extends Specification {
 
     def "should support long numbers as Entity Id "(){
         given:
-        def javers = javers().build()
         def longId = 1000000000L*1000
         def category = new Category(longId)
 

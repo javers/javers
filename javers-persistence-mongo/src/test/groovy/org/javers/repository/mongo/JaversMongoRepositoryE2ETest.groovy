@@ -24,7 +24,7 @@ abstract class JaversMongoRepositoryE2ETest extends JaversRepositoryE2ETest {
     protected JaversRepository prepareJaversRepository() {
         MongoRepository mongoRepository = new MongoRepository(getMongoDb())
         mongoRepository.clean()
-        return mongoRepository;
+        mongoRepository
     }
 
     def "should commit and read snapshot of Entity containing map field with dot keys"() {
