@@ -35,7 +35,7 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     protected JaversRepository prepareJaversRepository() {
-        return new InMemoryRepository();
+        new InMemoryRepository()
     }
 
     def "should persist various primitive types"(){
@@ -1075,12 +1075,11 @@ class JaversRepositoryE2ETest extends Specification {
     def "should provide cluster-friendly commitId generator"(){
         given:
         def threads = 10
-        def javersRepo = new InMemoryRepository()
         when:
         withPool threads, {
             (1..threads).collectParallel {
                 def javers = JaversBuilder.javers()
-                        .registerJaversRepository(javersRepo)
+                        .registerJaversRepository(repository)
                         .withCommitIdGenerator(CommitIdGenerator.RANDOM)
                         .build()
                 javers.commit("author", new SnapshotEntity(id: it))
@@ -1088,7 +1087,7 @@ class JaversRepositoryE2ETest extends Specification {
         }
 
         then:
-        def javers = JaversBuilder.javers().registerJaversRepository(javersRepo).build()
+        def javers = JaversBuilder.javers().registerJaversRepository(repository).build()
         def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject().build())
         (snapshots.collect{it -> it.commitId} as Set).size() == threads
     }
