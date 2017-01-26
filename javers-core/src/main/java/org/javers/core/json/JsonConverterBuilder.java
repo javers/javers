@@ -7,7 +7,9 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.java8support.Java8TypeAdapters;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,6 +22,7 @@ public class JsonConverterBuilder {
     private boolean typeSafeValues = false;
     private boolean prettyPrint = true;
     private final GsonBuilder gsonBuilder;
+    private final List<Class> valueTypes = new ArrayList<>();
 
     public JsonConverterBuilder() {
         this.gsonBuilder = new GsonBuilder();
@@ -105,10 +108,13 @@ public class JsonConverterBuilder {
         return this;
     }
 
+    public List<Class> getValueTypes() {
+        return Collections.unmodifiableList(valueTypes);
+    }
+
     public JsonConverter build() {
         registerJsonTypeAdapters(UtilTypeCoreAdapters.adapters());
         registerJsonTypeAdapters(Java8TypeAdapters.adapters());
-
         registerJsonTypeAdapter(new AtomicTypeAdapter(typeSafeValues));
 
         if (prettyPrint){
@@ -121,20 +127,10 @@ public class JsonConverterBuilder {
         return new JsonConverter(gsonBuilder.create());
     }
 
-    private void registerJsonTypeAdapterForType(Type targetType, final JsonTypeAdapter adapter) {
-        JsonSerializer jsonSerializer = new JsonSerializer() {
-            @Override
-            public JsonElement serialize(Object value, Type type, JsonSerializationContext jsonSerializationContext) {
-                return adapter.toJson(value, jsonSerializationContext);
-            }
-        };
-
-        JsonDeserializer jsonDeserializer = new JsonDeserializer() {
-            @Override
-            public Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-                return adapter.fromJson(jsonElement, jsonDeserializationContext);
-            }
-        };
+    private void registerJsonTypeAdapterForType(Class targetType, final JsonTypeAdapter adapter) {
+        valueTypes.add(targetType);
+        JsonSerializer jsonSerializer = (value, type, jsonSerializationContext) -> adapter.toJson(value, jsonSerializationContext);
+        JsonDeserializer jsonDeserializer = (jsonElement, type, jsonDeserializationContext) -> adapter.fromJson(jsonElement, jsonDeserializationContext);
 
         registerNativeGsonSerializer(targetType, jsonSerializer);
         registerNativeGsonDeserializer(targetType, jsonDeserializer);

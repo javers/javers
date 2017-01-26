@@ -25,7 +25,7 @@ import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.mongo.model.MongoHeadId;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import java.util.*;
 

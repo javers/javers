@@ -9,7 +9,7 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.DummyUserWithValues
-import org.joda.time.LocalDateTime
+import java.time.LocalDateTime
 
 import static DummyUserWithValues.dummyUserWithDate
 import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat
@@ -147,7 +147,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append LocalDateTime Value change" () {
         given:
-        def dob = new LocalDateTime()
+        def dob = LocalDateTime.now()
         def leftUser =  dummyUserWithDate("kaz", null)
         def rightUser = dummyUserWithDate("kaz", dob)
         def left = buildGraph(leftUser)

@@ -6,8 +6,8 @@ import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.container.*
 import org.javers.core.json.JsonConverter
 import org.javers.core.model.SnapshotEntity
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
+import java.time.LocalDate
+import java.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -81,7 +81,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
 
             with(change.commitMetadata.get()) {
                 author == "author"
-                commitDate == new LocalDateTime("2001-12-01T22:23:03")
+                commitDate == LocalDateTime.of(2001,12,1,22,23,3)
                 id.majorId == 1.0
 
             }

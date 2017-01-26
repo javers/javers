@@ -6,7 +6,7 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyIgnoredPropertiesType
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
-import org.joda.time.LocalDateTime
+import java.time.LocalDateTime
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll

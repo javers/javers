@@ -11,8 +11,8 @@ import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
+import java.time.LocalDate
+import java.time.LocalDateTime
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -236,7 +236,7 @@ class MapChangeTypeAdapterTest extends Specification {
         change.affectedGlobalId == instanceId(1,SnapshotEntity)
         change.commitMetadata.get().author == "kazik"
         change.commitMetadata.get().id.majorId == 1
-        change.commitMetadata.get().commitDate == new LocalDateTime("2001-12-01T22:23:03")
+        change.commitMetadata.get().commitDate == LocalDateTime.of(2001,12,01,22,23,03)
         change.propertyName == "mapOfPrimitives"
         MapChangeAssert.assertThat(change)
                        .hasEntryAdded("some1",1)

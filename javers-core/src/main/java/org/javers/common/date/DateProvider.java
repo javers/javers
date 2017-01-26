@@ -1,8 +1,7 @@
 package org.javers.common.date;
 
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 public interface DateProvider {
-
     LocalDateTime now();
 }

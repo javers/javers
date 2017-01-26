@@ -3,10 +3,11 @@ package org.javers.repository.sql.repositories;
 import java.util.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.repository.sql.PolyUtil;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
@@ -67,7 +68,7 @@ public class CommitMetadataRepository extends SchemaNameAware {
     }
 
     private Timestamp toTimestamp(LocalDateTime commitMetadata) {
-        return new Timestamp(commitMetadata.toDate());
+        return new Timestamp(UtilTypeCoreAdapters.toUtilDate(commitMetadata));
     }
 
     public CommitId getCommitHeadId() {

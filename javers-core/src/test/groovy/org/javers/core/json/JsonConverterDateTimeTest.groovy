@@ -23,27 +23,70 @@ class JsonConverterDateTimeTest extends Specification {
     long time = 1443807427050
 
     @Unroll
-    def "should convert joda.LocalDateTime and java8.LocalDateTime in the same way from given json #asJson"(){
+    def "should convert java8.LocalDateTime from json #fromJson to json #expectedJson"(){
       when:
-      def jodaTime =  jsonConverter.fromJson(asJson, org.joda.time.LocalDateTime)
-      def java8Time = jsonConverter.fromJson(asJson, java.time.LocalDateTime)
+      def java8Time = jsonConverter.fromJson(fromJson, java.time.LocalDateTime)
+
+      then:
+      jsonConverter.toJson(java8Time) == expectedJson
+
+      where:
+      fromJson << [
+                '"2015-10-02T17:37:07.050"',
+                '"2015-10-02T17:37:07.05"',
+                '"2015-10-02T17:37:07.000"',
+                '"2015-10-02T17:37:07.0"',
+                '"2015-10-02T17:37:07"'
+              ]
+      expectedJson << [
+              '"2015-10-02T17:37:07.05"',
+              '"2015-10-02T17:37:07.05"',
+              '"2015-10-02T17:37:07"',
+              '"2015-10-02T17:37:07"',
+              '"2015-10-02T17:37:07"'
+      ]
+    }
+
+    @Unroll
+    def "should convert joda.LocalDateTime from json #fromJson to json #expectedJson"(){
+        when:
+        def jodaTime =  jsonConverter.fromJson(fromJson, org.joda.time.LocalDateTime)
+
+        then:
+        jsonConverter.toJson(jodaTime) == expectedJson
+
+        where:
+        fromJson << [
+                '"2015-10-02T17:37:07.050"',
+                '"2015-10-02T17:37:07.05"',
+                '"2015-10-02T17:37:07.0"',
+                '"2015-10-02T17:37:07"'
+        ]
+        expectedJson << [
+                '"2015-10-02T17:37:07.050"',
+                '"2015-10-02T17:37:07.050"',
+                '"2015-10-02T17:37:07.000"',
+                '"2015-10-02T17:37:07.000"'
+        ]
+    }
+
+    def "should convert java8.LocalDateTime and joda.LocalDateTime to the same value"(){
+      when:
+      def jodaTime =  jsonConverter.fromJson(fromJson, org.joda.time.LocalDateTime)
+      def java8Time = jsonConverter.fromJson(fromJson, java.time.LocalDateTime)
 
       then:
       jodaTime.toDateTime(DateTimeZone.default).getMillis() == java8Time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
       where:
-      asJson << [
-                '"2015-10-02T17:37:07.050"',
-                '"2015-10-02T17:37:07.05"',
-                '"2015-10-02T17:37:07.0"',
-                '"2015-10-02T17:37:07"'
-              ]
+      fromJson << ['"2015-10-02T17:37:07.050"']
+
     }
 
     @Unroll
     def "should convert #expectedType to and from JSON (#expectedJson) in ISO format"() {
         expect:
-        logger.info ( "util "+givenValue.toString() +" converted to:" + jsonConverter.toJson(givenValue)+", expected:"+expectedJson)
+        logger.info ( "date "+ givenValue.toString() +" converted to:" + jsonConverter.toJson(givenValue)+", expected:"+expectedJson)
         jsonConverter.toJson(givenValue) == expectedJson
         jsonConverter.fromJson(expectedJson, expectedType) == givenValue
         jsonConverter.fromJson(jsonConverter.toJson(givenValue), expectedType) == givenValue
@@ -63,7 +106,8 @@ class JsonConverterDateTimeTest extends Specification {
                          new org.joda.time.LocalDateTime(time, DateTimeZone.UTC),
                          new org.joda.time.LocalDate(2015,10,02)
         ]
-        expectedJson << ['"2015-10-02T17:37:07.050"'] *5 +
+        expectedJson << ['"2015-10-02T17:37:07.05"'] * 4 +
+                        ['"2015-10-02T17:37:07.050"']  +
                         ['"2015-10-02"']
     }
 

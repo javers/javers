@@ -3,7 +3,7 @@ package org.javers.core.cases
 import org.javers.common.exception.JaversException
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
-import org.joda.time.LocalDateTime
+import java.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -28,7 +28,7 @@ public class Case250BetterExceptionMessage extends Specification {
         println e.getMessage()
 
         where:
-        val << ["String", 1, new LocalDateTime()]
+        val << ["String", 1, LocalDateTime.now()]
     }
 
     @Unroll
@@ -45,6 +45,6 @@ public class Case250BetterExceptionMessage extends Specification {
         println e.getMessage()
 
         where:
-        val << ["String", 1, new LocalDateTime()]
+        val << ["String", 1, LocalDateTime.now()]
     }
 }

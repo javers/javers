@@ -8,7 +8,7 @@ dependencies {
     compile 'io.github.lukehutch:fast-classpath-scanner:2.0.11'
 
     //should be on application's classpath when using custom comparators
-    optional 'joda-time:joda-time:2.9.7'
+    optional "joda-time:joda-time:$jodaVersion"
     optional "com.google.guava:guava:$guavaVersion"
 
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'

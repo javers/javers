@@ -8,7 +8,7 @@ import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.PhoneWithShallowCategory
 import org.javers.core.model.ShallowPhone
 import org.javers.core.model.SnapshotEntity
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 import org.javers.core.model.*
@@ -63,7 +63,7 @@ class JaversCommitE2ETest extends Specification {
 
         when:
         javers.commit("author",entity)
-        entity.dob = new LocalDate()
+        entity.dob = LocalDate.now()
         entity.intProperty = 5
         def commit = javers.commit("author",entity)
 

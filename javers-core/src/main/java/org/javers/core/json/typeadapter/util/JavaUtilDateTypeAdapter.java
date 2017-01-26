@@ -1,7 +1,6 @@
 package org.javers.core.json.typeadapter.util;
 
 import org.javers.core.json.BasicStringTypeAdapter;
-
 import java.util.Date;
 
 
@@ -19,7 +18,7 @@ class JavaUtilDateTypeAdapter extends BasicStringTypeAdapter<Date> {
 
     @Override
     public Date deserialize(String serializedValue) {
-        return UtilTypeCoreAdapters.deserialize(serializedValue).toDate(UtilTypeCoreAdapters.UTC);
+        return new Date(java.util.Date.from(UtilTypeCoreAdapters.deserializeToInstant(serializedValue)).getTime());
     }
 
     @Override

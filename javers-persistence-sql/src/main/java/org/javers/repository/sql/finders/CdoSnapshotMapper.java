@@ -2,7 +2,7 @@ package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Pair;
 import org.javers.core.json.CdoSnapshotSerialized;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
 
 import java.sql.ResultSet;
@@ -16,7 +16,7 @@ class CdoSnapshotMapper implements ObjectMapper<Pair<CdoSnapshotSerialized,Long>
     public Pair<CdoSnapshotSerialized,Long> createObject(ResultSet resultSet) throws SQLException {
         return new Pair<>(new CdoSnapshotSerialized()
                 .withCommitAuthor(resultSet.getString(COMMIT_AUTHOR))
-                .withCommitDate(LocalDateTime.fromDateFields(resultSet.getTimestamp(COMMIT_COMMIT_DATE)))
+                .withCommitDate(resultSet.getTimestamp(COMMIT_COMMIT_DATE))
                 .withCommitId(resultSet.getBigDecimal(COMMIT_COMMIT_ID))
                 .withVersion(resultSet.getLong(SNAPSHOT_VERSION))
                 .withSnapshotState(resultSet.getString(SNAPSHOT_STATE))

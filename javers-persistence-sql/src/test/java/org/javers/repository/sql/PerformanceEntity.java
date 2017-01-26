@@ -2,7 +2,7 @@ package org.javers.repository.sql;
 
 import org.javers.common.collections.Lists;
 import org.javers.core.metamodel.annotation.Id;
-import org.joda.time.LocalDate;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,11 +25,11 @@ class PerformanceEntity {
     String str4 = "PerformanceEntity.str4";
     String str5 = "PerformanceEntity.str5";
 
-    LocalDate date1 = new LocalDate(2001, 1, 1);
-    LocalDate date2 = new LocalDate(2001, 1, 2);
-    LocalDate date3 = new LocalDate(2001, 1, 3);
-    LocalDate date4 = new LocalDate(2001, 1, 4);
-    LocalDate date5 = new LocalDate(2001, 1, 5);
+    LocalDate date1 = LocalDate.of(2001, 1, 1);
+    LocalDate date2 = LocalDate.of(2001, 1, 2);
+    LocalDate date3 = LocalDate.of(2001, 1, 3);
+    LocalDate date4 = LocalDate.of(2001, 1, 4);
+    LocalDate date5 = LocalDate.of(2001, 1, 5);
 
     void change() {
         intList.set(0, intList.get(0) + 1);

@@ -2,7 +2,7 @@ package org.javers.core.json.typeadapter
 
 import groovy.json.JsonSlurper
 import org.javers.core.diff.changetype.Atomic
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 

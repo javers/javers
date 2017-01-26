@@ -2,7 +2,7 @@ package org.javers.core.model
 
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multiset
-import org.joda.time.LocalDate
+import java.time.LocalDate
 
 import javax.persistence.Id
 
@@ -70,7 +70,7 @@ class SnapshotEntity {
     Map nonParametrizedMap                              //not supported
 
     @Id
-    public int getId() {
+    int getId() {
         id
     }
 }

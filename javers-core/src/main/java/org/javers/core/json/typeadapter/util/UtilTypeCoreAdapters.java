@@ -2,30 +2,48 @@ package org.javers.core.json.typeadapter.util;
 
 import org.javers.common.collections.Lists;
 import org.javers.core.json.JsonTypeAdapter;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-import org.joda.time.LocalDateTime;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * @author bartosz.walacik
  */
 public class UtilTypeCoreAdapters {
+    private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
     public static final ZoneId UTC = ZoneId.of("UTC");
 
-    public static String serializeToLocal(java.util.Date date) {
-        return serialize(new DateTime(date.getTime()));
+    public static LocalDateTime deserialize(String date) {
+        return LocalDateTime.parse(date, ISO_FORMAT);
     }
 
-    public static String serialize(java.util.Date date) {
-        date.toInstant().atZone(UTC).toLocalDateTime();
+    public static Instant deserializeToInstant(String date) {
+        return deserialize(date).toInstant(ZoneOffset.UTC);
+    }
 
-        //TODO date.toInstant ...
-        return serialize(new DateTime(date.getTime(), DateTimeZone.UTC));
+    public static String serialize(LocalDateTime date) {
+        return date.format(ISO_FORMAT);
+    }
+
+    public static LocalDateTime fromUtilDate(Date date) {
+        if (date.getClass() == Date.class) {
+            return LocalDateTime.ofInstant(date.toInstant(), UTC);
+        }
+        return fromUtilDate(new Date(date.getTime())); //hack for old java.sql.Date
+    }
+
+    public static Date toUtilDate(LocalDateTime localDateTime) {
+        return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
+    }
+
+    public static String serialize(Date date) {
+        return serialize(fromUtilDate(date));
     }
 
     public static List<JsonTypeAdapter> adapters() {

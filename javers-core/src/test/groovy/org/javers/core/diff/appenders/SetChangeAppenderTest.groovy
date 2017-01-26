@@ -3,7 +3,7 @@ package org.javers.core.diff.appenders
 import org.javers.core.diff.RealNodePair
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import spock.lang.Unroll
 
 import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat

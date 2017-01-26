@@ -6,7 +6,7 @@ import org.javers.core.diff.changetype.map.EntryRemoved
 import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.DummyUser
-import org.joda.time.LocalDateTime
+import java.time.LocalDateTime
 import spock.lang.Unroll
 
 import static org.javers.core.diff.ChangeAssert.assertThat
@@ -87,8 +87,8 @@ class MapChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append EntryValueChanged when ValueType value is changed"() {
 
-        def dayOne = new LocalDateTime(2000,1,1,12,1)
-        def dayTwo = new LocalDateTime(2000,1,1,12,2)
+        def dayOne = LocalDateTime.of(2000,1,1,12,1)
+        def dayTwo = LocalDateTime.of(2000,1,1,12,2)
 
         given:
         def left =  dummyUser("1").withValueMap(["some":dayOne, "other":dayTwo] )

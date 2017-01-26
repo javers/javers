@@ -11,8 +11,8 @@ import org.javers.repository.api.JaversRepository
 import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.QueryBuilder
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
+import java.time.LocalDate
+import java.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -213,7 +213,7 @@ class JaversRepositoryE2ETest extends Specification {
     def "should query for Entity snapshots and changes by Entity class and changed property"() {
         given:
         javers.commit( "author", new SnapshotEntity(id:1, intProperty: 1) )
-        javers.commit( "author", new SnapshotEntity(id:1, intProperty: 1, dob: new LocalDate()) ) //noise
+        javers.commit( "author", new SnapshotEntity(id:1, intProperty: 1, dob: LocalDate.now()) ) //noise
         javers.commit( "author", new SnapshotEntity(id:1, intProperty: 2) )
         javers.commit( "author", new DummyAddress() ) //noise
         javers.commit( "author", new SnapshotEntity(id:2, intProperty: 1) )
@@ -341,8 +341,8 @@ class JaversRepositoryE2ETest extends Specification {
     def "should query for Entity snapshots and changes by GlobalId and changed property"() {
         given:
         javers.commit("author", new SnapshotEntity(id:1, intProperty: 4))
-        javers.commit("author", new SnapshotEntity(id:1, intProperty: 4, dob : new LocalDate()))
-        javers.commit("author", new SnapshotEntity(id:1, intProperty: 5, dob : new LocalDate()))
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 4, dob : LocalDate.now()))
+        javers.commit("author", new SnapshotEntity(id:1, intProperty: 5, dob : LocalDate.now()))
         javers.commit("author", new SnapshotEntity(id:2, intProperty: 4)) //noise
 
         when: "should find snapshots"
@@ -653,7 +653,7 @@ class JaversRepositoryE2ETest extends Specification {
         given:
         (1..5).each{
             def entity =  new SnapshotEntity(id: 1, intProperty: it)
-            fakeDateProvider.set( new LocalDateTime(2015,01,1,it,0) )
+            fakeDateProvider.set( LocalDateTime.of(2015,01,1,it,0) )
             javers.commit('author', entity)
         }
 
@@ -667,15 +667,15 @@ class JaversRepositoryE2ETest extends Specification {
         where:
         what << ['util from','util to','util in time range']
         query << [
-            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,01,1,3,0)).build(),
-            byInstanceId(1, SnapshotEntity).to(new LocalDateTime(2015,01,1,3,0)).build(),
-            byInstanceId(1, SnapshotEntity).from(new LocalDateTime(2015,01,1,2,0))
-                                           .to(new LocalDateTime(2015,01,1,4,0)).build()
+            byInstanceId(1, SnapshotEntity).from(LocalDateTime.of(2015,01,1,3,0)).build(),
+            byInstanceId(1, SnapshotEntity).to(LocalDateTime.of(2015,01,1,3,0)).build(),
+            byInstanceId(1, SnapshotEntity).from(LocalDateTime.of(2015,01,1,2,0))
+                                           .to(LocalDateTime.of(2015,01,1,4,0)).build()
         ]
         expectedCommitDates << [
-            (5..3).collect{new LocalDateTime(2015,01,1,it,0)},
-            (3..1).collect{new LocalDateTime(2015,01,1,it,0)},
-            (4..2).collect{new LocalDateTime(2015,01,1,it,0)}
+            (5..3).collect{LocalDateTime.of(2015,01,1,it,0)},
+            (3..1).collect{LocalDateTime.of(2015,01,1,it,0)},
+            (4..2).collect{LocalDateTime.of(2015,01,1,it,0)}
         ]
     }
 
@@ -845,7 +845,7 @@ class JaversRepositoryE2ETest extends Specification {
             def entity = new SnapshotEntity(id: 1, intProperty: it)
             javers.commit("author", entity)
 
-            entity.dob = new LocalDate()
+            entity.dob = LocalDate.now()
             javers.commit("author", entity)
         }
 

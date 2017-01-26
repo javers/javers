@@ -1,9 +1,7 @@
 package org.javers.jodasupport;
 
-import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.ConditionalTypesPlugin;
 import org.javers.core.JaversBuilder;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -16,20 +14,14 @@ public class JodaAddOns extends ConditionalTypesPlugin {
         return ISO_DATE_TIME_FORMATTER.print(date);
     }
 
-    static String serialize(DateTime date) {
-        return ISO_DATE_TIME_FORMATTER.print(date);
-    }
-
     static LocalDateTime deserialize(String serializedValue) {
         if (serializedValue == null) {
             return null;
         }
+        if (serializedValue.length() == 19) {
+            return deserialize(serializedValue + ".0");
+        }
         return ISO_DATE_TIME_FORMATTER.parseLocalDateTime(serializedValue);
-    }
-
-    @Override
-    public boolean shouldBeActivated() {
-        return ReflectionUtil.isClassPresent("org.joda.time.LocalDate");
     }
 
     @Override

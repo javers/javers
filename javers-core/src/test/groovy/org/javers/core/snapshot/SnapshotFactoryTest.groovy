@@ -8,8 +8,8 @@ import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.PrimitiveEntity
 import org.javers.core.model.SnapshotEntity
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
+import java.time.LocalDate
+import java.time.LocalDateTime
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -105,7 +105,7 @@ class SnapshotFactoryTest extends Specification{
 
         when:
         prevSnapshot = updateSnapshot
-        cdo.dob = new LocalDate()
+        cdo.dob = LocalDate.now()
         updateSnapshot = snapshotFactory.createUpdate(cdoWrapper, prevSnapshot, someCommitMetadata())
 
         then:

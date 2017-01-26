@@ -8,14 +8,14 @@ import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.QueryParamsBuilder;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import java.math.BigDecimal;
 import java.util.*;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
-import static org.joda.time.LocalTime.MIDNIGHT;
+import static java.time.LocalTime.MIDNIGHT;
 
 /**
  * Fluent API for building {@link JqlQuery},
@@ -260,7 +260,7 @@ public class QueryBuilder {
      * delegates to {@link #from(LocalDateTime)} with MIDNIGHT
      */
     public QueryBuilder from(LocalDate fromDate) {
-        return from(fromDate.toLocalDateTime(MIDNIGHT));
+        return from(fromDate.atTime(MIDNIGHT));
     }
 
     /**
@@ -276,7 +276,7 @@ public class QueryBuilder {
      * delegates to {@link #to(LocalDateTime)} with MIDNIGHT
      */
     public QueryBuilder to(LocalDate toDate) {
-        return to(toDate.toLocalDateTime(MIDNIGHT));
+        return to(toDate.atTime(MIDNIGHT));
     }
 
     /**

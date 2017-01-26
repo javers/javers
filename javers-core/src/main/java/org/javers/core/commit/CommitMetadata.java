@@ -2,7 +2,7 @@ package org.javers.core.commit;
 
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import java.io.Serializable;
 import java.util.HashMap;

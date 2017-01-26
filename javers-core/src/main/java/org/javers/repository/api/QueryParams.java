@@ -2,7 +2,7 @@ package org.javers.repository.api;
 
 import java.util.Optional;
 import org.javers.core.commit.CommitId;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import java.util.Collections;
 import java.util.Map;
