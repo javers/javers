@@ -134,7 +134,7 @@ class SnapshotFactoryTest extends Specification{
         def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
 
         then:
-        snapshot.size() == 0
+        snapshot.size() == 1
     }
 
     @Unroll

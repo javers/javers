@@ -7,6 +7,7 @@ import javax.persistence.Id;
  */
 public class PrimitiveEntity {
     @Id
+    private String   id = "a";
     private int      intField;
     private long     longField;
     private double   doubleField;
@@ -15,4 +16,12 @@ public class PrimitiveEntity {
     private byte     byteField;
     private short    shortField;
     private boolean  booleanField;
+
+    private Integer  IntegerField;
+    private Long     LongField;
+    private Double   DoubleField;
+    private Float    FloatField;
+    private Byte     ByteField;
+    private Short    ShortField;
+    private Boolean  BooleanField;
 }
