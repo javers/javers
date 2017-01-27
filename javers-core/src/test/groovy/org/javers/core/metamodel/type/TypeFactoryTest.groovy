@@ -27,7 +27,7 @@ class TypeFactoryTest extends Specification {
 
     static def entityCreator(MappingStyle mappingStyle){
         def typeFactory = create(mappingStyle)
-        return { clazz -> typeFactory.createEntity(clazz)}
+        return { clazz -> typeFactory.create(new EntityDefinition(clazz))}
     }
 
     static TypeFactory create(MappingStyle mappingStyle){

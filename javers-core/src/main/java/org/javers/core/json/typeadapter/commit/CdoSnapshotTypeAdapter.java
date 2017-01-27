@@ -23,7 +23,6 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
     static final String GLOBAL_CDO_ID = "globalId";
     static final String COMMIT_METADATA = "commitMetadata";
     static final String STATE_NAME = "state";
-    static final String INITIAL_NAME_LEGACY = "initial";
     static final String TYPE_NAME = "type";
     static final String CHANGED_NAME = "changedProperties";
     static final String VERSION = "version";
@@ -89,12 +88,6 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
     }
 
     private void deserializeType(JsonObject jsonObject, CdoSnapshotBuilder builder){
-        JsonElement initial = jsonObject.get(INITIAL_NAME_LEGACY);
-        if (initial != null){ //for legacy JSON's
-            builder.withInitial(initial.getAsBoolean());
-            return;
-        }
-
         JsonElement type = jsonObject.get(TYPE_NAME);
         if (type != null) {
             builder.withType(SnapshotType.valueOf(type.getAsString()));

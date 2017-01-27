@@ -47,11 +47,6 @@ class TypeFactory {
         }
     }
 
-    @Deprecated
-    EntityType createEntity(Class<?> javaType) {
-        return entityTypeFactory.createEntity(new EntityDefinition(javaType));
-    }
-
     private ValueObjectType createValueObject(ValueObjectDefinition definition) {
         return new ValueObjectType(managedClassFactory.create(definition), definition.getTypeName());
     }

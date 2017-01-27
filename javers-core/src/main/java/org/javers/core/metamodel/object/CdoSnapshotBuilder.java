@@ -90,16 +90,6 @@ public class CdoSnapshotBuilder {
         return this;
     }
 
-    @Deprecated
-    public CdoSnapshotBuilder withInitial(boolean initial) {
-        if (initial) {
-            this.type = INITIAL;
-        } else {
-            this.type = UPDATE;
-        }
-        return this;
-    }
-
     public CdoSnapshotBuilder markAllAsChanged() {
         markAllAsChanged = true;
         return this;
