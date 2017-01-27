@@ -109,8 +109,8 @@ class ContainerChangeTypeAdapterTest extends Specification{
         given:
             def javers = javersTestAssembly()
             def affectedId = javers.instanceId(new SnapshotEntity(id:1))
-            def ref2  = javers.idBuilder().instanceId(2,SnapshotEntity)
-            def ref3 =  javers.idBuilder().instanceId(3,SnapshotEntity)
+            def ref2  = javers.instanceId(new SnapshotEntity(id:2))
+            def ref3 =  javers.instanceId(new SnapshotEntity(id:3))
             def elementChanges = [new ElementValueChange(1, ref2, ref3),
                                   new ValueAdded  (2, ref2),
                                   new ValueRemoved(3, ref3)]

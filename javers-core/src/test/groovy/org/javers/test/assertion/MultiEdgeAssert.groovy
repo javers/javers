@@ -25,8 +25,9 @@ class MultiEdgeAssert {
         this
     }
 
-    MultiEdgeAssert refersToGlobalIds(def expectedRefCdoIds) {
-        assert actual.references.collect { it.globalId } == expectedRefCdoIds
+    MultiEdgeAssert refersToGlobalIds(Object expectedRefCdoIds) {
+        assert actual.references.collect { it.globalId.value() } ==
+                expectedRefCdoIds.collect { it.value() }
         this
     }
 

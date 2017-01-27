@@ -318,8 +318,8 @@ class SnapshotFactoryTest extends Specification{
                         ["this":1,"that":2],
                         [(new LocalDate(2000, 1, 1)):1.5],
                         ["key1":valueObjectId(1, SnapshotEntity,"mapPrimitiveToVO/key1")],
-                        [(javers.idBuilder().instanceId(2,SnapshotEntity)):
-                          javers.idBuilder().instanceId(3,SnapshotEntity)]
+                        [(javers.instanceId(2,SnapshotEntity)):
+                          javers.instanceId(3,SnapshotEntity)]
                        ]
     }
 

@@ -11,10 +11,11 @@ import org.javers.repository.api.JaversRepository
 import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.QueryBuilder
-import java.time.LocalDate
-import java.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 import static groovyx.gpars.GParsPool.withPool
 import static org.javers.core.JaversBuilder.javers
@@ -27,11 +28,13 @@ class JaversRepositoryE2ETest extends Specification {
     protected FakeDateProvider fakeDateProvider
     protected JaversRepository repository
     protected Javers javers
+    protected JaversTestBuilder javersTestBuilder
 
     def setup() {
         fakeDateProvider = new FakeDateProvider()
         repository = prepareJaversRepository()
         javers = javers().withDateTimeProvider(fakeDateProvider).registerJaversRepository(repository).build()
+        javersTestBuilder = JaversTestBuilder.javersTestAssembly()
     }
 
     protected JaversRepository prepareJaversRepository() {
@@ -806,10 +809,10 @@ class JaversRepositoryE2ETest extends Specification {
         }
 
         def snapshotIdentifiers = [
-            new SnapshotIdentifier(javers.idBuilder().instanceId(new SnapshotEntity(id: 1)), 3),
-            new SnapshotIdentifier(javers.idBuilder().instanceId(new SnapshotEntity(id: 3)), 7),
-            new SnapshotIdentifier(javers.idBuilder().instanceId(new SnapshotEntity(id: 2)), 1),
-            new SnapshotIdentifier(javers.idBuilder().instanceId(new SnapshotEntity(id: 1)), 10)
+            new SnapshotIdentifier(javersTestBuilder.instanceId(new SnapshotEntity(id: 1)), 3),
+            new SnapshotIdentifier(javersTestBuilder.instanceId(new SnapshotEntity(id: 3)), 7),
+            new SnapshotIdentifier(javersTestBuilder.instanceId(new SnapshotEntity(id: 2)), 1),
+            new SnapshotIdentifier(javersTestBuilder.instanceId(new SnapshotEntity(id: 1)), 10)
         ]
 
         when:
@@ -829,7 +832,7 @@ class JaversRepositoryE2ETest extends Specification {
         }
 
         def snapshotIdentifiers = (1..1000).collect {
-            new SnapshotIdentifier(javers.idBuilder().instanceId(new SnapshotEntity(id: 1)), it)
+            new SnapshotIdentifier(javersTestBuilder.instanceId(new SnapshotEntity(id: 1)), it)
         }
 
         when:

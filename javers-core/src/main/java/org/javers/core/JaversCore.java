@@ -162,11 +162,6 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public IdBuilder idBuilder() {
-        return new IdBuilder(globalIdFactory);
-    }
-
-    @Override
     public <T extends JaversType> T getTypeMapping(Type clientsType) {
         return (T) typeMapper.getJaversType(clientsType);
     }

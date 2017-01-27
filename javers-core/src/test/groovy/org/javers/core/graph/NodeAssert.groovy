@@ -23,7 +23,7 @@ class NodeAssert {
     }
 
     NodeAssert hasGlobalId(def expectedGlobalId) {
-        assert actual.globalId == expectedGlobalId
+        assert actual.globalId.value() == expectedGlobalId.value()
         this
     }
 

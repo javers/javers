@@ -1,8 +1,8 @@
 package org.javers.core.graph
 
-import org.javers.core.IdBuilder
 import org.javers.core.JaversTestBuilder
 import org.javers.core.model.*
+import org.javers.repository.jql.UnboundedValueObjectIdDTO
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
 import spock.lang.Specification
@@ -11,6 +11,9 @@ import spock.lang.Unroll
 import static NodeAssert.assertThat
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUserDetails.dummyUserDetails
+import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
+import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
+import static org.javers.repository.jql.ValueObjectIdDTO.withUnboundedValueObjectOwner
 
 /**
  * @author bartosz walacik
@@ -414,7 +417,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should support cycles on ValueObjects"() {
         given:
-        IdBuilder idBuilder = javers.idBuilder()
         ObjectGraphBuilder graphBuilder = newBuilder()
 
         def child1 = new CategoryVo("child1")
@@ -426,14 +428,14 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(root).root()
 
         then:
-        assertThat(node).hasGlobalId(idBuilder.unboundedValueObjectId(CategoryVo))
+        assertThat(node).hasGlobalId(unboundedValueObjectId(CategoryVo))
         assertThat(node).hasMultiEdge("children").refersToGlobalIds([
-                idBuilder.withUnboundedOwner(CategoryVo).voId("children/0"),
-                idBuilder.withUnboundedOwner(CategoryVo).voId("children/1")
+                withUnboundedValueObjectOwner(CategoryVo, "children/0"),
+                withUnboundedValueObjectOwner(CategoryVo, "children/1")
         ])
         assertThat(node).hasMultiEdge("children")
                         .andFirstTargetNode()
-                        .hasSingleEdge("parent").andTargetNode().hasGlobalId(idBuilder.unboundedValueObjectId(CategoryVo))
+                        .hasSingleEdge("parent").andTargetNode().hasGlobalId(unboundedValueObjectId(CategoryVo))
     }
 
     def "should support large graphs (more than 10000 edges)"() {

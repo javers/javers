@@ -1,16 +1,16 @@
 package org.javers.repository.jql
 
 import org.javers.core.Javers
+import org.javers.core.JaversBuilder
 import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.math.RoundingMode
 
-@Ignore
 class NewPerformanceTest extends Specification {
 
     static int n = 10000
-    Javers javers
+    Javers javers = JaversBuilder.javers().build()
     def start
 
     def "should init database - insert and updates"() {

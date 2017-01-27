@@ -7,7 +7,7 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.annotation.Entity;
 import org.javers.core.metamodel.annotation.Id;
-import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.repository.jql.ValueObjectIdDTO;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -35,11 +35,9 @@ public class NpeFromReflectionUtilCase {
         // then
         assertTrue(diff.getChanges().size() == 1);
         ValueChange change = diff.getChangesByType(ValueChange.class).get(0);
-        ValueObjectId voId = javers.idBuilder()
-              .withOwner("1", TestClassWithInterfaceProperty.class)
-              .voId("interfaceProperty");
+        ValueObjectIdDTO voId = ValueObjectIdDTO.valueObjectId("1", TestClassWithInterfaceProperty.class, "interfaceProperty");
 
-        Assertions.assertThat(change.getAffectedGlobalId()).isEqualTo(voId);
+        Assertions.assertThat(change.getAffectedGlobalId().value()).isEqualTo(voId.value());
         Assertions.assertThat(change.getPropertyName()).isEqualTo("value");
         Assertions.assertThat(change.getLeft()).isEqualTo("Foo");
         Assertions.assertThat(change.getRight()).isEqualTo("Bar");
