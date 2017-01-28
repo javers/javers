@@ -2,9 +2,12 @@ package org.javers.core.cases
 
 import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.clazz.EntityDefinition
+import org.javers.core.metamodel.clazz.EntityDefinitionBuilder
 import org.javers.core.metamodel.clazz.ValueObjectDefinition
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
+
+import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition
 
 /**
  * https://github.com/javers/javers/issues/94

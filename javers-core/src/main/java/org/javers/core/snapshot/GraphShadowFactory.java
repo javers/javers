@@ -1,11 +1,8 @@
 package org.javers.core.snapshot;
 
-import org.javers.common.collections.Optional;
-import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.ObjectNode;
-import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.HashSet;
@@ -29,13 +26,8 @@ class GraphShadowFactory {
 
         Set<ObjectNode> snapshotNodes = new HashSet<>();
         for (ObjectNode liveNode : liveGraph.nodes()){
-            Optional<CdoSnapshot> snapshot =  javersRepository.getLatest(liveNode.getGlobalId());
-
-            if (snapshot.isEmpty()){
-                continue;
-            }
-
-            snapshotNodes.add(new ObjectNode(snapshot.get()));
+            javersRepository.getLatest(liveNode.getGlobalId())
+                    .map(s -> snapshotNodes.add(new ObjectNode(s)));
         }
 
         return new ShadowGraph(snapshotNodes);

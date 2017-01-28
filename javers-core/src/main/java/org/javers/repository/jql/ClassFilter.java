@@ -1,6 +1,5 @@
 package org.javers.repository.jql;
 
-import org.javers.common.collections.Function;
 import org.javers.common.collections.Sets;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
@@ -25,12 +24,7 @@ class ClassFilter extends Filter {
     @Override
     public String toString() {
         return "classes=" + ToStringBuilder.setToString(
-            Sets.transform(requiredClasses, new Function<Class, String>() {
-                @Override
-                public String apply(Class javaClass) {
-                    return javaClass.getName();
-                }
-            })
+                Sets.transform(requiredClasses, javaClass -> javaClass.getName())
         );
     }
 }

@@ -1,9 +1,7 @@
 package org.javers.repository.inmemory;
 
-import org.javers.common.collections.Function;
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Optional;
-import org.javers.common.collections.Predicate;
+import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -25,7 +23,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.unmodifiableList;
-import static org.javers.common.collections.Collections.allMatch;
 
 /**
  * Fake impl of JaversRepository
@@ -46,17 +43,14 @@ public class InMemoryRepository implements JaversRepository {
     public List<CdoSnapshot> getValueObjectStateHistory(final EntityType ownerEntity, final String path, QueryParams queryParams) {
         Validate.argumentsAreNotNull(ownerEntity, path, queryParams);
 
-        List<CdoSnapshot> result =  Lists.positiveFilter(getAll(), new Predicate<CdoSnapshot>() {
-            @Override
-            public boolean apply(CdoSnapshot input) {
-                if (!(input.getGlobalId() instanceof ValueObjectId)) {
-                    return false;
-                }
-                ValueObjectId id = (ValueObjectId) input.getGlobalId();
-
-                return id.hasOwnerOfType(ownerEntity)
-                        && id.getFragment().equals(path);
+        List<CdoSnapshot> result =  Lists.positiveFilter(getAll(), input -> {
+            if (!(input.getGlobalId() instanceof ValueObjectId)) {
+                return false;
             }
+            ValueObjectId id = (ValueObjectId) input.getGlobalId();
+
+            return id.hasOwnerOfType(ownerEntity)
+                    && id.getFragment().equals(path);
         });
 
         return applyQueryParams(result, queryParams);
@@ -148,50 +142,29 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     private List<CdoSnapshot> filterSnapshotsByCommitId(List<CdoSnapshot> snapshots, final CommitId commitId) {
-        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
-            public boolean apply(CdoSnapshot snapshot) {
-                return commitId.equals(snapshot.getCommitId());
-            }
-        });
+        return Lists.positiveFilter(snapshots, snapshot -> commitId.equals(snapshot.getCommitId()));
     }
 
     private List<CdoSnapshot> filterSnapshotsByVersion(List<CdoSnapshot> snapshots, final Long version) {
-        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
-            public boolean apply(CdoSnapshot snapshot) {
-                return version == snapshot.getVersion();
-            }
-        });
+        return Lists.positiveFilter(snapshots, snapshot -> version == snapshot.getVersion());
     }
 
     private List<CdoSnapshot> filterSnapshotsByAuthor(List<CdoSnapshot> snapshots, final String author) {
-        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
-            public boolean apply(CdoSnapshot snapshot) {
-                return author.equals(snapshot.getCommitMetadata().getAuthor());
-            }
-        });
+        return Lists.positiveFilter(snapshots, snapshot -> author.equals(snapshot.getCommitMetadata().getAuthor()));
     }
 
     private List<CdoSnapshot> filterSnapshotsByCommitDate(List<CdoSnapshot> snapshots, final QueryParams queryParams) {
-        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
-            public boolean apply(CdoSnapshot snapshot) {
-                return queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate());
-            }
-        });
+        return Lists.positiveFilter(snapshots, snapshot -> queryParams.isDateInRange(snapshot.getCommitMetadata().getCommitDate()));
     }
 
     private List<CdoSnapshot> filterSnapshotsByCommitProperties(List<CdoSnapshot> snapshots, final Map<String, String> commitProperties) {
-        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
-            public boolean apply(final CdoSnapshot snapshot) {
-                return allMatch(commitProperties.entrySet(), new Predicate<Map.Entry<String, String>>() {
-                    @Override
-                    public boolean apply(Map.Entry<String, String> commitProperty) {
-                        Map<String, String> actualCommitProperties = snapshot.getCommitMetadata().getProperties();
-                        return actualCommitProperties.containsKey(commitProperty.getKey()) &&
-                            actualCommitProperties.get(commitProperty.getKey()).equals(commitProperty.getValue());
-                    }
-                });
-            }
-        });
+        return Lists.positiveFilter(snapshots, snapshot ->
+            commitProperties.entrySet().stream().allMatch(commitProperty -> {
+                Map<String, String> actualCommitProperties = snapshot.getCommitMetadata().getProperties();
+                return actualCommitProperties.containsKey(commitProperty.getKey()) &&
+                        actualCommitProperties.get(commitProperty.getKey()).equals(commitProperty.getValue());
+            })
+        );
     }
 
     private List<CdoSnapshot> trimResultsToRequestedSlice(List<CdoSnapshot> snapshots, int from, int size) {
@@ -221,24 +194,15 @@ public class InMemoryRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        List<SnapshotIdentifier> persistedIdentifiers = getPersistedIdentifiers(snapshotIdentifiers);
-        return Lists.transform(persistedIdentifiers, new Function<SnapshotIdentifier, CdoSnapshot>() {
-            @Override
-            public CdoSnapshot apply(SnapshotIdentifier snapshotIdentifier) {
-                List<CdoSnapshot> objectSnapshots = snapshots.get(snapshotIdentifier.getGlobalId());
-                return objectSnapshots.get(objectSnapshots.size() - ((int)snapshotIdentifier.getVersion()));
-            }
+        return Lists.transform(getPersistedIdentifiers(snapshotIdentifiers), snapshotIdentifier -> {
+            List<CdoSnapshot> objectSnapshots = snapshots.get(snapshotIdentifier.getGlobalId());
+            return objectSnapshots.get(objectSnapshots.size() - ((int)snapshotIdentifier.getVersion()));
         });
     }
 
     private List<SnapshotIdentifier> getPersistedIdentifiers(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return Lists.positiveFilter(new ArrayList<>(snapshotIdentifiers), new Predicate<SnapshotIdentifier>() {
-            @Override
-            public boolean apply(SnapshotIdentifier snapshotIdentifier) {
-                return snapshots.containsKey(snapshotIdentifier.getGlobalId()) &&
-                    snapshotIdentifier.getVersion() <= snapshots.get(snapshotIdentifier.getGlobalId()).size();
-            }
-        });
+        return Lists.positiveFilter(new ArrayList<>(snapshotIdentifiers), snapshotIdentifier -> snapshots.containsKey(snapshotIdentifier.getGlobalId()) &&
+            snapshotIdentifier.getVersion() <= snapshots.get(snapshotIdentifier.getGlobalId()).size());
     }
 
     @Override
@@ -262,11 +226,7 @@ public class InMemoryRepository implements JaversRepository {
     }
 
     private List<CdoSnapshot> filterByPropertyName(List<CdoSnapshot> snapshots, final String propertyName){
-        return Lists.positiveFilter(snapshots, new Predicate<CdoSnapshot>() {
-            public boolean apply(CdoSnapshot input) {
-                return input.hasChangeAt(propertyName);
-            }
-        });
+        return Lists.positiveFilter(snapshots, input -> input.hasChangeAt(propertyName));
     }
 
     private List<CdoSnapshot> getAll(){

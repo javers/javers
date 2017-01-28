@@ -25,7 +25,7 @@ import static org.javers.core.diff.DiffAssert.assertThat
 /**
  * @author bartosz.walacik
  */
-class Java8AddOnsE2ETest extends Specification {
+class Java8TypeAdaptersE2ETest extends Specification {
 
     @Unroll
     def "should register #j8type.simpleName as ValueTypes"(){

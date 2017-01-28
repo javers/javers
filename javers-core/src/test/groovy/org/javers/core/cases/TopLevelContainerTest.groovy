@@ -56,7 +56,7 @@ class TopLevelContainerTest extends Specification {
         javers.commit("author",container2)
 
 
-        def changes = javers.findChanges(QueryBuilder.byGlobalIdDTO(voId).limit(3).build())
+        def changes = javers.findChanges(QueryBuilder.byGlobalId(voId).limit(3).build())
 
         then:
         changes[0].propertyName == colType

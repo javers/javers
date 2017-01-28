@@ -1,6 +1,5 @@
 package org.javers.core.json.builder
 
-import org.javers.common.collections.Optional
 import org.javers.core.JaversTestBuilder
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
@@ -64,7 +63,7 @@ class ChangeTestBuilder {
         InstanceId oldRefId = instanceId(oldRef)
         InstanceId newRefId = instanceId(newRef)
 
-        new ReferenceChange(globalId, propertyName, oldRefId, newRefId)
+        new ReferenceChange(globalId, propertyName, oldRefId, newRefId, null, null)
     }
 
     private static InstanceId instanceId(Object cdo) {

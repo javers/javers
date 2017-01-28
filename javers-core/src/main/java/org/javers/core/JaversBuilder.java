@@ -1,7 +1,7 @@
 package org.javers.core;
 
 import com.google.gson.TypeAdapter;
-import org.javers.common.collections.Sets;
+import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
 import org.javers.common.reflection.ReflectionUtil;
@@ -21,7 +21,6 @@ import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
-import org.javers.core.json.typeadapter.util.UtilTypeAdapters;
 import org.javers.core.metamodel.annotation.*;
 import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.scanner.ScannerModule;
@@ -30,7 +29,7 @@ import org.javers.core.pico.AddOnsModule;
 import org.javers.core.snapshot.SnapshotModule;
 import org.javers.groovysupport.GroovyAddOns;
 import org.javers.guava.GuavaAddOns;
-import org.javers.java8support.Java8AddOns;
+import org.javers.jodasupport.JodaAddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
 import org.javers.repository.api.JaversExtendedRepository;
@@ -91,12 +90,17 @@ public class JaversBuilder extends AbstractContainerBuilder {
         logger.debug("starting up JaVers ...");
 
         //conditional plugins
-        conditionalTypesPlugins = Sets.asSet(
-                new GroovyAddOns(),
-                new Java8AddOns(),
-                new GuavaAddOns(),
-                new UtilTypeAdapters()
-        );
+        conditionalTypesPlugins = new HashSet<>();
+
+        if (ReflectionUtil.isClassPresent("groovy.lang.MetaClass")) {
+            conditionalTypesPlugins.add(new GroovyAddOns());
+        }
+        if (ReflectionUtil.isClassPresent("org.joda.time.LocalDate")){
+            conditionalTypesPlugins.add(new JodaAddOns());
+        }
+        if (ReflectionUtil.isClassPresent("com.google.common.collect.Multimap")) {
+            conditionalTypesPlugins.add(new GuavaAddOns());
+        }
 
         // bootstrap phase 1: container & core
         bootContainer();
@@ -130,7 +134,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         bootManagedTypeModule();
 
         // bootstrap phase 5: JSON beans & domain aware typeAdapters
-        bootJsonConverter();
+        additionalTypes.addAll( bootJsonConverter() );
 
         bootDateTimeProvider();
 
@@ -505,7 +509,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
   /**
-   * DateProvider providers current date for {@link Commit#getCommitDate()}.
+   * DateProvider providers current util for {@link Commit#getCommitDate()}.
    * <br/>
    * By default, now() is used.
    * <br/>
@@ -540,16 +544,14 @@ public class JaversBuilder extends AbstractContainerBuilder {
         Set<JaversType> additionalTypes = new HashSet<>();
 
         for (ConditionalTypesPlugin plugin : conditionalTypesPlugins) {
-            if (plugin.shouldBeActivated()){
-                logger.info("loading "+plugin.getClass().getSimpleName()+" ...");
+            logger.info("loading "+plugin.getClass().getSimpleName()+" ...");
 
-                plugin.beforeAssemble(this);
+            plugin.beforeAssemble(this);
 
-                additionalTypes.addAll(plugin.getNewTypes());
+            additionalTypes.addAll(plugin.getNewTypes());
 
-                AddOnsModule addOnsModule = new AddOnsModule(getContainer(), (Collection)plugin.getPropertyChangeAppenders());
-                addModule(addOnsModule);
-            }
+            AddOnsModule addOnsModule = new AddOnsModule(getContainer(), (Collection)plugin.getPropertyChangeAppenders());
+            addModule(addOnsModule);
         }
 
         return additionalTypes;
@@ -563,20 +565,22 @@ public class JaversBuilder extends AbstractContainerBuilder {
     /**
      * boots JsonConverter and registers domain aware typeAdapters
      */
-    private void bootJsonConverter() {
+    private Collection<JaversType> bootJsonConverter() {
         JsonConverterBuilder jsonConverterBuilder = jsonConverterBuilder();
 
         addModule(new ChangeTypeAdaptersModule(getContainer()));
         addModule(new CommitTypeAdaptersModule(getContainer()));
 
-        if (new RequiredMongoSupportPredicate().apply(repository)) {
+        if (new RequiredMongoSupportPredicate().test(repository)) {
             jsonConverterBuilder.registerNativeGsonDeserializer(Long.class, new MongoLong64JsonDeserializer());
         }
 
-        jsonConverterBuilder
-                .registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
+        jsonConverterBuilder.registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
 
-        addComponent(jsonConverterBuilder.build());
+        JsonConverter jsonConverter = jsonConverterBuilder.build();
+        addComponent(jsonConverter);
+
+        return Lists.transform(jsonConverterBuilder.getValueTypes(), c -> new ValueType(c));
     }
 
     private void bootDateTimeProvider() {

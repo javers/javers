@@ -2,7 +2,7 @@ package org.javers.repository.api;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import java.util.HashMap;
 import java.util.Map;

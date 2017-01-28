@@ -1,8 +1,7 @@
 package org.javers.spring.jpa;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.validation.Validate;
-import org.javers.core.IdBuilder;
 import org.javers.core.Javers;
 import org.javers.core.changelog.ChangeProcessor;
 import org.javers.core.commit.Commit;
@@ -18,7 +17,6 @@ import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.*;
@@ -135,11 +133,6 @@ public class JaversTransactionalDecorator implements Javers {
     @Override
     public <T extends JaversType> T getTypeMapping(Type clientsType) {
         return delegate.getTypeMapping(clientsType);
-    }
-
-    @Override
-    public IdBuilder idBuilder() {
-        return delegate.idBuilder();
     }
 
     @PostConstruct

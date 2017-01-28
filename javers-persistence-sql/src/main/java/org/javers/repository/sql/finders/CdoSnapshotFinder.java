@@ -1,7 +1,8 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.common.collections.Function;
-import org.javers.common.collections.Optional;
+import java.util.Optional;
+
+import org.javers.common.collections.Lists;
 import org.javers.common.collections.Pair;
 import org.javers.common.collections.Sets;
 import org.javers.core.json.CdoSnapshotSerialized;
@@ -44,18 +45,14 @@ public class CdoSnapshotFinder {
 
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId);
-        if (globalIdPk.isEmpty()){
+        if (!globalIdPk.isPresent()){
             return Optional.empty();
         }
 
-        Optional<Long> maxSnapshot = selectMaxSnapshotPrimaryKey(globalIdPk.get());
-
-        if (maxSnapshot.isEmpty()) {
-            return Optional.empty();
-        }
-
-        QueryParams oneItemLimit = QueryParamsBuilder.withLimit(1).build();
-        return Optional.of(fetchCdoSnapshots(new SnapshotIdFilter(tableNameProvider, maxSnapshot.get()), Optional.of(oneItemLimit)).get(0));
+        return selectMaxSnapshotPrimaryKey(globalIdPk.get()).map(maxSnapshot -> {
+            QueryParams oneItemLimit = QueryParamsBuilder.withLimit(1).build();
+            return fetchCdoSnapshots(new SnapshotIdFilter(tableNameProvider, maxSnapshot), Optional.of(oneItemLimit)).get(0);
+        });
     }
 
     public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
@@ -67,12 +64,7 @@ public class CdoSnapshotFinder {
     }
 
     public List<CdoSnapshot> getStateHistory(Set<ManagedType> managedTypes, QueryParams queryParams) {
-        Set<String> managedTypeNames = Sets.transform(managedTypes, new Function<ManagedType, String>() {
-            @Override
-            public String apply(ManagedType managedType) {
-                return managedType.getName();
-            }
-        });
+        Set<String> managedTypeNames = Sets.transform(managedTypes, managedType -> managedType.getName());
         ManagedClassFilter classFilter = new ManagedClassFilter(tableNameProvider, managedTypeNames, queryParams.isAggregate());
         return fetchCdoSnapshots(classFilter, Optional.of(queryParams));
     }
@@ -85,10 +77,9 @@ public class CdoSnapshotFinder {
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
         Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId);
 
-        if (globalIdPk.isEmpty()){
-            return Collections.emptyList();
-        }
-        return fetchCdoSnapshots(new GlobalIdFilter(tableNameProvider, globalIdPk.get(), queryParams.isAggregate()), Optional.of(queryParams));
+        return globalIdPk.map(id ->
+                fetchCdoSnapshots(new GlobalIdFilter(tableNameProvider, id, queryParams.isAggregate()), Optional.of(queryParams)))
+                .orElse(Collections.emptyList());
     }
 
     private List<CdoSnapshot> fetchCdoSnapshots(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams) {
@@ -99,12 +90,8 @@ public class CdoSnapshotFinder {
 
         cdoSnapshotsEnricher.enrichWithCommitProperties(serializedSnapshots, commitPropertyDTOs);
 
-        List<CdoSnapshot> result = new ArrayList<>();
-        for (Pair<CdoSnapshotSerialized,Long> serializedSnapshot : serializedSnapshots) {
-            result.add(jsonConverter.fromSerializedSnapshot(serializedSnapshot.left()));
-        }
-
-        return result;
+        return Lists.transform(serializedSnapshots,
+                serializedSnapshot -> jsonConverter.fromSerializedSnapshot(serializedSnapshot.left()));
     }
 
     private List<Pair<CdoSnapshotSerialized,Long>> queryForCdoSnapshotDTOs(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams) {

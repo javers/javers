@@ -5,10 +5,10 @@ import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
-import org.javers.core.json.typeadapter.date.DateTypeCoreAdapters
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters
 import org.javers.core.model.DummyUser
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
+import java.time.LocalDate
+import java.time.LocalDateTime
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
@@ -67,17 +67,16 @@ class ValueChangeTypeAdapterTest extends Specification {
     def "should serialize ValueChange with Values using custom TypeAdapter" () {
         given:
         JsonConverter jsonConverter = javersTestAssembly().jsonConverter
-        def dob = new LocalDateTime()
+        def dob = LocalDateTime.now()
         ValueChange change = valueChange(dummyUserWithDate("kaz"),"dob",null, dob)
 
         when:
         String jsonText = jsonConverter.toJson(change)
-        //println(jsonText)
 
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.left ==  null
-        json.right == DateTypeCoreAdapters.serialize(dob)
+        json.right == UtilTypeCoreAdapters.serialize(dob)
     }
 
     def "should deserialize ValueChange with Values using custom TypeAdapter"() {

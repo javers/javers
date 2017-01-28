@@ -4,12 +4,13 @@ import org.javers.core.commit.CommitId;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
-import org.joda.time.LocalDateTime;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
+import static org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters.toUtilDate;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 abstract class SnapshotFilter extends SchemaNameAware {
@@ -86,12 +87,12 @@ abstract class SnapshotFilter extends SchemaNameAware {
 
     private void addFromDateCondition(SelectQuery query, LocalDateTime from) {
         query.append(" AND " + COMMIT_COMMIT_DATE + " >= :commitFromDate")
-            .withArgument("commitFromDate", new Timestamp(from.toDate()));
+            .withArgument("commitFromDate", new Timestamp(toUtilDate(from)));
     }
 
     private void addToDateCondition(SelectQuery query, LocalDateTime to) {
         query.append(" AND " + COMMIT_COMMIT_DATE + " <= :commitToDate")
-            .withArgument("commitToDate", new Timestamp(to.toDate()));
+            .withArgument("commitToDate", new Timestamp(toUtilDate(to)));
     }
 
     private void addCommitIdCondition(SelectQuery query, CommitId commitId) {

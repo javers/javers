@@ -9,14 +9,12 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.javers.common.collections.Function;
-import org.javers.common.collections.Lists;
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.string.RegexEscape;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.json.typeadapter.date.DateTypeCoreAdapters;
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.EntityType;
@@ -27,10 +25,11 @@ import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.mongo.model.MongoHeadId;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import java.util.*;
 
+import static org.javers.common.collections.Lists.toImmutableList;
 import static org.javers.common.validation.Validate.conditionFulfilled;
 import static org.javers.repository.mongo.DocumentConverter.fromDocument;
 import static org.javers.repository.mongo.DocumentConverter.toDocument;
@@ -62,11 +61,7 @@ public class MongoRepository implements JaversRepository {
     MongoRepository(MongoDatabase mongo, JsonConverter jsonConverter, int cacheSize) {
         this.jsonConverter = jsonConverter;
         this.mongoSchemaManager = new MongoSchemaManager(mongo);
-        cache = new LatestSnapshotCache(cacheSize, new Function<GlobalId, Optional<CdoSnapshot>>() {
-            public Optional<CdoSnapshot> apply(GlobalId input) {
-                return getLatest(createIdQuery(input));
-            }
-        });
+        cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
     }
 
     @Override
@@ -155,27 +150,22 @@ public class MongoRepository implements JaversRepository {
     }
 
     private Bson createSnapshotIdentifiersQuery(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        Collection<Bson> descFilters = Lists.transform(new ArrayList<>(snapshotIdentifiers), new Function<SnapshotIdentifier, Bson>() {
-            @Override
-            public Bson apply(SnapshotIdentifier snapshotIdentifier) {
-                return Filters.and(
-                    createIdQuery(snapshotIdentifier.getGlobalId()),
-                    createVersionQuery(snapshotIdentifier.getVersion())
-                );
-            }
-        });
+        List<Bson> descFilters = snapshotIdentifiers.stream().map(
+            snapshotIdentifier -> Filters.and(
+                createIdQuery(snapshotIdentifier.getGlobalId()),
+                createVersionQuery(snapshotIdentifier.getVersion())
+        )).collect(toImmutableList());
         return Filters.or(descFilters);
     }
 
     private Bson createManagedTypeQuery(Set<ManagedType> managedTypes, boolean aggregate) {
-        List<Bson> classFilters = new ArrayList<>();
-        for (ManagedType managedType : managedTypes) {
-            if (managedType instanceof ValueObjectType) {
-                classFilters.add(createValueObjectTypeQuery(managedType));
-            } else {
-                classFilters.add(createEntityTypeQuery(aggregate, managedType));
-            }
-        }
+        List<Bson> classFilters = managedTypes.stream().map( managedType -> {
+                if (managedType instanceof ValueObjectType) {
+                    return createValueObjectTypeQuery(managedType);
+                } else {
+                    return createEntityTypeQuery(aggregate, managedType);
+                }
+            }).collect(toImmutableList());
         return Filters.or(classFilters);
     }
 
@@ -213,10 +203,10 @@ public class MongoRepository implements JaversRepository {
 
     private void persistSnapshots(Commit commit) {
         MongoCollection<Document> collection = snapshotsCollection();
-        for (CdoSnapshot snapshot: commit.getSnapshots()) {
+        commit.getSnapshots().forEach(snapshot -> {
             collection.insertOne(writeToDBObject(snapshot));
             cache.put(snapshot);
-        }
+        });
     }
 
     private void persistHeadId(Commit commit) {
@@ -283,11 +273,11 @@ public class MongoRepository implements JaversRepository {
     }
 
     private Bson addFromDateFiler(Bson query, LocalDateTime from) {
-        return Filters.and(query, Filters.gte(COMMIT_DATE, DateTypeCoreAdapters.serialize(from)));
+        return Filters.and(query, Filters.gte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(from)));
     }
 
     private Bson addToDateFilter(Bson query, LocalDateTime to) {
-        return Filters.and(query, Filters.lte(COMMIT_DATE, DateTypeCoreAdapters.serialize(to)));
+        return Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(to)));
     }
 
     private Bson addCommitIdFilter(Bson query, CommitId commitId) {
@@ -303,16 +293,12 @@ public class MongoRepository implements JaversRepository {
     }
 
     private Bson addCommitPropertiesFilter(Bson query, Map<String, String> commitProperties) {
-
-        List<Bson> propertyFilters = new ArrayList<>();
-        for (Map.Entry<String, String> commitProperty : commitProperties.entrySet()) {
-            BasicDBObject propertyFilter = new BasicDBObject(COMMIT_PROPERTIES,
+        List<Bson> propertyFilters = commitProperties.entrySet().stream().map( commitProperty ->
+            new BasicDBObject(COMMIT_PROPERTIES,
                 new BasicDBObject("$elemMatch",
-                    new BasicDBObject("key", commitProperty.getKey()).append(
-                        "value", commitProperty.getValue())));
-            propertyFilters.add(propertyFilter);
-        }
-
+                        new BasicDBObject("key", commitProperty.getKey()).append(
+                                          "value", commitProperty.getValue())))
+        ).collect(toImmutableList());
         return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
     }
 
@@ -323,12 +309,8 @@ public class MongoRepository implements JaversRepository {
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {
         QueryParams queryParams = QueryParamsBuilder.withLimit(1).build();
         MongoCursor<Document> mongoLatest = getMongoSnapshotsCursor(idQuery, Optional.of(queryParams));
-        Optional<Document> doc = getOne(mongoLatest);
-        if (doc.isEmpty()) {
-            return Optional.empty();
-        }
 
-        return Optional.of(readFromDBObject(doc.get()));
+        return getOne(mongoLatest).map(d -> readFromDBObject(d));
     }
 
     private List<CdoSnapshot> queryForSnapshots(Bson query, Optional<QueryParams> queryParams) {

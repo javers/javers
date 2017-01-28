@@ -1,6 +1,6 @@
 package org.javers.repository.sql;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.Commit;

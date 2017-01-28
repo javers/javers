@@ -2,10 +2,10 @@ package org.javers.core.metamodel.type;
 
 import org.javers.core.JaversBuilder;
 import org.javers.core.json.JsonTypeAdapter;
-import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * Value class in client's domain model. Simple value holder.

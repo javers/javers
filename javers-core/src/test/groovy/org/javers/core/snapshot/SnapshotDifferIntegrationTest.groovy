@@ -9,7 +9,7 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 

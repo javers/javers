@@ -7,8 +7,8 @@ import com.google.gson.JsonSerializationContext;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonTypeAdapterTemplate;
-import org.joda.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 class CommitMetadataTypeAdapter extends JsonTypeAdapterTemplate<CommitMetadata> {

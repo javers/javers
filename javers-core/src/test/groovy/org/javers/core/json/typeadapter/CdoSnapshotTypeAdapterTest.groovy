@@ -8,7 +8,7 @@ import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.repository.jql.ValueObjectIdDTO
-import org.joda.time.LocalDateTime
+import java.time.LocalDateTime
 import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
@@ -106,7 +106,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 intArray: [1, 2],
                 integerList: [3, 4],
                 stringSet: ["5", "6"] as Set,
-                primitiveMap: [time: new LocalDateTime(2000, 1, 1, 12, 0)] )
+                primitiveMap: [time: LocalDateTime.of(2000, 1, 1, 12, 0, 0)] )
 
         def cdoWrapper = javers.createCdoWrapper( dummyUser )
         def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
@@ -121,7 +121,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
             intArray == [1, 2]
             integerList == [3, 4]
             stringSet == ["5", "6"]
-            primitiveMap.time == "2000-01-01T12:00:00.000"
+            primitiveMap.time == "2000-01-01T12:00:00"
         }
     }
 
@@ -155,7 +155,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         snapshot.commitMetadata.id.value() == "1.0"
         snapshot.commitMetadata.author == "author"
         snapshot.commitMetadata.properties == ["os" : "Solaris"]
-        snapshot.commitMetadata.commitDate == new LocalDateTime(2000,1,1,12,0)
+        snapshot.commitMetadata.commitDate == LocalDateTime.of(2000,1,1,12,0,0)
         snapshot.globalId == instanceId("kaz",DummyUser)
         snapshot.initial == true
         snapshot.changed.collect{it} as Set == ["name", "age"] as Set
@@ -325,7 +325,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
             getPropertyValue("intArray") == [1, 2].toArray()
             getPropertyValue("integerList") == [3, 4]
             getPropertyValue("stringSet") == ["5", "6"] as Set
-            getPropertyValue("primitiveMap") == [time: new LocalDateTime(2000, 1, 1, 12, 0)]
+            getPropertyValue("primitiveMap") == [time: LocalDateTime.of(2000, 1, 1, 12, 0, 0, 0)]
 
             getPropertyValue("dummyUserDetailsList").size() == 2
             getPropertyValue("dummyUserDetailsList").get(0) == instanceId(1, DummyUserDetails)

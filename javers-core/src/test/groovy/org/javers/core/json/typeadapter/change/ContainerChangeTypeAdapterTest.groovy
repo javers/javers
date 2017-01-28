@@ -6,8 +6,8 @@ import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.container.*
 import org.javers.core.json.JsonConverter
 import org.javers.core.model.SnapshotEntity
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
+import java.time.LocalDate
+import java.time.LocalDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -81,7 +81,7 @@ class ContainerChangeTypeAdapterTest extends Specification{
 
             with(change.commitMetadata.get()) {
                 author == "author"
-                commitDate == new LocalDateTime("2001-12-01T22:23:03")
+                commitDate == LocalDateTime.of(2001,12,1,22,23,3)
                 id.majorId == 1.0
 
             }
@@ -109,8 +109,8 @@ class ContainerChangeTypeAdapterTest extends Specification{
         given:
             def javers = javersTestAssembly()
             def affectedId = javers.instanceId(new SnapshotEntity(id:1))
-            def ref2  = javers.idBuilder().instanceId(2,SnapshotEntity)
-            def ref3 =  javers.idBuilder().instanceId(3,SnapshotEntity)
+            def ref2  = javers.instanceId(new SnapshotEntity(id:2))
+            def ref3 =  javers.instanceId(new SnapshotEntity(id:3))
             def elementChanges = [new ElementValueChange(1, ref2, ref3),
                                   new ValueAdded  (2, ref2),
                                   new ValueRemoved(3, ref3)]

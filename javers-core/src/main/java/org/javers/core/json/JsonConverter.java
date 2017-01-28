@@ -3,8 +3,6 @@ package org.javers.core.json;
 import com.google.gson.*;
 import org.javers.core.json.typeadapter.commit.CdoSnapshotAssembler;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;
 
@@ -36,8 +34,8 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  *     <li> native Gson {@link JsonDeserializer}
  * </ul>
  *
- * Javers provides JsonTypeAdapters for some well known Values like Joda {@link LocalDateTime},
- * Joda {@link LocalDate}, java.time.LocalDate, java.time.LocalDateTime
+ * Javers provides JsonTypeAdapters for some well known Values like java.time.LocalDateTime,
+ * org.joda.time.LocalDateTime.
  *
  * @author bartosz walacik
  */

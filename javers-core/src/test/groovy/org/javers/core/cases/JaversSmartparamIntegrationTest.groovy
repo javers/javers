@@ -4,11 +4,10 @@ import groovy.json.JsonSlurper
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.Diff
-import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.model.DummyParameterEntry
-import org.javers.core.model.DummyUser
-import org.joda.time.LocalDate
 import spock.lang.Specification
+
+import java.time.LocalDate
 
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 
@@ -23,8 +22,8 @@ class JaversSmartparamIntegrationTest extends Specification{
                                      .withTypeSafeValues(true)
                                      .build()
 
-        def entry1 = new DummyParameterEntry(["date":new LocalDate(2014,01,10)])
-        def entry2 = new DummyParameterEntry(["date":new LocalDate(2014,01,12),
+        def entry1 = new DummyParameterEntry(["util": LocalDate.of(2014,01,10)])
+        def entry2 = new DummyParameterEntry(["util": LocalDate.of(2014,01,12),
                                               "rate":new BigDecimal(10),
                                               "int" :1,
                                               "String":"str",
@@ -42,39 +41,34 @@ class JaversSmartparamIntegrationTest extends Specification{
         mapChange.globalId.valueObject == "org.javers.core.model.DummyParameterEntry"
         mapChange.property == "levels"
         mapChange.entryChanges.size() == 5
-        List sortedEntryChanges = mapChange.entryChanges.sort{it.key}
 
-        with(sortedEntryChanges[0]) {
+        with(mapChange.entryChanges.find{it -> it.key == "String"}) {
             entryChangeType == "EntryAdded"
-            key == "String"
             value == "str"
         }
 
-        with(sortedEntryChanges[1]) {
+        with(mapChange.entryChanges.find{it -> it.key == "util"}) {
             entryChangeType == "EntryValueChange"
-            key == "date"
             leftValue.typeAlias == "LocalDate"
             leftValue.value == "2014-01-10"
             rightValue.value == "2014-01-12"
             rightValue.typeAlias == "LocalDate"
         }
 
-        with(sortedEntryChanges[2]) {
+        with(mapChange.entryChanges.find{it -> it.key == "enum"}) {
             entryChangeType == "EntryAdded"
-            key == "enum"
             value.typeAlias == "Sex"
             value.value == FEMALE.name()
         }
 
-        with(sortedEntryChanges[3]) {
+        with(mapChange.entryChanges.find{it -> it.key == "int"}) {
             entryChangeType == "EntryAdded"
             key == "int"
             value == 1
         }
 
-        with(sortedEntryChanges[4]) {
+        with(mapChange.entryChanges.find{it -> it.key == "rate"}) {
             entryChangeType == "EntryAdded"
-            key == "rate"
             value.typeAlias == "BigDecimal"
             value.value == 10
         }

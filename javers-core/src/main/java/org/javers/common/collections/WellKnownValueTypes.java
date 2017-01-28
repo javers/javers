@@ -1,11 +1,10 @@
 package org.javers.common.collections;
 
 import org.javers.common.reflection.ReflectionUtil;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-
 import java.math.BigDecimal;
-import java.util.Date;
+import java.net.URI;
+import java.net.URL;
+import java.util.Currency;
 import java.util.UUID;
 
 /**
@@ -13,12 +12,12 @@ import java.util.UUID;
  */
 public class WellKnownValueTypes {
     private static final Class<?>[] VALUE_TYPES = {
-            LocalDateTime.class,
-            LocalDate.class,
             BigDecimal.class,
-            Date.class,
             ThreadLocal.class,
             UUID.class,
+            Currency.class,
+            URI.class,
+            URL.class
     };
 
     public static Class<?>[] getValueTypes() {

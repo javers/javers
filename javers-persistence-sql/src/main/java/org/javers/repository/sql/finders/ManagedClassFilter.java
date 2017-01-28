@@ -1,6 +1,5 @@
 package org.javers.repository.sql.finders;
 
-import org.javers.common.collections.Function;
 import org.javers.common.collections.Sets;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.repository.sql.schema.TableNameProvider;
@@ -43,12 +42,7 @@ class ManagedClassFilter extends SnapshotFilter {
     }
 
     private String getCondition() {
-        Set<String> managedTypesInQuotes = Sets.transform(managedTypes, new Function<String, String>() {
-            @Override
-            public String apply(String managedType) {
-                return "'" + managedType + "'";
-            }
-        });
+        Set<String> managedTypesInQuotes = Sets.transform(managedTypes, managedType -> "'" + managedType + "'");
         return SNAPSHOT_MANAGED_TYPE + " in (" + ToStringBuilder.join(new ArrayList<>(managedTypesInQuotes)) + ")";
     }
 }

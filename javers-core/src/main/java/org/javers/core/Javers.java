@@ -1,6 +1,6 @@
 package org.javers.core;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.changelog.ChangeProcessor;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitMetadata;
@@ -353,12 +353,6 @@ public interface Javers {
      * </pre>
      */
     <T extends JaversType> T getTypeMapping(Type userType);
-
-    /**
-     * @deprecated since 2.8.0
-     */
-    @Deprecated
-    IdBuilder idBuilder();
 
     /**
      * Returns {@link Property} which underlies given {@link PropertyChange}

@@ -57,7 +57,7 @@ class MongoRepositoryFongoIntTest extends Specification {
         def commitFactory = javersTestBuilder.commitFactory
 
         def kazik = new DummyUser("kazik")
-        def id = javersTestBuilder.javers().idBuilder().instanceId(new DummyUser("kazik"))
+        def id = javersTestBuilder.instanceId(new DummyUser("kazik"))
 
         when:
         //persist
@@ -99,7 +99,7 @@ class MongoRepositoryFongoIntTest extends Specification {
         def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
         def mongoRepository = new MongoRepository(mongoDb, javersTestBuilder.jsonConverter, 100)
         def commitFactory = javersTestBuilder.commitFactory
-        def id = javersTestBuilder.javers().idBuilder().instanceId(new DummyUser("kazik"))
+        def id = javersTestBuilder.instanceId(new DummyUser("kazik"))
 
         //create entity & persist commit
         def kazik = new DummyUser("kazik")
@@ -130,7 +130,7 @@ class MongoRepositoryFongoIntTest extends Specification {
         javers.commit("andy", kazikV1)
         javers.commit("andy", kazikV2)
 
-        def id = javersTestBuilder.javers().idBuilder().instanceId(new DummyUser("kazik"))
+        def id = javersTestBuilder.instanceId(new DummyUser("kazik"))
         def queryParams = QueryParamsBuilder.withLimit(2).build()
 
         when:

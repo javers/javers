@@ -1,7 +1,7 @@
 package org.javers.core.model
 
 import org.javers.core.metamodel.annotation.DiffIgnore
-import org.joda.time.LocalDateTime
+import java.time.LocalDateTime
 import javax.persistence.Id
 import javax.persistence.Transient
 

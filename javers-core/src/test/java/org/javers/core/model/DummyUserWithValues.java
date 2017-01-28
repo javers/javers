@@ -1,6 +1,6 @@
 package org.javers.core.model;
 
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import javax.persistence.Id;
 import java.math.BigDecimal;
@@ -17,7 +17,7 @@ public class DummyUserWithValues {
 
     private DummyUserWithValues(String name) {
         this.name = name;
-        this.dob = new LocalDateTime();
+        this.dob = LocalDateTime.now();
     }
 
     private DummyUserWithValues(String name, LocalDateTime dob) {

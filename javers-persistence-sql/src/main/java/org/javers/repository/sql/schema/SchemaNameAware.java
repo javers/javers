@@ -57,12 +57,4 @@ public abstract class SchemaNameAware {
     protected String getSequenceNameWithSchema(String pkColName){
         return tableNameProvider.getSequenceNameWithSchema(pkColName);
     }
-
-    /**
-     * used only by migration scripts
-     */
-    @Deprecated
-    protected String getCdoClassTableNameWithSchema() {
-        return tableNameProvider.getCdoClassTableNameWithSchema();
-    }
 }

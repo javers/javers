@@ -1,6 +1,6 @@
 package org.javers.repository.sql;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.query.mapper.ObjectMapper;

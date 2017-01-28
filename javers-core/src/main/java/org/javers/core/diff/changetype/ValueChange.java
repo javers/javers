@@ -1,8 +1,9 @@
 package org.javers.core.diff.changetype;
 
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.GlobalId;
-
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.javers.common.string.ToStringBuilder.addField;
 
@@ -14,7 +15,11 @@ public final class ValueChange extends PropertyChange {
     private final Atomic right;
 
     public ValueChange(GlobalId affectedCdoId, String propertyName, Object leftValue, Object rightValue) {
-        super(affectedCdoId, propertyName);
+        this(affectedCdoId, propertyName, leftValue, rightValue, Optional.empty());
+    }
+
+    public ValueChange(GlobalId affectedCdoId, String propertyName, Object leftValue, Object rightValue, Optional<CommitMetadata> commitMetadata) {
+        super(affectedCdoId, propertyName, commitMetadata);
         this.left = new Atomic(leftValue);
         this.right = new Atomic(rightValue);
     }

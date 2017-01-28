@@ -50,12 +50,11 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
 
         List<ContainerElementChange> changes = new ArrayList<>();
 
-        for (Object valueOrId : Sets.difference(leftSet, rightSet)) {
-            changes.add(new ValueRemoved(valueOrId));
-        }
-        for (Object valueOrId : Sets.difference(rightSet, leftSet)) {
-            changes.add(new ValueAdded(valueOrId));
-        }
+        Sets.difference(leftSet, rightSet).forEach(valueOrId ->
+                changes.add(new ValueRemoved(valueOrId)));
+
+        Sets.difference(rightSet, leftSet).forEach(valueOrId ->
+                changes.add(new ValueAdded(valueOrId)));
 
         return changes;
     }

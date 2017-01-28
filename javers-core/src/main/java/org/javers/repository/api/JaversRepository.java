@@ -1,6 +1,6 @@
 package org.javers.repository.api;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
@@ -43,7 +43,7 @@ public interface JaversRepository {
      * Snapshots (historical states) of given object
      * in reverse chronological order
      *
-     * @param queryParams parameters constraining returned list (size limit, date from/to)
+     * @param queryParams parameters constraining returned list (size limit, util from/to)
      * @return empty List if object is not versioned
      */
     List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams);
@@ -57,7 +57,7 @@ public interface JaversRepository {
      * All snapshots of objects within given managed classes,
      * in reverse chronological order
      *
-     * @param queryParams parameters constraining returned list (size limit, date from/to)
+     * @param queryParams parameters constraining returned list (size limit, util from/to)
      * @return empty List if no snapshots found
      */
     List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams);
@@ -71,7 +71,7 @@ public interface JaversRepository {
     /**
      * Snapshots of all objects in reverse chronological order
      *
-     * @param queryParams parameters constraining returned list (size limit, date from/to)
+     * @param queryParams parameters constraining returned list (size limit, util from/to)
      */
     List<CdoSnapshot> getSnapshots(QueryParams queryParams);
 

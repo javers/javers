@@ -2,7 +2,7 @@ package org.javers.common.reflection;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.collections.Primitives;
 import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;
@@ -24,10 +24,6 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class ReflectionUtil {
     private static final Logger logger = getLogger(ReflectionUtil.class);
-
-    public static boolean isJava8runtime(){
-        return isClassPresent("java.time.LocalDate");
-    }
 
     public static boolean isClassPresent(String className) {
         try {

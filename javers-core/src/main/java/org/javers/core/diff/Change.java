@@ -1,9 +1,8 @@
 package org.javers.core.diff;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitMetadata;
-import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalId;
@@ -30,21 +29,24 @@ import static org.javers.common.validation.Validate.*;
  */
 public abstract class Change implements Serializable {
 
-    private Optional<CommitMetadata> commitMetadata;
+    private CommitMetadata commitMetadata; //optional, can't use Optional here, because it isn't Serializable
     private final GlobalId affectedCdoId;
-
-    private transient Optional<Object> affectedCdo;
+    private transient Object affectedCdo;  //optional
 
     protected Change(GlobalId affectedCdoId) {
-        argumentsAreNotNull(affectedCdoId);
-        this.affectedCdoId = affectedCdoId;
-        this.commitMetadata = Optional.empty();
+        this(affectedCdoId, Optional.empty());
     }
 
-    protected Change(GlobalId affectedCdoId, CommitMetadata commitMetadata) {
-        argumentsAreNotNull(affectedCdoId, commitMetadata);
+    protected Change(GlobalId affectedCdoId, Optional<Object> affectedCdo) {
+        this(affectedCdoId, affectedCdo, Optional.empty());
+    }
+
+    protected Change(GlobalId affectedCdoId, Optional<Object> affectedCdo, Optional<CommitMetadata> commitMetadata) {
+        argumentsAreNotNull(affectedCdoId);
         this.affectedCdoId = affectedCdoId;
-        this.commitMetadata = Optional.of(commitMetadata);
+        this.commitMetadata = null;
+        affectedCdo.ifPresent(cdo -> this.affectedCdo = cdo);
+        commitMetadata.ifPresent(meta -> this.commitMetadata = meta);
     }
 
     /**
@@ -74,14 +76,14 @@ public abstract class Change implements Serializable {
      * Not available for Changes read from JaversRepository
      */
     public Optional<Object> getAffectedObject() {
-        return affectedCdo;
+        return Optional.ofNullable(affectedCdo);
     }
 
     /**
      * Empty if change is calculated by {@link Javers#compare(Object, Object)}
      */
     public Optional<CommitMetadata> getCommitMetadata() {
-        return commitMetadata;
+        return Optional.ofNullable(commitMetadata);
     }
 
     @Override
@@ -93,23 +95,20 @@ public abstract class Change implements Serializable {
         return addFirstField("globalId", getAffectedGlobalId());
     }
 
-    protected void setAffectedCdo(Optional<Object> affectedCdo) {
+    void setAffectedCdo(Object affectedCdo) {
         argumentIsNotNull(affectedCdo);
         conditionFulfilled(this.affectedCdo == null, "affectedCdo already set");
         this.affectedCdo = affectedCdo;
     }
 
-    /**
-     * //TODO reduce visibility to protected
-     */
-    public void bindToCommit(CommitMetadata commitMetadata) {
+    void bindToCommit(CommitMetadata commitMetadata) {
         argumentIsNotNull(commitMetadata);
 
-        if (this.commitMetadata.isPresent()) {
+        if (this.commitMetadata != null) {
             throw new IllegalStateException("Change should be effectively immutable");
         }
 
-        this.commitMetadata = Optional.of(commitMetadata);
+        this.commitMetadata = commitMetadata;
     }
 
     @Override

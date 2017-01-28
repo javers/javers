@@ -2,6 +2,9 @@ package org.javers.common.collections;
 
 import java.util.*;
 import java.util.Collections;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
 
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.unmodifiableList;
@@ -48,14 +51,7 @@ public class Lists {
      */
     public static <T> List<T> positiveFilter(List<T> input, Predicate<T> filter) {
         argumentsAreNotNull(input, filter);
-
-        List<T> result = new ArrayList<>();
-        for (T element : input) {
-            if (filter.apply(element)){
-                result.add(element);
-            }
-        }
-        return Collections.unmodifiableList(result);
+        return input.stream().filter(filter).collect(toImmutableList());
     }
 
     /**
@@ -63,25 +59,12 @@ public class Lists {
      */
     public static <T> List<T> negativeFilter(List<T> input, final Predicate<T>  filter) {
         argumentsAreNotNull(input, filter);
-        return positiveFilter(input, negative(filter));
-    }
-
-    public static <T> Predicate<T> negative(final Predicate<T> predicate) {
-        return new Predicate<T>() {
-            public boolean apply(T input) {
-                return !predicate.apply(input);
-            }
-        };
+        return input.stream().filter(element -> !filter.test(element)).collect(toImmutableList());
     }
 
     public static <F, T> List<T> transform(List<F> input, Function<F, T> transformation) {
         argumentsAreNotNull(input, transformation);
-
-        List<T> result = new ArrayList<>();
-        for (F element : input) {
-            result.add(transformation.apply(element));
-        }
-        return Collections.unmodifiableList(result);
+        return input.stream().map(transformation::apply).collect(toImmutableList());
     }
 
     public static <E> List<E> difference(List<E> first, List<E> second) {
@@ -96,5 +79,12 @@ public class Lists {
         List<E> difference = new ArrayList<>(first);
         difference.removeAll(second);
         return difference;
+    }
+
+    public static <t> Collector<t, List<t>, List<t>> toImmutableList() {
+        return Collector.of(ArrayList::new, List::add, (left, right) -> {
+            left.addAll(right);
+            return left;
+        }, Collections::unmodifiableList);
     }
 }

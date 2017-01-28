@@ -43,12 +43,12 @@ class ReferenceChangeAssert {
     }
     
     ReferenceChangeAssert hasLeftObject(Object expected) {
-        assert expected == null && actual.leftObject.isEmpty() || expected == actual.leftObject.get()
+        assert expected == null && !actual.leftObject.isPresent() || expected == actual.leftObject.get()
         this
     }
     
     ReferenceChangeAssert hasRightObject(Object expected) {
-        assert expected == null && actual.rightObject.isEmpty() || expected == actual.rightObject.get()
+        assert expected == null && !actual.rightObject.isPresent() || expected == actual.rightObject.get()
         this
     }
 }

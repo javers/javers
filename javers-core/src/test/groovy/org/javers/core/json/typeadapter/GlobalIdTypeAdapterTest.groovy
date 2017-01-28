@@ -49,7 +49,7 @@ class GlobalIdTypeAdapterTest extends Specification {
     def "should serialize Instance @EmbeddedId using json fields"(){
         given:
         def javers = javersTestAssembly()
-        def id = javers.idBuilder().instanceId(new DummyPoint(2,3),DummyEntityWithEmbeddedId)
+        def id = javers.instanceId(new DummyPoint(2,3),DummyEntityWithEmbeddedId)
 
         when:
         def jsonText = javers.jsonConverter.toJson(id)
@@ -64,7 +64,7 @@ class GlobalIdTypeAdapterTest extends Specification {
     def "should serialize InstanceId with #what name"() {
         given:
         def javers = javersTestAssembly()
-        def id = javers.idBuilder().instanceId("kaz",clazz)
+        def id = javers.instanceId("kaz",clazz)
 
         when:
         def jsonText = javers.jsonConverter.toJson(id)
@@ -83,7 +83,7 @@ class GlobalIdTypeAdapterTest extends Specification {
     def "should serialize UnboundedValueObjectId"() {
         given:
         def javers = javersTestAssembly()
-        def id = javers.idBuilder().unboundedValueObjectId(DummyAddress)
+        def id = javers.unboundedValueObjectId(DummyAddress)
 
         when:
         def jsonText = javers.jsonConverter.toJson(id)
@@ -103,7 +103,7 @@ class GlobalIdTypeAdapterTest extends Specification {
 
         then:
         idHolder.id instanceof UnboundedValueObjectId
-        idHolder.id == javers.idBuilder().unboundedValueObjectId(DummyAddress)
+        idHolder.id == javers.unboundedValueObjectId(DummyAddress)
     }
 
     def "should deserialize InstanceId with @EmbeddedId to original Type"(){
@@ -146,7 +146,7 @@ class GlobalIdTypeAdapterTest extends Specification {
     def "should serialize ValueObjectId"() {
         given:
         def javers = javersTestAssembly()
-        def id = javers.idBuilder().withOwner(5,DummyUserDetails).voId("dummyAddress")
+        def id = javers.valueObjectId(5,DummyUserDetails,"dummyAddress")
 
         when:
         def jsonText = javers.jsonConverter.toJson(id)

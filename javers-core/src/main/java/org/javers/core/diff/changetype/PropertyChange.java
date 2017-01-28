@@ -1,9 +1,11 @@
 package org.javers.core.diff.changetype;
 
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.javers.common.string.ToStringBuilder.addField;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -16,8 +18,8 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public abstract class PropertyChange extends Change {
     private final String propertyName;
 
-    protected PropertyChange(GlobalId affectedCdoId, String propertyName) {
-        super(affectedCdoId);
+    protected PropertyChange(GlobalId affectedCdoId, String propertyName, Optional<CommitMetadata> commitMetadata) {
+        super(affectedCdoId, Optional.empty(), commitMetadata);
         argumentIsNotNull(propertyName);
         this.propertyName = propertyName;
     }

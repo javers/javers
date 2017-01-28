@@ -10,6 +10,8 @@ import org.javers.core.json.JsonConverterBuilder
 import org.javers.core.metamodel.object.CdoWrapper
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.object.UnboundedValueObjectId
+import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.model.DummyAddress
 import org.javers.core.snapshot.ObjectHasher
 import org.javers.core.snapshot.SnapshotFactory
@@ -99,7 +101,7 @@ class JaversTestBuilder {
 
     CdoWrapper createCdoWrapper(Object cdo){
         def mType = getTypeMapper().getJaversManagedType(cdo.class)
-        def id = idBuilder().instanceId(cdo)
+        def id = instanceId(cdo)
 
         new CdoWrapper(cdo, id, mType)
     }
@@ -164,11 +166,20 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(LiveGraphFactory).createLiveGraph(liveCdo)
     }
 
-    IdBuilder idBuilder(){
-        javers().idBuilder()
+    InstanceId instanceId(Object instance){
+        getGlobalIdFactory().createInstanceId(instance)
     }
 
-    InstanceId instanceId(Object instance){
-        idBuilder().instanceId(instance)
+    InstanceId instanceId(Object localId, Class entity){
+        getGlobalIdFactory().createInstanceId(localId, entity)
     }
+
+    ValueObjectId valueObjectId(Object localId, Class owningEntity, fragment) {
+        getGlobalIdFactory().createValueObjectIdFromPath(instanceId(localId, owningEntity), fragment)
+    }
+
+    UnboundedValueObjectId unboundedValueObjectId(Class valueObject) {
+        getGlobalIdFactory().createUnboundedValueObjectId(valueObject)
+    }
+
 }

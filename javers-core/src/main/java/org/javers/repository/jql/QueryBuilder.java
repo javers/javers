@@ -8,14 +8,14 @@ import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.QueryParamsBuilder;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import java.math.BigDecimal;
 import java.util.*;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
-import static org.joda.time.LocalTime.MIDNIGHT;
+import static java.time.LocalTime.MIDNIGHT;
 
 /**
  * Fluent API for building {@link JqlQuery},
@@ -150,8 +150,7 @@ public class QueryBuilder {
         return new QueryBuilder(new IdFilter(ValueObjectIdDTO.valueObjectId(ownerLocalId, ownerEntityClass, path)));
     }
 
-    @Deprecated
-    public static QueryBuilder byGlobalIdDTO(GlobalIdDTO globalId){
+    public static QueryBuilder byGlobalId(GlobalIdDTO globalId){
         Validate.argumentIsNotNull(globalId);
         return new QueryBuilder(new IdFilter(globalId));
     }
@@ -235,7 +234,7 @@ public class QueryBuilder {
 
     /**
      * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those created after (>=) given date.
+     * to those created after (>=) given util.
      * <br/><br/>
      *
      * <h2>CommitDate is local datetime</h2>
@@ -260,12 +259,12 @@ public class QueryBuilder {
      * delegates to {@link #from(LocalDateTime)} with MIDNIGHT
      */
     public QueryBuilder from(LocalDate fromDate) {
-        return from(fromDate.toLocalDateTime(MIDNIGHT));
+        return from(fromDate.atTime(MIDNIGHT));
     }
 
     /**
      * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those created before (<=) given date.
+     * to those created before (<=) given util.
      */
     public QueryBuilder to(LocalDateTime to) {
         queryParamsBuilder.to(to);
@@ -276,7 +275,7 @@ public class QueryBuilder {
      * delegates to {@link #to(LocalDateTime)} with MIDNIGHT
      */
     public QueryBuilder to(LocalDate toDate) {
-        return to(toDate.toLocalDateTime(MIDNIGHT));
+        return to(toDate.atTime(MIDNIGHT));
     }
 
     /**

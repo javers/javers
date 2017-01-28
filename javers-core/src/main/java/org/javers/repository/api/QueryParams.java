@@ -1,8 +1,8 @@
 package org.javers.repository.api;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.commit.CommitId;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import java.util.Collections;
 import java.util.Map;
@@ -35,15 +35,15 @@ public class QueryParams {
     QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty) {
         this.limit = limit;
         this.skip = skip;
-        this.from = Optional.fromNullable(from);
-        this.to = Optional.fromNullable(to);
-        this.commitId = Optional.fromNullable(commitId);
-        this.version = Optional.fromNullable(version);
-        this.author = Optional.fromNullable(author);
-        this.commitProperties = Optional.fromNullable(commitProperties);
+        this.from = Optional.ofNullable(from);
+        this.to = Optional.ofNullable(to);
+        this.commitId = Optional.ofNullable(commitId);
+        this.version = Optional.ofNullable(version);
+        this.author = Optional.ofNullable(author);
+        this.commitProperties = Optional.ofNullable(commitProperties);
         this.aggregate = aggregate;
         this.newObjectChanges = newObjectChanges;
-        this.changedProperty = Optional.fromNullable(changedProperty);
+        this.changedProperty = Optional.ofNullable(changedProperty);
     }
 
     public int limit() {
@@ -73,14 +73,14 @@ public class QueryParams {
     }
 
     /**
-     * filters results to Snapshots created after given date
+     * filters results to Snapshots created after given util
      */
     public Optional<LocalDateTime> from() {
         return from;
     }
 
     /**
-     * filters results to Snapshots created before given date
+     * filters results to Snapshots created before given util
      */
     public Optional<LocalDateTime> to() {
         return to;

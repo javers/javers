@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.clazz;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.metamodel.type.EntityType;
 import java.util.List;
 
@@ -29,20 +29,16 @@ public class EntityDefinition  extends ClientsClassDefinition {
                 .withIdPropertyName(idPropertyName));
     }
 
-    EntityDefinition(EntityDefinitionBuilder builder) {
-        super(builder);
-        this.idPropertyName = builder.getIdPropertyName();
-        this.shallowReference = builder.isShallowReference();
-    }
-
-    /**
-     * @deprecated use {@link EntityDefinitionBuilder}
-     */
-    @Deprecated
     public EntityDefinition(Class<?> entity, String idPropertyName, List<String> ignoredProperties) {
         this(new EntityDefinitionBuilder(entity)
                 .withIdPropertyName(idPropertyName)
                 .withIgnoredProperties(ignoredProperties));
+    }
+
+    EntityDefinition(EntityDefinitionBuilder builder) {
+        super(builder);
+        this.idPropertyName = builder.getIdPropertyName();
+        this.shallowReference = builder.isShallowReference();
     }
 
     public boolean hasCustomId() {

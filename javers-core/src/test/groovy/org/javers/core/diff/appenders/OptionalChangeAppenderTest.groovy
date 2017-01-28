@@ -28,10 +28,10 @@ class OptionalChangeAppenderTest extends AbstractDiffAppendersTest {
         !change
 
         where:
-        leftOptional     | rightOptional
-        empty() | empty()
-        empty() | null
-        of(2)            | of(2)
+        leftOptional  | rightOptional
+        empty()       | empty()
+        empty()       | null
+        of(2)         | of(2)
     }
 
     @Unroll

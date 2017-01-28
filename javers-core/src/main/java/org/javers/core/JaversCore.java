@@ -1,6 +1,6 @@
 package org.javers.core;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.changelog.ChangeListTraverser;
@@ -159,11 +159,6 @@ class JaversCore implements Javers {
 
         ChangeListTraverser.traverse(changes, changeProcessor);
         return changeProcessor.result();
-    }
-
-    @Override
-    public IdBuilder idBuilder() {
-        return new IdBuilder(globalIdFactory);
     }
 
     @Override

@@ -13,6 +13,8 @@ dependencies {
     testCompile 'org.postgresql:postgresql:9.4-1201-jdbc41'
     testCompile 'mysql:mysql-connector-java:5.1.36'
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
+    testCompile "joda-time:joda-time:$jodaVersion"
+
 }
 
 task integrationTest(type: Test) {

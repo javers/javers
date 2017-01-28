@@ -1,6 +1,6 @@
 package org.javers.repository.sql;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.common.validation.Validate;
 
 
@@ -30,6 +30,6 @@ public class SqlRepositoryConfiguration {
     }
 
     public Optional<String> getSchemaNameAsOptional() {
-        return Optional.fromNullable(schemaName);
+        return Optional.ofNullable(schemaName);
     }
 }

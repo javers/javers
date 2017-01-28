@@ -1,6 +1,6 @@
 package org.javers.core.changelog;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.*;

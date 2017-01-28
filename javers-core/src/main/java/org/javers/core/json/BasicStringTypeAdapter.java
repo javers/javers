@@ -14,7 +14,7 @@ import org.javers.core.metamodel.type.ValueType;
  * Implementation shouldn't take care about nulls (nulls are handled by Gson engine)
  * <br><br>
  *
- * For concrete class example see {@link org.javers.core.json.typeadapter.date.LocalDateTimeTypeAdapter}.
+ * For concrete class example see {@link org.javers.core.json.typeadapter.util.LocalDateTimeTypeAdapter}.
  * <br><br>
  *
  * @author bartosz walacik

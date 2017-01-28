@@ -2,7 +2,7 @@ package org.javers.core.commit;
 
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -44,6 +44,6 @@ public class CommitMetadata implements Serializable {
 
     @Override
     public String toString() {
-        return ToStringBuilder.toString(this, "author", author, "properties", properties, "date", commitDate, "id", id);
+        return ToStringBuilder.toString(this, "author", author, "properties", properties, "util", commitDate, "id", id);
     }
 }

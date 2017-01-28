@@ -1,6 +1,5 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.common.collections.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
@@ -8,6 +7,7 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.unmodifiableList;
 import static org.javers.common.validation.Validate.argumentIsNotNull;

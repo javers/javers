@@ -1,7 +1,7 @@
 package org.javers.core.json
 
 import org.javers.common.collections.Arrays
-import org.joda.time.LocalDateTime
+import java.time.LocalDateTime
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll

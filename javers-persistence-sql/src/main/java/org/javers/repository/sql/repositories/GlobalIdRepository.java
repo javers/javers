@@ -2,7 +2,7 @@ package org.javers.repository.sql.repositories;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
@@ -74,16 +74,15 @@ public class GlobalIdRepository extends SchemaNameAware {
         SelectQuery query = polyJdbc.query().select(GLOBAL_ID_PK).from(getGlobalIdTableNameWithSchema());
 
         if (globalId instanceof ValueObjectId) {
-            ValueObjectId valueObjectId  = (ValueObjectId) globalId;
+            final ValueObjectId valueObjectId  = (ValueObjectId) globalId;
             Optional<Long> ownerFk = findGlobalIdPk(valueObjectId.getOwnerId());
-            if (ownerFk.isEmpty()){
+            if (!ownerFk.isPresent()){
                 return Optional.empty();
             }
-            query
-                .where(GLOBAL_ID_FRAGMENT + " = :fragment ")
-                .withArgument("fragment", valueObjectId.getFragment())
-                .append("AND " + GLOBAL_ID_OWNER_ID_FK + " = :ownerFk ")
-                .withArgument("ownerFk", ownerFk.get());
+            query.where(GLOBAL_ID_FRAGMENT + " = :fragment ")
+                 .withArgument("fragment", valueObjectId.getFragment())
+                 .append("AND " + GLOBAL_ID_OWNER_ID_FK + " = :ownerFk ")
+                 .withArgument("ownerFk", ownerFk.get());
         }
         else if (globalId instanceof InstanceId){
             query

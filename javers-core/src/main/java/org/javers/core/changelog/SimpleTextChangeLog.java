@@ -10,8 +10,7 @@ import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.metamodel.object.GlobalId;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Sample text changeLog, renders text log like that:
@@ -30,7 +29,7 @@ import org.joda.time.format.DateTimeFormatter;
  * @author bartosz walacik
  */
 public class SimpleTextChangeLog extends AbstractTextChangeLog {
-    public static final DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormat.mediumDateTime();
+    public static final DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final DateTimeFormatter dateTimeFormatter;
 
@@ -45,7 +44,7 @@ public class SimpleTextChangeLog extends AbstractTextChangeLog {
     @Override
     public void onCommit(CommitMetadata commitMetadata) {
         appendln("commit " + commitMetadata.getId() + ", author: " + commitMetadata.getAuthor() +
-                ", " + dateTimeFormatter.print(commitMetadata.getCommitDate()));
+                ", " + dateTimeFormatter.format(commitMetadata.getCommitDate()));
     }
 
     @Override

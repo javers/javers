@@ -67,7 +67,7 @@ class NewObjectTypeAdapterTest extends Specification {
         def jsonText = javers.jsonConverter.toJson(change)
 
         then:
-        change.commitMetadata instanceof org.javers.common.collections.Optional
+        change.commitMetadata instanceof Optional
         def json = new JsonSlurper().parseText(jsonText)
         json.commitMetadata.id == 1.00
         json.commitMetadata.author == "author"

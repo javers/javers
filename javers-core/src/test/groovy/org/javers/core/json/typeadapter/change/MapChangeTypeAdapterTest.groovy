@@ -11,8 +11,8 @@ import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
+import java.time.LocalDate
+import java.time.LocalDateTime
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -121,12 +121,13 @@ class MapChangeTypeAdapterTest extends Specification {
     }
     def "should serialize MapChange.EntryValueChange with references" () {
         given:
-        def javers = javersTestAssembly().javers()
+        def javersTestBuilder = javersTestAssembly()
+        def javers = javersTestBuilder.javers()
         def jsonConverter = javers.getJsonConverter()
 
-        def keyId = javers.idBuilder().instanceId(1,SnapshotEntity)
-        def leftReference  = javers.idBuilder().instanceId(2,SnapshotEntity)
-        def rightReference = javers.idBuilder().instanceId(3,SnapshotEntity)
+        def keyId = javersTestBuilder.instanceId(1,SnapshotEntity)
+        def leftReference  = javersTestBuilder.instanceId(2,SnapshotEntity)
+        def rightReference = javersTestBuilder.instanceId(3,SnapshotEntity)
         def entryChanges = [new EntryValueChange(keyId, leftReference, rightReference)]
 
         def change = mapChange(new SnapshotEntity(id:1),"mapOfEntities",entryChanges)
@@ -236,7 +237,7 @@ class MapChangeTypeAdapterTest extends Specification {
         change.affectedGlobalId == instanceId(1,SnapshotEntity)
         change.commitMetadata.get().author == "kazik"
         change.commitMetadata.get().id.majorId == 1
-        change.commitMetadata.get().commitDate == new LocalDateTime("2001-12-01T22:23:03")
+        change.commitMetadata.get().commitDate == LocalDateTime.of(2001,12,01,22,23,03)
         change.propertyName == "mapOfPrimitives"
         MapChangeAssert.assertThat(change)
                        .hasEntryAdded("some1",1)

@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.scanner;
 
-import org.javers.common.collections.Optional;
+import java.util.Optional;
 
 /**
  * @author bartosz.walacik

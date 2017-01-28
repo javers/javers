@@ -1,10 +1,11 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Predicate;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
 import java.util.*;
+import java.util.function.Predicate;
+
 import static org.javers.common.exception.JaversExceptionCode.PROPERTY_NOT_FOUND;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -61,7 +62,7 @@ class ManagedClass {
         List<Property> retProperties = new ArrayList<>();
 
         for (Property property : managedProperties) {
-            if (query.apply(property)){
+            if (query.test(property)){
                 retProperties.add(property);
             }
         }
