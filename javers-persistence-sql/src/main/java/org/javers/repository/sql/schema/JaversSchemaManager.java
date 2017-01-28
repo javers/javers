@@ -42,40 +42,16 @@ public class JaversSchemaManager extends SchemaNameAware {
             ensureTable(e.getKey(), e.getValue());
         }
 
-        alterCommitIdColumnIfNeeded();
-        addSnapshotVersionColumnIfNeeded();
-        addSnapshotManagedTypeColumnIfNeeded();
-        addGlobalIdTypeNameColumnIfNeeded();
+        alterCommitIdColumnIfNeeded(); // JaVers 2.5 to 2.6 schema migration
 
         TheCloser.close(schemaManager, schemaInspector);
     }
 
     /**
-     * JaVers 1.3.15 to 1.3.16 schema migration
      * JaVers 2.5 to 2.6 schema migration
      */
     private void alterCommitIdColumnIfNeeded() {
-
         ColumnType commitIdColType = getTypeOf(getCommitTableNameWithSchema(), "commit_id");
-        if (commitIdColType.type == Types.VARCHAR) {
-            logger.info("migrating db schema from JaVers 1.3.15 to 1.3.16 ...");
-
-            if (dialect instanceof PostgresDialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id TYPE numeric(12,2) USING commit_id::numeric");
-            } else if (dialect instanceof H2Dialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id numeric(12,2)");
-            } else if (dialect instanceof MysqlDialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY commit_id numeric(12,2)");
-            } else if (dialect instanceof OracleDialect) {
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY commit_id number(12,2)");
-            } else if (dialect instanceof MsSqlDialect) {
-                executeSQL("drop index jv_commit_commit_id_idx on " + getCommitTableNameWithSchema());
-                executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " ALTER COLUMN commit_id numeric(12,2)");
-                executeSQL("CREATE INDEX jv_commit_commit_id_idx ON " + getCommitTableNameWithSchema() + " (commit_id)");
-            } else {
-                handleUnsupportedDialect();
-            }
-        }
 
         if (commitIdColType.precision == 12) {
             logger.info("migrating db schema from JaVers 2.5 to 2.6 ...");
@@ -100,75 +76,6 @@ public class JaversSchemaManager extends SchemaNameAware {
     private void handleUnsupportedDialect() {
         logger.error("\nno DB schema migration script for {} :(\nplease contact with JaVers team, javers@javers.org",
                 dialect.getCode());
-    }
-
-    /**
-     * JaVers 1.4.3 to 1.4.4 schema migration
-     */
-    private void addSnapshotVersionColumnIfNeeded() {
-        if (!columnExists(getSnapshotTableNameWithSchema(), "version")) {
-            addLongColumn(getSnapshotTableNameWithSchema(), "version");
-        }
-    }
-
-    private void addLongColumn(String tableName, String colName) {
-        logger.warn("column " + tableName + "." + colName + " not exists, running ALTER TABLE ...");
-
-        String sqlType = dialect.types().bigint(0);
-
-        if (dialect instanceof OracleDialect ||
-                dialect instanceof MsSqlDialect) {
-            executeSQL("ALTER TABLE " + tableName + " ADD " + colName + " " + sqlType);
-        } else {
-            executeSQL("ALTER TABLE " + tableName + " ADD COLUMN " + colName + " " + sqlType);
-        }
-    }
-
-    /**
-     * JaVers 1.6.x to 2.0 schema migration
-     */
-    private void addSnapshotManagedTypeColumnIfNeeded() {
-        if (!columnExists(getSnapshotTableNameWithSchema(), "managed_type")) {
-            addStringColumn(getSnapshotTableNameWithSchema(), "managed_type", 200);
-
-            populateSnapshotManagedType();
-        }
-    }
-
-    /**
-     * JaVers 1.6.x to 2.0 schema migration
-     */
-    private void addGlobalIdTypeNameColumnIfNeeded() {
-        if (!columnExists(getGlobalIdTableNameWithSchema(), "type_name")) {
-            addStringColumn(getGlobalIdTableNameWithSchema(), "type_name", 200);
-
-            populateGlobalIdTypeName();
-        }
-    }
-
-    private void populateSnapshotManagedType() {
-        String updateStmt =
-                "UPDATE " + getSnapshotTableNameWithSchema() +
-                        "  SET managed_type = (SELECT qualified_name" +
-                        "                      FROM " + getCdoClassTableNameWithSchema() + "," + getGlobalIdTableNameWithSchema() +
-                        "                      WHERE cdo_class_pk = cdo_class_fk " +
-                        "                      AND   global_id_pk = global_id_fk" +
-                        "                     )";
-        int cnt = executeUpdate(updateStmt);
-        logger.info("populate jv_snapshot.managed_type - " + cnt + " row(s) updated");
-    }
-
-    private void populateGlobalIdTypeName() {
-        String updateStmt =
-                "UPDATE " + getGlobalIdTableNameWithSchema() +
-                        "  SET type_name = (SELECT qualified_name" +
-                        "                   FROM " + getCdoClassTableNameWithSchema() +
-                        "                   WHERE cdo_class_pk = cdo_class_fk" +
-                        "                   )" +
-                        "  WHERE owner_id_fk IS NULL";
-        int cnt = executeUpdate(updateStmt);
-
-        logger.info("populate jv_global_id.type_name - " + cnt + " row(s) updated");
     }
 
     private boolean executeSQL(String sql) {
@@ -250,6 +157,19 @@ public class JaversSchemaManager extends SchemaNameAware {
         logger.warn("column " + tableName + "." + colName + " not exists, running ALTER TABLE ...");
 
         String sqlType = dialect.types().string(len);
+
+        if (dialect instanceof OracleDialect ||
+                dialect instanceof MsSqlDialect) {
+            executeSQL("ALTER TABLE " + tableName + " ADD " + colName + " " + sqlType);
+        } else {
+            executeSQL("ALTER TABLE " + tableName + " ADD COLUMN " + colName + " " + sqlType);
+        }
+    }
+
+    private void addLongColumn(String tableName, String colName) {
+        logger.warn("column " + tableName + "." + colName + " not exists, running ALTER TABLE ...");
+
+        String sqlType = dialect.types().bigint(0);
 
         if (dialect instanceof OracleDialect ||
                 dialect instanceof MsSqlDialect) {
