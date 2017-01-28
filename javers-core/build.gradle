@@ -3,9 +3,9 @@ mainClassName = "org.javers.core.selftest.Application"
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.22'
-    compile 'com.google.code.gson:gson:2.8.0'
+    compile "com.google.code.gson:gson:$gsonVersion"
     compile 'org.picocontainer:picocontainer:2.15'
-    compile 'io.github.lukehutch:fast-classpath-scanner:2.0.11'
+    compile 'io.github.lukehutch:fast-classpath-scanner:2.0.13'
 
     //should be on application's classpath when using custom comparators
     optional "joda-time:joda-time:$jodaVersion"
