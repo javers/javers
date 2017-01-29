@@ -126,13 +126,13 @@ public abstract class JaversType {
             if (!allTypeArguments.isEmpty() && i<allTypeArguments.size()){
                 existingArgument = allTypeArguments.get(i);
             }
-            concreteTypeArguments.add(getActualClassTypeArgument(existingArgument, baseJavaType));
+            concreteTypeArguments.add(getActualClassTypeArgument(existingArgument));
         }
 
         return concreteTypeArguments;
     }
 
-    private static Type getActualClassTypeArgument(Type existingArgument, Type baseJavaType) {
+    private static Type getActualClassTypeArgument(Type existingArgument) {
         if (existingArgument == null) {
              return DEFAULT_TYPE_PARAMETER;
         }

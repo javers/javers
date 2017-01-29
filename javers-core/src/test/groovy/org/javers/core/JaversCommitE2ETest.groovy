@@ -35,7 +35,7 @@ class JaversCommitE2ETest extends Specification {
         then:
         commit.snapshots.each {
             println it.toString()
-            println ".. props:"+ it.state.properties
+            println ".. props:"+ it.state.propertyNames
         }
         commit.snapshots.size() == 1
     }
@@ -51,7 +51,7 @@ class JaversCommitE2ETest extends Specification {
         then:
         commit.snapshots.each {
             println it.toString()
-            println ".. props:"+ it.state.properties
+            println ".. props:"+ it.state.propertyNames
         }
         commit.snapshots.size() == 1
     }

@@ -73,8 +73,8 @@ public class SnapshotFactory {
             JaversType itemType = typeMapper.getJaversType( ((ContainerType)propertyType).getItemClass() );
             dehydratorMapFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
         }
-        else if (propertyType instanceof MapType) {
-            MapContentType mapContentType = typeMapper.getMapContentType((MapType) propertyType);
+        else if (propertyType instanceof KeyValueType) {
+            MapContentType mapContentType = typeMapper.getMapContentType((KeyValueType) propertyType);
             dehydratorMapFunction = new DehydrateMapFunction(globalIdFactory, mapContentType);
         }
         else {

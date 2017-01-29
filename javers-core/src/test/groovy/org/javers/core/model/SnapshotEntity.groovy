@@ -2,6 +2,8 @@ package org.javers.core.model
 
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multiset
+import groovy.transform.EqualsAndHashCode
+
 import java.time.LocalDate
 
 import javax.persistence.Id
@@ -9,12 +11,13 @@ import javax.persistence.Id
 /**
  * @author bartosz walacik
  */
+@EqualsAndHashCode
 class SnapshotEntity {
 
     @Id
     int id = 1
 
-    public enum DummyEnum { val1, val2, val3 }
+    enum DummyEnum { val1, val2, val3 }
 
     LocalDate dob
 

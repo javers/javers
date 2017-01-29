@@ -22,7 +22,7 @@ public class SnapshotModule extends InstantiatingModule {
                 GraphSnapshotFacade.class,
                 GraphSnapshotFactory.class,
                 SnapshotDiffer.class,
-                GraphShadowFactory.class
+                ShadowGraphFactory.class
         );
     }
 }
