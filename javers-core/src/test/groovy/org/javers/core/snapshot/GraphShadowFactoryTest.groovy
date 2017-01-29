@@ -14,11 +14,11 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId
 class GraphShadowFactoryTest extends Specification {
 
     @Shared JaversTestBuilder javers
-    @Shared GraphShadowFactory graphShadowFactory
+    @Shared ShadowGraphFactory graphShadowFactory
 
     def setup(){
         javers = JaversTestBuilder.javersTestAssembly()
-        graphShadowFactory = javers.getContainerComponent(GraphShadowFactory)
+        graphShadowFactory = javers.getContainerComponent(ShadowGraphFactory)
     }
 
     def "should create ShadowGraph with snapshots of committed objects "() {

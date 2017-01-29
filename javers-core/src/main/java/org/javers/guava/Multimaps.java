@@ -1,8 +1,7 @@
 package org.javers.guava;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ListMultimap;
+import com.google.common.collect.ForwardingMultimap;
 import com.google.common.collect.Multimap;
 import org.javers.common.collections.Sets;
 
@@ -37,14 +36,6 @@ class Multimaps{
         }
 
         return Sets.difference(left.keySet(), right.keySet());
-    }
-
-    public static Multimap createEmptyMultimap(Object sourceMap){
-        if(sourceMap instanceof ListMultimap){
-            return ArrayListMultimap.create();
-        }else {
-            return  HashMultimap.create();
-        }
     }
 
     public static Multimap toNotNullMultimap(Object sourceMap){

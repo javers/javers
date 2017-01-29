@@ -14,10 +14,10 @@ import java.util.Set;
  *
  * @author bartosz walacik
  */
-class GraphShadowFactory {
+class ShadowGraphFactory {
     private final JaversExtendedRepository javersRepository;
 
-    GraphShadowFactory(JaversExtendedRepository javersRepository) {
+    ShadowGraphFactory(JaversExtendedRepository javersRepository) {
         this.javersRepository = javersRepository;
     }
 

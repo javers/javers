@@ -79,6 +79,26 @@ public class JsonConverterBuilder {
     }
 
     /**
+     * @since 3.1
+     * @see JsonSerializer
+     */
+    public JsonConverterBuilder registerNativeGsonHierarchySerializer(Class targetType, JsonSerializer<?> jsonSerializer) {
+        Validate.argumentsAreNotNull(targetType, jsonSerializer);
+        gsonBuilder.registerTypeHierarchyAdapter(targetType, jsonSerializer);
+        return this;
+    }
+
+    /**
+     * @since 3.1
+     * @see JsonDeserializer
+     */
+    public JsonConverterBuilder registerNativeGsonHierarchyDeserializer(Class targetType, JsonDeserializer<?> jsonDeserializer) {
+        Validate.argumentsAreNotNull(targetType, jsonDeserializer);
+        gsonBuilder.registerTypeHierarchyAdapter(targetType, jsonDeserializer);
+        return this;
+    }
+
+    /**
      * @see JsonDeserializer
      */
     public JsonConverterBuilder registerNativeGsonDeserializer(Type targetType, JsonDeserializer<?> jsonDeserializer) {
@@ -102,9 +122,22 @@ public class JsonConverterBuilder {
      */
     public JsonConverterBuilder registerJsonTypeAdapter(JsonTypeAdapter adapter) {
         Validate.argumentIsNotNull(adapter);
-        for (Class c : (List<Class>)adapter.getValueTypes()){
-            registerJsonTypeAdapterForType(c, adapter);
-        }
+        adapter.getValueTypes().forEach( c -> registerJsonTypeAdapterForType((Class)c, adapter));
+        return this;
+    }
+
+    /**
+     * @since 3.1
+     */
+    public JsonConverterBuilder registerJsonAdvancedTypeAdapter(JsonAdvancedTypeAdapter adapter) {
+        Validate.argumentIsNotNull(adapter);
+
+        JsonSerializer jsonSerializer = (value, type, jsonSerializationContext) -> adapter.toJson(value, type, jsonSerializationContext);
+        JsonDeserializer jsonDeserializer = (jsonElement, type, jsonDeserializationContext) -> adapter.fromJson(jsonElement, type, jsonDeserializationContext);
+
+        registerNativeGsonHierarchySerializer(adapter.getTypeSuperclass(), jsonSerializer);
+        registerNativeGsonHierarchyDeserializer(adapter.getTypeSuperclass(), jsonDeserializer);
+
         return this;
     }
 

@@ -11,15 +11,15 @@ import java.util.List;
  */
 public class GraphSnapshotFacade {
     private final GraphSnapshotFactory graphSnapshotFactory;
-    private final GraphShadowFactory graphShadowFactory;
+    private final ShadowGraphFactory shadowGraphFactory;
 
-    public GraphSnapshotFacade(GraphSnapshotFactory graphSnapshotFactory, GraphShadowFactory graphShadowFactory) {
+    public GraphSnapshotFacade(GraphSnapshotFactory graphSnapshotFactory, ShadowGraphFactory shadowGraphFactory) {
         this.graphSnapshotFactory = graphSnapshotFactory;
-        this.graphShadowFactory = graphShadowFactory;
+        this.shadowGraphFactory = shadowGraphFactory;
     }
 
     public ShadowGraph createLatestShadow(LiveGraph currentGraph) {
-        return graphShadowFactory.createLatestShadow(currentGraph);
+        return shadowGraphFactory.createLatestShadow(currentGraph);
     }
 
     public List<CdoSnapshot> createGraphSnapshot(LiveGraph currentGraph, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata) {

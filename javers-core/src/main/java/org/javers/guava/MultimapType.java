@@ -1,5 +1,6 @@
 package org.javers.guava;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import org.javers.common.collections.EnumerableFunction;
@@ -12,7 +13,6 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
 
-import static org.javers.guava.Multimaps.createEmptyMultimap;
 import static org.javers.guava.Multimaps.toNotNullMultimap;
 
 
@@ -33,7 +33,7 @@ public class MultimapType extends KeyValueType {
     public Multimap map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentIsNotNull(mapFunction);
         Multimap sourceMultimap = toNotNullMultimap(sourceMap_);
-        Multimap targetMultimap = createEmptyMultimap(sourceMap_);
+        Multimap targetMultimap = ArrayListMultimap.create();
 
         MapEnumerationOwnerContext enumeratorContext = new MapEnumerationOwnerContext(owner, true);
 

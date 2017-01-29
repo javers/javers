@@ -62,7 +62,7 @@ public class Lists {
         return input.stream().filter(element -> !filter.test(element)).collect(toImmutableList());
     }
 
-    public static <F, T> List<T> transform(List<F> input, Function<F, T> transformation) {
+    public static <F, T> List<T> transform(Collection<F> input, Function<F, T> transformation) {
         argumentsAreNotNull(input, transformation);
         return input.stream().map(transformation::apply).collect(toImmutableList());
     }
