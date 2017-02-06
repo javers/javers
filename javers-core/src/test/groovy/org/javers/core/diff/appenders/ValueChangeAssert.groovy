@@ -2,7 +2,6 @@ package org.javers.core.diff.appenders
 
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.core.metamodel.property.Property
 
 class ValueChangeAssert {
 

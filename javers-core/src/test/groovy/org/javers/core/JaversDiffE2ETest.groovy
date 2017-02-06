@@ -3,8 +3,6 @@ package org.javers.core
 import groovy.json.JsonSlurper
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.DiffAssert
-import org.javers.core.diff.GraphPair
-import org.javers.core.diff.appenders.NewObjectAppender
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.PropertyChange
 import org.javers.core.diff.changetype.ReferenceChange
@@ -23,11 +21,8 @@ import static org.javers.core.MappingStyle.FIELD
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
 import static org.javers.core.model.DummyUser.dummyUser
-import static org.javers.core.model.DummyIgnoredPropertiesType.dummyIgnoredPropertiesType;
 import static org.javers.core.model.DummyUserWithPoint.userWithPoint
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-
-import static org.javers.core.diff.ChangeAssert.assertThat
 
 /**
  * @author bartosz walacik

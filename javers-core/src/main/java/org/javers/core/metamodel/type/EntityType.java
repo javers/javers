@@ -7,8 +7,6 @@ import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.InstanceId;
-import org.javers.core.metamodel.property.Property;
-
 import java.lang.reflect.Type;
 
 /**
@@ -35,16 +33,16 @@ import java.lang.reflect.Type;
  * @author bartosz walacik
  */
 public class EntityType extends ManagedType {
-    private final Property idProperty;
+    private final JaversProperty idProperty;
 
-    EntityType(ManagedClass entity, Property idProperty, Optional<String> typeName) {
+    EntityType(ManagedClass entity, JaversProperty idProperty, Optional<String> typeName) {
         super(entity, typeName);
         Validate.argumentIsNotNull(idProperty);
         this.idProperty = idProperty;
     }
 
-    EntityType(ManagedClass entity, Property idProperty) {
-        this(entity, idProperty, Optional.<String>empty());
+    EntityType(ManagedClass entity, JaversProperty idProperty) {
+        this(entity, idProperty, Optional.empty());
     }
 
     @Override
@@ -68,7 +66,7 @@ public class EntityType extends ManagedType {
         return super.prettyPrintBuilder().addField("idProperty", getIdProperty().getName());
     }
 
-    public Property getIdProperty() {
+    public JaversProperty getIdProperty() {
         return idProperty;
     }
 

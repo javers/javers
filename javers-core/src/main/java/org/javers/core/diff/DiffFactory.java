@@ -14,10 +14,7 @@ import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.PrimitiveType;
-import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.metamodel.type.ValueType;
+import org.javers.core.metamodel.type.*;
 
 import java.util.*;
 
@@ -138,7 +135,7 @@ public class DiffFactory {
                 continue;
             }
 
-            JaversType javersType = typeMapper.getPropertyType(property);
+            JaversType javersType = ((JaversProperty) property).getType();
 
             appendChanges(diff, pair, property, javersType, commitMetadata);
         }

@@ -34,7 +34,7 @@ class MapChangeTypeAdapter extends ChangeTypeAdapter<MapChange> {
         JsonObject jsonObject = (JsonObject) json;
         PropertyChangeStub stub = deserializeStub(jsonObject, context);
 
-        MapType mapType = typeMapper.getPropertyType(stub.property);
+        MapType mapType = stub.property.getType();
         List<EntryChange> changes = parseChanges(jsonObject, context, mapType);
 
         CommitMetadata commitMetadata = deserializeCommitMetadata(jsonObject, context);

@@ -10,8 +10,6 @@ import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -20,9 +18,6 @@ import java.util.Map;
  * @author pawel szymczyk
  */
 class ArrayChangeAppender extends CorePropertyChangeAppender<ArrayChange>{
-
-    private static final Logger logger = LoggerFactory.getLogger(ArrayChangeAppender.class);
-
     private final MapChangeAppender mapChangeAppender;
     private final TypeMapper typeMapper;
 
@@ -42,7 +37,7 @@ class ArrayChangeAppender extends CorePropertyChangeAppender<ArrayChange>{
         Map leftMap =  Arrays.asMap(pair.getLeftPropertyValue(property));
         Map rightMap = Arrays.asMap(pair.getRightPropertyValue(property));
 
-        ArrayType arrayType = typeMapper.getPropertyType(property);
+        ArrayType arrayType = ((JaversProperty) property).getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
         MapContentType mapContentType = typeMapper.getMapContentType(arrayType);
 

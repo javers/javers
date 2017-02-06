@@ -1,17 +1,16 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import static java.util.Collections.unmodifiableList;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -93,6 +92,7 @@ public final class CdoSnapshot extends Cdo {
 
     @Override
     public boolean isNull(Property property) {
+        Validate.argumentIsNotNull(property);
         return state.isNull(property.getName());
     }
 

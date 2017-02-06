@@ -51,7 +51,7 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
         Map leftRawMap =  (Map)pair.getLeftPropertyValue(property);
         Map rightRawMap = (Map)pair.getRightPropertyValue(property);
 
-        MapType mapType = typeMapper.getPropertyType(property);
+        MapType mapType = ((JaversProperty) property).getType();
         MapContentType mapContentType = typeMapper.getMapContentType(mapType);
 
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());

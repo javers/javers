@@ -36,7 +36,7 @@ public class OptionalChangeAppender extends CorePropertyChangeAppender<PropertyC
     @Override
     public PropertyChange calculateChanges(NodePair pair, Property property) {
 
-        OptionalType optionalType = typeMapper.getPropertyType(property);
+        OptionalType optionalType = ((JaversProperty) property).getType();
         JaversType contentType = typeMapper.getJaversType(optionalType.getItemType());
 
         Optional leftOptional =  normalize((Optional) pair.getLeftPropertyValue(property));

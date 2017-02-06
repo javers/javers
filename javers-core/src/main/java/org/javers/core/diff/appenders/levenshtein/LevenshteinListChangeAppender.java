@@ -8,6 +8,7 @@ import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ListType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -51,14 +52,14 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
 
         ListChange result = getListChange(pair.getGlobalId(), property, changes);
         if (result != null) {
-            ListType listType = typeMapper.getPropertyType(property);
+            ListType listType = ((JaversProperty) property).getType();
             renderNotParametrizedWarningIfNeeded(listType.getItemType(), "item", "List", property);
         }
         return result;
     }
 
     private EqualsFunction createDehydratingEqualsFunction(NodePair pair, Property property){
-        ListType listType = typeMapper.getPropertyType(property);
+        ListType listType = ((JaversProperty) property).getType();
         final JaversType listContentType = typeMapper.getJaversType(listType.getItemType());
         final OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
         return new EqualsFunction() {

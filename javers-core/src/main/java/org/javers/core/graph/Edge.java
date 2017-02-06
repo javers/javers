@@ -1,7 +1,7 @@
 package org.javers.core.graph;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 
 /**
  * Relation between (Entity) instances
@@ -11,14 +11,14 @@ import org.javers.core.metamodel.property.Property;
  * @author bartosz walacik
  */
 abstract class Edge {
-    private final Property property;
+    private final JaversProperty property;
 
-    Edge(Property property) {
+    Edge(JaversProperty property) {
         Validate.argumentIsNotNull(property);
         this.property = property;
     }
 
-    public Property getProperty() {
+    public JaversProperty getProperty() {
         return property;
     }
 

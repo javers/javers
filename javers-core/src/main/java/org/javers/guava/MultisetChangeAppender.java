@@ -10,6 +10,7 @@ import org.javers.core.diff.changetype.container.ValueAdded;
 import org.javers.core.diff.changetype.container.ValueRemoved;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.TypeMapper;
 
@@ -45,7 +46,7 @@ class MultisetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         Multiset left =  (Multiset)pair.getLeftPropertyValue(property);
         Multiset right = (Multiset)pair.getRightPropertyValue(property);
 
-        MultisetType multisetType = typeMapper.getPropertyType(property);
+        MultisetType multisetType = ((JaversProperty) property).getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
 
         List<ContainerElementChange> entryChanges = calculateEntryChanges(multisetType, left, right, owner);
