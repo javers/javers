@@ -27,7 +27,7 @@ public class CdoSnapshotStateBuilder {
             return this;
         }
 
-        if (properties.containsKey(property)){
+        if (properties.containsKey(property.getName())){
             throw new JaversException(JaversExceptionCode.SNAPSHOT_STATE_VIOLATION);
         }
 

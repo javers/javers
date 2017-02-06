@@ -57,7 +57,7 @@ public class SnapshotFactory {
 
     public CdoSnapshotState createSnapshotState(CdoWrapper cdoWrapper){
         CdoSnapshotStateBuilder stateBuilder = CdoSnapshotStateBuilder.cdoSnapshotState();
-        for (Property property : cdoWrapper.getManagedType().getProperties()) {
+        for (JaversProperty property : cdoWrapper.getManagedType().getProperties()) {
             Object propertyVal = cdoWrapper.getPropertyValue(property.getName());
             if (Objects.equals(propertyVal, Defaults.defaultValue(property.getGenericType()))) {
                 continue;
@@ -91,14 +91,13 @@ public class SnapshotFactory {
                 .withManagedType(cdoWrapper.getManagedType());
     }
 
-    private Object dehydrateProperty(Property property, Object propertyVal, GlobalId id){
-        JaversType propertyType = typeMapper.getPropertyType(property);
+    private Object dehydrateProperty(JaversProperty property, Object propertyVal, GlobalId id){
         OwnerContext owner = new PropertyOwnerContext(id, property.getName());
 
-        if (propertyType instanceof EnumerableType) {
-            return extractAndDehydrateEnumerable(propertyVal, (EnumerableType) propertyType, owner);
+        if (property.getType() instanceof EnumerableType) {
+            return extractAndDehydrateEnumerable(propertyVal, (EnumerableType) property.getType(), owner);
         } else {
-            return  globalIdFactory.dehydrate(propertyVal, propertyType, owner);
+            return  globalIdFactory.dehydrate(propertyVal, property.getType(), owner);
         }
     }
 }

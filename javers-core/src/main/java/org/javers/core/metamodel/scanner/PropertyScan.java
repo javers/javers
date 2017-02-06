@@ -3,7 +3,6 @@ package org.javers.core.metamodel.scanner;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,18 +11,13 @@ import java.util.List;
  */
 class PropertyScan {
     private final List<Property> properties;
-    private final List<Property> looksLikeId;
+    private final boolean hasId;
 
     PropertyScan(List<Property> properties) {
         Validate.argumentIsNotNull(properties);
         this.properties = properties;
-        looksLikeId = new ArrayList<>();
 
-        for (Property p : properties){
-            if (p.looksLikeId()){
-                looksLikeId.add(p);
-            }
-        }
+        hasId = properties.stream().anyMatch(p -> p.looksLikeId());
     }
 
     public Property getFirst(){
@@ -34,11 +28,7 @@ class PropertyScan {
         return Collections.unmodifiableList(properties);
     }
 
-    public List<Property> getLooksLikeId() {
-        return Collections.unmodifiableList(looksLikeId);
-    }
-
     public boolean hasId(){
-        return !looksLikeId.isEmpty();
+        return hasId;
     }
 }

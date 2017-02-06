@@ -1,8 +1,9 @@
 package org.javers.core.metamodel.object;
 
-import java.util.Optional;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.ManagedType;
+
+import java.util.Optional;
 
 import static org.javers.common.validation.Validate.*;
 

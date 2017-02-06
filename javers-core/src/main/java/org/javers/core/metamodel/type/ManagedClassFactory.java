@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.javers.common.collections.Lists.positiveFilter;
+
 /**
  * @author bartosz walacik
  */
@@ -28,19 +30,34 @@ class ManagedClassFactory {
 
     ManagedClass create(Class<?> baseJavaClass){
         ClassScan scan = classScanner.scan(baseJavaClass);
-        return new ManagedClass(baseJavaClass, scan.getProperties(), scan.getLooksLikeId());
+        List<JaversProperty> allProperties = convert(scan.getProperties());
+        return new ManagedClass(baseJavaClass, allProperties,
+                positiveFilter(allProperties, p -> p.looksLikeId()));
     }
 
     ManagedClass create(ClientsClassDefinition def){
         ClassScan scan = classScanner.scan(def.getBaseJavaClass());
-        List<Property> filtered = filterIgnored(scan.getProperties(), def);
+        List<JaversProperty> allProperties = convert(scan.getProperties());
+        List<JaversProperty> filtered = filterIgnored(allProperties, def);
         filtered = filterIgnoredType(filtered, def.getBaseJavaClass());
-        return new ManagedClass(def.getBaseJavaClass(), filtered, scan.getLooksLikeId());
+
+        return new ManagedClass(def.getBaseJavaClass(), filtered,
+                positiveFilter(allProperties, p -> p.looksLikeId()));
     }
 
-    private List<Property> filterIgnoredType(List<Property> properties, final Class<?> currentClass){
+    private List<JaversProperty> convert(List<Property> properties) {
+        return Lists.transform(properties,  p -> {
+            if (typeMapper.contains(p.getGenericType())) {
+                final JaversType javersType = typeMapper.getJaversType(p.getGenericType());
+                return new JaversProperty(() -> javersType, p);
+            }
+            return new JaversProperty(() -> typeMapper.getJaversType(p.getGenericType()), p);
+        });
+    }
 
-        return Lists.negativeFilter(properties, property -> {
+    private List<JaversProperty> filterIgnoredType(List<JaversProperty> properties, final Class<?> currentClass){
+
+        return (List)Lists.negativeFilter(properties, property -> {
             if (property.getRawType() == currentClass){
                 return false;
             }
@@ -54,22 +71,22 @@ class ManagedClassFactory {
         });
     }
 
-    private List<Property> filterIgnored(List<Property> properties, ClientsClassDefinition definition){
+    private List<JaversProperty> filterIgnored(List<JaversProperty> properties, ClientsClassDefinition definition){
         if (definition.getIgnoredProperties().isEmpty()){
             return properties;
         }
 
-        List<Property> filtered = new ArrayList<>(properties);
+        List<JaversProperty> filtered = new ArrayList<>(properties);
         for (String ignored : definition.getIgnoredProperties()){
             filterOneProperty(filtered, ignored, definition.getBaseJavaClass());
         }
         return filtered;
     }
 
-    private void filterOneProperty(List<Property> properties, String ignoredName, Class<?> clientsClass) {
-        Iterator<Property> it = properties.iterator();
+    private void filterOneProperty(List<JaversProperty> properties, String ignoredName, Class<?> clientsClass) {
+        Iterator<JaversProperty> it = properties.iterator();
         while (it.hasNext()) {
-            Property property = it.next();
+            JaversProperty property = it.next();
             if (property.getName().equals(ignoredName)) {
                 it.remove();
                 return;

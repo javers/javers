@@ -1,8 +1,6 @@
 package org.javers.core.diff.appenders
 
 import org.javers.core.diff.changetype.ReferenceChange
-import org.javers.core.metamodel.object.GlobalId
-import org.javers.core.metamodel.property.Property
 
 /**
  * @author bartosz walacik

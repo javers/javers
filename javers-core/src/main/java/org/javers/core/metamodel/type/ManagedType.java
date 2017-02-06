@@ -1,13 +1,12 @@
 package org.javers.core.metamodel.type;
 
-import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Property;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -41,15 +40,15 @@ public abstract class ManagedType extends JaversType {
     /**
      * @throws JaversException PROPERTY_NOT_FOUND
      */
-    public Property getProperty(String propertyName) {
+    public JaversProperty getProperty(String propertyName) {
         return managedClass.getProperty(propertyName);
     }
 
-    public List<Property> getProperties(Predicate<Property> query) {
+    public List<JaversProperty> getProperties(Predicate<JaversProperty> query) {
         return managedClass.getManagedProperties(query);
     }
 
-    public List<Property> getProperties() {
+    public List<JaversProperty> getProperties() {
         return managedClass.getManagedProperties();
     }
 

@@ -1,7 +1,6 @@
 package org.javers.core.diff.custom;
 
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 

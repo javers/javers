@@ -1,7 +1,8 @@
 package org.javers.core.metamodel.scanner;
 
-import java.util.Optional;
 import org.javers.core.metamodel.property.Property;
+
+import java.util.Optional;
 
 import java.util.List;
 
@@ -19,10 +20,6 @@ public class ClassScan {
 
     public List<Property> getProperties() {
         return propertyScan.getProperties();
-    }
-
-    public List<Property> getLooksLikeId() {
-        return propertyScan.getLooksLikeId();
     }
 
     public boolean hasIdProperty() {

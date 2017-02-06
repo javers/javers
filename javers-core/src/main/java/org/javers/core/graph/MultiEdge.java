@@ -1,10 +1,10 @@
 package org.javers.core.graph;
 
-import org.javers.core.metamodel.property.Property;
-
+import org.javers.core.metamodel.type.JaversProperty;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 /**
  * OneToMany or ManyToMany relation
  * @author bartosz walacik
@@ -12,7 +12,7 @@ import java.util.List;
 class MultiEdge extends Edge {
     private final List<ObjectNode> references; //should not be empty
 
-    public MultiEdge(Property property) {
+    public MultiEdge(JaversProperty property) {
         super(property);
         references = new ArrayList<>();
     }

@@ -1,10 +1,8 @@
 package org.javers.core.metamodel.type;
 
-import java.util.Optional;
-import org.javers.core.metamodel.property.Property;
-
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * ValueObject class in client's domain model.
@@ -34,8 +32,8 @@ public class ValueObjectType extends ManagedType{
         super(valueObject);
     }
 
-    public ValueObjectType(Class baseJavaClass, List<Property> allProperties){
-        this(new ManagedClass(baseJavaClass, allProperties, Collections.<Property>emptyList()));
+    public ValueObjectType(Class baseJavaClass, List<JaversProperty> allProperties){
+        this(new ManagedClass(baseJavaClass, allProperties, Collections.emptyList()));
     }
 
     ValueObjectType(ManagedClass valueObject, Optional<String> typeName) {
