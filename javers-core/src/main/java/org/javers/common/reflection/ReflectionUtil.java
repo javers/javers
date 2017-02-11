@@ -270,7 +270,7 @@ public class ReflectionUtil {
 
         StringBuilder ret = new StringBuilder();
         for (JaversField f : getAllPersistentFields(cdoId.getClass()) ){
-            Object val = f.invokeEvenIfPrivate(cdoId);
+            Object val = f.getEvenIfPrivate(cdoId);
             if (val != null) {
                 ret.append(val.toString());
             }

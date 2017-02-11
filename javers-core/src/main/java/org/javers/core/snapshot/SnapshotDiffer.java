@@ -69,8 +69,8 @@ public class SnapshotDiffer {
         changes.addAll(diff.getChanges());
     }
 
-    private ShadowGraph shadowGraph(CdoSnapshot snapshot) {
-        return new ShadowGraph(Sets.asSet(new ObjectNode(snapshot)));
+    private SnapshotGraph shadowGraph(CdoSnapshot snapshot) {
+        return new SnapshotGraph(Sets.asSet(new ObjectNode(snapshot)));
     }
 
     private Optional<CommitMetadata> commitMetadata(CdoSnapshot snapshot) {
