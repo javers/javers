@@ -118,7 +118,7 @@ class ShadowFactoryTest extends Specification {
       shadow.entityRef.intProperty == 2
     }
 
-    def "should support cycles"(){
+    def "should support circular references"(){
         given:
         def e = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2, intProperty:2))
         e.entityRef.entityRef = e
@@ -133,7 +133,7 @@ class ShadowFactoryTest extends Specification {
         shadow.id == 1
         shadow.entityRef instanceof SnapshotEntity
         shadow.entityRef.id == 2
-        shadow.entityRef.entityRef == null //no circular references for now (due to Gson limitations)
+        identityHashCode(shadow.entityRef.entityRef) == identityHashCode(shadow)
     }
 
     Function byIdSnapshotSupplier() {

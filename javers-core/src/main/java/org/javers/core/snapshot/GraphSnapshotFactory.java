@@ -3,6 +3,7 @@ package org.javers.core.snapshot;
 import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.diff.ObjectGraph;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -28,7 +29,7 @@ class GraphSnapshotFactory {
     /**
      * @param currentVersion outcome from ObjectGraphBuilder.buildGraph()
      */
-    List<CdoSnapshot> create(LiveGraph currentVersion, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata){
+    List<CdoSnapshot> create(LiveGraph currentVersion, ObjectGraph<CdoSnapshot> latestShadowGraph, CommitMetadata commitMetadata){
         Validate.argumentsAreNotNull(currentVersion, commitMetadata, latestShadowGraph);
 
         List<CdoSnapshot> result = new ArrayList<>();
@@ -65,7 +66,7 @@ class GraphSnapshotFactory {
         }
     }
 
-    private boolean isInitial(ObjectNode node, ShadowGraph latestShadowGraph){
+    private boolean isInitial(ObjectNode node, ObjectGraph latestShadowGraph){
         return !latestShadowGraph.contains(node);
     }
 }

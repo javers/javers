@@ -1,74 +1,64 @@
 package org.javers.shadow;
 
-import com.google.gson.JsonObject;
-import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.property.Property;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Stateful builder
- *
  * @author bartosz.walacik
  */
 class ShadowBuilder {
-    private final JsonConverter jsonConverter;
-    private final Function<GlobalId, CdoSnapshot> referenceResolver;
-    private boolean built = false;
-    private Map<GlobalId, JsonObject> builtNodes = new HashMap<>();
+    private final CdoSnapshot cdoSnapshot;
+    private Object shadow;
+    private Set<Wiring> wirings = new HashSet<>();
 
-    ShadowBuilder(JsonConverter jsonConverter, Function<GlobalId, CdoSnapshot> referenceResolver) {
-        this.jsonConverter = jsonConverter;
-        this.referenceResolver = referenceResolver;
+    ShadowBuilder(CdoSnapshot cdoSnapshot) {
+        this.cdoSnapshot = cdoSnapshot;
     }
 
-    Object buildDeepShadow(CdoSnapshot cdoSnapshot) {
-        switchToBuilt();
-
-        return jsonConverter.fromJson(assembleStateToJsonNode(cdoSnapshot),
-                cdoSnapshot.getManagedType().getBaseJavaClass());
+    void withStub(Object shadowStub) {
+        this.shadow = shadowStub;
     }
 
-    private void switchToBuilt() {
-        if (built) {
-            throw new IllegalStateException("already built");
+    Object getShadow() {
+        return shadow;
+    }
+
+    CdoSnapshot getCdoSnapshot() {
+        return cdoSnapshot;
+    }
+
+    void addReferenceWiring(Property property, ShadowBuilder targetShadow) {
+        this.wirings.add(new ReferenceWiring(property, targetShadow));
+    }
+
+    void wire() {
+        wirings.forEach(Wiring::wire);
+    }
+
+    private abstract class Wiring {
+        final Property property;
+
+        Wiring(Property property) {
+            this.property = property;
         }
-        built = true;
+
+        abstract void wire();
     }
 
-    private JsonObject assembleStateToJsonNode(CdoSnapshot cdoSnapshot) {
-        JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(cdoSnapshot.getState());
+    private class ReferenceWiring extends Wiring {
+        final ShadowBuilder target;
 
-        builtNodes.put(cdoSnapshot.getGlobalId(), jsonElement);
+        ReferenceWiring(Property property, ShadowBuilder targetShadow) {
+            super(property);
+            this.target = targetShadow;
+        }
 
-        return resolveOrNullReferences(cdoSnapshot, jsonElement);
-    }
-
-    private JsonObject resolveOrNullReferences(CdoSnapshot cdoSnapshot, JsonObject jsonElement){
-
-        cdoSnapshot.getManagedType().forEachProperty( property -> {
-            if (property.getType() instanceof ManagedType && !cdoSnapshot.isNull(property)) {
-
-                GlobalId refId = (GlobalId) cdoSnapshot.getPropertyValue(property);
-
-                CdoSnapshot ref = referenceResolver.apply(refId);
-                if (ref == null) { //nullify unavailable reference
-                    jsonElement.remove(property.getName());
-                }
-                else if (!builtNodes.containsKey(refId)){
-                    //recursion here
-                    jsonElement.add(property.getName(), assembleStateToJsonNode(ref));
-                }
-                else { //circular references are not supported by Gson, so nullify for now
-                    jsonElement.remove(property.getName());
-                }
-            }
-        });
-
-        return jsonElement;
+        @Override
+        void wire() {
+            property.set(shadow, target.shadow);
+        }
     }
 }

@@ -8,13 +8,13 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
+import org.javers.core.diff.ObjectGraph;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.snapshot.GraphSnapshotFacade;
-import org.javers.core.snapshot.ShadowGraph;
 import org.javers.core.snapshot.SnapshotFactory;
 import org.javers.repository.api.JaversExtendedRepository;
 
@@ -65,7 +65,7 @@ public class CommitFactory {
         Validate.argumentsAreNotNull(author, currentVersion);
         CommitMetadata commitMetadata = nextCommit(author, properties);
         LiveGraph currentGraph = liveGraphFactory.createLiveGraph(currentVersion);
-        ShadowGraph latestShadowGraph = graphSnapshotFacade.createLatestShadow(currentGraph);
+        ObjectGraph<CdoSnapshot> latestShadowGraph = graphSnapshotFacade.createLatestShadow(currentGraph);
         List<CdoSnapshot> snapshots = graphSnapshotFacade.createGraphSnapshot(currentGraph, latestShadowGraph, commitMetadata);
         Diff diff = diffFactory.create(latestShadowGraph, currentGraph, Optional.of(commitMetadata));
         return new Commit(commitMetadata, snapshots, diff);

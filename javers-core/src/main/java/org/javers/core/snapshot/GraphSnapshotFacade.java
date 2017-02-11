@@ -1,6 +1,7 @@
 package org.javers.core.snapshot;
 
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.diff.ObjectGraph;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.metamodel.object.CdoSnapshot;
 
@@ -18,11 +19,11 @@ public class GraphSnapshotFacade {
         this.shadowGraphFactory = shadowGraphFactory;
     }
 
-    public ShadowGraph createLatestShadow(LiveGraph currentGraph) {
+    public SnapshotGraph createLatestShadow(LiveGraph currentGraph) {
         return shadowGraphFactory.createLatestShadow(currentGraph);
     }
 
-    public List<CdoSnapshot> createGraphSnapshot(LiveGraph currentGraph, ShadowGraph latestShadowGraph, CommitMetadata commitMetadata) {
+    public List<CdoSnapshot> createGraphSnapshot(LiveGraph currentGraph, ObjectGraph<CdoSnapshot> latestShadowGraph, CommitMetadata commitMetadata) {
         return graphSnapshotFactory.create(currentGraph, latestShadowGraph, commitMetadata);
     }
 }

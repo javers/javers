@@ -22,8 +22,7 @@ public class ShadowFactory {
     }
 
     Object createShadow(CdoSnapshot cdoSnapshot, Function<GlobalId, CdoSnapshot> referenceResolver) {
-        ShadowBuilder builder = new ShadowBuilder(jsonConverter, referenceResolver);
+        ShadowGraphBuilder builder = new ShadowGraphBuilder(jsonConverter, referenceResolver);
         return builder.buildDeepShadow(cdoSnapshot);
     }
-
 }

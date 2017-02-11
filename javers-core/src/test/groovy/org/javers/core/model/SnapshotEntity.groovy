@@ -23,9 +23,9 @@ class SnapshotEntity {
 
     int intProperty
 
-    SnapshotEntity entityRef
+    private SnapshotEntity entityRef
 
-    DummyAddress valueObjectRef
+    private DummyAddress valueObjectRef
 
     Integer[] arrayOfIntegers
     int[] arrayOfInts

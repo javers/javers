@@ -10,7 +10,7 @@ import java.util.Set;
 
 
 /**
- * Builds ShadowGraph from latest snapshots loaded from javersRepository
+ * Builds SnapshotGraph from latest snapshots loaded from javersRepository
  *
  * @author bartosz walacik
  */
@@ -21,7 +21,7 @@ class ShadowGraphFactory {
         this.javersRepository = javersRepository;
     }
 
-    ShadowGraph createLatestShadow(LiveGraph liveGraph){
+    SnapshotGraph createLatestShadow(LiveGraph liveGraph){
         Validate.argumentIsNotNull(liveGraph);
 
         Set<ObjectNode> snapshotNodes = new HashSet<>();
@@ -30,6 +30,6 @@ class ShadowGraphFactory {
                     .map(s -> snapshotNodes.add(new ObjectNode(s)));
         }
 
-        return new ShadowGraph(snapshotNodes);
+        return new SnapshotGraph(snapshotNodes);
     }
 }
