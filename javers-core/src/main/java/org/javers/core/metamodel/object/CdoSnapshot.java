@@ -117,11 +117,11 @@ public final class CdoSnapshot extends Cdo {
         return state;
     }
 
-    public <R> List<R> mapProperties(BiFunction<String, Object, R> mapper) {
+    <R> List<R> mapProperties(BiFunction<String, Object, R> mapper) {
         return getState().mapProperties(mapper);
     }
 
-    public void forEachProperty(BiConsumer<String, Object> consumer) {
+    void forEachProperty(BiConsumer<String, Object> consumer) {
         getState().forEachProperty(consumer);
     }
 

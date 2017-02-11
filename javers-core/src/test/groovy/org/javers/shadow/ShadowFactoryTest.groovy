@@ -3,12 +3,13 @@ package org.javers.shadow
 import com.google.common.collect.HashMultiset
 import org.javers.core.Javers
 import org.javers.core.JaversTestBuilder
+import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.PrimitiveEntity
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.model.SomeEnum
 import org.javers.guava.MultimapBuilder
 import org.javers.repository.jql.QueryBuilder
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -94,16 +95,17 @@ class ShadowFactoryTest extends Specification {
              }]
     }
 
-    @Ignore
     def "should resolve Entity ref in a simple case "(){
       given:
-      def e = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2, intProperty:2))
+      def e = new SnapshotEntity(id:1,
+                                 entityRef: new SnapshotEntity(id:2, intProperty:2),
+                                 valueObjectRef: new DummyAddress("unavailable ref"))
       javers.commit("author", e)
 
       when:
       def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
       def shadow = shadowFactory.createShadow(snapshots[0], { id ->
-          if (id.cdoId == 2) {
+          if (id instanceof InstanceId && id.cdoId == 2) {
               return javers.findSnapshots(QueryBuilder.byInstanceId(2, SnapshotEntity).build())[0]
           }
           null
@@ -111,6 +113,9 @@ class ShadowFactoryTest extends Specification {
 
       then:
       shadow instanceof SnapshotEntity
+
+      shadow.valueObjectRef == null
+
       shadow.entityRef instanceof SnapshotEntity
       shadow.entityRef.id == 2
       shadow.entityRef.intProperty == 2
