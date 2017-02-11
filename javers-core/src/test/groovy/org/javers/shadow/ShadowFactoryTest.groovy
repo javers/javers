@@ -15,6 +15,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.time.LocalDate
+import java.util.function.Function
 
 import static java.lang.System.identityHashCode
 import static java.time.LocalDate.now
@@ -104,20 +105,43 @@ class ShadowFactoryTest extends Specification {
 
       when:
       def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
-      def shadow = shadowFactory.createShadow(snapshots[0], { id ->
-          if (id instanceof InstanceId && id.cdoId == 2) {
-              return javers.findSnapshots(QueryBuilder.byInstanceId(2, SnapshotEntity).build())[0]
-          }
-          null
-      })
+      def shadow = shadowFactory.createShadow(snapshots[0], byIdSnapshotSupplier())
 
       then:
       shadow instanceof SnapshotEntity
+      shadow.id == 1
 
       shadow.valueObjectRef == null
 
       shadow.entityRef instanceof SnapshotEntity
       shadow.entityRef.id == 2
       shadow.entityRef.intProperty == 2
+    }
+
+    def "should support cycles"(){
+        given:
+        def e = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2, intProperty:2))
+        e.entityRef.entityRef = e
+        javers.commit("author", e)
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+        def shadow = shadowFactory.createShadow(snapshots[0], byIdSnapshotSupplier())
+
+        then:
+        shadow instanceof SnapshotEntity
+        shadow.id == 1
+        shadow.entityRef instanceof SnapshotEntity
+        shadow.entityRef.id == 2
+        shadow.entityRef.entityRef == null //no circular references for now (due to Gson limitations)
+    }
+
+    Function byIdSnapshotSupplier() {
+        return { id ->
+            if (id instanceof InstanceId && (id.cdoId == 1 || id.cdoId == 2)) {
+                return javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, SnapshotEntity).build())[0]
+            }
+            null
+        }
     }
 }
