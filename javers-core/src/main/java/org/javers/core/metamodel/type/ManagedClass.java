@@ -4,6 +4,7 @@ import org.javers.common.collections.Lists;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static org.javers.common.exception.JaversExceptionCode.PROPERTY_NOT_FOUND;
@@ -73,6 +74,10 @@ class ManagedClass {
             throw new JaversException(PROPERTY_NOT_FOUND, withName, baseJavaClass.getName());
         }
         return propertiesByName.get(withName);
+    }
+
+    void forEachProperty(Consumer<JaversProperty> consumer) {
+        managedProperties.forEach(p -> consumer.accept(p));
     }
 
     Class<?> getBaseJavaClass() {

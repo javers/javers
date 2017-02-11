@@ -1095,4 +1095,22 @@ class JaversRepositoryE2ETest extends Specification {
         def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject().build())
         (snapshots.collect{it -> it.commitId} as Set).size() == threads
     }
+
+    def "should return mutable collections for easy sorting"(){
+        given:
+        def paris =   new DummyAddress(city: "Paris")
+        def london =  new DummyAddress(city: "london")
+
+        javers.commit("a", paris)
+        javers.commit("a", london)
+
+        when:
+        def col = javers.findSnapshots(QueryBuilder.anyDomainObject().build())
+        col.add(null)
+        col = javers.findChanges(QueryBuilder.anyDomainObject().build())
+        col.add(null)
+
+        then:
+        noExceptionThrown()
+    }
 }

@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -50,6 +51,10 @@ public abstract class ManagedType extends JaversType {
 
     public List<JaversProperty> getProperties() {
         return managedClass.getManagedProperties();
+    }
+
+    public void forEachProperty(Consumer<JaversProperty> consumer) {
+        managedClass.forEachProperty(consumer);
     }
 
     public Set<String> getPropertyNames(){
