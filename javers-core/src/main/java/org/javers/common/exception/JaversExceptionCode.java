@@ -28,6 +28,8 @@ public enum JaversExceptionCode {
 
     PROPERTY_ACCESS_ERROR("error getting value from property '%s' on target object of type '%s', cause: %s"),
 
+    PROPERTY_SETTING_ERROR("error setting '%s' value to property '%s', cause: %s"),
+
     CONTAINER_NOT_READY(JaversException.BOOTSTRAP_ERROR +"pico container is not ready"),
 
     AFFECTED_CDO_IS_NOT_AVAILABLE("affected cdo is not available, you can access it only for freshly generated diffs"),

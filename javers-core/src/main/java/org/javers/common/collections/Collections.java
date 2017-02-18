@@ -17,4 +17,13 @@ public class Collections {
             throw new IllegalArgumentException("At this moment Javers don't support "  + first.getClass().getSimpleName());
         }
     }
+
+    public static Collection wrapNull(Object sourceCollection) {
+        if (sourceCollection == null) {
+            return java.util.Collections.emptySet();
+        }
+        else{
+            return (Collection)sourceCollection;
+        }
+    }
 }

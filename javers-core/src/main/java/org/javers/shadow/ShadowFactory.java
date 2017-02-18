@@ -3,7 +3,7 @@ package org.javers.shadow;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-
+import org.javers.core.metamodel.type.TypeMapper;
 import java.util.function.Function;
 
 /**
@@ -12,9 +12,11 @@ import java.util.function.Function;
 public class ShadowFactory {
 
     private final JsonConverter jsonConverter;
+    private final TypeMapper typeMapper;
 
-    public ShadowFactory(JsonConverter jsonConverter) {
+    public ShadowFactory(JsonConverter jsonConverter, TypeMapper typeMapper) {
         this.jsonConverter = jsonConverter;
+        this.typeMapper = typeMapper;
     }
 
     Object createShadow(CdoSnapshot cdoSnapshot) {
@@ -22,7 +24,7 @@ public class ShadowFactory {
     }
 
     Object createShadow(CdoSnapshot cdoSnapshot, Function<GlobalId, CdoSnapshot> referenceResolver) {
-        ShadowGraphBuilder builder = new ShadowGraphBuilder(jsonConverter, referenceResolver);
+        ShadowGraphBuilder builder = new ShadowGraphBuilder(jsonConverter, referenceResolver, typeMapper);
         return builder.buildDeepShadow(cdoSnapshot);
     }
 }

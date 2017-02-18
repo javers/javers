@@ -13,11 +13,11 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 public class Lists {
 
-    public static List wrapNull(List list){
+    public static List wrapNull(Object list){
         if (list == null){
             return Collections.emptyList();
         }
-        return list;
+        return (List)list;
     }
 
     public static <T> List<T> immutableListOf(T... elements){

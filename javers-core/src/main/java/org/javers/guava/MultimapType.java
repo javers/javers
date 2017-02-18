@@ -4,6 +4,8 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import org.javers.common.collections.EnumerableFunction;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.type.KeyValueType;
@@ -12,6 +14,7 @@ import org.javers.core.metamodel.type.MapEnumerationOwnerContext;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
 
 import static org.javers.guava.Multimaps.toNotNullMultimap;
 
@@ -30,9 +33,9 @@ public class MultimapType extends KeyValueType {
     }
 
     @Override
-    public Multimap map(Object sourceMap_, EnumerableFunction mapFunction, OwnerContext owner) {
+    public Multimap map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentIsNotNull(mapFunction);
-        Multimap sourceMultimap = toNotNullMultimap(sourceMap_);
+        Multimap sourceMultimap = toNotNullMultimap(sourceEnumerable);
         Multimap targetMultimap = ArrayListMultimap.create();
 
         MapEnumerationOwnerContext enumeratorContext = new MapEnumerationOwnerContext(owner, true);
@@ -56,5 +59,10 @@ public class MultimapType extends KeyValueType {
     @Override
     public boolean isEmpty(Object container){
         return container == null || ((Multimap) container).isEmpty();
+    }
+
+    @Override
+    public Object map(Object sourceEnumerable, Function mapFunction) {
+        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
     }
 }
