@@ -1,9 +1,11 @@
 package org.javers.shadow;
 
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.ContainerType;
+import org.javers.core.metamodel.type.JaversProperty;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,8 +32,12 @@ class ShadowBuilder {
         return cdoSnapshot;
     }
 
-    void addReferenceWiring(Property property, ShadowBuilder targetShadow) {
+    void addReferenceWiring(JaversProperty property, ShadowBuilder targetShadow) {
         this.wirings.add(new ReferenceWiring(property, targetShadow));
+    }
+
+    void addReferenceContainerWiring(JaversProperty property, List<ShadowBuilder> targetShadows) {
+        this.wirings.add(new ReferenceContainerWiring(property, targetShadows));
     }
 
     void wire() {
@@ -39,9 +45,9 @@ class ShadowBuilder {
     }
 
     private abstract class Wiring {
-        final Property property;
+        final JaversProperty property;
 
-        Wiring(Property property) {
+        Wiring(JaversProperty property) {
             this.property = property;
         }
 
@@ -51,7 +57,7 @@ class ShadowBuilder {
     private class ReferenceWiring extends Wiring {
         final ShadowBuilder target;
 
-        ReferenceWiring(Property property, ShadowBuilder targetShadow) {
+        ReferenceWiring(JaversProperty property, ShadowBuilder targetShadow) {
             super(property);
             this.target = targetShadow;
         }
@@ -59,6 +65,22 @@ class ShadowBuilder {
         @Override
         void wire() {
             property.set(shadow, target.shadow);
+        }
+    }
+
+    private class ReferenceContainerWiring extends Wiring {
+        final List<ShadowBuilder> targetShadows;
+
+        ReferenceContainerWiring(JaversProperty property, List<ShadowBuilder> targetShadows) {
+            super(property);
+            this.targetShadows = targetShadows;
+        }
+
+        @Override
+        void wire() {
+            ContainerType propertyType = property.getType();
+            Object targetContainer = propertyType.map(targetShadows, (target) -> ((ShadowBuilder)target).shadow);
+            property.set(shadow, targetContainer);
         }
     }
 }

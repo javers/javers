@@ -26,9 +26,9 @@ public class MultisetType extends CollectionType{
     }
 
     @Override
-    public Object map(Object sourceMultiset_, EnumerableFunction mapFunction, OwnerContext owner) {
+    public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentIsNotNull(mapFunction);
-        Multiset sourceMultiset = toNotNullMultiset(sourceMultiset_);
+        Multiset sourceMultiset = toNotNullMultiset(sourceEnumerable);
         Multiset targetMultiset = HashMultiset.create();
 
         EnumerationAwareOwnerContext enumeratorContext = new EnumerationAwareOwnerContext(owner, true);

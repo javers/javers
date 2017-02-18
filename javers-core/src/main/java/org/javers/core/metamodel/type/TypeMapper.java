@@ -92,6 +92,17 @@ public class TypeMapper {
     }
 
     /**
+     * is Set, List or Array of ManagedClasses
+     */
+    public boolean isContainerOfManagedTypes(JaversType javersType){
+        if (! (javersType instanceof ContainerType)) {
+            return false;
+        }
+
+        return getJaversType(((ContainerType)javersType).getItemType()) instanceof ManagedType;
+    }
+
+    /**
      * returns mapped type or spawns new one from prototype
      * or infers new one using default mapping
      */

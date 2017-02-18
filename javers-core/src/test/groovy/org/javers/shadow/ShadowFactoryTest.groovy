@@ -14,6 +14,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.lang.reflect.Array
 import java.time.LocalDate
 import java.util.function.Function
 
@@ -136,9 +137,68 @@ class ShadowFactoryTest extends Specification {
         identityHashCode(shadow.entityRef.entityRef) == identityHashCode(shadow)
     }
 
+    def "should support #container of Entities"(){
+        given:
+        javers.commit("author", cdo)
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+        def shadow = shadowFactory.createShadow(snapshots[0], byIdSupplier())
+
+        then:
+        shadow.properties[pName].class.simpleName == className
+        shadow.properties[pName].size() == 2
+
+        shadow.properties[pName][0] instanceof SnapshotEntity
+        shadow.properties[pName][0].id == 2
+        shadow.properties[pName][0].intProperty == 2
+
+        shadow.properties[pName][1] instanceof SnapshotEntity
+        shadow.properties[pName][1].id == 3
+        shadow.properties[pName][1].intProperty == 3
+
+        where:
+        container << ['List', 'Array']
+        className << ['ArrayList', 'SnapshotEntity[]']
+        cdo << [new SnapshotEntity(id:1,
+                        listOfEntities: [new SnapshotEntity(id:2, intProperty:2), new SnapshotEntity(id:3, intProperty:3)]),
+                new SnapshotEntity(id:1,
+                        arrayOfEntities: [new SnapshotEntity(id:2, intProperty:2), new SnapshotEntity(id:3, intProperty:3)])]
+        pName << ['listOfEntities','arrayOfEntities']
+
+    }
+
+    def "should support Set of ValueObjects"(){
+        given:
+        def cdo = new SnapshotEntity(id:1,
+                setOfValueObjects: [new DummyAddress('London'), new DummyAddress('Paris')])
+        javers.commit("author", cdo)
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+        def shadow = shadowFactory.createShadow(snapshots[0], byIdSupplier())
+
+        then:
+        shadow.setOfValueObjects instanceof Set
+        shadow.setOfValueObjects.size() == 2
+
+        shadow.setOfValueObjects.find{it -> it.city == 'London'} instanceof DummyAddress
+        shadow.setOfValueObjects.find{it -> it.city == 'Paris'} instanceof DummyAddress
+    }
+
+    Function byIdSupplier() {
+        return { id ->
+            if (id instanceof InstanceId) {
+                return javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, SnapshotEntity).build())[0]
+            } else {
+                return javers.findSnapshots(QueryBuilder.byValueObject(SnapshotEntity, id.fragment).build())[0]
+            }
+        }
+    }
+
     Function byIdSnapshotSupplier() {
         return { id ->
-            if (id instanceof InstanceId && (id.cdoId == 1 || id.cdoId == 2)) {
+            if (id instanceof InstanceId && id.cdoId) {
                 return javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, SnapshotEntity).build())[0]
             }
             null

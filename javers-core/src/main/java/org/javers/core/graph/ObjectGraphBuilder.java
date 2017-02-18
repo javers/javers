@@ -110,7 +110,7 @@ class ObjectGraphBuilder {
             if (!(property.getType() instanceof EnumerableType)) {
                 return false;
             }
-            EnumerableType enumerableType = (EnumerableType) property.getType();
+            EnumerableType enumerableType = property.getType();
 
             Object container = node.getPropertyValue(property);
             if (enumerableType.isEmpty(container)) {
@@ -120,25 +120,10 @@ class ObjectGraphBuilder {
             if (node.isNull(property)) {
                 return false;
             }
-            return (isContainerOfManagedTypes(enumerableType) ||
+            return (typeMapper.isContainerOfManagedTypes(enumerableType) ||
                 isMapWithManagedTypes(enumerableType)
             );
         });
-    }
-
-    /**
-     * is Set, List or Array of ManagedClasses
-     */
-    private boolean isContainerOfManagedTypes(JaversType javersType){
-        if (! (javersType instanceof ContainerType)) {
-            return false;
-        }
-
-        return isItemManagedType((ContainerType) javersType);
-    }
-
-    private boolean isItemManagedType(ContainerType containerType){
-        return typeMapper.getJaversType(containerType.getItemType()) instanceof ManagedType;
     }
 
     /**
