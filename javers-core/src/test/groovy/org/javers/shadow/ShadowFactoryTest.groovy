@@ -1,5 +1,6 @@
 package org.javers.shadow
 
+import com.google.common.collect.HashMultimap
 import com.google.common.collect.HashMultiset
 import org.javers.core.Javers
 import org.javers.core.JaversTestBuilder
@@ -8,6 +9,7 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.PrimitiveEntity
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.model.SomeEnum
+import org.javers.guava.MultimapBuilder
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Shared
 import spock.lang.Specification
@@ -18,7 +20,6 @@ import java.util.function.Function
 
 import static java.lang.System.identityHashCode
 import static java.time.LocalDate.now
-import static org.javers.guava.MultimapBuilder.create
 
 /**
  * @author bartosz.walacik
@@ -91,7 +92,7 @@ class ShadowFactoryTest extends Specification {
               },
               {  def v2 = new SnapshotEntity()
                  v2.multiSetOfPrimitives = HashMultiset.create(['a','a'])
-                 v2.multiMapOfPrimitives = create([a:['a','b','c']])
+                 v2.multiMapOfPrimitives = MultimapBuilder.create([a:['a', 'b', 'c']])
                  v2
              }]
     }
@@ -239,7 +240,7 @@ class ShadowFactoryTest extends Specification {
     def "should support Multimap with mixed content"() {
         given:
         def cdo = new SnapshotEntity(id: 1,
-                multiMapPrimitiveToEntity: create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]]))
+                multiMapPrimitiveToEntity: MultimapBuilder.create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]]))
         javers.commit("author", cdo)
 
         when:
@@ -248,6 +249,20 @@ class ShadowFactoryTest extends Specification {
 
         then:
         shadow.multiMapPrimitiveToEntity.get("NY") == [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]
+    }
+
+    def "should support Multiset with Entities"() {
+        given:
+        def cdo = new SnapshotEntity(id: 1,
+                multiSetOfEntities: HashMultiset.create([new SnapshotEntity(id:2), new SnapshotEntity(id:2)]))
+        javers.commit("author", cdo)
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+        def shadow = shadowFactory.createShadow(snapshots[0], byIdSupplier())
+
+        then:
+        shadow.multiSetOfEntities == HashMultiset.create([new SnapshotEntity(id:2), new SnapshotEntity(id:2)])
     }
 
     Function byIdSupplier() {
