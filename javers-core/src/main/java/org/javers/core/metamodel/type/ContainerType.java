@@ -1,9 +1,6 @@
 package org.javers.core.metamodel.type;
 
 import java.lang.reflect.Type;
-import java.util.List;
-import java.util.function.Function;
-
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 
 /**
@@ -30,10 +27,4 @@ public abstract class ContainerType extends EnumerableType {
     public Class getItemClass(){
         return extractClass(getItemType());
     }
-
-    /**
-     * Returns a List with items from sourceEnumerable mapped by mapFunction. <br/>
-     * Nulls are filtered
-     */
-    public abstract List mapToList(Object sourceContainer, Function mapFunction);
 }

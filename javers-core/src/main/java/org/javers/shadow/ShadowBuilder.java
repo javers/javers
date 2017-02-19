@@ -2,10 +2,10 @@ package org.javers.shadow;
 
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.type.ContainerType;
+import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversProperty;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -36,8 +36,8 @@ class ShadowBuilder {
         this.wirings.add(new ReferenceWiring(property, targetShadow));
     }
 
-    void addReferenceContainerWiring(JaversProperty property, List<ShadowBuilder> targetShadows) {
-        this.wirings.add(new ReferenceContainerWiring(property, targetShadows));
+    void addEnumerableWiring(JaversProperty property, Object targetWithShadows) {
+        this.wirings.add(new EnumerableWiring(property, targetWithShadows));
     }
 
     void wire() {
@@ -68,19 +68,29 @@ class ShadowBuilder {
         }
     }
 
-    private class ReferenceContainerWiring extends Wiring {
-        final List<ShadowBuilder> targetShadows;
+    private class EnumerableWiring extends Wiring {
+        final Object targetWithShadows;
 
-        ReferenceContainerWiring(JaversProperty property, List<ShadowBuilder> targetShadows) {
+        EnumerableWiring(JaversProperty property, Object targetWithShadows) {
             super(property);
-            this.targetShadows = targetShadows;
+            this.targetWithShadows = targetWithShadows;
         }
 
         @Override
         void wire() {
-            ContainerType propertyType = property.getType();
-            Object targetContainer = propertyType.map(targetShadows, (target) -> ((ShadowBuilder)target).shadow);
+            EnumerableType propertyType = property.getType();
+
+            Object targetContainer = propertyType.map(targetWithShadows, (valueOrShadow) -> {
+                if (valueOrShadow instanceof ShadowBuilder) {
+                    //injecting reference to shadow
+                    return ((ShadowBuilder) valueOrShadow).shadow;
+                }
+                return valueOrShadow; //vale is passed as is
+            });
+
             property.set(shadow, targetContainer);
         }
     }
+
+
 }

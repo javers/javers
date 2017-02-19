@@ -83,7 +83,7 @@ public class TypeMapper {
     }
 
     /**
-     * for change appenders
+     * only for change appenders
      */
     public MapContentType getMapContentType(ContainerType containerType){
         JaversType keyType = getJaversType(Integer.class);
@@ -100,6 +100,22 @@ public class TypeMapper {
         }
 
         return getJaversType(((ContainerType)javersType).getItemType()) instanceof ManagedType;
+    }
+
+    /**
+     * is Map (or Multimap) with ManagedClass on Key or Value position
+     */
+    public boolean isKeyValueTypeWithManagedTypes(JaversType enumerableType) {
+        if (enumerableType instanceof KeyValueType){
+            KeyValueType mapType = (KeyValueType)enumerableType;
+
+            JaversType keyType = getJaversType(mapType.getKeyType());
+            JaversType valueType = getJaversType(mapType.getValueType());
+
+            return keyType instanceof ManagedType || valueType instanceof ManagedType;
+        } else{
+            return false;
+        }
     }
 
     /**
