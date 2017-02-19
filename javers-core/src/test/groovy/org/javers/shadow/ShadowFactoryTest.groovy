@@ -8,18 +8,17 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.PrimitiveEntity
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.model.SomeEnum
-import org.javers.guava.MultimapBuilder
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import java.lang.reflect.Array
 import java.time.LocalDate
 import java.util.function.Function
 
 import static java.lang.System.identityHashCode
 import static java.time.LocalDate.now
+import static org.javers.guava.MultimapBuilder.create
 
 /**
  * @author bartosz.walacik
@@ -92,7 +91,7 @@ class ShadowFactoryTest extends Specification {
               },
               {  def v2 = new SnapshotEntity()
                  v2.multiSetOfPrimitives = HashMultiset.create(['a','a'])
-                 v2.multiMapOfPrimitives = MultimapBuilder.create([a:['a','b','c']])
+                 v2.multiMapOfPrimitives = create([a:['a','b','c']])
                  v2
              }]
     }
@@ -137,6 +136,7 @@ class ShadowFactoryTest extends Specification {
         identityHashCode(shadow.entityRef.entityRef) == identityHashCode(shadow)
     }
 
+    @Unroll
     def "should support #container of Entities"(){
         given:
         javers.commit("author", cdo)
@@ -168,6 +168,33 @@ class ShadowFactoryTest extends Specification {
 
     }
 
+    def "should support long chain of references with cycle"(){
+      given:
+      def cdo = new SnapshotEntity(id:1)
+      def node = cdo
+      (2..100).each {
+          node.entityRef = new SnapshotEntity(id:it)
+          node = node.entityRef
+      }
+      node.entityRef = cdo
+
+      javers.commit("author", cdo)
+
+
+      when:
+      def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+      def shadow = shadowFactory.createShadow(snapshots[0], byIdSnapshotSupplier())
+
+      then:
+      shadow instanceof SnapshotEntity
+      (2..100).each {
+          assert shadow.entityRef instanceof SnapshotEntity
+          assert shadow.entityRef.id == it
+          shadow = shadow.entityRef
+      }
+      shadow.entityRef.id == 1
+    }
+
     def "should support Set of ValueObjects"(){
         given:
         def cdo = new SnapshotEntity(id:1,
@@ -184,6 +211,43 @@ class ShadowFactoryTest extends Specification {
 
         shadow.setOfValueObjects.find{it -> it.city == 'London'} instanceof DummyAddress
         shadow.setOfValueObjects.find{it -> it.city == 'Paris'} instanceof DummyAddress
+    }
+
+    @Unroll
+    def "should support Map with #content"(){
+        given:
+        javers.commit("author", cdo)
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+        def shadow = shadowFactory.createShadow(snapshots[0], byIdSupplier())
+
+        then:
+        shadow.properties[pName][expectedKey] == expectedValue
+
+        where:
+        content << ["Entities", "mixed content"]
+        cdo << [
+                new SnapshotEntity(id:1, mapOfEntities: [(new SnapshotEntity(id:2)) : new SnapshotEntity(id:3)]),
+                new SnapshotEntity(id:1, mapPrimitiveToEntity: ["key" : new SnapshotEntity(id:3)])
+        ]
+        pName << ["mapOfEntities", "mapPrimitiveToEntity"]
+        expectedKey << [new SnapshotEntity(id:2), "key"]
+        expectedValue << [new SnapshotEntity(id:3)] * 2
+    }
+
+    def "should support Multimap with mixed content"() {
+        given:
+        def cdo = new SnapshotEntity(id: 1,
+                multiMapPrimitiveToEntity: create(["NY": [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]]))
+        javers.commit("author", cdo)
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+        def shadow = shadowFactory.createShadow(snapshots[0], byIdSupplier())
+
+        then:
+        shadow.multiMapPrimitiveToEntity.get("NY") == [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]
     }
 
     Function byIdSupplier() {

@@ -26,6 +26,9 @@ public class CollectionType extends ContainerType {
         return collection == null || ((Collection)collection).isEmpty();
     }
 
+    /**
+     * @return immutable Set
+     */
     @Override
     public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentsAreNotNull(mapFunction, owner);
@@ -39,18 +42,12 @@ public class CollectionType extends ContainerType {
         return Collections.unmodifiableSet(targetSet);
     }
 
-    @Override
-    public Object map(Object sourceEnumerable, Function mapFunction) {
-        Collection sourceCol = wrapNull(sourceEnumerable);
-        return sourceCol.stream().map(mapFunction).collect(Collectors.toSet());
-    }
-
     /**
      * Nulls are filtered
      */
     @Override
-    public List mapToList(Object sourceContainer, Function mapFunction) {
-        Collection sourceCol = wrapNull(sourceContainer);
-        return (List)sourceCol.stream().map(mapFunction).filter(it -> it != null).collect(Collectors.toList());
+    public Object map(Object sourceEnumerable, Function mapFunction) {
+        Collection sourceCol = wrapNull(sourceEnumerable);
+        return sourceCol.stream().map(mapFunction).filter(it -> it != null).collect(Collectors.toSet());
     }
 }

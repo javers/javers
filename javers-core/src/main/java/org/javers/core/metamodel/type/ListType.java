@@ -19,6 +19,9 @@ public class ListType extends CollectionType{
         super(baseJavaType);
     }
 
+    /**
+     * @return immutable List
+     */
     @Override
     public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentsAreNotNull(mapFunction, owner);
@@ -32,9 +35,12 @@ public class ListType extends CollectionType{
         return Collections.unmodifiableList(targetList);
     }
 
+    /**
+     * Nulls are filtered
+     */
     @Override
     public Object map(Object sourceEnumerable, Function mapFunction) {
         List sourceCol = Lists.wrapNull(sourceEnumerable);
-        return sourceCol.stream().map(mapFunction).collect(Collectors.toList());
+        return sourceCol.stream().map(mapFunction).filter(it -> it != null).collect(Collectors.toList());
     }
 }
