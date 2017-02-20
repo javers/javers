@@ -1,9 +1,13 @@
 package org.javers.shadow
 
-import com.google.common.collect.HashMultimap
 import com.google.common.collect.HashMultiset
 import org.javers.core.Javers
 import org.javers.core.JaversTestBuilder
+import org.javers.core.examples.typeNames.NewEntity
+import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
+import org.javers.core.examples.typeNames.OldEntity
+import org.javers.core.examples.typeNames.OldEntityWithTypeAlias
+import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.PrimitiveEntity
@@ -11,6 +15,7 @@ import org.javers.core.model.SnapshotEntity
 import org.javers.core.model.SomeEnum
 import org.javers.guava.MultimapBuilder
 import org.javers.repository.jql.QueryBuilder
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -263,6 +268,56 @@ class ShadowFactoryTest extends Specification {
 
         then:
         shadow.multiSetOfEntities == HashMultiset.create([new SnapshotEntity(id:2), new SnapshotEntity(id:2)])
+    }
+
+    def "should manage changed class name"(){
+      given:
+      def cdo = new OldEntityWithTypeAlias(id:1.0, val:1)
+      javers.commit("author", cdo)
+
+      when:
+      def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1.0, NewEntityWithTypeAlias).build())[0]
+      snapshot = simulatePersistence(snapshot)
+      def shadow = shadowFactory.createShadow(snapshot, { it -> null })
+
+      then:
+      shadow instanceof NewEntityWithTypeAlias
+      shadow.val == 1
+    }
+
+    @Ignore //TODO
+    def "should skip missing properties"(){
+      given:
+      def cdo = new OldEntity(id:1, oldValue: 1)
+      javers.commit("author", cdo)
+
+      when:
+      def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1, NewEntity).build())[0]
+      snapshot = simulatePersistence(snapshot)
+      def shadow = shadowFactory.createShadow(snapshot, { it -> null })
+
+      then:
+      shadow instanceof NewEntity
+    }
+
+    //deserialize and serialize to simulate real JaversRepository
+    CdoSnapshot simulatePersistence(CdoSnapshot snapshot) {
+        javers.getJsonConverter().fromJson(javers.getJsonConverter().toJson(snapshot), CdoSnapshot)
+    }
+
+    def "should not break on polymorfic Collection"() {
+      given:
+      def cdo = new SnapshotEntity(id: 1, polymorficList: [new LocalDate(2017,1,1), new LocalDate(2017,1,2) ])
+      javers.commit("author", cdo)
+
+      when:
+      def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())[0]
+      //serialize & deserialize
+      snapshot = javers.getJsonConverter().fromJson(javers.getJsonConverter().toJson(snapshot), CdoSnapshot)
+      def shadow = shadowFactory.createShadow(snapshot, byIdSupplier())
+
+      then: "objects converted to JSON String should be returned"
+      shadow.polymorficList == ["2017-01-01", "2017-01-02"]
     }
 
     Function byIdSupplier() {

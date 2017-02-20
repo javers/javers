@@ -37,6 +37,7 @@ class SnapshotEntity {
     List<LocalDate> listOfDates
     List<SnapshotEntity> listOfEntities
     List<DummyAddress> listOfValueObjects
+    List<Object> polymorficList
 
     Set<Integer> setOfIntegers
     Set<LocalDate> setOfDates
