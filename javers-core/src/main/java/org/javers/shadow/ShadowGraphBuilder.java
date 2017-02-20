@@ -1,6 +1,7 @@
 package org.javers.shadow;
 
 import com.google.gson.JsonObject;
+import org.javers.common.validation.Validate;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
@@ -29,6 +30,7 @@ class ShadowGraphBuilder {
     }
 
     Object buildDeepShadow(CdoSnapshot cdoSnapshot) {
+        Validate.argumentIsNotNull(cdoSnapshot);
         switchToBuilt();
 
         ShadowBuilder root = assembleShadowStub(cdoSnapshot);
