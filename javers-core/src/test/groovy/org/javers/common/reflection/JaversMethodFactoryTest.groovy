@@ -10,15 +10,18 @@ class JaversMethodFactoryTest extends Specification {
     //TODO check if this is relevant
     def "should return distinct method keys"() {
         given:
-
+        def keys = [:]
         when:
-        def aKey = JaversMethodFactory.methodKey(ReflectionTestClass.getMethod("Aa", String))
-        def bKey = JaversMethodFactory.methodKey(ReflectionTestClass.getMethod("BB", String))
+        keys.put("Aa", JaversMethodFactory.methodKey(ReflectionTestClass.getMethod("Aa", String)))
+        keys.put("BB", JaversMethodFactory.methodKey(ReflectionTestClass.getMethod("BB", String)))
+        keys.put("isOrOperation", JaversMethodFactory.methodKey(ReflectionTestClass.getMethod("isOrOperation", String)))
+        keys.put("getCmdline", JaversMethodFactory.methodKey(ReflectionTestClass.getMethod("getCmdline", String)))
 
-        println("aKey $aKey")
-        println("bKey $bKey")
+        keys.keySet().forEach {
+            println it + " : " + keys[it]
+        }
 
         then:
-        aKey != bKey
+        new HashSet(keys.values()).size() == 4
     }
 }
