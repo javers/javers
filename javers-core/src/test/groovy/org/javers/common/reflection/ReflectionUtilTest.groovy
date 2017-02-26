@@ -98,4 +98,15 @@ class ReflectionUtilTest extends Specification {
         "Method"   | { ReflectionUtil.getAllMethods(ConcreteWithActualType).find{it.name() == "getValue"} }
         "Field"    | { ReflectionUtil.getAllFields(ConcreteWithActualType).find{it.name() == "value"} }
     }
+
+    def "should get all methods from a given class without inheritance duplicates"(){
+        when:
+        def methods = ReflectionUtil.getAllMethods(ReflectionTestClass)
+                .findAll{it.declaringClass != Object}
+
+        methods.each { println it }
+
+        then:
+        methods.size() == 5
+    }
 }
