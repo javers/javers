@@ -4,8 +4,8 @@ import javax.persistence.Id
 
 class AbstractGeneric<ID, V> {
     @Id
-    private ID id
-    private V value
+    ID id
+    V value
 
     V getValue() {
         return value
@@ -17,4 +17,8 @@ class AbstractGeneric<ID, V> {
 }
 
 class ConcreteWithActualType extends AbstractGeneric<String, List<String>> {
+    ConcreteWithActualType(String id, List<String> value) {
+        this.id = id
+        this.value = value
+    }
 }
