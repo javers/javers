@@ -16,7 +16,13 @@ class TypeResolvingContext {
 
     Type getSubstitution(Type type) {
         if (type instanceof  TypeVariable){
-            return substitutions.get((TypeVariable)type);
+            Type resolved =  substitutions.get(type);
+            if (resolved instanceof TypeVariable) {
+                return getSubstitution(resolved);
+            }
+            else {
+                return resolved;
+            }
         }
         return null;
     }
@@ -47,8 +53,7 @@ class TypeResolvingContext {
         for (int i=0; i<typeParameters.length; i++){
             TypeVariable typeParam = typeParameters[i];
             Type typeArg = actualTypeArguments[i];
-            substitutions.put(typeParam,typeArg);
+            substitutions.put(typeParam, typeArg);
         }
-
     }
 }
