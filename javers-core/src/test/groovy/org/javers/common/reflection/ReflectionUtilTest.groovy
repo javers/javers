@@ -97,6 +97,17 @@ class ReflectionUtilTest extends Specification {
         "Field"    | { ReflectionUtil.getAllFields(ConcreteWithActualType).find{it.name() == "value"} }
     }
 
+    def "should get all methods from a given class without inheritance duplicates"(){
+        when:
+        def methods = ReflectionUtil.getAllMethods(ReflectionTestClass)
+                .findAll{it.declaringClass != Object}
+
+        methods.each { println it }
+
+        then:
+        methods.size() == 5
+    }
+
     @Unroll
     def "should resolve formal type parameter for inherited #memberType when inheritance hierarchy has three levels"() {
         when:

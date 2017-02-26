@@ -5,17 +5,17 @@ import javax.persistence.Id;
 /**
  * @author Pawel Cierpiatka
  */
-public class Category extends AbstractCategory {
+public class CategoryC extends AbstractCategory {
 
     @Id
     private Long id;
 
-    public Category(Long id) {
+    public CategoryC(Long id) {
         super("name "+id);
         this.id = id;
     }
 
-    public Category(Long id, String name) {
+    public CategoryC(Long id, String name) {
         super(name);
         this.id = id;
     }

@@ -4,9 +4,7 @@ import org.javers.core.Javers
 import org.javers.core.diff.Diff
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
-import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.model.Category
 import org.javers.test.builder.CategoryTestBuilder
 import spock.lang.Specification
 
@@ -14,7 +12,7 @@ import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.diff.DiffAssert.assertThat
 
 /**
- * <b>Use case</b> of our client multiprogram.pl, comparing large Category Trees
+ * <b>Use case</b> of our client multiprogram.pl, comparing large CategoryC Trees
  *
  * @author bartosz walacik
  */
@@ -22,8 +20,8 @@ class JaversNapCategoryTreeIntegrationTest extends Specification {
 
     def "should check all nodes when calculating property changes"(){
         given:
-        Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(3, 3, "name").build()
-        Category cat2 = CategoryTestBuilder.category().deepWithChildNumber(3, 3, "newName").build()
+        def cat1 = CategoryTestBuilder.category().deepWithChildNumber(3, 3, "name").build()
+        def cat2 = CategoryTestBuilder.category().deepWithChildNumber(3, 3, "newName").build()
         Javers javers = javers().build()
 
         when:
@@ -35,8 +33,8 @@ class JaversNapCategoryTreeIntegrationTest extends Specification {
 
     def "should manage empty diff on big graphs"() {
         given:
-        Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
-        Category cat2 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
+        def cat1 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
+        def cat2 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
         Javers javers = javers().build()
 
         when:
@@ -48,8 +46,8 @@ class JaversNapCategoryTreeIntegrationTest extends Specification {
 
     def "should manage full diff on big graphs"() {
         given:
-        Category cat1 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
-        Category cat2 = CategoryTestBuilder.category(-1).deepWithChildNumber(5,5).build()
+        def cat1 = CategoryTestBuilder.category().deepWithChildNumber(5,5).build()
+        def cat2 = CategoryTestBuilder.category(-1).deepWithChildNumber(5,5).build()
         Javers javers = javers().build()
 
         when:
