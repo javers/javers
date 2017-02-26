@@ -83,20 +83,6 @@ class ReflectionUtilTest extends Specification {
 
     }
 
-    @Unroll
-    def "should resolve formal type parameter with actual type argument for inherited #memberType"() {
-        when:
-        def member = action.call()
-
-        then:
-        member.genericResolvedType == new TypeToken<List<String>>(){}.type
-
-        where:
-        memberType | action
-        "Method"   | { ReflectionUtil.getAllMethods(ConcreteWithActualType).find{it.name() == "getValue"} }
-        "Field"    | { ReflectionUtil.getAllFields(ConcreteWithActualType).find{it.name() == "value"} }
-    }
-
     def "should get all methods from a given class without inheritance duplicates"(){
         when:
         def methods = ReflectionUtil.getAllMethods(ReflectionTestClass)
@@ -109,7 +95,21 @@ class ReflectionUtilTest extends Specification {
     }
 
     @Unroll
-    def "should resolve formal type parameter for inherited #memberType when inheritance hierarchy has three levels"() {
+    def "should resolve type variable with actual type argument for inherited #memberType"() {
+        when:
+        def member = action.call()
+
+        then:
+        member.genericResolvedType == new TypeToken<List<String>>(){}.type
+
+        where:
+        memberType | action
+        "Method"   | { ReflectionUtil.getAllMethods(ConcreteWithActualType).find{it.name() == "getValue"} }
+        "Field"    | { ReflectionUtil.getAllFields(ConcreteWithActualType).find{it.name() == "value"} }
+    }
+
+    @Unroll
+    def "should resolve type variable for inherited #memberType when inheritance hierarchy has three levels"() {
         when:
         def member = action.call()
 
