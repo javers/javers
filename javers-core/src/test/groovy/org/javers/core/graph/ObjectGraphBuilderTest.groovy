@@ -2,7 +2,6 @@ package org.javers.core.graph
 
 import org.javers.core.JaversTestBuilder
 import org.javers.core.model.*
-import org.javers.repository.jql.UnboundedValueObjectIdDTO
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
 import spock.lang.Specification
@@ -11,7 +10,6 @@ import spock.lang.Unroll
 import static NodeAssert.assertThat
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUserDetails.dummyUserDetails
-import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.repository.jql.ValueObjectIdDTO.withUnboundedValueObjectOwner
 
@@ -440,10 +438,10 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should support large graphs (more than 10000 edges)"() {
         given:
-        def root = new Category(0);
+        def root = new CategoryC(0);
         def parent = root
         10000.times {
-            def child = new Category(parent.id+1)
+            def child = new CategoryC(parent.id+1)
             parent.addChild(child)
             parent = child
         }

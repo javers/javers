@@ -3,8 +3,6 @@ package org.javers.core
 import groovy.json.JsonSlurper
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.DiffAssert
-import org.javers.core.diff.GraphPair
-import org.javers.core.diff.appenders.NewObjectAppender
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.PropertyChange
 import org.javers.core.diff.changetype.ReferenceChange
@@ -23,11 +21,8 @@ import static org.javers.core.MappingStyle.FIELD
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
 import static org.javers.core.model.DummyUser.dummyUser
-import static org.javers.core.model.DummyIgnoredPropertiesType.dummyIgnoredPropertiesType;
 import static org.javers.core.model.DummyUserWithPoint.userWithPoint
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
-
-import static org.javers.core.diff.ChangeAssert.assertThat
 
 /**
  * @author bartosz walacik
@@ -245,8 +240,8 @@ class JaversDiffE2ETest extends AbstractDiffTest {
     def "should not compare properties when class is mapped as ShallowReference"() {
         given:
         def javers = javers().build()
-        def left =  new SnapshotEntity(id:1, shallowPhone: new ShallowPhone(1, "123", new Category(1)))
-        def right = new SnapshotEntity(id:1, shallowPhone: new ShallowPhone(1, "321", new Category(2)))
+        def left =  new SnapshotEntity(id:1, shallowPhone: new ShallowPhone(1, "123", new CategoryC(1)))
+        def right = new SnapshotEntity(id:1, shallowPhone: new ShallowPhone(1, "321", new CategoryC(2)))
 
         expect:
         javers.compare(left, right).hasChanges() == false
@@ -256,8 +251,8 @@ class JaversDiffE2ETest extends AbstractDiffTest {
     def "should use ReferenceChange when #propType is annotated as ShallowReferences"() {
         given:
         def javers = javers().withMappingStyle(mapping).build()
-        def left =  new PhoneWithShallowCategory(id:1, shallowCategory:new Category(1, "old shallow"))
-        def right = new PhoneWithShallowCategory(id:1, shallowCategory:new Category(2, "new shallow"))
+        def left =  new PhoneWithShallowCategory(id:1, shallowCategory:new CategoryC(1, "old shallow"))
+        def right = new PhoneWithShallowCategory(id:1, shallowCategory:new CategoryC(2, "new shallow"))
 
         when:
         def changes = javers.compare(left, right).getChangesByType(ReferenceChange)
@@ -265,8 +260,8 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         then:
         changes.size() == 1
         changes[0] instanceof ReferenceChange
-        changes[0].left.value() == Category.name+"/1"
-        changes[0].right.value() == Category.name+"/2"
+        changes[0].left.value() == CategoryC.name+"/1"
+        changes[0].right.value() == CategoryC.name+"/2"
 
         where:
         propType << ["field", "getter"]
@@ -277,8 +272,8 @@ class JaversDiffE2ETest extends AbstractDiffTest {
     def "should not compare properties when #propType is annotated as ShallowReference"() {
         given:
         def javers = javers().withMappingStyle(mapping).build()
-        def left =  new PhoneWithShallowCategory(id:1, shallowCategory:new Category(1, "old shallow"), deepCategory:new Category(2, "old deep"))
-        def right = new PhoneWithShallowCategory(id:1, shallowCategory:new Category(1, "new shallow"), deepCategory:new Category(2, "new deep"))
+        def left =  new PhoneWithShallowCategory(id:1, shallowCategory:new CategoryC(1, "old shallow"), deepCategory:new CategoryC(2, "old deep"))
+        def right = new PhoneWithShallowCategory(id:1, shallowCategory:new CategoryC(1, "new shallow"), deepCategory:new CategoryC(2, "new deep"))
 
         when:
         def changes = javers.compare(left, right).changes

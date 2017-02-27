@@ -11,19 +11,19 @@ class PhoneWithShallowCategory {
     Long id
     String number = "123"
     @ShallowReference
-    Category shallowCategory
-    Category deepCategory
+    CategoryC shallowCategory
+    CategoryC deepCategory
 
     Long getId() {
         id
     }
 
     @ShallowReference
-    Category getShallowCategory() {
+    CategoryC getShallowCategory() {
         shallowCategory
     }
 
-    Category getDeepCategory() {
+    CategoryC getDeepCategory() {
         deepCategory
     }
 }

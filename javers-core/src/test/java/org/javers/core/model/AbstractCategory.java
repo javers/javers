@@ -28,7 +28,7 @@ public class AbstractCategory {
         return parent;
     }
 
-    public void setParent(Category parent) {
+    public void setParent(CategoryC parent) {
         this.parent = parent;
     }
 

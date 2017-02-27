@@ -27,7 +27,7 @@ class JaversCommitE2ETest extends Specification {
     def "should not commit snapshot of ShallowReference Entity"() {
         given:
         def javers = javers().build()
-        def entity =  new SnapshotEntity(id:1, shallowPhone:new ShallowPhone(1, "123", new Category(1, "some")))
+        def entity =  new SnapshotEntity(id:1, shallowPhone:new ShallowPhone(1, "123", new CategoryC(1, "some")))
 
         when:
         def commit = javers.commit("", entity)
@@ -43,7 +43,7 @@ class JaversCommitE2ETest extends Specification {
     def "should not commit snapshot of ShallowReference property"() {
         given:
         def javers = javers().build()
-        def entity =  new PhoneWithShallowCategory(id:1, shallowCategory:new Category(1, "old shallow"))
+        def entity =  new PhoneWithShallowCategory(id:1, shallowCategory:new CategoryC(1, "old shallow"))
 
         when:
         def commit = javers.commit("", entity)
