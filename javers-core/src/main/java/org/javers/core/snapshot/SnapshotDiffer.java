@@ -50,7 +50,7 @@ public class SnapshotDiffer {
     }
 
     private void addInitialChanges(List<Change> changes, CdoSnapshot initialSnapshot) {
-        CdoSnapshot emptySnapshot = CdoSnapshotBuilder.emptyCopyOf(initialSnapshot);
+        CdoSnapshot emptySnapshot = CdoSnapshotBuilder.emptyCopyOf(initialSnapshot).build();
         Diff diff = diffFactory.create(shadowGraph(emptySnapshot), shadowGraph(initialSnapshot),
             commitMetadata(initialSnapshot));
         NewObject newObjectChange =
