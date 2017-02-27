@@ -52,6 +52,11 @@ public class JaversMethod extends JaversMember<Method> {
         }
     }
 
+/*TODO
+    private Method setter() {
+
+    }*/
+
     @Override
     public String propertyName() {
         return getterToField(name());

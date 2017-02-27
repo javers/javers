@@ -29,12 +29,12 @@ public class CdoSnapshotBuilder {
     private CdoSnapshotBuilder() {
     }
 
-    public static CdoSnapshot emptyCopyOf(CdoSnapshot snapshot){
+    public static CdoSnapshotBuilder emptyCopyOf(CdoSnapshot snapshot){
         return cdoSnapshot()
                 .withGlobalId(snapshot.getGlobalId())
                 .withManagedType(snapshot.getManagedType())
                 .withCommitMetadata(snapshot.getCommitMetadata())
-                .withType(snapshot.getType()).build();
+                .withType(snapshot.getType());
     }
 
     public static CdoSnapshotBuilder cdoSnapshot() {

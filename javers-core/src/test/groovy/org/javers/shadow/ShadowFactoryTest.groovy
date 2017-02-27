@@ -5,9 +5,10 @@ import org.javers.core.Javers
 import org.javers.core.JaversTestBuilder
 import org.javers.core.examples.typeNames.NewEntity
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
-import org.javers.core.examples.typeNames.OldEntity
 import org.javers.core.examples.typeNames.OldEntityWithTypeAlias
 import org.javers.core.metamodel.object.CdoSnapshot
+import org.javers.core.metamodel.object.CdoSnapshotBuilder
+import org.javers.core.metamodel.object.CdoSnapshotState
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.PrimitiveEntity
@@ -15,7 +16,6 @@ import org.javers.core.model.SnapshotEntity
 import org.javers.core.model.SomeEnum
 import org.javers.guava.MultimapBuilder
 import org.javers.repository.jql.QueryBuilder
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -31,9 +31,15 @@ import static java.time.LocalDate.now
  */
 class ShadowFactoryTest extends Specification {
 
-    @Shared JaversTestBuilder javersTestAssembly = JaversTestBuilder.javersTestAssembly()
-    @Shared ShadowFactory shadowFactory = javersTestAssembly.shadowFactory
-    @Shared Javers javers = javersTestAssembly.javers()
+    @Shared JaversTestBuilder javersTestAssembly
+    @Shared ShadowFactory shadowFactory
+    @Shared Javers javers
+
+    def setupSpec() {
+        javersTestAssembly = JaversTestBuilder.javersTestAssembly()
+        shadowFactory = javersTestAssembly.shadowFactory
+        javers = javersTestAssembly.javers()
+    }
 
     @Unroll
     def "should create Shadows with #what"(){
@@ -285,19 +291,21 @@ class ShadowFactoryTest extends Specification {
       shadow.val == 1
     }
 
-    @Ignore //TODO
     def "should skip missing properties"(){
       given:
-      def cdo = new OldEntity(id:1, oldValue: 1)
+      def cdo = new NewEntity(id:1)
       javers.commit("author", cdo)
 
       when:
       def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1, NewEntity).build())[0]
-      snapshot = simulatePersistence(snapshot)
-      def shadow = shadowFactory.createShadow(snapshot, { it -> null })
+      def extendedSnapshot = CdoSnapshotBuilder.emptyCopyOf(snapshot)
+            .withState(new CdoSnapshotState([strangeValue:2])).build()
+
+      def shadow = shadowFactory.createShadow(extendedSnapshot, { it -> null })
 
       then:
       shadow instanceof NewEntity
+      !shadow.id
     }
 
     //deserialize and serialize to simulate real JaversRepository
