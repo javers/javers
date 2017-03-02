@@ -39,6 +39,16 @@ class JsonConverterWellKnownValuesTest extends Specification {
         jsonConverter.toJson(v) == expectedJson
         jsonConverter.fromJson(expectedJson, BigDecimal) == new BigDecimal(1.0).setScale(3,HALF_UP)
     }
+    
+    def "should convert BigInteger to and from JSON without issues"() {
+        given:
+        def v = new BigInteger("1")
+        def expectedJson = '1'
+
+        expect:
+        jsonConverter.toJson(v) == expectedJson
+        jsonConverter.fromJson(expectedJson, BigInteger) == new BigInteger("1")
+    }
 
     def "should be null safe when converting to and from JSON"(){
         expect:
