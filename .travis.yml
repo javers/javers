@@ -23,6 +23,7 @@ script:
   - "./gradlew integrationTest"
 
 deploy:
+  skip_cleanup: true
   provider: script
   script:
   - "./gradlew uploadArchives -PnexusUsername=$sonatypeUser -PnexusPassword=$sonatypePassword"
