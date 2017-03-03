@@ -24,7 +24,9 @@ script:
 
 deploy:
   provider: script
-  script: "./gradlew bintray"
+  script:
+  - "./gradlew uploadArchives -PnexusUsername=$sonatypeUser -PnexusPassword=$sonatypePassword"
+  - "./gradlew closeAndPromoteRepository -PnexusUsername=$sonatypeUser -PnexusPassword=$sonatypePassword"
   on:
     tags: true
     all_branches: true
