@@ -1,33 +1,30 @@
 language: java
-
 jdk:
-  - oraclejdk8
-
+- oraclejdk8
 addons:
   apt:
     sources:
-      - mongodb-upstart
-      - mongodb-3.2-precise
+    - mongodb-upstart
+    - mongodb-3.2-precise
     packages:
-      - mongodb-org-server
-      - mongodb-org-shell
-
+    - mongodb-org-server
+    - mongodb-org-shell
 before_script:
-  - sleep 15 #mongo may not be responded directly
-  - psql -c 'create database travis_ci_test;' -U postgres
-  - psql -c 'create schema j_some authorization postgres;' -U postgres travis_ci_test
-  - mysql -e 'create database travis_ci_test;' -u root
-
+- sleep 15
+- psql -c 'create database travis_ci_test;' -U postgres
+- psql -c 'create schema j_some authorization postgres;' -U postgres travis_ci_test
+- mysql -e 'create database travis_ci_test;' -u root
 script:
-  - "./gradlew build"
-  - "./gradlew integrationTest"
-
+- ./gradlew build
+- ./gradlew integrationTest
 deploy:
   skip_cleanup: true
   provider: script
-  script: "./deployToSonatype.sh"
+  script: travis/deployToSonatype.sh
   on:
     tags: true
     all_branches: true
-
 sudo: false
+before_install:
+- openssl aes-256-cbc -K $encrypted_750aaef1260c_key -iv $encrypted_750aaef1260c_iv
+  -in travis/codesigning.asc.enc -out travis/codesigning.asc -d
