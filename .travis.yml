@@ -19,15 +19,13 @@ before_script:
   - mysql -e 'create database travis_ci_test;' -u root
 
 script:
-  - "./gradlew check"
+  - "./gradlew build"
   - "./gradlew integrationTest"
 
 deploy:
   skip_cleanup: true
   provider: script
-  script:
-  - "./gradlew uploadArchives -PnexusUsername=$sonatypeUser -PnexusPassword=$sonatypePassword"
-  - "./gradlew closeAndPromoteRepository -PnexusUsername=$sonatypeUser -PnexusPassword=$sonatypePassword"
+  script: "./deployToSonatype.sh"
   on:
     tags: true
     all_branches: true
