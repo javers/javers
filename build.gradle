@@ -116,8 +116,11 @@ subprojects {
     }
 }
 
+//io.codearte.gradle
 nexusStaging {
     packageGroup = 'org.javers'
+    numberOfRetries = 10
+    delayBetweenRetriesInMillis = 3000
 }
 
 task wrapper(type: Wrapper) {
