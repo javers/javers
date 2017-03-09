@@ -197,7 +197,7 @@ class JaversCommitE2ETest extends Specification {
     }
 
     //not sure about that.
-    // We know that object was removed when concerning the local context of LiveGraph and ShadowGraph
+    // We know that object was removed when concerning the local context of LiveGraph and SnapshotGraph
     // but we don't know if it was removed 'globally'
     def "should generate only ReferenceChange for removed objects"() {
         given:

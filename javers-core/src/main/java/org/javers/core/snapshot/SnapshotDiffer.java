@@ -1,6 +1,5 @@
 package org.javers.core.snapshot;
 
-import java.util.Optional;
 import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
@@ -14,7 +13,10 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.CdoSnapshotBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -51,7 +53,7 @@ public class SnapshotDiffer {
 
     private void addInitialChanges(List<Change> changes, CdoSnapshot initialSnapshot) {
         CdoSnapshot emptySnapshot = CdoSnapshotBuilder.emptyCopyOf(initialSnapshot).build();
-        Diff diff = diffFactory.create(shadowGraph(emptySnapshot), shadowGraph(initialSnapshot),
+        Diff diff = diffFactory.create(snapshotGraph(emptySnapshot), snapshotGraph(initialSnapshot),
             commitMetadata(initialSnapshot));
         NewObject newObjectChange =
             new NewObject(initialSnapshot.getGlobalId(), empty(), of(initialSnapshot.getCommitMetadata()));
@@ -64,12 +66,12 @@ public class SnapshotDiffer {
     }
 
     private void addChanges(List<Change> changes, CdoSnapshot previousSnapshot, CdoSnapshot currentSnapshot) {
-        Diff diff = diffFactory.create(shadowGraph(previousSnapshot), shadowGraph(currentSnapshot),
+        Diff diff = diffFactory.create(snapshotGraph(previousSnapshot), snapshotGraph(currentSnapshot),
             commitMetadata(currentSnapshot));
         changes.addAll(diff.getChanges());
     }
 
-    private SnapshotGraph shadowGraph(CdoSnapshot snapshot) {
+    private SnapshotGraph snapshotGraph(CdoSnapshot snapshot) {
         return new SnapshotGraph(Sets.asSet(new ObjectNode(snapshot)));
     }
 
