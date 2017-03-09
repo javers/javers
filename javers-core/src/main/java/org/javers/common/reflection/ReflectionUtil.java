@@ -2,7 +2,6 @@ package org.javers.common.reflection;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import org.javers.common.collections.Lists;
-import java.util.Optional;
 import org.javers.common.collections.Primitives;
 import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;
@@ -16,6 +15,7 @@ import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -29,8 +29,7 @@ public class ReflectionUtil {
         try {
             Class.forName(className, false, Javers.class.getClassLoader());
             return true;
-        }
-        catch (Throwable ex) {
+        } catch (Throwable ex) {
             // Class or one of its dependencies is not present...
             return false;
         }
@@ -42,8 +41,7 @@ public class ReflectionUtil {
     public static Class classForName(String className) {
         try {
             return Class.forName(className, false, Javers.class.getClassLoader());
-        }
-        catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             throw new JaversException(ex);
         }
     }
@@ -51,9 +49,9 @@ public class ReflectionUtil {
     public static Object invokeGetter(Object target, String getterName) {
         Validate.argumentsAreNotNull(target, getterName);
         try {
-            Method m = target.getClass().getMethod(getterName, new Class[]{});
-            return m.invoke(target, new Object[]{});
-        }catch (Exception e ) {
+            Method m = target.getClass().getMethod(getterName);
+            return m.invoke(target);
+        } catch (Exception e) {
             throw new JaversException(e);
         }
     }
@@ -62,21 +60,21 @@ public class ReflectionUtil {
      * Creates new instance of public or package-private class.
      * Calls first, not-private constructor
      */
-    public static Object newInstance(Class clazz, ArgumentResolver resolver){
+    public static Object newInstance(Class clazz, ArgumentResolver resolver) {
         Validate.argumentIsNotNull(clazz);
         for (Constructor constructor : clazz.getDeclaredConstructors()) {
             if (isPrivate(constructor) || isProtected(constructor)) {
                 continue;
             }
 
-            Class [] types = constructor.getParameterTypes();
+            Class[] types = constructor.getParameterTypes();
             Object[] params = new Object[types.length];
-            for (int i=0; i<types.length; i++){
+            for (int i = 0; i < types.length; i++) {
                 try {
                     params[i] = resolver.resolve(types[i]);
-                } catch (JaversException e){
-                    logger.error("failed to create new instance of "+clazz.getName()+", argument resolver for arg["+i+"] " +
-                                 types[i].getName() + " thrown exception: "+e.getMessage());
+                } catch (JaversException e) {
+                    logger.error("failed to create new instance of " + clazz.getName() + ", argument resolver for arg[" + i + "] " +
+                            types[i].getName() + " thrown exception: " + e.getMessage());
                     throw e;
                 }
             }
@@ -87,12 +85,12 @@ public class ReflectionUtil {
                 throw new RuntimeException(e);
             }
         }
-        throw new JaversException(JaversExceptionCode.NO_PUBLIC_CONSTRUCTOR,clazz.getName());
+        throw new JaversException(JaversExceptionCode.NO_PUBLIC_CONSTRUCTOR, clazz.getName());
     }
 
     public static List<JaversField> getAllPersistentFields(Class methodSource) {
         List<JaversField> result = new ArrayList<>();
-        for(JaversField field : getAllFields(methodSource)) {
+        for (JaversField field : getAllFields(methodSource)) {
             if (isPersistentField(field.getRawMember())) {
                 result.add(field);
             }
@@ -102,12 +100,47 @@ public class ReflectionUtil {
 
     public static List<JaversMethod> findAllPersistentGetters(Class methodSource) {
         List<JaversMethod> result = new ArrayList<>();
-        for(JaversMethod m : getAllMethods(methodSource)) {
-             if (isPersistentGetter(m.getRawMember())) {
-                 result.add(m);
-             }
+        for (JaversMethod m : getAllMethods(methodSource)) {
+            if (isPersistentGetter(m.getRawMember())) {
+                result.add(m);
+            }
         }
         return result;
+    }
+
+    static boolean trySetMemberRelevantToGetter(JaversMethod getter, Object onObject, Object value) {
+        if (isGetter(getter.getRawMember())) {
+            String setterName = setterNameForGetterName(getter.getRawMember().getName());
+            return trySetMemberWithSetter(setterName, getter.getGenericResolvedType().getClass(), onObject, value) ||
+                    trySetMemberWithField(getter.propertyName(), onObject, value);
+        }
+        return false;
+    }
+
+    private static String setterNameForGetterName(String getterName) {
+        return getterName.replaceAll("^(get|is)", "set");
+    }
+
+    private static boolean trySetMemberWithSetter(String setterName, Class returnClass, Object onObject, Object value) {
+        try {
+            Method method = onObject.getClass().getDeclaredMethod(setterName, returnClass);
+            method.setAccessible(true);
+            method.invoke(onObject, value);
+            return true;
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            return false;
+        }
+    }
+
+    private static boolean trySetMemberWithField(String fieldName, Object onObject, Object value) {
+        try {
+            Field field = onObject.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(onObject, value);
+            return true;
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            return false;
+        }
     }
 
     /**
@@ -126,25 +159,25 @@ public class ReflectionUtil {
     /**
      * true if method is getter and
      * <ul>
-     *     <li/>is not abstract
-     *     <li/>is not native
+     * <li/>is not abstract
+     * <li/>is not native
      * </ul>
      */
     public static boolean isPersistentGetter(Method m) {
-        if (!isGetter(m)){
+        if (!isGetter(m)) {
             return false;
         }
 
-        return  !Modifier.isStatic(m.getModifiers()) &&
+        return !Modifier.isStatic(m.getModifiers()) &&
                 !Modifier.isAbstract(m.getModifiers()) &&
-                !Modifier.isNative(m.getModifiers()) ;
+                !Modifier.isNative(m.getModifiers());
     }
 
     public static boolean isPersistentField(Field field) {
 
         return !Modifier.isTransient(field.getModifiers()) &&
-               !Modifier.isStatic(field.getModifiers()) &&
-               !field.getName().equals("this$0"); //owner of inner class
+                !Modifier.isStatic(field.getModifiers()) &&
+                !field.getName().equals("this$0"); //owner of inner class
     }
 
     public static boolean isGetter(Method m) {
@@ -153,11 +186,11 @@ public class ReflectionUtil {
                 m.getParameterTypes().length == 0;
     }
 
-    private static boolean isPrivate(Member member){
+    private static boolean isPrivate(Member member) {
         return Modifier.isPrivate(member.getModifiers());
     }
 
-    private static boolean isProtected(Member member){
+    private static boolean isProtected(Member member) {
         return Modifier.isProtected(member.getModifiers());
     }
 
@@ -171,18 +204,18 @@ public class ReflectionUtil {
 
         return Lists.immutableListOf(((ParameterizedType) javaType).getActualTypeArguments());
     }
-    
+
     public static List<Class<?>> findClasses(Class<? extends Annotation> annotation, String... packages) {
         Validate.argumentsAreNotNull(annotation, packages);
-    	List<String> names = new FastClasspathScanner(packages).scan().getNamesOfClassesWithAnnotation(annotation);
-    	List<Class<?>> classes = new ArrayList<>();
-    	for (String className : names) {
+        List<String> names = new FastClasspathScanner(packages).scan().getNamesOfClassesWithAnnotation(annotation);
+        List<Class<?>> classes = new ArrayList<>();
+        for (String className : names) {
             classes.add(classForName(className));
         }
-    	return classes;
+        return classes;
     }
 
-    public static Optional<Type> isConcreteType(Type javaType){
+    public static Optional<Type> isConcreteType(Type javaType) {
         if (javaType instanceof Class || javaType instanceof ParameterizedType) {
             return Optional.of(javaType);
         } else if (javaType instanceof WildcardType) {
@@ -205,22 +238,22 @@ public class ReflectionUtil {
      */
     public static Class extractClass(Type javaType) {
         if (javaType instanceof ParameterizedType
-                && ((ParameterizedType)javaType).getRawType() instanceof Class){
-            return (Class)((ParameterizedType)javaType).getRawType();
-        }  else if (javaType instanceof GenericArrayType) {
+                && ((ParameterizedType) javaType).getRawType() instanceof Class) {
+            return (Class) ((ParameterizedType) javaType).getRawType();
+        } else if (javaType instanceof GenericArrayType) {
             return Object[].class;
-        }  else if (javaType instanceof Class) {
-            return (Class)javaType;
+        } else if (javaType instanceof Class) {
+            return (Class) javaType;
         }
 
         throw new JaversException(JaversExceptionCode.CLASS_EXTRACTION_ERROR, javaType);
     }
 
-    public static boolean isAnnotationPresentInHierarchy(Class<?> clazz, Class<? extends Annotation> ann){
+    public static boolean isAnnotationPresentInHierarchy(Class<?> clazz, Class<? extends Annotation> ann) {
         Class<?> current = clazz;
 
-        while (current != null && current != Object.class){
-            if (current.isAnnotationPresent(ann)){
+        while (current != null && current != Object.class) {
+            if (current.isAnnotationPresent(ann)) {
                 return true;
             }
             current = current.getSuperclass();
@@ -256,7 +289,7 @@ public class ReflectionUtil {
     }
 
     public static String reflectiveToString(Object cdoId) {
-        if (cdoId == null){
+        if (cdoId == null) {
             return "";
         }
 
@@ -264,12 +297,12 @@ public class ReflectionUtil {
             return (String) cdoId;
         }
 
-        if (WellKnownValueTypes.isValueType(cdoId) || Primitives.isPrimitiveOrBox(cdoId)){
+        if (WellKnownValueTypes.isValueType(cdoId) || Primitives.isPrimitiveOrBox(cdoId)) {
             return cdoId.toString();
         }
 
         StringBuilder ret = new StringBuilder();
-        for (JaversField f : getAllPersistentFields(cdoId.getClass()) ){
+        for (JaversField f : getAllPersistentFields(cdoId.getClass())) {
             Object val = f.getEvenIfPrivate(cdoId);
             if (val != null) {
                 ret.append(val.toString());
@@ -279,9 +312,8 @@ public class ReflectionUtil {
 
         if (ret.length() == 0) {
             return cdoId.toString();
-        }
-        else{
-            ret.delete(ret.length()-1, ret.length());
+        } else {
+            ret.delete(ret.length() - 1, ret.length());
             return ret.toString();
         }
     }

@@ -7,6 +7,7 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.*;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -19,9 +20,8 @@ import java.util.function.Function;
 class ShadowGraphBuilder {
     private final JsonConverter jsonConverter;
     private final Function<GlobalId, CdoSnapshot> referenceResolver;
-    private boolean built = false;
-    private Map<GlobalId, ShadowBuilder> builtNodes = new HashMap<>();
     private final TypeMapper typeMapper;
+    private boolean built = false;
 
     ShadowGraphBuilder(JsonConverter jsonConverter, Function<GlobalId, CdoSnapshot> referenceResolver, TypeMapper typeMapper) {
         this.jsonConverter = jsonConverter;
@@ -33,15 +33,17 @@ class ShadowGraphBuilder {
         Validate.argumentIsNotNull(cdoSnapshot);
         switchToBuilt();
 
-        ShadowBuilder root = assembleShadowStub(cdoSnapshot);
-
-        doWiring();
-
-        return root.getShadow();
+        Collection<ShadowBuilder> shadowBuilders = createStubShadowBuildersOfCdoSnapshotssAchievableFrom(cdoSnapshot);
+        wireStubShadowBuilders(shadowBuilders);
+        return findShadowBuilderForSnapshot(shadowBuilders, cdoSnapshot).getShadow();
     }
 
-    private void doWiring() {
-        builtNodes.values().forEach(ShadowBuilder::wire);
+    private void wireStubShadowBuilders(Collection<ShadowBuilder> shadowBuilders) {
+        shadowBuilders.forEach(ShadowBuilder::wire);
+    }
+
+    private ShadowBuilder findShadowBuilderForSnapshot(Collection<ShadowBuilder> shadowBuilders, CdoSnapshot cdoSnapshot) {
+        return shadowBuilders.stream().filter(b -> cdoSnapshot.equals(b.getCdoSnapshot())).findFirst().get();
     }
 
     private void switchToBuilt() {
@@ -51,13 +53,19 @@ class ShadowGraphBuilder {
         built = true;
     }
 
-    private ShadowBuilder assembleShadowStub(CdoSnapshot cdoSnapshot) {
+    private Collection<ShadowBuilder> createStubShadowBuildersOfCdoSnapshotssAchievableFrom(CdoSnapshot cdoSnapshot) {
+        Map<GlobalId, ShadowBuilder> builtNodes = new HashMap<>();
+        assembleShadowStub(cdoSnapshot, builtNodes);
+        return builtNodes.values();
+    }
+
+    private ShadowBuilder assembleShadowStub(CdoSnapshot cdoSnapshot, Map<GlobalId, ShadowBuilder> builtNodes) {
         ShadowBuilder shadowBuilder = new ShadowBuilder(cdoSnapshot);
         builtNodes.put(cdoSnapshot.getGlobalId(), shadowBuilder);
 
         JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(cdoSnapshot.getState());
 
-        followReferences(shadowBuilder, jsonElement);
+        followReferences(shadowBuilder, jsonElement, builtNodes);
 
         Object shadowStub = jsonConverter.fromJson(jsonElement, cdoSnapshot.getManagedType().getBaseJavaClass());
         shadowBuilder.withStub(shadowStub);
@@ -65,7 +73,7 @@ class ShadowGraphBuilder {
         return shadowBuilder;
     }
 
-    private void followReferences(ShadowBuilder currentNode, JsonObject jsonElement) {
+    private void followReferences(ShadowBuilder currentNode, JsonObject jsonElement, Map<GlobalId, ShadowBuilder> builtNodes) {
         CdoSnapshot cdoSnapshot = currentNode.getCdoSnapshot();
 
         cdoSnapshot.getManagedType().forEachProperty( property -> {
@@ -76,7 +84,7 @@ class ShadowGraphBuilder {
             if (property.getType() instanceof ManagedType) {
                 GlobalId refId = (GlobalId) cdoSnapshot.getPropertyValue(property);
 
-                ShadowBuilder target = createOrReuseNodeFromRef(refId);
+                ShadowBuilder target = createOrReuseNodeFromRef(refId, builtNodes);
                 if (target != null) {
                     currentNode.addReferenceWiring(property, target);
                 }
@@ -91,27 +99,28 @@ class ShadowGraphBuilder {
 
                 Object containerWithRefs = cdoSnapshot.getPropertyValue(property);
 
-                currentNode.addEnumerableWiring(property, propertyType.map(containerWithRefs, this::passValueOrCreateNodeFromRef));
+                currentNode.addEnumerableWiring(property,
+                        propertyType.map(containerWithRefs, (o -> passValueOrCreateNodeFromRef(o, builtNodes))));
 
                 jsonElement.remove(property.getName());
             }
         });
     }
 
-    private Object passValueOrCreateNodeFromRef(Object value) {
+    private Object passValueOrCreateNodeFromRef(Object value, Map<GlobalId, ShadowBuilder> builtNodes) {
         if (value instanceof GlobalId) {
-            return createOrReuseNodeFromRef((GlobalId)value);
+            return createOrReuseNodeFromRef((GlobalId)value, builtNodes);
         }
         return value;
     }
 
-    private ShadowBuilder createOrReuseNodeFromRef(GlobalId globalId) {
+    private ShadowBuilder createOrReuseNodeFromRef(GlobalId globalId, Map<GlobalId, ShadowBuilder> builtNodes) {
         CdoSnapshot cdoSnapshot = referenceResolver.apply(globalId);
         if (cdoSnapshot != null) {
             if (builtNodes.containsKey(globalId)) {
                 return builtNodes.get(globalId);
             } else {
-                return assembleShadowStub(cdoSnapshot);
+                return assembleShadowStub(cdoSnapshot, builtNodes);
             }
         }
         return null;

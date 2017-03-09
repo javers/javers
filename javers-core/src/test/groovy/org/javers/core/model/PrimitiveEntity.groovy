@@ -29,6 +29,51 @@ class PrimitiveEntity {
     private Boolean  BooleanField
 
     private SomeEnum someEnum
+
+    @Id
+    String getId() {
+        return id
+    }
+
+    int getIntField() {
+        return intField
+    }
+
+    long getLongField() {
+        return longField
+    }
+
+    double getDoubleField() {
+        return doubleField
+    }
+
+    float getFloatField() {
+        return floatField
+    }
+
+    char getCharField() {
+        return charField
+    }
+
+    byte getByteField() {
+        return byteField
+    }
+
+    short getShortField() {
+        return shortField
+    }
+
+    boolean getBooleanField() {
+        return booleanField
+    }
+
+    SomeEnum getSomeEnum() {
+        return someEnum
+    }
+
+    Integer getIntegerField() {
+        return IntegerField
+    }
 }
 
 enum SomeEnum { A, B}

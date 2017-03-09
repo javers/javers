@@ -17,18 +17,18 @@ import org.javers.core.metamodel.type.ValueObjectType;
 public class CollectionsCdoFactory {
 
     private final ClassScanner classScanner;
-    private final TailoredJaversMemberFactory memberGenericTypeInjector;
+    private final TailoredJaversMemberFactory memberGenericTypeFactory;
     private final TypeMapper typeMapper;
 
-    public CollectionsCdoFactory(ClassScanner classScanner, TailoredJaversMemberFactory memberGenericTypeInjector, TypeMapper typeMapper) {
+    public CollectionsCdoFactory(ClassScanner classScanner, TailoredJaversMemberFactory memberGenericTypeFactory, TypeMapper typeMapper) {
         this.classScanner = classScanner;
-        this.memberGenericTypeInjector = memberGenericTypeInjector;
+        this.memberGenericTypeFactory = memberGenericTypeFactory;
         this.typeMapper = typeMapper;
     }
 
-    public Cdo createCdo(final CollectionWrapper wrapper, final Class<?> clazz) {
+    Cdo createCdo(final CollectionWrapper wrapper, final Class<?> clazz) {
         Property primaryProperty = classScanner.scan(wrapper.getClass()).getProperties().get(0);
-        JaversMember javersMember = memberGenericTypeInjector.create(primaryProperty, clazz);
+        JaversMember javersMember = memberGenericTypeFactory.create(primaryProperty, clazz);
 
         Property fixedProperty = new Property(javersMember, false);
         JaversProperty fixedJProperty = new JaversProperty(() -> typeMapper.getPropertyType(fixedProperty), fixedProperty);

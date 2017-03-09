@@ -13,9 +13,9 @@ import java.lang.reflect.Type;
  */
 abstract class TailoredJaversMemberFactory {
 
-     protected abstract JaversMember create(Property primaryProperty, Class<?> genericItemClass);
+     abstract JaversMember create(Property primaryProperty, Class<?> genericItemClass);
 
-     protected ParameterizedType parametrizedType(Property property, Class<?> itemClass) {
+     ParameterizedType parametrizedType(Property property, Class<?> itemClass) {
           return new ParametrizedDehydratedType(property.getRawType(), Lists.asList((Type) itemClass));
      }
 }
