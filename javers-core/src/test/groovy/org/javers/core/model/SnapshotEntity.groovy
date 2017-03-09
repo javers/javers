@@ -77,4 +77,164 @@ class SnapshotEntity {
     int getId() {
         id
     }
+
+    LocalDate getDob() {
+        return dob
+    }
+
+    int getIntProperty() {
+        return intProperty
+    }
+
+    SnapshotEntity getEntityRef() {
+        return entityRef
+    }
+
+    DummyAddress getValueObjectRef() {
+        return valueObjectRef
+    }
+
+    Integer[] getArrayOfIntegers() {
+        return arrayOfIntegers
+    }
+
+    int[] getArrayOfInts() {
+        return arrayOfInts
+    }
+
+    LocalDate[] getArrayOfDates() {
+        return arrayOfDates
+    }
+
+    SnapshotEntity[] getArrayOfEntities() {
+        return arrayOfEntities
+    }
+
+    DummyAddress[] getArrayOfValueObjects() {
+        return arrayOfValueObjects
+    }
+
+    List<Integer> getListOfIntegers() {
+        return listOfIntegers
+    }
+
+    List<LocalDate> getListOfDates() {
+        return listOfDates
+    }
+
+    List<SnapshotEntity> getListOfEntities() {
+        return listOfEntities
+    }
+
+    List<DummyAddress> getListOfValueObjects() {
+        return listOfValueObjects
+    }
+
+    List<Object> getPolymorficList() {
+        return polymorficList
+    }
+
+    Set<Integer> getSetOfIntegers() {
+        return setOfIntegers
+    }
+
+    Set<LocalDate> getSetOfDates() {
+        return setOfDates
+    }
+
+    Set<SnapshotEntity> getSetOfEntities() {
+        return setOfEntities
+    }
+
+    Set<DummyAddress> getSetOfValueObjects() {
+        return setOfValueObjects
+    }
+
+    Optional<Integer> getOptionalInteger() {
+        return optionalInteger
+    }
+
+    Optional<LocalDate> getOptionalDate() {
+        return optionalDate
+    }
+
+    Optional<SnapshotEntity> getOptionalEntity() {
+        return optionalEntity
+    }
+
+    Optional<DummyAddress> getOptionalValueObject() {
+        return optionalValueObject
+    }
+
+    Multiset<String> getMultiSetOfPrimitives() {
+        return multiSetOfPrimitives
+    }
+
+    Multiset<DummyAddress> getMultiSetValueObject() {
+        return multiSetValueObject
+    }
+
+    Multiset<SnapshotEntity> getMultiSetOfEntities() {
+        return multiSetOfEntities
+    }
+
+    Multimap<String, String> getMultiMapOfPrimitives() {
+        return multiMapOfPrimitives
+    }
+
+    Multimap<String, DummyAddress> getMultimapPrimitiveToValueObject() {
+        return multimapPrimitiveToValueObject
+    }
+
+    Multimap<String, SnapshotEntity> getMultiMapPrimitiveToEntity() {
+        return multiMapPrimitiveToEntity
+    }
+
+    Multimap<SnapshotEntity, SnapshotEntity> getMultiMapEntityToEntity() {
+        return multiMapEntityToEntity
+    }
+
+    Multimap<DummyAddress, DummyAddress> getMultimapValueObjectToValueObject() {
+        return multimapValueObjectToValueObject
+    }
+
+    Map<String, Integer> getMapOfPrimitives() {
+        return mapOfPrimitives
+    }
+
+    Map<LocalDate, BigDecimal> getMapOfValues() {
+        return mapOfValues
+    }
+
+    Map<String, DummyAddress> getMapPrimitiveToVO() {
+        return mapPrimitiveToVO
+    }
+
+    Map<String, SnapshotEntity> getMapPrimitiveToEntity() {
+        return mapPrimitiveToEntity
+    }
+
+    Map<SnapshotEntity, SnapshotEntity> getMapOfEntities() {
+        return mapOfEntities
+    }
+
+    Map<Object, Object> getPolymorficMap() {
+        return polymorficMap
+    }
+
+    Map<String, EnumSet<DummyEnum>> getMapOfGenericValues() {
+        return mapOfGenericValues
+    }
+
+    ShallowPhone getShallowPhone() {
+        return shallowPhone
+    }
+
+    Map<DummyAddress, String> getMapVoToPrimitive() {
+        return mapVoToPrimitive
+    }
+
+    Map getNonParametrizedMap() {
+        return nonParametrizedMap
+    }
 }
