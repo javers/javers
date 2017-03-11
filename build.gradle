@@ -1,17 +1,20 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
         maven { url 'http://repo.spring.io/plugins-release' }
     }
 
     dependencies {
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
         classpath 'pl.allegro.tech.build:axion-release-plugin:0.9.5'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+        classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3'
     }
 }
 
 apply plugin: 'axion-release'
+apply plugin: 'io.codearte.nexus-staging'
 
 scmVersion {
     tag {
@@ -20,11 +23,11 @@ scmVersion {
 }
 
 subprojects {
-    apply plugin: 'maven'
+   // apply plugin: 'maven'
     apply plugin: 'java'
     apply plugin: 'groovy'
     apply plugin: 'propdeps'
-    apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'com.bmuschko.nexus'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -46,34 +49,16 @@ subprojects {
         testCompile 'org.easytesting:fest-assert-core:2.0M10'
     }
 
-    task wrapper(type: Wrapper) {
-        gradleVersion = '2.10'
-    }
-
     javadoc {
         options.noTimestamp()
     }
 
-    task example (dependsOn: 'cleanTest') << {
+    task example(dependsOn: 'cleanTest') << {
         tasks.test.testLogging {
             events 'failed', 'passed'
             showStandardStreams = true
         }
         tasks.test.execute()
-    }
-
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourceJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives javadocJar, sourceJar
     }
 
     //disable javadoc doclint for Java8
@@ -85,55 +70,41 @@ subprojects {
         }
     }
 
-    install.repositories.mavenInstaller.pom.project {
-        name 'JaVers'
+    //com.bmuschko.nexus
+    modifyPom {
+        project {
+            name 'JaVers'
+            description 'JaVers - object auditing and diff framework for Java'
+            url 'http://javers.org'
+            inceptionYear '2013'
 
-        packaging 'jar'
-
-        description 'JaVers object auditing and diff framework'
-        url 'http://javers.org'
-        inceptionYear '2013'
-
-        scm {
-            connection 'scm:git:https://github.com/javers/javers.git'
-            url 'https://github.com/javers/javers'
-        }
-
-        licenses {
-            license {
-                name 'The Apache Software License, Version 2.0'
-                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            scm {
+                connection 'scm:git:https://github.com/javers/javers.git'
+                url 'https://github.com/javers/javers'
+                developerConnection 'scm:git:https://github.com/javers/javers.git'
             }
-        }
 
-        developers {
-            developer {
-                name 'Bartosz Walacik'
+            scm {
+                connection 'scm:git:https://github.com/javers/javers.git'
+                url 'https://github.com/javers/javers'
             }
-            developer {
-                name 'Pawel Szymczyk'
-            }
-            developer {
-                name 'Michal Wesolowski'
-            }
-        }
-    }
 
-    bintray {
-        user = project.ext.has('bintrayUser') ? project.ext.bintrayUser : System.getenv('bintrayUser')
-        key = project.ext.has('bintrayKey') ? project.ext.bintrayKey : System.getenv('bintrayKey')
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
 
-        configurations = ['archives']
-        publish = true
-        pkg {
-            repo = 'maven'
-            name = 'javers'
-            version {
-                mavenCentralSync {
-                    user = project.ext.has('sonatypeUser') ? project.ext.sonatypeUser : System.getenv('sonatypeUser')
-                    password = project.ext.has('sonatypePassword') ? project.ext.sonatypePassword : System.getenv('sonatypePassword')
-                    sync = true
-                    close = '1'
+            developers {
+                developer {
+                    name 'Bartosz Walacik'
+                }
+                developer {
+                    name 'Pawel Szymczyk'
+                }
+                developer {
+                    name 'Michal Wesolowski'
                 }
             }
         }
@@ -143,4 +114,15 @@ subprojects {
         testLogging.exceptionFormat = 'full'
         testLogging.showStackTraces = true
     }
+}
+
+//io.codearte.gradle
+nexusStaging {
+    packageGroup = 'org.javers'
+    numberOfRetries = 10
+    delayBetweenRetriesInMillis = 3000
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.1'
 }

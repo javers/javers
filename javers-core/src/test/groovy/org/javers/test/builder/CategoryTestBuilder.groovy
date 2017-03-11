@@ -1,12 +1,12 @@
 package org.javers.test.builder
 
-import org.javers.core.model.Category
+import org.javers.core.model.CategoryC
 
 /**
  * @author bartosz walacik
  */
 class CategoryTestBuilder {
-    private Category root
+    private CategoryC root
     private long nodes
     private int idMultiplier
 
@@ -35,7 +35,7 @@ class CategoryTestBuilder {
     /**
      * recursive
      */
-    private void create(Category cat, int level, int numberOfChild, String namePrefix) {
+    private void create(CategoryC cat, int level, int numberOfChild, String namePrefix) {
         if(level <= 0){
             return
         }
@@ -43,20 +43,20 @@ class CategoryTestBuilder {
         cat.categories.each {c ->  create(c, level - 1, numberOfChild, namePrefix)}
     }
 
-    private void createCategoryChildren(Category parent, int numberOfChild, String namePrefix) {
+    private void createCategoryChildren(CategoryC parent, int numberOfChild, String namePrefix) {
         (0..numberOfChild-1).each {
-            Category child =  crateCategory(namePrefix)
+            CategoryC child =  crateCategory(namePrefix)
             parent.addChild(child)
         }
     }
 
-    private Category crateCategory(String namePrefix) {
+    private CategoryC crateCategory(String namePrefix) {
         nodes++
-        new Category(nodes*idMultiplier, namePrefix+" "+nodes*idMultiplier)
+        new CategoryC(nodes*idMultiplier, namePrefix+" "+nodes*idMultiplier)
     }
 
-    Category build() {
-        println("created Category tree with "+nodes+" nodes")
+    CategoryC build() {
+        println("created CategoryC tree with "+nodes+" nodes")
         root
     }
 }

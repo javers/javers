@@ -83,13 +83,13 @@ class JaversRepositoryE2ETest extends Specification {
     def "should support long numbers as Entity Id "(){
         given:
         def longId = 1000000000L*1000
-        def category = new Category(longId)
+        def category = new CategoryC(longId)
 
         when:
         javers.commit("author",category)
 
         then:
-        javers.getLatestSnapshot(longId, Category).get().globalId.cdoId == longId
+        javers.getLatestSnapshot(longId, CategoryC).get().globalId.cdoId == longId
     }
 
     def "should query for ValueObject changes by owning Entity class"() {

@@ -2,6 +2,7 @@ package org.javers.common.collections;
 
 import org.javers.common.reflection.ReflectionUtil;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
 import java.util.Currency;
@@ -13,6 +14,7 @@ import java.util.UUID;
 public class WellKnownValueTypes {
     private static final Class<?>[] VALUE_TYPES = {
             BigDecimal.class,
+            BigInteger.class,
             ThreadLocal.class,
             UUID.class,
             Currency.class,
