@@ -80,6 +80,11 @@ class JaversCore implements Javers {
         Commit commit = commitFactory.create(author, commitProperties, currentVersion);
         long stop_f = System.currentTimeMillis();
 
+        if (commit.getSnapshots().isEmpty()) {
+            logger.info("Skipping persisting empty commit: {}", commit.toString());
+            return commit;
+        }
+
         repository.persist(commit);
         long stop = System.currentTimeMillis();
 
