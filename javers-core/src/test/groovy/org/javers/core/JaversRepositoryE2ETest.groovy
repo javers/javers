@@ -1095,4 +1095,23 @@ class JaversRepositoryE2ETest extends Specification {
         def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject().build())
         (snapshots.collect{it -> it.commitId} as Set).size() == threads
     }
+
+    def "should not persist commits with zero snapshots" () {
+        given:
+        def anEntity = new SnapshotEntity(id: 1, intProperty: 100)
+
+        when:
+        def commit = javers.commit("author", anEntity)
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+
+        then:
+        snapshots.size() == 1
+        repository.getHeadId() == commit.getId()
+
+        when: "should not be persisted"
+        javers.commit("author", anEntity)
+
+        then:
+        repository.getHeadId() == commit.getId()
+    }
 }
