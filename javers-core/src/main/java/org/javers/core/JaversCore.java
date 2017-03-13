@@ -81,7 +81,7 @@ class JaversCore implements Javers {
         long stop_f = System.currentTimeMillis();
 
         if (commit.getSnapshots().isEmpty()) {
-            logger.info("Skip persisting commit (0 snapshots): {}", commit.toString());
+            logger.info("Skipping persisting empty commit: {}", commit.toString());
             return commit;
         }
 
