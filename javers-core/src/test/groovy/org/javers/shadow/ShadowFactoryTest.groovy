@@ -44,6 +44,9 @@ class ShadowFactoryTest extends Specification {
     @Unroll
     def "should create Shadows with #what"(){
       when:
+      def tv1 = v1()
+      def tv2 = v2()
+
       javers.commit("author",v1())
       javers.commit("author",v2())
 

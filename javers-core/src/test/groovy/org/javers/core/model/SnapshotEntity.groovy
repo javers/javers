@@ -77,4 +77,8 @@ class SnapshotEntity {
     int getId() {
         id
     }
+
+    SnapshotEntity getEntityRef() {
+        return entityRef
+    }
 }
