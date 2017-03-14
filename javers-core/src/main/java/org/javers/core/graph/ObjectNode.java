@@ -4,7 +4,6 @@ import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.CdoWrapper;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EntityType;
@@ -15,7 +14,6 @@ import org.javers.core.metamodel.type.ValueObjectType;
 import java.util.HashMap;
 import java.util.Map;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
-import static org.javers.core.metamodel.object.InstanceId.createFromInstance;
 
 /**
  * Node in client's domain object graph. Reflects one {@link Cdo} or {@link CdoSnapshot}.
@@ -33,10 +31,6 @@ public class ObjectNode {
     public ObjectNode(Cdo cdo) {
         argumentsAreNotNull(cdo);
         this.cdo = cdo;
-    }
-
-    ObjectNode(Object cdo, EntityType entity) {
-        this(new CdoWrapper(cdo, createFromInstance(cdo, entity), entity));
     }
 
     /**
