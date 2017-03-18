@@ -32,47 +32,47 @@ class PrimitiveEntity {
 
     @Id
     String getId() {
-        return id
+        id
     }
 
     int getIntField() {
-        return intField
+        intField
     }
 
     long getLongField() {
-        return longField
+        longField
     }
 
     double getDoubleField() {
-        return doubleField
+        doubleField
     }
 
     float getFloatField() {
-        return floatField
+        floatField
     }
 
     char getCharField() {
-        return charField
+        charField
     }
 
     byte getByteField() {
-        return byteField
+        byteField
     }
 
     short getShortField() {
-        return shortField
+        shortField
     }
 
     boolean getBooleanField() {
-        return booleanField
+        booleanField
     }
 
     SomeEnum getSomeEnum() {
-        return someEnum
+        someEnum
     }
 
     Integer getIntegerField() {
-        return IntegerField
+        IntegerField
     }
 }
 

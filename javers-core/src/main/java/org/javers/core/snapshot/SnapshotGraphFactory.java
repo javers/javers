@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 
 /**
  * Builds SnapshotGraph from latest snapshots loaded from javersRepository
- *
- * @author bartosz walacik
  */
 public class SnapshotGraphFactory {
     private final JaversExtendedRepository javersRepository;
