@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
 class TailoredJaversFieldFactory extends TailoredJaversMemberFactory {
 
     @Override
-    public JaversField create(final Property primaryProperty, final Class<?> genericItemClass) {
+    JaversField create(final Property primaryProperty, final Class<?> genericItemClass) {
         return new JaversField((Field) primaryProperty.getMember().getRawMember(), null) {
             @Override
             public Type getGenericResolvedType() {

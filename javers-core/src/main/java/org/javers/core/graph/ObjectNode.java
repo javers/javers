@@ -35,10 +35,6 @@ public class ObjectNode {
         this.cdo = cdo;
     }
 
-    ObjectNode(Object cdo, EntityType entity) {
-        this(new CdoWrapper(cdo, createFromInstance(cdo, entity), entity));
-    }
-
     /**
      * @return returns {@link Optional#EMPTY} for snapshots
      */
