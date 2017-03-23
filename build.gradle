@@ -53,12 +53,14 @@ subprojects {
         options.noTimestamp()
     }
 
-    task example(dependsOn: 'cleanTest') << {
-        tasks.test.testLogging {
-            events 'failed', 'passed'
-            showStandardStreams = true
+    task example(dependsOn: 'cleanTest') {
+        doLast {
+            tasks.test.testLogging {
+                events 'failed', 'passed'
+                showStandardStreams = true
+            }
+            tasks.test.execute()
         }
-        tasks.test.execute()
     }
 
     //disable javadoc doclint for Java8
