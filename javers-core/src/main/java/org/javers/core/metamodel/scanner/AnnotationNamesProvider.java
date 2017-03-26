@@ -80,4 +80,8 @@ class AnnotationNamesProvider {
     public Set<String> getPropertyNameAliases() {
         return Collections.unmodifiableSet(propertyNameAliases);
     }
+
+    public Set<String> getTypeNameAliases() {
+        return Collections.unmodifiableSet(typeNameAliases);
+    }
 }

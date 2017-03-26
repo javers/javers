@@ -2,11 +2,11 @@ package org.javers.core.metamodel.scanner;
 
 import org.javers.common.reflection.JaversMethod;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.metamodel.annotation.PropertyName;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author pawel szymczyk
@@ -28,12 +28,9 @@ class BeanBasedPropertyScanner extends PropertyScanner {
             boolean isIgnoredInType = ignoreDeclaredProperties && getter.getDeclaringClass().equals(managedClass);
             boolean hasTransientAnn = getter.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
             boolean hasShallowReferenceAnn = getter.hasAnyAnnotation(annotationNamesProvider.getShallowReferenceAliases());
-            if(getter.hasAnyAnnotation(annotationNamesProvider.getPropertyNameAliases())){
-                String customPropertyName = getter.getRawMember().getAnnotation(PropertyName.class).value();
-                beanProperties.add(new Property(getter, hasTransientAnn || isIgnoredInType, hasShallowReferenceAnn, customPropertyName));
-            } else {
-                beanProperties.add(new Property(getter, hasTransientAnn || isIgnoredInType, hasShallowReferenceAnn, getter.propertyName()));
-            }
+
+            Optional<String> customPropertyName = getter.getFirstValue(annotationNamesProvider.getPropertyNameAliases());
+            beanProperties.add(new Property(getter, hasTransientAnn || isIgnoredInType, hasShallowReferenceAnn, customPropertyName));
 
         }
         return new PropertyScan(beanProperties);

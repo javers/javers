@@ -2,7 +2,9 @@ package org.javers.common.reflection;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import org.javers.common.collections.Lists;
-import java.util.Optional;
+
+import java.util.*;
+
 import org.javers.common.collections.Primitives;
 import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;
@@ -13,9 +15,6 @@ import org.slf4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -293,5 +292,15 @@ public class ReflectionUtil {
             }
         }
         return false;
+    }
+
+    public static <T> T getAnnotationValue(Annotation ann, String propertyName) {
+        return (T) ReflectionUtil.invokeGetter(ann, propertyName);
+    }
+
+    public static Optional<Annotation> findFirst(AnnotatedElement annotatedElement, Set<String> annotationNames) {
+        return Arrays.stream(annotatedElement.getAnnotations())
+                .filter(a -> annotationNames.contains(a.annotationType().getSimpleName()))
+                .findFirst();
     }
 }

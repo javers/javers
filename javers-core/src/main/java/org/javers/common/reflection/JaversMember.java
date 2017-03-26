@@ -1,6 +1,5 @@
 package org.javers.common.reflection;
 
-import java.util.Optional;
 import org.javers.common.validation.Validate;
 
 import java.lang.annotation.Annotation;
@@ -8,6 +7,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -62,22 +62,15 @@ public abstract class JaversMember<T extends Member> {
     }
 
     public boolean hasAnyAnnotation(Set<String> annotationNames){
-        for (String annotationName : annotationNames){
-            if (isAnnotationPresent(annotationName)) {
-                return true;
-            }
-        }
-        return false;
+        return findFirst(annotationNames).isPresent();
     }
 
-    public boolean isAnnotationPresent(String annotationName){
-        Validate.argumentsAreNotNull(annotationName);
+    public Optional<Annotation> findFirst(Set<String> annotationNames) {
+        return ReflectionUtil.findFirst((AccessibleObject) rawMember, annotationNames);
+    }
 
-        if (contains(( (AccessibleObject)rawMember).getAnnotations(), annotationName)) {
-            return true;
-        }
-
-        return false;
+    public Optional<String> getFirstValue(Set<String> annotationNames) {
+        return findFirst(annotationNames).map(a -> ReflectionUtil.getAnnotationValue(a, "value"));
     }
 
     public abstract Object invokeEvenIfPrivate(Object target);
@@ -91,15 +84,6 @@ public abstract class JaversMember<T extends Member> {
 
     private boolean isPublic(Member member){
         return Modifier.isPublic(member.getModifiers());
-    }
-
-    private static boolean contains(Annotation[] annotations, String annotationName) {
-        for (Annotation a : annotations){
-            if (a.annotationType().getSimpleName().equals(annotationName)){
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

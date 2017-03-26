@@ -1,10 +1,10 @@
 package org.javers.core.metamodel.scanner;
 
-import java.util.Optional;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
 
 import java.lang.annotation.Annotation;
+import java.util.Optional;
 
 /**
  * Should scan well known annotations at class level
@@ -22,12 +22,8 @@ class ClassAnnotationsScanner {
     public ClassAnnotationsScan scan(Class javaClass){
         Validate.argumentIsNotNull(javaClass);
 
-        Optional<String> typeName = Optional.empty();
-        for (Annotation ann : javaClass.getAnnotations()) {
-            if (annotationNamesProvider.isTypeName(ann)) {
-                typeName = Optional.of((String) ReflectionUtil.invokeGetter(ann, "value"));
-            }
-        }
+        Optional<String> typeName = ReflectionUtil.findFirst(javaClass, annotationNamesProvider.getTypeNameAliases())
+                .map(a -> ReflectionUtil.getAnnotationValue(a, "value"));
 
         boolean hasValue = false;
         boolean hasIgnored = false;

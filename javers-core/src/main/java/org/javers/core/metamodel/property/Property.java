@@ -1,10 +1,12 @@
 package org.javers.core.metamodel.property;
 
+import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.JaversMember;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -21,16 +23,16 @@ public class Property {
     private transient final boolean hasShallowReferenceAnn;
     private String name;
 
-    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, String name){
+    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, Optional<String> name){
         argumentIsNotNull(member);
         this.member = member;
         this.hasTransientAnn = hasTransientAnn;
         this.hasShallowReferenceAnn = hasShallowReferenceAnn;
-        this.name = name;
+        this.name = name.orElse(member.propertyName());
     }
 
-    public Property(JaversMember member, boolean hasTransientAnn){
-        this(member, hasTransientAnn, false, member.propertyName());
+    public Property(JaversMember member, boolean hasTransientAnn) {
+        this(member, hasTransientAnn, false, Optional.empty());
     }
 
     public Type getGenericType() {
@@ -48,7 +50,7 @@ public class Property {
      * true if property looks like identifier of an Entity, for example has @Id annotation
      */
     public boolean looksLikeId() {
-        return member.isAnnotationPresent(ID_ANN) || member.isAnnotationPresent(EMBEDDED_ID_ANN);
+        return member.findFirst(Sets.asSet(ID_ANN, EMBEDDED_ID_ANN)).isPresent();
     }
 
     /**
