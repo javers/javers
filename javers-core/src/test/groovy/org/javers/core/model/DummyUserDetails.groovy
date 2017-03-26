@@ -48,4 +48,9 @@ class DummyUserDetails {
         this.addressList.addAll(dummyAddress)
         this
     }
+
+    @PropertyName("Customized Property")
+    String getCustomizedProperty() {
+        return customizedProperty
+    }
 }
