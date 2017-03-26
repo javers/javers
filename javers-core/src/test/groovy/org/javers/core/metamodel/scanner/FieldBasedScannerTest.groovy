@@ -1,6 +1,8 @@
 package org.javers.core.metamodel.scanner
 
+import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
+import org.javers.core.model.DummyUserDetails
 
 import static PropertyScanAssert.assertThat
 
@@ -20,4 +22,14 @@ class FieldBasedScannerTest extends PropertyScannerTest {
         then:
         assertThat(properties).hasntGotProperty("someTransientField")
     }
+
+    def "should scan PropertyName property for field based scanner"() {
+        when:
+        def properties = propertyScanner.scan(DummyUserDetails)
+
+        then:
+        assertThat(properties).hasProperty("Customized Property")
+                .hasJavaType(String)
+    }
+
 }

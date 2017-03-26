@@ -44,4 +44,9 @@ class JaversAnnotationsNamesSpace implements AnnotationsNameSpace {
     public Set<String> getIgnoredTypeAliases() {
         return Sets.asSet(DiffIgnore.class.getSimpleName());
     }
+
+    @Override
+    public Set<String> getPropertyNameAliases() {
+        return Sets.asSet(PropertyName.class.getSimpleName());
+    }
 }
