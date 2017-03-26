@@ -1,6 +1,6 @@
 dependencies {
     compile project(':javers-core')
-    compile 'org.polyjdbc:polyjdbc:0.6.4'
+    compile 'org.polyjdbc:polyjdbc:0.6.5'
     compile "com.google.guava:guava:$guavaVersion"
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
