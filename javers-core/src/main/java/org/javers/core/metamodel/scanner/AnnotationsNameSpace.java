@@ -20,4 +20,6 @@ interface AnnotationsNameSpace {
     Set<String> getShallowReferenceAliases();
 
     Set<String> getTypeNameAliases();
+
+    Set<String> getPropertyNameAliases();
 }

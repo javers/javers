@@ -1114,4 +1114,18 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         repository.getHeadId() == commit.getId()
     }
+
+    def "should use name from @PropertyName in commits and queries"(){
+        given:
+        def javers = javers().build()
+
+        when:
+        javers.commit("author", new DummyUserDetails(id:1))
+        javers.commit("author", new DummyUserDetails(id:1, customizedProperty: 'a'))
+        def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject().andProperty('Customized Property').build())
+
+        then:
+        snapshots.size() == 1
+        snapshots[0].getPropertyValue('Customized Property') == 'a'
+    }
 }

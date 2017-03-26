@@ -197,4 +197,12 @@ abstract class PropertyScannerTest extends Specification {
                               .hasJavaType(DummyAddress)
     }
 
+    def "should use name from @PropertyName when given"() {
+        when:
+        def properties = propertyScanner.scan(DummyUserDetails)
+
+        then:
+        assertThat(properties).hasProperty("Customized Property")
+                              .hasJavaType(String)
+    }
 }
