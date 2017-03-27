@@ -334,7 +334,7 @@ class ShadowFactoryTest extends Specification {
     Function byIdSupplier() {
         return { id ->
             if (id instanceof InstanceId) {
-                return javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, SnapshotEntity).build())[0]
+                return javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, Class.forName(id.typeName)).build())[0]
             } else {
                 return javers.findSnapshots(QueryBuilder.byValueObject(SnapshotEntity, id.fragment).build())[0]
             }

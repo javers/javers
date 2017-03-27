@@ -5,6 +5,8 @@ import org.javers.common.exception.JaversExceptionCode;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Optional;
+
 import static org.javers.common.string.ToStringBuilder.typeName;
 
 /**
@@ -13,8 +15,11 @@ import static org.javers.common.string.ToStringBuilder.typeName;
 public class JaversMethod extends JaversMember<Method> {
     private static final Object[] EMPTY_ARRAY = new Object[]{};
 
+    private final Optional<Method> setter;
+
     public JaversMethod(Method rawMethod, Type resolvedReturnType) {
         super(rawMethod, resolvedReturnType);
+        setter = ReflectionUtil.findSetterForGetter(rawMethod);
     }
 
     @Override
@@ -41,7 +46,17 @@ public class JaversMethod extends JaversMember<Method> {
 
     @Override
     public void setEvenIfPrivate(Object onObject, Object value) {
-        ReflectionUtil.trySetMemberRelevantToGetter(this, onObject, value);
+        if (setter.isPresent()) {
+            try {
+                setter.get().invoke(onObject, value);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new JaversException(JaversExceptionCode.SETTER_INVOCATION_ERROR,
+                        setter.get().getName(), onObject.getClass().getName(), e);
+            }
+        } else {
+            throw new JaversException(JaversExceptionCode.SETTER_NOT_FOUND,
+                    getRawMember().getName(), getRawMember().getDeclaringClass().getName());
+        }
     }
 
     @Override

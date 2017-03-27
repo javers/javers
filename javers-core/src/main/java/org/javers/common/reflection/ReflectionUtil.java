@@ -110,39 +110,23 @@ public class ReflectionUtil {
         return result;
     }
 
-    static boolean trySetMemberRelevantToGetter(JaversMethod getter, Object onObject, Object value) {
-        if (isGetter(getter.getRawMember())) {
-            String setterName = setterNameForGetterName(getter.getRawMember().getName());
-            return trySetMemberWithSetter(setterName, getter.getGenericResolvedType().getClass(), onObject, value) ||
-                    trySetMemberWithField(getter.propertyName(), onObject, value);
+    static Optional<Method> findSetterForGetter(Method getter) {
+        if (isGetter(getter)) {
+            Class<?> clazz = getter.getDeclaringClass();
+            String setterName = setterNameForGetterName(getter.getName());
+            try {
+                Method setter = clazz.getDeclaredMethod(setterName, getter.getReturnType());
+                setter.setAccessible(true);
+                return Optional.of(setter);
+            } catch (NoSuchMethodException e) {
+                logger.info("setter for getter '" + getter.getName() + "' in class " + clazz.getName() + " not found");
+            }
         }
-        return false;
+        return Optional.empty();
     }
 
     private static String setterNameForGetterName(String getterName) {
         return getterName.replaceAll("^(get|is)", "set");
-    }
-
-    private static boolean trySetMemberWithSetter(String setterName, Class returnClass, Object onObject, Object value) {
-        try {
-            Method method = onObject.getClass().getDeclaredMethod(setterName, returnClass);
-            method.setAccessible(true);
-            method.invoke(onObject, value);
-            return true;
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            return false;
-        }
-    }
-
-    private static boolean trySetMemberWithField(String fieldName, Object onObject, Object value) {
-        try {
-            Field field = onObject.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(onObject, value);
-            return true;
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            return false;
-        }
     }
 
     /**
