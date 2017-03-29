@@ -29,7 +29,7 @@ import static java.time.LocalDate.now
 /**
  * @author bartosz.walacik
  */
-class ShadowFactoryTest extends Specification {
+abstract class ShadowFactoryTest extends Specification {
 
     @Shared JaversTestBuilder javersTestAssembly
     @Shared ShadowFactory shadowFactory
@@ -329,23 +329,6 @@ class ShadowFactoryTest extends Specification {
 
       then: "objects converted to JSON String should be returned"
       shadow.polymorficList == ["2017-01-01", "2017-01-02"]
-    }
-
-    def "should manage immutable objects creation"(){
-      given:
-      def ref = new ImmutableEntity(2, null)
-      def cdo = new ImmutableEntity(1, ref)
-      javers.commit("author", cdo)
-      def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1, ImmutableEntity).build())[0]
-
-      when:
-      def shadow = shadowFactory.createShadow(snapshot, {id -> javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, ImmutableEntity).build())[0]})
-
-      then:
-      shadow instanceof ImmutableEntity
-      shadow.id == 1
-      shadow.entityRef instanceof ImmutableEntity
-      shadow.entityRef.id == 2
     }
 
     Function byIdSupplier() {

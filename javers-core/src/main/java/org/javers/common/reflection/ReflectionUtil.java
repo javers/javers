@@ -119,7 +119,7 @@ public class ReflectionUtil {
                 setter.setAccessible(true);
                 return Optional.of(setter);
             } catch (NoSuchMethodException e) {
-                logger.info("setter for getter '" + getter.getName() + "' in class " + clazz.getName() + " not found");
+                logger.debug("setter for getter '" + getter.getName() + "' in class " + clazz.getName() + " not found");
             }
         }
         return Optional.empty();

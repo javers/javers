@@ -6,15 +6,15 @@ class ImmutableEntity {
     @Id
     private final int id
 
-    private final ImmutableEntity reference
+    private final ImmutableEntity entityRef
 
     ImmutableEntity(int id) {
         this(id, null)
     }
 
-    ImmutableEntity(int id, ImmutableEntity reference) {
+    ImmutableEntity(int id, ImmutableEntity entityRef) {
         this.id = id
-        this.reference = reference
+        this.entityRef = entityRef
     }
 
     @Id
@@ -23,6 +23,6 @@ class ImmutableEntity {
     }
 
     ImmutableEntity getReference() {
-        reference
+        entityRef
     }
 }
