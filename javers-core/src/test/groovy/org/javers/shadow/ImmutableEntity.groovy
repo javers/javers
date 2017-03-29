@@ -8,16 +8,21 @@ class ImmutableEntity {
 
     private final ImmutableEntity entityRef
 
+    ImmutableEntity(int id) {
+        this(id, null)
+    }
+
     ImmutableEntity(int id, ImmutableEntity entityRef) {
         this.id = id
         this.entityRef = entityRef
     }
 
+    @Id
     int getId() {
-        return id
+        id
     }
 
-    ImmutableEntity getEntityRef() {
-        return entityRef
+    ImmutableEntity getReference() {
+        entityRef
     }
 }

@@ -11,17 +11,17 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId
 /**
  * @author bartosz walacik
  */
-class GraphShadowFactoryTest extends Specification {
+class SnapshotGraphFactoryTest extends Specification {
 
     @Shared JaversTestBuilder javers
-    @Shared ShadowGraphFactory graphShadowFactory
+    @Shared SnapshotGraphFactory snapshotGraphFactory
 
     def setup(){
         javers = JaversTestBuilder.javersTestAssembly()
-        graphShadowFactory = javers.getContainerComponent(ShadowGraphFactory)
+        snapshotGraphFactory = javers.getContainerComponent(SnapshotGraphFactory)
     }
 
-    def "should create ShadowGraph with snapshots of committed objects "() {
+    def "should create SnapshotGraph with snapshots of committed objects "() {
         given:
         def oldRef = new SnapshotEntity(id: 2, intProperty:2)
         javers.javers().commit("user",oldRef)
@@ -29,11 +29,11 @@ class GraphShadowFactoryTest extends Specification {
         def liveGraph = javers.createLiveGraph(cdo)
 
         when:
-        def shadow = graphShadowFactory.createLatestShadow(liveGraph)
+        def snapshotGraph = snapshotGraphFactory.createLatest(liveGraph.globalIds())
 
         then:
-        shadow.nodes().size() == 1
-        NodeAssert.assertThat(shadow.nodes()[0]).hasGlobalId(instanceId(2,SnapshotEntity))
+        snapshotGraph.nodes().size() == 1
+        NodeAssert.assertThat(snapshotGraph.nodes()[0]).hasGlobalId(instanceId(2,SnapshotEntity))
                   .isSnapshot()
     }
 }

@@ -110,6 +110,25 @@ public class ReflectionUtil {
         return result;
     }
 
+    static Optional<Method> findSetterForGetter(Method getter) {
+        if (isGetter(getter)) {
+            Class<?> clazz = getter.getDeclaringClass();
+            String setterName = setterNameForGetterName(getter.getName());
+            try {
+                Method setter = clazz.getDeclaredMethod(setterName, getter.getReturnType());
+                setter.setAccessible(true);
+                return Optional.of(setter);
+            } catch (NoSuchMethodException e) {
+                logger.debug("setter for getter '" + getter.getName() + "' in class " + clazz.getName() + " not found");
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static String setterNameForGetterName(String getterName) {
+        return getterName.replaceAll("^(get|is)", "set");
+    }
+
     /**
      * @see JaversMethodFactory#getAllMethods()
      */
@@ -171,7 +190,7 @@ public class ReflectionUtil {
 
         return Lists.immutableListOf(((ParameterizedType) javaType).getActualTypeArguments());
     }
-    
+
     public static List<Class<?>> findClasses(Class<? extends Annotation> annotation, String... packages) {
         Validate.argumentsAreNotNull(annotation, packages);
     	List<String> names = new FastClasspathScanner(packages).scan().getNamesOfClassesWithAnnotation(annotation);

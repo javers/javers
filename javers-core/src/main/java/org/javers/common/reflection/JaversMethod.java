@@ -5,6 +5,8 @@ import org.javers.common.exception.JaversExceptionCode;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Optional;
+
 import static org.javers.common.string.ToStringBuilder.typeName;
 
 /**
@@ -13,8 +15,11 @@ import static org.javers.common.string.ToStringBuilder.typeName;
 public class JaversMethod extends JaversMember<Method> {
     private static final Object[] EMPTY_ARRAY = new Object[]{};
 
+    private final Optional<Method> setter;
+
     public JaversMethod(Method rawMethod, Type resolvedReturnType) {
         super(rawMethod, resolvedReturnType);
+        setter = ReflectionUtil.findSetterForGetter(rawMethod);
     }
 
     @Override
@@ -41,21 +46,18 @@ public class JaversMethod extends JaversMember<Method> {
 
     @Override
     public void setEvenIfPrivate(Object onObject, Object value) {
-        try {
-            getRawMember().invoke(onObject, new Object[]{value});
-        } catch (IllegalArgumentException ie){
-            String valueType = value == null ? "null" : value.getClass().getName();
-            throw new JaversException(JaversExceptionCode.PROPERTY_SETTING_ERROR, valueType, this, ie.getClass().getName() + " - " + ie.getMessage());
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            throw new JaversException(JaversExceptionCode.PROPERTY_ACCESS_ERROR,
-                    this, onObject.getClass().getSimpleName(), e.getClass().getName()+": "+e.getMessage());
+        if (setter.isPresent()) {
+            try {
+                setter.get().invoke(onObject, value);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new JaversException(JaversExceptionCode.SETTER_INVOCATION_ERROR,
+                        setter.get().getName(), onObject.getClass().getName(), e);
+            }
+        } else {
+            throw new JaversException(JaversExceptionCode.SETTER_NOT_FOUND,
+                    getRawMember().getName(), getRawMember().getDeclaringClass().getName());
         }
     }
-
-/*TODO
-    private Method setter() {
-
-    }*/
 
     @Override
     public String propertyName() {

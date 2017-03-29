@@ -77,4 +77,12 @@ class SnapshotEntity {
     int getId() {
         id
     }
+
+    SnapshotEntity getEntityRef() {
+        entityRef
+    }
+
+    void setEntityRef(SnapshotEntity entityRef) {
+        this.entityRef = entityRef
+    }
 }

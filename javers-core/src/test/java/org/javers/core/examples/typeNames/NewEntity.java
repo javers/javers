@@ -14,4 +14,17 @@ public class NewEntity {
     private int value;
 
     private int newValue;
+
+    @Id
+    public int getId() {
+        return id;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public int getNewValue() {
+        return newValue;
+    }
 }
