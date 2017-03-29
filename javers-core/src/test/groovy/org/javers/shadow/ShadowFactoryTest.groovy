@@ -320,15 +320,32 @@ class ShadowFactoryTest extends Specification {
       given:
       def cdo = new SnapshotEntity(id: 1, polymorficList: [new LocalDate(2017,1,1), new LocalDate(2017,1,2) ])
       javers.commit("author", cdo)
-
-      when:
       def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())[0]
       //serialize & deserialize
       snapshot = javers.getJsonConverter().fromJson(javers.getJsonConverter().toJson(snapshot), CdoSnapshot)
+
+      when:
       def shadow = shadowFactory.createShadow(snapshot, byIdSupplier())
 
       then: "objects converted to JSON String should be returned"
       shadow.polymorficList == ["2017-01-01", "2017-01-02"]
+    }
+
+    def "should manage immutable objects creation"(){
+      given:
+      def ref = new ImmutableEntity(2, null)
+      def cdo = new ImmutableEntity(1, ref)
+      javers.commit("author", cdo)
+      def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1, ImmutableEntity).build())[0]
+
+      when:
+      def shadow = shadowFactory.createShadow(snapshot, {id -> javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, ImmutableEntity).build())[0]})
+
+      then:
+      shadow instanceof ImmutableEntity
+      shadow.id == 1
+      shadow.entityRef instanceof ImmutableEntity
+      shadow.entityRef.id == 2
     }
 
     Function byIdSupplier() {
