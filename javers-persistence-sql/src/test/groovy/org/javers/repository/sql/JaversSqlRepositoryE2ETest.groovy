@@ -10,6 +10,7 @@ import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryBuilder
 
 import java.sql.Connection
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 
 import static groovyx.gpars.GParsPool.withPool
@@ -17,6 +18,7 @@ import static groovyx.gpars.GParsPool.withPool
 abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     private ThreadLocal<Connection> connection = ThreadLocal.withInitial({createAndInitConnection()})
+    private Collection<Connection> connections = new ConcurrentLinkedQueue<>()
 
     protected abstract Connection createConnection()
 
@@ -31,13 +33,20 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     Connection createAndInitConnection() {
         def connection = createConnection()
         connection.setAutoCommit(false)
+        connections.add(connection)
         connection
     }
 
     @Override
     def setup() {
         clearTables()
-        getConnection().commit()
+    }
+
+    def cleanup() {
+        connections.each {
+            it.rollback()
+            it.close()
+        }
     }
 
     @Override
@@ -55,15 +64,11 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         execute("delete  from ${schemaPrefix()}jv_commit")
         execute("delete  from ${schemaPrefix()}jv_commit_property")
         execute("delete  from ${schemaPrefix()}jv_global_id")
+        getConnection().commit()
     }
 
     String schemaPrefix() {
         getSchema() ? getSchema() + "." : ""
-    }
-
-    def cleanup() {
-        getConnection().rollback()
-        getConnection().close()
     }
 
     def execute(String sql) {
@@ -170,10 +175,25 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
       snapshots[0].commitId.majorId == 1
     }
 
+    def "should persist over 100 snapshots with proper sequence of primary keys"() {
+        given:
+        (150..1).each{
+            javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
+        }
+
+        when:
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).limit(150).build()
+        def snapshots = javers.findSnapshots(query)
+        def intPropertyValues = snapshots.collect { it.getPropertyValue("intProperty") }
+
+        then:
+        intPropertyValues == 1..150
+    }
+
     def "should allow concurrent updates of different Objects"(){
         given:
         def cnt = new AtomicInteger()
-        def threads = 50
+        def threads = 99
 
         when:
         withPool threads, {
@@ -194,7 +214,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         given:
         def cnt = new AtomicInteger()
         def sId = 222
-        def threads = 50
+        def threads = 99
         //initial commit
         javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
         getConnection().commit()
