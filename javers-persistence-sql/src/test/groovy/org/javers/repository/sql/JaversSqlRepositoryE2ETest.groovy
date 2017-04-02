@@ -10,34 +10,41 @@ import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryBuilder
 
 import java.sql.Connection
+import java.util.concurrent.atomic.AtomicInteger
+
+import static groovyx.gpars.GParsPool.withPool
 
 abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
-    private Connection connection
+    private ThreadLocal<Connection> connection = ThreadLocal.withInitial({createAndInitConnection()})
 
     protected abstract Connection createConnection()
 
     protected abstract DialectName getDialect()
 
-    protected abstract String getSchema();
+    protected abstract String getSchema()
 
     protected Connection getConnection() {
+        connection.get()
+    }
+
+    Connection createAndInitConnection() {
+        def connection = createConnection()
+        connection.setAutoCommit(false)
         connection
     }
 
     @Override
     def setup() {
         clearTables()
-        connection.commit()
+        getConnection().commit()
     }
 
     @Override
     protected JaversRepository prepareJaversRepository() {
-        connection = createConnection()
-        connection.setAutoCommit(false)
-        return SqlRepositoryBuilder
+        SqlRepositoryBuilder
                 .sqlRepository()
-                .withConnectionProvider({ connection } as ConnectionProvider)
+                .withConnectionProvider({ getConnection() } as ConnectionProvider)
                 .withDialect(getDialect())
                 .withSchema(getSchema())
                 .build()
@@ -55,19 +62,19 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     }
 
     def cleanup() {
-        connection.rollback()
-        connection.close()
+        getConnection().rollback()
+        getConnection().close()
     }
 
     def execute(String sql) {
-        def stmt = connection.createStatement()
+        def stmt = getConnection().createStatement()
         stmt.executeUpdate(sql)
         stmt.close()
     }
 
     def "should select Head using max CommitId and not table PK"(){
         given:
-        def sql = new Sql(connection)
+        def sql = new Sql(getConnection())
         [
                 [3, 3.00],
                 [2, 11.02],
@@ -91,7 +98,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
         when:
         javers.commit("author", anEntity)
-        connection.rollback()
+        getConnection().rollback()
         def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         then:
@@ -99,7 +106,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
         when:
         javers.commit("author", anEntity)
-        connection.commit()
+        getConnection().commit()
         snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
 
         then:
@@ -161,5 +168,26 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
       then:
       snapshots.size() == 1
       snapshots[0].commitId.majorId == 1
+    }
+
+    def "should allow concurrent writes"(){
+        given:
+        def cnt = new AtomicInteger()
+        def sId = 222
+        def threads = 99
+        //initial commit
+        javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
+
+        when:
+        withPool threads, {
+            (1..threads).collectParallel {
+                5.times {
+                    javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
+                }
+            }
+        }
+
+        then:
+        javers.findSnapshots(QueryBuilder.byInstanceId(sId, SnapshotEntity).limit(1000).build()).size() == threads * 5 + 1
     }
 }

@@ -16,7 +16,6 @@ import spock.lang.Unroll
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.concurrent.atomic.AtomicInteger
 
 import static groovyx.gpars.GParsPool.withPool
 import static org.javers.core.JaversBuilder.javers
@@ -1128,26 +1127,5 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         snapshots.size() == 1
         snapshots[0].getPropertyValue('Customized Property') == 'a'
-    }
-
-    def "should allow concurrent writes"(){
-        given:
-        def cnt = new AtomicInteger()
-        def sId = 222
-        def threads = 99
-        //initial commit
-        javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
-
-        when:
-        withPool threads, {
-            (1..threads).collectParallel {
-                5.times {
-                    javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
-                }
-            }
-        }
-
-        then:
-        javers.findSnapshots(QueryBuilder.byInstanceId(sId, SnapshotEntity).limit(1000).build()).size() == threads * 5 + 1
     }
 }
