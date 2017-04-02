@@ -170,24 +170,46 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
       snapshots[0].commitId.majorId == 1
     }
 
-    def "should allow concurrent writes"(){
+    def "should allow concurrent updates of different Objects"(){
         given:
         def cnt = new AtomicInteger()
-        def sId = 222
-        def threads = 99
-        //initial commit
-        javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
+        def threads = 50
 
         when:
         withPool threads, {
             (1..threads).collectParallel {
-                5.times {
-                    javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
+                def thread = it
+                4.times {
+                    javers.commit("author", new SnapshotEntity(id: thread, intProperty: cnt.incrementAndGet()))
+                    getConnection().commit()
                 }
             }
         }
 
         then:
-        javers.findSnapshots(QueryBuilder.byInstanceId(sId, SnapshotEntity).limit(1000).build()).size() == threads * 5 + 1
+        javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).limit(1000).build()).size() == threads * 4
+    }
+
+    def "should allow concurrent updates of the same Object"(){
+        given:
+        def cnt = new AtomicInteger()
+        def sId = 222
+        def threads = 50
+        //initial commit
+        javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
+        getConnection().commit()
+
+        when:
+        withPool threads, {
+            (1..threads).collectParallel {
+                4.times {
+                    javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
+                    getConnection().commit()
+                }
+            }
+        }
+
+        then:
+        javers.findSnapshots(QueryBuilder.byInstanceId(sId, SnapshotEntity).limit(1000).build()).size() == threads * 4 + 1
     }
 }
