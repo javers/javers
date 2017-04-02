@@ -18,19 +18,4 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
     String getSchema() {
         return null
     }
-
-    def "should persist over 100 snapshots with proper sequence of primary keys"() {
-        given:
-        (150..1).each{
-            javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
-        }
-
-        when:
-        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).limit(150).build()
-        def snapshots = javers.findSnapshots(query)
-        def intPropertyValues = snapshots.collect { it.getPropertyValue("intProperty") }
-
-        then:
-        intPropertyValues == 1..150
-    }
 }
