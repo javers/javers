@@ -1,6 +1,6 @@
 package org.javers.core.metamodel.scanner;
 
-import org.javers.common.reflection.JaversMethod;
+import org.javers.common.reflection.JaversGetter;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.property.Property;
 
@@ -20,10 +20,10 @@ class BeanBasedPropertyScanner extends PropertyScanner {
 
     @Override
     public PropertyScan scan(Class<?> managedClass, boolean ignoreDeclaredProperties) {
-        List<JaversMethod> getters = ReflectionUtil.findAllPersistentGetters(managedClass);
+        List<JaversGetter> getters = ReflectionUtil.getAllGetters(managedClass);
         List<Property> beanProperties = new ArrayList<>();
 
-        for (JaversMethod getter : getters) {
+        for (JaversGetter getter : getters) {
             boolean isIgnoredInType = ignoreDeclaredProperties && getter.getDeclaringClass().equals(managedClass);
             boolean hasTransientAnn = getter.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
             boolean hasShallowReferenceAnn = getter.hasAnyAnnotation(annotationNamesProvider.getShallowReferenceAliases());

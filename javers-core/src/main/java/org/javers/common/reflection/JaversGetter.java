@@ -2,24 +2,29 @@ package org.javers.common.reflection;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.slf4j.Logger;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
 import static org.javers.common.string.ToStringBuilder.typeName;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author bartosz walacik
  */
-public class JaversMethod extends JaversMember<Method> {
+public class JaversGetter extends JaversMember<Method> {
+    private static final Logger logger = getLogger(JaversGetter.class);
+
     private static final Object[] EMPTY_ARRAY = new Object[]{};
 
-    private final Optional<Method> setter;
+    private final Optional<Method> setterMethod;
 
-    public JaversMethod(Method rawMethod, Type resolvedReturnType) {
-        super(rawMethod, resolvedReturnType);
-        setter = ReflectionUtil.findSetterForGetter(rawMethod);
+    protected JaversGetter(Method getterMethod, Type resolvedReturnType) {
+        super(getterMethod, resolvedReturnType);
+        setterMethod = findSetterForGetter(getterMethod);
     }
 
     @Override
@@ -46,12 +51,12 @@ public class JaversMethod extends JaversMember<Method> {
 
     @Override
     public void setEvenIfPrivate(Object onObject, Object value) {
-        if (setter.isPresent()) {
+        if (setterMethod.isPresent()) {
             try {
-                setter.get().invoke(onObject, value);
+                setterMethod.get().invoke(onObject, value);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new JaversException(JaversExceptionCode.SETTER_INVOCATION_ERROR,
-                        setter.get().getName(), onObject.getClass().getName(), e);
+                        setterMethod.get().getName(), onObject.getClass().getName(), e);
             }
         } else {
             throw new JaversException(JaversExceptionCode.SETTER_NOT_FOUND,
@@ -61,7 +66,7 @@ public class JaversMethod extends JaversMember<Method> {
 
     @Override
     public String propertyName() {
-        return getterToField(name());
+        return getterNameToFieldName(name());
     }
 
     @Override
@@ -69,18 +74,35 @@ public class JaversMethod extends JaversMember<Method> {
         return "Method " + typeName(getGenericResolvedType())+" " + name() +"; //declared in: " +getDeclaringClass().getSimpleName();
     }
 
-    /**
-     * ex: getCode() -> code,
-     *     isTrue()  -> true
-     */
-    private String getterToField(String getterName) {
+    private static Optional<Method> findSetterForGetter(Method getter) {
+        Class<?> clazz = getter.getDeclaringClass();
+        String setterName = setterNameForGetterName(getter.getName());
+        try {
+            Method setter = clazz.getDeclaredMethod(setterName, getter.getReturnType());
+            setter.setAccessible(true);
+            return Optional.of(setter);
+        } catch (NoSuchMethodException e) {
+            logger.debug("setter for getter '" + getter.getName() + "' in class " + clazz.getName() + " not found");
+            return Optional.empty();
+        }
+    }
 
+    private String getterNameToFieldName(String getterName) {
+        String withoutPrefix = getterNameWithoutPrefix(getterName);
+        return withoutPrefix.substring(0, 1).toLowerCase() + withoutPrefix.substring(1);
+    }
+
+    private static String setterNameForGetterName(String getterName) {
+        return "set" + getterNameWithoutPrefix(getterName);
+    }
+
+    private static String getterNameWithoutPrefix(String getterName) {
         if (getterName.substring(0, 3).equals("get")) {
-            return getterName.substring(3, 4).toLowerCase()+getterName.substring(4);
+            return getterName.substring(3);
         }
 
         if (getterName.substring(0, 2).equals("is")) {
-            return getterName.substring(2, 3).toLowerCase()+getterName.substring(3);
+            return getterName.substring(2);
         }
 
         throw new IllegalArgumentException("Name {"+getterName+"} is not a getter name");

@@ -85,8 +85,7 @@ class ReflectionUtilTest extends Specification {
 
     def "should get all methods from a given class without inheritance duplicates"(){
         when:
-        def methods = ReflectionUtil.getAllMethods(ReflectionTestClass)
-                .findAll{it.declaringClass != Object}
+        def methods = ReflectionUtil.getAllGetters(ReflectionTestClass)
 
         methods.each { println it }
 
@@ -104,7 +103,7 @@ class ReflectionUtilTest extends Specification {
 
         where:
         memberType | action
-        "Method"   | { ReflectionUtil.getAllMethods(ConcreteWithActualType).find{it.name() == "getValue"} }
+        "Method"   | { ReflectionUtil.getAllGetters(ConcreteWithActualType).find{it.name() == "getValue"} }
         "Field"    | { ReflectionUtil.getAllFields(ConcreteWithActualType).find{it.name() == "value"} }
     }
 
@@ -118,7 +117,7 @@ class ReflectionUtilTest extends Specification {
 
         where:
         memberType | action
-        "Method"   | { ReflectionUtil.getAllMethods(ConcreteIdentified).find{it.name() == "getId"} }
+        "Method"   | { ReflectionUtil.getAllGetters(ConcreteIdentified).find{it.name() == "getId"} }
         "Field"    | { ReflectionUtil.getAllFields(ConcreteIdentified).find{it.name() == "id"} }
     }
 }
