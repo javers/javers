@@ -51,16 +51,14 @@ public class JaversGetter extends JaversMember<Method> {
 
     @Override
     public void setEvenIfPrivate(Object onObject, Object value) {
-        if (setterMethod.isPresent()) {
-            try {
-                setterMethod.get().invoke(onObject, value);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new JaversException(JaversExceptionCode.SETTER_INVOCATION_ERROR,
-                        setterMethod.get().getName(), onObject.getClass().getName(), e);
-            }
-        } else {
-            throw new JaversException(JaversExceptionCode.SETTER_NOT_FOUND,
-                    getRawMember().getName(), getRawMember().getDeclaringClass().getName());
+        setterMethod.orElseThrow(() -> new JaversException(JaversExceptionCode.SETTER_NOT_FOUND,
+                getRawMember().getName(), getRawMember().getDeclaringClass().getName()));
+
+        try {
+            setterMethod.get().invoke(onObject, value);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new JaversException(JaversExceptionCode.SETTER_INVOCATION_ERROR,
+                    setterMethod.get().getName(), onObject.getClass().getName(), e);
         }
     }
 
@@ -74,15 +72,15 @@ public class JaversGetter extends JaversMember<Method> {
         return "Method " + typeName(getGenericResolvedType())+" " + name() +"; //declared in: " +getDeclaringClass().getSimpleName();
     }
 
-    private static Optional<Method> findSetterForGetter(Method getter) {
+    private Optional<Method> findSetterForGetter(Method getter) {
         Class<?> clazz = getter.getDeclaringClass();
         String setterName = setterNameForGetterName(getter.getName());
         try {
             Method setter = clazz.getDeclaredMethod(setterName, getter.getReturnType());
-            setter.setAccessible(true);
+            setAccessibleIfNecessary(setter);
             return Optional.of(setter);
         } catch (NoSuchMethodException e) {
-            logger.debug("setter for getter '" + getter.getName() + "' in class " + clazz.getName() + " not found");
+            logger.debug("setter for getter '" + clazz.getName() + "." + getter.getName() + " not found");
             return Optional.empty();
         }
     }

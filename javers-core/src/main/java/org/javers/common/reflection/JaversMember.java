@@ -32,7 +32,7 @@ public abstract class JaversMember<T extends Member> {
         Validate.argumentIsNotNull(rawMember);
         this.rawMember = rawMember;
         this.resolvedReturnType = Optional.ofNullable(resolvedReturnType);
-        setAccessibleIfNecessary();
+        setAccessibleIfNecessary(rawMember);
     }
 
     protected abstract Type getRawGenericType();
@@ -85,7 +85,7 @@ public abstract class JaversMember<T extends Member> {
 
     public abstract void setEvenIfPrivate(Object target, Object value);
 
-    private void setAccessibleIfNecessary() {
+    void setAccessibleIfNecessary(Member rawMember) {
         if(!isPublic(rawMember))
         {
             ((AccessibleObject)rawMember).setAccessible(true); //that's Java Reflection API ...
