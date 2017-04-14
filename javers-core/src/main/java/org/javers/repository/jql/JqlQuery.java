@@ -5,9 +5,12 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.QueryParams;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -23,13 +26,15 @@ import java.util.Set;
 public class JqlQuery {
 
     private final QueryParams queryParams;
-    private final List<Filter> filters;
+    private final FilterDefinition filterDefinition;
+    private Filter filter;
+    private final ShadowScope shadowScope;
 
-    JqlQuery(List<Filter> filters, QueryParams queryParams) {
-        Validate.argumentsAreNotNull(filters);
+    JqlQuery(FilterDefinition filter, QueryParams queryParams, ShadowScope shadowScope) {
+        Validate.argumentsAreNotNull(filter);
         this.queryParams = queryParams;
-        this.filters = filters;
-        validate();
+        this.filterDefinition = filter;
+        this.shadowScope = shadowScope;
     }
 
     private void validate(){
@@ -45,7 +50,7 @@ public class JqlQuery {
     public String toString() {
         return "JqlQuery{" +
                 "queryParams=" + queryParams +
-                ", filters=" + filters +
+                ", filter=" + filter +
                 '}';
     }
 
@@ -57,16 +62,16 @@ public class JqlQuery {
         return getFilter(ofType).isPresent();
     }
 
-    Set<Class> getClassFilter(){
-        return getFilter(ClassFilter.class).get().getRequiredClasses();
+    Set<ManagedType> getClassFilter(){
+        return getFilter(ClassFilter.class).get().getManagedTypes();
     }
 
-    GlobalIdDTO getIdFilter() {
+    GlobalId getIdFilter() {
         return getFilter(IdFilter.class).get().getGlobalId();
     }
 
-    Object getInstanceFilter() {
-        return getFilter(InstanceFilter.class).get().getInstance();
+    ShadowScope getShadowScope() {
+        return shadowScope;
     }
 
     String getChangedProperty(){
@@ -78,12 +83,20 @@ public class JqlQuery {
     }
 
     <T extends Filter> Optional<T> getFilter(Class<T> ofType) {
-        for (Filter f : filters) {
-            if (f.getClass().equals(ofType)) {
-                return Optional.of((T)f);
-            }
+        Validate.conditionFulfilled(filter != null, "jqlQuery is not compiled");
+        if (filter.getClass().equals(ofType)) {
+            return Optional.of((T)filter);
         }
         return Optional.empty();
+    }
+
+    void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
+        this.filter = filterDefinition.compile(globalIdFactory, typeMapper);
+        validate();
+    }
+
+    boolean matches(GlobalId globalId) {
+        return filter.matches(globalId);
     }
 
     boolean isNewObjectChanges() {
@@ -98,10 +111,6 @@ public class JqlQuery {
         return hasFilter(IdFilter.class);
     }
 
-    boolean isInstanceQuery(){
-        return hasFilter(InstanceFilter.class);
-    }
-
     boolean hasChangedPropertyFilter(){
         return queryParams.changedProperty().isPresent();
     }
@@ -111,7 +120,8 @@ public class JqlQuery {
     }
 
     boolean isInstanceIdQuery() {
-        return hasFilter(IdFilter.class)  && getIdFilter() instanceof InstanceIdDTO;
+        Optional<IdFilter> idFilter = getFilter(IdFilter.class);
+        return idFilter.isPresent() && idFilter.get().isInstanceIdFilter();
     }
 
     boolean isVoOwnerQuery(){

@@ -1,18 +1,17 @@
 package org.javers.repository.jql;
 
 import org.javers.common.collections.Sets;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.api.QueryParamsBuilder;
+import org.javers.repository.jql.FilterDefinition.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import java.math.BigDecimal;
-import java.util.*;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 import static java.time.LocalTime.MIDNIGHT;
@@ -28,11 +27,13 @@ public class QueryBuilder {
     private static final int DEFAULT_LIMIT = 100;
     private static final int DEFAULT_SKIP = 0;
 
-    private final List<Filter> filters = new ArrayList<>();
+    private final FilterDefinition filter;
     private final QueryParamsBuilder queryParamsBuilder;
+    private ShadowScope shadowScope = ShadowScope.SHALLOW;
 
-    private QueryBuilder(Filter initialFilter) {
-        addFilter(initialFilter);
+    private QueryBuilder(FilterDefinition filter) {
+        Validate.argumentIsNotNull(filter);
+        this.filter = filter;
         queryParamsBuilder = QueryParamsBuilder
                 .withLimit(DEFAULT_LIMIT)
                 .skip(DEFAULT_SKIP);
@@ -49,7 +50,7 @@ public class QueryBuilder {
      * @since 2.0
      */
     public static QueryBuilder anyDomainObject(){
-        return new QueryBuilder(new AnyDomainObjectFilter());
+        return new QueryBuilder(new AnyDomainObjectFilterDefinition());
     }
 
     /**
@@ -63,7 +64,7 @@ public class QueryBuilder {
      * </pre>
      */
     public static QueryBuilder byClass(Class... requiredClasses){
-        return new QueryBuilder(new ClassFilter(Sets.asSet(requiredClasses)));
+        return new QueryBuilder(new ClassFilterDefinition(Sets.asSet(requiredClasses)));
     }
 
     /**
@@ -77,7 +78,7 @@ public class QueryBuilder {
      */
     public static QueryBuilder byInstanceId(Object localId, Class entityClass){
         Validate.argumentsAreNotNull(localId, entityClass);
-        return new QueryBuilder(new IdFilter(instanceId(localId, entityClass)));
+        return new QueryBuilder(new IdFilterDefinition(instanceId(localId, entityClass)));
     }
 
     /**
@@ -92,7 +93,7 @@ public class QueryBuilder {
      */
     public static QueryBuilder byInstance(Object instance){
         Validate.argumentsAreNotNull(instance);
-        return new QueryBuilder(new InstanceFilter(instance));
+        return new QueryBuilder(new InstanceFilterDefinition(instance));
     }
 
     /**
@@ -104,7 +105,7 @@ public class QueryBuilder {
      */
     public static QueryBuilder byValueObject(Class ownerEntityClass, String path){
         Validate.argumentsAreNotNull(ownerEntityClass, path);
-        return new QueryBuilder(new VoOwnerFilter(ownerEntityClass, path));
+        return new QueryBuilder(new VoOwnerFilterDefinition(ownerEntityClass, path));
     }
 
     /**
@@ -147,12 +148,12 @@ public class QueryBuilder {
      */
     public static QueryBuilder byValueObjectId(Object ownerLocalId, Class ownerEntityClass, String path){
         Validate.argumentsAreNotNull(ownerEntityClass, ownerLocalId, path);
-        return new QueryBuilder(new IdFilter(ValueObjectIdDTO.valueObjectId(ownerLocalId, ownerEntityClass, path)));
+        return new QueryBuilder(new IdFilterDefinition(ValueObjectIdDTO.valueObjectId(ownerLocalId, ownerEntityClass, path)));
     }
 
     public static QueryBuilder byGlobalId(GlobalIdDTO globalId){
         Validate.argumentIsNotNull(globalId);
-        return new QueryBuilder(new IdFilter(globalId));
+        return new QueryBuilder(new IdFilterDefinition(globalId));
     }
 
     /**
@@ -322,6 +323,35 @@ public class QueryBuilder {
     }
 
     /**
+     * Choose between shallow or deep shadows.
+     * <br/>
+     *
+     * Default is {@link ShadowScope#SHALLOW}
+     * <br/>
+     *
+     * Makes sense only for Shadow queries.
+     *
+     * @see ShadowScope
+     * @since 3.2
+     */
+    public QueryBuilder withShadowScope(ShadowScope shadowScope){
+        Validate.argumentIsNotNull(shadowScope);
+        this.shadowScope = shadowScope;
+        return this;
+    }
+
+    /**
+     * Alias to <code>withShadowScope(ShadowScope.COMMIT_DEPTH)</code>
+     *
+     * @see #withShadowScope(ShadowScope)
+     * @see ShadowScope
+     * @since 3.2
+     */
+    public QueryBuilder withShadowScopeDeep() {
+        return withShadowScope(ShadowScope.COMMIT_DEPTH);
+    }
+
+    /**
      * Limits Snapshots to be fetched from JaversRepository
      * to those with a given commit author.
      * @since 2.0
@@ -332,18 +362,7 @@ public class QueryBuilder {
         return this;
     }
 
-    protected void addFilter(Filter filter) {
-        filters.add(filter);
-    }
-
-    protected List<Filter> getFilters() {
-        return Collections.unmodifiableList(filters);
-    }
-
     public JqlQuery build(){
-        if (filters.isEmpty()){
-            throw new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "empty JqlQuery");
-        }
-        return new JqlQuery(getFilters(), queryParamsBuilder.build());
+        return new JqlQuery(filter, queryParamsBuilder.build(), shadowScope);
     }
 }

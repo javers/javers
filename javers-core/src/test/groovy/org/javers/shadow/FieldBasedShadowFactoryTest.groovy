@@ -20,7 +20,7 @@ class FieldBasedShadowFactoryTest extends ShadowFactoryTest {
         def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1, ImmutableEntity).build())[0]
 
         when:
-        def shadow = shadowFactory.createShadow(snapshot, {id -> javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, ImmutableEntity).build())[0]})
+        def shadow = shadowFactory.createShadow(snapshot, {s, id -> javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, ImmutableEntity).build())[0]})
 
         then:
         shadow instanceof ImmutableEntity
