@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author bartosz.walacik
@@ -85,12 +86,12 @@ public class ShadowQueryRunner {
                     .collect(Collectors.toList());
         }
 
-        // n+1 queries !
         void loadFullCommits() {
-            commitsMap.keySet().forEach( cm -> {
-                QueryParams params = QueryParamsBuilder.withLimit(Integer.MAX_VALUE).commitId(cm.getId()).build();
-                repository.getSnapshots(params).stream().forEach(s -> commitsMap.get(cm).append(s));
-            });
+            QueryParams params = QueryParamsBuilder
+                    .withLimit(Integer.MAX_VALUE)
+                    .commitIds(commitsMap.keySet().stream().map(cm -> cm.getId()).collect(toSet()))
+                    .build();
+            repository.getSnapshots(params).stream().forEach(s -> commitsMap.get(s.getCommitMetadata()).append(s));
         }
 
         CdoSnapshot findLatestTo(CommitMetadata rootContext, GlobalId targetId) {
@@ -196,12 +197,12 @@ public class ShadowQueryRunner {
             Set<GlobalId> result = valueObjects.keySet().stream()
                     .map(voId -> voId.getOwnerId())
                     .filter(instanceId -> !entities.containsKey(instanceId))
-                    .collect(Collectors.toSet());
+                    .collect(toSet());
 
             result.addAll(valueObjects.keySet().stream()
                     .flatMap(voId -> voId.getParentValueObjectIds().stream())
                     .filter(voId -> ! valueObjects.containsKey(voId))
-                    .collect(Collectors.toSet()));
+                    .collect(toSet()));
 
             return result;
         }

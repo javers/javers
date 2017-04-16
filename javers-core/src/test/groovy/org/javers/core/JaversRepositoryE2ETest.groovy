@@ -1275,4 +1275,24 @@ class JaversRepositoryE2ETest extends Specification {
         shadows[4].valueObjectRef.city == "London"
        !shadows[4].valueObjectRef.networkAddress
     }
+
+    def "should query by multiple CommitId"(){
+      given:
+      def entity = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London"))
+      javers.commit("a", entity)
+
+      3.times {
+          entity.intProperty = it
+          javers.commit("a", entity)
+      }
+
+      when:
+      def snapshots = javers
+              .findSnapshots(QueryBuilder.anyDomainObject()
+              .withCommitIds( [1.0, 4.0] ).build())
+
+      then:
+      snapshots.size() == 3
+      snapshots.every{it.commitId.majorId == 1 || it.commitId.majorId == 4}
+    }
 }

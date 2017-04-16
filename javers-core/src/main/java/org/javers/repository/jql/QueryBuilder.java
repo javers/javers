@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 import static java.time.LocalTime.MIDNIGHT;
@@ -290,11 +292,21 @@ public class QueryBuilder {
     }
 
     /**
-     * delegates to {@link #withCommitId(CommitId)}
+     * Delegates to {@link #withCommitId(CommitId)}
      */
     public QueryBuilder withCommitId(BigDecimal commitId) {
         Validate.argumentIsNotNull(commitId);
         queryParamsBuilder.commitId(CommitId.valueOf(commitId));
+        return this;
+    }
+
+    /**
+     * Limits snapshots (or changes) to be fetched from JaversRepository
+     * to those with given commit ids.
+     */
+    public QueryBuilder withCommitIds(Collection<BigDecimal> commitIds) {
+        Validate.argumentIsNotNull(commitIds);
+        queryParamsBuilder.commitIds(commitIds.stream().map(CommitId::valueOf).collect(Collectors.toSet()));
         return this;
     }
 

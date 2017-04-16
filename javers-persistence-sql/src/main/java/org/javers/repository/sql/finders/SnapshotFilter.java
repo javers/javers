@@ -1,5 +1,6 @@
 package org.javers.repository.sql.finders;
 
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.commit.CommitId;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.sql.schema.SchemaNameAware;
@@ -8,7 +9,10 @@ import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters.toUtilDate;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
@@ -66,8 +70,8 @@ abstract class SnapshotFilter extends SchemaNameAware {
         if (queryParams.to().isPresent()) {
             addToDateCondition(query, queryParams.to().get());
         }
-        if (queryParams.commitId().isPresent()) {
-            addCommitIdCondition(query, queryParams.commitId().get());
+        if (queryParams.commitIds().size() > 0) {
+            addCommitIdCondition(query, queryParams.commitIds());
         }
         if (queryParams.version().isPresent()) {
             addVersionCondition(query, queryParams.version().get());
@@ -95,9 +99,8 @@ abstract class SnapshotFilter extends SchemaNameAware {
             .withArgument("commitToDate", new Timestamp(toUtilDate(to)));
     }
 
-    private void addCommitIdCondition(SelectQuery query, CommitId commitId) {
-        query.append(" AND " + COMMIT_COMMIT_ID + " = :commitId")
-            .withArgument("commitId", commitId.valueAsNumber());
+    private void addCommitIdCondition(SelectQuery query, Set<CommitId> commitIds) {
+        query.append(" AND " + COMMIT_COMMIT_ID + " IN (" + ToStringBuilder.join(commitIds.stream().map(c -> c.valueAsNumber()).collect(Collectors.toList())) + ")");
     }
 
     void addVersionCondition(SelectQuery query, Long version) {
