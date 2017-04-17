@@ -13,6 +13,8 @@ import static org.javers.common.string.ToStringBuilder.addField;
  * Changed reference to Entity or ValueObject (in *ToOne relation)
  *
  * @author bartosz walacik
+ * 
+ * pull request test
  */
 public final class ReferenceChange extends PropertyChange {
     private final GlobalId left;
