@@ -1180,7 +1180,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("a", new SnapshotEntity(id: 3))
 
         when:
-        def shadows = javers.findShadows(QueryBuilder.byClass( SnapshotEntity)
+        def shadows = javers.findShadows(QueryBuilder.byClass(SnapshotEntity)
                 .build()).collect{it.get()}
 
         then:
@@ -1191,6 +1191,22 @@ class JaversRepositoryE2ETest extends Specification {
         shadows[0].id == 3
         shadows[1].id == 2
         shadows[2].id == 1
+    }
+
+    def "should query for Shadows by multiple classes"(){
+      given:
+      javers.commit("a", new SnapshotEntity(id:1))
+      javers.commit("a", new OldEntity(id:1))
+      javers.commit("a", new NewEntityWithTypeAlias(id:1))
+
+      when:
+      def shadows = javers.findShadows(QueryBuilder.byClass(NewEntity, NewEntityWithTypeAlias)
+              .build()).collect{it.get()}
+
+      then:
+      shadows.size() == 2
+      shadows[0] instanceof NewEntityWithTypeAlias
+      shadows[1] instanceof OldEntity
     }
 
     def "should query for Shadows of Entity with Entity refs in COMMIT scope"(){

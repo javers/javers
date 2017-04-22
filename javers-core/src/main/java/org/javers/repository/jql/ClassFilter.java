@@ -31,6 +31,6 @@ class ClassFilter extends Filter {
 
     @Override
     boolean matches(GlobalId globalId) {
-        return managedTypes.stream().allMatch(id -> id.getName().equals(globalId.getTypeName()));
+        return managedTypes.stream().anyMatch(id -> id.getName().equals(globalId.getTypeName()));
     }
 }
