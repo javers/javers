@@ -20,6 +20,7 @@ class AnnotationNamesProvider {
     private final Set<String> transientPropertyAliases = new HashSet<>();
     private final Set<String> shallowReferenceAliases = new HashSet<>();
     private final Set<String> ignoredTypeAliases = new HashSet<>();
+    private final Set<String> propertyNameAliases = new HashSet<>();
 
     private final List<AnnotationsNameSpace> namesProviders = Lists.immutableListOf(
             new JaversAnnotationsNamesSpace(),
@@ -36,6 +37,7 @@ class AnnotationNamesProvider {
             shallowReferenceAliases.addAll(provider.getShallowReferenceAliases());
             typeNameAliases.addAll(provider.getTypeNameAliases());
             ignoredTypeAliases.addAll(provider.getIgnoredTypeAliases());
+            propertyNameAliases.addAll(provider.getPropertyNameAliases());
         }
     }
 
@@ -73,5 +75,13 @@ class AnnotationNamesProvider {
 
     Set<String> getShallowReferenceAliases() {
         return Collections.unmodifiableSet(shallowReferenceAliases);
+    }
+
+    public Set<String> getPropertyNameAliases() {
+        return Collections.unmodifiableSet(propertyNameAliases);
+    }
+
+    public Set<String> getTypeNameAliases() {
+        return Collections.unmodifiableSet(typeNameAliases);
     }
 }

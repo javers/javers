@@ -1097,6 +1097,40 @@ class JaversRepositoryE2ETest extends Specification {
         (snapshots.collect{it -> it.commitId} as Set).size() == threads
     }
 
+    def "should not persist commits with zero snapshots" () {
+        given:
+        def anEntity = new SnapshotEntity(id: 1, intProperty: 100)
+
+        when:
+        def commit = javers.commit("author", anEntity)
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+
+        then:
+        snapshots.size() == 1
+        repository.getHeadId() == commit.getId()
+
+        when: "should not be persisted"
+        javers.commit("author", anEntity)
+
+        then:
+        repository.getHeadId() == commit.getId()
+    }
+
+    def "should use name from @PropertyName in commits and queries"(){
+        given:
+        def javers = javers().build()
+
+        when:
+        javers.commit("author", new DummyUserDetails(id:1))
+        javers.commit("author", new DummyUserDetails(id:1, customizedProperty: 'a'))
+        def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject().andProperty('Customized Property').build())
+
+        then:
+        snapshots.size() == 1
+        snapshots[0].getPropertyValue('Customized Property') == 'a'
+    }
+
+
     def "should return mutable collections for easy sorting"(){
         given:
         def paris =   new DummyAddress(city: "Paris")

@@ -41,4 +41,9 @@ class JPAAnnotationsNameSpace implements AnnotationsNameSpace {
     public Set<String> getIgnoredTypeAliases() {
         return Collections.emptySet();
     }
+
+    @Override
+    public Set<String> getPropertyNameAliases() {
+        return Collections.emptySet();
+    }
 }

@@ -53,12 +53,14 @@ subprojects {
         options.noTimestamp()
     }
 
-    task example(dependsOn: 'cleanTest') << {
-        tasks.test.testLogging {
-            events 'failed', 'passed'
-            showStandardStreams = true
+    task example(dependsOn: 'cleanTest') {
+        doLast {
+            tasks.test.testLogging {
+                events 'failed', 'passed'
+                showStandardStreams = true
+            }
+            tasks.test.execute()
         }
-        tasks.test.execute()
     }
 
     //disable javadoc doclint for Java8
@@ -124,5 +126,5 @@ nexusStaging {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.1'
+    gradleVersion = '3.4.1'
 }

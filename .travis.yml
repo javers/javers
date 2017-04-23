@@ -9,8 +9,10 @@ addons:
     packages:
     - mongodb-org-server
     - mongodb-org-shell
+services:
+  - postgresql
+  - mysql
 before_script:
-- sleep 15
 - psql -c 'create database travis_ci_test;' -U postgres
 - psql -c 'create schema j_some authorization postgres;' -U postgres travis_ci_test
 - mysql -e 'create database travis_ci_test;' -u root

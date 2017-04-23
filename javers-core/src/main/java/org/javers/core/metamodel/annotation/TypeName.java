@@ -28,9 +28,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * }
  * </pre>
  *
- * TypeName is an equivalent for org.springframework.data.annotation.TypeAlias
+ * TypeName is alias for org.springframework.data.annotation.TypeAlias
  * from Spring Data.
  *
+ * @see PropertyName
  * @since 1.4
  * @author bartosz.walacik
  */
