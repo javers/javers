@@ -4,7 +4,6 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.List;
@@ -18,9 +17,9 @@ import static org.javers.core.metamodel.object.SnapshotType.INITIAL;
 import static org.javers.core.metamodel.object.SnapshotType.TERMINAL;
 
 /**
- * Captured state of client's domain object.
- * Values and primitives are stored 'by value',
- * referenced Entities and ValueObjects are stored 'by reference' using {@link GlobalId}
+ * Captured a state of your domain object.
+ * Values and primitives are stored 'by value'.
+ * Referenced Entities and ValueObjects are stored 'by reference' using {@link GlobalId}
  *
  * @author bartosz walacik
  */

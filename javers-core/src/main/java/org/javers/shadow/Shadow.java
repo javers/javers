@@ -5,9 +5,14 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.repository.api.JaversRepository;
 
 /**
- * Shadow is a historical version of a domain object restored
- * from a snapshot (that was loaded from {@link JaversRepository})<br/>
+ * Shadow is a historical version of your domain object restored
+ * from a snapshot (that was loaded from {@link JaversRepository})
+ * <br/><br/>
  *
+ * Shadows use the same types as domain objects.
+ * For example, a Shadow of a Person object is an instance of Person.class.
+ *
+ * <br/><br/>
  * Shadows class is a thin wrapper for a shadow object and {@link CommitMetadata}
  *
  * @author bartosz.walacik
