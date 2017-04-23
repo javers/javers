@@ -2,9 +2,13 @@ package org.javers.shadow;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.repository.api.JaversRepository;
 
 /**
- * //TODO javadoc
+ * Shadow is a historical version of a domain object restored
+ * from a snapshot (that was loaded from {@link JaversRepository})<br/>
+ *
+ * Shadows class is a thin wrapper for a shadow object and {@link CommitMetadata}
  *
  * @author bartosz.walacik
  */
@@ -22,6 +26,9 @@ public class Shadow {
         return commitMetadata;
     }
 
+    /**
+     * @return Shadow
+     */
     public Object get() {
         return it;
     }

@@ -15,7 +15,7 @@ class ClassFilter extends Filter {
 
     public ClassFilter(Set<ManagedType> managedTypes) {
         Validate.argumentIsNotNull(managedTypes);
-        this.managedTypes = managedTypes;
+        this.managedTypes =  managedTypes;
     }
 
     Set<ManagedType> getManagedTypes() {

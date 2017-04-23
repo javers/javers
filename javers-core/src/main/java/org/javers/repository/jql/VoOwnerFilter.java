@@ -1,6 +1,7 @@
 package org.javers.repository.jql;
 
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.type.EntityType;
 
 /**
@@ -26,6 +27,13 @@ class VoOwnerFilter extends Filter {
 
     @Override
     boolean matches(GlobalId globalId) {
-      return false; //TODO
+        if (!(globalId instanceof ValueObjectId)) {
+          return false;
+        }
+
+        ValueObjectId valueObjectId = (ValueObjectId) globalId;
+
+        return valueObjectId.getOwnerId().getTypeName().equals(ownerEntity.getName())
+            &&valueObjectId.getFragment().equals(path);
     }
 }

@@ -1194,19 +1194,35 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     def "should query for Shadows by multiple classes"(){
-      given:
-      javers.commit("a", new SnapshotEntity(id:1))
-      javers.commit("a", new OldEntity(id:1))
-      javers.commit("a", new NewEntityWithTypeAlias(id:1))
+        given:
+        javers.commit("a", new SnapshotEntity(id:1))
+        javers.commit("a", new OldEntity(id:1))
+        javers.commit("a", new NewEntityWithTypeAlias(id:1))
 
-      when:
-      def shadows = javers.findShadows(QueryBuilder.byClass(NewEntity, NewEntityWithTypeAlias)
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byClass(NewEntity, NewEntityWithTypeAlias)
               .build()).collect{it.get()}
 
-      then:
-      shadows.size() == 2
-      shadows[0] instanceof NewEntityWithTypeAlias
-      shadows[1] instanceof OldEntity
+        then:
+        shadows.size() == 2
+        shadows[0] instanceof NewEntityWithTypeAlias
+        shadows[1] instanceof OldEntity
+    }
+
+    def "should query for Shadows by ValueObject path"(){
+        given:
+        javers.commit("a", new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London")))
+        javers.commit("a", new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "Paris")))
+        javers.commit("a", new SnapshotEntity(id: 1, arrayOfValueObjects: [new DummyAddress(city: "Paris")]))
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byValueObject(SnapshotEntity, "valueObjectRef")
+                .build()).collect{it.get()}
+
+        then:
+        shadows.size() == 2
+        shadows[0].city == "Paris"
+        shadows[1].city == "London"
     }
 
     def "should query for Shadows of Entity with Entity refs in COMMIT scope"(){
