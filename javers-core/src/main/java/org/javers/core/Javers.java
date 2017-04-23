@@ -19,6 +19,7 @@ import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
+import org.javers.shadow.Shadow;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -166,6 +167,14 @@ public interface Javers {
      * Use it alongside with {@link #compare(Object, Object)}
      */
     Diff initial(Object newDomainObject);
+
+    /**
+     * //TODO javadoc
+     *
+     * @return empty List if nothing found
+     * @since 3.2
+     */
+    List<Shadow> findShadows(JqlQuery query);
 
     /**
      * Queries JaversRepository for changes history (diff sequence) of given class, object or property.<br/>

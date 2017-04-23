@@ -2,6 +2,7 @@ package org.javers.shadow;
 
 import com.google.gson.JsonObject;
 import org.javers.common.validation.Validate;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
@@ -9,7 +10,7 @@ import org.javers.core.metamodel.type.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * Stateful builder
@@ -18,15 +19,17 @@ import java.util.function.Function;
  */
 class ShadowGraphBuilder {
     private final JsonConverter jsonConverter;
-    private final Function<GlobalId, CdoSnapshot> referenceResolver;
+    private final BiFunction<CommitMetadata, GlobalId, CdoSnapshot> referenceResolver;
     private boolean built = false;
     private Map<GlobalId, ShadowBuilder> builtNodes = new HashMap<>();
     private final TypeMapper typeMapper;
+    private final CommitMetadata rootContext;
 
-    ShadowGraphBuilder(JsonConverter jsonConverter, Function<GlobalId, CdoSnapshot> referenceResolver, TypeMapper typeMapper) {
+    ShadowGraphBuilder(JsonConverter jsonConverter, BiFunction<CommitMetadata, GlobalId, CdoSnapshot> referenceResolver, TypeMapper typeMapper, CommitMetadata rootContext) {
         this.jsonConverter = jsonConverter;
         this.referenceResolver = referenceResolver;
         this.typeMapper = typeMapper;
+        this.rootContext = rootContext;
     }
 
     Object buildDeepShadow(CdoSnapshot cdoSnapshot) {
@@ -68,7 +71,7 @@ class ShadowGraphBuilder {
     private void followReferences(ShadowBuilder currentNode, JsonObject jsonElement) {
         CdoSnapshot cdoSnapshot = currentNode.getCdoSnapshot();
 
-        cdoSnapshot.getManagedType().forEachProperty( property -> {
+        cdoSnapshot.getManagedType().forEachProperty( (JaversProperty property) -> {
             if (cdoSnapshot.isNull(property)) {
                 return;
             }
@@ -91,7 +94,7 @@ class ShadowGraphBuilder {
 
                 Object containerWithRefs = cdoSnapshot.getPropertyValue(property);
 
-                currentNode.addEnumerableWiring(property, propertyType.map(containerWithRefs, this::passValueOrCreateNodeFromRef));
+                currentNode.addEnumerableWiring(property, propertyType.map(containerWithRefs, (value) -> passValueOrCreateNodeFromRef(value)));
 
                 jsonElement.remove(property.getName());
             }
@@ -106,7 +109,7 @@ class ShadowGraphBuilder {
     }
 
     private ShadowBuilder createOrReuseNodeFromRef(GlobalId globalId) {
-        CdoSnapshot cdoSnapshot = referenceResolver.apply(globalId);
+        CdoSnapshot cdoSnapshot = referenceResolver.apply(rootContext, globalId);
         if (cdoSnapshot != null) {
             if (builtNodes.containsKey(globalId)) {
                 return builtNodes.get(globalId);

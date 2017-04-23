@@ -21,6 +21,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.time.LocalDate
+import java.util.function.BiFunction
 import java.util.function.Function
 
 import static java.lang.System.identityHashCode
@@ -331,18 +332,18 @@ abstract class ShadowFactoryTest extends Specification {
       shadow.polymorficList == ["2017-01-01", "2017-01-02"]
     }
 
-    Function byIdSupplier() {
-        return { id ->
+    BiFunction byIdSupplier() {
+        return { s, id ->
             if (id instanceof InstanceId) {
                 return javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, Class.forName(id.typeName)).build())[0]
             } else {
                 return javers.findSnapshots(QueryBuilder.byValueObject(SnapshotEntity, id.fragment).build())[0]
             }
-        }
+        } as BiFunction
     }
 
-    Function byIdSnapshotSupplier() {
-        return { id ->
+    BiFunction byIdSnapshotSupplier() {
+        return { s, id ->
             if (id instanceof InstanceId && id.cdoId) {
                 return javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, SnapshotEntity).build())[0]
             }
