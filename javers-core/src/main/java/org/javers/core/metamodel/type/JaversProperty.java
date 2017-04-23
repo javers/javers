@@ -1,7 +1,6 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.core.metamodel.property.Property;
-
 import java.util.function.Supplier;
 
 /**
@@ -16,7 +15,7 @@ public class JaversProperty extends Property {
     private final Supplier<JaversType> propertyType;
 
     public JaversProperty(Supplier<JaversType> propertyType, Property property) {
-        super(property.getMember(),  property.hasTransientAnn(), property.hasShallowReferenceAnn());
+        super(property.getMember(),  property.hasTransientAnn(), property.hasShallowReferenceAnn(), property.getName());
         this.propertyType = propertyType;
     }
 

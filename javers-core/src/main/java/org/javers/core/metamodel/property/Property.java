@@ -4,7 +4,6 @@ import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.JaversMember;
-
 import java.lang.reflect.Type;
 import java.util.Optional;
 
@@ -29,6 +28,10 @@ public class Property {
         this.hasTransientAnn = hasTransientAnn;
         this.hasShallowReferenceAnn = hasShallowReferenceAnn;
         this.name = name.orElse(member.propertyName());
+    }
+
+    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, String name){
+        this(member, hasTransientAnn, hasShallowReferenceAnn, Optional.of(name));
     }
 
     public Property(JaversMember member, boolean hasTransientAnn) {

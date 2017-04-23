@@ -1348,7 +1348,7 @@ class JaversRepositoryE2ETest extends Specification {
       javers.commit("a", entity)
 
       3.times {
-          entity.intProperty = it
+          entity.intProperty = it + 1
           javers.commit("a", entity)
       }
 
