@@ -250,8 +250,7 @@ public interface Javers {
 
     /**
      * Queries JaversRepository for object Snapshots. <br/>
-     * Snapshot is a historical version of your domain object
-     * stored in JaversRepository. Snapshot captures object's state as a property -> value Map.
+     * Snapshot is a historical state of your domain object captured as a property->value Map.
      * <br/><br/>
      *
      * For example, to get latest Snapshots of "bob" Person, call:

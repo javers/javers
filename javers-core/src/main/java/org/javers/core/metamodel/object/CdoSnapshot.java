@@ -17,7 +17,7 @@ import static org.javers.core.metamodel.object.SnapshotType.INITIAL;
 import static org.javers.core.metamodel.object.SnapshotType.TERMINAL;
 
 /**
- * Captured a state of your domain object.
+ * Historical state of your domain object captured as a property->value Map.
  * Values and primitives are stored 'by value'.
  * Referenced Entities and ValueObjects are stored 'by reference' using {@link GlobalId}
  *
