@@ -170,7 +170,7 @@ public interface Javers {
 
     /**
      * Queries JaversRepository for object Shadows (historical versions). <br/>
-     * Shadow is a historical version of your domain object restored from a snapshot.
+     * Shadow is a historical version of a domain object restored from a snapshot.
      * <br/><br/>
      *
      * For example, to get latest Shadows of "bob" Person, call:
@@ -197,8 +197,7 @@ public interface Javers {
 
     /**
      * Queries JaversRepository for changes history (diff sequence) of a given class, object or property.<br/>
-     * There are various types of changes: {@link ValueChange}, {@link ReferenceChange}, {@link ListChange}, {@link NewObject} and so on. <br/>
-     * See {@link Change} class hierarchy.
+     * There are various types of changes. See {@link Change} class hierarchy.
      * <br/><br/>
      *
      * <b>Querying for Entity changes by instance Id</b><br/><br/>
@@ -250,7 +249,7 @@ public interface Javers {
 
     /**
      * Queries JaversRepository for object Snapshots. <br/>
-     * Snapshot is a historical state of your domain object captured as a property->value Map.
+     * Snapshot is a historical state of a domain object captured as the property->value Map.
      * <br/><br/>
      *
      * For example, to get latest Snapshots of "bob" Person, call:

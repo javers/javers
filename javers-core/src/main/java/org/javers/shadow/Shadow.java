@@ -5,7 +5,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.repository.api.JaversRepository;
 
 /**
- * Shadow is a historical version of your domain object restored
+ * Shadow is a historical version of a domain object restored
  * from a snapshot (that was loaded from {@link JaversRepository})
  * <br/><br/>
  *

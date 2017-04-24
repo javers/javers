@@ -100,10 +100,11 @@ class JqlExample extends Specification {
         given:
         def javers = JaversBuilder.javers().build()
 
-        javers.commit("author", new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city: "London")))
-        javers.commit("author", new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city: "Paris")))
-        javers.commit("author", new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "New York")))
-        javers.commit("author", new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Washington")))
+        javers.commit("me", new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city: "London")))
+        javers.commit("me", new DummyUserDetails(id:1, dummyAddress: new DummyAddress(city: "Paris")))
+        javers.commit("me", new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Rome")))
+        javers.commit("me", new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Palma")))
+        javers.commit("me", new SnapshotEntity(id:2, intProperty:2))
 
         when:
         def changes = javers.findChanges( QueryBuilder.byClass(DummyAddress.class).build() )
