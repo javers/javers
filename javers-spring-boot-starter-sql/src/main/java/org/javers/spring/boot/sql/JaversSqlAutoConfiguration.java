@@ -11,7 +11,11 @@ import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.repository.sql.SqlRepositoryBuilder;
-import org.javers.spring.auditable.*;
+import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.EmptyPropertiesProvider;
+import org.javers.spring.auditable.MockAuthorProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
@@ -53,9 +57,9 @@ public class JaversSqlAutoConfiguration {
     private EntityManagerFactory entityManagerFactory;
 
     @Bean
-    public DialectName javersSqlDialectName(){
+    public DialectName javersSqlDialectName() {
         SessionFactoryImplementor sessionFactory =
-                (SessionFactoryImplementor)entityManagerFactory.unwrap(SessionFactory.class);
+                (SessionFactoryImplementor) entityManagerFactory.unwrap(SessionFactory.class);
 
         Dialect hibernateDialect = sessionFactory.getDialect();
         logger.info("detected Hibernate dialect: " + hibernateDialect.getClass().getSimpleName());
@@ -63,16 +67,19 @@ public class JaversSqlAutoConfiguration {
         return dialectMapper.map(hibernateDialect);
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public JaversSqlRepository javersSqlRepository(ConnectionProvider connectionProvider) {
+        return SqlRepositoryBuilder
+            .sqlRepository()
+            .withConnectionProvider(connectionProvider)
+            .withDialect(javersSqlDialectName())
+            .build();
+    }
+
     @Bean(name = "javers")
     @ConditionalOnMissingBean
-    public Javers javers(ConnectionProvider connectionProvider,
-                         PlatformTransactionManager transactionManager) {
-        JaversSqlRepository sqlRepository = SqlRepositoryBuilder
-                .sqlRepository()
-                .withConnectionProvider(connectionProvider)
-                .withDialect(javersSqlDialectName())
-                .build();
-
+    public Javers javers(JaversSqlRepository sqlRepository, PlatformTransactionManager transactionManager) {
         return TransactionalJaversBuilder
                 .javers()
                 .withTxManager(transactionManager)

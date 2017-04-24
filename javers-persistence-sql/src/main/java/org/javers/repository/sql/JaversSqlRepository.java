@@ -1,6 +1,5 @@
 package org.javers.repository.sql;
 
-import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.Commit;
@@ -18,13 +17,16 @@ import org.javers.repository.sql.repositories.CdoSnapshotRepository;
 import org.javers.repository.sql.repositories.CommitMetadataRepository;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.JaversSchemaManager;
+import org.polyjdbc.core.PolyJDBC;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class JaversSqlRepository implements JaversRepository {
 
+    private final PolyJDBC polyJDBC;
     private final CommitMetadataRepository commitRepository;
     private final GlobalIdRepository globalIdRepository;
     private final CdoSnapshotRepository cdoSnapshotRepository;
@@ -32,7 +34,10 @@ public class JaversSqlRepository implements JaversRepository {
     private final JaversSchemaManager schemaManager;
     private final SqlRepositoryConfiguration sqlRepositoryConfiguration;
 
-    public JaversSqlRepository(CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository, CdoSnapshotRepository cdoSnapshotRepository, CdoSnapshotFinder finder, JaversSchemaManager schemaManager, SqlRepositoryConfiguration sqlRepositoryConfiguration) {
+    public JaversSqlRepository(PolyJDBC polyJDBC, CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository,
+                               CdoSnapshotRepository cdoSnapshotRepository, CdoSnapshotFinder finder, JaversSchemaManager schemaManager,
+                               SqlRepositoryConfiguration sqlRepositoryConfiguration) {
+        this.polyJDBC = polyJDBC;
         this.commitRepository = commitRepository;
         this.globalIdRepository = globalIdRepository;
         this.cdoSnapshotRepository = cdoSnapshotRepository;
@@ -130,5 +135,12 @@ public class JaversSqlRepository implements JaversRepository {
      */
     public SqlRepositoryConfiguration getConfiguration() {
         return sqlRepositoryConfiguration;
+    }
+
+    /**
+     * @since 3.1.1
+     */
+    public void evictSequenceAllocationCache() {
+        polyJDBC.resetKeyGeneratorCache();
     }
 }
