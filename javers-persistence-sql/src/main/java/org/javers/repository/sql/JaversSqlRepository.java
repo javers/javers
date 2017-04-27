@@ -138,6 +138,8 @@ public class JaversSqlRepository implements JaversRepository {
     }
 
     /**
+     * Clears the sequence allocation cache. It can be useful for testing.
+     * See https://github.com/javers/javers/issues/532
      * @since 3.1.1
      */
     public void evictSequenceAllocationCache() {
