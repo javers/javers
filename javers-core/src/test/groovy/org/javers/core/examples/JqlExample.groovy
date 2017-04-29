@@ -4,6 +4,7 @@ import org.javers.common.date.FakeDateProvider
 import org.javers.core.JaversBuilder
 import org.javers.core.commit.CommitId
 import org.javers.core.diff.changetype.NewObject
+import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
 import org.javers.core.examples.model.Person
@@ -18,6 +19,32 @@ import spock.lang.Specification
  * @author bartosz.walacik
  */
 class JqlExample extends Specification {
+
+    def "should query for Changes made on an object"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        def bob = new Employee(name: "bob", age: 30, salary: 1000,
+                               primaryAddress: new Address("London"))
+        javers.commit("author", bob)      //initial commit
+
+        bob.salary = 1200                 //the change
+        bob.primaryAddress.city = "Paris"
+        javers.commit("author", bob)      //second commit
+
+        when:
+        def changes = javers.findChanges( QueryBuilder.anyDomainObject().build() )
+
+        then:
+        ValueChange salaryChange = changes.find{it.propertyName == "salary"}
+        ValueChange cityChange = changes.find{it.propertyName == "city"}
+        assert changes.size() == 2
+        assert salaryChange.left ==  1000
+        assert salaryChange.right == 1200
+        assert cityChange.left ==  "London"
+        assert cityChange.right == "Paris"
+        printChanges(changes)
+    }
 
     def "should query for Entity changes by instance Id"() {
         given:
