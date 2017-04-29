@@ -1,7 +1,7 @@
 package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Lists;
-import org.javers.core.metamodel.annotation.IgnoreDeclaredProperties;
+import org.javers.core.metamodel.annotation.*;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
@@ -42,22 +42,37 @@ class AnnotationNamesProvider {
     }
 
     boolean isTypeName(Annotation ann) {
+        if (ann.getClass() == JaversAnnotationsNamesSpace.TYPE_NAME_ANN) { //priority for javers ann
+            return true;
+        }
         return typeNameAliases.contains(ann.annotationType().getSimpleName());
     }
 
     boolean isEntityAlias(Annotation ann) {
+        if (ann.getClass() == JaversAnnotationsNamesSpace.ENTITY_ANN) { //priority for javers ann
+            return true;
+        }
         return entityAliases.contains(ann.annotationType().getSimpleName());
     }
 
-    boolean isValueObjectAlias(Annotation ann){
+    boolean isValueObjectAlias(Annotation ann) {
+        if (ann.getClass() == JaversAnnotationsNamesSpace.VALUE_OBJECT_ANN) { //priority for javers ann
+            return true;
+        }
         return valueObjectAliases.contains(ann.annotationType().getSimpleName());
     }
 
     boolean isValueAlias(Annotation ann){
+        if (ann.getClass() == JaversAnnotationsNamesSpace.VALUE_ANN) { //priority for javers ann
+            return true;
+        }
         return valueAliases.contains(ann.annotationType().getSimpleName());
     }
 
     boolean isIgnoredTypeAlias(Annotation ann) {
+        if (ann.getClass() == JaversAnnotationsNamesSpace.DIFF_IGNORE_ANN) { //priority for javers ann
+            return true;
+        }
         return ignoredTypeAliases.contains(ann.annotationType().getSimpleName());
     }
 

@@ -16,6 +16,8 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import javax.persistence.Id
+
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition
 import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.valueObjectDefinition
@@ -163,5 +165,23 @@ class TypeFactoryTest extends Specification {
         then:
         JaversException e = thrown()
         e.code == JaversExceptionCode.PROPERTY_NOT_FOUND
+    }
+
+    @javax.persistence.Entity
+    @org.javers.core.metamodel.annotation.ValueObject
+    class AmbiguousValueObjectType {
+        @Id int id
+    }
+
+    @javax.persistence.Embeddable
+    @org.javers.core.metamodel.annotation.Entity
+    class AmbiguousEntityType {
+        @Id int id
+    }
+
+    def "should use javers type annotations firts, when ambiguous type mapping"(){
+        expect:
+        typeFactory.inferFromAnnotations(AmbiguousValueObjectType) instanceof ValueObjectType
+        typeFactory.inferFromAnnotations(AmbiguousEntityType) instanceof EntityType
     }
 }
