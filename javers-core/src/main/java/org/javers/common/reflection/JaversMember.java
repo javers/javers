@@ -1,5 +1,6 @@
 package org.javers.common.reflection;
 
+import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 
 import java.lang.annotation.Annotation;
@@ -9,6 +10,8 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.Set;
+
+import static java.util.Collections.unmodifiableSet;
 
 /**
  * Enhanced Field or Method, deals with Java type erasure.
@@ -61,16 +64,19 @@ public abstract class JaversMember<T extends Member> {
         return rawMember.getName();
     }
 
-    public boolean hasAnyAnnotation(Set<String> annotationNames){
-        return findFirst(annotationNames).isPresent();
+    public Set<Annotation> getAnnotations() {
+        return unmodifiableSet(Sets.asSet(((AccessibleObject) rawMember).getAnnotations()));
     }
 
-    public Optional<Annotation> findFirst(Set<String> annotationNames) {
-        return ReflectionUtil.findFirst((AccessibleObject) rawMember, annotationNames);
+    public Set<Class<? extends Annotation>> getAnnotationTypes() {
+        return Sets.transform(getAnnotations(), ann -> ann.annotationType());
     }
 
-    public Optional<String> getFirstValue(Set<String> annotationNames) {
-        return findFirst(annotationNames).map(a -> ReflectionUtil.getAnnotationValue(a, "value"));
+    public boolean hasAnnotation(Set<String> aliases) {
+        if (aliases == null) {
+            return false;
+        }
+        return getAnnotationTypes().stream().anyMatch(annType -> aliases.contains(annType.getSimpleName()));
     }
 
     public abstract Object invokeEvenIfPrivate(Object target);

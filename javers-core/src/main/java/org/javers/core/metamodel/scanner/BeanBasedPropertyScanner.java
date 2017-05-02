@@ -26,10 +26,10 @@ class BeanBasedPropertyScanner extends PropertyScanner {
 
         for (JaversMethod getter : getters) {
             boolean isIgnoredInType = ignoreDeclaredProperties && getter.getDeclaringClass().equals(managedClass);
-            boolean hasTransientAnn = getter.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
-            boolean hasShallowReferenceAnn = getter.hasAnyAnnotation(annotationNamesProvider.getShallowReferenceAliases());
+            boolean hasTransientAnn = annotationNamesProvider.hasTransientPropertyAnn(getter.getAnnotationTypes());
+            boolean hasShallowReferenceAnn = annotationNamesProvider.hasShallowReferenceAnn(getter.getAnnotationTypes());
 
-            Optional<String> customPropertyName = getter.getFirstValue(annotationNamesProvider.getPropertyNameAliases());
+            Optional<String> customPropertyName = annotationNamesProvider.findPropertyNameAnnValue(getter.getAnnotations());
             beanProperties.add(new Property(getter, hasTransientAnn || isIgnoredInType, hasShallowReferenceAnn, customPropertyName));
 
         }

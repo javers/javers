@@ -179,9 +179,9 @@ class TypeFactoryTest extends Specification {
         @Id int id
     }
 
-    def "should use javers type annotations firts, when ambiguous type mapping"(){
+    def "should use javers type annotations first, when ambiguous type mapping"(){
         expect:
-        typeFactory.inferFromAnnotations(AmbiguousValueObjectType) instanceof ValueObjectType
         typeFactory.inferFromAnnotations(AmbiguousEntityType) instanceof EntityType
+        typeFactory.inferFromAnnotations(AmbiguousValueObjectType) instanceof ValueObjectType
     }
 }

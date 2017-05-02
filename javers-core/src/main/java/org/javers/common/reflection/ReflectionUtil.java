@@ -297,10 +297,4 @@ public class ReflectionUtil {
     public static <T> T getAnnotationValue(Annotation ann, String propertyName) {
         return (T) ReflectionUtil.invokeGetter(ann, propertyName);
     }
-
-    public static Optional<Annotation> findFirst(AnnotatedElement annotatedElement, Set<String> annotationNames) {
-        return Arrays.stream(annotatedElement.getAnnotations())
-                .filter(a -> annotationNames.contains(a.annotationType().getSimpleName()))
-                .findFirst();
-    }
 }
