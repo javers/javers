@@ -1,13 +1,10 @@
 package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Lists;
-import org.javers.core.metamodel.annotation.IgnoreDeclaredProperties;
+import org.javers.common.reflection.ReflectionUtil;
 
 import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author bartosz walacik
@@ -18,70 +15,67 @@ class AnnotationNamesProvider {
     private final Set<String> valueObjectAliases = new HashSet<>();
     private final Set<String> valueAliases = new HashSet<>();
     private final Set<String> transientPropertyAliases = new HashSet<>();
-    private final Set<String> shallowReferenceAliases = new HashSet<>();
-    private final Set<String> ignoredTypeAliases = new HashSet<>();
     private final Set<String> propertyNameAliases = new HashSet<>();
 
     private final List<AnnotationsNameSpace> namesProviders = Lists.immutableListOf(
-            new JaversAnnotationsNamesSpace(),
             new JPAAnnotationsNameSpace());
 
 
     AnnotationNamesProvider() {
-
         for (AnnotationsNameSpace provider : namesProviders){
             entityAliases.addAll(provider.getEntityAliases());
             valueObjectAliases.addAll(provider.getValueObjectAliases());
             valueAliases.addAll(provider.getValueAliases());
             transientPropertyAliases.addAll(provider.getTransientPropertyAliases());
-            shallowReferenceAliases.addAll(provider.getShallowReferenceAliases());
             typeNameAliases.addAll(provider.getTypeNameAliases());
-            ignoredTypeAliases.addAll(provider.getIgnoredTypeAliases());
             propertyNameAliases.addAll(provider.getPropertyNameAliases());
         }
     }
 
-    boolean isTypeName(Annotation ann) {
-        return typeNameAliases.contains(ann.annotationType().getSimpleName());
+    boolean hasEntityAnnAlias(Set<Class<? extends Annotation>> annTypes) {
+        return annTypes.stream().anyMatch(annType -> entityAliases.contains(annType.getSimpleName()));
     }
 
-    boolean isEntityAlias(Annotation ann) {
-        return entityAliases.contains(ann.annotationType().getSimpleName());
+    boolean hasValueObjectAnnAlias(Set<Class<? extends Annotation>> annTypes) {
+        return annTypes.stream().anyMatch(annType -> valueObjectAliases.contains(annType.getSimpleName()));
     }
 
-    boolean isValueObjectAlias(Annotation ann){
-        return valueObjectAliases.contains(ann.annotationType().getSimpleName());
+    boolean hasValueAnnAlias(Set<Class<? extends Annotation>> annTypes){
+        return annTypes.stream().anyMatch(annType -> valueAliases.contains(annType.getSimpleName()));
     }
 
-    boolean isValueAlias(Annotation ann){
-        return valueAliases.contains(ann.annotationType().getSimpleName());
+    boolean hasTransientPropertyAnn(Set<Class<? extends Annotation>> annTypes){
+        return annTypes.contains(JaversAnnotationsNameSpace.DIFF_IGNORE_ANN) ||
+               annTypes.stream().anyMatch(annType -> transientPropertyAliases.contains(annType.getSimpleName()));
     }
 
-    boolean isIgnoredTypeAlias(Annotation ann) {
-        return ignoredTypeAliases.contains(ann.annotationType().getSimpleName());
+    boolean hasShallowReferenceAnn(Set<Class<? extends Annotation>> annTypes) {
+        return annTypes.contains(JaversAnnotationsNameSpace.SHALLOW_REFERENCE_ANN);
     }
 
-    Set<String> getTransientAliases() {
-        return Collections.unmodifiableSet(transientPropertyAliases);
+    Optional<String> findTypeNameAnnValue(Set<Annotation> annotations) {
+        return getAnnotationValue(annotations, JaversAnnotationsNameSpace.TYPE_NAME_ANN, typeNameAliases);
     }
 
-    boolean isShallowReferenceAlias(Annotation ann){
-        return shallowReferenceAliases.contains(ann.annotationType().getSimpleName());
+    Optional<String> findPropertyNameAnnValue(Set<Annotation> annotations) {
+        return getAnnotationValue(annotations, JaversAnnotationsNameSpace.PROPERTY_NAME_ANN, propertyNameAliases);
     }
 
-    public boolean isIgnoreDeclaredPropertiesAlias(Annotation ann) {
-        return IgnoreDeclaredProperties.class.getSimpleName().equals( ann.annotationType().getSimpleName() );
+    private Optional<String> getAnnotationValue(Set<Annotation> annotations, Class<? extends Annotation> javersAnnType, Set<String> aliases) {
+        Optional<Annotation> annotation = findAnnotation(annotations, javersAnnType, aliases);
+        return annotation.map(ann -> ReflectionUtil.getAnnotationValue(ann, "value"));
     }
 
-    Set<String> getShallowReferenceAliases() {
-        return Collections.unmodifiableSet(shallowReferenceAliases);
-    }
+    private Optional<Annotation> findAnnotation(Set<Annotation> annotations, Class<? extends Annotation> javersAnnType, Set<String> aliases) {
+        Optional<Annotation> jTypeName = annotations.stream()
+                .filter(ann -> javersAnnType.isAssignableFrom(ann.getClass()))
+                .findAny();
+        if (jTypeName.isPresent()) {
+            return jTypeName;
+        }
 
-    public Set<String> getPropertyNameAliases() {
-        return Collections.unmodifiableSet(propertyNameAliases);
-    }
-
-    public Set<String> getTypeNameAliases() {
-        return Collections.unmodifiableSet(typeNameAliases);
+        return annotations.stream()
+                .filter(ann -> aliases.contains(ann.annotationType().getSimpleName()))
+                .findFirst();
     }
 }

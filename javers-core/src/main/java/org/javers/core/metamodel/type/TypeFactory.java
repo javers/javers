@@ -101,6 +101,10 @@ class TypeFactory {
             return create( new IgnoredTypeDefinition(javaClass) );
         }
 
+        if (scan.hasValueObjectAnn()) {
+            return create(ValueObjectDefinitionBuilder.valueObjectDefinition(javaClass).build());
+        }
+
         ClientsClassDefinitionBuilder builder;
         if (scan.hasIdProperty() || scan.hasEntityAnn()) {
             builder = EntityDefinitionBuilder.entityDefinition(javaClass);

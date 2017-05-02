@@ -1,10 +1,17 @@
 package org.javers.core.metamodel.scanner;
 
-import org.javers.common.reflection.ReflectionUtil;
+import org.javers.common.collections.Lists;
+import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.annotation.*;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.javers.core.metamodel.scanner.JaversAnnotationsNameSpace.IGNORE_DECLARED_PROPERTIES_ANN;
 
 /**
  * Should scan well known annotations at class level
@@ -12,8 +19,14 @@ import java.util.Optional;
  * @author bartosz walacik
  */
 class ClassAnnotationsScanner {
-
     private final AnnotationNamesProvider annotationNamesProvider;
+    private List<Class<? extends Annotation>> JAVERS_TYPE_ANNOTATIONS = Lists.immutableListOf(
+            DiffIgnore.class,
+            Entity.class,
+            ShallowReference.class,
+            ValueObject.class,
+            Value.class
+    );
 
     ClassAnnotationsScanner(AnnotationNamesProvider annotationNamesProvider) {
         this.annotationNamesProvider = annotationNamesProvider;
@@ -22,48 +35,35 @@ class ClassAnnotationsScanner {
     public ClassAnnotationsScan scan(Class javaClass){
         Validate.argumentIsNotNull(javaClass);
 
-        Optional<String> typeName = ReflectionUtil.findFirst(javaClass, annotationNamesProvider.getTypeNameAliases())
-                .map(a -> ReflectionUtil.getAnnotationValue(a, "value"));
+        Set<Annotation> annotations = Sets.asSet(javaClass.getAnnotations());
+        Set<Class<? extends Annotation>> annTypes = annotations.stream()
+                .map(a -> a.annotationType())
+                .collect(Collectors.toSet());
 
-        boolean hasValue = false;
-        boolean hasIgnored = false;
-        boolean hasValueObject = false;
-        boolean hasEntity = false;
-        boolean hasShallowReference = false;
-        boolean hasIgnoreDeclaredProperties = false;
+        Optional<String> typeName = annotationNamesProvider.findTypeNameAnnValue(annotations);
 
-        //scan class level annotations
-        for (Annotation ann : javaClass.getAnnotations()) {
-            if (annotationNamesProvider.isEntityAlias(ann)) {
-                hasEntity = true;
-            }
-            if (annotationNamesProvider.isValueAlias(ann)) {
-                hasValue = true;
-            }
+        Optional<Class<? extends Annotation>> javersTypeAnnotation =
+                JAVERS_TYPE_ANNOTATIONS.stream().filter(annTypes::contains).findFirst();
 
-            if (annotationNamesProvider.isShallowReferenceAlias(ann)) {
-                hasShallowReference = true;
-            }
+        boolean hasIgnoreDeclaredProperties = annTypes.contains(IGNORE_DECLARED_PROPERTIES_ANN);
 
-            if (annotationNamesProvider.isIgnoredTypeAlias(ann)) {
-                hasIgnored = true;
-            }
-
-            if (annotationNamesProvider.isValueObjectAlias(ann)) {
-                hasValueObject = true;
-            }
-
-            if (annotationNamesProvider.isIgnoreDeclaredPropertiesAlias(ann)){
-                hasIgnoreDeclaredProperties = true;
-            }
-        }
-
-        return new ClassAnnotationsScan(hasValue,
-                                        hasValueObject,
-                                        hasEntity,
-                                        hasShallowReference,
-                                        hasIgnored,
+        return new ClassAnnotationsScan(typeFromAnnotation(annTypes),
                                         hasIgnoreDeclaredProperties,
                                         typeName);
+    }
+
+    private TypeFromAnnotation typeFromAnnotation(Set<Class<? extends Annotation>> annTypes) {
+        Optional<Class<? extends Annotation>> javersTypeAnnotation =
+                JAVERS_TYPE_ANNOTATIONS.stream().filter(annTypes::contains).findFirst();
+
+        if (javersTypeAnnotation.isPresent()) {
+            return new TypeFromAnnotation(javersTypeAnnotation.get());
+        }
+        else {
+            boolean hasValue = annotationNamesProvider.hasValueAnnAlias(annTypes);
+            boolean hasValueObject = annotationNamesProvider.hasValueObjectAnnAlias(annTypes);
+            boolean hasEntity = annotationNamesProvider.hasEntityAnnAlias(annTypes);
+            return new TypeFromAnnotation(hasEntity, hasValueObject, hasValue);
+        }
     }
 }

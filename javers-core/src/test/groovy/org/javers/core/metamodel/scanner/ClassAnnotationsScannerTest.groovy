@@ -18,7 +18,7 @@ class ClassAnnotationsScannerTest extends Specification {
         def result = scanner.scan(classToScan)
 
         then:
-        result.hasEntity
+        result.entity
 
         where:
         annotation << [javax.persistence.Entity,
@@ -34,7 +34,7 @@ class ClassAnnotationsScannerTest extends Specification {
         def result = scanner.scan(classToScan)
 
         then:
-        result.hasValueObject
+        result.valueObject
 
         where:
         annotation << [javax.persistence.Embeddable,
@@ -49,7 +49,7 @@ class ClassAnnotationsScannerTest extends Specification {
         def result = scanner.scan(classToScan)
 
         then:
-        result.hasValue
+        result.value
 
         where:
         annotation << [org.javers.core.metamodel.annotation.Value]

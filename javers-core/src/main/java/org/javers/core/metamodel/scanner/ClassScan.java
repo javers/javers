@@ -30,19 +30,19 @@ public class ClassScan {
     }
 
     public boolean hasValueAnn() {
-        return classAnnotationsScan.hasValue();
+        return classAnnotationsScan.isValue();
     }
 
     public boolean hasValueObjectAnn() {
-        return classAnnotationsScan.hasValueObject();
+        return classAnnotationsScan.isValueObject();
     }
 
     public boolean hasEntityAnn() {
-        return classAnnotationsScan.hasEntity();
+        return classAnnotationsScan.isEntity();
     }
 
     public boolean hasShallowReferenceAnn() {
-        return classAnnotationsScan.hasShallowReference();
+        return classAnnotationsScan.isShallowReference();
     }
 
     public Optional<String> typeName() {
@@ -50,6 +50,6 @@ public class ClassScan {
     }
 
     public boolean hasIgnoredAnn() {
-        return classAnnotationsScan.hasIgnored();
+        return classAnnotationsScan.isIgnored();
     }
 }

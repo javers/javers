@@ -26,10 +26,10 @@ class FieldBasedPropertyScanner extends PropertyScanner {
 
         for (JaversField field : fields) {
             boolean isIgnoredInType = ignoreDeclaredProperties && field.getDeclaringClass().equals(managedClass);
-            boolean hasTransientAnn = field.hasAnyAnnotation(annotationNamesProvider.getTransientAliases());
-            boolean hasShallowReferenceAnn = field.hasAnyAnnotation(annotationNamesProvider.getShallowReferenceAliases());
+            boolean hasTransientAnn = annotationNamesProvider.hasTransientPropertyAnn(field.getAnnotationTypes());
+            boolean hasShallowReferenceAnn = annotationNamesProvider.hasShallowReferenceAnn(field.getAnnotationTypes());
 
-            Optional<String> customPropertyName = field.getFirstValue(annotationNamesProvider.getPropertyNameAliases());
+            Optional<String> customPropertyName = annotationNamesProvider.findPropertyNameAnnValue(field.getAnnotations());
             propertyList.add(new Property(field, hasTransientAnn || isIgnoredInType, hasShallowReferenceAnn, customPropertyName));
         }
         return new PropertyScan(propertyList);
