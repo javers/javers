@@ -1,5 +1,6 @@
 package org.javers.core.json.typeadapter
 
+import com.google.common.collect.HashMultiset
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.commit.CommitId
@@ -7,6 +8,8 @@ import org.javers.core.commit.CommitMetadata
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
+import org.javers.core.model.SnapshotEntity
+import org.javers.guava.MultimapBuilder
 import org.javers.repository.jql.ValueObjectIdDTO
 import java.time.LocalDateTime
 import spock.lang.Specification
@@ -97,6 +100,43 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.state.dummyAddress.fragment == "dummyAddress"
+    }
+
+    def "should serialize state with Multimaps in CdoSnapshots"() {
+        given:
+        def javers = javersTestAssembly()
+        def entity = new SnapshotEntity(multiMapOfPrimitives:MultimapBuilder.create([a:['a', 'b', 'c']]))
+
+        def cdoWrapper = javers.createCdoWrapper( entity )
+        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+
+        when:
+        def jsonText = javers.jsonConverter.toJson(snapshot)
+
+        then:
+        def jsonMultimap = new JsonSlurper().parseText(jsonText).state.multiMapOfPrimitives
+        jsonMultimap == [
+                [key:'a', value: 'a'],
+                [key:'a', value: 'b'],
+                [key:'a', value: 'c']
+        ]
+    }
+
+    def "should serialize state with Multisets in CdoSnapshots"() {
+        given:
+        def javers = javersTestAssembly()
+        def entity = new SnapshotEntity(multiSetOfPrimitives: HashMultiset.create(['a','a','b']))
+
+        def cdoWrapper = javers.createCdoWrapper( entity )
+        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+
+        when:
+        def jsonText = javers.jsonConverter.toJson(snapshot)
+        println jsonText
+
+        then:
+        def jsonMultiset = new JsonSlurper().parseText(jsonText).state.multiSetOfPrimitives
+        jsonMultiset == ['a','a','b']
     }
 
     def "should serialize state with collections in CdoSnapshots"() {

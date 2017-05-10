@@ -20,6 +20,7 @@ import org.javers.core.metamodel.type.TypeMapper
 import org.javers.repository.api.JaversExtendedRepository
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryRunner
+import org.javers.shadow.ShadowFactory
 
 /**
  * This is just a test builder,
@@ -141,6 +142,11 @@ class JaversTestBuilder {
     JsonConverter getJsonConverter() {
         javersBuilder.getContainerComponent(JsonConverter)
     }
+
+    ShadowFactory getShadowFactory() {
+        javersBuilder.getContainerComponent(ShadowFactory)
+    }
+
 
     JsonConverter getJsonConverterMinifiedPrint() {
         JaversBuilder.javers().withPrettyPrint(false).build().getJsonConverter()

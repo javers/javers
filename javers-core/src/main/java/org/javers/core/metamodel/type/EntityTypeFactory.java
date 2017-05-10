@@ -3,7 +3,6 @@ package org.javers.core.metamodel.type;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.metamodel.clazz.EntityDefinition;
-import org.javers.core.metamodel.property.Property;
 
 /**
  * @author bartosz.walacik
@@ -18,7 +17,7 @@ class EntityTypeFactory {
     EntityType createEntity(EntityDefinition definition) {
         ManagedClass managedClass = managedClassFactory.create(definition);
 
-        Property idProperty;
+        JaversProperty idProperty;
         if (definition.hasCustomId()) {
             idProperty = managedClass.getProperty(definition.getIdPropertyName());
         } else {
@@ -35,7 +34,7 @@ class EntityTypeFactory {
     /**
      * @throws JaversException ENTITY_WITHOUT_ID
      */
-    private Property findDefaultIdProperty(ManagedClass managedClass) {
+    private JaversProperty findDefaultIdProperty(ManagedClass managedClass) {
         if (managedClass.getLooksLikeId().isEmpty()) {
             throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID, managedClass.getBaseJavaClass().getName());
         }

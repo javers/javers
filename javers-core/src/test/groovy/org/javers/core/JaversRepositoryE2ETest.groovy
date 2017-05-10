@@ -11,6 +11,7 @@ import org.javers.repository.api.JaversRepository
 import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.QueryBuilder
+import org.javers.repository.jql.ShadowScope
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -1127,5 +1128,237 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         snapshots.size() == 1
         snapshots[0].getPropertyValue('Customized Property') == 'a'
+    }
+
+
+    def "should return mutable collections for easy sorting"(){
+        given:
+        def paris =   new DummyAddress(city: "Paris")
+        def london =  new DummyAddress(city: "london")
+
+        javers.commit("a", paris)
+        javers.commit("a", london)
+
+        when:
+        def col = javers.findSnapshots(QueryBuilder.anyDomainObject().build())
+        col.add(null)
+        col = javers.findChanges(QueryBuilder.anyDomainObject().build())
+        col.add(null)
+
+        then:
+        noExceptionThrown()
+    }
+
+    def "should query for deep Shadows of ValueObject in COMMIT scope"() {
+        given:
+        def vo =  new DummyAddress(city: "London", networkAddress: new DummyNetworkAddress(address: "a"))
+        def entity = new SnapshotEntity(id: 1, valueObjectRef: vo)
+        javers.commit("a", entity)
+
+        vo.city = "Paris"
+        javers.commit("a", entity)
+
+        vo.city = "Rome"
+        javers.commit("a", entity)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byValueObjectId(1, SnapshotEntity, "valueObjectRef")
+                .withShadowScope(ShadowScope.COMMIT_DEPTH)
+                .build()).collect{it.get()}
+
+        then:
+        shadows.size() == 3
+        shadows.each {
+            it instanceof DummyAddress
+            it.networkAddress instanceof DummyNetworkAddress
+        }
+
+        shadows[0].city == "Rome"
+        shadows[0].networkAddress.address == "a"
+
+        shadows[1].city == "Paris"
+        shadows[1].networkAddress.address == "a"
+
+        shadows[2].city == "London"
+        shadows[2].networkAddress.address == "a"
+    }
+
+    def "should query for Shadows of Entity in SHALLOW scope"() {
+        given:
+        def entity = new SnapshotEntity(id: 1, intProperty: 1)
+        javers.commit("a", entity)
+        entity.intProperty = 2
+        javers.commit("a", entity)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+
+        then:
+        shadows.size() == 2
+        shadows.each {
+            assert it.get() instanceof SnapshotEntity
+            assert it.get().id == 1
+        }
+
+        shadows[0].commitMetadata.id.value() == "2.0"
+        shadows[0].get().intProperty == 2
+
+        shadows[1].commitMetadata.id.value() == "1.0"
+        shadows[1].get().intProperty == 1
+    }
+
+    def "should query for all Entity Shadows in SHALLOW scope"() {
+        given:
+        javers.commit("a", new SnapshotEntity(id: 1))
+        javers.commit("a", new SnapshotEntity(id: 2))
+        javers.commit("a", new SnapshotEntity(id: 3))
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byClass(SnapshotEntity)
+                .build()).collect{it.get()}
+
+        then:
+        shadows.size() == 3
+        shadows.each {
+            assert it instanceof SnapshotEntity
+        }
+        shadows[0].id == 3
+        shadows[1].id == 2
+        shadows[2].id == 1
+    }
+
+    def "should query for Shadows by multiple classes"(){
+        given:
+        javers.commit("a", new SnapshotEntity(id:1))
+        javers.commit("a", new OldEntity(id:1))
+        javers.commit("a", new NewEntityWithTypeAlias(id:1))
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byClass(NewEntity, NewEntityWithTypeAlias)
+              .build()).collect{it.get()}
+
+        then:
+        shadows.size() == 2
+        shadows[0] instanceof NewEntityWithTypeAlias
+        shadows[1] instanceof OldEntity
+    }
+
+    def "should query for Shadows by ValueObject path"(){
+        given:
+        javers.commit("a", new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London")))
+        javers.commit("a", new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "Paris")))
+        javers.commit("a", new SnapshotEntity(id: 1, arrayOfValueObjects: [new DummyAddress(city: "Paris")]))
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byValueObject(SnapshotEntity, "valueObjectRef")
+                .build()).collect{it.get()}
+
+        then:
+        shadows.size() == 2
+        shadows[0].city == "Paris"
+        shadows[1].city == "London"
+    }
+
+    def "should query for Shadows of Entity with Entity refs in COMMIT scope"(){
+        given:
+        def ref1 = new SnapshotEntity(id: 5, intProperty: 5)
+        javers.commit("a", new SnapshotEntity(id: 1, intProperty: 1, entityRef: ref1))
+
+        def ref2 = new SnapshotEntity(id: 5, intProperty: 55)
+        javers.commit("a", new SnapshotEntity(id: 1, intProperty: 2, entityRef: ref2))
+
+        javers.commit("a", new SnapshotEntity(id: 1, intProperty: 3, entityRef: ref2))
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity).withShadowScopeDeep()
+                .build()).collect{it.get()}
+
+        then:
+        shadows.size() == 3
+        shadows.each {
+            assert it instanceof SnapshotEntity
+            assert it.id == 1
+        }
+        shadows[0].intProperty == 3
+        shadows[0].entityRef == ref2
+
+        shadows[1].intProperty == 2
+        shadows[1].entityRef == ref2
+
+        shadows[2].intProperty == 1
+        shadows[2].entityRef == ref1
+    }
+
+    def "should query for Shadows of Entity with child ValueObjects in COMMIT scope"(){
+        given:
+        def address = new DummyAddress(city: "London")
+        def entity = new SnapshotEntity(id: 1, valueObjectRef: address, intProperty: 1)
+        javers.commit("a", entity)
+
+        address.city = "Paris"
+        javers.commit("a", entity)
+
+        address.networkAddress = new DummyNetworkAddress(address: "some")
+        javers.commit("a", entity)
+
+        address.networkAddress.address = "another"
+        javers.commit("a", entity)
+
+        entity.intProperty = 5
+        javers.commit("a", entity)
+
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
+                .withChildValueObjects()
+                .withShadowScopeDeep().build()).collect{it.get()}
+
+        then:
+        shadows.size() == 5
+        shadows.each {
+            assert it instanceof SnapshotEntity
+            assert it.valueObjectRef instanceof DummyAddress
+            assert it.id == 1
+        }
+
+        shadows[0].intProperty == 5
+        shadows[0].valueObjectRef.city == "Paris"
+        shadows[0].valueObjectRef.networkAddress.address == "another"
+
+        shadows[1].intProperty == 1
+        shadows[1].valueObjectRef.city == "Paris"
+        shadows[1].valueObjectRef.networkAddress.address == "another"
+
+        shadows[2].intProperty == 1
+        shadows[2].valueObjectRef.city == "Paris"
+        shadows[2].valueObjectRef.networkAddress.address == "some"
+
+        shadows[3].intProperty == 1
+        shadows[3].valueObjectRef.city == "Paris"
+       !shadows[3].valueObjectRef.networkAddress
+
+        shadows[4].intProperty == 1
+        shadows[4].valueObjectRef.city == "London"
+       !shadows[4].valueObjectRef.networkAddress
+    }
+
+    def "should query by multiple CommitId"(){
+      given:
+      def entity = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London"))
+      javers.commit("a", entity)
+
+      3.times {
+          entity.intProperty = it + 1
+          javers.commit("a", entity)
+      }
+
+      when:
+      def snapshots = javers
+              .findSnapshots(QueryBuilder.anyDomainObject()
+              .withCommitIds( [1.0, 4.0] ).build())
+
+      then:
+      snapshots.size() == 3
+      snapshots.every{it.commitId.majorId == 1 || it.commitId.majorId == 4}
     }
 }

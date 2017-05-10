@@ -15,11 +15,10 @@ import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.json.JsonTypeAdapterTemplate;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -98,9 +97,9 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
 
     protected class PropertyChangeStub{
         GlobalId id;
-        Property property;
+        JaversProperty property;
 
-        PropertyChangeStub(GlobalId id, Property property) {
+        PropertyChangeStub(GlobalId id, JaversProperty property) {
             this.id = id;
             this.property = property;
         }

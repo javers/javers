@@ -4,7 +4,6 @@ import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.JaversMember;
-
 import java.lang.reflect.Type;
 import java.util.Optional;
 
@@ -29,6 +28,10 @@ public class Property {
         this.hasTransientAnn = hasTransientAnn;
         this.hasShallowReferenceAnn = hasShallowReferenceAnn;
         this.name = name.orElse(member.propertyName());
+    }
+
+    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, String name){
+        this(member, hasTransientAnn, hasShallowReferenceAnn, Optional.of(name));
     }
 
     public Property(JaversMember member, boolean hasTransientAnn) {
@@ -62,10 +65,29 @@ public class Property {
      */
     public Object get(Object target) {
         try {
-            return  member.invokeEvenIfPrivate(target);
+            return  member.getEvenIfPrivate(target);
         } catch (JaversException e) {
             if (e.getCode() == JaversExceptionCode.MISSING_PROPERTY) {
                 return null;
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * Sets property value, even if private.
+     * <br/>
+     * Swallows JaversException.MISSING_PROPERTY
+     *
+     * @param target invocation target
+     * @param value value to be set
+     */
+    public void set(Object target, Object value) {
+        try {
+            member.setEvenIfPrivate(target, value);
+        } catch (JaversException e) {
+            if (e.getCode() == JaversExceptionCode.MISSING_PROPERTY) {
+                return; //swallowed
             }
             throw e;
         }

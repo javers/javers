@@ -4,8 +4,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import java.time.LocalDateTime;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author michal wesolowski
@@ -15,7 +14,7 @@ public class QueryParamsBuilder {
     private int skip;
     private LocalDateTime from;
     private LocalDateTime to;
-    private CommitId commitId;
+    private Set<CommitId> commitIds = new HashSet<>();
     private Long version;
     private String author;
     private boolean aggregate;
@@ -43,18 +42,16 @@ public class QueryParamsBuilder {
         Validate.argumentIsNotNull(queryParams);
 
         QueryParamsBuilder builder = QueryParamsBuilder.withLimit(queryParams.limit());
+        builder.commitIds(queryParams.commitIds());
         builder.skip(queryParams.skip());
         if (queryParams.from().isPresent()) {
-            builder = builder.from(queryParams.from().get());
+            builder.from(queryParams.from().get());
         }
         if (queryParams.to().isPresent()) {
-            builder = builder.to(queryParams.to().get());
-        }
-        if (queryParams.commitId().isPresent()) {
-            builder = builder.commitId(queryParams.commitId().get());
+            builder.to(queryParams.to().get());
         }
         if (queryParams.version().isPresent()) {
-            builder = builder.version(queryParams.version().get());
+            builder.version(queryParams.version().get());
         }
         return builder;
     }
@@ -99,10 +96,18 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * @see QueryParams#commitId()
+     * @see QueryParams#commitIds()
      */
     public QueryParamsBuilder commitId(CommitId commitId) {
-        this.commitId = commitId;
+        this.commitIds.add(commitId);
+        return this;
+    }
+
+    /**
+     * @see QueryParams#commitIds()
+     */
+    public QueryParamsBuilder commitIds(Collection<CommitId> commitIds) {
+        this.commitIds.addAll(commitIds);
         return this;
     }
 
@@ -146,6 +151,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to, commitId, version, author, commitProperties, aggregate, newObjectChanges, changedProperty);
+        return new QueryParams(limit, skip, from, to, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty);
     }
 }

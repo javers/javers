@@ -14,6 +14,7 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
+import org.javers.shadow.Shadow;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +107,12 @@ public class JaversTransactionalDecorator implements Javers {
     @Override
     public Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass) {
         return delegate.getLatestSnapshot(localId, entityClass);
+    }
+
+    @Transactional
+    @Override
+    public List<Shadow> findShadows(JqlQuery query) {
+        return delegate.findShadows(query);
     }
 
     @Transactional

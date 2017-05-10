@@ -28,6 +28,10 @@ public enum JaversExceptionCode {
 
     PROPERTY_ACCESS_ERROR("error getting value from property '%s' on target object of type '%s', cause: %s"),
 
+    PROPERTY_SETTING_ERROR("error setting '%s' value to property '%s', cause: %s"),
+
+    SETTER_INVOCATION_ERROR("error invoking setter '%s' on target object of type '%s', cause: %s"),
+
     CONTAINER_NOT_READY(JaversException.BOOTSTRAP_ERROR +"pico container is not ready"),
 
     AFFECTED_CDO_IS_NOT_AVAILABLE("affected cdo is not available, you can access it only for freshly generated diffs"),
@@ -44,6 +48,8 @@ public enum JaversExceptionCode {
     SNAPSHOT_STATE_VIOLATION("snapshots are immutable"),
 
     PROPERTY_NOT_FOUND("property '%s' not found in class '%s'"),
+
+    SETTER_NOT_FOUND("setter for getter '%s' not found in class '%s'"),
 
     /** @since 1.4 */
     TYPE_NAME_NOT_FOUND(

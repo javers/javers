@@ -18,6 +18,7 @@ import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.TailoredJaversMemberFactoryModule;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
+import org.javers.core.json.JsonAdvancedTypeAdapter;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
@@ -35,6 +36,7 @@ import org.javers.mongosupport.RequiredMongoSupportPredicate;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.inmemory.InMemoryRepositoryModule;
+import org.javers.shadow.ShadowModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +128,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addModule(new DiffAppendersModule(coreConfiguration(), getContainer()));
         addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
         addModule(new ScannerModule(coreConfiguration(), getContainer()));
+        addModule(new ShadowModule(getContainer()));
 
         // bootstrap phase 3: add-on modules
         Set<JaversType> additionalTypes = bootAddOns();
@@ -342,6 +345,17 @@ public class JaversBuilder extends AbstractContainerBuilder {
         }
 
         jsonConverterBuilder().registerJsonTypeAdapter(typeAdapter);
+        return this;
+    }
+
+    /**
+     * <font color='red'>INCUBATING</font><br/>
+     *
+     * For complex structures like Multimap
+     * @since 3.1
+     */
+    public JaversBuilder registerJsonAdvancedTypeAdapter(JsonAdvancedTypeAdapter adapter) {
+        jsonConverterBuilder().registerJsonAdvancedTypeAdapter(adapter);
         return this;
     }
 

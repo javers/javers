@@ -6,17 +6,13 @@ import java.time.LocalDateTime;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Container for additional query parameters
  * used for filtering Snapshots to be fetched from database.
- * <br/>
- *
- * Query parameters can't affect query semantic
- * as they are used by all types of queries.
  *
  * @see QueryParamsBuilder
- *
  * @author michal wesolowski
  */
 public class QueryParams {
@@ -24,7 +20,7 @@ public class QueryParams {
     private final int skip;
     private final Optional<LocalDateTime> from;
     private final Optional<LocalDateTime> to;
-    private final Optional<CommitId> commitId;
+    private final Set<CommitId> commitIds;
     private final Optional<Long> version;
     private final Optional<String> author;
     private final Optional<Map<String, String>> commitProperties;
@@ -32,12 +28,12 @@ public class QueryParams {
     private final boolean newObjectChanges;
     private final Optional<String> changedProperty;
 
-    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, CommitId commitId, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty) {
         this.limit = limit;
         this.skip = skip;
         this.from = Optional.ofNullable(from);
         this.to = Optional.ofNullable(to);
-        this.commitId = Optional.ofNullable(commitId);
+        this.commitIds = commitIds;
         this.version = Optional.ofNullable(version);
         this.author = Optional.ofNullable(author);
         this.commitProperties = Optional.ofNullable(commitProperties);
@@ -89,8 +85,8 @@ public class QueryParams {
     /**
      * filters results to Snapshots with a given commitId
      */
-    public Optional<CommitId> commitId() {
-        return commitId;
+    public Set<CommitId> commitIds() {
+        return Collections.unmodifiableSet(commitIds);
     }
 
     /**
@@ -140,7 +136,7 @@ public class QueryParams {
                 ", skip=" + skip +
                 ", from=" + from +
                 ", to=" + to +
-                ", commitId=" + commitId +
+                ", commitIds=" + commitIds +
                 ", commitProperties=" + commitProperties +
                 ", version=" + version +
                 "}";

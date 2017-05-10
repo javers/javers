@@ -32,7 +32,7 @@ abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends Cha
         JsonObject jsonObject = (JsonObject) json;
         PropertyChangeStub stub = deserializeStub(jsonObject, context);
 
-        ContainerType containerType = typeMapper.getPropertyType(stub.property);
+        ContainerType containerType = stub.property.getType();
         List<ContainerElementChange> changes = parseChanges(jsonObject, context, containerType);
 
         CommitMetadata commitMetadata = deserializeCommitMetadata(jsonObject, context);

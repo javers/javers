@@ -35,7 +35,7 @@ class JaversCommitE2ETest extends Specification {
         then:
         commit.snapshots.each {
             println it.toString()
-            println ".. props:"+ it.state.properties
+            println ".. props:"+ it.state.propertyNames
         }
         commit.snapshots.size() == 1
     }
@@ -51,7 +51,7 @@ class JaversCommitE2ETest extends Specification {
         then:
         commit.snapshots.each {
             println it.toString()
-            println ".. props:"+ it.state.properties
+            println ".. props:"+ it.state.propertyNames
         }
         commit.snapshots.size() == 1
     }
@@ -197,7 +197,7 @@ class JaversCommitE2ETest extends Specification {
     }
 
     //not sure about that.
-    // We know that object was removed when concerning the local context of LiveGraph and ShadowGraph
+    // We know that object was removed when concerning the local context of LiveGraph and SnapshotGraph
     // but we don't know if it was removed 'globally'
     def "should generate only ReferenceChange for removed objects"() {
         given:

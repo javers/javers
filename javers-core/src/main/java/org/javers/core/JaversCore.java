@@ -21,6 +21,7 @@ import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryRunner;
+import org.javers.shadow.Shadow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,6 +136,11 @@ class JaversCore implements Javers {
     @Override
     public Diff initial(Object newDomainObject) {
         return diffFactory.initial(newDomainObject);
+    }
+
+    @Override
+    public List<Shadow> findShadows(JqlQuery query) {
+        return queryRunner.queryForShadows(query);
     }
 
     @Override

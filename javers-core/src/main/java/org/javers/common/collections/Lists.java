@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.unmodifiableList;
@@ -12,11 +13,11 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 public class Lists {
 
-    public static List wrapNull(List list){
+    public static List wrapNull(Object list){
         if (list == null){
             return Collections.emptyList();
         }
-        return list;
+        return (List)list;
     }
 
     public static <T> List<T> immutableListOf(T... elements){
@@ -51,7 +52,7 @@ public class Lists {
      */
     public static <T> List<T> positiveFilter(List<T> input, Predicate<T> filter) {
         argumentsAreNotNull(input, filter);
-        return input.stream().filter(filter).collect(toImmutableList());
+        return input.stream().filter(filter).collect(Collectors.toList());
     }
 
     /**
@@ -59,12 +60,12 @@ public class Lists {
      */
     public static <T> List<T> negativeFilter(List<T> input, final Predicate<T>  filter) {
         argumentsAreNotNull(input, filter);
-        return input.stream().filter(element -> !filter.test(element)).collect(toImmutableList());
+        return input.stream().filter(element -> !filter.test(element)).collect(Collectors.toList());
     }
 
-    public static <F, T> List<T> transform(List<F> input, Function<F, T> transformation) {
+    public static <F, T> List<T> transform(Collection<F> input, Function<F, T> transformation) {
         argumentsAreNotNull(input, transformation);
-        return input.stream().map(transformation::apply).collect(toImmutableList());
+        return input.stream().map(transformation::apply).collect(Collectors.toList());
     }
 
     public static <E> List<E> difference(List<E> first, List<E> second) {

@@ -1,10 +1,8 @@
 package org.javers.core.diff;
 
 import org.javers.core.graph.ObjectNode;
-
 import java.util.Collections;
 import java.util.Set;
-
 import static org.javers.common.collections.Sets.difference;
 
 /**
@@ -36,12 +34,9 @@ public class GraphPair {
         this.onlyOnRight = rightGraph.nodes();
     }
 
-    private class EmptyGraph implements ObjectGraph {
-        public Set<ObjectNode> nodes() {
-            return  Collections.emptySet();
-        }
-        public ObjectNode root() {
-            throw new RuntimeException("not implemented");
+    private class EmptyGraph extends ObjectGraph {
+        EmptyGraph() {
+            super(Collections.emptySet());
         }
     }
 

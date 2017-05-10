@@ -9,6 +9,13 @@ import java.util.Set;
  */
 public class Maps {
 
+    public static Map wrapNull(Object map){
+        if (map == null){
+            return Collections.emptyMap();
+        }
+        return (Map)map;
+    }
+
     /**
      * null args are allowed
      */

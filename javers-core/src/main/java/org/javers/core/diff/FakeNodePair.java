@@ -38,7 +38,7 @@ class FakeNodePair implements NodePair {
 
     @Override
     public List<Property> getProperties() {
-        return getManagedType().getProperties();
+        return (List)getManagedType().getProperties();
     }
 
     @Override

@@ -28,6 +28,7 @@ import org.javers.repository.mongo.model.MongoHeadId;
 import java.time.LocalDateTime;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.javers.common.collections.Lists.toImmutableList;
 import static org.javers.common.validation.Validate.conditionFulfilled;
@@ -243,8 +244,8 @@ public class MongoRepository implements JaversRepository {
             if (params.to().isPresent()) {
                 query = addToDateFilter(query, params.to().get());
             }
-            if (params.commitId().isPresent()) {
-                query = addCommitIdFilter(query, params.commitId().get());
+            if (params.commitIds().size() > 0) {
+                query = addCommitIdFilter(query, params.commitIds());
             }
             if (params.version().isPresent()) {
                 query = addVersionFilter(query, params.version().get());
@@ -280,8 +281,8 @@ public class MongoRepository implements JaversRepository {
         return Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(to)));
     }
 
-    private Bson addCommitIdFilter(Bson query, CommitId commitId) {
-        return Filters.and(query, new BasicDBObject(COMMIT_ID, commitId.valueAsNumber().doubleValue()));
+    private Bson addCommitIdFilter(Bson query, Set<CommitId> commitIds) {
+        return Filters.in(COMMIT_ID, commitIds.stream().map(c -> c.valueAsNumber().doubleValue()).collect(Collectors.toSet()));
     }
 
     private Bson addChangedPropertyFilter(Bson query, String changedProperty){

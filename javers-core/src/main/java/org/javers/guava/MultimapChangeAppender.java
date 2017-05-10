@@ -58,7 +58,7 @@ class MultimapChangeAppender extends CorePropertyChangeAppender<MapChange>{
         Multimap left =  (Multimap)pair.getLeftPropertyValue(property);
         Multimap right = (Multimap)pair.getRightPropertyValue(property);
 
-        MultimapType multimapType = typeMapper.getPropertyType(property);
+        MultimapType multimapType = ((JaversProperty) property).getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
 
         List<EntryChange> entryChanges = calculateChanges(multimapType, left, right, owner);

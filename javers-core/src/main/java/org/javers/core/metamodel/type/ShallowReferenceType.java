@@ -1,14 +1,13 @@
 package org.javers.core.metamodel.type;
 
 import java.util.Optional;
-import org.javers.core.metamodel.property.Property;
 
 /**
  * @see org.javers.core.metamodel.annotation.ShallowReference
  * @author bartosz.walacik
  */
 public class ShallowReferenceType extends EntityType {
-    ShallowReferenceType(ManagedClass entity, Property idProperty, Optional<String> typeName) {
+    ShallowReferenceType(ManagedClass entity, JaversProperty idProperty, Optional<String> typeName) {
         super(entity.createShallowReference(), idProperty, typeName);
     }
 
