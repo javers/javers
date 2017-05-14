@@ -169,7 +169,7 @@ public interface Javers {
     Diff initial(Object newDomainObject);
 
     /**
-     * Queries JaversRepository for object Shadows (historical versions). <br/>
+     * Queries JaversRepository for object Shadows. <br/>
      * Shadow is a historical version of a domain object restored from a snapshot.
      * <br/><br/>
      *

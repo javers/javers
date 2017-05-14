@@ -25,9 +25,7 @@ import static org.javers.common.validation.Validate.*;
  * See the inheritance hierarchy for the complete list.
  * <br><br>
  *
- * Change is a <i>Value Object</i> and typically can not exists without
- * owning {@link Diff}. For more information see {@link Diff} javadoc.
- *
+ * @see Diff
  * @author bartosz walacik
  */
 public abstract class Change implements Serializable {

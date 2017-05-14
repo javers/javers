@@ -20,30 +20,66 @@ import spock.lang.Specification
  */
 class JqlExample extends Specification {
 
-    def "should query for Changes made on an object"() {
+    def "should query for Changes made on any object"() {
         given:
         def javers = JaversBuilder.javers().build()
-
-        def bob = new Employee(name: "bob", age: 30, salary: 1000,
+        def bob = new Employee(name: "bob",
+                               age: 30,
+                               salary: 1000,
                                primaryAddress: new Address("London"))
-        javers.commit("author", bob)      //initial commit
+        javers.commit("author", bob)       // initial commit
 
-        bob.salary = 1200                 //the change
-        bob.primaryAddress.city = "Paris"
-        javers.commit("author", bob)      //second commit
+        bob.salary = 1200                  // changes
+        bob.primaryAddress.city = "Paris"  //
+
+        javers.commit("author", bob)       // second commit
 
         when:
         def changes = javers.findChanges( QueryBuilder.anyDomainObject().build() )
 
         then:
+        assert changes.size() == 2
         ValueChange salaryChange = changes.find{it.propertyName == "salary"}
         ValueChange cityChange = changes.find{it.propertyName == "city"}
-        assert changes.size() == 2
         assert salaryChange.left ==  1000
         assert salaryChange.right == 1200
         assert cityChange.left ==  "London"
         assert cityChange.right == "Paris"
+
         printChanges(changes)
+    }
+
+    def "should query for Shadows of an Entity"() {
+        given:
+        def javers = JaversBuilder.javers().build()
+        def bob = new Employee(name: "bob",
+                               age: 30,
+                               salary: 1000,
+                               primaryAddress: new Address("London"))
+        javers.commit("author", bob)       // initial commit
+
+        bob.salary = 1200                  // changes
+        bob.primaryAddress.city = "Paris"  //
+
+        javers.commit("author", bob)       // second commit
+
+        when:
+        def shadows = javers.findShadows(
+                QueryBuilder.byInstance(bob).withChildValueObjects().build() )
+
+        then:
+        assert shadows.size() == 2
+
+        Employee bobNew = shadows[0].get()     // Employees Shadows are instances
+        Employee bobOld = shadows[1].get()     // of Employee.class
+
+        bobNew.salary == 1200
+        bobOld.salary == 1000
+        bobNew.primaryAddress.city == "Paris"  // Employees Shadows are linked
+        bobOld.primaryAddress.city == "London" // to Addresses Shadows
+
+        shadows[0].commitMetadata.id.majorId == 2
+        shadows[1].commitMetadata.id.majorId == 1
     }
 
     def "should query for Entity changes by instance Id"() {
