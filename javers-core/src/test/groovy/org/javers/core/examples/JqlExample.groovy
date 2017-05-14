@@ -102,7 +102,7 @@ class JqlExample extends Specification {
       assert bobOld.boss == null
 
       when: "query with COMMIT_DEPTH scope"
-      shadows = javers.findShadows(QueryBuilder.byInstance(bob).withShadowScopeDeep().build() )
+      shadows = javers.findShadows(QueryBuilder.byInstance(bob).withShadowScopeDeep().build())
       bobNew = shadows[0].get()
       bobOld = shadows[1].get()
 
