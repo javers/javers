@@ -1,16 +1,11 @@
 package org.javers.core;
 
-import java.util.Optional;
 import org.javers.core.changelog.ChangeProcessor;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.diff.changetype.ReferenceChange;
-import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
@@ -19,12 +14,14 @@ import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
+import org.javers.repository.jql.ShadowScope;
 import org.javers.shadow.Shadow;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -185,9 +182,11 @@ public interface Javers {
      * assert shadows.get(0).get() instanceof Person.class;
      * </pre>
      *
+     * Choose between shallow or deep shadows using {@link QueryBuilder#withShadowScope(ShadowScope)},
+     * default is {@link ShadowScope#SHALLOW}
+     * <br/><br/>
+     *
      * For more query examples, see {@link #findChanges(JqlQuery)} method.
-     * <br/>
-     * Use the same JqlQuery to get changes, snapshots and shadows views.
      *
      * @return A list ordered in reverse chronological order. Empty if nothing found.
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>

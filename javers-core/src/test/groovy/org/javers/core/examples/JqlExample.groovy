@@ -82,6 +82,36 @@ class JqlExample extends Specification {
         shadows[1].commitMetadata.id.majorId == 1
     }
 
+    def "should query for Shadows with different scopes"(){
+      given:
+      def javers = JaversBuilder.javers().build()
+      def john = new Employee(name: "john")
+      def bob = new Employee(name: "bob", boss: john)
+
+      javers.commit("author", bob)       // initial commit
+      bob.salary = 1200                  // changes
+      javers.commit("author", bob)       // second commit
+
+      when: "query with SHALLOW scope"
+      def shadows = javers.findShadows(QueryBuilder.byInstance(bob).build() )
+      Employee bobNew = shadows[0].get()
+      Employee bobOld = shadows[1].get()
+
+      then:
+      assert bobNew.boss == null
+      assert bobOld.boss == null
+
+      when: "query with COMMIT_DEPTH scope"
+      shadows = javers.findShadows(QueryBuilder.byInstance(bob).withShadowScopeDeep().build() )
+      bobNew = shadows[0].get()
+      bobOld = shadows[1].get()
+
+      then:
+      assert bobNew.boss.name == "john"
+      assert bobOld.boss.name == "john"
+    }
+
+
     def "should query for Entity changes by instance Id"() {
         given:
         def javers = JaversBuilder.javers().build()
