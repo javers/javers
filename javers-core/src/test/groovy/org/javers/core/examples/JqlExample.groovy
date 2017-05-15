@@ -93,13 +93,13 @@ class JqlExample extends Specification {
       javers.commit("author", bob)       // second commit
 
       when: "query with SHALLOW scope"
-      def shadows = javers.findShadows(QueryBuilder.byInstance(bob).build() )
+      def shadows = javers.findShadows(QueryBuilder.byInstance(bob).build() ) //SHALLOW scope
       Employee bobNew = shadows[0].get()
       Employee bobOld = shadows[1].get()
 
       then:
-      assert bobNew.boss == null
-      assert bobOld.boss == null
+      assert bobNew.boss == null  //john is outside the query scope,
+      assert bobOld.boss == null  //so references from bob to john are nulled
 
       when: "query with COMMIT_DEPTH scope"
       shadows = javers.findShadows(QueryBuilder.byInstance(bob).withShadowScopeDeep().build())
@@ -107,8 +107,9 @@ class JqlExample extends Specification {
       bobOld = shadows[1].get()
 
       then:
-      assert bobNew.boss.name == "john"
-      assert bobOld.boss.name == "john"
+      assert bobNew.boss.name == "john"  // john is inside the query scope,
+      assert bobOld.boss.name == "john"  // so his Shadow is reconstruced
+                                         // and linked with bob's Shadows
     }
 
 

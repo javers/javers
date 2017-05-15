@@ -111,7 +111,7 @@ public class JaversTransactionalDecorator implements Javers {
 
     @Transactional
     @Override
-    public List<Shadow> findShadows(JqlQuery query) {
+    public <T> List<Shadow<T>> findShadows(JqlQuery query) {
         return delegate.findShadows(query);
     }
 

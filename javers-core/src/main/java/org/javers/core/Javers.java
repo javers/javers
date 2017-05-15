@@ -189,10 +189,11 @@ public interface Javers {
      * For more query examples, see {@link #findChanges(JqlQuery)} method.
      *
      * @return A list ordered in reverse chronological order. Empty if nothing found.
+     * @param <T> type of a domain object
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      * @since 3.2
      */
-    List<Shadow> findShadows(JqlQuery query);
+    <T> List<Shadow<T>> findShadows(JqlQuery query);
 
     /**
      * Queries JaversRepository for changes history (diff sequence) of a given class, object or property.<br/>

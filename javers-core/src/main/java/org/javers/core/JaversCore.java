@@ -139,8 +139,8 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public List<Shadow> findShadows(JqlQuery query) {
-        return queryRunner.queryForShadows(query);
+    public <T> List<Shadow<T>> findShadows(JqlQuery query) {
+        return (List)queryRunner.queryForShadows(query);
     }
 
     @Override
