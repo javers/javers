@@ -12,8 +12,9 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
-import java.time.LocalDate
 import spock.lang.Specification
+
+import java.time.LocalDate
 
 /**
  * @author bartosz.walacik
@@ -24,14 +25,12 @@ class JqlExample extends Specification {
         given:
         def javers = JaversBuilder.javers().build()
         def bob = new Employee(name: "bob",
-                               age: 30,
                                salary: 1000,
                                primaryAddress: new Address("London"))
         javers.commit("author", bob)       // initial commit
 
         bob.salary = 1200                  // changes
         bob.primaryAddress.city = "Paris"  //
-
         javers.commit("author", bob)       // second commit
 
         when:
@@ -49,18 +48,16 @@ class JqlExample extends Specification {
         printChanges(changes)
     }
 
-    def "should query for Shadows of an Entity"() {
+    def "should query for Shadows of an object"() {
         given:
         def javers = JaversBuilder.javers().build()
         def bob = new Employee(name: "bob",
-                               age: 30,
                                salary: 1000,
                                primaryAddress: new Address("London"))
         javers.commit("author", bob)       // initial commit
 
         bob.salary = 1200                  // changes
         bob.primaryAddress.city = "Paris"  //
-
         javers.commit("author", bob)       // second commit
 
         when:
@@ -110,6 +107,38 @@ class JqlExample extends Specification {
       assert bobNew.boss.name == "john"  // john is inside the query scope,
       assert bobOld.boss.name == "john"  // so his Shadow is reconstruced
                                          // and linked with bob's Shadows
+    }
+
+    def "should query for Snapshots of an object"(){
+        given:
+        def javers = JaversBuilder.javers().build()
+        def bob = new Employee(name: "bob",
+                               salary: 1000,
+                               age: 29,
+                               boss: new Employee("john"))
+        javers.commit("author", bob)       // initial commit
+
+        bob.salary = 1200                  // changes
+        bob.age = 30                       //
+        javers.commit("author", bob)       // second commit
+
+        when:
+        def snapshots = javers.findSnapshots( QueryBuilder.byInstance(bob).build() )
+
+        then:
+        assert snapshots.size() == 2
+
+        assert snapshots[0].commitMetadata.id.majorId == 2
+        assert snapshots[0].changed == ["salary", "age"]
+        assert snapshots[0].getPropertyValue("salary") == 1200
+        assert snapshots[0].getPropertyValue("age") == 30
+        // references are dehydrated
+        assert snapshots[0].getPropertyValue("boss").value() == "Employee/john"
+
+        assert snapshots[1].commitMetadata.id.majorId == 1
+        assert snapshots[1].getPropertyValue("salary") == 1000
+        assert snapshots[1].getPropertyValue("age") == 29
+        assert snapshots[1].getPropertyValue("boss").value() == "Employee/john"
     }
 
 

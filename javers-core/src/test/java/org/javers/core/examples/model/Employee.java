@@ -1,6 +1,7 @@
 package org.javers.core.examples.model;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Id;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author bartosz walacik
  */
+@TypeName("Employee")
 public class Employee {
 
     @Id
