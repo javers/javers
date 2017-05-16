@@ -21,7 +21,7 @@ class EntityTypeFactory {
         if (definition.hasCustomId()) {
             idProperty = managedClass.getProperty(definition.getIdPropertyName());
         } else {
-            idProperty = findDefaultIdProperty(managedClass);
+            idProperty = findDefaultIdProperty(managedClass, definition.isShallowReference());
         }
 
         if (definition.isShallowReference()) {
@@ -34,9 +34,12 @@ class EntityTypeFactory {
     /**
      * @throws JaversException ENTITY_WITHOUT_ID
      */
-    private JaversProperty findDefaultIdProperty(ManagedClass managedClass) {
+    private JaversProperty findDefaultIdProperty(ManagedClass managedClass, boolean isShallowReference) {
         if (managedClass.getLooksLikeId().isEmpty()) {
-            throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID, managedClass.getBaseJavaClass().getName());
+            JaversExceptionCode code = isShallowReference ?
+                    JaversExceptionCode.SHALLOW_REF_ENTITY_WITHOUT_ID :
+                    JaversExceptionCode.ENTITY_WITHOUT_ID;
+            throw new JaversException(code, managedClass.getBaseJavaClass().getName());
         }
         return managedClass.getLooksLikeId().get(0);
     }

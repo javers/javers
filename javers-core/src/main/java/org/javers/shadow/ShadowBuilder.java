@@ -1,7 +1,6 @@
 package org.javers.shadow;
 
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.type.ContainerType;
 import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversProperty;
 
@@ -16,8 +15,9 @@ class ShadowBuilder {
     private Object shadow;
     private Set<Wiring> wirings = new HashSet<>();
 
-    ShadowBuilder(CdoSnapshot cdoSnapshot) {
+    ShadowBuilder(CdoSnapshot cdoSnapshot, Object shadow) {
         this.cdoSnapshot = cdoSnapshot;
+        this.shadow = shadow;
     }
 
     void withStub(Object shadowStub) {
@@ -28,6 +28,9 @@ class ShadowBuilder {
         return shadow;
     }
 
+    /**
+     * nullable
+     */
     CdoSnapshot getCdoSnapshot() {
         return cdoSnapshot;
     }
@@ -91,6 +94,4 @@ class ShadowBuilder {
             property.set(shadow, targetContainer);
         }
     }
-
-
 }

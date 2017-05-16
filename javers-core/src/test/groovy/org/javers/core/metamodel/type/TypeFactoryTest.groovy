@@ -12,6 +12,7 @@ import org.javers.core.metamodel.scanner.ClassScanner
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyIgnoredType
 import org.javers.core.model.DummyUser
+import org.javers.core.model.ShallowPhone
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -19,6 +20,8 @@ import spock.lang.Unroll
 import javax.persistence.Id
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.core.MappingStyle.BEAN
+import static org.javers.core.MappingStyle.FIELD
 import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition
 import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.valueObjectDefinition
 
@@ -120,6 +123,15 @@ class TypeFactoryTest extends Specification {
     def "should map @DiffIgnored type as IgnoredType"(){
         expect:
         typeFactory.inferFromAnnotations(DummyIgnoredType) instanceof IgnoredType
+    }
+
+    @Unroll
+    def "should map @ShallowReference type as ShallowReference when using #style style"(){
+        expect:
+        create(style).inferFromAnnotations(ShallowPhone) instanceof ShallowReferenceType
+
+        where:
+        style << [BEAN, FIELD]
     }
 
     def "should map as ValueObjectType by default"(){

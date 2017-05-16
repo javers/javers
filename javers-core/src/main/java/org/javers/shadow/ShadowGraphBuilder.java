@@ -4,13 +4,14 @@ import com.google.gson.JsonObject;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+
+import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapshotState;
 
 /**
  * Stateful builder
@@ -54,12 +55,22 @@ class ShadowGraphBuilder {
         built = true;
     }
 
+    private ShadowBuilder assembleShallowReferenceShadow(InstanceId instanceId, ShallowReferenceType shallowReferenceType) {
+        CdoSnapshotState state = cdoSnapshotState().withPropertyValue(shallowReferenceType.getIdProperty(), instanceId.getCdoId()).build();
+        JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(state);
+        Object shadowStub = jsonConverter.fromJson(jsonElement, shallowReferenceType.getBaseJavaClass());
+
+        ShadowBuilder shadowBuilder = new ShadowBuilder(null, shadowStub);
+        builtNodes.put(instanceId, shadowBuilder);
+
+        return shadowBuilder;
+    }
+
     private ShadowBuilder assembleShadowStub(CdoSnapshot cdoSnapshot) {
-        ShadowBuilder shadowBuilder = new ShadowBuilder(cdoSnapshot);
+        ShadowBuilder shadowBuilder = new ShadowBuilder(cdoSnapshot, null);
         builtNodes.put(cdoSnapshot.getGlobalId(), shadowBuilder);
 
         JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(cdoSnapshot.getState());
-
         followReferences(shadowBuilder, jsonElement);
 
         Object shadowStub = jsonConverter.fromJson(jsonElement, cdoSnapshot.getManagedType().getBaseJavaClass());
@@ -79,7 +90,7 @@ class ShadowGraphBuilder {
             if (property.getType() instanceof ManagedType) {
                 GlobalId refId = (GlobalId) cdoSnapshot.getPropertyValue(property);
 
-                ShadowBuilder target = createOrReuseNodeFromRef(refId);
+                ShadowBuilder target = createOrReuseNodeFromRef(refId, property.getType());
                 if (target != null) {
                     currentNode.addReferenceWiring(property, target);
                 }
@@ -93,29 +104,33 @@ class ShadowGraphBuilder {
                 EnumerableType propertyType = property.getType();
 
                 Object containerWithRefs = cdoSnapshot.getPropertyValue(property);
-
-                currentNode.addEnumerableWiring(property, propertyType.map(containerWithRefs, (value) -> passValueOrCreateNodeFromRef(value)));
-
-                jsonElement.remove(property.getName());
+                if (!propertyType.isEmpty(containerWithRefs)) {
+                    currentNode.addEnumerableWiring(property, propertyType.map(containerWithRefs, (value) -> passValueOrCreateNodeFromRef(value, propertyType)));
+                    jsonElement.remove(property.getName());
+                }
             }
         });
     }
 
-    private Object passValueOrCreateNodeFromRef(Object value) {
+    private Object passValueOrCreateNodeFromRef(Object value, JaversType propertyType) {
         if (value instanceof GlobalId) {
-            return createOrReuseNodeFromRef((GlobalId)value);
+            return createOrReuseNodeFromRef((GlobalId)value, propertyType);
         }
         return value;
     }
 
-    private ShadowBuilder createOrReuseNodeFromRef(GlobalId globalId) {
+    private ShadowBuilder createOrReuseNodeFromRef(GlobalId globalId, JaversType propertyType) {
+        if (builtNodes.containsKey(globalId)) {
+            return builtNodes.get(globalId);
+        }
+
+        if (propertyType instanceof ShallowReferenceType) {
+            return assembleShallowReferenceShadow((InstanceId)globalId, (ShallowReferenceType)propertyType);
+        }
+
         CdoSnapshot cdoSnapshot = referenceResolver.apply(rootContext, globalId);
         if (cdoSnapshot != null) {
-            if (builtNodes.containsKey(globalId)) {
-                return builtNodes.get(globalId);
-            } else {
-                return assembleShadowStub(cdoSnapshot);
-            }
+            return assembleShadowStub(cdoSnapshot);
         }
         return null;
     }

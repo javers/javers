@@ -106,11 +106,11 @@ class TypeFactory {
         }
 
         ClientsClassDefinitionBuilder builder;
-        if (scan.hasIdProperty() || scan.hasEntityAnn()) {
+        if (scan.hasShallowReferenceAnn()) {
+            builder = EntityDefinitionBuilder.entityDefinition(javaClass).withShallowReference();
+        } else
+        if (scan.hasEntityAnn() || scan.hasIdProperty()) {
             builder = EntityDefinitionBuilder.entityDefinition(javaClass);
-            if (scan.hasShallowReferenceAnn()) {
-                ((EntityDefinitionBuilder)builder).withShallowReference();
-            }
         } else {
             builder = ValueObjectDefinitionBuilder.valueObjectDefinition(javaClass);
         }

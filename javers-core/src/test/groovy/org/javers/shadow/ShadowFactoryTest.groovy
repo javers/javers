@@ -10,8 +10,10 @@ import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.CdoSnapshotBuilder
 import org.javers.core.metamodel.object.CdoSnapshotState
 import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.model.CategoryC
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.PrimitiveEntity
+import org.javers.core.model.ShallowPhone
 import org.javers.core.model.SnapshotEntity
 import org.javers.core.model.SomeEnum
 import org.javers.guava.MultimapBuilder
@@ -19,11 +21,8 @@ import org.javers.repository.jql.QueryBuilder
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
-
 import java.time.LocalDate
 import java.util.function.BiFunction
-import java.util.function.Function
-
 import static java.lang.System.identityHashCode
 import static java.time.LocalDate.now
 
@@ -45,9 +44,6 @@ abstract class ShadowFactoryTest extends Specification {
     @Unroll
     def "should create Shadows with #what"(){
       when:
-      def tv1 = v1()
-      def tv2 = v2()
-
       javers.commit("author",v1())
       javers.commit("author",v2())
 
@@ -121,7 +117,7 @@ abstract class ShadowFactoryTest extends Specification {
 
       when:
       def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
-      def shadow = shadowFactory.createShadow(snapshots[0], byIdSnapshotSupplier())
+      def shadow = shadowFactory.createShadow(snapshots[0], snapshotEntitySnapshotSupplier())
 
       then:
       shadow instanceof SnapshotEntity
@@ -134,6 +130,22 @@ abstract class ShadowFactoryTest extends Specification {
       shadow.entityRef.intProperty == 2
     }
 
+    def "should resolve Shallow reference"(){
+      given:
+      def e = new SnapshotEntity(id:1, shallowPhone:new ShallowPhone(11, "123", new CategoryC(1, "some")))
+      javers.commit("author", e)
+
+      when:
+      def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+      def shadow = shadowFactory.createShadow(snapshots[0], byIdSupplier())
+
+      then:
+      shadow.shallowPhone instanceof ShallowPhone
+      shadow.shallowPhone.id == 11
+      !shadow.shallowPhone.number
+      !shadow.shallowPhone.category
+    }
+
     def "should support circular references"(){
         given:
         def e = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2, intProperty:2))
@@ -142,7 +154,7 @@ abstract class ShadowFactoryTest extends Specification {
 
         when:
         def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
-        def shadow = shadowFactory.createShadow(snapshots[0], byIdSnapshotSupplier())
+        def shadow = shadowFactory.createShadow(snapshots[0], byIdSupplier())
 
         then:
         shadow instanceof SnapshotEntity
@@ -199,7 +211,7 @@ abstract class ShadowFactoryTest extends Specification {
 
       when:
       def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
-      def shadow = shadowFactory.createShadow(snapshots[0], byIdSnapshotSupplier())
+      def shadow = shadowFactory.createShadow(snapshots[0], byIdSupplier())
 
       then:
       shadow instanceof SnapshotEntity
@@ -342,7 +354,7 @@ abstract class ShadowFactoryTest extends Specification {
         } as BiFunction
     }
 
-    BiFunction byIdSnapshotSupplier() {
+    BiFunction snapshotEntitySnapshotSupplier() {
         return { s, id ->
             if (id instanceof InstanceId && id.cdoId) {
                 return javers.findSnapshots(QueryBuilder.byInstanceId(id.cdoId, SnapshotEntity).build())[0]
