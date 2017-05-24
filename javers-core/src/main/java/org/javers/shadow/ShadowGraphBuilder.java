@@ -55,7 +55,7 @@ class ShadowGraphBuilder {
         built = true;
     }
 
-    private ShadowBuilder assembleShallowReferenceShadow(InstanceId instanceId, ShallowReferenceType shallowReferenceType) {
+    private ShadowBuilder assembleShallowReferenceShadow(InstanceId instanceId, EntityType shallowReferenceType) {
         CdoSnapshotState state = cdoSnapshotState().withPropertyValue(shallowReferenceType.getIdProperty(), instanceId.getCdoId()).build();
         JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(state);
         Object shadowStub = jsonConverter.fromJson(jsonElement, shallowReferenceType.getBaseJavaClass());
@@ -90,7 +90,7 @@ class ShadowGraphBuilder {
             if (property.getType() instanceof ManagedType) {
                 GlobalId refId = (GlobalId) cdoSnapshot.getPropertyValue(property);
 
-                ShadowBuilder target = createOrReuseNodeFromRef(refId, property.getType());
+                ShadowBuilder target = createOrReuseNodeFromRef(refId, property);
                 if (target != null) {
                     currentNode.addReferenceWiring(property, target);
                 }
@@ -105,27 +105,27 @@ class ShadowGraphBuilder {
 
                 Object containerWithRefs = cdoSnapshot.getPropertyValue(property);
                 if (!propertyType.isEmpty(containerWithRefs)) {
-                    currentNode.addEnumerableWiring(property, propertyType.map(containerWithRefs, (value) -> passValueOrCreateNodeFromRef(value, propertyType)));
+                    currentNode.addEnumerableWiring(property, propertyType.map(containerWithRefs, (value) -> passValueOrCreateNodeFromRef(value, property)));
                     jsonElement.remove(property.getName());
                 }
             }
         });
     }
 
-    private Object passValueOrCreateNodeFromRef(Object value, JaversType propertyType) {
+    private Object passValueOrCreateNodeFromRef(Object value, JaversProperty property) {
         if (value instanceof GlobalId) {
-            return createOrReuseNodeFromRef((GlobalId)value, propertyType);
+            return createOrReuseNodeFromRef((GlobalId)value, property);
         }
         return value;
     }
 
-    private ShadowBuilder createOrReuseNodeFromRef(GlobalId globalId, JaversType propertyType) {
+    private ShadowBuilder createOrReuseNodeFromRef(GlobalId globalId, JaversProperty property) {
         if (builtNodes.containsKey(globalId)) {
             return builtNodes.get(globalId);
         }
 
-        if (propertyType instanceof ShallowReferenceType) {
-            return assembleShallowReferenceShadow((InstanceId)globalId, (ShallowReferenceType)propertyType);
+        if (property.isShallowReference()) {
+            return assembleShallowReferenceShadow((InstanceId)globalId, (EntityType)property.getType());
         }
 
         CdoSnapshot cdoSnapshot = referenceResolver.apply(rootContext, globalId);

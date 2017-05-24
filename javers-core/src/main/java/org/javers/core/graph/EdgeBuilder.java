@@ -29,16 +29,11 @@ class EdgeBuilder {
         Object rawReference = node.getPropertyValue(singleRef);
         Cdo cdo = cdoFactory.create(rawReference, createOwnerContext(node, singleRef));
 
-        if (!isShallowReference(singleRef, cdo)){
+        if (!singleRef.isShallowReference()){
             ObjectNode targetNode = buildNodeStubOrReuse(cdo);
             return new SingleEdge(singleRef, targetNode);
         }
         return new ShallowSingleEdge(singleRef, cdo);
-    }
-
-    private boolean isShallowReference(JaversProperty reference, Cdo target){
-        return (reference.hasShallowReferenceAnn() ||
-                target.getManagedType() instanceof ShallowReferenceType);
     }
 
     private OwnerContext createOwnerContext(ObjectNode parentNode, JaversProperty property) {

@@ -14,6 +14,7 @@ class PhoneWithShallowCategory {
     CategoryC shallowCategory
     CategoryC deepCategory
 
+    @Id
     Long getId() {
         id
     }

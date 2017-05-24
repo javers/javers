@@ -36,4 +36,9 @@ public class JaversProperty extends Property {
     public int hashCode() {
         return super.hashCode();
     }
+
+    public boolean isShallowReference(){
+        return (hasShallowReferenceAnn() ||
+                getType() instanceof ShallowReferenceType);
+    }
 }

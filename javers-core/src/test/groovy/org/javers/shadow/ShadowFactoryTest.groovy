@@ -12,6 +12,7 @@ import org.javers.core.metamodel.object.CdoSnapshotState
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.CategoryC
 import org.javers.core.model.DummyAddress
+import org.javers.core.model.PhoneWithShallowCategory
 import org.javers.core.model.PrimitiveEntity
 import org.javers.core.model.ShallowPhone
 import org.javers.core.model.SnapshotEntity
@@ -130,7 +131,7 @@ abstract class ShadowFactoryTest extends Specification {
       shadow.entityRef.intProperty == 2
     }
 
-    def "should resolve Shallow reference"(){
+    def "should resolve Entity with ShallowReference"(){
       given:
       def e = new SnapshotEntity(id:1, shallowPhone:new ShallowPhone(11, "123", new CategoryC(1, "some")))
       javers.commit("author", e)
@@ -144,6 +145,20 @@ abstract class ShadowFactoryTest extends Specification {
       shadow.shallowPhone.id == 11
       !shadow.shallowPhone.number
       !shadow.shallowPhone.category
+    }
+
+    def "should resolve Property with ShallowReference"() {
+      def e = new PhoneWithShallowCategory(id:1, shallowCategory: new CategoryC(2, "cat1"))
+      javers.commit("author", e)
+
+      when:
+      def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, PhoneWithShallowCategory).build())
+      def shadow = shadowFactory.createShadow(snapshots[0], byIdSupplier())
+
+      then:
+      shadow.shallowCategory instanceof CategoryC
+      shadow.shallowCategory.id == 2
+      !shadow.shallowCategory.name
     }
 
     def "should support circular references"(){
