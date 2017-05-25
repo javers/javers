@@ -121,7 +121,7 @@ subprojects {
 //io.codearte.gradle
 nexusStaging {
     packageGroup = 'org.javers'
-    numberOfRetries = 10
+    numberOfRetries = 20
     delayBetweenRetriesInMillis = 3000
 }
 
