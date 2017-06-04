@@ -9,6 +9,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.appenders.NodeChangeAppender;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
 import org.javers.core.diff.changetype.ObjectRemoved;
+import org.javers.core.diff.custom.CustomComparators;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectNode;
@@ -35,15 +36,21 @@ public class DiffFactory {
     private final LiveGraphFactory graphFactory;
     private final JaversCoreConfiguration javersCoreConfiguration;
 
-    public DiffFactory(TypeMapper typeMapper, List<NodeChangeAppender> nodeChangeAppenders, List<PropertyChangeAppender> propertyChangeAppender, LiveGraphFactory graphFactory, JaversCoreConfiguration javersCoreConfiguration) {
+    public DiffFactory(TypeMapper typeMapper,
+                       List<NodeChangeAppender> nodeChangeAppenders,
+                       List<PropertyChangeAppender> propertyChangeAppender,
+                       LiveGraphFactory graphFactory,
+                       CustomComparators customComparators,
+                       JaversCoreConfiguration javersCoreConfiguration) {
         this.typeMapper = typeMapper;
         this.nodeChangeAppenders = nodeChangeAppenders;
         this.graphFactory = graphFactory;
         this.javersCoreConfiguration = javersCoreConfiguration;
 
         //sort by priority
-        Collections.sort(propertyChangeAppender, (p1, p2) -> ((Integer)p1.priority()).compareTo(p2.priority()));
         this.propertyChangeAppender = propertyChangeAppender;
+        this.propertyChangeAppender.addAll(customComparators.getAllComparators());
+        Collections.sort(this.propertyChangeAppender, (p1, p2) -> ((Integer)p1.priority()).compareTo(p2.priority()));
     }
 
     /**

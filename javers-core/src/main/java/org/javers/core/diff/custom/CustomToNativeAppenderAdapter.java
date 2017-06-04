@@ -18,6 +18,10 @@ public class CustomToNativeAppenderAdapter<T, C extends PropertyChange> implemen
         this.propertyJavaClass = propertyJavaClass;
     }
 
+    public <T> boolean supports(Class<T> clazz){
+        return propertyJavaClass.equals(clazz);
+    }
+
     @Override
     public boolean supports(JaversType propertyType) {
         return propertyType.getBaseJavaClass().equals(propertyJavaClass);

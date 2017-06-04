@@ -11,6 +11,8 @@ import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.diff.changetype.PropertyChange;
+import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.custom.CustomComparators;
 import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
 import org.javers.core.graph.GraphFactoryModule;
@@ -477,6 +479,37 @@ public class JaversBuilder extends AbstractContainerBuilder {
         return this;
     }
 
+
+    /**
+     * Registers a custom comparator for a given Value type
+     * (type of a property owned by Entity or ValueObject).
+     *
+     * Comparator which produces {@link ValueChange} should be registered by this method, it causes that comparator will
+     * be used during comparing {@link List}, {@link Set} and {@link java.util.Map}
+     *
+     * <br/><br/>
+     *
+     * Custom comparators are used by diff algorithm to calculate property-to-property diff.
+     * <br/><br/>
+     *
+     * Comparator has to calculate and return a {@link ValueChange}.
+     * <br/><br/>
+     *
+     * Internally, given type is mapped as {@link CustomType}.
+     * <br/><br/>
+     *
+     * Custom types are serialized to JSON using Gson defaults.
+     *
+     * @param <T> custom type
+     * @param customType class literal to define a custom type
+     * @see CustomPropertyComparator
+     */
+    public <T> JaversBuilder registerValueChangeCustomComparator(CustomPropertyComparator<T, ValueChange> comparator, Class<T> customType){
+        clientsClassDefinitions.add(new CustomDefinition(customType));
+        getComponent(CustomComparators.class).registerValueChangeComparator(comparator, customType);
+        return this;
+    }
+
     /**
      * Registers a custom comparator for a given Value type
      * (type of a property owned by Entity or ValueObject).
@@ -499,7 +532,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
         clientsClassDefinitions.add(new CustomDefinition(customType));
-        bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
+        getComponent(CustomComparators.class).registerCustomComparator(comparator, customType);
         return this;
     }
 

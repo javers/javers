@@ -2,6 +2,7 @@ package org.javers.core
 
 import org.javers.common.date.DateProvider
 import org.javers.core.commit.CommitFactory
+import org.javers.core.diff.custom.CustomComparators
 import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.LiveGraphFactory
@@ -162,6 +163,10 @@ class JaversTestBuilder {
 
     String addressHash(String city){
         getObjectHasher().hash(new DummyAddress(city))
+    }
+
+    CustomComparators getCustomComparators() {
+        return javersBuilder.getContainerComponent(CustomComparators)
     }
 
     def getContainerComponent(Class type) {

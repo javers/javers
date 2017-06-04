@@ -43,6 +43,11 @@ public abstract class AbstractContainerBuilder {
         return container.getComponents(ofClass);
     }
 
+    protected <T> T getComponent(Class<T> ofClass){
+        checkIfBuilt();
+        return container.getComponent(ofClass);
+    }
+
     protected MutablePicoContainer getContainer() {
         return container;
     }

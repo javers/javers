@@ -42,7 +42,7 @@ class ArrayChangeAppender extends CorePropertyChangeAppender<ArrayChange>{
         MapContentType mapContentType = typeMapper.getMapContentType(arrayType);
 
         List<EntryChange> entryChanges =
-                mapChangeAppender.calculateEntryChanges(leftMap, rightMap, owner, mapContentType);
+                mapChangeAppender.calculateEntryChanges(pair, property, leftMap, rightMap, owner, mapContentType);
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());

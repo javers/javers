@@ -1,6 +1,7 @@
 package org.javers.core;
 
 import org.javers.common.collections.Lists;
+import org.javers.core.diff.custom.CustomComparators;
 import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.pico.InstantiatingModule;
@@ -26,7 +27,8 @@ public class CoreJaversModule extends InstantiatingModule {
                 JaversCoreConfiguration.class,
                 GlobalIdFactory.class,
                 QueryRunner.class,
-                ShadowQueryRunner.class
+                ShadowQueryRunner.class,
+                CustomComparators.class
         );
     }
 }

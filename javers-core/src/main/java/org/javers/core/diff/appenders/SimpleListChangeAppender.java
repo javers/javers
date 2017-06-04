@@ -42,7 +42,7 @@ public class SimpleListChangeAppender extends CorePropertyChangeAppender<ListCha
         MapContentType mapContentType = typeMapper.getMapContentType(listType);
 
         List<EntryChange> entryChanges =
-                mapChangeAppender.calculateEntryChanges(asMap(leftList), asMap(rightList), owner, mapContentType);
+                mapChangeAppender.calculateEntryChanges(pair, property, asMap(leftList), asMap(rightList), owner, mapContentType);
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
