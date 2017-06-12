@@ -9,7 +9,7 @@ import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.property.Property
-import org.javers.core.metamodel.type.CustomType
+import org.javers.core.metamodel.type.ValueType
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserWithValues
 import org.javers.core.model.GuavaObject
@@ -64,7 +64,7 @@ class CustomPropertyComparatorE2ETest extends Specification {
 
         then:
         changes.size() == expectedChanges
-        javers.getTypeMapping(BigDecimal) instanceof CustomType
+        javers.getTypeMapping(BigDecimal) instanceof ValueType
 
         if (expectedChanges) {
             assert changes[0] instanceof ValueChange
