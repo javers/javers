@@ -122,7 +122,6 @@ public class ShadowQueryRunner {
                 commitEntry.getMissingParents().stream()
                         .filter(movingLatest::containsKey)
                         .forEach(voId -> {
-                            System.out.println("adding missing parent: " + commitEntry.commitMetadata.getId()+" -> " +voId);
                             commitEntry.append(movingLatest.get(voId));
                         });
 
