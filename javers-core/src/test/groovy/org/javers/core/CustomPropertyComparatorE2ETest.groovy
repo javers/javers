@@ -3,11 +3,13 @@ package org.javers.core
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
 import org.javers.core.diff.changetype.PropertyChange
+import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.custom.CustomBigDecimalComparator
 import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.property.Property
+import org.javers.core.metamodel.type.CustomType
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserWithValues
 import org.javers.core.model.GuavaObject
@@ -49,23 +51,33 @@ class CustomPropertyComparatorE2ETest extends Specification {
         }
     }
 
-    def "should support custom comparator for Value types"(){
+    @Unroll
+    def "should support custom comparator for Value types like BigDecimal"(){
         given:
         def left = new DummyUserWithValues("user", 10.11)
         def right = new DummyUserWithValues("user", 10.12)
 
         when:
-        def javers = JaversBuilder.javers().build()
+        def javers = JaversBuilder.javers()
+                .registerCustomComparator(new CustomBigDecimalComparator(precision), BigDecimal).build()
+        def changes = javers.compare(left,right).changes
 
         then:
-        javers.compare(left,right).hasChanges()
+        changes.size() == expectedChanges
+        javers.getTypeMapping(BigDecimal) instanceof CustomType
 
-        when:
-        javers = JaversBuilder.javers()
-                .registerCustomComparator(new CustomBigDecimalComparator(1), BigDecimal).build()
+        if (expectedChanges) {
+            assert changes[0] instanceof ValueChange
+            assert changes[0].left == 10.11
+            assert changes[0].right == 10.12
+        }
 
-        then:
-        !javers.compare(left,right).hasChanges()
+
+        where:
+        precision | expectedChanges
+        0         | 0
+        1         | 0
+        2         | 1
     }
 
     def "should support custom comparator for custom types"() {
