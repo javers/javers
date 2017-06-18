@@ -4,6 +4,7 @@ import com.google.gson.*;
 import org.javers.core.json.typeadapter.commit.CdoSnapshotAssembler;
 import org.javers.core.metamodel.object.CdoSnapshot;
 
+import java.io.Reader;
 import java.lang.reflect.Type;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -58,6 +59,10 @@ public class JsonConverter {
     }
 
     public <T> T fromJson(String json, Class<T> expectedType){
+        return gson.fromJson(json, expectedType);
+    }
+
+    public <T> T fromJson(Reader json, Class<T> expectedType){
         return gson.fromJson(json, expectedType);
     }
 

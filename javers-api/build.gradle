@@ -1,0 +1,8 @@
+dependencies {
+    compile project(':javers-core')
+    optional "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+
+    testCompile project(':javers-spring-boot-starter-mongo')
+    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testCompile "com.github.fakemongo:fongo:2.0.13"
+}
