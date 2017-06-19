@@ -13,12 +13,8 @@ import org.javers.core.metamodel.annotation.TypeName;
 @TypeName("Animal")
 @AutoValue
 public abstract class Animal {
-    public abstract String getName();
-
     @Id
-    public String getJaversId() {
-        return getName();
-    }
+    public abstract String getName();
 
     public abstract int getNumberOfLegs();
 
