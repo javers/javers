@@ -6,8 +6,6 @@ package org.javers.core.cases;
 import com.google.auto.value.AutoValue;
 import org.javers.core.metamodel.annotation.Id;
 import org.javers.core.metamodel.annotation.TypeName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author jfreedman
@@ -15,10 +13,14 @@ import org.slf4j.LoggerFactory;
 @TypeName("Animal")
 @AutoValue
 public abstract class Animal {
-    @Id
-    public abstract String name();
+    public abstract String getName();
 
-    public abstract int numberOfLegs();
+    @Id
+    public String getJaversId() {
+        return getName();
+    }
+
+    public abstract int getNumberOfLegs();
 
     public static Builder builder() {
         return new AutoValue_Animal.Builder();
