@@ -28,15 +28,14 @@ class JaversGetterFactory {
         Class clazz = getterSource;
         while (clazz != null && clazz != Object.class) {
             context.addTypeSubstitutions(clazz);
-            final List<JaversGetter> newProperties = Arrays.stream(clazz.getDeclaredMethods())
+            Arrays.stream(clazz.getDeclaredMethods())
                     .filter(method -> isGetter(method) && !method.isBridge())
-                    .map(getterMethod -> createJaversGetter(getterMethod, context))
-                    .collect(Collectors.toList());
-            final List<JaversGetter> overridden = newProperties.stream().flatMap(property ->
-                getters.stream().filter((existing) -> isOverridden(property.getRawMember(), existing.getRawMember()))
-            ).collect(Collectors.toList());
-            getters.removeAll(overridden);
-            getters.addAll(newProperties);
+                    .forEach(newProperty -> {
+                        final List<JaversGetter> overridden = getters.stream().filter((existing) -> isOverridden(newProperty, existing.getRawMember())).collect(Collectors.toList());
+                        final boolean looksLikeId = overridden.stream().anyMatch(JaversMember::looksLikeId);
+                        getters.removeAll(overridden);
+                        getters.add(createJaversGetter(newProperty, context, looksLikeId));
+                    });
             clazz = clazz.getSuperclass();
         }
 
@@ -93,8 +92,8 @@ class JaversGetterFactory {
         return false;
     }
 
-    private JaversGetter createJaversGetter(Method getterMethod, TypeResolvingContext context) {
+    private JaversGetter createJaversGetter(Method getterMethod, TypeResolvingContext context, boolean looksLikeId) {
         Type actualReturnType = context.getSubstitution(getterMethod.getGenericReturnType());
-        return new JaversGetter(getterMethod, actualReturnType);
+        return new JaversGetter(getterMethod, actualReturnType, looksLikeId);
     }
 }

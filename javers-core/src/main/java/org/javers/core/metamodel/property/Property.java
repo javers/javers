@@ -53,7 +53,7 @@ public class Property {
      * true if property looks like identifier of an Entity, for example has @Id annotation
      */
     public boolean looksLikeId() {
-        return member.hasAnnotation(Sets.asSet(ID_ANN, EMBEDDED_ID_ANN));
+        return member.looksLikeId();
     }
 
     /**
