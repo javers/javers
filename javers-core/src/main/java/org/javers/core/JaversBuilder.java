@@ -340,7 +340,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *     <li/>Set item
      * </ul>
      *
-     * For example, BigDecimals are (by default) Value types
+     * For example, BigDecimals are (by default) ValueTypes
      * compared using {@link java.math.BigDecimal#equals(Object)}.
      * If you want to compare them in the smarter way, ignoring trailing zeros:
      *

@@ -100,26 +100,4 @@ class CustomPropertyComparatorE2ETest extends Specification {
             changes[0].rightValue == 2
         }
     }
-
-    @Unroll
-    def "should support custom comparator for objects stored in #containerType"() {
-        when:
-        def javers = JaversBuilder.javers().build()
-
-        then:
-        javers.compare(left, right).changes.size() == 1
-
-        when:
-        javers = JaversBuilder.javers()
-                .registerValueChangeCustomComparator(new DummyCustomPropertyComparator(), String)
-                .build()
-
-        then:
-        javers.compare(left, right).changes.size() == 0
-
-        where:
-        left           | right          | containerType
-        ["abc"]        | ["def"]        | List.class.simpleName
-        [1, "abc"]     | [1, "def"]     | Map.class.simpleName
-    }
 }
