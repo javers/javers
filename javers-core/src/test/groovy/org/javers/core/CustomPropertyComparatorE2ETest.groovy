@@ -51,35 +51,6 @@ class CustomPropertyComparatorE2ETest extends Specification {
         }
     }
 
-    @Unroll
-    def "should support custom comparator for Value types like BigDecimal"(){
-        given:
-        def left = new DummyUserWithValues("user", 10.11)
-        def right = new DummyUserWithValues("user", 10.12)
-
-        when:
-        def javers = JaversBuilder.javers()
-                .registerCustomComparator(new CustomBigDecimalComparator(precision), BigDecimal).build()
-        def changes = javers.compare(left,right).changes
-
-        then:
-        changes.size() == expectedChanges
-        javers.getTypeMapping(BigDecimal) instanceof ValueType
-
-        if (expectedChanges) {
-            assert changes[0] instanceof ValueChange
-            assert changes[0].left == 10.11
-            assert changes[0].right == 10.12
-        }
-
-
-        where:
-        precision | expectedChanges
-        0         | 0
-        1         | 0
-        2         | 1
-    }
-
     def "should support custom comparator for custom types"() {
         given:
         def left =  new GuavaObject(multimap: Multimaps.forMap(["a":1]))

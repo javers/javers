@@ -28,7 +28,7 @@ class CustomValueComparatorTest extends Specification {
     def "should use CustomValueComparator for user's ValueTypes"(){
         given:
         def javers = JaversBuilder.javers()
-                .registerValue(SomeValue, {a, b -> a.intValue() == b.intValue()}).build()
+                .registerValue(BigDecimal, {a, b -> a.intValue() == b.intValue()}).build()
 
         when:
         def diff = javers.compare( new SomeValue(v:left), new SomeValue(v:right) )

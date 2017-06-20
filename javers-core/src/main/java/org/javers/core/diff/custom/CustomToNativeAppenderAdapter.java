@@ -3,7 +3,7 @@ package org.javers.core.diff.custom;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 
 /**
@@ -18,17 +18,13 @@ public class CustomToNativeAppenderAdapter<T, C extends PropertyChange> implemen
         this.propertyJavaClass = propertyJavaClass;
     }
 
-    public <T> boolean supports(Class<T> clazz){
-        return propertyJavaClass.equals(clazz);
-    }
-
     @Override
     public boolean supports(JaversType propertyType) {
         return propertyType.getBaseJavaClass().equals(propertyJavaClass);
     }
 
     @Override
-    public C calculateChanges(NodePair pair, Property property) {
+    public C calculateChanges(NodePair pair, JaversProperty property) {
         T leftValue = (T)pair.getLeftPropertyValue(property);
         T rightValue = (T)pair.getRightPropertyValue(property);
 

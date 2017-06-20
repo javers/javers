@@ -2,12 +2,7 @@ package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.EntityType;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.ManagedType;
-import org.javers.core.metamodel.type.PrimitiveOrValueType;
-import java.util.Objects;
+import org.javers.core.metamodel.type.*;
 import static org.javers.common.reflection.ReflectionUtil.reflectiveToString;
 
 /**
@@ -24,18 +19,18 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
      * @param property supported property (of PrimitiveType or ValueObjectType)
      */
     @Override
-    public ValueChange calculateChanges(NodePair pair, Property property) {
+    public ValueChange calculateChanges(NodePair pair, JaversProperty property) {
         Object leftValue = pair.getLeftPropertyValue(property);
         Object rightValue = pair.getRightPropertyValue(property);
 
         //special treatment for EmbeddedId - could be ValueObjects without good equals() implementation
         if (isIdProperty(pair, property)) {
-            if (Objects.equals(reflectiveToString(leftValue),
+            if (property.getType().equals(reflectiveToString(leftValue),
                                reflectiveToString(rightValue))){
                 return null;
             }
         }else {
-            if (Objects.equals(leftValue, rightValue)) {
+            if (property.getType().equals(leftValue, rightValue)) {
                 return null;
             }
         }
@@ -43,7 +38,7 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
         return new ValueChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);
     }
 
-    private boolean isIdProperty(NodePair nodePair, Property property){
+    private boolean isIdProperty(NodePair nodePair, JaversProperty property){
         ManagedType managedType = nodePair.getManagedType();
 
         if (managedType instanceof EntityType) {

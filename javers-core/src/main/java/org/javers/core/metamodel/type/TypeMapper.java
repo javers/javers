@@ -53,9 +53,6 @@ public class TypeMapper {
             registerPrimitiveType(primitiveOrBox);
         }
 
-        //String & Enum
-        registerPrimitiveType(String.class);
-        registerPrimitiveType(CharSequence.class);
         registerPrimitiveType(Enum.class);
 
         //array
@@ -201,7 +198,7 @@ public class TypeMapper {
     }
 
     public void registerClientsClass(ClientsClassDefinition def) {
-        state.computeIfAbsent(def);
+        state.register(def);
     }
 
     public void registerValueType(Class<?> valueCLass) {

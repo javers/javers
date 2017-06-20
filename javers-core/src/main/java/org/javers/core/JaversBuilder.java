@@ -11,8 +11,8 @@ import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.diff.custom.CustomComparators;
 import org.javers.core.diff.custom.CustomPropertyComparator;
+import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
 import org.javers.core.diff.custom.CustomValueComparator;
 import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.graph.ObjectAccessHook;
@@ -353,10 +353,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public <T> JaversBuilder registerValue(Class<T> valueClass, CustomValueComparator<T> customValueComparator) {
         argumentsAreNotNull(valueClass, customValueComparator);
-
-        // TODO
-        // clientsClassDefinitions.add(new ValueDefinition(valueClass));
-
+        clientsClassDefinitions.add(new ValueDefinition(valueClass, customValueComparator));
         return this;
     }
 
@@ -540,7 +537,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
         clientsClassDefinitions.add(new CustomDefinition(customType));
-        getComponent(CustomComparators.class).registerCustomComparator(comparator, customType);
+        bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
     }
 

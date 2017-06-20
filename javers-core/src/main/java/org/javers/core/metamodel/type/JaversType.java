@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
-import java.util.Optional;
+import java.util.*;
+
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;
@@ -10,9 +11,6 @@ import org.javers.core.metamodel.annotation.TypeName;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -175,6 +173,13 @@ public abstract class JaversType {
      public boolean isInstance(Object cdo) {
         argumentIsNotNull(cdo);
         return baseJavaClass.isAssignableFrom(cdo.getClass());
+     }
+
+    /**
+     * Used for comparing as Values
+     */
+     public boolean equals(Object left, Object right) {
+         return Objects.equals(left, right);
      }
 
      protected PrettyPrintBuilder prettyPrintBuilder(){

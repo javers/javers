@@ -3,6 +3,7 @@ package org.javers.core.diff.appenders;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 
 /**
@@ -23,7 +24,7 @@ public interface PropertyChangeAppender <T extends PropertyChange> {
      */
     boolean supports(JaversType propertyType);
 
-    T calculateChanges(NodePair pair, Property supportedProperty);
+    T calculateChanges(NodePair pair, JaversProperty supportedProperty);
 
     int priority();
 }

@@ -19,7 +19,9 @@ public class WellKnownValueTypes {
             UUID.class,
             Currency.class,
             URI.class,
-            URL.class
+            URL.class,
+            CharSequence.class,
+            String.class
     };
 
     public static Class<?>[] getValueTypes() {
