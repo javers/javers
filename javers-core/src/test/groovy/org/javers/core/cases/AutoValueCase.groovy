@@ -17,9 +17,14 @@ class AutoValueCase extends Specification {
   }
 
   @PackageScope
-  class ConcreteEntity extends AbstractEntity {
-    private int value
-    private int id
+  final class ConcreteEntity extends AbstractEntity {
+    private final int id
+    private final int value
+
+    ConcreteEntity(final int id, final int value) {
+      this.id = id
+      this.value = value
+    }
 
     @Override
     int getId() {
@@ -35,14 +40,25 @@ class AutoValueCase extends Specification {
   @Unroll
   def "#label should support abstract idGetter"() {
     given:
-    def a = new ConcreteEntity(id:1, value: 1)
-    def b = new ConcreteEntity(id:1, value: 2)
+    def a = new ConcreteEntity(1, 1)
+    def b = new ConcreteEntity(1, 2)
     def diff = javers.compare(a, b)
+    def first = javers.commit('Alice', a)
+    def second = javers.commit('Bob', b)
 
     expect:
     diff.changes.size() == 1
+    diff.changes[0].propertyName == 'value'
     diff.changes[0].left == 1
     diff.changes[0].right == 2
+
+    first.author == 'Alice'
+    second.author == 'Bob'
+    second.changes.size() == 1
+    second.changes[0].propertyName == 'value'
+    second.changes[0].left == 1
+    second.changes[0].right == 2
+    second.snapshots[0].managedType.managedClass.looksLikeId.size() == looksLikeId
 
     where:
     label << ['basic javers', 'javers with bean mapping', 'javers with bean mapping and entity registered']
@@ -51,5 +67,6 @@ class AutoValueCase extends Specification {
             JaversBuilder.javers().withMappingStyle(MappingStyle.BEAN).build(),
             JaversBuilder.javers().withMappingStyle(MappingStyle.BEAN).registerEntity(AbstractEntity.class).build()
     ]
+    looksLikeId << [0, 1, 1]
   }
 }
