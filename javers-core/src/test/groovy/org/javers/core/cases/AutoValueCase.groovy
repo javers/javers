@@ -4,6 +4,7 @@ import groovy.transform.PackageScope
 import org.javers.core.JaversBuilder
 import org.javers.core.MappingStyle
 import org.javers.core.metamodel.annotation.Id
+import org.javers.core.metamodel.type.EntityType
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -68,5 +69,17 @@ class AutoValueCase extends Specification {
             JaversBuilder.javers().withMappingStyle(MappingStyle.BEAN).registerEntity(AbstractEntity.class).build()
     ]
     looksLikeId << [0, 1, 1]
+  }
+
+  @Unroll
+  def "should map #entity.simpleName with abstract @IdGetter as EntityType"(){
+    given:
+    def javers = JaversBuilder.javers().withMappingStyle(MappingStyle.BEAN).build()
+
+    expect:
+    javers.getTypeMapping(entity) instanceof EntityType
+
+    where:
+    entity << [AbstractEntity, ConcreteEntity]
   }
 }
