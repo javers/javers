@@ -1,5 +1,4 @@
 apply plugin: 'application'
-apply plugin: 'net.ltgt.apt'
 mainClassName = "org.javers.core.selftest.Application"
 
 dependencies {
@@ -20,9 +19,6 @@ dependencies {
     }
     testCompile 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
-    testCompile 'org.hamcrest:hamcrest-library:1.3'
-    testCompileOnly 'com.google.auto.value:auto-value:1.2'
-    apt 'com.google.auto.value:auto-value:1.2'
 }
 
 task testJar(type: Jar) {
