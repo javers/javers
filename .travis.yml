@@ -27,6 +27,4 @@ deploy:
     tags: true
     all_branches: true
 sudo: false
-before_install:
-- openssl aes-256-cbc -K $encrypted_750aaef1260c_key -iv $encrypted_750aaef1260c_iv
-  -in travis/secring.gpg.enc -out travis/secring.gpg -d
+
