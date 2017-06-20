@@ -81,8 +81,16 @@ public class JaversSchemaManager extends SchemaNameAware {
      * This method is needed for upgrading TEXT columns to VARCHAR(MAX) since TEXT is deprecated.
      */
     private void alterMssqlTextColumns() {
-        executeSQL("ALTER TABLE " + getSnapshotTableNameWithSchema() + " ALTER COLUMN state VARCHAR(MAX)");
-        executeSQL("ALTER TABLE " + getSnapshotTableNameWithSchema() + " ALTER COLUMN changed_properties VARCHAR(MAX)");
+        ColumnType stateColType = getTypeOf(getSnapshotTableNameWithSchema(), "state");
+        ColumnType changedPropertiesColType = getTypeOf(getSnapshotTableNameWithSchema(), "state");
+
+        if(stateColType.typeName.equals("text")) {
+            executeSQL("ALTER TABLE " + getSnapshotTableNameWithSchema() + " ALTER COLUMN state VARCHAR(MAX)");
+        }
+
+        if(changedPropertiesColType.typeName.equals("text")) {
+            executeSQL("ALTER TABLE " + getSnapshotTableNameWithSchema() + " ALTER COLUMN changed_properties VARCHAR(MAX)");
+        }
     }
 
     private void handleUnsupportedDialect() {
@@ -123,11 +131,12 @@ public class JaversSchemaManager extends SchemaNameAware {
             ResultSet res = stmt.executeQuery("select " + colName + " from " + tableName + " where 1<0");
             int colType = res.getMetaData().getColumnType(1);
             int colPrec = res.getMetaData().getPrecision(1);
+            String colTypeName = res.getMetaData().getColumnTypeName(1);
 
             stmt.close();
             res.close();
 
-            return new ColumnType(colType, colPrec);
+            return new ColumnType(colType, colPrec, colTypeName);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -198,10 +207,12 @@ public class JaversSchemaManager extends SchemaNameAware {
     static class ColumnType {
         final int type;
         final int precision;
+        final String typeName;
 
-        ColumnType(int type, int precision) {
+        ColumnType(int type, int precision, String typeName) {
             this.type = type;
             this.precision = precision;
+            this.typeName = typeName;
         }
     }
 }
