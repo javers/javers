@@ -44,6 +44,10 @@ public class JaversSchemaManager extends SchemaNameAware {
 
         alterCommitIdColumnIfNeeded(); // JaVers 2.5 to 2.6 schema migration
 
+        if(this.dialect instanceof MsSqlDialect) {
+            alterMssqlTextColumns();
+        }
+
         TheCloser.close(schemaManager, schemaInspector);
     }
 
@@ -71,6 +75,14 @@ public class JaversSchemaManager extends SchemaNameAware {
                 handleUnsupportedDialect();
             }
         }
+    }
+
+    /**
+     * This method is needed for upgrading TEXT columns to VARCHAR(MAX) since TEXT is deprecated.
+     */
+    private void alterMssqlTextColumns() {
+        executeSQL("ALTER TABLE " + getSnapshotTableNameWithSchema() + " ALTER COLUMN state VARCHAR(MAX)");
+        executeSQL("ALTER TABLE " + getSnapshotTableNameWithSchema() + " ALTER COLUMN changed_properties VARCHAR(MAX)");
     }
 
     private void handleUnsupportedDialect() {
