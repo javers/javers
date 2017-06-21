@@ -3,6 +3,7 @@ package org.javers.core.diff;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface NodePair {
 
     ObjectNode getRight();
 
-    List<Property> getProperties();
+    List<JaversProperty> getProperties();
 
     Object getLeftPropertyValue(Property property);
 

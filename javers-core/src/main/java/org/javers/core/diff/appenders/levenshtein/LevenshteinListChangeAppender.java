@@ -38,7 +38,7 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
     }
 
     @Override
-    public ListChange calculateChanges(final NodePair pair, final Property property) {
+    public ListChange calculateChanges(final NodePair pair, final JaversProperty property) {
 
         final List leftList =  wrapNull( (List) pair.getLeftPropertyValue(property) );
         final List rightList = wrapNull((List) pair.getRightPropertyValue(property));

@@ -127,21 +127,21 @@ public class DiffFactory {
 
     /* Node scope appender */
     private void appendPropertyChanges(DiffBuilder diff, NodePair pair, final Optional<CommitMetadata> commitMetadata) {
-        List<Property> nodeProperties = pair.getProperties();
-        for (Property property : nodeProperties) {
+        List<JaversProperty> nodeProperties = pair.getProperties();
+        for (JaversProperty property : nodeProperties) {
 
             //optimization, skip all appenders if null on both sides
             if (pair.isNullOnBothSides(property)) {
                 continue;
             }
 
-            JaversType javersType = ((JaversProperty) property).getType();
+            JaversType javersType = property.getType();
 
             appendChanges(diff, pair, property, javersType, commitMetadata);
         }
     }
 
-    private void appendChanges(DiffBuilder diff, NodePair pair, Property property, JaversType javersType, Optional<CommitMetadata> commitMetadata) {
+    private void appendChanges(DiffBuilder diff, NodePair pair, JaversProperty property, JaversType javersType, Optional<CommitMetadata> commitMetadata) {
         for (PropertyChangeAppender appender : propertyChangeAppender) {
             if (! appender.supports(javersType)){
                 continue;

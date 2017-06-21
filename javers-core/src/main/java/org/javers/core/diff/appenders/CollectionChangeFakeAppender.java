@@ -2,8 +2,8 @@ package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.CollectionType;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class CollectionChangeFakeAppender extends CorePropertyChangeAppender<Pro
     }
 
     @Override
-    public PropertyChange calculateChanges(NodePair pair, Property property) {
+    public PropertyChange calculateChanges(NodePair pair, JaversProperty property) {
 
         Collection leftCol = (Collection) pair.getLeftPropertyValue(property);
         Collection rightCol = (Collection) pair.getRightPropertyValue(property);

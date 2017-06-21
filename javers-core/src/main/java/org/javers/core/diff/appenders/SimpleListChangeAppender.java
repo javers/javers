@@ -7,7 +7,6 @@ import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public class SimpleListChangeAppender extends CorePropertyChangeAppender<ListCha
     }
 
     @Override
-    public ListChange calculateChanges(final NodePair pair, final Property property) {
+    public ListChange calculateChanges(final NodePair pair, final JaversProperty property) {
         List leftList = (List) pair.getLeftPropertyValue(property);
         List rightList = (List) pair.getRightPropertyValue(property);
 

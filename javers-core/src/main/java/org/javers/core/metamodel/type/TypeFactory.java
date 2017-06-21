@@ -39,7 +39,8 @@ class TypeFactory {
         } else if (def instanceof ValueObjectDefinition){
             return createValueObject((ValueObjectDefinition) def);
         } else if (def instanceof ValueDefinition) {
-            return new ValueType(def.getBaseJavaClass());
+            ValueDefinition valueDefinition = (ValueDefinition) def;
+            return new ValueType(valueDefinition.getBaseJavaClass(), valueDefinition.getComparator());
         } else if (def instanceof IgnoredTypeDefinition) {
             return new IgnoredType(def.getBaseJavaClass());
         } else {

@@ -13,6 +13,7 @@ import org.javers.core.diff.appenders.DiffAppendersModule;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
+import org.javers.core.diff.custom.CustomValueComparator;
 import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.TailoredJaversMemberFactoryModule;
@@ -41,10 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -171,8 +169,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * For example, Entities are: Person, Document
      *
+     * @see <a href="http://javers.org/documentation/domain-configuration/#entity">http://javers.org/documentation/domain-configuration/#entity</a>
      * @see #registerEntity(EntityDefinition)
-     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerEntity(Class<?> entityClass) {
         argumentIsNotNull(entityClass);
@@ -186,8 +184,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * For example, ValueObjects are: Address, Point
      *
+     * @see <a href="http://javers.org/documentation/domain-configuration/#value-object">http://javers.org/documentation/domain-configuration/#value-object</a>
      * @see #registerValueObject(ValueObjectDefinition)
-     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         argumentIsNotNull(valueObjectClass);
@@ -217,8 +215,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * javersBuilder.registerEntity( new EntityDefinition(Person.class, "login") );
      * </pre>
      *
+     * @see <a href="http://javers.org/documentation/domain-configuration/#entity">http://javers.org/documentation/domain-configuration/#entity</a>
      * @see EntityDefinitionBuilder#entityDefinition(Class)
-     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerEntity(EntityDefinition entityDefinition){
         argumentIsNotNull(entityDefinition);
@@ -246,8 +244,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * javersBuilder.registerValueObject( new ValueObjectDefinition(Address.class, "ignored") );
      * </pre>
      *
+     * @see <a href="http://javers.org/documentation/domain-configuration/#value-object">http://javers.org/documentation/domain-configuration/#value-object</a>
      * @see ValueObjectDefinitionBuilder#valueObjectDefinition(Class)
-     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
      */
     public JaversBuilder registerValueObject(ValueObjectDefinition valueObjectDefinition) {
         argumentIsNotNull(valueObjectDefinition);
@@ -307,12 +305,55 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * <br/><br/>
      *
      * Use this method if you are not willing to use {@link Value} annotation.
+     * <br/><br/>
      *
-     * @see <a href="http://javers.org/documentation/domain-configuration/#domain-model-mapping">http://javers.org/documentation/domain-configuration/#domain-model-mapping</a>
+     * Values are compared using default {@link Object#equals(Object)}.
+     * If you don't want to use it,
+     * register a custom value comparator with {@link #registerValue(Class, CustomValueComparator)}.
+     *
+     * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
      */
     public JaversBuilder registerValue(Class<?> valueClass) {
         argumentIsNotNull(valueClass);
         clientsClassDefinitions.add(new ValueDefinition(valueClass));
+        return this;
+    }
+
+    /**
+     * Registers a {@link ValueType} with a custom comparator to be used instead of
+     * default {@link Object#equals(Object)}.
+     * <br/><br/>
+     *
+     * Given comparator is used when given Value type is:
+     * <ul>
+     *     <li/>simple property
+     *     <li/>List item
+     *     <li/>Array item
+     *     <li/>Map value
+     * </ul>
+     *
+     * Since this comparator is not aligned with {@link Object#hashCode()},
+     * it <b>is not used </b> when given Value type is:
+     *
+     * <ul>
+     *     <li/>Map key
+     *     <li/>Set item
+     * </ul>
+     *
+     * For example, BigDecimals are (by default) ValueTypes
+     * compared using {@link java.math.BigDecimal#equals(Object)}.
+     * If you want to compare them in the smarter way, ignoring trailing zeros:
+     *
+     * <pre>
+     * javersBuilder.registerValue(BigDecimal.class, (a,b) -> a.compareTo(b) == 0);
+     * </pre>
+     *
+     * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
+     * @since 3.3
+     */
+    public <T> JaversBuilder registerValue(Class<T> valueClass, CustomValueComparator<T> customValueComparator) {
+        argumentsAreNotNull(valueClass, customValueComparator);
+        clientsClassDefinitions.add(new ValueDefinition(valueClass, customValueComparator));
         return this;
     }
 
@@ -478,8 +519,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Registers a custom comparator for a given Value type
-     * (type of a property owned by Entity or ValueObject).
+     * Registers a custom property comparator for a given Custom type.
      * <br/><br/>
      *
      * Custom comparators are used by diff algorithm to calculate property-to-property diff.
@@ -491,11 +531,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * Internally, given type is mapped as {@link CustomType}.
      * <br/><br/>
      *
-     * Custom types are serialized to JSON using Gson defaults.
-     *
      * @param <T> custom type
      * @param customType class literal to define a custom type
-     * @see CustomPropertyComparator
+     * @see CustomType
      */
     public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
         clientsClassDefinitions.add(new CustomDefinition(customType));

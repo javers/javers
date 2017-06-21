@@ -8,7 +8,6 @@ import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
 import java.util.List;
@@ -32,7 +31,7 @@ class ArrayChangeAppender extends CorePropertyChangeAppender<ArrayChange>{
     }
 
     @Override
-    public ArrayChange calculateChanges(NodePair pair, Property property) {
+    public ArrayChange calculateChanges(NodePair pair, JaversProperty property) {
 
         Map leftMap =  Arrays.asMap(pair.getLeftPropertyValue(property));
         Map rightMap = Arrays.asMap(pair.getRightPropertyValue(property));

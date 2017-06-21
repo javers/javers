@@ -3,15 +3,18 @@ package org.javers.core
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
 import org.javers.core.diff.changetype.PropertyChange
+import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.custom.CustomBigDecimalComparator
 import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.property.Property
+import org.javers.core.metamodel.type.ValueType
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserWithValues
 import org.javers.core.model.GuavaObject
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.javers.core.model.DummyAddress.Kind.HOME
 import static org.javers.core.model.DummyAddress.Kind.OFFICE
@@ -46,25 +49,6 @@ class CustomPropertyComparatorE2ETest extends Specification {
         PropertyChange compare(Object left, Object right, GlobalId affectedId, Property property) {
             null
         }
-    }
-
-    def "should support custom comparator for Value types"(){
-        given:
-        def left = new DummyUserWithValues("user", 10.11)
-        def right = new DummyUserWithValues("user", 10.12)
-
-        when:
-        def javers = JaversBuilder.javers().build()
-
-        then:
-        javers.compare(left,right).hasChanges()
-
-        when:
-        javers = JaversBuilder.javers()
-                .registerCustomComparator(new CustomBigDecimalComparator(1), BigDecimal).build()
-
-        then:
-        !javers.compare(left,right).hasChanges()
     }
 
     def "should support custom comparator for custom types"() {

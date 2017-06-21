@@ -3,7 +3,7 @@ package org.javers.core.diff.appenders;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ManagedType;
 
@@ -21,7 +21,7 @@ class ReferenceChangeAppender extends CorePropertyChangeAppender<ReferenceChange
     }
 
     @Override
-    public ReferenceChange calculateChanges(NodePair pair, Property property) {
+    public ReferenceChange calculateChanges(NodePair pair, JaversProperty property) {
         GlobalId leftId = pair.getLeftGlobalId(property);
         GlobalId rightId = pair.getRightGlobalId(property);
 
