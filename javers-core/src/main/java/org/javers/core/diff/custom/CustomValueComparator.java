@@ -4,9 +4,9 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.metamodel.type.ValueType;
 
 /**
- * Can be used only for comparing {@link ValueType}.
- *
- * @see JaversBuilder#registerValue(Class, CustomValueComparator)
+ * Can be used for comparing {@link ValueType}.
+ * Register a CustomValueComparator for your class
+ * using {@link JaversBuilder#registerValue(Class, CustomValueComparator)}
  */
 @FunctionalInterface
 public interface CustomValueComparator<T> {
