@@ -30,11 +30,13 @@ class JaversGetterFactory {
             context.addTypeSubstitutions(clazz);
             Arrays.stream(clazz.getDeclaredMethods())
                     .filter(method -> isGetter(method) && !method.isBridge())
-                    .forEach(newProperty -> {
-                        final List<JaversGetter> overridden = getters.stream().filter((existing) -> isOverridden(newProperty, existing.getRawMember())).collect(Collectors.toList());
+                    .forEach(getterMethod -> {
+                        final List<JaversGetter> overridden = getters.stream()
+                                .filter((existing) -> isOverridden(getterMethod, existing.getRawMember()))
+                                .collect(Collectors.toList());
                         final boolean looksLikeId = overridden.stream().anyMatch(JaversMember::looksLikeId);
                         getters.removeAll(overridden);
-                        getters.add(createJaversGetter(newProperty, context, looksLikeId));
+                        getters.add(createJaversGetter(getterMethod, context, looksLikeId));
                     });
             clazz = clazz.getSuperclass();
         }
@@ -71,25 +73,27 @@ class JaversGetterFactory {
         return !Modifier.isNative(rawMethod.getModifiers());
     }
 
-    private static boolean isOverridden(Method parent, Method toCheck) {
-        if (parent.getDeclaringClass().isAssignableFrom(toCheck.getDeclaringClass())
-                && parent.getName().equals(toCheck.getName())) {
-            if (!parent.getReturnType().isAssignableFrom(toCheck.getReturnType())) {
-                return false;
-            }
+    private static boolean isOverridden(final Method parent, final Method toCheck) {
+        return isSubClass(parent, toCheck) &&
+                sameMethodName(parent, toCheck) &&
+                returnTypeCovariant(parent, toCheck) &&
+                sameArguments(parent, toCheck);
+    }
 
-            Class<?>[] params1 = parent.getParameterTypes();
-            Class<?>[] params2 = toCheck.getParameterTypes();
-            if (params1.length == params2.length) {
-                for (int i = 0; i < params1.length; i++) {
-                    if (!params1[i].equals(params2[i])) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
+    private static boolean isSubClass(final Method parent, final Method toCheck) {
+        return parent.getDeclaringClass().isAssignableFrom(toCheck.getDeclaringClass());
+    }
+
+    private static boolean sameMethodName(final Method parent, final Method toCheck) {
+        return parent.getName().equals(toCheck.getName());
+    }
+
+    private static boolean returnTypeCovariant(final Method parent, final Method toCheck) {
+        return parent.getReturnType().isAssignableFrom(toCheck.getReturnType());
+    }
+
+    private static boolean sameArguments(final Method parent, final Method toCheck) {
+        return Arrays.equals(parent.getParameterTypes(), toCheck.getParameterTypes());
     }
 
     private JaversGetter createJaversGetter(Method getterMethod, TypeResolvingContext context, boolean looksLikeId) {

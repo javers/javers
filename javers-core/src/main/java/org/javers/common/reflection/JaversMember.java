@@ -34,11 +34,7 @@ public abstract class JaversMember<T extends Member> {
      * @param resolvedReturnType nullable
      */
     public JaversMember(T rawMember, Type resolvedReturnType) {
-        Validate.argumentIsNotNull(rawMember);
-        this.rawMember = rawMember;
-        this.resolvedReturnType = Optional.ofNullable(resolvedReturnType);
-        this.looksLikeId = hasAnnotation(Sets.asSet(Property.ID_ANN, Property.EMBEDDED_ID_ANN));
-        setAccessibleIfNecessary(rawMember);
+        this(rawMember, resolvedReturnType, false);
     }
 
     public JaversMember(final T rawMember, final Type resolvedReturnType, final boolean looksLikeId) {
