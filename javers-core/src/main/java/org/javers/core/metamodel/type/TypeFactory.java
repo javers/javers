@@ -40,7 +40,9 @@ class TypeFactory {
             return createValueObject((ValueObjectDefinition) def);
         } else if (def instanceof ValueDefinition) {
             ValueDefinition valueDefinition = (ValueDefinition) def;
-            return new ValueType(valueDefinition.getBaseJavaClass(), valueDefinition.getComparator());
+            return valueDefinition.getComparator()
+                    .map(comparator -> new ValueType(valueDefinition.getBaseJavaClass(), comparator))
+                    .orElse(new ValueType(valueDefinition.getBaseJavaClass()));
         } else if (def instanceof IgnoredTypeDefinition) {
             return new IgnoredType(def.getBaseJavaClass());
         } else {

@@ -4,26 +4,26 @@ import org.javers.common.validation.Validate;
 import org.javers.core.diff.custom.CustomValueComparator;
 
 import java.lang.reflect.Type;
-import java.util.Optional;
 
 /**
  * @author bartosz walacik
  */
 public abstract class PrimitiveOrValueType extends JaversType{
-    private final Optional<CustomValueComparator> customValueComparator;
+    private final CustomValueComparator valueComparator;
 
     PrimitiveOrValueType(Type baseJavaType) {
-        this(baseJavaType, Optional.empty());
+        super(baseJavaType);
+        this.valueComparator = super::equals;
     }
 
-    PrimitiveOrValueType(Type baseJavaType, Optional<CustomValueComparator> customValueComparator) {
+    PrimitiveOrValueType(Type baseJavaType, CustomValueComparator customValueComparator) {
         super(baseJavaType);
         Validate.argumentIsNotNull(customValueComparator);
-        this.customValueComparator = customValueComparator;
+        this.valueComparator = customValueComparator;
     }
 
     @Override
     public boolean equals(Object left, Object right) {
-        return customValueComparator.map(it -> it.equals(left, right)).orElse(super.equals(left, right));
+        return valueComparator.equals(left, right);
     }
 }

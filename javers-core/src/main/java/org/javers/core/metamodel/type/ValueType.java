@@ -7,7 +7,6 @@ import org.javers.core.json.JsonTypeAdapter;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 /**
  * Value class in client's domain model. Simple value holder.
@@ -35,7 +34,7 @@ public class ValueType extends PrimitiveOrValueType {
         super(baseJavaType);
     }
 
-    ValueType(Type baseJavaType, Optional<CustomValueComparator> customValueComparator) {
+    ValueType(Type baseJavaType, CustomValueComparator customValueComparator) {
         super(baseJavaType, customValueComparator);
     }
 }
