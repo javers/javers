@@ -78,6 +78,8 @@ public class JaversSchemaManager extends SchemaNameAware {
     }
 
     /**
+     * JaVers 3.3.0 to 3.3.1 MsSql schema migration
+     *
      * This method is needed for upgrading TEXT columns to VARCHAR(MAX) since TEXT is deprecated.
      */
     private void alterMssqlTextColumns() {
