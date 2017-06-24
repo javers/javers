@@ -1,6 +1,6 @@
 dependencies {
     compile project(':javers-core')
-    compile 'org.polyjdbc:polyjdbc:0.7.0'
+    compile 'org.polyjdbc:polyjdbc:0.7.1'
     compile "com.google.guava:guava:$guavaVersion"
 
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
@@ -14,6 +14,7 @@ dependencies {
     testCompile 'mysql:mysql-connector-java:5.1.36'
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
     testCompile "joda-time:joda-time:$jodaVersion"
+    testCompile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.1.0.jre8'
 
 }
 
