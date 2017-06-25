@@ -9,6 +9,7 @@ import org.javers.core.metamodel.object.OwnerContext;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -87,5 +88,11 @@ public class ArrayType extends ContainerType {
             return Array.newInstance(getItemClass(), len);
         }
         return new Object[len];
+    }
+
+    @Override
+    public boolean equals(Object left, Object right) {
+        //see https://github.com/javers/javers/issues/546
+        return Arrays.equals((Object[]) left, (Object[]) right);
     }
 }
