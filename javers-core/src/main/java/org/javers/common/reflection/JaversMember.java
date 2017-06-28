@@ -2,6 +2,7 @@ package org.javers.common.reflection;
 
 import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.property.Property;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
@@ -27,14 +28,20 @@ import static java.util.Collections.unmodifiableSet;
 public abstract class JaversMember<T extends Member> {
     private final T rawMember; //delegate
     private final Optional<Type> resolvedReturnType;
+    private final boolean looksLikeId;
 
     /**
      * @param resolvedReturnType nullable
      */
     public JaversMember(T rawMember, Type resolvedReturnType) {
+        this(rawMember, resolvedReturnType, false);
+    }
+
+    public JaversMember(final T rawMember, final Type resolvedReturnType, final boolean looksLikeId) {
         Validate.argumentIsNotNull(rawMember);
         this.rawMember = rawMember;
         this.resolvedReturnType = Optional.ofNullable(resolvedReturnType);
+        this.looksLikeId = looksLikeId || hasAnnotation(Sets.asSet(Property.ID_ANN, Property.EMBEDDED_ID_ANN));
         setAccessibleIfNecessary(rawMember);
     }
 
@@ -78,6 +85,10 @@ public abstract class JaversMember<T extends Member> {
             return false;
         }
         return getAnnotationTypes().stream().anyMatch(annType -> aliases.contains(annType.getSimpleName()));
+    }
+
+    public boolean looksLikeId() {
+        return looksLikeId;
     }
 
     public abstract Object getEvenIfPrivate(Object target);

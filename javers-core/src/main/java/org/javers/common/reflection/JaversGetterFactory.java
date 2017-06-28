@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author bartosz walacik
@@ -20,17 +21,23 @@ class JaversGetterFactory {
     /**
      * List all class getters, including inherited and private.
      */
-    List<JaversGetter> getAllGetters(){
+    List<JaversGetter> getAllGetters() {
         List<JaversGetter> getters = new ArrayList<>();
         TypeResolvingContext context = new TypeResolvingContext();
 
         Class clazz = getterSource;
-        while (clazz != Object.class) {
+        while (clazz != null && clazz != Object.class) {
             context.addTypeSubstitutions(clazz);
             Arrays.stream(clazz.getDeclaredMethods())
                     .filter(method -> isGetter(method) && !method.isBridge())
-                    .map(getterMethod -> createJaversGetter(getterMethod, context))
-                    .forEach(getters::add);
+                    .forEach(getterMethod -> {
+                        final List<JaversGetter> overridden = getters.stream()
+                                .filter((existing) -> isOverridden(getterMethod, existing.getRawMember()))
+                                .collect(Collectors.toList());
+                        final boolean looksLikeId = overridden.stream().anyMatch(JaversMember::looksLikeId);
+                        getters.removeAll(overridden);
+                        getters.add(createJaversGetter(getterMethod, context, looksLikeId));
+                    });
             clazz = clazz.getSuperclass();
         }
 
@@ -42,7 +49,6 @@ class JaversGetterFactory {
                 hasNoParamters(rawMethod) &&
                 returnsSomething(rawMethod) &&
                 isNotStatic(rawMethod) &&
-                isNotAbstract(rawMethod) &&
                 isNotNative(rawMethod);
     }
 
@@ -63,16 +69,35 @@ class JaversGetterFactory {
         return !Modifier.isStatic(rawMethod.getModifiers());
     }
 
-    private static boolean isNotAbstract(Method rawMethod) {
-        return !Modifier.isAbstract(rawMethod.getModifiers());
-    }
-
     private static boolean isNotNative(Method rawMethod) {
         return !Modifier.isNative(rawMethod.getModifiers());
     }
 
-    private JaversGetter createJaversGetter(Method getterMethod, TypeResolvingContext context){
+    private static boolean isOverridden(final Method parent, final Method toCheck) {
+        return isSubClass(parent, toCheck) &&
+                sameMethodName(parent, toCheck) &&
+                returnTypeCovariant(parent, toCheck) &&
+                sameArguments(parent, toCheck);
+    }
+
+    private static boolean isSubClass(final Method parent, final Method toCheck) {
+        return parent.getDeclaringClass().isAssignableFrom(toCheck.getDeclaringClass());
+    }
+
+    private static boolean sameMethodName(final Method parent, final Method toCheck) {
+        return parent.getName().equals(toCheck.getName());
+    }
+
+    private static boolean returnTypeCovariant(final Method parent, final Method toCheck) {
+        return parent.getReturnType().isAssignableFrom(toCheck.getReturnType());
+    }
+
+    private static boolean sameArguments(final Method parent, final Method toCheck) {
+        return Arrays.equals(parent.getParameterTypes(), toCheck.getParameterTypes());
+    }
+
+    private JaversGetter createJaversGetter(Method getterMethod, TypeResolvingContext context, boolean looksLikeId) {
         Type actualReturnType = context.getSubstitution(getterMethod.getGenericReturnType());
-        return new JaversGetter(getterMethod, actualReturnType);
+        return new JaversGetter(getterMethod, actualReturnType, looksLikeId);
     }
 }
