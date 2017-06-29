@@ -3,9 +3,7 @@ package org.javers.common.reflection;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,33 +26,31 @@ class JaversGetterFactory {
         Class clazz = getterSource;
         while (clazz != null && clazz != Object.class) {
             context.addTypeSubstitutions(clazz);
-            Arrays.stream(clazz.getDeclaredMethods())
-                    .filter(method -> isGetter(method) && !method.isBridge())
-                    .forEach(getterMethod -> {
-                        final List<JaversGetter> overridden = getters.stream()
-                                .filter((existing) -> isOverridden(getterMethod, existing.getRawMember()))
-                                .collect(Collectors.toList());
-                        final boolean looksLikeId = overridden.stream().anyMatch(JaversMember::looksLikeId);
-                        getters.removeAll(overridden);
-                        getters.add(createJaversGetter(getterMethod, context, looksLikeId));
-                    });
+            getters.addAll(
+                Arrays.stream(clazz.getDeclaredMethods())
+                        .filter(method -> isGetter(method) && !method.isBridge())
+                        .filter(method -> !isOverridden(method, getters))
+                        .map(getter -> createJaversGetter(getter, context))
+                        .collect(Collectors.toList()));
             clazz = clazz.getSuperclass();
         }
 
         return getters;
     }
 
+
     private static boolean isGetter(Method rawMethod) {
         return hasGetOrIsPrefix(rawMethod) &&
-                hasNoParamters(rawMethod) &&
-                returnsSomething(rawMethod) &&
-                isNotStatic(rawMethod) &&
-                isNotNative(rawMethod);
+               hasNoParamters(rawMethod) &&
+               returnsSomething(rawMethod) &&
+               isNotStatic(rawMethod) &&
+               //isNotAbstract(rawMethod) &&
+               isNotNative(rawMethod);
     }
 
     private static boolean hasGetOrIsPrefix(Method rawMethod) {
         return rawMethod.getName().startsWith("get") ||
-                rawMethod.getName().startsWith("is");
+               rawMethod.getName().startsWith("is");
     }
 
     private static boolean hasNoParamters(Method rawMethod) {
@@ -73,11 +69,17 @@ class JaversGetterFactory {
         return !Modifier.isNative(rawMethod.getModifiers());
     }
 
-    private static boolean isOverridden(final Method parent, final Method toCheck) {
+    private static boolean isOverridden(Method parent, Collection<JaversGetter> toCheck) {
+        return toCheck.stream()
+                .map(it -> it.getRawMember())
+                .anyMatch(it -> isOverridden(parent, it));
+    }
+
+    private static boolean isOverridden(Method parent, Method toCheck) {
         return isSubClass(parent, toCheck) &&
-                sameMethodName(parent, toCheck) &&
-                returnTypeCovariant(parent, toCheck) &&
-                sameArguments(parent, toCheck);
+               sameMethodName(parent, toCheck) &&
+               returnTypeCovariant(parent, toCheck) &&
+               sameArguments(parent, toCheck);
     }
 
     private static boolean isSubClass(final Method parent, final Method toCheck) {
@@ -96,8 +98,27 @@ class JaversGetterFactory {
         return Arrays.equals(parent.getParameterTypes(), toCheck.getParameterTypes());
     }
 
-    private JaversGetter createJaversGetter(Method getterMethod, TypeResolvingContext context, boolean looksLikeId) {
+    private JaversGetter createJaversGetter(Method getterMethod, TypeResolvingContext context) {
         Type actualReturnType = context.getSubstitution(getterMethod.getGenericReturnType());
-        return new JaversGetter(getterMethod, actualReturnType, looksLikeId);
+
+        if (hasInheritedId(getterMethod)) {
+            return new JaversGetter(getterMethod, actualReturnType, true);
+        }
+        return new JaversGetter(getterMethod, actualReturnType);
+    }
+
+    private static boolean hasInheritedId(Method concrete) {
+        List<Method> overridden = new ArrayList<>();
+        Class clazz = concrete.getDeclaringClass().getSuperclass();
+
+        while (clazz != null && clazz != Object.class) {
+            Arrays.asList(clazz.getDeclaredMethods())
+                    .stream()
+                    .filter(parent -> isOverridden(parent, concrete))
+                    .findFirst().ifPresent(parent -> overridden.add(parent));
+            clazz = clazz.getSuperclass();
+        }
+
+        return overridden.stream().anyMatch(ReflectionUtil::looksLikeId);
     }
 }

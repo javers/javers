@@ -5,7 +5,6 @@ import org.javers.core.JaversBuilder
 import org.javers.core.MappingStyle
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.type.EntityType
-import org.javers.core.metamodel.type.ManagedType
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -48,15 +47,16 @@ class CaseWithGoogleAutoValue extends Specification {
 
         then:
         jType instanceof EntityType
+        jType.idProperty.name == "id"
         def properties = jType.getProperties{true}
-        assert properties.size() == 2
-        properties.each { assert it.member.declaringClass == AbstractEntity}
+        properties.size() == 2
+        properties.each { assert it.member.declaringClass == entity}
 
         where:
         entity << [AbstractEntity, ConcreteEntity]
     }
 
-    def "should support package protected abstract types"(){
+    def "should compare package protected Entity with abstract @IdGetter"(){
         given:
         def javers = JaversBuilder.javers().withMappingStyle(MappingStyle.BEAN).build()
 

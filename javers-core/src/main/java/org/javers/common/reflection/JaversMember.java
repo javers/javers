@@ -2,7 +2,6 @@ package org.javers.common.reflection;
 
 import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.Property;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
@@ -11,8 +10,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.Set;
-
-import static java.util.Collections.unmodifiableSet;
 
 /**
  * Enhanced Field or Method, deals with Java type erasure.
@@ -33,15 +30,15 @@ public abstract class JaversMember<T extends Member> {
     /**
      * @param resolvedReturnType nullable
      */
-    public JaversMember(T rawMember, Type resolvedReturnType) {
-        this(rawMember, resolvedReturnType, false);
+    protected JaversMember(T rawMember, Type resolvedReturnType) {
+        this(rawMember, resolvedReturnType, ReflectionUtil.looksLikeId(rawMember));
     }
 
-    public JaversMember(final T rawMember, final Type resolvedReturnType, final boolean looksLikeId) {
+    protected JaversMember(final T rawMember, final Type resolvedReturnType, final boolean looksLikeId) {
         Validate.argumentIsNotNull(rawMember);
         this.rawMember = rawMember;
         this.resolvedReturnType = Optional.ofNullable(resolvedReturnType);
-        this.looksLikeId = looksLikeId || hasAnnotation(Sets.asSet(Property.ID_ANN, Property.EMBEDDED_ID_ANN));
+        this.looksLikeId = looksLikeId;
         setAccessibleIfNecessary(rawMember);
     }
 
@@ -73,18 +70,11 @@ public abstract class JaversMember<T extends Member> {
     }
 
     public Set<Annotation> getAnnotations() {
-        return unmodifiableSet(Sets.asSet(((AccessibleObject) rawMember).getAnnotations()));
+        return ReflectionUtil.getAnnotations(rawMember);
     }
 
     public Set<Class<? extends Annotation>> getAnnotationTypes() {
         return Sets.transform(getAnnotations(), ann -> ann.annotationType());
-    }
-
-    public boolean hasAnnotation(Set<String> aliases) {
-        if (aliases == null) {
-            return false;
-        }
-        return getAnnotationTypes().stream().anyMatch(annType -> aliases.contains(annType.getSimpleName()));
     }
 
     public boolean looksLikeId() {
@@ -96,14 +86,13 @@ public abstract class JaversMember<T extends Member> {
     public abstract void setEvenIfPrivate(Object target, Object value);
 
     void setAccessibleIfNecessary(Member rawMember) {
-        if(!isPublic(rawMember))
-        {
+        if(!isPublic(rawMember)) {
             ((AccessibleObject)rawMember).setAccessible(true); //that's Java Reflection API ...
         }
     }
 
     private boolean isPublic(Member member){
-        return Modifier.isPublic(member.getModifiers());
+        return Modifier.isPublic(member.getModifiers()) && Modifier.isPublic(member.getDeclaringClass().getModifiers());
     }
 
     @Override

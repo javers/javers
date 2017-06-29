@@ -20,23 +20,19 @@ import static org.javers.common.collections.Lists.positiveFilter;
  * @author bartosz walacik
  */
 class ManagedClassFactory {
-    private final ClassScanner classScanner;
     private final TypeMapper typeMapper;
 
-    public ManagedClassFactory(ClassScanner classScanner, TypeMapper typeMapper) {
-        this.classScanner = classScanner;
+    public ManagedClassFactory(TypeMapper typeMapper) {
         this.typeMapper = typeMapper;
     }
 
-    ManagedClass create(Class<?> baseJavaClass){
-        ClassScan scan = classScanner.scan(baseJavaClass);
+    ManagedClass create(Class<?> baseJavaClass, ClassScan scan){
         List<JaversProperty> allProperties = convert(scan.getProperties());
         return new ManagedClass(baseJavaClass, allProperties,
                 positiveFilter(allProperties, p -> p.looksLikeId()));
     }
 
-    ManagedClass create(ClientsClassDefinition def){
-        ClassScan scan = classScanner.scan(def.getBaseJavaClass());
+    ManagedClass create(ClientsClassDefinition def, ClassScan scan){
         List<JaversProperty> allProperties = convert(scan.getProperties());
         List<JaversProperty> filtered = filterIgnored(allProperties, def);
         filtered = filterIgnoredType(filtered, def.getBaseJavaClass());

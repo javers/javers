@@ -3,6 +3,7 @@ package org.javers.core.metamodel.type;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.javers.core.metamodel.scanner.ClassScan;
 
 /**
  * @author bartosz.walacik
@@ -14,8 +15,8 @@ class EntityTypeFactory {
         this.managedClassFactory = managedClassFactory;
     }
 
-    EntityType createEntity(EntityDefinition definition) {
-        ManagedClass managedClass = managedClassFactory.create(definition);
+    EntityType createEntity(EntityDefinition definition, ClassScan scan) {
+        ManagedClass managedClass = managedClassFactory.create(definition, scan);
 
         JaversProperty idProperty;
         if (definition.hasCustomId()) {
