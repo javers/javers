@@ -11,7 +11,7 @@ import static org.javers.common.string.ToStringBuilder.typeName;
  */
 public class JaversField extends JaversMember<Field> {
 
-    public JaversField(Field rawField, Type resolvedReturnType) {
+    protected JaversField(Field rawField, Type resolvedReturnType) {
         super(rawField, resolvedReturnType);
     }
 

@@ -27,6 +27,11 @@ public class JaversGetter extends JaversMember<Method> {
         setterMethod = findSetterForGetter(getterMethod);
     }
 
+    protected JaversGetter(Method getterMethod, Type resolvedReturnType, boolean looksLikeId) {
+        super(getterMethod, resolvedReturnType, looksLikeId);
+        setterMethod = findSetterForGetter(getterMethod);
+    }
+
     @Override
     protected Type getRawGenericType() {
         return getRawMember().getGenericReturnType();

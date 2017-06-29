@@ -6,16 +6,19 @@ import org.javers.common.collections.Lists;
 import java.util.*;
 
 import org.javers.common.collections.Primitives;
+import org.javers.common.collections.Sets;
 import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
+import org.javers.core.metamodel.property.Property;
 import org.slf4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 
+import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -259,5 +262,15 @@ public class ReflectionUtil {
 
     public static <T> T getAnnotationValue(Annotation ann, String propertyName) {
         return (T) ReflectionUtil.invokeGetter(ann, propertyName);
+    }
+
+    public static boolean looksLikeId(Member member) {
+        return getAnnotations(member).stream()
+                .map(ann -> ann.annotationType().getSimpleName())
+                .anyMatch(annName -> annName.equals(Property.ID_ANN) || annName.equals(Property.EMBEDDED_ID_ANN));
+    }
+
+    public static Set<Annotation> getAnnotations(Member member) {
+        return unmodifiableSet(Sets.asSet(((AccessibleObject) member).getAnnotations()));
     }
 }
