@@ -7,13 +7,13 @@ buildscript {
 
     dependencies {
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
-        classpath 'pl.allegro.tech.build:axion-release-plugin:0.9.5'
+        classpath 'pl.allegro.tech.build:axion-release-plugin:1.7.0'
         classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
         classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.8.0'
     }
 }
 
-apply plugin: 'axion-release'
+apply plugin: 'pl.allegro.tech.build.axion-release'
 apply plugin: 'io.codearte.nexus-staging'
 
 scmVersion {

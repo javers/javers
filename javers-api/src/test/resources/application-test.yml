@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+javers:
+  api:
+    enabled: true
+  mappingStyle: bean
+  newObjectSnapshot: false
+  prettyPrint: false
+  typeSafeValues: true
+  packagesToScan: org.javers.spring.boot
+
+spring:
+  data:
+    mongodb:
+      database: spring-mongo
