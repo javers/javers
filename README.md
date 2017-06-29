@@ -1,5 +1,5 @@
 ﻿﻿
-![javers-black-logo-1.0.png](javers-black-logo-1.0.png)
+![logotype.svg](https://javers.org/img/logotype.svg)
 
 ## What is JaVers
 
