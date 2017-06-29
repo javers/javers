@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author bartosz walacik
@@ -26,18 +25,16 @@ class JaversGetterFactory {
         Class clazz = getterSource;
         while (clazz != null && clazz != Object.class) {
             context.addTypeSubstitutions(clazz);
-            getters.addAll(
-                Arrays.stream(clazz.getDeclaredMethods())
-                        .filter(method -> isGetter(method) && !method.isBridge())
-                        .filter(method -> !isOverridden(method, getters))
-                        .map(getter -> createJaversGetter(getter, context))
-                        .collect(Collectors.toList()));
+            Arrays.stream(clazz.getDeclaredMethods())
+                  .filter(method -> isGetter(method) && !method.isBridge())
+                  .filter(method -> !isOverridden(method, getters))
+                  .map(getter -> createJaversGetter(getter, context))
+                  .forEach(getters::add);
             clazz = clazz.getSuperclass();
         }
 
         return getters;
     }
-
 
     private static boolean isGetter(Method rawMethod) {
         return hasGetOrIsPrefix(rawMethod) &&
