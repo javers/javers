@@ -1,0 +1,14 @@
+javers:
+  mappingStyle: bean
+
+spring:
+  jpa:
+#    properties:
+#      hibernate.show_sql: true
+#      hibernate.use_sql_comments: true
+#      hibernate.format_sql: true
+
+logging:
+    level:
+        org.hibernate: INFO
+        org.hibernate.SQL: DEBUG
