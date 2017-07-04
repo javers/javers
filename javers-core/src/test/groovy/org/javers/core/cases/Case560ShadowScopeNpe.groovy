@@ -15,7 +15,7 @@ class Case560ShadowScopeNpe extends Specification {
         javers.commit(id.toString(),entity)
 
         when:
-        def query = QueryBuilder.byInstanceId(id.toString(), MongoStoredEntity.class).withShadowScopeDeep().build();
+        def query = QueryBuilder.byInstanceId(id, MongoStoredEntity.class).withShadowScopeDeep().build();
         def shadows = javers.findShadows(query)
 
         then:

@@ -87,6 +87,9 @@ public class ShadowQueryRunner {
         }
 
         void loadFullCommits() {
+            if (commitsMap.isEmpty()) {
+                return;
+            }
             QueryParams params = QueryParamsBuilder
                     .withLimit(Integer.MAX_VALUE)
                     .commitIds(commitsMap.keySet().stream().map(cm -> cm.getId()).collect(toSet()))
