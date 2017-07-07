@@ -2,6 +2,7 @@ package org.javers.repository.sql.finders;
 
 import org.javers.common.string.ToStringBuilder;
 import org.javers.core.commit.CommitId;
+import org.javers.core.json.JsonConverter;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
@@ -9,7 +10,6 @@ import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,8 +19,11 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 abstract class SnapshotFilter extends SchemaNameAware {
 
-    SnapshotFilter(TableNameProvider tableNameProvider) {
+    private JsonConverter converter;
+
+    SnapshotFilter(TableNameProvider tableNameProvider, JsonConverter converter) {
         super(tableNameProvider);
+        this.converter = converter;
     }
 
     private static final String BASE_FIELDS =
@@ -61,8 +64,14 @@ abstract class SnapshotFilter extends SchemaNameAware {
     abstract  void addWhere(SelectQuery query);
 
     void applyQueryParams(SelectQuery query, QueryParams queryParams) {
+        if (queryParams.newObjectChanges().isPresent() && !queryParams.newObjectChanges().get() ){
+            addSkipInitialCondition(query);
+        }
         if (queryParams.changedProperty().isPresent()){
             addChangedPropertyCondition(query, queryParams.changedProperty().get());
+        }
+        if (queryParams.propertyValueName().isPresent()){
+            addPropertyValueCondition(query, queryParams.propertyValueName().get(), queryParams.propertyValue().get());
         }
         if (queryParams.from().isPresent()) {
             addFromDateCondition(query, queryParams.from().get());
@@ -85,8 +94,22 @@ abstract class SnapshotFilter extends SchemaNameAware {
         query.limit(queryParams.limit(), queryParams.skip());
     }
 
+    private void addSkipInitialCondition(SelectQuery query) {
+        query.append(" AND " + SNAPSHOT_TYPE + " <> :type")
+                .withArgument("type", "INITIAL");
+    }
+
     private void addChangedPropertyCondition(SelectQuery query, String changedProperty) {
         query.append(" AND " + SNAPSHOT_CHANGED + " like '%\"" + changedProperty +"\"%'");
+    }
+
+    // ISSUE-556: we should be able to transform queryParams.propertyValue().get()
+    // for a primitive to itself
+    // for an object to its snapshot db string representation
+    // for an entityRef to its corresponding instanceId
+    // maybe with the help of JsonConverter, or some other utility class
+    private void addPropertyValueCondition(SelectQuery query, String propertyValueName, Object propertyValue) {
+        query.append(" AND " + SNAPSHOT_STATE + " like '%\"" + String.format("%s: %s", propertyValueName, converter.toJson(propertyValue)) +"\"%'");
     }
 
     private void addFromDateCondition(SelectQuery query, LocalDateTime from) {

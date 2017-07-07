@@ -1,7 +1,6 @@
 package org.javers.repository.inmemory;
 
 import org.javers.common.collections.Lists;
-import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -22,8 +21,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.util.Collections.unmodifiableList;
-
 /**
  * Fake impl of JaversRepository
  *
@@ -35,6 +32,8 @@ public class InMemoryRepository implements JaversRepository {
     private Map<GlobalId, LinkedList<CdoSnapshot>> snapshots = new ConcurrentHashMap<>();
 
     private CommitId head;
+
+    private JsonConverter jsonConverter;
 
     public InMemoryRepository() {
     }
@@ -134,8 +133,19 @@ public class InMemoryRepository implements JaversRepository {
         if (queryParams.hasDates()) {
             snapshots = filterSnapshotsByCommitDate(snapshots, queryParams);
         }
+        if (queryParams.newObjectChanges().isPresent() && !queryParams.newObjectChanges().get()){
+            snapshots = skipInitial(snapshots);
+        }
         if (queryParams.changedProperty().isPresent()){
             snapshots = filterByPropertyName(snapshots, queryParams.changedProperty().get());
+        }
+        if (queryParams.propertyValueName().isPresent()){
+            // ISSUE-556: we should be able to transform queryParams.propertyValue().get()
+            // for a primitive to itself
+            // for an object to its snapshot in memory representation (CdoSnapshot.getPropertyValue)
+            // for an entityRef to its corresponding instanceId
+            // maybe with the help of JsonConverter, or some other utility class
+            snapshots = filterByPropertyValue(snapshots, queryParams.propertyValueName().get(), queryParams.propertyValue().get());
         }
         snapshots = filterSnapshotsByCommitProperties(snapshots, queryParams.commitProperties());
         return trimResultsToRequestedSlice(snapshots, queryParams.skip(), queryParams.limit());
@@ -223,10 +233,21 @@ public class InMemoryRepository implements JaversRepository {
 
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
+        this.jsonConverter = jsonConverter;
     }
 
     private List<CdoSnapshot> filterByPropertyName(List<CdoSnapshot> snapshots, final String propertyName){
         return Lists.positiveFilter(snapshots, input -> input.hasChangeAt(propertyName));
+    }
+
+    private List<CdoSnapshot> filterByPropertyValue(List<CdoSnapshot> snapshots, final String propertyValueName, Object propertyValue){
+        return Lists.positiveFilter(snapshots, input ->
+                Objects.equals(input.getPropertyValue(propertyValueName), propertyValue)
+        );
+    }
+
+    private List<CdoSnapshot> skipInitial(List<CdoSnapshot> snapshots) {
+        return Lists.negativeFilter(snapshots, snapshot -> snapshot.isInitial());
     }
 
     private List<CdoSnapshot> getAll(){

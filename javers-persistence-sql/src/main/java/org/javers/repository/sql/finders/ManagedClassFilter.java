@@ -2,6 +2,7 @@ package org.javers.repository.sql.finders;
 
 import org.javers.common.collections.Sets;
 import org.javers.common.string.ToStringBuilder;
+import org.javers.core.json.JsonConverter;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.query.SelectQuery;
 
@@ -17,8 +18,8 @@ class ManagedClassFilter extends SnapshotFilter {
     private final Set<String> managedTypes;
     private final boolean aggregate;
 
-    ManagedClassFilter(TableNameProvider tableNameProvider, Set<String> managedTypes, boolean aggregate) {
-        super(tableNameProvider);
+    ManagedClassFilter(TableNameProvider tableNameProvider, JsonConverter converter, Set<String> managedTypes, boolean aggregate) {
+        super(tableNameProvider, converter);
         this.managedTypes = managedTypes;
         this.aggregate = aggregate;
     }

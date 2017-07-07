@@ -1361,4 +1361,63 @@ class JaversRepositoryE2ETest extends Specification {
       snapshots.size() == 3
       snapshots.every{it.commitId.majorId == 1 || it.commitId.majorId == 4}
     }
+
+    def "should ignore newObject snapshot" () {
+        given:
+        def anEntity = new SnapshotEntity(id: 1, intProperty: 100)
+        javers.commit("author", anEntity)
+
+        anEntity.intProperty = 200;
+        javers.commit("author", anEntity)
+
+        anEntity.intProperty = 300;
+        javers.commit("author", anEntity)
+
+        when:
+        def updateSnapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity.class).withNewObjectChanges(false).build())
+
+        then:
+        updateSnapshots.size() == 2
+    }
+
+    def "should query by primitive property value" () {
+        given:
+        def anEntity = new SnapshotEntity(id: 1, intProperty: 100)
+        javers.commit("author", anEntity)
+
+        anEntity.intProperty = 200;
+        javers.commit("author", anEntity)
+
+        anEntity.intProperty = 300;
+        javers.commit("author", anEntity)
+
+        when:
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity.class).andPropertyValue("intProperty", 100).build())
+
+        then:
+        snapshots.size() == 1
+    }
+
+    // ISSUE-556: not yet working
+    def "should query by entity property value" () {
+        given:
+        def anEntityRef = new SnapshotEntity(id: 0, intProperty: 0)
+
+        def anEntity = new SnapshotEntity(id: 1, intProperty: 100, entityRef: anEntityRef)
+        javers.commit("author", anEntity)
+
+        anEntity.intProperty = 200;
+        javers.commit("author", anEntity)
+
+        anEntity.intProperty = 300;
+        anEntity.entityRef = null;
+        javers.commit("author", anEntity)
+
+        when:
+        // ISSUE-556: we should be able to compare to a non primitive type in the diverse repositories
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity.class).andPropertyValue("entityRef", anEntityRef).build())
+
+        then:
+        snapshots.size() == 1
+    }
 }

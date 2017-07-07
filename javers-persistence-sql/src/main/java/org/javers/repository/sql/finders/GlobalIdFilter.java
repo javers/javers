@@ -1,5 +1,6 @@
 package org.javers.repository.sql.finders;
 
+import org.javers.core.json.JsonConverter;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.query.SelectQuery;
 
@@ -10,8 +11,8 @@ class GlobalIdFilter extends SnapshotFilter  {
     private final long globalIdPk;
     private final boolean aggregate;
 
-    GlobalIdFilter(TableNameProvider tableNameProvider, long globalIdPk, boolean aggregate) {
-        super(tableNameProvider);
+    GlobalIdFilter(TableNameProvider tableNameProvider, JsonConverter converter, long globalIdPk, boolean aggregate) {
+        super(tableNameProvider, converter);
         this.globalIdPk = globalIdPk;
         this.aggregate = aggregate;
     }

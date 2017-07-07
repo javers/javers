@@ -1,6 +1,5 @@
 package org.javers.repository.jql;
 
-import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -11,6 +10,7 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.QueryParams;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -100,7 +100,7 @@ public class JqlQuery {
     }
 
     boolean isNewObjectChanges() {
-        return queryParams.newObjectChanges();
+        return !queryParams.newObjectChanges().isPresent() || queryParams.newObjectChanges().get();
     }
 
     boolean isAnyDomainObjectQuery() {

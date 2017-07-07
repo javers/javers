@@ -1,5 +1,6 @@
 package org.javers.repository.sql.finders;
 
+import org.javers.core.json.JsonConverter;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.query.SelectQuery;
 
@@ -13,8 +14,8 @@ public class VoOwnerEntityFilter extends SnapshotFilter {
     private final String ownerTypeName;
     private final String fragment;
 
-    VoOwnerEntityFilter(TableNameProvider tableNameProvider, String ownerTypeName, String fragment) {
-        super(tableNameProvider);
+    VoOwnerEntityFilter(TableNameProvider tableNameProvider, JsonConverter converter, String ownerTypeName, String fragment) {
+        super(tableNameProvider, converter);
         this.ownerTypeName = ownerTypeName;
         this.fragment = fragment;
     }

@@ -1,11 +1,11 @@
 package org.javers.repository.api;
 
-import java.util.Optional;
 import org.javers.core.commit.CommitId;
-import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -25,10 +25,12 @@ public class QueryParams {
     private final Optional<String> author;
     private final Optional<Map<String, String>> commitProperties;
     private final boolean aggregate;
-    private final boolean newObjectChanges;
+    private final Optional<Boolean> newObjectChanges;
     private final Optional<String> changedProperty;
+    private final Optional<String> propertyValueName;
+    private final Optional<Object> propertyValue;
 
-    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, Boolean newObjectChanges, String changedProperty, String propertyValueName, Object propertyValue) {
         this.limit = limit;
         this.skip = skip;
         this.from = Optional.ofNullable(from);
@@ -38,8 +40,11 @@ public class QueryParams {
         this.author = Optional.ofNullable(author);
         this.commitProperties = Optional.ofNullable(commitProperties);
         this.aggregate = aggregate;
-        this.newObjectChanges = newObjectChanges;
+        this.newObjectChanges = Optional.ofNullable(newObjectChanges);
         this.changedProperty = Optional.ofNullable(changedProperty);
+        this.propertyValueName = Optional.ofNullable(propertyValueName);
+        this.propertyValue = Optional.ofNullable(propertyValue);
+
     }
 
     public int limit() {
@@ -97,12 +102,29 @@ public class QueryParams {
             commitProperties.get() : Collections.<String, String>emptyMap();
     }
 
+
     /**
      * filters results to Snapshots with a given property on changed properties list
      */
     public Optional<String> changedProperty(){
         return changedProperty;
     }
+
+    /**
+     * filters results to Snapshots with a given property name on snapshot state
+     */
+    public Optional<String> propertyValueName(){
+        return propertyValueName;
+    }
+
+
+    /**
+     * filters results to Snapshots with a given property value on snapshot state
+     */
+    public Optional<Object> propertyValue(){
+        return propertyValue;
+    }
+
 
     /**
      * filters results to Snapshots with a given version
@@ -125,7 +147,7 @@ public class QueryParams {
         return aggregate;
     }
 
-    public boolean newObjectChanges() {
+    public Optional<Boolean> newObjectChanges() {
         return newObjectChanges;
     }
 

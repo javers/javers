@@ -1,12 +1,13 @@
 package org.javers.repository.sql.finders;
 
+import org.javers.core.json.JsonConverter;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.query.SelectQuery;
 
 class AnySnapshotFilter extends SnapshotFilter {
 
-    AnySnapshotFilter(TableNameProvider tableNameProvider) {
-        super(tableNameProvider);
+    AnySnapshotFilter(TableNameProvider tableNameProvider, JsonConverter converter) {
+        super(tableNameProvider, converter);
     }
 
     @Override

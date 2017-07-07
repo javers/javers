@@ -18,9 +18,11 @@ public class QueryParamsBuilder {
     private Long version;
     private String author;
     private boolean aggregate;
-    private boolean newObjectChanges;
+    private Boolean newObjectChanges;
     private Map<String, String> commitProperties = new HashMap<>();
     private String changedProperty;
+    private String propertyValueName;
+    private Object propertyValue;
 
     private QueryParamsBuilder(int limit) {
         this.limit = limit;
@@ -138,6 +140,12 @@ public class QueryParamsBuilder {
         return this;
     }
 
+    public QueryParamsBuilder propertyValue(String propertyValueName, Object propertyValue) {
+        this.propertyValueName = propertyValueName;
+        this.propertyValue = propertyValue;
+        return this;
+    }
+
     /**
      * @see QueryParams#author()
      */
@@ -151,6 +159,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty);
+        return new QueryParams(limit, skip, from, to, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty, propertyValueName, propertyValue);
     }
 }

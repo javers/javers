@@ -170,6 +170,17 @@ public class QueryBuilder {
     }
 
     /**
+     * Filters to snapshots (or changes) with a given property value for a specific state property.
+     *
+     * @see CdoSnapshot#getChanged()
+     */
+    public QueryBuilder andPropertyValue(String propertyValueName, Object propertyValue) {
+        Validate.argumentIsNotNull(propertyValueName);
+        queryParamsBuilder.propertyValue(propertyValueName, propertyValue);
+        return this;
+    }
+
+    /**
      * Affects changes query only.
      * When switched on, additional changes are generated for the initial snapshot
      * (the first commit of a given object). Off by default.

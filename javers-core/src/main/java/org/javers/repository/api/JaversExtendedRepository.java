@@ -1,7 +1,6 @@
 package org.javers.repository.api;
 
 import org.javers.common.collections.Lists;
-import java.util.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.diff.Change;
@@ -13,7 +12,10 @@ import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.snapshot.SnapshotDiffer;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -36,7 +38,7 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(globalId, queryParams);
 
         List<CdoSnapshot> snapshots = getStateHistory(globalId, queryParams);
-        List<Change> changes = getChangesIntroducedBySnapshots(queryParams.newObjectChanges() ? snapshots : skipInitial(snapshots));
+        List<Change> changes = getChangesIntroducedBySnapshots(!queryParams.newObjectChanges().isPresent() || queryParams.newObjectChanges().get() ? snapshots : skipInitial(snapshots));
 
         return filterByPropertyName(changes, queryParams);
     }
@@ -45,7 +47,7 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(givenClasses, queryParams);
 
         List<CdoSnapshot> snapshots = getStateHistory(givenClasses, queryParams);
-        List<Change> changes = getChangesIntroducedBySnapshots(queryParams.newObjectChanges() ? snapshots : skipInitial(snapshots));
+        List<Change> changes = getChangesIntroducedBySnapshots(!queryParams.newObjectChanges().isPresent() || queryParams.newObjectChanges().get()  ? snapshots : skipInitial(snapshots));
         return filterByPropertyName(changes, queryParams);
     }
 
@@ -53,7 +55,7 @@ public class JaversExtendedRepository implements JaversRepository {
         argumentsAreNotNull(ownerEntity, path, queryParams);
 
         List<CdoSnapshot> snapshots = getValueObjectStateHistory(ownerEntity, path, queryParams);
-        return getChangesIntroducedBySnapshots(queryParams.newObjectChanges() ? snapshots : skipInitial(snapshots));
+        return getChangesIntroducedBySnapshots(!queryParams.newObjectChanges().isPresent() || queryParams.newObjectChanges().get()  ? snapshots : skipInitial(snapshots));
     }
 
     public List<Change> getChanges(boolean newObjects, QueryParams queryParams) {
