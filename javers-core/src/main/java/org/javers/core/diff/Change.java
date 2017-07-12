@@ -3,8 +3,10 @@ package org.javers.core.diff;
 import java.util.Optional;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 
@@ -15,16 +17,15 @@ import static org.javers.common.string.ToStringBuilder.addFirstField;
 import static org.javers.common.validation.Validate.*;
 
 /**
- * Change represents <b>atomic</b> difference between two objects.
+ * Change represents an <b>atomic</b> difference between two objects.
  * <br><br>
  *
- * There are several change types: {@link ValueChange}, {@link ReferenceChange}, ...
- * For complete list see inheritance hierarchy.
+ * There are several types fo change:
+ * {@link ValueChange}, {@link ReferenceChange}, {@link ListChange}, {@link NewObject}, and so on.
+ * See the inheritance hierarchy for the complete list.
  * <br><br>
  *
- * Change is a <i>Value Object</i> and typically can not exists without
- * owning {@link Diff}. For more information see {@link Diff} javadoc.
- *
+ * @see Diff
  * @author bartosz walacik
  */
 public abstract class Change implements Serializable {

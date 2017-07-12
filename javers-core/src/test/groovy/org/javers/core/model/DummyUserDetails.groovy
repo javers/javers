@@ -1,5 +1,7 @@
 package org.javers.core.model
 
+import org.javers.core.metamodel.annotation.PropertyName
+
 import javax.persistence.Id
 
 /**
@@ -15,6 +17,9 @@ class DummyUserDetails {
     DummyAddress dummyAddress
     List<DummyAddress> addressList = []
     List<Integer> integerList = []
+
+    @PropertyName("Customized Property")
+    String customizedProperty
 
     @Id
     public Long getId() {
@@ -42,5 +47,10 @@ class DummyUserDetails {
     DummyUserDetails withAddresses(DummyAddress... dummyAddress) {
         this.addressList.addAll(dummyAddress)
         this
+    }
+
+    @PropertyName("Customized Property")
+    String getCustomizedProperty() {
+        return customizedProperty
     }
 }

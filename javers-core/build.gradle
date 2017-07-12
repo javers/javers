@@ -31,7 +31,7 @@ configurations {
 }
 
 artifacts {
-    archives javadocJar, sourceJar, testJar
+    archives testJar
 }
 
 artifacts {

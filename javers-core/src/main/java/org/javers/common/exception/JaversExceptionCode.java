@@ -14,6 +14,8 @@ public enum JaversExceptionCode {
 
     ENTITY_WITHOUT_ID ("Class '%s' mapped as Entity has no Id property. Use @Id annotation to mark unique and not-null Entity identifier"),
 
+    SHALLOW_REF_ENTITY_WITHOUT_ID ("Class '%s' mapped as ShallowReference Entity has no Id property. Use @Id annotation to mark unique and not-null Entity identifier"),
+
     ENTITY_INSTANCE_WITH_NULL_ID("Found Entity instance '%s' with null idProperty '%s'"),
 
     NOT_INSTANCE_OF(JaversException.BOOTSTRAP_ERROR + "expected instance of '%s', got instance of '%s'"),
@@ -27,6 +29,10 @@ public enum JaversExceptionCode {
     ALREADY_BUILT(JaversException.BOOTSTRAP_ERROR + "instance already built, each AbstractContainerBuilder may produce only one target instance"),
 
     PROPERTY_ACCESS_ERROR("error getting value from property '%s' on target object of type '%s', cause: %s"),
+
+    PROPERTY_SETTING_ERROR("error setting '%s' value to property '%s', cause: %s"),
+
+    SETTER_INVOCATION_ERROR("error invoking setter '%s' on target object of type '%s', cause: %s"),
 
     CONTAINER_NOT_READY(JaversException.BOOTSTRAP_ERROR +"pico container is not ready"),
 
@@ -44,6 +50,8 @@ public enum JaversExceptionCode {
     SNAPSHOT_STATE_VIOLATION("snapshots are immutable"),
 
     PROPERTY_NOT_FOUND("property '%s' not found in class '%s'"),
+
+    SETTER_NOT_FOUND("setter for getter '%s' not found in class '%s'"),
 
     /** @since 1.4 */
     TYPE_NAME_NOT_FOUND(

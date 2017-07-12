@@ -1,12 +1,10 @@
 ﻿﻿
-![javers-black-logo-1.0.png](javers-black-logo-1.0.png)
+![logotype.svg](https://javers.org/img/logotype.svg)
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core)<br/>
+[![Build Status](https://travis-ci.org/javers/javers.svg?branch=master)](https://travis-ci.org/javers/javers/)
 
 ## What is JaVers
-
-[![Build Status](https://travis-ci.org/javers/javers.svg?branch=master)](https://travis-ci.org/javers/javers/)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core)
-[![Join the chat at https://gitter.im/javers/javers](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/javers/javers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Ideal for contribution](https://badge.waffle.io/javers/javers.svg?label=ideal%20for%20contribution&title=Ideal for contribution)](http://waffle.io/javers/javers)
 
 JaVers is the lightweight Java library for **auditing** changes in your data.
 

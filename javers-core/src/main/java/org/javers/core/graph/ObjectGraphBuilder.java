@@ -2,7 +2,6 @@ package org.javers.core.graph;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +72,7 @@ class ObjectGraphBuilder {
     }
 
     private void buildSingleEdges(ObjectNode node) {
-        for (Property singleRef : getSingleReferencesWithManagedTypes(node.getManagedType())) {
+        for (JaversProperty singleRef : getSingleReferencesWithManagedTypes(node.getManagedType())) {
             if (node.isNull(singleRef)) {
                 continue;
             }
@@ -85,8 +84,8 @@ class ObjectGraphBuilder {
     }
 
     private void buildMultiEdges(ObjectNode node) {
-        for (Property containerProperty : getNonEmptyEnumerablesWithManagedTypes(node))  {
-            EnumerableType enumerableType = typeMapper.getPropertyType(containerProperty);
+        for (JaversProperty containerProperty : getNonEmptyEnumerablesWithManagedTypes(node))  {
+            EnumerableType enumerableType = containerProperty.getType();
 
             //looks like we have Container or Map with Entity references or Value Objects
             MultiEdge multiEdge = edgeBuilder.createMultiEdge(containerProperty, enumerableType, node);
@@ -102,21 +101,16 @@ class ObjectGraphBuilder {
         built = true;
     }
 
-    private List<Property> getSingleReferencesWithManagedTypes(ManagedType managedType) {
-        return managedType.getProperties(property -> {
-            JaversType javersType = typeMapper.getPropertyType(property);
-
-            return javersType instanceof ManagedType;
-        });
+    private List<JaversProperty> getSingleReferencesWithManagedTypes(ManagedType managedType) {
+        return managedType.getProperties(property -> property.getType() instanceof ManagedType);
     }
 
-    private List<Property> getNonEmptyEnumerablesWithManagedTypes(final ObjectNode node) {
+    private List<JaversProperty> getNonEmptyEnumerablesWithManagedTypes(final ObjectNode node) {
         return node.getManagedType().getProperties(property -> {
-            JaversType javersType = typeMapper.getPropertyType(property);
-            if (!(javersType instanceof EnumerableType)) {
+            if (!(property.getType() instanceof EnumerableType)) {
                 return false;
             }
-            EnumerableType enumerableType = (EnumerableType) javersType;
+            EnumerableType enumerableType = property.getType();
 
             Object container = node.getPropertyValue(property);
             if (enumerableType.isEmpty(container)) {
@@ -126,42 +120,9 @@ class ObjectGraphBuilder {
             if (node.isNull(property)) {
                 return false;
             }
-            return (isContainerOfManagedTypes(enumerableType) ||
-                isMapWithManagedTypes(enumerableType)
+            return (typeMapper.isContainerOfManagedTypes(enumerableType) ||
+                    typeMapper.isKeyValueTypeWithManagedTypes(enumerableType)
             );
         });
-    }
-
-    /**
-     * is Set, List or Array of ManagedClasses
-     */
-    private boolean isContainerOfManagedTypes(JaversType javersType){
-        if (! (javersType instanceof ContainerType)) {
-            return false;
-        }
-
-        return isItemManagedType((ContainerType) javersType);
-    }
-
-    private boolean isItemManagedType(ContainerType containerType){
-        return typeMapper.getJaversType(containerType.getItemType()) instanceof ManagedType;
-    }
-
-    /**
-     * is Map (or Multimap) with ManagedClass on Key or Value position
-     */
-    private boolean isMapWithManagedTypes(EnumerableType enumerableType) {
-        if (enumerableType instanceof KeyValueType){
-            KeyValueType mapType = (KeyValueType)enumerableType;
-
-            JaversType keyType = typeMapper.getJaversType(mapType.getKeyType());
-            JaversType valueType = typeMapper.getJaversType(mapType.getValueType());
-
-            return keyType instanceof ManagedType || valueType instanceof ManagedType;
-     } else{
-            return false;
-        }
-
-
     }
 }

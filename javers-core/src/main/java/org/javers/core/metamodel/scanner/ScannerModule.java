@@ -16,7 +16,6 @@ import java.util.Collection;
 public class ScannerModule extends LateInstantiatingModule {
     private static final Logger logger = LoggerFactory.getLogger(ScannerModule.class);
 
-
     public ScannerModule(JaversCoreConfiguration configuration, MutablePicoContainer container) {
         super(configuration, container);
     }
@@ -35,7 +34,6 @@ public class ScannerModule extends LateInstantiatingModule {
         } else{
             throw new RuntimeException("not implementation for "+mappingStyle);
         }
-
 
         return (Collection) Lists.asList(
                 ClassScanner.class,

@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapshotState;
-import static org.javers.core.metamodel.object.SnapshotType.INITIAL;
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE;
 
 /**
@@ -30,12 +29,12 @@ public class CdoSnapshotBuilder {
     private CdoSnapshotBuilder() {
     }
 
-    public static CdoSnapshot emptyCopyOf(CdoSnapshot snapshot){
+    public static CdoSnapshotBuilder emptyCopyOf(CdoSnapshot snapshot){
         return cdoSnapshot()
                 .withGlobalId(snapshot.getGlobalId())
                 .withManagedType(snapshot.getManagedType())
                 .withCommitMetadata(snapshot.getCommitMetadata())
-                .withType(snapshot.getType()).build();
+                .withType(snapshot.getType());
     }
 
     public static CdoSnapshotBuilder cdoSnapshot() {
@@ -78,7 +77,7 @@ public class CdoSnapshotBuilder {
         }
 
         if (markAllAsChanged){
-            changed = new ArrayList<>(state.getProperties());
+            changed = new ArrayList<>(state.getPropertyNames());
         }
 
         return new CdoSnapshot(globalId, commitMetadata, state, type, changed, managedType, version);

@@ -68,6 +68,9 @@ public class Sets {
         return new HashSet<>(elements);
     }
 
+    /**
+     * @return ImmutableSet
+     */
     public static <F, T> Set<T> transform(Set<F> input, Function<F, T> transformation) {
         Validate.argumentsAreNotNull(input, transformation);
         return input.stream().map(transformation::apply).collect(toImmutableSet());

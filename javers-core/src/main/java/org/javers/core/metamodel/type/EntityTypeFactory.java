@@ -3,7 +3,7 @@ package org.javers.core.metamodel.type;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.metamodel.clazz.EntityDefinition;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.scanner.ClassScan;
 
 /**
  * @author bartosz.walacik
@@ -15,14 +15,14 @@ class EntityTypeFactory {
         this.managedClassFactory = managedClassFactory;
     }
 
-    EntityType createEntity(EntityDefinition definition) {
-        ManagedClass managedClass = managedClassFactory.create(definition);
+    EntityType createEntity(EntityDefinition definition, ClassScan scan) {
+        ManagedClass managedClass = managedClassFactory.create(definition, scan);
 
-        Property idProperty;
+        JaversProperty idProperty;
         if (definition.hasCustomId()) {
             idProperty = managedClass.getProperty(definition.getIdPropertyName());
         } else {
-            idProperty = findDefaultIdProperty(managedClass);
+            idProperty = findDefaultIdProperty(managedClass, definition.isShallowReference());
         }
 
         if (definition.isShallowReference()) {
@@ -35,9 +35,12 @@ class EntityTypeFactory {
     /**
      * @throws JaversException ENTITY_WITHOUT_ID
      */
-    private Property findDefaultIdProperty(ManagedClass managedClass) {
+    private JaversProperty findDefaultIdProperty(ManagedClass managedClass, boolean isShallowReference) {
         if (managedClass.getLooksLikeId().isEmpty()) {
-            throw new JaversException(JaversExceptionCode.ENTITY_WITHOUT_ID, managedClass.getBaseJavaClass().getName());
+            JaversExceptionCode code = isShallowReference ?
+                    JaversExceptionCode.SHALLOW_REF_ENTITY_WITHOUT_ID :
+                    JaversExceptionCode.ENTITY_WITHOUT_ID;
+            throw new JaversException(code, managedClass.getBaseJavaClass().getName());
         }
         return managedClass.getLooksLikeId().get(0);
     }

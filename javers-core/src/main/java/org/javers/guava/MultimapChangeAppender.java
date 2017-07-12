@@ -12,7 +12,6 @@ import org.javers.core.metamodel.object.DehydrateMapFunction;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
 import java.util.ArrayList;
@@ -54,11 +53,11 @@ class MultimapChangeAppender extends CorePropertyChangeAppender<MapChange>{
     }
 
     @Override
-    public MapChange calculateChanges(NodePair pair, Property property){
+    public MapChange calculateChanges(NodePair pair, JaversProperty property){
         Multimap left =  (Multimap)pair.getLeftPropertyValue(property);
         Multimap right = (Multimap)pair.getRightPropertyValue(property);
 
-        MultimapType multimapType = typeMapper.getPropertyType(property);
+        MultimapType multimapType = ((JaversProperty) property).getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
 
         List<EntryChange> entryChanges = calculateChanges(multimapType, left, right, owner);

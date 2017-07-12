@@ -2,6 +2,7 @@ package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
@@ -28,13 +29,13 @@ public abstract class CorePropertyChangeAppender<T extends PropertyChange> imple
         return LOW_PRIORITY;
     }
 
-    protected void renderNotParametrizedWarningIfNeeded(Type parameterType, String parameterName, String colType, Property property){
+    protected void renderNotParametrizedWarningIfNeeded(Type parameterType, String parameterName, String colType, JaversProperty property){
         if (parameterType == DEFAULT_TYPE_PARAMETER){
             printNotParametrizedWarning(parameterName, colType, property);
         }
     }
 
-    private void printNotParametrizedWarning(String parameterName, String colType, Property property) {
+    private void printNotParametrizedWarning(String parameterName, String colType, JaversProperty property) {
         logger.warn("Unknown {} type in {} property: {}. Defaulting to {}, see {}.{}",
                 parameterName,
                 colType,

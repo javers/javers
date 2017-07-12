@@ -11,11 +11,12 @@ import org.javers.core.metamodel.type.CollectionType;
 import org.javers.core.metamodel.type.SetType;
 
 import java.lang.reflect.Type;
+import java.util.function.Function;
 
 /**
  * @author akrystian
  */
-public class MultisetType extends CollectionType{
+public class MultisetType extends CollectionType {
 
     public static MultisetType getInstance(){
         return  new MultisetType(Multiset.class);
@@ -25,10 +26,13 @@ public class MultisetType extends CollectionType{
         super(baseJavaType);
     }
 
+    /**
+     * @return immutable Multiset
+     */
     @Override
-    public Object map(Object sourceMultiset_, EnumerableFunction mapFunction, OwnerContext owner) {
+    public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentIsNotNull(mapFunction);
-        Multiset sourceMultiset = toNotNullMultiset(sourceMultiset_);
+        Multiset sourceMultiset = toNotNullMultiset(sourceEnumerable);
         Multiset targetMultiset = HashMultiset.create();
 
         EnumerationAwareOwnerContext enumeratorContext = new EnumerationAwareOwnerContext(owner, true);
@@ -36,6 +40,25 @@ public class MultisetType extends CollectionType{
             targetMultiset.add(mapFunction.apply(sourceVal, enumeratorContext));
         }
         return Multisets.unmodifiableMultiset(targetMultiset);
+    }
+
+    /**
+     * Nulls are filtered
+     */
+    @Override
+    public Object map(Object sourceEnumerable, Function mapFunction) {
+        Validate.argumentIsNotNull(mapFunction);
+        Multiset sourceMultiset = toNotNullMultiset(sourceEnumerable);
+        Multiset targetMultiset = HashMultiset.create();
+
+        for (Object sourceVal : sourceMultiset) {
+            Object mappedVale = mapFunction.apply(sourceVal);
+            if (mappedVale == null) continue;
+
+            targetMultiset.add(mappedVale);
+        }
+
+        return targetMultiset;
     }
 
     private Multiset toNotNullMultiset(Object sourceSet) {

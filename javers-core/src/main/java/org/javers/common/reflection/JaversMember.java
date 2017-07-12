@@ -1,6 +1,6 @@
 package org.javers.common.reflection;
 
-import java.util.Optional;
+import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 
 import java.lang.annotation.Annotation;
@@ -8,6 +8,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -24,14 +25,21 @@ import java.util.Set;
 public abstract class JaversMember<T extends Member> {
     private final T rawMember; //delegate
     private final Optional<Type> resolvedReturnType;
+    private final boolean looksLikeId;
 
     /**
      * @param resolvedReturnType nullable
      */
-    public JaversMember(T rawMember, Type resolvedReturnType) {
+    protected JaversMember(T rawMember, Type resolvedReturnType) {
+        this(rawMember, resolvedReturnType, ReflectionUtil.looksLikeId(rawMember));
+    }
+
+    protected JaversMember(final T rawMember, final Type resolvedReturnType, final boolean looksLikeId) {
         Validate.argumentIsNotNull(rawMember);
         this.rawMember = rawMember;
         this.resolvedReturnType = Optional.ofNullable(resolvedReturnType);
+        this.looksLikeId = looksLikeId;
+        setAccessibleIfNecessary(rawMember);
     }
 
     protected abstract Type getRawGenericType();
@@ -61,45 +69,30 @@ public abstract class JaversMember<T extends Member> {
         return rawMember.getName();
     }
 
-    public boolean hasAnyAnnotation(Set<String> annotationNames){
-        for (String annotationName : annotationNames){
-            if (isAnnotationPresent(annotationName)) {
-                return true;
-            }
-        }
-        return false;
+    public Set<Annotation> getAnnotations() {
+        return ReflectionUtil.getAnnotations(rawMember);
     }
 
-    public boolean isAnnotationPresent(String annotationName){
-        Validate.argumentsAreNotNull(annotationName);
-
-        if (contains(( (AccessibleObject)rawMember).getAnnotations(), annotationName)) {
-            return true;
-        }
-
-        return false;
+    public Set<Class<? extends Annotation>> getAnnotationTypes() {
+        return Sets.transform(getAnnotations(), ann -> ann.annotationType());
     }
 
-    public abstract Object invokeEvenIfPrivate(Object target);
+    public boolean looksLikeId() {
+        return looksLikeId;
+    }
 
-    protected void setAccessibleIfNecessary() {
-        if(!isPublic(rawMember))
-        {
+    public abstract Object getEvenIfPrivate(Object target);
+
+    public abstract void setEvenIfPrivate(Object target, Object value);
+
+    void setAccessibleIfNecessary(Member rawMember) {
+        if(!isPublic(rawMember)) {
             ((AccessibleObject)rawMember).setAccessible(true); //that's Java Reflection API ...
         }
     }
 
     private boolean isPublic(Member member){
-        return Modifier.isPublic(member.getModifiers());
-    }
-
-    private static boolean contains(Annotation[] annotations, String annotationName) {
-        for (Annotation a : annotations){
-            if (a.annotationType().getSimpleName().equals(annotationName)){
-                return true;
-            }
-        }
-        return false;
+        return Modifier.isPublic(member.getModifiers()) && Modifier.isPublic(member.getDeclaringClass().getModifiers());
     }
 
     @Override

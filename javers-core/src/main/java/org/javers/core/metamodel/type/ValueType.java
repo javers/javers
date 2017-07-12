@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.core.JaversBuilder;
+import org.javers.core.diff.custom.CustomValueComparator;
 import org.javers.core.json.JsonTypeAdapter;
 
 import java.lang.reflect.Type;
@@ -33,7 +34,7 @@ public class ValueType extends PrimitiveOrValueType {
         super(baseJavaType);
     }
 
-    ValueType(Class<?> baseJavaClass) {
-        super(baseJavaClass);
+    ValueType(Type baseJavaType, CustomValueComparator customValueComparator) {
+        super(baseJavaType, customValueComparator);
     }
 }

@@ -7,6 +7,10 @@ import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static org.javers.common.collections.Collections.wrapNull;
 
 /**
  * @author bartosz walacik
@@ -22,19 +26,28 @@ public class CollectionType extends ContainerType {
         return collection == null || ((Collection)collection).isEmpty();
     }
 
+    /**
+     * @return immutable Set
+     */
     @Override
-    public Object map(Object sourceCol_, EnumerableFunction mapFunction, OwnerContext owner) {
-        Validate.argumentIsNotNull(mapFunction);
-        Collection<?> sourceCol = (Collection) sourceCol_;
-        if (sourceCol == null || sourceCol.isEmpty()) {
-            return Collections.emptySet();
-        }
-
+    public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
+        Validate.argumentsAreNotNull(mapFunction, owner);
+        Collection sourceCol = wrapNull(sourceEnumerable);
         Set targetSet = new HashSet(sourceCol.size());
-        EnumerationAwareOwnerContext enumerationContext = new EnumerationAwareOwnerContext(owner);
+
+        EnumerationAwareOwnerContext enumerationContext = new EnumerationAwareOwnerContext(owner, true);
         for (Object sourceVal : sourceCol) {
             targetSet.add(mapFunction.apply(sourceVal, enumerationContext));
         }
         return Collections.unmodifiableSet(targetSet);
+    }
+
+    /**
+     * Nulls are filtered
+     */
+    @Override
+    public Object map(Object sourceEnumerable, Function mapFunction) {
+        Collection sourceCol = wrapNull(sourceEnumerable);
+        return sourceCol.stream().map(mapFunction).filter(it -> it != null).collect(Collectors.toSet());
     }
 }

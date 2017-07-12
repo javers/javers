@@ -2,11 +2,14 @@ package org.javers.core.metamodel.object;
 
 import org.javers.common.collections.Arrays;
 import org.javers.common.collections.Defaults;
+import org.javers.common.collections.Lists;
 import org.javers.common.collections.Sets;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 /**
  * @author bartosz walacik
@@ -46,8 +49,16 @@ public class CdoSnapshotState {
         return !properties.containsKey(propertyName);
     }
 
-    public Set<String> getProperties() {
+    public Set<String> getPropertyNames() {
         return Collections.unmodifiableSet(properties.keySet());
+    }
+
+    public <R> List<R> mapProperties(BiFunction<String, Object, R> mapper) {
+        return Lists.transform(properties.entrySet(), entry -> mapper.apply(entry.getKey(), entry.getValue()));
+    }
+
+    public void forEachProperty(BiConsumer<String, Object> consumer) {
+        properties.entrySet().forEach(entry -> consumer.accept(entry.getKey(), entry.getValue()));
     }
 
     @Override

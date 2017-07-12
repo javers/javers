@@ -8,6 +8,8 @@ import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 import static java.util.Collections.unmodifiableList;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -15,9 +17,9 @@ import static org.javers.core.metamodel.object.SnapshotType.INITIAL;
 import static org.javers.core.metamodel.object.SnapshotType.TERMINAL;
 
 /**
- * Captured state of client's domain object.
- * Values and primitives are stored 'by value',
- * referenced Entities and ValueObjects are stored 'by reference' using {@link GlobalId}
+ * Historical state of a domain object captured as the property->value Map.
+ * Values and primitives are stored 'by value'.
+ * Referenced Entities and ValueObjects are stored 'by reference' using {@link GlobalId}
  *
  * @author bartosz walacik
  */
@@ -89,6 +91,7 @@ public final class CdoSnapshot extends Cdo {
 
     @Override
     public boolean isNull(Property property) {
+        Validate.argumentIsNotNull(property);
         return state.isNull(property.getName());
     }
 
@@ -111,6 +114,14 @@ public final class CdoSnapshot extends Cdo {
 
     public CdoSnapshotState getState() {
         return state;
+    }
+
+    <R> List<R> mapProperties(BiFunction<String, Object, R> mapper) {
+        return getState().mapProperties(mapper);
+    }
+
+    void forEachProperty(BiConsumer<String, Object> consumer) {
+        getState().forEachProperty(consumer);
     }
 
     public boolean isInitial() {

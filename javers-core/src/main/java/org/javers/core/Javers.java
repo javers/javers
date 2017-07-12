@@ -1,16 +1,11 @@
 package org.javers.core;
 
-import java.util.Optional;
 import org.javers.core.changelog.ChangeProcessor;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.diff.changetype.ReferenceChange;
-import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
@@ -19,11 +14,14 @@ import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
+import org.javers.repository.jql.ShadowScope;
+import org.javers.shadow.Shadow;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -168,12 +166,38 @@ public interface Javers {
     Diff initial(Object newDomainObject);
 
     /**
-     * Queries JaversRepository for changes history (diff sequence) of given class, object or property.<br/>
-     * There are various types of changes: {@link ValueChange}, {@link ReferenceChange}, {@link ListChange}, {@link NewObject} and so on. <br/>
-     * See {@link Change} class hierarchy.
+     * Queries JaversRepository for object Shadows. <br/>
+     * Shadow is a historical version of a domain object restored from a snapshot.
      * <br/><br/>
      *
-     * Resulting List is ordered in reverse chronological order.
+     * For example, to get latest Shadows of "bob" Person, call:
+     * <pre>
+     * List<Shadow> shadows = javers.findShadows( QueryBuilder.byInstanceId("bob", Person.class).limit(5).build() );
+     * </pre>
+     *
+     * Since Shadows are instances of your domain classes,
+     * you can use them directly in your application:
+     *
+     * <pre>
+     * assert shadows.get(0).get() instanceof Person.class;
+     * </pre>
+     *
+     * Choose between shallow or deep shadows using {@link QueryBuilder#withShadowScope(ShadowScope)},
+     * default is {@link ShadowScope#SHALLOW}
+     * <br/><br/>
+     *
+     * For more query examples, see {@link #findChanges(JqlQuery)} method.
+     *
+     * @return A list ordered in reverse chronological order. Empty if nothing found.
+     * @param <T> type of a domain object
+     * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
+     * @since 3.2
+     */
+    <T> List<Shadow<T>> findShadows(JqlQuery query);
+
+    /**
+     * Queries JaversRepository for changes history (diff sequence) of a given class, object or property.<br/>
+     * There are various types of changes. See {@link Change} class hierarchy.
      * <br/><br/>
      *
      * <b>Querying for Entity changes by instance Id</b><br/><br/>
@@ -218,29 +242,26 @@ public interface Javers {
      * javers.findChanges( QueryBuilder.byClass(Person.class).andProperty("myProperty").build() );
      * </pre>
      *
-     * @return empty List if nothing found
+     * @return A list ordered in reverse chronological order. Empty if nothing found.
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      */
     List<Change> findChanges(JqlQuery query);
 
     /**
-     * Queries JaversRepository for object Snapshots (historical versions). <br/>
-     * Snapshot is a simple Map (property -> value) representation of your domain object.
+     * Queries JaversRepository for object Snapshots. <br/>
+     * Snapshot is a historical state of a domain object captured as the property->value Map.
      * <br/><br/>
      *
-     * Resulting List is ordered in reverse chronological order.
-     * <br/><br/>
-     *
-     * For example, to get last 5 snapshots versions of "bob" Person, call:
+     * For example, to get latest Snapshots of "bob" Person, call:
      * <pre>
      * javers.findSnapshots( QueryBuilder.byInstanceId("bob", Person.class).limit(5).build() );
      * </pre>
      *
      * For more query examples, see {@link #findChanges(JqlQuery)} method.
-     * Both methods use Javers Query Language (JQL).
-     * So you can use the same query object to get changes and snapshots views.
+     * <br/>
+     * Use the same JqlQuery to get changes, snapshots and shadows views.
      *
-     * @return empty List if nothing found
+     * @return A list ordered in reverse chronological order. Empty if nothing found.
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      */
     List<CdoSnapshot> findSnapshots(JqlQuery query);
@@ -339,7 +360,7 @@ public interface Javers {
      * Person person = new Person("bob", "Uncle Bob");
      *
      * System.out.println("Bob's properties:");
-     * for (Property p : jType.getProperties()){
+     * for (Property p : jType.getPropertyNames()){
      *     Object value = p.get(person);
      *     System.out.println( "property:" + p.getName() + ", value:" + value );
      * }

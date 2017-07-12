@@ -3,7 +3,7 @@ package org.javers.core.graph;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 
 /**
  * @author bartosz.walacik
@@ -11,7 +11,7 @@ import org.javers.core.metamodel.property.Property;
 class ShallowSingleEdge extends AbstractSingleEdge {
     private final Cdo reference;
 
-    ShallowSingleEdge(Property property, Cdo referencedObject) {
+    ShallowSingleEdge(JaversProperty property, Cdo referencedObject) {
         super(property);
         Validate.argumentIsNotNull(referencedObject);
         this.reference = referencedObject;

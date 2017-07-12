@@ -10,7 +10,7 @@ import org.javers.core.metamodel.object.DehydrateContainerFunction;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.SetType;
 import org.javers.core.metamodel.type.TypeMapper;
@@ -60,11 +60,11 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
     }
 
     @Override
-    public SetChange calculateChanges(NodePair pair, Property property) {
+    public SetChange calculateChanges(NodePair pair, JaversProperty property) {
         Set leftValues = (Set) pair.getLeftPropertyValue(property);
         Set rightValues = (Set) pair.getRightPropertyValue(property);
 
-        SetType setType = typeMapper.getPropertyType(property);
+        SetType setType = ((JaversProperty) property).getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
         List<ContainerElementChange> entryChanges =
                 calculateEntryChanges(setType, leftValues, rightValues, owner);

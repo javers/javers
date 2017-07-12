@@ -4,6 +4,7 @@ import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
+import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -90,8 +91,11 @@ class TypeMapperState {
         computeIfAbsent(javaType, ignored -> jType);
     }
 
-    void computeIfAbsent(final ClientsClassDefinition def) {
-        computeIfAbsent(def.getBaseJavaClass(), ignored -> typeFactory.create(def));
+    void register(final ClientsClassDefinition def) {
+        Type javaType = def.getBaseJavaClass();
+        JaversType newType = typeFactory.create(def);
+
+        addFullMapping(javaType, newType);
     }
 
     //synchronizes on map Key (javaType) only for map writes
@@ -108,30 +112,13 @@ class TypeMapperState {
 
             addFullMapping(javaType, newType);
 
-            inferIdPropertyTypeForEntityIfNeed(newType);
-
             return newType;
         }
     }
 
-    /**
-     * if type of given id-property is not already mapped, maps it as ValueType
-     * <p/>
-     * must be called within synchronized block
-     */
-    private void inferIdPropertyTypeForEntityIfNeed(JaversType jType) {
-        argumentIsNotNull(jType);
-        if (jType instanceof EntityType) {
-            EntityType entityType = (EntityType) jType;
-            Type idType = entityType.getIdPropertyGenericType();
-            addFullMapping(idType, typeFactory.inferIdPropertyTypeAsValue(idType));
-        }
-    }
-
-    /**
-     * must be called within synchronized block
-     */
     private void addFullMapping(Type javaType, JaversType newType){
+        Validate.argumentsAreNotNull(javaType, newType);
+
         putToMap(javaType, newType);
 
         if (newType instanceof ManagedType){
@@ -139,6 +126,18 @@ class TypeMapperState {
             mappedTypeNames.put(new DuckType(managedType.getName()), ReflectionUtil.extractClass(javaType));
             mappedTypeNames.put(new DuckType(managedType), ReflectionUtil.extractClass(javaType));
         }
+
+        if (newType instanceof EntityType) {
+            inferIdPropertyTypeForEntity((EntityType) newType);
+        }
+    }
+
+    /**
+     * maps type of given Entity's id-property as ValueType
+     */
+    private void inferIdPropertyTypeForEntity(EntityType entityType) {
+        Type idType = entityType.getIdPropertyGenericType();
+        addFullMapping(idType, typeFactory.inferIdPropertyTypeAsValue(idType));
     }
 
     /**

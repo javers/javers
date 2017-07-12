@@ -14,10 +14,7 @@ import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.PrimitiveType;
-import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.metamodel.type.ValueType;
+import org.javers.core.metamodel.type.*;
 
 import java.util.*;
 
@@ -130,21 +127,21 @@ public class DiffFactory {
 
     /* Node scope appender */
     private void appendPropertyChanges(DiffBuilder diff, NodePair pair, final Optional<CommitMetadata> commitMetadata) {
-        List<Property> nodeProperties = pair.getProperties();
-        for (Property property : nodeProperties) {
+        List<JaversProperty> nodeProperties = pair.getProperties();
+        for (JaversProperty property : nodeProperties) {
 
             //optimization, skip all appenders if null on both sides
             if (pair.isNullOnBothSides(property)) {
                 continue;
             }
 
-            JaversType javersType = typeMapper.getPropertyType(property);
+            JaversType javersType = property.getType();
 
             appendChanges(diff, pair, property, javersType, commitMetadata);
         }
     }
 
-    private void appendChanges(DiffBuilder diff, NodePair pair, Property property, JaversType javersType, Optional<CommitMetadata> commitMetadata) {
+    private void appendChanges(DiffBuilder diff, NodePair pair, JaversProperty property, JaversType javersType, Optional<CommitMetadata> commitMetadata) {
         for (PropertyChangeAppender appender : propertyChangeAppender) {
             if (! appender.supports(javersType)){
                 continue;

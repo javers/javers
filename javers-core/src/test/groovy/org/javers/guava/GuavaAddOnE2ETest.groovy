@@ -153,8 +153,8 @@ class GuavaAddOnE2ETest extends Specification {
 
     def "should detect value changes in Multimap of ValueObjects "() {
         given:
-        def left = new SnapshotEntity(multimapPrimitiveToValueObject: HashMultimap.create(leftList))
-        def right = new SnapshotEntity(multimapPrimitiveToValueObject: HashMultimap.create(rightList))
+        def left = new SnapshotEntity(multimapPrimitiveToValueObject: leftMultimap)
+        def right = new SnapshotEntity(multimapPrimitiveToValueObject: rightMultimap)
 
         when:
         def diff = javers.compare(left, right)
@@ -165,7 +165,7 @@ class GuavaAddOnE2ETest extends Specification {
         actualContainerChanges[0].entryChanges.size() == expectedContainerChanges
 
         where:
-        leftList << [
+        leftMultimap << [
                 MultimapBuilder.create(["NY": [new DummyAddress("City")]]),
                 MultimapBuilder.create(["NY": [new DummyAddress("City")]]),
                 HashMultimap.create(),
@@ -173,8 +173,8 @@ class GuavaAddOnE2ETest extends Specification {
                                                new DummyAddress("Buffalo"),
                                                new DummyAddress("London")]]),
         ]
-        rightList << [MultimapBuilder.create(["NY": [new DummyAddress("Buffalo")]]),
-                      MultimapBuilder.create(["NY": [new DummyAddress("City"),
+        rightMultimap << [MultimapBuilder.create(["NY": [new DummyAddress("Buffalo")]]),
+                          MultimapBuilder.create(["NY": [new DummyAddress("City"),
                                                      new DummyAddress("Buffalo"),
                                                      new DummyAddress("London")]]),
                       MultimapBuilder.create(["NY": [new DummyAddress("City")]]),

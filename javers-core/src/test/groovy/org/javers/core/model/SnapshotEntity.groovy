@@ -2,6 +2,8 @@ package org.javers.core.model
 
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multiset
+import groovy.transform.EqualsAndHashCode
+
 import java.time.LocalDate
 
 import javax.persistence.Id
@@ -9,20 +11,21 @@ import javax.persistence.Id
 /**
  * @author bartosz walacik
  */
+@EqualsAndHashCode
 class SnapshotEntity {
 
     @Id
     int id = 1
 
-    public enum DummyEnum { val1, val2, val3 }
+    enum DummyEnum { val1, val2, val3 }
 
     LocalDate dob
 
     int intProperty
 
-    SnapshotEntity entityRef
+    private SnapshotEntity entityRef
 
-    DummyAddress valueObjectRef
+    private DummyAddress valueObjectRef
 
     Integer[] arrayOfIntegers
     int[] arrayOfInts
@@ -34,6 +37,7 @@ class SnapshotEntity {
     List<LocalDate> listOfDates
     List<SnapshotEntity> listOfEntities
     List<DummyAddress> listOfValueObjects
+    List<Object> polymorficList
 
     Set<Integer> setOfIntegers
     Set<LocalDate> setOfDates
@@ -72,5 +76,13 @@ class SnapshotEntity {
     @Id
     int getId() {
         id
+    }
+
+    SnapshotEntity getEntityRef() {
+        entityRef
+    }
+
+    void setEntityRef(SnapshotEntity entityRef) {
+        this.entityRef = entityRef
     }
 }

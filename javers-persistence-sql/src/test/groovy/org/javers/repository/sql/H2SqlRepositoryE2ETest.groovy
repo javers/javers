@@ -1,14 +1,14 @@
 package org.javers.repository.sql
 
 import org.javers.core.model.SnapshotEntity
-import org.javers.repository.jql.QueryBuilder
+
 import java.sql.Connection
 import java.sql.DriverManager
 
 class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
 
     Connection createConnection() {
-        DriverManager.getConnection( "jdbc:h2:mem:test" )
+        DriverManager.getConnection("jdbc:h2:mem:test")
     }
 
     DialectName getDialect() {
@@ -19,18 +19,27 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
         return null
     }
 
-    def "should persist over 100 snapshots with proper sequence of primary keys"() {
+    /**
+     * see https://github.com/javers/javers/issues/532
+     */
+    def "should evict sequence allocation cache"() {
         given:
-        (150..1).each{
+        (1..50).each {
             javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
         }
 
         when:
-        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).limit(150).build()
-        def snapshots = javers.findSnapshots(query)
-        def intPropertyValues = snapshots.collect { it.getPropertyValue("intProperty") }
+        clearTables()
+        execute("alter sequence  ${schemaPrefix()}jv_commit_pk_seq restart with 1")
+        execute("alter sequence  ${schemaPrefix()}jv_global_id_pk_seq restart with 1")
+        execute("alter sequence  ${schemaPrefix()}jv_snapshot_pk_seq restart with 1")
+        def sqlRepository = (JaversSqlRepository) repository
+        sqlRepository.evictSequenceAllocationCache()
+        sqlRepository.evictCache()
 
         then:
-        intPropertyValues == 1..150
+        (1..150).each {
+            javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
+        }
     }
 }

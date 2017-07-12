@@ -9,12 +9,12 @@ import org.javers.core.metamodel.object.DehydrateMapFunction;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
 
 /**
@@ -47,11 +47,11 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
     }
 
     @Override
-    public MapChange calculateChanges(NodePair pair, Property property) {
+    public MapChange calculateChanges(NodePair pair, JaversProperty property) {
         Map leftRawMap =  (Map)pair.getLeftPropertyValue(property);
         Map rightRawMap = (Map)pair.getRightPropertyValue(property);
 
-        MapType mapType = typeMapper.getPropertyType(property);
+        MapType mapType = ((JaversProperty) property).getType();
         MapContentType mapContentType = typeMapper.getMapContentType(mapType);
 
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
@@ -77,17 +77,13 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
         Map leftMap =  MapType.mapStatic(leftRawMap, dehydrateFunction, owner);
         Map rightMap = MapType.mapStatic(rightRawMap, dehydrateFunction, owner);
 
-        if (Objects.equals(leftMap, rightMap)) {
-            return Collections.emptyList();
-        }
-
         List<EntryChange> changes = new ArrayList<>();
 
         for (Object commonKey : Maps.commonKeys(leftMap, rightMap)) {
             Object leftVal  = leftMap.get(commonKey);
             Object rightVal = rightMap.get(commonKey);
 
-            if (!Objects.equals(leftVal, rightVal)){
+            if (!mapContentType.getValueType().equals(leftVal, rightVal)){
                 changes.add( new EntryValueChange(commonKey, leftVal, rightVal));
             }
         }

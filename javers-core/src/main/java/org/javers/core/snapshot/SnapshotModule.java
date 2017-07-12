@@ -19,10 +19,9 @@ public class SnapshotModule extends InstantiatingModule {
         return (Collection) Lists.asList(
                 SnapshotFactory.class,
                 ObjectHasher.class,
-                GraphSnapshotFacade.class,
-                GraphSnapshotFactory.class,
                 SnapshotDiffer.class,
-                GraphShadowFactory.class
+                SnapshotGraphFactory.class,
+                ChangedCdoSnapshotsFactory.class
         );
     }
 }

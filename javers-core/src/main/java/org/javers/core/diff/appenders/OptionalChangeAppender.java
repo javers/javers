@@ -7,7 +7,6 @@ import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
 import java.util.Objects;
@@ -34,9 +33,9 @@ public class OptionalChangeAppender extends CorePropertyChangeAppender<PropertyC
     }
 
     @Override
-    public PropertyChange calculateChanges(NodePair pair, Property property) {
+    public PropertyChange calculateChanges(NodePair pair, JaversProperty property) {
 
-        OptionalType optionalType = typeMapper.getPropertyType(property);
+        OptionalType optionalType = ((JaversProperty) property).getType();
         JaversType contentType = typeMapper.getJaversType(optionalType.getItemType());
 
         Optional leftOptional =  normalize((Optional) pair.getLeftPropertyValue(property));

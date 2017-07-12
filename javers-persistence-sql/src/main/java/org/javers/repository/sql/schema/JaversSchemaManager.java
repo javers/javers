@@ -44,6 +44,10 @@ public class JaversSchemaManager extends SchemaNameAware {
 
         alterCommitIdColumnIfNeeded(); // JaVers 2.5 to 2.6 schema migration
 
+        if(this.dialect instanceof MsSqlDialect) {
+            alterMssqlTextColumns();
+        }
+
         TheCloser.close(schemaManager, schemaInspector);
     }
 
@@ -70,6 +74,24 @@ public class JaversSchemaManager extends SchemaNameAware {
             } else {
                 handleUnsupportedDialect();
             }
+        }
+    }
+
+    /**
+     * JaVers 3.3.0 to 3.3.1 MsSql schema migration
+     *
+     * This method is needed for upgrading TEXT columns to VARCHAR(MAX) since TEXT is deprecated.
+     */
+    private void alterMssqlTextColumns() {
+        ColumnType stateColType = getTypeOf(getSnapshotTableNameWithSchema(), "state");
+        ColumnType changedPropertiesColType = getTypeOf(getSnapshotTableNameWithSchema(), "state");
+
+        if(stateColType.typeName.equals("text")) {
+            executeSQL("ALTER TABLE " + getSnapshotTableNameWithSchema() + " ALTER COLUMN state VARCHAR(MAX)");
+        }
+
+        if(changedPropertiesColType.typeName.equals("text")) {
+            executeSQL("ALTER TABLE " + getSnapshotTableNameWithSchema() + " ALTER COLUMN changed_properties VARCHAR(MAX)");
         }
     }
 
@@ -111,11 +133,12 @@ public class JaversSchemaManager extends SchemaNameAware {
             ResultSet res = stmt.executeQuery("select " + colName + " from " + tableName + " where 1<0");
             int colType = res.getMetaData().getColumnType(1);
             int colPrec = res.getMetaData().getPrecision(1);
+            String colTypeName = res.getMetaData().getColumnTypeName(1);
 
             stmt.close();
             res.close();
 
-            return new ColumnType(colType, colPrec);
+            return new ColumnType(colType, colPrec, colTypeName);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -186,10 +209,12 @@ public class JaversSchemaManager extends SchemaNameAware {
     static class ColumnType {
         final int type;
         final int precision;
+        final String typeName;
 
-        ColumnType(int type, int precision) {
+        ColumnType(int type, int precision, String typeName) {
             this.type = type;
             this.precision = precision;
+            this.typeName = typeName;
         }
     }
 }

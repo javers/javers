@@ -4,7 +4,6 @@ import org.javers.common.collections.Arrays;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
 import java.util.LinkedList;
@@ -25,18 +24,17 @@ class GlobalIdPathParser {
     }
 
     private ValueObjectType parseChildValueObjectFromPathSegments(ManagedType ownerType, LinkedList<String> segments, String path) {
-        Property property = ownerType.getProperty(segments.getFirst());
-        JaversType propertyType = typeMapper.getJaversType(property.getGenericType());
+        JaversProperty property = ownerType.getProperty(segments.getFirst());
 
-        ValueObjectType childVoType = extractChildValueObject(propertyType, path);
+        ValueObjectType childVoType = extractChildValueObject(property.getType(), path);
 
         if (segments.size() == 1 ||
-            segments.size() == 2 &&  propertyType instanceof EnumerableType){
+            segments.size() == 2 &&  property.getType() instanceof EnumerableType){
             return childVoType;
         }
 
         segments.removeFirst();
-        if (propertyType instanceof EnumerableType){
+        if (property.getType() instanceof EnumerableType){
             segments.removeFirst(); //removing segment with list index or map key
         }
 

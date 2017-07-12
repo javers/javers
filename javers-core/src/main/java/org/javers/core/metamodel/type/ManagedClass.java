@@ -1,9 +1,10 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Lists;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.property.Property;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static org.javers.common.exception.JaversExceptionCode.PROPERTY_NOT_FOUND;
@@ -16,11 +17,11 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  */
 class ManagedClass {
     private final Class<?> baseJavaClass;
-    private final Map<String, Property> propertiesByName;
-    private final List<Property> managedProperties;
-    private final List<Property> looksLikeId;
+    private final Map<String, JaversProperty> propertiesByName;
+    private final List<JaversProperty> managedProperties;
+    private final List<JaversProperty> looksLikeId;
 
-    ManagedClass(Class baseJavaClass, List<Property> allProperties, List<Property> looksLikeId) {
+    ManagedClass(Class baseJavaClass, List<JaversProperty> allProperties, List<JaversProperty> looksLikeId) {
         argumentsAreNotNull(baseJavaClass, allProperties, looksLikeId);
 
         this.baseJavaClass = baseJavaClass;
@@ -28,7 +29,7 @@ class ManagedClass {
         this.propertiesByName = new HashMap<>();
         this.looksLikeId = looksLikeId;
 
-        for (Property property : allProperties) {
+        for (JaversProperty property : allProperties) {
             if (!property.hasTransientAnn()){
                 this.managedProperties.add(property);
             }
@@ -37,17 +38,17 @@ class ManagedClass {
     }
 
     ManagedClass createShallowReference(){
-        return new ManagedClass(baseJavaClass, Collections.<Property>emptyList(), getLooksLikeId());
+        return new ManagedClass(baseJavaClass, Collections.emptyList(), getLooksLikeId());
     }
 
     /**
      * returns all managed properties
      */
-    List<Property> getManagedProperties() {
+    List<JaversProperty> getManagedProperties() {
         return Collections.unmodifiableList(managedProperties);
     }
 
-    List<Property> getLooksLikeId() {
+    List<JaversProperty> getLooksLikeId() {
         return Collections.unmodifiableList(looksLikeId);
     }
 
@@ -58,16 +59,8 @@ class ManagedClass {
     /**
      * returns managed properties subset
      */
-    List<Property> getManagedProperties(Predicate<Property> query) {
-        List<Property> retProperties = new ArrayList<>();
-
-        for (Property property : managedProperties) {
-            if (query.test(property)){
-                retProperties.add(property);
-            }
-        }
-
-        return retProperties;
+    List<JaversProperty> getManagedProperties(Predicate<JaversProperty> query) {
+        return Lists.positiveFilter(managedProperties, query);
     }
 
     /**
@@ -75,12 +68,16 @@ class ManagedClass {
      *
      * @throws JaversException PROPERTY_NOT_FOUND
      */
-    Property getProperty(String withName) {
+    JaversProperty getProperty(String withName) {
         Validate.argumentIsNotNull(withName);
         if (!propertiesByName.containsKey(withName)){
             throw new JaversException(PROPERTY_NOT_FOUND, withName, baseJavaClass.getName());
         }
         return propertiesByName.get(withName);
+    }
+
+    void forEachProperty(Consumer<JaversProperty> consumer) {
+        managedProperties.forEach(p -> consumer.accept(p));
     }
 
     Class<?> getBaseJavaClass() {

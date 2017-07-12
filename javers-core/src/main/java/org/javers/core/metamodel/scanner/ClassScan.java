@@ -1,7 +1,8 @@
 package org.javers.core.metamodel.scanner;
 
-import java.util.Optional;
 import org.javers.core.metamodel.property.Property;
+
+import java.util.Optional;
 
 import java.util.List;
 
@@ -21,28 +22,24 @@ public class ClassScan {
         return propertyScan.getProperties();
     }
 
-    public List<Property> getLooksLikeId() {
-        return propertyScan.getLooksLikeId();
-    }
-
     public boolean hasIdProperty() {
         return propertyScan.hasId();
     }
 
     public boolean hasValueAnn() {
-        return classAnnotationsScan.hasValue();
+        return classAnnotationsScan.isValue();
     }
 
     public boolean hasValueObjectAnn() {
-        return classAnnotationsScan.hasValueObject();
+        return classAnnotationsScan.isValueObject();
     }
 
     public boolean hasEntityAnn() {
-        return classAnnotationsScan.hasEntity();
+        return classAnnotationsScan.isEntity();
     }
 
     public boolean hasShallowReferenceAnn() {
-        return classAnnotationsScan.hasShallowReference();
+        return classAnnotationsScan.isShallowReference();
     }
 
     public Optional<String> typeName() {
@@ -50,6 +47,6 @@ public class ClassScan {
     }
 
     public boolean hasIgnoredAnn() {
-        return classAnnotationsScan.hasIgnored();
+        return classAnnotationsScan.isIgnored();
     }
 }

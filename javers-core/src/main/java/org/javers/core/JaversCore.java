@@ -21,6 +21,7 @@ import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryRunner;
+import org.javers.shadow.Shadow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,10 +81,15 @@ class JaversCore implements Javers {
         Commit commit = commitFactory.create(author, commitProperties, currentVersion);
         long stop_f = System.currentTimeMillis();
 
+        if (commit.getSnapshots().isEmpty()) {
+            logger.info("Skipping persisting empty commit: {}", commit.toString());
+            return commit;
+        }
+
         repository.persist(commit);
         long stop = System.currentTimeMillis();
 
-        logger.info(commit.toString()+", done in "+ (stop-start)+ " millis (factory:{}, persist:{})",(stop_f-start), (stop-stop_f));
+        logger.info(commit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(stop_f-start), (stop-stop_f));
         return commit;
     }
 
@@ -130,6 +136,11 @@ class JaversCore implements Javers {
     @Override
     public Diff initial(Object newDomainObject) {
         return diffFactory.initial(newDomainObject);
+    }
+
+    @Override
+    public <T> List<Shadow<T>> findShadows(JqlQuery query) {
+        return (List)queryRunner.queryForShadows(query);
     }
 
     @Override
