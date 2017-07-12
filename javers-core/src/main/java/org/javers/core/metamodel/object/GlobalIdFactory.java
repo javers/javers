@@ -90,6 +90,8 @@ public class GlobalIdFactory {
 
     public InstanceId createInstanceId(Object instance){
         Validate.argumentIsNotNull(instance);
+		
+		instance = objectAccessHook.access(instance);
         EntityType entityType = typeMapper.getJaversManagedType(instance.getClass(), EntityType.class);
         return createInstanceId(entityType.getIdOf(instance), entityType);
     }
