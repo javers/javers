@@ -1,5 +1,6 @@
 package org.javers.spring.sql
 
+import org.hibernate.Hibernate
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.boot.sql.*
@@ -86,6 +87,14 @@ public class Issue558Test {
         maths = courseRepository.save(maths) // 1st commit
 
         Course mathsRef = courseRepository.getOne(1); // TestCase Note: get an Hibernate Proxy!!! It never gets selected in DB.
+
+        println "proxy.isInitialized: " + Hibernate.isInitialized(mathsRef)
+        println "proxy.class: " + mathsRef.getClass()
+        println "proxy.id: " + mathsRef.getId()
+        println "proxy.persistenClass: "+ mathsRef.getHibernateLazyInitializer().getPersistentClass()
+        println "proxy.isInitialized: " + Hibernate.isInitialized(mathsRef)
+        println 'I am happy :)'
+
         def enrolledJohnInMaths = new LinkStudentCourse(1, "enrolled", john, mathsRef);
         john.getCourses().add(enrolledJohnInMaths);
         john = studentRepository.save(john) // 2nd commit
