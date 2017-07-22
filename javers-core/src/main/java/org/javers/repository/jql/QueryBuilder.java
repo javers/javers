@@ -335,11 +335,11 @@ public class QueryBuilder {
     }
 
     /**
-     * Choose between shallow or deep shadows.
-     * <br/>
+     * Choose between <i>shallow</i>, <i>commit-depth</i> or <i>commit-depth+</i> query scopes.
+     * <br/> The wider the scope, the more shadows are loaded to the graph.
      *
-     * Default is {@link ShadowScope#SHALLOW}
-     * <br/>
+     * Default scope is {@link ShadowScope#SHALLOW}
+     * <br/><br/>
      *
      * Makes sense only for Shadow queries.
      *
@@ -353,14 +353,34 @@ public class QueryBuilder {
     }
 
     /**
-     * Alias to <code>withShadowScope(ShadowScope.COMMIT_DEPTH)</code>
-     *
-     * @see #withShadowScope(ShadowScope)
-     * @see ShadowScope
-     * @since 3.2
+     * renamed to {@link #withCommitScopeDepth()}
+     * @deprecated
      */
+    @Deprecated
     public QueryBuilder withShadowScopeDeep() {
         return withShadowScope(ShadowScope.COMMIT_DEPTH);
+    }
+
+    /**
+     * Only for Shadow queries.<br/>
+     * Shortcut to {@link #withShadowScope(ShadowScope COMMIT_DEPTH)} )}
+     *
+     * @see ShadowScope#COMMIT_DEPTH
+     * @since 3.4
+     */
+    public QueryBuilder withCommitScopeDepth() {
+        return withShadowScope(ShadowScope.COMMIT_DEPTH);
+    }
+
+    /**
+     * Only for Shadow queries.<br/>
+     * Shortcut to {@link #withShadowScope(ShadowScope COMMIT_DEPTH_PLUS)} )}
+     *
+     * @see ShadowScope#COMMIT_DEPTH_PLUS
+     * @since 3.4
+     */
+    public QueryBuilder withFullDepth() {
+        return withShadowScope(ShadowScope.COMMIT_DEPTH_PLUS);
     }
 
     /**

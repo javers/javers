@@ -1307,7 +1307,6 @@ class JaversRepositoryE2ETest extends Specification {
         entity.intProperty = 5
         javers.commit("a", entity)
 
-
         when:
         def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
                 .withChildValueObjects()
@@ -1340,6 +1339,30 @@ class JaversRepositoryE2ETest extends Specification {
         shadows[4].intProperty == 1
         shadows[4].valueObjectRef.city == "London"
        !shadows[4].valueObjectRef.networkAddress
+    }
+
+    def "should load latest Entity Shadow in FULL_SCOPE query"(){
+        given:
+        def ref = new SnapshotEntity(id: 2, intProperty: 2)
+        javers.commit("a", ref)
+
+        def entity = new SnapshotEntity(id: 1, entityRef: ref, intProperty: 1)
+        javers.commit("a", entity)
+
+        entity.intProperty++
+        javers.commit("a", entity)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
+                .withFullDepth().build()).collect{it.get()}
+
+        then:
+        shadows.size() == 2
+
+        shadows.each {
+            it.entityRef.id == 2
+            it.entityRef.intProperty == 2
+        }
     }
 
     def "should query by multiple CommitId"(){
