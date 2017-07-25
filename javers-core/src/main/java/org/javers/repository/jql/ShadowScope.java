@@ -24,8 +24,8 @@ public enum ShadowScope {
      *
      * <b>Caution!</b> Commit-deep doesn't mean full.
      * References to objects that aren't available in selected commits <b>are nulled</b>.
-     * This may be observed as unexpected <i>holes</i> in a shadow graph.<br/>
-     * You can fill those holes using Commit-deep+ scope.
+     * This may be observed as unexpected <i>gaps</i> in a shadow graph.<br/>
+     * You can fill these gaps using Commit-deep+ scope.
      *
      * <br/><br/>
      * Commit-deep query is slower than shallow query,
@@ -46,8 +46,12 @@ public enum ShadowScope {
      *
      * Commit-deep+ query is slower than Commit-deep query.
      * JaVers executes one more query to load latest snapshots of referenced objects
-     * that not exist in selected commits (to fill the <i>holes</i> in a shadow graph
-     * created by commit-deep query.
+     * that not exist in selected commits (to fill the gaps in a shadow graph
+     * created by a commit-deep query.
      */
-    COMMIT_DEPTH_PLUS
+    COMMIT_DEPTH_PLUS;
+
+    public boolean isCommitDepthOrWider() {
+        return this == COMMIT_DEPTH || this == COMMIT_DEPTH_PLUS;
+    }
 }

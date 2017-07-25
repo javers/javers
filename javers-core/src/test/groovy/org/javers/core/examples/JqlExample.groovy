@@ -99,13 +99,13 @@ class JqlExample extends Specification {
       assert bobOld.boss == null  //so references from bob to john are nulled
 
       when: "query with COMMIT_DEPTH scope"
-      shadows = javers.findShadows(QueryBuilder.byInstance(bob).withShadowScopeDeep().build())
+      shadows = javers.findShadows(QueryBuilder.byInstance(bob).withCommitDepthScope().build())
       bobNew = shadows[0].get()
       bobOld = shadows[1].get()
 
       then:
       assert bobNew.boss.name == "john"  // john is inside the query scope,
-      assert bobOld.boss.name == "john"  // so his Shadow is reconstruced
+      assert bobOld.boss.name == "john"  // so his Shadow is reconstructed
                                          // and linked with bob's Shadows
     }
 

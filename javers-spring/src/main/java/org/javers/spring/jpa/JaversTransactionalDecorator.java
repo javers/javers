@@ -1,5 +1,6 @@
 package org.javers.spring.jpa;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
@@ -107,6 +108,12 @@ public class JaversTransactionalDecorator implements Javers {
     @Override
     public Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass) {
         return delegate.getLatestSnapshot(localId, entityClass);
+    }
+
+    @Transactional
+    @Override
+    public Optional<CdoSnapshot> getHistoricalSnapshot(Object localId, Class entity, LocalDateTime effectiveDate) {
+        return delegate.getHistoricalSnapshot(localId, entity, effectiveDate);
     }
 
     @Transactional

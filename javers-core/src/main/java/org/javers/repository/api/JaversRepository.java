@@ -1,5 +1,6 @@
 package org.javers.repository.api;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -63,7 +64,8 @@ public interface JaversRepository {
     List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams);
 
     /**
-     * Latest snapshot of given object,
+     * Latest snapshot of a given object.
+     * <br/><br/>
      * Optional#EMPTY if object is not versioned
      */
     Optional<CdoSnapshot> getLatest(GlobalId globalId);

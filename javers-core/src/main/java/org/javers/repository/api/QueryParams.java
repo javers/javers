@@ -69,14 +69,14 @@ public class QueryParams {
     }
 
     /**
-     * filters results to Snapshots created after given util
+     * selects Snapshots created after this date (or exactly at this date)
      */
     public Optional<LocalDateTime> from() {
         return from;
     }
 
     /**
-     * filters results to Snapshots created before given util
+     * only Snapshots created before this date (or exactly at this date)
      */
     public Optional<LocalDateTime> to() {
         return to;

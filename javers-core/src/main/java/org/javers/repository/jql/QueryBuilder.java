@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 import static java.time.LocalTime.MIDNIGHT;
+import static org.javers.repository.jql.ShadowScope.*;
 
 /**
  * Fluent API for building {@link JqlQuery},
@@ -28,10 +29,13 @@ import static java.time.LocalTime.MIDNIGHT;
 public class QueryBuilder {
     private static final int DEFAULT_LIMIT = 100;
     private static final int DEFAULT_SKIP = 0;
+    private static final int DEFAULT_GAPS_TO_FILL_LIMIT = 10;
+    private static final ShadowScope DEFAULT_SHADOW_SCOPE = SHALLOW;
 
     private final FilterDefinition filter;
     private final QueryParamsBuilder queryParamsBuilder;
-    private ShadowScope shadowScope = ShadowScope.SHALLOW;
+    private ShadowScope shadowScope = DEFAULT_SHADOW_SCOPE;
+    private int maxGapsToFill;
 
     private QueryBuilder(FilterDefinition filter) {
         Validate.argumentIsNotNull(filter);
@@ -336,12 +340,42 @@ public class QueryBuilder {
 
     /**
      * Choose between <i>shallow</i>, <i>commit-depth</i> or <i>commit-depth+</i> query scopes.
-     * <br/> The wider the scope, the more shadows are loaded to the graph.
+     * <br/> The wider the scope, the more object shadows are loaded to the resulting graph.
+     * <br/><br/>
+     *
+     * <b>For example</b>, we have three Entities in the object graph
+     * joined by the references.
+     *
+     * <pre>
+     *   /-> E2 -> E3
+     * E1
+     *   \-> E4
+     * </pre>
+     *
+     * Let's consider two scenarios.<br/>
+     * <b>In the first scenario</b>, our entities are committed one by one:
+     *
+     * <pre>
+     * javers.commit("author", e3); // commit 1.0 created with e3 snapshot
+     * javers.commit("author", e2); // commit 2.0 created with e2 snapshot
+     * javers.commit("author", e1); // commit 3.0 created with snapshots of e1 and e4</pre>
+     *
+     * Remember that JaVers reuses existing snapshots and creates a fresh one
+     * only if a given object is changed.<br/><br/>
+     *
+     * The shadow query for E1 produces different object graphs, depending on the scope:
+     *
+     * <pre>
+     * //TODO
+     * javers.findShadows(byInstanceId(1, E).withShadowScope(SHALLOW).build())
+     * </pre>
+     *
+     * creates the shallow graph
      *
      * Default scope is {@link ShadowScope#SHALLOW}
      * <br/><br/>
      *
-     * Makes sense only for Shadow queries.
+     * Calling this method makes sense only for Shadow queries.
      *
      * @see ShadowScope
      * @since 3.2
@@ -349,38 +383,60 @@ public class QueryBuilder {
     public QueryBuilder withShadowScope(ShadowScope shadowScope){
         Validate.argumentIsNotNull(shadowScope);
         this.shadowScope = shadowScope;
+        if (shadowScope == COMMIT_DEPTH_PLUS && maxGapsToFill == 0) {
+            this.maxGapsToFill = DEFAULT_GAPS_TO_FILL_LIMIT;
+        }
+
         return this;
     }
 
     /**
-     * renamed to {@link #withCommitScopeDepth()}
-     * @deprecated
-     */
-    @Deprecated
-    public QueryBuilder withShadowScopeDeep() {
-        return withShadowScope(ShadowScope.COMMIT_DEPTH);
-    }
-
-    /**
-     * Only for Shadow queries.<br/>
-     * Shortcut to {@link #withShadowScope(ShadowScope COMMIT_DEPTH)} )}
+     * Selects commit-depth scope for Shadow queries.
+     * <br/><br/>
      *
+     * Shortcut to <code>withShadowScope(COMMIT_DEPTH).</code>
+     * <br/><br/>
+     *
+     * Only for Shadow queries.
+     *
+     * @see #withShadowScope(ShadowScope)
      * @see ShadowScope#COMMIT_DEPTH
      * @since 3.4
      */
-    public QueryBuilder withCommitScopeDepth() {
-        return withShadowScope(ShadowScope.COMMIT_DEPTH);
+    public QueryBuilder withCommitDepthScope() {
+        return withShadowScope(COMMIT_DEPTH);
     }
 
     /**
-     * Only for Shadow queries.<br/>
-     * Shortcut to {@link #withShadowScope(ShadowScope COMMIT_DEPTH_PLUS)} )}
+     * Selects commit-depth+ scope with default <code></cpce>maxGapsToFill</code> = 10.
+     * <br/><br/>
      *
+     * Shortcut to <code>withShadowScope(COMMIT_DEPTH_PLUS).</code>
+     * <br/><br/>
+     *
+     * Only for Shadow queries.
+     *
+     * @see #withShadowScope(ShadowScope)
      * @see ShadowScope#COMMIT_DEPTH_PLUS
      * @since 3.4
      */
-    public QueryBuilder withFullDepth() {
-        return withShadowScope(ShadowScope.COMMIT_DEPTH_PLUS);
+    public QueryBuilder withCommitDepthPlusScope() {
+        return withShadowScope(COMMIT_DEPTH_PLUS);
+    }
+
+    /**
+     * Selects commit-depth+ scope with given gaps-to-fill limit.
+     * <br/><br/>
+     *
+     * Only for Shadow queries.
+     *
+     * @see #withShadowScope(ShadowScope)
+     * @see ShadowScope#COMMIT_DEPTH_PLUS
+     * @since 3.4
+     */
+    public QueryBuilder withCommitDepthPlusScope(int maxGapsToFill) {
+        this.maxGapsToFill = maxGapsToFill;
+        return withShadowScope(COMMIT_DEPTH_PLUS);
     }
 
     /**
@@ -395,6 +451,15 @@ public class QueryBuilder {
     }
 
     public JqlQuery build(){
-        return new JqlQuery(filter, queryParamsBuilder.build(), shadowScope);
+        return new JqlQuery(filter, queryParamsBuilder.build(), new ShadowScopeDefinition(shadowScope, maxGapsToFill));
+    }
+
+    /**
+     * renamed to {@link #withCommitDepthScope()}
+     * @deprecated
+     */
+    @Deprecated
+    public QueryBuilder withShadowScopeDeep() {
+        return withShadowScope(COMMIT_DEPTH);
     }
 }

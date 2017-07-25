@@ -18,6 +18,7 @@ import org.javers.repository.jql.ShadowScope;
 import org.javers.shadow.Shadow;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -267,16 +268,32 @@ public interface Javers {
     List<CdoSnapshot> findSnapshots(JqlQuery query);
 
     /**
-     * Latest snapshot of given entity instance
-     * or Optional#EMPTY if instance is not versioned.
+     * Latest snapshot of a given Entity instance.
      * <br/><br/>
      *
-     * For example, to get last snapshot of "bob" Person, call:
+     * For example, to get the current state of <code>Bob</code>, call:
      * <pre>
-     * javers.getLatestSnapshot("bob", Person.class));
+     * javers.getLatestSnapshot("bob", Person.class);
      * </pre>
+     *
+     * Returns Optional#EMPTY if an instance is not versioned.
      */
-    Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass);
+    Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entity);
+
+    /**
+     * Historical snapshot of a given Entity instance.
+     * <br/><br/>
+     *
+     * For example, to get the historical state of <code>Bob</code> at 2017-01-01, call:
+     * <pre>
+     * javers.getHistoricalSnapshot("bob", Person.class, LocalDateTime.of(2017,01,01));
+     * </pre>
+     *
+     * Returns Optional#EMPTY if an instance is not versioned.
+     *
+     * @since 3.4
+     */
+    Optional<CdoSnapshot> getHistoricalSnapshot(Object localId, Class entity, LocalDateTime effectiveDate);
 
     /**
      * If you are serializing JaVers objects like
