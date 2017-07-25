@@ -1,6 +1,7 @@
 package org.javers.repository.inmemory;
 
 import org.javers.common.collections.Lists;
+
 import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
@@ -14,15 +15,11 @@ import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.api.QueryParams;
-import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static java.util.Collections.unmodifiableList;
 
 /**
  * Fake impl of JaversRepository
@@ -113,12 +110,6 @@ public class InMemoryRepository implements JaversRepository {
         ValueObjectId child = (ValueObjectId)childCandidate;
 
         return child.getOwnerId().getTypeName().equals(parent.getName());
-    }
-
-    private QueryParams getQueryParamsWithIncreasedLimit(QueryParams queryParams) {
-        return QueryParamsBuilder.initializeWith(queryParams)
-            .limit(queryParams.limit() * 10)
-            .build();
     }
 
     private List<CdoSnapshot> applyQueryParams(List<CdoSnapshot> snapshots, final QueryParams queryParams){

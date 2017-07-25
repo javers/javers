@@ -1,6 +1,9 @@
 package org.javers.repository.jql;
 
 import org.javers.common.collections.Consumer;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.*;
 import org.javers.repository.api.JaversExtendedRepository;
@@ -8,6 +11,8 @@ import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.shadow.Shadow;
 import org.javers.shadow.ShadowFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,11 +20,15 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.javers.repository.jql.ShadowScope.COMMIT_DEPTH_PLUS;
+import static org.javers.repository.jql.ShadowScope.SHALLOW;
 
 /**
  * @author bartosz.walacik
  */
 public class ShadowQueryRunner {
+    private static final Logger logger = LoggerFactory.getLogger(ShadowQueryRunner.class);
+
     private final JaversExtendedRepository repository;
     private final ShadowFactory shadowFactory;
 
@@ -29,10 +38,14 @@ public class ShadowQueryRunner {
     }
 
     public List<Shadow> queryForShadows(JqlQuery query, List<CdoSnapshot> coreSnapshots) {
+        if (query.getShadowScope() != COMMIT_DEPTH_PLUS && query.getShadowScopeMaxGapsToFill() > 0) {
+            throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
+                    "maxGapsToFill can be used only in the COMMIT_DEPTH_PLUS query scope");
+        }
 
-        final CommitTable commitTable = new CommitTable(coreSnapshots);
+        final CommitTable commitTable = new CommitTable(coreSnapshots, query.getShadowScopeMaxGapsToFill());
 
-        if (query.getShadowScope() == ShadowScope.COMMIT_DEPTH) {
+        if (query.getShadowScope().isCommitDepthOrWider()) {
             commitTable.loadFullCommits();
         }
 
@@ -57,12 +70,13 @@ public class ShadowQueryRunner {
     }
 
     class CommitTable {
+        private final int maxGapsToFill;
+        private final Map<ReferenceKey, CdoSnapshot> filledGaps = new HashMap<>();
         private final Map<CommitMetadata, CommitEntry> commitsMap = new HashMap<>();
         private final List<CommitEntry> commitsList = new ArrayList<>();
-        private final List<CdoSnapshot> coreSnapshots;
 
-        CommitTable(List<CdoSnapshot> coreSnapshots) {
-            this.coreSnapshots = coreSnapshots;
+        CommitTable(List<CdoSnapshot> coreSnapshots, int maxGapsToFill) {
+            this.maxGapsToFill = maxGapsToFill;
             if (coreSnapshots.isEmpty()) {
                 return;
             }
@@ -70,7 +84,7 @@ public class ShadowQueryRunner {
             coreSnapshots.forEach(s -> {
                 CommitEntry current = commitsMap.get(s.getCommitMetadata());
                 if (current == null) {
-                    current = nextCommit(s);
+                    current = appendCommit(s);
                 }
                 current.append(s);
             });
@@ -112,10 +126,26 @@ public class ShadowQueryRunner {
             }, rootContext);
 
             if (found.size() == 0) {
+                CdoSnapshot gap = fillGapFromRepository(new ReferenceKey(rootContext, targetId));
+                if (gap == null){
+                    logger.debug("Object '" + targetId.value() + "' is outside the Shadow query scope" +
+                            ", references to this object will be nulled. " +
+                            "Use the wider scope to fill gaps in the object graph.");
+                }
+                return gap;
+            } else {
+                return found.get(found.size() - 1);
+            }
+        }
+
+        CdoSnapshot fillGapFromRepository(ReferenceKey referenceKey) {
+            if (filledGaps.size() >= maxGapsToFill) {
                 return null;
             }
 
-            return found.get(found.size() - 1);
+            return filledGaps.computeIfAbsent(referenceKey, key ->
+                repository.getHistorical(key.targetId, key.rootContext.getCommitDate()).orElse(null)
+            );
         }
 
         void fillMissingParents() {
@@ -133,7 +163,7 @@ public class ShadowQueryRunner {
             });
         }
 
-        CommitEntry nextCommit(CdoSnapshot snapshot) {
+        CommitEntry appendCommit(CdoSnapshot snapshot) {
             CommitEntry entry = new CommitEntry(snapshot.getCommitMetadata());
             commitsMap.put(entry.commitMetadata, entry);
             commitsList.add(entry);
@@ -207,6 +237,31 @@ public class ShadowQueryRunner {
                     .collect(toSet()));
 
             return result;
+        }
+    }
+
+    final static class ReferenceKey {
+        private final CommitMetadata rootContext;
+        private final GlobalId targetId;
+
+        ReferenceKey(CommitMetadata rootContext, GlobalId targetId) {
+            Validate.argumentsAreNotNull(rootContext, targetId);
+            this.rootContext = rootContext;
+            this.targetId = targetId;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ReferenceKey that = (ReferenceKey) o;
+            return Objects.equals(rootContext, that.rootContext) &&
+                    Objects.equals(targetId, that.targetId);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(rootContext, targetId);
         }
     }
 }

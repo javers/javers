@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
@@ -154,9 +155,15 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass) {
-        Validate.argumentsAreNotNull(localId, entityClass);
-        return queryRunner.runQueryForLatestSnapshot(instanceId(localId, entityClass));
+    public Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entity) {
+        Validate.argumentsAreNotNull(localId, entity);
+        return queryRunner.runQueryForLatestSnapshot(instanceId(localId, entity));
+    }
+
+    @Override
+    public Optional<CdoSnapshot> getHistoricalSnapshot(Object localId, Class entity, LocalDateTime effectiveDate) {
+        Validate.argumentsAreNotNull(localId, entity, effectiveDate);
+        return repository.getHistorical(globalIdFactory.createInstanceId(localId, entity), effectiveDate);
     }
 
     @Override

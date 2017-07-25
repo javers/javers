@@ -28,13 +28,13 @@ public class JqlQuery {
     private final QueryParams queryParams;
     private final FilterDefinition filterDefinition;
     private Filter filter;
-    private final ShadowScope shadowScope;
+    private final ShadowScopeDefinition shadowScopeDef;
 
-    JqlQuery(FilterDefinition filter, QueryParams queryParams, ShadowScope shadowScope) {
+    JqlQuery(FilterDefinition filter, QueryParams queryParams, ShadowScopeDefinition shadowScope) {
         Validate.argumentsAreNotNull(filter);
         this.queryParams = queryParams;
         this.filterDefinition = filter;
-        this.shadowScope = shadowScope;
+        this.shadowScopeDef = shadowScope;
     }
 
     private void validate(){
@@ -71,7 +71,11 @@ public class JqlQuery {
     }
 
     ShadowScope getShadowScope() {
-        return shadowScope;
+        return shadowScopeDef.getShadowScope();
+    }
+
+    int getShadowScopeMaxGapsToFill() {
+        return shadowScopeDef.getMaxGapsToFill();
     }
 
     String getChangedProperty(){

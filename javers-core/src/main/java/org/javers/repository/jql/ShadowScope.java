@@ -4,24 +4,54 @@ package org.javers.repository.jql;
  * @author bartosz.walacik
  */
 public enum ShadowScope {
-
     /**
-     * Shadows are created only from snapshots selected directly in the JQL query.
-     * <br/>
+     * Shadows are created only from snapshots selected directly in the main JQL query.
+     * <br/><br/>
      *
      * This query is fast (no additional queries are executed)
-     * but shadows are shallow. In most cases, references are not resolved.
+     * but shadows are shallow. Most object references <b>are nulled</b>.
+     * <br/><br/>
+     *
+     * You can initialize referenced objects using the wider scopes:
+     * commit-deep or commit-deep+.
      */
     SHALLOW,
 
     /**
-     * JaVers tries to restore deep shadow graphs. References
-     * are resolved when they exists in selected commits.
-     * <br/>
+     * JaVers restores commit-deep shadow graphs. Referenced
+     * objects are resolved <b>if they exist</b> in selected commits.
+     * <br/><br/>
      *
-     * This query is slower than SHALLOW query,
-     * because JaVers executes additional query for all
-     * snapshots in commits touched by the JQL query.
+     * <b>Caution!</b> Commit-deep doesn't mean full.
+     * References to objects that aren't available in selected commits <b>are nulled</b>.
+     * This may be observed as unexpected <i>gaps</i> in a shadow graph.<br/>
+     * You can fill these gaps using Commit-deep+ scope.
+     *
+     * <br/><br/>
+     * Commit-deep query is slower than shallow query,
+     * because JaVers executes the additional query to load all
+     * snapshots in commits touched by the main JQL query.
      */
-    COMMIT_DEPTH
+    COMMIT_DEPTH,
+
+    /**
+     * JaVers tries to restore original shadow graphs
+     * with all object references resolved.
+     * <br/><br/>
+     *
+     * <b>Caution!</b> Commit-deep+ doesn't mean full, it's just adds
+     * another level of recursive initialization to Commit-deep scope.
+     * We have to stop somewhere.
+     * <br/><br/>
+     *
+     * Commit-deep+ query is slower than Commit-deep query.
+     * JaVers executes one more query to load latest snapshots of referenced objects
+     * that not exist in selected commits (to fill the gaps in a shadow graph
+     * created by a commit-deep query.
+     */
+    COMMIT_DEPTH_PLUS;
+
+    public boolean isCommitDepthOrWider() {
+        return this == COMMIT_DEPTH || this == COMMIT_DEPTH_PLUS;
+    }
 }

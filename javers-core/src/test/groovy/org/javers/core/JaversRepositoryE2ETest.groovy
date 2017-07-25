@@ -22,6 +22,9 @@ import static groovyx.gpars.GParsPool.withPool
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.QueryBuilder.*
+import static org.javers.repository.jql.ShadowScope.COMMIT_DEPTH
+import static org.javers.repository.jql.ShadowScope.COMMIT_DEPTH_PLUS
+import static org.javers.repository.jql.ShadowScope.SHALLOW
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
@@ -1270,7 +1273,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("a", new SnapshotEntity(id: 1, intProperty: 3, entityRef: ref2))
 
         when:
-        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity).withShadowScopeDeep()
+        def shadows = javers.findShadows(byInstanceId(1, SnapshotEntity).withCommitDepthScope()
                 .build()).collect{it.get()}
 
         then:
@@ -1307,11 +1310,10 @@ class JaversRepositoryE2ETest extends Specification {
         entity.intProperty = 5
         javers.commit("a", entity)
 
-
         when:
         def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
                 .withChildValueObjects()
-                .withShadowScopeDeep().build()).collect{it.get()}
+                .withCommitDepthScope().build()).collect{it.get()}
 
         then:
         shadows.size() == 5
@@ -1340,6 +1342,85 @@ class JaversRepositoryE2ETest extends Specification {
         shadows[4].intProperty == 1
         shadows[4].valueObjectRef.city == "London"
        !shadows[4].valueObjectRef.networkAddress
+    }
+
+    def "should load latest Entity Shadow in commit-depth+ query"(){
+        given:
+        def ref = new SnapshotEntity(id: 2, intProperty: 1, valueObjectRef: new DummyAddress(city: "London"))
+        javers.commit("a", ref)
+
+        ref.intProperty = 5
+        javers.commit("a", ref)
+
+        def entity = new SnapshotEntity(id: 1, entityRef: ref, intProperty: 1)
+        javers.commit("a", entity)
+
+        entity.intProperty++
+        javers.commit("a", entity)
+
+        //noise
+        ref.intProperty = 3
+        sleep(1000)
+        javers.commit("a", ref)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
+                .withCommitDepthPlusScope().build()).collect{it.get()}
+
+        then:
+        shadows.size() == 2
+
+        shadows.each {
+            assert it.entityRef.id == 2
+            assert it.entityRef.intProperty == 5
+            assert it.entityRef.valueObjectRef.city == "London"
+        }
+    }
+
+    def "should stop filling gaps in a Shadow graph when limit exceeded"(){
+        given:
+        def ref = new SnapshotEntity(id: 2, valueObjectRef: new DummyAddress(city: "London"))
+        javers.commit("a", ref)
+
+        def entity = new SnapshotEntity(id: 1, entityRef: ref, )
+        javers.commit("a", entity)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
+                .withCommitDepthPlusScope(1).build()).collect{it.get()}
+
+        then:
+        shadows.size() == 1
+
+        shadows[0].entityRef.id == 2
+        !shadows[0].entityRef.valueObjectRef
+    }
+
+    def "should load master snapshot even if child snapshots 'consumed' the snapshot limit"(){
+      given:
+      def a = new DummyAddress(city: "a")
+      def e = new SnapshotEntity(id: 1, valueObjectRef:a)
+      javers.commit("a", e)
+
+      50.times {
+         a.city = it
+         javers.commit("a", e)
+      }
+
+      when:
+      def query = QueryBuilder.byInstanceId(1, SnapshotEntity).withChildValueObjects().limit(50).build()
+      def snapshots = javers.findSnapshots(query)
+      def shadows = javers.findShadows(query).collect{it.get()}
+
+      then:
+      snapshots.size() == 51
+      snapshots.find {it -> it.globalId.typeName.endsWith('SnapshotEntity') && it.globalId.cdoId == 1}
+
+      shadows.size() == 51
+      shadows.each {
+          it instanceof SnapshotEntity
+          it.valueObjectRef instanceof DummyAddress
+      }
     }
 
     def "should query by multiple CommitId"(){

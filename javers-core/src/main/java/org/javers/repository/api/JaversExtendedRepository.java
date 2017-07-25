@@ -1,14 +1,19 @@
 package org.javers.repository.api;
 
+import org.javers.common.collections.Collections;
 import org.javers.common.collections.Lists;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.snapshot.SnapshotDiffer;
@@ -66,7 +71,13 @@ public class JaversExtendedRepository implements JaversRepository {
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
         argumentsAreNotNull(globalId, queryParams);
-        return delegate.getStateHistory(globalId, queryParams);
+        List<CdoSnapshot> snapshots = delegate.getStateHistory(globalId, queryParams);
+
+        if (globalId instanceof InstanceId && queryParams.isAggregate()) {
+            return loadMasterEntitySnapshotIfNecessary((InstanceId) globalId, snapshots);
+        } else {
+            return snapshots;
+        }
     }
 
     @Override
@@ -79,6 +90,16 @@ public class JaversExtendedRepository implements JaversRepository {
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         argumentIsNotNull(globalId);
         return delegate.getLatest(globalId);
+    }
+
+    public Optional<CdoSnapshot> getHistorical(GlobalId globalId, LocalDateTime date) {
+        argumentsAreNotNull(globalId, date);
+        List<CdoSnapshot> result = delegate.getStateHistory(globalId, QueryParamsBuilder.withLimit(1).to(date).build());
+
+        if (result.size() > 0) {
+            return Optional.of(result.get(0));
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -132,5 +153,18 @@ public class JaversExtendedRepository implements JaversRepository {
 
     private List<Change> getChangesIntroducedBySnapshots(List<CdoSnapshot> snapshots) {
         return snapshotDiffer.calculateDiffs(snapshots, previousSnapshotsCalculator.calculate(snapshots));
+    }
+
+    //required for the corner case, when valueObject snapshots consume all the limit
+    private List<CdoSnapshot> loadMasterEntitySnapshotIfNecessary(InstanceId instanceId, List<CdoSnapshot> alreadyLoaded) {
+        if (alreadyLoaded.stream().filter(s -> s.getGlobalId().equals(instanceId)).findFirst().isPresent()) {
+            return alreadyLoaded;
+        }
+
+        return getLatest(instanceId).map(it -> {
+            List<CdoSnapshot> enhanced = new ArrayList(alreadyLoaded);
+            enhanced.add(it);
+            return java.util.Collections.unmodifiableList(enhanced);
+        }).orElse(alreadyLoaded);
     }
 }

@@ -19,7 +19,7 @@ import java.util.Objects;
 import static org.javers.common.collections.Lists.wrapNull;
 
 /**
- * @author kornel kiełczewski
+ * @author kornel kielczewski
  */
 public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<ListChange> {
 
