@@ -1348,7 +1348,6 @@ class JaversRepositoryE2ETest extends Specification {
         given:
         def ref = new SnapshotEntity(id: 2, intProperty: 1, valueObjectRef: new DummyAddress(city: "London"))
         javers.commit("a", ref)
-        sleep(2)
 
         ref.intProperty = 5
         javers.commit("a", ref)
@@ -1360,8 +1359,8 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("a", entity)
 
         //noise
-        sleep(2)
         ref.intProperty = 3
+        sleep(1000)
         javers.commit("a", ref)
 
         when:
