@@ -483,14 +483,10 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Default is {@link CommitIdGenerator#SYNCHRONIZED_SEQUENCE}
-     * <br/><br/>
-     *
-     * If your application is distributed, use cluster-friendly {@link CommitIdGenerator#RANDOM}
-     * (when more than one JaVers instance writes to a shared database).
-     *
+     * @deprecated RANDOM CommitIdGenerator is deprecated because it don't play along with Shadow queries. Only the default algorithm (SYNCHRONIZED_SEQUENCE) is supported.
      * @since 2.6
      */
+    @Deprecated
     public JaversBuilder withCommitIdGenerator(CommitIdGenerator commitIdGenerator) {
         argumentIsNotNull(commitIdGenerator);
         coreConfiguration().withCommitIdGenerator(commitIdGenerator);
@@ -546,7 +542,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * or ListCompareAlgorithm.LEVENSHTEIN_DISTANCE.
      * <br/><br/>
      * Generally, we recommend using LEVENSHTEIN_DISTANCE, because it's smarter.
-     * Hoverer, it can be slow for long lists, so SIMPLE is enabled by default.
+     * However, it can be slow for long lists, so SIMPLE is enabled by default.
      * <br/><br/>
      *
      * Refer to <a href="http://javers.org/documentation/diff-configuration/#list-algorithms">http://javers.org/documentation/diff-configuration/#list-algorithms</a>

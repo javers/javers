@@ -13,6 +13,10 @@ public enum CommitIdGenerator {
      */
     SYNCHRONIZED_SEQUENCE,
 
-    /** Fast algorithm based on UUID. For distributed applications. */
+    /**
+     * Fast algorithm based on UUID. For distributed applications.
+     * @deprecated
+     */
+    @Deprecated
     RANDOM
 }

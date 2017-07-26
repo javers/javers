@@ -43,6 +43,10 @@ public class CommitMetadata implements Serializable {
         return id;
     }
 
+    public boolean isBeforeOrEqual(CommitMetadata that){
+        return this.id.isBeforeOrEqual(that.id);
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.toString(this, "author", author, "properties", properties, "util", commitDate, "id", id);
