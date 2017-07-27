@@ -5,7 +5,7 @@ package org.javers.repository.jql;
  */
 public enum ShadowScope {
     /**
-     * Shadows are created only from snapshots selected directly in the main JQL query.
+     * Object shadows are created only from snapshots selected directly in the main JQL query.
      * <br/><br/>
      *
      * This query is fast (no additional queries are executed)
@@ -18,7 +18,7 @@ public enum ShadowScope {
     SHALLOW,
 
     /**
-     * JaVers restores commit-deep shadow graphs. Referenced
+     * JaVers restores commit-deep shadow graph. Referenced
      * objects are resolved <b>if they exist</b> in selected commits.
      * <br/><br/>
      *
@@ -35,19 +35,20 @@ public enum ShadowScope {
     COMMIT_DEPTH,
 
     /**
-     * JaVers tries to restore original shadow graphs
-     * with all object references resolved.
+     * JaVers tries to restore an original object graph
+     * with (possibly) all object references resolved.
      * <br/><br/>
      *
-     * <b>Caution!</b> Commit-deep+ doesn't mean full, it's just adds
-     * another level of recursive initialization to Commit-deep scope.
-     * We have to stop somewhere.
+     * <b>Caution!</b> Commit-deep+ doesn't mean full, it just
+     * fills recursively potential gaps in the restored object graph.
+     * <br/>
+     * We have to stop somewhere. The query parameter <code>maxGapsToFill</code>
+     * limits the number of objects that would be loaded.<br/>
+     * Think of commit-deep+ scope as commit-deep with max N gaps filled.
      * <br/><br/>
      *
-     * Commit-deep+ query is slower than Commit-deep query.
-     * JaVers executes one more query to load latest snapshots of referenced objects
-     * that not exist in selected commits (to fill the gaps in a shadow graph
-     * created by a commit-deep query.
+     * Commit-deep+ query is slower than commit-deep query.
+     * JaVers executes up to N additional queries to fill potential gaps in the object graph created by the commit-deep query.
      */
     COMMIT_DEPTH_PLUS;
 
