@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.javers.repository.jql.ShadowScope.COMMIT_DEPTH_PLUS;
-import static org.javers.repository.jql.ShadowScope.SHALLOW;
 
 /**
  * @author bartosz.walacik
@@ -144,7 +143,7 @@ public class ShadowQueryRunner {
             }
 
             return filledGaps.computeIfAbsent(referenceKey, key ->
-                repository.getHistorical(key.targetId, key.rootContext.getCommitDate()).orElse(null)
+                repository.getHistorical(key.targetId, key.rootContext.getId()).orElse(null)
             );
         }
 

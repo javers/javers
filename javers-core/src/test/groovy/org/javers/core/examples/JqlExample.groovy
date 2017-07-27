@@ -264,7 +264,7 @@ class JqlExample extends Specification {
 
         when:
         def query = QueryBuilder.byInstanceId("bob", Employee.class)
-                .andProperty("salary").build()
+                .withChangedProperty("salary").build()
         def changes = javers.findChanges(query)
 
         then:

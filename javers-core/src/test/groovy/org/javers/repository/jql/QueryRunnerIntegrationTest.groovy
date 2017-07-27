@@ -28,7 +28,7 @@ class QueryRunnerIntegrationTest extends Specification {
 
         where:
         query << [QueryBuilder.byInstanceId(1, NewEntityWithTypeAlias).build(),
-                  QueryBuilder.byInstanceId(1, NewEntityWithTypeAlias).andProperty("id").build(),
+                  QueryBuilder.byInstanceId(1, NewEntityWithTypeAlias).withChangedProperty("id").build(),
                   QueryBuilder.byClass(NewEntityWithTypeAlias).build(),
                   QueryBuilder.byClass(NewValueObjectWithTypeAlias).build(),
                   QueryBuilder.byValueObject(NewEntityWithTypeAlias,"valueObject").build(),

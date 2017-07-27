@@ -2,6 +2,8 @@ package org.javers.repository.api;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
+import org.javers.repository.jql.QueryBuilder;
+
 import java.time.LocalDateTime;
 
 import java.util.*;
@@ -14,6 +16,7 @@ public class QueryParamsBuilder {
     private int skip;
     private LocalDateTime from;
     private LocalDateTime to;
+    private CommitId toCommitId;
     private Set<CommitId> commitIds = new HashSet<>();
     private Long version;
     private String author;
@@ -56,13 +59,16 @@ public class QueryParamsBuilder {
         return builder;
     }
 
+    /**
+     * @see QueryBuilder#withChildValueObjects()
+     */
     public QueryParamsBuilder withChildValueObjects(boolean aggregate) {
         this.aggregate = aggregate;
         return this;
     }
 
     /**
-     * @see #withLimit(int)
+     * @see QueryBuilder#limit(int)
      */
     public QueryParamsBuilder limit(int limit) {
         checkLimit(limit);
@@ -71,7 +77,7 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * @see QueryParams#skip()
+     * @see QueryBuilder#skip(int)
      */
     public QueryParamsBuilder skip(int skip) {
         Validate.argumentCheck(limit >= 0, "Skip is not a non-negative number.");
@@ -80,7 +86,7 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * @see QueryParams#from()
+     * @see QueryBuilder#from(LocalDateTime)
      */
     public QueryParamsBuilder from(LocalDateTime from) {
         this.from = from;
@@ -88,7 +94,7 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * @see QueryParams#to()
+     * @see QueryBuilder#to(LocalDateTime)
      */
     public QueryParamsBuilder to(LocalDateTime to) {
         this.to = to;
@@ -96,7 +102,7 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * @see QueryParams#commitIds()
+     * @see QueryBuilder#withCommitId(CommitId)
      */
     public QueryParamsBuilder commitId(CommitId commitId) {
         this.commitIds.add(commitId);
@@ -104,7 +110,15 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * @see QueryParams#commitIds()
+     * @see QueryBuilder#toCommitId(CommitId)
+     */
+    public QueryParamsBuilder toCommitId(CommitId toCommitId) {
+        this.toCommitId = toCommitId;
+        return this;
+    }
+
+    /**
+     * @see QueryBuilder#withCommitIds(Collection)
      */
     public QueryParamsBuilder commitIds(Collection<CommitId> commitIds) {
         this.commitIds.addAll(commitIds);
@@ -112,7 +126,7 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * @see QueryParams#commitProperties()
+     * @see QueryBuilder#withCommitProperty(String, String)
      */
     public QueryParamsBuilder commitProperty(String name, String value) {
         this.commitProperties.put(name, value);
@@ -120,7 +134,7 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * @see QueryParams#version()
+     * @see QueryBuilder#withVersion(long)
      */
     public QueryParamsBuilder version(Long version) {
         this.version = version;
@@ -128,18 +142,24 @@ public class QueryParamsBuilder {
     }
 
 
+    /**
+     * @see QueryBuilder#withNewObjectChanges(boolean)
+     */
     public QueryParamsBuilder newObjectChanges(boolean newObjectChanges) {
         this.newObjectChanges = newObjectChanges;
         return this;
     }
 
+    /**
+     * @see QueryBuilder#withChangedProperty(String)
+     */
     public QueryParamsBuilder changedProperty(String propertyName) {
         this.changedProperty = propertyName;
         return this;
     }
 
     /**
-     * @see QueryParams#author()
+     * @see QueryBuilder#byAuthor(String)
      */
     public QueryParamsBuilder author(String author) {
         this.author = author;
@@ -151,6 +171,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty);
+        return new QueryParams(limit, skip, from, to, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty, toCommitId);
     }
 }

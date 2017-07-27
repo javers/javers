@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
@@ -163,11 +164,11 @@ public class QueryBuilder {
     }
 
     /**
-     * Filters to snapshots (or changes) with a given property on changed properties list.
+     * Only snapshots which changed a given property.
      *
      * @see CdoSnapshot#getChanged()
      */
-    public QueryBuilder andProperty(String propertyName) {
+    public QueryBuilder withChangedProperty(String propertyName) {
         Validate.argumentIsNotNull(propertyName);
         queryParamsBuilder.changedProperty(propertyName);
         return this;
@@ -196,12 +197,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Optional filter for Entity queries ({@link #byInstanceId(Object, Class)} and {@link #byClass(Class...)}).
-     * Can be used with both changes and snapshots queries.
-     * <br/><br/>
-     *
-     * When enabled, all child ValueObjects owned by selected Entities are included in a query scope.
-     *
+     * @see #withChildValueObjects()
      * @since 2.1
      */
     public QueryBuilder withChildValueObjects(boolean aggregate) {
@@ -210,7 +206,11 @@ public class QueryBuilder {
     }
 
     /**
-     * Alias to {@link #withChildValueObjects(boolean)} with true
+     * When enabled, selects all child ValueObjects owned by selected Entities.
+     * <br/><br/>
+     *
+     * Optional filter for Entity queries ({@link #byInstanceId(Object, Class)} and {@link #byClass(Class...)}).
+     * Can be used with both changes and snapshots queries.
      *
      * @since 2.1
      */
@@ -221,7 +221,8 @@ public class QueryBuilder {
 
     /**
      * Limits number of snapshots to be fetched from JaversRepository, default is 100.
-     * <br/>
+     * <br/><br/>
+     *
      * Always choose reasonable limits to improve performance of your queries,
      * production database could contain more records than you expect.
      */
@@ -232,7 +233,7 @@ public class QueryBuilder {
 
     /**
      * Sets the number of snapshots to skip.
-     * Use skip() and limit() for for paging.
+     * Use skip() and limit() for paging.
      */
     public QueryBuilder skip(int skip) {
         queryParamsBuilder.skip(skip);
@@ -240,8 +241,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those created after (>=) given util.
+     * Limits to snapshots created after this date or exactly at this date.
      * <br/><br/>
      *
      * <h2>CommitDate is local datetime</h2>
@@ -263,15 +263,7 @@ public class QueryBuilder {
     }
 
     /**
-     * delegates to {@link #from(LocalDateTime)} with MIDNIGHT
-     */
-    public QueryBuilder from(LocalDate fromDate) {
-        return from(fromDate.atTime(MIDNIGHT));
-    }
-
-    /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those created before (<=) given util.
+     * Limits to snapshots created before this date or exactly at this date.
      */
     public QueryBuilder to(LocalDateTime to) {
         queryParamsBuilder.to(to);
@@ -279,15 +271,7 @@ public class QueryBuilder {
     }
 
     /**
-     * delegates to {@link #to(LocalDateTime)} with MIDNIGHT
-     */
-    public QueryBuilder to(LocalDate toDate) {
-        return to(toDate.atTime(MIDNIGHT));
-    }
-
-    /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those with a given commitId.
+     * Only snapshots created in a given commit.
      */
     public QueryBuilder withCommitId(CommitId commitId) {
         Validate.argumentIsNotNull(commitId);
@@ -305,8 +289,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those with given commit ids.
+     * Only snapshots created in given commits.
      */
     public QueryBuilder withCommitIds(Collection<BigDecimal> commitIds) {
         Validate.argumentIsNotNull(commitIds);
@@ -315,11 +298,34 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those with a given commit property.
-     * <br/>
+     * Only snapshots created before this commit or exactly in this commit.
+     */
+    public QueryBuilder toCommitId(CommitId commitId) {
+        Validate.argumentIsNotNull(commitId);
+        queryParamsBuilder.toCommitId(commitId);
+        return this;
+    }
+
+    /**
+     * delegates to {@link #from(LocalDateTime)} with MIDNIGHT
+     */
+    public QueryBuilder from(LocalDate fromDate) {
+        return from(fromDate.atTime(MIDNIGHT));
+    }
+
+    /**
+     * delegates to {@link #to(LocalDateTime)} with MIDNIGHT
+     */
+    public QueryBuilder to(LocalDate toDate) {
+        return to(toDate.atTime(MIDNIGHT));
+    }
+
+    /**
+     * Only snapshots with a given commit property.
+     * <br/><br/
+     *
      * If this method is called multiple times,
-     * all given properties must match with persisted commit properties.
+     * <b>all</b> given properties must match with persisted commit properties.
      * @since 2.0
      */
     public QueryBuilder withCommitProperty(String name, String value) {
@@ -329,8 +335,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those with a given snapshot version.
+     * Only snapshots with a given version.
      */
     public QueryBuilder withVersion(long version) {
         Validate.argumentCheck(version > 0, "Version is not a positive number.");
@@ -440,8 +445,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits Snapshots to be fetched from JaversRepository
-     * to those with a given commit author.
+     * Only snapshots committed by a given author.
      * @since 2.0
      */
     public QueryBuilder byAuthor(String author) {
@@ -461,5 +465,14 @@ public class QueryBuilder {
     @Deprecated
     public QueryBuilder withShadowScopeDeep() {
         return withShadowScope(COMMIT_DEPTH);
+    }
+
+    /**
+     * renamed to {@link #withChangedProperty(String)}
+     * @deprecated
+     */
+    @Deprecated
+    public QueryBuilder andProperty(String propertyName) {
+        return withChangedProperty(propertyName);
     }
 }

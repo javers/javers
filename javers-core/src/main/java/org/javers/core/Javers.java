@@ -210,7 +210,7 @@ public interface Javers {
      *
      * Last "salary" changes of "bob" Person:
      * <pre>
-     * javers.findChanges( QueryBuilder.byInstanceId("bob", Person.class).andProperty("salary").build() );
+     * javers.findChanges( QueryBuilder.byInstanceId("bob", Person.class).withChangedProperty("salary").build() );
      * </pre>
      *
      * <b>Querying for ValueObject changes</b><br/><br/>
@@ -240,7 +240,7 @@ public interface Javers {
      *
      * Last "myProperty" changes on any object of MyClass.class:
      * <pre>
-     * javers.findChanges( QueryBuilder.byClass(Person.class).andProperty("myProperty").build() );
+     * javers.findChanges( QueryBuilder.byClass(Person.class).withChangedProperty("myProperty").build() );
      * </pre>
      *
      * @return A list ordered in reverse chronological order. Empty if nothing found.
