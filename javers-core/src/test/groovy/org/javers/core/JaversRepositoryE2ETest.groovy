@@ -1270,7 +1270,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("a", new SnapshotEntity(id: 1, intProperty: 3, entityRef: ref2))
 
         when:
-        def shadows = javers.findShadows(byInstanceId(1, SnapshotEntity).withCommitDepthScope()
+        def shadows = javers.findShadows(byInstanceId(1, SnapshotEntity).withCommitDeepScope()
                 .build()).collect{it.get()}
 
         then:
@@ -1310,7 +1310,7 @@ class JaversRepositoryE2ETest extends Specification {
         when:
         def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
                 .withChildValueObjects()
-                .withCommitDepthScope().build()).collect{it.get()}
+                .withCommitDeepScope().build()).collect{it.get()}
 
         then:
         shadows.size() == 5

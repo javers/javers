@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.javers.repository.jql.ShadowScope.COMMIT_DEPTH_PLUS;
+import static org.javers.repository.jql.ShadowScope.COMMIT_DEEP_PLUS;
 
 /**
  * @author bartosz.walacik
@@ -37,14 +37,14 @@ public class ShadowQueryRunner {
     }
 
     public List<Shadow> queryForShadows(JqlQuery query, List<CdoSnapshot> coreSnapshots) {
-        if (query.getShadowScope() != COMMIT_DEPTH_PLUS && query.getShadowScopeMaxGapsToFill() > 0) {
+        if (query.getShadowScope() != COMMIT_DEEP_PLUS && query.getShadowScopeMaxGapsToFill() > 0) {
             throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
-                    "maxGapsToFill can be used only in the COMMIT_DEPTH_PLUS query scope");
+                    "maxGapsToFill can be used only in the COMMIT_DEEP_PLUS query scope");
         }
 
         final CommitTable commitTable = new CommitTable(coreSnapshots, query.getShadowScopeMaxGapsToFill());
 
-        if (query.getShadowScope().isCommitDepthOrWider()) {
+        if (query.getShadowScope().isCommitDeepOrWider()) {
             commitTable.loadFullCommits();
         }
 

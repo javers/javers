@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
@@ -349,7 +348,7 @@ public class QueryBuilder {
      * <br/><br/>
      *
      * <b>For example</b>, we have three Entities in the object graph
-     * joined by the references.
+     * joined by references.
      *
      * <pre>
      *   /-> E2 -> E3
@@ -388,7 +387,7 @@ public class QueryBuilder {
     public QueryBuilder withShadowScope(ShadowScope shadowScope){
         Validate.argumentIsNotNull(shadowScope);
         this.shadowScope = shadowScope;
-        if (shadowScope == COMMIT_DEPTH_PLUS && maxGapsToFill == 0) {
+        if (shadowScope == COMMIT_DEEP_PLUS && maxGapsToFill == 0) {
             this.maxGapsToFill = DEFAULT_GAPS_TO_FILL_LIMIT;
         }
 
@@ -396,52 +395,53 @@ public class QueryBuilder {
     }
 
     /**
-     * Selects commit-depth scope for Shadow queries.
+     * Selects commit-deep scope for Shadow queries.
      * <br/><br/>
      *
-     * Shortcut to <code>withShadowScope(COMMIT_DEPTH).</code>
+     * Shortcut to {@link #withShadowScope(ShadowScope)} with <code>COMMIT_DEEP</code>
      * <br/><br/>
      *
      * Only for Shadow queries.
      *
-     * @see #withShadowScope(ShadowScope)
-     * @see ShadowScope#COMMIT_DEPTH
+     * @see ShadowScope#COMMIT_DEEP
      * @since 3.4
      */
-    public QueryBuilder withCommitDepthScope() {
-        return withShadowScope(COMMIT_DEPTH);
+    public QueryBuilder withCommitDeepScope() {
+        return withShadowScope(COMMIT_DEEP);
     }
 
     /**
-     * Selects commit-depth+ scope with default <code></cpce>maxGapsToFill</code> = 10.
+     * Selects commit-deep+ scope with default <code></cpce>maxGapsToFill</code> = 10.
      * <br/><br/>
      *
-     * Shortcut to <code>withShadowScope(COMMIT_DEPTH_PLUS).</code>
+     * Shortcut to {@link #withShadowScope(ShadowScope)} with <code>COMMIT_DEEP_PLUS</code>
      * <br/><br/>
      *
      * Only for Shadow queries.
      *
-     * @see #withShadowScope(ShadowScope)
-     * @see ShadowScope#COMMIT_DEPTH_PLUS
+     * @see ShadowScope#COMMIT_DEEP_PLUS
      * @since 3.4
      */
     public QueryBuilder withCommitDepthPlusScope() {
-        return withShadowScope(COMMIT_DEPTH_PLUS);
+        return withShadowScope(COMMIT_DEEP_PLUS);
     }
 
     /**
-     * Selects commit-depth+ scope with given gaps-to-fill limit.
+     * Selects commit-deep+ scope.<br/>
+     * It means commit-deep scope plus up to N objects.
+     * <br/><br/>
+     *
+     * See javadoc in {@link #withShadowScope(ShadowScope)}
      * <br/><br/>
      *
      * Only for Shadow queries.
      *
-     * @see #withShadowScope(ShadowScope)
-     * @see ShadowScope#COMMIT_DEPTH_PLUS
+     * @see ShadowScope#COMMIT_DEEP_PLUS
      * @since 3.4
      */
     public QueryBuilder withCommitDepthPlusScope(int maxGapsToFill) {
         this.maxGapsToFill = maxGapsToFill;
-        return withShadowScope(COMMIT_DEPTH_PLUS);
+        return withShadowScope(COMMIT_DEEP_PLUS);
     }
 
     /**
@@ -459,12 +459,12 @@ public class QueryBuilder {
     }
 
     /**
-     * renamed to {@link #withCommitDepthScope()}
+     * renamed to {@link #withCommitDeepScope()}
      * @deprecated
      */
     @Deprecated
     public QueryBuilder withShadowScopeDeep() {
-        return withShadowScope(COMMIT_DEPTH);
+        return withShadowScope(COMMIT_DEEP);
     }
 
     /**

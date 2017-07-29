@@ -32,7 +32,7 @@ public enum ShadowScope {
      * because JaVers executes the additional query to load all
      * snapshots in commits touched by the main JQL query.
      */
-    COMMIT_DEPTH,
+    COMMIT_DEEP,
 
     /**
      * JaVers tries to restore an original object graph
@@ -44,15 +44,17 @@ public enum ShadowScope {
      * <br/>
      * We have to stop somewhere. The query parameter <code>maxGapsToFill</code>
      * limits the number of objects that would be loaded.<br/>
-     * Think of commit-deep+ scope as commit-deep with max N gaps filled.
+     * Think of commit-deep+ scope as commit-deep with up to N gaps filled.
      * <br/><br/>
      *
      * Commit-deep+ query is slower than commit-deep query.
-     * JaVers executes up to N additional queries to fill potential gaps in the object graph created by the commit-deep query.
+     * JaVers executes up to N additional queries to fill potential gaps in the object graph created by the commit-deep query
+     * (one query per each gap).
+     *
      */
-    COMMIT_DEPTH_PLUS;
+    COMMIT_DEEP_PLUS;
 
-    public boolean isCommitDepthOrWider() {
-        return this == COMMIT_DEPTH || this == COMMIT_DEPTH_PLUS;
+    public boolean isCommitDeepOrWider() {
+        return this == COMMIT_DEEP || this == COMMIT_DEEP_PLUS;
     }
 }

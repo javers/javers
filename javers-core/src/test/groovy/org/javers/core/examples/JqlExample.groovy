@@ -8,6 +8,7 @@ import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
 import org.javers.core.examples.model.Person
+import org.javers.core.metamodel.annotation.Id
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
@@ -20,6 +21,73 @@ import java.time.LocalDate
  * @author bartosz.walacik
  */
 class JqlExample extends Specification {
+
+    def "should query for Shadows with different scopes, lightweight example"(){
+      given: 'In this scenario, our entities are committed one by one'
+      def javers = JaversBuilder.javers().build()
+
+      //   /-> E2 -> E3
+      // E1
+      //   \-> E4
+      def e3 = new Entity(id:3)
+      def e2 = new Entity(id:2, refA:e3)
+      def e4 = new Entity(id:4)
+      def e1 = new Entity(id:1, refA:e2, refB:e4)
+
+      javers.commit("author", e3) // commit 1.0 with e3 snapshot
+      javers.commit("author", e2) // commit 2.0 with e2 snapshot
+      javers.commit("author", e1) // commit 3.0 with snapshots of e1 and e4
+
+      when: 'shallow scope query'
+      def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+                   .build())
+      def shadowE1 = shadows.get(0).get()
+
+      then: 'only e1 is loaded'
+      shadowE1 instanceof Entity
+      shadowE1.id == 1
+      shadowE1.refA == null
+      shadowE1.refB == null
+
+      when: 'commit-deep scope query'
+      shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+               .withCommitDeepScope().build())
+      shadowE1 = shadows.get(0).get()
+
+      then: 'only e1 and e4 are loaded, both was committed in commit 3.0'
+      shadowE1.id == 1
+      shadowE1.refA == null
+      shadowE1.refB.id == 4
+
+      when: 'commit-deep+1 scope query'
+      shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+              .withCommitDepthPlusScope(1).build())
+      shadowE1 = shadows.get(0).get()
+
+      then: 'e1, e4 and e2 are loaded'
+      shadowE1.id == 1
+      shadowE1.refA.id == 2
+      shadowE1.refA.refA == null
+      shadowE1.refB.id == 4
+
+
+      when: 'commit-deep+2 scope query'
+      shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+              .withCommitDepthPlusScope(2).build())
+      shadowE1 = shadows.get(0).get()
+
+      then: 'all object shadows are loaded'
+      shadowE1.id == 1
+      shadowE1.refA.id == 2
+      shadowE1.refA.refA.id == 3
+      shadowE1.refB.id == 4
+    }
+
+    class Entity {
+        @Id int id
+        Entity refA
+        Entity refB
+    }
 
     def "should query for Changes made on any object"() {
         given:
@@ -98,8 +166,8 @@ class JqlExample extends Specification {
       assert bobNew.boss == null  //john is outside the query scope,
       assert bobOld.boss == null  //so references from bob to john are nulled
 
-      when: "query with COMMIT_DEPTH scope"
-      shadows = javers.findShadows(QueryBuilder.byInstance(bob).withCommitDepthScope().build())
+      when: "query with COMMIT_DEEP scope"
+      shadows = javers.findShadows(QueryBuilder.byInstance(bob).withCommitDeepScope().build())
       bobNew = shadows[0].get()
       bobOld = shadows[1].get()
 
@@ -107,6 +175,12 @@ class JqlExample extends Specification {
       assert bobNew.boss.name == "john"  // john is inside the query scope,
       assert bobOld.boss.name == "john"  // so his Shadow is reconstructed
                                          // and linked with bob's Shadows
+
+      when: "query with COMMIT_DEEP_PLUS scope"
+        //TODO
+
+      then:
+      false
     }
 
     def "should query for Snapshots of an object"(){
@@ -483,4 +557,6 @@ class JqlExample extends Specification {
         def i = 0
         changes.each {println "commit "+ it.commitMetadata.get().id.toString()+": $it"; i++}
     }
+
+
 }
