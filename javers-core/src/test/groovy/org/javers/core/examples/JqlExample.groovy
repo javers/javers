@@ -53,7 +53,7 @@ class JqlExample extends Specification {
 
       when: 'commit-deep scope query'
       shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-               .withCommitDeepScope().build())
+               .withScopeCommitDeep().build())
       shadowE1 = shadows.get(0).get()
 
       then: 'only e1 and e2 are loaded, both was committed in commit 3.0'
@@ -63,7 +63,7 @@ class JqlExample extends Specification {
 
       when: 'commit-deep+1 scope query'
       shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-              .withCommitDeepPlusScope(1).build())
+              .withScopeCommitDeepPlus(1).build())
       shadowE1 = shadows.get(0).get()
 
       then: 'e1, e2 and e3 are loaded'
@@ -74,7 +74,7 @@ class JqlExample extends Specification {
 
       when: 'commit-deep+2 scope query'
       shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-              .withCommitDeepPlusScope(2).build())
+              .withScopeCommitDeepPlus(2).build())
       shadowE1 = shadows.get(0).get()
 
       then: 'all object are loaded'
@@ -108,7 +108,7 @@ class JqlExample extends Specification {
 
         when: 'commit-deep scope query'
         shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-                .withCommitDeepScope().build())
+                .withScopeCommitDeep().build())
         shadowE1 = shadows.get(0).get()
 
         then: 'all object are loaded'
@@ -207,7 +207,7 @@ class JqlExample extends Specification {
       when: 'commit-deep scope query'
       shadows = javers.findShadows(QueryBuilder.byInstance(bob)
               .withChildValueObjects()
-              .withCommitDeepScope().build())
+              .withScopeCommitDeep().build())
       bobShadow = shadows[0].get()
 
       then: 'John is also loaded'
@@ -217,7 +217,7 @@ class JqlExample extends Specification {
       when: 'commit-deep+ scope query'
       shadows = javers.findShadows(QueryBuilder.byInstance(bob)
               .withChildValueObjects()
-              .withCommitDeepPlusScope(1).build())
+              .withScopeCommitDeepPlus(1).build())
       bobShadow = shadows[0].get()
 
       then: 'all objects are loaded'

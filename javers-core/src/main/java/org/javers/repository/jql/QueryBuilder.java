@@ -390,7 +390,7 @@ public class QueryBuilder {
      *
      * when: 'commit-deep scope query'
      * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *          .withCommitDeepScope().build())
+     *          .withScopeCommitDeep().build())
      * shadowE1 = shadows.get(0).get()
      *
      * then: 'only e1 and e2 are loaded, both was committed in commit 3.0'
@@ -400,7 +400,7 @@ public class QueryBuilder {
      *
      * when: 'commit-deep+1 scope query'
      * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *          .withCommitDeepPlusScope(1).build())
+     *          .withScopeCommitDeepPlus(1).build())
      * shadowE1 = shadows.get(0).get()
      *
      * then: 'e1, e2 and e3 are loaded'
@@ -411,7 +411,7 @@ public class QueryBuilder {
      *
      * when: 'commit-deep+2 scope query'
      * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *          .withCommitDeepPlusScope(2).build())
+     *          .withScopeCommitDeepPlus(2).build())
      * shadowE1 = shadows.get(0).get()
      *
      * then: 'all object are loaded'
@@ -431,7 +431,7 @@ public class QueryBuilder {
      *
      * when: 'commit-deep scope query'
      * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *          .withCommitDeepScope().build())
+     *          .withScopeCommitDeep().build())
      * shadowE1 = shadows.get(0).get()
      *
      * then: 'all object are loaded'
@@ -466,7 +466,7 @@ public class QueryBuilder {
      * @see ShadowScope#COMMIT_DEEP
      * @since 3.5
      */
-    public QueryBuilder withCommitDeepScope() {
+    public QueryBuilder withScopeCommitDeep() {
         return withShadowScope(COMMIT_DEEP);
     }
 
@@ -482,7 +482,7 @@ public class QueryBuilder {
      * @see ShadowScope#COMMIT_DEEP_PLUS
      * @since 3.5
      */
-    public QueryBuilder withCommitDeepPlusScope() {
+    public QueryBuilder withScopeCommitDeepPlus() {
         return withShadowScope(COMMIT_DEEP_PLUS);
     }
 
@@ -498,7 +498,7 @@ public class QueryBuilder {
      * @see ShadowScope#COMMIT_DEEP_PLUS
      * @since 3.5
      */
-    public QueryBuilder withCommitDeepPlusScope(int maxGapsToFill) {
+    public QueryBuilder withScopeCommitDeepPlus(int maxGapsToFill) {
         this.maxGapsToFill = maxGapsToFill;
         return withShadowScope(COMMIT_DEEP_PLUS);
     }
@@ -518,7 +518,7 @@ public class QueryBuilder {
     }
 
     /**
-     * renamed to {@link #withCommitDeepScope()}
+     * renamed to {@link #withScopeCommitDeep()}
      * @deprecated
      */
     @Deprecated
