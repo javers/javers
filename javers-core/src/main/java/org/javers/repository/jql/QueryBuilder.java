@@ -344,42 +344,102 @@ public class QueryBuilder {
 
     /**
      * Choose between <i>shallow</i>, <i>commit-depth</i> or <i>commit-depth+</i> query scopes.
-     * <br/> The wider the scope, the more object shadows are loaded to the resulting graph.
+     * <br/>
+     * The wider the scope, the more object shadows are loaded to the resulting graph.
      * <br/><br/>
      *
-     * <b>For example</b>, we have three Entities in the object graph
-     * joined by references.
+     * Default scope is {@link ShadowScope#SHALLOW}.
+     * <br/>
+     * Calling this method makes sense only for Shadow queries.
+     * <br/><br/>
+     *
+     * To understand shadow query scopes, you need to understand how JaVers commit works.<br/>
+     * Remember that JaVers reuses existing snapshots and creates a fresh one
+     * only if a given object is changed.<br/>
+     * The way how objects are committed affects shadow query results.
+     *
+     * <h3>For example, we have four Entities in the object graph joined by references:</h3>
      *
      * <pre>
-     *   /-> E2 -> E3
-     * E1
-     *   \-> E4
+     * // E1 -> E2 -> E3 -> E4
+     * def e4 = new Entity(id:4)
+     * def e3 = new Entity(id:3, ref:e4)
+     * def e2 = new Entity(id:2, ref:e3)
+     * def e1 = new Entity(id:1, ref:e2)
      * </pre>
      *
-     * Let's consider two scenarios.<br/>
-     * <b>In the first scenario</b>, our entities are committed one by one:
+     * <h3>In the first scenario, our four entities are committed in three commits:</h3>
+     *
+     * Full graph is loaded only in commit-deep+2 scope.
      *
      * <pre>
+     * given:
      * javers.commit("author", e3); // commit 1.0 created with e3 snapshot
      * javers.commit("author", e2); // commit 2.0 created with e2 snapshot
-     * javers.commit("author", e1); // commit 3.0 created with snapshots of e1 and e4</pre>
+     * javers.commit("author", e1); // commit 3.0 created with snapshots of e1 and e4
      *
-     * Remember that JaVers reuses existing snapshots and creates a fresh one
-     * only if a given object is changed.<br/><br/>
+     * when: 'shallow scope query'
+     * def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *              .build())
+     * def shadowE1 = shadows.get(0).get()
      *
-     * The shadow query for E1 produces different object graphs, depending on the scope:
+     * then: 'only e1 is loaded'
+     * shadowE1 instanceof Entity
+     * shadowE1.id == 1
+     * shadowE1.ref == null
      *
-     * <pre>
-     * //TODO
-     * javers.findShadows(byInstanceId(1, E).withShadowScope(SHALLOW).build())
+     * when: 'commit-deep scope query'
+     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *          .withCommitDeepScope().build())
+     * shadowE1 = shadows.get(0).get()
+     *
+     * then: 'only e1 and e2 are loaded, both was committed in commit 3.0'
+     * shadowE1.id == 1
+     * shadowE1.ref.id == 2
+     * shadowE1.ref.ref == null
+     *
+     * when: 'commit-deep+1 scope query'
+     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *          .withCommitDepthPlusScope(1).build())
+     * shadowE1 = shadows.get(0).get()
+     *
+     * then: 'e1, e2 and e3 are loaded'
+     * shadowE1.id == 1
+     * shadowE1.ref.id == 2
+     * shadowE1.ref.ref.id == 3
+     * shadowE1.ref.ref.ref == null
+     *
+     * when: 'commit-deep+2 scope query'
+     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *          .withCommitDepthPlusScope(2).build())
+     * shadowE1 = shadows.get(0).get()
+     *
+     * then: 'all object are loaded'
+     * shadowE1.id == 1
+     * shadowE1.ref.id == 2
+     * shadowE1.ref.ref.id == 3
+     * shadowE1.ref.ref.ref.id == 4
      * </pre>
      *
-     * creates the shallow graph
+     * <h3>In the second scenario, our four entities are committed in the single commit:</h3>
      *
-     * Default scope is {@link ShadowScope#SHALLOW}
-     * <br/><br/>
+     * Shallow scope works in the same way, just commit-deep scope gives the full graph.
      *
-     * Calling this method makes sense only for Shadow queries.
+     * <pre>
+     * given:
+     * javers.commit("author", e1) // commit 1.0 with snapshots of e1, e2, e3 and e4
+     *
+     * when: 'commit-deep scope query'
+     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *          .withCommitDeepScope().build())
+     * shadowE1 = shadows.get(0).get()
+     *
+     * then: 'all object are loaded'
+     * shadowE1.id == 1
+     * shadowE1.ref.id == 2
+     * shadowE1.ref.ref.id == 3
+     * shadowE1.ref.ref.ref.id == 4
+     * </pre>
      *
      * @see ShadowScope
      * @since 3.2
@@ -414,7 +474,7 @@ public class QueryBuilder {
      * Selects commit-deep+ scope with default <code></cpce>maxGapsToFill</code> = 10.
      * <br/><br/>
      *
-     * Shortcut to {@link #withShadowScope(ShadowScope)} with <code>COMMIT_DEEP_PLUS</code>
+     * See javadoc in {@link #withShadowScope(ShadowScope)}
      * <br/><br/>
      *
      * Only for Shadow queries.
@@ -427,9 +487,8 @@ public class QueryBuilder {
     }
 
     /**
-     * Selects commit-deep+ scope.<br/>
-     * It means commit-deep scope plus up to N objects.
-     * <br/><br/>
+     * Selects commit-deep+ scope with given <code>maxGapsToFill</code>.
+     * <br/>
      *
      * See javadoc in {@link #withShadowScope(ShadowScope)}
      * <br/><br/>

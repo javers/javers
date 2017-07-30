@@ -1163,7 +1163,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         when:
         def shadows = javers.findShadows(QueryBuilder.byValueObjectId(1, SnapshotEntity, "valueObjectRef")
-                .withShadowScope(ShadowScope.COMMIT_DEPTH)
+                .withCommitDeepScope()
                 .build()).collect{it.get()}
 
         then:
