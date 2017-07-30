@@ -11,7 +11,6 @@ import org.javers.repository.api.JaversRepository
 import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.QueryBuilder
-import org.javers.repository.jql.ShadowScope
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -1361,7 +1360,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         when:
         def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
-                .withCommitDepthPlusScope().build()).collect{it.get()}
+                .withCommitDeepPlusScope().build()).collect{it.get()}
 
         then:
         shadows.size() == 2
@@ -1383,7 +1382,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         when:
         def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
-                .withCommitDepthPlusScope(1).build()).collect{it.get()}
+                .withCommitDeepPlusScope(1).build()).collect{it.get()}
 
         then:
         shadows.size() == 1

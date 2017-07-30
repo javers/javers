@@ -63,7 +63,7 @@ class JqlExample extends Specification {
 
       when: 'commit-deep+1 scope query'
       shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-              .withCommitDepthPlusScope(1).build())
+              .withCommitDeepPlusScope(1).build())
       shadowE1 = shadows.get(0).get()
 
       then: 'e1, e2 and e3 are loaded'
@@ -74,7 +74,7 @@ class JqlExample extends Specification {
 
       when: 'commit-deep+2 scope query'
       shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-              .withCommitDepthPlusScope(2).build())
+              .withCommitDeepPlusScope(2).build())
       shadowE1 = shadows.get(0).get()
 
       then: 'all object are loaded'
@@ -217,7 +217,7 @@ class JqlExample extends Specification {
       when: 'commit-deep+ scope query'
       shadows = javers.findShadows(QueryBuilder.byInstance(bob)
               .withChildValueObjects()
-              .withCommitDepthPlusScope(1).build())
+              .withCommitDeepPlusScope(1).build())
       bobShadow = shadows[0].get()
 
       then: 'all objects are loaded'

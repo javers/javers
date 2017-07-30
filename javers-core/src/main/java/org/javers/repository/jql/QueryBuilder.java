@@ -343,7 +343,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Choose between <i>shallow</i>, <i>commit-depth</i> or <i>commit-depth+</i> query scopes.
+     * Choose between <i>shallow</i>, <i>commit-deep</i> or <i>commit-deep+</i> query scopes.
      * <br/>
      * The wider the scope, the more object shadows are loaded to the resulting graph.
      * <br/><br/>
@@ -400,7 +400,7 @@ public class QueryBuilder {
      *
      * when: 'commit-deep+1 scope query'
      * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *          .withCommitDepthPlusScope(1).build())
+     *          .withCommitDeepPlusScope(1).build())
      * shadowE1 = shadows.get(0).get()
      *
      * then: 'e1, e2 and e3 are loaded'
@@ -411,7 +411,7 @@ public class QueryBuilder {
      *
      * when: 'commit-deep+2 scope query'
      * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *          .withCommitDepthPlusScope(2).build())
+     *          .withCommitDeepPlusScope(2).build())
      * shadowE1 = shadows.get(0).get()
      *
      * then: 'all object are loaded'
@@ -464,7 +464,7 @@ public class QueryBuilder {
      * Only for Shadow queries.
      *
      * @see ShadowScope#COMMIT_DEEP
-     * @since 3.4
+     * @since 3.5
      */
     public QueryBuilder withCommitDeepScope() {
         return withShadowScope(COMMIT_DEEP);
@@ -480,9 +480,9 @@ public class QueryBuilder {
      * Only for Shadow queries.
      *
      * @see ShadowScope#COMMIT_DEEP_PLUS
-     * @since 3.4
+     * @since 3.5
      */
-    public QueryBuilder withCommitDepthPlusScope() {
+    public QueryBuilder withCommitDeepPlusScope() {
         return withShadowScope(COMMIT_DEEP_PLUS);
     }
 
@@ -496,9 +496,9 @@ public class QueryBuilder {
      * Only for Shadow queries.
      *
      * @see ShadowScope#COMMIT_DEEP_PLUS
-     * @since 3.4
+     * @since 3.5
      */
-    public QueryBuilder withCommitDepthPlusScope(int maxGapsToFill) {
+    public QueryBuilder withCommitDeepPlusScope(int maxGapsToFill) {
         this.maxGapsToFill = maxGapsToFill;
         return withShadowScope(COMMIT_DEEP_PLUS);
     }
