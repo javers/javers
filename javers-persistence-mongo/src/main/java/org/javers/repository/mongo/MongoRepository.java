@@ -244,6 +244,9 @@ public class MongoRepository implements JaversRepository {
             if (params.to().isPresent()) {
                 query = addToDateFilter(query, params.to().get());
             }
+            if (params.toCommitId().isPresent()) {
+                query = addToCommitIdFilter(query, params.toCommitId().get());
+            }
             if (params.commitIds().size() > 0) {
                 query = addCommitIdFilter(query, params.commitIds());
             }
@@ -279,6 +282,10 @@ public class MongoRepository implements JaversRepository {
 
     private Bson addToDateFilter(Bson query, LocalDateTime to) {
         return Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(to)));
+    }
+
+    private Bson addToCommitIdFilter(Bson query, CommitId commitId) {
+        return Filters.and(query, Filters.lte(COMMIT_ID, commitId.valueAsNumber().doubleValue()));
     }
 
     private Bson addCommitIdFilter(Bson query, Set<CommitId> commitIds) {

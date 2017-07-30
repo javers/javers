@@ -92,14 +92,22 @@ public class JaversExtendedRepository implements JaversRepository {
         return delegate.getLatest(globalId);
     }
 
+    /**
+     * last snapshot with commitId <= given timePoint
+     */
+    public Optional<CdoSnapshot> getHistorical(GlobalId globalId, CommitId timePoint) {
+        argumentsAreNotNull(globalId, timePoint);
+        return delegate.getStateHistory(globalId, QueryParamsBuilder.withLimit(1).toCommitId(timePoint).build())
+            .stream().findFirst();
+    }
+
+    /**
+     * last snapshot with commitId <= given date
+     */
     public Optional<CdoSnapshot> getHistorical(GlobalId globalId, LocalDateTime date) {
         argumentsAreNotNull(globalId, date);
-        List<CdoSnapshot> result = delegate.getStateHistory(globalId, QueryParamsBuilder.withLimit(1).to(date).build());
-
-        if (result.size() > 0) {
-            return Optional.of(result.get(0));
-        }
-        return Optional.empty();
+        return delegate.getStateHistory(globalId, QueryParamsBuilder.withLimit(1).to(date).build())
+                .stream().findFirst();
     }
 
     @Override

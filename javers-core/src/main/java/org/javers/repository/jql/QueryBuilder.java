@@ -163,11 +163,11 @@ public class QueryBuilder {
     }
 
     /**
-     * Filters to snapshots (or changes) with a given property on changed properties list.
+     * Only snapshots which changed a given property.
      *
      * @see CdoSnapshot#getChanged()
      */
-    public QueryBuilder andProperty(String propertyName) {
+    public QueryBuilder withChangedProperty(String propertyName) {
         Validate.argumentIsNotNull(propertyName);
         queryParamsBuilder.changedProperty(propertyName);
         return this;
@@ -196,12 +196,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Optional filter for Entity queries ({@link #byInstanceId(Object, Class)} and {@link #byClass(Class...)}).
-     * Can be used with both changes and snapshots queries.
-     * <br/><br/>
-     *
-     * When enabled, all child ValueObjects owned by selected Entities are included in a query scope.
-     *
+     * @see #withChildValueObjects()
      * @since 2.1
      */
     public QueryBuilder withChildValueObjects(boolean aggregate) {
@@ -210,7 +205,11 @@ public class QueryBuilder {
     }
 
     /**
-     * Alias to {@link #withChildValueObjects(boolean)} with true
+     * When enabled, selects all child ValueObjects owned by selected Entities.
+     * <br/><br/>
+     *
+     * Optional filter for Entity queries ({@link #byInstanceId(Object, Class)} and {@link #byClass(Class...)}).
+     * Can be used with both changes and snapshots queries.
      *
      * @since 2.1
      */
@@ -221,7 +220,8 @@ public class QueryBuilder {
 
     /**
      * Limits number of snapshots to be fetched from JaversRepository, default is 100.
-     * <br/>
+     * <br/><br/>
+     *
      * Always choose reasonable limits to improve performance of your queries,
      * production database could contain more records than you expect.
      */
@@ -232,7 +232,7 @@ public class QueryBuilder {
 
     /**
      * Sets the number of snapshots to skip.
-     * Use skip() and limit() for for paging.
+     * Use skip() and limit() for paging.
      */
     public QueryBuilder skip(int skip) {
         queryParamsBuilder.skip(skip);
@@ -240,8 +240,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those created after (>=) given util.
+     * Limits to snapshots created after this date or exactly at this date.
      * <br/><br/>
      *
      * <h2>CommitDate is local datetime</h2>
@@ -263,15 +262,7 @@ public class QueryBuilder {
     }
 
     /**
-     * delegates to {@link #from(LocalDateTime)} with MIDNIGHT
-     */
-    public QueryBuilder from(LocalDate fromDate) {
-        return from(fromDate.atTime(MIDNIGHT));
-    }
-
-    /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those created before (<=) given util.
+     * Limits to snapshots created before this date or exactly at this date.
      */
     public QueryBuilder to(LocalDateTime to) {
         queryParamsBuilder.to(to);
@@ -279,15 +270,7 @@ public class QueryBuilder {
     }
 
     /**
-     * delegates to {@link #to(LocalDateTime)} with MIDNIGHT
-     */
-    public QueryBuilder to(LocalDate toDate) {
-        return to(toDate.atTime(MIDNIGHT));
-    }
-
-    /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those with a given commitId.
+     * Only snapshots created in a given commit.
      */
     public QueryBuilder withCommitId(CommitId commitId) {
         Validate.argumentIsNotNull(commitId);
@@ -305,8 +288,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those with given commit ids.
+     * Only snapshots created in given commits.
      */
     public QueryBuilder withCommitIds(Collection<BigDecimal> commitIds) {
         Validate.argumentIsNotNull(commitIds);
@@ -315,11 +297,34 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those with a given commit property.
-     * <br/>
+     * Only snapshots created before this commit or exactly in this commit.
+     */
+    public QueryBuilder toCommitId(CommitId commitId) {
+        Validate.argumentIsNotNull(commitId);
+        queryParamsBuilder.toCommitId(commitId);
+        return this;
+    }
+
+    /**
+     * delegates to {@link #from(LocalDateTime)} with MIDNIGHT
+     */
+    public QueryBuilder from(LocalDate fromDate) {
+        return from(fromDate.atTime(MIDNIGHT));
+    }
+
+    /**
+     * delegates to {@link #to(LocalDateTime)} with MIDNIGHT
+     */
+    public QueryBuilder to(LocalDate toDate) {
+        return to(toDate.atTime(MIDNIGHT));
+    }
+
+    /**
+     * Only snapshots with a given commit property.
+     * <br/><br/
+     *
      * If this method is called multiple times,
-     * all given properties must match with persisted commit properties.
+     * <b>all</b> given properties must match with persisted commit properties.
      * @since 2.0
      */
     public QueryBuilder withCommitProperty(String name, String value) {
@@ -329,8 +334,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Limits snapshots (or changes) to be fetched from JaversRepository
-     * to those with a given snapshot version.
+     * Only snapshots with a given version.
      */
     public QueryBuilder withVersion(long version) {
         Validate.argumentCheck(version > 0, "Version is not a positive number.");
@@ -340,42 +344,102 @@ public class QueryBuilder {
 
     /**
      * Choose between <i>shallow</i>, <i>commit-depth</i> or <i>commit-depth+</i> query scopes.
-     * <br/> The wider the scope, the more object shadows are loaded to the resulting graph.
+     * <br/>
+     * The wider the scope, the more object shadows are loaded to the resulting graph.
      * <br/><br/>
      *
-     * <b>For example</b>, we have three Entities in the object graph
-     * joined by the references.
+     * Default scope is {@link ShadowScope#SHALLOW}.
+     * <br/>
+     * Calling this method makes sense only for Shadow queries.
+     * <br/><br/>
+     *
+     * To understand shadow query scopes, you need to understand how JaVers commit works.<br/>
+     * Remember that JaVers reuses existing snapshots and creates a fresh one
+     * only if a given object is changed.<br/>
+     * The way how objects are committed affects shadow query results.
+     *
+     * <h3>For example, we have four Entities in the object graph joined by references:</h3>
      *
      * <pre>
-     *   /-> E2 -> E3
-     * E1
-     *   \-> E4
+     * // E1 -> E2 -> E3 -> E4
+     * def e4 = new Entity(id:4)
+     * def e3 = new Entity(id:3, ref:e4)
+     * def e2 = new Entity(id:2, ref:e3)
+     * def e1 = new Entity(id:1, ref:e2)
      * </pre>
      *
-     * Let's consider two scenarios.<br/>
-     * <b>In the first scenario</b>, our entities are committed one by one:
+     * <h3>In the first scenario, our four entities are committed in three commits:</h3>
+     *
+     * Full graph is loaded only in commit-deep+2 scope.
      *
      * <pre>
+     * given:
      * javers.commit("author", e3); // commit 1.0 created with e3 snapshot
      * javers.commit("author", e2); // commit 2.0 created with e2 snapshot
-     * javers.commit("author", e1); // commit 3.0 created with snapshots of e1 and e4</pre>
+     * javers.commit("author", e1); // commit 3.0 created with snapshots of e1 and e4
      *
-     * Remember that JaVers reuses existing snapshots and creates a fresh one
-     * only if a given object is changed.<br/><br/>
+     * when: 'shallow scope query'
+     * def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *              .build())
+     * def shadowE1 = shadows.get(0).get()
      *
-     * The shadow query for E1 produces different object graphs, depending on the scope:
+     * then: 'only e1 is loaded'
+     * shadowE1 instanceof Entity
+     * shadowE1.id == 1
+     * shadowE1.ref == null
      *
-     * <pre>
-     * //TODO
-     * javers.findShadows(byInstanceId(1, E).withShadowScope(SHALLOW).build())
+     * when: 'commit-deep scope query'
+     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *          .withCommitDeepScope().build())
+     * shadowE1 = shadows.get(0).get()
+     *
+     * then: 'only e1 and e2 are loaded, both was committed in commit 3.0'
+     * shadowE1.id == 1
+     * shadowE1.ref.id == 2
+     * shadowE1.ref.ref == null
+     *
+     * when: 'commit-deep+1 scope query'
+     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *          .withCommitDepthPlusScope(1).build())
+     * shadowE1 = shadows.get(0).get()
+     *
+     * then: 'e1, e2 and e3 are loaded'
+     * shadowE1.id == 1
+     * shadowE1.ref.id == 2
+     * shadowE1.ref.ref.id == 3
+     * shadowE1.ref.ref.ref == null
+     *
+     * when: 'commit-deep+2 scope query'
+     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *          .withCommitDepthPlusScope(2).build())
+     * shadowE1 = shadows.get(0).get()
+     *
+     * then: 'all object are loaded'
+     * shadowE1.id == 1
+     * shadowE1.ref.id == 2
+     * shadowE1.ref.ref.id == 3
+     * shadowE1.ref.ref.ref.id == 4
      * </pre>
      *
-     * creates the shallow graph
+     * <h3>In the second scenario, our four entities are committed in the single commit:</h3>
      *
-     * Default scope is {@link ShadowScope#SHALLOW}
-     * <br/><br/>
+     * Shallow scope works in the same way, just commit-deep scope gives the full graph.
      *
-     * Calling this method makes sense only for Shadow queries.
+     * <pre>
+     * given:
+     * javers.commit("author", e1) // commit 1.0 with snapshots of e1, e2, e3 and e4
+     *
+     * when: 'commit-deep scope query'
+     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *          .withCommitDeepScope().build())
+     * shadowE1 = shadows.get(0).get()
+     *
+     * then: 'all object are loaded'
+     * shadowE1.id == 1
+     * shadowE1.ref.id == 2
+     * shadowE1.ref.ref.id == 3
+     * shadowE1.ref.ref.ref.id == 4
+     * </pre>
      *
      * @see ShadowScope
      * @since 3.2
@@ -383,7 +447,7 @@ public class QueryBuilder {
     public QueryBuilder withShadowScope(ShadowScope shadowScope){
         Validate.argumentIsNotNull(shadowScope);
         this.shadowScope = shadowScope;
-        if (shadowScope == COMMIT_DEPTH_PLUS && maxGapsToFill == 0) {
+        if (shadowScope == COMMIT_DEEP_PLUS && maxGapsToFill == 0) {
             this.maxGapsToFill = DEFAULT_GAPS_TO_FILL_LIMIT;
         }
 
@@ -391,57 +455,56 @@ public class QueryBuilder {
     }
 
     /**
-     * Selects commit-depth scope for Shadow queries.
+     * Selects commit-deep scope for Shadow queries.
      * <br/><br/>
      *
-     * Shortcut to <code>withShadowScope(COMMIT_DEPTH).</code>
+     * Shortcut to {@link #withShadowScope(ShadowScope)} with <code>COMMIT_DEEP</code>
      * <br/><br/>
      *
      * Only for Shadow queries.
      *
-     * @see #withShadowScope(ShadowScope)
-     * @see ShadowScope#COMMIT_DEPTH
+     * @see ShadowScope#COMMIT_DEEP
      * @since 3.4
      */
-    public QueryBuilder withCommitDepthScope() {
-        return withShadowScope(COMMIT_DEPTH);
+    public QueryBuilder withCommitDeepScope() {
+        return withShadowScope(COMMIT_DEEP);
     }
 
     /**
-     * Selects commit-depth+ scope with default <code></cpce>maxGapsToFill</code> = 10.
+     * Selects commit-deep+ scope with default <code></cpce>maxGapsToFill</code> = 10.
      * <br/><br/>
      *
-     * Shortcut to <code>withShadowScope(COMMIT_DEPTH_PLUS).</code>
+     * See javadoc in {@link #withShadowScope(ShadowScope)}
      * <br/><br/>
      *
      * Only for Shadow queries.
      *
-     * @see #withShadowScope(ShadowScope)
-     * @see ShadowScope#COMMIT_DEPTH_PLUS
+     * @see ShadowScope#COMMIT_DEEP_PLUS
      * @since 3.4
      */
     public QueryBuilder withCommitDepthPlusScope() {
-        return withShadowScope(COMMIT_DEPTH_PLUS);
+        return withShadowScope(COMMIT_DEEP_PLUS);
     }
 
     /**
-     * Selects commit-depth+ scope with given gaps-to-fill limit.
+     * Selects commit-deep+ scope with given <code>maxGapsToFill</code>.
+     * <br/>
+     *
+     * See javadoc in {@link #withShadowScope(ShadowScope)}
      * <br/><br/>
      *
      * Only for Shadow queries.
      *
-     * @see #withShadowScope(ShadowScope)
-     * @see ShadowScope#COMMIT_DEPTH_PLUS
+     * @see ShadowScope#COMMIT_DEEP_PLUS
      * @since 3.4
      */
     public QueryBuilder withCommitDepthPlusScope(int maxGapsToFill) {
         this.maxGapsToFill = maxGapsToFill;
-        return withShadowScope(COMMIT_DEPTH_PLUS);
+        return withShadowScope(COMMIT_DEEP_PLUS);
     }
 
     /**
-     * Limits Snapshots to be fetched from JaversRepository
-     * to those with a given commit author.
+     * Only snapshots committed by a given author.
      * @since 2.0
      */
     public QueryBuilder byAuthor(String author) {
@@ -455,11 +518,20 @@ public class QueryBuilder {
     }
 
     /**
-     * renamed to {@link #withCommitDepthScope()}
+     * renamed to {@link #withCommitDeepScope()}
      * @deprecated
      */
     @Deprecated
     public QueryBuilder withShadowScopeDeep() {
-        return withShadowScope(COMMIT_DEPTH);
+        return withShadowScope(COMMIT_DEEP);
+    }
+
+    /**
+     * renamed to {@link #withChangedProperty(String)}
+     * @deprecated
+     */
+    @Deprecated
+    public QueryBuilder andProperty(String propertyName) {
+        return withChangedProperty(propertyName);
     }
 }

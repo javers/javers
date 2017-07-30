@@ -55,6 +55,10 @@ public final class CommitId implements Comparable<CommitId>, Serializable {
         return new BigDecimal(majorId+(minorId*.01)).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
+    public boolean isBeforeOrEqual(CommitId that){
+        return valueAsNumber().compareTo(that.valueAsNumber()) <= 0;
+    }
+
     /**
      * e.g. "1.0"
      */

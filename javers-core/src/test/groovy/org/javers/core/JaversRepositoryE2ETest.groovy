@@ -22,9 +22,6 @@ import static groovyx.gpars.GParsPool.withPool
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.QueryBuilder.*
-import static org.javers.repository.jql.ShadowScope.COMMIT_DEPTH
-import static org.javers.repository.jql.ShadowScope.COMMIT_DEPTH_PLUS
-import static org.javers.repository.jql.ShadowScope.SHALLOW
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
@@ -233,7 +230,7 @@ class JaversRepositoryE2ETest extends Specification {
         }
 
         when:
-        def snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress).andProperty("city").build())
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress).withChangedProperty("city").build())
 
         then:
         snapshots.size() == 3
@@ -251,7 +248,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit( "author", new SnapshotEntity(id:2, intProperty: 1) )
 
         when:
-        def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).andProperty("intProperty").build())
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).withChangedProperty("intProperty").build())
 
         then: "snapshots query"
         snapshots.size() == 3
@@ -261,7 +258,7 @@ class JaversRepositoryE2ETest extends Specification {
         }
 
         when: "changes query"
-        def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity).andProperty("intProperty").build())
+        def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity).withChangedProperty("intProperty").build())
 
         then:
         changes.size() == 1
@@ -379,7 +376,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         when: "should find snapshots"
         def snapshots = javers.findSnapshots(
-                byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
+                byInstanceId(1, SnapshotEntity).withChangedProperty("intProperty").build())
 
         then:
         snapshots.size() == 2
@@ -388,7 +385,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         when: "should find changes"
         def changes = javers.findChanges(
-                byInstanceId(1, SnapshotEntity).andProperty("intProperty").build())
+                byInstanceId(1, SnapshotEntity).withChangedProperty("intProperty").build())
 
         then:
         changes.size() == 1
@@ -440,7 +437,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         when:
         def changes = javers.findChanges(
-            byInstanceId(1,SnapshotEntity).andProperty("intProperty").build())
+            byInstanceId(1,SnapshotEntity).withChangedProperty("intProperty").build())
 
         then:
         changes.size() == n-1
@@ -882,7 +879,7 @@ class JaversRepositoryE2ETest extends Specification {
         }
 
         when:
-        def query = byInstanceId(1, SnapshotEntity).andProperty('intProperty').limit(limit).build()
+        def query = byInstanceId(1, SnapshotEntity).withChangedProperty('intProperty').limit(limit).build()
         def snapshots = javers.findSnapshots(query)
         def changes = javers.findChanges(query)
 
@@ -1126,7 +1123,7 @@ class JaversRepositoryE2ETest extends Specification {
         when:
         javers.commit("author", new DummyUserDetails(id:1))
         javers.commit("author", new DummyUserDetails(id:1, customizedProperty: 'a'))
-        def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject().andProperty('Customized Property').build())
+        def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject().withChangedProperty('Customized Property').build())
 
         then:
         snapshots.size() == 1
@@ -1166,7 +1163,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         when:
         def shadows = javers.findShadows(QueryBuilder.byValueObjectId(1, SnapshotEntity, "valueObjectRef")
-                .withShadowScope(ShadowScope.COMMIT_DEPTH)
+                .withCommitDeepScope()
                 .build()).collect{it.get()}
 
         then:
@@ -1273,7 +1270,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("a", new SnapshotEntity(id: 1, intProperty: 3, entityRef: ref2))
 
         when:
-        def shadows = javers.findShadows(byInstanceId(1, SnapshotEntity).withCommitDepthScope()
+        def shadows = javers.findShadows(byInstanceId(1, SnapshotEntity).withCommitDeepScope()
                 .build()).collect{it.get()}
 
         then:
@@ -1313,7 +1310,7 @@ class JaversRepositoryE2ETest extends Specification {
         when:
         def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
                 .withChildValueObjects()
-                .withCommitDepthScope().build()).collect{it.get()}
+                .withCommitDeepScope().build()).collect{it.get()}
 
         then:
         shadows.size() == 5
@@ -1360,7 +1357,6 @@ class JaversRepositoryE2ETest extends Specification {
 
         //noise
         ref.intProperty = 3
-        sleep(1000)
         javers.commit("a", ref)
 
         when:

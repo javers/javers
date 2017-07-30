@@ -45,4 +45,26 @@ class CommitSeqGeneratorTest extends Specification {
         commitSeqGenerator.nextId(commit1)  == new CommitId(2,2)
         commitSeqGenerator.nextId(commit2)  == new CommitId(3,1)
     }
+
+    def "should provide chronological ordering for commitIds"() {
+        given:
+        def commitSeqGenerator = new CommitSeqGenerator()
+        def head = commitSeqGenerator.nextId(null)
+
+        when:
+        def commits = []
+        15.times {
+            commits << commitSeqGenerator.nextId(head)
+        }
+
+        commits.each {
+            println it.valueAsNumber()
+        }
+
+        then:
+        14.times {
+            assert commits[it].isBeforeOrEqual(commits[it])
+            assert commits[it].isBeforeOrEqual(commits[it + 1])
+        }
+    }
 }

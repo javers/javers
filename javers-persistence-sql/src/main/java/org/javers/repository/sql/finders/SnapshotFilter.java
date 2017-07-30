@@ -70,6 +70,9 @@ abstract class SnapshotFilter extends SchemaNameAware {
         if (queryParams.to().isPresent()) {
             addToDateCondition(query, queryParams.to().get());
         }
+        if (queryParams.toCommitId().isPresent()) {
+            addToCommitIdCondition(query, queryParams.toCommitId().get());
+        }
         if (queryParams.commitIds().size() > 0) {
             addCommitIdCondition(query, queryParams.commitIds());
         }
@@ -101,6 +104,10 @@ abstract class SnapshotFilter extends SchemaNameAware {
 
     private void addCommitIdCondition(SelectQuery query, Set<CommitId> commitIds) {
         query.append(" AND " + COMMIT_COMMIT_ID + " IN (" + ToStringBuilder.join(commitIds.stream().map(c -> c.valueAsNumber()).collect(Collectors.toList())) + ")");
+    }
+
+    private void addToCommitIdCondition(SelectQuery query, CommitId commitId) {
+        query.append(" AND " + COMMIT_COMMIT_ID + " <= " + commitId.valueAsNumber());
     }
 
     void addVersionCondition(SelectQuery query, Long version) {
