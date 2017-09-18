@@ -44,7 +44,7 @@ dependencies {
 
     testCompile 'org.springframework.data:spring-data-mongodb:1.9.2.RELEASE'
     testCompile "com.github.fakemongo:fongo:$fongoVersion"
-    testCompile "org.mongodb:mongo-java-driver:$mongoJavaDriverVersion"
+    testCompile "org.mongodb:mongodb-driver:$mongoDbDriverVersion"
 
     testCompile project(':javers-persistence-mongo')
 }
