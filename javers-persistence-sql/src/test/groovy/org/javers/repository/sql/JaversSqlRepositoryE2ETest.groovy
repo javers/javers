@@ -61,6 +61,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     def clearTables() {
         execute("delete  from ${schemaPrefix()}jv_snapshot")
+        execute("delete  from ${schemaPrefix()}jv_commit_property")
         execute("delete  from ${schemaPrefix()}jv_commit")
         execute("delete  from ${schemaPrefix()}jv_commit_property")
         execute("delete  from ${schemaPrefix()}jv_global_id")
