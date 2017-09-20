@@ -9,7 +9,7 @@ before_script:
 - psql -c 'create database travis_ci_test;' -U postgres
 - psql -c 'create schema j_some authorization postgres;' -U postgres travis_ci_test
 - mysql -e 'create database travis_ci_test;' -u root
-- mongo mydb_test --eval 'db.createUser("travis", "test");'
+- mongo mydb_test --eval 'db.testCollection.insertOne( { x: 1 } );'
 script:
 - ./gradlew build
 - ./gradlew integrationTest
