@@ -5,7 +5,7 @@ import com.mongodb.client.MongoDatabase
 import org.javers.repository.mongo.JaversMongoRepositoryE2ETest
 
 /**
- * runs e2e test suite with real MongoDB at http://mongolab.com
+ * runs e2e test suite with real MongoDB at localhost
  *
  * @author bartosz walacik
  */

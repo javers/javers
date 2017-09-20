@@ -1,21 +1,15 @@
 language: java
 jdk:
 - oraclejdk8
-addons:
-  apt:
-    sources:
-    - mongodb-upstart
-    - mongodb-3.2-precise
-    packages:
-    - mongodb-org-server
-    - mongodb-org-shell
 services:
   - postgresql
   - mysql
+  - mongodb
 before_script:
 - psql -c 'create database travis_ci_test;' -U postgres
 - psql -c 'create schema j_some authorization postgres;' -U postgres travis_ci_test
 - mysql -e 'create database travis_ci_test;' -u root
+- mongo mydb_test --eval 'db.addUser("travis", "test");'
 script:
 - ./gradlew build
 - ./gradlew integrationTest
