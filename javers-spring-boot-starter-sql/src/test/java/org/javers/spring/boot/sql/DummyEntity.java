@@ -1,21 +1,22 @@
 package org.javers.spring.boot.sql;
 
-
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.UUID;
 
-/**
- * @author pawelszymczyk
- */
 @Entity
 public class DummyEntity {
 
+    @Id
     private int id;
     private String name;
 
-    public DummyEntity() {
+    DummyEntity() {
+    }
+
+    public static DummyEntity random() {
+        return new DummyEntity(UUID.randomUUID().hashCode(), UUID.randomUUID().toString());
     }
 
     public DummyEntity(int id, String name) {

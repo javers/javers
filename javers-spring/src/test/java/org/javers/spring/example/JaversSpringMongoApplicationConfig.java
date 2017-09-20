@@ -19,13 +19,10 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import java.util.Map;
 
-/**
- * @author bartosz walacik
- */
 @Configuration
 @ComponentScan(basePackages = "org.javers.spring.repository.mongo")
 @EnableAspectJAutoProxy
-@EnableMongoRepositories(basePackages = "org.javers.spring.repository.mongo")
+//@EnableMongoRepositories({"org.javers.spring.repository.mongo"})
 public class JaversSpringMongoApplicationConfig {
 
     /**

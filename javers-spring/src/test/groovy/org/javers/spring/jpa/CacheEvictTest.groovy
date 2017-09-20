@@ -2,19 +2,17 @@ package org.javers.spring.jpa
 
 import groovy.sql.Sql
 import org.javers.core.Javers
-import org.javers.hibernate.integration.entity.Person
-import org.javers.hibernate.integration.entity.PersonCrudRepository
+import org.javers.hibernate.entity.Person
+import org.javers.hibernate.entity.PersonCrudRepository
 import org.javers.repository.jql.QueryBuilder
 import org.javers.repository.sql.JaversSqlRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.IntegrationTest
-import org.springframework.boot.test.SpringApplicationConfiguration
+import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
 import static org.javers.hibernate.integration.config.HibernateConfig.H2_URL
 
-@IntegrationTest
-@SpringApplicationConfiguration(classes = CacheEvictSpringConfig)
+@ContextConfiguration(classes = CacheEvictSpringConfig)
 class CacheEvictTest extends Specification{
 
     @Autowired

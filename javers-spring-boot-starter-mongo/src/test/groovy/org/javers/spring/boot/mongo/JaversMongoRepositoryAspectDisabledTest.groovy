@@ -8,14 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import spock.lang.Specification
 
 /**
  * @author mwesolowski
  */
-@RunWith(SpringJUnit4ClassRunner)
 @SpringBootTest(classes = [TestApplication], properties = ["javers.springDataAuditableRepositoryAspectEnabled=false"])
 @ActiveProfiles("test")
-class JaversMongoRepositoryAspectDisabledTest {
+class JaversMongoRepositoryAspectDisabledTest extends Specification{
 
     @Autowired
     Javers javers
@@ -23,17 +23,13 @@ class JaversMongoRepositoryAspectDisabledTest {
     @Autowired
     DummyEntityRepository dummyEntityRepository
 
-    @Test
-    void "should build javers instance without auto-audit aspect"() {
-        //given
-        def dummyEntity = new DummyEntity(1)
+    def "should build javers instance without auto-audit aspect"() {
+        when:
+        def dummyEntity = dummyEntityRepository.save(new DummyEntity(UUID.randomUUID().hashCode()))
 
-        //when
-        dummyEntityRepository.save(dummyEntity)
-
-        //then
-        def snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyEntity).build())
+        then:
+        def snapshots = javers
+                .findSnapshots(QueryBuilder.byInstanceId(dummyEntity.id, DummyEntity).build())
         assert snapshots.size() == 0
     }
-
 }

@@ -1,7 +1,0 @@
-javers:
-  algorithm: levenshtein_distance
-  mappingStyle: bean
-  newObjectSnapshot: false
-  prettyPrint: false
-  typeSafeValues: true
-  dialect: postgres

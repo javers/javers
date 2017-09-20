@@ -3,32 +3,20 @@ package org.javers.spring.auditable.integration
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.example.JaversSpringMongoApplicationConfig
-import org.javers.spring.repository.mongo.DummyAuditedRepository
 import org.javers.spring.model.DummyObject
-import org.springframework.context.ApplicationContext
-import org.springframework.context.annotation.AnnotationConfigApplicationContext
-import spock.lang.Shared
+import org.javers.spring.repository.mongo.DummyAuditedRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
-/**
- * @author Pawel Szymczyk
- */
+@ContextConfiguration(classes = JaversSpringMongoApplicationConfig)
 class JaversAuditableAspectIntegrationTest extends Specification {
 
-    @Shared
-    ApplicationContext context
-
-    @Shared
+    @Autowired
     Javers javers
 
-    @Shared
+    @Autowired
     DummyAuditedRepository repository
-
-    def setupSpec() {
-        context = new AnnotationConfigApplicationContext(JaversSpringMongoApplicationConfig)
-        javers = context.getBean(Javers)
-        repository = context.getBean(DummyAuditedRepository)
-    }
 
     def "should commit single argument when method is annotated with @JaversAuditable"() {
         given: "one arg test"

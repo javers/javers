@@ -2,23 +2,19 @@ package org.javers.spring.boot.mongo
 
 import org.javers.core.Javers
 import org.javers.core.metamodel.type.EntityType
-import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
-import org.junit.Test
-import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.SpringApplicationConfiguration
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import spock.lang.Specification
 
 /**
  * @author pawelszymczyk
  */
-@RunWith(SpringJUnit4ClassRunner)
-@SpringApplicationConfiguration(classes = [TestApplication])
+@SpringBootTest(classes = [TestApplication])
 @ActiveProfiles("test")
-class JaversMongoAutoConfigurationTest {
+class JaversMongoAutoConfigurationTest extends Specification{
 
     @Autowired
     Javers javers
@@ -29,27 +25,27 @@ class JaversMongoAutoConfigurationTest {
     @Autowired
     AuthorProvider provider
 
-    @Test
-    void shoudUseDbNameFromMongoStarter(){
-        assert javers.repository.delegate.mongoSchemaManager.mongo.name == "spring-mongo"
+    def "shoudUseDbNameFromMongoStarter"(){
+        expect:
+        javers.repository.delegate.mongoSchemaManager.mongo.name == "spring-mongo"
     }
 
-    @Test
-    void shouldReadConfigurationFromYml() {
-        assert javersProperties.algorithm == "levenshtein_distance"
-        assert javersProperties.mappingStyle == "bean"
-        assert !javersProperties.newObjectSnapshot
-        assert !javersProperties.prettyPrint
-        assert javersProperties.typeSafeValues
+    def "shouldReadConfigurationFromYml"() {
+        expect:
+        javersProperties.algorithm == "levenshtein_distance"
+        javersProperties.mappingStyle == "bean"
+        !javersProperties.newObjectSnapshot
+        !javersProperties.prettyPrint
+        javersProperties.typeSafeValues
     }
 
-    @Test
-    void shouldReadBeanMappingStyleFromYml() {
-        assert javers.getTypeMapping(DummyEntity) instanceof EntityType
+    def "shouldReadBeanMappingStyleFromYml"() {
+        expect:
+        javers.getTypeMapping(DummyEntity) instanceof EntityType
     }
 
-    @Test
-    void shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath() {
-        assert provider instanceof SpringSecurityAuthorProvider
+    def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath"() {
+        expect:
+        provider instanceof SpringSecurityAuthorProvider
     }
 }

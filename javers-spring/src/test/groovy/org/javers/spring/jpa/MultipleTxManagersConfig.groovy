@@ -2,14 +2,13 @@ package org.javers.spring.jpa
 
 import org.javers.core.Javers
 import org.javers.hibernate.integration.config.HibernateConfig
+import org.javers.hibernate.integration.config.HibernateConfig
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.JaversSqlRepository
 import org.javers.repository.sql.SqlRepositoryBuilder
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
@@ -21,11 +20,10 @@ import org.springframework.transaction.annotation.TransactionManagementConfigure
 import javax.persistence.EntityManagerFactory
 
 @Configuration()
-@ComponentScan(basePackages = ["org.javers.hibernate", "org.javers.spring.jpa"])
-@EnableJpaRepositories(basePackages = "org.javers.hibernate")
+@EnableJpaRepositories(basePackages = ["org.javers.hibernate.entity"])
 @EnableTransactionManagement()
 @EnableAspectJAutoProxy
-@Import(HibernateConfig.class)
+@Import(HibernateConfig)
 class MultipleTxManagersConfig extends HibernateConfig implements TransactionManagementConfigurer {
 
 

@@ -1,19 +1,17 @@
 package org.javers.spring.boot.sql;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author pawelszymczyk
  */
-@EnableAutoConfiguration
-@EnableTransactionManagement
+@SpringBootApplication
 @ComponentScan("org.javers.spring.boot.sql")
 public class TestApplication {
     @Bean

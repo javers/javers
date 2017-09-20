@@ -1,4 +1,4 @@
-package org.javers.hibernate.integration.entity;
+package org.javers.hibernate.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
