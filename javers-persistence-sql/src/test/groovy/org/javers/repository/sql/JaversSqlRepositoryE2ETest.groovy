@@ -194,7 +194,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     def "should allow concurrent updates of different Objects"(){
         given:
         def cnt = new AtomicInteger()
-        def threads = 99
+        def threads = 85
 
         when:
         withPool threads, {
