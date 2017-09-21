@@ -8,7 +8,9 @@ services:
 before_script:
 - psql -c 'create database travis_ci_test;' -U postgres
 - psql -c 'create schema j_some authorization postgres;' -U postgres travis_ci_test
-- mysql -e 'create database travis_ci_test;' -u root
+- mysql -e 'CREATE DATABASE travis_ci_test;' -u root
+- mysql -e "CREATE USER 'javers'@'localhost' IDENTIFIED BY 'javers';" -u root
+- mysql -e "GRANT ALL PRIVILEGES ON travis_ci_test.* TO 'javers'@'localhost' WITH GRANT OPTION;" -u root
 - mongo --eval 'db.version();'
 script:
 - ./gradlew build
