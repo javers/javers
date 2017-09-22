@@ -61,12 +61,6 @@ subprojects {
         }
     }
 
-    integrationTest {
-        testLogging {
-            exceptionFormat = 'full'
-        }
-    }
-
     task example(dependsOn: 'cleanTest') {
         doLast {
             tasks.test.testLogging {
