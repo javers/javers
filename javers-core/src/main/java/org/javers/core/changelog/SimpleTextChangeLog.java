@@ -30,6 +30,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class SimpleTextChangeLog extends AbstractTextChangeLog {
     public static final DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final String MARGIN = "    ";
 
     private final DateTimeFormatter dateTimeFormatter;
 
@@ -54,48 +55,45 @@ public class SimpleTextChangeLog extends AbstractTextChangeLog {
 
     @Override
     public void onValueChange(ValueChange valueChange) {
-        appendln("    value changed on '"+valueChange.getPropertyName()+"' property: '"+ valueChange.getLeft() +
-                 "' -> '" + valueChange.getRight() + "'");
+        appendWithMargin(valueChange.toString());
     }
 
     @Override
     public void onReferenceChange(ReferenceChange referenceChange) {
-        appendln("    reference changed on '" + referenceChange.getPropertyName() + "' property: '" + referenceChange.getLeft() +
-                "' -> '" + referenceChange.getRight() + "'");
+        appendWithMargin(referenceChange.toString());
     }
 
     @Override
     public void onNewObject(NewObject newObject) {
-        appendln("    new object: " + newObject.getAffectedGlobalId());
+        appendWithMargin(newObject.toString());
     }
 
     @Override
     public void onObjectRemoved(ObjectRemoved objectRemoved) {
-        appendln("    object removed: '" + objectRemoved.getAffectedGlobalId());
+        appendWithMargin(objectRemoved.toString());
     }
 
     @Override
     public void onMapChange(MapChange mapChange) {
-        appendln("    map changed on '" + mapChange.getPropertyName() + "' property: " +
-                mapChange.getEntryChanges());
+         appendWithMargin(mapChange.toString());
     }
 
     @Override
     public void onArrayChange(ArrayChange arrayChange) {
-        appendln("    array changed on '" + arrayChange.getPropertyName() + "' property: " +
-                arrayChange.getChanges());
+        appendWithMargin(arrayChange.toString());
     }
 
     @Override
     public void onListChange(ListChange listChange) {
-        appendln("    list changed on '" + listChange.getPropertyName() + "' property: " +
-                listChange.getChanges());
+        appendWithMargin(listChange.toString());
     }
 
     @Override
     public void onSetChange(SetChange setChange) {
-        appendln("    set changed on '" + setChange.getPropertyName() + "' property: "+
-                 setChange.getChanges());
+        appendWithMargin(setChange.toString());
     }
 
+    private void appendWithMargin(String txt) {
+        append(MARGIN + txt);
+    }
 }

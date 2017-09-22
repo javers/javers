@@ -55,4 +55,9 @@ public final class ValueChange extends PropertyChange {
     public int hashCode() {
         return Objects.hash(super.hashCode(), getLeft(), getRight());
     }
+
+    @Override
+    public String toString() {
+        return "value changed on '"+ getPropertyName()+"' property: '"+ getLeft() + "' -> '" + getRight() + "'";
+    }
 }

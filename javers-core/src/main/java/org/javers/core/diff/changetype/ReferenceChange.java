@@ -93,4 +93,9 @@ public final class ReferenceChange extends PropertyChange {
     public int hashCode() {
         return Objects.hash(super.hashCode(), getLeft(), getRight());
     }
+
+    @Override
+    public String toString() {
+        return "reference changed on '" + getPropertyName() + "' property: '" + getLeft() + "' -> '" + getRight() + "'";
+    }
 }
