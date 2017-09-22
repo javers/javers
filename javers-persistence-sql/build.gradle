@@ -22,6 +22,10 @@ task integrationTest(type: Test) {
     filter {
         includeTestsMatching 'org.javers.repository.sql.integration.opendatabases.*'
     }
+    testLogging {
+        exceptionFormat = 'full'
+        events 'failed', 'passed'
+    }
 }
 
 task integrationTestMs(type: Test) {

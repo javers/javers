@@ -14,7 +14,8 @@ task integrationTest(type: Test) {
         includeTestsMatching 'org.javers.repository.mongo.integration.**'
     }
     testLogging {
-        showStandardStreams = true
+        exceptionFormat = 'full'
+        events 'failed', 'passed'
     }
 }
 
