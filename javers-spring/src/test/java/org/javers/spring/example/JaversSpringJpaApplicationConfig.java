@@ -33,14 +33,11 @@ import javax.sql.DataSource;
 import java.util.Map;
 import java.util.Properties;
 
-/**
- * @author bartosz walacik
- */
 @Configuration
 @ComponentScan(basePackages = "org.javers.spring.repository.jpa")
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
-@EnableJpaRepositories(basePackages = "org.javers.spring.repository.jpa")
+@EnableJpaRepositories({"org.javers.spring.repository.jpa"})
 public class JaversSpringJpaApplicationConfig {
 
     //.. JaVers setup ..

@@ -1,7 +1,7 @@
 package org.javers.spring.jpa
 
-import org.javers.hibernate.integration.entity.Person
-import org.javers.hibernate.integration.entity.PersonCrudRepository
+import org.javers.hibernate.entity.Person
+import org.javers.hibernate.entity.PersonCrudRepository
 
 import javax.transaction.Transactional
 

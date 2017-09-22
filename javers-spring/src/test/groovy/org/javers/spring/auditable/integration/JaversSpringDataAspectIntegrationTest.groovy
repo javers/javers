@@ -6,34 +6,25 @@ import org.javers.spring.example.JaversSpringJpaApplicationConfig
 import org.javers.spring.model.DummyObject
 import org.javers.spring.repository.jpa.DummyAuditedJpaCrudRepository
 import org.javers.spring.repository.jpa.DummyNoAuditJpaCrudRepository
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
-import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
-import spock.lang.Shared
+import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
-/**
- * Created by gessnerfl on 22.02.15.
- */
+@ContextConfiguration(classes = [JaversSpringJpaApplicationConfig])
 class JaversSpringDataAspectIntegrationTest extends Specification {
-    @Shared
+    @Autowired
     ApplicationContext context
 
-    @Shared
+    @Autowired
     Javers javers
 
-    @Shared
+    @Autowired
     DummyAuditedJpaCrudRepository repository
 
-    @Shared
+    @Autowired
     DummyNoAuditJpaCrudRepository noAuditRepository
-
-    def setupSpec() {
-        context = new AnnotationConfigApplicationContext(JaversSpringJpaApplicationConfig)
-        javers = context.getBean(Javers)
-        repository = context.getBean(DummyAuditedJpaCrudRepository)
-        noAuditRepository = context.getBean(DummyNoAuditJpaCrudRepository)
-    }
 
     def "should not fail on JaVers aspect when deleting an object which not exists in JaVers repository"(){
         when:

@@ -12,14 +12,14 @@ dependencies {
     compile project(':javers-persistence-sql')
     compile project(':javers-core')
 
-    compile 'org.aspectj:aspectjweaver:1.8.6'
+    compile "org.aspectj:aspectjweaver:$aspectjweaverVersion"
     compile 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:1.0.0.Final'
 
     //should be on application's classpath
     optional "org.springframework:spring-context:$springVersion"
 
     //should be on application's classpath when using JaversSpringDataAuditable
-    optional 'org.springframework.data:spring-data-commons:1.11.1.RELEASE'
+    optional 'org.springframework.data:spring-data-commons:1.13.7.RELEASE'
 
     //should be on application's classpath when using SpringSecurityAuthorProvider
     optional 'org.springframework.security:spring-security-core:4.0.3.RELEASE'
@@ -36,15 +36,11 @@ dependencies {
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile "org.springframework:spring-test:$springVersion"
 
-    testCompile "org.springframework.boot:spring-boot-test:$springBootVersion"
-    testCompile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
-
-    testCompile "org.spockframework:spock-core:$spockVersion"
+    testCompile "org.springframework.data:spring-data-jpa:1.11.7.RELEASE"
     testCompile "org.spockframework:spock-spring:$spockVersion"
 
-    testCompile 'org.springframework.data:spring-data-mongodb:1.9.2.RELEASE'
+    testCompile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     testCompile "com.github.fakemongo:fongo:$fongoVersion"
-    testCompile "org.mongodb:mongo-java-driver:$mongoJavaDriverVersion"
 
     testCompile project(':javers-persistence-mongo')
 }

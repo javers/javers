@@ -1,6 +1,6 @@
 dependencies {
     compile project(':javers-core')
-    compile "org.mongodb:mongo-java-driver:$mongoJavaDriverVersion"
+    compile "org.mongodb:mongodb-driver:$mongoDbDriverVersion"
     compile "com.google.guava:guava:$guavaVersion"
 
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
@@ -14,7 +14,8 @@ task integrationTest(type: Test) {
         includeTestsMatching 'org.javers.repository.mongo.integration.**'
     }
     testLogging {
-        showStandardStreams = true
+        exceptionFormat = 'full'
+        events 'failed', 'passed'
     }
 }
 

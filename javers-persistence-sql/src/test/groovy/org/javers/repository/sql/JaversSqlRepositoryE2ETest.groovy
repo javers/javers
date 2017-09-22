@@ -61,6 +61,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
 
     def clearTables() {
         execute("delete  from ${schemaPrefix()}jv_snapshot")
+        execute("delete  from ${schemaPrefix()}jv_commit_property")
         execute("delete  from ${schemaPrefix()}jv_commit")
         execute("delete  from ${schemaPrefix()}jv_commit_property")
         execute("delete  from ${schemaPrefix()}jv_global_id")
@@ -193,7 +194,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
     def "should allow concurrent updates of different Objects"(){
         given:
         def cnt = new AtomicInteger()
-        def threads = 99
+        def threads = 85
 
         when:
         withPool threads, {
@@ -214,7 +215,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
         given:
         def cnt = new AtomicInteger()
         def sId = 222
-        def threads = 99
+        def threads = 85
         //initial commit
         javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
         getConnection().commit()

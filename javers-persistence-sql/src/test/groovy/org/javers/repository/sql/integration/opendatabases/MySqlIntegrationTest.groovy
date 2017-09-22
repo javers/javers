@@ -9,7 +9,7 @@ import java.sql.DriverManager
 class MySqlIntegrationTest extends JaversSqlRepositoryE2ETest {
 
     Connection createConnection() {
-        DriverManager.getConnection("jdbc:mysql://localhost/travis_ci_test", "travis", "");
+        DriverManager.getConnection("jdbc:mysql://localhost/travis_ci_test", "javers", "javers");
     }
 
     DialectName getDialect() {

@@ -7,7 +7,7 @@ import spock.lang.Specification
 
 import java.math.RoundingMode
 
-class NewPerformanceTest extends Specification {
+abstract class NewPerformanceTest extends Specification {
 
     static int n = 10000
     Javers javers = JaversBuilder.javers().build()

@@ -5,44 +5,39 @@ import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
 import org.javers.spring.boot.sql.JaversProperties
 import org.javers.spring.boot.sql.TestApplication
-import org.junit.Test
-import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.SpringApplicationConfiguration
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
-
-import static org.fest.assertions.api.Assertions.assertThat
+import spock.lang.Specification
 
 /**
  * @author pawelszymczyk
  */
-@RunWith(SpringJUnit4ClassRunner)
-@SpringApplicationConfiguration(classes = [TestApplication])
-@ActiveProfiles("integrationTest")
-public class JaversSqlAutoConfigurationTest {
+@SpringBootTest(classes = [TestApplication])
+@ActiveProfiles("test")
+class JaversSqlAutoConfigurationTest extends Specification {
 
     @Autowired
-    DialectName dialectName;
+    DialectName dialectName
 
     @Autowired
-    JaversProperties javersProperties;
+    JaversProperties javersProperties
 
     @Autowired
     AuthorProvider provider
 
-    @Test
-    void shouldReadConfigurationFromYml() {
-        assertThat(javersProperties.getAlgorithm()).isEqualTo("levenshtein_distance")
-        assertThat(javersProperties.getMappingStyle()).isEqualTo("bean")
-        assertThat(javersProperties.isNewObjectSnapshot()).isFalse()
-        assertThat(javersProperties.isPrettyPrint()).isFalse()
-        assertThat(javersProperties.isTypeSafeValues()).isTrue()
-        assertThat(dialectName).isEqualTo(DialectName.H2)
+    def "shouldReadConfigurationFromYml" () {
+        expect:
+        javersProperties.getAlgorithm() == "levenshtein_distance"
+        javersProperties.getMappingStyle() == "bean"
+        !javersProperties.isNewObjectSnapshot()
+        !javersProperties.isPrettyPrint()
+        javersProperties.isTypeSafeValues()
+        dialectName == DialectName.H2
     }
 
-    @Test
-    void shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath() {
-        assert provider instanceof SpringSecurityAuthorProvider
+    def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath" () {
+        expect:
+        provider instanceof SpringSecurityAuthorProvider
     }
 }
