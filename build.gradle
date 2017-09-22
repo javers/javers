@@ -55,6 +55,18 @@ subprojects {
         options.noTimestamp()
     }
 
+    test {
+        testLogging {
+            exceptionFormat = 'full'
+        }
+    }
+
+    integrationTest {
+        testLogging {
+            exceptionFormat = 'full'
+        }
+    }
+
     task example(dependsOn: 'cleanTest') {
         doLast {
             tasks.test.testLogging {
