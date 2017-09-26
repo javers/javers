@@ -35,4 +35,9 @@ public final class NewObject extends Change {
     public int hashCode() {
         return super.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "new object: " + getAffectedGlobalId();
+    }
 }

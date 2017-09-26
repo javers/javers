@@ -36,4 +36,9 @@ public final class ListChange extends CollectionChange {
     public int hashCode() {
         return Objects.hash(super.hashCode());
     }
+
+    @Override
+    public String toString() {
+        return "list changed on '" + getPropertyName() + "' property: " + getChanges();
+    }
 }

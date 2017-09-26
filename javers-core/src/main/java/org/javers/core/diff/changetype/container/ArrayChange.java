@@ -37,4 +37,9 @@ public final class ArrayChange extends ContainerChange {
     public int hashCode() {
         return Objects.hash(super.hashCode());
     }
+
+    @Override
+    public String toString() {
+        return "array changed on '" + getPropertyName() + "' property: " + getChanges();
+    }
 }

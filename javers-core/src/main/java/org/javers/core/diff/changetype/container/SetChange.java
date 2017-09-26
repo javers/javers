@@ -42,4 +42,9 @@ public final class SetChange extends CollectionChange {
     public int hashCode() {
         return Objects.hash(super.hashCode());
     }
+
+    @Override
+    public String toString() {
+        return "set changed on '" + getPropertyName() + "' property: "+ getChanges();
+    }
 }

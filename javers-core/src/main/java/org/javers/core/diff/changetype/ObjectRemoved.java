@@ -35,4 +35,9 @@ public final class ObjectRemoved extends Change {
     public int hashCode() {
         return super.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "object removed: '" + getAffectedGlobalId();
+    }
 }
