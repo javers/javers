@@ -87,10 +87,10 @@ public class ToStringBuilder {
     }
 
     public static String addFirstField(String fieldName, Object value) {
-        return fieldName+":'"+ (value != null ? value.toString() : "")+"'";
+        return fieldName+":'"+ (value != null ? value.toString() : "null")+"'";
     }
 
     public static String addEnumField(String fieldName, Object value) {
-        return ", "+fieldName+":["+ (value != null ? value.toString() : "")+"]";
+        return ", "+fieldName+":["+ (value != null ? value.toString() : "null")+"]";
     }
 }
