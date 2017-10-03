@@ -71,12 +71,18 @@ class ShadowGraphBuilder {
         builtNodes.put(cdoSnapshot.getGlobalId(), shadowBuilder);
 
         JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(cdoSnapshot.getState());
+        mapCustomPropertyNamesToJavaOrigin(cdoSnapshot, jsonElement);
         followReferences(shadowBuilder, jsonElement);
 
         Object shadowStub = jsonConverter.fromJson(jsonElement, cdoSnapshot.getManagedType().getBaseJavaClass());
         shadowBuilder.withStub(shadowStub);
 
         return shadowBuilder;
+    }
+
+    private void mapCustomPropertyNamesToJavaOrigin(CdoSnapshot cdoSnapshot, JsonObject jsonElement) {
+        CustomPropertyToJavaOriginFunction function = new CustomPropertyToJavaOriginFunction(jsonElement);
+        cdoSnapshot.getManagedType().forEachProperty(javersProperty -> function.consume(javersProperty));
     }
 
     private void followReferences(ShadowBuilder currentNode, JsonObject jsonElement) {
