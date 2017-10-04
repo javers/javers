@@ -12,7 +12,7 @@ import java.util.Map;
  * @author pawelszymczyk
  */
 @SpringBootApplication
-@ComponentScan("org.javers.spring.boot.sql")
+@ComponentScan("org.javers.spring")
 public class TestApplication {
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {

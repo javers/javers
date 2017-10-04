@@ -40,7 +40,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         notThrown(Exception)
     }
 
-    def "should create a new version on create via audited repository"() {
+    def "should create a new version on save via audited repository"() {
         setup:
         def o = new DummyObject("foo")
 
