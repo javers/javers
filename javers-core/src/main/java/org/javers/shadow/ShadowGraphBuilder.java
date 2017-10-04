@@ -1,5 +1,6 @@
 package org.javers.shadow;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
@@ -81,14 +82,19 @@ class ShadowGraphBuilder {
     }
 
     private void mapCustomPropertyNamesToJavaOrigin(CdoSnapshot cdoSnapshot, JsonObject jsonElement) {
-        CustomPropertyToJavaOriginFunction function = new CustomPropertyToJavaOriginFunction(jsonElement);
-        cdoSnapshot.getManagedType().forEachProperty(javersProperty -> function.consume(javersProperty));
+        cdoSnapshot.getManagedType().forEachProperty(javersProperty -> {
+                if (javersProperty.hasCustomName()) {
+                    JsonElement value = jsonElement.get(javersProperty.getName());
+                    jsonElement.remove(javersProperty.getName());
+                    jsonElement.add(javersProperty.getOriginalName(), value);
+                }
+        });
     }
 
     private void followReferences(ShadowBuilder currentNode, JsonObject jsonElement) {
         CdoSnapshot cdoSnapshot = currentNode.getCdoSnapshot();
 
-        cdoSnapshot.getManagedType().forEachProperty( (JaversProperty property) -> {
+        cdoSnapshot.getManagedType().forEachProperty( property -> {
             if (cdoSnapshot.isNull(property)) {
                 return;
             }
