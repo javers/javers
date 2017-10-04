@@ -47,6 +47,11 @@ public class JaversSpringDataAuditableRepositoryAspect {
         onVersionEvent(pjp, saveHandler);
     }
 
+    @AfterReturning("execution(public * saveAndFlush(..)) && this(org.springframework.data.repository.CrudRepository)")
+    public void onSaveAndFlushExecuted(JoinPoint pjp) {
+        onVersionEvent(pjp, saveHandler);
+    }
+
     private void onVersionEvent(JoinPoint pjp, AuditChangeHandler handler) {
         Optional<Class> versionedInterface = getRepositoryInterface(pjp);
 
