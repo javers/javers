@@ -1,5 +1,6 @@
 package org.javers.shadow;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
@@ -71,6 +72,7 @@ class ShadowGraphBuilder {
         builtNodes.put(cdoSnapshot.getGlobalId(), shadowBuilder);
 
         JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(cdoSnapshot.getState());
+        mapCustomPropertyNamesToJavaOrigin(cdoSnapshot, jsonElement);
         followReferences(shadowBuilder, jsonElement);
 
         Object shadowStub = jsonConverter.fromJson(jsonElement, cdoSnapshot.getManagedType().getBaseJavaClass());
@@ -79,10 +81,20 @@ class ShadowGraphBuilder {
         return shadowBuilder;
     }
 
+    private void mapCustomPropertyNamesToJavaOrigin(CdoSnapshot cdoSnapshot, JsonObject jsonElement) {
+        cdoSnapshot.getManagedType().forEachProperty(javersProperty -> {
+                if (javersProperty.hasCustomName()) {
+                    JsonElement value = jsonElement.get(javersProperty.getName());
+                    jsonElement.remove(javersProperty.getName());
+                    jsonElement.add(javersProperty.getOriginalName(), value);
+                }
+        });
+    }
+
     private void followReferences(ShadowBuilder currentNode, JsonObject jsonElement) {
         CdoSnapshot cdoSnapshot = currentNode.getCdoSnapshot();
 
-        cdoSnapshot.getManagedType().forEachProperty( (JaversProperty property) -> {
+        cdoSnapshot.getManagedType().forEachProperty( property -> {
             if (cdoSnapshot.isNull(property)) {
                 return;
             }

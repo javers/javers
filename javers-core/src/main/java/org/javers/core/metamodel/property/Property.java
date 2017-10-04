@@ -1,6 +1,5 @@
 package org.javers.core.metamodel.property;
 
-import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.JaversMember;
@@ -20,14 +19,16 @@ public class Property {
     private transient final JaversMember member;
     private transient final boolean hasTransientAnn;
     private transient final boolean hasShallowReferenceAnn;
-    private String name;
+    private final String name;
+    private final String originalName;
 
     public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, Optional<String> name){
         argumentIsNotNull(member);
         this.member = member;
         this.hasTransientAnn = hasTransientAnn;
         this.hasShallowReferenceAnn = hasShallowReferenceAnn;
-        this.name = name.orElse(member.propertyName());
+        this.originalName = member.propertyName();
+        this.name = name.orElse(originalName);
     }
 
     public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, String name){
@@ -97,8 +98,22 @@ public class Property {
         return get(target) == null;
     }
 
+    /**
+     * Property name used by JaVers, originalName by default, can be changed with @PropertyName.
+     */
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * Property name as in Java class
+     */
+    public String getOriginalName() {
+        return originalName;
+    }
+
+    public boolean hasCustomName() {
+        return this.name != this.originalName;
     }
 
     public boolean hasTransientAnn() {

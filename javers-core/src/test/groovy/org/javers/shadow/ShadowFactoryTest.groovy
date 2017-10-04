@@ -6,6 +6,8 @@ import org.javers.core.JaversTestBuilder
 import org.javers.core.examples.typeNames.NewEntity
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.examples.typeNames.OldEntityWithTypeAlias
+import org.javers.core.metamodel.annotation.Id
+import org.javers.core.metamodel.annotation.PropertyName
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.CdoSnapshotBuilder
 import org.javers.core.metamodel.object.CdoSnapshotState
@@ -357,6 +359,26 @@ abstract class ShadowFactoryTest extends Specification {
 
       then: "objects converted to JSON String should be returned"
       shadow.polymorficList == ["2017-01-01", "2017-01-02"]
+    }
+
+    static class EntityWithPropertyName {
+        @Id int id
+        @PropertyName("otherField") String someField
+        @PropertyName("otherField") String getSomeField() { return someField }
+        @Id int getId() { return id }
+    }
+
+    def "should use @PropertyName when creating Shadows"(){
+        given:
+        def e = new EntityWithPropertyName(id:1, someField: "s")
+        javers.commit("author", e)
+
+        when:
+        EntityWithPropertyName shadow = javers.findShadows(QueryBuilder.byInstance(e).build()).get(0).get()
+
+        then:
+        shadow.id == 1
+        shadow.someField == "s"
     }
 
     BiFunction byIdSupplier() {
