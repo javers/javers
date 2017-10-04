@@ -40,12 +40,28 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         notThrown(Exception)
     }
 
-    def "should create a new version on create via audited repository"() {
+    def "should create a new version on save via audited repository"() {
         setup:
         def o = new DummyObject("foo")
 
         when:
         repository.save(o)
+
+        then:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
+
+        snapshots.size() == 1
+        snapshots[0].initial
+        snapshots[0].commitMetadata.properties["key"] == "ok"
+        snapshots[0].commitMetadata.author == "unauthenticated"
+    }
+
+    def "should create a new version on saveAndFlush via audited repository"() {
+        setup:
+        def o = new DummyObject("foo")
+
+        when:
+        repository.saveAndFlush(o)
 
         then:
         def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
