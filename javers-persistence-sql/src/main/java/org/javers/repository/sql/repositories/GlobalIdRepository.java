@@ -15,7 +15,7 @@ import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
 
-import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
+import static org.javers.repository.sql.poly.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class GlobalIdRepository extends SchemaNameAware {
