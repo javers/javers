@@ -1,4 +1,4 @@
-package org.javers.repository.sql;
+package org.javers.repository.sql.poly;
 
 import java.util.Optional;
 import org.polyjdbc.core.PolyJDBC;

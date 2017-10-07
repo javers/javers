@@ -4,7 +4,7 @@ import java.util.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
-import org.javers.repository.sql.PolyUtil;
+import org.javers.repository.sql.poly.PolyUtil;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ import org.polyjdbc.core.type.Timestamp;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import static org.javers.repository.sql.PolyUtil.queryForOptionalBigDecimal;
+import static org.javers.repository.sql.poly.PolyUtil.queryForOptionalBigDecimal;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 /**

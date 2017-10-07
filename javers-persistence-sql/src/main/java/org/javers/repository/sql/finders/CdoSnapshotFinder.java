@@ -22,7 +22,7 @@ import org.polyjdbc.core.query.SelectQuery;
 
 import java.util.*;
 
-import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
+import static org.javers.repository.sql.poly.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CdoSnapshotFinder {
@@ -102,6 +102,7 @@ public class CdoSnapshotFinder {
             snapshotFilter.applyQueryParams(query, queryParams.get());
         }
         query.orderBy(SNAPSHOT_PK, Order.DESC);
+        //TODO HOT SPOT!!!
         return polyJDBC.queryRunner().queryList(query, cdoSnapshotMapper);
     }
 
