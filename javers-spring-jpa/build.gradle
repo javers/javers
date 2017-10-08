@@ -1,0 +1,27 @@
+repositories {
+    maven {
+        url "http://repo.spring.io/milestone"
+    }
+}
+
+javadoc {
+    failOnError = false
+}
+
+dependencies {
+    compile project(':javers-spring')
+    compile project(':javers-persistence-sql')
+
+    //both should be on application's classpath when using JaversTransactionalDecorator
+    optional "org.hibernate:hibernate-entitymanager:$hibernateVersion"
+    optional "org.springframework:spring-tx:$springVersion"
+
+    //should be on application's classpath when using JaversSpringDataAuditable
+    optional "org.springframework.data:spring-data-jpa:$springDataJPAVersion"
+
+    testCompile 'com.h2database:h2:1.4.184'
+    testCompile "org.springframework:spring-orm:$springVersion"
+    testCompile "org.springframework:spring-test:$springVersion"
+    testCompile "org.spockframework:spock-spring:$spockVersion"
+    testCompile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+}

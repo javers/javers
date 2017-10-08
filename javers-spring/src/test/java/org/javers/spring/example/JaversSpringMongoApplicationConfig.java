@@ -2,7 +2,7 @@ package org.javers.spring.example;
 
 import com.github.fakemongo.Fongo;
 import com.google.common.collect.ImmutableMap;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.MongoClient;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
@@ -15,22 +15,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-import java.util.Map;
-
 @Configuration
-@ComponentScan(basePackages = "org.javers.spring.repository.mongo")
+@ComponentScan(basePackages = "org.javers.spring.repository")
+@EnableMongoRepositories({"org.javers.spring.repository"})
 @EnableAspectJAutoProxy
-//@EnableMongoRepositories({"org.javers.spring.repository.mongo"})
 public class JaversSpringMongoApplicationConfig {
+    private static final String DATABASE_NAME = "mydatabase";
 
     /**
      * Creates JaVers instance backed by {@link MongoRepository}
      */
     @Bean
     public Javers javers() {
-        MongoRepository javersMongoRepository = new MongoRepository(mongoDB());
+        MongoRepository javersMongoRepository =
+                new MongoRepository(mongo().getDatabase(DATABASE_NAME));
 
         return JaversBuilder.javers()
                 .registerJaversRepository(javersMongoRepository)
@@ -41,8 +42,16 @@ public class JaversSpringMongoApplicationConfig {
      * MongoDB setup
      */
     @Bean
-    public MongoDatabase mongoDB() {
-        return new Fongo("test").getDatabase("test");
+    public MongoClient mongo() {
+        return new Fongo("test").getMongo();
+    }
+
+    /**
+     * required by Spring Data MongoDB
+     */
+    @Bean
+    public MongoTemplate mongoTemplate() throws Exception {
+        return new MongoTemplate(mongo(), DATABASE_NAME);
     }
 
     /**
@@ -64,7 +73,8 @@ public class JaversSpringMongoApplicationConfig {
      */
     @Bean
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
-        return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(), commitPropertiesProvider());
+        return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(),
+                commitPropertiesProvider());
     }
 
     /**
@@ -84,11 +94,6 @@ public class JaversSpringMongoApplicationConfig {
      */
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        return new CommitPropertiesProvider() {
-            @Override
-            public Map<String, String> provide() {
-                return ImmutableMap.of("key", "ok");
-            }
-        };
+        return () -> ImmutableMap.of("key", "ok");
     }
 }

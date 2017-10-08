@@ -1,7 +1,6 @@
 package org.javers.spring.auditable.aspect.springdata;
 
 import org.javers.core.Javers;
-import org.javers.core.metamodel.object.InstanceId;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;

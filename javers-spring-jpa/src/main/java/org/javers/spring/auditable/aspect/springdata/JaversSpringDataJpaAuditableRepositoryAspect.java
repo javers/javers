@@ -8,13 +8,13 @@ import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
 /**
- * Commits all arguments passed to save() and delete() methods
- * in Spring Data CrudRepository
+ * Commits all arguments passed to save(), delete() and saveAndFlush() methods
+ * in Spring Data JpaRepository
  * when repositories are annotated with (class-level) @JaversSpringDataAuditable.
  */
 @Aspect
-public class JaversSpringDataAuditableRepositoryAspect extends AbstractSpringAuditableRepositoryAspect {
-    public JaversSpringDataAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+public class JaversSpringDataJpaAuditableRepositoryAspect extends AbstractSpringAuditableRepositoryAspect {
+    public JaversSpringDataJpaAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         super(javers, authorProvider, commitPropertiesProvider);
     }
 
@@ -26,5 +26,10 @@ public class JaversSpringDataAuditableRepositoryAspect extends AbstractSpringAud
     @AfterReturning("execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)")
     public void onSaveExecuted(JoinPoint pjp) {
         onSave(pjp);
+    }
+
+    @AfterReturning("execution(public * saveAndFlush(..)) && this(org.springframework.data.jpa.repository.JpaRepository)")
+    public void onSaveAndFlushExecuted(JoinPoint pjp) {
+       onSave(pjp);
     }
 }

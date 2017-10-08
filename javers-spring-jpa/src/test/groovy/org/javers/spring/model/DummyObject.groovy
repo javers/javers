@@ -1,12 +1,9 @@
 package org.javers.spring.model
 
-import org.javers.core.metamodel.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
+import javax.persistence.Entity
+import javax.persistence.Id
 
-/**
- * Created by gessnerfl on 21.02.15.
- */
-@Document
+@Entity
 class DummyObject {
     @Id
     String id

@@ -31,9 +31,5 @@ configurations {
 }
 
 artifacts {
-    archives testJar
-}
-
-artifacts {
     testArtifacts testJar
 }

@@ -2,7 +2,7 @@ dependencies {
     compile project(':javers-core')
     compile project(':javers-spring')
     compile project(':javers-persistence-mongo')
-    //should be on application's classpath when using JaversSpringBootStarterMongo
+
     optional "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     optional "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 

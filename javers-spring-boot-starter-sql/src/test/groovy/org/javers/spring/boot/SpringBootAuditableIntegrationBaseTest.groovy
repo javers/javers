@@ -1,11 +1,12 @@
 package org.javers.spring.boot
 
 import org.javers.core.Javers
-import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.boot.sql.DummyEntity
 import org.javers.spring.boot.sql.DummyEntityRepository
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
+
+import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 abstract class SpringBootAuditableIntegrationBaseTest extends Specification{
 
@@ -15,12 +16,15 @@ abstract class SpringBootAuditableIntegrationBaseTest extends Specification{
     @Autowired
     DummyEntityRepository dummyEntityRepository
 
-    def "@JaversSpringDataAuditable aspect should work with spring-boot"(){
+    def "@JaversSpringDataAuditable aspect should work effortlessly with spring-boot"(){
         when:
-        def entity = DummyEntity.random()
-        dummyEntityRepository.save(entity)
+        def o = DummyEntity.random()
+
+        dummyEntityRepository.save(o)
+        o.name = "a"
+        dummyEntityRepository.saveAndFlush(o)
 
         then:
-        javers.findSnapshots( QueryBuilder.byInstanceId(entity.id, DummyEntity).build() ).size() == 1
+        javers.findSnapshots( byInstanceId(o.id, DummyEntity).build() ).size() == 2
     }
 }
