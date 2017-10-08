@@ -1,4 +1,4 @@
-package org.javers.spring.repository.mongo
+package org.javers.spring.repository
 
 import org.javers.spring.annotation.JaversAuditable
 import org.javers.spring.model.DummyObject

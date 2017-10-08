@@ -12,6 +12,7 @@ import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
+import org.javers.spring.auditable.aspect.springdata.JaversSpringDataJpaAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
 import org.springframework.context.annotation.Bean;
@@ -34,10 +35,10 @@ import java.util.Map;
 import java.util.Properties;
 
 @Configuration
-@ComponentScan(basePackages = "org.javers.spring.repository.jpa")
+@ComponentScan(basePackages = "org.javers.spring.repository")
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
-@EnableJpaRepositories({"org.javers.spring.repository.jpa"})
+@EnableJpaRepositories({"org.javers.spring.repository"})
 public class JaversSpringJpaApplicationConfig {
 
     //.. JaVers setup ..
@@ -76,11 +77,12 @@ public class JaversSpringJpaApplicationConfig {
      * Enables auto-audit aspect for Spring Data repositories. <br/>
      *
      * Use {@link org.javers.spring.annotation.JaversSpringDataAuditable}
-     * to annotate CrudRepositories you want to audit.
+     * to annotate CrudRepository, PagingAndSortingRepository or JpaRepository
+     * you want to audit.
      */
     @Bean
-    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers) {
-        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider(), commitPropertiesProvider());
+    public JaversSpringDataJpaAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers) {
+        return new JaversSpringDataJpaAuditableRepositoryAspect(javers, authorProvider(), commitPropertiesProvider());
     }
 
     /**
@@ -100,12 +102,7 @@ public class JaversSpringJpaApplicationConfig {
      */
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        return new CommitPropertiesProvider() {
-            @Override
-            public Map<String, String> provide() {
-                return ImmutableMap.of("key", "ok");
-            }
-        };
+        return () -> ImmutableMap.of("key", "ok");
     }
 
     /**

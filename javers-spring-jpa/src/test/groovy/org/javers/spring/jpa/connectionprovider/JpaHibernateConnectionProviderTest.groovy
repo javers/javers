@@ -4,8 +4,9 @@ import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.example.JaversSpringJpaApplicationConfig
 import org.javers.spring.model.DummyObject
-import org.javers.spring.repository.jpa.DummyAuditedJpaCrudRepository
-import org.javers.spring.repository.jpa.DummyAuditedJpaRepository
+import org.javers.spring.repository.DummyAuditedJpaRepository
+import org.javers.spring.repository.DummyAuditedRepository
+import org.javers.spring.repository.DummyNoAuditJpaRepository
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification
@@ -43,8 +44,8 @@ class JpaHibernateConnectionProviderTest extends Specification {
         snapshots.size() == 1
 
         where:
-        repositortKind <<  ["ordinal","spring-data-jpa"]
-        repositoryClass << [DummyAuditedJpaRepository, DummyAuditedJpaCrudRepository]
+        repositortKind <<  ["ordinal","spring-data-crud"]
+        repositoryClass << [DummyAuditedRepository, DummyAuditedJpaRepository]
     }
 
 }

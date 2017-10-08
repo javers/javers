@@ -1,18 +1,19 @@
 package org.javers.spring.auditable.integration
 
 import org.javers.core.Javers
-import org.javers.repository.jql.QueryBuilder
-import org.javers.spring.example.JaversSpringJpaApplicationConfig
+import org.javers.spring.example.JaversSpringMongoApplicationConfig
 import org.javers.spring.model.DummyObject
-import org.javers.spring.repository.jpa.DummyAuditedJpaCrudRepository
-import org.javers.spring.repository.jpa.DummyNoAuditJpaCrudRepository
+import org.javers.spring.repository.DummyAuditedCrudRepository
+import org.javers.spring.repository.DummyNoAuditedCrudRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
-@ContextConfiguration(classes = [JaversSpringJpaApplicationConfig])
+import static org.javers.repository.jql.QueryBuilder.byInstanceId
+
+@ContextConfiguration(classes = [JaversSpringMongoApplicationConfig])
 class JaversSpringDataAspectIntegrationTest extends Specification {
     @Autowired
     ApplicationContext context
@@ -21,17 +22,17 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
     Javers javers
 
     @Autowired
-    DummyAuditedJpaCrudRepository repository
+    DummyAuditedCrudRepository repository
 
     @Autowired
-    DummyNoAuditJpaCrudRepository noAuditRepository
+    DummyNoAuditedCrudRepository noAuditRepository
 
     def "should not fail on JaVers aspect when deleting an object which not exists in JaVers repository"(){
         when:
         repository.delete("a")
 
         then:
-        thrown(EmptyResultDataAccessException)
+        notThrown(Exception)
 
         when:
         repository.delete(new DummyObject(id:"a"))
@@ -40,15 +41,15 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         notThrown(Exception)
     }
 
-    def "should create a new version on create via audited repository"() {
-        setup:
-        def o = new DummyObject("foo")
+    def "should commit to JaVers on audited crudRepository.save(Object)"() {
+        given:
+        def o = new DummyObject()
 
         when:
         repository.save(o)
 
         then:
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
+        def snapshots = javers.findSnapshots(byInstanceId(o.id, DummyObject).build())
 
         snapshots.size() == 1
         snapshots[0].initial
@@ -56,68 +57,70 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         snapshots[0].commitMetadata.author == "unauthenticated"
     }
 
-    def "should create a new version when creating few objects via audited repository"() {
-        setup:
-        def objects = [new DummyObject("foo"), new DummyObject("foo")]
+    def "should commit to JaVers on audited crudRepository.save(Iterable)"() {
+        given:
+        def o1 = new DummyObject()
+        def o2 = new DummyObject()
 
         when:
-        repository.save(objects)
+        repository.save([o1,o2])
 
         then:
-        objects.each {
-            def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(it.id, DummyObject).build())
-            snapshots.size() == 1
-            snapshots[0].initial
-        }
+        javers.findSnapshots(byInstanceId(o1.id, DummyObject).build()).size() == 1
+        javers.findSnapshots(byInstanceId(o2.id, DummyObject).build()).size() == 1
     }
 
-    def "should create a new version on update via audited repository"() {
-        setup:
-        def o = new DummyObject("foo")
-
-        when:
-        repository.save(o)
-        o.name = "bar"
-        repository.save(o)
-
-        then:
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
-        snapshots.size() == 2
-        !snapshots[0].initial
-        snapshots[1].initial
-    }
-
-    def "should create a new version on delete using object instance via audited repository"() {
-        setup:
-        def o =  new DummyObject("foo")
+    def "should commitDelete on audited crudRepository.delete(object)"() {
+        given:
+        def o = new DummyObject()
 
         when:
         repository.save(o)
         repository.delete(o)
 
         then:
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
+        def snapshots = javers.findSnapshots(byInstanceId(o.id, DummyObject).build())
         snapshots.size() == 2
         snapshots[0].terminal
         snapshots[1].initial
     }
 
-    def "should create a new version on delete using object id via audited repository"() {
-        setup:
-        def o =  new DummyObject("foo")
+    def "should commitDelete on audited crudRepository.delete(id)"() {
+        given:
+        def o =  new DummyObject()
 
         when:
         repository.save(o)
         repository.delete(o.id)
 
         then:
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
+        def snapshots = javers.findSnapshots(byInstanceId(o.id, DummyObject).build())
         snapshots.size() == 2
         snapshots[0].terminal
         snapshots[1].initial
     }
 
-    def "should not create new version when finder is executed on audit enabled repository"() {
+    def "should commitDelete on audited crudRepository.delete(Iterable)"() {
+        given:
+        def o1 = new DummyObject()
+        def o2 = new DummyObject()
+
+        when:
+        repository.save([o1, o2])
+        repository.delete([o1, o2] as Iterable)
+
+        then:
+        def snapshots1 = javers.findSnapshots(byInstanceId(o1.id, DummyObject).build())
+        def snapshots2 = javers.findSnapshots(byInstanceId(o2.id, DummyObject).build())
+
+        [snapshots1, snapshots2].each { snapshots ->
+            snapshots.size() == 2
+            snapshots[0].terminal
+            snapshots[1].initial
+        }
+    }
+
+    def "should not commit when finder is called on audited repository"() {
         setup:
         def o =  new DummyObject("foo")
 
@@ -127,48 +130,37 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
 
         then:
         result != null
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
+        def snapshots = javers.findSnapshots(byInstanceId(o.id, DummyObject).build())
         snapshots.size() == 1
         snapshots[0].initial
     }
 
-
-    def "should not create a new version on save via normal repository"() {
+    def "should commit on update via audited crudRepository.save()"() {
         setup:
-        def o = new DummyObject("foo")
+        def o = new DummyObject()
 
         when:
-        noAuditRepository.save(o)
+        repository.save(o)
+        o.name = "a"
+        repository.save(o)
 
         then:
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
-        snapshots.empty
+        def snapshots = javers.findSnapshots(byInstanceId(o.id, DummyObject).build())
+        snapshots.size() == 2
+        !snapshots[0].initial
+        snapshots[1].initial
     }
 
-    def "should not create a new version on delete via normal repository"() {
+    def "should not commit when any method is called on not audited repository"() {
         setup:
         def o = new DummyObject("foo")
 
         when:
         noAuditRepository.save(o)
         noAuditRepository.delete(o)
+        noAuditRepository.findOne(o.id)
 
         then:
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
-        snapshots.empty
-    }
-
-    def "should not create new version when finder is executed on normal repository"() {
-        setup:
-        def o =  new DummyObject("foo")
-
-        when:
-        noAuditRepository.save(o)
-        def result = noAuditRepository.findOne(o.id)
-
-        then:
-        result != null
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
-        snapshots.empty
+        javers.findSnapshots(byInstanceId(o.id, DummyObject).build()).size() == 0
     }
 }

@@ -7,7 +7,6 @@ import org.javers.hibernate.entity.Person
 import org.javers.hibernate.entity.PersonCrudRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
-import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 

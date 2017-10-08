@@ -9,7 +9,6 @@ javadoc {
 }
 
 dependencies {
-    compile project(':javers-persistence-sql')
     compile project(':javers-core')
 
     compile "org.aspectj:aspectjweaver:$aspectjweaverVersion"
@@ -19,28 +18,14 @@ dependencies {
     optional "org.springframework:spring-context:$springVersion"
 
     //should be on application's classpath when using JaversSpringDataAuditable
-    optional 'org.springframework.data:spring-data-commons:1.13.7.RELEASE'
+    optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
 
     //should be on application's classpath when using SpringSecurityAuthorProvider
     optional 'org.springframework.security:spring-security-core:4.0.3.RELEASE'
 
-    //both should be on application's classpath when using JaversTransactionalDecorator
-    optional "org.hibernate:hibernate-entitymanager:$hibernateVersion"
-    optional "org.springframework:spring-tx:$springVersion"
-    //..
-
-    //for JpaConnectionProvider test
-    testCompile 'com.h2database:h2:1.4.184'
-    testCompile "org.springframework:spring-orm:$springVersion"
-
-    testCompile project(path: ":javers-core", configuration: "testArtifacts")
     testCompile "org.springframework:spring-test:$springVersion"
-
-    testCompile "org.springframework.data:spring-data-jpa:1.11.7.RELEASE"
     testCompile "org.spockframework:spock-spring:$spockVersion"
-
-    testCompile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     testCompile "com.github.fakemongo:fongo:$fongoVersion"
-
+    testCompile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     testCompile project(':javers-persistence-mongo')
 }

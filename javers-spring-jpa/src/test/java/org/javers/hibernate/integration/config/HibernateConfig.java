@@ -6,6 +6,7 @@ import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
@@ -83,7 +84,7 @@ public class HibernateConfig {
      * <br/>
      * Provide real implementation,
      * when using Spring Security you can use
-     * {@link org.javers.spring.auditable.SpringSecurityAuthorProvider}.
+     * {@link SpringSecurityAuthorProvider}.
      */
     @Bean
     public AuthorProvider authorProvider() {
