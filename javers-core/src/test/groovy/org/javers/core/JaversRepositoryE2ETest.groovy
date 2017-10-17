@@ -2,7 +2,9 @@ package org.javers.core
 
 import org.javers.common.date.FakeDateProvider
 import org.javers.common.reflection.ConcreteWithActualType
+import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
@@ -1005,8 +1007,7 @@ class JaversRepositoryE2ETest extends Specification {
             new SnapshotEntity(id:1, valueObjectRef: london1v1),
             new SnapshotEntity(id:1, valueObjectRef: london2v1),
             new SnapshotEntity(id:1, valueObjectRef: london2v2) ,
-            new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris")) , //noise
-            new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris 2")) //noise
+            new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris")) //noise
         ]
         objects.each {
             javers.commit("author", it)
@@ -1018,35 +1019,35 @@ class JaversRepositoryE2ETest extends Specification {
         def snapshots = javers.findSnapshots(query)
 
         then:
-        snapshots.each {
-            assert it.globalId == instanceId(1, SnapshotEntity) ||
-                    it.globalId.ownerId == instanceId(1, SnapshotEntity)
-        }
+        def sName = SnapshotEntity.class.name
         snapshots.size() == 5
+        snapshots[0].globalId.value() == "$sName/1#valueObjectRef/networkAddress"
+        snapshots[1].globalId.value() == "$sName/1#valueObjectRef"
+        snapshots[2,3,4].collect{it.globalId.value()} as Set ==
+                ["$sName/1#valueObjectRef/networkAddress",
+                 "$sName/1#valueObjectRef",
+                 "$sName/1"
+                ] as Set
 
         when: "changes query"
         def changes = javers.findChanges(query)
 
         then:
-        changes.each {
-            println it
-        }
         changes.size() == 2
+        changes[0].affectedGlobalId.value() == "$sName/1#valueObjectRef/networkAddress"
+        changes[1].affectedGlobalId.value() == "$sName/1#valueObjectRef"
     }
 
     def "should query withChildValueObjects for snapshots and changes by Entity type"() {
         given:
         def london = new DummyAddress(city: "London")
-        def paris =  new DummyAddress(city: "Paris")
-        def paris2 = new DummyAddress(city: "Paris",
-                networkAddress: new DummyNetworkAddress(address: "v2"))
+        def paris = new DummyAddress(city: "Paris", networkAddress: new DummyNetworkAddress(address: "v2"))
 
         def objects = [
                 new SnapshotEntity(id: 1, valueObjectRef: london),
-                new SnapshotEntity(id: 1, valueObjectRef: paris),
-                new SnapshotEntity(id: 1, valueObjectRef: paris2),
-                new SnapshotEntity(id: 1, valueObjectRef: paris2, listOfValueObjects: [london]),
-                new SnapshotEntity(id: 1, valueObjectRef: paris2, listOfValueObjects: [london, paris]),
+                new SnapshotEntity(id: 1, valueObjectRef: paris, listOfValueObjects: [
+                        new DummyAddress(city: "Bologne"),
+                        new DummyAddress(city: "Ferrara")]),
                 new DummyUserDetails(id: 1, dummyAddress: paris) //noise
         ]
         objects.each {
@@ -1059,21 +1060,57 @@ class JaversRepositoryE2ETest extends Specification {
         def snapshots = javers.findSnapshots(query)
 
         then:
-        snapshots.each {
-            assert it.globalId.typeName == SnapshotEntity.name ||
-                   it.globalId.ownerId.typeName == SnapshotEntity.name
-        }
-        snapshots.size() == 9
+        def sName = SnapshotEntity.class.name
+        snapshots.size() == 7
+        snapshots[0,1,2,3,4].collect{it.globalId.value()} as Set == [
+                "$sName/1",
+                "$sName/1#valueObjectRef",
+                "$sName/1#listOfValueObjects/0",
+                "$sName/1#listOfValueObjects/1",
+                "$sName/1#valueObjectRef/networkAddress"
+        ] as Set
+
+        snapshots[5,6].collect{it.globalId.value()} as Set == [
+                "$sName/1",
+                "$sName/1#valueObjectRef",
+        ] as Set
 
         when: "changes query"
         def changes = javers.findChanges(query)
 
         then:
-        changes.each {
-            println it
-        }
-        changes.size() == 4
+        changes.find{it instanceof ListChange}.affectedGlobalId.value() == "$sName/1"
+        changes.find{it instanceof ValueChange}.affectedGlobalId.value() == "$sName/1#valueObjectRef"
+        changes.find{it instanceof ReferenceChange}.affectedGlobalId.value() == "$sName/1#valueObjectRef"
     }
+
+    /*
+    def "should query withChildValueObjects for snapshots and changes by Entity type and property"() {
+        given:
+        def e = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London"))
+        javers.commit("author", e)
+
+        e.intProperty = 5
+        javers.commit("author", e)
+
+        e.valueObjectRef = new DummyAddress(city: "Paris")
+        javers.commit("author", e)
+
+        e.intProperty = 6
+        javers.commit("author", e)
+
+        e.dob = LocalDate.now()
+        javers.commit("author", e)
+
+
+        when: "snapshots query"
+        def query =
+        def snapshots = javers.findSnapshots(
+                QueryBuilder.by
+
+
+    }
+    */
 
     def "should provide cluster-friendly commitId generator"(){
         given:
