@@ -24,9 +24,8 @@ class ClassFilter extends Filter {
 
     @Override
     public String toString() {
-        return "types=" + ToStringBuilder.setToString(
-                Sets.transform(managedTypes, t -> t.getName())
-        );
+        return ToStringBuilder.toString(this, "types",
+                Sets.transform(managedTypes, t -> t.getName()));
     }
 
     @Override

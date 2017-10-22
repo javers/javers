@@ -5,6 +5,7 @@ package org.javers.repository.jql;
  */
 public enum ShadowScope {
     /**
+     * Default scope.<br/>
      * Object shadows are created only from snapshots selected directly in the main JQL query.
      * <br/><br/>
      *
@@ -13,9 +14,19 @@ public enum ShadowScope {
      * <br/><br/>
      *
      * You can initialize referenced objects using the wider scopes:
-     * commit-deep or commit-deep+.
+     * child-value-object, commit-deep or commit-deep+.
      */
     SHALLOW,
+
+    /**
+     * JaVers loads all child Value Objects owned by selected Entities.
+     * <br/><br/>
+     *
+     * This scope can be combined with commit-deep and commit-deep+.
+     *
+     * @since 3.6.1
+     */
+    CHILD_VALUE_OBJECT,
 
     /**
      * JaVers restores commit-deep shadow graph. Referenced

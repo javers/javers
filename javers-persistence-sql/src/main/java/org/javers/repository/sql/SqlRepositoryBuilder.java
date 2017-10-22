@@ -63,7 +63,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     }
 
     public JaversSqlRepository build() {
-        logger.info("starting up SQL repository module ...");
+        logger.info("starting up SqlRepository with dialect {} ...", dialectName);
         bootContainer();
 
         SqlRepositoryConfiguration config =

@@ -183,15 +183,31 @@ public interface Javers {
      * assert shadows.get(0).get() instanceof Person.class;
      * </pre>
      *
-     * Choose between shallow or deep shadows using {@link QueryBuilder#withShadowScope(ShadowScope)},
-     * default is {@link ShadowScope#SHALLOW}
+     * <b>By default</b>, queries are run in the {@link ShadowScope#SHALLOW} scope,
+     * which is the fastest one.<br/>
+     * To load all referenced objects use one of the wider scopes:
+     *
+     * <ul>
+     *  <li/> {@link QueryBuilder#withChildValueObjects()}
+     *  <li/> {@link QueryBuilder#withScopeCommitDeep()}
+     *  <li/> {@link QueryBuilder#withScopeCommitDeepPlus(int)}
+     * </ul>
+     *
+     * We recommend {@link QueryBuilder#withChildValueObjects()} as a good start.
      * <br/><br/>
      *
      * For more query examples, see {@link #findChanges(JqlQuery)} method.
+     * <br/><br/>
+     *
+     * For query profiling use:
+     * <pre>
+     * &lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
+     * </pre>
      *
      * @return A list ordered in reverse chronological order. Empty if nothing found.
      * @param <T> type of a domain object
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
+     * @see ShadowScope
      * @since 3.2
      */
     <T> List<Shadow<T>> findShadows(JqlQuery query);

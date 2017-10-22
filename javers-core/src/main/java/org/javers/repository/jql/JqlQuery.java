@@ -38,7 +38,7 @@ public class JqlQuery {
     }
 
     private void validate(){
-        if (queryParams.isAggregate()) {
+        if (isAggregate()) {
             if (!(isClassQuery() || isInstanceIdQuery())) {
                 throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
                         "aggregate filter can be enabled only for byClass and byInstanceId queries");
@@ -48,10 +48,11 @@ public class JqlQuery {
 
     @Override
     public String toString() {
-        return "JqlQuery{" +
-                "queryParams=" + queryParams +
-                ", filter=" + filter +
-                '}';
+        return "\nJqlQuery {\n" +
+                "  "+filter + "\n"+
+                "  "+queryParams + "\n" +
+                "  "+shadowScopeDef + "\n" +
+                "}";
     }
 
     QueryParams getQueryParams() {
@@ -130,5 +131,9 @@ public class JqlQuery {
 
     boolean isVoOwnerQuery(){
         return hasFilter(VoOwnerFilter.class);
+    }
+
+    public boolean isAggregate() {
+        return queryParams.isAggregate();
     }
 }

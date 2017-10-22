@@ -1,5 +1,6 @@
 package org.javers.repository.jql;
 
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.type.EntityType;
@@ -35,5 +36,12 @@ class VoOwnerFilter extends Filter {
 
         return valueObjectId.getOwnerId().getTypeName().equals(ownerEntity.getName())
             &&valueObjectId.getFragment().equals(path);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.toString(this,
+                "ownerEntity", ownerEntity,
+                "path", path);
     }
 }

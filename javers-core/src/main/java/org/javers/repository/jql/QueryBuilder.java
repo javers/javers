@@ -208,10 +208,11 @@ public class QueryBuilder {
      * When enabled, selects all child ValueObjects owned by selected Entities.
      * <br/><br/>
      *
-     * Optional filter for Entity queries ({@link #byInstanceId(Object, Class)} and {@link #byClass(Class...)}).
-     * Can be used with both changes and snapshots queries.
+     * Can be used with all kind of queries.<br/>
+     * For Shadow queries, it has additional effect &mdash; enables the child-valueObject scope.
      *
      * @since 2.1
+     * @see ShadowScope#CHILD_VALUE_OBJECT
      */
     public QueryBuilder withChildValueObjects() {
         queryParamsBuilder.withChildValueObjects(true);
@@ -458,7 +459,7 @@ public class QueryBuilder {
      * Selects commit-deep scope for Shadow queries.
      * <br/><br/>
      *
-     * Shortcut to {@link #withShadowScope(ShadowScope)} with <code>COMMIT_DEEP</code>
+     * See javadoc in {@link #withShadowScope(ShadowScope)}
      * <br/><br/>
      *
      * Only for Shadow queries.
