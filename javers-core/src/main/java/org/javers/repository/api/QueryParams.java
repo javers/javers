@@ -1,5 +1,6 @@
 package org.javers.repository.api;
 
+import org.javers.common.string.ToStringBuilder;
 import org.javers.repository.jql.QueryBuilder;
 
 import java.util.*;
@@ -130,16 +131,18 @@ public class QueryParams {
 
     @Override
     public String toString() {
-        return "QueryParams{" +
-                "limit=" + limit +
-                ", skip=" + skip +
-                ", from=" + from +
-                ", to=" + to +
-                ", toCommitId=" + toCommitId +
-                ", commitIds=" + commitIds +
-                ", commitProperties=" + commitProperties +
-                ", version=" + version +
-                "}";
+        return ToStringBuilder.toString(this,
+                "aggregate", aggregate,
+                "from", from,
+                "to", to,
+                "toCommitId", toCommitId,
+                "commitIds", commitIds,
+                "changedProperty", changedProperty,
+                "version", version,
+                "author", author,
+                "newObjectChanges", newObjectChanges,
+                "limit", limit,
+                "skip", skip);
     }
 
     public boolean hasDates() {

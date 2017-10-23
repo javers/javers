@@ -1,5 +1,6 @@
 package org.javers.repository.jql;
 
+import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
@@ -21,7 +22,7 @@ class IdFilter extends Filter {
 
     @Override
     public String toString() {
-        return "globalId=" + globalId.value();
+        return ToStringBuilder.toString(this, "globalId", globalId);
     }
 
     boolean isInstanceIdFilter() {

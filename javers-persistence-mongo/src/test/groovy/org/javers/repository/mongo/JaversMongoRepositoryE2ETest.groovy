@@ -1,7 +1,7 @@
 package org.javers.repository.mongo
 
 import com.mongodb.client.MongoDatabase
-import org.javers.core.JaversRepositoryE2ETest
+import org.javers.core.JaversRepositoryShadowE2ETest
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.api.JaversRepository
 
@@ -12,7 +12,7 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
  *
  * @author bartosz walacik
  */
-abstract class JaversMongoRepositoryE2ETest extends JaversRepositoryE2ETest {
+abstract class JaversMongoRepositoryE2ETest extends JaversRepositoryShadowE2ETest {
     protected abstract MongoDatabase getMongoDb()
 
     @Override

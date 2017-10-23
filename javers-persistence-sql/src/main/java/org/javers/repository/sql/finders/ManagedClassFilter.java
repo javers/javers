@@ -42,7 +42,6 @@ class ManagedClassFilter extends SnapshotFilter {
     }
 
     private String getCondition() {
-        Set<String> managedTypesInQuotes = Sets.transform(managedTypes, managedType -> "'" + managedType + "'");
-        return SNAPSHOT_MANAGED_TYPE + " in (" + ToStringBuilder.join(new ArrayList<>(managedTypesInQuotes)) + ")";
+        return SNAPSHOT_MANAGED_TYPE + " in (" + ToStringBuilder.join(managedTypes) + ")";
     }
 }

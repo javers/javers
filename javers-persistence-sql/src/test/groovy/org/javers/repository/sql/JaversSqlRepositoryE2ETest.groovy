@@ -1,7 +1,7 @@
 package org.javers.repository.sql
 
 import groovy.sql.Sql
-import org.javers.core.JaversRepositoryE2ETest
+import org.javers.core.JaversRepositoryShadowE2ETest
 import org.javers.core.cases.Case207Arrays
 import org.javers.core.cases.Case208DateTimeTypes
 import org.javers.core.model.DummyAddress
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import static groovyx.gpars.GParsPool.withPool
 
-abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryE2ETest {
+abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest {
 
     private ThreadLocal<Connection> connection = ThreadLocal.withInitial({createAndInitConnection()})
     private Collection<Connection> connections = new ConcurrentLinkedQueue<>()

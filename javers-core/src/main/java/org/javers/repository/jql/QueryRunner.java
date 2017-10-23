@@ -10,6 +10,8 @@ import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.shadow.Shadow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +22,8 @@ import java.util.Optional;
  * @author bartosz.walacik
  */
 public class QueryRunner {
+    private static final Logger logger = LoggerFactory.getLogger("org.javers.JQL");
+
     private final JaversExtendedRepository repository;
     private final GlobalIdFactory globalIdFactory;
     private final TypeMapper typeMapper;
@@ -33,11 +37,17 @@ public class QueryRunner {
     }
 
     public List<Shadow> queryForShadows(JqlQuery query) {
+        long s = System.currentTimeMillis();
         compile(query);
+
+        logger.debug("queryForShadows({})", query);
 
         List<CdoSnapshot> snapshots = queryForSnapshots(query);
 
-        return shadowQueryRunner.queryForShadows(query, snapshots);
+        List<Shadow> result = shadowQueryRunner.queryForShadows(query, snapshots);
+
+        logger.debug(".. queryForShadows completed in {} millis", System.currentTimeMillis()-s);
+        return result;
     }
 
     public Optional<CdoSnapshot> runQueryForLatestSnapshot(GlobalIdDTO globalId) {

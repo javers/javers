@@ -26,7 +26,7 @@ import static org.javers.repository.jql.ShadowScope.COMMIT_DEEP_PLUS;
  * @author bartosz.walacik
  */
 public class ShadowQueryRunner {
-    private static final Logger logger = LoggerFactory.getLogger(ShadowQueryRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger("org.javers.JQL");
 
     private final JaversExtendedRepository repository;
     private final ShadowFactory shadowFactory;
@@ -42,9 +42,11 @@ public class ShadowQueryRunner {
                     "maxGapsToFill can be used only in the COMMIT_DEEP_PLUS query scope");
         }
 
-        final CommitTable commitTable = new CommitTable(coreSnapshots, query.getShadowScopeMaxGapsToFill());
+        final CommitTable commitTable = new CommitTable(coreSnapshots, query.getShadowScopeMaxGapsToFill(),
+                query.isAggregate());
 
         if (query.getShadowScope().isCommitDeepOrWider()) {
+            logger.debug("action: loading {} full commit(s) in {} scope", commitTable.commitsList.size(), query.getShadowScope().name());
             commitTable.loadFullCommits();
         }
 
@@ -70,12 +72,15 @@ public class ShadowQueryRunner {
 
     class CommitTable {
         private final int maxGapsToFill;
+        private final boolean isChildValueObjectScope;
         private final Map<ReferenceKey, CdoSnapshot> filledGaps = new HashMap<>();
         private final Map<CommitMetadata, CommitEntry> commitsMap = new HashMap<>();
         private final List<CommitEntry> commitsList = new ArrayList<>();
 
-        CommitTable(List<CdoSnapshot> coreSnapshots, int maxGapsToFill) {
+        CommitTable(List<CdoSnapshot> coreSnapshots, int maxGapsToFill, boolean isChildValueObjectScope) {
             this.maxGapsToFill = maxGapsToFill;
+            this.isChildValueObjectScope = isChildValueObjectScope;
+
             if (coreSnapshots.isEmpty()) {
                 return;
             }
@@ -127,7 +132,7 @@ public class ShadowQueryRunner {
             if (found.size() == 0) {
                 CdoSnapshot gap = fillGapFromRepository(new ReferenceKey(rootContext, targetId));
                 if (gap == null){
-                    logger.debug("Object '" + targetId.value() + "' is outside the Shadow query scope" +
+                    logger.debug("warning: object '" + targetId.value() + "' is outside the Shadow query scope" +
                             ", references to this object will be nulled. " +
                             "Use the wider scope to fill gaps in the object graph.");
                 }
@@ -137,9 +142,21 @@ public class ShadowQueryRunner {
             }
         }
 
+        private boolean isInChildValueObjectScope(ReferenceKey referenceKey) {
+            return isChildValueObjectScope && referenceKey.targetId instanceof ValueObjectId;
+        }
+
         CdoSnapshot fillGapFromRepository(ReferenceKey referenceKey) {
-            if (filledGaps.size() >= maxGapsToFill) {
+
+            if (filledGaps.size() >= maxGapsToFill && !isInChildValueObjectScope(referenceKey)) {
                 return null;
+            }
+
+            if (isInChildValueObjectScope(referenceKey)) {
+                logger.debug("action: loading ValueObject '{}' in CHILD_VALUE_OBJECT scope", referenceKey.targetId.value());
+            }
+            else {
+                logger.debug("action: loading reference '{}' in COMMIT_DEEP_PLUS scope", referenceKey.targetId.value());
             }
 
             return filledGaps.computeIfAbsent(referenceKey, key ->
