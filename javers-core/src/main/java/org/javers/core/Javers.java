@@ -183,6 +183,8 @@ public interface Javers {
      * assert shadows.get(0).get() instanceof Person.class;
      * </pre>
      *
+     * <h2>Query scopes</h2>
+     *
      * <b>By default</b>, queries are run in the {@link ShadowScope#SHALLOW} scope,
      * which is the fastest one.<br/>
      * To load all referenced objects use one of the wider scopes:
@@ -196,10 +198,19 @@ public interface Javers {
      * We recommend {@link QueryBuilder#withChildValueObjects()} as a good start.
      * <br/><br/>
      *
-     * For more query examples, see {@link #findChanges(JqlQuery)} method.
-     * <br/><br/>
+     * <h2>More about the query scopes</h2>
      *
-     * For query profiling use:
+     *
+     * <h2>Other views</h2>
+     * TODO See also {@link #findChanges(JqlQuery)}
+     *
+     *
+     * <h2>Performance</h2>
+     * Each Shadow query runs one or more Snapshot queries (depending on the scope)
+     * and then Snapshots are converted to Shadows. If you are having
+     * performance issues, check how your Shadow query is executed using debug mode
+     * and then, try to reduce the scope.
+     *
      * <pre>
      * &lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
      * </pre>
@@ -207,7 +218,6 @@ public interface Javers {
      * @return A list ordered in reverse chronological order. Empty if nothing found.
      * @param <T> type of a domain object
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
-     * @see ShadowScope
      * @since 3.2
      */
     <T> List<Shadow<T>> findShadows(JqlQuery query);

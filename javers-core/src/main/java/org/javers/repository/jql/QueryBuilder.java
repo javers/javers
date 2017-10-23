@@ -344,6 +344,8 @@ public class QueryBuilder {
     }
 
     /**
+     * TODO move to findShadows
+     *
      * Choose between <i>shallow</i>, <i>commit-deep</i> or <i>commit-deep+</i> query scopes.
      * <br/>
      * The wider the scope, the more object shadows are loaded to the resulting graph.
@@ -459,6 +461,7 @@ public class QueryBuilder {
      * Selects commit-deep scope for Shadow queries.
      * <br/><br/>
      *
+     * TODO for scopes examples see ...
      * See javadoc in {@link #withShadowScope(ShadowScope)}
      * <br/><br/>
      *
@@ -475,6 +478,7 @@ public class QueryBuilder {
      * Selects commit-deep+ scope with default <code></cpce>maxGapsToFill</code> = 10.
      * <br/><br/>
      *
+     * TODO for scopes examples see ...
      * See javadoc in {@link #withShadowScope(ShadowScope)}
      * <br/><br/>
      *
@@ -491,6 +495,7 @@ public class QueryBuilder {
      * Selects commit-deep+ scope with given <code>maxGapsToFill</code>.
      * <br/>
      *
+     * TODO for scopes examples see ...
      * See javadoc in {@link #withShadowScope(ShadowScope)}
      * <br/><br/>
      *
