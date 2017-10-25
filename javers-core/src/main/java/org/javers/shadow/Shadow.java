@@ -11,8 +11,8 @@ import org.javers.repository.api.JaversRepository;
  *
  * Shadows use the same types as domain objects.
  * For example, a Shadow of a Person object is an instance of Person.class.
- *
  * <br/><br/>
+ *
  * Shadows class is a thin wrapper for a Shadow object and {@link CommitMetadata}
  *
  * @param <T> type of a domain object
@@ -33,7 +33,7 @@ public class Shadow<T> {
     }
 
     /**
-     * @return Shadow object
+     * Shadow object per se
      */
     public T get() {
         return it;
