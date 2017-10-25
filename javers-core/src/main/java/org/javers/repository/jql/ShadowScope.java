@@ -19,7 +19,7 @@ public enum ShadowScope {
     SHALLOW,
 
     /**
-     * JaVers loads all child Value Objects owned by selected Entities.
+     * JaVers loads all child ValueObjects owned by selected Entities.
      * <br/><br/>
      *
      * This scope can be combined with commit-deep and commit-deep+.

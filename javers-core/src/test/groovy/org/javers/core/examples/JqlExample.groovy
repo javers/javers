@@ -146,83 +146,93 @@ class JqlExample extends Specification {
     }
 
     def "should query for Shadows of an object"() {
-        given:
-        def javers = JaversBuilder.javers().build()
-        def bob = new Employee(name: "bob",
-                               salary: 1000,
-                               primaryAddress: new Address("London"))
-        javers.commit("author", bob)       // initial commit
+      given:
+          def javers = JaversBuilder.javers().build()
+          def bob = new Employee(name: "bob",
+                                 salary: 1000,
+                                 primaryAddress: new Address("London"))
+          javers.commit("author", bob)       // initial commit
 
-        bob.salary = 1200                         // changes
-        bob.primaryAddress.city = "Paris"         //
-        javers.commit("author", bob)       // second commit
+          bob.salary = 1200                  // changes
+          bob.primaryAddress.city = "Paris"  //
+          javers.commit("author", bob)       // second commit
 
-        when:
-        def shadows = javers.findShadows(
-                QueryBuilder.byInstance(bob).withChildValueObjects().build() )
+      when:
+          def shadows = javers.findShadows(
+                  QueryBuilder.byInstance(bob).withChildValueObjects().build() )
 
-        then:
-        assert shadows.size() == 2
+      then:
+          assert shadows.size() == 2
 
-        Employee bobNew = shadows[0].get()     // Employee shadows are instances
-        Employee bobOld = shadows[1].get()     // of Employee.class
+          Employee bobNew = shadows[0].get()     // Employee shadows are instances
+          Employee bobOld = shadows[1].get()     // of Employee.class
 
-        bobNew.salary == 1200
-        bobOld.salary == 1000
-        bobNew.primaryAddress.city == "Paris"  // Employee shadows are linked
-        bobOld.primaryAddress.city == "London" // to Address Shadows
+          bobNew.salary == 1200
+          bobOld.salary == 1000
+          bobNew.primaryAddress.city == "Paris"  // Employee shadows are linked
+          bobOld.primaryAddress.city == "London" // to Address Shadows
 
-        shadows[0].commitMetadata.id.majorId == 2
-        shadows[1].commitMetadata.id.majorId == 1
+          shadows[0].commitMetadata.id.majorId == 2
+          shadows[1].commitMetadata.id.majorId == 1
     }
 
     def "should query for Shadows with different scopes"(){
       given:
-      def javers = JaversBuilder.javers().build()
+          def javers = JaversBuilder.javers().build()
 
-      //    /-> John -> Steve
-      // Bob
-      //    \-> #address
-      def steve = new Employee(name: 'steve')
-      def john = new Employee(name: 'john', boss: steve)
-      def bob  = new Employee(name: 'bob', boss: john, primaryAddress: new Address('London'))
+          //    /-> John -> Steve
+          // Bob
+          //    \-> #address
+          def steve = new Employee(name: 'steve')
+          def john = new Employee(name: 'john', boss: steve)
+          def bob  = new Employee(name: 'bob', boss: john, primaryAddress: new Address('London'))
 
-      javers.commit('author', steve)  // commit 1.0 with snapshot of Steve
-      javers.commit('author', bob)    // commit 2.0 with snapshots of Bob, Bob#address and John
-      bob.salary = 1200                      // changes
-      javers.commit('author', bob)    // commit 3.0 with snapshot of Bob
+          javers.commit('author', steve)  // commit 1.0 with snapshot of Steve
+          javers.commit('author', bob)    // commit 2.0 with snapshots of Bob, Bob#address and John
+          bob.salary = 1200               // the change
+          javers.commit('author', bob)    // commit 3.0 with snapshot of Bob
 
       when: 'shallow scope query'
-      def shadows = javers.findShadows(QueryBuilder.byInstance(bob)
-                   .withChildValueObjects().build())
-      Employee bobShadow = shadows[0].get()  //get the latest version of Bob
+          def shadows = javers.findShadows(QueryBuilder.byInstance(bob)
+                              .build())
+          Employee bobShadow = shadows[0].get()  //get the latest version of Bob
+      then:
+          assert shadows.size() == 2      //we have 2 shadows of Bob
+          assert bobShadow.name == 'bob'
+          // all referenced objects (including address) are outside the query scope
+          // so they are nulled
+          assert bobShadow.primaryAddress == null
+          assert bobShadow.boss == null
 
-      then: 'only Bob and his address are loaded'
-      assert shadows.size() == 2           //we have 2 shadows of Bob
-      assert bobShadow.name == 'bob'
-      assert bobShadow.primaryAddress.city == 'London'
-      assert bobShadow.boss == null        //john is outside the query scope,
-                                           //so reference from bob to john is nulled
+      when: 'child-value-object scope query'
+          shadows = javers.findShadows(QueryBuilder.byInstance(bob)
+                          .withChildValueObjects().build())
+          bobShadow = shadows[0].get()
+      then:
+          // address is inside the query scope
+          assert bobShadow.primaryAddress.city == 'London'
+          assert bobShadow.boss == null        // John is still outside the query scope
 
       when: 'commit-deep scope query'
-      shadows = javers.findShadows(QueryBuilder.byInstance(bob)
-              .withChildValueObjects()
-              .withScopeCommitDeep().build())
-      bobShadow = shadows[0].get()
-
-      then: 'John is also loaded'
-      assert bobShadow.boss.name == 'john' // John is inside the query scope, so his
-                                           // shadow is loaded and linked to Bob
+          shadows = javers.findShadows(QueryBuilder.byInstance(bob)
+                          .withChildValueObjects()
+                          .withScopeCommitDeep().build())
+          bobShadow = shadows[0].get()
+      then:
+          assert bobShadow.primaryAddress.city == 'London'
+          assert bobShadow.boss.name == 'john' // John is inside the query scope, so his
+                                               // shadow is loaded and linked to Bob
+          assert bobShadow.boss.boss == null   // Steve is still outside the scope
 
       when: 'commit-deep+ scope query'
-      shadows = javers.findShadows(QueryBuilder.byInstance(bob)
-              .withChildValueObjects()
-              .withScopeCommitDeepPlus(1).build())
-      bobShadow = shadows[0].get()
-
+          shadows = javers.findShadows(QueryBuilder.byInstance(bob)
+                          .withChildValueObjects()
+                          .withScopeCommitDeepPlus(1).build())
+          bobShadow = shadows[0].get()
       then: 'all objects are loaded'
-      assert bobShadow.boss.name == 'john'
-      assert bobShadow.boss.boss.name == 'steve'
+          assert bobShadow.primaryAddress.city == 'London'
+          assert bobShadow.boss.name == 'john'
+          assert bobShadow.boss.boss.name == 'steve' // Steve is loaded thanks to +1 scope
     }
 
     def "should query for Snapshots of an object"(){
