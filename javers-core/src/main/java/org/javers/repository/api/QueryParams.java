@@ -1,6 +1,7 @@
 package org.javers.repository.api;
 
 import org.javers.common.string.ToStringBuilder;
+import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.jql.QueryBuilder;
 
 import java.util.*;
@@ -28,8 +29,9 @@ public class QueryParams {
     private final boolean aggregate;
     private final boolean newObjectChanges;
     private final Optional<String> changedProperty;
+    private final Optional<SnapshotType> snapshotType;
 
-    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty, CommitId toCommitId) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty, CommitId toCommitId, SnapshotType snapshotType) {
         this.limit = limit;
         this.skip = skip;
         this.from = Optional.ofNullable(from);
@@ -42,6 +44,7 @@ public class QueryParams {
         this.newObjectChanges = newObjectChanges;
         this.changedProperty = Optional.ofNullable(changedProperty);
         this.toCommitId = Optional.ofNullable(toCommitId);
+        this.snapshotType = Optional.ofNullable(snapshotType);
     }
 
     /**
@@ -123,6 +126,13 @@ public class QueryParams {
     }
 
     /**
+     * @see QueryBuilder#withSnapshotType(SnapshotType)
+     */
+    public Optional<SnapshotType> snapshotType() {
+        return snapshotType;
+    }
+
+    /**
      * @see QueryBuilder#withNewObjectChanges(boolean)
      */
     public boolean newObjectChanges() {
@@ -141,6 +151,7 @@ public class QueryParams {
                 "version", version,
                 "author", author,
                 "newObjectChanges", newObjectChanges,
+                "snapshotType", snapshotType,
                 "limit", limit,
                 "skip", skip);
     }

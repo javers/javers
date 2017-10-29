@@ -2,6 +2,7 @@ package org.javers.repository.api;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
+import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.jql.QueryBuilder;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public class QueryParamsBuilder {
     private boolean newObjectChanges;
     private Map<String, String> commitProperties = new HashMap<>();
     private String changedProperty;
+    private SnapshotType snapshotType;
 
     private QueryParamsBuilder(int limit) {
         this.limit = limit;
@@ -141,12 +143,19 @@ public class QueryParamsBuilder {
         return this;
     }
 
-
     /**
      * @see QueryBuilder#withNewObjectChanges(boolean)
      */
     public QueryParamsBuilder newObjectChanges(boolean newObjectChanges) {
         this.newObjectChanges = newObjectChanges;
+        return this;
+    }
+
+    /**
+     * @see QueryBuilder#withSnapshotType(SnapshotType)
+     */
+    public QueryParamsBuilder withSnapshotType(SnapshotType snapshotType) {
+        this.snapshotType = snapshotType;
         return this;
     }
 
@@ -171,6 +180,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty, toCommitId);
+        return new QueryParams(limit, skip, from, to, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType);
     }
 }

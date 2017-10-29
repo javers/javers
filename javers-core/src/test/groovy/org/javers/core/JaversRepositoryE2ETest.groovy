@@ -22,6 +22,8 @@ import java.time.LocalDateTime
 import static groovyx.gpars.GParsPool.withPool
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.core.metamodel.object.SnapshotType.INITIAL
+import static org.javers.core.metamodel.object.SnapshotType.UPDATE
 import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.QueryBuilder.*
 import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
@@ -230,13 +232,42 @@ class JaversRepositoryE2ETest extends Specification {
         }
 
         when:
-        def snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress).withChangedProperty("city").build())
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
+                .withChangedProperty("city")
+                .withSnapshotTypeUpdate().build())
+
+        then:
+        snapshots.size() == 1
+        snapshots[0].globalId.typeName == DummyAddress.name
+
+        when: "withNewObjectChanges"
+        snapshots = javers.findSnapshots(QueryBuilder.byClass(DummyAddress)
+                .withChangedProperty("city").build())
 
         then:
         snapshots.size() == 3
-        snapshots.each {
-            assert it.globalId.typeName == DummyAddress.name
-        }
+    }
+
+    def "should query for Entity snapshots with snapshotType filter"(){
+      given:
+      javers.commit( "author", new SnapshotEntity(id:1, intProperty: 1) )
+      javers.commit( "author", new SnapshotEntity(id:1, intProperty: 2) )
+
+      when:
+      def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity)
+              .withSnapshotType(INITIAL).build())
+
+      then:
+      snapshots.size() == 1
+      snapshots[0].commitId.majorId == 1
+
+      when:
+      snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity)
+            .withSnapshotType(UPDATE).build())
+
+      then:
+      snapshots.size() == 1
+      snapshots[0].commitId.majorId == 2
     }
 
     def "should query for Entity snapshots and changes by Entity class and changed property"() {
@@ -248,25 +279,34 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit( "author", new SnapshotEntity(id:2, intProperty: 1) )
 
         when:
-        def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity).withChangedProperty("intProperty").build())
+        def snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity)
+                .withChangedProperty("intProperty")
+                .withSnapshotTypeUpdate().build())
 
-        then: "snapshots query"
+        then:
+        true
+        snapshots.size() == 1
+        snapshots[0].commitId.majorId == 3
+        snapshots[0].globalId.value() ==  SnapshotEntity.name+"/1"
+
+        when: "withNewObjectChanges"
+        snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity)
+                .withChangedProperty("intProperty").build())
+
+        then:
         snapshots.size() == 3
-        snapshots[0].commitId.majorId == 5
-        snapshots.each {
-            assert it.globalId.typeName == SnapshotEntity.name
-        }
 
         when: "changes query"
-        def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity).withChangedProperty("intProperty").build())
+        def changes = javers.findChanges(QueryBuilder.byClass(SnapshotEntity)
+                .withChangedProperty("intProperty").build())
 
         then:
         changes.size() == 1
         changes[0].getCommitMetadata().get().id.majorId == 3
-        changes.each {
-            assert it instanceof ValueChange
-            assert it.propertyName == "intProperty"
-        }
+        changes[0] instanceof ValueChange
+        changes[0].propertyName == "intProperty"
+        changes[0].left == 1
+        changes[0].right == 2
     }
 
     def "should query for Entity changes by Entity class"() {

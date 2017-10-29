@@ -62,62 +62,40 @@ abstract class SnapshotFilter extends SchemaNameAware {
 
     void applyQueryParams(SelectQuery query, QueryParams queryParams) {
         if (queryParams.changedProperty().isPresent()){
-            addChangedPropertyCondition(query, queryParams.changedProperty().get());
+            query.append(" AND " + SNAPSHOT_CHANGED + " like '%\"' || :changedProperty || '\"%'")
+                 .withArgument("changedProperty", queryParams.changedProperty().get());
         }
         if (queryParams.from().isPresent()) {
-            addFromDateCondition(query, queryParams.from().get());
+            query.append(" AND " + COMMIT_COMMIT_DATE + " >= :commitFromDate")
+                 .withArgument("commitFromDate", new Timestamp(toUtilDate( queryParams.from().get())));
         }
         if (queryParams.to().isPresent()) {
-            addToDateCondition(query, queryParams.to().get());
+            query.append(" AND " + COMMIT_COMMIT_DATE + " <= :commitToDate")
+                 .withArgument("commitToDate", new Timestamp(toUtilDate(queryParams.to().get())));
         }
         if (queryParams.toCommitId().isPresent()) {
-            addToCommitIdCondition(query, queryParams.toCommitId().get());
+            query.append(" AND " + COMMIT_COMMIT_ID + " <= " + queryParams.toCommitId().get().valueAsNumber());
         }
         if (queryParams.commitIds().size() > 0) {
-            addCommitIdCondition(query, queryParams.commitIds());
+            query.append(" AND " + COMMIT_COMMIT_ID + " IN (" + ToStringBuilder.join(
+                    queryParams.commitIds().stream().map(c -> c.valueAsNumber()).collect(Collectors.toList())) + ")");
         }
         if (queryParams.version().isPresent()) {
-            addVersionCondition(query, queryParams.version().get());
+            query.append(" AND " + SNAPSHOT_VERSION + " = :version")
+                 .withArgument("version", queryParams.version().get());
         }
         if (queryParams.author().isPresent()) {
-            addAuthorCondition(query, queryParams.author().get());
+            query.append(" AND " + COMMIT_AUTHOR + " = :author")
+                 .withArgument("author",  queryParams.author().get());
         }
         if (queryParams.commitProperties().size() > 0) {
             addCommitPropertyConditions(query, queryParams.commitProperties());
         }
+        if (queryParams.snapshotType().isPresent()){
+            query.append(" AND " + SNAPSHOT_TYPE + " = :snapshotType")
+                 .withArgument("snapshotType", queryParams.snapshotType().get().name());
+        }
         query.limit(queryParams.limit(), queryParams.skip());
-    }
-
-    private void addChangedPropertyCondition(SelectQuery query, String changedProperty) {
-        query.append(" AND " + SNAPSHOT_CHANGED + " like '%\"" + changedProperty +"\"%'");
-    }
-
-    private void addFromDateCondition(SelectQuery query, LocalDateTime from) {
-        query.append(" AND " + COMMIT_COMMIT_DATE + " >= :commitFromDate")
-            .withArgument("commitFromDate", new Timestamp(toUtilDate(from)));
-    }
-
-    private void addToDateCondition(SelectQuery query, LocalDateTime to) {
-        query.append(" AND " + COMMIT_COMMIT_DATE + " <= :commitToDate")
-            .withArgument("commitToDate", new Timestamp(toUtilDate(to)));
-    }
-
-    private void addCommitIdCondition(SelectQuery query, Set<CommitId> commitIds) {
-        query.append(" AND " + COMMIT_COMMIT_ID + " IN (" + ToStringBuilder.join(commitIds.stream().map(c -> c.valueAsNumber()).collect(Collectors.toList())) + ")");
-    }
-
-    private void addToCommitIdCondition(SelectQuery query, CommitId commitId) {
-        query.append(" AND " + COMMIT_COMMIT_ID + " <= " + commitId.valueAsNumber());
-    }
-
-    void addVersionCondition(SelectQuery query, Long version) {
-        query.append(" AND " + SNAPSHOT_VERSION + " = :version")
-            .withArgument("version", version);
-    }
-
-    private void addAuthorCondition(SelectQuery query, String author) {
-        query.append(" AND " + COMMIT_AUTHOR + " = :author")
-            .withArgument("author", author);
     }
 
     private void addCommitPropertyConditions(SelectQuery query, Map<String, String> commitProperties) {

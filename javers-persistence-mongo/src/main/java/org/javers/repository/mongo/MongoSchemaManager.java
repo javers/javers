@@ -28,6 +28,7 @@ class MongoSchemaManager {
     static final String SNAPSHOT_VERSION = "version";
     static final String CHANGED_PROPERTIES = "changedProperties";
     static final String OBJECT_ID = "_id";
+    static final String SNAPSHOT_TYPE = "type";
 
     private static final Logger logger = LoggerFactory.getLogger(MongoSchemaManager.class);
 
