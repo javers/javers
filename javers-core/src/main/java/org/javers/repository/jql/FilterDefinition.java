@@ -53,7 +53,7 @@ abstract class FilterDefinition {
             } catch (JaversException e) {
                 if (e.getCode() == JaversExceptionCode.MANAGED_CLASS_MAPPING_ERROR) {
                     throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
-                        "object passed to byInstance(Object) query should an instance of Entity or ValueObject, got "+typeMapper.getJaversType(instance.getClass()) + " - " +ToStringBuilder.format(instance)+".\nDid you mean byInstanceId(Object localId, Class entityClass)?");
+                        "object passed to byInstance(Object) query should be instance of Entity or ValueObject, got "+typeMapper.getJaversType(instance.getClass()) + " - " +ToStringBuilder.format(instance)+".\nDid you mean byInstanceId(Object localId, Class entityClass)?");
                 }
                 else {
                     throw e;
