@@ -1,5 +1,8 @@
 package org.javers.repository.jql
 
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
+import org.javers.core.JaversBuilder
 import org.javers.core.JaversTestBuilder
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.examples.typeNames.NewValueObjectWithTypeAlias
@@ -10,6 +13,19 @@ import spock.lang.Unroll
  * @author bartosz.walacik
  */
 class QueryRunnerIntegrationTest extends Specification {
+
+    def "should throw MALFORMED_JQL when  "(){
+      given:
+      def javers = JaversBuilder.javers().build()
+
+      when:
+      javers.findSnapshots(QueryBuilder.byInstance("value").build())
+
+      then:
+      def e = thrown(JaversException)
+      println(e)
+      e.code == JaversExceptionCode.MALFORMED_JQL
+    }
 
     @Unroll
     def "should touch Entity and ValueObject classes before running #queryType query"(){

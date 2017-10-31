@@ -3,6 +3,7 @@ package org.javers.repository.jql;
 import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
@@ -47,7 +48,17 @@ abstract class FilterDefinition {
         }
 
         Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
-            return new IdFilter(globalIdFactory.createId(instance));
+            try {
+                return new IdFilter(globalIdFactory.createId(instance));
+            } catch (JaversException e) {
+                if (e.getCode() == JaversExceptionCode.MANAGED_CLASS_MAPPING_ERROR) {
+                    throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
+                        "object passed to byInstance(Object) query should an instance of Entity or ValueObject, got "+typeMapper.getJaversType(instance.getClass()) + " - " +ToStringBuilder.format(instance)+".\nDid you mean byInstanceId(Object localId, Class entityClass)?");
+                }
+                else {
+                    throw e;
+                }
+            }
         }
     }
 
