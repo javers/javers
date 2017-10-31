@@ -83,7 +83,7 @@ public class ToStringBuilder {
         return out.toString();
     }
 
-    private static String format(Object value) {
+    public static String format(Object value) {
         if ( value instanceof String) return "'"+value+"'";
         if ( value instanceof Set) return ToStringBuilder.setToString((Set)value);
         if ( value instanceof List) return ToStringBuilder.listToString((List)value);

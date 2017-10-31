@@ -117,10 +117,10 @@ public class InMemoryRepository implements JaversRepository {
             snapshots = filterSnapshotsByCommitIds(snapshots, queryParams.commitIds());
         }
         if (queryParams.toCommitId().isPresent()) {
-            snapshots = filterSnapshotsByToCommitId(snapshots,queryParams.toCommitId().get());
+            snapshots = filterSnapshotsByToCommitId(snapshots, queryParams.toCommitId().get());
         }
         if (queryParams.version().isPresent()) {
-            snapshots = filterSnapshotsByVersion(snapshots, queryParams.version().get());
+            snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getVersion() == queryParams.version().get());
         }
         if (queryParams.author().isPresent()) {
             snapshots = filterSnapshotsByAuthor(snapshots, queryParams.author().get());
@@ -130,6 +130,9 @@ public class InMemoryRepository implements JaversRepository {
         }
         if (queryParams.changedProperty().isPresent()){
             snapshots = filterByPropertyName(snapshots, queryParams.changedProperty().get());
+        }
+        if (queryParams.snapshotType().isPresent()){
+            snapshots = Lists.positiveFilter(snapshots, snapshot -> snapshot.getType() == queryParams.snapshotType().get());
         }
         snapshots = filterSnapshotsByCommitProperties(snapshots, queryParams.commitProperties());
         return trimResultsToRequestedSlice(snapshots, queryParams.skip(), queryParams.limit());
@@ -141,10 +144,6 @@ public class InMemoryRepository implements JaversRepository {
 
     private List<CdoSnapshot> filterSnapshotsByCommitIds(List<CdoSnapshot> snapshots, final Set<CommitId> commitIds) {
         return Lists.positiveFilter(snapshots, snapshot -> commitIds.contains(snapshot.getCommitId()));
-    }
-
-    private List<CdoSnapshot> filterSnapshotsByVersion(List<CdoSnapshot> snapshots, final Long version) {
-        return Lists.positiveFilter(snapshots, snapshot -> version == snapshot.getVersion());
     }
 
     private List<CdoSnapshot> filterSnapshotsByAuthor(List<CdoSnapshot> snapshots, final String author) {

@@ -5,6 +5,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.jql.FilterDefinition.*;
 
@@ -174,6 +175,14 @@ public class QueryBuilder {
     }
 
     /**
+     * See javadoc in {@link #withNewObjectChanges()}
+     */
+    public QueryBuilder withNewObjectChanges(boolean newObjectChanges) {
+        queryParamsBuilder.newObjectChanges(newObjectChanges);
+        return this;
+    }
+
+    /**
      * Affects changes query only.
      * When switched on, additional changes are generated for the initial snapshot
      * (the first commit of a given object). Off by default.
@@ -182,16 +191,33 @@ public class QueryBuilder {
      * and the full set of initial PropertyChanges with null on the left side
      * and initial property value on the right.
      */
-    public QueryBuilder withNewObjectChanges(boolean newObjectChanges) {
-        queryParamsBuilder.newObjectChanges(newObjectChanges);
+    public QueryBuilder withNewObjectChanges() {
+        queryParamsBuilder.newObjectChanges(true);
         return this;
     }
 
     /**
-     * Alias to {@link #withNewObjectChanges(boolean)} with true
+     * Selects only snapshots with a given type: initial, update or terminal.
+     * <br/><br/>
+     *
+     * Typical use case:
+     *
+     * <pre>
+     * javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity)
+     *       .withChangedProperty("someProperty")
+     *       .withSnapshotTypeUpdate().build())
+     * </pre>
      */
-    public QueryBuilder withNewObjectChanges() {
-        queryParamsBuilder.newObjectChanges(true);
+    public QueryBuilder withSnapshotType(SnapshotType snapshotType) {
+        queryParamsBuilder.withSnapshotType(snapshotType);
+        return this;
+    }
+
+    /**
+     * Selects only updating snapshots (without initial ones).
+     */
+    public QueryBuilder withSnapshotTypeUpdate() {
+        queryParamsBuilder.withSnapshotType(SnapshotType.UPDATE);
         return this;
     }
 
@@ -428,7 +454,7 @@ public class QueryBuilder {
         return this;
     }
 
-    public JqlQuery build(){
+    public JqlQuery build() {
         return new JqlQuery(filter, queryParamsBuilder.build(), new ShadowScopeDefinition(shadowScope, maxGapsToFill));
     }
 

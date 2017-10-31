@@ -239,29 +239,35 @@ public class MongoRepository implements JaversRepository {
             QueryParams params = queryParams.get();
 
             if (params.from().isPresent()) {
-                query = addFromDateFiler(query, params.from().get());
+                query = Filters.and(query, Filters.gte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(params.from().get())));
             }
             if (params.to().isPresent()) {
-                query = addToDateFilter(query, params.to().get());
+                query =  Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(params.to().get())));
             }
             if (params.toCommitId().isPresent()) {
-                query = addToCommitIdFilter(query, params.toCommitId().get());
+                double commitId = params.toCommitId().get().valueAsNumber().doubleValue();
+                query = Filters.and(query, Filters.lte(COMMIT_ID, commitId));
             }
             if (params.commitIds().size() > 0) {
-                query = addCommitIdFilter(query, params.commitIds());
+                query = Filters.in(COMMIT_ID, params.commitIds().stream()
+                        .map(c -> c.valueAsNumber().doubleValue()).collect(Collectors.toSet()));
             }
             if (params.version().isPresent()) {
-                query = addVersionFilter(query, params.version().get());
+                query = Filters.and(query, createVersionQuery(params.version().get()));
             }
             if (params.author().isPresent()) {
-                query = addAuthorFilter(query, params.author().get());
+                query = Filters.and(query, new BasicDBObject(COMMIT_AUTHOR, params.author().get()));
             }
             if (!params.commitProperties().isEmpty()) {
                 query = addCommitPropertiesFilter(query, params.commitProperties());
             }
             if (params.changedProperty().isPresent()) {
-                query = addChangedPropertyFilter(query, params.changedProperty().get());
+                query = Filters.and(query, new BasicDBObject(CHANGED_PROPERTIES, params.changedProperty().get()));
             }
+            if (params.snapshotType().isPresent()) {
+                query = Filters.and(query, new BasicDBObject(SNAPSHOT_TYPE, params.snapshotType().get().name()));
+            }
+
         }
         return query;
     }
@@ -276,30 +282,6 @@ public class MongoRepository implements JaversRepository {
         return  findIterable;
     }
 
-    private Bson addFromDateFiler(Bson query, LocalDateTime from) {
-        return Filters.and(query, Filters.gte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(from)));
-    }
-
-    private Bson addToDateFilter(Bson query, LocalDateTime to) {
-        return Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(to)));
-    }
-
-    private Bson addToCommitIdFilter(Bson query, CommitId commitId) {
-        return Filters.and(query, Filters.lte(COMMIT_ID, commitId.valueAsNumber().doubleValue()));
-    }
-
-    private Bson addCommitIdFilter(Bson query, Set<CommitId> commitIds) {
-        return Filters.in(COMMIT_ID, commitIds.stream().map(c -> c.valueAsNumber().doubleValue()).collect(Collectors.toSet()));
-    }
-
-    private Bson addChangedPropertyFilter(Bson query, String changedProperty){
-        return Filters.and(query, new BasicDBObject(CHANGED_PROPERTIES, changedProperty));
-    }
-
-    private Bson addVersionFilter(Bson query, Long version) {
-        return Filters.and(query, createVersionQuery(version));
-    }
-
     private Bson addCommitPropertiesFilter(Bson query, Map<String, String> commitProperties) {
         List<Bson> propertyFilters = commitProperties.entrySet().stream().map( commitProperty ->
             new BasicDBObject(COMMIT_PROPERTIES,
@@ -308,10 +290,6 @@ public class MongoRepository implements JaversRepository {
                                           "value", commitProperty.getValue())))
         ).collect(toImmutableList());
         return Filters.and(query, Filters.and(propertyFilters.toArray(new Bson[]{})));
-    }
-
-    private Bson addAuthorFilter(Bson query, String author) {
-        return Filters.and(query, new BasicDBObject(COMMIT_AUTHOR, author));
     }
 
     private Optional<CdoSnapshot> getLatest(Bson idQuery) {
