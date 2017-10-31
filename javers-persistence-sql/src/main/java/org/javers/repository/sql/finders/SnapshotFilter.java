@@ -62,8 +62,8 @@ abstract class SnapshotFilter extends SchemaNameAware {
 
     void applyQueryParams(SelectQuery query, QueryParams queryParams) {
         if (queryParams.changedProperty().isPresent()){
-            query.append(" AND " + SNAPSHOT_CHANGED + " like '%\"' || :changedProperty || '\"%'")
-                 .withArgument("changedProperty", queryParams.changedProperty().get());
+            query.append(" AND " + SNAPSHOT_CHANGED + " like :changedProperty ")
+                  .withArgument("changedProperty", "%\"" + queryParams.changedProperty().get() +"\"%");
         }
         if (queryParams.from().isPresent()) {
             query.append(" AND " + COMMIT_COMMIT_DATE + " >= :commitFromDate")
