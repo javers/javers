@@ -16,6 +16,7 @@ import java.util.TreeMap;
  * @author bartosz walacik
  */
 public class FixedSchemaFactory extends SchemaNameAware {
+    private static final int MAX_INDEX_KEY_LEN_IN_MYSQL = 191;
 
     public static final String GLOBAL_ID_TABLE_NAME = "jv_global_id";
     public static final String GLOBAL_ID_PK =         "global_id_pk";
@@ -110,7 +111,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
         relationBuilder
             .primaryKey(tableName.localName() + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
-            .withAttribute().string(COMMIT_PROPERTY_NAME).withMaxLength(190).and()
+            .withAttribute().string(COMMIT_PROPERTY_NAME).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).and()
             .withAttribute().string(COMMIT_PROPERTY_VALUE).withMaxLength(600).and();
         foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
         relationBuilder.build();
@@ -121,7 +122,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         if (dialect instanceof MysqlDialect) {
             columnsIndex(tableName, schema, new IndexedCols(
                     new String[]{COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE},
-                    new int[]{0, 200}));
+                    new int[]{0, MAX_INDEX_KEY_LEN_IN_MYSQL}));
         }
         else {
             columnsIndex(tableName, schema, COMMIT_PROPERTY_NAME, COMMIT_PROPERTY_VALUE);
@@ -136,7 +137,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
         primaryKey(GLOBAL_ID_PK, schema,relationBuilder);
         relationBuilder
-                .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(190).and()
+                .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).and()
                 .withAttribute().string(GLOBAL_ID_FRAGMENT).withMaxLength(200).and()
                 .withAttribute().string(GLOBAL_ID_TYPE_NAME).withMaxLength(200).and();
         foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, getGlobalIdTableNameWithSchema(), GLOBAL_ID_PK, relationBuilder);
