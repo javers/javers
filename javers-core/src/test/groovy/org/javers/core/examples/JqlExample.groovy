@@ -62,7 +62,7 @@ class JqlExample extends Specification {
 
       when: 'deep+1 scope query'
         shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-                        .withScopeCommitDeepPlus(1).build())
+                        .withScopeDeepPlus(1).build())
         shadowE1 = shadows.get(0).get()
 
       then: 'only e1 and e2 are loaded'
@@ -70,9 +70,9 @@ class JqlExample extends Specification {
         shadowE1.ref.id == 2
         shadowE1.ref.ref == null
 
-      when: 'deep+2 scope query'
+      when: 'deep+3 scope query'
         shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-                        .withScopeCommitDeepPlus(3).build())
+                        .withScopeDeepPlus(3).build())
         shadowE1 = shadows.get(0).get()
 
       then: 'all object are loaded'
@@ -194,6 +194,7 @@ class JqlExample extends Specification {
           def shadows = javers.findShadows(QueryBuilder.byInstance(bob)
                               .build())
           Employee bobShadow = shadows[0].get()  //get the latest version of Bob
+
       then:
           assert shadows.size() == 2      //we have 2 shadows of Bob
           assert bobShadow.name == 'bob'
@@ -222,16 +223,16 @@ class JqlExample extends Specification {
                                                // shadow is loaded and linked to Bob
           assert bobShadow.boss.boss == null   // Steve is still outside the scope
 
-      when: 'commit-deep+ scope query'
+      when: 'deep+2 scope query'
           shadows = javers.findShadows(QueryBuilder.byInstance(bob)
                           .withChildValueObjects()
-                          .withScopeCommitDeepPlus(2).build())
+                          .withScopeDeepPlus(2).build())
           bobShadow = shadows[0].get()
 
       then: 'all objects are loaded'
           assert bobShadow.primaryAddress.city == 'London'
           assert bobShadow.boss.name == 'john'
-          assert bobShadow.boss.boss.name == 'steve' // Steve is loaded thanks to +2 scope
+          assert bobShadow.boss.boss.name == 'steve' // Steve is loaded thanks to deep+2 scope
     }
 
     def "should query for Snapshots of an object"(){

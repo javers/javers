@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.javers.repository.jql.ShadowScope.COMMIT_DEEP_PLUS;
+import static org.javers.repository.jql.ShadowScope.DEEP_PLUS;
 
 /**
  * @author bartosz.walacik
@@ -37,9 +37,9 @@ public class ShadowQueryRunner {
     }
 
     public List<Shadow> queryForShadows(JqlQuery query, List<CdoSnapshot> coreSnapshots) {
-        if (query.getShadowScope() != COMMIT_DEEP_PLUS && query.getShadowScopeMaxGapsToFill() > 0) {
+        if (query.getShadowScope() != DEEP_PLUS && query.getShadowScopeMaxGapsToFill() > 0) {
             throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
-                    "maxGapsToFill can be used only in the COMMIT_DEEP_PLUS query scope");
+                    "maxGapsToFill can be used only in the DEEP_PLUS query scope");
         }
 
         final CommitTable commitTable = new CommitTable(coreSnapshots, query.getShadowScopeMaxGapsToFill(),
@@ -162,7 +162,7 @@ public class ShadowQueryRunner {
                 logger.debug("action: loading ValueObject '{}' in CHILD_VALUE_OBJECT scope", referenceKey.targetId.value());
             }
             else {
-                logger.debug("action: loading reference '{}' in COMMIT_DEEP_PLUS scope", referenceKey.targetId.value());
+                logger.debug("action: loading reference '{}' in DEEP_PLUS scope", referenceKey.targetId.value());
             }
 
             return filledGaps.computeIfAbsent(referenceKey, key ->

@@ -192,7 +192,7 @@ public interface Javers {
      * <ul>
      *  <li/> {@link QueryBuilder#withChildValueObjects()}
      *  <li/> {@link QueryBuilder#withScopeCommitDeep()}
-     *  <li/> {@link QueryBuilder#withScopeCommitDeepPlus(int)}
+     *  <li/> {@link QueryBuilder#withScopeDeepPlus(int)}
      * </ul>
      *
      * We recommend {@link QueryBuilder#withChildValueObjects()} as a good start.
@@ -217,7 +217,7 @@ public interface Javers {
      *
      * <h3>In the first scenario, our four entities are committed in three commits:</h3>
      *
-     * Full graph is loaded only in commit-deep+2 scope.
+     * Full graph is loaded only in deep+3 scope.
      *
      * <pre>
      * given:
@@ -247,7 +247,7 @@ public interface Javers {
      *
      * when: 'deep+1 scope query'
      *   shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *                   .withScopeCommitDeepPlus(1).build())
+     *                   .withScopeDeepPlus(1).build())
      *   shadowE1 = shadows.get(0).get()
      *
      * then: 'only e1 + e2 are loaded'
@@ -255,9 +255,9 @@ public interface Javers {
      *   shadowE1.ref.id == 2
      *   shadowE1.ref.ref == null
      *
-     * when: 'deep+2 scope query'
+     * when: 'deep+3 scope query'
      *   shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *                   .withScopeCommitDeepPlus(3).build())
+     *                   .withScopeDeepPlus(3).build())
      *   shadowE1 = shadows.get(0).get()
      *
      * then: 'all object are loaded'
@@ -273,18 +273,18 @@ public interface Javers {
      *
      * <pre>
      * given:
-     * javers.commit("author", e1) // commit 1.0 with snapshots of e1, e2, e3 and e4
+     *   javers.commit("author", e1) //commit 1.0 with snapshots of e1, e2, e3 and e4
      *
      * when: 'commit-deep scope query'
-     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *          .withScopeCommitDeep().build())
-     * shadowE1 = shadows.get(0).get()
+     *   shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *                   .withScopeCommitDeep().build())
+     *   shadowE1 = shadows.get(0).get()
      *
      * then: 'all object are loaded'
-     * shadowE1.id == 1
-     * shadowE1.ref.id == 2
-     * shadowE1.ref.ref.id == 3
-     * shadowE1.ref.ref.ref.id == 4
+     *   shadowE1.id == 1
+     *   shadowE1.ref.id == 2
+     *   shadowE1.ref.ref.id == 3
+     *   shadowE1.ref.ref.ref.id == 4
      * </pre>
      *
      * <h2>Performance</h2>
