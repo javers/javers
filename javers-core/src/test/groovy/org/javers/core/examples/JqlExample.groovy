@@ -29,59 +29,57 @@ class JqlExample extends Specification {
 
     def "should query for Shadows with different scopes, lightweight example, multiple commits"(){
       given: 'In this scenario, our 4 entities are committed in 3 commits'
-      def javers = JaversBuilder.javers().build()
+        def javers = JaversBuilder.javers().build()
 
-      // E1 -> E2 -> E3 -> E4
-      def e4 = new Entity(id:4)
-      def e3 = new Entity(id:3, ref:e4)
-      def e2 = new Entity(id:2, ref:e3)
-      def e1 = new Entity(id:1, ref:e2)
+        // E1 -> E2 -> E3 -> E4
+        def e4 = new Entity(id:4)
+        def e3 = new Entity(id:3, ref:e4)
+        def e2 = new Entity(id:2, ref:e3)
+        def e1 = new Entity(id:1, ref:e2)
 
-      javers.commit("author", e4) // commit 1.0 with e4 snapshot
-      javers.commit("author", e3) // commit 2.0 with e3 snapshot
-      javers.commit("author", e1) // commit 3.0 with snapshots of e1 and e2
+        javers.commit("author", e4) // commit 1.0 with e4 snapshot
+        javers.commit("author", e3) // commit 2.0 with e3 snapshot
+        javers.commit("author", e1) // commit 3.0 with snapshots of e1 and e2
 
       when: 'shallow scope query'
-      def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-                   .build())
-      def shadowE1 = shadows.get(0).get()
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity).build())
+        def shadowE1 = shadows.get(0).get()
 
       then: 'only e1 is loaded'
-      shadowE1 instanceof Entity
-      shadowE1.id == 1
-      shadowE1.ref == null
+        shadowE1 instanceof Entity
+        shadowE1.id == 1
+        shadowE1.ref == null
 
       when: 'commit-deep scope query'
-      shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-               .withScopeCommitDeep().build())
-      shadowE1 = shadows.get(0).get()
+        shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+                        .withScopeCommitDeep().build())
+        shadowE1 = shadows.get(0).get()
 
       then: 'only e1 and e2 are loaded, both was committed in commit 3.0'
-      shadowE1.id == 1
-      shadowE1.ref.id == 2
-      shadowE1.ref.ref == null
+        shadowE1.id == 1
+        shadowE1.ref.id == 2
+        shadowE1.ref.ref == null
 
-      when: 'commit-deep+1 scope query'
-      shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-              .withScopeCommitDeepPlus(1).build())
-      shadowE1 = shadows.get(0).get()
+      when: 'deep+1 scope query'
+        shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+                        .withScopeDeepPlus(1).build())
+        shadowE1 = shadows.get(0).get()
 
-      then: 'e1, e2 and e3 are loaded'
-      shadowE1.id == 1
-      shadowE1.ref.id == 2
-      shadowE1.ref.ref.id == 3
-      shadowE1.ref.ref.ref == null
+      then: 'only e1 and e2 are loaded'
+        shadowE1.id == 1
+        shadowE1.ref.id == 2
+        shadowE1.ref.ref == null
 
-      when: 'commit-deep+2 scope query'
-      shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-              .withScopeCommitDeepPlus(2).build())
-      shadowE1 = shadows.get(0).get()
+      when: 'deep+3 scope query'
+        shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+                        .withScopeDeepPlus(3).build())
+        shadowE1 = shadows.get(0).get()
 
       then: 'all object are loaded'
-      shadowE1.id == 1
-      shadowE1.ref.id == 2
-      shadowE1.ref.ref.id == 3
-      shadowE1.ref.ref.ref.id == 4
+        shadowE1.id == 1
+        shadowE1.ref.id == 2
+        shadowE1.ref.ref.id == 3
+        shadowE1.ref.ref.ref.id == 4
     }
 
     def "should query for Shadows with different scopes, lightweight example, single commit"(){
@@ -196,6 +194,7 @@ class JqlExample extends Specification {
           def shadows = javers.findShadows(QueryBuilder.byInstance(bob)
                               .build())
           Employee bobShadow = shadows[0].get()  //get the latest version of Bob
+
       then:
           assert shadows.size() == 2      //we have 2 shadows of Bob
           assert bobShadow.name == 'bob'
@@ -224,15 +223,16 @@ class JqlExample extends Specification {
                                                // shadow is loaded and linked to Bob
           assert bobShadow.boss.boss == null   // Steve is still outside the scope
 
-      when: 'commit-deep+ scope query'
+      when: 'deep+2 scope query'
           shadows = javers.findShadows(QueryBuilder.byInstance(bob)
                           .withChildValueObjects()
-                          .withScopeCommitDeepPlus(1).build())
+                          .withScopeDeepPlus(2).build())
           bobShadow = shadows[0].get()
+
       then: 'all objects are loaded'
           assert bobShadow.primaryAddress.city == 'London'
           assert bobShadow.boss.name == 'john'
-          assert bobShadow.boss.boss.name == 'steve' // Steve is loaded thanks to +1 scope
+          assert bobShadow.boss.boss.name == 'steve' // Steve is loaded thanks to deep+2 scope
     }
 
     def "should query for Snapshots of an object"(){

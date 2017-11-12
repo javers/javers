@@ -371,7 +371,7 @@ public class QueryBuilder {
     }
 
     /**
-     * Choose between <i>shallow</i>, <i>child-value-object</i>, </i><i>commit-deep</i> or <i>commit-deep+</i> query scopes.
+     * Choose between <i>shallow</i>, <i>child-value-object</i>, </i><i>commit-deep</i> or <i>deep+</i> query scopes.
      * <br/>
      * The wider the scope, the more object shadows are loaded to the resulting graph.
      * <br/><br/>
@@ -390,7 +390,7 @@ public class QueryBuilder {
     public QueryBuilder withShadowScope(ShadowScope shadowScope){
         Validate.argumentIsNotNull(shadowScope);
         this.shadowScope = shadowScope;
-        if (shadowScope == COMMIT_DEEP_PLUS && maxGapsToFill == 0) {
+        if (shadowScope == DEEP_PLUS && maxGapsToFill == 0) {
             this.maxGapsToFill = DEFAULT_GAPS_TO_FILL_LIMIT;
         }
 
@@ -411,8 +411,8 @@ public class QueryBuilder {
     }
 
     /**
-     * Selects {@link ShadowScope#COMMIT_DEEP_PLUS}
-     * with default <code></cpce>maxGapsToFill</code> = 10.
+     * Selects {@link ShadowScope#DEEP_PLUS}
+     * with <code></cpce>maxGapsToFill</code> = 10.
      * <br/><br/>
      *
      * Read about query scopes in {@link Javers#findShadows(JqlQuery)} javadoc.
@@ -423,12 +423,12 @@ public class QueryBuilder {
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      * @since 3.5
      */
-    public QueryBuilder withScopeCommitDeepPlus() {
-        return withShadowScope(COMMIT_DEEP_PLUS);
+    public QueryBuilder withScopeDeepPlus() {
+        return withShadowScope(DEEP_PLUS);
     }
 
     /**
-     * Selects {@link ShadowScope#COMMIT_DEEP_PLUS} with given <code>maxGapsToFill</code>.
+     * Selects {@link ShadowScope#DEEP_PLUS} with given <code>maxGapsToFill</code>.
      * <br/><br/>
      *
      * Read about query scopes in {@link Javers#findShadows(JqlQuery)} javadoc.
@@ -439,9 +439,25 @@ public class QueryBuilder {
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      * @since 3.5
      */
-    public QueryBuilder withScopeCommitDeepPlus(int maxGapsToFill) {
+    public QueryBuilder withScopeDeepPlus(int maxGapsToFill) {
         this.maxGapsToFill = maxGapsToFill;
-        return withShadowScope(COMMIT_DEEP_PLUS);
+        return withShadowScope(DEEP_PLUS);
+    }
+
+    /**
+     * @deprecated renamed to {@link #withScopeDeepPlus()} ()}
+     */
+    @Deprecated
+    public QueryBuilder withScopeCommitDeepPlus() {
+        return withScopeDeepPlus();
+    }
+
+    /**
+     * @deprecated renamed to {@link #withScopeDeepPlus(int)} ()}
+     */
+    @Deprecated
+    public QueryBuilder withScopeCommitDeepPlus(int maxGapsToFill) {
+        return withScopeDeepPlus(maxGapsToFill);
     }
 
     /**

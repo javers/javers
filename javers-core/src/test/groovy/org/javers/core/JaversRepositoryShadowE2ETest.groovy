@@ -14,6 +14,33 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
+    def "should not mix COMMIT_DEEP scope with DEEP_PLUS scope"(){
+      given:
+      def eRef = new SnapshotEntity(id: 2, intProperty: 2)
+      def e = new SnapshotEntity(id: 1, intProperty: 1, entityRef: eRef)
+      javers.commit("a", e)
+
+      e.intProperty = 30
+      eRef.intProperty = 3
+      javers.commit("a", eRef)
+      javers.commit("a", e)
+
+      e.intProperty = 33
+      eRef.intProperty = 4
+      javers.commit("a", eRef)
+      javers.commit("a", e)
+
+      when:
+      def shadows = javers.findShadows(QueryBuilder.byInstance(e)
+              .withScopeDeepPlus()
+              .build()).collect{it.get()}
+
+      then:
+      shadows[0].entityRef.intProperty == 4
+      shadows[1].entityRef.intProperty == 3
+      shadows[2].entityRef.intProperty == 2
+    }
+
     def "should query for deep Shadows of ValueObject in COMMIT_DEEP scope"() {
         given:
         def vo =  new DummyAddress(city: "London", networkAddress: new DummyNetworkAddress(address: "a"))
@@ -225,7 +252,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
         when:
         def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
-                .withScopeCommitDeepPlus().build()).collect{it.get()}
+                .withScopeDeepPlus().build()).collect{it.get()}
 
         then:
         shadows.size() == 2
@@ -247,7 +274,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
         when:
         def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
-                .withScopeCommitDeepPlus(1).build()).collect{it.get()}
+                .withScopeDeepPlus(1).build()).collect{it.get()}
 
         then:
         shadows.size() == 1
