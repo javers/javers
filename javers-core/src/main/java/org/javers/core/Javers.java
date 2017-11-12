@@ -221,51 +221,50 @@ public interface Javers {
      *
      * <pre>
      * given:
-     * javers.commit("author", e3); // commit 1.0 created with e3 snapshot
-     * javers.commit("author", e2); // commit 2.0 created with e2 snapshot
-     * javers.commit("author", e1); // commit 3.0 created with snapshots of e1 and e4
+     *   javers.commit("author", e4) // commit 1.0 with e4 snapshot
+     *   javers.commit("author", e3) // commit 2.0 with e3 snapshot
+     *   javers.commit("author", e1) // commit 3.0 with snapshots of e1 and e2
      *
      * when: 'shallow scope query'
-     * def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *              .build())
-     * def shadowE1 = shadows.get(0).get()
+     *   def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *                       .build())
+     *   def shadowE1 = shadows.get(0).get()
      *
      * then: 'only e1 is loaded'
-     * shadowE1 instanceof Entity
-     * shadowE1.id == 1
-     * shadowE1.ref == null
+     *   shadowE1 instanceof Entity
+     *   shadowE1.id == 1
+     *   shadowE1.ref == null
      *
      * when: 'commit-deep scope query'
-     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *          .withScopeCommitDeep().build())
-     * shadowE1 = shadows.get(0).get()
+     *   shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *                   .withScopeCommitDeep().build())
+     *   shadowE1 = shadows.get(0).get()
      *
      * then: 'only e1 and e2 are loaded, both was committed in commit 3.0'
-     * shadowE1.id == 1
-     * shadowE1.ref.id == 2
-     * shadowE1.ref.ref == null
+     *   shadowE1.id == 1
+     *   shadowE1.ref.id == 2
+     *   shadowE1.ref.ref == null
      *
-     * when: 'commit-deep+1 scope query'
-     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *          .withScopeCommitDeepPlus(1).build())
-     * shadowE1 = shadows.get(0).get()
+     * when: 'deep+1 scope query'
+     *   shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *                   .withScopeCommitDeepPlus(1).build())
+     *   shadowE1 = shadows.get(0).get()
      *
-     * then: 'e1, e2 and e3 are loaded'
-     * shadowE1.id == 1
-     * shadowE1.ref.id == 2
-     * shadowE1.ref.ref.id == 3
-     * shadowE1.ref.ref.ref == null
+     * then: 'only e1 + e2 are loaded'
+     *   shadowE1.id == 1
+     *   shadowE1.ref.id == 2
+     *   shadowE1.ref.ref == null
      *
-     * when: 'commit-deep+2 scope query'
-     * shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
-     *          .withScopeCommitDeepPlus(2).build())
-     * shadowE1 = shadows.get(0).get()
+     * when: 'deep+2 scope query'
+     *   shadows = javers.findShadows(QueryBuilder.byInstanceId(1, Entity)
+     *                   .withScopeCommitDeepPlus(3).build())
+     *   shadowE1 = shadows.get(0).get()
      *
      * then: 'all object are loaded'
-     * shadowE1.id == 1
-     * shadowE1.ref.id == 2
-     * shadowE1.ref.ref.id == 3
-     * shadowE1.ref.ref.ref.id == 4
+     *   shadowE1.id == 1
+     *   shadowE1.ref.id == 2
+     *   shadowE1.ref.ref.id == 3
+     *   shadowE1.ref.ref.ref.id == 4
      * </pre>
      *
      * <h3>In the second scenario, our four entities are committed in the single commit:</h3>

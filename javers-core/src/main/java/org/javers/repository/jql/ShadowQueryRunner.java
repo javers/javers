@@ -45,14 +45,20 @@ public class ShadowQueryRunner {
         final CommitTable commitTable = new CommitTable(coreSnapshots, query.getShadowScopeMaxGapsToFill(),
                 query.isAggregate());
 
-        if (query.getShadowScope().isCommitDeepOrWider()) {
+        if (query.getShadowScope().isCommitDeep()) {
             logger.debug("action: loading {} full commit(s) in {} scope", commitTable.commitsList.size(), query.getShadowScope().name());
             commitTable.loadFullCommits();
         }
 
-        return commitTable.rootsForQuery(query).stream()
+
+        List<Shadow> shadows = commitTable.rootsForQuery(query).stream()
                 .map(r -> shadowFactory.createShadow(r.root, r.context, (cm, targetId) -> commitTable.findLatestTo(cm, targetId)))
                 .collect(toList());
+
+        if (commitTable.filledGaps.size() > 0) {
+            logger.debug(".. filledGaps: {}", commitTable.filledGaps.size());
+        }
+        return shadows;
     }
 
     private static class ShadowRoot {
