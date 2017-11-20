@@ -193,31 +193,29 @@ public class ReflectionUtil {
         return false;
     }
 
-    public static int calculateHierarchyDistance(Class<?> clazz, Class<?> parent) {
-        Class<?> current = clazz;
-        int distance = 0;
+    public static List<Type> calculateHierarchyDistance(Class<?> clazz) {
+        List<Type> interfaces = new ArrayList<>();
 
-        //search in class hierarchy
-        while (current != null) {
-            //try class
-            if (parent == current) {
-                return distance;
+        List<Type> parents = new ArrayList<>();
+
+        Class<?> current = clazz;
+        while (current != null && current != Object.class){
+            if (clazz != current) {
+                parents.add(current);
             }
 
-            //try interfaces
-            for (Class<?> interf : current.getInterfaces()) {
-                if (parent == interf) {
-                    return distance + 1;
+            for (Class i : current.getInterfaces()) {
+                if (!interfaces.contains(i)) {
+                    interfaces.add(i);
                 }
             }
 
-            //step up in class hierarchy
             current = current.getSuperclass();
-
-            distance++;
         }
 
-        return Integer.MAX_VALUE;
+        parents.addAll(interfaces);
+
+        return parents;
     }
 
     public static String reflectiveToString(Object cdoId) {

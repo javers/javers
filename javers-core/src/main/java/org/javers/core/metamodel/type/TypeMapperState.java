@@ -69,7 +69,7 @@ class TypeMapperState {
     }
 
     boolean contains(Type javaType){
-        return mappedTypes.containsKey(javaType.toString());
+        return getFromMap(javaType) != null;
     }
 
     JaversType getJaversType(Type javaType) {
@@ -145,27 +145,28 @@ class TypeMapperState {
      */
     private JaversType infer(Type javaType) {
         argumentIsNotNull(javaType);
-        JaversType prototype = findNearestAncestor(javaType);
-        JaversType newType = typeFactory.infer(javaType, Optional.ofNullable(prototype));
-
-        return newType;
+        return typeFactory.infer(javaType, findNearestMappedAncestor(javaType));
     }
 
-    private JaversType findNearestAncestor(Type javaType) {
+    private Optional<JaversType> findNearestMappedAncestor(Type javaType) {
         Class javaClass = extractClass(javaType);
-        List<DistancePair> distances = new ArrayList<>();
+        List<Type> hierarchy = ReflectionUtil.calculateHierarchyDistance(javaClass);
 
-        for (JaversType javersType : mappedTypes.values()) {
-            DistancePair distancePair = new DistancePair(javaClass, javersType);
+
+        for (Type parent : hierarchy) {
+            System.out.println("hier: " + parent.getTypeName() + ", mapped?"+ contains(parent));
+        }
+
+       /*     DistancePair distancePair = new DistancePair(javaClass, javersType);
 
             //this is due too spoiled Java Array reflection API
             if (javaClass.isArray()) {
-                return getJaversType(Object[].class);
+                return Optional.of(getJaversType(Object[].class));
             }
 
             //just to better speed
             if (distancePair.getDistance() == 0) {
-                return distancePair.getJaversType();
+                return Optional.of(distancePair.getJaversType());
             }
 
             distances.add(distancePair);
@@ -174,10 +175,12 @@ class TypeMapperState {
         Collections.sort(distances);
 
         if (distances.get(0).isMax()) {
-            return null;
-        }
+            return Optional.empty();
+        }*/
 
-        return distances.get(0).getJaversType();
+        //return Optional.of(distances.get(0).getJaversType());
+
+        return Optional.empty();
     }
 
     private Optional<? extends Class> parseClass(String qualifiedName){

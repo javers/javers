@@ -201,18 +201,22 @@ public class TypeMapperIntegrationTest extends Specification {
         expectedJaversType << [EntityType, ValueObjectType, ValueType]
     }
 
+    class DummyUserOne extends AbstractDummyUser {
+        @Id int id
+    }
+
     @Unroll
-    def "should spawn #expectedJaversType.simpleName from mapped superclass"() {
+    def "should spawn #expectedJaversType.simpleName from explicitly mapped superclass"() {
         given:
         def mapper = javersTestAssembly().typeMapper
         mapper.registerClientsClass(givenDefinitionOfSuperclass)
 
         when:
-        def jType = mapper.getJaversType(DummyUser)
+        def jType = mapper.getJaversType(DummyUserOne)
 
         then:
         jType.class == expectedJaversType
-        jType.baseJavaClass == DummyUser
+        jType.baseJavaClass == DummyUserOne
 
         where:
         givenDefinitionOfSuperclass << [

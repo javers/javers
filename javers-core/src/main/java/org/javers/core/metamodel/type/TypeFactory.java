@@ -8,8 +8,12 @@ import org.javers.core.metamodel.scanner.ClassScanner;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Type;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
+import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition;
+import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.valueObjectDefinition;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -58,21 +62,28 @@ class TypeFactory {
         return new ValueObjectType(managedClassFactory.create(definition, scan), definition.getTypeName());
     }
 
+    JaversType infer(Type javaType) {
+        return infer(javaType, Optional.empty());
+    }
+
     JaversType infer(Type javaType, Optional<JaversType> prototype) {
-        JaversType jType;
+        JavaRichType javaRichType = new JavaRichType(javaType);
 
         if (prototype.isPresent()) {
-            jType = spawnFromPrototype(javaType, prototype.get());
+            JaversType jType = spawnFromPrototype(javaRichType, prototype.get());
             logger.debug("javersType of {} spawned as {} from prototype {}",
-                    javaType, jType.getClass().getSimpleName(), prototype.get());
-        }
-        else {
-            jType = inferFromAnnotations(javaType);
-            logger.debug("javersType of {} inferred as {}",
-                    javaType, jType.getClass().getSimpleName());
+                    javaRichType.getSimpleName(), jType.getClass().getSimpleName(), prototype.get());
+            return jType;
         }
 
-        return jType;
+        return inferFromAnnotations(javaRichType).map(jType -> {
+            logger.debug("javersType of {} inferred from annotations as {}",
+                    javaRichType.getSimpleName(), jType.getClass().getSimpleName());
+            return jType;
+        }).orElseGet(() -> {
+            logger.debug("javersType of {} defaulted to ValueObjectType", javaRichType.getSimpleName());
+            return defaultType(javaRichType);
+        });
     }
 
     ValueType inferIdPropertyTypeAsValue(Type idPropertyGenericType) {
@@ -82,50 +93,67 @@ class TypeFactory {
         return new ValueType(idPropertyGenericType);
     }
 
-    private JaversType spawnFromPrototype(Type javaType, JaversType prototype) {
-        Validate.argumentsAreNotNull(javaType, prototype);
-        Class javaClass = extractClass(javaType);
+    private JaversType spawnFromPrototype(JavaRichType javaRichType, JaversType prototype) {
+        Validate.argumentsAreNotNull(javaRichType, prototype);
 
         if (prototype instanceof ManagedType) {
-            ClassScan scan = classScanner.scan(javaClass);
-            ManagedClass managedClass = managedClassFactory.create(javaClass, scan);
-            return ((ManagedType) prototype).spawn(managedClass, scan.typeName());
+            ManagedClass managedClass = managedClassFactory.create(javaRichType.javaClass, javaRichType.getScan());
+            return ((ManagedType) prototype).spawn(managedClass, javaRichType.getScan().typeName());
         }
         else {
-            return prototype.spawn(javaType); //delegate to simple constructor
+            return prototype.spawn(javaRichType.javaType); //delegate to simple constructor
         }
     }
 
-    JaversType inferFromAnnotations(Type javaType) {
-        Class javaClass = extractClass(javaType);
-        ClassScan scan = classScanner.scan(javaClass);
+    private JaversType defaultType(JavaRichType t) {
+        return create(valueObjectDefinition(t.javaClass).withTypeName(t.getScan().typeName()).build(), t.getScan());
+    }
 
-        if (scan.hasValueAnn()){
-            return create( new ValueDefinition(javaClass), scan);
+    private Optional<JaversType> inferFromAnnotations(JavaRichType t) {
+        if (t.getScan().hasValueAnn()){
+            return Optional.of(create( new ValueDefinition(t.javaClass), t.getScan()));
         }
 
-        if (scan.hasIgnoredAnn()){
-            return create( new IgnoredTypeDefinition(javaClass), scan);
+        if (t.getScan().hasIgnoredAnn()){
+            return Optional.of(create( new IgnoredTypeDefinition(t.javaClass), t.getScan()));
         }
 
-        if (scan.hasValueObjectAnn()) {
-            return create(ValueObjectDefinitionBuilder.valueObjectDefinition(javaClass).build(), scan);
+        if (t.getScan().hasValueObjectAnn()) {
+            return Optional.of(create(valueObjectDefinition(t.javaClass).withTypeName(t.getScan().typeName()).build(),t.getScan()));
         }
 
-        ClientsClassDefinitionBuilder builder;
-        if (scan.hasShallowReferenceAnn()) {
-            builder = EntityDefinitionBuilder.entityDefinition(javaClass).withShallowReference();
-        } else
-        if (scan.hasEntityAnn() || scan.hasIdProperty()) {
-            builder = EntityDefinitionBuilder.entityDefinition(javaClass);
-        } else {
-            builder = ValueObjectDefinitionBuilder.valueObjectDefinition(javaClass);
+        if (t.getScan().hasShallowReferenceAnn()) {
+            return Optional.of(create(entityDefinition(t.javaClass).withTypeName(t.getScan().typeName()).withShallowReference().build(), t.getScan()));
         }
 
-        if (scan.typeName().isPresent()) {
-            builder.withTypeName(scan.typeName().get());
+        if (t.getScan().hasEntityAnn() || t.getScan().hasIdProperty()) {
+            return Optional.of(create(entityDefinition(t.javaClass).withTypeName(t.getScan().typeName()).build(), t.getScan()));
         }
 
-        return create(builder.build(), scan);
+        return Optional.empty();
+    }
+
+    private class JavaRichType {
+        Type javaType;
+        Class javaClass;
+        ClassScan scan;
+        Supplier<ClassScan> classScan;
+
+        JavaRichType(Type javaType) {
+            this.javaType = javaType;
+            this.javaClass = extractClass(javaType);
+            this.classScan = () -> classScanner.scan(javaClass);
+        }
+
+        Object getSimpleName() {
+            return javaClass.getSimpleName();
+        }
+
+        ClassScan getScan() {
+            if (scan == null) {
+                scan = classScan.get();
+            }
+            return scan;
+        }
     }
 }
