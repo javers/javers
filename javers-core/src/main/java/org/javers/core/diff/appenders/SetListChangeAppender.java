@@ -8,6 +8,7 @@ import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.javers.common.collections.Sets.asSet;
 
@@ -17,11 +18,9 @@ import static org.javers.common.collections.Sets.asSet;
 public class SetListChangeAppender extends CorePropertyChangeAppender<ListChange> {
 
     private final SetChangeAppender setChangeAppender;
-    private final TypeMapper typeMapper;
 
-    SetListChangeAppender(SetChangeAppender setChangeAppender, TypeMapper typeMapper) {
+    SetListChangeAppender(SetChangeAppender setChangeAppender) {
         this.setChangeAppender = setChangeAppender;
-        this.typeMapper = typeMapper;
     }
 
     @Override
@@ -31,18 +30,18 @@ public class SetListChangeAppender extends CorePropertyChangeAppender<ListChange
 
     @Override
     public ListChange calculateChanges(final NodePair pair, final JaversProperty property) {
-        List leftList = (List) pair.getLeftPropertyValue(property);
-        List rightList = (List) pair.getRightPropertyValue(property);
+        Set leftList =  asSet((List) pair.getLeftPropertyValue(property));
+        Set rightList = asSet((List) pair.getRightPropertyValue(property));
 
-        ListType listType = ((JaversProperty) property).getType();
+        ListType listType = property.getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
-        SetType setType = typeMapper.getSetType(listType);
+        SetType setType = new SetType(listType.getItemType());
 
         List<ContainerElementChange> entryChanges =
-                setChangeAppender.calculateEntryChanges(setType, leftList == null ? null : asSet(leftList), rightList == null ? null : asSet(rightList), owner);
+                setChangeAppender.calculateEntryChanges(setType, leftList, rightList, owner);
 
         if (!entryChanges.isEmpty()) {
-            renderNotParametrizedWarningIfNeeded(setType.getItemType(), "item", "Set", property);
+            renderNotParametrizedWarningIfNeeded(setType.getItemType(), "item", "List", property);
             return new ListChange(pair.getGlobalId(), property.getName(), entryChanges);
         } else {
             return null;

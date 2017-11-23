@@ -13,10 +13,10 @@ import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
 /**
  * @author pawel szymczyk
  */
-abstract class SetAppenderTest extends AbstractDiffAppendersTest {
+abstract class AbstractSetAppenderTest extends AbstractDiffAppendersTest {
 
     @Shared
-    CorePropertyChangeAppender propertyChangeAppender
+    CorePropertyChangeAppender setChangeAppender
     @Shared
     String commonFieldName
     @Shared
@@ -29,7 +29,7 @@ abstract class SetAppenderTest extends AbstractDiffAppendersTest {
         def leftNode = buildGraph(new DummyUser(name: 'name', "$commonFieldName": leftField))
         def rightNode = buildGraph(new DummyUser(name: 'name', "$commonFieldName": rightField))
 
-        def change = propertyChangeAppender.calculateChanges(
+        def change = setChangeAppender.calculateChanges(
                 new RealNodePair(leftNode, rightNode), getProperty(DummyUser, commonFieldName))
 
         then:
@@ -56,7 +56,7 @@ abstract class SetAppenderTest extends AbstractDiffAppendersTest {
         def leftNode = buildGraph(new DummyUser(name: 'name', "$commonFieldName": leftField))
         def rightNode = buildGraph(new DummyUser(name: 'name', "$commonFieldName": rightField))
 
-        def change = propertyChangeAppender.calculateChanges(
+        def change = setChangeAppender.calculateChanges(
                 new RealNodePair(leftNode, rightNode), getProperty(DummyUser, commonFieldName))
 
         then:
@@ -75,7 +75,7 @@ abstract class SetAppenderTest extends AbstractDiffAppendersTest {
         def rightCdo = new SnapshotEntity("$dateFieldName": [new LocalDate(2001, 5, 5), new LocalDate(2001, 1, 1)])
 
         when:
-        def change = propertyChangeAppender
+        def change = setChangeAppender
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, dateFieldName))
 
         then:
@@ -91,7 +91,7 @@ abstract class SetAppenderTest extends AbstractDiffAppendersTest {
         def rightCdo = new SnapshotEntity("$dateFieldName": [new LocalDate(2001, 1, 1)])
 
         when:
-        def change = propertyChangeAppender
+        def change = setChangeAppender
                 .calculateChanges(realNodePair(leftCdo, rightCdo), getProperty(SnapshotEntity, dateFieldName))
 
         then:

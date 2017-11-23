@@ -89,13 +89,6 @@ public class TypeMapper {
     }
 
     /**
-     * only for change appenders
-     */
-    public SetType getSetType(ContainerType containerType){
-        return new SetType(containerType.getItemType());
-    }
-
-    /**
      * is Set, List or Array of ManagedClasses
      */
     public boolean isContainerOfManagedTypes(JaversType javersType){

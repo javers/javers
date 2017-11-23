@@ -3,10 +3,13 @@ package org.javers.core
 import groovy.json.JsonSlurper
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.DiffAssert
+import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.PropertyChange
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.container.ListChange
+import org.javers.core.diff.changetype.container.ValueAdded
 import org.javers.core.examples.model.Person
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
@@ -306,14 +309,29 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         def right = new DummyIgnoredPropertiesType(name:"bob", age: 16, propertyThatShouldBeIgnored: 2, anotherIgnored: 2)
 
         when:
-
-        println javers.getTypeMapping(DummyIgnoredPropertiesType).prettyPrint()
-
         def diff = javers.compare(left, right)
 
         then:
         diff.changes.size() == 1
         diff.changes[0].propertyName == "age"
+    }
+
+    def "should compare Lists as Sets when ListCompareAlgorithm.SET is enabled"(){
+      given:
+      def javers = javers().withListCompareAlgorithm(ListCompareAlgorithm.AS_SET).build()
+      def left =  new DummyUser(name:"bob", stringList: ['z', 'a', 'b'])
+      def right = new DummyUser(name:"bob", stringList: ['cc', 'b', 'z', 'a'])
+
+      when:
+      def diff = javers.compare(left, right)
+
+      then:
+      diff.changes.size() == 1
+      def change = diff.changes[0]
+      change instanceof ListChange
+      change.changes.size() == 1
+      change.changes[0] instanceof ValueAdded
+      change.changes[0].addedValue == 'cc'
     }
 
     class SetValueObject {

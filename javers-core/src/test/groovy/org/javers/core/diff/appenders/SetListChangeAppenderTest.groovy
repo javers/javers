@@ -1,13 +1,13 @@
 package org.javers.core.diff.appenders
+
 /**
  * @author Sergey Kobyshev
  */
-class SetListChangeAppenderTest extends SetAppenderTest {
+class SetListChangeAppenderTest extends AbstractSetAppenderTest {
 
     def setupSpec() {
-        propertyChangeAppender = setListChangeAppender()
+        setChangeAppender = setListChangeAppender()
         commonFieldName = "stringList"
         dateFieldName = "listOfDates"
     }
-
 }

@@ -64,7 +64,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         Set leftValues = (Set) pair.getLeftPropertyValue(property);
         Set rightValues = (Set) pair.getRightPropertyValue(property);
 
-        SetType setType = ((JaversProperty) property).getType();
+        SetType setType = property.getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
         List<ContainerElementChange> entryChanges =
                 calculateEntryChanges(setType, leftValues, rightValues, owner);

@@ -65,6 +65,9 @@ public class Sets {
     }
 
     public static <E> Set<E> asSet(Collection<E> elements) {
+        if (elements == null) {
+            return Collections.emptySet();
+        }
         return new HashSet<>(elements);
     }
 

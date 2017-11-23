@@ -10,7 +10,7 @@ public enum ListCompareAlgorithm {
 
     SIMPLE(SimpleListChangeAppender.class),
     LEVENSHTEIN_DISTANCE(LevenshteinListChangeAppender.class),
-    SET(SetListChangeAppender.class);
+    AS_SET(SetListChangeAppender.class);
 
     private final Class<? extends CorePropertyChangeAppender<ListChange>> listChangeAppender;
 
