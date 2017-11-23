@@ -38,6 +38,7 @@ class DummyUser extends AbstractDummyUser {
 
     //collections
     Set<String> stringSet
+    List<String> stringList
     List<Integer> integerList
     Map<String, LocalDateTime> primitiveMap
     Map<String, LocalDateTime> valueMap

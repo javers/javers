@@ -36,7 +36,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         return propertyType instanceof SetType;
     }
 
-    private List<ContainerElementChange> calculateEntryChanges(SetType setType, Set leftRawSet, Set rightRawSet, OwnerContext owner) {
+    List<ContainerElementChange> calculateEntryChanges(SetType setType, Set leftRawSet, Set rightRawSet, OwnerContext owner) {
 
         JaversType itemType = typeMapper.getJaversType(setType.getItemType());
         DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
@@ -64,7 +64,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         Set leftValues = (Set) pair.getLeftPropertyValue(property);
         Set rightValues = (Set) pair.getRightPropertyValue(property);
 
-        SetType setType = ((JaversProperty) property).getType();
+        SetType setType = property.getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
         List<ContainerElementChange> entryChanges =
                 calculateEntryChanges(setType, leftValues, rightValues, owner);

@@ -58,7 +58,7 @@ subprojects {
     test {
         testLogging {
             exceptionFormat = 'full'
-            events 'failed', 'passed'
+            events 'failed'
         }
     }
 
