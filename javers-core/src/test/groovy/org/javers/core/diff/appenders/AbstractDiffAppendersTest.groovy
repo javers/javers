@@ -33,6 +33,6 @@ abstract class AbstractDiffAppendersTest extends AbstractDiffTest {
     }
 
     SetListChangeAppender setListChangeAppender() {
-        new SetListChangeAppender(setChangeAppender(), javers.typeMapper)
+        new SetListChangeAppender(setChangeAppender())
     }
 }
