@@ -7,8 +7,6 @@ import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -133,11 +131,11 @@ class TypeMapperState {
     }
 
     /**
-     * maps type of given Entity's id-property as ValueType
+     * maps a type of given Entity's id-property as ValueType
      */
     private void inferIdPropertyTypeForEntity(EntityType entityType) {
         Type idType = entityType.getIdPropertyGenericType();
-        addFullMapping(idType, typeFactory.inferIdPropertyTypeAsValue(idType));
+        computeIfAbsent(idType, typeFactory::inferIdPropertyTypeAsValue);
     }
 
     /**
@@ -145,40 +143,30 @@ class TypeMapperState {
      */
     private JaversType infer(Type javaType) {
         argumentIsNotNull(javaType);
-        return typeFactory.infer(javaType, findNearestMappedAncestor(javaType));
+        return typeFactory.infer(javaType, findPrototype(javaType));
     }
 
-    private Optional<JaversType> findNearestMappedAncestor(Type javaType) {
+    private Optional<JaversType> findPrototype(Type javaType) {
         Class javaClass = extractClass(javaType);
         List<Type> hierarchy = ReflectionUtil.calculateHierarchyDistance(javaClass);
 
+        //this is due too spoiled Java Array reflection API
+        if (javaClass.isArray()) {
+            return Optional.of(getJaversType(Object[].class));
+        }
+
+        JaversType selfClassType = getFromMap(javaClass);
+        if (selfClassType != null && javaClass != javaType){
+            return  Optional.of(selfClassType); //returns rawType for ParametrizedTypes
+        }
 
         for (Type parent : hierarchy) {
-            System.out.println("hier: " + parent.getTypeName() + ", mapped?"+ contains(parent));
-        }
-
-       /*     DistancePair distancePair = new DistancePair(javaClass, javersType);
-
-            //this is due too spoiled Java Array reflection API
-            if (javaClass.isArray()) {
-                return Optional.of(getJaversType(Object[].class));
+            JaversType jType = getFromMap(parent);
+            if (jType != null && jType.canBePrototype()) {
+                System.out.println("proto for " + javaType +" -> "+jType);
+                return Optional.of(jType);
             }
-
-            //just to better speed
-            if (distancePair.getDistance() == 0) {
-                return Optional.of(distancePair.getJaversType());
-            }
-
-            distances.add(distancePair);
         }
-
-        Collections.sort(distances);
-
-        if (distances.get(0).isMax()) {
-            return Optional.empty();
-        }*/
-
-        //return Optional.of(distances.get(0).getJaversType());
 
         return Optional.empty();
     }

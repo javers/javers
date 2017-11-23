@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * Type for JSON representation. Generic version of {@link JaversType#getRawDehydratedType()}
+ * Type for JSON representation. Generic version of {@link ClassType#getRawDehydratedType()}
  *
  * @author bartosz.walacik
  */
@@ -22,13 +22,12 @@ class DehydratedTypeFactory {
 
     //recursive
     public Type build(Type givenType){
-        final JaversType javersType = mapper.getJaversType(givenType);
+        final ClassType javersType = mapper.getJaversClassType(givenType);
 
         //for Generics, we have list of type arguments to dehydrate
         if (javersType.isGenericType()) {
-            Type rawType = javersType.getBaseJavaClass();
             List<Type> actualDehydratedTypeArguments = extractAndDehydrateTypeArguments(javersType);
-            return new ParametrizedDehydratedType(rawType, actualDehydratedTypeArguments);
+            return new ParametrizedDehydratedType(javersType.getBaseJavaClass(), actualDehydratedTypeArguments);
         }
 
         if (javersType instanceof ArrayType){

@@ -11,10 +11,10 @@ import java.util.function.Function;
  * Collection or Array or Map
  * @author bartosz walacik
  */
-public abstract class EnumerableType extends JaversType {
+public abstract class EnumerableType extends ClassType {
 
-    public EnumerableType(Type baseJavaType, int expectedArgs) {
-        super(baseJavaType, Optional.<String>empty(), expectedArgs);
+    EnumerableType(Type baseJavaType, int expectedArgs) {
+        super(baseJavaType, Optional.empty(), expectedArgs);
     }
 
     /**

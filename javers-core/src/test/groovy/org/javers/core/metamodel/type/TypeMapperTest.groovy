@@ -65,10 +65,10 @@ class TypeMapperTest extends Specification {
 
     def "should return dehydrated type for Map<String,EnumSet<DummyEnum>>"() {
         given:
-        Type givenJaversType = getFieldFromClass(DummyMapWithGenericValue, "mapWithGenericValueArgument").genericType
+        Type givenJavaType = getFieldFromClass(DummyMapWithGenericValue, "mapWithGenericValueArgument").genericType
 
         when:
-        def dehydrated = mapper.getDehydratedType(givenJaversType)
+        def dehydrated = mapper.getDehydratedType(givenJavaType)
 
         then:
         dehydrated instanceof ParameterizedType
@@ -189,8 +189,8 @@ class TypeMapperTest extends Specification {
         jType.valueType == Integer
 
         where:
-        givenJavaType << [new TypeToken<Map<String, Integer>>() {}.type, new TypeToken<HashMap<String, Integer>>() {
-        }.type]
+        givenJavaType << [new TypeToken<Map<String, Integer>>() {}.type,
+                          new TypeToken<HashMap<String, Integer>>() {}.type]
     }
 
     def "should spawn generic types as distinct javers types"() {

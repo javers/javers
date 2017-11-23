@@ -22,7 +22,7 @@ import java.lang.reflect.Type;
  *
  * @author bartosz walacik
  */
-public class CustomType extends JaversType {
+public class CustomType extends ClassType {
     public CustomType(Type baseJavaType) {
         super(baseJavaType);
     }

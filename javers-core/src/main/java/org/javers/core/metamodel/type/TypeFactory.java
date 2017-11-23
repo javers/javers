@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.type;
 
+import java.lang.reflect.TypeVariable;
 import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.*;
@@ -8,7 +9,6 @@ import org.javers.core.metamodel.scanner.ClassScanner;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Type;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
@@ -59,7 +59,7 @@ class TypeFactory {
     }
 
     private ValueObjectType createValueObject(ValueObjectDefinition definition, ClassScan scan) {
-        return new ValueObjectType(managedClassFactory.create(definition, scan), definition.getTypeName());
+        return new ValueObjectType(managedClassFactory.create(definition, scan), definition.getTypeName(), definition.isDefault());
     }
 
     JaversType infer(Type javaType) {
@@ -82,14 +82,17 @@ class TypeFactory {
             return jType;
         }).orElseGet(() -> {
             logger.debug("javersType of {} defaulted to ValueObjectType", javaRichType.getSimpleName());
-            return defaultType(javaRichType);
+            return createDefaultType(javaRichType);
         });
     }
 
-    ValueType inferIdPropertyTypeAsValue(Type idPropertyGenericType) {
+    JaversType inferIdPropertyTypeAsValue(Type idPropertyGenericType) {
+        if (idPropertyGenericType instanceof TypeVariable) {
+            logger.debug("javersType of {} inferred as TokenType", idPropertyGenericType);
+            return new TokenType((TypeVariable)idPropertyGenericType);
+        }
         logger.debug("javersType of {} inferred as ValueType, it's used as id-property type",
                 idPropertyGenericType);
-
         return new ValueType(idPropertyGenericType);
     }
 
@@ -105,8 +108,11 @@ class TypeFactory {
         }
     }
 
-    private JaversType defaultType(JavaRichType t) {
-        return create(valueObjectDefinition(t.javaClass).withTypeName(t.getScan().typeName()).build(), t.getScan());
+    private JaversType createDefaultType(JavaRichType t) {
+        return create(valueObjectDefinition(t.javaClass)
+                .withTypeName(t.getScan().typeName())
+                .defaultType()
+                .build(), t.getScan());
     }
 
     private Optional<JaversType> inferFromAnnotations(JavaRichType t) {
@@ -119,24 +125,24 @@ class TypeFactory {
         }
 
         if (t.getScan().hasValueObjectAnn()) {
-            return Optional.of(create(valueObjectDefinition(t.javaClass).withTypeName(t.getScan().typeName()).build(),t.getScan()));
+            return Optional.of(create(valueObjectDefinition(t.javaClass).withTypeName(t.getAnnTypeName()).build(),t.getScan()));
         }
 
         if (t.getScan().hasShallowReferenceAnn()) {
-            return Optional.of(create(entityDefinition(t.javaClass).withTypeName(t.getScan().typeName()).withShallowReference().build(), t.getScan()));
+            return Optional.of(create(entityDefinition(t.javaClass).withTypeName(t.getAnnTypeName()).withShallowReference().build(), t.getScan()));
         }
 
         if (t.getScan().hasEntityAnn() || t.getScan().hasIdProperty()) {
-            return Optional.of(create(entityDefinition(t.javaClass).withTypeName(t.getScan().typeName()).build(), t.getScan()));
+            return Optional.of(create(entityDefinition(t.javaClass).withTypeName(t.getAnnTypeName()).build(), t.getScan()));
         }
 
         return Optional.empty();
     }
 
     private class JavaRichType {
-        Type javaType;
-        Class javaClass;
-        ClassScan scan;
+        private Type javaType;
+        private Class javaClass;
+        private ClassScan scan;
         Supplier<ClassScan> classScan;
 
         JavaRichType(Type javaType) {
@@ -154,6 +160,10 @@ class TypeFactory {
                 scan = classScan.get();
             }
             return scan;
+        }
+
+        Optional<String> getAnnTypeName() {
+            return getScan().typeName();
         }
     }
 }

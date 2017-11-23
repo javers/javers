@@ -47,7 +47,9 @@ public class EntityType extends ManagedType {
 
     @Override
     EntityType spawn(ManagedClass managedClass, Optional<String> typeName) {
-        return new EntityType(managedClass, idProperty, typeName);
+        //when spawning from prototype, prototype.idProperty and child.idProperty are different objects
+        //with (possibly) different return types, so we need to update Id pointer
+        return new EntityType(managedClass, managedClass.getProperty(idProperty.getName()), typeName);
     }
 
     public Type getIdPropertyGenericType() {
@@ -79,7 +81,7 @@ public class EntityType extends ManagedType {
     public Object getIdOf(Object instance) {
         Validate.argumentIsNotNull(instance);
 
-        if (!getBaseJavaClass().isInstance(instance)) {
+        if (!isInstance(instance)) {
             throw new JaversException(JaversExceptionCode.NOT_INSTANCE_OF, getName(), instance.getClass().getName());
         }
 

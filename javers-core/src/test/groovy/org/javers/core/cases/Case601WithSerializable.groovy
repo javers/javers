@@ -3,6 +3,7 @@ package org.javers.core.cases
 import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.type.EntityType
+import org.javers.core.metamodel.type.TokenType
 import spock.lang.Specification
 
 class Case601WithSerializable extends Specification {
@@ -21,13 +22,11 @@ class Case601WithSerializable extends Specification {
 
     abstract class AbstractPermission extends MongoBaseModel<String> implements Serializable {
         protected String name
-        protected String description
     }
 
 
     class Permission extends AbstractPermission {
         private Set<String> inclusions
-        private Set<String> exclusions
     }
 
     class Role extends AbstractPermission {
@@ -38,10 +37,16 @@ class Case601WithSerializable extends Specification {
       given:
       def javers = JaversBuilder.javers().build()
 
-      expect:
-      javers.getTypeMapping(Role) instanceof EntityType
-      javers.getTypeMapping(Permission) instanceof EntityType
-      //javers.getTypeMapping(HashMap) instanceof MapType
+      def roleType = javers.getTypeMapping(Role)
+      def permissionType = javers.getTypeMapping(Permission)
+      def mongoBaseModelType = javers.getTypeMapping(MongoBaseModel)
 
+      expect:
+      [roleType, permissionType, mongoBaseModelType].each {
+          assert it instanceof EntityType
+      }
+      roleType.idProperty.type.baseJavaClass == String
+      permissionType.idProperty.type.baseJavaClass == String
+      mongoBaseModelType.idProperty.type instanceof TokenType
     }
 }

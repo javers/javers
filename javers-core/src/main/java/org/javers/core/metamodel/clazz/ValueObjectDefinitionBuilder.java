@@ -14,7 +14,9 @@ package org.javers.core.metamodel.clazz;
  * @since 1.4
  * @author bartosz.walacik
  */
-public class ValueObjectDefinitionBuilder extends ClientsClassDefinitionBuilder<ValueObjectDefinitionBuilder>{
+public class ValueObjectDefinitionBuilder extends ClientsClassDefinitionBuilder<ValueObjectDefinitionBuilder> {
+    private boolean defaultType;
+
     private ValueObjectDefinitionBuilder(Class valueObject) {
         super(valueObject);
     }
@@ -23,8 +25,17 @@ public class ValueObjectDefinitionBuilder extends ClientsClassDefinitionBuilder<
         return new ValueObjectDefinitionBuilder(valueObject);
     }
 
+    public ValueObjectDefinitionBuilder defaultType() {
+        this.defaultType = true;
+        return this;
+    }
+
     @Override
     public ValueObjectDefinition build() {
         return new ValueObjectDefinition(this);
+    }
+
+    public boolean isDefault() {
+        return defaultType;
     }
 }

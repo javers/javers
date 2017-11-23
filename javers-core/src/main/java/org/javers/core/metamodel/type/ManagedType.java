@@ -14,11 +14,11 @@ import java.util.function.Predicate;
 /**
  * @author bartosz walacik
  */
-public abstract class ManagedType extends JaversType {
+public abstract class ManagedType extends ClassType {
     private final ManagedClass managedClass;
 
     ManagedType(ManagedClass managedClass) {
-        this(managedClass, Optional.<String>empty());
+        this(managedClass, Optional.empty());
     }
 
     ManagedType(ManagedClass managedClass, Optional<String> typeName) {
