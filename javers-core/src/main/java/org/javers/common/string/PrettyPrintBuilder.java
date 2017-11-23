@@ -31,8 +31,12 @@ public class PrettyPrintBuilder {
         out.append(text + "\n");
     }
 
+    private void print(String text) {
+        out.append(text);
+    }
+
     public String build() {
-        println("}");
+        print("}");
         return out.toString();
     }
 }

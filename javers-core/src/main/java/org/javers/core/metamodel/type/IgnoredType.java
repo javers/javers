@@ -7,13 +7,9 @@ import java.lang.reflect.Type;
  *
  * @author bartosz.walacik
  */
-public class IgnoredType extends JaversType {
+public class IgnoredType extends ClassType {
 
     public IgnoredType(Type baseJavaType) {
         super(baseJavaType);
-    }
-
-    IgnoredType(Class<?> baseJavaClass) {
-        super(baseJavaClass);
     }
 }

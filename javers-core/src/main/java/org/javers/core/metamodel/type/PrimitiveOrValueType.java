@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
 /**
  * @author bartosz walacik
  */
-public abstract class PrimitiveOrValueType extends JaversType{
+public abstract class PrimitiveOrValueType extends ClassType{
     private final CustomValueComparator valueComparator;
 
     PrimitiveOrValueType(Type baseJavaType) {

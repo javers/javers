@@ -50,7 +50,7 @@ class TypeFactoryTest extends Specification {
 
     def "should use name from @TypeName when inferring from prototype"(){
         given:
-        def prototype = typeFactory.inferFromAnnotations(AbstractValueObject)
+        def prototype = typeFactory.infer(AbstractValueObject)
 
         when:
         def jType = typeFactory.infer(NewNamedValueObject, Optional.of(prototype))
@@ -62,7 +62,7 @@ class TypeFactoryTest extends Specification {
     @Unroll
     def "should use name from @TypeName for inferred #expectedType.simpleName"(){
         when:
-        def type = typeFactory.inferFromAnnotations(clazz)
+        def type = typeFactory.infer(clazz)
 
         then:
         type.name == "myName"
@@ -113,7 +113,7 @@ class TypeFactoryTest extends Specification {
 
     def "should ignore properties with @DiffIgnored type"(){
         when:
-        EntityType entity = typeFactory.inferFromAnnotations(DummyUser)
+        EntityType entity = typeFactory.infer(DummyUser)
 
         then:
         !entity.propertyNames.contains("propertyWithDiffIgnoredType")
@@ -122,13 +122,13 @@ class TypeFactoryTest extends Specification {
 
     def "should map @DiffIgnored type as IgnoredType"(){
         expect:
-        typeFactory.inferFromAnnotations(DummyIgnoredType) instanceof IgnoredType
+        typeFactory.infer(DummyIgnoredType) instanceof IgnoredType
     }
 
     @Unroll
     def "should map @ShallowReference type as ShallowReference when using #style style"(){
         expect:
-        create(style).inferFromAnnotations(ShallowPhone) instanceof ShallowReferenceType
+        create(style).infer(ShallowPhone) instanceof ShallowReferenceType
 
         where:
         style << [BEAN, FIELD]
@@ -136,24 +136,23 @@ class TypeFactoryTest extends Specification {
 
     def "should map as ValueObjectType by default"(){
         expect:
-        typeFactory.inferFromAnnotations(DummyAddress) instanceof ValueObjectType
+        typeFactory.infer(DummyAddress) instanceof ValueObjectType
     }
 
     def "should map as ValueType when @Value annotation is present "(){
         expect:
-        typeFactory.inferFromAnnotations(JaversValue) instanceof ValueType
+        typeFactory.infer(JaversValue) instanceof ValueType
     }
 
     def "should map as EntityType if property level @Id annotation is present"() {
         expect:
-        typeFactory.inferFromAnnotations(DummyUser) instanceof EntityType
+        typeFactory.infer(DummyUser) instanceof EntityType
     }
 
     def "should map as EntityType when @Entity annotation is present"() {
         expect:
-        typeFactory.inferFromAnnotations(JaversEntity) instanceof EntityType
+        typeFactory.infer(JaversEntity) instanceof EntityType
     }
-
 
     @Unroll
     def "should ignore given #managedType properties"() {
@@ -193,7 +192,7 @@ class TypeFactoryTest extends Specification {
 
     def "should use javers type annotations first, when ambiguous type mapping"(){
         expect:
-        typeFactory.inferFromAnnotations(AmbiguousEntityType) instanceof EntityType
-        typeFactory.inferFromAnnotations(AmbiguousValueObjectType) instanceof ValueObjectType
+        typeFactory.infer(AmbiguousEntityType) instanceof EntityType
+        typeFactory.infer(AmbiguousValueObjectType) instanceof ValueObjectType
     }
 }

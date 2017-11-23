@@ -27,21 +27,29 @@ import java.util.Optional;
  * @author bartosz walacik
  */
 public class ValueObjectType extends ManagedType{
+    private final boolean defaultType;
 
     ValueObjectType(ManagedClass valueObject){
         super(valueObject);
+        this.defaultType = false;
     }
 
     public ValueObjectType(Class baseJavaClass, List<JaversProperty> allProperties){
         this(new ManagedClass(baseJavaClass, allProperties, Collections.emptyList()));
     }
 
-    ValueObjectType(ManagedClass valueObject, Optional<String> typeName) {
+    ValueObjectType(ManagedClass valueObject, Optional<String> typeName, boolean isDefault) {
         super(valueObject, typeName);
+        this.defaultType = isDefault;
     }
 
     @Override
     ValueObjectType spawn(ManagedClass managedClass, Optional<String> typeName) {
-        return new ValueObjectType(managedClass, typeName);
+        return new ValueObjectType(managedClass, typeName, defaultType);
+    }
+
+    @Override
+    public boolean canBePrototype() {
+        return !defaultType;
     }
 }

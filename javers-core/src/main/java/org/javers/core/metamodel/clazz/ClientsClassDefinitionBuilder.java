@@ -31,10 +31,14 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
         return (T) this;
     }
 
-    public T withTypeName(String typeName) {
+    public T withTypeName(Optional<String> typeName) {
         Validate.argumentIsNotNull(typeName);
-        this.typeName = Optional.of(typeName);
+        this.typeName = typeName;
         return (T) this;
+    }
+
+    public T withTypeName(String typeName) {
+        return withTypeName(Optional.ofNullable(typeName));
     }
 
     public ClientsClassDefinition build() {

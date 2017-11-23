@@ -116,12 +116,26 @@ public class TypeMapper {
     }
 
     /**
-     * returns mapped type or spawns new one from prototype
-     * or infers new one using default mapping
+     * Returns mapped type, spawns a new one from a prototype,
+     * or infers a new one using default mapping.
      */
     public JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
         return state.getJaversType(javaType);
+    }
+
+    public ClassType getJaversClassType(Type javaType) {
+        argumentIsNotNull(javaType);
+        JaversType jType = getJaversType(javaType);
+
+        if (jType instanceof ClassType) {
+            return (ClassType) jType;
+        }
+
+        throw new JaversException(JaversExceptionCode.CLASS_MAPPING_ERROR,
+                    javaType,
+                    jType.getClass().getSimpleName(),
+                    ClassType.class.getSimpleName());
     }
 
     /**
