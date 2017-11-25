@@ -232,7 +232,61 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         !shadows[4].valueObjectRef.networkAddress
     }
 
-    def "should load latest Entity Shadow in COMMIT_DEEP_PLUS query"(){
+    def "should run aggregate query when loading entity refs"(){
+      given:
+      def ref = new SnapshotEntity(id: 2, valueObjectRef: new DummyAddress(city: "London"))
+      javers.commit("a", ref)
+
+      def entity = new SnapshotEntity(id: 1, entityRef: ref)
+      javers.commit("a", entity)
+
+      when:
+      def query = QueryBuilder.byInstanceId(1, SnapshotEntity)
+                .withChildValueObjects()
+                .withScopeDeepPlus().build()
+      def shadows = javers.findShadows(query).collect{it.get()}
+
+      then:
+      shadows.size() == 1
+      shadows[0].entityRef.valueObjectRef.city == "London"
+
+      query.stats().dbQueriesCount == 2
+      query.stats().allSnapshotsCount == 3
+    }
+
+    def "should prefetch refs in DEEP_PLUS scope"(){
+        given:
+        def ref = new SnapshotEntity(id: 2)
+        def entity = new SnapshotEntity(id: 1, entityRef: ref)
+
+        4.times{
+            ref.intProperty = it
+            entity.intProperty = it
+            javers.commit("a", ref)
+            javers.commit("a", entity)
+        }
+
+        when:
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity)
+                .withScopeDeepPlus().build()
+        def shadows = javers.findShadows(query).collect{it.get()}
+
+        then:
+        query.stats().dbQueriesCount == 2
+        query.stats().allSnapshotsCount == 8
+        query.stats().deepPlusSnapshotsCount == 4
+
+        shadows[0].intProperty == 3
+        shadows[0].entityRef.intProperty == 3
+        shadows[1].intProperty == 2
+        shadows[1].entityRef.intProperty == 2
+        shadows[2].intProperty == 1
+        shadows[2].entityRef.intProperty == 1
+        shadows[3].intProperty == 0
+        shadows[3].entityRef.intProperty == 0
+    }
+
+    def "should load latest Entity Shadow in DEEP_PLUS query"(){
         given:
         def ref = new SnapshotEntity(id: 2, intProperty: 1, valueObjectRef: new DummyAddress(city: "London"))
         javers.commit("a", ref)

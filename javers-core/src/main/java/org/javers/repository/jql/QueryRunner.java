@@ -37,16 +37,14 @@ public class QueryRunner {
     }
 
     public List<Shadow> queryForShadows(JqlQuery query) {
-        long s = System.currentTimeMillis();
         compile(query);
-
-        logger.debug("queryForShadows({})", query);
 
         List<CdoSnapshot> snapshots = queryForSnapshots(query);
 
         List<Shadow> result = shadowQueryRunner.queryForShadows(query, snapshots);
 
-        logger.debug(".. queryForShadows completed in {} millis", System.currentTimeMillis()-s);
+        query.stats().stop();
+        logger.debug("queryForShadows executed: {}", query);
         return result;
     }
 
@@ -58,25 +56,26 @@ public class QueryRunner {
     public List<CdoSnapshot> queryForSnapshots(JqlQuery query){
         compile(query);
 
+        List<CdoSnapshot> result;
         if (query.isAnyDomainObjectQuery()) {
-            return repository.getSnapshots(query.getQueryParams());
-        }
-
+            result = repository.getSnapshots(query.getQueryParams());
+        } else
         if (query.isIdQuery()){
-            return repository.getStateHistory(query.getIdFilter(), query.getQueryParams());
-        }
-
+            result = repository.getStateHistory(query.getIdFilter(), query.getQueryParams());
+        } else
         if (query.isClassQuery()){
-            return repository.getStateHistory(query.getClassFilter(), query.getQueryParams());
-        }
-
+            result = repository.getStateHistory(query.getClassFilter(), query.getQueryParams());
+        } else
         if (query.isVoOwnerQuery()) {
             VoOwnerFilter filter = query.getVoOwnerFilter();
             globalIdFactory.touchValueObjectFromPath(filter.getOwnerEntity(), filter.getPath());
-            return repository.getValueObjectStateHistory(filter.getOwnerEntity(), filter.getPath(), query.getQueryParams());
+            result = repository.getValueObjectStateHistory(filter.getOwnerEntity(), filter.getPath(), query.getQueryParams());
+        } else {
+            throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForSnapshots: " + query + " is not supported");
         }
 
-        throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForSnapshots: " + query + " is not supported");
+        query.stats().logShallowQuery(result);
+        return result;
     }
 
     public List<Change> queryForChanges(JqlQuery query) {
