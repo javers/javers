@@ -27,7 +27,7 @@ import static org.javers.repository.jql.ShadowScope.DEEP_PLUS;
  * @author bartosz.walacik
  */
 public class ShadowQueryRunner {
-    private static final Logger logger = LoggerFactory.getLogger("org.javers.JQL");
+    private static final Logger logger = LoggerFactory.getLogger(JqlQuery.JQL_LOGGER_NAME);
 
     private final JaversExtendedRepository repository;
     private final ShadowFactory shadowFactory;

@@ -22,7 +22,7 @@ import java.util.Optional;
  * @author bartosz.walacik
  */
 public class QueryRunner {
-    private static final Logger logger = LoggerFactory.getLogger("org.javers.JQL");
+    private static final Logger logger = LoggerFactory.getLogger(JqlQuery.JQL_LOGGER_NAME);
 
     private final JaversExtendedRepository repository;
     private final GlobalIdFactory globalIdFactory;

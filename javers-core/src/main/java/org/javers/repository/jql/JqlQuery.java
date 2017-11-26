@@ -29,7 +29,7 @@ import java.util.Set;
  * @author bartosz.walacik
  */
 public class JqlQuery {
-    private static final String JQL_LOGGER_NAME = "org.javers.JQL";
+    public static final String JQL_LOGGER_NAME = "org.javers.JQL";
     private static final Logger logger = LoggerFactory.getLogger(JQL_LOGGER_NAME);
 
     private final QueryParams queryParams;
