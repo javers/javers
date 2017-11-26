@@ -149,6 +149,7 @@ public class ShadowQueryRunner {
         }
 
         private boolean isInChildValueObjectScope(ReferenceKey referenceKey) {
+            //TODO
             return query.isAggregate() && referenceKey.targetId instanceof ValueObjectId;
         }
 
@@ -160,11 +161,11 @@ public class ShadowQueryRunner {
             List<CdoSnapshot> historicals;
             if (isInChildValueObjectScope(referenceKey)) {
                 historicals = repository.getHistoricals(referenceKey.targetId, referenceKey.rootContext, false, limit);
-                query.stats().logQueryInChildValueObjectScope(historicals);
+                query.stats().logQueryInChildValueObjectScope(referenceKey.targetId, referenceKey.rootContext, historicals.size());
             }
             else {
                 historicals = repository.getHistoricals(referenceKey.targetId, referenceKey.rootContext, query.isAggregate(), limit);
-                query.stats().logQueryInDeepPlusScope(historicals);
+                query.stats().logQueryInDeepPlusScope(referenceKey.targetId, referenceKey.rootContext, historicals.size());
             }
 
             filledGaps++;

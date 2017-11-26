@@ -7,6 +7,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
+import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
@@ -160,21 +161,30 @@ public class JqlQuery {
         private int deepPlusSnapshotsCount;
         private int commitDeepSnapshotsCount;
         private int childVOSnapshotsCount;
+        private int deepPlusReferences;
 
-        void logQueryInChildValueObjectScope(List<CdoSnapshot> snapshots) {
-            logger.debug("CHILD_VALUE_OBJECT query: {} snapshots loaded", snapshots.size());
+        void logQueryInChildValueObjectScope(GlobalId reference, CommitId context, int snapshotsLoaded) {
+            logger.debug("CHILD_VALUE_OBJECT query for '{}' at commitId {}, {} snapshot(s) loaded",
+                    reference.toString(),
+                    context.value(),
+                    snapshotsLoaded);
 
             dbQueriesCount++;
-            allSnapshotsCount += snapshots.size();
-            childVOSnapshotsCount += snapshots.size();
+            allSnapshotsCount += snapshotsLoaded;
+            childVOSnapshotsCount += snapshotsLoaded;
         }
 
-        void logQueryInDeepPlusScope(List<CdoSnapshot> snapshots) {
-            logger.debug("DEEP_PLUS query: {} snapshots loaded", snapshots.size());
-
+        void logQueryInDeepPlusScope(GlobalId reference, CommitId context, int snapshotsLoaded) {
             dbQueriesCount++;
-            allSnapshotsCount += snapshots.size();
-            deepPlusSnapshotsCount = snapshots.size();
+            allSnapshotsCount += snapshotsLoaded;
+            deepPlusSnapshotsCount += snapshotsLoaded;
+            deepPlusReferences++;
+
+            logger.debug("DEEP_PLUS query for '{}' at commitId {}, {} snapshot(s) loaded, reference(s) resolved so far: {}",
+                    reference.toString(),
+                    context.value(),
+                    snapshotsLoaded,
+                    deepPlusReferences);
         }
 
         void logShallowQuery(List<CdoSnapshot> snapshots) {
@@ -208,7 +218,8 @@ public class JqlQuery {
                     "SHALLOW snapshots", shallowSnapshotsCount,
                     "COMMIT_DEEP snapshots", commitDeepSnapshotsCount,
                     "CHILD_VALUE_OBJECT snapshots", childVOSnapshotsCount,
-                    "DEEP_PLUS snapshots", deepPlusSnapshotsCount
+                    "DEEP_PLUS snapshots", deepPlusSnapshotsCount,
+                    "DEEP_PLUS references", deepPlusReferences
                     );
         }
 
@@ -242,6 +253,10 @@ public class JqlQuery {
 
         public int getChildVOSnapshotsCount() {
             return childVOSnapshotsCount;
+        }
+
+        public int getDeepPlusReferences() {
+            return deepPlusReferences;
         }
     }
 }
