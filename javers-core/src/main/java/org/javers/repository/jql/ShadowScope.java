@@ -19,16 +19,6 @@ public enum ShadowScope {
     SHALLOW,
 
     /**
-     * JaVers loads all child ValueObjects owned by selected Entities.
-     * <br/><br/>
-     *
-     * This scope can be combined with commit-deep and deep+.
-     *
-     * @since 3.6.1
-     */
-    CHILD_VALUE_OBJECT,
-
-    /**
      * JaVers restores commit-deep shadow graph. Referenced
      * objects are resolved <b>if they exist</b> in selected commits.
      * <br/><br/>
@@ -65,7 +55,17 @@ public enum ShadowScope {
      * <b>Warning: </b> since 3.6.3, deep+ scope doesn't include commit-deep scope.
      * They are independent scopes.
      */
-    DEEP_PLUS;
+    DEEP_PLUS,
+
+    /**
+     * JaVers loads all child ValueObjects owned by selected Entities.
+     * <br/><br/>
+     *
+     * This scope is implicitly added to all Shadow scopes and can't be disabled.
+     *
+     * @since 3.6.1
+     */
+    CHILD_VALUE_OBJECT;
 
     public boolean isCommitDeep() {
         return this == COMMIT_DEEP;

@@ -190,12 +190,11 @@ public interface Javers {
      * To load all referenced objects use one of the wider scopes:
      *
      * <ul>
-     *  <li/> {@link QueryBuilder#withChildValueObjects()}
      *  <li/> {@link QueryBuilder#withScopeCommitDeep()}
      *  <li/> {@link QueryBuilder#withScopeDeepPlus(int)}
      * </ul>
      *
-     * We recommend {@link QueryBuilder#withChildValueObjects()} as a good start.
+     * We recommend {@link ShadowScope#DEEP_PLUS} as a good start.
      * <br/><br/>
      *
      * <h2>Query scopes example</h2>

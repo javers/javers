@@ -19,32 +19,38 @@ import java.time.LocalDateTime;
 public class QueryParams {
     private final int limit;
     private final int skip;
-    private final Optional<LocalDateTime> from;
-    private final Optional<LocalDateTime> to;
-    private final Optional<CommitId> toCommitId;
+    private final LocalDateTime from;
+    private final LocalDateTime to;
+    private final CommitId toCommitId;
     private final Set<CommitId> commitIds;
-    private final Optional<Long> version;
-    private final Optional<String> author;
-    private final Optional<Map<String, String>> commitProperties;
+    private final Long version;
+    private final String author;
+    private final Map<String, String> commitProperties;
     private final boolean aggregate;
     private final boolean newObjectChanges;
-    private final Optional<String> changedProperty;
-    private final Optional<SnapshotType> snapshotType;
+    private final String changedProperty;
+    private final SnapshotType snapshotType;
 
     QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty, CommitId toCommitId, SnapshotType snapshotType) {
         this.limit = limit;
         this.skip = skip;
-        this.from = Optional.ofNullable(from);
-        this.to = Optional.ofNullable(to);
+        this.from = from;
+        this.to = to;
         this.commitIds = commitIds;
-        this.version = Optional.ofNullable(version);
-        this.author = Optional.ofNullable(author);
-        this.commitProperties = Optional.ofNullable(commitProperties);
+        this.version = version;
+        this.author = author;
+        this.commitProperties = commitProperties;
         this.aggregate = aggregate;
         this.newObjectChanges = newObjectChanges;
-        this.changedProperty = Optional.ofNullable(changedProperty);
-        this.toCommitId = Optional.ofNullable(toCommitId);
-        this.snapshotType = Optional.ofNullable(snapshotType);
+        this.changedProperty = changedProperty;
+        this.toCommitId = toCommitId;
+        this.snapshotType = snapshotType;
+    }
+
+    public static QueryParams forShadowQuery(QueryParams q) {
+        return new QueryParams(
+            q.limit, q.skip, q.from, q.to, q.commitIds, q.version, q.author, q.commitProperties,
+            true, q.newObjectChanges, q.changedProperty, q.toCommitId, q.snapshotType);
     }
 
     /**
@@ -65,21 +71,21 @@ public class QueryParams {
      * @see QueryBuilder#from(LocalDateTime)
      */
     public Optional<LocalDateTime> from() {
-        return from;
+        return Optional.ofNullable(from);
     }
 
     /**
      * @see QueryBuilder#to(LocalDateTime)
      */
     public Optional<LocalDateTime> to() {
-        return to;
+        return Optional.ofNullable(to);
     }
 
     /**
      * @see QueryBuilder#toCommitId(CommitId)
      */
     public Optional<CommitId> toCommitId() {
-        return toCommitId;
+        return Optional.ofNullable(toCommitId);
     }
 
     /**
@@ -93,29 +99,29 @@ public class QueryParams {
      * @see QueryBuilder#withCommitProperty(String, String)
      */
     public Map<String, String> commitProperties() {
-        return commitProperties.isPresent() ?
-            commitProperties.get() : Collections.<String, String>emptyMap();
+        return commitProperties != null ?
+            commitProperties : Collections.emptyMap();
     }
 
     /**
      * @see QueryBuilder#withChangedProperty(String)
      */
     public Optional<String> changedProperty(){
-        return changedProperty;
+        return Optional.ofNullable(changedProperty);
     }
 
     /**
      * @see QueryBuilder#withVersion(long)
      */
     public Optional<Long> version() {
-        return version;
+        return Optional.ofNullable(version);
     }
 
     /**
      * @see QueryBuilder#byAuthor(String)
      */
     public Optional<String> author() {
-        return author;
+        return Optional.ofNullable(author);
     }
 
     /**
@@ -129,7 +135,7 @@ public class QueryParams {
      * @see QueryBuilder#withSnapshotType(SnapshotType)
      */
     public Optional<SnapshotType> snapshotType() {
-        return snapshotType;
+        return Optional.ofNullable(snapshotType);
     }
 
     /**
@@ -157,14 +163,14 @@ public class QueryParams {
     }
 
     public boolean hasDates() {
-        return from.isPresent() || to.isPresent();
+        return from().isPresent() || to().isPresent();
     }
 
     public boolean isDateInRange(LocalDateTime date) {
-        if (from.isPresent() && from.get().isAfter(date)){
+        if (from().isPresent() && from().get().isAfter(date)){
             return false;
         }
-        if (to.isPresent() && to.get().isBefore(date)){
+        if (to().isPresent() && to().get().isBefore(date)){
             return false;
         }
 

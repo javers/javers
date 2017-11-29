@@ -37,9 +37,10 @@ public class QueryRunner {
     }
 
     public List<Shadow> queryForShadows(JqlQuery query) {
-        compile(query);
+        query.compile(globalIdFactory, typeMapper, QueryType.SHADOWS);
 
         List<CdoSnapshot> snapshots = queryForSnapshots(query);
+        query.stats().logShallowQuery(snapshots);
 
         List<Shadow> result = shadowQueryRunner.queryForShadows(query, snapshots);
 
@@ -54,7 +55,7 @@ public class QueryRunner {
     }
 
     public List<CdoSnapshot> queryForSnapshots(JqlQuery query){
-        compile(query);
+        query.compile(globalIdFactory, typeMapper, QueryType.SNAPSHOTS);
 
         List<CdoSnapshot> result;
         if (query.isAnyDomainObjectQuery()) {
@@ -74,12 +75,11 @@ public class QueryRunner {
             throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForSnapshots: " + query + " is not supported");
         }
 
-        query.stats().logShallowQuery(result);
         return result;
     }
 
     public List<Change> queryForChanges(JqlQuery query) {
-        compile(query);
+        query.compile(globalIdFactory, typeMapper, QueryType.CHANGES);
 
         if (query.isAnyDomainObjectQuery()) {
             return repository.getChanges(query.isNewObjectChanges(), query.getQueryParams());
@@ -105,10 +105,5 @@ public class QueryRunner {
 
     private GlobalId fromInstance(Object instance) {
         return globalIdFactory.createInstanceId(instance);
-    }
-
-    private void compile(JqlQuery query) {
-        Validate.argumentIsNotNull(query);
-        query.compile(globalIdFactory, typeMapper);
     }
 }

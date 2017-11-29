@@ -61,6 +61,10 @@ public class ToStringBuilder {
     }
 
     public static String toStringSimple(Object... fieldsMap){
+        return toString(", ", fieldsMap);
+    }
+
+    private static String toString(String sep, Object... fieldsMap){
         argumentCheck(fieldsMap.length % 2 == 0, "map expected");
 
         StringBuilder out = new StringBuilder();
@@ -75,7 +79,7 @@ public class ToStringBuilder {
                 out.append(addFirstField(name + "", value));
             }
             else{
-                out.append(addField(name + "", value));
+                out.append(addField(name + "", value, sep));
             }
             first = false;
         }
@@ -108,21 +112,31 @@ public class ToStringBuilder {
         return false;
     }
 
-    public static String toString(Object instance, Object... fieldsMap){
-         argumentIsNotNull(instance);
+    public static String toStringBlockStyle(Object instance, String baseIndent, Object... fieldsMap) {
+        argumentIsNotNull(instance);
+        String indent = baseIndent + "\n  "+baseIndent;
+        String lastIndent = baseIndent + "\n"+baseIndent;
+        return instance.getClass().getSimpleName() + "{" + indent + toString(indent, fieldsMap) + lastIndent + "}";
+    }
 
-         return instance.getClass().getSimpleName()+"{"+toStringSimple(fieldsMap)+"}";
+    public static String toString(Object instance, Object... fieldsMap) {
+         argumentIsNotNull(instance);
+         return instance.getClass().getSimpleName()+"{ "+toStringSimple(fieldsMap)+" }";
      }
 
     public static String addField(String fieldName, Object value) {
-        return ", "+addFirstField(fieldName, value);
+        return addField(fieldName, value, ", ");
     }
 
     public static String addFirstField(String fieldName, Object value) {
-        return fieldName + ":" + format(value);
+        return addField(fieldName, value, "");
+    }
+
+    public static String addField(String fieldName, Object value, String separator) {
+        return separator + fieldName + ": " + format(value);
     }
 
     public static String addEnumField(String fieldName, Object value) {
-        return ", "+fieldName+":["+ (value != null ? value.toString() : "null")+"]";
+        return ", "+fieldName+": ["+ (value != null ? value.toString() : "null")+"]";
     }
 }

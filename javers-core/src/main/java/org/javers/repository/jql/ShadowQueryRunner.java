@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.javers.repository.jql.ShadowScope.DEEP_PLUS;
 
 /**
  * @author bartosz.walacik
@@ -38,12 +37,7 @@ public class ShadowQueryRunner {
     }
 
     public List<Shadow> queryForShadows(JqlQuery query, List<CdoSnapshot> coreSnapshots) {
-        if (query.getShadowScope() != DEEP_PLUS && query.getShadowScopeMaxGapsToFill() > 0) {
-            throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
-                    "maxGapsToFill can be used only in the DEEP_PLUS query scope");
-        }
-
-        final CommitTable commitTable = new CommitTable(coreSnapshots, query.getShadowScopeMaxGapsToFill(),
+        final CommitTable commitTable = new CommitTable(coreSnapshots, query.getMaxGapsToFill(),
                 query);
 
         if (query.getShadowScope().isCommitDeep()) {
@@ -120,14 +114,12 @@ public class ShadowQueryRunner {
 
             CdoSnapshot latest = findLatestToInCommitTable(rootContext, targetId);
             if (latest == null) {
-                appendSnapshots(fillGapFromRepository(new ReferenceKey(rootContext, targetId), 10));
+                appendSnapshots(fillGapFromRepository(new ReferenceKey(rootContext, targetId), 15));
             }
 
             latest = findLatestToInCommitTable(rootContext, targetId);
             if (latest == null){
-                logger.info("warning: object '" + targetId.value() + "' is outside the Shadow query scope" +
-                        ", references to this object will be nulled. " +
-                        "Use the wider scope to fill gaps in the object graph.");
+                query.stats().logMaxGapsToFillExceededInfo(targetId);
             }
             return latest;
         }

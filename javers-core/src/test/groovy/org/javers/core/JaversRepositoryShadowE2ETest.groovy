@@ -181,7 +181,8 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         shadows[2].entityRef == ref1
     }
 
-    def "should query for Shadows of Entity with child ValueObjects in CHILD_VALUE_OBJECT scope"(){
+    def '''should return Entity Shadow with its child ValueObjects in SHALLOW scope
+           (CHILD_VALUE_OBJECT should be enabled by default)'''(){
         given:
         def address = new DummyAddress(city: "London")
         def entity = new SnapshotEntity(id: 1, valueObjectRef: address, intProperty: 1)
@@ -200,8 +201,8 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         javers.commit("a", entity)
 
         when:
-        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
-                .withChildValueObjects().build()).collect{it.get()}
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).build()
+        def shadows = javers.findShadows(query).collect{it.get()}
 
         then:
         shadows.size() == 5
@@ -230,6 +231,41 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         shadows[4].intProperty == 1
         shadows[4].valueObjectRef.city == "London"
         !shadows[4].valueObjectRef.networkAddress
+
+        query.stats().dbQueriesCount == 1
+    }
+
+    def "should query for Shadows with property filter in CHILD_VALUE_OBJECT scope"() {
+        given:
+        def e = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London"))
+        javers.commit("author", e)
+
+        e.intProperty = 5
+        javers.commit("author", e)
+
+        e.valueObjectRef = new DummyAddress(city: "Paris")
+        javers.commit("author", e)
+
+        e.intProperty = 6
+        javers.commit("author", e)
+
+        e.dob = LocalDate.now()
+        javers.commit("author", e)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byClass(SnapshotEntity)
+                .withChangedProperty("intProperty").withChildValueObjects().build())
+
+        then:
+        with(shadows[0].get()){
+            intProperty == 6
+            valueObjectRef.city == "Paris"
+        }
+
+        with(shadows[1].get()){
+            intProperty == 5
+            valueObjectRef.city == "London"
+        }
     }
 
     def "should run aggregate query when loading entity refs"(){
@@ -318,12 +354,14 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         }
     }
 
-    def "should stop filling gaps in a Shadow graph when limit exceeded"(){
+    def "should stop filling gaps in a Shadow graph when DEEP_PLUS limit is exceeded"(){
         given:
-        def ref = new SnapshotEntity(id: 2, valueObjectRef: new DummyAddress(city: "London"))
-        javers.commit("a", ref)
+        def ref1 = new SnapshotEntity(id: 2)
+        def ref2 = new SnapshotEntity(id: 3)
+        javers.commit("a", ref1)
+        javers.commit("a", ref2)
 
-        def entity = new SnapshotEntity(id: 1, entityRef: ref, )
+        def entity = new SnapshotEntity(id: 1, listOfEntities: [ref1,ref2])
         javers.commit("a", entity)
 
         when:
@@ -333,8 +371,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         then:
         shadows.size() == 1
 
-        shadows[0].entityRef.id == 2
-        !shadows[0].entityRef.valueObjectRef
+        shadows[0].listOfEntities.size() == 1
     }
 
     def "should load master snapshot even if child snapshots 'consumed' the snapshot limit"(){
@@ -349,13 +386,13 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         }
 
         when:
-        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).withChildValueObjects().limit(50).build()
-
         println "findSnapshots ..."
-        def snapshots = javers.findSnapshots(query)
+        def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity)
+                .withChildValueObjects().limit(50).build())
 
         println "findShadows ..."
-        def shadows = javers.findShadows(query).collect{it.get()}
+        def shadows = javers.findShadows(byInstanceId(1, SnapshotEntity)
+                .limit(50).build()).collect{it.get()}
 
         then:
         snapshots.size() == 51
@@ -365,39 +402,6 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         shadows.each {
             it instanceof SnapshotEntity
             it.valueObjectRef instanceof DummyAddress
-        }
-    }
-
-    def "should query for Shadows with property filter in CHILD_VALUE_OBJECT scope"() {
-        given:
-        def e = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London"))
-        javers.commit("author", e)
-
-        e.intProperty = 5
-        javers.commit("author", e)
-
-        e.valueObjectRef = new DummyAddress(city: "Paris")
-        javers.commit("author", e)
-
-        e.intProperty = 6
-        javers.commit("author", e)
-
-        e.dob = LocalDate.now()
-        javers.commit("author", e)
-
-        when:
-        def shadows = javers.findShadows(QueryBuilder.byClass(SnapshotEntity)
-                .withChangedProperty("intProperty").withChildValueObjects().build())
-
-        then:
-        with(shadows[0].get()){
-            intProperty == 6
-            valueObjectRef.city == "Paris"
-        }
-
-        with(shadows[1].get()){
-            intProperty == 5
-            valueObjectRef.city == "London"
         }
     }
 }
