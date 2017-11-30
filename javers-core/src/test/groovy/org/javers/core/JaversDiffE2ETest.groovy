@@ -58,10 +58,12 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
         then:
         DiffAssert.assertThat(diff).hasChanges(1).hasValueChangeAt("someVal",5,6)
+
+        DiffAssert.assertThat(diff).hasChanges(1).hasAffectedCdoId("org.javers.core.model.DummyEntityWithEmbeddedId/1,2")
     }
 
 
-    def "should compare objects with a composite @EmbeddedId using Id reflectiveToString() to match instances"(){
+    def "should compare objects with a composite @EmbeddedId using Id reflectiveToString() to match instances and replacing toString method"(){
         given:
         def javers = JaversTestBuilder.newInstance()
         def left  = new DummyEntityWithCompositeEmbeddedId(point: new DummyCompositePoint(new DummyPoint(1,2), 1), someVal: 5)
