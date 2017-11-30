@@ -63,4 +63,12 @@ public abstract class GlobalId implements Serializable {
     public String getTypeName() {
         return typeName;
     }
+
+    String getTypeNameShort() {
+        String[] split = getTypeName().split("\\.");
+        if (split.length >=2) {
+            return "..." + split[split.length-1];
+        }
+        return getTypeName();
+    }
 }

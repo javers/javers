@@ -28,8 +28,6 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 public class JaversExtendedRepository implements JaversRepository {
-    private static final Logger logger = LoggerFactory.getLogger("org.javers.JQL");
-
     private final JaversRepository delegate;
     private final SnapshotDiffer snapshotDiffer;
     private final PreviousSnapshotsCalculator previousSnapshotsCalculator;
@@ -75,8 +73,6 @@ public class JaversExtendedRepository implements JaversRepository {
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
         argumentsAreNotNull(globalId, queryParams);
 
-        logger.debug("getStateHistory('{}', {})", globalId.value(), queryParams);
-
         List<CdoSnapshot> snapshots = delegate.getStateHistory(globalId, queryParams);
 
         if (globalId instanceof InstanceId && queryParams.isAggregate()) {
@@ -90,8 +86,6 @@ public class JaversExtendedRepository implements JaversRepository {
     public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
         argumentsAreNotNull(ownerEntity, path, queryParams);
 
-        logger.debug("getVing mlueOb eectSt ateHisto of y(ower:'{}', path:'{}', {})", ownerEntity.getName(), path, queryParams);
-
         return delegate.getValueObjectStateHistory(ownerEntity, path, queryParams);
     }
 
@@ -99,21 +93,20 @@ public class JaversExtendedRepository implements JaversRepository {
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         argumentIsNotNull(globalId);
 
-        logger.debug("getLatest('{}')" , globalId.value());
-
         return delegate.getLatest(globalId);
     }
 
     /**
      * last snapshot with commitId <= given timePoint
      */
-    public Optional<CdoSnapshot> getHistorical(GlobalId globalId, CommitId timePoint) {
+    public List<CdoSnapshot> getHistoricals(GlobalId globalId, CommitId timePoint, boolean withChildValueObjects, int limit) {
         argumentsAreNotNull(globalId, timePoint);
 
-        logger.debug("getHistorical('{}', timePoint='{}')", globalId.value(), timePoint.value());
-
-        return delegate.getStateHistory(globalId, QueryParamsBuilder.withLimit(1).toCommitId(timePoint).build())
-            .stream().findFirst();
+        return delegate.getStateHistory(globalId, QueryParamsBuilder
+                        .withLimit(limit)
+                        .withChildValueObjects(withChildValueObjects)
+                        .toCommitId(timePoint)
+                        .build());
     }
 
     /**
@@ -121,8 +114,6 @@ public class JaversExtendedRepository implements JaversRepository {
      */
     public Optional<CdoSnapshot> getHistorical(GlobalId globalId, LocalDateTime timePoint) {
         argumentsAreNotNull(globalId, timePoint);
-
-        logger.debug("getHistorical('{}', timePoint='{}')", globalId.value(), timePoint);
 
         return delegate.getStateHistory(globalId, QueryParamsBuilder.withLimit(1).to(timePoint).build())
                 .stream().findFirst();
@@ -132,8 +123,6 @@ public class JaversExtendedRepository implements JaversRepository {
     public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
         argumentsAreNotNull(queryParams);
 
-        logger.debug("getSnapshots({}) ", queryParams);
-
         return delegate.getSnapshots(queryParams);
     }
 
@@ -141,18 +130,11 @@ public class JaversExtendedRepository implements JaversRepository {
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
         argumentIsNotNull(snapshotIdentifiers);
 
-        logger.debug("getSnapshots({}) ", snapshotIdentifiers);
-
         return delegate.getSnapshots(snapshotIdentifiers);
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
-
-        logger.debug("getStateHistory({}, {})",
-                ToStringBuilder.setToString(givenClasses.stream().map(JaversType::getName).collect(Collectors.toSet())),
-                queryParams);
-
         return delegate.getStateHistory(givenClasses, queryParams);
     }
 
@@ -197,8 +179,6 @@ public class JaversExtendedRepository implements JaversRepository {
         if (alreadyLoaded.stream().filter(s -> s.getGlobalId().equals(instanceId)).findFirst().isPresent()) {
             return alreadyLoaded;
         }
-
-        logger.debug("action: loading master entity Snapshot of '{}'", instanceId.value());
 
         return getLatest(instanceId).map(it -> {
             List<CdoSnapshot> enhanced = new ArrayList(alreadyLoaded);
