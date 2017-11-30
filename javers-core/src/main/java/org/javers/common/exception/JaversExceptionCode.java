@@ -87,8 +87,8 @@ public enum JaversExceptionCode {
             "it doesn't exists in JaversRepository"),
 
     CANT_FIND_COMMIT_HEAD_ID("can't find commit head id in JaversRepository"),
-
     CANT_SAVE_ALREADY_PERSISTED_COMMIT("can't save already persisted commit '%s'"),
+
     SQL_EXCEPTION("SqlException: %s"),
 
     UNSUPPORTED_SQL_DIALECT("dialect '%s' is not supported by JaVers"),
