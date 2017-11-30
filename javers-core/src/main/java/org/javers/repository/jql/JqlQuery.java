@@ -102,7 +102,8 @@ public class JqlQuery {
         this.stats = new Stats();
         this.filter = filterDefinition.compile(globalIdFactory, typeMapper);
 
-        if (queryType == QueryType.SHADOWS && isInstanceIdQuery()) {
+        if (queryType == QueryType.SHADOWS &&
+                (isInstanceIdQuery() || isClassQuery())) {
             queryParams = QueryParams.forShadowQuery(queryParams);
         }
 
@@ -154,6 +155,12 @@ public class JqlQuery {
         return shadowScopeDef.getScope();
     }
 
+    /**
+     * Shadow query execution statistics. Can be printed by:
+     * <pre>
+     * &lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
+     * </pre>
+     */
     public Stats stats() {
         return stats;
     }

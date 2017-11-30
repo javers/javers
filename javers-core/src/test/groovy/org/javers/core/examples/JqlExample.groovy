@@ -156,8 +156,7 @@ class JqlExample extends Specification {
           javers.commit("author", bob)       // second commit
 
       when:
-          def shadows = javers.findShadows(
-                  QueryBuilder.byInstance(bob).withChildValueObjects().build() )
+          def shadows = javers.findShadows(QueryBuilder.byInstance(bob).build())
 
       then:
           assert shadows.size() == 2

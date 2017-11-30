@@ -235,7 +235,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         query.stats().dbQueriesCount == 1
     }
 
-    def "should query for Shadows with property filter in CHILD_VALUE_OBJECT scope"() {
+    def "should query for Shadows with property filter using implicit CHILD_VALUE_OBJECT scope"() {
         given:
         def e = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London"))
         javers.commit("author", e)
@@ -254,7 +254,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
         when:
         def shadows = javers.findShadows(QueryBuilder.byClass(SnapshotEntity)
-                .withChangedProperty("intProperty").withChildValueObjects().build())
+                .withChangedProperty("intProperty").build())
 
         then:
         with(shadows[0].get()){
@@ -268,7 +268,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         }
     }
 
-    def "should run aggregate query when loading entity refs"(){
+    def "should run aggregate query when loading entity refs (using implicit CHILD_VALUE_OBJECT scope)"(){
       given:
       def ref = new SnapshotEntity(id: 2, valueObjectRef: new DummyAddress(city: "London"))
       javers.commit("a", ref)
@@ -278,7 +278,6 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
       when:
       def query = QueryBuilder.byInstanceId(1, SnapshotEntity)
-                .withChildValueObjects()
                 .withScopeDeepPlus().build()
       def shadows = javers.findShadows(query).collect{it.get()}
 

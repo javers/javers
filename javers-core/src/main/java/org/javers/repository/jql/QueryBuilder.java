@@ -417,7 +417,7 @@ public class QueryBuilder {
      * with <code></cpce>maxGapsToFill</code> defaulted to <b>10</b>.
      * <br/><br/>
      *
-     * Read about query scopes in {@link Javers#findShadows(JqlQuery)} javadoc.
+     * Read more about query scopes in {@link Javers#findShadows(JqlQuery)} javadoc.
      * <br/><br/>
      *
      * Only for Shadow queries.
@@ -433,11 +433,15 @@ public class QueryBuilder {
      * Selects {@link ShadowScope#DEEP_PLUS} with given <code>maxGapsToFill</code>.
      * <br/><br/>
      *
-     * Read about query scopes in {@link Javers#findShadows(JqlQuery)} javadoc.
+     * Read more about Shadow query <b>scopes, profiling, and runtime statistics</b>
+     * in {@link Javers#findShadows(JqlQuery)} javadoc.
      * <br/><br/>
      *
      * Only for Shadow queries.
      *
+     * @param maxGapsToFill Limits the number of referenced entity Shadows to be eagerly loaded.
+     *                      The limit is global for a query. When it is exceeded,
+     *                      references to other entities are nulled. Collections of entities may not be fully loaded.
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      * @since 3.5
      */
