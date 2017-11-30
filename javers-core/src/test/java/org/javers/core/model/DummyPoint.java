@@ -2,6 +2,7 @@ package org.javers.core.model;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.javers.core.metamodel.annotation.EntityStringId;
 
 /**
  * @author bartosz walacik
@@ -32,5 +33,10 @@ public class DummyPoint {
 
     int getY() {
         return y;
+    }
+
+    @EntityStringId
+    public String getStringId() {
+        return x + "," + y;
     }
 }

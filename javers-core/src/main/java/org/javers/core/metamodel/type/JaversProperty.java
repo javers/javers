@@ -1,6 +1,8 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.core.metamodel.property.Property;
+
+import java.io.Serializable;
 import java.util.function.Supplier;
 
 /**
@@ -8,7 +10,7 @@ import java.util.function.Supplier;
  *
  * @author bartosz.walacik
  */
-public class JaversProperty extends Property {
+public class JaversProperty extends Property implements Serializable {
     /**
      * Supplier prevents stack overflow exception when building JaversType
      */

@@ -87,8 +87,8 @@ public enum JaversExceptionCode {
             "it doesn't exists in JaversRepository"),
 
     CANT_FIND_COMMIT_HEAD_ID("can't find commit head id in JaversRepository"),
-    CANT_SAVE_ALREADY_PERSISTED_COMMIT("can't save already persisted commit '%s'"),
 
+    CANT_SAVE_ALREADY_PERSISTED_COMMIT("can't save already persisted commit '%s'"),
     SQL_EXCEPTION("SqlException: %s"),
 
     UNSUPPORTED_SQL_DIALECT("dialect '%s' is not supported by JaVers"),
@@ -99,7 +99,10 @@ public enum JaversExceptionCode {
 
     RUNTIME_EXCEPTION("uncategorized runtime exception. %s"),
 
-    TRANSACTION_MANAGER_NOT_SET("Can't create javers bean due to missing configuration. Since javers-spring 2.8.0, transactionManager bean should be explicitly provided in TransactionalJaversBuilder.withTxManager(). See example at http://javers.org/documentation/spring-integration/#spring-jpa-example")
+    TRANSACTION_MANAGER_NOT_SET("Can't create javers bean due to missing configuration. Since javers-spring 2.8.0, transactionManager bean should be explicitly provided in TransactionalJaversBuilder.withTxManager(). See example at http://javers.org/documentation/spring-integration/#spring-jpa-example"),
+
+    INVALID_METHOD(" method with annotation @EntityStringId was bad defined in class %s")
+
     ;
 
     private final String message;

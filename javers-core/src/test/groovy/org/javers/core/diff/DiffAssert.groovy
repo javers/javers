@@ -53,6 +53,13 @@ class DiffAssert {
         this
     }
 
+    DiffAssert hasAffectedCdoId(String affectedCdoId) {
+        ValueChange change = actual.changes.first()
+        assert change
+        assert change.affectedGlobalId.toString() == affectedCdoId
+        this
+    }
+
     DiffAssert hasReferenceChangeAt(String property, def oldRef, def newRef) {
         ReferenceChange change = actual.changes.find{it instanceof ReferenceChange && it.propertyName == property}
         assert change

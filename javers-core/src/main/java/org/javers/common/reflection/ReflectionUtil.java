@@ -1,10 +1,6 @@
 package org.javers.common.reflection;
 
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import org.javers.common.collections.Lists;
-
-import java.util.*;
-
 import org.javers.common.collections.Primitives;
 import org.javers.common.collections.Sets;
 import org.javers.common.collections.WellKnownValueTypes;
@@ -12,11 +8,30 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
+import org.javers.core.metamodel.annotation.EntityStringId;
 import org.javers.core.metamodel.property.Property;
 import org.slf4j.Logger;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -25,14 +40,14 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author bartosz walacik
  */
 public class ReflectionUtil {
+
     private static final Logger logger = getLogger(ReflectionUtil.class);
 
     public static boolean isClassPresent(String className) {
         try {
             Class.forName(className, false, Javers.class.getClassLoader());
             return true;
-        }
-        catch (Throwable ex) {
+        } catch (Throwable ex) {
             // Class or one of its dependencies is not present...
             return false;
         }
@@ -44,8 +59,7 @@ public class ReflectionUtil {
     public static Class classForName(String className) {
         try {
             return Class.forName(className, false, Javers.class.getClassLoader());
-        }
-        catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             throw new JaversException(ex);
         }
     }
@@ -55,7 +69,7 @@ public class ReflectionUtil {
         try {
             Method m = target.getClass().getMethod(getterName);
             return m.invoke(target);
-        }catch (Exception e ) {
+        } catch (Exception e) {
             throw new JaversException(e);
         }
     }
@@ -64,21 +78,21 @@ public class ReflectionUtil {
      * Creates new instance of public or package-private class.
      * Calls first, not-private constructor
      */
-    public static Object newInstance(Class clazz, ArgumentResolver resolver){
+    public static Object newInstance(Class clazz, ArgumentResolver resolver) {
         Validate.argumentIsNotNull(clazz);
         for (Constructor constructor : clazz.getDeclaredConstructors()) {
             if (isPrivate(constructor) || isProtected(constructor)) {
                 continue;
             }
 
-            Class [] types = constructor.getParameterTypes();
+            Class[] types = constructor.getParameterTypes();
             Object[] params = new Object[types.length];
-            for (int i=0; i<types.length; i++){
+            for (int i = 0; i < types.length; i++) {
                 try {
                     params[i] = resolver.resolve(types[i]);
-                } catch (JaversException e){
-                    logger.error("failed to create new instance of "+clazz.getName()+", argument resolver for arg["+i+"] " +
-                                 types[i].getName() + " thrown exception: "+e.getMessage());
+                } catch (JaversException e) {
+                    logger.error("failed to create new instance of " + clazz.getName() + ", argument resolver for arg[" + i + "] " +
+                                 types[i].getName() + " thrown exception: " + e.getMessage());
                     throw e;
                 }
             }
@@ -89,12 +103,12 @@ public class ReflectionUtil {
                 throw new RuntimeException(e);
             }
         }
-        throw new JaversException(JaversExceptionCode.NO_PUBLIC_CONSTRUCTOR,clazz.getName());
+        throw new JaversException(JaversExceptionCode.NO_PUBLIC_CONSTRUCTOR, clazz.getName());
     }
 
     public static List<JaversField> getAllPersistentFields(Class methodSource) {
         List<JaversField> result = new ArrayList<>();
-        for(JaversField field : getAllFields(methodSource)) {
+        for (JaversField field : getAllFields(methodSource)) {
             if (isPersistentField(field.getRawMember())) {
                 result.add(field);
             }
@@ -118,11 +132,11 @@ public class ReflectionUtil {
                !field.getName().equals("this$0"); //owner of inner class
     }
 
-    private static boolean isPrivate(Member member){
+    private static boolean isPrivate(Member member) {
         return Modifier.isPrivate(member.getModifiers());
     }
 
-    private static boolean isProtected(Member member){
+    private static boolean isProtected(Member member) {
         return Modifier.isProtected(member.getModifiers());
     }
 
@@ -139,15 +153,15 @@ public class ReflectionUtil {
 
     public static List<Class<?>> findClasses(Class<? extends Annotation> annotation, String... packages) {
         Validate.argumentsAreNotNull(annotation, packages);
-    	List<String> names = new FastClasspathScanner(packages).scan().getNamesOfClassesWithAnnotation(annotation);
-    	List<Class<?>> classes = new ArrayList<>();
-    	for (String className : names) {
+        List<String> names = new FastClasspathScanner(packages).scan().getNamesOfClassesWithAnnotation(annotation);
+        List<Class<?>> classes = new ArrayList<>();
+        for (String className : names) {
             classes.add(classForName(className));
         }
-    	return classes;
+        return classes;
     }
 
-    public static Optional<Type> isConcreteType(Type javaType){
+    public static Optional<Type> isConcreteType(Type javaType) {
         if (javaType instanceof Class || javaType instanceof ParameterizedType) {
             return Optional.of(javaType);
         } else if (javaType instanceof WildcardType) {
@@ -170,22 +184,22 @@ public class ReflectionUtil {
      */
     public static Class extractClass(Type javaType) {
         if (javaType instanceof ParameterizedType
-                && ((ParameterizedType)javaType).getRawType() instanceof Class){
-            return (Class)((ParameterizedType)javaType).getRawType();
-        }  else if (javaType instanceof GenericArrayType) {
+            && ((ParameterizedType) javaType).getRawType() instanceof Class) {
+            return (Class) ((ParameterizedType) javaType).getRawType();
+        } else if (javaType instanceof GenericArrayType) {
             return Object[].class;
-        }  else if (javaType instanceof Class) {
-            return (Class)javaType;
+        } else if (javaType instanceof Class) {
+            return (Class) javaType;
         }
 
         throw new JaversException(JaversExceptionCode.CLASS_EXTRACTION_ERROR, javaType);
     }
 
-    public static boolean isAnnotationPresentInHierarchy(Class<?> clazz, Class<? extends Annotation> ann){
+    public static boolean isAnnotationPresentInHierarchy(Class<?> clazz, Class<? extends Annotation> ann) {
         Class<?> current = clazz;
 
-        while (current != null && current != Object.class){
-            if (current.isAnnotationPresent(ann)){
+        while (current != null && current != Object.class) {
+            if (current.isAnnotationPresent(ann)) {
                 return true;
             }
             current = current.getSuperclass();
@@ -199,7 +213,7 @@ public class ReflectionUtil {
         List<Type> parents = new ArrayList<>();
 
         Class<?> current = clazz;
-        while (current != null && current != Object.class){
+        while (current != null && current != Object.class) {
             if (clazz != current) {
                 parents.add(current);
             }
@@ -219,7 +233,7 @@ public class ReflectionUtil {
     }
 
     public static String reflectiveToString(Object cdoId) {
-        if (cdoId == null){
+        if (cdoId == null) {
             return "";
         }
 
@@ -227,26 +241,51 @@ public class ReflectionUtil {
             return (String) cdoId;
         }
 
-        if (WellKnownValueTypes.isValueType(cdoId) || Primitives.isPrimitiveOrBox(cdoId)){
+        if (WellKnownValueTypes.isValueType(cdoId) || Primitives.isPrimitiveOrBox(cdoId)) {
             return cdoId.toString();
         }
 
         StringBuilder ret = new StringBuilder();
-        for (JaversField f : getAllPersistentFields(cdoId.getClass()) ){
+        for (JaversField f : getAllPersistentFields(cdoId.getClass())) {
             Object val = f.getEvenIfPrivate(cdoId);
             if (val != null) {
-                ret.append(val.toString());
+                Object byAnnotation = callMethodByAnnotation(val, EntityStringId.class);
+                if(byAnnotation != null) {
+                    ret.append(byAnnotation.toString());
+                } else {
+                    ret.append(val.toString());
+                }
             }
             ret.append(",");
         }
 
         if (ret.length() == 0) {
             return cdoId.toString();
-        }
-        else{
-            ret.delete(ret.length()-1, ret.length());
+        } else {
+            ret.delete(ret.length() - 1, ret.length());
             return ret.toString();
         }
+    }
+
+    private static Object callMethodByAnnotation(Object obj, Class<? extends Annotation> annotationClass) {
+
+        Class clazz = obj.getClass();
+        while (clazz != null && clazz != Object.class) {
+            Optional<Method> methodOptional = Arrays.stream(clazz.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(annotationClass))
+                .findFirst();
+            if(methodOptional.isPresent()) {
+                try {
+                    return methodOptional.get().invoke(obj);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new JaversException(JaversExceptionCode.INVALID_METHOD, clazz.getSimpleName());
+                }
+            }
+
+            clazz = clazz.getSuperclass();
+        }
+
+        return null;
     }
 
     public static boolean isAssignableFromAny(Class clazz, Class<?>[] assignableFrom) {
@@ -264,8 +303,8 @@ public class ReflectionUtil {
 
     public static boolean looksLikeId(Member member) {
         return getAnnotations(member).stream()
-                .map(ann -> ann.annotationType().getSimpleName())
-                .anyMatch(annName -> annName.equals(Property.ID_ANN) || annName.equals(Property.EMBEDDED_ID_ANN));
+            .map(ann -> ann.annotationType().getSimpleName())
+            .anyMatch(annName -> annName.equals(Property.ID_ANN) || annName.equals(Property.EMBEDDED_ID_ANN));
     }
 
     public static Set<Annotation> getAnnotations(Member member) {
