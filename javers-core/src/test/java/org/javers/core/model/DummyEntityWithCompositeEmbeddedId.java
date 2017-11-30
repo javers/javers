@@ -5,7 +5,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 import javax.persistence.EmbeddedId;
 
 /**
- * @author bartosz.walacik
+ * @author ismael.costa
  */
 @TypeName("dummyEntityWithCompositeEmbeddedId")
 public class DummyEntityWithCompositeEmbeddedId {
