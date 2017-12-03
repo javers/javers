@@ -306,7 +306,7 @@ public interface Javers {
      *DEBUG org.javers.JQL - SHALLOW query: 1 snapshots loaded (entities: 1, valueObjects: 0)
      *DEBUG org.javers.JQL - DEEP_PLUS query for '...SnapshotEntity/2' at commitId 3.0, 1 snapshot(s) loaded, gaps filled so far: 1
      *DEBUG org.javers.JQL - warning: object '...SnapshotEntity/3' is outside of the DEEP_PLUS+1 scope, references to this object will be nulled. Increase maxGapsToFill and fill all gaps in your object graph.
-     *[main] DEBUG org.javers.JQL - queryForShadows executed:
+     *DEBUG org.javers.JQL - queryForShadows executed:
      *JqlQuery {
      *  IdFilter{ globalId: ...SnapshotEntity/1 }
      *  QueryParams{ aggregate: true, limit: 100 }
