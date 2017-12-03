@@ -14,20 +14,36 @@ import java.util.List;
 public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefinitionBuilder> {
     private Class<?> clazz;
     private List<String> ignoredProperties = Collections.emptyList();
+    private List<String> includedProperties = Collections.emptyList();
     private Optional<String> typeName = Optional.empty();
 
     ClientsClassDefinitionBuilder(Class<?> clazz) {
         this.clazz = clazz;
     }
 
+    /**
+     * See {@link ClientsClassDefinition#getIgnoredProperties()}
+     */
     public T withIgnoredProperties(String... ignoredProperties) {
         withIgnoredProperties(Lists.asList(ignoredProperties));
         return (T) this;
     }
 
+    /**
+     * See {@link ClientsClassDefinition#getIgnoredProperties()}
+     */
     public T withIgnoredProperties(List<String> ignoredProperties) {
         Validate.argumentIsNotNull(ignoredProperties);
         this.ignoredProperties = ignoredProperties;
+        return (T) this;
+    }
+
+    /**
+     * See {@link ClientsClassDefinition#getIncludedProperties()}
+     */
+    public T withIncludedProperties(List<String> includedProperties) {
+        Validate.argumentIsNotNull(includedProperties);
+        this.ignoredProperties = includedProperties;
         return (T) this;
     }
 
@@ -53,7 +69,12 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
         return ignoredProperties;
     }
 
+    public List<String> getIncludedProperties() {
+        return includedProperties;
+    }
+
     public Optional<String> getTypeName() {
         return typeName;
     }
+
 }
