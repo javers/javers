@@ -34,7 +34,11 @@ class ManagedClassFactory {
 
     ManagedClass create(ClientsClassDefinition def, ClassScan scan){
         List<JaversProperty> allProperties = convert(scan.getProperties());
+
         List<JaversProperty> filtered = filterIgnored(allProperties, def);
+
+        //TODO if def.getIncludedProperties() are defined, use Included, otherwise use Ignored
+
         filtered = filterIgnoredType(filtered, def.getBaseJavaClass());
 
         return new ManagedClass(def.getBaseJavaClass(), filtered,
