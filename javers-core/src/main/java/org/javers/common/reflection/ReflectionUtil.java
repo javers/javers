@@ -16,7 +16,6 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -24,7 +23,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -267,27 +265,6 @@ public class ReflectionUtil {
             ret.delete(ret.length()-1, ret.length());
             return ret.toString();
         }
-    }
-
-    private static Object callMethodByAnnotation(Object obj, Class<? extends Annotation> annotationClass) {
-
-        Class clazz = obj.getClass();
-        while (clazz != null && clazz != Object.class) {
-            Optional<Method> methodOptional = Arrays.stream(clazz.getDeclaredMethods())
-                .filter(method -> method.isAnnotationPresent(annotationClass))
-                .findFirst();
-            if(methodOptional.isPresent()) {
-                try {
-                    return methodOptional.get().invoke(obj);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new JaversException(JaversExceptionCode.INVALID_METHOD, clazz.getSimpleName());
-                }
-            }
-
-            clazz = clazz.getSuperclass();
-        }
-
-        return null;
     }
 
     public static boolean isAssignableFromAny(Class clazz, Class<?>[] assignableFrom) {
