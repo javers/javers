@@ -18,6 +18,8 @@ import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
 import spock.lang.Unroll
 
+import java.util.function.Function
+
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.MappingStyle.BEAN
 import static org.javers.core.MappingStyle.FIELD
@@ -62,10 +64,9 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         DiffAssert.assertThat(diff).hasChanges(1).hasAffectedCdoId("org.javers.core.model.DummyEntityWithEmbeddedId/1,2")
     }
 
-
     def "should compare objects with a composite @EmbeddedId using Id reflectiveToString() to match instances and replacing toString method"(){
         given:
-        def javers = JaversTestBuilder.newInstance()
+        def javers = JaversBuilder.javers().registerToStringFunction(DummyPoint.class, {x -> x.getStringId()} as Function<DummyPoint, String>).build();
         def left  = new DummyEntityWithCompositeEmbeddedId(point: new DummyCompositePoint(new DummyPoint(1,2), 1), someVal: 5)
         def right = new DummyEntityWithCompositeEmbeddedId(point: new DummyCompositePoint(new DummyPoint(1,2), 1), someVal: 6)
 

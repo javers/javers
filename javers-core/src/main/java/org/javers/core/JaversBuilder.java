@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.function.Function;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -250,6 +251,20 @@ public class JaversBuilder extends AbstractContainerBuilder {
     public JaversBuilder registerValueObject(ValueObjectDefinition valueObjectDefinition) {
         argumentIsNotNull(valueObjectDefinition);
         clientsClassDefinitions.add(valueObjectDefinition);
+        return this;
+    }
+
+
+    /**
+     * Registers a toString function to use in the globalId_key field.
+     * Projected for legacy code when the toString method can't be changed.
+     *
+     * @param clazz
+     * @param toString
+     * @since 3.7.6
+     */
+    public  <T> JaversBuilder registerToStringFunction(Class<T> clazz, Function<T, String> toString) {
+        ReflectionUtil.registerToStringFunction(clazz, toString);
         return this;
     }
 

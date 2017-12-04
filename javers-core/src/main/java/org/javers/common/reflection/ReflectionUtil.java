@@ -8,13 +8,30 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
-import org.javers.core.metamodel.annotation.EntityStringId;
 import org.javers.core.metamodel.property.Property;
 import org.slf4j.Logger;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 
@@ -26,6 +43,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class ReflectionUtil {
     private static final Logger logger = getLogger(ReflectionUtil.class);
+
+    private static final Map<Class, Function<Object, String>> MAPPED_TO_STRING_FUNCTION = new ConcurrentHashMap<>();
 
     public static boolean isClassPresent(String className) {
         try {
@@ -235,12 +254,8 @@ public class ReflectionUtil {
         for (JaversField f : getAllPersistentFields(cdoId.getClass()) ){
             Object val = f.getEvenIfPrivate(cdoId);
             if (val != null) {
-                Object byAnnotation = callMethodByAnnotation(val, EntityStringId.class);
-                if(byAnnotation != null) {
-                    ret.append(byAnnotation.toString());
-                } else {
-                    ret.append(val.toString());
-                }
+               Function<Object, String> toStringFunction = MAPPED_TO_STRING_FUNCTION.getOrDefault(val.getClass(), Object::toString);
+               ret.append(toStringFunction.apply(val));
             }
             ret.append(",");
         }
@@ -296,5 +311,9 @@ public class ReflectionUtil {
 
     public static Set<Annotation> getAnnotations(Member member) {
         return unmodifiableSet(Sets.asSet(((AccessibleObject) member).getAnnotations()));
+    }
+
+    public static <T> void registerToStringFunction(Class<T> clazz, Function<T, String> toString) {
+        MAPPED_TO_STRING_FUNCTION.put(clazz, (Function<Object, String>) toString);
     }
 }
