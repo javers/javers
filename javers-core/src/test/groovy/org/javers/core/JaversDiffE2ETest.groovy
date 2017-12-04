@@ -67,7 +67,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
     def "should replace to string with custom option"(){
 
         given:
-        
+
         def javers = JaversBuilder.javers().registerToStringFunction(DummyPoint.class, {x -> x.getStringId()} as Function<DummyPoint, String>).build();
         def left  = new DummyEntityWithCompositeEmbeddedId(point: new DummyCompositePoint(new DummyPoint(1,2), 1), someVal: 5)
         def right = new DummyEntityWithCompositeEmbeddedId(point: new DummyCompositePoint(new DummyPoint(1,2), 1), someVal: 6)

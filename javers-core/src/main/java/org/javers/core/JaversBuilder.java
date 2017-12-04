@@ -1,6 +1,7 @@
 package org.javers.core;
 
 import com.google.gson.TypeAdapter;
+
 import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
@@ -17,16 +18,33 @@ import org.javers.core.diff.custom.CustomValueComparator;
 import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.TailoredJaversMemberFactoryModule;
+import org.javers.core.json.JsonAdvancedTypeAdapter;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
-import org.javers.core.json.JsonAdvancedTypeAdapter;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
-import org.javers.core.metamodel.annotation.*;
-import org.javers.core.metamodel.clazz.*;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.Entity;
+import org.javers.core.metamodel.annotation.TypeName;
+import org.javers.core.metamodel.annotation.Value;
+import org.javers.core.metamodel.annotation.ValueObject;
+import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.CustomDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinitionBuilder;
+import org.javers.core.metamodel.clazz.IgnoredTypeDefinition;
+import org.javers.core.metamodel.clazz.ValueDefinition;
+import org.javers.core.metamodel.clazz.ValueObjectDefinition;
+import org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder;
 import org.javers.core.metamodel.scanner.ScannerModule;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.CustomType;
+import org.javers.core.metamodel.type.EntityType;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.TypeMapperModule;
+import org.javers.core.metamodel.type.ValueObjectType;
+import org.javers.core.metamodel.type.ValueType;
 import org.javers.core.pico.AddOnsModule;
 import org.javers.core.snapshot.SnapshotModule;
 import org.javers.groovysupport.GroovyAddOns;
@@ -42,7 +60,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -71,6 +94,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
     private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
+
+    private final Map<Class, Function<?, String>> mappedToStringFunction = new ConcurrentHashMap<>();
 
     private final Set<Class> classesToScan = new HashSet<>();
 
@@ -264,7 +289,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @since 3.7.6
      */
     public  <T> JaversBuilder registerToStringFunction(Class<T> clazz, Function<T, String> toString) {
-        ReflectionUtil.registerToStringFunction(clazz, toString);
+        mappedToStringFunction.put(clazz, toString);
         return this;
     }
 
@@ -591,6 +616,11 @@ public class JaversBuilder extends AbstractContainerBuilder {
         }
     }
 
+    private void mapRegisteredToStringFunction() {
+        TypeMapper typeMapper = typeMapper();
+        mappedToStringFunction.forEach( (clazz, function) -> typeMapper.addToString(clazz, function));
+    }
+
     private TypeMapper typeMapper() {
         return getContainerComponent(TypeMapper.class);
     }
@@ -623,6 +653,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     private void bootManagedTypeModule() {
         addModule(new TypeMapperModule(getContainer()));
         mapRegisteredClasses();
+        mapRegisteredToStringFunction();
     }
 
     /**
