@@ -237,10 +237,14 @@ public class TypeMapper {
         state.putIfAbsent(jType.getBaseJavaType(), jType);
     }
 
-    public void addToString(Class clazz, Function<?, String> toString) {
+    public void addToString(Class clazz, Function<Object, String> toString) {
         Validate.argumentIsNotNull(clazz);
         Validate.argumentIsNotNull(toString);
         state.putToMap(clazz, toString);
+    }
+
+    public Map<Class, Function<Object, String>> getMappedToStringFunction() {
+        return state.getMappedToStringFunction();
     }
 
     public void addTypes(Collection<JaversType> jTypes) {

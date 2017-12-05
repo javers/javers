@@ -4,9 +4,10 @@ import org.javers.common.collections.Lists;
 import org.javers.core.metamodel.type.EntityType;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -25,8 +26,8 @@ public class ValueObjectId extends GlobalId {
     private final GlobalId ownerId;
     private final String fragment;
 
-    public ValueObjectId(String typeName, GlobalId ownerId, String fragment) {
-        super(typeName);
+    public ValueObjectId(String typeName, Map<Class, Function<Object, String>> mappedToStringFunction, GlobalId ownerId, String fragment) {
+        super(typeName, mappedToStringFunction);
         argumentsAreNotNull(ownerId, fragment);
         this.ownerId = ownerId;
         this.fragment = fragment;
@@ -62,7 +63,7 @@ public class ValueObjectId extends GlobalId {
 
         return segments.stream()
                 .limit(segments.size()-1)
-                .map(s -> new ValueObjectId(this.getTypeName(), ownerId, s))
+                .map(s -> new ValueObjectId(this.getTypeName(), this.getMappedToStringFunction(), ownerId, s))
                 .collect(Collectors.toSet());
     }
 

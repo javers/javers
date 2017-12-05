@@ -49,7 +49,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
 
     private UnboundedValueObjectId parseUnboundedValueObject(JsonObject jsonObject){
         String typeName = jsonObject.get(VALUE_OBJECT_FIELD).getAsString();
-        return new UnboundedValueObjectId(typeName);
+        return new UnboundedValueObjectId(typeName, typeMapper.getMappedToStringFunction());
     }
 
     private ValueObjectId parseValueObjectId(JsonObject jsonObject, JsonDeserializationContext context) {
@@ -57,7 +57,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
         String fragment = jsonObject.get(FRAGMENT_FIELD).getAsString();
         GlobalId ownerId = context.deserialize(jsonObject.get(OWNER_ID_FIELD), GlobalId.class);
 
-        return new ValueObjectId(typeName, ownerId, fragment);
+        return new ValueObjectId(typeName, typeMapper.getMappedToStringFunction(), ownerId, fragment);
     }
 
     private InstanceId parseInstanceId(JsonObject jsonObject, JsonDeserializationContext context) {

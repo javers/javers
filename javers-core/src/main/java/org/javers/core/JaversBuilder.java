@@ -95,7 +95,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
 
-    private final Map<Class, Function<?, String>> mappedToStringFunction = new ConcurrentHashMap<>();
+    private final Map<Class, Function<Object, String>> mappedToStringFunction = new ConcurrentHashMap<>();
 
     private final Set<Class> classesToScan = new HashSet<>();
 
@@ -285,11 +285,11 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * Projected for legacy code when the toString method can't be changed.
      *
      * @param clazz
-     * @param toString
+     * @param toString the method who will be used as toString Object
      * @since 3.7.6
      */
     public  <T> JaversBuilder registerToStringFunction(Class<T> clazz, Function<T, String> toString) {
-        mappedToStringFunction.put(clazz, toString);
+        mappedToStringFunction.put(clazz, (Function<Object, String>) toString);
         return this;
     }
 

@@ -3,6 +3,10 @@ package org.javers.core.diff.appenders;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.type.*;
+
+import java.util.Map;
+import java.util.function.Function;
+
 import static org.javers.common.reflection.ReflectionUtil.reflectiveToString;
 
 /**
@@ -25,8 +29,10 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
 
         //special treatment for EmbeddedId - could be ValueObjects without good equals() implementation
         if (isIdProperty(pair, property)) {
-            if (property.getType().equals(reflectiveToString(leftValue),
-                               reflectiveToString(rightValue))){
+
+            Map<Class, Function<Object, String>> mappedToStringFunction = pair.getGlobalId().getMappedToStringFunction();
+            if (property.getType().equals(reflectiveToString(leftValue, mappedToStringFunction),
+                               reflectiveToString(rightValue, mappedToStringFunction))){
                 return null;
             }
         }else {

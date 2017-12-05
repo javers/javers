@@ -71,6 +71,6 @@ class ChangeTestBuilder {
             return null
         }
 
-        return InstanceId.createFromInstance(cdo, typeMapper.getJaversType(cdo.getClass()))
+        return InstanceId.createFromInstance(cdo, typeMapper.getJaversType(cdo.getClass()), typeMapper.getMappedToStringFunction())
     }
 }

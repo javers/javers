@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.object
 
+import com.google.common.collect.Maps
 import org.javers.core.model.DummyPoint
 import spock.lang.Specification
 
@@ -11,7 +12,7 @@ class InstanceIdTest extends Specification {
 
     def "should build value() from typeName and id.toString for primitive Id "() {
         when:
-        def instanceId = new InstanceId("entity", 12)
+        def instanceId = new InstanceId("entity", 12, Maps.newHashMap())
 
         then:
         instanceId.typeName == "entity"
@@ -23,7 +24,7 @@ class InstanceIdTest extends Specification {
         given:
 
         when:
-        def instanceId = new InstanceId("entity", new DummyPoint(1,3))
+        def instanceId = new InstanceId("entity", new DummyPoint(1, 3), Maps.newHashMap())
 
         then:
         instanceId.typeName == "entity"

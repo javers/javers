@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
@@ -41,8 +40,6 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class ReflectionUtil {
     private static final Logger logger = getLogger(ReflectionUtil.class);
-
-    private static final Map<Class, Function<Object, String>> MAPPED_TO_STRING_FUNCTION = new ConcurrentHashMap<>();
 
     public static boolean isClassPresent(String className) {
         try {
@@ -235,7 +232,7 @@ public class ReflectionUtil {
         return parents;
     }
 
-    public static String reflectiveToString(Object cdoId) {
+    public static String reflectiveToString(Object cdoId, Map<Class, Function<Object, String>> mappedToStringFunction) {
         if (cdoId == null){
             return "";
         }
@@ -252,7 +249,7 @@ public class ReflectionUtil {
         for (JaversField f : getAllPersistentFields(cdoId.getClass()) ){
             Object val = f.getEvenIfPrivate(cdoId);
             if (val != null) {
-               Function<Object, String> toStringFunction = MAPPED_TO_STRING_FUNCTION.getOrDefault(val.getClass(), Object::toString);
+               Function<Object, String> toStringFunction = mappedToStringFunction.getOrDefault(val.getClass(), Object::toString);
                ret.append(toStringFunction.apply(val));
             }
             ret.append(",");
@@ -290,7 +287,4 @@ public class ReflectionUtil {
         return unmodifiableSet(Sets.asSet(((AccessibleObject) member).getAnnotations()));
     }
 
-    public static <T> void registerToStringFunction(Class<T> clazz, Function<T, String> toString) {
-        MAPPED_TO_STRING_FUNCTION.put(clazz, (Function<Object, String>) toString);
-    }
 }

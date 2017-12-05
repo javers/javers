@@ -4,6 +4,9 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.type.EntityType;
 
+import java.util.Map;
+import java.util.function.Function;
+
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
@@ -14,8 +17,8 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class InstanceId extends GlobalId {
     private final Object cdoId;
 
-    InstanceId(String typeName, Object cdoId) {
-        super(typeName);
+    InstanceId(String typeName, Object cdoId, Map<Class, Function<Object, String>> mappedToStringFunction) {
+        super(typeName, mappedToStringFunction);
         argumentsAreNotNull(cdoId);
         this.cdoId = cdoId;
     }
@@ -24,8 +27,8 @@ public class InstanceId extends GlobalId {
      * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
      * @throws JaversException NOT_INSTANCE_OF
      */
-    public static InstanceId createFromInstance(Object instance, EntityType entity){
-        return new InstanceId(entity.getName(), entity.getIdOf(instance));
+    public static InstanceId createFromInstance(Object instance, EntityType entity, Map<Class, Function<Object, String>> mappedToStringFunction){
+        return new InstanceId(entity.getName(), entity.getIdOf(instance), mappedToStringFunction);
     }
 
     /**
@@ -41,6 +44,6 @@ public class InstanceId extends GlobalId {
     }
 
     private String getCdoIdAsString(){
-        return ReflectionUtil.reflectiveToString(cdoId);
+        return ReflectionUtil.reflectiveToString(cdoId, getMappedToStringFunction());
     }
 }

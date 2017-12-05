@@ -1,5 +1,6 @@
 package org.javers.core.graph
 
+import com.google.common.collect.Maps
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.metamodel.object.Cdo
@@ -18,7 +19,7 @@ abstract class ObjectNodeTest extends Specification {
     protected def createEntity
 
     private ObjectNode objectNode(Object cdo, EntityType entity) {
-        new ObjectNode<>(new CdoWrapper(cdo, createFromInstance(cdo, entity), entity));
+        new ObjectNode<>(new CdoWrapper(cdo, createFromInstance(cdo, entity, Maps.newHashMap()), entity));
     }
 
     def "should hold Entity reference"() {
@@ -43,7 +44,7 @@ abstract class ObjectNodeTest extends Specification {
         ObjectNode wrapper = objectNode(cdo, entity)
 
         then:
-        wrapper.globalId == InstanceId.createFromInstance(cdo, entity)
+        wrapper.globalId == InstanceId.createFromInstance(cdo, entity, Maps.newHashMap())
     }
 
     def "should hold Cdo reference"() {

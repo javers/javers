@@ -5,6 +5,8 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.jql.GlobalIdDTO;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Global ID of Client's domain object (CDO)
@@ -13,9 +15,13 @@ public abstract class GlobalId implements Serializable {
 
     private final String typeName;
 
-    GlobalId(String typeName) {
+    private final transient Map<Class, Function<Object, String>> mappedToStringFunction;
+
+    GlobalId(String typeName, Map<Class, Function<Object, String>> mappedToStringFunction) {
         Validate.argumentIsNotNull(typeName);
+        Validate.argumentIsNotNull(mappedToStringFunction);
         this.typeName = typeName;
+        this.mappedToStringFunction = mappedToStringFunction;
     }
 
     /**
@@ -62,5 +68,9 @@ public abstract class GlobalId implements Serializable {
 
     public String getTypeName() {
         return typeName;
+    }
+
+    public Map<Class, Function<Object, String>> getMappedToStringFunction() {
+        return mappedToStringFunction;
     }
 }

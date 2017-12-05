@@ -25,7 +25,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 class TypeMapperState {
     private final Map<String, JaversType> mappedTypes = new ConcurrentHashMap<>();
     private final Map<DuckType, Class> mappedTypeNames = new ConcurrentHashMap<>();
-    private final Map<Class, Function<?, String>> mappedToStringFunction = new ConcurrentHashMap<>();
+    private final Map<Class, Function<Object, String>> mappedToStringFunction = new ConcurrentHashMap<>();
     private final TypeFactory typeFactory;
     private final ValueType OBJECT_TYPE = new ValueType(Object.class);
 
@@ -191,7 +191,11 @@ class TypeMapperState {
         mappedTypes.put(javaType.toString(), javersType);
     }
 
-    void putToMap(Class clazz, Function<?, String> toString) {
+    void putToMap(Class clazz, Function<Object, String> toString) {
         mappedToStringFunction.put(clazz, toString);
+    }
+
+    public Map<Class, Function<Object, String>> getMappedToStringFunction() {
+        return mappedToStringFunction;
     }
 }
