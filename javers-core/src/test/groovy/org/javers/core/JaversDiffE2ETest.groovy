@@ -61,7 +61,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         then:
         DiffAssert.assertThat(diff).hasChanges(1).hasValueChangeAt("someVal",5,6)
 
-        DiffAssert.assertThat(diff).hasChanges(1).hasAffectedCdoId("org.javers.core.model.DummyEntityWithEmbeddedId/1,2")
+        DiffAssert.assertThat(diff).hasChanges(1).hasAffectedCdoId("...DummyEntityWithEmbeddedId/1,2")
     }
 
     def "should replace to string with custom option"(){
