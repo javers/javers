@@ -41,27 +41,6 @@ public class QueryParamsBuilder {
     }
 
     /**
-     * Initializes builder with parameters from a given queryParams instance
-     */
-    public static QueryParamsBuilder initializeWith(QueryParams queryParams) {
-        Validate.argumentIsNotNull(queryParams);
-
-        QueryParamsBuilder builder = QueryParamsBuilder.withLimit(queryParams.limit());
-        builder.commitIds(queryParams.commitIds());
-        builder.skip(queryParams.skip());
-        if (queryParams.from().isPresent()) {
-            builder.from(queryParams.from().get());
-        }
-        if (queryParams.to().isPresent()) {
-            builder.to(queryParams.to().get());
-        }
-        if (queryParams.version().isPresent()) {
-            builder.version(queryParams.version().get());
-        }
-        return builder;
-    }
-
-    /**
      * @see QueryBuilder#withChildValueObjects()
      */
     public QueryParamsBuilder withChildValueObjects(boolean aggregate) {

@@ -46,4 +46,9 @@ public class InstanceId extends GlobalId {
     private String getCdoIdAsString(){
         return ReflectionUtil.reflectiveToString(cdoId, getMappedToStringFunction());
     }
+
+    @Override
+    public String toString() {
+        return getTypeNameShort()+"/"+getCdoIdAsString();
+    }
 }

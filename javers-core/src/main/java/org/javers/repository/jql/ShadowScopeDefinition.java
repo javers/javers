@@ -11,7 +11,7 @@ class ShadowScopeDefinition {
         this.maxGapsToFill = maxGapsToFill;
     }
 
-    ShadowScope getShadowScope() {
+    ShadowScope getScope() {
         return shadowScope;
     }
 
@@ -21,8 +21,8 @@ class ShadowScopeDefinition {
 
     @Override
     public String toString() {
-        return "ShadowScope{"+ToStringBuilder.toStringSimple(
+        return ToStringBuilder.toString(this,
                 "shadowScope", shadowScope,
-                "maxGapsToFill", maxGapsToFill) +"}";
+                "maxGapsToFill", maxGapsToFill);
     }
 }

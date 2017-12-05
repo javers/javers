@@ -1,17 +1,23 @@
 package org.javers.repository.jql;
 
-import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.commit.CommitId;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.QueryParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+
+import static org.javers.repository.jql.ShadowScope.DEEP_PLUS;
 
 /**
  * JaversRepository query.
@@ -24,11 +30,14 @@ import java.util.Set;
  * @author bartosz.walacik
  */
 public class JqlQuery {
+    public static final String JQL_LOGGER_NAME = "org.javers.JQL";
+    private static final Logger logger = LoggerFactory.getLogger(JQL_LOGGER_NAME);
 
-    private final QueryParams queryParams;
+    private QueryParams queryParams;
     private final FilterDefinition filterDefinition;
-    private Filter filter;
     private final ShadowScopeDefinition shadowScopeDef;
+    private Filter filter;
+    private Stats stats;
 
     JqlQuery(FilterDefinition filter, QueryParams queryParams, ShadowScopeDefinition shadowScope) {
         Validate.argumentsAreNotNull(filter);
@@ -37,12 +46,17 @@ public class JqlQuery {
         this.shadowScopeDef = shadowScope;
     }
 
-    private void validate(){
+    void validate(){
         if (isAggregate()) {
             if (!(isClassQuery() || isInstanceIdQuery())) {
                 throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
                         "aggregate filter can be enabled only for byClass and byInstanceId queries");
             }
+        }
+
+        if (getShadowScope() != DEEP_PLUS && getMaxGapsToFill() > 0) {
+            throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
+                    "maxGapsToFill can be used only in the DEEP_PLUS query scope");
         }
     }
 
@@ -52,6 +66,7 @@ public class JqlQuery {
                 "  "+filter + "\n"+
                 "  "+queryParams + "\n" +
                 "  "+shadowScopeDef + "\n" +
+                "  "+stats+ "\n" +
                 "}";
     }
 
@@ -71,18 +86,6 @@ public class JqlQuery {
         return getFilter(IdFilter.class).get().getGlobalId();
     }
 
-    ShadowScope getShadowScope() {
-        return shadowScopeDef.getShadowScope();
-    }
-
-    int getShadowScopeMaxGapsToFill() {
-        return shadowScopeDef.getMaxGapsToFill();
-    }
-
-    String getChangedProperty(){
-        return queryParams.changedProperty().get();
-    }
-
     VoOwnerFilter getVoOwnerFilter() {
         return getFilter(VoOwnerFilter.class).get();
     }
@@ -95,8 +98,15 @@ public class JqlQuery {
         return Optional.empty();
     }
 
-    void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
+    void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper, QueryType queryType) {
+        this.stats = new Stats();
         this.filter = filterDefinition.compile(globalIdFactory, typeMapper);
+
+        if (queryType == QueryType.SHADOWS &&
+                (isInstanceIdQuery() || isClassQuery())) {
+            queryParams = QueryParams.forShadowQuery(queryParams);
+        }
+
         validate();
     }
 
@@ -135,5 +145,159 @@ public class JqlQuery {
 
     public boolean isAggregate() {
         return queryParams.isAggregate();
+    }
+
+    public int getMaxGapsToFill() {
+        return shadowScopeDef.getMaxGapsToFill();
+    }
+
+    public ShadowScope getShadowScope() {
+        return shadowScopeDef.getScope();
+    }
+
+    /**
+     * Shadow query execution statistics. Can be printed by:
+     * <pre>
+     * &lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
+     * </pre>
+     */
+    public Stats stats() {
+        return stats;
+    }
+
+    public static class Stats {
+        private long startTimestamp = System.currentTimeMillis();
+        private long endTimestamp;
+        private int dbQueriesCount;
+        private int allSnapshotsCount;
+        private int shallowSnapshotsCount;
+        private int deepPlusSnapshotsCount;
+        private int commitDeepSnapshotsCount;
+        private int childVOSnapshotsCount;
+        private int deepPlusGapsFilled;
+        private int deepPlusGapsLeft;
+
+        void logQueryInChildValueObjectScope(GlobalId reference, CommitId context, int snapshotsLoaded) {
+            validateChange();
+            logger.debug("CHILD_VALUE_OBJECT query for '{}' at commitId {}, {} snapshot(s) loaded",
+                    reference.toString(),
+                    context.value(),
+                    snapshotsLoaded);
+
+            dbQueriesCount++;
+            allSnapshotsCount += snapshotsLoaded;
+            childVOSnapshotsCount += snapshotsLoaded;
+        }
+
+        void logMaxGapsToFillExceededInfo(GlobalId reference) {
+            validateChange();
+            deepPlusGapsLeft++;
+            logger.debug("warning: object '" + reference.toString() +
+                         "' is outside of the DEEP_PLUS+{} scope" +
+                         ", references to this object will be nulled. " +
+                         "Increase maxGapsToFill and fill all gaps in your object graph.", deepPlusGapsFilled);
+        }
+
+        void logQueryInDeepPlusScope(GlobalId reference, CommitId context, int snapshotsLoaded) {
+            validateChange();
+            dbQueriesCount++;
+            allSnapshotsCount += snapshotsLoaded;
+            deepPlusSnapshotsCount += snapshotsLoaded;
+            deepPlusGapsFilled++;
+
+            logger.debug("DEEP_PLUS query for '{}' at commitId {}, {} snapshot(s) loaded, gaps filled so far: {}",
+                    reference.toString(),
+                    context.value(),
+                    snapshotsLoaded,
+                    deepPlusGapsFilled);
+        }
+
+        void logShallowQuery(List<CdoSnapshot> snapshots) {
+            validateChange();
+            logger.debug("SHALLOW query: {} snapshots loaded (entities: {}, valueObjects: {})", snapshots.size(),
+                    snapshots.stream().filter(it -> it.getGlobalId() instanceof InstanceId).count(),
+                    snapshots.stream().filter(it -> it.getGlobalId() instanceof ValueObjectId).count());
+            dbQueriesCount++;
+            allSnapshotsCount += snapshots.size();
+            shallowSnapshotsCount += snapshots.size();
+        }
+
+        void logQueryInCommitDeepScope(List<CdoSnapshot> snapshots) {
+            validateChange();
+            logger.debug("COMMIT_DEEP query: {} snapshots loaded", snapshots.size());
+            dbQueriesCount++;
+            allSnapshotsCount += snapshots.size();
+            commitDeepSnapshotsCount+=snapshots.size();
+        }
+
+        void stop() {
+            validateChange();
+            endTimestamp = System.currentTimeMillis();
+        }
+
+        @Override
+        public String toString() {
+            if (endTimestamp == 0){
+                return ToStringBuilder.toString(this,
+                        "executed", "?");
+            }
+            return ToStringBuilder.toStringBlockStyle(this, "  ",
+                    "executed in millis", endTimestamp-startTimestamp,
+                    "DB queries", dbQueriesCount,
+                    "all snapshots", allSnapshotsCount,
+                    "SHALLOW snapshots", shallowSnapshotsCount,
+                    "COMMIT_DEEP snapshots", commitDeepSnapshotsCount,
+                    "CHILD_VALUE_OBJECT snapshots", childVOSnapshotsCount,
+                    "DEEP_PLUS snapshots", deepPlusSnapshotsCount,
+                    "gaps filled", deepPlusGapsFilled,
+                    "gaps left!", deepPlusGapsLeft
+            );
+        }
+
+        public long getStartTimestamp() {
+            return startTimestamp;
+        }
+
+        public long getEndTimestamp() {
+            return endTimestamp;
+        }
+
+        public int getDbQueriesCount() {
+            return dbQueriesCount;
+        }
+
+        public int getAllSnapshotsCount() {
+            return allSnapshotsCount;
+        }
+
+        public int getShallowSnapshotsCount() {
+            return shallowSnapshotsCount;
+        }
+
+        public int getDeepPlusSnapshotsCount() {
+            return deepPlusSnapshotsCount;
+        }
+
+        public int getCommitDeepSnapshotsCount() {
+            return commitDeepSnapshotsCount;
+        }
+
+        public int getChildVOSnapshotsCount() {
+            return childVOSnapshotsCount;
+        }
+
+        public int getDeepPlusGapsFilled() {
+            return deepPlusGapsFilled;
+        }
+
+        public int getDeepPlusGapsLeft() {
+            return deepPlusGapsLeft;
+        }
+
+        private void validateChange() {
+            if (endTimestamp > 0) {
+                throw new RuntimeException(new IllegalAccessException("executed query can't be changed"));
+            }
+        }
     }
 }

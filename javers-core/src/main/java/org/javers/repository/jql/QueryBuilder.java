@@ -222,7 +222,8 @@ public class QueryBuilder {
     }
 
     /**
-     * @see #withChildValueObjects()
+     * Only for Snapshot and Changes queries, see {@link #withChildValueObjects()}
+     *
      * @since 2.1
      */
     public QueryBuilder withChildValueObjects(boolean aggregate) {
@@ -231,12 +232,13 @@ public class QueryBuilder {
     }
 
     /**
+     * Only for Snapshot and Changes queries.
      * When enabled, selects all child ValueObjects owned by selected Entities.
      * <br/><br/>
      *
-     * Can be used with all kind of queries.<br/><br/>
-     *
-     * For Shadow queries, it has additional effect &mdash; enables {@link ShadowScope#CHILD_VALUE_OBJECT}.
+     * This switch <b>has no effect on Shadow queries</b> because Shadows
+     * are always loaded together with their child ValueObjects
+     * (see  {@link ShadowScope#CHILD_VALUE_OBJECT}).
      *
      * @since 2.1
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
@@ -412,10 +414,10 @@ public class QueryBuilder {
 
     /**
      * Selects {@link ShadowScope#DEEP_PLUS}
-     * with <code></cpce>maxGapsToFill</code> = 10.
+     * with <code></cpce>maxGapsToFill</code> defaulted to <b>10</b>.
      * <br/><br/>
      *
-     * Read about query scopes in {@link Javers#findShadows(JqlQuery)} javadoc.
+     * Read more about query scopes in {@link Javers#findShadows(JqlQuery)} javadoc.
      * <br/><br/>
      *
      * Only for Shadow queries.
@@ -431,11 +433,15 @@ public class QueryBuilder {
      * Selects {@link ShadowScope#DEEP_PLUS} with given <code>maxGapsToFill</code>.
      * <br/><br/>
      *
-     * Read about query scopes in {@link Javers#findShadows(JqlQuery)} javadoc.
+     * Read more about Shadow query <b>scopes, profiling, and runtime statistics</b>
+     * in {@link Javers#findShadows(JqlQuery)} javadoc.
      * <br/><br/>
      *
      * Only for Shadow queries.
      *
+     * @param maxGapsToFill Limits the number of referenced entity Shadows to be eagerly loaded.
+     *                      The limit is global for a query. When it is exceeded,
+     *                      references to other entities are nulled. Collections of entities may not be fully loaded.
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      * @since 3.5
      */

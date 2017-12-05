@@ -79,4 +79,9 @@ public class ValueObjectId extends GlobalId {
 
         return joinedSegments;
     }
+
+    @Override
+    public String toString() {
+        return getOwnerId().toString() +"#"+ fragment;
+    }
 }
