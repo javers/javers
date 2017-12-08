@@ -18,6 +18,8 @@ import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
 import spock.lang.Unroll
 
+import javax.persistence.EmbeddedId
+
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.MappingStyle.BEAN
 import static org.javers.core.MappingStyle.FIELD
@@ -59,14 +61,19 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         then:
         DiffAssert.assertThat(diff).hasChanges(1).hasValueChangeAt("someVal",5,6)
 
-        DiffAssert.assertThat(diff).hasChanges(1).hasAffectedCdoId("...DummyEntityWithEmbeddedId/1,2")
+        diff.changes[0].affectedGlobalId.value().endsWith("DummyEntityWithEmbeddedId/1,2")
+    }
+
+    class DummyCompositePoint {
+        @EmbeddedId DummyPoint dummyPoint
+        int value
     }
 
     def "should use custom toString function when provided for building InstanceId"(){
         given:
         def javers = JaversBuilder.javers().registerValueWithCustomToString(DummyPoint, {x -> x.getStringId()}).build()
-        def left  = new DummyCompositePoint(new DummyPoint(1,2), 5)
-        def right = new DummyCompositePoint(new DummyPoint(1,2), 6)
+        def left  = new DummyCompositePoint(dummyPoint: new DummyPoint(1,2), value:5)
+        def right = new DummyCompositePoint(dummyPoint: new DummyPoint(1,2), value:6)
 
         when:
         def diff = javers.compare(left,right)

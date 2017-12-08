@@ -4,7 +4,6 @@ import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.TypeName
 import org.javers.core.metamodel.object.GlobalId
-import org.javers.core.metamodel.type.EntityType
 import spock.lang.Specification
 
 class CustomToStringExample extends Specification {
@@ -18,6 +17,10 @@ class CustomToStringExample extends Specification {
     class Point {
         double x
         double y
+
+        String myToString() {
+            "("+ (int)x +"," +(int)y + ")"
+        }
     }
 
     def "should use custom toString function for complex ID"(){
@@ -35,7 +38,7 @@ class CustomToStringExample extends Specification {
 
       when: "custom toString function"
       javers = JaversBuilder.javers()
-              .registerValueWithCustomToString(Point, {p -> "("+ (int)p.x +"," +(int)p.y + ")"})
+              .registerValueWithCustomToString(Point, {it.myToString()})
               .build()
       id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
 

@@ -4,8 +4,6 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.type.*;
 
-import java.util.Objects;
-
 /**
  * @author bartosz walacik
  */
@@ -23,20 +21,6 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
     public ValueChange calculateChanges(NodePair pair, JaversProperty property) {
         Object leftValue = pair.getLeftPropertyValue(property);
         Object rightValue = pair.getRightPropertyValue(property);
-
-        //special treatment for EmbeddedId - could be ValueObjects without good equals()
-        /*if (isIdProperty(pair, property)) {
-            PrimitiveOrValueType idPropertyType = property.getType();
-
-            if (Objects.equals(idPropertyType.smartToString(leftValue),
-                               idPropertyType.smartToString(rightValue))) {
-                return null;
-            }
-        } else {
-            if (property.getType().equals(leftValue, rightValue)) {
-                return null;
-            }
-        }*/
 
         if (property.getType().equals(leftValue, rightValue)) {
             return null;

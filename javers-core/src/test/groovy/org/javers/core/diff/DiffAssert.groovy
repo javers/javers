@@ -53,13 +53,6 @@ class DiffAssert {
         this
     }
 
-    DiffAssert hasAffectedCdoId(String affectedCdoId) {
-        ValueChange change = actual.changes.first()
-        assert change
-        assert change.affectedGlobalId.toString() == affectedCdoId
-        this
-    }
-
     DiffAssert hasReferenceChangeAt(String property, def oldRef, def newRef) {
         ReferenceChange change = actual.changes.find{it instanceof ReferenceChange && it.propertyName == property}
         assert change
@@ -72,21 +65,6 @@ class DiffAssert {
         assert actual.changes.find { it instanceof NewObject && it.affectedGlobalId == expectedId }
         this
     }
-
-    /*
-    DiffAssert hasNewObject(def expectedId, Map<String, Object> expectedInitialState){
-        assert actual.changes.find{it instanceof NewObject && it.affectedCdoId == expectedId}
-
-        expectedInitialState.entrySet().each{ entry ->
-            PropertyChange change = actual.changes.find{it instanceof PropertyChange &&
-                                                        it.affectedCdoId == expectedId &&
-                                                        it.propertyName == entry.key}
-            assert change, "no PropertyChange for "+ entry.key
-            assert !change.left
-            assert change.right ==  entry.value
-        }
-        this
-    }*/
 
     DiffAssert hasListReferenceAddedAt(String property, def addedRef){
         ListChange change = actual.changes.find{it instanceof ListChange && it.propertyName == property}

@@ -90,7 +90,7 @@ public class EntityType extends ManagedType {
      * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
      * @throws JaversException NOT_INSTANCE_OF
      */
-    Object getIdOf(Object instance) {
+    private Object getIdOf(Object instance) {
         Validate.argumentIsNotNull(instance);
 
         if (!isInstance(instance)) {
@@ -104,7 +104,7 @@ public class EntityType extends ManagedType {
         return cdoId;
     }
 
-    String localIdAsString(Object localId) {
+    private String localIdAsString(Object localId) {
         PrimitiveOrValueType idPropertyType = getIdProperty().getType();
         return idPropertyType.smartToString(localId);
     }
