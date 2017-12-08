@@ -1,18 +1,16 @@
 package org.javers.core.metamodel.type;
 
+import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
-
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -25,7 +23,6 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 class TypeMapperState {
     private final Map<String, JaversType> mappedTypes = new ConcurrentHashMap<>();
     private final Map<DuckType, Class> mappedTypeNames = new ConcurrentHashMap<>();
-    private final Map<Class, Function<Object, String>> mappedToStringFunction = new ConcurrentHashMap<>();
     private final TypeFactory typeFactory;
     private final ValueType OBJECT_TYPE = new ValueType(Object.class);
 
@@ -189,13 +186,5 @@ class TypeMapperState {
 
     private void putToMap(Type javaType, JaversType javersType) {
         mappedTypes.put(javaType.toString(), javersType);
-    }
-
-    void putToMap(Class clazz, Function<Object, String> toString) {
-        mappedToStringFunction.put(clazz, toString);
-    }
-
-    public Map<Class, Function<Object, String>> getMappedToStringFunction() {
-        return mappedToStringFunction;
     }
 }

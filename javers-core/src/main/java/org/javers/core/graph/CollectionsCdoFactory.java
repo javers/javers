@@ -34,6 +34,6 @@ public class CollectionsCdoFactory {
         JaversProperty fixedJProperty = new JaversProperty(() -> typeMapper.getPropertyType(fixedProperty), fixedProperty);
 
         ValueObjectType valueObject = new ValueObjectType(wrapper.getClass(), Lists.asList(fixedJProperty));
-        return new CdoWrapper(wrapper, new UnboundedValueObjectId(valueObject.getName(), typeMapper.getMappedToStringFunction()), valueObject);
+        return new CdoWrapper(wrapper, new UnboundedValueObjectId(valueObject.getName()), valueObject);
     }
 }

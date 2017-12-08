@@ -35,6 +35,6 @@ public class DummyPoint {
     }
 
     public String getStringId() {
-        return x + "," + y;
+        return "("+ x + "," + y + ")";
     }
 }

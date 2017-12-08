@@ -1,7 +1,6 @@
 package org.javers.core;
 
 import com.google.gson.TypeAdapter;
-
 import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
@@ -24,27 +23,10 @@ import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
-import org.javers.core.metamodel.annotation.DiffIgnore;
-import org.javers.core.metamodel.annotation.Entity;
-import org.javers.core.metamodel.annotation.TypeName;
-import org.javers.core.metamodel.annotation.Value;
-import org.javers.core.metamodel.annotation.ValueObject;
-import org.javers.core.metamodel.clazz.ClientsClassDefinition;
-import org.javers.core.metamodel.clazz.CustomDefinition;
-import org.javers.core.metamodel.clazz.EntityDefinition;
-import org.javers.core.metamodel.clazz.EntityDefinitionBuilder;
-import org.javers.core.metamodel.clazz.IgnoredTypeDefinition;
-import org.javers.core.metamodel.clazz.ValueDefinition;
-import org.javers.core.metamodel.clazz.ValueObjectDefinition;
-import org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder;
+import org.javers.core.metamodel.annotation.*;
+import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.scanner.ScannerModule;
-import org.javers.core.metamodel.type.CustomType;
-import org.javers.core.metamodel.type.EntityType;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.TypeMapper;
-import org.javers.core.metamodel.type.TypeMapperModule;
-import org.javers.core.metamodel.type.ValueObjectType;
-import org.javers.core.metamodel.type.ValueType;
+import org.javers.core.metamodel.type.*;
 import org.javers.core.pico.AddOnsModule;
 import org.javers.core.snapshot.SnapshotModule;
 import org.javers.groovysupport.GroovyAddOns;
@@ -60,11 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -93,7 +71,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class JaversBuilder extends AbstractContainerBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
-    private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
+    private final Map<Class, ClientsClassDefinition> clientsClassDefinitions = new HashMap<>();
 
     private final Map<Class, Function<Object, String>> mappedToStringFunction = new ConcurrentHashMap<>();
 
@@ -215,7 +193,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         argumentIsNotNull(valueObjectClass);
-        clientsClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
+        registerClassDefinition(new ValueObjectDefinition(valueObjectClass));
         return this;
     }
 
@@ -246,7 +224,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerEntity(EntityDefinition entityDefinition){
         argumentIsNotNull(entityDefinition);
-        clientsClassDefinitions.add(entityDefinition);
+        registerClassDefinition(entityDefinition);
         return this;
     }
 
@@ -275,27 +253,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerValueObject(ValueObjectDefinition valueObjectDefinition) {
         argumentIsNotNull(valueObjectDefinition);
-        clientsClassDefinitions.add(valueObjectDefinition);
-        return this;
-    }
-
-
-    /**
-     * Registers a toString function to use in the globalId_key field.
-     * Projected for legacy code when the toString method can't be changed.
-     *
-     * @param clazz
-     * @param toString the method who will be used as toString Object
-     * @since 3.7.6
-     */
-    public  <T> JaversBuilder registerToStringFunction(Class<T> clazz, Function<T, String> toString) {
-        mappedToStringFunction.put(clazz, (Function<Object, String>) toString);
+        registerClassDefinition(valueObjectDefinition);
         return this;
     }
 
     /**
      * Comma separated list of packages.<br/>
-     * Allows you to register all your classes with &#64;{@link TypeName} annotation
+     * Allows you to registerClassDefinition all your classes with &#64;{@link TypeName} annotation
      * in order to use them in all kinds of JQL queries<br/>
      * (without getting TYPE_NAME_NOT_FOUND exception).
      *
@@ -349,13 +313,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * Values are compared using default {@link Object#equals(Object)}.
      * If you don't want to use it,
-     * register a custom value comparator with {@link #registerValue(Class, CustomValueComparator)}.
+     * registerClassDefinition a custom value comparator with {@link #registerValue(Class, CustomValueComparator)}.
      *
      * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
      */
     public JaversBuilder registerValue(Class<?> valueClass) {
         argumentIsNotNull(valueClass);
-        clientsClassDefinitions.add(new ValueDefinition(valueClass));
+        registerClassDefinition(new ValueDefinition(valueClass));
         return this;
     }
 
@@ -393,7 +357,36 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public <T> JaversBuilder registerValue(Class<T> valueClass, CustomValueComparator<T> customValueComparator) {
         argumentsAreNotNull(valueClass, customValueComparator);
-        clientsClassDefinitions.add(new ValueDefinition(valueClass, customValueComparator));
+
+        if (!clientsClassDefinitions.containsKey(valueClass)){
+            registerClassDefinition(new ValueDefinition(valueClass));
+        }
+        ValueDefinition def = getClassDefinition(valueClass);
+        def.setCustomValueComparator(customValueComparator);
+
+        return this;
+    }
+
+    /**
+     * Only for @ID value.
+     *
+     * TODO
+     *
+     * Registers a toString function to use in the globalId_key field.
+     * Projected for legacy code when the toString method can't be changed.
+     *
+     * @param toString the function to be used instead of Object.toString()
+     * @since 3.7.6
+     */
+    public <T> JaversBuilder registerValueWithCustomToString(Class<T> valueClass, Function<T, String> toString) {
+        argumentsAreNotNull(valueClass, toString);
+
+        if (!clientsClassDefinitions.containsKey(valueClass)){
+            registerClassDefinition(new ValueDefinition(valueClass));
+        }
+        ValueDefinition def = getClassDefinition(valueClass);
+        def.setToStringFunction((Function)toString);
+
         return this;
     }
 
@@ -407,7 +400,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerIgnoredClass(Class<?> ignoredClass) {
         argumentIsNotNull(ignoredClass);
-        clientsClassDefinitions.add(new IgnoredTypeDefinition(ignoredClass));
+        registerClassDefinition(new IgnoredTypeDefinition(ignoredClass));
         return this;
     }
 
@@ -572,7 +565,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @see CustomType
      */
     public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
-        clientsClassDefinitions.add(new CustomDefinition(customType));
+        registerClassDefinition(new CustomDefinition(customType));
         bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
     }
@@ -611,14 +604,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private void mapRegisteredClasses() {
         TypeMapper typeMapper = typeMapper();
-        for (ClientsClassDefinition def : clientsClassDefinitions) {
+        for (ClientsClassDefinition def : clientsClassDefinitions.values()) {
             typeMapper.registerClientsClass(def);
         }
-    }
-
-    private void mapRegisteredToStringFunction() {
-        TypeMapper typeMapper = typeMapper();
-        mappedToStringFunction.forEach( (clazz, function) -> typeMapper.addToString(clazz, function));
     }
 
     private TypeMapper typeMapper() {
@@ -653,7 +641,6 @@ public class JaversBuilder extends AbstractContainerBuilder {
     private void bootManagedTypeModule() {
         addModule(new TypeMapperModule(getContainer()));
         mapRegisteredClasses();
-        mapRegisteredToStringFunction();
     }
 
     /**
@@ -686,7 +673,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private void bootRepository(){
         if (repository == null){
-            logger.info("using fake InMemoryRepository, register actual implementation via JaversBuilder.registerJaversRepository()");
+            logger.info("using fake InMemoryRepository, registerClassDefinition actual implementation via JaversBuilder.registerJaversRepository()");
             addModule(new InMemoryRepositoryModule(getContainer()));
             repository = getContainerComponent(JaversRepository.class);
         } else {
@@ -696,5 +683,14 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
        //JaversExtendedRepository can be created after users calls JaversBuilder.registerJaversRepository()
         addComponent(JaversExtendedRepository.class);
+    }
+
+    private <T extends ClientsClassDefinition> T getClassDefinition(Class<?> baseJavaClass) {
+        return (T)clientsClassDefinitions.get(baseJavaClass);
+    }
+
+    private void registerClassDefinition(ClientsClassDefinition clientsClassDefinition) {
+        argumentIsNotNull(clientsClassDefinition);
+        clientsClassDefinitions.put(clientsClassDefinition.getBaseJavaClass(), clientsClassDefinition);
     }
 }

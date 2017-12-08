@@ -9,8 +9,6 @@ import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.type.EntityType
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
-
-import static org.javers.core.metamodel.object.InstanceId.createFromInstance
 import static org.javers.core.model.DummyUser.dummyUser
 
 
@@ -19,7 +17,7 @@ abstract class ObjectNodeTest extends Specification {
     protected def createEntity
 
     private ObjectNode objectNode(Object cdo, EntityType entity) {
-        new ObjectNode<>(new CdoWrapper(cdo, createFromInstance(cdo, entity, Maps.newHashMap()), entity));
+        new ObjectNode<>(new CdoWrapper(cdo, entity.createIdFromInstance(cdo), entity));
     }
 
     def "should hold Entity reference"() {
@@ -44,7 +42,7 @@ abstract class ObjectNodeTest extends Specification {
         ObjectNode wrapper = objectNode(cdo, entity)
 
         then:
-        wrapper.globalId == InstanceId.createFromInstance(cdo, entity, Maps.newHashMap())
+        wrapper.globalId == entity.createIdFromInstance(cdo)
     }
 
     def "should hold Cdo reference"() {

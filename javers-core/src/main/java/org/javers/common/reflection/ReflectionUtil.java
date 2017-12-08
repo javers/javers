@@ -1,6 +1,10 @@
 package org.javers.common.reflection;
 
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import org.javers.common.collections.Lists;
+
+import java.util.*;
+
 import org.javers.common.collections.Primitives;
 import org.javers.common.collections.Sets;
 import org.javers.common.collections.WellKnownValueTypes;
@@ -12,25 +16,7 @@ import org.javers.core.metamodel.property.Property;
 import org.slf4j.Logger;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import java.lang.reflect.*;
 
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -158,10 +144,10 @@ public class ReflectionUtil {
     	for (String className : names) {
             classes.add(classForName(className));
         }
-        return classes;
+    	return classes;
     }
 
-    public static Optional<Type> isConcreteType(Type javaType) {
+    public static Optional<Type> isConcreteType(Type javaType){
         if (javaType instanceof Class || javaType instanceof ParameterizedType) {
             return Optional.of(javaType);
         } else if (javaType instanceof WildcardType) {
@@ -232,31 +218,20 @@ public class ReflectionUtil {
         return parents;
     }
 
-    public static String reflectiveToString(Object cdoId, Map<Class, Function<Object, String>> mappedToStringFunction) {
-        if (cdoId == null){
-            return "";
-        }
-
-        if (cdoId instanceof String) {
-            return (String) cdoId;
-        }
-
-        if (WellKnownValueTypes.isValueType(cdoId) || Primitives.isPrimitiveOrBox(cdoId)){
-            return cdoId.toString();
-        }
+    public static String reflectiveToString(Object obj) {
+        Validate.argumentIsNotNull(obj);
 
         StringBuilder ret = new StringBuilder();
-        for (JaversField f : getAllPersistentFields(cdoId.getClass()) ){
-            Object val = f.getEvenIfPrivate(cdoId);
+        for (JaversField f : getAllPersistentFields(obj.getClass()) ){
+            Object val = f.getEvenIfPrivate(obj);
             if (val != null) {
-               Function<Object, String> toStringFunction = mappedToStringFunction.getOrDefault(val.getClass(), Object::toString);
-               ret.append(toStringFunction.apply(val));
+                ret.append(val.toString());
             }
             ret.append(",");
         }
 
         if (ret.length() == 0) {
-            return cdoId.toString();
+            return obj.toString();
         }
         else{
             ret.delete(ret.length()-1, ret.length());
@@ -286,5 +261,4 @@ public class ReflectionUtil {
     public static Set<Annotation> getAnnotations(Member member) {
         return unmodifiableSet(Sets.asSet(((AccessibleObject) member).getAnnotations()));
     }
-
 }

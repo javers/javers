@@ -4,10 +4,7 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.type.*;
 
-import java.util.Map;
-import java.util.function.Function;
-
-import static org.javers.common.reflection.ReflectionUtil.reflectiveToString;
+import java.util.Objects;
 
 /**
  * @author bartosz walacik
@@ -27,18 +24,22 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
         Object leftValue = pair.getLeftPropertyValue(property);
         Object rightValue = pair.getRightPropertyValue(property);
 
-        //special treatment for EmbeddedId - could be ValueObjects without good equals() implementation
-        if (isIdProperty(pair, property)) {
+        //special treatment for EmbeddedId - could be ValueObjects without good equals()
+        /*if (isIdProperty(pair, property)) {
+            PrimitiveOrValueType idPropertyType = property.getType();
 
-            Map<Class, Function<Object, String>> mappedToStringFunction = pair.getGlobalId().getMappedToStringFunction();
-            if (property.getType().equals(reflectiveToString(leftValue, mappedToStringFunction),
-                               reflectiveToString(rightValue, mappedToStringFunction))){
+            if (Objects.equals(idPropertyType.smartToString(leftValue),
+                               idPropertyType.smartToString(rightValue))) {
                 return null;
             }
-        }else {
+        } else {
             if (property.getType().equals(leftValue, rightValue)) {
                 return null;
             }
+        }*/
+
+        if (property.getType().equals(leftValue, rightValue)) {
+            return null;
         }
 
         return new ValueChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);

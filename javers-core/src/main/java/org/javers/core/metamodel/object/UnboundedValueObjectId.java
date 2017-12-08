@@ -1,8 +1,5 @@
 package org.javers.core.metamodel.object;
 
-import java.util.Map;
-import java.util.function.Function;
-
 /**
  * Unbounded ValueObject, has '/' as symbolic cdoId representation.
  * <p/>
@@ -19,8 +16,8 @@ import java.util.function.Function;
 public class UnboundedValueObjectId extends GlobalId {
     private static final String UNBOUNDED_FRAGMENT = "/";
 
-    public UnboundedValueObjectId(String typeName, Map<Class, Function<Object, String>> mappedToStringFunction) {
-        super(typeName, mappedToStringFunction);
+    public UnboundedValueObjectId(String typeName) {
+        super(typeName);
     }
 
     @Override

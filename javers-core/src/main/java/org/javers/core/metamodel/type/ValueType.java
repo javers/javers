@@ -1,5 +1,8 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.collections.Primitives;
+import org.javers.common.collections.WellKnownValueTypes;
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.custom.CustomValueComparator;
 import org.javers.core.json.JsonTypeAdapter;
@@ -7,6 +10,8 @@ import org.javers.core.json.JsonTypeAdapter;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Value class in client's domain model. Simple value holder.
@@ -30,11 +35,30 @@ import java.time.LocalDateTime;
  * @author bartosz walacik
  */
 public class ValueType extends PrimitiveOrValueType {
+    private final Optional<Function<Object, String>> toStringFunction;
+
     public ValueType(Type baseJavaType) {
         super(baseJavaType);
+        toStringFunction = Optional.empty();
     }
 
-    ValueType(Type baseJavaType, CustomValueComparator customValueComparator) {
+    ValueType(Type baseJavaType, CustomValueComparator customValueComparator, Function<Object, String> toStringFunction) {
         super(baseJavaType, customValueComparator);
+        this.toStringFunction = Optional.ofNullable(toStringFunction);
+    }
+
+    @Override
+    public String smartToString(Object cdo) {
+        if (cdo == null){
+            return "";
+        }
+
+        if (WellKnownValueTypes.isValueType(cdo)){
+            return cdo.toString();
+        }
+
+        return toStringFunction
+                .map(f -> f.apply(cdo))
+                .orElse(ReflectionUtil.reflectiveToString(cdo));
     }
 }
