@@ -73,12 +73,24 @@ public class EntityType extends ManagedType {
     }
 
     /**
+     * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
+     * @throws JaversException NOT_INSTANCE_OF
+     */
+    public InstanceId createIdFromInstance(Object instance) {
+        return createIdFromLocalId(getIdOf(instance));
+    }
+
+    public InstanceId createIdFromLocalId(Object localId) {
+        return new InstanceId(getName(), localId, localIdAsString(localId));
+    }
+
+    /**
      * @param instance instance of {@link #getBaseJavaClass()}
      * @return returns ID of given instance (value of idProperty)
      * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
      * @throws JaversException NOT_INSTANCE_OF
      */
-    public Object getIdOf(Object instance) {
+    private Object getIdOf(Object instance) {
         Validate.argumentIsNotNull(instance);
 
         if (!isInstance(instance)) {
@@ -90,6 +102,11 @@ public class EntityType extends ManagedType {
             throw new JaversException(JaversExceptionCode.ENTITY_INSTANCE_WITH_NULL_ID, getName(), getIdProperty().getName());
         }
         return cdoId;
+    }
+
+    private String localIdAsString(Object localId) {
+        PrimitiveOrValueType idPropertyType = getIdProperty().getType();
+        return idPropertyType.smartToString(localId);
     }
 
     @Override

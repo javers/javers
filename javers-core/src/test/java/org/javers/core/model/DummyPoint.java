@@ -33,4 +33,8 @@ public class DummyPoint {
     int getY() {
         return y;
     }
+
+    public String getStringId() {
+        return "("+ x + "," + y + ")";
+    }
 }

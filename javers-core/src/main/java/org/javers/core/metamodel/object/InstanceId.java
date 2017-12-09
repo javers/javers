@@ -1,7 +1,6 @@
 package org.javers.core.metamodel.object;
 
 import org.javers.common.exception.JaversException;
-import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.type.EntityType;
 
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -13,19 +12,20 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  */
 public class InstanceId extends GlobalId {
     private final Object cdoId;
+    private final String cdoIdAsString;
 
     InstanceId(String typeName, Object cdoId) {
         super(typeName);
         argumentsAreNotNull(cdoId);
         this.cdoId = cdoId;
+        this.cdoIdAsString = cdoId.toString();
     }
 
-    /**
-     * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
-     * @throws JaversException NOT_INSTANCE_OF
-     */
-    public static InstanceId createFromInstance(Object instance, EntityType entity){
-        return new InstanceId(entity.getName(), entity.getIdOf(instance));
+    public InstanceId(String typeName, Object cdoId, String cdoIdAsString) {
+        super(typeName);
+        argumentsAreNotNull(cdoId, cdoIdAsString);
+        this.cdoId = cdoId;
+        this.cdoIdAsString = cdoIdAsString;
     }
 
     /**
@@ -37,15 +37,11 @@ public class InstanceId extends GlobalId {
     }
 
     public String value() {
-        return getTypeName()+"/"+getCdoIdAsString();
-    }
-
-    private String getCdoIdAsString(){
-        return ReflectionUtil.reflectiveToString(cdoId);
+        return getTypeName()+"/"+cdoIdAsString;
     }
 
     @Override
     public String toString() {
-        return getTypeNameShort()+"/"+getCdoIdAsString();
+        return getTypeNameShort()+"/"+cdoIdAsString;
     }
 }

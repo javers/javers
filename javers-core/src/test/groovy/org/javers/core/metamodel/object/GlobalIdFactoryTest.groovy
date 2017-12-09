@@ -1,7 +1,9 @@
 package org.javers.core.metamodel.object
 
 import org.javers.core.model.DummyAddress
+import org.javers.core.model.DummyEntityWithEmbeddedId
 import org.javers.core.model.DummyNetworkAddress
+import org.javers.core.model.DummyPoint
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
@@ -18,6 +20,17 @@ class GlobalIdFactoryTest extends Specification {
     @Shared
     GlobalIdFactory globalIdFactory = javersTestAssembly().globalIdFactory
 
+    def "should build value() from typeName and reflectiveToString() for Embedded Id "() {
+        when:
+        def instanceId = globalIdFactory.createInstanceId(
+                new DummyEntityWithEmbeddedId(point: new DummyPoint(1,3)))
+
+        then:
+        instanceId.typeName == DummyEntityWithEmbeddedId.class.name
+        instanceId.cdoId.x == 1
+        instanceId.cdoId.y == 3
+        instanceId.value() == instanceId.typeName+"/1,3"
+    }
     @Unroll
     def "should infer valueObjectType from path when path is #pathType"(){
       when:

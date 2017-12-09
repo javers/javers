@@ -17,9 +17,9 @@ import org.javers.core.diff.custom.CustomValueComparator;
 import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.TailoredJaversMemberFactoryModule;
+import org.javers.core.json.JsonAdvancedTypeAdapter;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.json.JsonConverterBuilder;
-import org.javers.core.json.JsonAdvancedTypeAdapter;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
@@ -43,7 +43,10 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
+import static org.javers.common.reflection.ReflectionUtil.*;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -69,7 +72,9 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class JaversBuilder extends AbstractContainerBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
-    private final Set<ClientsClassDefinition> clientsClassDefinitions = new HashSet<>();
+    private final Map<Class, ClientsClassDefinition> clientsClassDefinitions = new HashMap<>();
+
+    private final Map<Class, Function<Object, String>> mappedToStringFunction = new ConcurrentHashMap<>();
 
     private final Set<Class> classesToScan = new HashSet<>();
 
@@ -92,13 +97,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
         //conditional plugins
         conditionalTypesPlugins = new HashSet<>();
 
-        if (ReflectionUtil.isClassPresent("groovy.lang.MetaClass")) {
+        if (isClassPresent("groovy.lang.MetaClass")) {
             conditionalTypesPlugins.add(new GroovyAddOns());
         }
-        if (ReflectionUtil.isClassPresent("org.joda.time.LocalDate")){
+        if (isClassPresent("org.joda.time.LocalDate")){
             conditionalTypesPlugins.add(new JodaAddOns());
         }
-        if (ReflectionUtil.isClassPresent("com.google.common.collect.Multimap")) {
+        if (isClassPresent("com.google.common.collect.Multimap")) {
             conditionalTypesPlugins.add(new GuavaAddOns());
         }
 
@@ -189,7 +194,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         argumentIsNotNull(valueObjectClass);
-        clientsClassDefinitions.add(new ValueObjectDefinition(valueObjectClass));
+        registerClassDefinition(new ValueObjectDefinition(valueObjectClass));
         return this;
     }
 
@@ -220,7 +225,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerEntity(EntityDefinition entityDefinition){
         argumentIsNotNull(entityDefinition);
-        clientsClassDefinitions.add(entityDefinition);
+        registerClassDefinition(entityDefinition);
         return this;
     }
 
@@ -249,13 +254,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerValueObject(ValueObjectDefinition valueObjectDefinition) {
         argumentIsNotNull(valueObjectDefinition);
-        clientsClassDefinitions.add(valueObjectDefinition);
+        registerClassDefinition(valueObjectDefinition);
         return this;
     }
 
     /**
      * Comma separated list of packages.<br/>
-     * Allows you to register all your classes with &#64;{@link TypeName} annotation
+     * Allows you to registerClassDefinition all your classes with &#64;{@link TypeName} annotation
      * in order to use them in all kinds of JQL queries<br/>
      * (without getting TYPE_NAME_NOT_FOUND exception).
      *
@@ -269,7 +274,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
         long start = System.currentTimeMillis();
         logger.info("scanning package(s): {}", packagesToScan);
-        List<Class<?>> scan = ReflectionUtil.findClasses(TypeName.class, packagesToScan.replaceAll(" ","").split(","));
+        List<Class<?>> scan = findClasses(TypeName.class, packagesToScan.replaceAll(" ","").split(","));
 		for (Class<?> c : scan) {
 			scanTypeName(c);
 		}
@@ -309,13 +314,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * Values are compared using default {@link Object#equals(Object)}.
      * If you don't want to use it,
-     * register a custom value comparator with {@link #registerValue(Class, CustomValueComparator)}.
+     * registerClassDefinition a custom value comparator with {@link #registerValue(Class, CustomValueComparator)}.
      *
      * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
      */
     public JaversBuilder registerValue(Class<?> valueClass) {
         argumentIsNotNull(valueClass);
-        clientsClassDefinitions.add(new ValueDefinition(valueClass));
+        registerClassDefinition(new ValueDefinition(valueClass));
         return this;
     }
 
@@ -353,7 +358,81 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public <T> JaversBuilder registerValue(Class<T> valueClass, CustomValueComparator<T> customValueComparator) {
         argumentsAreNotNull(valueClass, customValueComparator);
-        clientsClassDefinitions.add(new ValueDefinition(valueClass, customValueComparator));
+
+        if (!clientsClassDefinitions.containsKey(valueClass)){
+            registerClassDefinition(new ValueDefinition(valueClass));
+        }
+        ValueDefinition def = getClassDefinition(valueClass);
+        def.setCustomValueComparator(customValueComparator);
+
+        return this;
+    }
+
+    /**
+     * For complex <code>ValueType</code> classes that are used as Entity Id.
+     * <br/><br/>
+     *
+     * Registers a custom <code>toString</code> function that will be used for creating
+     * <code>GlobalId</code> for Entities,
+     * instead of default {@link ReflectionUtil#reflectiveToString(Object)}.
+     * <br/><br/>
+     *
+     * For example:
+     *
+     * <pre>
+     * class Entity {
+     *     &#64;Id Point id
+     *     String data
+     * }
+     *
+     * class Point {
+     *     double x
+     *     double y
+     *
+     *     String myToString() {
+     *         "("+ (int)x +"," +(int)y + ")"
+     *     }
+     * }
+     *
+     * def "should use custom toString function for complex Id"(){
+     *   given:
+     *     Entity entity = new Entity(
+     *     id: new Point(x: 1/3, y: 4/3))
+     *
+     *   when: "default reflectiveToString function"
+     *     def javers = JaversBuilder.javers().build()
+     *     GlobalId id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
+     *
+     *   then:
+     *     id.value() == "com.mypackage.Entity/0.3333333333,1.3333333333"
+     *
+     *   when: "custom toString function"
+     *     javers = JaversBuilder.javers()
+     *             .registerValueWithCustomToString(Point, {it.myToString()}).build()
+     *     id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
+     *
+     *   then:
+     *     id.value() == "com.mypackage.Entity/(0,1)"
+     * }
+     * </pre>
+     *
+     * For <code>ValueType</code> you can register both
+     * custom <code>toString</code> function and <code>CustomValueComparator</code>.
+     *
+     * @param toString should return String value of a given object
+     * @see ValueType
+     * @see #registerValue(Class, CustomValueComparator)
+     * @since 3.7.6
+     */
+    public <T> JaversBuilder registerValueWithCustomToString(Class<T> valueClass, Function<T, String> toString) {
+        argumentsAreNotNull(valueClass, toString);
+
+        if (!clientsClassDefinitions.containsKey(valueClass)){
+            registerClassDefinition(new ValueDefinition(valueClass));
+        }
+        ValueDefinition def = getClassDefinition(valueClass);
+        def.setToStringFunction((Function)toString);
+
         return this;
     }
 
@@ -367,7 +446,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerIgnoredClass(Class<?> ignoredClass) {
         argumentIsNotNull(ignoredClass);
-        clientsClassDefinitions.add(new IgnoredTypeDefinition(ignoredClass));
+        registerClassDefinition(new IgnoredTypeDefinition(ignoredClass));
         return this;
     }
 
@@ -532,7 +611,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @see CustomType
      */
     public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
-        clientsClassDefinitions.add(new CustomDefinition(customType));
+        registerClassDefinition(new CustomDefinition(customType));
         bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
     }
@@ -571,7 +650,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private void mapRegisteredClasses() {
         TypeMapper typeMapper = typeMapper();
-        for (ClientsClassDefinition def : clientsClassDefinitions) {
+        for (ClientsClassDefinition def : clientsClassDefinitions.values()) {
             typeMapper.registerClientsClass(def);
         }
     }
@@ -640,7 +719,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private void bootRepository(){
         if (repository == null){
-            logger.info("using fake InMemoryRepository, register actual implementation via JaversBuilder.registerJaversRepository()");
+            logger.info("using fake InMemoryRepository, registerClassDefinition actual implementation via JaversBuilder.registerJaversRepository()");
             addModule(new InMemoryRepositoryModule(getContainer()));
             repository = getContainerComponent(JaversRepository.class);
         } else {
@@ -650,5 +729,14 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
        //JaversExtendedRepository can be created after users calls JaversBuilder.registerJaversRepository()
         addComponent(JaversExtendedRepository.class);
+    }
+
+    private <T extends ClientsClassDefinition> T getClassDefinition(Class<?> baseJavaClass) {
+        return (T)clientsClassDefinitions.get(baseJavaClass);
+    }
+
+    private void registerClassDefinition(ClientsClassDefinition clientsClassDefinition) {
+        argumentIsNotNull(clientsClassDefinition);
+        clientsClassDefinitions.put(clientsClassDefinition.getBaseJavaClass(), clientsClassDefinition);
     }
 }

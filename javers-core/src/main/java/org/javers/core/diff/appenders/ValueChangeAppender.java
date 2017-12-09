@@ -3,7 +3,6 @@ package org.javers.core.diff.appenders;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.type.*;
-import static org.javers.common.reflection.ReflectionUtil.reflectiveToString;
 
 /**
  * @author bartosz walacik
@@ -23,16 +22,8 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
         Object leftValue = pair.getLeftPropertyValue(property);
         Object rightValue = pair.getRightPropertyValue(property);
 
-        //special treatment for EmbeddedId - could be ValueObjects without good equals() implementation
-        if (isIdProperty(pair, property)) {
-            if (property.getType().equals(reflectiveToString(leftValue),
-                               reflectiveToString(rightValue))){
-                return null;
-            }
-        }else {
-            if (property.getType().equals(leftValue, rightValue)) {
-                return null;
-            }
+        if (property.getType().equals(leftValue, rightValue)) {
+            return null;
         }
 
         return new ValueChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);

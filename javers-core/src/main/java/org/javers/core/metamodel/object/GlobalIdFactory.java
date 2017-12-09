@@ -6,8 +6,6 @@ import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.metamodel.type.*;
 import org.javers.core.snapshot.ObjectHasher;
-import org.javers.guava.MultimapType;
-import org.javers.guava.MultisetType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.jql.UnboundedValueObjectIdDTO;
@@ -46,7 +44,7 @@ public class GlobalIdFactory {
         ManagedType targetManagedType = typeMapper.getJaversManagedType(targetCdo.getClass());
 
         if (targetManagedType instanceof EntityType) {
-            return InstanceId.createFromInstance(targetCdo, (EntityType) targetManagedType);
+            return ((EntityType) targetManagedType).createIdFromInstance(targetCdo);
         }
 
         if (targetManagedType instanceof ValueObjectType && !hasOwner(ownerContext)) {
@@ -93,11 +91,7 @@ public class GlobalIdFactory {
 		
         instance = objectAccessHook.access(instance);
         EntityType entityType = typeMapper.getJaversManagedType(instance.getClass(), EntityType.class);
-        return createInstanceId(entityType.getIdOf(instance), entityType);
-    }
-
-    public InstanceId createInstanceId(Object localId, EntityType entity){
-        return new InstanceId(entity.getName(), localId);
+        return entityType.createIdFromInstance(instance);
     }
 
     @Deprecated
@@ -107,19 +101,13 @@ public class GlobalIdFactory {
         return new ValueObjectId(valueObjectType.getName(), owner, fragment);
     }
 
-    public ValueObjectId createValueObjectId(String voTypeName, GlobalId owner, String fragment){
-        Validate.argumentsAreNotNull(voTypeName, owner, fragment);
-        ValueObjectType valueObjectType = typeMapper.getJaversManagedType(voTypeName, ValueObjectType.class);
-        return new ValueObjectId(valueObjectType.getName(), owner, fragment);
-    }
-
     public void touchValueObjectFromPath(ManagedType ownerType, String fragment){
         pathParser.parseChildValueObject(ownerType, fragment);
     }
 
     public InstanceId createInstanceId(Object localId, Class entityClass){
         EntityType entity = typeMapper.getJaversManagedType(entityClass, EntityType.class);
-        return createInstanceId(localId, entity);
+        return entity.createIdFromLocalId(localId);
     }
 
     public GlobalId createFromDto(GlobalIdDTO globalIdDTO){

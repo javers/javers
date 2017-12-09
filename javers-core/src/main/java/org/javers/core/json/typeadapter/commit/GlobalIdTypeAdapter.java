@@ -19,11 +19,9 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     static final String VALUE_OBJECT_FIELD = "valueObject";
     static final String FRAGMENT_FIELD = "fragment";
 
-    private final GlobalIdFactory globalIdFactory;
     private final TypeMapper typeMapper;
 
-    public GlobalIdTypeAdapter(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
-        this.globalIdFactory = globalIdFactory;
+    public GlobalIdTypeAdapter(TypeMapper typeMapper) {
         this.typeMapper = typeMapper;
     }
 
@@ -60,7 +58,7 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
         JsonElement cdoIdElement = jsonObject.get(CDO_ID_FIELD);
         Object cdoId = context.deserialize(cdoIdElement, entity.getIdProperty().getGenericType());
 
-        return globalIdFactory.createInstanceId(cdoId, entity);
+        return entity.createIdFromLocalId(cdoId);
     }
 
     @Override

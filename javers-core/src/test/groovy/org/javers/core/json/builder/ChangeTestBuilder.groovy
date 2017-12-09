@@ -12,6 +12,7 @@ import org.javers.core.diff.changetype.container.SetChange
 import org.javers.core.diff.changetype.map.EntryChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.type.EntityType
 import org.javers.core.metamodel.type.TypeMapper
 
 /**
@@ -71,6 +72,7 @@ class ChangeTestBuilder {
             return null
         }
 
-        return InstanceId.createFromInstance(cdo, typeMapper.getJaversType(cdo.getClass()))
+        EntityType entityType = typeMapper.getJaversType(cdo.getClass())
+        entityType.createIdFromInstance(cdo)
     }
 }

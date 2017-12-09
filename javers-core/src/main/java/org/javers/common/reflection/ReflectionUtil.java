@@ -218,22 +218,12 @@ public class ReflectionUtil {
         return parents;
     }
 
-    public static String reflectiveToString(Object cdoId) {
-        if (cdoId == null){
-            return "";
-        }
-
-        if (cdoId instanceof String) {
-            return (String) cdoId;
-        }
-
-        if (WellKnownValueTypes.isValueType(cdoId) || Primitives.isPrimitiveOrBox(cdoId)){
-            return cdoId.toString();
-        }
+    public static String reflectiveToString(Object obj) {
+        Validate.argumentIsNotNull(obj);
 
         StringBuilder ret = new StringBuilder();
-        for (JaversField f : getAllPersistentFields(cdoId.getClass()) ){
-            Object val = f.getEvenIfPrivate(cdoId);
+        for (JaversField f : getAllPersistentFields(obj.getClass()) ){
+            Object val = f.getEvenIfPrivate(obj);
             if (val != null) {
                 ret.append(val.toString());
             }
@@ -241,7 +231,7 @@ public class ReflectionUtil {
         }
 
         if (ret.length() == 0) {
-            return cdoId.toString();
+            return obj.toString();
         }
         else{
             ret.delete(ret.length()-1, ret.length());

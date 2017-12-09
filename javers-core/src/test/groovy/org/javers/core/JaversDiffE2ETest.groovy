@@ -18,6 +18,8 @@ import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
 import spock.lang.Unroll
 
+import javax.persistence.EmbeddedId
+
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.MappingStyle.BEAN
 import static org.javers.core.MappingStyle.FIELD
@@ -47,7 +49,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
       !property.looksLikeId()
     }
 
-    def "should compare objects with @EmbeddedId using Id reflectiveToString() to match instances"(){
+    def "should use reflectiveToString() to build InstanceId"(){
         given:
         def javers = JaversTestBuilder.newInstance()
         def left  = new DummyEntityWithEmbeddedId(point: new DummyPoint(1,2), someVal: 5)
@@ -58,6 +60,27 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
         then:
         DiffAssert.assertThat(diff).hasChanges(1).hasValueChangeAt("someVal",5,6)
+
+        diff.changes[0].affectedGlobalId.value().endsWith("DummyEntityWithEmbeddedId/1,2")
+    }
+
+    class DummyCompositePoint {
+        @EmbeddedId DummyPoint dummyPoint
+        int value
+    }
+
+    def "should use custom toString function when provided for building InstanceId"(){
+        given:
+        def javers = JaversBuilder.javers().registerValueWithCustomToString(DummyPoint, {x -> x.getStringId()}).build()
+        def left  = new DummyCompositePoint(dummyPoint: new DummyPoint(1,2), value:5)
+        def right = new DummyCompositePoint(dummyPoint: new DummyPoint(1,2), value:6)
+
+        when:
+        def diff = javers.compare(left,right)
+
+        then:
+        DiffAssert.assertThat(diff).hasChanges(1).hasValueChangeAt("value",5,6)
+        diff.changes.get(0).affectedGlobalId.value() == DummyCompositePoint.class.name+"/(1,2)"
     }
 
     def "should create NewObject for all nodes in initial diff"() {

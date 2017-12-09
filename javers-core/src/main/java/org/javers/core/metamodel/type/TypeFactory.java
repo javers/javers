@@ -42,16 +42,20 @@ class TypeFactory {
     JaversType create(ClientsClassDefinition def, ClassScan scan) {
         if (def instanceof CustomDefinition) {
             return new CustomType(def.getBaseJavaClass());
-        } else if (def instanceof EntityDefinition) {
+        } else
+        if (def instanceof EntityDefinition) {
             return entityTypeFactory.createEntity((EntityDefinition) def, scan);
-        } else if (def instanceof ValueObjectDefinition){
+        } else
+        if (def instanceof ValueObjectDefinition){
             return createValueObject((ValueObjectDefinition) def, scan);
-        } else if (def instanceof ValueDefinition) {
+        } else
+        if (def instanceof ValueDefinition) {
             ValueDefinition valueDefinition = (ValueDefinition) def;
-            return valueDefinition.getComparator()
-                    .map(comparator -> new ValueType(valueDefinition.getBaseJavaClass(), comparator))
-                    .orElse(new ValueType(valueDefinition.getBaseJavaClass()));
-        } else if (def instanceof IgnoredTypeDefinition) {
+            return new ValueType(valueDefinition.getBaseJavaClass(),
+                                 valueDefinition.getComparator(),
+                                 valueDefinition.getToStringFunction());
+        } else
+        if (def instanceof IgnoredTypeDefinition) {
             return new IgnoredType(def.getBaseJavaClass());
         } else {
            throw new IllegalArgumentException("unsupported definition " + def.getClass().getSimpleName());
