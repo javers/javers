@@ -23,7 +23,7 @@ class CustomToStringExample extends Specification {
         }
     }
 
-    def "should use custom toString function for complex ID"(){
+    def "should use custom toString function for complex Id"(){
       given:
       Entity entity = new Entity(
               id: new Point(x: 1/3, y: 4/3))

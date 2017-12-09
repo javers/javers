@@ -46,6 +46,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import static org.javers.common.reflection.ReflectionUtil.*;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -96,13 +97,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
         //conditional plugins
         conditionalTypesPlugins = new HashSet<>();
 
-        if (ReflectionUtil.isClassPresent("groovy.lang.MetaClass")) {
+        if (isClassPresent("groovy.lang.MetaClass")) {
             conditionalTypesPlugins.add(new GroovyAddOns());
         }
-        if (ReflectionUtil.isClassPresent("org.joda.time.LocalDate")){
+        if (isClassPresent("org.joda.time.LocalDate")){
             conditionalTypesPlugins.add(new JodaAddOns());
         }
-        if (ReflectionUtil.isClassPresent("com.google.common.collect.Multimap")) {
+        if (isClassPresent("com.google.common.collect.Multimap")) {
             conditionalTypesPlugins.add(new GuavaAddOns());
         }
 
@@ -273,7 +274,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
         long start = System.currentTimeMillis();
         logger.info("scanning package(s): {}", packagesToScan);
-        List<Class<?>> scan = ReflectionUtil.findClasses(TypeName.class, packagesToScan.replaceAll(" ","").split(","));
+        List<Class<?>> scan = findClasses(TypeName.class, packagesToScan.replaceAll(" ","").split(","));
 		for (Class<?> c : scan) {
 			scanTypeName(c);
 		}
@@ -368,14 +369,59 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Only for @ID value.
+     * For complex <code>ValueType</code> classes that are used as Entity Id.
+     * <br/><br/>
      *
-     * TODO
+     * Registers a custom <code>toString</code> function that will be used for creating
+     * <code>GlobalId</code> for Entities,
+     * instead of default {@link ReflectionUtil#reflectiveToString(Object)}.
+     * <br/><br/>
      *
-     * Registers a toString function to use in the globalId_key field.
-     * Projected for legacy code when the toString method can't be changed.
+     * For example:
      *
-     * @param toString the function to be used instead of Object.toString()
+     * <pre>
+     * class Entity {
+     *     &#64;Id Point id
+     *     String data
+     * }
+     *
+     * class Point {
+     *     double x
+     *     double y
+     *
+     *     String myToString() {
+     *         "("+ (int)x +"," +(int)y + ")"
+     *     }
+     * }
+     *
+     * def "should use custom toString function for complex Id"(){
+     *   given:
+     *     Entity entity = new Entity(
+     *     id: new Point(x: 1/3, y: 4/3))
+     *
+     *   when: "default reflectiveToString function"
+     *     def javers = JaversBuilder.javers().build()
+     *     GlobalId id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
+     *
+     *   then:
+     *     id.value() == "com.mypackage.Entity/0.3333333333,1.3333333333"
+     *
+     *   when: "custom toString function"
+     *     javers = JaversBuilder.javers()
+     *             .registerValueWithCustomToString(Point, {it.myToString()}).build()
+     *     id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
+     *
+     *   then:
+     *     id.value() == "com.mypackage.Entity/(0,1)"
+     * }
+     * </pre>
+     *
+     * For <code>ValueType</code> you can register both
+     * custom <code>toString</code> function and <code>CustomValueComparator</code>.
+     *
+     * @param toString should return String value of a given object
+     * @see ValueType
+     * @see #registerValue(Class, CustomValueComparator)
      * @since 3.7.6
      */
     public <T> JaversBuilder registerValueWithCustomToString(Class<T> valueClass, Function<T, String> toString) {
