@@ -29,9 +29,14 @@ class CommitPropertiesConverter {
         JsonArray propertiesArray = new JsonArray();
         if (properties != null) {
             for (Map.Entry<String, String> metadata : properties.entrySet()) {
+                String value = metadata.getValue();
+                if (value == null) {
+                    continue;
+                }
+
                 JsonObject propertyObject = new JsonObject();
                 propertyObject.add(PROPERTY_KEY_FIELD, new JsonPrimitive(metadata.getKey()));
-                propertyObject.add(PROPERTY_VALUE_FIELD, new JsonPrimitive(metadata.getValue()));
+                propertyObject.add(PROPERTY_VALUE_FIELD, new JsonPrimitive(value));
                 propertiesArray.add(propertyObject);
             }
         }
