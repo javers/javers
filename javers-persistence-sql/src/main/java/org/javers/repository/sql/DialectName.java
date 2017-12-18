@@ -14,7 +14,9 @@ public enum DialectName {
     ORACLE,
     MYSQL,
     /** Microsoft SQL Server*/
-    MSSQL;
+    MSSQL,
+    DB2,
+    DB2400;
 
     public DialectRegistry getPolyDialectName() {
         return DialectRegistry.valueOf(this.name());

@@ -24,6 +24,12 @@ public class DialectMapper {
         if (hibernateDialect instanceof MySQLDialect){
             return DialectName.MYSQL;
         }
+        if (hibernateDialect instanceof DB2400Dialect) {
+            return DialectName.DB2400;
+        }
+        if (hibernateDialect instanceof DB2Dialect) {
+            return DialectName.DB2;
+        }
 
         throw new JaversException(JaversExceptionCode.UNSUPPORTED_SQL_DIALECT, hibernateDialect.getClass().getSimpleName());
     }
