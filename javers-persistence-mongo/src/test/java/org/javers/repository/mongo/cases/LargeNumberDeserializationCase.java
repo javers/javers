@@ -21,7 +21,7 @@ public class LargeNumberDeserializationCase {
   public void setup() {
     MongoDatabase mongoDb = new Fongo("myDb").getDatabase("test");
 
-    MongoRepository mongoRepo = new MongoRepository(mongoDb);
+    MongoRepository mongoRepo = new MongoRepository(mongoDb, false);
     javers = JaversBuilder.javers().registerJaversRepository(mongoRepo).build();
   }
 

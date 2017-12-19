@@ -9,7 +9,6 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import java.util.Optional;
 import org.javers.common.string.RegexEscape;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
@@ -25,16 +24,33 @@ import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.mongo.model.MongoHeadId;
-import java.time.LocalDateTime;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.javers.common.collections.Lists.toImmutableList;
 import static org.javers.common.validation.Validate.conditionFulfilled;
 import static org.javers.repository.mongo.DocumentConverter.fromDocument;
 import static org.javers.repository.mongo.DocumentConverter.toDocument;
-import static org.javers.repository.mongo.MongoSchemaManager.*;
+import static org.javers.repository.mongo.MongoSchemaManager.CHANGED_PROPERTIES;
+import static org.javers.repository.mongo.MongoSchemaManager.COMMIT_AUTHOR;
+import static org.javers.repository.mongo.MongoSchemaManager.COMMIT_DATE;
+import static org.javers.repository.mongo.MongoSchemaManager.COMMIT_ID;
+import static org.javers.repository.mongo.MongoSchemaManager.COMMIT_PROPERTIES;
+import static org.javers.repository.mongo.MongoSchemaManager.GLOBAL_ID_ENTITY;
+import static org.javers.repository.mongo.MongoSchemaManager.GLOBAL_ID_FRAGMENT;
+import static org.javers.repository.mongo.MongoSchemaManager.GLOBAL_ID_KEY;
+import static org.javers.repository.mongo.MongoSchemaManager.GLOBAL_ID_OWNER_ID_ENTITY;
+import static org.javers.repository.mongo.MongoSchemaManager.GLOBAL_ID_VALUE_OBJECT;
+import static org.javers.repository.mongo.MongoSchemaManager.OBJECT_ID;
+import static org.javers.repository.mongo.MongoSchemaManager.SNAPSHOT_TYPE;
+import static org.javers.repository.mongo.MongoSchemaManager.SNAPSHOT_VERSION;
 
 /**
  * @author pawel szymczyk
@@ -48,20 +64,28 @@ public class MongoRepository implements JaversRepository {
     private final MapKeyDotReplacer mapKeyDotReplacer = new MapKeyDotReplacer();
     private final LatestSnapshotCache cache;
 
+    public MongoRepository(MongoDatabase mongo, boolean useTypeNameIndex) {
+        this(mongo, null, DEFAULT_CACHE_SIZE, useTypeNameIndex);
+    }
+
     public MongoRepository(MongoDatabase mongo) {
-        this(mongo, null, DEFAULT_CACHE_SIZE);
+        this(mongo, null, DEFAULT_CACHE_SIZE, false);
     }
 
     /**
      * @param cacheSize Size of the latest snapshots cache, default is 5000. Set 0 to disable.
      */
     public MongoRepository(MongoDatabase mongo, int cacheSize) {
-        this(mongo, null, cacheSize);
+        this(mongo, null, cacheSize, false);
     }
 
-    MongoRepository(MongoDatabase mongo, JsonConverter jsonConverter, int cacheSize) {
+    public MongoRepository(MongoDatabase mongo, JsonConverter jsonConverter, int cacheSize) {
+        this(mongo, jsonConverter, cacheSize, false);
+    }
+
+    private MongoRepository(MongoDatabase mongo, JsonConverter jsonConverter, int cacheSize, boolean useTypeNameIndex) {
         this.jsonConverter = jsonConverter;
-        this.mongoSchemaManager = new MongoSchemaManager(mongo);
+        this.mongoSchemaManager = new MongoSchemaManager(mongo, useTypeNameIndex);
         cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
     }
 

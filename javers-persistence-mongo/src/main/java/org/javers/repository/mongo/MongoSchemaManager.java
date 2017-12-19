@@ -5,10 +5,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.javers.repository.mongo.model.MongoHeadId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+import java.util.function.Function;
 
 /**
  * @author bartosz.walacik
@@ -30,50 +28,42 @@ class MongoSchemaManager {
     static final String OBJECT_ID = "_id";
     static final String SNAPSHOT_TYPE = "type";
 
-    private static final Logger logger = LoggerFactory.getLogger(MongoSchemaManager.class);
-
     private final MongoDatabase mongo;
+    private final boolean useTypeNameIndex;
+    private final Function<MongoCollection<Document>, Snapshots> factory;
+    private final CommitIdTypeMigration migration;
 
-    MongoSchemaManager(MongoDatabase mongo) {
+    MongoSchemaManager(MongoDatabase mongo, boolean useTypeNameIndex) {
+        this(mongo, useTypeNameIndex, Snapshots::new, new CommitIdTypeMigration());
+    }
+
+    MongoSchemaManager(MongoDatabase mongo, boolean useTypeNameIndex,
+                       Function<MongoCollection<Document>, Snapshots> factory, CommitIdTypeMigration migration) {
         this.mongo = mongo;
+        this.useTypeNameIndex = useTypeNameIndex;
+        this.factory = factory;
+        this.migration = migration;
     }
 
     public void ensureSchema() {
         //ensures collections and indexes
-        MongoCollection<Document> snapshots = snapshotsCollection();
-        snapshots.createIndex(new BasicDBObject(GLOBAL_ID_KEY, ASC));
-        snapshots.createIndex(new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, ASC));
-        snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
-        snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
-        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC));
+        MongoCollection<Document> documents = snapshotsCollection();
+        documents.createIndex(new BasicDBObject(GLOBAL_ID_KEY, ASC));
+        documents.createIndex(new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, ASC));
+        documents.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
+        documents.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
+        documents.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC));
 
         headCollection();
 
-        //schema migration script from JaVers 2.0 to 2.1
-        dropIndexIfExists(snapshots, GLOBAL_ID_ENTITY);
+        if (!useTypeNameIndex) {
+            //schema migration script from JaVers 2.0 to 2.1
+            Snapshots snapshots = factory.apply(documents);
+            snapshots.dropGlobalIdEntityIndex();
+        }
 
         //schema migration script from JaVers 1.1 to 1.2
-        Document doc = snapshots.find().first();
-        if (doc != null) {
-            Object stringCommitId = ((Map)doc.get("commitMetadata")).get("id");
-            if (stringCommitId instanceof String) {
-                logger.info("executing db migration script, from JaVers 1.1 to 1.2 ...");
-
-                Document update = new Document("eval",
-                        "function() { \n"+
-                                "    db.jv_snapshots.find().forEach( \n"+
-                                "      function(snapshot) { \n"+
-                                "        snapshot.commitMetadata.id = Number(snapshot.commitMetadata.id); \n"+
-                                "        db.jv_snapshots.save(snapshot); } \n" +
-                                "    ); "+
-                                "    return 'ok'; \n"+
-                                "}"
-                );
-
-                Document ret = mongo.runCommand(update);
-                logger.info("result: \n "+ ret.toJson());
-            }
-        }
+        migration.runOnInstance(mongo);
     }
 
     MongoCollection<Document> snapshotsCollection() {
@@ -82,19 +72,5 @@ class MongoSchemaManager {
 
     MongoCollection<Document> headCollection() {
         return mongo.getCollection(MongoHeadId.COLLECTION_NAME);
-    }
-
-    private static void dropIndexIfExists(MongoCollection<Document> col, String fieldName){
-        for (Document d : col.listIndexes()) {
-            if (d.get("key", Document.class).containsKey(fieldName)) {
-                logger.warn("Schema migration. Dropping index: "+fieldName +" ...");
-
-                try {
-                    col.dropIndex(fieldName);
-                }catch (Exception swallowed){} //because not implemented in Fongo
-
-                return;
-            }
-        }
     }
 }

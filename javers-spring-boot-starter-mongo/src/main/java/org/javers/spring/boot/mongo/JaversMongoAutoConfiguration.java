@@ -8,12 +8,17 @@ import org.javers.core.MappingStyle;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.mongo.MongoRepository;
-import org.javers.spring.auditable.*;
+import org.javers.spring.auditable.AuthorProvider;
+import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.EmptyPropertiesProvider;
+import org.javers.spring.auditable.MockAuthorProvider;
+import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
@@ -44,24 +49,24 @@ public class JaversMongoAutoConfiguration {
 
     @Bean(name = "javers")
     @ConditionalOnMissingBean
-    public Javers javers() {
-        logger.info("Starting javers-spring-boot-starter-mongo ...");
-
-        MongoDatabase mongoDatabase = mongoClient.getDatabase( mongoProperties.getMongoClientDatabase() );
-
-        logger.info("connecting to database: {}", mongoProperties.getMongoClientDatabase());
-
-        JaversRepository javersRepository = new MongoRepository(mongoDatabase);
-
+    public Javers javers(JaversRepository repository) {
         return JaversBuilder.javers()
                 .withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
                 .withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
                 .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
                 .withPrettyPrint(javersProperties.isPrettyPrint())
                 .withTypeSafeValues(javersProperties.isTypeSafeValues())
-                .registerJaversRepository(javersRepository)
+                .registerJaversRepository(repository)
                 .withPackagesToScan(javersProperties.getPackagesToScan())
                 .build();
+    }
+
+    @Bean(name = "repository")
+    @ConditionalOnMissingBean
+    public JaversRepository repository(@Value("${javers.dropIndexes:false}") boolean useTypeNameIndex) {
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(mongoProperties.getMongoClientDatabase());
+        logger.info("connecting to database: {}", mongoProperties.getMongoClientDatabase());
+        return new MongoRepository(mongoDatabase, useTypeNameIndex);
     }
 
     @Bean(name = "authorProvider")
