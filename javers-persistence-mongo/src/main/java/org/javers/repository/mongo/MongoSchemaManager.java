@@ -43,14 +43,12 @@ class MongoSchemaManager {
         MongoCollection<Document> snapshots = snapshotsCollection();
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_KEY, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_VALUE_OBJECT, ASC));
+        snapshots.createIndex(new BasicDBObject(GLOBAL_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
         snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC));
 
         headCollection();
-
-        //schema migration script from JaVers 2.0 to 2.1
-        dropIndexIfExists(snapshots, GLOBAL_ID_ENTITY);
 
         //schema migration script from JaVers 1.1 to 1.2
         Document doc = snapshots.find().first();
