@@ -4,9 +4,33 @@ import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.TypeName
 import org.javers.core.metamodel.object.GlobalId
+import org.javers.core.metamodel.object.InstanceId
 import spock.lang.Specification
 
 class CustomToStringExample extends Specification {
+
+    @TypeName("Person")
+    class Person {
+        @Id String name
+        String position
+    }
+
+    def "should map Person as EntityType"(){
+      given:
+      def bob = new Person(name: "Bob", position: "dev")
+      def javers = JaversBuilder.javers().build()
+
+      def personType = javers.getTypeMapping(Person)
+      def bobId = personType.createIdFromInstance(bob)
+
+      expect:
+      println "JaversType of Person: " + personType.prettyPrint()
+
+      println "Id of bob: '${bobId.value()}'"
+
+      bobId.value() == "Person/Bob"
+      bobId instanceof InstanceId
+    }
 
     @TypeName("Entity")
     class Entity {
