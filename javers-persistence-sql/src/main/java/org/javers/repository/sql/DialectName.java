@@ -13,9 +13,14 @@ public enum DialectName {
     POSTGRES,
     ORACLE,
     MYSQL,
+
     /** Microsoft SQL Server*/
     MSSQL,
+
+    /** incubating */
     DB2,
+
+    /** incubating */
     DB2400;
 
     public DialectRegistry getPolyDialectName() {

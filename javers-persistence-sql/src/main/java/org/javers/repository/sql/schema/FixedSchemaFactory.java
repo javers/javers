@@ -1,8 +1,6 @@
 package org.javers.repository.sql.schema;
 
-import org.polyjdbc.core.dialect.Dialect;
-import org.polyjdbc.core.dialect.OracleDialect;
-import org.polyjdbc.core.dialect.MysqlDialect;
+import org.polyjdbc.core.dialect.*;
 import org.polyjdbc.core.schema.model.LongAttributeBuilder;
 import org.polyjdbc.core.schema.model.RelationBuilder;
 import org.polyjdbc.core.schema.model.Schema;
@@ -149,10 +147,10 @@ public class FixedSchemaFactory extends SchemaNameAware {
         return schema;
     }
 
-    private void foreignKey(DBObjectName tableName, String fkColName, boolean notNull, String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
+    private void foreignKey(DBObjectName tableName, String fkColName, boolean isPartOfPrimaryKey, String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
         LongAttributeBuilder longAttributeBuilder = relationBuilder
                 .withAttribute().longAttr(fkColName);
-        if (notNull) {
+        if (isPartOfPrimaryKey && (dialect instanceof DB2Dialect && dialect instanceof DB2400Dialect)) {
             longAttributeBuilder.notNull();
         }
         longAttributeBuilder.and()
