@@ -22,8 +22,17 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
         Object leftValue = pair.getLeftPropertyValue(property);
         Object rightValue = pair.getRightPropertyValue(property);
 
-        if (property.getType().equals(leftValue, rightValue)) {
-            return null;
+        //special treatment for EmbeddedId - could be ValueObjects without good equals() implementation
+        if (isIdProperty(pair, property)) {
+            //For idProperty, only initial change is possible (from null to value).
+            //If we have values on both sides, we know that they have the same String representation
+            if (leftValue != null && rightValue != null) {
+                return null;
+            }
+        } else {
+            if (property.getType().equals(leftValue, rightValue)) {
+                return null;
+            }
         }
 
         return new ValueChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);

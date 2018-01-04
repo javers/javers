@@ -161,8 +161,7 @@ public interface Javers {
     <T> Diff compareCollections(Collection<T> oldVersion, Collection<T> currentVersion, Class<T> itemClass);
 
     /**
-     * Initial diff is a kind of snapshot of given domain object graph.
-     * Use it alongside with {@link #compare(Object, Object)}
+     * Initial diff is a kind of snapshot of a given object graph.
      */
     Diff initial(Object newDomainObject);
 

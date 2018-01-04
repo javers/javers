@@ -23,6 +23,25 @@ class CustomToStringExample extends Specification {
         }
     }
 
+    def "should use String representation of complex Id instead of its equals()"(){
+      given:
+      Point p1 = new Point(x: 1, y: 3)
+      Point p2 = new Point(x: 1, y: 3)
+
+      Entity entity1 = new Entity(id: p1)
+      Entity entity2 = new Entity(id: p2)
+
+      def javers = JaversBuilder.javers().build()
+
+      expect:
+      println "p1.equals(p2): " + p1.equals(p2)
+      println "GlobalId of entity1: '${javers.getTypeMapping(Entity).createIdFromInstance(entity1).value()}'"
+      println "GlobalId of entity2: '${javers.getTypeMapping(Entity).createIdFromInstance(entity2).value()}'"
+
+      !p1.equals(p2)
+      javers.compare(entity1, entity2).changes.size() == 0
+    }
+
     def "should use custom toString function for complex Id"(){
       given:
       Entity entity = new Entity(
