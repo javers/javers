@@ -150,7 +150,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
     private void foreignKey(DBObjectName tableName, String fkColName, boolean isPartOfPrimaryKey, String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
         LongAttributeBuilder longAttributeBuilder = relationBuilder
                 .withAttribute().longAttr(fkColName);
-        if (isPartOfPrimaryKey && (dialect instanceof DB2Dialect && dialect instanceof DB2400Dialect)) {
+        if (isPartOfPrimaryKey && (dialect instanceof DB2Dialect || dialect instanceof DB2400Dialect)) {
             longAttributeBuilder.notNull();
         }
         longAttributeBuilder.and()
