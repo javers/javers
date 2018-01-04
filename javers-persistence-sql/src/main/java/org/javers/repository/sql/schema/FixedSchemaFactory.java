@@ -1,8 +1,7 @@
 package org.javers.repository.sql.schema;
 
-import org.polyjdbc.core.dialect.Dialect;
-import org.polyjdbc.core.dialect.OracleDialect;
-import org.polyjdbc.core.dialect.MysqlDialect;
+import org.polyjdbc.core.dialect.*;
+import org.polyjdbc.core.schema.model.LongAttributeBuilder;
 import org.polyjdbc.core.schema.model.RelationBuilder;
 import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.util.StringUtils;
@@ -79,8 +78,8 @@ public class FixedSchemaFactory extends SchemaNameAware {
                        .withAttribute().text(SNAPSHOT_STATE).and()
                        .withAttribute().text(SNAPSHOT_CHANGED).and()
                        .withAttribute().string(SNAPSHOT_MANAGED_TYPE).withMaxLength(200).and();
-        foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, getGlobalIdTableNameWithSchema(), GLOBAL_ID_PK, relationBuilder);
-        foreignKey(tableName, SNAPSHOT_COMMIT_FK, getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
+        foreignKey(tableName, SNAPSHOT_GLOBAL_ID_FK, false, getGlobalIdTableNameWithSchema(), GLOBAL_ID_PK, relationBuilder);
+        foreignKey(tableName, SNAPSHOT_COMMIT_FK, false, getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
         columnsIndex(tableName, schema, SNAPSHOT_GLOBAL_ID_FK);
@@ -111,9 +110,9 @@ public class FixedSchemaFactory extends SchemaNameAware {
         RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
         relationBuilder
             .primaryKey(tableName.localName() + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
-            .withAttribute().string(COMMIT_PROPERTY_NAME).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).and()
+            .withAttribute().string(COMMIT_PROPERTY_NAME).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).notNull().and()
             .withAttribute().string(COMMIT_PROPERTY_VALUE).withMaxLength(600).and();
-        foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
+        foreignKey(tableName, COMMIT_PROPERTY_COMMIT_FK, true, getCommitTableNameWithSchema(), COMMIT_PK, relationBuilder);
         relationBuilder.build();
 
         columnsIndex(tableName, schema, COMMIT_PROPERTY_COMMIT_FK);
@@ -140,7 +139,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
                 .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).and()
                 .withAttribute().string(GLOBAL_ID_FRAGMENT).withMaxLength(200).and()
                 .withAttribute().string(GLOBAL_ID_TYPE_NAME).withMaxLength(200).and();
-        foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, getGlobalIdTableNameWithSchema(), GLOBAL_ID_PK, relationBuilder);
+        foreignKey(tableName, GLOBAL_ID_OWNER_ID_FK, false, getGlobalIdTableNameWithSchema(), GLOBAL_ID_PK, relationBuilder);
         relationBuilder.build();
 
         columnsIndex(tableName, schema, GLOBAL_ID_LOCAL_ID);
@@ -148,9 +147,13 @@ public class FixedSchemaFactory extends SchemaNameAware {
         return schema;
     }
 
-    private void foreignKey(DBObjectName tableName, String fkColName, String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
-        relationBuilder
-                .withAttribute().longAttr(fkColName).and()
+    private void foreignKey(DBObjectName tableName, String fkColName, boolean isPartOfPrimaryKey, String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
+        LongAttributeBuilder longAttributeBuilder = relationBuilder
+                .withAttribute().longAttr(fkColName);
+        if (isPartOfPrimaryKey && (dialect instanceof DB2Dialect || dialect instanceof DB2400Dialect)) {
+            longAttributeBuilder.notNull();
+        }
+        longAttributeBuilder.and()
                 .foreignKey(tableName.localName() + "_" + fkColName).on(fkColName).references(targetTableName, targetPkColName).and();
     }
 
