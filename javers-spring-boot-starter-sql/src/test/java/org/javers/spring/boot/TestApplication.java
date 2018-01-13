@@ -1,4 +1,4 @@
-package org.javers.spring.boot.sql;
+package org.javers.spring.boot;
 
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
