@@ -1,21 +1,22 @@
-package org.javers.spring.boot.sql;
+package org.javers.spring.boot;
 
 
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import java.util.UUID;
 
-/**
- * @author pawelszymczyk
- */
 @Entity
 public class DummyEntity {
 
+    @Id
     private int id;
     private String name;
+    private ShallowEntity shallowEntity;
 
-    public DummyEntity() {
+    DummyEntity() {
     }
 
     public DummyEntity(int id, String name) {
@@ -23,10 +24,23 @@ public class DummyEntity {
         this.name = name;
     }
 
+    public static DummyEntity random() {
+        return new DummyEntity(UUID.randomUUID().hashCode(), UUID.randomUUID().toString());
+    }
+
     @Id
     @GeneratedValue
     public int getId() {
         return id;
+    }
+
+    @ManyToOne
+    public ShallowEntity getShallowEntity() {
+        return shallowEntity;
+    }
+
+    public void setShallowEntity(ShallowEntity shallowEntity) {
+        this.shallowEntity = shallowEntity;
     }
 
     public void setId(int id) {

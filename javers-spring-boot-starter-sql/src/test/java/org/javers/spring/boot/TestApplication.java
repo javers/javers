@@ -1,4 +1,4 @@
-package org.javers.spring.boot.sql;
+package org.javers.spring.boot;
 
 import java.util.HashMap;
 import java.util.Map;
