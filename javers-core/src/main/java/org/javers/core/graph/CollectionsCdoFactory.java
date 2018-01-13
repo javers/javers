@@ -3,7 +3,6 @@ package org.javers.core.graph;
 import org.javers.common.collections.Lists;
 import org.javers.common.reflection.JaversMember;
 import org.javers.core.metamodel.object.Cdo;
-import org.javers.core.metamodel.object.CdoWrapper;
 import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScanner;
@@ -34,6 +33,6 @@ public class CollectionsCdoFactory {
         JaversProperty fixedJProperty = new JaversProperty(() -> typeMapper.getPropertyType(fixedProperty), fixedProperty);
 
         ValueObjectType valueObject = new ValueObjectType(wrapper.getClass(), Lists.asList(fixedJProperty));
-        return new CdoWrapper(wrapper, new UnboundedValueObjectId(valueObject.getName()), valueObject);
+        return new LiveCdoWrapper(wrapper, new UnboundedValueObjectId(valueObject.getName()), valueObject);
     }
 }

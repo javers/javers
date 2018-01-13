@@ -2,11 +2,13 @@ package org.javers.spring.sql
 
 import org.hibernate.Hibernate
 import org.javers.core.Javers
+import org.javers.core.metamodel.object.CdoSnapshot
+import org.javers.core.metamodel.object.InstanceId
+import org.javers.spring.boot.DummyEntity
 import org.javers.spring.boot.ShallowEntity
 import org.javers.spring.boot.ShallowEntityRepository
 import org.javers.spring.boot.TestApplication
-import org.javers.spring.boot.DummyEntity
-import org.javers.spring.boot.DummyEntityRepository
+import org.javers.spring.boot.sql.DummyEntityRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -45,6 +47,11 @@ class HibernateSmartUnproxyTest extends Specification{
       dummyEntityRepository.save(entity)
 
       then:
+      def entitySnapshot = javers.getLatestSnapshot(entity.id, DummyEntity).get()
+      InstanceId shallowRef = entitySnapshot.getPropertyValue("shallowEntity")
+      shallowRef.typeName == ShallowEntity.class.name
+      shallowRef.cdoId == shallowEntity.id
+
       assert !Hibernate.isInitialized(proxy)
     }
 }

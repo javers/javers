@@ -25,11 +25,11 @@ public class ChangedCdoSnapshotsFactory {
      * @param latestSnapshots CDO snapshots used to check which of liveObjects have been created or changed
      * @param commitMetadata commit metadata used to create new snapshots
      */
-    public List<CdoSnapshot> create(Set<CdoWrapper> liveObjects, Set<CdoSnapshot> latestSnapshots, CommitMetadata commitMetadata) {
+    public List<CdoSnapshot> create(Set<LiveCdo> liveObjects, Set<CdoSnapshot> latestSnapshots, CommitMetadata commitMetadata) {
         Validate.argumentsAreNotNull(liveObjects, commitMetadata, latestSnapshots);
 
         List<CdoSnapshot> result = new ArrayList<>();
-        for (CdoWrapper currentCdo : liveObjects) {
+        for (LiveCdo currentCdo : liveObjects) {
             Optional<CdoSnapshot> previousSnapshot = latestSnapshots.stream().filter(currentCdo::equals).findFirst();
             CdoSnapshot currentSnapshot = createSnapshot(latestSnapshots, commitMetadata, currentCdo, previousSnapshot);
             if (isCdoChanged(previousSnapshot, currentSnapshot)) {
@@ -40,22 +40,22 @@ public class ChangedCdoSnapshotsFactory {
     }
 
     private CdoSnapshot createSnapshot(Set<CdoSnapshot> previousCdos, CommitMetadata commitMetadata,
-                                       CdoWrapper cdoWrapper, Optional<CdoSnapshot> previousSnapshot) {
-        return isNewlyCreated(cdoWrapper, previousCdos) ?
-                createInitialSnapshot(commitMetadata, cdoWrapper) :
-                createUpdateSnapshot(commitMetadata, cdoWrapper, previousSnapshot.get());
+                                       LiveCdo liveCdo, Optional<CdoSnapshot> previousSnapshot) {
+        return isNewlyCreated(liveCdo, previousCdos) ?
+                createInitialSnapshot(commitMetadata, liveCdo) :
+                createUpdateSnapshot(commitMetadata, liveCdo, previousSnapshot.get());
     }
 
     private boolean isNewlyCreated(Cdo cdo, Set<CdoSnapshot> previousCdos) {
         return !previousCdos.contains(cdo);
     }
 
-    private CdoSnapshot createInitialSnapshot(CommitMetadata commitMetadata, CdoWrapper cdoWrapper) {
-        return snapshotFactory.createInitial(cdoWrapper, commitMetadata);
+    private CdoSnapshot createInitialSnapshot(CommitMetadata commitMetadata, LiveCdo liveCdo) {
+        return snapshotFactory.createInitial(liveCdo, commitMetadata);
     }
 
-    private CdoSnapshot createUpdateSnapshot(CommitMetadata commitMetadata, CdoWrapper cdoWrapper, CdoSnapshot previousSnapshot) {
-        return snapshotFactory.createUpdate(cdoWrapper, previousSnapshot, commitMetadata);
+    private CdoSnapshot createUpdateSnapshot(CommitMetadata commitMetadata, LiveCdo liveCdo, CdoSnapshot previousSnapshot) {
+        return snapshotFactory.createUpdate(liveCdo, previousSnapshot, commitMetadata);
     }
 
     private boolean isCdoChanged(Optional<CdoSnapshot> previousSnapshot, CdoSnapshot currentSnapshot) {

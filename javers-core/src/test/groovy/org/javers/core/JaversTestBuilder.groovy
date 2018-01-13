@@ -3,11 +3,12 @@ package org.javers.core
 import org.javers.common.date.DateProvider
 import org.javers.core.commit.CommitFactory
 import org.javers.core.graph.LiveCdoFactory
+import org.javers.core.graph.LiveCdoWrapper
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.LiveGraphFactory
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.JsonConverterBuilder
-import org.javers.core.metamodel.object.CdoWrapper
+import org.javers.core.metamodel.object.LiveCdo
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
@@ -100,11 +101,11 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(Javers)
     }
 
-    CdoWrapper createCdoWrapper(Object cdo){
+    LiveCdo createCdoWrapper(Object cdo){
         def mType = getTypeMapper().getJaversManagedType(cdo.class)
         def id = instanceId(cdo)
 
-        new CdoWrapper(cdo, id, mType)
+        new LiveCdoWrapper(cdo, id, mType)
     }
 
     Property getProperty(Class type, String propName) {
@@ -173,7 +174,7 @@ class JaversTestBuilder {
     }
 
     InstanceId instanceId(Object instance){
-        getGlobalIdFactory().createInstanceId(instance)
+        getGlobalIdFactory().createId(instance)
     }
 
     InstanceId instanceId(Object localId, Class entity){

@@ -15,11 +15,6 @@ public class DummyEntity {
     private ShallowEntity shallowEntity;
 
     DummyEntity() {
-    DummyEntity() {
-    }
-
-    public static DummyEntity random() {
-        return new DummyEntity(UUID.randomUUID().hashCode(), UUID.randomUUID().toString());
     }
 
     public DummyEntity(int id, String name) {

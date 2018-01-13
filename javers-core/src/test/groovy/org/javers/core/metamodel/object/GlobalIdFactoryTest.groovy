@@ -22,7 +22,7 @@ class GlobalIdFactoryTest extends Specification {
 
     def "should build value() from typeName and reflectiveToString() for Embedded Id "() {
         when:
-        def instanceId = globalIdFactory.createInstanceId(
+        def instanceId = globalIdFactory.createId(
                 new DummyEntityWithEmbeddedId(point: new DummyPoint(1,3)))
 
         then:

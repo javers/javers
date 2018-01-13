@@ -1,23 +1,20 @@
 package org.javers.core.graph
 
-import com.google.common.collect.Maps
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.metamodel.object.Cdo
-import org.javers.core.metamodel.object.CdoWrapper
-import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.type.EntityType
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
-import static org.javers.core.model.DummyUser.dummyUser
 
+import static org.javers.core.model.DummyUser.dummyUser
 
 abstract class ObjectNodeTest extends Specification {
 
     protected def createEntity
 
     private ObjectNode objectNode(Object cdo, EntityType entity) {
-        new ObjectNode<>(new CdoWrapper(cdo, entity.createIdFromInstance(cdo), entity));
+        new ObjectNode<>(new LiveCdoWrapper(cdo, entity.createIdFromInstance(cdo), entity));
     }
 
     def "should hold Entity reference"() {
