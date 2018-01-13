@@ -4,7 +4,7 @@ import org.javers.repository.sql.DialectName
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
 import org.javers.spring.boot.sql.JaversProperties
-import org.javers.spring.boot.sql.TestApplication
+import org.javers.spring.boot.TestApplication
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles

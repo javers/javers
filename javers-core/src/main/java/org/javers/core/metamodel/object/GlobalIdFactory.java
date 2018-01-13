@@ -3,6 +3,7 @@ package org.javers.core.metamodel.object;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.graph.ObjectAccessProxy;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.metamodel.type.*;
 import org.javers.core.snapshot.ObjectHasher;
@@ -11,6 +12,8 @@ import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.jql.UnboundedValueObjectIdDTO;
 import org.javers.repository.jql.ValueObjectIdDTO;
 import org.picocontainer.PicoContainer;
+
+import java.util.Optional;
 
 /**
  * @author bartosz walacik
@@ -40,11 +43,18 @@ public class GlobalIdFactory {
     public GlobalId createId(Object targetCdo, OwnerContext ownerContext) {
         Validate.argumentsAreNotNull(targetCdo);
 
-        targetCdo = objectAccessHook.access(targetCdo);
-        ManagedType targetManagedType = typeMapper.getJaversManagedType(targetCdo.getClass());
+        Optional<ObjectAccessProxy> cdoProxy = objectAccessHook.createAccessor(targetCdo);
+
+        Class<?> targetClass = cdoProxy.map((p) -> p.getTargetClass()).orElse(targetCdo.getClass());
+        ManagedType targetManagedType = typeMapper.getJaversManagedType(targetClass);
 
         if (targetManagedType instanceof EntityType) {
-            return ((EntityType) targetManagedType).createIdFromInstance(targetCdo);
+            if (cdoProxy.isPresent() && cdoProxy.get().getLocalId().isPresent()){
+                return createInstanceId(cdoProxy.get().getLocalId().get(), targetClass);
+            }
+            else {
+                return ((EntityType) targetManagedType).createIdFromInstance(targetCdo);
+            }
         }
 
         if (targetManagedType instanceof ValueObjectType && !hasOwner(ownerContext)) {
@@ -55,7 +65,7 @@ public class GlobalIdFactory {
             String pathFromRoot = createPathFromRoot(ownerContext.getOwnerId(), ownerContext.getPath());
 
             if (ownerContext.requiresObjectHasher()) {
-                pathFromRoot += "/" + getObjectHasher().hash(targetCdo);
+                pathFromRoot += "/" + getObjectHasher().hash(cdoProxy.map((p) -> p.access()).orElse(targetCdo));
             }
             return new ValueObjectId(targetManagedType.getName(), getRootOwnerId(ownerContext), pathFromRoot);
         }
@@ -84,14 +94,6 @@ public class GlobalIdFactory {
     public UnboundedValueObjectId createUnboundedValueObjectId(Class valueObjectClass){
         ValueObjectType valueObject = typeMapper.getJaversManagedType(valueObjectClass, ValueObjectType.class);
         return new UnboundedValueObjectId(valueObject.getName());
-    }
-
-    public InstanceId createInstanceId(Object instance){
-        Validate.argumentIsNotNull(instance);
-		
-        instance = objectAccessHook.access(instance);
-        EntityType entityType = typeMapper.getJaversManagedType(instance.getClass(), EntityType.class);
-        return entityType.createIdFromInstance(instance);
     }
 
     @Deprecated

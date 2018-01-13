@@ -12,15 +12,10 @@ import static org.javers.common.validation.Validate.*;
  *
  * @author bartosz walacik
  */
-public class CdoWrapper extends Cdo {
-    private final Object wrappedCdo;
+public abstract class LiveCdo extends Cdo {
 
-    public CdoWrapper(Object wrappedCdo, GlobalId globalId, ManagedType managedType) {
+    public LiveCdo(GlobalId globalId, ManagedType managedType) {
         super(globalId, managedType);
-        argumentsAreNotNull(wrappedCdo, managedType);
-        argumentCheck(managedType.isInstance(wrappedCdo), "wrappedCdo is not an instance of given managedClass");
-
-        this.wrappedCdo = wrappedCdo;
     }
 
     @Override
@@ -33,7 +28,7 @@ public class CdoWrapper extends Cdo {
     @Override
     public Object getPropertyValue(Property property) {
         argumentIsNotNull(property);
-        return property.get(wrappedCdo);
+        return property.get(wrappedCdo());
     }
 
     /**
@@ -41,12 +36,14 @@ public class CdoWrapper extends Cdo {
      */
     @Override
     public Optional<Object> getWrappedCdo() {
-        return Optional.of(wrappedCdo);
+        return Optional.of(wrappedCdo());
     }
 
     @Override
     public boolean isNull(Property property) {
         argumentIsNotNull(property);
-        return property.isNull(wrappedCdo);
+        return property.isNull(wrappedCdo());
     }
+
+    protected abstract Object wrappedCdo();
 }

@@ -1,32 +1,34 @@
 package org.javers.hibernate.integration;
 
-import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.proxy.LazyInitializer;
 import org.hibernate.proxy.pojo.javassist.JavassistLazyInitializer;
 import org.javers.core.graph.ObjectAccessHook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.javers.core.graph.ObjectAccessProxy;
 
-public class HibernateUnproxyObjectAccessHook implements ObjectAccessHook {
+import java.util.Optional;
 
-    private static final Logger logger = LoggerFactory.getLogger(HibernateUnproxyObjectAccessHook.class);
+public class HibernateUnproxyObjectAccessHook<T> implements ObjectAccessHook<T> {
 
-    public <T> T access(T entity) {
+    @Override
+    public Optional<ObjectAccessProxy<T>> createAccessor(T entity) {
         if (entity instanceof HibernateProxy) {
-            Hibernate.initialize(entity);
-            HibernateProxy proxy = (HibernateProxy) entity;
-            T unproxed = (T) proxy.getHibernateLazyInitializer().getImplementation();
-            logger.info("unproxying instance of " + entity.getClass().getSimpleName() + " to " + unproxed.getClass().getSimpleName());
-            return unproxed;
+            LazyInitializer lazyInitializer = ((HibernateProxy) entity).getHibernateLazyInitializer();
+
+            return fromLazyInitializer(lazyInitializer);
         }
         if (entity instanceof JavassistLazyInitializer){
             JavassistLazyInitializer proxy = (JavassistLazyInitializer) entity;
-            T unproxed = (T) proxy.getImplementation();
-            logger.info("unproxying instance of " + entity.getClass().getSimpleName() + " to " + unproxed.getClass().getSimpleName());
-            return unproxed;
-
+            return fromLazyInitializer(proxy);
         }
-        return entity;
+
+        return Optional.empty();
+    }
+
+    private Optional<ObjectAccessProxy<T>> fromLazyInitializer(LazyInitializer lazyInitializer) {
+        return Optional.of(new ObjectAccessProxy(() -> lazyInitializer.getImplementation(),
+                lazyInitializer.getPersistentClass(),
+                lazyInitializer.getIdentifier()));
     }
 }
 

@@ -4,7 +4,7 @@ import org.javers.common.string.ShaDigest;
 import org.javers.core.graph.LiveCdoFactory;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshotState;
-import org.javers.core.metamodel.object.CdoWrapper;
+import org.javers.core.metamodel.object.LiveCdo;
 
 /**
  * @author bartosz.walacik
@@ -21,7 +21,7 @@ public class ObjectHasher {
     }
 
     public String hash(Object object) {
-        CdoWrapper cdo = liveCdoFactory.create(object, null);
+        LiveCdo cdo = liveCdoFactory.create(object, null);
 
         CdoSnapshotState state = snapshotFactory.createSnapshotState(cdo);
 

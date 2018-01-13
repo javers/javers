@@ -5,7 +5,6 @@ import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.exception.JaversException;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.*;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
 import java.util.Objects;
@@ -37,32 +36,32 @@ public class SnapshotFactory {
                 .build();
     }
 
-    public CdoSnapshot createInitial(CdoWrapper cdoWrapper, CommitMetadata commitMetadata) {
-        return initSnapshotBuilder(cdoWrapper, commitMetadata)
-                .withState(createSnapshotState(cdoWrapper))
+    public CdoSnapshot createInitial(LiveCdo liveCdo, CommitMetadata commitMetadata) {
+        return initSnapshotBuilder(liveCdo, commitMetadata)
+                .withState(createSnapshotState(liveCdo))
                 .withType(INITIAL)
                 .markAllAsChanged()
                 .withVersion(1L)
                 .build();
     }
 
-    public CdoSnapshot createUpdate(CdoWrapper cdoWrapper, CdoSnapshot previous, CommitMetadata commitMetadata) {
-        return initSnapshotBuilder(cdoWrapper, commitMetadata)
-                .withState(createSnapshotState(cdoWrapper))
+    public CdoSnapshot createUpdate(LiveCdo liveCdo, CdoSnapshot previous, CommitMetadata commitMetadata) {
+        return initSnapshotBuilder(liveCdo, commitMetadata)
+                .withState(createSnapshotState(liveCdo))
                 .withType(UPDATE)
                 .markChanged(previous)
                 .withVersion(previous.getVersion()+1)
                 .build();
     }
 
-    public CdoSnapshotState createSnapshotState(CdoWrapper cdoWrapper){
+    public CdoSnapshotState createSnapshotState(LiveCdo liveCdo){
         CdoSnapshotStateBuilder stateBuilder = CdoSnapshotStateBuilder.cdoSnapshotState();
-        for (JaversProperty property : cdoWrapper.getManagedType().getProperties()) {
-            Object propertyVal = cdoWrapper.getPropertyValue(property.getName());
+        for (JaversProperty property : liveCdo.getManagedType().getProperties()) {
+            Object propertyVal = liveCdo.getPropertyValue(property.getName());
             if (Objects.equals(propertyVal, Defaults.defaultValue(property.getGenericType()))) {
                 continue;
             }
-            stateBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, cdoWrapper.getGlobalId()));
+            stateBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, liveCdo.getGlobalId()));
         }
         return stateBuilder.build();
     }
@@ -84,11 +83,11 @@ public class SnapshotFactory {
         return  propertyType.map(propertyVal, dehydratorMapFunction, owner);
     }
 
-    private CdoSnapshotBuilder initSnapshotBuilder(CdoWrapper cdoWrapper, CommitMetadata commitMetadata) {
+    private CdoSnapshotBuilder initSnapshotBuilder(LiveCdo liveCdo, CommitMetadata commitMetadata) {
         return cdoSnapshot()
-                .withGlobalId(cdoWrapper.getGlobalId())
+                .withGlobalId(liveCdo.getGlobalId())
                 .withCommitMetadata(commitMetadata)
-                .withManagedType(cdoWrapper.getManagedType());
+                .withManagedType(liveCdo.getManagedType());
     }
 
     private Object dehydrateProperty(JaversProperty property, Object propertyVal, GlobalId id){

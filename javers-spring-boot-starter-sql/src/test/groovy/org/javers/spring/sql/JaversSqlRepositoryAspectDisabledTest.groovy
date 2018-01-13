@@ -2,9 +2,9 @@ package org.javers.spring.sql
 
 import org.javers.core.Javers
 import org.javers.repository.jql.QueryBuilder
-import org.javers.spring.boot.sql.DummyEntity
+import org.javers.spring.boot.DummyEntity
+import org.javers.spring.boot.TestApplication
 import org.javers.spring.boot.sql.DummyEntityRepository
-import org.javers.spring.boot.sql.TestApplication
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification

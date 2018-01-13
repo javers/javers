@@ -5,7 +5,6 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.JaversExtendedRepository;
@@ -101,9 +100,5 @@ public class QueryRunner {
         }
 
         throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "queryForChanges: " + query + " is not supported");
-    }
-
-    private GlobalId fromInstance(Object instance) {
-        return globalIdFactory.createInstanceId(instance);
     }
 }

@@ -1,7 +1,6 @@
 package org.javers.spring.boot
 
 import org.javers.core.Javers
-import org.javers.spring.boot.sql.DummyEntity
 import org.javers.spring.boot.sql.DummyEntityRepository
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification

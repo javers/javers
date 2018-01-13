@@ -1,5 +1,7 @@
 package org.javers.core.graph;
 
+import java.util.Optional;
+
 /**
  * Object access hook
  * <br><br>
@@ -10,6 +12,7 @@ package org.javers.core.graph;
  * Needs to be idempotent because JaVers could call it more than once during diff.
  *
  */
-public interface ObjectAccessHook {
-    <T> T access(T entity);
+public interface ObjectAccessHook<T> {
+    /** Return object wrapper, possibly without proxy initialization */
+    Optional<ObjectAccessProxy<T>> createAccessor(final T entity);
 }

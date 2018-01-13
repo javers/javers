@@ -1,11 +1,10 @@
 package org.javers.core.graph;
 
-/**
- * @author bartosz.walacik
- */
-class ObjectAccessHookDoNothingImpl implements ObjectAccessHook {
+import java.util.Optional;
+
+class ObjectAccessHookDoNothingImpl<T> implements ObjectAccessHook<T> {
     @Override
-    public <T> T access(T entity) {
-        return entity;
+    public Optional<ObjectAccessProxy<T>> createAccessor(T entity) {
+        return Optional.empty();
     }
 }
