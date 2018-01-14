@@ -41,7 +41,7 @@ public abstract class ClientsClassDefinition {
     private ClientsClassDefinition(Class<?> baseJavaClass, List<String> ignoredProperties, Optional<String> typeName, List<String> includedProperties) {
         argumentsAreNotNull(baseJavaClass, typeName, ignoredProperties, includedProperties);
 
-        Validate.argumentCheck(!(includedProperties.size() > 0) && ignoredProperties.size() > 0,
+        Validate.argumentCheck(!(includedProperties.size() > 0 && ignoredProperties.size() > 0),
                 "Can't create ClientsClassDefinition for " + baseJavaClass.getSimpleName() +
                 ", you can't define both ignored and included properties");
 
