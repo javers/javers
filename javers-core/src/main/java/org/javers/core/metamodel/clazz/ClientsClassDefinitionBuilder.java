@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefinitionBuilder> {
     private Class<?> clazz;
     private List<String> ignoredProperties = Collections.emptyList();
-    private List<String> includedProperties = Collections.emptyList();
+    private List<String> whitelistedProperties = Collections.emptyList();
     private Optional<String> typeName = Optional.empty();
 
     ClientsClassDefinitionBuilder(Class<?> clazz) {
@@ -39,11 +39,11 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
     }
 
     /**
-     * See {@link ClientsClassDefinition#getIncludedProperties()}
+     * See {@link ClientsClassDefinition#getWhitelistedProperties()}
      */
-    public T withIncludedProperties(List<String> includedProperties) {
-        Validate.argumentIsNotNull(includedProperties);
-        this.ignoredProperties = includedProperties;
+    public T withWhitelistedProperties(List<String> whitelistedProperties) {
+        Validate.argumentIsNotNull(whitelistedProperties);
+        this.whitelistedProperties = whitelistedProperties;
         return (T) this;
     }
 
@@ -61,19 +61,19 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
         throw new RuntimeException("not implemented");
     }
 
-    public Class<?> getClazz() {
+    Class<?> getClazz() {
         return clazz;
     }
 
-    public List<String> getIgnoredProperties() {
+    List<String> getIgnoredProperties() {
         return ignoredProperties;
     }
 
-    public List<String> getIncludedProperties() {
-        return includedProperties;
+    List<String> getWhitelistedProperties() {
+        return whitelistedProperties;
     }
 
-    public Optional<String> getTypeName() {
+    Optional<String> getTypeName() {
         return typeName;
     }
 

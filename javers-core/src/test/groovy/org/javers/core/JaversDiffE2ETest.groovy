@@ -23,6 +23,8 @@ import javax.persistence.EmbeddedId
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.MappingStyle.BEAN
 import static org.javers.core.MappingStyle.FIELD
+import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition
+import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.valueObjectDefinition
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
 import static org.javers.core.model.DummyUser.dummyUser
@@ -33,6 +35,35 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId
  * @author bartosz walacik
  */
 class JaversDiffE2ETest extends AbstractDiffTest {
+
+    class WhitelistedClass {
+        int id
+        int a
+        int b
+    }
+
+    @Unroll
+    def "should ignore all props of #classType which are not whitelisted"(){
+      given:
+      def javers = JaversBuilder.javers().registerType(definition).build()
+
+      when:
+      def left =  new WhitelistedClass(id:1, a:2, b:3)
+      def right = new WhitelistedClass(id:1, a:4, b:6)
+      def diff = javers.compare(left, right)
+
+      then:
+      !diff.changes.size()
+
+      where:
+      definition << [entityDefinition(WhitelistedClass)
+                             .withIdPropertyName("id")
+                             .withWhitelistedProperties(["id"]).build(),
+                     valueObjectDefinition(WhitelistedClass)
+                             .withWhitelistedProperties(["id"]).build()
+      ]
+      classType << ["EntityType", "ValueObjectType"]
+    }
 
     def "should extract Property from PropertyChange"(){
       given:

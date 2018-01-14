@@ -35,9 +35,7 @@ class ManagedClassFactory {
     ManagedClass create(ClientsClassDefinition def, ClassScan scan){
         List<JaversProperty> allProperties = convert(scan.getProperties());
 
-        List<JaversProperty> filtered = filterIgnored(allProperties, def);
-
-        //TODO if def.getIncludedProperties() are defined, use Included, otherwise use Ignored
+        List<JaversProperty> filtered = filterProperties(allProperties, def);
 
         filtered = filterIgnoredType(filtered, def.getBaseJavaClass());
 
@@ -71,12 +69,32 @@ class ManagedClassFactory {
         });
     }
 
-    private List<JaversProperty> filterIgnored(List<JaversProperty> properties, ClientsClassDefinition definition){
-        if (definition.getIgnoredProperties().isEmpty()){
-            return properties;
+    private List<JaversProperty> filterProperties(List<JaversProperty> allProperties, ClientsClassDefinition definition){
+        if (definition.hasWhitelistedProperties()) {
+            return onlyWhitelisted(allProperties, definition);
         }
 
-        List<JaversProperty> filtered = new ArrayList<>(properties);
+        if (definition.hasIgnoredProperties()) {
+            return filterIgnored(allProperties, definition);
+        }
+
+        return allProperties;
+    }
+
+    private List<JaversProperty> onlyWhitelisted(List<JaversProperty> allProperties, ClientsClassDefinition definition){
+        List<JaversProperty> filtered = new ArrayList<>();
+        for (String whiteName : definition.getWhitelistedProperties()) {
+            JaversProperty whiteProperty = allProperties.stream()
+                    .filter(p -> p.getName().equals(whiteName))
+                    .findFirst()
+                    .orElseThrow(() -> new JaversException(JaversExceptionCode.PROPERTY_NOT_FOUND, whiteName, definition.getBaseJavaClass().getName()));
+            filtered.add(whiteProperty);
+        }
+        return filtered;
+    }
+
+    private List<JaversProperty> filterIgnored(List<JaversProperty> allProperties, ClientsClassDefinition definition){
+        List<JaversProperty> filtered = new ArrayList<>(allProperties);
         for (String ignored : definition.getIgnoredProperties()){
             filterOneProperty(filtered, ignored, definition.getBaseJavaClass());
         }
