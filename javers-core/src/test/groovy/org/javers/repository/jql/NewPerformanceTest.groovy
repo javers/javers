@@ -9,7 +9,7 @@ import java.math.RoundingMode
 
 abstract class NewPerformanceTest extends Specification {
 
-    static int n = 10000
+    static int n = 10
     Javers javers = JaversBuilder.javers().build()
     def start
 

@@ -29,6 +29,9 @@ public class CommitPropertyFinder {
             return Collections.emptyList();
         }
 
+        //TODO HOTSPOT
+        System.out.println("-- findCommitPropertiesOfSnaphots("+commitPKs+") ");
+
         SelectQuery query = polyJDBC.query()
             .select(COMMIT_PROPERTY_COMMIT_FK + ", " + COMMIT_PROPERTY_NAME + ", " + COMMIT_PROPERTY_VALUE)
             .from(tableNameProvider.getCommitPropertyTableNameWithSchema())

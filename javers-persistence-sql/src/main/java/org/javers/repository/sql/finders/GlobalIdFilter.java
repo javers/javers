@@ -26,4 +26,12 @@ class GlobalIdFilter extends SnapshotFilter  {
                          "  OR g." + GLOBAL_ID_OWNER_ID_FK + " = " + globalIdPk + ")");
         }
     }
+
+    @Override
+    public String toString() {
+        return "GlobalIdFilter{" +
+                "globalIdPk=" + globalIdPk +
+                ", aggregate=" + aggregate +
+                '}';
+    }
 }

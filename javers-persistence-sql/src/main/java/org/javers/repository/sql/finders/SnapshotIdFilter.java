@@ -21,4 +21,11 @@ class SnapshotIdFilter extends SnapshotFilter {
     void addWhere(SelectQuery query) {
         query.where(SNAPSHOT_PK + " = "+ snapshotPK);
     }
+
+    @Override
+    public String toString() {
+        return "SnapshotIdFilter{" +
+                "snapshotPK=" + snapshotPK +
+                '}';
+    }
 }
