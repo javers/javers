@@ -33,6 +33,9 @@ public class CdoSnapshotRepository extends SchemaNameAware {
     }
 
     private long insertSnapshot(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot) {
+        // TODO HOTSPOT
+        System.out.println("-- insertSnapshot() globalIdPk:" + globalIdPk+ ", commitIdPk:"+commitIdPk);
+
         InsertQuery query = javersPolyJDBC.query().insert().into(getSnapshotTableNameWithSchema())
                 .value(SNAPSHOT_TYPE, cdoSnapshot.getType().toString())
                 .value(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)

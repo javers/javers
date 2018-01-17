@@ -7,7 +7,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 import static org.javers.core.JaversBuilder.javers
 
-@Ignore
+//TODO @Ignore
 class NewSqlPerformanceTest extends NewPerformanceTest {
 
     Connection dbConnection
@@ -44,6 +44,7 @@ class NewSqlPerformanceTest extends NewPerformanceTest {
     }
 
     void execute(String sql){
+        println (sql)
         def stmt = dbConnection.createStatement()
         stmt.executeUpdate(sql)
         stmt.close()

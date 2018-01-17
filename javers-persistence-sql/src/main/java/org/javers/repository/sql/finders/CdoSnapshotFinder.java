@@ -95,6 +95,10 @@ public class CdoSnapshotFinder {
     }
 
     private List<Pair<CdoSnapshotSerialized,Long>> queryForCdoSnapshotDTOs(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams) {
+
+        //TODO HOTSPOT
+        System.out.println("-- fetchCdoSnapshots() " + snapshotFilter);
+
         SelectQuery query =  polyJDBC.query().select(snapshotFilter.select());
         snapshotFilter.addFrom(query);
         snapshotFilter.addWhere(query);
@@ -102,7 +106,6 @@ public class CdoSnapshotFinder {
             snapshotFilter.applyQueryParams(query, queryParams.get());
         }
         query.orderBy(SNAPSHOT_PK, Order.DESC);
-        //TODO HOT SPOT!!!
         return polyJDBC.queryRunner().queryList(query, cdoSnapshotMapper);
     }
 
