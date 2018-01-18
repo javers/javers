@@ -21,7 +21,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 public abstract class ClientsClassDefinition {
-    private final List<String> whitelistedProperties;
+    private final List<String> includedProperties;
     private final Class<?> baseJavaClass;
     private final List<String> ignoredProperties;
     private final Optional<String> typeName;
@@ -35,20 +35,20 @@ public abstract class ClientsClassDefinition {
     }
 
     ClientsClassDefinition(ClientsClassDefinitionBuilder builder) {
-        this(builder.getClazz(), builder.getIgnoredProperties(), builder.getTypeName(), builder.getWhitelistedProperties());
+        this(builder.getClazz(), builder.getIgnoredProperties(), builder.getTypeName(), builder.getIncludedProperties());
     }
 
-    private ClientsClassDefinition(Class<?> baseJavaClass, List<String> ignoredProperties, Optional<String> typeName, List<String> whitelistedProperties) {
-        argumentsAreNotNull(baseJavaClass, typeName, ignoredProperties, whitelistedProperties);
+    private ClientsClassDefinition(Class<?> baseJavaClass, List<String> ignoredProperties, Optional<String> typeName, List<String> includedProperties) {
+        argumentsAreNotNull(baseJavaClass, typeName, ignoredProperties, includedProperties);
 
-        Validate.argumentCheck(!(whitelistedProperties.size() > 0 && ignoredProperties.size() > 0),
+        Validate.argumentCheck(!(includedProperties.size() > 0 && ignoredProperties.size() > 0),
                 "Can't create ClientsClassDefinition for " + baseJavaClass.getSimpleName() +
-                ", you can't define both ignored and whitelisted properties");
+                ", you can't define both ignored and included properties");
 
         this.baseJavaClass = baseJavaClass;
         this.ignoredProperties = new ArrayList<>(ignoredProperties);
         this.typeName = typeName;
-        this.whitelistedProperties = new ArrayList<>(whitelistedProperties);
+        this.includedProperties = new ArrayList<>(includedProperties);
     }
 
     public Class<?> getBaseJavaClass() {
@@ -84,19 +84,19 @@ public abstract class ClientsClassDefinition {
         return !ignoredProperties.isEmpty();
     }
 
-    public boolean hasWhitelistedProperties() {
-        return !whitelistedProperties.isEmpty();
+    public boolean hasIncludedProperties() {
+        return !includedProperties.isEmpty();
     }
 
     /**
-     * If whitelisted properties list is defined, only those props are
+     * If ignored properties list is defined, only those props are
      * visible for JaVers, and the rest is ignored.
      * <br/>
      *
-     * Whitelisted props can be defined only if ignored properties are not defined.
+     * Included props can be defined only if ignored properties are not defined.
      */
-    public List<String> getWhitelistedProperties() {
-        return Collections.unmodifiableList(whitelistedProperties);
+    public List<String> getIncludedProperties() {
+        return Collections.unmodifiableList(includedProperties);
     }
 
     public Optional<String> getTypeName() {

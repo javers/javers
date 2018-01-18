@@ -8,7 +8,6 @@ import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScan;
-import org.javers.core.metamodel.scanner.ClassScanner;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -70,8 +69,8 @@ class ManagedClassFactory {
     }
 
     private List<JaversProperty> filterProperties(List<JaversProperty> allProperties, ClientsClassDefinition definition){
-        if (definition.hasWhitelistedProperties()) {
-            return onlyWhitelisted(allProperties, definition);
+        if (definition.hasIncludedProperties()) {
+            return onlyIncluded(allProperties, definition);
         }
 
         if (definition.hasIgnoredProperties()) {
@@ -81,9 +80,9 @@ class ManagedClassFactory {
         return allProperties;
     }
 
-    private List<JaversProperty> onlyWhitelisted(List<JaversProperty> allProperties, ClientsClassDefinition definition){
+    private List<JaversProperty> onlyIncluded(List<JaversProperty> allProperties, ClientsClassDefinition definition){
         List<JaversProperty> filtered = new ArrayList<>();
-        for (String whiteName : definition.getWhitelistedProperties()) {
+        for (String whiteName : definition.getIncludedProperties()) {
             JaversProperty whiteProperty = allProperties.stream()
                     .filter(p -> p.getName().equals(whiteName))
                     .findFirst()

@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefinitionBuilder> {
     private Class<?> clazz;
     private List<String> ignoredProperties = Collections.emptyList();
-    private List<String> whitelistedProperties = Collections.emptyList();
+    private List<String> includedProperties = Collections.emptyList();
     private Optional<String> typeName = Optional.empty();
 
     ClientsClassDefinitionBuilder(Class<?> clazz) {
@@ -22,6 +22,7 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
     }
 
     /**
+     * Model properties to be ignored by Javers.
      * See {@link ClientsClassDefinition#getIgnoredProperties()}
      */
     public T withIgnoredProperties(String... ignoredProperties) {
@@ -31,19 +32,23 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
 
     /**
      * See {@link ClientsClassDefinition#getIgnoredProperties()}
+     * @throws IllegalArgumentException If includedProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
      */
     public T withIgnoredProperties(List<String> ignoredProperties) {
+        Validate.argumentCheck(this.includedProperties.size() == 0, "includedProperties already set. You can either specify includedProperties or ignoredProperties, not both.");
         Validate.argumentIsNotNull(ignoredProperties);
         this.ignoredProperties = ignoredProperties;
         return (T) this;
     }
 
     /**
-     * See {@link ClientsClassDefinition#getWhitelistedProperties()}
+     * See {@link ClientsClassDefinition#getIncludedProperties()}
+     * @throws IllegalArgumentException If ignoredProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
      */
-    public T withWhitelistedProperties(List<String> whitelistedProperties) {
-        Validate.argumentIsNotNull(whitelistedProperties);
-        this.whitelistedProperties = whitelistedProperties;
+    public T withIncludedProperties(List<String> includedProperties) {
+        Validate.argumentCheck(this.ignoredProperties.size() == 0, "ignoredProperties already set. You can either specify includedProperties or ignoredProperties, not both.");
+        Validate.argumentIsNotNull(includedProperties);
+        this.includedProperties = includedProperties;
         return (T) this;
     }
 
@@ -69,8 +74,8 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
         return ignoredProperties;
     }
 
-    List<String> getWhitelistedProperties() {
-        return whitelistedProperties;
+    List<String> getIncludedProperties() {
+        return includedProperties;
     }
 
     Optional<String> getTypeName() {

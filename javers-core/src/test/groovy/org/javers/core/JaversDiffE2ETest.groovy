@@ -36,34 +36,64 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId
  */
 class JaversDiffE2ETest extends AbstractDiffTest {
 
-    class WhitelistedClass {
+    class IncludedPropsClass {
         int id
         int a
         int b
     }
 
+    class SubclassOfIncludedPropsClass extends IncludedPropsClass {
+        int c;
+    }
+
     @Unroll
-    def "should ignore all props of #classType which are not whitelisted"(){
+    def "should ignore all props of #classType which are not in the 'included' list of properties"(){
       given:
       def javers = JaversBuilder.javers().registerType(definition).build()
 
       when:
-      def left =  new WhitelistedClass(id:1, a:2, b:3)
-      def right = new WhitelistedClass(id:1, a:4, b:6)
+      def left =  new IncludedPropsClass(id:1, a:2, b:3)
+      def right = new IncludedPropsClass(id:1, a:4, b:6)
       def diff = javers.compare(left, right)
 
       then:
       !diff.changes.size()
 
       where:
-      definition << [entityDefinition(WhitelistedClass)
+      definition << [entityDefinition(IncludedPropsClass)
                              .withIdPropertyName("id")
-                             .withWhitelistedProperties(["id"]).build(),
-                     valueObjectDefinition(WhitelistedClass)
-                             .withWhitelistedProperties(["id"]).build()
+                             .withIncludedProperties(["id"]).build(),
+                     valueObjectDefinition(IncludedPropsClass)
+                             .withIncludedProperties(["id"]).build()
       ]
       classType << ["EntityType", "ValueObjectType"]
     }
+
+    /**
+     * 'Included' properties are inherited. JaVers should ignore any other property in subclasses as well.
+     */
+    @Unroll
+def "should ignore all props of a subclass of #classType that were not in the 'include' list of #classType client's definition"(){
+    given:
+    def javers = JaversBuilder.javers().registerType(definition).build()
+
+    when:
+    def left =  new SubclassOfIncludedPropsClass(id:1, a:2, b:3, c:4)
+    def right = new SubclassOfIncludedPropsClass(id:1, a:2, b:31, c:41)
+    def diff = javers.compare(left, right)
+
+    then:
+    !diff.changes.size()
+
+    where:
+    definition << [entityDefinition(IncludedPropsClass)
+                           .withIdPropertyName("id")
+                           .withIncludedProperties(["id"]).build(),
+                   valueObjectDefinition(IncludedPropsClass)
+                           .withIncludedProperties(["id"]).build()
+    ]
+    classType << ["EntityType", "ValueObjectType"]
+}
 
     def "should extract Property from PropertyChange"(){
       given:
