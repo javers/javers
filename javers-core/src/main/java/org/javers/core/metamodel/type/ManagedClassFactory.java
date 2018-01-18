@@ -82,12 +82,12 @@ class ManagedClassFactory {
 
     private List<JaversProperty> onlyIncluded(List<JaversProperty> allProperties, ClientsClassDefinition definition){
         List<JaversProperty> filtered = new ArrayList<>();
-        for (String whiteName : definition.getIncludedProperties()) {
-            JaversProperty whiteProperty = allProperties.stream()
-                    .filter(p -> p.getName().equals(whiteName))
+        for (String includedName : definition.getIncludedProperties()) {
+            JaversProperty includedProperty = allProperties.stream()
+                    .filter(p -> p.getName().equals(includedName))
                     .findFirst()
-                    .orElseThrow(() -> new JaversException(JaversExceptionCode.PROPERTY_NOT_FOUND, whiteName, definition.getBaseJavaClass().getName()));
-            filtered.add(whiteProperty);
+                    .orElseThrow(() -> new JaversException(JaversExceptionCode.PROPERTY_NOT_FOUND, includedName, definition.getBaseJavaClass().getName()));
+            filtered.add(includedProperty);
         }
         return filtered;
     }
