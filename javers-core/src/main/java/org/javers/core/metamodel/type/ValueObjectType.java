@@ -35,7 +35,7 @@ public class ValueObjectType extends ManagedType{
     }
 
     public ValueObjectType(Class baseJavaClass, List<JaversProperty> allProperties){
-        this(new ManagedClass(baseJavaClass, allProperties, Collections.emptyList()));
+        this(new ManagedClass(baseJavaClass, allProperties, Collections.emptyList(), ManagedPropertiesFilter.empty()));
     }
 
     ValueObjectType(ManagedClass valueObject, Optional<String> typeName, boolean isDefault) {

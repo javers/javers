@@ -22,7 +22,7 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
     }
 
     /**
-     * See {@link ClientsClassDefinition#getIgnoredProperties()}
+     * See {@link PropertiesFilter#getIgnoredProperties()}
      * @throws IllegalArgumentException If includedProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
      */
     public T withIgnoredProperties(String... ignoredProperties) {
@@ -31,7 +31,7 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
     }
 
     /**
-     * See {@link ClientsClassDefinition#getIgnoredProperties()}
+     * See {@link PropertiesFilter#getIgnoredProperties()}
      * @throws IllegalArgumentException If includedProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
      */
     public T withIgnoredProperties(List<String> ignoredProperties) {
@@ -42,7 +42,7 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
     }
 
     /**
-     * See {@link ClientsClassDefinition#getIncludedProperties()}
+     * See {@link PropertiesFilter#getIncludedProperties()}
      * @throws IllegalArgumentException If ignoredProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
      */
     public T withIncludedProperties(List<String> includedProperties) {
