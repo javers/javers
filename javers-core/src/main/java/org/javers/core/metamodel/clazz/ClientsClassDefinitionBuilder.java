@@ -22,8 +22,8 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
     }
 
     /**
-     * Model properties to be ignored by Javers.
      * See {@link ClientsClassDefinition#getIgnoredProperties()}
+     * @throws IllegalArgumentException If includedProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
      */
     public T withIgnoredProperties(String... ignoredProperties) {
         withIgnoredProperties(Lists.asList(ignoredProperties));
