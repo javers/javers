@@ -46,11 +46,11 @@ public class EntityDefinitionBuilder extends ClientsClassDefinitionBuilder<Entit
         return new EntityDefinition(this);
     }
 
-    public Optional<String> getIdPropertyName() {
+    Optional<String> getIdPropertyName() {
         return idPropertyName;
     }
 
-    public boolean isShallowReference() {
+    boolean isShallowReference() {
         return shallowReference;
     }
 }

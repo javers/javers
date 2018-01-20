@@ -14,20 +14,41 @@ import java.util.List;
 public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefinitionBuilder> {
     private Class<?> clazz;
     private List<String> ignoredProperties = Collections.emptyList();
+    private List<String> includedProperties = Collections.emptyList();
     private Optional<String> typeName = Optional.empty();
 
     ClientsClassDefinitionBuilder(Class<?> clazz) {
         this.clazz = clazz;
     }
 
+    /**
+     * See {@link PropertiesFilter#getIgnoredProperties()}
+     * @throws IllegalArgumentException If includedProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
+     */
     public T withIgnoredProperties(String... ignoredProperties) {
         withIgnoredProperties(Lists.asList(ignoredProperties));
         return (T) this;
     }
 
+    /**
+     * See {@link PropertiesFilter#getIgnoredProperties()}
+     * @throws IllegalArgumentException If includedProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
+     */
     public T withIgnoredProperties(List<String> ignoredProperties) {
+        Validate.argumentCheck(this.includedProperties.size() == 0, "includedProperties already set. You can either specify includedProperties or ignoredProperties, not both.");
         Validate.argumentIsNotNull(ignoredProperties);
         this.ignoredProperties = ignoredProperties;
+        return (T) this;
+    }
+
+    /**
+     * See {@link PropertiesFilter#getIncludedProperties()}
+     * @throws IllegalArgumentException If ignoredProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
+     */
+    public T withIncludedProperties(List<String> includedProperties) {
+        Validate.argumentCheck(this.ignoredProperties.size() == 0, "ignoredProperties already set. You can either specify includedProperties or ignoredProperties, not both.");
+        Validate.argumentIsNotNull(includedProperties);
+        this.includedProperties = includedProperties;
         return (T) this;
     }
 
@@ -45,15 +66,20 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
         throw new RuntimeException("not implemented");
     }
 
-    public Class<?> getClazz() {
+    Class<?> getClazz() {
         return clazz;
     }
 
-    public List<String> getIgnoredProperties() {
+    List<String> getIgnoredProperties() {
         return ignoredProperties;
     }
 
-    public Optional<String> getTypeName() {
+    List<String> getIncludedProperties() {
+        return includedProperties;
+    }
+
+    Optional<String> getTypeName() {
         return typeName;
     }
+
 }

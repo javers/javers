@@ -35,7 +35,7 @@ public class ValueObjectDefinitionBuilder extends ClientsClassDefinitionBuilder<
         return new ValueObjectDefinition(this);
     }
 
-    public boolean isDefault() {
+    boolean isDefault() {
         return defaultType;
     }
 }

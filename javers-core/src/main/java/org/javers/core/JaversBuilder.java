@@ -194,7 +194,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerValueObject(Class<?> valueObjectClass) {
         argumentIsNotNull(valueObjectClass);
-        registerClassDefinition(new ValueObjectDefinition(valueObjectClass));
+        registerType(new ValueObjectDefinition(valueObjectClass));
         return this;
     }
 
@@ -225,7 +225,16 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerEntity(EntityDefinition entityDefinition){
         argumentIsNotNull(entityDefinition);
-        registerClassDefinition(entityDefinition);
+        return registerType(entityDefinition);
+    }
+
+    /**
+     * Generic version of {@link #registerEntity(EntityDefinition)} and
+     * {@link #registerValueObject(ValueObjectDefinition)}
+     */
+    public JaversBuilder registerType(ClientsClassDefinition clientsClassDefinition) {
+        argumentIsNotNull(clientsClassDefinition);
+        clientsClassDefinitions.put(clientsClassDefinition.getBaseJavaClass(), clientsClassDefinition);
         return this;
     }
 
@@ -254,13 +263,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerValueObject(ValueObjectDefinition valueObjectDefinition) {
         argumentIsNotNull(valueObjectDefinition);
-        registerClassDefinition(valueObjectDefinition);
+        registerType(valueObjectDefinition);
         return this;
     }
 
     /**
      * Comma separated list of packages.<br/>
-     * Allows you to registerClassDefinition all your classes with &#64;{@link TypeName} annotation
+     * Allows you to registerType all your classes with &#64;{@link TypeName} annotation
      * in order to use them in all kinds of JQL queries<br/>
      * (without getting TYPE_NAME_NOT_FOUND exception).
      *
@@ -314,13 +323,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * Values are compared using default {@link Object#equals(Object)}.
      * If you don't want to use it,
-     * registerClassDefinition a custom value comparator with {@link #registerValue(Class, CustomValueComparator)}.
+     * registerType a custom value comparator with {@link #registerValue(Class, CustomValueComparator)}.
      *
      * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
      */
     public JaversBuilder registerValue(Class<?> valueClass) {
         argumentIsNotNull(valueClass);
-        registerClassDefinition(new ValueDefinition(valueClass));
+        registerType(new ValueDefinition(valueClass));
         return this;
     }
 
@@ -360,7 +369,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         argumentsAreNotNull(valueClass, customValueComparator);
 
         if (!clientsClassDefinitions.containsKey(valueClass)){
-            registerClassDefinition(new ValueDefinition(valueClass));
+            registerType(new ValueDefinition(valueClass));
         }
         ValueDefinition def = getClassDefinition(valueClass);
         def.setCustomValueComparator(customValueComparator);
@@ -428,7 +437,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         argumentsAreNotNull(valueClass, toString);
 
         if (!clientsClassDefinitions.containsKey(valueClass)){
-            registerClassDefinition(new ValueDefinition(valueClass));
+            registerType(new ValueDefinition(valueClass));
         }
         ValueDefinition def = getClassDefinition(valueClass);
         def.setToStringFunction((Function)toString);
@@ -446,7 +455,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      */
     public JaversBuilder registerIgnoredClass(Class<?> ignoredClass) {
         argumentIsNotNull(ignoredClass);
-        registerClassDefinition(new IgnoredTypeDefinition(ignoredClass));
+        registerType(new IgnoredTypeDefinition(ignoredClass));
         return this;
     }
 
@@ -611,7 +620,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @see CustomType
      */
     public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
-        registerClassDefinition(new CustomDefinition(customType));
+        registerType(new CustomDefinition(customType));
         bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
     }
@@ -719,7 +728,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private void bootRepository(){
         if (repository == null){
-            logger.info("using fake InMemoryRepository, registerClassDefinition actual implementation via JaversBuilder.registerJaversRepository()");
+            logger.info("using fake InMemoryRepository, registerType actual implementation via JaversBuilder.registerJaversRepository()");
             addModule(new InMemoryRepositoryModule(getContainer()));
             repository = getContainerComponent(JaversRepository.class);
         } else {
@@ -733,10 +742,5 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private <T extends ClientsClassDefinition> T getClassDefinition(Class<?> baseJavaClass) {
         return (T)clientsClassDefinitions.get(baseJavaClass);
-    }
-
-    private void registerClassDefinition(ClientsClassDefinition clientsClassDefinition) {
-        argumentIsNotNull(clientsClassDefinition);
-        clientsClassDefinitions.put(clientsClassDefinition.getBaseJavaClass(), clientsClassDefinition);
     }
 }

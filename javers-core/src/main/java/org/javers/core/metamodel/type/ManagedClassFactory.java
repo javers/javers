@@ -1,17 +1,12 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Lists;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScan;
-import org.javers.core.metamodel.scanner.ClassScanner;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.javers.common.collections.Lists.positiveFilter;
@@ -26,19 +21,28 @@ class ManagedClassFactory {
         this.typeMapper = typeMapper;
     }
 
-    ManagedClass create(Class<?> baseJavaClass, ClassScan scan){
+    ManagedClass create(ClientsClassDefinition def, ClassScan scan) {
         List<JaversProperty> allProperties = convert(scan.getProperties());
-        return new ManagedClass(baseJavaClass, allProperties,
-                positiveFilter(allProperties, p -> p.looksLikeId()));
+
+        ManagedPropertiesFilter managedPropertiesFilter =
+                new ManagedPropertiesFilter(def.getBaseJavaClass(), allProperties, def.getPropertiesFilter());
+
+        return create(def.getBaseJavaClass(), allProperties, managedPropertiesFilter);
     }
 
-    ManagedClass create(ClientsClassDefinition def, ClassScan scan){
+    ManagedClass createFromPrototype(Class<?> baseJavaClass, ClassScan scan, ManagedPropertiesFilter prototypePropertiesFilter) {
         List<JaversProperty> allProperties = convert(scan.getProperties());
-        List<JaversProperty> filtered = filterIgnored(allProperties, def);
-        filtered = filterIgnoredType(filtered, def.getBaseJavaClass());
+        return create(baseJavaClass, allProperties, prototypePropertiesFilter);
+    }
 
-        return new ManagedClass(def.getBaseJavaClass(), filtered,
-                positiveFilter(allProperties, p -> p.looksLikeId()));
+    private ManagedClass create(Class<?> baseJavaClass, List<JaversProperty> allProperties, ManagedPropertiesFilter propertiesFilter){
+
+        List<JaversProperty> filtered = propertiesFilter.filterProperties(allProperties);
+
+        filtered = filterIgnoredType(filtered, baseJavaClass);
+
+        return new ManagedClass(baseJavaClass, filtered,
+                positiveFilter(allProperties, p -> p.looksLikeId()), propertiesFilter);
     }
 
     private List<JaversProperty> convert(List<Property> properties) {
@@ -53,7 +57,7 @@ class ManagedClassFactory {
 
     private List<JaversProperty> filterIgnoredType(List<JaversProperty> properties, final Class<?> currentClass){
 
-        return (List)Lists.negativeFilter(properties, property -> {
+        return Lists.negativeFilter(properties, property -> {
             if (property.getRawType() == currentClass){
                 return false;
             }
@@ -65,29 +69,5 @@ class ManagedClassFactory {
 
             return ReflectionUtil.isAnnotationPresentInHierarchy(property.getRawType(), DiffIgnore.class);
         });
-    }
-
-    private List<JaversProperty> filterIgnored(List<JaversProperty> properties, ClientsClassDefinition definition){
-        if (definition.getIgnoredProperties().isEmpty()){
-            return properties;
-        }
-
-        List<JaversProperty> filtered = new ArrayList<>(properties);
-        for (String ignored : definition.getIgnoredProperties()){
-            filterOneProperty(filtered, ignored, definition.getBaseJavaClass());
-        }
-        return filtered;
-    }
-
-    private void filterOneProperty(List<JaversProperty> properties, String ignoredName, Class<?> clientsClass) {
-        Iterator<JaversProperty> it = properties.iterator();
-        while (it.hasNext()) {
-            JaversProperty property = it.next();
-            if (property.getName().equals(ignoredName)) {
-                it.remove();
-                return;
-            }
-        }
-        throw new JaversException(JaversExceptionCode.PROPERTY_NOT_FOUND, ignoredName, clientsClass.getName());
     }
 }
