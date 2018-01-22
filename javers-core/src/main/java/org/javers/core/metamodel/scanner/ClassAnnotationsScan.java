@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.scanner;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author bartosz.walacik
@@ -8,14 +9,17 @@ import java.util.Optional;
 class ClassAnnotationsScan {
     private final TypeFromAnnotation typeFromAnnotation;
     private final boolean hasIgnoreDeclaredProperties;
+    private final Optional<Set<String>> includedProperties;
     private final Optional<String> typeName;
 
     ClassAnnotationsScan(TypeFromAnnotation typeFromAnnotation,
                          boolean hasIgnoreDeclaredProperties,
-                         Optional<String> typeName) {
+                         Optional<String> typeName,
+                         Optional<Set<String>> includedProperties) {
         this.typeFromAnnotation = typeFromAnnotation;
         this.typeName = typeName;
         this.hasIgnoreDeclaredProperties = hasIgnoreDeclaredProperties;
+        this.includedProperties = includedProperties;
     }
 
     public boolean isValue() {
@@ -44,5 +48,9 @@ class ClassAnnotationsScan {
 
     public boolean hasIgnoreDeclaredProperties() {
         return hasIgnoreDeclaredProperties;
+    }
+
+    public Optional<Set<String>> includedProperties() {
+        return includedProperties;
     }
 }

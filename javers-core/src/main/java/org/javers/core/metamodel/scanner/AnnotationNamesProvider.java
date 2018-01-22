@@ -57,6 +57,14 @@ class AnnotationNamesProvider {
         return getAnnotationValue(annotations, JaversAnnotationsNameSpace.TYPE_NAME_ANN, typeNameAliases);
     }
 
+    Optional<Set<String>> findDiffIncludeAnnValue(Set<Annotation> annotations) {
+        return getAnnotationValues(annotations, JaversAnnotationsNameSpace.DIFF_IGNORE_ANN, typeNameAliases);
+    }
+
+    private Optional<Set<String>> getAnnotationValues(Set<Annotation> annotations, Class<? extends Annotation> javersAnnType, Set<String> aliases) {
+        Optional<Annotation> annotation = findAnnotation(annotations, javersAnnType, aliases);
+        return annotation.map(ann -> ReflectionUtil.getAnnotationValue(ann, "value"));
+    }
     Optional<String> findPropertyNameAnnValue(Set<Annotation> annotations) {
         return getAnnotationValue(annotations, JaversAnnotationsNameSpace.PROPERTY_NAME_ANN, propertyNameAliases);
     }

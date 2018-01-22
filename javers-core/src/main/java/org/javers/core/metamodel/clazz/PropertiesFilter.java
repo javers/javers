@@ -9,7 +9,7 @@ public class PropertiesFilter {
     private final List<String> includedProperties;
     private final List<String> ignoredProperties;
 
-    PropertiesFilter(List<String> includedProperties, List<String> ignoredProperties) {
+    public PropertiesFilter(List<String> includedProperties, List<String> ignoredProperties) {
         argumentsAreNotNull(ignoredProperties, includedProperties);
         this.includedProperties = new ArrayList<>(includedProperties);
         this.ignoredProperties = new ArrayList<>(ignoredProperties);

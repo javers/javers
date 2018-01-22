@@ -15,7 +15,7 @@ public class ClassScanner {
     }
 
     public ClassScan scan(Class<?> managedClass){
-        ClassAnnotationsScan classScan = classAnnotationsScanner.scan(managedClass);
-        return new ClassScan(propertyScanner.scan(managedClass, classScan.hasIgnoreDeclaredProperties()), classScan);
+        ClassAnnotationsScan classAnnScan = classAnnotationsScanner.scan(managedClass);
+        return new ClassScan(propertyScanner.scan(managedClass, classAnnScan.hasIgnoreDeclaredProperties()), classAnnScan);
     }
 }
