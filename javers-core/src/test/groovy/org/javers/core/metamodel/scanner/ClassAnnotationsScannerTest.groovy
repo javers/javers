@@ -27,6 +27,22 @@ class ClassAnnotationsScannerTest extends Specification {
         classToScan << [JpaEntity, JpaMappedSuperclass, JaversEntity]
     }
 
+    def "should set includedProperties if @DiffInclude annotation is found in class"() {
+        when:
+        def result = scanner.scan(classToScan)
+
+        then:
+        result.includedProperties().isPresent()
+        result.includedProperties().get().size() == 2
+        result.includedProperties().get().contains("id")
+        result.includedProperties().get().contains("includedField")
+        !result.includedProperties().get().contains("ignoredField")
+
+        where:
+        annotation << [org.javers.core.metamodel.annotation.DiffInclude]
+        classToScan << [JaversEntityWithDiffInclude]
+    }
+
     @Unroll
     def "should map #annotation.name to ValueObject"() {
 

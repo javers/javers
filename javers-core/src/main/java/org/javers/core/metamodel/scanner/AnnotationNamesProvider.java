@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Lists;
+import org.javers.common.collections.Sets;
 import org.javers.common.reflection.ReflectionUtil;
 
 import java.lang.annotation.Annotation;
@@ -58,12 +59,12 @@ class AnnotationNamesProvider {
     }
 
     Optional<Set<String>> findDiffIncludeAnnValue(Set<Annotation> annotations) {
-        return getAnnotationValues(annotations, JaversAnnotationsNameSpace.DIFF_IGNORE_ANN, typeNameAliases);
+        return getAnnotationValues(annotations, JaversAnnotationsNameSpace.DIFF_INCLUDE_ANN, typeNameAliases);
     }
 
     private Optional<Set<String>> getAnnotationValues(Set<Annotation> annotations, Class<? extends Annotation> javersAnnType, Set<String> aliases) {
         Optional<Annotation> annotation = findAnnotation(annotations, javersAnnType, aliases);
-        return annotation.map(ann -> ReflectionUtil.getAnnotationValue(ann, "value"));
+        return annotation.map(ann -> Sets.asSet((String[])ReflectionUtil.getAnnotationValue(ann, "value")));
     }
     Optional<String> findPropertyNameAnnValue(Set<Annotation> annotations) {
         return getAnnotationValue(annotations, JaversAnnotationsNameSpace.PROPERTY_NAME_ANN, propertyNameAliases);
