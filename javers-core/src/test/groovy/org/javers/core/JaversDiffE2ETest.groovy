@@ -13,6 +13,7 @@ import org.javers.core.diff.changetype.container.ValueAdded
 import org.javers.core.examples.model.Person
 import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
+import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
@@ -37,13 +38,9 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId
 class JaversDiffE2ETest extends AbstractDiffTest {
 
     class PropsClass {
-        int id
+        @DiffInclude int id
         int a
         int b
-    }
-
-    class SubclassOPropsClass extends PropsClass {
-        int c
     }
 
     @Unroll
@@ -61,64 +58,11 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
       where:
       definition << [entityDefinition(PropsClass)
-                             .withIdPropertyName("id")
-                             .withIncludedProperties(["id"]).build(),
+                             .withIdPropertyName("id").build(),
                      valueObjectDefinition(PropsClass)
                              .withIncludedProperties(["id"]).build()
       ]
       classType << ["EntityType", "ValueObjectType"]
-    }
-
-    /**
-     * 'Included' properties are inherited. JaVers should ignore any other property in subclasses as well.
-     */
-    @Unroll
-    def "should ignore all props of a subclass that were not in the 'include' list of its superclass #classType"(){
-        given:
-        def javers = JaversBuilder.javers().registerType(definition).build()
-
-        when:
-        def left =  new SubclassOPropsClass(id:1, a:2, b:3, c:4)
-        def right = new SubclassOPropsClass(id:1, a:2, b:31, c:41)
-        def diff = javers.compare(left, right)
-
-        then:
-        println javers.getTypeMapping(SubclassOPropsClass).prettyPrint()
-
-        !diff.changes.size()
-
-        where:
-        definition << [entityDefinition(PropsClass)
-                               .withIdPropertyName("id")
-                               .withIncludedProperties(["id", "a"]).build(),
-                       valueObjectDefinition(PropsClass)
-                               .withIncludedProperties(["id", "a"]).build()
-        ]
-        classType << ["EntityType", "ValueObjectType"]
-    }
-
-    def "should ignore all props of a subclass that were ignored in its superclass #classType"(){
-        given:
-        def javers = JaversBuilder.javers().registerType(definition).build()
-
-        when:
-        def left =  new SubclassOPropsClass(id:1, a:2, b:3,  c:4)
-        def right = new SubclassOPropsClass(id:1, a:2, b:31, c:4)
-        def diff = javers.compare(left, right)
-
-        then:
-        println javers.getTypeMapping(SubclassOPropsClass).prettyPrint()
-
-        !diff.changes.size()
-
-        where:
-        definition << [entityDefinition(PropsClass)
-                               .withIdPropertyName("id")
-                               .withIgnoredProperties(["b"]).build(),
-                       valueObjectDefinition(PropsClass)
-                               .withIgnoredProperties(["b"]).build()
-        ]
-        classType << ["EntityType", "ValueObjectType"]
     }
 
     def "should extract Property from PropertyChange"(){

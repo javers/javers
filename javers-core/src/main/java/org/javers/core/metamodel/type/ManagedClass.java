@@ -23,8 +23,8 @@ class ManagedClass {
     private final List<JaversProperty> looksLikeId;
     private final ManagedPropertiesFilter managedPropertiesFilter;
 
-    ManagedClass(Class baseJavaClass, List<JaversProperty> allProperties, List<JaversProperty> looksLikeId, ManagedPropertiesFilter managedPropertiesFilter) {
-        argumentsAreNotNull(baseJavaClass, allProperties, looksLikeId, managedPropertiesFilter);
+    ManagedClass(Class baseJavaClass, List<JaversProperty> managedProperties, List<JaversProperty> looksLikeId, ManagedPropertiesFilter managedPropertiesFilter) {
+        argumentsAreNotNull(baseJavaClass, managedProperties, looksLikeId, managedPropertiesFilter);
 
         this.baseJavaClass = baseJavaClass;
         this.managedProperties = new ArrayList<>();
@@ -32,11 +32,8 @@ class ManagedClass {
         this.looksLikeId = looksLikeId;
         this.managedPropertiesFilter = managedPropertiesFilter;
 
-        //TODO not sure why TransientAnn goes here, it should be encapsulated in ClassScan
-        for (JaversProperty property : allProperties) {
-            if (!property.hasTransientAnn()){
-                this.managedProperties.add(property);
-            }
+        for (JaversProperty property : managedProperties) {
+            this.managedProperties.add(property);
             propertiesByName.put(property.getName(),property);
         }
     }

@@ -28,6 +28,11 @@ class PropertyAssert {
         this
     }
 
+    PropertyAssert isIncluded() {
+        assert actual.hasIncludedAnn
+        this
+    }
+
     PropertyAssert looksLikeId() {
         assert actual.looksLikeId()
         this

@@ -40,12 +40,14 @@ abstract class TypeFactoryIdTest extends Specification {
         entity.idProperty.name == 'bigFlag'
     }
 
-    def "should ignore @Transient annotation when idProperty name is given"() {
+    def "should not ignore @Transient annotation when idProperty name is given"() {
         when:
-        def entity = typeFactory.create(new EntityDefinition(DummyUser,"propertyWithTransientAnn"))
+        typeFactory.create(new EntityDefinition(DummyUser,"propertyWithTransientAnn"))
 
         then:
-        entity.idProperty.name == 'propertyWithTransientAnn'
+        JaversException e = thrown()
+        e.code == JaversExceptionCode.PROPERTY_NOT_FOUND
+        println(e)
     }
 
     def "should fail for Entity without Id property"() {

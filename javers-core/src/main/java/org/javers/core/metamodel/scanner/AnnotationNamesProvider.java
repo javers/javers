@@ -50,6 +50,10 @@ class AnnotationNamesProvider {
                annTypes.stream().anyMatch(annType -> transientPropertyAliases.contains(annType.getSimpleName()));
     }
 
+    boolean hasDiffIncludeAnn(Set<Class<? extends Annotation>> annTypes) {
+        return annTypes.contains(JaversAnnotationsNameSpace.DIFF_INCLUDE_ANN);
+    }
+
     boolean hasShallowReferenceAnn(Set<Class<? extends Annotation>> annTypes) {
         return annTypes.contains(JaversAnnotationsNameSpace.SHALLOW_REFERENCE_ANN);
     }
@@ -58,14 +62,6 @@ class AnnotationNamesProvider {
         return getAnnotationValue(annotations, JaversAnnotationsNameSpace.TYPE_NAME_ANN, typeNameAliases);
     }
 
-    Optional<Set<String>> findDiffIncludeAnnValue(Set<Annotation> annotations) {
-        return getAnnotationValues(annotations, JaversAnnotationsNameSpace.DIFF_INCLUDE_ANN, typeNameAliases);
-    }
-
-    private Optional<Set<String>> getAnnotationValues(Set<Annotation> annotations, Class<? extends Annotation> javersAnnType, Set<String> aliases) {
-        Optional<Annotation> annotation = findAnnotation(annotations, javersAnnType, aliases);
-        return annotation.map(ann -> Sets.asSet((String[])ReflectionUtil.getAnnotationValue(ann, "value")));
-    }
     Optional<String> findPropertyNameAnnValue(Set<Annotation> annotations) {
         return getAnnotationValue(annotations, JaversAnnotationsNameSpace.PROPERTY_NAME_ANN, propertyNameAliases);
     }

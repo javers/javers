@@ -2,10 +2,8 @@ package org.javers.core.metamodel.scanner;
 
 import org.javers.core.metamodel.property.Property;
 
-import java.util.Optional;
-
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 /**
  * @author bartosz.walacik
@@ -45,10 +43,6 @@ public class ClassScan {
 
     public Optional<String> typeName() {
         return classAnnotationsScan.typeName();
-    }
-
-    public Optional<Set<String>> includedProperties() {
-        return classAnnotationsScan.includedProperties();
     }
 
     public boolean hasIgnoredAnn() {

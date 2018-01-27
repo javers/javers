@@ -41,7 +41,6 @@ class ClassAnnotationsScanner {
                 .collect(Collectors.toSet());
 
         Optional<String> typeName = annotationNamesProvider.findTypeNameAnnValue(annotations);
-        Optional<Set<String>> includedProperties = annotationNamesProvider.findDiffIncludeAnnValue(annotations);
 
         Optional<Class<? extends Annotation>> javersTypeAnnotation =
                 JAVERS_TYPE_ANNOTATIONS.stream().filter(annTypes::contains).findFirst();
@@ -50,8 +49,7 @@ class ClassAnnotationsScanner {
 
         return new ClassAnnotationsScan(typeFromAnnotation(annTypes),
                                         hasIgnoreDeclaredProperties,
-                                        typeName,
-                                        includedProperties);
+                                        typeName);
     }
 
     private TypeFromAnnotation typeFromAnnotation(Set<Class<? extends Annotation>> annTypes) {

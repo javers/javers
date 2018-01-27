@@ -15,7 +15,7 @@ public class JaversProperty extends Property {
     private final Supplier<JaversType> propertyType;
 
     public JaversProperty(Supplier<JaversType> propertyType, Property property) {
-        super(property.getMember(),  property.hasTransientAnn(), property.hasShallowReferenceAnn(), property.getName());
+        super(property.getMember(),  property.hasTransientAnn(), property.hasShallowReferenceAnn(), property.getName(), property.isHasIncludedAnn());
         this.propertyType = propertyType;
     }
 

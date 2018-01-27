@@ -43,16 +43,20 @@ class TypeFactory {
     JaversType create(ClientsClassDefinition def, ClassScan scan) {
         if (def instanceof CustomDefinition) {
             return new CustomType(def.getBaseJavaClass());
-        } else if (def instanceof EntityDefinition) {
+        } else
+        if (def instanceof EntityDefinition) {
             return entityTypeFactory.createEntity((EntityDefinition) def, scan);
-        } else if (def instanceof ValueObjectDefinition) {
+        } else
+        if (def instanceof ValueObjectDefinition){
             return createValueObject((ValueObjectDefinition) def, scan);
-        } else if (def instanceof ValueDefinition) {
+        } else
+        if (def instanceof ValueDefinition) {
             ValueDefinition valueDefinition = (ValueDefinition) def;
             return new ValueType(valueDefinition.getBaseJavaClass(),
                     valueDefinition.getComparator(),
                     valueDefinition.getToStringFunction());
-        } else if (def instanceof IgnoredTypeDefinition) {
+        } else
+        if (def instanceof IgnoredTypeDefinition) {
             return new IgnoredType(def.getBaseJavaClass());
         } else {
             throw new IllegalArgumentException("unsupported definition " + def.getClass().getSimpleName());
@@ -106,7 +110,8 @@ class TypeFactory {
             ManagedClass managedClass = managedClassFactory.createFromPrototype(javaRichType.javaClass, javaRichType.getScan(),
                     managedPrototype.getManagedClass().getManagedPropertiesFilter());
             return managedPrototype.spawn(managedClass, javaRichType.getScan().typeName());
-        } else {
+        }
+        else {
             return prototype.spawn(javaRichType.javaType); //delegate to simple constructor
         }
     }
@@ -119,9 +124,6 @@ class TypeFactory {
     }
 
     private Optional<JaversType> inferFromAnnotations(JavaRichType t) {
-        //set included properties from annotation if available.
-        List<String> includedProperties = t.getScan().includedProperties().isPresent() ? new ArrayList<>(t.getScan().includedProperties().get()) : Collections.emptyList();
-
         if (t.getScan().hasValueAnn()) {
             return Optional.of(create(new ValueDefinition(t.javaClass), t.getScan()));
         }
@@ -131,7 +133,7 @@ class TypeFactory {
         }
 
         if (t.getScan().hasValueObjectAnn()) {
-            return Optional.of(create(valueObjectDefinition(t.javaClass).withTypeName(t.getAnnTypeName()).withIncludedProperties(includedProperties).build(), t.getScan()));
+            return Optional.of(create(valueObjectDefinition(t.javaClass).withTypeName(t.getAnnTypeName()).build(),t.getScan()));
         }
 
         if (t.getScan().hasShallowReferenceAnn()) {
@@ -139,7 +141,7 @@ class TypeFactory {
         }
 
         if (t.getScan().hasEntityAnn() || t.getScan().hasIdProperty()) {
-            return Optional.of(create(entityDefinition(t.javaClass).withIncludedProperties(includedProperties).withTypeName(t.getAnnTypeName()).build(), t.getScan()));
+            return Optional.of(create(entityDefinition(t.javaClass).withTypeName(t.getAnnTypeName()).build(), t.getScan()));
         }
 
         return Optional.empty();

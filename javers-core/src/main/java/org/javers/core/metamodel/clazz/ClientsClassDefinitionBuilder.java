@@ -2,6 +2,9 @@ package org.javers.core.metamodel.clazz;
 
 import org.javers.common.collections.Lists;
 import java.util.Optional;
+
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 
 import java.util.Collections;
@@ -32,22 +35,26 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
 
     /**
      * See {@link PropertiesFilter#getIgnoredProperties()}
-     * @throws IllegalArgumentException If includedProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
+     * @throws JaversException If includedProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
      */
     public T withIgnoredProperties(List<String> ignoredProperties) {
-        Validate.argumentCheck(this.includedProperties.size() == 0, "includedProperties already set. You can either specify includedProperties or ignoredProperties, not both.");
         Validate.argumentIsNotNull(ignoredProperties);
+        if (includedProperties.size() > 0) {
+            throw new JaversException(JaversExceptionCode.IGNORED_AND_INCLUDED_PROPERTIES_MIX, clazz.getSimpleName());
+        }
         this.ignoredProperties = ignoredProperties;
         return (T) this;
     }
 
     /**
      * See {@link PropertiesFilter#getIncludedProperties()}
-     * @throws IllegalArgumentException If ignoredProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
+     * @throws JaversException If ignoredProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
      */
     public T withIncludedProperties(List<String> includedProperties) {
-        Validate.argumentCheck(this.ignoredProperties.size() == 0, "ignoredProperties already set. You can either specify includedProperties or ignoredProperties, not both.");
         Validate.argumentIsNotNull(includedProperties);
+        if (ignoredProperties.size() > 0) {
+            throw new JaversException(JaversExceptionCode.IGNORED_AND_INCLUDED_PROPERTIES_MIX, clazz.getSimpleName());
+        }
         this.includedProperties = includedProperties;
         return (T) this;
     }

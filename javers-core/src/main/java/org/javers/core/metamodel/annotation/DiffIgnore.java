@@ -22,9 +22,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * <H2>Class level</H2>
  * Add DiffIgnore to classes to mark them as ignored. <br/>
- * When certain class is ignored, all properties
+ * When a given class is ignored, all properties
  * (found in other classes) with this class as a return type are ignored.
  *
+ * @see DiffInclude
  * @see JaversBuilder#withMappingStyle(MappingStyle)
  * @author bartosz walacik
  */

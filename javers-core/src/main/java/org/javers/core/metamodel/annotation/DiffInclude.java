@@ -14,11 +14,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <br/><br/>
  * For example, in the below example, JaVers will ignore every property except for id and foo:
  * <pre>
- * &#64;DiffInclude (value = {"id", "foo"})
  * class A {
  *     &#64;Id
+ *     &#64;DiffInclude
  *     private Long id;
+ *
+ *     &#64;DiffInclude
  *     private String foo;
+ *
  *     private String bar;
  * }
  *
@@ -34,7 +37,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * class A {
  *     &#64;Id
  *     private Long id;
+ *
  *     private String foo;
+ *
  *     &#64;DiffIgnore
  *     private String bar;
  * }
@@ -49,8 +54,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @see DiffIgnore
  * @author Iulian Stefanica
  */
-@Target({ TYPE})
+@Target({METHOD, FIELD})
 @Retention(RUNTIME)
 public @interface DiffInclude {
-    String[] value();
 }
