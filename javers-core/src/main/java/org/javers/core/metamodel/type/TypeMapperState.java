@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -21,6 +23,8 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz.walacik
  */
 class TypeMapperState {
+    private static final Logger logger = LoggerFactory.getLogger(TypeMapperState.class);
+
     private final Map<String, JaversType> mappedTypes = new ConcurrentHashMap<>();
     private final Map<DuckType, Class> mappedTypeNames = new ConcurrentHashMap<>();
     private final TypeFactory typeFactory;
@@ -163,7 +167,7 @@ class TypeMapperState {
         for (Type parent : hierarchy) {
             JaversType jType = getFromMap(parent);
             if (jType != null && jType.canBePrototype()) {
-                System.out.println("proto for " + javaType +" -> "+jType);
+                logger.debug("proto for {} -> {}", javaType, jType);
                 return Optional.of(jType);
             }
         }
