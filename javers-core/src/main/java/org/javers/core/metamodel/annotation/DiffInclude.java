@@ -7,12 +7,16 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Use DiffInclude annotation to tell JaVers what properties to include in the diff results for this type.
- * All other properties in the current type and it's subclasses will be ignored by JaVers.
+ * Use {@code DiffInclude} annotation to tell JaVers which properties to include in diff/commit
+ * operations for a given class.
+ * All other properties in this class and all properties in its subclasses will be ignored by JaVers.
+ * <br/>
  *
- * If more or different properties should be included in a subclass, apply the annotation to the subclass with the different list of properties.
+ * If some properties in a subclass should be included, apply the {@code DiffInclude} annotation on them.
  * <br/><br/>
- * For example, in the below example, JaVers will ignore every property except for id and foo:
+ *
+ * For example, JaVers will ignore {@code bar} in the {@code A} class and both {@code bar} and {@code qux}
+ * in the {@code B} class.
  * <pre>
  * class A {
  *     &#64;Id
@@ -25,7 +29,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *     private String bar;
  * }
  *
- * Suppose we have a subclass
  * class B extends A {
  *     private String qux;
  * }
@@ -44,12 +47,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *     private String bar;
  * }
  *
- * and
- *
  * class B extends A {
  *     &#64;DiffIgnore
  *     private String qux;
  * }
+ * </pre>
+ *
+ * <b>Warning</b>: {@code DiffInclude} can't be mixed with {@code DiffIgnore} in the same class.
  *
  * @see DiffIgnore
  * @author Iulian Stefanica
