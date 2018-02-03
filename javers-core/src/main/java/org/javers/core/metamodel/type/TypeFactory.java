@@ -43,20 +43,16 @@ class TypeFactory {
     JaversType create(ClientsClassDefinition def, ClassScan scan) {
         if (def instanceof CustomDefinition) {
             return new CustomType(def.getBaseJavaClass());
-        } else
-        if (def instanceof EntityDefinition) {
+        } else if (def instanceof EntityDefinition) {
             return entityTypeFactory.createEntity((EntityDefinition) def, scan);
-        } else
-        if (def instanceof ValueObjectDefinition){
+        } else if (def instanceof ValueObjectDefinition) {
             return createValueObject((ValueObjectDefinition) def, scan);
-        } else
-        if (def instanceof ValueDefinition) {
+        } else if (def instanceof ValueDefinition) {
             ValueDefinition valueDefinition = (ValueDefinition) def;
             return new ValueType(valueDefinition.getBaseJavaClass(),
                     valueDefinition.getComparator(),
                     valueDefinition.getToStringFunction());
-        } else
-        if (def instanceof IgnoredTypeDefinition) {
+        } else if (def instanceof IgnoredTypeDefinition) {
             return new IgnoredType(def.getBaseJavaClass());
         } else {
             throw new IllegalArgumentException("unsupported definition " + def.getClass().getSimpleName());
@@ -110,8 +106,7 @@ class TypeFactory {
             ManagedClass managedClass = managedClassFactory.createFromPrototype(javaRichType.javaClass, javaRichType.getScan(),
                     managedPrototype.getManagedClass().getManagedPropertiesFilter());
             return managedPrototype.spawn(managedClass, javaRichType.getScan().typeName());
-        }
-        else {
+        } else {
             return prototype.spawn(javaRichType.javaType); //delegate to simple constructor
         }
     }

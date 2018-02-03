@@ -33,12 +33,12 @@ import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.value
  */
 class TypeFactoryTest extends Specification {
 
-    static def entityCreator(MappingStyle mappingStyle) {
+    static def entityCreator(MappingStyle mappingStyle){
         def typeFactory = create(mappingStyle)
-        return { clazz -> typeFactory.create(new EntityDefinition(clazz)) }
+        return { clazz -> typeFactory.create(new EntityDefinition(clazz))}
     }
 
-    static TypeFactory create(MappingStyle mappingStyle) {
+    static TypeFactory create(MappingStyle mappingStyle){
         def javersTestAssembly = javersTestAssembly(mappingStyle)
         def classScanner = javersTestAssembly.getContainerComponent(ClassScanner)
         new TypeFactory(classScanner, javersTestAssembly.typeMapper)
@@ -51,7 +51,7 @@ class TypeFactoryTest extends Specification {
     @Shared
     TypeFactory typeFactory
 
-    def "should use name from @TypeName when inferring from prototype"() {
+    def "should use name from @TypeName when inferring from prototype"(){
         given:
         def prototype = typeFactory.infer(AbstractValueObject)
 
@@ -63,7 +63,7 @@ class TypeFactoryTest extends Specification {
     }
 
     @Unroll
-    def "should use name from @TypeName for inferred #expectedType.simpleName"() {
+    def "should use name from @TypeName for inferred #expectedType.simpleName"(){
         when:
         def type = typeFactory.infer(clazz)
 
@@ -72,12 +72,12 @@ class TypeFactoryTest extends Specification {
         type.class == expectedType
 
         where:
-        expectedType << [ValueObjectType, EntityType]
+        expectedType  << [ValueObjectType, EntityType]
         clazz << [JaversValueObjectWithTypeAlias, NewEntityWithTypeAlias]
     }
 
     @Unroll
-    def "should use typeName from ClientClassDefinition for #expectedType.simpleName"() {
+    def "should use typeName from ClientClassDefinition for #expectedType.simpleName"(){
         when:
         def type = typeFactory.create(definition)
 
@@ -86,7 +86,7 @@ class TypeFactoryTest extends Specification {
         type.class == expectedType
 
         where:
-        expectedType << [EntityType, ValueObjectType]
+        expectedType  << [EntityType,ValueObjectType]
         definition << [entityDefinition(DummyUser).withTypeName("myName").build(),
                        valueObjectDefinition(DummyUser).withTypeName("myName").build()
         ]
@@ -114,7 +114,7 @@ class TypeFactoryTest extends Specification {
         vo.properties.size() > 2
     }
 
-    def "should ignore properties with @DiffIgnored type"() {
+    def "should ignore properties with @DiffIgnored type"(){
         when:
         EntityType entity = typeFactory.infer(DummyUser)
 
@@ -123,13 +123,13 @@ class TypeFactoryTest extends Specification {
         !entity.propertyNames.contains("propertyWithDiffIgnoredSubtype")
     }
 
-    def "should map @DiffIgnored type as IgnoredType"() {
+    def "should map @DiffIgnored type as IgnoredType"(){
         expect:
         typeFactory.infer(DummyIgnoredType) instanceof IgnoredType
     }
 
     @Unroll
-    def "should map @ShallowReference type as ShallowReference when using #style style"() {
+    def "should map @ShallowReference type as ShallowReference when using #style style"(){
         expect:
         create(style).infer(ShallowPhone) instanceof ShallowReferenceType
 
@@ -137,12 +137,12 @@ class TypeFactoryTest extends Specification {
         style << [BEAN, FIELD]
     }
 
-    def "should map as ValueObjectType by default"() {
+    def "should map as ValueObjectType by default"(){
         expect:
         typeFactory.infer(DummyAddress) instanceof ValueObjectType
     }
 
-    def "should map as ValueType when @Value annotation is present "() {
+    def "should map as ValueType when @Value annotation is present "(){
         expect:
         typeFactory.infer(JaversValue) instanceof ValueType
     }
@@ -174,7 +174,7 @@ class TypeFactoryTest extends Specification {
 
     def "should fail if given ignored EntityType property not exists"() {
         when:
-        typeFactory.create(new EntityDefinition(DummyAddress, "street", ["city__"]))
+        typeFactory.create(new EntityDefinition(DummyAddress, "street",["city__"]))
 
         then:
         JaversException e = thrown()
@@ -184,18 +184,16 @@ class TypeFactoryTest extends Specification {
     @javax.persistence.Entity
     @org.javers.core.metamodel.annotation.ValueObject
     class AmbiguousValueObjectType {
-        @Id
-        int id
+        @Id int id
     }
 
     @javax.persistence.Embeddable
     @org.javers.core.metamodel.annotation.Entity
     class AmbiguousEntityType {
-        @Id
-        int id
+        @Id int id
     }
 
-    def "should use javers type annotations first, when ambiguous type mapping"() {
+    def "should use javers type annotations first, when ambiguous type mapping"(){
         expect:
         typeFactory.infer(AmbiguousEntityType) instanceof EntityType
         typeFactory.infer(AmbiguousValueObjectType) instanceof ValueObjectType
