@@ -339,4 +339,16 @@ class TypeMapperTest extends Specification {
         type.properties.collect{it.name} as Set == ["id", "a"] as Set
     }
 
+    class SubclassWithMoreIncluded extends EntityWithIncluded {
+        @DiffInclude int c
+    }
+
+    def "should support DiffInclude annotation in superclass and subclass"() {
+        when:
+        def type = mapper.getJaversType(SubclassWithMoreIncluded)
+
+        then:
+        println type.prettyPrint()
+        type.properties.collect{it.name} as Set == ["id", "a", "c"] as Set
+    }
 }
