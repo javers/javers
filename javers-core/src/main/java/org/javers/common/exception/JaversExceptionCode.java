@@ -42,6 +42,8 @@ public enum JaversExceptionCode {
 
     NOT_IMPLEMENTED("not implemented"),
 
+    IGNORED_AND_INCLUDED_PROPERTIES_MIX("Mapping error in class '%s'. You can either specify Included Properties or Ignored Properties, not both."),
+
     SNAPSHOT_NOT_FOUND("snapshot '%s' not found in JaversRepository"),
 
     //graph & snapshot
@@ -49,7 +51,7 @@ public enum JaversExceptionCode {
 
     SNAPSHOT_STATE_VIOLATION("snapshots are immutable"),
 
-    PROPERTY_NOT_FOUND("property '%s' not found in class '%s'"),
+    PROPERTY_NOT_FOUND("Property '%s' not found in class '%s'. If the name is correct - check annotations. Properties with @DiffIgnore or @Transient are not visible for JaVers."),
 
     SETTER_NOT_FOUND("setter for getter '%s' not found in class '%s'"),
 

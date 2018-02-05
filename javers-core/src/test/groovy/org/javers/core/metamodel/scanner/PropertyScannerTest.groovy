@@ -1,6 +1,11 @@
 package org.javers.core.metamodel.scanner
 
 import com.google.gson.reflect.TypeToken
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
+import org.javers.core.metamodel.annotation.DiffIgnore
+import org.javers.core.metamodel.annotation.DiffInclude
+import org.javers.core.metamodel.clazz.JaversEntity
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyIgnoredPropertiesType
 import org.javers.core.model.DummyUser
@@ -18,6 +23,22 @@ import static PropertyScanAssert.assertThat
 abstract class PropertyScannerTest extends Specification {
 
     @Shared PropertyScanner propertyScanner
+
+    class EntityWithDiffInclude extends JaversEntity {
+        @DiffInclude String includedField
+
+        @DiffInclude String getIncludedField() {
+            return includedField
+        }
+    }
+
+    def "should scan included property"() {
+        when:
+        def properties = propertyScanner.scan(EntityWithDiffInclude)
+
+        then:
+        assertThat(properties).hasProperty("includedField").isIncluded()
+    }
 
     def "should scan and get inherited property"() {
         when:

@@ -2,8 +2,11 @@ package org.javers.core.metamodel.type
 
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
+import org.javers.core.JaversBuilder
 import org.javers.core.MappingStyle
 import org.javers.core.examples.typeNames.*
+import org.javers.core.metamodel.annotation.DiffIgnore
+import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.clazz.EntityDefinition
 import org.javers.core.metamodel.clazz.JaversEntity
 import org.javers.core.metamodel.clazz.JaversValue
@@ -46,7 +49,7 @@ class TypeFactoryTest extends Specification {
     }
 
     @Shared
-    def TypeFactory typeFactory
+    TypeFactory typeFactory
 
     def "should use name from @TypeName when inferring from prototype"(){
         given:
@@ -164,9 +167,9 @@ class TypeFactoryTest extends Specification {
         !jType.hasProperty("kind")
 
         where:
-        managedType <<   ["EntityType", "ValueObjectType"]
-        managedClassRecipe << [ new EntityDefinition(DummyAddress, "street", ["city","kind"]),
-                                new ValueObjectDefinition(DummyAddress, ["city","kind"]) ]
+        managedType << ["EntityType", "ValueObjectType"]
+        managedClassRecipe << [new EntityDefinition(DummyAddress, "street", ["city", "kind"]),
+                               new ValueObjectDefinition(DummyAddress, ["city", "kind"])]
     }
 
     def "should fail if given ignored EntityType property not exists"() {
@@ -194,5 +197,87 @@ class TypeFactoryTest extends Specification {
         expect:
         typeFactory.infer(AmbiguousEntityType) instanceof EntityType
         typeFactory.infer(AmbiguousValueObjectType) instanceof ValueObjectType
+    }
+
+    class EntityWithMixedAnnotations extends JaversEntity {
+        @DiffInclude
+        String includedField
+        @DiffIgnore
+        String ignoredField
+
+        @DiffInclude
+        String getIncludedField() {
+            return includedField
+        }
+
+        @DiffIgnore
+        String getIgnoredField() {
+            return ignoredField
+        }
+    }
+
+    def "should throw JaversException when ignored and included properties are mixed"() {
+        when:
+        typeFactory.infer(EntityWithMixedAnnotations)
+
+        then:
+        JaversException exception = thrown()
+        exception.code == JaversExceptionCode.IGNORED_AND_INCLUDED_PROPERTIES_MIX
+    }
+
+    class PropsClass {
+        int id
+        int a
+        int b
+    }
+
+    @Unroll
+    def "should ignore all props of defined #classType which are not in the 'included' list of properties"() {
+        when:
+        def type = typeFactory.create(definition)
+
+        then:
+        type.properties.size() == 1
+        type.properties[0].name == "id"
+        if (type instanceof EntityType) {
+            assert type.idProperty.name == "id"
+        }
+        println type.prettyPrint()
+
+        where:
+        definition << [entityDefinition(PropsClass)
+                               .withIdPropertyName("id")
+                               .withIncludedProperties(["id"]).build(),
+                       valueObjectDefinition(PropsClass)
+                               .withIncludedProperties(["id"]).build()
+        ]
+        classType << ["EntityType", "ValueObjectType"]
+    }
+
+    class EntityWithIncluded {
+        @DiffInclude @Id int id
+        int a
+    }
+
+    class ValueObjectWithIncluded {
+        @DiffInclude int id
+        int a
+    }
+
+    @Unroll
+    def "should ignore all props of inferred #clazz.simpleName without @DiffInclude annotation"() {
+        when:
+        def type = typeFactory.infer(clazz)
+
+        then:
+        type.properties.size() == 1
+        type.properties[0].name == "id"
+        if (type instanceof EntityType) {
+            assert type.idProperty.name == "id"
+        }
+        println type.prettyPrint()
+
+        where:
+        clazz << [EntityWithIncluded, ValueObjectWithIncluded]
     }
 }

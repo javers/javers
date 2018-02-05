@@ -16,19 +16,18 @@ class PropertyScan {
     PropertyScan(List<Property> properties) {
         Validate.argumentIsNotNull(properties);
         this.properties = properties;
-
         hasId = properties.stream().anyMatch(p -> p.looksLikeId());
     }
 
-    public Property getFirst(){
+    Property getFirst(){
         return properties.get(0);
     }
 
-    public List<Property> getProperties() {
+    List<Property> getProperties() {
         return Collections.unmodifiableList(properties);
     }
 
-    public boolean hasId(){
+    boolean hasId(){
         return hasId;
     }
 }

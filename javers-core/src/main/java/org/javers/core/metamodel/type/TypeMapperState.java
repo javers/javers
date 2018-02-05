@@ -152,7 +152,6 @@ class TypeMapperState {
 
     private Optional<JaversType> findPrototype(Type javaType) {
         Class javaClass = extractClass(javaType);
-        List<Type> hierarchy = ReflectionUtil.calculateHierarchyDistance(javaClass);
 
         //this is due too spoiled Java Array reflection API
         if (javaClass.isArray()) {
@@ -163,6 +162,8 @@ class TypeMapperState {
         if (selfClassType != null && javaClass != javaType){
             return  Optional.of(selfClassType); //returns rawType for ParametrizedTypes
         }
+
+        List<Type> hierarchy = ReflectionUtil.calculateHierarchyDistance(javaClass);
 
         for (Type parent : hierarchy) {
             JaversType jType = getFromMap(parent);
