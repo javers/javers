@@ -5,3 +5,4 @@ javers:
   prettyPrint: false
   typeSafeValues: true
   dialect: H2
+  sqlManagementEnabled: true

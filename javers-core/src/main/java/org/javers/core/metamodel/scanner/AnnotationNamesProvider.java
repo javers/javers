@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Lists;
+import org.javers.common.collections.Sets;
 import org.javers.common.reflection.ReflectionUtil;
 
 import java.lang.annotation.Annotation;
@@ -47,6 +48,10 @@ class AnnotationNamesProvider {
     boolean hasTransientPropertyAnn(Set<Class<? extends Annotation>> annTypes){
         return annTypes.contains(JaversAnnotationsNameSpace.DIFF_IGNORE_ANN) ||
                annTypes.stream().anyMatch(annType -> transientPropertyAliases.contains(annType.getSimpleName()));
+    }
+
+    boolean hasDiffIncludeAnn(Set<Class<? extends Annotation>> annTypes) {
+        return annTypes.contains(JaversAnnotationsNameSpace.DIFF_INCLUDE_ANN);
     }
 
     boolean hasShallowReferenceAnn(Set<Class<? extends Annotation>> annTypes) {

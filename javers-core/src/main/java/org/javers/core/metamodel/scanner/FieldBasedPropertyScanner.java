@@ -1,37 +1,21 @@
 package org.javers.core.metamodel.scanner;
 
-import org.javers.common.reflection.JaversField;
+import org.javers.common.reflection.JaversMember;
 import org.javers.common.reflection.ReflectionUtil;
-import org.javers.core.metamodel.property.Property;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author pawel szymczyk
  */
 class FieldBasedPropertyScanner extends PropertyScanner {
 
-    private final AnnotationNamesProvider annotationNamesProvider;
-
-    public FieldBasedPropertyScanner(AnnotationNamesProvider annotationNamesProvider) {
-        this.annotationNamesProvider = annotationNamesProvider;
+    FieldBasedPropertyScanner(AnnotationNamesProvider annotationNamesProvider) {
+        super(annotationNamesProvider);
     }
 
     @Override
-    public PropertyScan scan(Class<?> managedClass, boolean ignoreDeclaredProperties) {
-        List<JaversField> fields = ReflectionUtil.getAllPersistentFields(managedClass);
-        List<Property> propertyList = new ArrayList<>(fields.size());
-
-        for (JaversField field : fields) {
-            boolean isIgnoredInType = ignoreDeclaredProperties && field.getDeclaringClass().equals(managedClass);
-            boolean hasTransientAnn = annotationNamesProvider.hasTransientPropertyAnn(field.getAnnotationTypes());
-            boolean hasShallowReferenceAnn = annotationNamesProvider.hasShallowReferenceAnn(field.getAnnotationTypes());
-
-            Optional<String> customPropertyName = annotationNamesProvider.findPropertyNameAnnValue(field.getAnnotations());
-            propertyList.add(new Property(field, hasTransientAnn || isIgnoredInType, hasShallowReferenceAnn, customPropertyName));
-        }
-        return new PropertyScan(propertyList);
+    List<JaversMember> getMembers(Class<?> managedClass) {
+        return (List)ReflectionUtil.getAllPersistentFields(managedClass);
     }
 }

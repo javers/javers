@@ -2,6 +2,7 @@ package org.javers.repository.sql;
 
 import org.javers.core.AbstractContainerBuilder;
 import org.javers.repository.sql.pico.JaversSqlModule;
+import org.javers.repository.sql.pico.SchemaManagementDisabledModule;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.PolyJDBCBuilder;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
     private String schemaName;
     private boolean globalIdCacheDisabled;
+    private boolean isManagementEnabled=true;// default create tables
 
     public SqlRepositoryBuilder() {
     }
@@ -62,6 +64,11 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         return this;
     }
 
+    public SqlRepositoryBuilder withSchemaManagementEnabled(boolean isManagementEnabled){
+        this.isManagementEnabled = isManagementEnabled;
+        return this;
+    }
+
     public JaversSqlRepository build() {
         logger.info("starting up SqlRepository with dialect {} ...", dialectName);
         bootContainer();
@@ -79,7 +86,12 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
                 }).build();
 
         addComponent(polyJDBC);
-        addModule(new JaversSqlModule());
+
+        if(this.isManagementEnabled) {
+            addModule(new JaversSqlModule());
+        }else{
+            addModule(new SchemaManagementDisabledModule());
+        }
         addComponent(dialectName.getPolyDialect());
         addComponent(connectionProvider);
         return getContainerComponent(JaversSqlRepository.class);

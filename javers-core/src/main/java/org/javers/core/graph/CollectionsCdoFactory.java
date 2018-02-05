@@ -29,7 +29,7 @@ public class CollectionsCdoFactory {
         Property primaryProperty = classScanner.scan(wrapper.getClass()).getProperties().get(0);
         JaversMember javersMember = memberGenericTypeInjector.create(primaryProperty, clazz);
 
-        Property fixedProperty = new Property(javersMember, false);
+        Property fixedProperty = new Property(javersMember);
         JaversProperty fixedJProperty = new JaversProperty(() -> typeMapper.getPropertyType(fixedProperty), fixedProperty);
 
         ValueObjectType valueObject = new ValueObjectType(wrapper.getClass(), Lists.asList(fixedJProperty));

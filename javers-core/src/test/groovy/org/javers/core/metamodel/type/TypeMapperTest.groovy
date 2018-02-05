@@ -2,6 +2,7 @@ package org.javers.core.metamodel.type
 
 import com.google.gson.reflect.TypeToken
 import org.javers.core.JaversTestBuilder
+import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -14,6 +15,8 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 import static org.javers.common.reflection.ReflectionTestHelper.getFieldFromClass
+import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition
+import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.valueObjectDefinition
 
 /**
  * @author bartosz walacik
@@ -257,5 +260,95 @@ class TypeMapperTest extends Specification {
     def "prototypes mapped by default should not be considered"(){
       expect:
       mapper.getJaversType(EntityThree) instanceof EntityType
+    }
+
+    class PropsClass {
+        int id
+        int a
+        int b
+    }
+
+    class SubclassOfPropsClass extends PropsClass {
+        int c
+    }
+
+    /**
+     * 'Included' properties are inherited. JaVers should ignore any other property in subclasses as well.
+     */
+    @Unroll
+    def "should ignore all props of subclass when superclass #classType has Included properties definition"(){
+        given:
+        mapper.registerClientsClass(definition)
+
+        when:
+        def type = mapper.getJaversType(SubclassOfPropsClass)
+
+        then:
+        println type.prettyPrint()
+        type.properties.collect{it.name} == ["id", "a"]
+
+        where:
+        definition << [entityDefinition(PropsClass)
+                               .withIdPropertyName("id")
+                               .withIncludedProperties(["id", "a"]).build(),
+                       valueObjectDefinition(PropsClass)
+                               .withIncludedProperties(["id", "a"]).build()
+        ]
+        classType << ["EntityType", "ValueObjectType"]
+    }
+
+    class AnotherPropsClass {
+        int id
+        int a
+        int b
+    }
+
+    class SubclassOfAnotherPropsClass extends AnotherPropsClass {
+        int c
+    }
+
+    def "should ignore all props of subclass that were ignored in superclass Entity definition"(){
+        given:
+        mapper.registerClientsClass(entityDefinition(AnotherPropsClass)
+                .withIdPropertyName("id")
+                .withIgnoredProperties(["b"]).build())
+
+        when:
+        def type = mapper.getJaversType(SubclassOfAnotherPropsClass)
+
+        then:
+        type.properties.collect{it.name} as Set == ["id", "a", "c"] as Set
+    }
+
+    class EntityWithIncluded {
+        @DiffInclude @Id int id
+        @DiffInclude int a
+        int b
+    }
+
+    class SubclassOfEntityWithIncluded extends EntityWithIncluded {
+        int c
+    }
+
+    def "should ignore all props of subclass when superclass Entity has inferred Included properties"() {
+        when:
+        def type = mapper.getJaversType(SubclassOfEntityWithIncluded)
+
+        then:
+        println type.prettyPrint()
+        type.properties.collect{it.name} as Set == ["id", "a"] as Set
+    }
+
+    class SubclassWithMoreIncluded extends EntityWithIncluded {
+        @DiffInclude int c
+    }
+
+    def "should support DiffInclude annotation in superclass and subclass"() {
+        when:
+        def type = mapper.getJaversType(SubclassWithMoreIncluded)
+
+        then:
+        println type.prettyPrint()
+        type.properties.collect{it.name} as Set == ["id", "a", "c"] as Set
     }
 }

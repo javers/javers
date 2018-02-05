@@ -18,25 +18,27 @@ public class Property {
 
     private transient final JaversMember member;
     private transient final boolean hasTransientAnn;
+    private transient final boolean hasIncludedAnn;
     private transient final boolean hasShallowReferenceAnn;
     private final String name;
     private final String originalName;
 
-    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, Optional<String> name){
+    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, Optional<String> name, boolean hasIncludedAnn){
         argumentIsNotNull(member);
         this.member = member;
         this.hasTransientAnn = hasTransientAnn;
         this.hasShallowReferenceAnn = hasShallowReferenceAnn;
         this.originalName = member.propertyName();
         this.name = name.orElse(originalName);
+        this.hasIncludedAnn = hasIncludedAnn;
     }
 
-    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, String name){
-        this(member, hasTransientAnn, hasShallowReferenceAnn, Optional.of(name));
+    public Property(JaversMember member, boolean hasTransientAnn, boolean hasShallowReferenceAnn, String name, boolean hasIncludedAnn){
+        this(member, hasTransientAnn, hasShallowReferenceAnn, Optional.of(name), hasIncludedAnn);
     }
 
-    public Property(JaversMember member, boolean hasTransientAnn) {
-        this(member, hasTransientAnn, false, Optional.empty());
+    public Property(JaversMember member) {
+        this(member, false, false, Optional.empty(), false);
     }
 
     public Type getGenericType() {
@@ -118,6 +120,10 @@ public class Property {
 
     public boolean hasTransientAnn() {
         return hasTransientAnn;
+    }
+
+    public boolean isHasIncludedAnn() {
+        return hasIncludedAnn;
     }
 
     public boolean hasShallowReferenceAnn() {

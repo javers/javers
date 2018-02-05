@@ -2,7 +2,12 @@ package org.javers.core.metamodel.clazz;
 
 import org.javers.common.collections.Lists;
 import java.util.Optional;
+
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,8 +27,7 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
     }
 
     /**
-     * See {@link PropertiesFilter#getIgnoredProperties()}
-     * @throws IllegalArgumentException If includedProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
+     * @see #withIgnoredProperties(List)
      */
     public T withIgnoredProperties(String... ignoredProperties) {
         withIgnoredProperties(Lists.asList(ignoredProperties));
@@ -31,23 +35,43 @@ public abstract class ClientsClassDefinitionBuilder<T extends ClientsClassDefini
     }
 
     /**
-     * See {@link PropertiesFilter#getIgnoredProperties()}
-     * @throws IllegalArgumentException If includedProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
+     * List of class properties to be ignored by JaVers.
+     * <br/><br/>
+     *
+     * Properties can be also ignored with the {@link DiffIgnore} annotation.
+     * <br/><br/>
+     *
+     * You can either specify includedProperties or ignoredProperties, not both.
+     *
+     * @see DiffIgnore
+     * @throws IllegalArgumentException If includedProperties was already set.
      */
     public T withIgnoredProperties(List<String> ignoredProperties) {
-        Validate.argumentCheck(this.includedProperties.size() == 0, "includedProperties already set. You can either specify includedProperties or ignoredProperties, not both.");
         Validate.argumentIsNotNull(ignoredProperties);
+        if (includedProperties.size() > 0) {
+            throw new JaversException(JaversExceptionCode.IGNORED_AND_INCLUDED_PROPERTIES_MIX, clazz.getSimpleName());
+        }
         this.ignoredProperties = ignoredProperties;
         return (T) this;
     }
 
     /**
-     * See {@link PropertiesFilter#getIncludedProperties()}
-     * @throws IllegalArgumentException If ignoredProperties was already set. You can either specify includedProperties or ignoredProperties, not both.
+     * If included properties are defined for a class,
+     * only these properties are visible for JaVers, and the rest is ignored.
+     * <br/><br/>
+     *
+     * Properties can be also included with the {@link DiffInclude} annotation.
+     * <br/><br/>
+     *
+     * You can either specify includedProperties or ignoredProperties, not both.
+     *
+     * @throws JaversException If ignoredProperties was already set
      */
     public T withIncludedProperties(List<String> includedProperties) {
-        Validate.argumentCheck(this.ignoredProperties.size() == 0, "ignoredProperties already set. You can either specify includedProperties or ignoredProperties, not both.");
         Validate.argumentIsNotNull(includedProperties);
+        if (ignoredProperties.size() > 0) {
+            throw new JaversException(JaversExceptionCode.IGNORED_AND_INCLUDED_PROPERTIES_MIX, clazz.getSimpleName());
+        }
         this.includedProperties = includedProperties;
         return (T) this;
     }

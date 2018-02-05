@@ -2,9 +2,8 @@ package org.javers.core.metamodel.scanner;
 
 import org.javers.core.metamodel.property.Property;
 
-import java.util.Optional;
-
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author bartosz.walacik
