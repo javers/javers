@@ -30,7 +30,7 @@ public abstract class PropertyChange extends Change {
 
     @Override
     protected String fieldsToString() {
-        return super.fieldsToString() + addField("property", propertyName);
+        return super.fieldsToString() + ", " + propertyName + "";
     }
 
     @Override

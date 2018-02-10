@@ -1,13 +1,12 @@
 package org.javers.core.diff.changetype;
 
-import java.util.Optional;
-
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.Objects;
+import java.util.Optional;
 
-import static org.javers.common.string.ToStringBuilder.addField;
+import static org.javers.common.string.ToStringBuilder.format;
 
 /**
  * Changed reference to Entity or ValueObject (in *ToOne relation)
@@ -72,7 +71,8 @@ public final class ReferenceChange extends PropertyChange {
 
     @Override
     protected String fieldsToString() {
-        return super.fieldsToString() + addField("oldRef", left) + addField("newRef", right);
+        return super.fieldsToString() + " " +
+                format(getLeft()) + " changed to " + format(getRight());
     }
 
     @Override

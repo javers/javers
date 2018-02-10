@@ -50,10 +50,10 @@ public abstract class ContainerChange extends PropertyChange {
         StringBuilder changesAsString = new StringBuilder();
 
         for (ContainerElementChange c : changes){
-            if (changesAsString.length() > 0) { changesAsString.append(", "); }
+            if (changesAsString.length() > 0) { changesAsString.append("\n  "); }
             changesAsString.append(c);
         }
-        return super.fieldsToString() + addEnumField("containerChanges", changesAsString);
+        return super.fieldsToString() + " changes:\n  " + changesAsString;
     }
 
     @Override

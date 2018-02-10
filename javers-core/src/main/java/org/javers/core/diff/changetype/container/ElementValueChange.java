@@ -2,7 +2,10 @@ package org.javers.core.diff.changetype.container;
 
 import java.util.Objects;
 
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.diff.changetype.Atomic;
+
+import static org.javers.common.string.ToStringBuilder.format;
 
 /**
  * @author pawel szymczyk
@@ -28,7 +31,7 @@ public class ElementValueChange extends ContainerElementChange {
 
     @Override
     public String toString() {
-        return "("+ getIndex() + ").'"+getLeftValue()+"'>>'"+getRightValue()+"'";
+        return getIndex() + ". "+ format(getLeftValue())+" changed to "+format(getRightValue());
     }
 
     @Override

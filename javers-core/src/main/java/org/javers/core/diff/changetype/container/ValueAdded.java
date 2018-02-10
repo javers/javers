@@ -1,6 +1,6 @@
 package org.javers.core.diff.changetype.container;
 
-import static org.javers.common.string.ToStringBuilder.toStringSimple;
+import org.javers.common.string.ToStringBuilder;
 
 /**
  * element added to collection
@@ -23,11 +23,7 @@ public class ValueAdded extends ValueAddOrRemove {
 
     @Override
     public String toString() {
-        if (getIndex() == null){
-            return toStringSimple("added", getAddedValue());
-        }
-        else{
-            return toStringSimple("("+getIndex()+").added", getAddedValue());
-        }
+        return (getIndex() == null ? "" : getIndex()) + ". " +
+                ToStringBuilder.format(getAddedValue()) + " added";
     }
 }
