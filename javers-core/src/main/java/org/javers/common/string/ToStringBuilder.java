@@ -88,7 +88,6 @@ public class ToStringBuilder {
     }
 
     public static String format(Object value) {
-        if ( value instanceof String) return "'"+value+"'";
         if ( value instanceof Set) return ToStringBuilder.setToString((Set)value);
         if ( value instanceof List) return ToStringBuilder.listToString((List)value);
         if ( value instanceof Optional) {
@@ -98,7 +97,7 @@ public class ToStringBuilder {
               return "empty";
           }
         }
-        return value + "";
+        return "'"+value+"'";
     }
 
     private static boolean isNullOrEmpty(Object value) {

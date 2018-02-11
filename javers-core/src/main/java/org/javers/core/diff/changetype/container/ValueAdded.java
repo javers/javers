@@ -3,7 +3,7 @@ package org.javers.core.diff.changetype.container;
 import org.javers.common.string.ToStringBuilder;
 
 /**
- * element added to collection
+ * Item added to a collection
  *
  * @author bartosz walacik
  */
@@ -17,6 +17,9 @@ public class ValueAdded extends ValueAddOrRemove {
         super(value);
     }
 
+    /**
+     * Added item. See {@link #getValue()} javadoc
+     */
     public Object getAddedValue() {
         return value.unwrap();
     }

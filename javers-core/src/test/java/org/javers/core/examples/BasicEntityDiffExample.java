@@ -3,33 +3,50 @@ package org.javers.core.examples;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
-import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.examples.model.Person;
+import org.javers.core.examples.model.Address;
+import org.javers.core.examples.model.Employee;
+import org.javers.core.examples.model.EmployeeBuilder;
 import org.junit.Test;
+
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.javers.core.diff.ListCompareAlgorithm.LEVENSHTEIN_DISTANCE;
 
 public class BasicEntityDiffExample {
+
   @Test
   public void shouldCompareTwoEntityObjects() {
     //given
-    Javers javers = JaversBuilder.javers().build();
+    Javers javers = JaversBuilder.javers()
+            .withListCompareAlgorithm(LEVENSHTEIN_DISTANCE)
+            .build();
 
-    Person tommyOld = new Person("tommy", "Tommy Smart");
-    Person tommyNew = new Person("tommy", "Tommy C. Smart");
+    Employee tommyOld = EmployeeBuilder.Employee("Frodo")
+            .withAge(40)
+            .withPosition("Townsman")
+            .withSalary(10_000)
+            .withPrimaryAddress(new Address("Shire"))
+            .withSkills("management")
+            .withSubordinates(new Employee("Sam"))
+            .build();
+
+    Employee tommyNew = EmployeeBuilder.Employee("Frodo")
+            .withAge(41)
+            .withPosition("Hero")
+            .withBoss(new Employee("Gandalf"))
+            .withPrimaryAddress(new Address("Mordor"))
+            .withSalary(12_000)
+            .withSkills("management", "agile coaching")
+            .withSubordinates(new Employee("Sméagol"), new Employee("Sam"))
+            .build();
 
     //when
     Diff diff = javers.compare(tommyOld, tommyNew);
 
     //then
-    //there should be one change of type {@link ValueChange}
-    ValueChange change = diff.getChangesByType(ValueChange.class).get(0);
-
-    assertThat(diff.getChanges()).hasSize(1);
-    assertThat(change.getPropertyName()).isEqualTo("name");
-    assertThat(change.getAffectedGlobalId().value()).isEqualTo("org.javers.core.examples.model.Person/tommy");
-    assertThat(change.getLeft()).isEqualTo("Tommy Smart");
-    assertThat(change.getRight()).isEqualTo("Tommy C. Smart");
+    assertThat(diff.getChanges()).hasSize(9);
 
     System.out.println(diff);
+
+    System.out.println(javers.getJsonConverter().toJson(diff));
   }
 }

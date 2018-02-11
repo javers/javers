@@ -15,7 +15,7 @@ public class ChangeLogExample {
     public void shoudPrintTextChangeLog() {
         // given:
         Javers javers = JaversBuilder.javers().build();
-        Employee bob = new Employee("Bob", 9_000, "Scrum master" );
+        Employee bob = new Employee("Bob", 9_000, "Scrum master");
         javers.commit("hr.manager", bob);
 
         // do some changes and commit

@@ -1,6 +1,7 @@
 package org.javers.core.diff.appenders.levenshtein
 
 import org.javers.core.diff.appenders.AbstractDiffAppendersTest
+import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
@@ -33,8 +34,10 @@ class LevenshteinListChangeAppenderTest extends AbstractDiffAppendersTest {
                 realNodePair(leftNode, rightNode), getProperty(SnapshotEntity, "listOfEntities"))
 
         then:
-        assertThat(change).hasSize(1)
-                          .hasValueAdded(1, added)
+        change.changes.size() == 1
+        def addedValue = change.changes[0].addedValue
+        addedValue instanceof InstanceId
+        addedValue.cdoId == 3
     }
 
     @Unroll

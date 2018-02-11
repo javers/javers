@@ -17,6 +17,9 @@ public class ValueRemoved extends ValueAddOrRemove {
         super(value);
     }
 
+    /**
+     * Removed item. See {@link #getValue()} javadoc
+     */
     public Object getRemovedValue() {
         return value.unwrap();
     }
