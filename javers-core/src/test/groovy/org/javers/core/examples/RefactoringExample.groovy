@@ -55,13 +55,6 @@ class RefactoringExample extends Specification {
         println changes[0]
     }
 
-    class PersonSimple {
-        @Id
-        int id
-
-        String name
-    }
-
     @TypeName("org.javers.core.examples.PersonSimple")
     class PersonRetrofitted {
         @Id
