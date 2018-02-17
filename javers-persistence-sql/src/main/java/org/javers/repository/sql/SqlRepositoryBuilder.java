@@ -2,7 +2,6 @@ package org.javers.repository.sql;
 
 import org.javers.core.AbstractContainerBuilder;
 import org.javers.repository.sql.pico.JaversSqlModule;
-import org.javers.repository.sql.pico.SchemaManagementDisabledModule;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.PolyJDBCBuilder;
 import org.slf4j.Logger;
@@ -87,14 +86,11 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
         addComponent(polyJDBC);
 
-        if(this.isManagementEnabled) {
-            addModule(new JaversSqlModule());
-        }else{
-            addModule(new SchemaManagementDisabledModule());
-        }
+        addModule(new JaversSqlModule());
+
         addComponent(dialectName.getPolyDialect());
         addComponent(connectionProvider);
-        return getContainerComponent(JaversSqlRepository.class);
+        return getContainerComponent(JaversSqlRepository.class).withSchemaManagementEnabled(this.isManagementEnabled);
     }
 
     /**
