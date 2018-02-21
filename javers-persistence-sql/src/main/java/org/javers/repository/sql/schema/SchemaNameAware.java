@@ -57,4 +57,6 @@ public abstract class SchemaNameAware {
     protected String getSequenceNameWithSchema(String pkColName){
         return tableNameProvider.getSequenceNameWithSchema(pkColName);
     }
+
+    public void ensureSchema() {}
 }

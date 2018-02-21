@@ -17,6 +17,7 @@ import org.javers.repository.sql.repositories.CdoSnapshotRepository;
 import org.javers.repository.sql.repositories.CommitMetadataRepository;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.JaversSchemaManager;
+import org.javers.repository.sql.schema.SchemaNameAware;
 import org.polyjdbc.core.PolyJDBC;
 
 import java.util.Collection;
@@ -31,7 +32,10 @@ public class JaversSqlRepository implements JaversRepository {
     private final GlobalIdRepository globalIdRepository;
     private final CdoSnapshotRepository cdoSnapshotRepository;
     private final CdoSnapshotFinder finder;
-    private final JaversSchemaManager schemaManager;
+    private SchemaNameAware schemaManager;
+
+    private boolean isManagementEnabled;
+
     private final SqlRepositoryConfiguration sqlRepositoryConfiguration;
 
     public JaversSqlRepository(PolyJDBC polyJDBC, CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository,
@@ -44,6 +48,16 @@ public class JaversSqlRepository implements JaversRepository {
         this.finder = finder;
         this.schemaManager = schemaManager;
         this.sqlRepositoryConfiguration = sqlRepositoryConfiguration;
+    }
+
+    public JaversSqlRepository withSchemaManager(SchemaNameAware schemaManager){
+        this.schemaManager = schemaManager;
+        return this;
+    }
+
+    public JaversSqlRepository withSchemaManagementEnabled(boolean isManagementEnabled){
+        this.isManagementEnabled = isManagementEnabled;
+        return this;
     }
 
     @Override
@@ -85,7 +99,9 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public void ensureSchema() {
-        schemaManager.ensureSchema();
+        if(this.isManagementEnabled) {
+            schemaManager.ensureSchema();
+        }
     }
 
     @Override
