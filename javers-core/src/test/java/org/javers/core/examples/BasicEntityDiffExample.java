@@ -14,7 +14,7 @@ import static org.javers.core.diff.ListCompareAlgorithm.LEVENSHTEIN_DISTANCE;
 public class BasicEntityDiffExample {
 
   @Test
-  public void shouldCompareTwoEntityObjects() {
+  public void shouldCompareTwoEntities() {
     //given
     Javers javers = JaversBuilder.javers()
             .withListCompareAlgorithm(LEVENSHTEIN_DISTANCE)
@@ -45,8 +45,10 @@ public class BasicEntityDiffExample {
     //then
     assertThat(diff.getChanges()).hasSize(9);
 
+    // diff pretty print
     System.out.println(diff);
 
+    // diff as JSON
     System.out.println(javers.getJsonConverter().toJson(diff));
   }
 }
