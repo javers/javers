@@ -70,6 +70,7 @@ public class JaversSqlAutoConfiguration {
             .sqlRepository()
             .withConnectionProvider(connectionProvider)
             .withDialect(javersSqlDialectName())
+            .withSchemaManagementEnabled(javersProperties.isSqlSchemaManagementEnabled())
             .build();
     }
 

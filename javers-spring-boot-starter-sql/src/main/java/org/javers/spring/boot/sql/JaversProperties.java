@@ -13,6 +13,7 @@ public class JaversProperties {
     private String packagesToScan = "";
     private boolean auditableAspectEnabled = true;
     private boolean springDataAuditableRepositoryAspectEnabled = true;
+    private boolean sqlSchemaManagementEnabled = true;
 
     public String getAlgorithm() {
         return algorithm;
@@ -76,5 +77,13 @@ public class JaversProperties {
 
     public void setSpringDataAuditableRepositoryAspectEnabled(boolean springDataAuditableRepositoryAspectEnabled) {
         this.springDataAuditableRepositoryAspectEnabled = springDataAuditableRepositoryAspectEnabled;
+    }
+
+    public boolean isSqlSchemaManagementEnabled() {
+        return sqlSchemaManagementEnabled;
+    }
+
+    public void setSqlSchemaManagementEnabled(boolean sqlSchemaManagementEnabled) {
+        this.sqlSchemaManagementEnabled = sqlSchemaManagementEnabled;
     }
 }

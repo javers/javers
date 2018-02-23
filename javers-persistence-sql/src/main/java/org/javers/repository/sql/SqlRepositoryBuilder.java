@@ -21,6 +21,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
     private String schemaName;
     private boolean globalIdCacheDisabled;
+    private boolean schemaManagementEnabled = true;
 
     public SqlRepositoryBuilder() {
     }
@@ -62,24 +63,26 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         return this;
     }
 
+    public SqlRepositoryBuilder withSchemaManagementEnabled(boolean schemaManagementEnabled){
+        this.schemaManagementEnabled = schemaManagementEnabled;
+        return this;
+    }
+
     public JaversSqlRepository build() {
         logger.info("starting up SqlRepository with dialect {} ...", dialectName);
         bootContainer();
 
         SqlRepositoryConfiguration config =
-                new SqlRepositoryConfiguration(globalIdCacheDisabled, schemaName);
+                new SqlRepositoryConfiguration(globalIdCacheDisabled, schemaName, schemaManagementEnabled);
         addComponent(config);
 
         PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect(), config.getSchemaName())
-                .usingManagedConnections(new org.polyjdbc.core.transaction.ConnectionProvider() {
-                    @Override
-                    public Connection getConnection() throws SQLException {
-                        return connectionProvider.getConnection();
-                    }
-                }).build();
+                .usingManagedConnections(() -> connectionProvider.getConnection()).build();
 
         addComponent(polyJDBC);
+
         addModule(new JaversSqlModule());
+
         addComponent(dialectName.getPolyDialect());
         addComponent(connectionProvider);
         return getContainerComponent(JaversSqlRepository.class);

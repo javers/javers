@@ -5,3 +5,5 @@ javers:
   prettyPrint: false
   typeSafeValues: true
   dialect: H2
+  sqlSchemaManagementEnabled: false
+  packagesToScan: my.company.domain.person, my.company.domain.finance

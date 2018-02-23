@@ -32,6 +32,7 @@ public class JaversSqlRepository implements JaversRepository {
     private final CdoSnapshotRepository cdoSnapshotRepository;
     private final CdoSnapshotFinder finder;
     private final JaversSchemaManager schemaManager;
+
     private final SqlRepositoryConfiguration sqlRepositoryConfiguration;
 
     public JaversSqlRepository(PolyJDBC polyJDBC, CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository,
@@ -85,7 +86,9 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public void ensureSchema() {
-        schemaManager.ensureSchema();
+        if(sqlRepositoryConfiguration.isSchemaManagementEnabled()) {
+            schemaManager.ensureSchema();
+        }
     }
 
     @Override

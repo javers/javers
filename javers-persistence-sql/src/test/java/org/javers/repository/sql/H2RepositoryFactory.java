@@ -19,7 +19,7 @@ public class H2RepositoryFactory {
                                 }
                             }).
                             withDialect(DialectName.H2).
-                            build();
+                    build();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
