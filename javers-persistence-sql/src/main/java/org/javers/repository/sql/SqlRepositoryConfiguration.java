@@ -10,12 +10,14 @@ import org.javers.common.validation.Validate;
 public class SqlRepositoryConfiguration {
     private final boolean globalIdCacheDisabled;
     private final String schemaName;
+    private final boolean schemaManagementEnabled;
 
-    SqlRepositoryConfiguration(boolean globalIdCacheDisabled, String schemaName) {
+    SqlRepositoryConfiguration(boolean globalIdCacheDisabled, String schemaName, boolean schemaManagementEnabled) {
         Validate.argumentCheck(schemaName == null || !schemaName.isEmpty(),"schemaName should be null or non-empty");
 
         this.globalIdCacheDisabled = globalIdCacheDisabled;
         this.schemaName = schemaName;
+        this.schemaManagementEnabled = schemaManagementEnabled;
     }
 
     public boolean isGlobalIdCacheDisabled() {
@@ -31,5 +33,9 @@ public class SqlRepositoryConfiguration {
 
     public Optional<String> getSchemaNameAsOptional() {
         return Optional.ofNullable(schemaName);
+    }
+
+    public boolean isSchemaManagementEnabled() {
+        return schemaManagementEnabled;
     }
 }

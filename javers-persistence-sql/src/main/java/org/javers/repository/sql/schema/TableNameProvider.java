@@ -17,12 +17,6 @@ public class TableNameProvider {
         this.schemaName = configuration.getSchemaNameAsOptional();
     }
 
-    public TableNameProvider(Optional<String> schemaName){
-        this.schemaName = schemaName;
-    }
-
-
-
     public String getGlobalIdTableNameWithSchema() {
         return getGlobalIdTableName().nameWithSchema();
     }

@@ -40,7 +40,7 @@ public class Case249GenericId {
     public void shouldCommitEntityWithSerializableId() {
         //given
         Javers javers = JaversBuilder.javers().
-                registerJaversRepository(H2RepositoryFactory.create(true)).build();
+                registerJaversRepository(H2RepositoryFactory.create()).build();
 
         //when
         Account acc = new Account("1","2");

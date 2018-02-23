@@ -26,7 +26,7 @@ class JaversSqlAutoConfigurationTest extends Specification {
     @Autowired
     AuthorProvider provider
 
-    def "shouldReadConfigurationFromYml" () {
+    def "should read configuration from yml" () {
         expect:
         javersProperties.getAlgorithm() == "levenshtein_distance"
         javersProperties.getMappingStyle() == "bean"
@@ -34,7 +34,8 @@ class JaversSqlAutoConfigurationTest extends Specification {
         !javersProperties.isPrettyPrint()
         javersProperties.isTypeSafeValues()
         dialectName == DialectName.H2
-        javersProperties.isSqlManagementEnabled()
+        javersProperties.isSqlSchemaManagementEnabled()
+        javersProperties.packagesToScan == "my.company.domain.person, my.company.domain.finance"
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath" () {

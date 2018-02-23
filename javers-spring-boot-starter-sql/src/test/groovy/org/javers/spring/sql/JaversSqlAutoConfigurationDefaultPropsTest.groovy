@@ -14,8 +14,7 @@ import spock.lang.Specification
  * @author pawelszymczyk
  */
 @SpringBootTest(classes = [TestApplication])
-@ActiveProfiles("schema")
-class JaversSqlAutoConfigurationSchema extends Specification {
+class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
 
     @Autowired
     DialectName dialectName
@@ -26,10 +25,16 @@ class JaversSqlAutoConfigurationSchema extends Specification {
     @Autowired
     AuthorProvider provider
 
-    def "shouldReadConfigurationFromYml" () {
+    def "should provide default props" () {
         expect:
+        javersProperties.getAlgorithm() == "simple"
+        javersProperties.getMappingStyle() == "field"
+        !javersProperties.isNewObjectSnapshot()
+        javersProperties.isPrettyPrint()
+        !javersProperties.isTypeSafeValues()
+        javersProperties.packagesToScan == ""
         dialectName == DialectName.H2
-        !javersProperties.isSqlManagementEnabled()
+        javersProperties.isSqlSchemaManagementEnabled()
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath" () {

@@ -21,7 +21,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
     private String schemaName;
     private boolean globalIdCacheDisabled;
-    private boolean isManagementEnabled=true;// default create tables
+    private boolean schemaManagementEnabled = true;
 
     public SqlRepositoryBuilder() {
     }
@@ -63,8 +63,8 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         return this;
     }
 
-    public SqlRepositoryBuilder withSchemaManagementEnabled(boolean isManagementEnabled){
-        this.isManagementEnabled = isManagementEnabled;
+    public SqlRepositoryBuilder withSchemaManagementEnabled(boolean schemaManagementEnabled){
+        this.schemaManagementEnabled = schemaManagementEnabled;
         return this;
     }
 
@@ -73,16 +73,11 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         bootContainer();
 
         SqlRepositoryConfiguration config =
-                new SqlRepositoryConfiguration(globalIdCacheDisabled, schemaName);
+                new SqlRepositoryConfiguration(globalIdCacheDisabled, schemaName, schemaManagementEnabled);
         addComponent(config);
 
         PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect(), config.getSchemaName())
-                .usingManagedConnections(new org.polyjdbc.core.transaction.ConnectionProvider() {
-                    @Override
-                    public Connection getConnection() throws SQLException {
-                        return connectionProvider.getConnection();
-                    }
-                }).build();
+                .usingManagedConnections(() -> connectionProvider.getConnection()).build();
 
         addComponent(polyJDBC);
 
@@ -90,7 +85,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
 
         addComponent(dialectName.getPolyDialect());
         addComponent(connectionProvider);
-        return getContainerComponent(JaversSqlRepository.class).withSchemaManagementEnabled(this.isManagementEnabled);
+        return getContainerComponent(JaversSqlRepository.class);
     }
 
     /**

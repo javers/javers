@@ -1,9 +1,13 @@
 package org.javers.repository.sql
 
+import org.javers.core.JaversBuilder
 import org.javers.core.model.SnapshotEntity
+import org.polyjdbc.core.exception.QueryExecutionException
 
 import java.sql.Connection
 import java.sql.DriverManager
+
+import static org.javers.repository.sql.SqlRepositoryBuilder.sqlRepository
 
 class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
 
@@ -17,6 +21,22 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
 
     String getSchema() {
         return null
+    }
+
+    def "should fail when schema is not created"(){
+        given:
+        def javers = JaversBuilder.javers()
+                .registerJaversRepository(sqlRepository()
+                .withConnectionProvider({ DriverManager.getConnection("jdbc:h2:mem:empty-test") } as ConnectionProvider)
+                .withSchemaManagementEnabled(false)
+                .withDialect(getDialect())
+                .build()).build()
+
+        when:
+        javers.commit("author", new SnapshotEntity(id: 1))
+
+        then:
+        thrown(QueryExecutionException)
     }
 
     /**
