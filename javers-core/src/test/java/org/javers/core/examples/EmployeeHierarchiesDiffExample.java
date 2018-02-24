@@ -38,26 +38,34 @@ public class EmployeeHierarchiesDiffExample {
     System.out.println(diff);
   }
 
-  /** {@link NewObject} example, large structure */
+  /** {@link ObjectRemoved} example */
   @Test
-  public void shouldDetectFiredInLargeDepthStructure() {
+  public void shouldDetectFired() {
     //given
     Javers javers = JaversBuilder.javers().build();
 
-    Employee oldBoss = new Employee("Big Boss");
-    Employee boss = oldBoss;
-    for (int i=0; i<1000; i++){
-      boss.addSubordinate(new Employee("Emp no."+i));
-      boss = boss.getSubordinates().get(0);
-    }
+    Employee oldBoss = new Employee("Big Boss")
+            .addSubordinates(
+                    new Employee("Great Developer"),
+                    new Employee("Team Lead").addSubordinates(
+                            new Employee("Another Dev"),
+                            new Employee("To Be Fired")
+                    ));
 
-    Employee newBoss = new Employee("Big Boss");
+    Employee newBoss = new Employee("Big Boss")
+            .addSubordinates(
+                    new Employee("Great Developer"),
+                    new Employee("Team Lead").addSubordinates(
+                            new Employee("Another Dev")
+                    ));
 
     //when
     Diff diff = javers.compare(oldBoss, newBoss);
 
     //then
-    assertThat(diff.getChangesByType(ObjectRemoved.class)).hasSize(1000);
+    assertThat(diff.getChangesByType(ObjectRemoved.class)).hasSize(1);
+
+    System.out.println(diff);
   }
 
   /** {@link ValueChange} example */
