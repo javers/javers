@@ -10,36 +10,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class EmployeeHierarchiesDiffExample {
 
-  /** {@link ValueChange} example */
-  @Test
-  public void shouldDetectSalaryChange(){
-    //given
-    Javers javers = JaversBuilder.javers().build();
-
-    Employee oldBoss = new Employee("Big Boss")
-        .addSubordinates(
-            new Employee("Noisy Manager"),
-            new Employee("Great Developer", 10000));
-
-    Employee newBoss = new Employee("Big Boss")
-        .addSubordinates(
-            new Employee("Noisy Manager"),
-            new Employee("Great Developer", 20000));
-
-    //when
-    Diff diff = javers.compare(oldBoss, newBoss);
-
-    //then
-    ValueChange change =  diff.getChangesByType(ValueChange.class).get(0);
-
-    assertThat(change.getAffectedLocalId()).isEqualTo("Great Developer");
-    assertThat(change.getPropertyName()).isEqualTo("salary");
-    assertThat(change.getLeft()).isEqualTo(10000);
-    assertThat(change.getRight()).isEqualTo(20000);
-
-    System.out.println(diff);
-  }
-
   /** {@link NewObject} example */
   @Test
   public void shouldDetectHired() {
@@ -64,6 +34,58 @@ public class EmployeeHierarchiesDiffExample {
         .hasSize(2)
         .containsOnly(new Employee("Hired One"),
                       new Employee("Hired Second"));
+
+    System.out.println(diff);
+  }
+
+  /** {@link NewObject} example, large structure */
+  @Test
+  public void shouldDetectFiredInLargeDepthStructure() {
+    //given
+    Javers javers = JaversBuilder.javers().build();
+
+    Employee oldBoss = new Employee("Big Boss");
+    Employee boss = oldBoss;
+    for (int i=0; i<1000; i++){
+      boss.addSubordinate(new Employee("Emp no."+i));
+      boss = boss.getSubordinates().get(0);
+    }
+
+    Employee newBoss = new Employee("Big Boss");
+
+    //when
+    Diff diff = javers.compare(oldBoss, newBoss);
+
+    //then
+    assertThat(diff.getChangesByType(ObjectRemoved.class)).hasSize(1000);
+  }
+
+  /** {@link ValueChange} example */
+  @Test
+  public void shouldDetectSalaryChange(){
+    //given
+    Javers javers = JaversBuilder.javers().build();
+
+    Employee oldBoss = new Employee("Big Boss")
+            .addSubordinates(
+                    new Employee("Noisy Manager"),
+                    new Employee("Great Developer", 10000));
+
+    Employee newBoss = new Employee("Big Boss")
+            .addSubordinates(
+                    new Employee("Noisy Manager"),
+                    new Employee("Great Developer", 20000));
+
+    //when
+    Diff diff = javers.compare(oldBoss, newBoss);
+
+    //then
+    ValueChange change =  diff.getChangesByType(ValueChange.class).get(0);
+
+    assertThat(change.getAffectedLocalId()).isEqualTo("Great Developer");
+    assertThat(change.getPropertyName()).isEqualTo("salary");
+    assertThat(change.getLeft()).isEqualTo(10000);
+    assertThat(change.getRight()).isEqualTo(20000);
 
     System.out.println(diff);
   }
@@ -97,27 +119,5 @@ public class EmployeeHierarchiesDiffExample {
     assertThat(change.getRight().value()).endsWith("Manager Second");
 
     System.out.println(diff);
-  }
-
-  /** {@link NewObject} example, large structure */
-  @Test
-  public void shouldDetectFiredInLargeDepthStructure() {
-    //given
-    Javers javers = JaversBuilder.javers().build();
-
-    Employee oldBoss = new Employee("Big Boss");
-    Employee boss = oldBoss;
-    for (int i=0; i<1000; i++){
-        boss.addSubordinate(new Employee("Emp no."+i));
-        boss = boss.getSubordinates().get(0);
-    }
-
-    Employee newBoss = new Employee("Big Boss");
-
-    //when
-    Diff diff = javers.compare(oldBoss, newBoss);
-
-    //then
-    assertThat(diff.getChangesByType(ObjectRemoved.class)).hasSize(1000);
   }
 }
