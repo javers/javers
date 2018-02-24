@@ -12,14 +12,14 @@ import java.util.List;
 public class ChangeLogExample {
 
     @Test
-    public void shoudPrintTextChangeLog() {
+    public void shouldPrintTextChangeLog() {
         // given:
         Javers javers = JaversBuilder.javers().build();
-        Employee bob = new Employee("Bob", 9_000, "Scrum master" );
+        Employee bob = new Employee("Bob", 9_000, "ScrumMaster");
         javers.commit("hr.manager", bob);
 
         // do some changes and commit
-        bob.setPosition("Team Lead");
+        bob.setPosition("Developer");
         bob.setSalary(11_000);
         javers.commit("hr.director", bob);
 

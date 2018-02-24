@@ -5,6 +5,7 @@ package org.javers.core.examples.model;
  */
 public class Address {
     private String city;
+
     private String street;
 
     public Address() {

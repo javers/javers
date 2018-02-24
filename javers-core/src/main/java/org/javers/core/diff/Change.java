@@ -1,6 +1,8 @@
 package org.javers.core.diff;
 
 import java.util.Optional;
+
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.NewObject;
@@ -89,11 +91,11 @@ public abstract class Change implements Serializable {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + "{" +fieldsToString() +"}";
+        return this.getClass().getSimpleName() + "{ " +fieldsToString() +" }";
     }
 
     protected String fieldsToString(){
-        return addFirstField("globalId", getAffectedGlobalId());
+        return "globalId:" + ToStringBuilder.format(getAffectedGlobalId());
     }
 
     void setAffectedCdo(Object affectedCdo) {
