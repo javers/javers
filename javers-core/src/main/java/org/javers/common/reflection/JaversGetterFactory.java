@@ -1,6 +1,7 @@
 package org.javers.common.reflection;
 
 import java.lang.reflect.Method;
+
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
