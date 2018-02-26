@@ -1,15 +1,21 @@
 package org.javers.common.reflection;
 
 import java.lang.reflect.Method;
+
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author bartosz walacik
  */
 class JaversGetterFactory {
     private final Class getterSource;
+    private final List<JaversGetter> getters = new ArrayList<>();
+    private final TypeResolvingContext context = new TypeResolvingContext();
 
     JaversGetterFactory(Class getterSource) {
         this.getterSource = getterSource;
@@ -19,21 +25,28 @@ class JaversGetterFactory {
      * List all class getters, including inherited and private.
      */
     List<JaversGetter> getAllGetters() {
-        List<JaversGetter> getters = new ArrayList<>();
-        TypeResolvingContext context = new TypeResolvingContext();
+        if (getters.size() > 0) {
+            throw new IllegalStateException("getters.size() > 0");
+        }
+        findAllGetters(getterSource);
 
-        Class clazz = getterSource;
+        return getters;
+    }
+
+    private void findAllGetters(Class currentGetterSource) {
+        Class clazz = currentGetterSource;
         while (clazz != null && clazz != Object.class) {
             context.addTypeSubstitutions(clazz);
             Arrays.stream(clazz.getDeclaredMethods())
-                  .filter(method -> isGetter(method) && !method.isBridge())
-                  .filter(method -> !isOverridden(method, getters))
-                  .map(getter -> createJaversGetter(getter, context))
-                  .forEach(getters::add);
+                    .filter(method -> isGetter(method) && !method.isBridge())
+                    .filter(method -> !isOverridden(method, getters))
+                    .map(getter -> createJaversGetter(getter, context))
+                    .forEach(getters::add);
+
+            Arrays.stream(clazz.getInterfaces()).forEach(this::findAllGetters);
+
             clazz = clazz.getSuperclass();
         }
-
-        return getters;
     }
 
     private static boolean isGetter(Method rawMethod) {
