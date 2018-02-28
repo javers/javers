@@ -150,7 +150,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
         then:
         DiffAssert.assertThat(diff).hasChanges(1).hasValueChangeAt("value",5,6)
-        diff.changes.get(0).affectedGlobalId.value() == DummyCompositePoint.class.name+"/1"
+        diff.changes.get(0).affectedGlobalId.value() == DummyWithEntityId.class.name+"/1"
     }
 
     def "should create NewObject for all nodes in initial diff"() {
