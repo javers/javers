@@ -106,24 +106,13 @@ public class EntityType extends ManagedType {
     }
 
     private String localIdAsString(Object localId) {
-        PrimitiveOrValueType idPropertyType = getIdPropertyType();
-        return idPropertyType.smartToString(getIdValue(localId));
-    }
-
-    private Object getIdValue(Object localId) {
-        JaversType type = getIdProperty().getType();
-        if(type instanceof EntityType) {
-            return ((EntityType) type).getIdOf(localId);
+        if (getIdProperty().getType() instanceof EntityType) {
+            EntityType idPropertyType = getIdProperty().getType();
+            return idPropertyType.localIdAsString(idPropertyType.getIdOf(localId));
         }
-        return localId;
-    }
 
-    private PrimitiveOrValueType getIdPropertyType() {
-        JaversType type = getIdProperty().getType();
-        while(type instanceof EntityType) {
-            type = ((EntityType) type).getIdProperty().getType();
-        }
-        return (PrimitiveOrValueType) type;
+        PrimitiveOrValueType idPropertyType = getIdProperty().getType();
+        return idPropertyType.smartToString(localId);
     }
 
     @Override

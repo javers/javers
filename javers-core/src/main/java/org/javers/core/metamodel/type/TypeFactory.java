@@ -87,6 +87,11 @@ class TypeFactory {
         });
     }
 
+    boolean inferredAsEntity(Type javaType) {
+        JavaRichType t = new JavaRichType(javaType);
+        return t.getScan().hasEntityAnn() || t.getScan().hasIdProperty();
+    }
+
     JaversType inferIdPropertyTypeAsValue(Type idPropertyGenericType) {
         if (idPropertyGenericType instanceof TypeVariable) {
             logger.debug("javersType of {} inferred as TokenType", idPropertyGenericType);

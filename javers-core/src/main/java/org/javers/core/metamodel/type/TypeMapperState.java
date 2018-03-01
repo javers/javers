@@ -136,10 +136,17 @@ class TypeMapperState {
 
     /**
      * maps a type of given Entity's id-property as ValueType
+     * (unless it's a nested Id Entity)
      */
     private void inferIdPropertyTypeForEntity(EntityType entityType) {
         Type idType = entityType.getIdPropertyGenericType();
-        computeIfAbsent(idType, typeFactory::inferIdPropertyTypeAsValue);
+
+        computeIfAbsent(idType, (it) -> {
+           if (typeFactory.inferredAsEntity(idType))  {
+               return typeFactory.infer(it);
+           }
+           return typeFactory.inferIdPropertyTypeAsValue(it);
+        });
     }
 
     /**
