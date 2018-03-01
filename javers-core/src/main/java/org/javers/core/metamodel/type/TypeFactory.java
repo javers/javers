@@ -88,6 +88,9 @@ class TypeFactory {
     }
 
     boolean inferredAsEntity(Type javaType) {
+        if (javaType instanceof TypeVariable) {
+            return false;
+        }
         JavaRichType t = new JavaRichType(javaType);
         return t.getScan().hasEntityAnn() || t.getScan().hasIdProperty();
     }
