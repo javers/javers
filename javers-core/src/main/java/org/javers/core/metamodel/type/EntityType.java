@@ -1,13 +1,14 @@
 package org.javers.core.metamodel.type;
 
-import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.InstanceId;
+
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 /**
  * Entity class in client's domain model.
@@ -105,6 +106,11 @@ public class EntityType extends ManagedType {
     }
 
     private String localIdAsString(Object localId) {
+        if (getIdProperty().getType() instanceof EntityType) {
+            EntityType idPropertyType = getIdProperty().getType();
+            return idPropertyType.localIdAsString(idPropertyType.getIdOf(localId));
+        }
+
         PrimitiveOrValueType idPropertyType = getIdProperty().getType();
         return idPropertyType.smartToString(localId);
     }

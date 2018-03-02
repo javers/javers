@@ -114,6 +114,35 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         diff.changes.get(0).affectedGlobalId.value() == DummyCompositePoint.class.name+"/(1,2)"
     }
 
+    class DummyWithEntityId {
+        @Id EntityAsId entityAsId
+        int value
+    }
+
+    class EntityAsId {
+        @Id
+        int id
+        int value
+    }
+
+    def "should use nested Entity Id value as Id of parent Entity"(){
+        given:
+        def javers = javers().build()
+        def left  = new DummyWithEntityId(entityAsId: new EntityAsId(id: 1, value:5), value:5)
+        def right = new DummyWithEntityId(entityAsId: new EntityAsId(id: 1, value:5), value:6)
+
+        when:
+        def diff = javers.compare(left,right)
+
+        then:
+
+        println javers.getTypeMapping(DummyWithEntityId).prettyPrint()
+        println javers.getTypeMapping(EntityAsId).prettyPrint()
+
+        DiffAssert.assertThat(diff).hasChanges(1).hasValueChangeAt("value",5,6)
+        diff.changes[0].affectedGlobalId.value() == DummyWithEntityId.name+"/1"
+    }
+
     def "should create NewObject for all nodes in initial diff"() {
         given:
         def javers = JaversTestBuilder.newInstance()
