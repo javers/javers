@@ -2,8 +2,9 @@ package org.javers.core.diff.changetype.map;
 
 import java.util.Objects;
 
-import org.javers.common.string.ToStringBuilder;
 import org.javers.core.diff.changetype.Atomic;
+
+import static org.javers.common.string.ToStringBuilder.format;
 
 /**
  * entry value changed, when value is a simple type
@@ -38,7 +39,7 @@ public class EntryValueChange extends EntryChange {
 
     @Override
     public String toString() {
-        return ToStringBuilder.toString(this, getKey(), getLeftValue()+"'>>'"+ getRightValue());
+        return format(getKey()) + " : " + format(getLeftValue())+" changed to "+format(getRightValue());
     }
 
     @Override

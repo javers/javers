@@ -85,6 +85,9 @@ class EdgeBuilder {
         }
 
         boolean isManagedPosition(Object input){
+            if (input == null) {
+                return false;
+            }
             return typeMapper.getJaversType(input.getClass()) instanceof ManagedType;
         }
     }

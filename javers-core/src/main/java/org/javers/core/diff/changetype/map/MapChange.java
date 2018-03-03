@@ -7,9 +7,6 @@ import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.*;
-import java.util.function.Predicate;
-
-import static org.javers.common.string.ToStringBuilder.addEnumField;
 
 /**
  * @author bartosz walacik
@@ -53,10 +50,10 @@ public class MapChange extends PropertyChange {
         StringBuilder changesAsString = new StringBuilder();
 
         for (EntryChange c : changes){
-            if (changesAsString.length() > 0) { changesAsString.append(", "); }
+            if (changesAsString.length() > 0) { changesAsString.append("\n  "); }
             changesAsString.append(c);
         }
-        return super.fieldsToString() + addEnumField("entryChanges", changesAsString);
+        return super.fieldsToString() + " changes:\n  " + changesAsString;
     }
 
     @Override
