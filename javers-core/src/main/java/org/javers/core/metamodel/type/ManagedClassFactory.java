@@ -35,6 +35,14 @@ class ManagedClassFactory {
         return create(baseJavaClass, allProperties, prototypePropertiesFilter);
     }
 
+    /**
+     * Creates a ManagedClass for a Class, given its JaversProperty list. It filters properties to be ignored, based on annotations found in the class.
+     *
+     * @param baseJavaClass Java class object for which to create the corresponding ManagedClass.
+     * @param allProperties List of JaversProperty of the class provided in <code>baseJavaClass</code>.
+     * @param propertiesFilter The ManagedPropertiesFilter for this class if any, to be applied to the list of properties.
+     * @return A ManagedClass containing all valid (not marked to be ignored) properties corresponding to the <code>baseJavaClass</code> class.
+     */
     private ManagedClass create(Class<?> baseJavaClass, List<JaversProperty> allProperties, ManagedPropertiesFilter propertiesFilter){
 
         List<JaversProperty> filtered = propertiesFilter.filterProperties(allProperties);
