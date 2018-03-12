@@ -25,10 +25,6 @@ class ManagedPropertiesFilter {
 
         this.ignoredProperties = filter(allSourceProperties, propertiesFilter.getIgnoredProperties(), baseJavaClass);
         this.ignoredProperties.addAll(allSourceProperties.stream().filter(p -> p.hasTransientAnn()).collect(Collectors.toSet()));
-
-        if (this.ignoredProperties.size() > 0  && this.includedProperties.size() > 0) {
-            throw new JaversException(JaversExceptionCode.IGNORED_AND_INCLUDED_PROPERTIES_MIX, baseJavaClass.getSimpleName());
-        }
     }
 
     private ManagedPropertiesFilter() {
