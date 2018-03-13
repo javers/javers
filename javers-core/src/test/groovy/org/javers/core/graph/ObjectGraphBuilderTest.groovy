@@ -413,7 +413,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 ])
     }
 
-    def "should support cycles on ValueObjects"() {
+    def "should support cycles on unbounded ValueObjects"() {
         given:
         ObjectGraphBuilder graphBuilder = newBuilder()
 
