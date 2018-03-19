@@ -20,7 +20,7 @@ class JaversMongoAutoConfigurationTest extends Specification{
     Javers javers
 
     @Autowired
-    JaversProperties javersProperties
+    JaversMongoProperties javersProperties
 
     @Autowired
     AuthorProvider provider

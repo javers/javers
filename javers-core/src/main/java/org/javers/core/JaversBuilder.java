@@ -657,6 +657,16 @@ public class JaversBuilder extends AbstractContainerBuilder {
         return this;
     }
 
+    public JaversBuilder withProperties(JaversCoreProperties javersProperties) {
+        this.withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
+            .withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
+            .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
+            .withPrettyPrint(javersProperties.isPrettyPrint())
+            .withTypeSafeValues(javersProperties.isTypeSafeValues())
+            .withPackagesToScan(javersProperties.getPackagesToScan());
+        return this;
+    }
+
     private void mapRegisteredClasses() {
         TypeMapper typeMapper = typeMapper();
         for (ClientsClassDefinition def : clientsClassDefinitions.values()) {

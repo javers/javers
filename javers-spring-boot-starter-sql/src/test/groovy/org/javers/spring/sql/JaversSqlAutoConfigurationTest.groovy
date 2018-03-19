@@ -3,7 +3,7 @@ package org.javers.spring.sql
 import org.javers.repository.sql.DialectName
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
-import org.javers.spring.boot.sql.JaversProperties
+import org.javers.spring.boot.sql.JaversSqlProperties
 import org.javers.spring.boot.TestApplication
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -21,7 +21,7 @@ class JaversSqlAutoConfigurationTest extends Specification {
     DialectName dialectName
 
     @Autowired
-    JaversProperties javersProperties
+    JaversSqlProperties javersProperties
 
     @Autowired
     AuthorProvider provider

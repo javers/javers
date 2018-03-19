@@ -1,21 +1,12 @@
-package org.javers.spring.boot.mongo;
+package org.javers.core;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-/**
- * @author pawelszymczyk
- */
-@ConfigurationProperties(prefix = "javers")
-public class JaversProperties {
-
+public abstract class JaversCoreProperties {
     private String algorithm = "simple";
     private String mappingStyle = "field";
     private boolean newObjectSnapshot = false;
     private boolean prettyPrint = true;
     private boolean typeSafeValues = false;
     private String packagesToScan = "";
-    private boolean auditableAspectEnabled = true;
-    private boolean springDataAuditableRepositoryAspectEnabled = true;
 
     public String getAlgorithm() {
         return algorithm;
@@ -35,6 +26,10 @@ public class JaversProperties {
 
     public boolean isTypeSafeValues() {
         return typeSafeValues;
+    }
+
+    public String getPackagesToScan() {
+        return packagesToScan;
     }
 
     public void setAlgorithm(String algorithm) {
@@ -57,27 +52,7 @@ public class JaversProperties {
         this.typeSafeValues = typeSafeValues;
     }
 
-	public String getPackagesToScan() {
-		return packagesToScan;
-	}
-
-	public void setPackagesToScan(String packagesToScan) {
-		this.packagesToScan = packagesToScan;
-	}
-
-    public boolean isAuditableAspectEnabled() {
-        return auditableAspectEnabled;
-    }
-
-    public void setAuditableAspectEnabled(boolean auditableAspectEnabled) {
-        this.auditableAspectEnabled = auditableAspectEnabled;
-    }
-
-    public boolean isSpringDataAuditableRepositoryAspectEnabled() {
-        return springDataAuditableRepositoryAspectEnabled;
-    }
-
-    public void setSpringDataAuditableRepositoryAspectEnabled(boolean springDataAuditableRepositoryAspectEnabled) {
-        this.springDataAuditableRepositoryAspectEnabled = springDataAuditableRepositoryAspectEnabled;
+    public void setPackagesToScan(String packagesToScan) {
+        this.packagesToScan = packagesToScan;
     }
 }
