@@ -5,6 +5,7 @@ import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
 import org.javers.common.reflection.ReflectionUtil;
+import org.javers.core.JaversCoreProperties.DatePrettyPrintFormats;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.diff.DiffFactoryModule;
@@ -657,13 +658,18 @@ public class JaversBuilder extends AbstractContainerBuilder {
         return this;
     }
 
+    public JaversBuilder withDatePrettyPrintFormats(DatePrettyPrintFormats datePrettyPrintFormats) {
+        return this;
+    }
+
     public JaversBuilder withProperties(JaversCoreProperties javersProperties) {
         this.withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
             .withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
             .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
             .withPrettyPrint(javersProperties.isPrettyPrint())
             .withTypeSafeValues(javersProperties.isTypeSafeValues())
-            .withPackagesToScan(javersProperties.getPackagesToScan());
+            .withPackagesToScan(javersProperties.getPackagesToScan())
+            .withDatePrettyPrintFormats(javersProperties.getDatePrettyPrintFormats());
         return this;
     }
 

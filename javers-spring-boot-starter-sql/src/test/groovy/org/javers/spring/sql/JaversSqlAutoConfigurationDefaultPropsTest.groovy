@@ -34,6 +34,10 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         javersProperties.packagesToScan == ""
         dialectName == DialectName.H2
         javersProperties.isSqlSchemaManagementEnabled()
+        javersProperties.datePrettyPrintFormats.localDateTimeFormat == "dd M yyyy HH:mm:ss"
+        javersProperties.datePrettyPrintFormats.zonedDateTimeFormat == "dd M yyyy HH:mm:ssZ"
+        javersProperties.datePrettyPrintFormats.localDateFormat == "dd M yyyy"
+        javersProperties.datePrettyPrintFormats.localTimeFormat == "HH:mm:ss"
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath" () {
