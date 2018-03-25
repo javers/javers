@@ -1,12 +1,16 @@
 package org.javers.core;
 
+import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.validation.Validate;
+import org.javers.core.JaversCoreProperties.PrettyPrintDateFormats;
 import org.javers.core.diff.ListCompareAlgorithm;
 
 /**
  * @author bartosz walacik
  */
 public class JaversCoreConfiguration {
+
+    private PrettyValuePrinter prettyValuePrinter = PrettyValuePrinter.getDefault();
 
     private MappingStyle mappingStyle = MappingStyle.FIELD;
 
@@ -36,6 +40,15 @@ public class JaversCoreConfiguration {
     JaversCoreConfiguration withListCompareAlgorithm(ListCompareAlgorithm algorithm) {
         this.listCompareAlgorithm = algorithm;
         return this;
+    }
+
+    JaversCoreConfiguration withPrettyPrintDateFormats(PrettyPrintDateFormats prettyPrintDateFormats) {
+        prettyValuePrinter = new PrettyValuePrinter(prettyPrintDateFormats);
+        return this;
+    }
+
+    public PrettyValuePrinter getPrettyValuePrinter() {
+        return prettyValuePrinter;
     }
 
     public MappingStyle getMappingStyle() {

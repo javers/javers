@@ -36,10 +36,10 @@ class JaversSqlAutoConfigurationTest extends Specification {
         dialectName == DialectName.H2
         !javersProperties.isSqlSchemaManagementEnabled()
         javersProperties.packagesToScan == "my.company.domain.person, my.company.domain.finance"
-        javersProperties.datePrettyPrintFormats.localDateTimeFormat == "dd-mm-yyyy"
-        javersProperties.datePrettyPrintFormats.zonedDateTimeFormat == "dd-mm-yyyy HH mm ss Z"
-        javersProperties.datePrettyPrintFormats.localDateFormat == "dd-mm-yyyy"
-        javersProperties.datePrettyPrintFormats.localTimeFormat == "HH mm ss"
+        javersProperties.prettyPrintDateFormats.localDateTime == "dd-mm-yyyy"
+        javersProperties.prettyPrintDateFormats.zonedDateTime == "dd-mm-yyyy HH mm ss Z"
+        javersProperties.prettyPrintDateFormats.localDate == "dd-mm-yyyy"
+        javersProperties.prettyPrintDateFormats.localTime == "HH mm ss"
 
 
     }

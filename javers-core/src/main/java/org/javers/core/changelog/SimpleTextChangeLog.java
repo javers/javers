@@ -1,5 +1,6 @@
 package org.javers.core.changelog;
 
+import org.javers.common.string.PrettyValuePrinter;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ObjectRemoved;
@@ -29,22 +30,14 @@ import java.time.format.DateTimeFormatter;
  * @author bartosz walacik
  */
 public class SimpleTextChangeLog extends AbstractTextChangeLog {
-    public static final DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-    private final DateTimeFormatter dateTimeFormatter;
 
     public SimpleTextChangeLog() {
-        this(DEFAULT_DATE_FORMATTER);
-    }
-
-    public SimpleTextChangeLog(DateTimeFormatter dateTimeFormatter) {
-        this.dateTimeFormatter = dateTimeFormatter;
     }
 
     @Override
     public void onCommit(CommitMetadata commitMetadata) {
         appendln("commit " + commitMetadata.getId() + ", author: " + commitMetadata.getAuthor() +
-                ", " + dateTimeFormatter.format(commitMetadata.getCommitDate()));
+                ", " + PrettyValuePrinter.getDefault().format(commitMetadata.getCommitDate()));
     }
 
     @Override
@@ -54,8 +47,10 @@ public class SimpleTextChangeLog extends AbstractTextChangeLog {
 
     @Override
     public void onValueChange(ValueChange valueChange) {
-        appendln("    value changed on '"+valueChange.getPropertyName()+"' property: '"+ valueChange.getLeft() +
-                 "' -> '" + valueChange.getRight() + "'");
+        appendln("    value changed on '"+valueChange.getPropertyName()+"' property: '"+
+                PrettyValuePrinter.getDefault().format(valueChange.getLeft()) +
+                 "' -> '" +
+                PrettyValuePrinter.getDefault().format(valueChange.getRight()) + "'");
     }
 
     @Override

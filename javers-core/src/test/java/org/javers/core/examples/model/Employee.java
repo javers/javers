@@ -5,7 +5,7 @@ import org.javers.common.collections.Sets;
 import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Id;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +38,7 @@ public class Employee {
 
     private Set<String> skills;
 
-    private LocalDateTime lastPromotionDate;
+    private ZonedDateTime lastPromotionDate;
 
     public Employee() {
     }
@@ -76,7 +76,7 @@ public class Employee {
         return this;
     }
 
-    public LocalDateTime getLastPromotionDate() {
+    public ZonedDateTime getLastPromotionDate() {
         return lastPromotionDate;
     }
 
@@ -148,7 +148,7 @@ public class Employee {
         this.skills = Sets.asSet(skills);
     }
 
-    void setLastPromotionDate(LocalDateTime lastPromotionDate) {
+    void setLastPromotionDate(ZonedDateTime lastPromotionDate) {
         this.lastPromotionDate = lastPromotionDate;
     }
 

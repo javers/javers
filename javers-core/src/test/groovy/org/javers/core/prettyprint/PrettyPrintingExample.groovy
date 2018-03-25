@@ -4,16 +4,14 @@ import org.javers.core.JaversBuilder
 import org.javers.core.changelog.SimpleTextChangeLog
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
-import org.javers.core.examples.model.EmployeeBuilder
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-class ChangesPrintingExample extends Specification {
+class PrettyPrintingExample extends Specification {
 
     def "should use given date format when printing"(){
       given:
@@ -34,17 +32,18 @@ class ChangesPrintingExample extends Specification {
               primaryAddress: new Address("Mordor"),
               postalAddress: new Address("Shire"),
               skills:["management", "agile coaching"],
-              lastPromotionDate: LocalDateTime.now(),
+              lastPromotionDate: ZonedDateTime.now(),
               subordinates: [new Employee("Sam")]
       )
       javers.commit("author", newFrodo)
 
       when:
-      println "diff pretty print"
+      println "-- diff pretty print -- "
+
       def diff = javers.compare(oldFrodo, newFrodo)
       println( diff )
 
-      println "--"
+      println "-- SimpleTextChangeLog print --"
 
       def changes = javers.findChanges(QueryBuilder.byInstance(newFrodo)
               .withChildValueObjects()

@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +16,7 @@ public abstract class JaversCoreProperties {
     private boolean prettyPrint = true;
     private boolean typeSafeValues = false;
     private String packagesToScan = "";
-    private DatePrettyPrintFormats datePrettyPrintFormats = new DatePrettyPrintFormats();
+    private PrettyPrintDateFormats prettyPrintDateFormats = new PrettyPrintDateFormats();
 
     public String getAlgorithm() {
         return algorithm;
@@ -66,70 +66,61 @@ public abstract class JaversCoreProperties {
         this.packagesToScan = packagesToScan;
     }
 
-    public DatePrettyPrintFormats getDatePrettyPrintFormats() {
-        return datePrettyPrintFormats;
+    public PrettyPrintDateFormats getPrettyPrintDateFormats() {
+        return prettyPrintDateFormats;
     }
 
-    /**
-     * @see DateTimeFormatter#ofPattern(String)
-     */
-    public void registerDatePrettyPrintFormat(Class<? extends Temporal> forType, String format) {
-        this.datePrettyPrintFormats.registerFormat(forType, format);
-    }
-
-    public static class DatePrettyPrintFormats {
+    public static class PrettyPrintDateFormats {
         private Map<Class<? extends Temporal>, String> formats = new HashMap<>();
 
-        private String LocalDateTimeFormat;
-        private String ZonedDateTimeFormat;
-        private String LocalDateFormat;
-        private String LocalTimeFormat;
-
-        private static final String DEFAULT_DATE_FORMAT = "dd M yyyy";
+        private static final String DEFAULT_DATE_FORMAT = "dd MMM yyyy";
         private static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
 
-        public DatePrettyPrintFormats() {
-            setLocalDateTimeFormat(DEFAULT_DATE_FORMAT + " " + DEFAULT_TIME_FORMAT);
-            setZonedDateTimeFormat(DEFAULT_DATE_FORMAT + " " + DEFAULT_TIME_FORMAT+"Z");
-            setLocalDateFormat(DEFAULT_DATE_FORMAT);
-            setLocalTimeFormat(DEFAULT_TIME_FORMAT);
+        public PrettyPrintDateFormats() {
+            setLocalDateTime(DEFAULT_DATE_FORMAT + ", " + DEFAULT_TIME_FORMAT);
+            setZonedDateTime(DEFAULT_DATE_FORMAT + ", " + DEFAULT_TIME_FORMAT+"Z");
+            setLocalDate(DEFAULT_DATE_FORMAT);
+            setLocalTime(DEFAULT_TIME_FORMAT);
         }
 
         public void registerFormat(Class<? extends Temporal> forType, String format) {
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
             formats.put(forType, format);
         }
 
-        public void setLocalDateTimeFormat(String localDateTimeFormat) {
-            registerFormat(LocalDateTime.class, localDateTimeFormat);
+        public void setLocalDateTime(String localDateTime) {
+            registerFormat(LocalDateTime.class, localDateTime);
         }
 
-        public void setZonedDateTimeFormat(String zonedDateTimeFormat) {
-            registerFormat(ZonedDateTime.class, zonedDateTimeFormat);
+        public void setZonedDateTime(String zonedDateTime) {
+            registerFormat(ZonedDateTime.class, zonedDateTime);
         }
 
-        public void setLocalDateFormat(String localDate) {
+        public void setLocalDate(String localDate) {
             registerFormat(LocalDate.class, localDate);
         }
 
-        public void setLocalTimeFormat(String localTime) {
+        public void setLocalTime(String localTime) {
             registerFormat(LocalTime.class, localTime);
         }
 
-        public String getLocalDateTimeFormat() {
+        public String getLocalDateTime() {
             return formats.get(LocalDateTime.class);
         }
 
-        public String getZonedDateTimeFormat() {
+        public String getZonedDateTime() {
             return formats.get(ZonedDateTime.class);
         }
 
-        public String getLocalDateFormat() {
+        public String getLocalDate() {
             return formats.get(LocalDate.class);
         }
 
-        public String getLocalTimeFormat() {
+        public String getLocalTime() {
             return formats.get(LocalTime.class);
+        }
+
+        public Map<Class<? extends Temporal>, String> getFormats() {
+            return Collections.unmodifiableMap(formats);
         }
     }
 }
