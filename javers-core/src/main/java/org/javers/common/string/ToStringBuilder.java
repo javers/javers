@@ -88,7 +88,7 @@ public class ToStringBuilder {
     }
 
     public static String format(Object value) {
-        return "'" + PrettyValuePrinter.getDefault().format(value) + "'";
+        return PrettyValuePrinter.getDefault().formatWithQuotes(value);
     }
 
     private static boolean isNullOrEmpty(Object value) {

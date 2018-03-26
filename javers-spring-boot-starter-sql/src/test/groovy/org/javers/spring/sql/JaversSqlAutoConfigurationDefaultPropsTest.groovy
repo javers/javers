@@ -34,9 +34,9 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         javersProperties.packagesToScan == ""
         dialectName == DialectName.H2
         javersProperties.isSqlSchemaManagementEnabled()
-        javersProperties.prettyPrintDateFormats.localDateTime == "dd M yyyy HH:mm:ss"
-        javersProperties.prettyPrintDateFormats.zonedDateTime == "dd M yyyy HH:mm:ssZ"
-        javersProperties.prettyPrintDateFormats.localDate == "dd M yyyy"
+        javersProperties.prettyPrintDateFormats.localDateTime == "dd MMM yyyy, HH:mm:ss"
+        javersProperties.prettyPrintDateFormats.zonedDateTime == "dd MMM yyyy, HH:mm:ssZ"
+        javersProperties.prettyPrintDateFormats.localDate == "dd MMM yyyy"
         javersProperties.prettyPrintDateFormats.localTime == "HH:mm:ss"
     }
 

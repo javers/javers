@@ -1,27 +1,29 @@
 package org.javers.core.prettyprint
 
 import org.javers.core.JaversBuilder
+import org.javers.core.JaversCoreProperties
 import org.javers.core.changelog.SimpleTextChangeLog
 import org.javers.core.examples.model.Address
 import org.javers.core.examples.model.Employee
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 class PrettyPrintingExample extends Specification {
 
     def "should use given date format when printing"(){
       given:
-      def javers = JaversBuilder.javers().build()
+      def p = new JaversCoreProperties.PrettyPrintDateFormats()
+      p.setZonedDateTime("dd.mm.yyyy HH:mm")
+      def javers = JaversBuilder.javers().withPrettyPrintDateFormats(p).build()
 
       Employee oldFrodo = new Employee(
               name:"Frodo",
               salary: 10_000,
               primaryAddress: new Address("Shire"),
-              skills:["management"]
+              skills:["management"],
+              performance: [1: "bb", 3: "aa"]
       )
       javers.commit("author", oldFrodo)
 
@@ -33,13 +35,12 @@ class PrettyPrintingExample extends Specification {
               postalAddress: new Address("Shire"),
               skills:["management", "agile coaching"],
               lastPromotionDate: ZonedDateTime.now(),
-              subordinates: [new Employee("Sam")]
+              subordinates: [new Employee("Sam")],
+              performance: [1: "aa", 2: "bb"]
       )
       javers.commit("author", newFrodo)
 
       when:
-      println "-- diff pretty print -- "
-
       def diff = javers.compare(oldFrodo, newFrodo)
       println( diff )
 
@@ -52,19 +53,7 @@ class PrettyPrintingExample extends Specification {
       def changeLog = javers.processChangeList(changes, new SimpleTextChangeLog());
       println( changeLog )
 
-
-      DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-      ZonedDateTime dtz = ZonedDateTime.now()
-      LocalDateTime dt = LocalDateTime.now()
-     // LocalDate d = LocalDate.now()
-
-      println "dtz " + dtz.format(DEFAULT_DATE_FORMATTER)
-      println "dt " + dt.format(DEFAULT_DATE_FORMATTER)
-     //print d.format(DEFAULT_DATE_FORMATTER)
-
-
-        then:
+      then:
       true
     }
 }

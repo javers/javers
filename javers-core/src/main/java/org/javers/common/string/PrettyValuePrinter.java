@@ -25,6 +25,10 @@ public class PrettyValuePrinter {
         }
     }
 
+    public String formatWithQuotes(Object value) {
+        return "'" + format(value) + "'";
+    }
+
     public String format(Object value) {
         if (value == null) {
             return "";

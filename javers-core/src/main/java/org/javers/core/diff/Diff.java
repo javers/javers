@@ -2,6 +2,7 @@ package org.javers.core.diff;
 
 import org.javers.common.collections.Lists;
 import org.javers.common.exception.JaversException;
+import org.javers.common.string.PrettyValuePrinter;
 import org.javers.core.diff.changetype.PropertyChange;
 
 import java.io.Serializable;
@@ -27,9 +28,11 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
 public class Diff implements Serializable {
 
     private final List<Change> changes;
+    private final transient PrettyValuePrinter valuePrinter;
 
-    Diff(List<Change> changes) {
+    Diff(List<Change> changes, PrettyValuePrinter valuePrinter) {
         this.changes = changes;
+        this.valuePrinter = valuePrinter;
     }
 
     /**
@@ -91,9 +94,10 @@ public class Diff implements Serializable {
     }
 
     /**
-     * Prints to String list of changes within this Diff
+     * Prints the nicely formatted list of changes.
+     * Alias to {@link #toString()}.
      */
-    public final String prettyPrint(){
+    public final String prettyPrint() {
         return toString();
     }
 
@@ -105,7 +109,7 @@ public class Diff implements Serializable {
 
         int i=1;
         for (Change change : changes){
-            b.append((i++)+". "+change+"\n");
+            b.append((i++) + ". " + change.prettyPrint(valuePrinter) + "\n");
         }
         return b.toString();
     }

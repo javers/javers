@@ -1,6 +1,6 @@
 package org.javers.core.diff.changetype.container;
 
-import org.javers.common.string.ToStringBuilder;
+import org.javers.common.string.PrettyValuePrinter;
 
 /**
  * element removed from collection
@@ -26,7 +26,12 @@ public class ValueRemoved extends ValueAddOrRemove {
 
     @Override
     public String toString() {
+        return prettyPrint(PrettyValuePrinter.getDefault());
+    }
+
+    @Override
+    protected String prettyPrint(PrettyValuePrinter valuePrinter) {
         return (getIndex() == null ? "" : getIndex()) + ". " +
-                ToStringBuilder.format(getRemovedValue()) + " removed";
+                valuePrinter.formatWithQuotes(getRemovedValue()) + " removed";
     }
 }

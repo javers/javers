@@ -6,10 +6,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Id;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -37,6 +34,8 @@ public class Employee {
     private Address postalAddress;
 
     private Set<String> skills;
+
+    private Map<Integer, String> performance;
 
     private ZonedDateTime lastPromotionDate;
 

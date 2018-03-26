@@ -13,14 +13,15 @@ import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.javers.core.diff.DiffBuilder.diff;
 
 /**
  * @author Maciej Zasada
@@ -71,7 +72,7 @@ public class DiffFactory {
     public Diff singleTerminal(GlobalId removedId, CommitMetadata commitMetadata){
         Validate.argumentsAreNotNull(removedId, commitMetadata);
 
-        DiffBuilder diff = diff();
+        DiffBuilder diff = new DiffBuilder(javersCoreConfiguration.getPrettyValuePrinter());
         diff.addChange(new ObjectRemoved(removedId, empty(), of(commitMetadata)));
 
         return diff.build();
@@ -102,7 +103,7 @@ public class DiffFactory {
      * Graph scope appender
      */
     private Diff createAndAppendChanges(GraphPair graphPair, Optional<CommitMetadata> commitMetadata) {
-        DiffBuilder diff = diff();
+        DiffBuilder diff = new DiffBuilder(javersCoreConfiguration.getPrettyValuePrinter());
 
         //calculate node scope diff
         for (NodeChangeAppender appender : nodeChangeAppenders) {

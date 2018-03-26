@@ -1,13 +1,11 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.common.string.ToStringBuilder;
+import org.javers.common.string.PrettyValuePrinter;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.GlobalId;
+
 import java.util.Objects;
 import java.util.Optional;
-
-import static org.javers.common.string.ToStringBuilder.addField;
-import static org.javers.common.string.ToStringBuilder.format;
 
 /**
  * @author bartosz walacik
@@ -35,9 +33,10 @@ public final class ValueChange extends PropertyChange {
     }
 
     @Override
-    protected String fieldsToString() {
-        return super.fieldsToString() + " " +
-                format(getLeft()) + " changed to " + format(getRight());
+    protected String fieldsToString(PrettyValuePrinter valuePrinter) {
+        return super.fieldsToString(valuePrinter) +
+            " changed from " + valuePrinter.formatWithQuotes(getLeft()) + " to " +
+                               valuePrinter.formatWithQuotes(getRight());
     }
 
     @Override
