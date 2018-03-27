@@ -1,6 +1,7 @@
 package org.javers.core.diff.changetype.container;
 
 import org.javers.common.collections.Lists;
+import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.PropertyChange;
@@ -46,14 +47,16 @@ public abstract class ContainerChange extends PropertyChange {
     }
 
     @Override
-    protected String fieldsToString() {
+    protected String fieldsToString(PrettyValuePrinter valuePrinter) {
         StringBuilder changesAsString = new StringBuilder();
 
         for (ContainerElementChange c : changes){
-            if (changesAsString.length() > 0) { changesAsString.append("\n  "); }
-            changesAsString.append(c);
+            if (changesAsString.length() > 0) {
+                changesAsString.append("\n  ");
+            }
+            changesAsString.append(c.prettyPrint(valuePrinter));
         }
-        return super.fieldsToString() + " changes:\n  " + changesAsString;
+        return super.fieldsToString(valuePrinter) + " changes:\n  " + changesAsString;
     }
 
     @Override

@@ -88,16 +88,7 @@ public class ToStringBuilder {
     }
 
     public static String format(Object value) {
-        if ( value instanceof Set) return ToStringBuilder.setToString((Set)value);
-        if ( value instanceof List) return ToStringBuilder.listToString((List)value);
-        if ( value instanceof Optional) {
-          if ( ((Optional)value).isPresent()) {
-              return format(((Optional) value).get());
-          } else {
-              return "empty";
-          }
-        }
-        return "'"+value+"'";
+        return PrettyValuePrinter.getDefault().formatWithQuotes(value);
     }
 
     private static boolean isNullOrEmpty(Object value) {

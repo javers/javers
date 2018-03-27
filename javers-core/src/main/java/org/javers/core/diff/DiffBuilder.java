@@ -1,5 +1,6 @@
 package org.javers.core.diff;
 
+import org.javers.common.string.PrettyValuePrinter;
 import org.javers.core.commit.CommitMetadata;
 
 import java.util.*;
@@ -9,16 +10,14 @@ import java.util.*;
  */
 class DiffBuilder {
     private final List<Change> changes = new ArrayList<>();
+    private final PrettyValuePrinter valuePrinter;
 
-    private DiffBuilder() {
-    }
-
-    public static DiffBuilder diff() {
-        return new DiffBuilder();
+    public DiffBuilder(PrettyValuePrinter valuePrinter) {
+        this.valuePrinter = valuePrinter;
     }
 
     public static Diff empty() {
-        return new Diff(Collections.<Change>emptyList());
+        return new Diff(Collections.<Change>emptyList(), PrettyValuePrinter.getDefault());
     }
 
     public DiffBuilder addChange(Change change, Optional<Object> affectedCdo) {
@@ -43,6 +42,6 @@ class DiffBuilder {
     }
 
     public Diff build() {
-        return new Diff(changes);
+        return new Diff(changes, valuePrinter);
     }
 }

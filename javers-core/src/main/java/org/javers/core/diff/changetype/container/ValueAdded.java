@@ -1,6 +1,6 @@
 package org.javers.core.diff.changetype.container;
 
-import org.javers.common.string.ToStringBuilder;
+import org.javers.common.string.PrettyValuePrinter;
 
 /**
  * Item added to a collection
@@ -26,7 +26,12 @@ public class ValueAdded extends ValueAddOrRemove {
 
     @Override
     public String toString() {
+        return prettyPrint(PrettyValuePrinter.getDefault());
+    }
+
+    @Override
+    protected String prettyPrint(PrettyValuePrinter valuePrinter) {
         return (getIndex() == null ? "" : getIndex()) + ". " +
-                ToStringBuilder.format(getAddedValue()) + " added";
+                valuePrinter.formatWithQuotes(getAddedValue()) + " added";
     }
 }

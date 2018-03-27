@@ -5,10 +5,8 @@ import org.javers.common.collections.Sets;
 import org.javers.core.metamodel.annotation.TypeName;
 
 import javax.persistence.Id;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,6 +34,10 @@ public class Employee {
     private Address postalAddress;
 
     private Set<String> skills;
+
+    private Map<Integer, String> performance;
+
+    private ZonedDateTime lastPromotionDate;
 
     public Employee() {
     }
@@ -73,6 +75,10 @@ public class Employee {
         return this;
     }
 
+    public ZonedDateTime getLastPromotionDate() {
+        return lastPromotionDate;
+    }
+
     public String getName() {
         return name;
     }
@@ -105,6 +111,10 @@ public class Employee {
         return Collections.unmodifiableSet(this.skills);
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setPosition(String position) {
         this.position = Position.valueOf(position);
     }
@@ -117,16 +127,28 @@ public class Employee {
         this.age = age;
     }
 
-    public void setSkills(String... skills) {
-        this.skills = Sets.asSet(skills);
-    }
-
     public void setBoss(Employee boss) {
         this.boss = boss;
     }
 
+    public void setSubordinates(List<Employee> subordinates) {
+        this.subordinates = subordinates;
+    }
+
     public void setPrimaryAddress(Address primaryAddress) {
         this.primaryAddress = primaryAddress;
+    }
+
+    public void setPostalAddress(Address postalAddress) {
+        this.postalAddress = postalAddress;
+    }
+
+    public void setSkills(String... skills) {
+        this.skills = Sets.asSet(skills);
+    }
+
+    void setLastPromotionDate(ZonedDateTime lastPromotionDate) {
+        this.lastPromotionDate = lastPromotionDate;
     }
 
     @Override

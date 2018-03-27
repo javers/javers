@@ -7,3 +7,8 @@ javers:
   dialect: H2
   sqlSchemaManagementEnabled: false
   packagesToScan: my.company.domain.person, my.company.domain.finance
+  prettyPrintDateFormats:
+    localDateTime: "dd-mm-yyyy"
+    zonedDateTime: "dd-mm-yyyy HH mm ss Z"
+    localDate: "dd-mm-yyyy"
+    localTime: "HH mm ss"

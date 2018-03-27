@@ -12,10 +12,10 @@ buildscript {
     }
 }
 
-
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.7.1'
 }
+
 apply plugin: 'io.codearte.nexus-staging'
 
 scmVersion {
@@ -25,7 +25,7 @@ scmVersion {
 }
 
 subprojects {
-   // apply plugin: 'maven'
+    apply plugin: 'maven-publish'
     apply plugin: 'java'
     apply plugin: 'groovy'
     apply plugin: 'propdeps'
@@ -125,6 +125,14 @@ subprojects {
         testLogging.exceptionFormat = 'full'
         testLogging.showStackTraces = true
     }
+
+    publishing {
+        publications {
+            libraryJar(MavenPublication) {
+                from components.java
+            }
+        }
+    }
 }
 
 //io.codearte.gradle
@@ -135,5 +143,5 @@ nexusStaging {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.4.1'
+    gradleVersion = '4.6'
 }

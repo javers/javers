@@ -1,5 +1,7 @@
 package org.javers.core.diff.changetype.map;
 
+import org.javers.common.string.PrettyValuePrinter;
+
 import static org.javers.common.string.ToStringBuilder.format;
 
 /**
@@ -13,6 +15,12 @@ public class EntryAdded extends EntryAddOrRemove {
 
     @Override
     public String toString() {
-        return format(getKey()) + " : " + format(getValue()) + " added";
+        return prettyPrint(PrettyValuePrinter.getDefault());
+    }
+
+    @Override
+    protected String prettyPrint(PrettyValuePrinter valuePrinter) {
+        return valuePrinter.formatWithQuotes(getKey()) + " -> " +
+               valuePrinter.formatWithQuotes(getValue()) + " added";
     }
 }

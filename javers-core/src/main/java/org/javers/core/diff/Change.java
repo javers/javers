@@ -2,7 +2,9 @@ package org.javers.core.diff;
 
 import java.util.Optional;
 
+import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.string.ToStringBuilder;
+import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.NewObject;
@@ -35,10 +37,6 @@ public abstract class Change implements Serializable {
     private CommitMetadata commitMetadata; //optional, can't use Optional here, because it isn't Serializable
     private final GlobalId affectedCdoId;
     private transient Object affectedCdo;  //optional
-
-    protected Change(GlobalId affectedCdoId) {
-        this(affectedCdoId, Optional.empty());
-    }
 
     protected Change(GlobalId affectedCdoId, Optional<Object> affectedCdo) {
         this(affectedCdoId, affectedCdo, Optional.empty());
@@ -89,13 +87,21 @@ public abstract class Change implements Serializable {
         return Optional.ofNullable(commitMetadata);
     }
 
+    /**
+     * Pretty print with default dates formatting
+     */
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + "{ " +fieldsToString() +" }";
+        return this.getClass().getSimpleName() + "{ " +fieldsToString(PrettyValuePrinter.getDefault()) +" }";
     }
 
-    protected String fieldsToString(){
-        return "globalId:" + ToStringBuilder.format(getAffectedGlobalId());
+    protected String prettyPrint(PrettyValuePrinter valuePrinter) {
+        Validate.argumentIsNotNull(valuePrinter);
+        return this.getClass().getSimpleName() + " { " +fieldsToString(valuePrinter) +" }";
+    }
+
+    protected String fieldsToString(PrettyValuePrinter valuePrinter){
+        return "globalId: " + valuePrinter.formatWithQuotes(getAffectedGlobalId());
     }
 
     void setAffectedCdo(Object affectedCdo) {

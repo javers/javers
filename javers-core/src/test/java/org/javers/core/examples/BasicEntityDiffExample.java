@@ -20,7 +20,7 @@ public class BasicEntityDiffExample {
             .withListCompareAlgorithm(LEVENSHTEIN_DISTANCE)
             .build();
 
-    Employee tommyOld = EmployeeBuilder.Employee("Frodo")
+    Employee frodoOld = EmployeeBuilder.Employee("Frodo")
             .withAge(40)
             .withPosition("Townsman")
             .withSalary(10_000)
@@ -29,7 +29,7 @@ public class BasicEntityDiffExample {
             .withSubordinates(new Employee("Sam"))
             .build();
 
-    Employee tommyNew = EmployeeBuilder.Employee("Frodo")
+    Employee frodoNew = EmployeeBuilder.Employee("Frodo")
             .withAge(41)
             .withPosition("Hero")
             .withBoss(new Employee("Gandalf"))
@@ -40,7 +40,7 @@ public class BasicEntityDiffExample {
             .build();
 
     //when
-    Diff diff = javers.compare(tommyOld, tommyNew);
+    Diff diff = javers.compare(frodoOld, frodoNew);
 
     //then
     assertThat(diff.getChanges()).hasSize(9);

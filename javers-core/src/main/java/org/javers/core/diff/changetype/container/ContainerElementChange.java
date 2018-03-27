@@ -1,5 +1,7 @@
 package org.javers.core.diff.changetype.container;
 
+import org.javers.common.string.PrettyValuePrinter;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -32,6 +34,8 @@ public abstract class ContainerElementChange implements Serializable {
         }
         return false;
     }
+
+    protected abstract String prettyPrint(PrettyValuePrinter valuePrinter);
 
     @Override
     public int hashCode() {

@@ -4,8 +4,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.javers.core.Javers;
-import org.javers.core.MappingStyle;
-import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
@@ -39,7 +37,7 @@ import javax.persistence.EntityManagerFactory;
  */
 @Configuration
 @EnableAspectJAutoProxy
-@EnableConfigurationProperties(value = {JaversProperties.class, JpaProperties.class})
+@EnableConfigurationProperties(value = {JaversSqlProperties.class, JpaProperties.class})
 @AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
 public class JaversSqlAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversSqlAutoConfiguration.class);
@@ -47,7 +45,7 @@ public class JaversSqlAutoConfiguration {
     private final DialectMapper dialectMapper = new DialectMapper();
 
     @Autowired
-    private JaversProperties javersProperties;
+    private JaversSqlProperties javersSqlProperties;
 
     @Autowired
     private EntityManagerFactory entityManagerFactory;
@@ -70,7 +68,7 @@ public class JaversSqlAutoConfiguration {
             .sqlRepository()
             .withConnectionProvider(connectionProvider)
             .withDialect(javersSqlDialectName())
-            .withSchemaManagementEnabled(javersProperties.isSqlSchemaManagementEnabled())
+            .withSchemaManagementEnabled(javersSqlProperties.isSqlSchemaManagementEnabled())
             .build();
     }
 
@@ -82,12 +80,7 @@ public class JaversSqlAutoConfiguration {
                 .withTxManager(transactionManager)
                 .registerJaversRepository(sqlRepository)
                 .withObjectAccessHook(new HibernateUnproxyObjectAccessHook())
-                .withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
-                .withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
-                .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
-                .withPrettyPrint(javersProperties.isPrettyPrint())
-                .withTypeSafeValues(javersProperties.isTypeSafeValues())
-                .withPackagesToScan(javersProperties.getPackagesToScan())
+                .withProperties(javersSqlProperties)
                 .build();
     }
 

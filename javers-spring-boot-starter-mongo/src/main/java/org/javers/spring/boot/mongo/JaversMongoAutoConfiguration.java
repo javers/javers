@@ -4,8 +4,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
-import org.javers.core.MappingStyle;
-import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.*;
@@ -29,12 +27,12 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  */
 @Configuration
 @EnableAspectJAutoProxy
-@EnableConfigurationProperties({JaversProperties.class})
+@EnableConfigurationProperties({JaversMongoProperties.class})
 public class JaversMongoAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversMongoAutoConfiguration.class);
 
     @Autowired
-    private JaversProperties javersProperties;
+    private JaversMongoProperties javersMongoProperties;
 
     @Autowired
     private MongoClient mongoClient; //from spring-boot-starter-data-mongodb
@@ -54,13 +52,8 @@ public class JaversMongoAutoConfiguration {
         JaversRepository javersRepository = new MongoRepository(mongoDatabase);
 
         return JaversBuilder.javers()
-                .withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
-                .withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
-                .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
-                .withPrettyPrint(javersProperties.isPrettyPrint())
-                .withTypeSafeValues(javersProperties.isTypeSafeValues())
                 .registerJaversRepository(javersRepository)
-                .withPackagesToScan(javersProperties.getPackagesToScan())
+                .withProperties(javersMongoProperties)
                 .build();
     }
 

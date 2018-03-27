@@ -1,5 +1,6 @@
 package org.javers.core.diff.changetype.map;
 
+import org.javers.common.string.PrettyValuePrinter;
 import org.javers.core.diff.changetype.Atomic;
 
 import java.io.Serializable;
@@ -42,4 +43,6 @@ public abstract class EntryChange implements Serializable {
     public int hashCode() {
         return Objects.hash(super.hashCode(), key);
     }
+
+    protected abstract String prettyPrint(PrettyValuePrinter valuePrinter);
 }

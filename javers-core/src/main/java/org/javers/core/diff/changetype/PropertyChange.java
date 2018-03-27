@@ -1,5 +1,6 @@
 package org.javers.core.diff.changetype;
 
+import org.javers.common.string.PrettyValuePrinter;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
@@ -29,8 +30,8 @@ public abstract class PropertyChange extends Change {
     }
 
     @Override
-    protected String fieldsToString() {
-        return super.fieldsToString() + ", " + propertyName + "";
+    protected String fieldsToString(PrettyValuePrinter valuePrinter) {
+        return super.fieldsToString(valuePrinter) + ", " + propertyName + "";
     }
 
     @Override
