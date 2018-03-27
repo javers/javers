@@ -4,6 +4,7 @@ import org.javers.common.collections.Sets;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.string.ToStringBuilder;
+import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
@@ -24,6 +25,21 @@ abstract class FilterDefinition {
 
         Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
             return new IdFilter(globalIdFactory.createFromDto(globalIdDTO));
+        }
+    }
+
+    static class IdAndTypeNameFilterDefinition extends FilterDefinition {
+        private final Object localId;
+        private final String typeName;
+
+        IdAndTypeNameFilterDefinition(Object localId, String typeName) {
+            Validate.argumentsAreNotNull(localId, typeName);
+            this.localId = localId;
+            this.typeName = typeName;
+        }
+
+        Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
+            return new IdFilter(globalIdFactory.createInstanceId(localId, typeName));
         }
     }
 

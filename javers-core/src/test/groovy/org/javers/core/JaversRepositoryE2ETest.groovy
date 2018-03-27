@@ -598,7 +598,7 @@ class JaversRepositoryE2ETest extends Specification {
         javers.commit("author", new ConcreteWithActualType("a", ["1","2"]) )
 
         when:
-        def changes = javers.findChanges(QueryBuilder.byClass(ConcreteWithActualType).build())
+        def changes = javers.findChanges(byClass(ConcreteWithActualType).build())
 
         then:
         def change = changes[0]
@@ -607,12 +607,13 @@ class JaversRepositoryE2ETest extends Specification {
         change.changes[0].addedValue == "2"
     }
 
+    @Unroll
     def "should manage Entity class name refactor when querying using new class with @TypeName retrofitted to old class name"(){
         when:
         javers.commit("author", new OldEntity(id:1, value:5))
         javers.commit("author", new NewEntity(id:1, value:15))
 
-        def changes = javers.findChanges(byInstanceId(1, NewEntity).build())
+        def changes = javers.findChanges(byInstanceId(1, type).build())
 
         then:
         changes.size() == 1
@@ -620,6 +621,9 @@ class JaversRepositoryE2ETest extends Specification {
             assert left == 5
             assert right == 15
         }
+
+        where:
+        type << [NewEntity, "org.javers.core.examples.typeNames.OldEntity"]
     }
 
     def "should manage Entity class name refactor when old and new class uses @TypeName"(){
