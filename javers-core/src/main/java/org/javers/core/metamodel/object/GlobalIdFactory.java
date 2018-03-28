@@ -112,6 +112,11 @@ public class GlobalIdFactory {
         return entity.createIdFromLocalId(localId);
     }
 
+    public InstanceId createInstanceId(Object localId, String typeName){
+        EntityType entity = typeMapper.getJaversManagedType(typeName, EntityType.class);
+        return entity.createIdFromLocalId(localId);
+    }
+
     public GlobalId createFromDto(GlobalIdDTO globalIdDTO){
         if (globalIdDTO instanceof InstanceIdDTO){
             InstanceIdDTO idDTO = (InstanceIdDTO) globalIdDTO;

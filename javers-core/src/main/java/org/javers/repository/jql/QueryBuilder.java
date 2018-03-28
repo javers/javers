@@ -88,6 +88,21 @@ public class QueryBuilder {
         return new QueryBuilder(new IdFilterDefinition(instanceId(localId, entityClass)));
     }
 
+
+    /**
+     * Query for selecting changes (or snapshots) made on a concrete type identified by name.
+     * <br/><br/>
+     *
+     * For example, last changes on "bob" Person:
+     * <pre>
+     * javers.findChanges( QueryBuilder.byInstanceId("bob", "Person").build() );
+     * </pre>
+     */
+    public static QueryBuilder byInstanceId(Object localId, String typeName){
+        Validate.argumentsAreNotNull(localId, typeName);
+        return new QueryBuilder(new IdAndTypeNameFilterDefinition(localId, typeName));
+    }
+
     /**
      * Query for selecting changes (or snapshots) made on a concrete Entity instance.
      * <br/><br/>
