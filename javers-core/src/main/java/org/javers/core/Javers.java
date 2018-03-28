@@ -11,10 +11,7 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
-import org.javers.repository.jql.GlobalIdDTO;
-import org.javers.repository.jql.JqlQuery;
-import org.javers.repository.jql.QueryBuilder;
-import org.javers.repository.jql.ShadowScope;
+import org.javers.repository.jql.*;
 import org.javers.shadow.Shadow;
 
 import java.lang.reflect.Type;
@@ -382,7 +379,7 @@ public interface Javers {
      * @return A list ordered in reverse chronological order. Empty if nothing found.
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      */
-    List<Change> findChanges(JqlQuery query);
+    Changes findChanges(JqlQuery query);
 
     /**
      * Queries JaversRepository for object Snapshots. <br/>

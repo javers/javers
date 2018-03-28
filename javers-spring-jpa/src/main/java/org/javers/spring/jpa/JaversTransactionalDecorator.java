@@ -3,6 +3,7 @@ package org.javers.spring.jpa;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.javers.common.validation.Validate;
+import org.javers.core.Changes;
 import org.javers.core.Javers;
 import org.javers.core.changelog.ChangeProcessor;
 import org.javers.core.commit.Commit;
@@ -130,7 +131,7 @@ public class JaversTransactionalDecorator implements Javers {
 
     @Transactional
     @Override
-    public List<Change> findChanges(JqlQuery query) {
+    public Changes findChanges(JqlQuery query) {
         return delegate.findChanges(query);
     }
 

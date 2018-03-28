@@ -95,7 +95,7 @@ public abstract class Change implements Serializable {
         return this.getClass().getSimpleName() + "{ " +fieldsToString(PrettyValuePrinter.getDefault()) +" }";
     }
 
-    protected String prettyPrint(PrettyValuePrinter valuePrinter) {
+    public String prettyPrint(PrettyValuePrinter valuePrinter) {
         Validate.argumentIsNotNull(valuePrinter);
         return this.getClass().getSimpleName() + " { " +fieldsToString(valuePrinter) +" }";
     }
