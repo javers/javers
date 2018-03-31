@@ -20,31 +20,69 @@ class NewFindChangesE2ETest extends Specification {
       changes.each{ println it }
 
       then:
-      changes.size() == 9
+      changes.size() == 7
     }
 
     def "should return changes grouped by commit"(){
-      given:
-      commitChanges()
+        given:
+        commitChanges()
 
-      when:
-      Changes changes = javers.findChanges(QueryBuilder.byClass(Employee).withChildValueObjects().build())
+        when:
+        Changes changes = javers.findChanges(QueryBuilder.byClass(Employee).withChildValueObjects().build())
 
-      println changes.prettyPrint()
+        println changes.prettyPrint()
 
-      List<Changes.ChangesInCommit> changesInCommit = changes.groupByCommit()
+        List<Changes.ChangesByCommit> changesByCommit = changes.groupByCommit()
 
-      then:
-      changesInCommit.size() == 3
+        then:
+        changesByCommit.size() == 3
 
-      changesInCommit[0].commit.id.majorId == 4
-      changesInCommit[0].size() == 3
+        changesByCommit[0].commit.id.majorId == 4
+        changesByCommit[0].size() == 3
 
-      changesInCommit[1].commit.id.majorId == 3
-      changesInCommit[1].size() == 2
+        changesByCommit[1].commit.id.majorId == 3
+        changesByCommit[1].size() == 2
 
-      changesInCommit[2].commit.id.majorId == 2
-      changesInCommit[2].size() == 4
+        changesByCommit[2].commit.id.majorId == 2
+        changesByCommit[2].size() == 4
+    }
+
+    def "should return changes grouped by commit and by entity object"(){
+        given:
+        commitChanges()
+
+        when:
+        Changes changes = javers.findChanges(QueryBuilder.byClass(Employee).withChildValueObjects().build())
+
+        println changes.prettyPrint()
+
+        List<Changes.ChangesByCommit> changesByCommit = changes.groupByCommit()
+        List<Changes.ChangesByObject> changesByObject = changesByCommit[0].groupByObject()
+
+        then:
+        changesByObject.size() == 1
+        changesByObject[0].size() == 3
+        changesByObject[0].commit.id.majorId == 4
+        changesByObject[0].globalId.value() == 'Employee/kaz'
+
+        when:
+        changesByObject = changesByCommit[1].groupByObject()
+
+        then:
+        changesByObject.size() == 1
+        changesByObject[0].size() == 2
+        changesByObject[0].commit.id.majorId == 3
+        changesByObject[0].globalId.value() == 'Employee/kaz'
+
+        when:
+        changesByObject = changesByCommit[2].groupByObject()
+
+        then:
+        changesByObject.size() == 2
+        changesByObject.each {
+            it.commit.id.majorId == 2
+        }
+        changesByObject.collect{it.globalId.value()} as Set == ['Employee/kaz','Employee/stef'] as Set
     }
 
     void commitChanges() {

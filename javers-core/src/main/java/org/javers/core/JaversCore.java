@@ -2,6 +2,8 @@ package org.javers.core;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import com.google.gson.Gson;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.changelog.ChangeListTraverser;
