@@ -5,10 +5,10 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 
-import java.util.AbstractList;
+import java.util.Collections;
 import java.util.List;
 
-public final class ChangesByCommit extends AbstractList<Change> {
+public final class ChangesByCommit {
     private final List<Change> changes;
     private final CommitMetadata commitMetadata;
     private final transient PrettyValuePrinter valuePrinter;
@@ -50,14 +50,8 @@ public final class ChangesByCommit extends AbstractList<Change> {
         return b.toString();
     }
 
-    @Override
-    public Change get(int index) {
-        return changes.get(index);
-    }
-
-    @Override
-    public int size() {
-        return changes.size();
+    public List<Change> get() {
+        return Collections.unmodifiableList(changes);
     }
 
     public CommitMetadata getCommit() {

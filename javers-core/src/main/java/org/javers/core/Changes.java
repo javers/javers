@@ -16,10 +16,9 @@ import static java.util.stream.Collectors.toList;
  * Convenient wrapper for the list of Changes returned by {@link Javers#findChanges(JqlQuery)}.
  * <br/><br/>
  *
- * Allows iterating over the list of Changes grouped by commits
- * and grouped by entities.
- *
- * TODO example
+ * Allows traversing over Changes grouped by commits
+ * and grouped by entities, see: <br/>
+ * {@link #groupByCommit()}, {@link #groupByObject()}.
  *
  * @since 3.9
  */
@@ -34,7 +33,55 @@ public class Changes extends AbstractList<Change> {
     }
 
     /**
-     * Changes grouped by commits
+     * Changes grouped by commits.
+     * For example, //TODO
+     *
+     * <pre>
+     * Javers javers = JaversBuilder.javers().build();
+     *
+     * Employee sam = new Employee("Sam", 1_000);
+     * Employee frodo = new Employee("Frodo", 10_000);
+     * javers.commit("author", frodo);
+     *
+     * frodo.addSubordinate(sam);
+     * frodo.setSalary(11_000);
+     * sam.setSalary(2_000);
+     * javers.commit("author", frodo);
+     *
+     * // when
+     * Changes changes = javers.findChanges(QueryBuilder.byClass(Employee.class)
+     *                         .withNewObjectChanges().build());
+     *
+     * changes.groupByCommit().forEach(byCommit -> {
+     *   System.out.println("commit " + byCommit.getCommit().getId());
+     *   byCommit.groupByObject().forEach(byObject -> {
+     *     System.out.println("  changes on " + byObject.getGlobalId().value() + " : ");
+     *     byObject.get().forEach(change -> {
+     *       System.out.println("  - " + change);
+     *     });
+     *   });
+     * });
+     * </pre>
+     *
+     * prints:
+     * <pre>
+     * commit 2.0
+     *   changes on Employee/Frodo :
+     *   - ValueChange{ 'salary' changed from '10000' to '11000' }
+     *   - ListChange{ 'subordinates' collection changes :
+     *   0. 'Employee/Sam' added }
+     *   changes on Employee/Sam :
+     *   - ValueChange{ 'name' changed from '' to 'Sam' }
+     *   - ValueChange{ 'salary' changed from '0' to '2000' }
+     *   - ReferenceChange{ 'boss' changed from '' to 'Employee/Frodo' }
+     *   - NewObject{ new object: Employee/Sam }
+     * commit 1.0
+     *   changes on Employee/Frodo :
+     *   - ValueChange{ 'name' changed from '' to 'Frodo' }
+     *   - ValueChange{ 'salary' changed from '0' to '10000' }
+     *   - NewObject{ new object: Employee/Frodo }
+     * </pre>
+     * @since 3.9
      */
     public List<ChangesByCommit> groupByCommit() {
         Map<CommitMetadata, List<Change>> changesByCommit = changes.stream().collect(
@@ -51,6 +98,8 @@ public class Changes extends AbstractList<Change> {
 
     /**
      * Changes grouped by entities
+     *
+     * @since 3.9
      */
     public List<ChangesByObject> groupByObject() {
         Map<GlobalId, List<Change>> changesByObject = changes.stream().collect(

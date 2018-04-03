@@ -330,8 +330,10 @@ public interface Javers {
     <T> List<Shadow<T>> findShadows(JqlQuery query);
 
     /**
-     * Queries JaversRepository for changes history (diff sequence) of a given class, object or property.<br/>
-     * There are various types of changes. See {@link Change} class hierarchy.
+     * Queries a JaversRepository for change history (diff sequence) of a given class, object or property.<br/>
+     * Returns the list of Changes.<br/>
+     * There are various types of changes. See {@link Change} class hierarchy.<br/>
+     * {@link Changes} can be easily traversed using {@link Changes#groupByCommit()} and {@link Changes#groupByObject()}.
      * <br/><br/>
      *
      * <b>Querying for Entity changes by instance Id</b><br/><br/>
@@ -376,7 +378,8 @@ public interface Javers {
      * javers.findChanges( QueryBuilder.byClass(Person.class).withChangedProperty("myProperty").build() );
      * </pre>
      *
-     * @return A list ordered in reverse chronological order. Empty if nothing found.
+     * @return A list of Changes ordered in reverse chronological order.
+     *         Empty if nothing found.
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      */
     Changes findChanges(JqlQuery query);

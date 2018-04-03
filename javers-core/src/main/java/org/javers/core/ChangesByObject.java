@@ -6,13 +6,12 @@ import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalId;
-
-import java.util.AbstractList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class ChangesByObject extends AbstractList<Change> {
+public final class ChangesByObject {
     private final List<Change> changes;
     private final GlobalId globalId;
     private final transient PrettyValuePrinter valuePrinter;
@@ -23,14 +22,8 @@ public final class ChangesByObject extends AbstractList<Change> {
         this.valuePrinter = valuePrinter;
     }
 
-    @Override
-    public Change get(int index) {
-        return changes.get(index);
-    }
-
-    @Override
-    public int size() {
-        return changes.size();
+    public List<Change> get() {
+        return Collections.unmodifiableList(changes);
     }
 
     /**

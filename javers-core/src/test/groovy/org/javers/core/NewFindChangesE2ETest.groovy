@@ -38,13 +38,13 @@ class NewFindChangesE2ETest extends Specification {
         changesByCommit.size() == 3
 
         changesByCommit[0].commit.id.majorId == 4
-        changesByCommit[0].size() == 4
+        changesByCommit[0].get().size() == 4
 
         changesByCommit[1].commit.id.majorId == 3
-        changesByCommit[1].size() == 2
+        changesByCommit[1].get().size() == 2
 
         changesByCommit[2].commit.id.majorId == 2
-        changesByCommit[2].size() == 4
+        changesByCommit[2].get().size() == 4
     }
 
     def "should return changes grouped by commit and by entity object"(){
@@ -64,7 +64,7 @@ class NewFindChangesE2ETest extends Specification {
         changesByCommit.size() == 3
 
         changesByObject.size() == 1
-        changesByObject[0].size() == 4
+        changesByObject[0].get().size() == 4
         changesByObject[0].globalId.value() == 'Employee/kaz'
 
         when:
@@ -72,7 +72,7 @@ class NewFindChangesE2ETest extends Specification {
 
         then:
         changesByObject.size() == 1
-        changesByObject[0].size() == 2
+        changesByObject[0].get().size() == 2
         changesByObject[0].globalId.value() == 'Employee/kaz'
 
         when:
@@ -80,8 +80,8 @@ class NewFindChangesE2ETest extends Specification {
 
         then:
         changesByObject.size() == 2
-        changesByObject[0].size() == 2
-        changesByObject[1].size() == 2
+        changesByObject[0].get().size() == 2
+        changesByObject[1].get().size() == 2
         changesByObject.collect{it.globalId.value()} as Set == ['Employee/kaz','Employee/stef'] as Set
     }
 
