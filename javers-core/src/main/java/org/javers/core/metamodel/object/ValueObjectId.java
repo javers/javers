@@ -4,7 +4,6 @@ import org.javers.common.collections.Lists;
 import org.javers.core.metamodel.type.EntityType;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,6 +46,11 @@ public class ValueObjectId extends GlobalId {
 
     public GlobalId getOwnerId() {
         return ownerId;
+    }
+
+    @Override
+    public GlobalId getMasterObjectId() {
+        return getOwnerId();
     }
 
     @Override

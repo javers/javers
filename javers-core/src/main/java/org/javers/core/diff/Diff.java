@@ -3,6 +3,8 @@ package org.javers.core.diff;
 import org.javers.common.collections.Lists;
 import org.javers.common.exception.JaversException;
 import org.javers.common.string.PrettyValuePrinter;
+import org.javers.core.Changes;
+import org.javers.core.ChangesByObject;
 import org.javers.core.diff.changetype.PropertyChange;
 
 import java.io.Serializable;
@@ -61,7 +63,7 @@ public class Diff implements Serializable {
     }
 
     /**
-     * Full list of changes
+     * Flat list of changes
      *
      * @return unmodifiable list
      */
@@ -70,7 +72,15 @@ public class Diff implements Serializable {
     }
 
     /**
-     * Changes that satisfies given filter condition
+     * Changes grouped by entities
+     * @since 3.9
+     */
+    public List<ChangesByObject> groupByObject() {
+       return new Changes(changes, valuePrinter).groupByObject();
+    }
+
+    /**
+     * Changes that satisfies given filter
      */
     public List<Change> getChanges(Predicate<Change> predicate) {
         return Lists.positiveFilter(changes, predicate);
@@ -107,10 +117,8 @@ public class Diff implements Serializable {
 
         b.append("Diff:\n");
 
-        int i=1;
-        for (Change change : changes){
-            b.append((i++) + ". " + change.prettyPrint(valuePrinter) + "\n");
-        }
+        groupByObject().forEach(it -> b.append(it.toString()));
+
         return b.toString();
     }
 

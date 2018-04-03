@@ -20,7 +20,7 @@ class NewFindChangesE2ETest extends Specification {
       changes.each{ println it }
 
       then:
-      changes.size() == 7
+      changes.size() == 8
     }
 
     def "should return changes grouped by commit"(){
@@ -32,13 +32,13 @@ class NewFindChangesE2ETest extends Specification {
 
         println changes.prettyPrint()
 
-        List<Changes.ChangesByCommit> changesByCommit = changes.groupByCommit()
+        List<ChangesByCommit> changesByCommit = changes.groupByCommit()
 
         then:
         changesByCommit.size() == 3
 
         changesByCommit[0].commit.id.majorId == 4
-        changesByCommit[0].size() == 3
+        changesByCommit[0].size() == 4
 
         changesByCommit[1].commit.id.majorId == 3
         changesByCommit[1].size() == 2
@@ -52,17 +52,19 @@ class NewFindChangesE2ETest extends Specification {
         commitChanges()
 
         when:
-        Changes changes = javers.findChanges(QueryBuilder.byClass(Employee).withChildValueObjects().build())
+        Changes changes = javers.findChanges(QueryBuilder.byClass(Employee)
+                .withChildValueObjects().build())
 
         println changes.prettyPrint()
 
-        List<Changes.ChangesByCommit> changesByCommit = changes.groupByCommit()
-        List<Changes.ChangesByObject> changesByObject = changesByCommit[0].groupByObject()
+        List<ChangesByCommit> changesByCommit = changes.groupByCommit()
+        List<ChangesByObject> changesByObject = changesByCommit[0].groupByObject()
 
         then:
+        changesByCommit.size() == 3
+
         changesByObject.size() == 1
-        changesByObject[0].size() == 3
-        changesByObject[0].commit.id.majorId == 4
+        changesByObject[0].size() == 4
         changesByObject[0].globalId.value() == 'Employee/kaz'
 
         when:
@@ -71,7 +73,6 @@ class NewFindChangesE2ETest extends Specification {
         then:
         changesByObject.size() == 1
         changesByObject[0].size() == 2
-        changesByObject[0].commit.id.majorId == 3
         changesByObject[0].globalId.value() == 'Employee/kaz'
 
         when:
@@ -79,9 +80,8 @@ class NewFindChangesE2ETest extends Specification {
 
         then:
         changesByObject.size() == 2
-        changesByObject.each {
-            it.commit.id.majorId == 2
-        }
+        changesByObject[0].size() == 2
+        changesByObject[1].size() == 2
         changesByObject.collect{it.globalId.value()} as Set == ['Employee/kaz','Employee/stef'] as Set
     }
 
@@ -105,6 +105,7 @@ class NewFindChangesE2ETest extends Specification {
         kaz.salary = 1002
         kaz.primaryAddress = new Address("two")
         kaz.postalAddress = new Address("two")
+        kaz.skills = ["skill A", "skill B"]
 
         javers.commit('author', kaz)
     }

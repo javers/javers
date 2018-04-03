@@ -6,10 +6,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalId;
-
 import java.util.*;
-
-import static org.javers.common.string.ToStringBuilder.addEnumField;
 
 /**
  * Collection or Array change
@@ -47,16 +44,17 @@ public abstract class ContainerChange extends PropertyChange {
     }
 
     @Override
-    protected String fieldsToString(PrettyValuePrinter valuePrinter) {
-        StringBuilder changesAsString = new StringBuilder();
+    public String prettyPrint(PrettyValuePrinter valuePrinter) {
+        Validate.argumentIsNotNull(valuePrinter);
 
-        for (ContainerElementChange c : changes){
-            if (changesAsString.length() > 0) {
-                changesAsString.append("\n  ");
-            }
-            changesAsString.append(c.prettyPrint(valuePrinter));
-        }
-        return super.fieldsToString(valuePrinter) + " changes:\n  " + changesAsString;
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(valuePrinter.formatWithQuotes(getPropertyNameWithPath()) + " collection changes :\n");
+
+        changes.forEach(cc -> builder.append("  " + cc.prettyPrint(valuePrinter)+"\n"));
+
+        String result = builder.toString();
+        return result.substring(0, result.length() - 1);
     }
 
     @Override

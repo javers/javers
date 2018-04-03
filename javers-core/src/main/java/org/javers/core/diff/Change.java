@@ -1,10 +1,6 @@
 package org.javers.core.diff;
 
-import java.util.Optional;
-
 import org.javers.common.string.PrettyValuePrinter;
-import org.javers.common.string.ToStringBuilder;
-import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.NewObject;
@@ -16,8 +12,8 @@ import org.javers.core.metamodel.object.InstanceId;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 
-import static org.javers.common.string.ToStringBuilder.addFirstField;
 import static org.javers.common.validation.Validate.*;
 
 /**
@@ -92,17 +88,10 @@ public abstract class Change implements Serializable {
      */
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + "{ " +fieldsToString(PrettyValuePrinter.getDefault()) +" }";
+        return this.getClass().getSimpleName() + "{ " +prettyPrint(PrettyValuePrinter.getDefault()) +" }";
     }
 
-    public String prettyPrint(PrettyValuePrinter valuePrinter) {
-        Validate.argumentIsNotNull(valuePrinter);
-        return this.getClass().getSimpleName() + " { " +fieldsToString(valuePrinter) +" }";
-    }
-
-    protected String fieldsToString(PrettyValuePrinter valuePrinter){
-        return "globalId: " + valuePrinter.formatWithQuotes(getAffectedGlobalId());
-    }
+    public abstract String prettyPrint(PrettyValuePrinter valuePrinter);
 
     void setAffectedCdo(Object affectedCdo) {
         argumentIsNotNull(affectedCdo);

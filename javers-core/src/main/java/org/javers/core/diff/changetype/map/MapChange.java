@@ -47,14 +47,16 @@ public class MapChange extends PropertyChange {
     }
 
     @Override
-    protected String fieldsToString(PrettyValuePrinter valuePrinter) {
-        StringBuilder changesAsString = new StringBuilder();
+    public String prettyPrint(PrettyValuePrinter valuePrinter) {
+        Validate.argumentIsNotNull(valuePrinter);
+        StringBuilder builder = new StringBuilder();
 
-        for (EntryChange c : changes){
-            if (changesAsString.length() > 0) { changesAsString.append("\n  "); }
-            changesAsString.append(c.prettyPrint(valuePrinter));
-        }
-        return super.fieldsToString(valuePrinter) + " changes:\n  " + changesAsString;
+        builder.append(valuePrinter.formatWithQuotes(getPropertyNameWithPath()) + " map changes :\n");
+
+        changes.forEach(cc -> builder.append("  " + cc.prettyPrint(valuePrinter)+"\n"));
+
+        String result = builder.toString();
+        return result.substring(0, result.length() - 1);
     }
 
     @Override

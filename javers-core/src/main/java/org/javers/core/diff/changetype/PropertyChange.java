@@ -1,14 +1,13 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.common.string.PrettyValuePrinter;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.ValueObjectId;
 
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.javers.common.string.ToStringBuilder.addField;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
@@ -29,9 +28,11 @@ public abstract class PropertyChange extends Change {
         return propertyName;
     }
 
-    @Override
-    protected String fieldsToString(PrettyValuePrinter valuePrinter) {
-        return super.fieldsToString(valuePrinter) + ", " + propertyName + "";
+    public String getPropertyNameWithPath() {
+        if (getAffectedGlobalId() instanceof ValueObjectId) {
+            return ((ValueObjectId) getAffectedGlobalId()).getFragment() + "." + propertyName;
+        }
+        return propertyName;
     }
 
     @Override
