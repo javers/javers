@@ -49,7 +49,7 @@ public class ValueObjectId extends GlobalId {
     }
 
     @Override
-    public GlobalId getMasterObjectId() {
+    public GlobalId masterObjectId() {
         return getOwnerId();
     }
 

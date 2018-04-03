@@ -54,7 +54,7 @@ public class Changes extends AbstractList<Change> {
      */
     public List<ChangesByObject> groupByObject() {
         Map<GlobalId, List<Change>> changesByObject = changes.stream().collect(
-                groupingBy(c -> c.getAffectedGlobalId().getMasterObjectId()));
+                groupingBy(c -> c.getAffectedGlobalId().masterObjectId()));
 
         List<ChangesByObject> result = new ArrayList<>();
         changesByObject.forEach((k, v) -> {

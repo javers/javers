@@ -64,7 +64,7 @@ public abstract class GlobalId implements Serializable {
         return typeName;
     }
 
-    public GlobalId getMasterObjectId() {
+    public GlobalId masterObjectId() {
         return this;
     }
 
