@@ -34,36 +34,13 @@ public class Changes extends AbstractList<Change> {
 
     /**
      * Changes grouped by commits.
-     * For example, //TODO
+     * <br/>
      *
-     * <pre>
-     * Javers javers = JaversBuilder.javers().build();
+     * When formatting a changelog,
+     * usually you need to group changes by commits and then by objects.
+     * <br/><br/>
      *
-     * Employee sam = new Employee("Sam", 1_000);
-     * Employee frodo = new Employee("Frodo", 10_000);
-     * javers.commit("author", frodo);
-     *
-     * frodo.addSubordinate(sam);
-     * frodo.setSalary(11_000);
-     * sam.setSalary(2_000);
-     * javers.commit("author", frodo);
-     *
-     * // when
-     * Changes changes = javers.findChanges(QueryBuilder.byClass(Employee.class)
-     *                         .withNewObjectChanges().build());
-     *
-     * changes.groupByCommit().forEach(byCommit -> {
-     *   System.out.println("commit " + byCommit.getCommit().getId());
-     *   byCommit.groupByObject().forEach(byObject -> {
-     *     System.out.println("  changes on " + byObject.getGlobalId().value() + " : ");
-     *     byObject.get().forEach(change -> {
-     *       System.out.println("  - " + change);
-     *     });
-     *   });
-     * });
-     * </pre>
-     *
-     * prints:
+     * For example, this changelog:
      * <pre>
      * commit 2.0
      *   changes on Employee/Frodo :
@@ -81,6 +58,23 @@ public class Changes extends AbstractList<Change> {
      *   - ValueChange{ 'salary' changed from '0' to '10000' }
      *   - NewObject{ new object: Employee/Frodo }
      * </pre>
+     *
+     * is printed by this code:
+     * <pre>
+     * Changes changes = javers.findChanges(QueryBuilder.byClass(Employee.class)
+     *                         .withNewObjectChanges().build());
+     *
+     * changes.groupByCommit().forEach(byCommit -> {
+     *   System.out.println("commit " + byCommit.getCommit().getId());
+     *   byCommit.groupByObject().forEach(byObject -> {
+     *     System.out.println("  changes on " + byObject.getGlobalId().value() + " : ");
+     *     byObject.get().forEach(change -> {
+     *       System.out.println("  - " + change);
+     *     });
+     *   });
+     * });
+     * </pre>
+     *
      * @since 3.9
      */
     public List<ChangesByCommit> groupByCommit() {
@@ -97,7 +91,11 @@ public class Changes extends AbstractList<Change> {
     }
 
     /**
-     * Changes grouped by entities
+     * Changes grouped by entities.
+     * <br/>
+     *
+     * See example in {@link #groupByCommit()}
+     *
      *
      * @since 3.9
      */
