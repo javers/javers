@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.toList;
  * Convenient wrapper for the list of Changes returned by {@link Javers#findChanges(JqlQuery)}.
  * <br/><br/>
  *
- * Allows traversing over Changes grouped by commits
+ * Allows traversing over the list of Changes grouped by commits
  * and grouped by entities, see: <br/>
  * {@link #groupByCommit()}, {@link #groupByObject()}.
  *
