@@ -8,6 +8,14 @@ import org.javers.core.diff.Change;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * List of Changes done in a specific commit.
+ *
+ * <ul>
+ * <li/>{@link #getCommit()}} commit metadata
+ * <li/>{@link #get()} list of Changes
+ * </ul>
+ */
 public final class ChangesByCommit {
     private final List<Change> changes;
     private final CommitMetadata commitMetadata;

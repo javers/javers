@@ -19,6 +19,9 @@ import static java.util.stream.Collectors.toList;
  * Allows traversing over the list of Changes grouped by commits
  * and grouped by entities, see: <br/>
  * {@link #groupByCommit()}, {@link #groupByObject()}.
+ * <br/><br/>
+ *
+ * {@link #prettyPrint()} prints Changes to the the nicely formatted String.
  *
  * @since 3.9
  */
@@ -122,7 +125,7 @@ public class Changes extends AbstractList<Change> {
     }
 
     /**
-     * Prints the nicely formatted list of changes.
+     * Prints the nicely formatted list of Changes.
      * Alias to {@link #toString()}.
      */
     public final String prettyPrint() {

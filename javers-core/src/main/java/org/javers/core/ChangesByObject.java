@@ -11,6 +11,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * List of Changes done on a specific object.
+ *
+ * <ul>
+ * <li/>{@link #getGlobalId()}} changed object Id
+ * <li/>{@link #get()} list of Changes
+ * </ul>
+ */
 public final class ChangesByObject {
     private final List<Change> changes;
     private final GlobalId globalId;
@@ -27,8 +35,9 @@ public final class ChangesByObject {
     }
 
     /**
-     * Id of changed Entity.
-     * For Value Objects -- id of owning Entity.
+     * Id of a changed Entity.
+     * <br/>
+     * For Value Objects &mdash; Id of an owning Entity.
      */
     public GlobalId getGlobalId() {
         return globalId;

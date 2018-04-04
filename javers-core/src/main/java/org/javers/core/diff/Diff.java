@@ -18,12 +18,20 @@ import static org.javers.common.exception.JaversExceptionCode.AFFECTED_CDO_IS_NO
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * Diff is a set of (atomic) changes between two graphs of objects.
+ * Diff is a list of changes between two object graphs.
  * <br><br>
  *
- * Typically it is used to capture and trace changes made by user on his domain data.
- * In this case diff is done between previous and current state of a bunch of domain objects.
+ * Typically, it is used to capture and trace changes made on domain objects.
+ * In this case, diff is done between previous and current state of an object graph.
  * <br><br>
+ *
+ * <ul>
+ * <li/>{@link #getChanges()} returns a flat list of Changes
+ *
+ * <li/>{@link #groupByObject()} returns Changes grouped by objects
+ *
+ * <li/>{@link #prettyPrint()} prints Changes to the the nicely formatted String
+ * </ul>
  *
  * @author bartosz walacik
  */
@@ -73,6 +81,7 @@ public class Diff implements Serializable {
 
     /**
      * Changes grouped by entities
+     *
      * @since 3.9
      */
     public List<ChangesByObject> groupByObject() {
@@ -104,7 +113,7 @@ public class Diff implements Serializable {
     }
 
     /**
-     * Prints the nicely formatted list of changes.
+     * Prints the nicely formatted list of Changes.
      * Alias to {@link #toString()}.
      */
     public final String prettyPrint() {
