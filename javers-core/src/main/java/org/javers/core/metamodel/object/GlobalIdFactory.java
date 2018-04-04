@@ -74,13 +74,11 @@ public class GlobalIdFactory {
     }
 
     private GlobalId getRootOwnerId(OwnerContext ownerContext) {
-        GlobalId rootOwnerId;
         if (ownerContext.getOwnerId() instanceof ValueObjectId){
-            rootOwnerId = ((ValueObjectId)ownerContext.getOwnerId()).getOwnerId();
+            return ((ValueObjectId)ownerContext.getOwnerId()).getOwnerId();
         } else{
-            rootOwnerId = ownerContext.getOwnerId();
+            return ownerContext.getOwnerId();
         }
-        return rootOwnerId;
     }
 
     private String createPathFromRoot(GlobalId parentId, String fragment) {

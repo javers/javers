@@ -1,6 +1,9 @@
 package org.javers.core.diff.changetype;
 
 import java.util.Optional;
+
+import org.javers.common.string.PrettyValuePrinter;
+import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
@@ -34,5 +37,11 @@ public final class ObjectRemoved extends Change {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    @Override
+    public String prettyPrint(PrettyValuePrinter valuePrinter) {
+        Validate.argumentIsNotNull(valuePrinter);
+        return "object removed: " + getAffectedGlobalId().value();
     }
 }

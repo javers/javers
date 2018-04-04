@@ -2,6 +2,8 @@ package org.javers.core;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import com.google.gson.Gson;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.changelog.ChangeListTraverser;
@@ -37,7 +39,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
 /**
- * core JaVers instance
+ * JaVers instance
  *
  * @author bartosz walacik
  */
@@ -51,8 +53,9 @@ class JaversCore implements Javers {
     private final JaversExtendedRepository repository;
     private final QueryRunner queryRunner;
     private final GlobalIdFactory globalIdFactory;
+    private final JaversCoreConfiguration configuration;
 
-    JaversCore(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, QueryRunner queryRunner, GlobalIdFactory globalIdFactory) {
+    JaversCore(DiffFactory diffFactory, TypeMapper typeMapper, JsonConverter jsonConverter, CommitFactory commitFactory, JaversExtendedRepository repository, QueryRunner queryRunner, GlobalIdFactory globalIdFactory, JaversCoreConfiguration javersCoreConfiguration) {
         this.diffFactory = diffFactory;
         this.typeMapper = typeMapper;
         this.jsonConverter = jsonConverter;
@@ -60,6 +63,7 @@ class JaversCore implements Javers {
         this.repository = repository;
         this.queryRunner = queryRunner;
         this.globalIdFactory = globalIdFactory;
+        this.configuration = javersCoreConfiguration;
     }
 
     @Override
@@ -150,8 +154,8 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public List<Change> findChanges(JqlQuery query){
-        return queryRunner.queryForChanges(query);
+    public Changes findChanges(JqlQuery query){
+        return new Changes(queryRunner.queryForChanges(query), configuration.getPrettyValuePrinter());
     }
 
     @Override

@@ -3,6 +3,8 @@ package org.javers.core.diff;
 import org.javers.common.collections.Lists;
 import org.javers.common.exception.JaversException;
 import org.javers.common.string.PrettyValuePrinter;
+import org.javers.core.Changes;
+import org.javers.core.ChangesByObject;
 import org.javers.core.diff.changetype.PropertyChange;
 
 import java.io.Serializable;
@@ -16,12 +18,20 @@ import static org.javers.common.exception.JaversExceptionCode.AFFECTED_CDO_IS_NO
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * Diff is a set of (atomic) changes between two graphs of objects.
+ * Diff is a list of changes between two object graphs.
  * <br><br>
  *
- * Typically it is used to capture and trace changes made by user on his domain data.
- * In this case diff is done between previous and current state of a bunch of domain objects.
+ * Typically, it is used to capture and trace changes made on domain objects.
+ * In this case, diff is done between previous and current state of an object graph.
  * <br><br>
+ *
+ * <ul>
+ * <li/>{@link #getChanges()} returns a flat list of Changes
+ *
+ * <li/>{@link #groupByObject()} returns Changes grouped by objects
+ *
+ * <li/>{@link #prettyPrint()} prints Changes to the the nicely formatted String
+ * </ul>
  *
  * @author bartosz walacik
  */
@@ -61,7 +71,7 @@ public class Diff implements Serializable {
     }
 
     /**
-     * Full list of changes
+     * Flat list of changes
      *
      * @return unmodifiable list
      */
@@ -70,7 +80,16 @@ public class Diff implements Serializable {
     }
 
     /**
-     * Changes that satisfies given filter condition
+     * Changes grouped by entities
+     *
+     * @since 3.9
+     */
+    public List<ChangesByObject> groupByObject() {
+       return new Changes(changes, valuePrinter).groupByObject();
+    }
+
+    /**
+     * Changes that satisfies given filter
      */
     public List<Change> getChanges(Predicate<Change> predicate) {
         return Lists.positiveFilter(changes, predicate);
@@ -94,7 +113,7 @@ public class Diff implements Serializable {
     }
 
     /**
-     * Prints the nicely formatted list of changes.
+     * Prints the nicely formatted list of Changes.
      * Alias to {@link #toString()}.
      */
     public final String prettyPrint() {
@@ -107,10 +126,8 @@ public class Diff implements Serializable {
 
         b.append("Diff:\n");
 
-        int i=1;
-        for (Change change : changes){
-            b.append((i++) + ". " + change.prettyPrint(valuePrinter) + "\n");
-        }
+        groupByObject().forEach(it -> b.append(it.toString()));
+
         return b.toString();
     }
 

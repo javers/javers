@@ -1,13 +1,13 @@
 package org.javers.core.diff.changetype;
 
 import org.javers.common.string.PrettyValuePrinter;
+import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.javers.common.string.ToStringBuilder.format;
 
 /**
  * Changed reference to Entity or ValueObject (in *ToOne relation)
@@ -71,10 +71,12 @@ public final class ReferenceChange extends PropertyChange {
     }
 
     @Override
-    protected String fieldsToString(PrettyValuePrinter valuePrinter) {
-        return super.fieldsToString(valuePrinter) +
+    public String prettyPrint(PrettyValuePrinter valuePrinter) {
+        Validate.argumentIsNotNull(valuePrinter);
+
+        return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
                 " changed from " + valuePrinter.formatWithQuotes(getLeft()) + " to " +
-                                   valuePrinter.formatWithQuotes(getRight());
+                valuePrinter.formatWithQuotes(getRight());
     }
 
     @Override

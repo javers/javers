@@ -1,23 +1,22 @@
 package org.javers.core.diff;
 
-import java.util.Optional;
-
 import org.javers.common.string.PrettyValuePrinter;
-import org.javers.common.string.ToStringBuilder;
-import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.NewObject;
+import org.javers.core.diff.changetype.ObjectRemoved;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.container.ContainerChange;
 import org.javers.core.diff.changetype.container.ListChange;
+import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 
-import static org.javers.common.string.ToStringBuilder.addFirstField;
 import static org.javers.common.validation.Validate.*;
 
 /**
@@ -25,7 +24,8 @@ import static org.javers.common.validation.Validate.*;
  * <br><br>
  *
  * There are several types fo change:
- * {@link ValueChange}, {@link ReferenceChange}, {@link ListChange}, {@link NewObject}, and so on.
+ * {@link ValueChange}, {@link ReferenceChange}, {@link ListChange}, {@link NewObject}, {@link ObjectRemoved},
+ * {@link ContainerChange}, {@link MapChange}.
  * See the inheritance hierarchy for the complete list.
  * <br><br>
  *
@@ -92,17 +92,10 @@ public abstract class Change implements Serializable {
      */
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + "{ " +fieldsToString(PrettyValuePrinter.getDefault()) +" }";
+        return this.getClass().getSimpleName() + "{ " +prettyPrint(PrettyValuePrinter.getDefault()) +" }";
     }
 
-    protected String prettyPrint(PrettyValuePrinter valuePrinter) {
-        Validate.argumentIsNotNull(valuePrinter);
-        return this.getClass().getSimpleName() + " { " +fieldsToString(valuePrinter) +" }";
-    }
-
-    protected String fieldsToString(PrettyValuePrinter valuePrinter){
-        return "globalId: " + valuePrinter.formatWithQuotes(getAffectedGlobalId());
-    }
+    public abstract String prettyPrint(PrettyValuePrinter valuePrinter);
 
     void setAffectedCdo(Object affectedCdo) {
         argumentIsNotNull(affectedCdo);

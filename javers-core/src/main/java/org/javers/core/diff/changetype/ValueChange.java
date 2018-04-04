@@ -1,6 +1,7 @@
 package org.javers.core.diff.changetype;
 
 import org.javers.common.string.PrettyValuePrinter;
+import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.GlobalId;
 
@@ -33,8 +34,10 @@ public final class ValueChange extends PropertyChange {
     }
 
     @Override
-    protected String fieldsToString(PrettyValuePrinter valuePrinter) {
-        return super.fieldsToString(valuePrinter) +
+    public String prettyPrint(PrettyValuePrinter valuePrinter) {
+        Validate.argumentIsNotNull(valuePrinter);
+
+        return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
             " changed from " + valuePrinter.formatWithQuotes(getLeft()) + " to " +
                                valuePrinter.formatWithQuotes(getRight());
     }

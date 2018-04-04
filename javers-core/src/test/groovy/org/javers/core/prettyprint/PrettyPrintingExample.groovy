@@ -16,7 +16,9 @@ class PrettyPrintingExample extends Specification {
       given:
       def p = new JaversCoreProperties.PrettyPrintDateFormats()
       p.setZonedDateTime("dd.mm.yyyy HH:mm")
+
       def javers = JaversBuilder.javers().withPrettyPrintDateFormats(p).build()
+      //def javers = JaversBuilder.javers().build()
 
       Employee oldFrodo = new Employee(
               name:"Frodo",
@@ -31,7 +33,7 @@ class PrettyPrintingExample extends Specification {
               name:"Frodo",
               position: "Hero",
               salary: 12_000,
-              primaryAddress: new Address("Mordor"),
+              primaryAddress: new Address("Mordor","Some Street"),
               postalAddress: new Address("Shire"),
               skills:["management", "agile coaching"],
               lastPromotionDate: ZonedDateTime.now(),
