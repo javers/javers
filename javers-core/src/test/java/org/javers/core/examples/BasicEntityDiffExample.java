@@ -48,7 +48,19 @@ public class BasicEntityDiffExample {
     // diff pretty print
     System.out.println(diff);
 
+    //iterating over changes grouped by objects
+    System.out.println("");
+    diff.groupByObject().forEach(byObject -> {
+      System.out.println("* changes on " +byObject.getGlobalId().value() + " : ");
+      byObject.get().forEach(change -> System.out.println("  - " + change));
+    });
+
+    //iterating over changes
+    System.out.println("");
+    diff.getChanges().forEach(change -> System.out.println("- " + change));
+
     // diff as JSON
+    System.out.println("");
     System.out.println(javers.getJsonConverter().toJson(diff));
   }
 }
