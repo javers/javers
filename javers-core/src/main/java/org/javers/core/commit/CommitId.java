@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 
 /**
  * @see CommitSeqGenerator
- * @see DistributedCommitSeqGenerator
  * @author bartosz walacik
  */
 public final class CommitId implements Comparable<CommitId>, Serializable {
@@ -92,7 +91,7 @@ public final class CommitId implements Comparable<CommitId>, Serializable {
 
     @Override
     public int hashCode() {
-        return value().hashCode();
+        return valueAsNumber().hashCode();
     }
 
     @Override

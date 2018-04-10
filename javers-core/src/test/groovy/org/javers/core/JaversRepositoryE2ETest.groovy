@@ -8,7 +8,6 @@ import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
-import org.javers.core.snapshot.SnapshotsAssert
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
@@ -458,11 +457,14 @@ class JaversRepositoryE2ETest extends Specification {
         def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build())
 
         then:
-        SnapshotsAssert.assertThat(snapshots)
-                       .hasSize(2)
-                       .hasOrdinarySnapshot(instanceId(1,SnapshotEntity))
-                       .hasTerminalSnapshot(instanceId(1,SnapshotEntity), "2.0")
+        snapshots.size() == 2
+        snapshots[0].globalId.equals(instanceId(1,SnapshotEntity))
+        snapshots[0].terminal
+        snapshots[0].commitId.majorId == 2
 
+        snapshots[1].globalId.equals(instanceId(1,SnapshotEntity))
+        snapshots[1].initial
+        snapshots[1].commitId.majorId == 1
     }
 
     def "should fetch changes in reverse chronological order"() {
@@ -483,7 +485,7 @@ class JaversRepositoryE2ETest extends Specification {
         changes.size() == n-1
         (0..n-2).each {
             def change = changes[it]
-            change.commitMetadata.get().id.majorId == n-it
+            assert change.commitMetadata.get().id.majorId == n-it
             assert change.left  == n-it-1
             assert change.right == n-it
         }
@@ -506,21 +508,22 @@ class JaversRepositoryE2ETest extends Specification {
         def snapshots = javers.findSnapshots(byInstanceId(1, SnapshotEntity).build())
 
         then:
-        def cdoId = instanceId(1,SnapshotEntity)
         def refId = instanceId(2,SnapshotEntity)
 
         //assert properties
-        SnapshotsAssert.assertThat(snapshots)
-                .hasSnapshot(cdoId, "2.0", [id:1,
-                                            entityRef:refId,
-                                            arrayOfIntegers:[1,2],
-                                            listOfDates: [new LocalDate(2001,1,1), new LocalDate(2001,1,2)],
-                                            mapOfValues: [(new LocalDate(2001,1,1)):1.1],
-                                            intProperty:5,
-                                            mapOfGenericValues: [("enumSet"):EnumSet.of(DummyEnum.val1, DummyEnum.val2)]])
+        def snapshot = snapshots.find{it.globalId.cdoId == 1}
+        snapshot.commitId.majorId == 2
+        snapshot.getPropertyValue('id') == 1
+        snapshot.getPropertyValue('entityRef') == refId
+        snapshot.getPropertyValue('arrayOfIntegers') == [1,2]
+        snapshot.getPropertyValue('listOfDates') == [new LocalDate(2001,1,1), new LocalDate(2001,1,2)]
+        snapshot.getPropertyValue('mapOfValues') == [(new LocalDate(2001,1,1)):1.1]
+        snapshot.getPropertyValue('intProperty') == 5
+        snapshot.getPropertyValue('mapOfGenericValues') == [("enumSet"):EnumSet.of(DummyEnum.val1, DummyEnum.val2)]
+
         //assert metadata
         with(snapshots[0]) {
-             commitId.value() == "2.0"
+             commitId.majorId == 2
              commitMetadata.author == "author2"
              commitMetadata.commitDate
              changed.size() == 1
@@ -528,7 +531,7 @@ class JaversRepositoryE2ETest extends Specification {
              !initial
         }
         with(snapshots[1]) {
-            commitId.value() == "1.0"
+            commitId.majorId == 1
             commitMetadata.author == "author"
             commitMetadata.commitDate
             !getPropertyValue("intProperty")
@@ -1044,15 +1047,14 @@ class JaversRepositoryE2ETest extends Specification {
 
     def "should query withChildValueObjects for snapshots and changes by InstanceId"() {
         given:
-        def london1v1 = new DummyAddress(city: "London", networkAddress: new DummyNetworkAddress(address: "v1"))
-        def london2v1 = new DummyAddress(city: "London 2", networkAddress: new DummyNetworkAddress(address: "v1"))
-        def london2v2 = new DummyAddress(city: "London 2", networkAddress: new DummyNetworkAddress(address: "v2"))
-
         def objects = [
-            new SnapshotEntity(id:1, valueObjectRef: london1v1),
-            new SnapshotEntity(id:1, valueObjectRef: london2v1),
-            new SnapshotEntity(id:1, valueObjectRef: london2v2) ,
-            new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris")) //noise
+          new SnapshotEntity(id:1,
+                  valueObjectRef: new DummyAddress(city: "London", networkAddress: new DummyNetworkAddress(address: "v1"))),
+          new SnapshotEntity(id:1,
+                  valueObjectRef: new DummyAddress(city: "London 2", networkAddress: new DummyNetworkAddress(address: "v1"))),
+          new SnapshotEntity(id:1,
+                  valueObjectRef: new DummyAddress(city: "London 2", networkAddress: new DummyNetworkAddress(address: "v2"))),
+          new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris")) //noise
         ]
         objects.each {
             javers.commit("author", it)
@@ -1064,10 +1066,11 @@ class JaversRepositoryE2ETest extends Specification {
         def snapshots = javers.findSnapshots(query)
 
         then:
-        def sName = SnapshotEntity.class.name
+        def sName = SnapshotEntity.name
         snapshots.size() == 5
-        snapshots[0].globalId.value() == "$sName/1#valueObjectRef/networkAddress"
-        snapshots[1].globalId.value() == "$sName/1#valueObjectRef"
+        snapshots[0,1].collect{it.globalId.value()} as Set == [
+                 "$sName/1#valueObjectRef/networkAddress",
+                 "$sName/1#valueObjectRef"] as Set
         snapshots[2,3,4].collect{it.globalId.value()} as Set ==
                 ["$sName/1#valueObjectRef/networkAddress",
                  "$sName/1#valueObjectRef",
@@ -1186,20 +1189,22 @@ class JaversRepositoryE2ETest extends Specification {
     def "should query by multiple CommitId"(){
       given:
       def entity = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(city: "London"))
-      javers.commit("a", entity)
+      def firstCommit = javers.commit("a", entity)
 
+      def lastCommit
       3.times {
           entity.intProperty = it + 1
-          javers.commit("a", entity)
+          lastCommit = javers.commit("a", entity)
       }
 
       when:
       def snapshots = javers
               .findSnapshots(QueryBuilder.anyDomainObject()
-              .withCommitIds( [1.0, 4.0] ).build())
+              .withCommitIds( [firstCommit.id.valueAsNumber(), lastCommit.id.valueAsNumber()] )
+              .build())
 
       then:
       snapshots.size() == 3
-      snapshots.every{it.commitId.majorId == 1 || it.commitId.majorId == 4}
+      snapshots.every{it.commitId == firstCommit.id || it.commitId == lastCommit.id}
     }
 }

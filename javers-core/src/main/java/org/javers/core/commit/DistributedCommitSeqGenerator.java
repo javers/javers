@@ -4,9 +4,8 @@ import java.util.UUID;
 
 /**
  * Generates commitId with random majorId and minorId set to 0.
- * Can be used in distributed applications.
  *
- * @deprecated
+ *  @deprecated
  * @author bartosz.walacik
  */
 @Deprecated
