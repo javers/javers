@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
+ * Changes on a List property
+ *
  * @author pawel szymczyk
  */
 public final class ListChange extends CollectionChange {

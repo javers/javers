@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
+ * Changes on an Array property
+ *
  * @author pawel szymczyk
  */
 public final class ArrayChange extends ContainerChange {

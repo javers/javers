@@ -8,7 +8,7 @@ import org.javers.core.diff.changetype.Atomic;
 import static org.javers.common.string.ToStringBuilder.format;
 
 /**
- * entry value changed, when value is a simple type
+ * Changed value assigned to a key in a Map
  *
  * @author bartosz walacik
  */

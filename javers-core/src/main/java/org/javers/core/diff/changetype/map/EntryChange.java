@@ -9,6 +9,8 @@ import java.util.Objects;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
+ * Any change in a Map
+ *
  * @author bartosz walacik
  */
 public abstract class EntryChange implements Serializable {

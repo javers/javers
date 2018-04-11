@@ -6,6 +6,8 @@ import org.javers.common.string.ToStringBuilder;
 import org.javers.core.diff.changetype.Atomic;
 
 /**
+ * Entry added or removed from a Map
+ *
  * @author bartosz walacik
  */
 public abstract  class EntryAddOrRemove extends EntryChange {

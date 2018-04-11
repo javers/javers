@@ -5,6 +5,8 @@ import org.javers.common.string.PrettyValuePrinter;
 import static org.javers.common.string.ToStringBuilder.format;
 
 /**
+ * Entry added to a Map
+ *
  * @author bartosz walacik
  */
 public class EntryAdded extends EntryAddOrRemove {

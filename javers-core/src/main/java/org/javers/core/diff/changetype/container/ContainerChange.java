@@ -9,7 +9,7 @@ import org.javers.core.metamodel.object.GlobalId;
 import java.util.*;
 
 /**
- * Collection or Array change
+ * Changes on an Array or Collection property
  *
  * @author bartosz walacik
  */

@@ -11,7 +11,7 @@ import java.util.Optional;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
- * Property change like {@link ValueChange} or {@link ReferenceChange}
+ * Change on object's property of any type (Value, List, Set, Map, Array or Reference)
  *
  * @author bartosz walacik
  */

@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * Any change in an Array or Collection
+ *
  * @author pawel szymczyk
  */
 public abstract class ContainerElementChange implements Serializable {

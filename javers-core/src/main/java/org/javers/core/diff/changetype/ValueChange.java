@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
+ * Change on a Value property, like int or String
+ *
  * @author bartosz walacik
  */
 public final class ValueChange extends PropertyChange {

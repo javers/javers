@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Changes on a Collection property
+ *
  * @author bartosz walacik
  */
 public abstract class CollectionChange extends ContainerChange {

@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import com.google.common.collect.ImmutableMap;
 import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
@@ -30,6 +31,9 @@ public class Changes extends AbstractList<Change> {
     private final transient PrettyValuePrinter valuePrinter;
 
     public Changes(List<Change> changes, PrettyValuePrinter valuePrinter) {
+
+        Map<String, String> string = ImmutableMap.of("a", "b", "c", "d");
+
         Validate.argumentsAreNotNull(changes, valuePrinter);
         this.changes = changes;
         this.valuePrinter = valuePrinter;

@@ -3,7 +3,7 @@ package org.javers.core.diff.changetype.container;
 import org.javers.common.string.PrettyValuePrinter;
 
 /**
- * Item added to a collection
+ * Item added to an Array or Collection
  *
  * @author bartosz walacik
  */

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 
 /**
- * Changed reference to Entity or ValueObject (in *ToOne relation)
+ * Changed reference to Entity or Value Object
  *
  * @author bartosz walacik
  */

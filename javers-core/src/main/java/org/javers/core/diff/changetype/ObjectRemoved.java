@@ -9,7 +9,7 @@ import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
 
 /**
- * primitive or Value Object changed
+ * Object removed from a graph
  *
  * @author bartosz walacik
  */

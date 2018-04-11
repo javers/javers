@@ -10,6 +10,8 @@ import java.util.Optional;
 import static org.javers.common.validation.Validate.conditionFulfilled;
 
 /**
+ * Changes on a Set property
+ *
  * @author pawel szymczyk
  */
 public final class SetChange extends CollectionChange {

@@ -6,6 +6,8 @@ import org.javers.core.diff.changetype.Atomic;
 import java.util.Objects;
 
 /**
+ * Value changed at certain index in an Array or List
+ *
  * @author pawel szymczyk
  */
 public class ElementValueChange extends ContainerElementChange {

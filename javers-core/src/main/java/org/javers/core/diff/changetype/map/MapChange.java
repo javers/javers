@@ -10,6 +10,8 @@ import org.javers.core.metamodel.object.GlobalId;
 import java.util.*;
 
 /**
+ * Changes on a Map property
+ *
  * @author bartosz walacik
  */
 public class MapChange extends PropertyChange {

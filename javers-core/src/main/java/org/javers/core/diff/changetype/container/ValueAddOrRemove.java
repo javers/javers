@@ -6,7 +6,7 @@ import org.javers.core.metamodel.object.GlobalId;
 import java.util.Objects;
 
 /**
- * Change on collection of values
+ * Abstract change in a collection
  *
  * @author bartosz walacik
  */

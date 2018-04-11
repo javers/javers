@@ -9,7 +9,7 @@ import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
 
 /**
- * new CDO added to graph
+ * New object added to a graph
  *
  * @author bartosz walacik
  */
