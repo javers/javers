@@ -13,16 +13,14 @@ import spock.lang.Specification
 
 class BasicCommitAndQueryExample extends Specification {
 
-     def "should commit and query from JaversRepository"() {
+    def "should commit and query from JaversRepository"() {
         given:
         // prepare JaVers instance. By default, JaVers uses InMemoryRepository,
         // it's useful for testing
         Javers javers = JaversBuilder.javers().build()
 
-
         Person robert = new Person("bob", "Robert Martin")
         javers.commit("user", robert)           // persist initial commit
-
 
         robert.setName("Robert C.")             // do some changes
         robert.setPosition(Position.Developer)
@@ -35,7 +33,7 @@ class BasicCommitAndQueryExample extends Specification {
 
         List<Shadow<Person>> shadows = javers.findShadows(query)
 
-        shadows.forEach{ println it.get()}
+        shadows.forEach { println it.get() }
 
         then: "there should be two Bob's Shadows"
         assert shadows.size == 2
@@ -45,7 +43,7 @@ class BasicCommitAndQueryExample extends Specification {
 
         List<CdoSnapshot> snapshots = javers.findSnapshots(query)
 
-        snapshots.forEach{ println it}
+        snapshots.forEach { println it }
 
         then: "there should be two Bob's Shadows"
         assert snapshots.size == 2
