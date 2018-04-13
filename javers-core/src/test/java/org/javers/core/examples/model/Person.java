@@ -4,15 +4,13 @@ import javax.persistence.Id;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author bartosz walacik
- */
 public class Person {
     @Id
     private String login;
     private String name;
     private List<Address> addresses;
     private Map<String, Address> addressMap;
+    private Position position;
 
     Person() {
     }
@@ -36,5 +34,22 @@ public class Person {
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "login='" + login + '\'' +
+                ", name='" + name + '\'' +
+                ", position=" + position +
+                '}';
     }
 }
