@@ -374,9 +374,9 @@ class JqlExample extends Specification {
         given:
         def javers = JaversBuilder.javers().build()
 
-        javers.commit("author", new Employee(name:"bob", age:30, salary:1000) )
-        javers.commit("author", new Employee(name:"bob", age:31, salary:1100) )
-        javers.commit("author", new Employee(name:"bob", age:31, salary:1200) )
+        javers.commit("me", new Employee(name:"bob", age:30, salary:1000) )
+        javers.commit("me", new Employee(name:"bob", age:31, salary:1100) )
+        javers.commit("me", new Employee(name:"bob", age:31, salary:1200) )
 
         when:
         def query = QueryBuilder.byInstanceId("bob", Employee.class)
@@ -393,10 +393,10 @@ class JqlExample extends Specification {
         given:
         def javers = JaversBuilder.javers().build()
 
-        javers.commit( "author", new Employee(name:"bob", salary: 900) )
-        javers.commit( "author", new Employee(name:"bob", salary: 1000) )
-        javers.commit( "author", new Employee(name:"bob", salary: 1100) )
-        javers.commit( "author", new Employee(name:"bob", salary: 1200) )
+        javers.commit( "me", new Employee(name:"bob", salary: 900) )
+        javers.commit( "me", new Employee(name:"bob", salary: 1000) )
+        javers.commit( "me", new Employee(name:"bob", salary: 1100) )
+        javers.commit( "me", new Employee(name:"bob", salary: 1200) )
 
         when:
         def query = QueryBuilder.byInstanceId("bob", Employee.class).limit(2).build()
@@ -412,10 +412,10 @@ class JqlExample extends Specification {
         given:
         def javers = JaversBuilder.javers().build()
 
-        javers.commit( "author", new Employee(name:"bob", age:29, salary: 900) )
-        javers.commit( "author", new Employee(name:"bob", age:30, salary: 1000) )
-        javers.commit( "author", new Employee(name:"bob", age:31, salary: 1100) )
-        javers.commit( "author", new Employee(name:"bob", age:32, salary: 1200) )
+        javers.commit( "me", new Employee(name:"bob", age:29, salary: 900) )
+        javers.commit( "me", new Employee(name:"bob", age:30, salary: 1000) )
+        javers.commit( "me", new Employee(name:"bob", age:31, salary: 1100) )
+        javers.commit( "me", new Employee(name:"bob", age:32, salary: 1200) )
 
         when:
         def query = QueryBuilder.byInstanceId("bob", Employee.class).skip(1).build()
@@ -494,13 +494,9 @@ class JqlExample extends Specification {
       Changes changes = javers.findChanges( query )
 
       then:
+      println changes.prettyPrint()
       assert changes.size() == 3
       assert javers.findSnapshots(query).size() == 3
-
-      println "found changes:"
-      changes.each {
-          println "commitDate: "+ it.commitMetadata.get().commitDate+" "+it
-      }
     }
 
     def "should query for changes (and snapshots) with commitId filter"(){
@@ -590,7 +586,6 @@ class JqlExample extends Specification {
       changes = javers.findChanges( query )
 
       then:
-      println changes.prettyPrint()
       assert changes.size() == 2
     }
 }
