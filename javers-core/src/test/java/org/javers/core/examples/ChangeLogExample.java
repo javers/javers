@@ -34,7 +34,11 @@ public class ChangeLogExample {
         System.out.println("Printing the flat list of Changes :");
         changes.forEach(change -> System.out.println("- " + change));
 
-        System.out.println("Printing Changes with grouping by commit and by object :");
+        //then
+        System.out.println("Changes prettyPrint :");
+        System.out.println(changes.prettyPrint());
+
+        System.out.println("Printing Changes with grouping by commits and by objects :");
         changes.groupByCommit().forEach(byCommit -> {
             System.out.println("commit " + byCommit.getCommit().getId());
             byCommit.groupByObject().forEach(byObject -> {
