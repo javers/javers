@@ -577,10 +577,8 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * <ul>
      * <li/> {@link CommitIdGenerator#SYNCHRONIZED_SEQUENCE} &mdash; for non-distributed applications
      * <li/> {@link CommitIdGenerator#RANDOM} &mdash; for distributed applications
-     * <br/><br/>
      * </ul>
      * SYNCHRONIZED_SEQUENCE is used by default.
-     *
      */
     public JaversBuilder withCommitIdGenerator(CommitIdGenerator commitIdGenerator) {
         coreConfiguration().withCommitIdGenerator(commitIdGenerator);
