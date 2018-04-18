@@ -10,8 +10,10 @@ import java.util.Comparator;
  */
 public enum CommitIdGenerator {
     /**
-     * Generates neat sequence of commitId numbers. Based on {@link JaversRepository#getHeadId()}.
-     * <br/>
+     * Generates neat, sequential commit identifiers.
+     * Based on {@link JaversRepository#getHeadId()}.
+     * <br/><br/>
+     *
      * Should not be used in distributed applications.
      */
     SYNCHRONIZED_SEQUENCE {
@@ -21,10 +23,16 @@ public enum CommitIdGenerator {
     },
 
     /**
-     * Fast algorithm based on UUID. For distributed applications.
-     * @deprecated
+     * Non-blocking algorithm based on UUID.
+     * <br/><br/>
+     *
+     * Suitable for distributed applications.<br/>
+     *
+     * <b>Warning!</b> When RANDOM generator is set,
+     * Shadow query runner sorts commits by commitDate.
+     * It means, that Shadow queries would be correct only
+     * if all application servers have synchronized clocks.
      */
-    @Deprecated
     RANDOM {
         public Comparator<CommitMetadata> getComparator() {
             return Comparator.comparing(CommitMetadata::getCommitDate);

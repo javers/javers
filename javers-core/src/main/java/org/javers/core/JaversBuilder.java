@@ -574,12 +574,14 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * @deprecated RANDOM CommitIdGenerator is deprecated because it don't play along with Shadow queries.
-     * CommitId must be ordinal.
-     * Only the default algorithm (SYNCHRONIZED_SEQUENCE) is supported.
-     * @since 2.6
+     * <ul>
+     * <li/> {@link CommitIdGenerator#SYNCHRONIZED_SEQUENCE} &mdash; for non-distributed applications
+     * <li/> {@link CommitIdGenerator#RANDOM} &mdash; for distributed applications
+     * <br/><br/>
+     * </ul>
+     * SYNCHRONIZED_SEQUENCE is used by default.
+     *
      */
-    @Deprecated
     public JaversBuilder withCommitIdGenerator(CommitIdGenerator commitIdGenerator) {
         coreConfiguration().withCommitIdGenerator(commitIdGenerator);
         return this;
