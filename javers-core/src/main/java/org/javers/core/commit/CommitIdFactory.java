@@ -5,6 +5,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.repository.api.JaversExtendedRepository;
 
+import static org.javers.core.CommitIdGenerator.CUSTOM;
 import static org.javers.core.CommitIdGenerator.RANDOM;
 import static org.javers.core.CommitIdGenerator.SYNCHRONIZED_SEQUENCE;
 
@@ -22,13 +23,17 @@ class CommitIdFactory {
     }
 
     CommitId nextId() {
-        if (javersCoreConfiguration.getCommitIdGenerator().equals(SYNCHRONIZED_SEQUENCE)) {
+        if (javersCoreConfiguration.getCommitIdGenerator() == SYNCHRONIZED_SEQUENCE) {
             CommitId head = javersRepository.getHeadId();
             return commitSeqGenerator.nextId(head);
         }
 
-        if (javersCoreConfiguration.getCommitIdGenerator().equals(RANDOM)) {
+        if (javersCoreConfiguration.getCommitIdGenerator() == RANDOM) {
             return distributedCommitSeqGenerator.nextId();
+        }
+
+        if (javersCoreConfiguration.getCommitIdGenerator() == CUSTOM) {
+            return javersCoreConfiguration.getCustomCommitIdGenerator().get();
         }
 
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);

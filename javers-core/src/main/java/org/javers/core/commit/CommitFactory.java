@@ -67,6 +67,7 @@ public class CommitFactory {
     public Commit create(String author, Map<String, String> properties, Object currentVersion){
         Validate.argumentsAreNotNull(author, currentVersion);
         CommitMetadata commitMetadata = newCommitMetadata(author, properties);
+
         LiveGraph currentGraph = liveGraphFactory.createLiveGraph(currentVersion);
         ObjectGraph<CdoSnapshot> latestSnapshotGraph = snapshotGraphFactory.createLatest(currentGraph.globalIds());
         List<CdoSnapshot> changedCdoSnapshots =

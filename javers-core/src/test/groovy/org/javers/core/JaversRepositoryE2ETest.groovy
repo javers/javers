@@ -2,6 +2,7 @@ package org.javers.core
 
 import org.javers.common.date.FakeDateProvider
 import org.javers.common.reflection.ConcreteWithActualType
+import org.javers.core.commit.CommitMetadata
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
@@ -37,6 +38,14 @@ class JaversRepositoryE2ETest extends Specification {
         fakeDateProvider = new FakeDateProvider()
         repository = prepareJaversRepository()
         javers = javers().withDateTimeProvider(fakeDateProvider).registerJaversRepository(repository).build()
+    }
+
+    protected int commitSeq(CommitMetadata commit) {
+        commit.id.majorId
+    }
+
+    protected setNow(LocalDateTime localDateTime) {
+        fakeDateProvider.set(localDateTime)
     }
 
     protected JaversRepository prepareJaversRepository() {
@@ -115,7 +124,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         changes.size() == 2
-        changes[0].commitMetadata.get().id.majorId == 6
+        commitSeq(changes[0].commitMetadata.get()) == 6
         changes.each{
             assert it.affectedGlobalId.fragment == "valueObjectRef"
             assert it.affectedGlobalId.typeName == DummyAddress.name
@@ -137,7 +146,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         changes.size() == 1
-        changes[0].commitMetadata.get().id.majorId == 3
+        commitSeq(changes[0].commitMetadata.get()) == 3
         changes.each {
             assert it.affectedGlobalId == valueObjectId(1,SnapshotEntity,"valueObjectRef")
         }
@@ -194,7 +203,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         snapshots.size() == 3
-        snapshots[0].commitId.majorId == 5
+        commitSeq(snapshots[0].commitMetadata) == 5
         snapshots.each {
             assert it.globalId == expectedGlobalId
         }
@@ -258,7 +267,7 @@ class JaversRepositoryE2ETest extends Specification {
 
       then:
       snapshots.size() == 1
-      snapshots[0].commitId.majorId == 1
+      commitSeq(snapshots[0].commitMetadata) == 1
 
       when:
       snapshots = javers.findSnapshots(QueryBuilder.byClass(SnapshotEntity)
@@ -266,7 +275,7 @@ class JaversRepositoryE2ETest extends Specification {
 
       then:
       snapshots.size() == 1
-      snapshots[0].commitId.majorId == 2
+      commitSeq(snapshots[0].commitMetadata) == 2
     }
 
     def "should query for Entity snapshots and changes by Entity class and changed property"() {
@@ -285,7 +294,7 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         true
         snapshots.size() == 1
-        snapshots[0].commitId.majorId == 3
+        commitSeq(snapshots[0].commitMetadata) == 3
         snapshots[0].globalId.value() ==  SnapshotEntity.name+"/1"
 
         when: "withNewObjectChanges"
@@ -301,7 +310,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         changes.size() == 1
-        changes[0].getCommitMetadata().get().id.majorId == 3
+        commitSeq(changes[0].getCommitMetadata().get()) == 3
         changes[0] instanceof ValueChange
         changes[0].propertyName == "intProperty"
         changes[0].left == 1
@@ -321,7 +330,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         changes.size() == 2
-        changes[0].commitMetadata.get().id.majorId == 5
+        commitSeq(changes[0].commitMetadata.get()) == 5
         changes.each {assert it instanceof ValueChange}
     }
 
@@ -336,7 +345,7 @@ class JaversRepositoryE2ETest extends Specification {
 
          then:
          snapshots.size() == 2
-         snapshots[0].commitId.majorId == 2
+         commitSeq(snapshots[0].commitMetadata) == 2
          snapshots.each {
              assert it.globalId.typeName == SnapshotEntity.name
          }
@@ -419,8 +428,8 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         snapshots.size() == 2
-        snapshots[0].commitId.majorId == 3
-        snapshots[1].commitId.majorId == 1
+        commitSeq(snapshots[0].commitMetadata) == 3
+        commitSeq(snapshots[1].commitMetadata) == 1
 
         when: "should find changes"
         def changes = javers.findChanges(
@@ -429,7 +438,7 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         changes.size() == 1
         changes[0] instanceof ValueChange
-        changes[0].commitMetadata.get().id.majorId == 3
+        commitSeq(changes[0].commitMetadata.get()) == 3
         changes[0].left == 4
         changes[0].right == 5
     }
@@ -443,7 +452,7 @@ class JaversRepositoryE2ETest extends Specification {
         def snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
 
         then:
-        snapshot.commitId.majorId == 2
+        commitSeq(snapshot.commitMetadata) == 2
         snapshot.getPropertyValue("intProperty") == 2
     }
 
@@ -460,11 +469,11 @@ class JaversRepositoryE2ETest extends Specification {
         snapshots.size() == 2
         snapshots[0].globalId.equals(instanceId(1,SnapshotEntity))
         snapshots[0].terminal
-        snapshots[0].commitId.majorId == 2
+        commitSeq(snapshots[0].commitMetadata) == 2
 
         snapshots[1].globalId.equals(instanceId(1,SnapshotEntity))
         snapshots[1].initial
-        snapshots[1].commitId.majorId == 1
+        commitSeq(snapshots[1].commitMetadata) == 1
     }
 
     def "should fetch changes in reverse chronological order"() {
@@ -485,7 +494,7 @@ class JaversRepositoryE2ETest extends Specification {
         changes.size() == n-1
         (0..n-2).each {
             def change = changes[it]
-            assert change.commitMetadata.get().id.majorId == n-it
+            assert commitSeq(change.commitMetadata.get()) == n-it
             assert change.left  == n-it-1
             assert change.right == n-it
         }
@@ -512,7 +521,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         //assert properties
         def snapshot = snapshots.find{it.globalId.cdoId == 1}
-        snapshot.commitId.majorId == 2
+        commitSeq(snapshot.commitMetadata) == 2
         snapshot.getPropertyValue('id') == 1
         snapshot.getPropertyValue('entityRef') == refId
         snapshot.getPropertyValue('arrayOfIntegers') == [1,2]
@@ -523,7 +532,7 @@ class JaversRepositoryE2ETest extends Specification {
 
         //assert metadata
         with(snapshots[0]) {
-             commitId.majorId == 2
+             commitSeq(commitMetadata)== 2
              commitMetadata.author == "author2"
              commitMetadata.commitDate
              changed.size() == 1
@@ -531,7 +540,7 @@ class JaversRepositoryE2ETest extends Specification {
              !initial
         }
         with(snapshots[1]) {
-            commitId.majorId == 1
+            commitSeq(commitMetadata) == 1
             commitMetadata.author == "author"
             commitMetadata.commitDate
             !getPropertyValue("intProperty")
@@ -714,7 +723,7 @@ class JaversRepositoryE2ETest extends Specification {
            should serialize and deserialize commitDate as local datetime'''() {
         given:
         def now = LocalDateTime.parse('2016-01-01T12:12')
-        fakeDateProvider.set(now)
+        setNow(now)
 
         when:
         javers.commit("author", new SnapshotEntity(id: 1))
@@ -729,7 +738,7 @@ class JaversRepositoryE2ETest extends Specification {
         given:
         (1..5).each{
             def entity =  new SnapshotEntity(id: 1, intProperty: it)
-            fakeDateProvider.set( LocalDateTime.of(2015,01,1,it,0) )
+            setNow( LocalDateTime.of(2015,01,1,it,0) )
             javers.commit('author', entity)
         }
 
