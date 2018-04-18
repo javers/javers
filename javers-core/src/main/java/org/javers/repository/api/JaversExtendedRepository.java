@@ -100,8 +100,7 @@ public class JaversExtendedRepository implements JaversRepository {
         return delegate.getStateHistory(globalId, QueryParamsBuilder
                         .withLimit(limit)
                         .withChildValueObjects(withChildValueObjects)
-                        .toCommitId(timePoint)
-                        .build());
+                        .toCommitId(timePoint).build());
     }
 
     /**
@@ -112,6 +111,16 @@ public class JaversExtendedRepository implements JaversRepository {
 
         return delegate.getStateHistory(globalId, QueryParamsBuilder.withLimit(1).to(timePoint).build())
                 .stream().findFirst();
+    }
+
+    public List<CdoSnapshot> getHistoricals(GlobalId globalId, LocalDateTime timePoint, boolean withChildValueObjects, int limit) {
+        argumentsAreNotNull(globalId, timePoint);
+
+        return delegate.getStateHistory(globalId, QueryParamsBuilder
+                        .withLimit(limit)
+                        .withChildValueObjects(withChildValueObjects)
+                        .to(timePoint).build());
+
     }
 
     @Override

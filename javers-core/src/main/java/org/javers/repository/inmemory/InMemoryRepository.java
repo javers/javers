@@ -4,6 +4,9 @@ import org.javers.common.collections.Lists;
 
 import java.util.Optional;
 import org.javers.common.validation.Validate;
+import org.javers.core.CommitIdGenerator;
+import org.javers.core.JaversCoreConfiguration;
+import org.javers.core.JaversCoreProperties;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -33,7 +36,14 @@ public class InMemoryRepository implements JaversRepository {
 
     private CommitId head;
 
+    private final CommitIdGenerator commitIdGenerator;
+
     public InMemoryRepository() {
+        this(CommitIdGenerator.SYNCHRONIZED_SEQUENCE);
+    }
+
+    public InMemoryRepository(CommitIdGenerator commitIdGenerator) {
+        this.commitIdGenerator = commitIdGenerator;
     }
 
     @Override
@@ -232,7 +242,7 @@ public class InMemoryRepository implements JaversRepository {
             all.addAll(snapshotsList);
         }
 
-        Collections.sort(all, (o1, o2) -> o2.getCommitId().compareTo(o1.getCommitId()));
+        Collections.sort(all, (o1, o2) -> commitIdGenerator.getComparator().compare(o2.getCommitMetadata(), o1.getCommitMetadata()));
         return all;
     }
 

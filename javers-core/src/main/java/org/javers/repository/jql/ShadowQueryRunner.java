@@ -1,9 +1,9 @@
 package org.javers.repository.jql;
 
 import org.javers.common.collections.Consumer;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.CommitIdGenerator;
+import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.*;
@@ -30,22 +30,24 @@ public class ShadowQueryRunner {
 
     private final JaversExtendedRepository repository;
     private final ShadowFactory shadowFactory;
+    private final JaversCoreConfiguration javersCoreConfiguration;
 
-    public ShadowQueryRunner(JaversExtendedRepository repository, ShadowFactory shadowFactory) {
+    public ShadowQueryRunner(JaversExtendedRepository repository, ShadowFactory shadowFactory, JaversCoreConfiguration javersCoreConfiguration) {
         this.repository = repository;
         this.shadowFactory = shadowFactory;
+        this.javersCoreConfiguration = javersCoreConfiguration;
     }
 
     public List<Shadow> queryForShadows(JqlQuery query, List<CdoSnapshot> coreSnapshots) {
-        final CommitTable commitTable = new CommitTable(coreSnapshots, query.getMaxGapsToFill(),
-                query);
+        final CommitTable commitTable =
+                new CommitTable(coreSnapshots, query.getMaxGapsToFill(), query, javersCoreConfiguration.getCommitIdGenerator());
 
         if (query.getShadowScope().isCommitDeep()) {
             commitTable.loadFullCommits();
         }
 
         List<Shadow> shadows = commitTable.rootsForQuery(query).stream()
-                .map(r -> shadowFactory.createShadow(r.root, r.context, (cm, targetId) -> commitTable.findLatestTo(cm.getId(), targetId)))
+                .map(r -> shadowFactory.createShadow(r.root, r.context, (cm, targetId) -> commitTable.findLatestTo(cm, targetId)))
                 .collect(toList());
 
         return shadows;
@@ -69,13 +71,13 @@ public class ShadowQueryRunner {
     class CommitTable {
         private final int maxGapsToFill;
         private int filledGaps;
-        private final Map<CommitId, CommitEntry> commitsMap = new TreeMap<>();
+        private final Map<CommitMetadata, CommitEntry> commitsMap;
         private final JqlQuery query;
 
-        CommitTable(List<CdoSnapshot> coreSnapshots, int maxGapsToFill, JqlQuery query) {
+        CommitTable(List<CdoSnapshot> coreSnapshots, int maxGapsToFill, JqlQuery query, CommitIdGenerator commitIdGenerator) {
             this.maxGapsToFill = maxGapsToFill;
             this.query = query;
-
+            this.commitsMap = new TreeMap<>(commitIdGenerator.getComparator());
             appendSnapshots(coreSnapshots);
         }
 
@@ -98,7 +100,7 @@ public class ShadowQueryRunner {
             }
             QueryParams params = QueryParamsBuilder
                     .withLimit(Integer.MAX_VALUE)
-                    .commitIds(commitsMap.keySet().stream().collect(toSet()))
+                    .commitIds(commitsMap.keySet().stream().map(it -> it.getId()).collect(toSet()))
                     .build();
             List<CdoSnapshot> fullCommitsSnapshots = repository.getSnapshots(params);
             query.stats().logQueryInCommitDeepScope(fullCommitsSnapshots);
@@ -106,18 +108,18 @@ public class ShadowQueryRunner {
             appendSnapshots(fullCommitsSnapshots);
         }
 
-        CdoSnapshot findLatestTo(CommitId rootContext, GlobalId targetId) {
+        CdoSnapshot findLatestTo(CommitMetadata rootContext, GlobalId targetId) {
 
             if (!commitsMap.containsKey(rootContext)) {
                 return null;
             }
 
-            CdoSnapshot latest = findLatestToInCommitTable(rootContext, targetId);
+            CdoSnapshot latest = findLatestToInCommitTable(rootContext.getId(), targetId);
             if (latest == null) {
                 appendSnapshots(fillGapFromRepository(new ReferenceKey(rootContext, targetId), 15));
             }
 
-            latest = findLatestToInCommitTable(rootContext, targetId);
+            latest = findLatestToInCommitTable(rootContext.getId(), targetId);
             if (latest == null){
                 query.stats().logMaxGapsToFillExceededInfo(targetId);
             }
@@ -152,16 +154,23 @@ public class ShadowQueryRunner {
 
             List<CdoSnapshot> historicals;
             if (isInChildValueObjectScope(referenceKey)) {
-                historicals = repository.getHistoricals(referenceKey.targetId, referenceKey.rootContext, false, limit);
-                query.stats().logQueryInChildValueObjectScope(referenceKey.targetId, referenceKey.rootContext, historicals.size());
+                historicals = getHistoricals(referenceKey.targetId, referenceKey, false, limit);
+                query.stats().logQueryInChildValueObjectScope(referenceKey.targetId, referenceKey.commit.getId(), historicals.size());
             }
             else {
-                historicals = repository.getHistoricals(referenceKey.targetId, referenceKey.rootContext, query.isAggregate(), limit);
-                query.stats().logQueryInDeepPlusScope(referenceKey.targetId, referenceKey.rootContext, historicals.size());
+                historicals = getHistoricals(referenceKey.targetId, referenceKey, query.isAggregate(), limit);
+                query.stats().logQueryInDeepPlusScope(referenceKey.targetId, referenceKey.commit.getId(), historicals.size());
             }
 
             filledGaps++;
             return historicals;
+        }
+
+        private List<CdoSnapshot> getHistoricals(GlobalId globalId, ReferenceKey timePoint, boolean withChildValueObjects, int limit) {
+            if (javersCoreConfiguration.getCommitIdGenerator() == CommitIdGenerator.SYNCHRONIZED_SEQUENCE){
+                return repository.getHistoricals(globalId, timePoint.commit.getId(), withChildValueObjects, limit);
+            }
+            return repository.getHistoricals(globalId, timePoint.commit.getCommitDate(), withChildValueObjects, limit);
         }
 
         void fillMissingParents() {
@@ -184,10 +193,10 @@ public class ShadowQueryRunner {
         }
 
         CommitEntry appendSnapshot(CdoSnapshot snapshot) {
-            CommitEntry entry = commitsMap.get(snapshot.getCommitMetadata().getId());
+            CommitEntry entry = commitsMap.get(snapshot.getCommitMetadata());
             if (entry == null) {
                 entry = new CommitEntry(snapshot.getCommitMetadata());
-                commitsMap.put(snapshot.getCommitId(), entry);
+                commitsMap.put(snapshot.getCommitMetadata(), entry);
             }
             entry.append(snapshot);
             return entry;
@@ -253,12 +262,12 @@ public class ShadowQueryRunner {
     }
 
     final static class ReferenceKey {
-        private final CommitId rootContext;
+        private final CommitMetadata commit;
         private final GlobalId targetId;
 
-        ReferenceKey(CommitId rootContext, GlobalId targetId) {
+        ReferenceKey(CommitMetadata rootContext, GlobalId targetId) {
             Validate.argumentsAreNotNull(rootContext, targetId);
-            this.rootContext = rootContext;
+            this.commit = rootContext;
             this.targetId = targetId;
         }
 
@@ -267,13 +276,13 @@ public class ShadowQueryRunner {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             ReferenceKey that = (ReferenceKey) o;
-            return Objects.equals(rootContext, that.rootContext) &&
-                    Objects.equals(targetId, that.targetId);
+            return Objects.equals(commit.getId(), that.commit.getId()) &&
+                   Objects.equals(targetId, that.targetId);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(rootContext, targetId);
+            return Objects.hash(commit.getId(), targetId);
         }
     }
 }

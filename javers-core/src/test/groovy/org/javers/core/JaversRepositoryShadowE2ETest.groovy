@@ -92,10 +92,10 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
             assert it.get().id == 1
         }
 
-        shadows[0].commitMetadata.id.value() == "2.0"
+        commitSeq(shadows[0].commitMetadata) == 2
         shadows[0].get().intProperty == 2
 
-        shadows[1].commitMetadata.id.value() == "1.0"
+        commitSeq(shadows[1].commitMetadata) == 1
         shadows[1].get().intProperty == 1
     }
 

@@ -8,6 +8,7 @@ import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.JaversCoreProperties.PrettyPrintDateFormats;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactoryModule;
+import org.javers.core.commit.CommitId;
 import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
@@ -46,6 +47,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.javers.common.reflection.ReflectionUtil.*;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -580,6 +582,11 @@ public class JaversBuilder extends AbstractContainerBuilder {
     @Deprecated
     public JaversBuilder withCommitIdGenerator(CommitIdGenerator commitIdGenerator) {
         coreConfiguration().withCommitIdGenerator(commitIdGenerator);
+        return this;
+    }
+
+    JaversBuilder withCustomCommitIdGenerator(Supplier<CommitId> commitIdGenerator) {
+        coreConfiguration().withCustomCommitIdGenerator(commitIdGenerator);
         return this;
     }
 

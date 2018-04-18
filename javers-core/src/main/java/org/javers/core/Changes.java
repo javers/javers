@@ -82,6 +82,7 @@ public class Changes extends AbstractList<Change> {
      * });
      * </pre>
      *
+     * @see <a href="https://javers.org/documentation/repository-examples/#change-log">http://javers.org/documentation/repository-examples/#change-log</a>
      * @since 3.9
      */
     public List<ChangesByCommit> groupByCommit() {
