@@ -180,6 +180,10 @@ public class JaversExtendedRepository implements JaversRepository {
 
     //required for the corner case, when valueObject snapshots consume all the limit
     private List<CdoSnapshot> loadMasterEntitySnapshotIfNecessary(InstanceId instanceId, List<CdoSnapshot> alreadyLoaded) {
+        if (alreadyLoaded.isEmpty()) {
+            return alreadyLoaded;
+        }
+
         if (alreadyLoaded.stream().filter(s -> s.getGlobalId().equals(instanceId)).findFirst().isPresent()) {
             return alreadyLoaded;
         }
