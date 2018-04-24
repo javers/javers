@@ -20,7 +20,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 import static groovyx.gpars.GParsPool.withPool
-import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE
@@ -50,6 +49,21 @@ class JaversRepositoryE2ETest extends Specification {
 
     protected JaversRepository prepareJaversRepository() {
         return new InMemoryRepository();
+    }
+
+    def "should persit commitDate with milliseconds precision"(){
+      given:
+      def now = LocalDateTime.now()
+      println now
+
+      fakeDateProvider.set(now)
+
+      when:
+      javers.commit("a", new SnapshotEntity(id:1))
+      def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+
+      then:
+      snapshots[0].getCommitMetadata().commitDate == now
     }
 
     def "should persist various primitive types"(){
