@@ -56,7 +56,7 @@ class JaversRepositoryE2ETest extends Specification {
       def now = LocalDateTime.now()
       println now
 
-      fakeDateProvider.set(now)
+      setNow(now)
 
       when:
       javers.commit("a", new SnapshotEntity(id:1))
