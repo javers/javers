@@ -47,9 +47,27 @@ public class JaversSchemaManager extends SchemaNameAware {
         if(this.dialect instanceof MsSqlDialect) {
             alterMssqlTextColumns();
         }
+        
+        if(this.dialect instanceof MysqlDialect) {
+            alterMySqlCommitDateColumn();
+        }
 
         TheCloser.close(schemaManager, schemaInspector);
     }
+
+    /**
+     * JaVers 3.9.2 to 3.9.3 schema migration (MySql only)
+     */
+    private void alterMySqlCommitDateColumn() {
+        ColumnType commitDateColType = getTypeOf(getCommitTableNameWithSchema(), "commit_date");
+
+        if (commitDateColType.typeName.equals("TIMESTAMP") &&
+            commitDateColType.precision == 19) {
+            logger.info("migrating db schema from JaVers 3.9.2 to 3.9.3 (MySql only) ...");
+            executeSQL("ALTER TABLE " + getCommitTableNameWithSchema() + " MODIFY commit_date TIMESTAMP(3)");
+        }
+    }
+
 
     /**
      * JaVers 2.5 to 2.6 schema migration
@@ -103,6 +121,8 @@ public class JaversSchemaManager extends SchemaNameAware {
     private boolean executeSQL(String sql) {
         try {
             Statement stmt = connectionProvider.getConnection().createStatement();
+
+            logger.info("executing schema migration SQL:\n" + sql);
 
             boolean b = stmt.execute(sql);
             stmt.close();
@@ -215,6 +235,15 @@ public class JaversSchemaManager extends SchemaNameAware {
             this.type = type;
             this.precision = precision;
             this.typeName = typeName;
+        }
+
+        @Override
+        public String toString() {
+            return "ColumnType{" +
+                    "type=" + type +
+                    ", precision=" + precision +
+                    ", typeName='" + typeName + '\'' +
+                    '}';
         }
     }
 }

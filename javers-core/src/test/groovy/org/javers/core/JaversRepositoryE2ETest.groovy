@@ -20,7 +20,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 import static groovyx.gpars.GParsPool.withPool
-import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE
@@ -37,7 +36,7 @@ class JaversRepositoryE2ETest extends Specification {
     def setup() {
         fakeDateProvider = new FakeDateProvider()
         repository = prepareJaversRepository()
-        javers = javers().withDateTimeProvider(fakeDateProvider).registerJaversRepository(repository).build()
+        javers = JaversBuilder.javers().withDateTimeProvider(fakeDateProvider).registerJaversRepository(repository).build()
     }
 
     protected int commitSeq(CommitMetadata commit) {
@@ -50,6 +49,21 @@ class JaversRepositoryE2ETest extends Specification {
 
     protected JaversRepository prepareJaversRepository() {
         return new InMemoryRepository();
+    }
+
+    def "should persit commitDate with milliseconds precision"(){
+      given:
+      def now = LocalDateTime.now()
+      println now
+
+      setNow(now)
+
+      when:
+      javers.commit("a", new SnapshotEntity(id:1))
+      def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+
+      then:
+      snapshots[0].getCommitMetadata().commitDate == now
     }
 
     def "should persist various primitive types"(){
@@ -1183,7 +1197,7 @@ class JaversRepositoryE2ETest extends Specification {
 
     def "should use name from @PropertyName in commits and queries"(){
         given:
-        def javers = javers().build()
+        def javers = JaversBuilder.javers().build()
 
         when:
         javers.commit("author", new DummyUserDetails(id:1))
