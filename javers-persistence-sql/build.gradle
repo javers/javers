@@ -11,7 +11,7 @@ dependencies {
     testCompile 'commons-dbcp:commons-dbcp:1.4'
     testCompile 'com.h2database:h2:1.4.187'
     testCompile 'org.postgresql:postgresql:9.4-1201-jdbc41'
-    testCompile 'mysql:mysql-connector-java:5.1.36'
+    testCompile 'org.mariadb.jdbc:mariadb-java-client:2.2.3'
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
     testCompile "joda-time:joda-time:$jodaVersion"
     testCompile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.1.0.jre8'

@@ -36,7 +36,7 @@ class JaversRepositoryE2ETest extends Specification {
     def setup() {
         fakeDateProvider = new FakeDateProvider()
         repository = prepareJaversRepository()
-        javers = javers().withDateTimeProvider(fakeDateProvider).registerJaversRepository(repository).build()
+        javers = JaversBuilder.javers().withDateTimeProvider(fakeDateProvider).registerJaversRepository(repository).build()
     }
 
     protected int commitSeq(CommitMetadata commit) {
@@ -1197,7 +1197,7 @@ class JaversRepositoryE2ETest extends Specification {
 
     def "should use name from @PropertyName in commits and queries"(){
         given:
-        def javers = javers().build()
+        def javers = JaversBuilder.javers().build()
 
         when:
         javers.commit("author", new DummyUserDetails(id:1))
