@@ -1,4 +1,4 @@
-package org.javers.spring.auditable.aspect.springdata;
+package org.javers.spring.auditable.aspect.springdatajpa;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
