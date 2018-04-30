@@ -1,4 +1,4 @@
-package org.javers.spring.auditable.aspect.springdata;
+package org.javers.spring.auditable.aspect.springdatajpa;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.javers.core.Javers;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.aspect.springdata.AbstractSpringAuditableRepositoryAspect;
 
 /**
  * Commits all arguments passed to save(), delete() and saveAndFlush() methods
