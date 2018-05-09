@@ -5,6 +5,8 @@ import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.JaversCoreConfiguration;
+import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
@@ -31,23 +33,23 @@ public class TypeMapper {
     private final TypeMapperState state;
     private final DehydratedTypeFactory dehydratedTypeFactory = new DehydratedTypeFactory(this);
 
-    public TypeMapper(ClassScanner classScanner) {
+    public TypeMapper(ClassScanner classScanner, JaversCoreConfiguration javersCoreConfiguration) {
         //Pico doesn't support cycles, so manual construction
         TypeFactory typeFactory = new TypeFactory(classScanner, this);
         this.state = new TypeMapperState(typeFactory);
-        registerCoreTypes();
+        registerCoreTypes(javersCoreConfiguration.getListCompareAlgorithm());
     }
 
     /**
-     * for TypeMapperConcurrentTest only, no better idea how to writhe this test
-     * without additional constructor
+     * For TypeMapperConcurrentTest only,
+     * no better idea how to writhe this test without additional constructor
      */
-    protected TypeMapper(TypeFactory typeFactory ) {
+    protected TypeMapper(TypeFactory typeFactory) {
         this.state = new TypeMapperState(typeFactory);
-        registerCoreTypes();
+        registerCoreTypes(ListCompareAlgorithm.SIMPLE);
     }
 
-    private void registerCoreTypes(){
+    private void registerCoreTypes(ListCompareAlgorithm listCompareAlgorithm){
         //primitives & boxes
         for (Class primitiveOrBox : Primitives.getPrimitiveAndBoxTypes()) {
             registerPrimitiveType(primitiveOrBox);
@@ -66,7 +68,11 @@ public class TypeMapper {
         //Collections
         addType(new CollectionType(Collection.class)); //only for exception handling
         addType(new SetType(Set.class));
-        addType(new ListType(List.class));
+        if (listCompareAlgorithm == ListCompareAlgorithm.AS_SET) {
+            addType(new ListAsSetType(List.class));
+        } else {
+            addType(new ListType(List.class));
+        }
         addType(new OptionalType());
 
         //& Maps

@@ -22,6 +22,7 @@ import spock.lang.Unroll
 import javax.persistence.EmbeddedId
 
 import static org.javers.core.JaversBuilder.javers
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.MappingStyle.BEAN
 import static org.javers.core.MappingStyle.FIELD
 import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition
@@ -399,7 +400,39 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         diff.changes[0].propertyName == "age"
     }
 
-    def "should compare Lists as Sets when ListCompareAlgorithm.SET is enabled"(){
+
+    def "should compare ValueObjects in Lists as Sets when ListCompareAlgorithm.SET is enabled"() {
+      given:
+      def javers = javers().withListCompareAlgorithm(ListCompareAlgorithm.AS_SET).build()
+
+      def s1 = new SnapshotEntity(id: 1, listOfValueObjects: [
+                  new DummyAddress("London", "some"),
+                  new DummyAddress("Paris",  "some")
+          ])
+
+      def s2 = new SnapshotEntity(id: 1, listOfValueObjects: [
+              new DummyAddress("Paris",  "some"),
+              new DummyAddress("Warsaw", "some"),
+              new DummyAddress("London", "some")
+          ])
+
+       when:
+       def diff = javers.compare(s1, s2)
+
+       then:
+       diff.changes.size() == 2
+
+       diff.getChangesByType(NewObject).size() == 1
+       diff.getChangesByType(ListChange).size() == 1
+
+       def lChange = diff.getChangesByType(ListChange)[0]
+       lChange.changes[0] instanceof ValueAdded
+       lChange.changes[0].addedValue.value().endsWith(
+               "SnapshotEntity/1#listOfValueObjects/"+
+               javersTestAssembly().hash(new DummyAddress("Warsaw", "some")))
+    }
+
+    def "should compare Values in Lists as Sets when ListCompareAlgorithm.SET is enabled"() {
       given:
       def javers = javers().withListCompareAlgorithm(ListCompareAlgorithm.AS_SET).build()
       def left =  new DummyUser(name:"bob", stringList: ['z', 'a', 'b'])

@@ -24,6 +24,9 @@ public interface PropertyChangeAppender <T extends PropertyChange> {
      */
     boolean supports(JaversType propertyType);
 
+    /**
+     * null if no changes
+     */
     T calculateChanges(NodePair pair, JaversProperty supportedProperty);
 
     int priority();
