@@ -159,8 +159,12 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(JsonConverterBuilder)
     }
 
-    ObjectHasher getObjectHasher(){
+    ObjectHasher getObjectHasher() {
         javersBuilder.getContainerComponent(ObjectHasher)
+    }
+
+    String hash(Object obj) {
+        getObjectHasher().hash(obj)
     }
 
     String addressHash(String city){

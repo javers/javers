@@ -44,6 +44,7 @@ subprojects {
     dependencies {
         testCompile 'junit:junit:4.11'
         testCompile "org.spockframework:spock-core:$spockVersion"
+        testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
         testCompile 'org.apache.commons:commons-lang3:3.3.2'
         testCompile 'ch.qos.logback:logback-classic:1.1.2'
         testCompile 'cglib:cglib-nodep:3.2.0'
