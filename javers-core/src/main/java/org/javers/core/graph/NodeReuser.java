@@ -80,6 +80,28 @@ class NodeReuser {
         if (cdo.getGlobalId() instanceof InstanceId) {
             return cdo.getGlobalId();
         }
-        return System.identityHashCode(cdo.getWrappedCdo().get());
+        return new SystemIdentityWrapper(cdo.getWrappedCdo().get());
+    }
+
+    private static class SystemIdentityWrapper {
+        private final Object cdo;
+
+        SystemIdentityWrapper(Object cdo) {
+            this.cdo = cdo;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || o.getClass() != SystemIdentityWrapper.class) {
+                return false;
+            }
+
+            return this.cdo == ((SystemIdentityWrapper)o).cdo;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(cdo);
+        }
     }
 }
