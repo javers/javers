@@ -10,18 +10,14 @@ import org.javers.core.metamodel.object.DehydrateContainerFunction;
 import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
-import org.javers.core.metamodel.type.JaversProperty;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.SetType;
-import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.*;
 
 import java.util.*;
-
 
 /**
  * @author pawel szymczyk
  */
-class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
+public class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
     private final TypeMapper typeMapper;
 
     private final GlobalIdFactory globalIdFactory;
@@ -36,7 +32,7 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         return propertyType instanceof SetType;
     }
 
-    List<ContainerElementChange> calculateEntryChanges(SetType setType, Set leftRawSet, Set rightRawSet, OwnerContext owner) {
+    List<ContainerElementChange> calculateEntryChanges(CollectionType setType, Collection leftRawSet, Collection rightRawSet, OwnerContext owner) {
 
         JaversType itemType = typeMapper.getJaversType(setType.getItemType());
         DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
@@ -61,10 +57,10 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
 
     @Override
     public SetChange calculateChanges(NodePair pair, JaversProperty property) {
-        Set leftValues = (Set) pair.getLeftPropertyValue(property);
-        Set rightValues = (Set) pair.getRightPropertyValue(property);
+        Collection leftValues = (Collection) pair.getLeftPropertyValue(property);
+        Collection rightValues = (Collection) pair.getRightPropertyValue(property);
 
-        SetType setType = property.getType();
+        CollectionType setType = property.getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
         List<ContainerElementChange> entryChanges =
                 calculateEntryChanges(setType, leftValues, rightValues, owner);

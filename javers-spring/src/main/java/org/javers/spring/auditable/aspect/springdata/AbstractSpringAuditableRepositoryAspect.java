@@ -12,20 +12,20 @@ import org.springframework.data.repository.core.support.DefaultRepositoryMetadat
 
 import java.util.Optional;
 
-class AbstractSpringAuditableRepositoryAspect {
+public class AbstractSpringAuditableRepositoryAspect {
     private final AuditChangeHandler saveHandler;
     private final AuditChangeHandler deleteHandler;
 
-    AbstractSpringAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+    protected AbstractSpringAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this.saveHandler = new OnSaveAuditChangeHandler(javers, authorProvider, commitPropertiesProvider);
         this.deleteHandler = new OnDeleteAuditChangeHandler(javers, authorProvider, commitPropertiesProvider);
     }
 
-    void onSave(JoinPoint pjp) {
+    protected void onSave(JoinPoint pjp) {
         onVersionEvent(pjp, saveHandler);
     }
 
-    void onDelete(JoinPoint pjp) {
+    protected void onDelete(JoinPoint pjp) {
         onVersionEvent(pjp, deleteHandler);
     }
 
