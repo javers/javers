@@ -23,19 +23,26 @@ class Case676NPEinList extends Specification {
 
     class Order {
         String orderNumber
+
+        String toString() {
+            "Order{" +
+                "orderNumber='" + orderNumber + '\'' +
+            '}'
+        }
     }
 
-    def "should support nulls in LIST "(){
+    def "should support nulls in List of Value Objects "(){
       given:
-      Customer customer = new Customer(id:"1", orders:[null, null])
+      Customer customer = new Customer(id:"1", orders:[null, new Order(orderNumber: "oo")])
       def javers = JaversBuilder.javers().build()
 
       when:
       javers.commit("a", customer)
-      def shadow = javers.findShadows(QueryBuilder.byInstanceId("1", Customer))[0].get()
+      def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId("1", Customer).build())[0]
 
       then:
-      println "Customer shadow : " + shadow
-      shadow.id == "1"
+      println "Customer snapshot : " + snapshot
+      snapshot.getPropertyValue("orders")[0] == null
+      snapshot.getPropertyValue("orders")[1].value().endsWith('$Customer/1#orders/0')
     }
 }

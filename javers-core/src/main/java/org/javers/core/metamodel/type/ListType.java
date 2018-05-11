@@ -30,7 +30,7 @@ public class ListType extends CollectionType{
 
         EnumerationAwareOwnerContext enumerationContext = new IndexableEnumerationOwnerContext(owner);
         for (Object sourceVal : sourceList){
-            targetList.add(mapFunction.apply(sourceVal, enumerationContext));
+            targetList.add(sourceVal == null ? null : mapFunction.apply(sourceVal, enumerationContext));
         }
         return Collections.unmodifiableList(targetList);
     }
