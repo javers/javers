@@ -47,7 +47,7 @@ public class JqlQuery {
     }
 
     void validate(){
-        if (isAggregate()) {
+        if (getQueryParams().shouldLoadChildValueObjects()) {
             if (!(isClassQuery() || isInstanceIdQuery())) {
                 throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
                         "aggregate filter can be enabled only for byClass and byInstanceId queries");
@@ -141,10 +141,6 @@ public class JqlQuery {
 
     boolean isVoOwnerQuery(){
         return hasFilter(VoOwnerFilter.class);
-    }
-
-    public boolean isAggregate() {
-        return queryParams.isAggregate();
     }
 
     public int getMaxGapsToFill() {

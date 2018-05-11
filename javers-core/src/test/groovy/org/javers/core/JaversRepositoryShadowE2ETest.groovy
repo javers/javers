@@ -424,6 +424,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         shadows[0].listOfEntities.size() == 1
     }
 
+    //TODO what with 'consumed' ?
     def "should load master snapshot even if child snapshots 'consumed' the snapshot limit"(){
         given:
         def a = new DummyAddress(city: "a")

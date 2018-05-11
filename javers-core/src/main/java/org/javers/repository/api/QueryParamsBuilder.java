@@ -1,13 +1,17 @@
 package org.javers.repository.api;
 
+import com.google.common.base.Preconditions;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.SnapshotType;
+import org.javers.repository.api.QueryParams.AggregateType;
 import org.javers.repository.jql.QueryBuilder;
 
 import java.time.LocalDateTime;
 
 import java.util.*;
+
+import static org.javers.repository.api.QueryParams.AggregateType.ENTITIES_ONLY;
 
 /**
  * @author michal wesolowski
@@ -21,7 +25,7 @@ public class QueryParamsBuilder {
     private Set<CommitId> commitIds = new HashSet<>();
     private Long version;
     private String author;
-    private boolean aggregate;
+    private AggregateType aggregate = ENTITIES_ONLY;
     private boolean newObjectChanges;
     private Map<String, String> commitProperties = new HashMap<>();
     private String changedProperty;
@@ -44,6 +48,20 @@ public class QueryParamsBuilder {
      * @see QueryBuilder#withChildValueObjects()
      */
     public QueryParamsBuilder withChildValueObjects(boolean aggregate) {
+        this.aggregate = aggregate ? AggregateType.ENTITIES_WITH_CHILD_VALUE_OBJECTS : AggregateType.ENTITIES_ONLY;
+        return this;
+    }
+
+    /**
+     * @see QueryBuilder#withOnlyChildValueObjects()
+     */
+    public QueryParamsBuilder withOnlyChildValueObjects() {
+        this.aggregate = AggregateType.CHILD_VALUE_OBJECTS_ONLY;
+        return this;
+    }
+
+    public QueryParamsBuilder withAggregateType(AggregateType aggregate) {
+        Preconditions.checkNotNull(aggregate);
         this.aggregate = aggregate;
         return this;
     }

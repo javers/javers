@@ -7,6 +7,7 @@ import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
+import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.repository.api.JaversRepository
@@ -1066,6 +1067,32 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         assert snapshots.size() == 1
         assert snapshots[0].getPropertyValue("id") == 2
+    }
+
+    def "should query withOnlyChildValueObjects for snapshots and changes by InstanceId"() {
+        given:
+        def objects = [
+                new SnapshotEntity(id:1,
+                        valueObjectRef: new DummyAddress(city: "London", networkAddress: new DummyNetworkAddress(address: "v1"))),
+                new SnapshotEntity(id:1,
+                        valueObjectRef: new DummyAddress(city: "London 2", networkAddress: new DummyNetworkAddress(address: "v1"))),
+                new SnapshotEntity(id:2, valueObjectRef: new DummyAddress(city: "Paris")) //noise
+        ]
+        objects.each {
+            javers.commit("author", it)
+        }
+
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).withOnlyChildValueObjects().build()
+
+        when:
+        def snapshots = javers.findSnapshots(query)
+
+        then:
+        snapshots.size() == 3
+        snapshots.each {
+            assert it.globalId instanceof ValueObjectId
+            assert it.globalId.ownerId.value() == SnapshotEntity.name + "/1"
+        }
     }
 
     def "should query withChildValueObjects for snapshots and changes by InstanceId"() {
