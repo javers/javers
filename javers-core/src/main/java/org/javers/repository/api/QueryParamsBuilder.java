@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 import java.util.*;
 
-import static org.javers.repository.api.QueryParams.AggregateType.ENTITIES_ONLY;
+import static org.javers.repository.api.QueryParams.AggregateType.NONE;
 
 /**
  * @author michal wesolowski
@@ -25,7 +25,7 @@ public class QueryParamsBuilder {
     private Set<CommitId> commitIds = new HashSet<>();
     private Long version;
     private String author;
-    private AggregateType aggregate = ENTITIES_ONLY;
+    private AggregateType aggregate = NONE;
     private boolean newObjectChanges;
     private Map<String, String> commitProperties = new HashMap<>();
     private String changedProperty;
@@ -48,15 +48,7 @@ public class QueryParamsBuilder {
      * @see QueryBuilder#withChildValueObjects()
      */
     public QueryParamsBuilder withChildValueObjects(boolean aggregate) {
-        this.aggregate = aggregate ? AggregateType.ENTITIES_WITH_CHILD_VALUE_OBJECTS : AggregateType.ENTITIES_ONLY;
-        return this;
-    }
-
-    /**
-     * @see QueryBuilder#withOnlyChildValueObjects()
-     */
-    public QueryParamsBuilder withOnlyChildValueObjects() {
-        this.aggregate = AggregateType.CHILD_VALUE_OBJECTS_ONLY;
+        this.aggregate = aggregate ? AggregateType.ENTITIES_WITH_CHILD_VALUE_OBJECTS : AggregateType.NONE;
         return this;
     }
 
@@ -79,7 +71,7 @@ public class QueryParamsBuilder {
      * @see QueryBuilder#skip(int)
      */
     public QueryParamsBuilder skip(int skip) {
-        Validate.argumentCheck(limit >= 0, "Skip is not a non-negative number.");
+        Validate.argumentCheck(skip >= 0, "Skip is not a non-negative number.");
         this.skip = skip;
         return this;
     }

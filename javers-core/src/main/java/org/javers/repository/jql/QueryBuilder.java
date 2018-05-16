@@ -263,11 +263,6 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder withOnlyChildValueObjects() {
-        queryParamsBuilder.withOnlyChildValueObjects();
-        return this;
-    }
-
     /**
      * Limits number of snapshots to be fetched from JaversRepository, default is 100.
      * <br/><br/>

@@ -70,4 +70,8 @@ public enum ShadowScope {
     public boolean isCommitDeep() {
         return this == COMMIT_DEEP;
     }
+
+    public boolean isShallow() {
+        return this == SHALLOW;
+    }
 }

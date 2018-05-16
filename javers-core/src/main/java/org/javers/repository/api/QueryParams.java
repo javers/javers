@@ -55,7 +55,7 @@ public class QueryParams {
     public static QueryParams forShadowQueryRoots(QueryParams q) {
         return new QueryParams(
             q.limit, q.skip, q.from, q.to, q.commitIds, q.version, q.author, q.commitProperties,
-            AggregateType.ENTITIES_ONLY, q.newObjectChanges, q.changedProperty, q.toCommitId, q.snapshotType);
+            AggregateType.NONE, q.newObjectChanges, q.changedProperty, q.toCommitId, q.snapshotType);
     }
 
     public static QueryParams forShadowQueryRootsChildren(QueryParams q) {
@@ -83,6 +83,10 @@ public class QueryParams {
      */
     public Optional<LocalDateTime> from() {
         return Optional.ofNullable(from);
+    }
+
+    public AggregateType aggregateType() {
+        return aggregate;
     }
 
     /**
@@ -149,8 +153,8 @@ public class QueryParams {
     }
 
     public boolean shouldLoadEntities() {
-        return aggregate == AggregateType.ENTITIES_ONLY ||
-                aggregate == AggregateType.ENTITIES_WITH_CHILD_VALUE_OBJECTS;
+        return aggregate == AggregateType.NONE ||
+               aggregate == AggregateType.ENTITIES_WITH_CHILD_VALUE_OBJECTS;
     }
 
     /**
@@ -200,8 +204,12 @@ public class QueryParams {
     }
 
     public enum AggregateType {
-        ENTITIES_ONLY,
+        NONE,
         ENTITIES_WITH_CHILD_VALUE_OBJECTS,
-        CHILD_VALUE_OBJECTS_ONLY
+        CHILD_VALUE_OBJECTS_ONLY,
+        /**
+         * internal, for core snapshots query
+         */
+        SHADOW_STYLE
     }
 }

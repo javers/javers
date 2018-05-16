@@ -11,6 +11,7 @@ import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.repository.api.JaversRepository
+import org.javers.repository.api.QueryParams
 import org.javers.repository.api.SnapshotIdentifier
 import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.QueryBuilder
@@ -1082,7 +1083,8 @@ class JaversRepositoryE2ETest extends Specification {
             javers.commit("author", it)
         }
 
-        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).withOnlyChildValueObjects().build()
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).build()
+        query.setAggregateType(QueryParams.AggregateType.CHILD_VALUE_OBJECTS_ONLY)
 
         when:
         def snapshots = javers.findSnapshots(query)

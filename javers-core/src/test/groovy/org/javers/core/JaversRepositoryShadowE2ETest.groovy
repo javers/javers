@@ -21,7 +21,11 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
       15.times {
           e.intProperty = it
-          e.valueObjectRef.street = "some "+ it
+          if (it % 2 ==0) {
+              e.valueObjectRef.street = "some "+ it
+          }
+          println ("commit: e.intProperty:" + e.intProperty)
+          println ("        e.valueObjectRef.street:" + e.valueObjectRef.street)
           javers.commit("a", e)
       }
 

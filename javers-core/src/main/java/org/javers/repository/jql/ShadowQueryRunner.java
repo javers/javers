@@ -42,6 +42,13 @@ public class ShadowQueryRunner {
         final CommitTable commitTable =
                 new CommitTable(coreSnapshots, query.getMaxGapsToFill(), query, javersCoreConfiguration.getCommitIdGenerator());
 
+        if (query.getShadowScope().isShallow()) {
+            //TODO load all Child VO
+            // List of Instance Id
+            // commitId bounds
+            // CHILD_ONLY
+        }
+
         if (query.getShadowScope().isCommitDeep()) {
             commitTable.loadFullCommits();
         }
@@ -69,20 +76,22 @@ public class ShadowQueryRunner {
     }
 
     class CommitTable {
+        private final Set<GlobalId> rootSnapshotIds;
         private final int maxGapsToFill;
         private int filledGaps;
         private final Map<CommitMetadata, CommitEntry> commitsMap;
         private final JqlQuery query;
 
-        CommitTable(List<CdoSnapshot> coreSnapshots, int maxGapsToFill, JqlQuery query, CommitIdGenerator commitIdGenerator) {
+        CommitTable(List<CdoSnapshot> rootSnapshots, int maxGapsToFill, JqlQuery query, CommitIdGenerator commitIdGenerator) {
             this.maxGapsToFill = maxGapsToFill;
             this.query = query;
             this.commitsMap = new TreeMap<>(commitIdGenerator.getComparator());
-            appendSnapshots(coreSnapshots);
+            this.rootSnapshotIds = rootSnapshots.stream().map(it -> it.getGlobalId()).collect(toSet());
+            appendSnapshots(rootSnapshots);
         }
 
         List<ShadowRoot> rootsForQuery(JqlQuery query) {
-            fillMissingParents();
+           // fillMissingParents();
 
             final List<CommitEntry> orderedCommits = new ArrayList<>();
             commitsMap.values().forEach(it -> orderedCommits.add(0,it));
@@ -142,25 +151,34 @@ public class ShadowQueryRunner {
             }
         }
 
+        //TODO remove
         private boolean isInChildValueObjectScope(ReferenceKey referenceKey) {
-            //TODO
-            return query.isAggregate() && referenceKey.targetId instanceof ValueObjectId;
+            if (!(referenceKey.targetId instanceof ValueObjectId)) {
+                return false;
+            }
+
+            ValueObjectId valueObjectId = (ValueObjectId) referenceKey.targetId;
+
+            return rootSnapshotIds.contains(valueObjectId.getOwnerId());
         }
 
         List<CdoSnapshot> fillGapFromRepository(ReferenceKey referenceKey, int limit) {
-            if (filledGaps >= maxGapsToFill && !isInChildValueObjectScope(referenceKey)) {
-                return Collections.emptyList();
-            }
 
             List<CdoSnapshot> historicals;
-            if (isInChildValueObjectScope(referenceKey)) {
-                historicals = getHistoricals(referenceKey.targetId, referenceKey, false, limit);
-                query.stats().logQueryInChildValueObjectScope(referenceKey.targetId, referenceKey.commit.getId(), historicals.size());
-            }
-            else {
-                historicals = getHistoricals(referenceKey.targetId, referenceKey, query.isAggregate(), limit);
-                query.stats().logQueryInDeepPlusScope(referenceKey.targetId, referenceKey.commit.getId(), historicals.size());
-            }
+// TODO remove
+//            if (isInChildValueObjectScope(referenceKey)) {
+//                historicals = getHistoricals(referenceKey.targetId, referenceKey, false, limit);
+//                query.stats().logQueryInChildValueObjectScope(referenceKey.targetId, referenceKey.commit.getId(), historicals.size());
+//           }
+//            else {
+                if (filledGaps >= maxGapsToFill) {
+                    return Collections.emptyList();
+                }
+                else {
+                    historicals = getHistoricals(referenceKey.targetId, referenceKey, true, limit);
+                    query.stats().logQueryInDeepPlusScope(referenceKey.targetId, referenceKey.commit.getId(), historicals.size());
+                }
+//            }
 
             filledGaps++;
             return historicals;
@@ -173,6 +191,7 @@ public class ShadowQueryRunner {
             return repository.getHistoricals(globalId, timePoint.commit.getCommitDate(), withChildValueObjects, limit);
         }
 
+        /*
         void fillMissingParents() {
             Map<GlobalId, CdoSnapshot> movingLatest = new HashMap<>();
 
@@ -186,7 +205,7 @@ public class ShadowQueryRunner {
                 //update movingLatest
                 commitEntry.getAllStream().forEach(e -> movingLatest.put(e.getGlobalId(), e));
             });
-        }
+        }*/
 
         void appendSnapshots(List<CdoSnapshot> snapshots) {
             snapshots.forEach(it -> appendSnapshot(it));
@@ -246,6 +265,7 @@ public class ShadowQueryRunner {
             return Stream.concat(valueObjects.values().stream(), entities.values().stream());
         }
 
+        /*
         Set<GlobalId> getMissingParents() {
             Set<GlobalId> result = valueObjects.keySet().stream()
                     .map(voId -> voId.getOwnerId())
@@ -258,7 +278,7 @@ public class ShadowQueryRunner {
                     .collect(toSet()));
 
             return result;
-        }
+        }*/
     }
 
     final static class ReferenceKey {
