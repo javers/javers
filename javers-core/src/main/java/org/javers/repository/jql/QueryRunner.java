@@ -6,6 +6,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.shadow.Shadow;
@@ -36,10 +37,21 @@ public class QueryRunner {
     }
 
     public List<Shadow> queryForShadows(JqlQuery query) {
-        query.compile(globalIdFactory, typeMapper, QueryType.SHADOWS);
+        query.compile(globalIdFactory, typeMapper);
 
-        List<CdoSnapshot> snapshots = queryForSnapshots(query);
-        query.stats().logShallowQuery(snapshots);
+
+        //TODO
+        //Query no 1. - NO AGGREGATE
+        //Query no 2. - LOAD CHILD
+
+        List<CdoSnapshot> snapshots;
+        if (query.isInstanceIdQuery()) {
+            snapshots = repository.getStateHistoryForEntityShadows((InstanceId)query.getIdFilter(), query.getQueryParams());
+            query.stats().logExtendedCoreSnapshotsQuery(snapshots);
+        } else {
+            snapshots = queryForSnapshots(query);
+            query.stats().logCoreSnapshotsQuery(snapshots);
+        }
 
         List<Shadow> result = shadowQueryRunner.queryForShadows(query, snapshots);
 
@@ -54,7 +66,7 @@ public class QueryRunner {
     }
 
     public List<CdoSnapshot> queryForSnapshots(JqlQuery query){
-        query.compile(globalIdFactory, typeMapper, QueryType.SNAPSHOTS);
+        query.compile(globalIdFactory, typeMapper);
 
         List<CdoSnapshot> result;
         if (query.isAnyDomainObjectQuery()) {
@@ -78,7 +90,7 @@ public class QueryRunner {
     }
 
     public List<Change> queryForChanges(JqlQuery query) {
-        query.compile(globalIdFactory, typeMapper, QueryType.CHANGES);
+        query.compile(globalIdFactory, typeMapper);
 
         if (query.isAnyDomainObjectQuery()) {
             return repository.getChanges(query.isNewObjectChanges(), query.getQueryParams());

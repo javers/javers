@@ -15,6 +15,36 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
+    def "should allow paging of Entities with Value Objects "(){
+      given:
+      def e = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(street: "some"))
+
+      15.times {
+          e.intProperty = it
+          if (it % 2 ==0) {
+              e.valueObjectRef.street = "some "+ it
+          }
+          println ("commit: e.intProperty:" + e.intProperty)
+          println ("        e.valueObjectRef.street:" + e.valueObjectRef.street)
+          javers.commit("a", e)
+      }
+
+      when:
+      def query = byInstanceId(1, SnapshotEntity)
+                 .limit(5).skip(5)
+                 .build()
+      def shadows = javers.findShadows(query)
+
+      then:
+      shadows.forEach{
+          println it.commitMetadata.id.value() + " " + it.get().intProperty
+      }
+
+      shadows.size() == 5
+      shadows[0].get().intProperty == 10
+      shadows[0].get().valueObjectRef.street == "some 10"
+    }
+
     def "should return nothing when querying with non-existing commitId"() {
         given:
         def ref1 = new SnapshotEntity(id: 2)
@@ -398,6 +428,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         shadows[0].listOfEntities.size() == 1
     }
 
+    //TODO what with 'consumed' ?
     def "should load master snapshot even if child snapshots 'consumed' the snapshot limit"(){
         given:
         def a = new DummyAddress(city: "a")

@@ -64,6 +64,28 @@ public class JaversExtendedRepository implements JaversRepository {
         return getChangesIntroducedBySnapshots(snapshots, queryParams.newObjectChanges());
     }
 
+    /**
+     * Limit and skip is applied in the first query only for Entities.
+     * Second (unbounded) query loads all child Value Objects.
+     */
+    public List<CdoSnapshot> getStateHistoryForEntityShadows(InstanceId instanceId, QueryParams queryParams) {
+        argumentsAreNotNull(instanceId, queryParams);
+
+        //TODO
+        /*
+        QueryParams entityQuery = new QueryParamsBuilder(queryParams)
+                .withAggregateType(QueryParams.AggregateType.NONE).build();
+        List<CdoSnapshot> result = delegate.getStateHistory(instanceId, entityQuery);
+
+        QueryParams voQuery = new QueryParamsBuilder(queryParams)
+                .withAggregateType(QueryParams.AggregateType.CHILD_VALUE_OBJECTS_ONLY)
+                .limit(entityQuery.limit()*100)
+                .build();
+        result.addAll(delegate.getStateHistory(instanceId, voQuery));
+*/
+        return result;
+    }
+
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
         argumentsAreNotNull(globalId, queryParams);

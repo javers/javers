@@ -6,6 +6,7 @@ buildscript {
     }
 
     dependencies {
+        classpath 'org.owasp:dependency-check-gradle:3.1.2'
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
         classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
         classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.8.0'
@@ -30,6 +31,7 @@ subprojects {
     apply plugin: 'groovy'
     apply plugin: 'propdeps'
     apply plugin: 'com.bmuschko.nexus'
+    apply plugin: 'org.owasp.dependencycheck'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8

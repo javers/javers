@@ -7,6 +7,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
 import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 import org.javers.repository.api.QueryParams;
@@ -47,7 +48,7 @@ public class JqlQuery {
     }
 
     void validate(){
-        if (isAggregate()) {
+        if (getQueryParams().shouldLoadChildValueObjects()) {
             if (!(isClassQuery() || isInstanceIdQuery())) {
                 throw new JaversException(JaversExceptionCode.MALFORMED_JQL,
                         "aggregate filter can be enabled only for byClass and byInstanceId queries");
@@ -98,15 +99,9 @@ public class JqlQuery {
         return Optional.empty();
     }
 
-    void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper, QueryType queryType) {
+    void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
         this.stats = new Stats();
         this.filter = filterDefinition.compile(globalIdFactory, typeMapper);
-
-        if (queryType == QueryType.SHADOWS &&
-                (isInstanceIdQuery() || isClassQuery())) {
-            queryParams = QueryParams.forShadowQuery(queryParams);
-        }
-
         validate();
     }
 
@@ -141,10 +136,6 @@ public class JqlQuery {
 
     boolean isVoOwnerQuery(){
         return hasFilter(VoOwnerFilter.class);
-    }
-
-    public boolean isAggregate() {
-        return queryParams.isAggregate();
     }
 
     public int getMaxGapsToFill() {
@@ -212,7 +203,7 @@ public class JqlQuery {
                     deepPlusGapsFilled);
         }
 
-        void logShallowQuery(List<CdoSnapshot> snapshots) {
+        void logCoreSnapshotsQuery(List<CdoSnapshot> snapshots) {
             validateChange();
             logger.debug("SHALLOW query: {} snapshots loaded (entities: {}, valueObjects: {})", snapshots.size(),
                     snapshots.stream().filter(it -> it.getGlobalId() instanceof InstanceId).count(),

@@ -26,12 +26,12 @@ public class QueryParams {
     private final Long version;
     private final String author;
     private final Map<String, String> commitProperties;
-    private final boolean aggregate;
+    private final AggregateType aggregate;
     private final boolean newObjectChanges;
     private final String changedProperty;
     private final SnapshotType snapshotType;
 
-    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty, CommitId toCommitId, SnapshotType snapshotType) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, AggregateType aggregate, boolean newObjectChanges, String changedProperty, CommitId toCommitId, SnapshotType snapshotType) {
         this.limit = limit;
         this.skip = skip;
         this.from = from;
@@ -47,10 +47,21 @@ public class QueryParams {
         this.snapshotType = snapshotType;
     }
 
+    @Deprecated
     public static QueryParams forShadowQuery(QueryParams q) {
+        return null;
+    }
+
+    public static QueryParams forShadowQueryRoots(QueryParams q) {
         return new QueryParams(
             q.limit, q.skip, q.from, q.to, q.commitIds, q.version, q.author, q.commitProperties,
-            true, q.newObjectChanges, q.changedProperty, q.toCommitId, q.snapshotType);
+            AggregateType.NONE, q.newObjectChanges, q.changedProperty, q.toCommitId, q.snapshotType);
+    }
+
+    public static QueryParams forShadowQueryRootsChildren(QueryParams q) {
+        return new QueryParams(
+            q.limit * 2, q.skip, q.from, q.to, q.commitIds, q.version, q.author, q.commitProperties,
+            AggregateType.CHILD_VALUE_OBJECTS_ONLY, q.newObjectChanges, q.changedProperty, q.toCommitId, q.snapshotType);
     }
 
     /**
@@ -72,6 +83,10 @@ public class QueryParams {
      */
     public Optional<LocalDateTime> from() {
         return Optional.ofNullable(from);
+    }
+
+    public AggregateType aggregateType() {
+        return aggregate;
     }
 
     /**
@@ -125,10 +140,21 @@ public class QueryParams {
     }
 
     /**
-     * @see QueryBuilder#withChildValueObjects()
+     * use {@link #shouldLoadChildValueObjects()} and {@link #shouldLoadEntities()}
      */
+    @Deprecated
     public boolean isAggregate() {
-        return aggregate;
+        return aggregate == AggregateType.ENTITIES_WITH_CHILD_VALUE_OBJECTS;
+    }
+
+    public boolean shouldLoadChildValueObjects() {
+        return aggregate == AggregateType.CHILD_VALUE_OBJECTS_ONLY ||
+               aggregate == AggregateType.ENTITIES_WITH_CHILD_VALUE_OBJECTS;
+    }
+
+    public boolean shouldLoadEntities() {
+        return aggregate == AggregateType.NONE ||
+               aggregate == AggregateType.ENTITIES_WITH_CHILD_VALUE_OBJECTS;
     }
 
     /**
@@ -175,5 +201,15 @@ public class QueryParams {
         }
 
         return true;
+    }
+
+    public enum AggregateType {
+        NONE,
+        ENTITIES_WITH_CHILD_VALUE_OBJECTS,
+        CHILD_VALUE_OBJECTS_ONLY,
+        /**
+         * internal, for core snapshots query
+         */
+        SHADOW_STYLE
     }
 }

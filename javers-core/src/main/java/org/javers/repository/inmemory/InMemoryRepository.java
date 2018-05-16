@@ -5,8 +5,6 @@ import org.javers.common.collections.Lists;
 import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.CommitIdGenerator;
-import org.javers.core.JaversCoreConfiguration;
-import org.javers.core.JaversCoreProperties;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -70,10 +68,10 @@ public class InMemoryRepository implements JaversRepository {
         List<CdoSnapshot> filtered = new ArrayList<>();
 
         for (CdoSnapshot snapshot : getAll()) {
-            if (snapshot.getGlobalId().equals(globalId)) {
+            if (queryParams.shouldLoadEntities() && snapshot.getGlobalId().equals(globalId)) {
                 filtered.add(snapshot);
             }
-            if (queryParams.isAggregate() && isParent(globalId, snapshot.getGlobalId())){
+            if (queryParams.shouldLoadChildValueObjects() && isParent(globalId, snapshot.getGlobalId())){
                 filtered.add(snapshot);
             }
         }
