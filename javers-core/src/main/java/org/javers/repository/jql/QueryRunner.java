@@ -36,16 +36,56 @@ public class QueryRunner {
     }
 
     public List<Shadow> queryForShadows(JqlQuery query) {
-        query.compile(globalIdFactory, typeMapper, QueryType.SHADOWS);
+        query.compile(globalIdFactory, typeMapper);
+        if(query.isClassQuery() || query.isInstanceIdQuery()) {
+            query.changeAggregate(true);
+        }
 
-        List<CdoSnapshot> snapshots = queryForSnapshots(query);
-        query.stats().logShallowQuery(snapshots);
-
+        List<CdoSnapshot> snapshots = loadCoreSnapshotsForShadowsQuery(query);
         List<Shadow> result = shadowQueryRunner.queryForShadows(query, snapshots);
 
         query.stats().stop();
         logger.debug("queryForShadows executed: {}", query);
         return result;
+    }
+
+    private List<CdoSnapshot> loadCoreSnapshotsForShadowsQuery(JqlQuery query) {
+        List<CdoSnapshot> snapshots = queryForSnapshots(query);
+        int targetLimit = query.getQueryParams().limit();
+        query.stats().logShallowQuery(snapshots);
+
+        int lastLimit = query.getQueryParams().limit();
+        List<CdoSnapshot> lastFrame = snapshots;
+        boolean lastFrameWasFull = lastFrame.size() == lastLimit;
+        boolean needMoreRoots = query.rootsForQuery(snapshots).size() < query.getQueryParams().limit();
+        if (needMoreRoots && lastFrameWasFull) {
+          //load second
+            query.changeLimitAndSkip(lastLimit * 2, query.getQueryParams().skip() + snapshots.size());
+
+            List<CdoSnapshot> nextFrame = queryForSnapshots(query);
+            query.stats().logShallowQuery(snapshots);
+
+            int toFill = targetLimit - query.rootsForQuery(snapshots).size();
+
+            System.out.println("toFill: "+ toFill);
+            for (CdoSnapshot newSnapshot : nextFrame) {
+                if (query.matches(newSnapshot.getGlobalId())) {
+                    if (toFill > 0) {
+                        snapshots.add(newSnapshot);
+                        System.out.println("snapshots.add(E) "+ newSnapshot.getGlobalId());
+                        toFill--;
+                    }
+                } else {
+                    snapshots.add(newSnapshot);
+                    System.out.println("snapshots.add(VO) "+ newSnapshot.getGlobalId());
+                }
+            }
+
+            //todo
+            //trim owerflow roots
+        }
+
+        return snapshots;
     }
 
     public Optional<CdoSnapshot> runQueryForLatestSnapshot(GlobalIdDTO globalId) {
@@ -54,7 +94,7 @@ public class QueryRunner {
     }
 
     public List<CdoSnapshot> queryForSnapshots(JqlQuery query){
-        query.compile(globalIdFactory, typeMapper, QueryType.SNAPSHOTS);
+        query.compile(globalIdFactory, typeMapper);
 
         List<CdoSnapshot> result;
         if (query.isAnyDomainObjectQuery()) {
@@ -78,7 +118,7 @@ public class QueryRunner {
     }
 
     public List<Change> queryForChanges(JqlQuery query) {
-        query.compile(globalIdFactory, typeMapper, QueryType.CHANGES);
+        query.compile(globalIdFactory, typeMapper);
 
         if (query.isAnyDomainObjectQuery()) {
             return repository.getChanges(query.isNewObjectChanges(), query.getQueryParams());

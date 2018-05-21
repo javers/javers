@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.javers.common.exception.JaversExceptionCode.COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -146,6 +147,11 @@ class JaversCore implements Javers {
     @Override
     public <T> List<Shadow<T>> findShadows(JqlQuery query) {
         return (List)queryRunner.queryForShadows(query);
+    }
+
+    @Override
+    public <T> Stream<Shadow<T>> streamShadows(JqlQuery query) {
+        return null;
     }
 
     @Override

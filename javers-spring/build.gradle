@@ -21,7 +21,7 @@ dependencies {
     optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
 
     //should be on application's classpath when using SpringSecurityAuthorProvider
-    optional 'org.springframework.security:spring-security-core:4.0.3.RELEASE'
+    optional "org.springframework.security:spring-security-core:$springSecurity"
 
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"

@@ -7,13 +7,57 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
+import spock.lang.Unroll
 
 import java.time.LocalDate
 
 import static org.javers.core.commit.CommitId.valueOf
+import static org.javers.repository.jql.QueryBuilder.byClass
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
+
+    @Unroll
+    def "should allow paging for Entities with Value Objects when querying by #queryType"(){
+        given:
+        def e = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(street: "some"))
+
+        15.times {
+            e.intProperty = it
+            if (it % 2 == 0) {
+                e.valueObjectRef.street = "some "+ it
+            }
+            println ("commit: e.intProperty:" + e.intProperty)
+            println ("        e.valueObjectRef.street:" + e.valueObjectRef.street)
+            javers.commit("a", e)
+        }
+
+        when:
+        def shadows = javers.findShadows(query)
+
+        then:
+    //shadows.size() == 5
+        shadows[0].get().intProperty == 9
+        shadows[0].get().valueObjectRef.street == "some 8"
+
+        shadows[1].get().intProperty == 8
+        shadows[1].get().valueObjectRef.street == "some 8"
+
+        shadows[2].get().intProperty == 7
+        shadows[2].get().valueObjectRef.street == "some 6"
+
+        shadows[3].get().intProperty == 6
+        shadows[3].get().valueObjectRef.street == "some 6"
+
+        shadows[4].get().intProperty == 5
+        shadows[4].get().valueObjectRef.street == "some 4"
+
+        where:
+        queryType << ["InstanceId", "Class"]
+        query     << [
+                byInstanceId(1, SnapshotEntity).limit(50).skip(5).build(),
+                byClass(SnapshotEntity).limit(50).skip(5).build()]
+    }
 
     def "should return nothing when querying with non-existing commitId"() {
         given:

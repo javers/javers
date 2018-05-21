@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 
 /**
@@ -328,6 +329,8 @@ public interface Javers {
      * @since 3.2
      */
     <T> List<Shadow<T>> findShadows(JqlQuery query);
+
+    <T> Stream<Shadow<T>> streamShadows(JqlQuery query);
 
     /**
      * Queries a JaversRepository for change history (diff sequence) of a given class, object or property.<br/>

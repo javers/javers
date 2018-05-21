@@ -46,11 +46,11 @@ public class ShadowQueryRunner {
             commitTable.loadFullCommits();
         }
 
-        List<Shadow> shadows = commitTable.rootsForQuery(query).stream()
+        List<Shadow> roots = commitTable.rootsForQuery(query).stream()
                 .map(r -> shadowFactory.createShadow(r.root, r.context, (cm, targetId) -> commitTable.findLatestTo(cm, targetId)))
                 .collect(toList());
 
-        return shadows;
+        return roots;
     }
 
     private static class ShadowRoot {
@@ -82,7 +82,7 @@ public class ShadowQueryRunner {
         }
 
         List<ShadowRoot> rootsForQuery(JqlQuery query) {
-            fillMissingParents();
+           // fillMissingParents();
 
             final List<CommitEntry> orderedCommits = new ArrayList<>();
             commitsMap.values().forEach(it -> orderedCommits.add(0,it));
@@ -173,6 +173,7 @@ public class ShadowQueryRunner {
             return repository.getHistoricals(globalId, timePoint.commit.getCommitDate(), withChildValueObjects, limit);
         }
 
+        /*
         void fillMissingParents() {
             Map<GlobalId, CdoSnapshot> movingLatest = new HashMap<>();
 
@@ -186,7 +187,7 @@ public class ShadowQueryRunner {
                 //update movingLatest
                 commitEntry.getAllStream().forEach(e -> movingLatest.put(e.getGlobalId(), e));
             });
-        }
+        }*/
 
         void appendSnapshots(List<CdoSnapshot> snapshots) {
             snapshots.forEach(it -> appendSnapshot(it));
@@ -246,6 +247,7 @@ public class ShadowQueryRunner {
             return Stream.concat(valueObjects.values().stream(), entities.values().stream());
         }
 
+        /*
         Set<GlobalId> getMissingParents() {
             Set<GlobalId> result = valueObjects.keySet().stream()
                     .map(voId -> voId.getOwnerId())
@@ -258,7 +260,7 @@ public class ShadowQueryRunner {
                     .collect(toSet()));
 
             return result;
-        }
+        }*/
     }
 
     final static class ReferenceKey {
