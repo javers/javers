@@ -36,7 +36,6 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         def shadows = javers.findShadows(query)
 
         then:
-    //shadows.size() == 5
         shadows[0].get().intProperty == 9
         shadows[0].get().valueObjectRef.street == "some 8"
 

@@ -47,12 +47,6 @@ public class QueryParams {
         this.snapshotType = snapshotType;
     }
 
-    public QueryParams changeLimitAndSkip(int newLimit, int newSkip) {
-        return new QueryParams(
-            newLimit, newSkip, from, to, commitIds, version, author, commitProperties,
-            aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType);
-    }
-
     public QueryParams changeAggregate(boolean newAggregate) {
         return new QueryParams(
                 limit, skip, from, to, commitIds, version, author, commitProperties,

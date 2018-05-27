@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.javers.repository.jql.ShadowScope.DEEP_PLUS;
 
@@ -99,6 +98,12 @@ public class JqlQuery {
         return Optional.empty();
     }
 
+    void aggregateIfEntityQuery() {
+        if (isInstanceIdQuery() || isClassQuery()) {
+            queryParams = queryParams.changeAggregate(true);
+        }
+    }
+
     void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
         this.stats = new Stats();
         this.filter = filterDefinition.compile(globalIdFactory, typeMapper);
@@ -106,20 +111,8 @@ public class JqlQuery {
         validate();
     }
 
-    void changeAggregate(boolean aggregate) {
-        queryParams = queryParams.changeAggregate(aggregate);
-    }
-
-    void changeLimitAndSkip(int limit, int skip) {
-        queryParams = queryParams.changeLimitAndSkip(limit, skip);
-    }
-
     boolean matches(GlobalId globalId) {
         return filter.matches(globalId);
-    }
-
-    List<CdoSnapshot> rootsForQuery(List<CdoSnapshot> snapshots) {
-        return snapshots.stream().filter(it -> matches(it.getGlobalId())).collect(Collectors.toList());
     }
 
     boolean isNewObjectChanges() {
@@ -173,7 +166,7 @@ public class JqlQuery {
         return stats;
     }
 
-    public class Stats {
+    public static class Stats {
         private long startTimestamp = System.currentTimeMillis();
         private long endTimestamp;
         private int dbQueriesCount;
@@ -222,16 +215,12 @@ public class JqlQuery {
 
         void logShallowQuery(List<CdoSnapshot> snapshots) {
             validateChange();
-            logger.debug("SHALLOW query: {} snapshots loaded (entities: {}, valueObjects: {}), limit:{}, skip:{}", snapshots.size(),
+            logger.debug("SHALLOW query: {} snapshots loaded (entities: {}, valueObjects: {})", snapshots.size(),
                     snapshots.stream().filter(it -> it.getGlobalId() instanceof InstanceId).count(),
-                    snapshots.stream().filter(it -> it.getGlobalId() instanceof ValueObjectId).count(),
-                    getQueryParams().limit(),
-                    getQueryParams().skip());
+                    snapshots.stream().filter(it -> it.getGlobalId() instanceof ValueObjectId).count());
             dbQueriesCount++;
             allSnapshotsCount += snapshots.size();
             shallowSnapshotsCount += snapshots.size();
-
-
         }
 
         void logQueryInCommitDeepScope(List<CdoSnapshot> snapshots) {

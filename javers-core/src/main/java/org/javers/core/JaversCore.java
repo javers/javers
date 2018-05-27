@@ -150,7 +150,7 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public <T> Stream<Shadow<T>> streamShadows(JqlQuery query) {
+    public <T> Stream<Shadow<T>> findShadowsAndStream(JqlQuery query) {
         return null;
     }
 

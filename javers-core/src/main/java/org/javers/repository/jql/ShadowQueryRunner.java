@@ -46,11 +46,11 @@ public class ShadowQueryRunner {
             commitTable.loadFullCommits();
         }
 
-        List<Shadow> roots = commitTable.rootsForQuery(query).stream()
+        List<Shadow> shadows = commitTable.rootsForQuery(query).stream()
                 .map(r -> shadowFactory.createShadow(r.root, r.context, (cm, targetId) -> commitTable.findLatestTo(cm, targetId)))
                 .collect(toList());
 
-        return roots;
+        return shadows;
     }
 
     private static class ShadowRoot {
@@ -82,15 +82,15 @@ public class ShadowQueryRunner {
         }
 
         List<ShadowRoot> rootsForQuery(JqlQuery query) {
-           // fillMissingParents();
+            fillMissingParents();
 
             final List<CommitEntry> orderedCommits = new ArrayList<>();
             commitsMap.values().forEach(it -> orderedCommits.add(0,it));
 
             return orderedCommits.stream()
                     .flatMap(e -> e.getAllStream()
-                    .filter(s -> query.matches(s.getGlobalId()))
-                    .map(s -> new ShadowRoot(e.commitMetadata, s)))
+                            .filter(s -> query.matches(s.getGlobalId()))
+                            .map(s -> new ShadowRoot(e.commitMetadata, s)))
                     .collect(Collectors.toList());
         }
 
@@ -173,7 +173,6 @@ public class ShadowQueryRunner {
             return repository.getHistoricals(globalId, timePoint.commit.getCommitDate(), withChildValueObjects, limit);
         }
 
-        /*
         void fillMissingParents() {
             Map<GlobalId, CdoSnapshot> movingLatest = new HashMap<>();
 
@@ -187,7 +186,7 @@ public class ShadowQueryRunner {
                 //update movingLatest
                 commitEntry.getAllStream().forEach(e -> movingLatest.put(e.getGlobalId(), e));
             });
-        }*/
+        }
 
         void appendSnapshots(List<CdoSnapshot> snapshots) {
             snapshots.forEach(it -> appendSnapshot(it));
@@ -247,7 +246,7 @@ public class ShadowQueryRunner {
             return Stream.concat(valueObjects.values().stream(), entities.values().stream());
         }
 
-        /*
+        //TODO not needed for Streams
         Set<GlobalId> getMissingParents() {
             Set<GlobalId> result = valueObjects.keySet().stream()
                     .map(voId -> voId.getOwnerId())
@@ -260,7 +259,7 @@ public class ShadowQueryRunner {
                     .collect(toSet()));
 
             return result;
-        }*/
+        }
     }
 
     final static class ReferenceKey {
@@ -279,7 +278,7 @@ public class ShadowQueryRunner {
             if (o == null || getClass() != o.getClass()) return false;
             ReferenceKey that = (ReferenceKey) o;
             return Objects.equals(commit.getId(), that.commit.getId()) &&
-                   Objects.equals(targetId, that.targetId);
+                    Objects.equals(targetId, that.targetId);
         }
 
         @Override
