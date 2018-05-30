@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Adapter from a JqlQuery to JaversRepository API
- *
  * @author bartosz.walacik
  */
 public class QueryRunner {

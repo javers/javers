@@ -495,6 +495,11 @@ public class QueryBuilder {
         return new JqlQuery(filter, queryParamsBuilder.build(), new ShadowScopeDefinition(shadowScope, maxGapsToFill));
     }
 
+    public JqlQuery buildStreamQuery() {
+        //TODO throw IllegalState
+        return new JqlQuery(filter, queryParamsBuilder.build(), new ShadowScopeDefinition(shadowScope, maxGapsToFill));
+    }
+
     /**
      * renamed to {@link #withScopeCommitDeep()}
      * @deprecated

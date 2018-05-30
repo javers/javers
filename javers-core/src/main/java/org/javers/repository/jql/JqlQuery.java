@@ -127,10 +127,6 @@ public class JqlQuery {
         return hasFilter(IdFilter.class);
     }
 
-    boolean hasChangedPropertyFilter(){
-        return queryParams.changedProperty().isPresent();
-    }
-
     boolean isClassQuery() {
         return hasFilter(ClassFilter.class);
     }
