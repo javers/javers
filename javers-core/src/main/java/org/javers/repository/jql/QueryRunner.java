@@ -28,7 +28,7 @@ public class QueryRunner {
         this.shadowStreamQueryRunner = shadowStreamQueryRunner;
     }
 
-    public Stream<Shadow> queryForShadowsStream(JqlStreamQuery query) {
+    public Stream<Shadow> queryForShadowsStream(JqlQuery query) {
         return shadowStreamQueryRunner.queryForShadowsStream(query);
     }
 

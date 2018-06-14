@@ -493,16 +493,6 @@ public class QueryBuilder {
         return this;
     }
 
-    public JqlStreamQuery buildStreamQuery() {
-        JqlQuery query = build();
-
-        if (query.getQueryParams().skip() > 0) {
-            throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "skip can't be used in Stream query");
-        }
-
-        return new JqlStreamQuery(query);
-    }
-
     public JqlQuery build() {
         return new JqlQuery(filter, queryParamsBuilder.build(), new ShadowScopeDefinition(shadowScope, maxGapsToFill));
     }

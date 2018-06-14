@@ -340,7 +340,7 @@ public interface Javers {
      * @return
      * @since 3.10
      */
-    <T> Stream<Shadow<T>> findShadowsAndStream(JqlStreamQuery query);
+    <T> Stream<Shadow<T>> findShadowsAndStream(JqlQuery query);
 
     /**
      * Queries a JaversRepository for change history (diff sequence) of a given class, object or property.<br/>

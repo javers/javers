@@ -5,10 +5,11 @@ import org.javers.common.validation.Validate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JqlStreamQuery {
+//TODO deprecated?
+class JqlStreamQuery {
     private final List<JqlQuery> queries = new ArrayList<>();
 
-    public JqlStreamQuery(JqlQuery initialQuery) {
+    JqlStreamQuery(JqlQuery initialQuery) {
         Validate.argumentIsNotNull(initialQuery);
         queries.add(initialQuery);
     }

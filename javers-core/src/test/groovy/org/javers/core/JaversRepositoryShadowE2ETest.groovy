@@ -1,5 +1,7 @@
 package org.javers.core
 
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.examples.typeNames.NewEntity
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.examples.typeNames.OldEntity
@@ -10,12 +12,43 @@ import org.javers.repository.jql.QueryBuilder
 import spock.lang.Unroll
 
 import java.time.LocalDate
+import java.util.stream.Collectors
 
 import static org.javers.core.commit.CommitId.valueOf
 import static org.javers.repository.jql.QueryBuilder.byClass
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
+
+    def "should run basic Stream query - Entity Shadows byInstanceId() in SHALLOW scope"(){
+      given:
+      def entity = new SnapshotEntity(id: 1, intProperty: 1)
+      javers.commit("a", entity)
+      entity.intProperty = 2
+      javers.commit("a", entity)
+
+      when:
+      def shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+                          .collect(Collectors.toList())
+                          .collect{it.get()}
+
+      then:
+      shadows.size() == 2
+      shadows[0].id == 1
+      shadows[0].intProperty == 2
+
+      shadows[1].id == 1
+      shadows[1].intProperty == 1
+    }
+
+    def "should not allow for setting skip in Stream query"(){
+      when:
+      def q = byInstanceId(1, SnapshotEntity).skip(5).buildStreamQuery()
+
+      then:
+      JaversException e = thrown()
+      e.code == JaversExceptionCode.MALFORMED_JQL
+    }
 
     @Unroll
     def "should return Shadows Stream for paging Entities with Value Objects when querying by #queryType"(){
@@ -143,7 +176,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         shadows[2].networkAddress.address == "a"
     }
 
-    def "should query for Shadows of Entity in SHALLOW scope"() {
+    def "should query for Entity Shadows byInstanceId() in SHALLOW scope"() {
         given:
         def entity = new SnapshotEntity(id: 1, intProperty: 1)
         javers.commit("a", entity)
@@ -167,7 +200,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         shadows[1].get().intProperty == 1
     }
 
-    def "should query for all Entity Shadows in SHALLOW scope"() {
+    def "should query for Entity Shadows byClass() in SHALLOW scope"() {
         given:
         javers.commit("a", new SnapshotEntity(id: 1))
         javers.commit("a", new SnapshotEntity(id: 2))
