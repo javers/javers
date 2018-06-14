@@ -1,6 +1,8 @@
 package org.javers.repository.jql;
 
 import org.javers.common.collections.Sets;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Javers;
 import org.javers.core.commit.CommitId;
@@ -491,12 +493,17 @@ public class QueryBuilder {
         return this;
     }
 
-    public JqlQuery build() {
-        return new JqlQuery(filter, queryParamsBuilder.build(), new ShadowScopeDefinition(shadowScope, maxGapsToFill));
+    public JqlStreamQuery buildStreamQuery() {
+        JqlQuery query = build();
+
+        if (query.getQueryParams().skip() > 0) {
+            throw new JaversException(JaversExceptionCode.MALFORMED_JQL, "skip can't be used in Stream query");
+        }
+
+        return new JqlStreamQuery(query);
     }
 
-    public JqlQuery buildStreamQuery() {
-        //TODO throw IllegalState
+    public JqlQuery build() {
         return new JqlQuery(filter, queryParamsBuilder.build(), new ShadowScopeDefinition(shadowScope, maxGapsToFill));
     }
 

@@ -39,6 +39,7 @@ import org.javers.mongosupport.RequiredMongoSupportPredicate;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.inmemory.InMemoryRepositoryModule;
+import org.javers.repository.jql.JqlModule;
 import org.javers.shadow.ShadowModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,6 +136,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         addModule(new TailoredJaversMemberFactoryModule(coreConfiguration(), getContainer()));
         addModule(new ScannerModule(coreConfiguration(), getContainer()));
         addModule(new ShadowModule(getContainer()));
+        addModule(new JqlModule(getContainer()));
 
         // bootstrap phase 3: add-on modules
         Set<JaversType> additionalTypes = bootAddOns();

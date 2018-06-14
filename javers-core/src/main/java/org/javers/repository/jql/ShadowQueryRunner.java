@@ -25,20 +25,26 @@ import static java.util.stream.Collectors.toSet;
 /**
  * @author bartosz.walacik
  */
-public class ShadowQueryRunner {
+class ShadowQueryRunner {
     private static final Logger logger = LoggerFactory.getLogger(JqlQuery.JQL_LOGGER_NAME);
 
+    private final QueryCompiler queryCompiler;
+    private final SnapshotQueryRunner snapshotQueryRunner;
     private final JaversExtendedRepository repository;
     private final ShadowFactory shadowFactory;
     private final JaversCoreConfiguration javersCoreConfiguration;
 
-    public ShadowQueryRunner(JaversExtendedRepository repository, ShadowFactory shadowFactory, JaversCoreConfiguration javersCoreConfiguration) {
+    ShadowQueryRunner(QueryCompiler queryCompiler, SnapshotQueryRunner snapshotQueryRunner, JaversExtendedRepository repository, ShadowFactory shadowFactory, JaversCoreConfiguration javersCoreConfiguration) {
+        this.queryCompiler = queryCompiler;
+        this.snapshotQueryRunner = snapshotQueryRunner;
         this.repository = repository;
         this.shadowFactory = shadowFactory;
         this.javersCoreConfiguration = javersCoreConfiguration;
     }
 
-    public List<Shadow> queryForShadows(JqlQuery query, List<CdoSnapshot> coreSnapshots) {
+    public List<Shadow> queryForShadows(JqlQuery query) {
+        List<CdoSnapshot> coreSnapshots = queryForCoreSnapshots(query);
+
         final CommitTable commitTable =
                 new CommitTable(coreSnapshots, query.getMaxGapsToFill(), query, javersCoreConfiguration.getCommitIdGenerator());
 
@@ -50,7 +56,19 @@ public class ShadowQueryRunner {
                 .map(r -> shadowFactory.createShadow(r.root, r.context, (cm, targetId) -> commitTable.findLatestTo(cm, targetId)))
                 .collect(toList());
 
+        query.stats().stop();
+        logger.debug("queryForShadows executed: {}", query);
         return shadows;
+    }
+
+    private List<CdoSnapshot> queryForCoreSnapshots(JqlQuery query) {
+        queryCompiler.compile(query);
+        query.aggregateIfEntityQuery();
+
+        List<CdoSnapshot> snapshots = snapshotQueryRunner.queryForSnapshots(query);
+        query.stats().logShallowQuery(snapshots);
+
+        return snapshots;
     }
 
     private static class ShadowRoot {
@@ -246,7 +264,7 @@ public class ShadowQueryRunner {
             return Stream.concat(valueObjects.values().stream(), entities.values().stream());
         }
 
-        //TODO not needed for Streams
+        //TODO not needed for Streams?
         Set<GlobalId> getMissingParents() {
             Set<GlobalId> result = valueObjects.keySet().stream()
                     .map(voId -> voId.getOwnerId())

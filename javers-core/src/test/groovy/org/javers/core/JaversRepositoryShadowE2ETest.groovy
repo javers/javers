@@ -18,7 +18,7 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
 class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
     @Unroll
-    def "should allow paging for Entities with Value Objects when querying by #queryType"(){
+    def "should return Shadows Stream for paging Entities with Value Objects when querying by #queryType"(){
         given:
         def e = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(street: "some"))
 

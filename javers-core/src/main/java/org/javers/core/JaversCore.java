@@ -23,6 +23,7 @@ import org.javers.core.metamodel.type.*;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
+import org.javers.repository.jql.JqlStreamQuery;
 import org.javers.repository.jql.QueryRunner;
 import org.javers.shadow.Shadow;
 import org.slf4j.Logger;
@@ -150,8 +151,8 @@ class JaversCore implements Javers {
     }
 
     @Override
-    public <T> Stream<Shadow<T>> findShadowsAndStream(JqlQuery query) {
-        return null;
+    public <T> Stream<Shadow<T>> findShadowsAndStream(JqlStreamQuery query) {
+        return (Stream)queryRunner.queryForShadowsStream(query);
     }
 
     @Override

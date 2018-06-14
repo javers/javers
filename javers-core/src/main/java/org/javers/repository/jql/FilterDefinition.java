@@ -26,6 +26,10 @@ abstract class FilterDefinition {
         Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
             return new IdFilter(globalIdFactory.createFromDto(globalIdDTO));
         }
+
+        boolean isInstanceIdFilter() {
+            return globalIdDTO instanceof InstanceIdDTO;
+        }
     }
 
     static class IdAndTypeNameFilterDefinition extends FilterDefinition {
