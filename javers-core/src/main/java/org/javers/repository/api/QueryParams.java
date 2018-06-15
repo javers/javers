@@ -53,6 +53,12 @@ public class QueryParams {
                 newAggregate, newObjectChanges, changedProperty, toCommitId, snapshotType);
     }
 
+    public QueryParams nextPage() {
+        return new QueryParams(
+                limit, skip+limit, from, to, commitIds, version, author, commitProperties,
+                aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType);
+    }
+
     /**
      * @see QueryBuilder#limit(int)
      */

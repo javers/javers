@@ -266,6 +266,8 @@ public class QueryBuilder {
     }
 
     /**
+     * //TODO not for Streams !!
+     *
      * Limits number of snapshots to be fetched from JaversRepository, default is 100.
      * <br/><br/>
      *

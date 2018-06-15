@@ -41,9 +41,65 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
       shadows[1].intProperty == 1
     }
 
+    def "should return Stream which is lazily populated by subsequent Shadow queries"(){
+        given:
+        def entity = new SnapshotEntity(id: 1, intProperty: 0)
+        20.times {
+            entity.intProperty = it
+            javers.commit("a", entity)
+        }
+
+        when:
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).limit(5).build()
+        def shadows = javers.findShadowsAndStream(query)
+                .limit(12)
+                .collect(Collectors.toList())
+
+        then:
+        shadows.size() == 12
+        12.times {
+            assert shadows[it].commitMetadata.id.majorId == 20-it
+            assert shadows[it].get().id == 1
+            assert shadows[it].get().intProperty == 19-it
+        }
+
+        query.stats().dbQueriesCount == 1
+        query.stats().allSnapshotsCount == 5
+        query.stats().shallowSnapshotsCount == 5
+
+        query.streamStats().jqlQueriesCount == 3
+        query.streamStats().dbQueriesCount == 3
+        query.streamStats().allSnapshotsCount == 15
+        query.streamStats().shallowSnapshotsCount == 15
+    }
+
+    def "should terminate Stream when there is no more Shadows"(){
+        given:
+        def entity = new SnapshotEntity(id: 1, intProperty: 0)
+        20.times {
+            entity.intProperty = it
+            javers.commit("a", entity)
+        }
+
+        when:
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).limit(5).build()
+        def shadows = javers.findShadowsAndStream(query)
+                .collect(Collectors.toList())
+
+        then:
+        shadows.size() == 20
+
+        query.stats().dbQueriesCount == 1
+        query.stats().allSnapshotsCount == 5
+
+        query.streamStats().jqlQueriesCount == 5
+        query.streamStats().dbQueriesCount == 5
+        query.streamStats().allSnapshotsCount == 20
+    }
+
     def "should not allow for setting skip in Stream query"(){
       when:
-      def q = byInstanceId(1, SnapshotEntity).skip(5).buildStreamQuery()
+      javers.findShadowsAndStream(byInstanceId(1, SnapshotEntity).skip(5).build())
 
       then:
       JaversException e = thrown()
