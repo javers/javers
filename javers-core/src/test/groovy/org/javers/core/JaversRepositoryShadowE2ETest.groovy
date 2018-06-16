@@ -20,6 +20,8 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
+    //should reuse commit table in Stream queries
+
     def "should run basic Stream query - Entity Shadows byInstanceId() in SHALLOW scope"(){
       given:
       def entity = new SnapshotEntity(id: 1, intProperty: 1)
@@ -116,35 +118,45 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
             if (it % 2 == 0) {
                 e.valueObjectRef.street = "some "+ it
             }
-            println ("commit: e.intProperty:" + e.intProperty)
-            println ("        e.valueObjectRef.street:" + e.valueObjectRef.street)
+            //println ("commit: e.intProperty:" + e.intProperty)
+            //println ("        e.valueObjectRef.street:" + e.valueObjectRef.street)
             javers.commit("a", e)
         }
 
         when:
-        def shadows = javers.findShadows(query)
+        def shadows = javers.findShadowsAndStream(query)
+                .skip(5)
+                .limit(5)
+                .collect(Collectors.toList())
+                .collect{it.get()}
 
         then:
-        shadows[0].get().intProperty == 9
-        shadows[0].get().valueObjectRef.street == "some 8"
+        shadows.size() == 5
+        shadows[0].intProperty == 9
+        shadows[0].valueObjectRef.street == "some 8"
 
-        shadows[1].get().intProperty == 8
-        shadows[1].get().valueObjectRef.street == "some 8"
+        shadows[1].intProperty == 8
+        shadows[1].valueObjectRef.street == "some 8"
 
-        shadows[2].get().intProperty == 7
-        shadows[2].get().valueObjectRef.street == "some 6"
+        shadows[2].intProperty == 7
+        shadows[2].valueObjectRef.street == "some 6"
 
-        shadows[3].get().intProperty == 6
-        shadows[3].get().valueObjectRef.street == "some 6"
+        shadows[3].intProperty == 6
+        shadows[3].valueObjectRef.street == "some 6"
 
-        shadows[4].get().intProperty == 5
-        shadows[4].get().valueObjectRef.street == "some 4"
+        shadows[4].intProperty == 5
+        shadows[4].valueObjectRef.street == "some 4"
+
+        //should reuse commit table in Stream queries
+
+        query.stats().dbQueriesCount == 1
+        query.streamStats().jqlQueriesCount == 1
 
         where:
         queryType << ["InstanceId", "Class"]
         query     << [
-                byInstanceId(1, SnapshotEntity).limit(50).skip(5).build(),
-                byClass(SnapshotEntity).limit(50).skip(5).build()]
+                byInstanceId(1, SnapshotEntity).build(),
+                byClass(SnapshotEntity).build()]
     }
 
     def "should return nothing when querying with non-existing commitId"() {
