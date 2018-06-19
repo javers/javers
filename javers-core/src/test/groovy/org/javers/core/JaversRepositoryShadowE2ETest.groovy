@@ -20,8 +20,6 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
 
-    //should reuse commit table in Stream queries
-
     def "should run basic Stream query - Entity Shadows byInstanceId() in SHALLOW scope"(){
       given:
       def entity = new SnapshotEntity(id: 1, intProperty: 1)
@@ -60,7 +58,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         then:
         shadows.size() == 12
         12.times {
-            assert shadows[it].commitMetadata.id.majorId == 20-it
+            assert commitSeq(shadows[it].commitMetadata) == 20-it
             assert shadows[it].get().id == 1
             assert shadows[it].get().intProperty == 19-it
         }
@@ -106,6 +104,37 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
       then:
       JaversException e = thrown()
       e.code == JaversExceptionCode.MALFORMED_JQL
+    }
+
+    def "should reuse references loaded in previous Stream queries"() {
+        given:
+        def ref = new SnapshotEntity(id: 2,)
+        javers.commit("a", ref)
+
+        def e = new SnapshotEntity(id: 1, entityRef: ref )
+        15.times {
+            e.intProperty = it
+            javers.commit("a", e)
+        }
+
+        when:
+        def query = byInstanceId(1, SnapshotEntity).limit(5).withScopeDeepPlus(1).build()
+        def shadows = javers.findShadowsAndStream(query)
+                .collect(Collectors.toList())
+                .collect{it.get()}
+
+        then:
+        shadows.size() == 15
+        shadows[0].intProperty == 14
+        shadows[14].intProperty == 0
+
+        shadows.each {
+            assert it.entityRef.id == 2
+        }
+
+        query.streamStats().jqlQueriesCount == 4
+        query.streamStats().dbQueriesCount == 5
+        query.streamStats().deepPlusGapsFilled == 1
     }
 
     @Unroll

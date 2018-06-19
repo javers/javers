@@ -1,8 +1,10 @@
 package org.javers.repository.jql;
 
+import org.javers.common.collections.Pair;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.shadow.Shadow;
 
 import java.util.*;
@@ -37,6 +39,7 @@ class ShadowStreamQueryRunner {
     class StreamQuery {
         private JqlQuery awaitingQuery;
         private final List<JqlQuery> queries = new ArrayList<>();
+        private final List<CdoSnapshot> filledGapsSnapshots = new ArrayList<>();
 
         StreamQuery(JqlQuery initialQuery) {
             Validate.argumentIsNotNull(initialQuery);
@@ -45,13 +48,17 @@ class ShadowStreamQueryRunner {
 
         List<Shadow> loadNextPage() {
             JqlQuery currentQuery = awaitingQuery;
-            List<Shadow> result = shadowQueryRunner.queryForShadows(currentQuery);
+
+            Pair<List<Shadow>, List<CdoSnapshot>> result =
+                    shadowQueryRunner.queryForShadows(currentQuery, filledGapsSnapshots);
+
             queries.add(currentQuery);
-            queries.get(0).appendNextStats(currentQuery.stats());
+            queries.get(0).appendNextStatsForStream(currentQuery.stats());
+            filledGapsSnapshots.addAll(result.right());
 
             awaitingQuery = currentQuery.nextQueryForStream();
 
-            return result;
+            return result.left();
         }
 
         Iterator<Shadow> lazyIterator() {

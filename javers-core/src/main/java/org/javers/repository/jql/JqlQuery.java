@@ -53,7 +53,7 @@ public class JqlQuery {
         return new JqlQuery(filterDefinition, queryParams.nextPage(), shadowScopeDef);
     }
 
-    void appendNextStats(Stats nextStats) {
+    void appendNextStatsForStream(Stats nextStats) {
         streamStats.add(nextStats);
     }
 
@@ -173,7 +173,8 @@ public class JqlQuery {
     }
 
     /**
-     * Stream execution statistics. Available only when using {@link Javers#findShadowsAndStream(JqlQuery)}
+     * Stream queries execution statistics.
+     * Available only when using {@link Javers#findShadowsAndStream(JqlQuery)}
      */
     public StreamStats streamStats() {
         return new StreamStats(streamStats);
@@ -193,7 +194,7 @@ public class JqlQuery {
 
         void logQueryInChildValueObjectScope(GlobalId reference, CommitId context, int snapshotsLoaded) {
             validateChange();
-            logger.debug("CHILD_VALUE_OBJECT query for '{}' at commitId {}, {} snapshot(s) loaded",
+            logger.debug("CHILD_VALUE_OBJECT query for '{}' at timepointCommitId {}, {} snapshot(s) loaded",
                     reference.toString(),
                     context.value(),
                     snapshotsLoaded);
@@ -219,7 +220,7 @@ public class JqlQuery {
             deepPlusSnapshotsCount += snapshotsLoaded;
             deepPlusGapsFilled++;
 
-            logger.debug("DEEP_PLUS query for '{}' at commitId {}, {} snapshot(s) loaded, gaps filled so far: {}",
+            logger.debug("DEEP_PLUS query for '{}' at timepointCommitId {}, {} snapshot(s) loaded, gaps filled so far: {}",
                     reference.toString(),
                     context.value(),
                     snapshotsLoaded,

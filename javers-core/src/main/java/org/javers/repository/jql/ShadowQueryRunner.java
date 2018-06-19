@@ -1,6 +1,8 @@
 package org.javers.repository.jql;
 
+import com.google.common.collect.Streams;
 import org.javers.common.collections.Consumer;
+import org.javers.common.collections.Pair;
 import org.javers.common.validation.Validate;
 import org.javers.core.CommitIdGenerator;
 import org.javers.core.JaversCoreConfiguration;
@@ -42,23 +44,32 @@ class ShadowQueryRunner {
         this.javersCoreConfiguration = javersCoreConfiguration;
     }
 
-    public List<Shadow> queryForShadows(JqlQuery query) {
+    List<Shadow> queryForShadows(JqlQuery query) {
+        return queryForShadows(query, Collections.emptyList()).left();
+    }
+
+    Pair<List<Shadow>, List<CdoSnapshot>> queryForShadows(JqlQuery query, List<CdoSnapshot> gapsFilledInPreviousQuery) {
         List<CdoSnapshot> coreSnapshots = queryForCoreSnapshots(query);
 
-        final CommitTable commitTable =
-                new CommitTable(coreSnapshots, query.getMaxGapsToFill(), query, javersCoreConfiguration.getCommitIdGenerator());
+        CommitTable commitTable = new CommitTable(
+                coreSnapshots,
+                query.getMaxGapsToFill(),
+                query);
+
+        commitTable.appendSnapshots(gapsFilledInPreviousQuery);
 
         if (query.getShadowScope().isCommitDeep()) {
             commitTable.loadFullCommits();
         }
 
         List<Shadow> shadows = commitTable.rootsForQuery(query).stream()
-                .map(r -> shadowFactory.createShadow(r.root, r.context, (cm, targetId) -> commitTable.findLatestTo(cm, targetId)))
+                .map(r -> shadowFactory.createShadow(r.root, r.context, (cm, targetId) -> commitTable.referenceResolver(cm, targetId)))
                 .collect(toList());
 
         query.stats().stop();
+
         logger.debug("queryForShadows executed: {}", query);
-        return shadows;
+        return new Pair(shadows, commitTable.getFilledGapsSnapshots());
     }
 
     private List<CdoSnapshot> queryForCoreSnapshots(JqlQuery query) {
@@ -86,16 +97,17 @@ class ShadowQueryRunner {
         }
     }
 
-    class CommitTable {
+    private class CommitTable {
         private final int maxGapsToFill;
-        private int filledGaps;
         private final Map<CommitMetadata, CommitEntry> commitsMap;
         private final JqlQuery query;
+        private int filledGapsCount;
+        private final List<CdoSnapshot> filledGapsSnapshots = new ArrayList<>();
 
-        CommitTable(List<CdoSnapshot> coreSnapshots, int maxGapsToFill, JqlQuery query, CommitIdGenerator commitIdGenerator) {
+        CommitTable(List<CdoSnapshot> coreSnapshots, int maxGapsToFill, JqlQuery query) {
             this.maxGapsToFill = maxGapsToFill;
             this.query = query;
-            this.commitsMap = new TreeMap<>(commitIdGenerator.getComparator());
+            this.commitsMap = new TreeMap<>(javersCoreConfiguration.getCommitIdGenerator().getComparator());
             appendSnapshots(coreSnapshots);
         }
 
@@ -126,32 +138,37 @@ class ShadowQueryRunner {
             appendSnapshots(fullCommitsSnapshots);
         }
 
-        CdoSnapshot findLatestTo(CommitMetadata rootContext, GlobalId targetId) {
+        CdoSnapshot referenceResolver(CommitMetadata rootContext, GlobalId targetId) {
+            SnapshotReference reference = new SnapshotReference(rootContext, targetId);
 
             if (!commitsMap.containsKey(rootContext)) {
                 return null;
             }
 
-            CdoSnapshot latest = findLatestToInCommitTable(rootContext.getId(), targetId);
+            CdoSnapshot latest = findLatestToInCommitTable(reference);
             if (latest == null) {
-                appendSnapshots(fillGapFromRepository(new ReferenceKey(rootContext, targetId), 15));
+                appendSnapshots(fillGapFromRepository(reference, 15));
             }
 
-            latest = findLatestToInCommitTable(rootContext.getId(), targetId);
+            latest = findLatestToInCommitTable(reference);
             if (latest == null){
                 query.stats().logMaxGapsToFillExceededInfo(targetId);
             }
             return latest;
         }
 
-        private CdoSnapshot findLatestToInCommitTable(CommitId rootContext, GlobalId targetId) {
+        List<CdoSnapshot> getFilledGapsSnapshots() {
+            return filledGapsSnapshots;
+        }
+
+        private CdoSnapshot findLatestToInCommitTable(SnapshotReference reference) {
             final List<CdoSnapshot> found = new ArrayList<>();
 
             iterateUntil(ce -> {
-                if (ce.getAny(targetId) != null) {
-                    found.add(ce.getAny(targetId));
+                if (ce.getAny(reference.targetId()) != null) {
+                    found.add(ce.getAny(reference.targetId()));
                 }
-            }, rootContext);
+            }, reference.timepointCommitId());
 
             if (found.size() == 0) {
                 return null;
@@ -160,35 +177,37 @@ class ShadowQueryRunner {
             }
         }
 
-        private boolean isInChildValueObjectScope(ReferenceKey referenceKey) {
+        private boolean isInChildValueObjectScope(SnapshotReference snapshotReference) {
             //TODO
-            return query.isAggregate() && referenceKey.targetId instanceof ValueObjectId;
+            return query.isAggregate() && snapshotReference.targetId() instanceof ValueObjectId;
         }
 
-        List<CdoSnapshot> fillGapFromRepository(ReferenceKey referenceKey, int limit) {
-            if (filledGaps >= maxGapsToFill && !isInChildValueObjectScope(referenceKey)) {
+        List<CdoSnapshot> fillGapFromRepository(SnapshotReference snapshotReference, int limit) {
+            if (filledGapsCount >= maxGapsToFill && !isInChildValueObjectScope(snapshotReference)) {
                 return Collections.emptyList();
             }
 
             List<CdoSnapshot> historicals;
-            if (isInChildValueObjectScope(referenceKey)) {
-                historicals = getHistoricals(referenceKey.targetId, referenceKey, false, limit);
-                query.stats().logQueryInChildValueObjectScope(referenceKey.targetId, referenceKey.commit.getId(), historicals.size());
+            if (isInChildValueObjectScope(snapshotReference)) {
+                historicals = getHistoricals(snapshotReference.targetId(), snapshotReference, false, limit);
+                query.stats().logQueryInChildValueObjectScope(snapshotReference.targetId(), snapshotReference.timepointCommitId(), historicals.size());
             }
             else {
-                historicals = getHistoricals(referenceKey.targetId, referenceKey, query.isAggregate(), limit);
-                query.stats().logQueryInDeepPlusScope(referenceKey.targetId, referenceKey.commit.getId(), historicals.size());
+                historicals = getHistoricals(snapshotReference.targetId(), snapshotReference, query.isAggregate(), limit);
+                query.stats().logQueryInDeepPlusScope(snapshotReference.targetId(), snapshotReference.timepointCommitId(), historicals.size());
+                //todo save to external cache
             }
 
-            filledGaps++;
+            filledGapsCount++;
+            filledGapsSnapshots.addAll(historicals);
             return historicals;
         }
 
-        private List<CdoSnapshot> getHistoricals(GlobalId globalId, ReferenceKey timePoint, boolean withChildValueObjects, int limit) {
+        private List<CdoSnapshot> getHistoricals(GlobalId globalId, SnapshotReference timePoint, boolean withChildValueObjects, int limit) {
             if (javersCoreConfiguration.getCommitIdGenerator() == CommitIdGenerator.SYNCHRONIZED_SEQUENCE){
-                return repository.getHistoricals(globalId, timePoint.commit.getId(), withChildValueObjects, limit);
+                return repository.getHistoricals(globalId, timePoint.timepointCommitId(), withChildValueObjects, limit);
             }
-            return repository.getHistoricals(globalId, timePoint.commit.getCommitDate(), withChildValueObjects, limit);
+            return repository.getHistoricals(globalId, timePoint.timepoint().getCommitDate(), withChildValueObjects, limit);
         }
 
         void fillMissingParents() {
@@ -206,7 +225,7 @@ class ShadowQueryRunner {
             });
         }
 
-        void appendSnapshots(List<CdoSnapshot> snapshots) {
+        void appendSnapshots(Collection<CdoSnapshot> snapshots) {
             snapshots.forEach(it -> appendSnapshot(it));
         }
 
@@ -280,28 +299,40 @@ class ShadowQueryRunner {
         }
     }
 
-    final static class ReferenceKey {
-        private final CommitMetadata commit;
+    static class SnapshotReference {
+        private final CommitMetadata timepoint;
         private final GlobalId targetId;
 
-        ReferenceKey(CommitMetadata rootContext, GlobalId targetId) {
+        SnapshotReference(CommitMetadata rootContext, GlobalId targetId) {
             Validate.argumentsAreNotNull(rootContext, targetId);
-            this.commit = rootContext;
+            this.timepoint = rootContext;
             this.targetId = targetId;
         }
 
+        CommitMetadata timepoint() {
+            return timepoint;
+        }
+
+        GlobalId targetId() {
+            return targetId;
+        }
+
+        CommitId timepointCommitId() {
+            return timepoint.getId();
+        }
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            ReferenceKey that = (ReferenceKey) o;
-            return Objects.equals(commit.getId(), that.commit.getId()) &&
-                    Objects.equals(targetId, that.targetId);
+            SnapshotReference that = (SnapshotReference) o;
+            return Objects.equals(timepointCommitId(), timepointCommitId()) &&
+                   Objects.equals(targetId, that.targetId);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(commit.getId(), targetId);
+            return Objects.hash(timepointCommitId(), targetId);
         }
     }
+
 }
