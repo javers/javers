@@ -1,11 +1,19 @@
-package org.javers.core
+package org.javers.core.cases
 
+import org.javers.core.JaversBuilder
+import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.clazz.EntityDefinitionBuilder
-import org.javers.core.model.DummyClassWithCyclicReference
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
 
 class IncludedPropertiesTest extends Specification {
+
+    class DummyClassWithCyclicReference {
+        DummyClassWithCyclicReference parent
+
+        @Id
+        String name
+    }
 
     def "Javers should be able to build when a class is configured using ClientsClassConfiguration with includedProperties"() {
         when:
