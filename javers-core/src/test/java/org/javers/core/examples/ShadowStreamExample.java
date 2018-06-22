@@ -28,7 +28,7 @@ public class ShadowStreamExample {
         });
 
         Stream<Shadow<Employee>> shadows = javers.findShadowsAndStream(
-                QueryBuilder.byInstanceId(1, Employee.class).build());
+                QueryBuilder.byInstanceId("Frodo", Employee.class).build());
 
         //then
         Employee employeeV5 =
