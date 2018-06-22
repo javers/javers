@@ -224,7 +224,7 @@ class TypeFactoryTest extends Specification {
         }
     }
 
-    def "should ignore @Transient and @DiffIgnore when @DiffInclude is present and only use includedProperties"() {
+    def "should ignore @Transient and @DiffIgnore when @DiffInclude is present and only use included properties"() {
         when:
         def javersType = typeFactory.infer(EntityWithMixedAnnotations)
 
