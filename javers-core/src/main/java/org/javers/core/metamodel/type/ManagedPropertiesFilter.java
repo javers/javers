@@ -3,6 +3,8 @@ package org.javers.core.metamodel.type;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.metamodel.clazz.PropertiesFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 class ManagedPropertiesFilter {
+    private static final Logger logger = LoggerFactory.getLogger(ManagedPropertiesFilter.class);
     private final Set<JaversProperty> includedProperties;
     private final Set<JaversProperty> ignoredProperties;
 
@@ -19,15 +22,15 @@ class ManagedPropertiesFilter {
     }
 
     ManagedPropertiesFilter(Class<?> baseJavaClass, List<JaversProperty> allSourceProperties, PropertiesFilter propertiesFilter) {
-
         this.includedProperties = filter(allSourceProperties, propertiesFilter.getIncludedProperties(), baseJavaClass);
         this.includedProperties.addAll(allSourceProperties.stream().filter(p -> p.isHasIncludedAnn()).collect(Collectors.toSet()));
 
-        this.ignoredProperties = filter(allSourceProperties, propertiesFilter.getIgnoredProperties(), baseJavaClass);
-        this.ignoredProperties.addAll(allSourceProperties.stream().filter(p -> p.hasTransientAnn()).collect(Collectors.toSet()));
-
-        if (this.ignoredProperties.size() > 0  && this.includedProperties.size() > 0) {
-            throw new JaversException(JaversExceptionCode.IGNORED_AND_INCLUDED_PROPERTIES_MIX, baseJavaClass.getSimpleName());
+        if (this.includedProperties.size() > 0) {
+            logger.debug("Included properties have been provided and thus any @Transient or @DiffIgnore annotation will be disregarded for class " + baseJavaClass.getName());
+            this.ignoredProperties = Collections.emptySet();
+        } else {
+            this.ignoredProperties = filter(allSourceProperties, propertiesFilter.getIgnoredProperties(), baseJavaClass);
+            this.ignoredProperties.addAll(allSourceProperties.stream().filter(p -> p.hasTransientAnn()).collect(Collectors.toSet()));
         }
     }
 

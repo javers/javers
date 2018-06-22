@@ -21,6 +21,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import javax.persistence.Id
+import javax.persistence.Transient
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.MappingStyle.BEAN
@@ -204,6 +205,8 @@ class TypeFactoryTest extends Specification {
         String includedField
         @DiffIgnore
         String ignoredField
+        @Transient
+        String transientField;
 
         @DiffInclude
         String getIncludedField() {
@@ -214,15 +217,20 @@ class TypeFactoryTest extends Specification {
         String getIgnoredField() {
             return ignoredField
         }
+
+        @Transient
+        String getTransientField() {
+            return transientField;
+        }
     }
 
-    def "should throw JaversException when ignored and included properties are mixed"() {
+    def "should ignore @Transient and @DiffIgnore when @DiffInclude is present and only use included properties"() {
         when:
-        typeFactory.infer(EntityWithMixedAnnotations)
+        def javersType = typeFactory.infer(EntityWithMixedAnnotations)
 
         then:
-        JaversException exception = thrown()
-        exception.code == JaversExceptionCode.IGNORED_AND_INCLUDED_PROPERTIES_MIX
+        !((ManagedType)javersType).getManagedClass().getManagedPropertiesFilter().hasIgnoredProperties()
+        ((ManagedType)javersType).getPropertyNames().toArray() == ["includedField"]
     }
 
     class PropsClass {
