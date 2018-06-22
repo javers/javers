@@ -1,6 +1,7 @@
 package org.javers.shadow;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.repository.api.JaversRepository;
 
@@ -30,6 +31,10 @@ public class Shadow<T> {
 
     public CommitMetadata getCommitMetadata() {
         return commitMetadata;
+    }
+
+    public CommitId getCommitId() {
+        return commitMetadata.getId();
     }
 
     /**

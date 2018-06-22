@@ -47,10 +47,16 @@ public class QueryParams {
         this.snapshotType = snapshotType;
     }
 
-    public static QueryParams forShadowQuery(QueryParams q) {
+    public QueryParams changeAggregate(boolean newAggregate) {
         return new QueryParams(
-            q.limit, q.skip, q.from, q.to, q.commitIds, q.version, q.author, q.commitProperties,
-            true, q.newObjectChanges, q.changedProperty, q.toCommitId, q.snapshotType);
+                limit, skip, from, to, commitIds, version, author, commitProperties,
+                newAggregate, newObjectChanges, changedProperty, toCommitId, snapshotType);
+    }
+
+    public QueryParams nextPage() {
+        return new QueryParams(
+                limit, skip+limit, from, to, commitIds, version, author, commitProperties,
+                aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType);
     }
 
     /**

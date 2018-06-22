@@ -1,9 +1,5 @@
 package org.javers.core;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import com.google.gson.Gson;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.changelog.ChangeListTraverser;
@@ -29,10 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static org.javers.common.exception.JaversExceptionCode.COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -146,6 +141,11 @@ class JaversCore implements Javers {
     @Override
     public <T> List<Shadow<T>> findShadows(JqlQuery query) {
         return (List)queryRunner.queryForShadows(query);
+    }
+
+    @Override
+    public <T> Stream<Shadow<T>> findShadowsAndStream(JqlQuery query) {
+        return (Stream)queryRunner.queryForShadowsStream(query);
     }
 
     @Override

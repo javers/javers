@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 
 /**
@@ -321,13 +322,33 @@ public interface Javers {
      *
      * Execution stats are also available in {@link JqlQuery#stats()}.
      *
-     * @return A list ordered in reverse chronological order. Empty if nothing found.
+     * @return A list of Shadows, ordered in reverse chronological order. Empty if nothing found.
+     *         Remember that {@link QueryBuilder#limit(int)}
+     *         limits the number of Snapshots loaded in the base query
+     *         and not the number of returned Shadows
+     *         (one Shadow can be reconstructed from many Snapshots).
+     *         The only correct way for paging Shadows is {@link #findShadowsAndStream(JqlQuery)}
+     *         with {@link Stream#skip(long)} and {@link Stream#limit(long)}.
      * @param <T> type of a domain object
      * @see ShadowScope
      * @see <a href="http://javers.org/documentation/jql-examples/">http://javers.org/documentation/jql-examples</a>
      * @since 3.2
      */
     <T> List<Shadow<T>> findShadows(JqlQuery query);
+
+    /**
+     * Streamed version of {@link #findShadows(JqlQuery)}.
+     * <br/><br/>
+     *
+     * Using {@link Stream#skip(long)} and {@link Stream#limit(long)}
+     * is the only correct way for paging Shadows.
+     *
+     * @return A stream of Shadows, ordered in reverse chronological order. Terminated stream if nothing found.
+     * @param <T> type of a domain object
+     * @see #findShadows(JqlQuery)
+     * @since 3.10
+     */
+    <T> Stream<Shadow<T>> findShadowsAndStream(JqlQuery query);
 
     /**
      * Queries a JaversRepository for change history (diff sequence) of a given class, object or property.<br/>

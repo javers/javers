@@ -7,6 +7,6 @@ dependencies {
 
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testCompile 'com.h2database:h2:1.4.187'
-    testCompile 'org.springframework.security:spring-security-core:4.0.3.RELEASE'
+    testCompile "org.springframework.security:spring-security-core:$springSecurity"
     testCompile "org.spockframework:spock-spring:$spockVersion"
 }

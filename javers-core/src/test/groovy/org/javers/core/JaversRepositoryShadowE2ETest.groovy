@@ -1,5 +1,7 @@
 package org.javers.core
 
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.examples.typeNames.NewEntity
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.examples.typeNames.OldEntity
@@ -7,13 +9,184 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
+import spock.lang.Unroll
 
 import java.time.LocalDate
+import java.util.stream.Collectors
 
 import static org.javers.core.commit.CommitId.valueOf
+import static org.javers.repository.jql.QueryBuilder.byClass
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
+
+    def "should run basic Stream query - Entity Shadows byInstanceId() in SHALLOW scope"(){
+      given:
+      def entity = new SnapshotEntity(id: 1, intProperty: 1)
+      javers.commit("a", entity)
+      entity.intProperty = 2
+      javers.commit("a", entity)
+
+      when:
+      def shadows = javers.findShadowsAndStream(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+                          .collect(Collectors.toList())
+                          .collect{it.get()}
+
+      then:
+      shadows.size() == 2
+      shadows[0].id == 1
+      shadows[0].intProperty == 2
+
+      shadows[1].id == 1
+      shadows[1].intProperty == 1
+    }
+
+    def "should return Stream which is lazily populated by subsequent Shadow queries"(){
+        given:
+        def entity = new SnapshotEntity(id: 1, intProperty: 0)
+        20.times {
+            entity.intProperty = it
+            javers.commit("a", entity)
+        }
+
+        when:
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).limit(5).build()
+        def shadows = javers.findShadowsAndStream(query)
+                .limit(12)
+                .collect(Collectors.toList())
+
+        then:
+        shadows.size() == 12
+        12.times {
+            assert commitSeq(shadows[it].commitMetadata) == 20-it
+            assert shadows[it].get().id == 1
+            assert shadows[it].get().intProperty == 19-it
+        }
+
+        query.stats().dbQueriesCount == 1
+        query.stats().allSnapshotsCount == 5
+        query.stats().shallowSnapshotsCount == 5
+
+        query.streamStats().jqlQueriesCount == 3
+        query.streamStats().dbQueriesCount == 3
+        query.streamStats().allSnapshotsCount == 15
+        query.streamStats().shallowSnapshotsCount == 15
+    }
+
+    def "should terminate Stream when there is no more Shadows"(){
+        given:
+        def entity = new SnapshotEntity(id: 1, intProperty: 0)
+        20.times {
+            entity.intProperty = it
+            javers.commit("a", entity)
+        }
+
+        when:
+        def query = QueryBuilder.byInstanceId(1, SnapshotEntity).limit(5).build()
+        def shadows = javers.findShadowsAndStream(query)
+                .collect(Collectors.toList())
+
+        then:
+        shadows.size() == 20
+
+        query.stats().dbQueriesCount == 1
+        query.stats().allSnapshotsCount == 5
+
+        query.streamStats().jqlQueriesCount == 5
+        query.streamStats().dbQueriesCount == 5
+        query.streamStats().allSnapshotsCount == 20
+    }
+
+    def "should not allow for setting skip in Stream query"(){
+      when:
+      javers.findShadowsAndStream(byInstanceId(1, SnapshotEntity).skip(5).build())
+
+      then:
+      JaversException e = thrown()
+      e.code == JaversExceptionCode.MALFORMED_JQL
+    }
+
+    def "should reuse references loaded in previous Stream queries"() {
+        given:
+        def ref = new SnapshotEntity(id: 2,)
+        javers.commit("a", ref)
+
+        def e = new SnapshotEntity(id: 1, entityRef: ref )
+        15.times {
+            e.intProperty = it
+            javers.commit("a", e)
+        }
+
+        when:
+        def query = byInstanceId(1, SnapshotEntity).limit(5).withScopeDeepPlus(1).build()
+        def shadows = javers.findShadowsAndStream(query)
+                .collect(Collectors.toList())
+                .collect{it.get()}
+
+        then:
+        shadows.size() == 15
+        shadows[0].intProperty == 14
+        shadows[14].intProperty == 0
+
+        shadows.each {
+            assert it.entityRef.id == 2
+        }
+
+        query.streamStats().jqlQueriesCount == 4
+        query.streamStats().dbQueriesCount == 5
+        query.streamStats().deepPlusGapsFilled == 1
+    }
+
+    @Unroll
+    def "should return Shadows Stream for paging Entities with Value Objects when querying by #queryType"(){
+        given:
+        def e = new SnapshotEntity(id: 1, valueObjectRef: new DummyAddress(street: "some"))
+
+        15.times {
+            e.intProperty = it
+            if (it % 2 == 0) {
+                e.valueObjectRef.street = "some "+ it
+            }
+            //println ("commit: e.intProperty:" + e.intProperty)
+            //println ("        e.valueObjectRef.street:" + e.valueObjectRef.street)
+            javers.commit("a", e)
+        }
+
+        when:
+        def shadows = javers.findShadowsAndStream(query)
+                .skip(5)
+                .limit(5)
+                .collect(Collectors.toList())
+                .collect{it.get()}
+
+        then:
+        shadows.size() == 5
+        shadows[0].intProperty == 9
+        shadows[0].valueObjectRef.street == "some 8"
+
+        shadows[1].intProperty == 8
+        shadows[1].valueObjectRef.street == "some 8"
+
+        shadows[2].intProperty == 7
+        shadows[2].valueObjectRef.street == "some 6"
+
+        shadows[3].intProperty == 6
+        shadows[3].valueObjectRef.street == "some 6"
+
+        shadows[4].intProperty == 5
+        shadows[4].valueObjectRef.street == "some 4"
+
+        //should reuse commit table in Stream queries
+
+        query.stats().dbQueriesCount == 1
+        query.streamStats().jqlQueriesCount == 1
+
+        where:
+        queryType << ["InstanceId", "Class"]
+        query     << [
+                byInstanceId(1, SnapshotEntity).build(),
+                byClass(SnapshotEntity).build()]
+    }
 
     def "should return nothing when querying with non-existing commitId"() {
         given:
@@ -100,7 +273,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         shadows[2].networkAddress.address == "a"
     }
 
-    def "should query for Shadows of Entity in SHALLOW scope"() {
+    def "should query for Entity Shadows byInstanceId() in SHALLOW scope"() {
         given:
         def entity = new SnapshotEntity(id: 1, intProperty: 1)
         javers.commit("a", entity)
@@ -124,7 +297,7 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
         shadows[1].get().intProperty == 1
     }
 
-    def "should query for all Entity Shadows in SHALLOW scope"() {
+    def "should query for Entity Shadows byClass() in SHALLOW scope"() {
         given:
         javers.commit("a", new SnapshotEntity(id: 1))
         javers.commit("a", new SnapshotEntity(id: 2))

@@ -1,7 +1,5 @@
 package org.javers.spring.jpa;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.Changes;
 import org.javers.core.Javers;
@@ -16,8 +14,8 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.JqlQuery;
-import org.javers.shadow.Shadow;
 import org.javers.repository.sql.JaversSqlRepository;
+import org.javers.shadow.Shadow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -27,9 +25,12 @@ import org.springframework.transaction.support.*;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Transactional wrapper for core JaVers instance.
@@ -121,6 +122,12 @@ public class JaversTransactionalDecorator implements Javers {
     @Override
     public <T> List<Shadow<T>> findShadows(JqlQuery query) {
         return delegate.findShadows(query);
+    }
+
+    @Transactional
+    @Override
+    public <T> Stream<Shadow<T>> findShadowsAndStream(JqlQuery query) {
+        return delegate.findShadowsAndStream(query);
     }
 
     @Transactional

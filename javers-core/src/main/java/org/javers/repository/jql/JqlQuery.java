@@ -13,9 +13,11 @@ import org.javers.repository.api.QueryParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static org.javers.repository.jql.ShadowScope.DEEP_PLUS;
 
@@ -38,12 +40,21 @@ public class JqlQuery {
     private final ShadowScopeDefinition shadowScopeDef;
     private Filter filter;
     private Stats stats;
+    private List<Stats> streamStats = new ArrayList<>();
 
     JqlQuery(FilterDefinition filter, QueryParams queryParams, ShadowScopeDefinition shadowScope) {
         Validate.argumentsAreNotNull(filter);
         this.queryParams = queryParams;
         this.filterDefinition = filter;
         this.shadowScopeDef = shadowScope;
+    }
+
+    JqlQuery nextQueryForStream() {
+        return new JqlQuery(filterDefinition, queryParams.nextPage(), shadowScopeDef);
+    }
+
+    void appendNextStatsForStream(Stats nextStats) {
+        streamStats.add(nextStats);
     }
 
     void validate(){
@@ -98,15 +109,15 @@ public class JqlQuery {
         return Optional.empty();
     }
 
-    void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper, QueryType queryType) {
-        this.stats = new Stats();
-        this.filter = filterDefinition.compile(globalIdFactory, typeMapper);
-
-        if (queryType == QueryType.SHADOWS &&
-                (isInstanceIdQuery() || isClassQuery())) {
-            queryParams = QueryParams.forShadowQuery(queryParams);
+    void aggregateIfEntityQuery() {
+        if (isInstanceIdQuery() || isClassQuery()) {
+            queryParams = queryParams.changeAggregate(true);
         }
+    }
 
+    void compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
+        stats = new Stats();
+        filter = filterDefinition.compile(globalIdFactory, typeMapper);
         validate();
     }
 
@@ -124,10 +135,6 @@ public class JqlQuery {
 
     boolean isIdQuery(){
         return hasFilter(IdFilter.class);
-    }
-
-    boolean hasChangedPropertyFilter(){
-        return queryParams.changedProperty().isPresent();
     }
 
     boolean isClassQuery() {
@@ -156,13 +163,30 @@ public class JqlQuery {
     }
 
     /**
-     * Shadow query execution statistics. Can be printed by:
+     * Shadow query execution statistics.
+     * <br/><br/>
+     *
+     * Can be printed by:
      * <pre>
      * &lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
      * </pre>
      */
     public Stats stats() {
         return stats;
+    }
+
+    /**
+     * Stream queries execution statistics.<br/>
+     * Available only when using {@link Javers#findShadowsAndStream(JqlQuery)}
+     * <br/><br/>
+     *
+     * Can be printed by:
+     * <pre>
+     * &lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
+     * </pre>
+     */
+    public StreamStats streamStats() {
+        return new StreamStats(streamStats);
     }
 
     public static class Stats {
@@ -179,7 +203,7 @@ public class JqlQuery {
 
         void logQueryInChildValueObjectScope(GlobalId reference, CommitId context, int snapshotsLoaded) {
             validateChange();
-            logger.debug("CHILD_VALUE_OBJECT query for '{}' at commitId {}, {} snapshot(s) loaded",
+            logger.debug("CHILD_VALUE_OBJECT query for '{}' at timepointCommitId {}, {} snapshot(s) loaded",
                     reference.toString(),
                     context.value(),
                     snapshotsLoaded);
@@ -205,7 +229,7 @@ public class JqlQuery {
             deepPlusSnapshotsCount += snapshotsLoaded;
             deepPlusGapsFilled++;
 
-            logger.debug("DEEP_PLUS query for '{}' at commitId {}, {} snapshot(s) loaded, gaps filled so far: {}",
+            logger.debug("DEEP_PLUS query for '{}' at timepointCommitId {}, {} snapshot(s) loaded, gaps filled so far: {}",
                     reference.toString(),
                     context.value(),
                     snapshotsLoaded,
@@ -298,6 +322,59 @@ public class JqlQuery {
             if (endTimestamp > 0) {
                 throw new RuntimeException(new IllegalAccessException("executed query can't be changed"));
             }
+        }
+    }
+
+    class StreamStats {
+        private final List<Stats> jqlQueriesStats;
+
+        StreamStats(List<Stats> jqlQueriesStats) {
+            Validate.argumentCheck(jqlQueriesStats.size() > 0, "empty jqlQueriesStats");
+            this.jqlQueriesStats = jqlQueriesStats;
+        }
+
+        public long getStartTimestamp() {
+            return jqlQueriesStats.get(0).startTimestamp;
+        }
+
+        public long getEndTimestamp() {
+            return jqlQueriesStats.get(jqlQueriesStats.size() - 1).endTimestamp;
+        }
+
+        public int getDbQueriesCount() {
+            return jqlQueriesStats.stream().mapToInt(it -> it.dbQueriesCount).sum();
+        }
+
+        public int getJqlQueriesCount() {
+            return jqlQueriesStats.size();
+        }
+
+        public int getAllSnapshotsCount() {
+            return jqlQueriesStats.stream().mapToInt(it -> it.allSnapshotsCount).sum();
+        }
+
+        public int getShallowSnapshotsCount() {
+            return jqlQueriesStats.stream().mapToInt(it -> it.shallowSnapshotsCount).sum();
+        }
+
+        public int getDeepPlusSnapshotsCount() {
+            return jqlQueriesStats.stream().mapToInt(it -> it.deepPlusSnapshotsCount).sum();
+        }
+
+        public int getCommitDeepSnapshotsCount() {
+            return jqlQueriesStats.stream().mapToInt(it -> it.commitDeepSnapshotsCount).sum();
+        }
+
+        public int getChildVOSnapshotsCount() {
+            return jqlQueriesStats.stream().mapToInt(it -> it.childVOSnapshotsCount).sum();
+        }
+
+        public int getDeepPlusGapsFilled() {
+            return jqlQueriesStats.stream().mapToInt(it -> it.deepPlusGapsFilled).sum();
+        }
+
+        public int getDeepPlusGapsLeft() {
+            return jqlQueriesStats.stream().mapToInt(it -> it.deepPlusGapsLeft).sum();
         }
     }
 }
