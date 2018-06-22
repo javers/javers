@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 import static java.time.LocalTime.MIDNIGHT;
@@ -266,13 +267,11 @@ public class QueryBuilder {
     }
 
     /**
-     * //TODO not for Streams !!
-     *
-     * Limits number of snapshots to be fetched from JaversRepository, default is 100.
+     * Limits number of Snapshots to be fetched from JaversRepository in a single query,
+     * default is 100.
      * <br/><br/>
      *
-     * Always choose reasonable limits to improve performance of your queries,
-     * production database could contain more records than you expect.
+     * Always choose reasonable limits to improve performance of your queries.
      */
     public QueryBuilder limit(int limit) {
         queryParamsBuilder.limit(limit);
@@ -280,8 +279,13 @@ public class QueryBuilder {
     }
 
     /**
-     * Sets the number of snapshots to skip.
-     * Use skip() and limit() for paging.
+     * Sets the number of Snapshots to skip.
+     * Use skip() and limit() for paging Snapshots and Changes.
+     * <br/><br/>
+     *
+     * For paging Shadows use {@link Javers#findShadowsAndStream(JqlQuery)}
+     * with {@link Stream#skip(long)} and {@link Stream#limit(long)}.
+     *  <br/><br/>
      */
     public QueryBuilder skip(int skip) {
         queryParamsBuilder.skip(skip);

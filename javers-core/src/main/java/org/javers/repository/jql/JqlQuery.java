@@ -163,7 +163,10 @@ public class JqlQuery {
     }
 
     /**
-     * Shadow query execution statistics. Can be printed by:
+     * Shadow query execution statistics.
+     * <br/><br/>
+     *
+     * Can be printed by:
      * <pre>
      * &lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
      * </pre>
@@ -173,8 +176,14 @@ public class JqlQuery {
     }
 
     /**
-     * Stream queries execution statistics.
+     * Stream queries execution statistics.<br/>
      * Available only when using {@link Javers#findShadowsAndStream(JqlQuery)}
+     * <br/><br/>
+     *
+     * Can be printed by:
+     * <pre>
+     * &lt;logger name="org.javers.JQL" level="DEBUG"/&gt;
+     * </pre>
      */
     public StreamStats streamStats() {
         return new StreamStats(streamStats);

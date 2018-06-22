@@ -1,6 +1,5 @@
 package org.javers.repository.jql;
 
-import com.google.common.collect.Streams;
 import org.javers.common.collections.Consumer;
 import org.javers.common.collections.Pair;
 import org.javers.common.validation.Validate;
@@ -178,7 +177,6 @@ class ShadowQueryRunner {
         }
 
         private boolean isInChildValueObjectScope(SnapshotReference snapshotReference) {
-            //TODO
             return query.isAggregate() && snapshotReference.targetId() instanceof ValueObjectId;
         }
 
@@ -195,7 +193,6 @@ class ShadowQueryRunner {
             else {
                 historicals = getHistoricals(snapshotReference.targetId(), snapshotReference, query.isAggregate(), limit);
                 query.stats().logQueryInDeepPlusScope(snapshotReference.targetId(), snapshotReference.timepointCommitId(), historicals.size());
-                //todo save to external cache
             }
 
             filledGapsCount++;
@@ -283,7 +280,6 @@ class ShadowQueryRunner {
             return Stream.concat(valueObjects.values().stream(), entities.values().stream());
         }
 
-        //TODO not needed for Streams?
         Set<GlobalId> getMissingParents() {
             Set<GlobalId> result = valueObjects.keySet().stream()
                     .map(voId -> voId.getOwnerId())
