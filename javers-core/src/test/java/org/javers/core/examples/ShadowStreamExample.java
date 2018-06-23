@@ -31,10 +31,9 @@ public class ShadowStreamExample {
                 QueryBuilder.byInstanceId("Frodo", Employee.class).build());
 
         //then
-        Employee employeeV5 =
-                shadows.filter(shadow -> shadow.getCommitId().getMajorId() == 5)
-                       .map(shadow -> shadow.get())
-                       .findFirst().orElse(null);
+        Employee employeeV5 = shadows.filter(shadow -> shadow.getCommitId().getMajorId() == 5)
+               .map(shadow -> shadow.get())
+               .findFirst().orElse(null);
 
         Assertions.assertThat( employeeV5.getSalary() == 5_000 );
     }
