@@ -5,9 +5,7 @@ import org.javers.common.collections.Lists;
 
 import java.util.*;
 
-import org.javers.common.collections.Primitives;
 import org.javers.common.collections.Sets;
-import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -62,10 +60,10 @@ public class ReflectionUtil {
 
     /**
      * Creates new instance of public or package-private class.
-     * Calls first, not-private constructor
      */
     public static Object newInstance(Class clazz, ArgumentResolver resolver){
         Validate.argumentIsNotNull(clazz);
+        JaversException ex = null;
         for (Constructor constructor : clazz.getDeclaredConstructors()) {
             if (isPrivate(constructor) || isProtected(constructor)) {
                 continue;
@@ -73,14 +71,11 @@ public class ReflectionUtil {
 
             Class [] types = constructor.getParameterTypes();
             Object[] params = new Object[types.length];
-            for (int i=0; i<types.length; i++){
-                try {
-                    params[i] = resolver.resolve(types[i]);
-                } catch (JaversException e){
-                    logger.error("failed to create new instance of "+clazz.getName()+", argument resolver for arg["+i+"] " +
-                                 types[i].getName() + " thrown exception: "+e.getMessage());
-                    throw e;
-                }
+            try {
+                resolveConstructorParamTypes(clazz, resolver, types, params);
+            } catch (JaversException e) {
+                ex = e;
+                continue;
             }
             try {
                 constructor.setAccessible(true);
@@ -89,7 +84,20 @@ public class ReflectionUtil {
                 throw new RuntimeException(e);
             }
         }
+        if (ex != null) throw ex;
         throw new JaversException(JaversExceptionCode.NO_PUBLIC_CONSTRUCTOR,clazz.getName());
+    }
+
+    private static void resolveConstructorParamTypes(Class clazz, ArgumentResolver resolver, Class[] types, Object[] params) throws JaversException {
+        for (int i=0; i<types.length; i++){
+            try {
+                params[i] = resolver.resolve(types[i]);
+            } catch (JaversException e){
+                logger.warn("failed to create new instance of "+clazz.getName()+", argument resolver for arg["+i+"] " +
+                             types[i].getName() + " thrown exception: "+e.getMessage());
+                throw e;
+            }
+        }
     }
 
     public static List<JaversField> getAllPersistentFields(Class methodSource) {
