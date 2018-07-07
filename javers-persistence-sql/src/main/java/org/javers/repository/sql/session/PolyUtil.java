@@ -1,4 +1,4 @@
-package org.javers.repository.sql.poly;
+package org.javers.repository.sql.session;
 
 import java.util.Optional;
 import org.polyjdbc.core.PolyJDBC;
@@ -15,21 +15,11 @@ import java.util.List;
  */
 public class PolyUtil {
     public static List<Long> queryForLongList(SelectQuery query, PolyJDBC poly){
-        return poly.queryRunner().queryList(query, new ObjectMapper<Long>() {
-            @Override
-            public Long createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getLong(1);
-            }
-        });
+        return poly.queryRunner().queryList(query, resultSet -> resultSet.getLong(1));
     }
 
-    public static List<BigDecimal> queryForBigDecimalList(SelectQuery query, PolyJDBC poly){
-        return poly.queryRunner().queryList(query, new ObjectMapper<BigDecimal>() {
-            @Override
-            public BigDecimal createObject(ResultSet resultSet) throws SQLException {
-                return resultSet.getBigDecimal(1);
-            }
-        });
+    static List<BigDecimal> queryForBigDecimalList(SelectQuery query, PolyJDBC poly){
+        return poly.queryRunner().queryList(query, resultSet -> resultSet.getBigDecimal(1));
     }
 
     public static Optional<BigDecimal> queryForOptionalBigDecimal(SelectQuery query, PolyJDBC poly){

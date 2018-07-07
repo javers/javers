@@ -2,6 +2,7 @@ package org.javers.repository.sql;
 
 import org.javers.core.AbstractContainerBuilder;
 import org.javers.repository.sql.pico.JaversSqlModule;
+import org.javers.repository.sql.session.SessionFactory;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.PolyJDBCBuilder;
 import org.slf4j.Logger;
@@ -79,7 +80,10 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect(), config.getSchemaName())
                 .usingManagedConnections(() -> connectionProvider.getConnection()).build();
 
+        SessionFactory sessionFactory = new SessionFactory(dialectName, connectionProvider, schemaName);
+
         addComponent(polyJDBC);
+        addComponent(sessionFactory);
 
         addModule(new JaversSqlModule());
 

@@ -4,6 +4,7 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 
@@ -24,17 +25,16 @@ public class CdoSnapshotRepository extends SchemaNameAware {
         this.globalIdRepository = globalIdRepository;
     }
 
-    public void save(long commitIdPk, List<CdoSnapshot> cdoSnapshots) {
-        //TODO add batch insert
+    public void save(long commitIdPk, List<CdoSnapshot> cdoSnapshots, Session session) {
         for (CdoSnapshot cdoSnapshot : cdoSnapshots) {
-            long globalIdPk = globalIdRepository.getOrInsertId(cdoSnapshot.getGlobalId());
+            long globalIdPk = globalIdRepository.getOrInsertId(cdoSnapshot.getGlobalId(), session);
             insertSnapshot(globalIdPk, commitIdPk, cdoSnapshot);
         }
     }
 
     private long insertSnapshot(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot) {
         // TODO HOTSPOT
-        System.out.println("-- insertSnapshot() globalIdPk:" + globalIdPk+ ", commitIdPk:"+commitIdPk);
+        System.out.println("--HOTSPOT-1 insertSnapshot() globalIdPk:" + globalIdPk+ ", commitIdPk:"+commitIdPk);
 
         InsertQuery query = javersPolyJDBC.query().insert().into(getSnapshotTableNameWithSchema())
                 .value(SNAPSHOT_TYPE, cdoSnapshot.getType().toString())

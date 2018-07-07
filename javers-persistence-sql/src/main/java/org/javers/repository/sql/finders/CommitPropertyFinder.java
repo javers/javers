@@ -30,21 +30,16 @@ public class CommitPropertyFinder {
         }
 
         //TODO HOTSPOT
-        System.out.println("-- findCommitPropertiesOfSnaphots("+commitPKs+") ");
+        System.out.println("--HOTSPOT-3- findCommitPropertiesOfSnaphots("+commitPKs+") ");
 
         SelectQuery query = polyJDBC.query()
             .select(COMMIT_PROPERTY_COMMIT_FK + ", " + COMMIT_PROPERTY_NAME + ", " + COMMIT_PROPERTY_VALUE)
             .from(tableNameProvider.getCommitPropertyTableNameWithSchema())
             .where(COMMIT_PROPERTY_COMMIT_FK + " in (" + Joiner.on(",").join(commitPKs) + ")");
-        return polyJDBC.queryRunner().queryList(query, new ObjectMapper<CommitPropertyDTO>() {
-            @Override
-            public CommitPropertyDTO createObject(ResultSet resultSet) throws SQLException {
-                return new CommitPropertyDTO(
-                    resultSet.getLong(COMMIT_PROPERTY_COMMIT_FK),
-                    resultSet.getString(COMMIT_PROPERTY_NAME),
-                    resultSet.getString(COMMIT_PROPERTY_VALUE)
-                );
-            }
-        });
+        return polyJDBC.queryRunner().queryList(query, resultSet -> new CommitPropertyDTO(
+            resultSet.getLong(COMMIT_PROPERTY_COMMIT_FK),
+            resultSet.getString(COMMIT_PROPERTY_NAME),
+            resultSet.getString(COMMIT_PROPERTY_VALUE)
+        ));
     }
 }

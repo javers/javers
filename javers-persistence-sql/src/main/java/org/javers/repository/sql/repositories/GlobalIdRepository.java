@@ -11,11 +11,12 @@ import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.repository.sql.SqlRepositoryConfiguration;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
 
-import static org.javers.repository.sql.poly.PolyUtil.queryForOptionalLong;
+import static org.javers.repository.sql.session.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class GlobalIdRepository extends SchemaNameAware {
@@ -34,9 +35,9 @@ public class GlobalIdRepository extends SchemaNameAware {
         this.disableCache = configuration.isGlobalIdCacheDisabled();
     }
 
-    public long getOrInsertId(GlobalId globalId) {
+    public long getOrInsertId(GlobalId globalId, Session session) {
         Optional<Long> pk = findGlobalIdPk(globalId);
-        return pk.isPresent() ? pk.get() : insert(globalId);
+        return pk.isPresent() ? pk.get() : insert(globalId, session);
     }
 
     public void evictCache() {
@@ -70,6 +71,7 @@ public class GlobalIdRepository extends SchemaNameAware {
     }
 
     private Optional<Long> findGlobalIdPkInDB(GlobalId globalId) {
+        System.out.println("--HOTSPOT-5* findGlobalIdPk " + globalId);
 
         SelectQuery query = polyJdbc.query().select(GLOBAL_ID_PK).from(getGlobalIdTableNameWithSchema());
 
@@ -100,7 +102,7 @@ public class GlobalIdRepository extends SchemaNameAware {
         return queryForOptionalLong(query, polyJdbc);
     }
 
-    private long insert(GlobalId globalId) {
+    private long insert(GlobalId globalId, Session session) {
         InsertQuery query = polyJdbc.query()
             .insert()
             .into(getGlobalIdTableNameWithSchema());
@@ -108,7 +110,7 @@ public class GlobalIdRepository extends SchemaNameAware {
 
         if (globalId instanceof ValueObjectId) {
             ValueObjectId valueObjectId  = (ValueObjectId) globalId;
-            long ownerFk = getOrInsertId(valueObjectId.getOwnerId());
+            long ownerFk = getOrInsertId(valueObjectId.getOwnerId(), session);
             query.value(GLOBAL_ID_FRAGMENT, valueObjectId.getFragment())
                  .value(GLOBAL_ID_OWNER_ID_FK, ownerFk);
         }
@@ -123,6 +125,7 @@ public class GlobalIdRepository extends SchemaNameAware {
 
         query.sequence(GLOBAL_ID_PK, getGlobalIdPkSeqWithSchema());
 
+        //TODO measure
         return polyJdbc.queryRunner().insert(query);
     }
 

@@ -22,7 +22,7 @@ import org.polyjdbc.core.query.SelectQuery;
 
 import java.util.*;
 
-import static org.javers.repository.sql.poly.PolyUtil.queryForOptionalLong;
+import static org.javers.repository.sql.session.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CdoSnapshotFinder {
@@ -97,7 +97,7 @@ public class CdoSnapshotFinder {
     private List<Pair<CdoSnapshotSerialized,Long>> queryForCdoSnapshotDTOs(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams) {
 
         //TODO HOTSPOT
-        System.out.println("-- fetchCdoSnapshots() " + snapshotFilter);
+        System.out.println("--HOTSPOT-2-- fetchCdoSnapshots() " + snapshotFilter);
 
         SelectQuery query =  polyJDBC.query().select(snapshotFilter.select());
         snapshotFilter.addFrom(query);
@@ -110,6 +110,9 @@ public class CdoSnapshotFinder {
     }
 
     private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk) {
+
+        System.out.println("--HOTSPOT-4-- selectMaxSnapshotPrimaryKey() " + globalIdPk);
+
         SelectQuery query = polyJDBC.query()
             .select("MAX(" + SNAPSHOT_PK + ")")
             .from(tableNameProvider.getSnapshotTableNameWithSchema())

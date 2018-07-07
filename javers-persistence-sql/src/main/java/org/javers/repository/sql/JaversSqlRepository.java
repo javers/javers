@@ -17,6 +17,8 @@ import org.javers.repository.sql.repositories.CdoSnapshotRepository;
 import org.javers.repository.sql.repositories.CommitMetadataRepository;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.JaversSchemaManager;
+import org.javers.repository.sql.session.SessionFactory;
+import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.PolyJDBC;
 
 import java.util.Collection;
@@ -26,6 +28,7 @@ import java.util.Set;
 
 public class JaversSqlRepository implements JaversRepository {
 
+    private final SessionFactory sessionFactory;
     private final PolyJDBC polyJDBC;
     private final CommitMetadataRepository commitRepository;
     private final GlobalIdRepository globalIdRepository;
@@ -35,10 +38,16 @@ public class JaversSqlRepository implements JaversRepository {
 
     private final SqlRepositoryConfiguration sqlRepositoryConfiguration;
 
-    public JaversSqlRepository(PolyJDBC polyJDBC, CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository,
-                               CdoSnapshotRepository cdoSnapshotRepository, CdoSnapshotFinder finder, JaversSchemaManager schemaManager,
+    public JaversSqlRepository(SessionFactory sessionFactory,
+                               PolyJDBC polyJDBC,
+                               CommitMetadataRepository commitRepository,
+                               GlobalIdRepository globalIdRepository,
+                               CdoSnapshotRepository cdoSnapshotRepository,
+                               CdoSnapshotFinder finder,
+                               JaversSchemaManager schemaManager,
                                SqlRepositoryConfiguration sqlRepositoryConfiguration) {
         this.polyJDBC = polyJDBC;
+        this.sessionFactory = sessionFactory;
         this.commitRepository = commitRepository;
         this.globalIdRepository = globalIdRepository;
         this.cdoSnapshotRepository = cdoSnapshotRepository;
@@ -64,31 +73,21 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public void persist(Commit commit) {
-        if (commitRepository.isPersisted(commit)) {
+        if (commitRepository.isCommitPersisted(commit)) {
             throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT, commit.getId());
         }
 
         long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getId());
-        cdoSnapshotRepository.save(commitPk, commit.getSnapshots());
+
+        //TODO try with resources
+        try(Session session = sessionFactory.create()) {
+            cdoSnapshotRepository.save(commitPk, commit.getSnapshots(), session);
+        }
     }
 
     @Override
     public CommitId getHeadId() {
         return commitRepository.getCommitHeadId();
-    }
-
-    @Override
-    public void setJsonConverter(JsonConverter jsonConverter) {
-        globalIdRepository.setJsonConverter(jsonConverter);
-        cdoSnapshotRepository.setJsonConverter(jsonConverter);
-        finder.setJsonConverter(jsonConverter);
-    }
-
-    @Override
-    public void ensureSchema() {
-        if(sqlRepositoryConfiguration.isSchemaManagementEnabled()) {
-            schemaManager.ensureSchema();
-        }
     }
 
     @Override
@@ -147,5 +146,20 @@ public class JaversSqlRepository implements JaversRepository {
      */
     public void evictSequenceAllocationCache() {
         polyJDBC.resetKeyGeneratorCache();
+    }
+
+    @Override
+    public void setJsonConverter(JsonConverter jsonConverter) {
+        //TODO centralize to Session?
+        globalIdRepository.setJsonConverter(jsonConverter);
+        cdoSnapshotRepository.setJsonConverter(jsonConverter);
+        finder.setJsonConverter(jsonConverter);
+    }
+
+    @Override
+    public void ensureSchema() {
+        if(sqlRepositoryConfiguration.isSchemaManagementEnabled()) {
+            schemaManager.ensureSchema();
+        }
     }
 }
