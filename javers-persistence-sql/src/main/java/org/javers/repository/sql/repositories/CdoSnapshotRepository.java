@@ -4,13 +4,14 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.session.InsertQuery;
 import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.PolyJDBC;
-import org.polyjdbc.core.query.InsertQuery;
 
 import java.util.List;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import static org.javers.repository.sql.session.Query.ParametersBuilder.parameters;
 
 public class CdoSnapshotRepository extends SchemaNameAware {
 
@@ -28,25 +29,28 @@ public class CdoSnapshotRepository extends SchemaNameAware {
     public void save(long commitIdPk, List<CdoSnapshot> cdoSnapshots, Session session) {
         for (CdoSnapshot cdoSnapshot : cdoSnapshots) {
             long globalIdPk = globalIdRepository.getOrInsertId(cdoSnapshot.getGlobalId(), session);
-            insertSnapshot(globalIdPk, commitIdPk, cdoSnapshot);
+            insertSnapshot(globalIdPk, commitIdPk, cdoSnapshot, session);
         }
     }
 
-    private long insertSnapshot(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot) {
+    private long insertSnapshot(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot, Session session) {
         // TODO HOTSPOT
-        System.out.println("--HOTSPOT-1 insertSnapshot() globalIdPk:" + globalIdPk+ ", commitIdPk:"+commitIdPk);
+        System.out.println("--HOTSPOT->PREPARED insertSnapshot() globalIdPk:" + globalIdPk+ ", commitIdPk:"+commitIdPk);
 
-        InsertQuery query = javersPolyJDBC.query().insert().into(getSnapshotTableNameWithSchema())
-                .value(SNAPSHOT_TYPE, cdoSnapshot.getType().toString())
-                .value(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
-                .value(SNAPSHOT_COMMIT_FK, commitIdPk)
-                .value(SNAPSHOT_VERSION, cdoSnapshot.getVersion())
-                .value(SNAPSHOT_STATE, jsonConverter.toJson(cdoSnapshot.getState()))
-                .value(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChanged()))
-                .value(SNAPSHOT_MANAGED_TYPE, cdoSnapshot.getManagedType().getName())
-                .sequence(SNAPSHOT_PK, getSnapshotTablePkSeqWithSchema());
-
-        return javersPolyJDBC.queryRunner().insert(query);
+        return session.insert(
+                "insert Snapshot",
+                parameters()
+                        .add(SNAPSHOT_TYPE, cdoSnapshot.getType().toString())
+                        .add(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
+                        .add(SNAPSHOT_COMMIT_FK, commitIdPk)
+                        .add(SNAPSHOT_VERSION, cdoSnapshot.getVersion())
+                        .add(SNAPSHOT_STATE, jsonConverter.toJson(cdoSnapshot.getState()))
+                        .add(SNAPSHOT_CHANGED, jsonConverter.toJson(cdoSnapshot.getChanged()))
+                        .add(SNAPSHOT_MANAGED_TYPE, cdoSnapshot.getManagedType().getName())
+                        .build(),
+                getSnapshotTableNameWithSchema(),
+                SNAPSHOT_PK,
+                getSnapshotTablePkSeqWithSchema());
     }
 
     public void setJsonConverter(JsonConverter jsonConverter) {
