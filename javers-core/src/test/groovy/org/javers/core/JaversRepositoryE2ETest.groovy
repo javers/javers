@@ -7,6 +7,7 @@ import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
+import org.javers.core.metamodel.annotation.TypeName
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.repository.api.JaversRepository
@@ -16,6 +17,7 @@ import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import javax.persistence.Id
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -1229,5 +1231,49 @@ class JaversRepositoryE2ETest extends Specification {
       then:
       snapshots.size() == 3
       snapshots.every{it.commitId == firstCommit.id || it.commitId == lastCommit.id}
+    }
+
+
+    @TypeName("C")
+    static class C1 {
+        @Id int id
+        String value
+    }
+
+    @TypeName("C")
+    static class C2 {
+        @Id int id
+        int value
+    }
+
+    @TypeName("C")
+    static class C3 {
+        @Id int id
+        C3 value
+    }
+
+    def "should allow for property type change"(){
+      given:
+      javers.commit("author", new C1(id:1, value: "a"))
+      javers.commit("author", new C2(id:1, value: 1))
+      javers.commit("author", new C3(id:1, value: new C3(id:2)))
+      javers.commit("author", new C1(id:1, value: "a"))
+
+      when:
+      def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, "C").build())
+
+      then:
+      snapshots.size() == 4
+      snapshots[0].getPropertyValue("value") == "a"
+      snapshots[1].getPropertyValue("value").value() == "C/2"
+      snapshots[2].getPropertyValue("value") == 1
+      snapshots[3].getPropertyValue("value") == "a"
+
+      when:
+      def changes = javers.findChanges(QueryBuilder.byInstanceId(1, "C").build())
+
+      then:
+      changes.prettyPrint()
+      changes.size() == 3
     }
 }
