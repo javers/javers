@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.CdoSnapshotState;
 import org.javers.core.metamodel.object.CdoSnapshotStateBuilder;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
@@ -35,14 +35,14 @@ class CdoSnapshotStateDeserializer {
 
         CdoSnapshotStateBuilder builder = cdoSnapshotState();
 
-        for (Property property : managedType.getProperties()) {
+        for (JaversProperty property : managedType.getProperties()) {
             builder.withPropertyValue(property, decodePropertyValue(stateObject, context, property));
         }
 
         return builder.build();
     }
 
-    private Object decodePropertyValue(JsonObject element, JsonDeserializationContext context, Property property) {
+    private Object decodePropertyValue(JsonObject element, JsonDeserializationContext context, JaversProperty property) {
         JsonElement propertyElement = element.get(property.getName());
         Type dehydratedPropertyType = typeMapper.getDehydratedType(property.getGenericType());
         return context.deserialize(propertyElement, dehydratedPropertyType);

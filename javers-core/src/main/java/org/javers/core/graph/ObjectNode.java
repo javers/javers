@@ -48,7 +48,7 @@ public class ObjectNode {
     }
 
     /**
-     * only for properties with return type: ManagedType
+     * returns null if property is not ManagedType
      */
     public GlobalId getReference(Property property){
         Edge edge = getEdge(property); //could be null for snapshots
@@ -58,7 +58,13 @@ public class ObjectNode {
             return ((AbstractSingleEdge)edge).getReference();
         }
         else {
-            return (GlobalId)getPropertyValue(property);
+            Object propertyValue = getPropertyValue(property);
+            if (propertyValue instanceof GlobalId) {
+                return (GlobalId)propertyValue;
+            } else {
+                //when user's class is refactored, a property can have changed type
+                return null;
+            }
         }
     }
 

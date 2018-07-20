@@ -27,7 +27,7 @@ public class RealNodePair implements NodePair {
 
     @Override
     public ManagedType getManagedType() {
-        return left.getManagedType();
+        return right.getManagedType();
     }
 
     @Override

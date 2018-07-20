@@ -43,16 +43,24 @@ class RefactoringExample extends Specification {
         javers.commit('author', new PersonRefactored(id:1, name:'Uncle Bob', city:'London'))
 
         def changes =
-            javers.findChanges( QueryBuilder.byInstanceId(1,PersonRefactored.class).build() )
+            javers.findChanges( QueryBuilder.byInstanceId(1, PersonRefactored.class).build() )
 
-        then: 'one ValueChange is expected'
-        assert changes.size() == 1
-        with(changes[0]){
+        then: 'two ValueChanges are expected'
+        assert changes.size() == 2
+
+        with(changes.find{it.propertyName == "name"}){
             assert left == 'Bob'
             assert right == 'Uncle Bob'
-            assert affectedGlobalId.value() == 'Person/1'
         }
-        println changes[0]
+
+        with(changes.find{it.propertyName == "city"}){
+            assert left == null
+            assert right == 'London'
+        }
+
+        changes.each { assert it.affectedGlobalId.value() == 'Person/1' }
+
+        println changes.prettyPrint()
     }
 
     @TypeName("org.javers.core.examples.PersonSimple")

@@ -14,7 +14,7 @@ class LiveCdoWrapper extends LiveCdo {
         super(globalId, managedType);
 
         argumentIsNotNull(wrappedCdo);
-        argumentCheck(managedType.isInstance(wrappedCdo), "wrappedCdo is not an instance of given managedClass");
+        argumentCheck(managedType.isInstance(wrappedCdo), "wrappedCdo is not an instance of given managedType '"+managedType.getBaseJavaClass().getSimpleName()+"' but '"+wrappedCdo.getClass().getSimpleName()+"'");
 
         this.wrappedCdo = wrappedCdo;
     }

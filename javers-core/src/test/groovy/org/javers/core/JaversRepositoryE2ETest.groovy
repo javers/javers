@@ -695,14 +695,13 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         changes.size() == 2
-        with(changes.find {it.propertyName == "oldField"}) {
-            assert left == 5
-            assert right == 0 //removed properties are treated as nulls
-        }
-        with(changes.find {it.propertyName == "newField"}) {
-            assert left == 10
-            assert right == 15
-        }
+        changes[0].propertyName == "newField"
+        changes[0].left == 10
+        changes[0].right == 15
+
+        changes[1].propertyName == "newField"
+        changes[1].left == 0  //removed properties are treated as nulls
+        changes[1].right == 10
     }
 
     def "should manage ValueObject class name refactor when querying using new class with @TypeName retrofitted to old class name"(){
@@ -714,9 +713,9 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         changes.size() == 2
-        with(changes.find {it.propertyName == "oldField"}) {
-            assert left == 10
-            assert right == 0 //removed properties are treated as nulls
+        with(changes.find {it.propertyName == "newField"}) {
+            assert left == 0 //removed properties are treated as nulls
+            assert right == 10
         }
         with(changes.find {it.propertyName == "someValue"}) {
             assert left == 5
@@ -1252,12 +1251,16 @@ class JaversRepositoryE2ETest extends Specification {
         C3 value
     }
 
+    @TypeName("C")
+    static class C4 extends C1 {
+    }
+
     def "should allow for property type change"(){
       given:
       javers.commit("author", new C1(id:1, value: "a"))
       javers.commit("author", new C2(id:1, value: 1))
       javers.commit("author", new C3(id:1, value: new C3(id:2)))
-      javers.commit("author", new C1(id:1, value: "a"))
+      javers.commit("author", new C4(id:1, value: "a"))
 
       when:
       def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, "C").build())
@@ -1273,7 +1276,8 @@ class JaversRepositoryE2ETest extends Specification {
       def changes = javers.findChanges(QueryBuilder.byInstanceId(1, "C").build())
 
       then:
-      changes.prettyPrint()
+      println changes.prettyPrint()
       changes.size() == 3
+      changes[0] instanceof ValueChange
     }
 }
