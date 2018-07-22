@@ -133,10 +133,10 @@ class RefactoringExample extends Specification {
       def changes =
           javers.findChanges( QueryBuilder.byValueObjectId(1, Person.class, 'address').build() )
 
-      then: 'three ValueChanges are expected'
-      assert changes.size() == 3
-      assert changes.collect{ it.propertyName }.containsAll( ['street','verified','email'] )
-
       changes.each { println it }
+
+      then: 'four ValueChanges are expected'
+      assert changes.size() == 4
+      assert changes.collect{ it.propertyName } as Set == ['street','verified','city'] as Set
     }
 }

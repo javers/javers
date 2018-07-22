@@ -1246,6 +1246,18 @@ class JaversRepositoryE2ETest extends Specification {
     }
 
     @TypeName("C")
+    static class C21 {
+        @Id int id
+        List<Integer> value
+    }
+
+    @TypeName("C")
+    static class C22 {
+        @Id int id
+        List<String> value
+    }
+
+    @TypeName("C")
     static class C3 {
         @Id int id
         C3 value
@@ -1257,27 +1269,32 @@ class JaversRepositoryE2ETest extends Specification {
 
     def "should allow for property type change"(){
       given:
-      javers.commit("author", new C1(id:1, value: "a"))
-      javers.commit("author", new C2(id:1, value: 1))
-      javers.commit("author", new C3(id:1, value: new C3(id:2)))
-      javers.commit("author", new C4(id:1, value: "a"))
+      javers.commit("author", new C1 (id:1, value: "a"))
+      javers.commit("author", new C2 (id:1, value: 1))
+      javers.commit("author", new C21(id:1, value: [2,1]))
+      javers.commit("author", new C22(id:1, value: ["2","1"]))
+      javers.commit("author", new C3 (id:1, value: new C3(id:2)))
+      javers.commit("author", new C4 (id:1, value: "a"))
 
       when:
       def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, "C").build())
 
       then:
-      snapshots.size() == 4
+      snapshots.size() == 6
+
       snapshots[0].getPropertyValue("value") == "a"
       snapshots[1].getPropertyValue("value").value() == "C/2"
-      snapshots[2].getPropertyValue("value") == 1
-      snapshots[3].getPropertyValue("value") == "a"
+      snapshots[2].getPropertyValue("value") == ["2","1"]
+      snapshots[3].getPropertyValue("value") == [2,1]
+      snapshots[4].getPropertyValue("value") == 1
+      snapshots[5].getPropertyValue("value") == "a"
 
       when:
       def changes = javers.findChanges(QueryBuilder.byInstanceId(1, "C").build())
 
       then:
       println changes.prettyPrint()
-      changes.size() == 3
+      changes.size() == 5
       changes[0] instanceof ValueChange
     }
 }

@@ -6,13 +6,14 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
 import java.util.Currency;
+import java.util.List;
 import java.util.UUID;
 
 /**
  * @author bartosz.walacik
  */
 public class WellKnownValueTypes {
-    private static final Class<?>[] VALUE_TYPES = {
+    private static final List<Class<?>> VALUE_TYPES = Lists.asList(
             BigDecimal.class,
             BigInteger.class,
             ThreadLocal.class,
@@ -22,10 +23,10 @@ public class WellKnownValueTypes {
             URL.class,
             CharSequence.class,
             String.class
-    };
+    );
 
-    public static Class<?>[] getValueTypes() {
-        return VALUE_TYPES;
+    public static List<Class<?>> getValueTypes() {
+        return java.util.Collections.unmodifiableList(VALUE_TYPES);
     }
 
     public static boolean isValueType(Object object) {

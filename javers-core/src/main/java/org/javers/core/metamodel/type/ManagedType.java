@@ -45,6 +45,12 @@ public abstract class ManagedType extends ClassType {
         return managedClass.getProperty(propertyName);
     }
 
+    public Optional<JaversProperty> findProperty(String propertyName) {
+        return managedClass.hasProperty(propertyName) ?
+                Optional.of(managedClass.getProperty(propertyName)) :
+                Optional.empty();
+    }
+
     public List<JaversProperty> getProperties(Predicate<JaversProperty> query) {
         return managedClass.getManagedProperties(query);
     }

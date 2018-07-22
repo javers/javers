@@ -239,7 +239,7 @@ public class ReflectionUtil {
         }
     }
 
-    public static boolean isAssignableFromAny(Class clazz, Class<?>[] assignableFrom) {
+    public static boolean isAssignableFromAny(Class clazz, List<Class<?>> assignableFrom) {
         for (Class<?> standardPrimitive : assignableFrom) {
             if (standardPrimitive.isAssignableFrom(clazz)) {
                 return true;

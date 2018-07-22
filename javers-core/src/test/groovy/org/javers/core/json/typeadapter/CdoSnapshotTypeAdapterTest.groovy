@@ -181,7 +181,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
           "type": "INITIAL",
           "state": {
             "name": "kaz",
-            "age": 1.33,
+            "age": "10",
             "someAge": 1.22,
             "someStr": "ab",
             "someList": [
@@ -194,11 +194,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
               "cdoId": 1
             }
           },
-          "changedProperties": [
-            "age",
-            "someList",
-            "someReference", "newAge"
-          ],
+          "changedProperties": [],
           "version": 1
         }"""
 
@@ -212,12 +208,11 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         snapshot.initial == true
 
         snapshot.state.propertyNames as Set == ["someStr", "someAge", "name", "someList", "age", "someReference"] as Set
-        snapshot.state.getPropertyValue("age") == 1 //casted to current type
-        snapshot.state.getPropertyValue("newAge") == 1.22
-        snapshot.state.getPropertyValue("someList") == [1,2,3]
+        snapshot.state.getPropertyValue("age") == "10"
+        snapshot.state.getPropertyValue("someAge") == 1.22
+        snapshot.state.getPropertyValue("someList") == [1.0,2.0,3.0]
         snapshot.state.getPropertyValue("someStr") == "ab"
         snapshot.state.getPropertyValue("someReference") == instanceId("1",DummyUserDetails)
-        snapshot.changed.collect{it} as Set == ["someStr", "someAge", "name", "someList", "age", "someReference"] as Set
     }
 
     def "should deserialize CdoSnapshot"() {

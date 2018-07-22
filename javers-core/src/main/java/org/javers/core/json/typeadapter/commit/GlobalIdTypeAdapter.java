@@ -99,6 +99,19 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
                 ValueObjectId.class);
     }
 
+    public static boolean looksLikeGlobalId(JsonElement propertyElement) {
+        if (propertyElement instanceof  JsonObject) {
+            JsonObject json = (JsonObject) propertyElement;
+            return hasStringField(json, ENTITY_FIELD) || hasStringField(json, VALUE_OBJECT_FIELD);
+        }
+        return false;
+    }
+
+    private static boolean hasStringField(JsonObject json, String childName) {
+        return json.has(childName) && json.get(childName) instanceof JsonPrimitive && ((JsonPrimitive)json.get(childName)).isString();
+
+    }
+
     private EntityType parseEntity(JsonObject object){
         String entityName = object.get(ENTITY_FIELD).getAsString();
         return typeMapper.getJaversManagedType(entityName, EntityType.class);
