@@ -52,4 +52,8 @@ public abstract class PrimitiveOrValueType extends ClassType{
                char.class == getBaseJavaClass() ||
                Character.class == getBaseJavaClass();
     }
+
+    public boolean isJsonPrimitive() {
+        return isStringy() || isBoolean() || isNumber();
+    }
 }

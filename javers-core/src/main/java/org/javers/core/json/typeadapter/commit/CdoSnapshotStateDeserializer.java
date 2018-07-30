@@ -51,10 +51,13 @@ class CdoSnapshotStateDeserializer {
         Type expectedJavaType = typeMapper.getDehydratedType(javersProperty.get().getGenericType());
         JaversType expectedJaversType = javersProperty.get().getType();
 
-        //if primitives on both sides, they should match, otherwise, expectedType is discarded
-        if (expectedJaversType instanceof PrimitiveOrValueType &&
-            !matches((PrimitiveOrValueType)expectedJaversType, propertyElement)) {
-            return decodePropertyValueUsingJsonType(propertyElement, context);
+        //if primitives on both sides, they should match, otherwise, expectedType is ignored
+        if (expectedJaversType instanceof PrimitiveOrValueType) {
+            PrimitiveOrValueType expectedJaversPrimitiveType = (PrimitiveOrValueType)expectedJaversType;
+            if (expectedJaversPrimitiveType.isJsonPrimitive() &&
+                !matches(expectedJaversPrimitiveType, propertyElement)) {
+                return decodePropertyValueUsingJsonType(propertyElement, context);
+            }
         }
 
         try {
