@@ -46,6 +46,6 @@ public class JaversSpringDataJpaAuditableRepositoryAspect extends AbstractSpring
 
     @AfterReturning("execution(public * deleteInBatch(..)) && this(org.springframework.data.jpa.repository.JpaRepository)")
     public void onDeleteInBatchExecuted(JoinPoint pjp) {
-       onSave(pjp);
+       onDelete(pjp);
     }
 }
