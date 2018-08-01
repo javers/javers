@@ -48,19 +48,21 @@ class CdoSnapshotStateDeserializer {
             return decodePropertyValueUsingJsonType(propertyElement, context);
         }
 
-        Type expectedJavaType = typeMapper.getDehydratedType(javersProperty.get().getGenericType());
         JaversType expectedJaversType = javersProperty.get().getType();
 
-        //if primitives on both sides, they should match, otherwise, expectedType is ignored
-        if (expectedJaversType instanceof PrimitiveOrValueType) {
-            PrimitiveOrValueType expectedJaversPrimitiveType = (PrimitiveOrValueType)expectedJaversType;
-            if (expectedJaversPrimitiveType.isJsonPrimitive() &&
-                !matches(expectedJaversPrimitiveType, propertyElement)) {
-                return decodePropertyValueUsingJsonType(propertyElement, context);
-            }
+        // if primitives on both sides, they should match, otherwise, expectedType is ignored
+        if (unmatchedPrimitivesOnBothSides(expectedJaversType, propertyElement)) {
+            return decodePropertyValueUsingJsonType(propertyElement, context);
+        }
+
+        // if collections of primitives on both sides, item types should match,
+        // otherwise, item type from expectedType is ignored
+        if (shouldUseBareContainerClass(expectedJaversType, propertyElement)) {
+            return context.deserialize(propertyElement, ((ContainerType) expectedJaversType).getBaseJavaClass());
         }
 
         try {
+            Type expectedJavaType = typeMapper.getDehydratedType(javersProperty.get().getGenericType());
             return context.deserialize(propertyElement, expectedJavaType);
         } catch (JsonSyntaxException e) {
             // when users's class is refactored, persisted property value
@@ -70,13 +72,37 @@ class CdoSnapshotStateDeserializer {
 
     }
 
-    private boolean matches(PrimitiveOrValueType javersPrimitive, JsonElement jsonElement) {
-        if (!(jsonElement instanceof JsonPrimitive)) {
+    private boolean unmatchedPrimitivesOnBothSides(JaversType expectedJaversType, JsonElement propertyElement) {
+        if (ifPrimitivesOnBothSides(expectedJaversType, propertyElement)) {
+            return !matches((PrimitiveOrValueType)expectedJaversType, (JsonPrimitive) propertyElement);
+        }
+        return false;
+    }
+
+    private boolean ifPrimitivesOnBothSides(JaversType expectedJaversType, JsonElement propertyElement) {
+        return expectedJaversType instanceof PrimitiveOrValueType &&
+                ((PrimitiveOrValueType) expectedJaversType).isJsonPrimitive() &&
+                propertyElement instanceof JsonPrimitive;
+    }
+
+    private boolean shouldUseBareContainerClass(JaversType expectedJaversType, JsonElement propertyElement){
+        if(!(expectedJaversType instanceof ContainerType) || !(propertyElement instanceof JsonArray)){
             return false;
         }
 
-        JsonPrimitive jsonPrimitive = (JsonPrimitive) jsonElement;
+        ContainerType expectedContainerType = (ContainerType) expectedJaversType;
+        JsonArray propertyArray = (JsonArray) propertyElement;
 
+        if (propertyArray.size() == 0) {
+            return false;
+        }
+
+        JsonElement firstItem = propertyArray.get(0);
+        JaversType itemType = typeMapper.getJaversType(expectedContainerType.getItemType());
+        return unmatchedPrimitivesOnBothSides(itemType, firstItem);
+    }
+
+    private boolean matches(PrimitiveOrValueType javersPrimitive, JsonPrimitive jsonPrimitive) {
         return (jsonPrimitive.isNumber() && javersPrimitive.isNumber()) ||
                (jsonPrimitive.isString() && javersPrimitive.isStringy()) ||
                (jsonPrimitive.isBoolean() && javersPrimitive.isBoolean());

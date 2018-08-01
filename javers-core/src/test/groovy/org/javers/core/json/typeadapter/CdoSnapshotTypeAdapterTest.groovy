@@ -212,9 +212,9 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         snapshot.state.propertyNames as Set == ["stringSet","integerList", "someStr", "someAge", "name", "someList", "age", "someReference"] as Set
         snapshot.state.getPropertyValue("age") == "10"
         snapshot.state.getPropertyValue("integerList") == ["1","2","3"]
-        snapshot.state.getPropertyValue("stringSet") == [1,2,3] as Set
+        snapshot.state.getPropertyValue("stringSet") == [1.0, 2.0, 3.0] as Set
         snapshot.state.getPropertyValue("someAge") == 1.22
-        snapshot.state.getPropertyValue("someList") == [1.0,2.0,3.0]
+        snapshot.state.getPropertyValue("someList") == [1.0, 2.0, 3.0]
         snapshot.state.getPropertyValue("someStr") == "ab"
         snapshot.state.getPropertyValue("someReference") == instanceId("1",DummyUserDetails)
     }
