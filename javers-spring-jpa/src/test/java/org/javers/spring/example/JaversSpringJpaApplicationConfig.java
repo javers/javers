@@ -1,6 +1,5 @@
 package org.javers.spring.example;
 
-import com.google.common.collect.ImmutableMap;
 import org.javers.core.Javers;
 import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
 import org.javers.repository.sql.ConnectionProvider;
@@ -11,7 +10,6 @@ import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
-import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
@@ -31,6 +29,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -102,7 +102,9 @@ public class JaversSpringJpaApplicationConfig {
      */
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        return () -> ImmutableMap.of("key", "ok");
+        final Map<String, String> rv = new HashMap<>();
+        rv.put("key", "ok");
+        return () -> Collections.unmodifiableMap(rv);
     }
 
     /**
