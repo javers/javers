@@ -28,9 +28,9 @@ public class LiveCdoFactory implements CdoFactory {
     public LiveCdo create(Object cdo, OwnerContext owner) {
         GlobalId globalId = globalIdFactory.createId(cdo, owner);
 
-        ManagedType managedType = typeMapper.getJaversManagedType(cdo.getClass());
-
         Optional<ObjectAccessProxy> objectAccessor = objectAccessHook.createAccessor(cdo);
+        Class<?> targetClass = objectAccessor.map((p) -> p.getTargetClass()).orElse(cdo.getClass());
+        ManagedType managedType = typeMapper.getJaversManagedType(targetClass);
 
         if (objectAccessor.isPresent()) {
             return new LazyCdoWrapper(objectAccessor.get().getObjectSupplier(), globalId, managedType);
