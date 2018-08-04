@@ -11,6 +11,7 @@ import org.javers.core.metamodel.type.DuckType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;

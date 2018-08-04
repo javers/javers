@@ -165,6 +165,60 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
     }
 
+    def "should deserialize CdoSnapshot state event if a user's class is strongly refactored"(){
+      given:
+        def json = """
+        { 
+          "commitMetadata": {
+            "id": "1.0",
+            "author": "author",
+            "commitDate": "2000-01-01T12:00:00"
+          },
+          "globalId": {
+            "entity": "org.javers.core.model.DummyUser",
+            "cdoId": "kaz"
+          },
+          "type": "INITIAL",
+          "state": {
+            "name": "kaz",
+            "stringSet": [1,2,3],
+            "integerList": ["1","2","3"],
+            "age": "10",
+            "someAge": 1.22,
+            "someStr": "ab",
+            "someList": [
+              1,
+              2,
+              3
+            ],
+            "someReference": {
+              "entity": "org.javers.core.model.DummyUserDetails",
+              "cdoId": 1
+            }
+          },
+          "changedProperties": [],
+          "version": 1
+        }"""
+
+      when:
+      def snapshot = javersTestAssembly().jsonConverter.fromJson(json, CdoSnapshot)
+
+      then:
+        snapshot.commitMetadata.id.value() == "1.0"
+        snapshot.commitMetadata.author == "author"
+        snapshot.globalId == instanceId("kaz",DummyUser)
+        snapshot.initial == true
+
+        snapshot.state.propertyNames as Set == ["stringSet","integerList", "someStr", "someAge", "name", "someList", "age", "someReference"] as Set
+        snapshot.state.getPropertyValue("age") == "10"
+        snapshot.state.getPropertyValue("integerList") == ["1","2","3"]
+        snapshot.state.getPropertyValue("stringSet") == [1.0, 2.0, 3.0] as Set
+        snapshot.state.getPropertyValue("someAge") == 1.22
+        snapshot.state.getPropertyValue("someList") == [1.0, 2.0, 3.0]
+        snapshot.state.getPropertyValue("someStr") == "ab"
+        snapshot.state.getPropertyValue("someReference") == instanceId("1",DummyUserDetails)
+    }
+
     def "should deserialize CdoSnapshot"() {
         given:
         def changed = ["name", "age"]

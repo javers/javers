@@ -48,8 +48,8 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
 
     @Override
     public MapChange calculateChanges(NodePair pair, JaversProperty property) {
-        Map leftRawMap =  (Map)pair.getLeftPropertyValue(property);
-        Map rightRawMap = (Map)pair.getRightPropertyValue(property);
+        Map leftRawMap =  pair.getLeftPropertyValueAndCast(property, Map.class);
+        Map rightRawMap = pair.getRightPropertyValueAndCast(property, Map.class);
 
         MapType mapType = ((JaversProperty) property).getType();
         MapContentType mapContentType = typeMapper.getMapContentType(mapType);
