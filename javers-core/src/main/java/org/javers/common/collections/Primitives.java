@@ -1,10 +1,10 @@
 package org.javers.common.collections;
 
-import com.google.common.collect.Streams;
 import org.javers.common.reflection.ReflectionUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author bartosz walacik
@@ -27,7 +27,7 @@ public class Primitives {
 
     public static List<Class<?>> getPrimitiveAndBoxTypes() {
         return java.util.Collections.unmodifiableList(
-                Streams.concat(PRIMITIVE_NUMBER_TYPES.stream(),
+                Stream.concat(PRIMITIVE_NUMBER_TYPES.stream(),
                                PRIMITIVE_TYPES.stream()).collect(Collectors.toList()));
     }
 
