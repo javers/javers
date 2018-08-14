@@ -22,7 +22,8 @@ public class WellKnownValueTypes {
             URI.class,
             URL.class,
             CharSequence.class,
-            String.class
+            String.class,
+            Number.class
     );
 
     public static List<Class<?>> getValueTypes() {
