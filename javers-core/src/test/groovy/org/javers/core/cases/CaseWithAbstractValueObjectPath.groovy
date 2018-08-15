@@ -1,5 +1,6 @@
 package org.javers.core.cases
 
+import com.sun.tools.hat.internal.model.Snapshot
 import org.javers.core.Changes
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.Change
@@ -11,7 +12,7 @@ import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
 /**
- * see https://github.com/indiana-jonas/javers-inheritance-issue-example
+ * see https://stackoverflow.com/questions/51634751/javersexception-property-not-found-property-in-derived-class-not-found-in-abstr
  */
 class CaseWithAbstractValueObjectPath extends Specification {
 
@@ -47,10 +48,10 @@ class CaseWithAbstractValueObjectPath extends Specification {
       given:
       def javers = JaversBuilder.javers().build()
       def staticInputFormGroup =
-              new StaticInputFormGroup(id: "100", inputControl: new InputControl("staticInputFormGroupInputControl"))
+              new StaticInputFormGroup(id: "100", inputControl: new InputControl("static Input"))
 
       def dynamicInputFormGroup =
-              new DynamicInputFormGroup(id: "200", inputControlList: [new InputControl("dynamicInputFormGroupInputControl")])
+              new DynamicInputFormGroup(id: "200", inputControlList: [new InputControl("dynamic Input")])
 
       def inputForm = new InputForm(id:"inputFormId", inputFormGroups: [staticInputFormGroup, dynamicInputFormGroup])
 
@@ -68,27 +69,16 @@ class CaseWithAbstractValueObjectPath extends Specification {
       javers.commit("author", inputForm)
 
       Changes changes = javers.findChanges(QueryBuilder.byClass(InputForm).withChildValueObjects().build())
-
-      for(Change change : changes)
-      {
-          if(change instanceof ValueChange)
-          {
-              String path = ((ValueChange) change).getPropertyNameWithPath()
-              println "query path: " + path
-
-              JqlQuery query = QueryBuilder.byValueObject(InputForm, path).build()
-
-              //This throws
-              /*
-              JaversException: PROPERTY_NOT_FOUND: Property 'inputControlList' not found in class 'com.example.javerspolymorphismissue.model.InputFormGroup'. If the name is correct - check annotations. Properties with @DiffIgnore or @Transient are not visible for JaVers.
-              */
-              Changes valueChanges = javers.findChanges(query)
-
-              println(valueChanges.prettyPrint())
-          }
-      }
+      println "all " + changes.prettyPrint()
 
       then:
-      true
+      def path = changes.find {it instanceof ValueChange}.affectedGlobalId.fragment
+      println "query path: " + path
+
+      // This has thrown
+      // JaversException: PROPERTY_NOT_FOUND: Property 'inputControlList' not found in class 'com.example.javerspolymorphismissue.model.InputFormGroup'. If the name is correct - check annotations. Properties with @DiffIgnore or @Transient are not visible for JaVers.
+      Changes valueChanges = javers.findChanges(QueryBuilder.byValueObject(InputForm, path).build())
+
+      valueChanges.size() == 2
     }
 }
