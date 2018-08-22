@@ -3,8 +3,8 @@ package org.javers.shadow
 import com.google.common.collect.HashMultiset
 import org.javers.core.Javers
 import org.javers.core.JaversTestBuilder
-import org.javers.core.examples.typeNames.NewEntity
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
+import org.javers.core.examples.typeNames.OldEntity
 import org.javers.core.examples.typeNames.OldEntityWithTypeAlias
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.PropertyName
@@ -326,18 +326,19 @@ abstract class ShadowFactoryTest extends Specification {
 
     def "should skip missing properties"(){
       given:
-      def cdo = new NewEntity(id:1)
+      def cdo = new OldEntity(id:1)
       javers.commit("author", cdo)
 
       when:
-      def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1, NewEntity).build())[0]
+      def snapshot = javers.findSnapshots(QueryBuilder.byInstanceId(1, OldEntity).build())[0]
       def extendedSnapshot = CdoSnapshotBuilder.emptyCopyOf(snapshot)
-            .withState(new CdoSnapshotState([strangeValue:2])).build()
+            .withState(new CdoSnapshotState([value:2])).build()
 
       def shadow = shadowFactory.createShadow(extendedSnapshot, { it -> null })
 
       then:
-      shadow instanceof NewEntity
+      shadow instanceof OldEntity
+      shadow.value == 2
       !shadow.id
     }
 

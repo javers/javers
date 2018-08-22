@@ -1,13 +1,11 @@
 package org.javers.core.cases
 
-import com.sun.tools.hat.internal.model.Snapshot
 import org.javers.core.Changes
 import org.javers.core.JaversBuilder
-import org.javers.core.diff.Change
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.metamodel.annotation.Entity
 import org.javers.core.metamodel.annotation.Id
-import org.javers.repository.jql.JqlQuery
+import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
@@ -46,7 +44,8 @@ class CaseWithAbstractValueObjectPath extends Specification {
 
     def "should manage query for Value Object by concrete path"(){
       given:
-      def javers = JaversBuilder.javers().build()
+      def repo = new InMemoryRepository()
+      def javers = JaversBuilder.javers().registerJaversRepository(repo) .build()
       def staticInputFormGroup =
               new StaticInputFormGroup(id: "100", inputControl: new InputControl("static Input"))
 
@@ -71,13 +70,18 @@ class CaseWithAbstractValueObjectPath extends Specification {
       Changes changes = javers.findChanges(QueryBuilder.byClass(InputForm).withChildValueObjects().build())
       println "all " + changes.prettyPrint()
 
-      then:
+
       def path = changes.find {it instanceof ValueChange}.affectedGlobalId.fragment
       println "query path: " + path
 
+      // new javers instance - fresh TypeMapper state
+      javers = JaversBuilder.javers().registerJaversRepository(repo) .build()
+
+      then:
       // This has thrown
       // JaversException: PROPERTY_NOT_FOUND: Property 'inputControlList' not found in class 'com.example.javerspolymorphismissue.model.InputFormGroup'. If the name is correct - check annotations. Properties with @DiffIgnore or @Transient are not visible for JaVers.
       Changes valueChanges = javers.findChanges(QueryBuilder.byValueObject(InputForm, path).build())
+      println valueChanges.prettyPrint()
 
       valueChanges.size() == 2
     }

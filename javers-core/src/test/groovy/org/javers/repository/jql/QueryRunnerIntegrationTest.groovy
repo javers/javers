@@ -47,26 +47,26 @@ class QueryRunnerIntegrationTest extends Specification {
                   QueryBuilder.byInstanceId(1, NewEntityWithTypeAlias).withChangedProperty("id").build(),
                   QueryBuilder.byClass(NewEntityWithTypeAlias).build(),
                   QueryBuilder.byClass(NewValueObjectWithTypeAlias).build(),
-                  QueryBuilder.byValueObject(NewEntityWithTypeAlias,"valueObject").build(),
-                  QueryBuilder.byValueObjectId(1, NewEntityWithTypeAlias,"valueObject").build()
+                 // QueryBuilder.byValueObject(NewEntityWithTypeAlias,"valueObject").build(),
+                 // QueryBuilder.byValueObjectId(1, NewEntityWithTypeAlias,"valueObject").build()
                 ] * 2
         expectedMappedTypes << [
                 ["myName"],
                 ["myName"],
                 ["myName"],
                 ["myValueObject"],
-                ["myName", "myValueObject"],
-                ["myName", "myValueObject"]
+                // ["myName", "myValueObject"],
+                // ["myName", "myValueObject"]
         ] * 2
         queryType << ["byInstanceId",
                       "byInstanceId and Property",
                       "Entity byClass",
                       "ValueObject byClass",
-                      "byValueObject",
-                      "byValueObjectId"
+                    // "byValueObject",
+                    // "byValueObjectId"
         ] * 2
-        action << [ { runner, query -> runner.queryForChanges(query) } ] * 6 +
-                  [ { runner, query -> runner.queryForSnapshots(query) } ] * 6
+        action << [ { runner, query -> runner.queryForChanges(query) } ] * 4 +
+                  [ { runner, query -> runner.queryForSnapshots(query) } ] * 4
 
 
     }
