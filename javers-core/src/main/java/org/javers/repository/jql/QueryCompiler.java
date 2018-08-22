@@ -14,10 +14,5 @@ class QueryCompiler {
 
     void compile(JqlQuery query) {
         query.compile(globalIdFactory, typeMapper);
-
-        if(query.isVoOwnerQuery()) {
-            VoOwnerFilter filter = query.getVoOwnerFilter();
-            globalIdFactory.touchValueObjectFromPath(filter.getOwnerEntity(), filter.getPath());
-        }
     }
 }

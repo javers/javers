@@ -12,4 +12,17 @@ public class OldEntity {
     private int value;
 
     private int oldValue;
+
+    @Id
+    public int getId() {
+        return id;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public int getOldValue() {
+        return oldValue;
+    }
 }

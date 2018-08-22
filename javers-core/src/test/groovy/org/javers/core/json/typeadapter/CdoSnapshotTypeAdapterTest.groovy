@@ -102,10 +102,27 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         json.state.dummyAddress.fragment == "dummyAddress"
     }
 
-    def "should serialize state with Multimaps in CdoSnapshots"() {
+    def "should serialize & deserialize state with Map of Entities"(){
+      given:
+      def javers = javersTestAssembly()
+      def entity = new SnapshotEntity(id:1, mapOfEntities: [(new SnapshotEntity(id:2)) : new SnapshotEntity(id:3)])
+
+      def cdoWrapper = javers.createCdoWrapper( entity )
+      def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+
+      when:
+      def jsonText = javers.jsonConverter.toJson(snapshot)
+      def deserializedSnapshot = javersTestAssembly().jsonConverter.fromJson(jsonText, CdoSnapshot)
+
+      then:
+      snapshot.getPropertyValue("mapOfEntities") == deserializedSnapshot.getPropertyValue("mapOfEntities")
+    }
+
+    def "should serialize & deserialize state with Multimaps in CdoSnapshots"() {
         given:
         def javers = javersTestAssembly()
-        def entity = new SnapshotEntity(multiMapOfPrimitives:MultimapBuilder.create([a:['a', 'b', 'c']]))
+        def entity = new SnapshotEntity(id: 1,
+                multiMapPrimitiveToEntity: MultimapBuilder.create(["NY": [new SnapshotEntity(id: 2), new SnapshotEntity(id: 3)]]))
 
         def cdoWrapper = javers.createCdoWrapper( entity )
         def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
@@ -114,12 +131,17 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def jsonText = javers.jsonConverter.toJson(snapshot)
 
         then:
-        def jsonMultimap = new JsonSlurper().parseText(jsonText).state.multiMapOfPrimitives
+        def jsonMultimap = new JsonSlurper().parseText(jsonText).state.multiMapPrimitiveToEntity
         jsonMultimap == [
-                [key:'a', value: 'a'],
-                [key:'a', value: 'b'],
-                [key:'a', value: 'c']
+                [key:'NY', value: [entity: 'org.javers.core.model.SnapshotEntity', cdoId: 2]],
+                [key:'NY', value: [entity: 'org.javers.core.model.SnapshotEntity', cdoId: 3]]
         ]
+
+        when:
+        def deserializedSnapshot = javersTestAssembly().jsonConverter.fromJson(jsonText, CdoSnapshot)
+
+        then:
+        snapshot.getPropertyValue("mapOfEntities") == deserializedSnapshot.getPropertyValue("mapOfEntities")
     }
 
     def "should serialize state with Multisets in CdoSnapshots"() {
@@ -165,7 +187,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
     }
 
-    def "should deserialize CdoSnapshot state event if a user's class is strongly refactored"(){
+    def "should deserialize CdoSnapshot state event if user's class is strongly refactored"(){
       given:
         def json = """
         { 
@@ -219,7 +241,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         snapshot.state.getPropertyValue("someReference") == instanceId("1",DummyUserDetails)
     }
 
-    def "should deserialize CdoSnapshot"() {
+    def "should deserialize CdoSnapshot metadata"() {
         given:
         def changed = ["name", "age"]
         def commitProperties = [["key" : "os", "value" : "Solaris"]]
@@ -315,7 +337,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
     }
 
-    def "should deserialize CdoSnapshot state with entity"() {
+    def "should deserialize CdoSnapshot state with Entity reference"() {
 
         given:
         def json = new JsonBuilder()
@@ -346,7 +368,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         entityId == instanceId(1, DummyUserDetails)
     }
 
-    def "should deserialize CdoSnapshot state with valueObject"() {
+    def "should deserialize CdoSnapshot state with ValueObject reference"() {
 
         given:
         def json = new JsonBuilder()

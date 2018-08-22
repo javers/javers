@@ -101,10 +101,6 @@ public class GlobalIdFactory {
         return new ValueObjectId(valueObjectType.getName(), owner, fragment);
     }
 
-    public void touchValueObjectFromPath(ManagedType ownerType, String fragment){
-        pathParser.parseChildValueObject(ownerType, fragment);
-    }
-
     public InstanceId createInstanceId(Object localId, Class entityClass){
         EntityType entity = typeMapper.getJaversManagedType(entityClass, EntityType.class);
         return entity.createIdFromLocalId(localId);

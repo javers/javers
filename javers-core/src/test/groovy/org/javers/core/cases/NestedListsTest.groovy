@@ -14,24 +14,24 @@ import spock.lang.Specification
  */
 class NestedListsTest extends Specification{
 
-    def "should support lists with generic item type"() {
+    def "should support lists with nested item type"() {
         given:
         def javers = JaversBuilder.javers().build()
-        def cdo = new EntityWithNestedList(id:1,listWithGenericItem: [threadLocal("a")])
+        def cdo = new EntityWithNestedList(id:1,listWithGenericItem: [Optional.of("a")])
 
         when:
         javers.commit("me@here.com", cdo)
-        cdo.setListWithGenericItem([threadLocal("b")])
+        cdo.setListWithGenericItem([Optional.empty()])
 
         javers.commit("me@here.com", cdo)
 
         then:
-        def changes = javers.findChanges(QueryBuilder.byInstanceId(1, EntityWithNestedList.class).build())
+        def changes = javers.findChanges(QueryBuilder.byInstanceId(1, EntityWithNestedList).build())
         ListChange change = changes[0]
         with(change.changes[0]) {
             index == 0
             leftValue.get() == "a"
-            rightValue.get() == "b"
+            !rightValue.present
         }
     }
 
@@ -55,11 +55,5 @@ class NestedListsTest extends Specification{
             leftValue == ["D", ".", "F"]
             rightValue == ["D", "E", "F"]
         }
-    }
-
-    def threadLocal(def what) {
-        def t = new ThreadLocal()
-        t.set(what)
-        t
     }
 }
