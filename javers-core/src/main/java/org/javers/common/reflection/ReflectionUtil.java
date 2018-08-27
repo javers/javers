@@ -1,13 +1,8 @@
 package org.javers.common.reflection;
 
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.classgraph.ClassGraph;
 import org.javers.common.collections.Lists;
-
-import java.util.*;
-
-import org.javers.common.collections.Primitives;
 import org.javers.common.collections.Sets;
-import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -17,6 +12,8 @@ import org.slf4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -41,7 +38,7 @@ public class ReflectionUtil {
     /**
      * throws RuntimeException if class is not found
      */
-    public static Class classForName(String className) {
+    public static Class<?> classForName(String className) {
         try {
             return Class.forName(className, false, Javers.class.getClassLoader());
         }
@@ -139,12 +136,13 @@ public class ReflectionUtil {
 
     public static List<Class<?>> findClasses(Class<? extends Annotation> annotation, String... packages) {
         Validate.argumentsAreNotNull(annotation, packages);
-    	List<String> names = new FastClasspathScanner(packages).scan().getNamesOfClassesWithAnnotation(annotation);
-    	List<Class<?>> classes = new ArrayList<>();
-    	for (String className : names) {
-            classes.add(classForName(className));
-        }
-    	return classes;
+    	return new ClassGraph()
+                .whitelistPackages(packages)
+                .enableAnnotationInfo()
+                .scan()
+                .getClassesWithAnnotation(annotation.getName())
+                .stream()
+                .map(cl -> classForName(cl.getName())).collect(Collectors.toList());
     }
 
     public static Optional<Type> isConcreteType(Type javaType){
