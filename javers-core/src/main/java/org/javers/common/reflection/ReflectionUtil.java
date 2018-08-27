@@ -141,8 +141,7 @@ public class ReflectionUtil {
                 .enableAnnotationInfo()
                 .scan()
                 .getClassesWithAnnotation(annotation.getName())
-                .stream()
-                .map(cl -> classForName(cl.getName())).collect(Collectors.toList());
+                .loadClasses();
     }
 
     public static Optional<Type> isConcreteType(Type javaType){
