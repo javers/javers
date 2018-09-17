@@ -1,11 +1,10 @@
-package org.javers.spring.boot.sql;
+package org.javers.spring.boot;
+
+import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
-import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.javers.spring.boot.custom.entity.EmployeeEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 @JaversSpringDataAuditable
 public interface EmployeeRepositoryWithJavers extends JpaRepository<EmployeeEntity, UUID> {
-
 }
