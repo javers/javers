@@ -16,6 +16,7 @@ public class DepartmentEntity {
   @OneToMany(mappedBy = "department")
   private List<EmployeeEntity> employee;
 
+  @org.javers.core.metamodel.annotation.Id
   public UUID getId() {
     return id;
   }
@@ -34,8 +35,6 @@ public class DepartmentEntity {
 
   @Override
   public String toString() {
-    return "DepartmentEntity{" +
-            "id=" + id +
-            '}';
+      return "DepartmentEntity{" + "id=" + id + '}';
   }
 }
