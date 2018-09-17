@@ -1,5 +1,6 @@
 package org.javers.spring.boot;
 
+import javax.annotation.Generated;
 import javax.persistence.*;
 import java.util.UUID;
 
@@ -9,7 +10,6 @@ public class EmployeeEntity {
 
   @Id
   @Column
-  @GeneratedValue
   private UUID id;
 
   @ManyToOne(cascade = CascadeType.ALL)
