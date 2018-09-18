@@ -1,5 +1,6 @@
 package org.javers.repository.sql.schema;
 
+import com.google.common.html.HtmlEscapers;
 import org.javers.repository.sql.ConnectionProvider;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.dialect.*;
@@ -47,15 +48,17 @@ public class JaversSchemaManager extends SchemaNameAware {
 
         alterCommitIdColumnIfNeeded(); // JaVers 2.5 to 2.6 schema migration
 
-        if(this.dialect instanceof MsSqlDialect) {
+        if(dialect instanceof MsSqlDialect) {
             alterMssqlTextColumns();
         }
         
-        if(this.dialect instanceof MysqlDialect) {
+        if(dialect instanceof MysqlDialect) {
             alterMySqlCommitDateColumn();
         }
 
-        addDbIndexOnOwnerId();
+        if(!(dialect instanceof H2Dialect)) {
+            addDbIndexOnOwnerId();
+        }
 
         TheCloser.close(schemaManager, schemaInspector);
     }
