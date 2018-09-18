@@ -1,10 +1,12 @@
 package org.javers.repository.sql.schema;
 
+import com.google.common.html.HtmlEscapers;
 import org.javers.repository.sql.ConnectionProvider;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.dialect.*;
 import org.polyjdbc.core.schema.SchemaInspector;
 import org.polyjdbc.core.schema.SchemaManager;
+import org.polyjdbc.core.schema.model.IndexBuilder;
 import org.polyjdbc.core.schema.model.Schema;
 import org.polyjdbc.core.util.TheCloser;
 import org.slf4j.Logger;
@@ -12,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.Map;
+
+import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_OWNER_ID_FK;
 
 /**
  * @author bartosz walacik
@@ -44,12 +48,16 @@ public class JaversSchemaManager extends SchemaNameAware {
 
         alterCommitIdColumnIfNeeded(); // JaVers 2.5 to 2.6 schema migration
 
-        if(this.dialect instanceof MsSqlDialect) {
+        if(dialect instanceof MsSqlDialect) {
             alterMssqlTextColumns();
         }
         
-        if(this.dialect instanceof MysqlDialect) {
+        if(dialect instanceof MysqlDialect) {
             alterMySqlCommitDateColumn();
+        }
+
+        if(!(dialect instanceof H2Dialect)) {
+            addDbIndexOnOwnerId();
         }
 
         TheCloser.close(schemaManager, schemaInspector);
@@ -68,6 +76,12 @@ public class JaversSchemaManager extends SchemaNameAware {
         }
     }
 
+    /**
+     * JaVers 3.11.4 to 3.11.5 schema migration
+     */
+    private void addDbIndexOnOwnerId() {
+        addIndex(getGlobalIdTableName(), new FixedSchemaFactory.IndexedCols(GLOBAL_ID_OWNER_ID_FK));
+    }
 
     /**
      * JaVers 2.5 to 2.6 schema migration
@@ -219,6 +233,18 @@ public class JaversSchemaManager extends SchemaNameAware {
             executeSQL("ALTER TABLE " + tableName + " ADD " + colName + " " + sqlType);
         } else {
             executeSQL("ALTER TABLE " + tableName + " ADD COLUMN " + colName + " " + sqlType);
+        }
+    }
+
+    private void addIndex(DBObjectName tableName, FixedSchemaFactory.IndexedCols indexedCols) {
+        String indexName = FixedSchemaFactory.createIndexName(tableName, indexedCols);
+
+        if (!schemaInspector.indexExists(tableName.localName(), indexName)) {
+            String ddl = IndexBuilder.index(dialect, indexName)
+                    .indexing(indexedCols.indexedColNames())
+                    .on(tableName.nameWithSchema()).build().ddl();
+
+            executeSQL(ddl);
         }
     }
 
