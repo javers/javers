@@ -29,23 +29,23 @@ public class JaversSpringDataJpaAuditableRepositoryAspect extends AbstractSpring
         onDelete(jp);
     }
 
-    @AfterReturning("execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)")
-    public void onSaveExecuted(JoinPoint pjp) {
-        onSave(pjp);
+    @AfterReturning(value = "execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)", returning = "responseEntity")
+    public void onSaveExecuted(JoinPoint pjp, Object responseEntity) {
+        onSave(pjp, responseEntity);
     }
 
-    @AfterReturning("execution(public * saveAll(..)) && this(org.springframework.data.repository.CrudRepository)")
-    public void onSaveAllExecuted(JoinPoint jp) {
-        onSave(jp);
+    @AfterReturning(value = "execution(public * saveAll(..)) && this(org.springframework.data.repository.CrudRepository)", returning = "responseEntity")
+    public void onSaveAllExecuted(JoinPoint jp, Object responseEntity) {
+        onSave(jp,responseEntity);
     }
 
-    @AfterReturning("execution(public * saveAndFlush(..)) && this(org.springframework.data.jpa.repository.JpaRepository)")
-    public void onSaveAndFlushExecuted(JoinPoint pjp) {
-       onSave(pjp);
+    @AfterReturning(value = "execution(public * saveAndFlush(..)) && this(org.springframework.data.jpa.repository.JpaRepository)", returning = "responseEntity")
+    public void onSaveAndFlushExecuted(JoinPoint pjp, Object responseEntity) {
+        onSave(pjp, responseEntity);
     }
 
     @AfterReturning("execution(public * deleteInBatch(..)) && this(org.springframework.data.jpa.repository.JpaRepository)")
     public void onDeleteInBatchExecuted(JoinPoint pjp) {
-       onDelete(pjp);
+        onDelete(pjp);
     }
 }

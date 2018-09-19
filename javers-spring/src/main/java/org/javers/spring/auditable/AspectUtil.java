@@ -22,4 +22,15 @@ public class AspectUtil {
         }
         return result;
     }
+
+    public static Iterable<Object> collectArguments(Object returnObject){
+        List<Object> result = new ArrayList<>();
+
+        if (returnObject instanceof Collection) {
+            result.addAll((Collection)returnObject);
+        } else {
+            result.add(returnObject);
+        }
+        return result;
+    }
 }

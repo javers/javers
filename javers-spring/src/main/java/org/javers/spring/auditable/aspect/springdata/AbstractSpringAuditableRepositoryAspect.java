@@ -21,8 +21,18 @@ public class AbstractSpringAuditableRepositoryAspect {
         this.deleteHandler = new OnDeleteAuditChangeHandler(javers, authorProvider, commitPropertiesProvider);
     }
 
-    protected void onSave(JoinPoint pjp) {
-        onVersionEvent(pjp, saveHandler);
+    protected void onSave(JoinPoint pjp, Object responseEntity) {
+        onVersionEvent(pjp, saveHandler, responseEntity);
+    }
+
+    private void onVersionEvent(JoinPoint pjp, AuditChangeHandler saveHandler, Object responseEntity) {
+        Optional<Class> versionedInterface = getRepositoryInterface(pjp);
+
+        versionedInterface.ifPresent(versioned -> {
+            RepositoryMetadata metadata = getMetadata(versioned);
+            Iterable<Object> domainObjects = AspectUtil.collectArguments(responseEntity);
+            applyVersionChanges(metadata, domainObjects, saveHandler);
+        });
     }
 
     protected void onDelete(JoinPoint pjp) {
