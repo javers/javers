@@ -22,19 +22,19 @@ public class JaversSpringDataAuditableRepositoryAspect extends AbstractSpringAud
     public void onDeleteExecuted(JoinPoint pjp) {
         onDelete(pjp);
     }
-    
+
     @AfterReturning("execution(public * deleteAll(..)) && this(org.springframework.data.repository.CrudRepository)")
     public void onDeleteAllExecuted(JoinPoint pjp) {
         onDelete(pjp);
     }
 
-    @AfterReturning("execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)")
-    public void onSaveExecuted(JoinPoint pjp) {
-        onSave(pjp);
+    @AfterReturning(value = "execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)", returning = "responseEntity")
+    public void onSaveExecuted(JoinPoint pjp, Object responseEntity) {
+        onSave(pjp, responseEntity);
     }
-    
-     @AfterReturning("execution(public * saveAll(..)) && this(org.springframework.data.repository.CrudRepository)")
-    public void onSaveAllExecuted(JoinPoint pjp) {
-        onSave(pjp);
+
+    @AfterReturning(value = "execution(public * saveAll(..)) && this(org.springframework.data.repository.CrudRepository)", returning = "responseEntity")
+    public void onSaveAllExecuted(JoinPoint pjp, Object responseEntity) {
+        onSave(pjp, responseEntity);
     }
 }
