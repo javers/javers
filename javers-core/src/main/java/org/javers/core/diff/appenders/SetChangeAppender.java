@@ -57,8 +57,8 @@ public class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
 
     @Override
     public SetChange calculateChanges(NodePair pair, JaversProperty property) {
-        Collection leftValues = (Collection) pair.getLeftPropertyValue(property);
-        Collection rightValues = (Collection) pair.getRightPropertyValue(property);
+        Collection leftValues = pair.getLeftPropertyValueAndCast(property, Collection.class);
+        Collection rightValues = pair.getRightPropertyValueAndCast(property, Collection.class);
 
         CollectionType setType = property.getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());

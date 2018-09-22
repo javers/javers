@@ -143,6 +143,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         relationBuilder.build();
 
         columnsIndex(tableName, schema, GLOBAL_ID_LOCAL_ID);
+        columnsIndex(tableName, schema, GLOBAL_ID_OWNER_ID_FK);
 
         return schema;
     }
@@ -162,7 +163,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
     }
 
     private void columnsIndex(DBObjectName tableName, Schema schema, IndexedCols indexedCols){
-        String indexName = tableName.localName() + "_" + indexedCols.concatenatedColNames() + "_idx";
+        String indexName = createIndexName(tableName, indexedCols);
         if (dialect instanceof OracleDialect &&
                 indexName.length() > ORACLE_MAX_NAME_LEN)
         {
@@ -174,13 +175,17 @@ public class FixedSchemaFactory extends SchemaNameAware {
                 .build();
     }
 
+    static String createIndexName(DBObjectName tableName, IndexedCols indexedCols) {
+        return tableName.localName() + "_" + indexedCols.concatenatedColNames() + "_idx";
+    }
+
     private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder) {
         relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
                 .primaryKey("jv_"+pkColName).using(pkColName).and();
         schema.addSequence(getSequenceNameWithSchema(pkColName)).build();
     }
 
-    private static class IndexedCols {
+    static class IndexedCols {
         private final String[] colNames;
         private final int[] prefixLengths;
 

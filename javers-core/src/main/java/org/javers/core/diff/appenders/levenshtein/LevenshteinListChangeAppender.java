@@ -43,8 +43,8 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
         DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
 
-        final List leftList =  (List) listType.map(pair.getLeftPropertyValue(property), dehydrateFunction, owner);
-        final List rightList = (List) listType.map(pair.getRightPropertyValue(property), dehydrateFunction, owner);
+        final List leftList =  (List) listType.map(pair.getLeftPropertyValueAndCast(property, List.class), dehydrateFunction, owner);
+        final List rightList = (List) listType.map(pair.getRightPropertyValueAndCast(property, List.class), dehydrateFunction, owner);
 
         EqualsFunction equalsFunction = (left, right) -> Objects.equals(left, right);
         Backtrack backtrack = new Backtrack(equalsFunction);

@@ -154,6 +154,8 @@ public class JsonConverterBuilder {
             gsonBuilder.setPrettyPrinting();
         }
 
+        gsonBuilder.enableComplexMapKeySerialization();
+
         gsonBuilder.serializeNulls()
                    .setDateFormat(ISO_DATE_TIME_FORMAT);
 

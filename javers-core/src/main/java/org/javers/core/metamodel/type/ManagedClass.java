@@ -81,6 +81,10 @@ class ManagedClass {
         return propertiesByName.get(withName);
     }
 
+    boolean hasProperty(String propertyName) {
+        return propertiesByName.containsKey(propertyName);
+    }
+
     void forEachProperty(Consumer<JaversProperty> consumer) {
         managedProperties.forEach(p -> consumer.accept(p));
     }

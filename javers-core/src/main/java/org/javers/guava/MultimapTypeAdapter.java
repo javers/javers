@@ -28,7 +28,7 @@ class MultimapTypeAdapter implements JsonAdvancedTypeAdapter<Multimap> {
         jsonArray.forEach(e -> {
             JsonObject entry = e.getAsJsonObject();
             Object key = context.deserialize(entry.get("key"), mapTypeArguments.get(0));
-            Object value = context.deserialize(entry.get("value"), mapTypeArguments.get(0));
+            Object value = context.deserialize(entry.get("value"), mapTypeArguments.get(1));
             multimap.put(key, value);
         });
 

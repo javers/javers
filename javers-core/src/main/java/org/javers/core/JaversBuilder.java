@@ -38,7 +38,7 @@ import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
-import org.javers.repository.inmemory.InMemoryRepositoryModule;
+import org.javers.repository.inmemory.InMemoryRepository;
 import org.javers.repository.jql.JqlModule;
 import org.javers.shadow.ShadowModule;
 import org.slf4j.Logger;
@@ -755,15 +755,15 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private void bootRepository(){
         if (repository == null){
-            logger.info("using fake InMemoryRepository, registerType actual implementation via JaversBuilder.registerJaversRepository()");
-            addModule(new InMemoryRepositoryModule(getContainer()));
-            repository = getContainerComponent(JaversRepository.class);
-        } else {
-            repository.setJsonConverter( getContainerComponent(JsonConverter.class));
-            addComponent(repository);
+            logger.info("using fake InMemoryRepository, register actual Repository implementation via JaversBuilder.registerJaversRepository()");
+            repository = new InMemoryRepository();
         }
 
-       //JaversExtendedRepository can be created after users calls JaversBuilder.registerJaversRepository()
+        repository.setJsonConverter( getContainerComponent(JsonConverter.class));
+
+        bindComponent(JaversRepository.class, repository);
+
+        //JaversExtendedRepository can be created after users calls JaversBuilder.registerJaversRepository()
         addComponent(JaversExtendedRepository.class);
     }
 

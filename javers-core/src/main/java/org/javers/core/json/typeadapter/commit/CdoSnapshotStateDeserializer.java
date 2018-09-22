@@ -1,16 +1,14 @@
 package org.javers.core.json.typeadapter.commit;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.CdoSnapshotState;
 import org.javers.core.metamodel.object.CdoSnapshotStateBuilder;
-import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.ManagedType;
-import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.type.*;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapshotState;
 
@@ -35,16 +33,86 @@ class CdoSnapshotStateDeserializer {
 
         CdoSnapshotStateBuilder builder = cdoSnapshotState();
 
-        for (Property property : managedType.getProperties()) {
-            builder.withPropertyValue(property, decodePropertyValue(stateObject, context, property));
-        }
+        stateObject.entrySet().stream().forEach(e -> {
+            builder.withPropertyValue(e.getKey(),
+                    decodePropertyValue(e.getValue(), context, managedType.findProperty(e.getKey())));
+
+        });
 
         return builder.build();
     }
 
-    private Object decodePropertyValue(JsonObject element, JsonDeserializationContext context, Property property) {
-        JsonElement propertyElement = element.get(property.getName());
-        Type dehydratedPropertyType = typeMapper.getDehydratedType(property.getGenericType());
-        return context.deserialize(propertyElement, dehydratedPropertyType);
+    private Object decodePropertyValue(JsonElement propertyElement, JsonDeserializationContext context, Optional<JaversProperty> javersProperty) {
+
+        if (!javersProperty.isPresent()) {
+            return decodePropertyValueUsingJsonType(propertyElement, context);
+        }
+
+        JaversType expectedJaversType = javersProperty.get().getType();
+
+        // if primitives on both sides, they should match, otherwise, expectedType is ignored
+        if (unmatchedPrimitivesOnBothSides(expectedJaversType, propertyElement)) {
+            return decodePropertyValueUsingJsonType(propertyElement, context);
+        }
+
+        // if collections of primitives on both sides, item types should match,
+        // otherwise, item type from expectedType is ignored
+        if (shouldUseBareContainerClass(expectedJaversType, propertyElement)) {
+            return context.deserialize(propertyElement, ((ContainerType) expectedJaversType).getBaseJavaClass());
+        }
+
+        try {
+            Type expectedJavaType = typeMapper.getDehydratedType(javersProperty.get().getGenericType());
+            return context.deserialize(propertyElement, expectedJavaType);
+        } catch (JsonSyntaxException e) {
+            // when users's class is refactored, persisted property value
+            // can have different type than expected
+            return decodePropertyValueUsingJsonType(propertyElement, context);
+        }
+
+    }
+
+    private boolean unmatchedPrimitivesOnBothSides(JaversType expectedJaversType, JsonElement propertyElement) {
+        if (ifPrimitivesOnBothSides(expectedJaversType, propertyElement)) {
+            return !matches((PrimitiveOrValueType)expectedJaversType, (JsonPrimitive) propertyElement);
+        }
+        return false;
+    }
+
+    private boolean ifPrimitivesOnBothSides(JaversType expectedJaversType, JsonElement propertyElement) {
+        return expectedJaversType instanceof PrimitiveOrValueType &&
+                ((PrimitiveOrValueType) expectedJaversType).isJsonPrimitive() &&
+                propertyElement instanceof JsonPrimitive;
+    }
+
+    private boolean shouldUseBareContainerClass(JaversType expectedJaversType, JsonElement propertyElement){
+        if(!(expectedJaversType instanceof ContainerType) || !(propertyElement instanceof JsonArray)){
+            return false;
+        }
+
+        ContainerType expectedContainerType = (ContainerType) expectedJaversType;
+        JsonArray propertyArray = (JsonArray) propertyElement;
+
+        if (propertyArray.size() == 0) {
+            return false;
+        }
+
+        JsonElement firstItem = propertyArray.get(0);
+        JaversType itemType = typeMapper.getJaversType(expectedContainerType.getItemType());
+        return unmatchedPrimitivesOnBothSides(itemType, firstItem);
+    }
+
+    private boolean matches(PrimitiveOrValueType javersPrimitive, JsonPrimitive jsonPrimitive) {
+        return (jsonPrimitive.isNumber() && javersPrimitive.isNumber()) ||
+               (jsonPrimitive.isString() && javersPrimitive.isStringy()) ||
+               (jsonPrimitive.isBoolean() && javersPrimitive.isBoolean());
+
+    }
+
+    private Object decodePropertyValueUsingJsonType(JsonElement propertyElement, JsonDeserializationContext context) {
+        if (GlobalIdTypeAdapter.looksLikeGlobalId(propertyElement)) {
+            return context.deserialize(propertyElement, GlobalId.class);
+        }
+        return context.deserialize(propertyElement, Object.class);
     }
 }

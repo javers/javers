@@ -27,6 +27,9 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
 
     @Override
     public GlobalId fromJson(JsonElement json, JsonDeserializationContext context) {
+        if (!(json instanceof JsonObject)) {
+            return null; //when user's class is refactored, a property can have changed type
+        }
         JsonObject jsonObject = (JsonObject) json;
 
         if (jsonObject.get(ENTITY_FIELD) != null) {
@@ -94,6 +97,19 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
                 InstanceId.class,
                 UnboundedValueObjectId.class,
                 ValueObjectId.class);
+    }
+
+    public static boolean looksLikeGlobalId(JsonElement propertyElement) {
+        if (propertyElement instanceof  JsonObject) {
+            JsonObject json = (JsonObject) propertyElement;
+            return hasStringField(json, ENTITY_FIELD) || hasStringField(json, VALUE_OBJECT_FIELD);
+        }
+        return false;
+    }
+
+    private static boolean hasStringField(JsonObject json, String childName) {
+        return json.has(childName) && json.get(childName) instanceof JsonPrimitive && ((JsonPrimitive)json.get(childName)).isString();
+
     }
 
     private EntityType parseEntity(JsonObject object){

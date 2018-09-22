@@ -1,6 +1,5 @@
 package org.javers.hibernate.integration.config;
 
-import com.google.common.collect.ImmutableMap;
 import org.javers.core.Javers;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.JaversSqlRepository;
@@ -20,6 +19,8 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -98,12 +99,9 @@ public class HibernateConfig {
 
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        return new CommitPropertiesProvider() {
-            @Override
-            public Map<String, String> provide() {
-                return ImmutableMap.of("key", "ok");
-            }
-        };
+        final Map<String, String> rv = new HashMap<>();
+        rv.put("key", "ok");
+        return () -> Collections.unmodifiableMap(rv);
     }
 
     Properties additionalProperties() {

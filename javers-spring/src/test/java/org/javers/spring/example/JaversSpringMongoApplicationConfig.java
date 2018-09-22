@@ -1,7 +1,6 @@
 package org.javers.spring.example;
 
 import com.github.fakemongo.Fongo;
-import com.google.common.collect.ImmutableMap;
 import com.mongodb.MongoClient;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -17,6 +16,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @ComponentScan(basePackages = "org.javers.spring.repository")
@@ -94,6 +97,8 @@ public class JaversSpringMongoApplicationConfig {
      */
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        return () -> ImmutableMap.of("key", "ok");
+        final Map<String, String> rv = new HashMap<>();
+        rv.put("key", "ok");
+        return () -> Collections.unmodifiableMap(rv);
     }
 }

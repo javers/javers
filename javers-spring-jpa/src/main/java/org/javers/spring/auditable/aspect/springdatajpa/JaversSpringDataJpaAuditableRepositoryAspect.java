@@ -24,13 +24,28 @@ public class JaversSpringDataJpaAuditableRepositoryAspect extends AbstractSpring
         onDelete(pjp);
     }
 
+    @AfterReturning("execution(public * deleteAll(..)) && this(org.springframework.data.repository.CrudRepository)")
+    public void onDeleteAllExecuted(JoinPoint jp) {
+        onDelete(jp);
+    }
+
     @AfterReturning("execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)")
     public void onSaveExecuted(JoinPoint pjp) {
         onSave(pjp);
     }
 
+    @AfterReturning("execution(public * saveAll(..)) && this(org.springframework.data.repository.CrudRepository)")
+    public void onSaveAllExecuted(JoinPoint jp) {
+        onSave(jp);
+    }
+
     @AfterReturning("execution(public * saveAndFlush(..)) && this(org.springframework.data.jpa.repository.JpaRepository)")
     public void onSaveAndFlushExecuted(JoinPoint pjp) {
        onSave(pjp);
+    }
+
+    @AfterReturning("execution(public * deleteInBatch(..)) && this(org.springframework.data.jpa.repository.JpaRepository)")
+    public void onDeleteInBatchExecuted(JoinPoint pjp) {
+       onDelete(pjp);
     }
 }

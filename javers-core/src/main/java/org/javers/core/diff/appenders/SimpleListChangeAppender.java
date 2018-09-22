@@ -33,8 +33,8 @@ public class SimpleListChangeAppender extends CorePropertyChangeAppender<ListCha
 
     @Override
     public ListChange calculateChanges(final NodePair pair, final JaversProperty property) {
-        List leftList = (List) pair.getLeftPropertyValue(property);
-        List rightList = (List) pair.getRightPropertyValue(property);
+        List leftList = pair.getLeftPropertyValueAndCast(property, List.class);
+        List rightList = pair.getRightPropertyValueAndCast(property, List.class);
 
         ListType listType = ((JaversProperty) property).getType();
         OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());

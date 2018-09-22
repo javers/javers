@@ -5,8 +5,6 @@ import org.javers.common.collections.Lists;
 import java.util.Optional;
 import org.javers.common.validation.Validate;
 import org.javers.core.CommitIdGenerator;
-import org.javers.core.JaversCoreConfiguration;
-import org.javers.core.JaversCoreProperties;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -32,9 +30,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InMemoryRepository implements JaversRepository {
     private static final Logger logger = LoggerFactory.getLogger(InMemoryRepository.class);
 
-    private Map<GlobalId, LinkedList<CdoSnapshot>> snapshots = new ConcurrentHashMap<>();
+    private Map<String, LinkedList<String>> snapshots = new ConcurrentHashMap<>();
 
     private CommitId head;
+
+    private JsonConverter jsonConverter;
 
     private final CommitIdGenerator commitIdGenerator;
 
@@ -184,9 +184,8 @@ public class InMemoryRepository implements JaversRepository {
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
         Validate.argumentsAreNotNull(globalId);
 
-        if (snapshots.containsKey(globalId)) {
-            LinkedList<CdoSnapshot> states = snapshots.get(globalId);
-            return Optional.of(states.peek());
+        if (contains(globalId)) {
+            return Optional.of(readSnapshots(globalId).peek());
         }
 
         return Optional.empty();
@@ -202,14 +201,14 @@ public class InMemoryRepository implements JaversRepository {
     @Override
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
         return Lists.transform(getPersistedIdentifiers(snapshotIdentifiers), snapshotIdentifier -> {
-            List<CdoSnapshot> objectSnapshots = snapshots.get(snapshotIdentifier.getGlobalId());
+            List<CdoSnapshot> objectSnapshots = readSnapshots(snapshotIdentifier.getGlobalId());
             return objectSnapshots.get(objectSnapshots.size() - ((int)snapshotIdentifier.getVersion()));
         });
     }
 
     private List<SnapshotIdentifier> getPersistedIdentifiers(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return Lists.positiveFilter(new ArrayList<>(snapshotIdentifiers), snapshotIdentifier -> snapshots.containsKey(snapshotIdentifier.getGlobalId()) &&
-            snapshotIdentifier.getVersion() <= snapshots.get(snapshotIdentifier.getGlobalId()).size());
+        return Lists.positiveFilter(new ArrayList<>(snapshotIdentifiers), snapshotIdentifier -> contains(snapshotIdentifier.getGlobalId()) &&
+            snapshotIdentifier.getVersion() <= readSnapshots(snapshotIdentifier.getGlobalId()).size());
     }
 
     @Override
@@ -230,6 +229,7 @@ public class InMemoryRepository implements JaversRepository {
 
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
+        this.jsonConverter = jsonConverter;
     }
 
     private List<CdoSnapshot> filterByPropertyName(List<CdoSnapshot> snapshots, final String propertyName){
@@ -238,25 +238,50 @@ public class InMemoryRepository implements JaversRepository {
 
     private List<CdoSnapshot> getAll(){
         List<CdoSnapshot> all = new ArrayList<>();
-        for (LinkedList<CdoSnapshot> snapshotsList : snapshots.values()) {
-            all.addAll(snapshotsList);
-        }
+
+        snapshots.keySet().forEach(it -> all.addAll(readSnapshots(it)));
 
         Collections.sort(all, (o1, o2) -> commitIdGenerator.getComparator().compare(o2.getCommitMetadata(), o1.getCommitMetadata()));
         return all;
     }
 
     private synchronized void persist(CdoSnapshot snapshot) {
-        LinkedList<CdoSnapshot> states = snapshots.get(snapshot.getGlobalId());
-        if (states == null){
-            states = new LinkedList<>();
-            snapshots.put(snapshot.getGlobalId(), states);
+        Validate.conditionFulfilled(jsonConverter != null, "jsonConverter is null");
+        String globalIdValue = snapshot.getGlobalId().value();
+
+        LinkedList<String> snapshotsList = snapshots.get(globalIdValue);
+        if (snapshotsList == null){
+            snapshotsList = new LinkedList<>();
+            snapshots.put(globalIdValue, snapshotsList);
         }
 
-        states.push(snapshot);
+        snapshotsList.push(jsonConverter.toJson(snapshot));
     }
 
     @Override
     public void ensureSchema() {
+    }
+
+    private boolean contains(GlobalId globalId) {
+        return contains(globalId.value());
+    }
+
+    private boolean contains(String globalIdValue) {
+        return snapshots.containsKey(globalIdValue);
+    }
+
+    private LinkedList<CdoSnapshot> readSnapshots(String globalIdValue) {
+        LinkedList<CdoSnapshot> result = new LinkedList<>();
+
+        if (!contains(globalIdValue)) {
+            return result;
+        }
+
+        snapshots.get(globalIdValue).forEach(it -> result.add(jsonConverter.fromJson(it, CdoSnapshot.class)));
+        return result;
+    }
+
+    private LinkedList<CdoSnapshot> readSnapshots(GlobalId globalId) {
+        return readSnapshots(globalId.value());
     }
 }

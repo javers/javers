@@ -21,18 +21,22 @@ public class CdoSnapshotStateBuilder {
         return new CdoSnapshotStateBuilder();
     }
 
-    public CdoSnapshotStateBuilder withPropertyValue(Property property, Object value){
-        Validate.argumentIsNotNull(property);
+    public CdoSnapshotStateBuilder withPropertyValue(String propertyName, Object value){
+        Validate.argumentIsNotNull(propertyName);
         if (value == null){
             return this;
         }
 
-        if (properties.containsKey(property.getName())){
+        if (properties.containsKey(propertyName)){
             throw new JaversException(JaversExceptionCode.SNAPSHOT_STATE_VIOLATION);
         }
 
-        properties.put(property.getName(), value);
+        properties.put(propertyName, value);
         return this;
+    }
+
+    public CdoSnapshotStateBuilder withPropertyValue(Property property, Object value){
+        return withPropertyValue(property.getName(), value);
     }
 
     public CdoSnapshotState build() {
