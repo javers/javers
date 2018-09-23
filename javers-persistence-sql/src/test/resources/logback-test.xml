@@ -6,6 +6,8 @@
         </encoder>
     </appender>
 
+    <logger name="org.javers.SQL" level="DEBUG"/>
+
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>

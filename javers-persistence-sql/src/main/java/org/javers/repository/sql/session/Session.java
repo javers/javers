@@ -1,15 +1,13 @@
 package org.javers.repository.sql.session;
 
 import org.javers.common.collections.Lists;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
+import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +15,12 @@ import java.util.Map;
 /**
  * @author bartosz.walacik
  */
-public class Session implements AutoCloseable{
+public class Session implements AutoCloseable {
+    public static final String SQL_LOGGER_NAME = "org.javers.SQL";
+    private static final Logger logger = LoggerFactory.getLogger(SQL_LOGGER_NAME);
+
     private final Dialect dialect;
-    private final Map<String, PreparedStatement> preparedStatements = new HashMap<>();
+    private final Map<String, PreparedStatementExecutor> statementExecutors = new HashMap<>();
     private final ConnectionProvider connectionProvider;
 
     Session(DialectName dialectName, ConnectionProvider connectionProvider) {
@@ -54,87 +55,38 @@ public class Session implements AutoCloseable{
     }
 
     private long queryForLong(Select select) {
-        PreparedStatement statement = getOrCreatePreparedStatement(select);
+        PreparedStatementExecutor executor = getOrCreatePreparedStatement(select);
+        return executor.executeQueryForLong(select);
+    }
 
-        wrapSqlException(() -> select.injectValuesTo(statement));
-
-        return wrapSqlException(() -> {
-            ResultSet rset = statement.executeQuery();
-            rset.next();
-            return rset.getLong(1);
-        });
+    private void execute(Insert insertQuery) {
+        PreparedStatementExecutor executor = getOrCreatePreparedStatement(insertQuery);
+        executor.execute(insertQuery);
     }
 
     @Override
     public void close() {
-        for(PreparedStatement p : preparedStatements.values()) {
-            wrapSqlException(() -> p.close());
-        }
+        statementExecutors.values().stream().forEach(p -> p.close());
+        logStats();
     }
 
-    private void execute(Insert insertQuery) {
-        PreparedStatement statement = getOrCreatePreparedStatement(insertQuery);
-
-        wrapSqlException(() -> insertQuery.injectValuesTo(statement));
-
-        wrapSqlException(() -> statement.executeUpdate());
-    }
-
-    private PreparedStatement getOrCreatePreparedStatement(Query query) {
-        if (preparedStatements.containsKey(query.name())) {
-            return preparedStatements.get(query.name());
+    private PreparedStatementExecutor getOrCreatePreparedStatement(Query query) {
+        if (statementExecutors.containsKey(query.name())) {
+            return statementExecutors.get(query.name());
         }
 
-        PreparedStatement statement = wrapSqlException(
-            () -> connectionProvider.getConnection().prepareStatement(query.rawSQl()));
+        PreparedStatementExecutor executor = new PreparedStatementExecutor(connectionProvider, query);
 
-        preparedStatements.put(query.name(), statement);
+        statementExecutors.put(query.name(), executor);
 
-        return statement;
+        return executor;
     }
 
-    private <T> T wrapSqlException(SqlAction<T> action) {
-        try {
-            return action.call();
-        } catch (SQLException e) {
-            throw new SqlUncheckedException("error while executing SQL", e);
-        }
-    }
+    private void logStats() {
+        logger.debug("SQL session finished. Executed {} statement(s) in {} millis.",
+                statementExecutors.values().stream().mapToInt(i -> i.getExecutionCount()).sum(),
+                statementExecutors.values().stream().mapToLong(i -> i.getExecutionTotalMillis()).sum());
 
-    private void wrapSqlException(SqlVoidAction action) {
-        try {
-            action.call();
-        } catch (SQLException e) {
-            throw new SqlUncheckedException("error while executing SQL", e);
-        }
-    }
-
-    @FunctionalInterface
-    private interface SqlAction<T> {
-        T call() throws SQLException;
-    }
-
-    @FunctionalInterface
-    private interface SqlVoidAction {
-        void call() throws SQLException;
-    }
-
-    class RegularSequenceDef extends Parameter {
-        private final String sequenceName;
-
-        RegularSequenceDef(String primaryKeyFieldName, String sequenceName) {
-            super(primaryKeyFieldName, null);
-            this.sequenceName = sequenceName;
-        }
-
-        @Override
-        public String getRawSqlRepresentation() {
-            return dialect.nextFromSequence(sequenceName);
-        }
-
-        @Override
-        void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
-            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
-        }
+        statementExecutors.values().stream().forEach(e -> logger.debug(". "+e.printStats()));
     }
 }
