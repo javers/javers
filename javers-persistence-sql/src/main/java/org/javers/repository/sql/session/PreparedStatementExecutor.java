@@ -1,6 +1,10 @@
 package org.javers.repository.sql.session;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.repository.sql.ConnectionProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -70,7 +74,7 @@ class PreparedStatementExecutor {
         try {
             action.call();
         } catch (SQLException e) {
-            throw new SqlUncheckedException("error while executing SQL", e);
+            throw new JaversException(JaversExceptionCode.SQL_EXCEPTION, e.getMessage(), rawSql);
         }
     }
 
@@ -78,7 +82,7 @@ class PreparedStatementExecutor {
         try {
             return action.call();
         } catch (SQLException e) {
-            throw new SqlUncheckedException("error while executing SQL", e);
+            throw new JaversException(JaversExceptionCode.SQL_EXCEPTION, e.getMessage(), rawSql);
         }
     }
 

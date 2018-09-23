@@ -5,7 +5,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.repository.sql.DialectName;
 
-class Dialect {
+abstract class Dialect {
     private final DialectName dialectName;
 
     private Dialect(DialectName dialectName) {
@@ -20,7 +20,10 @@ class Dialect {
         if (DialectName.MYSQL == dialectName) {
             return new MysqlDialect(dialectName);
         }
-        return new Dialect(dialectName);
+        if (DialectName.POSTGRES == dialectName) {
+            return new PostgresDialect(dialectName);
+        }
+        throw new JaversException(JaversExceptionCode.UNSUPPORTED_SQL_DIALECT, dialectName);
     }
 
     boolean supportsSequences() {
@@ -29,20 +32,22 @@ class Dialect {
 
     String lastInsertedAutoincrement() {
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
-
     }
 
     public DialectName getName() {
         return dialectName;
     }
 
-    String nextFromSequence(String seqName) {
-        return "SELECT " + seqName + ".nextval";
-    }
+    abstract String nextFromSequence(String seqName);
 
     static class H2 extends Dialect {
         H2(DialectName dialectName) {
             super(dialectName);
+        }
+
+        @Override
+        String nextFromSequence(String seqName) {
+            return "SELECT " + seqName + ".nextval";
         }
     }
 
@@ -59,6 +64,22 @@ class Dialect {
         @Override
         String lastInsertedAutoincrement() {
             return "select last_insert_id()";
+        }
+
+        @Override
+        String nextFromSequence(String seqName) {
+            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
+        }
+    }
+
+    static class PostgresDialect extends Dialect {
+        PostgresDialect(DialectName dialectName) {
+            super(dialectName);
+        }
+
+        @Override
+        public String nextFromSequence(String sequenceName) {
+            return "SELECT nextval('" + sequenceName + "')";
         }
     }
 }
