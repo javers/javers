@@ -2,7 +2,6 @@ package org.javers.spring.sql
 
 import org.hibernate.Hibernate
 import org.javers.core.Javers
-import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.spring.boot.DummyEntity
 import org.javers.spring.boot.ShallowEntity
@@ -16,7 +15,7 @@ import spock.lang.Specification
 
 @SpringBootTest(classes = [TestApplication])
 @ActiveProfiles("test")
-class HibernateSmartUnproxyTest extends Specification{
+class HibernateSmartUnproxyTest extends Specification {
     @Autowired
     Javers javers
 
@@ -26,32 +25,32 @@ class HibernateSmartUnproxyTest extends Specification{
     @Autowired
     ShallowEntityRepository shallowEntityRepository
 
-    def "should not initialize proxy of Shallow reference"(){
-      given:
-      def shallowEntity = ShallowEntity.random()
-      shallowEntityRepository.save(shallowEntity)
-      def proxy = shallowEntityRepository.getOne(shallowEntity.id)
+    def "should not initialize proxy of Shallow reference"() {
+        given:
+        def shallowEntity = ShallowEntity.random()
+        def shallowPersisted = shallowEntityRepository.save(shallowEntity)
+        def proxy = shallowEntityRepository.getOne(shallowPersisted.id)
 
-      println "proxy.isInitialized: " + Hibernate.isInitialized(proxy)
-      println "proxy.class: " + proxy.class
-      println "proxy.id: " + proxy.id
-      println "proxy.persistenClass: "+ proxy.getHibernateLazyInitializer().getPersistentClass()
-      println "proxy.isInitialized: " + Hibernate.isInitialized(proxy)
-      println 'I am happy :)'
+        println "proxy.isInitialized: " + Hibernate.isInitialized(proxy)
+        println "proxy.class: " + proxy.class
+        println "proxy.id: " + proxy.id
+        println "proxy.persistenClass: " + proxy.getHibernateLazyInitializer().getPersistentClass()
+        println "proxy.isInitialized: " + Hibernate.isInitialized(proxy)
+        println 'I am happy :)'
 
-      assert !Hibernate.isInitialized(proxy)
+        assert !Hibernate.isInitialized(proxy)
 
-      when:
-      def entity = DummyEntity.random()
-      entity.setShallowEntity(proxy)
-      dummyEntityRepository.save(entity)
+        when:
+        def entity = DummyEntity.random()
+        entity.setShallowEntity(proxy)
+        def dummyPersisted = dummyEntityRepository.save(entity)
 
-      then:
-      def entitySnapshot = javers.getLatestSnapshot(entity.id, DummyEntity).get()
-      InstanceId shallowRef = entitySnapshot.getPropertyValue("shallowEntity")
-      shallowRef.typeName == ShallowEntity.class.name
-      shallowRef.cdoId == shallowEntity.id
+        then:
+        def entitySnapshot = javers.getLatestSnapshot(dummyPersisted.id, DummyEntity).get()
+        InstanceId shallowRef = entitySnapshot.getPropertyValue("shallowEntity")
+        shallowRef.typeName == ShallowEntity.class.name
+        shallowRef.cdoId == shallowEntity.id
 
-      assert !Hibernate.isInitialized(proxy)
+        assert !Hibernate.isInitialized(proxy)
     }
 }
