@@ -20,6 +20,12 @@ public class Lists {
         return (List)list;
     }
 
+    public static <T> List<T> add(List<T> list, T element) {
+        List<T> l = new ArrayList<>(list);
+        l.add(element);
+        return unmodifiableList(l);
+    }
+
     public static <T> List<T> immutableListOf(T... elements){
         return unmodifiableList(java.util.Arrays.asList(elements));
     }

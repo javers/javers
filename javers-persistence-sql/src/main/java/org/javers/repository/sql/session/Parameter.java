@@ -2,43 +2,63 @@ package org.javers.repository.sql.session;
 
 import org.javers.common.validation.Validate;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-class Parameter {
+abstract class Parameter<T> {
     private final String name;
-    private final Object value;
+    private final T value;
 
-    Parameter(String name, Object value) {
+    Parameter(String name, T value) {
         Validate.argumentIsNotNull(name);
         this.name = name;
         this.value = value;
     }
 
+    abstract void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException;
+
     String getName() {
         return name;
     }
 
-    Object getValue() {
+    T getValue() {
         return value;
     }
 
-    static class ParametersBuilder {
-        private List<Parameter> list = new ArrayList<>();
+    public String getRawSqlRepresentation() {
+        return "?";
+    }
 
-        static ParametersBuilder parameters() {
-            return new ParametersBuilder();
+    static class StringParameter extends Parameter<String> {
+        StringParameter(String name, String value) {
+            super(name, value);
         }
 
-        ParametersBuilder add(String name, Object value) {
-            list.add(new Parameter(name, value));
-            return this;
-        }
-
-        List<Parameter> build() {
-            return Collections.unmodifiableList(list);
+        @Override
+        void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setString(order, getValue());
         }
     }
 
+    static class LongParameter extends Parameter<Long> {
+        LongParameter(String name, Long value) {
+            super(name, value);
+        }
+
+        @Override
+        void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setLong(order, getValue());
+        }
+    }
+
+    static class IntParameter extends Parameter<Integer> {
+        IntParameter(String name, Integer value) {
+            super(name, value);
+        }
+
+        @Override
+        void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setInt(order, getValue());
+        }
+    }
 }

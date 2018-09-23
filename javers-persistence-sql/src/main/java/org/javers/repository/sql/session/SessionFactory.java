@@ -15,6 +15,6 @@ public class SessionFactory {
     }
 
     public Session create() {
-        return new Session(dialectName);
+        return new Session(dialectName, connectionProvider);
     }
 }

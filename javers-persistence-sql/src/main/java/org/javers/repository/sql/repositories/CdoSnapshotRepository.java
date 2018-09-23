@@ -4,25 +4,21 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
-import org.javers.repository.sql.session.InsertQuery;
 import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.PolyJDBC;
 
 import java.util.List;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
-import static org.javers.repository.sql.session.Query.ParametersBuilder.parameters;
+import static org.javers.repository.sql.session.ParametersBuilder.parameters;
 
 public class CdoSnapshotRepository extends SchemaNameAware {
 
-
-    private final PolyJDBC javersPolyJDBC;
     private JsonConverter jsonConverter;
     private final GlobalIdRepository globalIdRepository;
 
-    public CdoSnapshotRepository(PolyJDBC javersPolyJDBC, GlobalIdRepository globalIdRepository, TableNameProvider tableNameProvider) {
+    public CdoSnapshotRepository(GlobalIdRepository globalIdRepository, TableNameProvider tableNameProvider) {
         super(tableNameProvider);
-        this.javersPolyJDBC = javersPolyJDBC;
         this.globalIdRepository = globalIdRepository;
     }
 

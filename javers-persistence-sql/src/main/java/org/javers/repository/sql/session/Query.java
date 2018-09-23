@@ -8,12 +8,13 @@ import org.polyjdbc.core.type.TypeWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author bartosz.walacik
+ */
 abstract class Query {
     private static final Pattern ARGUMENT_PATTERN = Pattern.compile("\\$[A-Za-z0-9_-]*");
     private static ColumnTypeMapper columnTypeMapper = new ColumnTypeMapper();
@@ -21,13 +22,15 @@ abstract class Query {
     private final String name;
     private final List<Parameter> orderedParameters;
     private final String rawSQL;
-    private final String sqlWithPlaceholders;
+  //  private final String sqlWithPlaceholders;
 
     Query(String name, List<Parameter> params, String rawSQL) {
         this.name = name;
         this.rawSQL = rawSQL;
+        this.orderedParameters = params;
 
-        String tmpSql = this.rawSQL;
+        //TODO wtf?
+        /*
         this.orderedParameters = new ArrayList<>();
         Matcher matcher = ARGUMENT_PATTERN.matcher(this.rawSQL);
         while (matcher.find()) {
@@ -39,18 +42,27 @@ abstract class Query {
             String replacement = "?";
             tmpSql = tmpSql.replaceFirst(foundPattern, replacement);
         }
+        */
+    }
 
-        this.sqlWithPlaceholders = tmpSql;
+    String rawSQl() {
+        return rawSQL;
+    };
+
+    String name() {
+        return name;
     }
 
     void injectValuesTo(PreparedStatement preparedStatement) throws SQLException {
         int parameterNumber = 1;
         for (Parameter parameter : orderedParameters) {
-            injectValue(preparedStatement, parameterNumber, parameter.getValue());
+            parameter.injectValuesTo(preparedStatement,parameterNumber);
             parameterNumber++;
         }
     }
 
+    @Deprecated
+    //TODO wtf?
     private void injectValue(PreparedStatement preparedStatement, int parameterNumber, Object value) throws SQLException {
         if (value != null) {
             SqlType type = columnTypeMapper.forClass(value.getClass());
@@ -80,15 +92,7 @@ abstract class Query {
         }
     }
 
-    String sql() {
-        return sqlWithPlaceholders;
-    };
-
-    String name() {
-        return name;
-    }
-
-    private static Parameter findParameter(String name, List<Parameter> params) {
+    private Parameter findParameter(String name, List<Parameter> params) {
         return params.stream().filter(it -> it.getName().equals(name)).findFirst().orElseThrow(
                 () -> new JaversException(JaversExceptionCode.RUNTIME_EXCEPTION, "parameter '"+name+"' not found in raw SQL '"+rawSQL+"'")
         );
