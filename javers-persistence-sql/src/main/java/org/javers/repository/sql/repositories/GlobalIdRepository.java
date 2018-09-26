@@ -11,11 +11,12 @@ import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.repository.sql.SqlRepositoryConfiguration;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.session.ParametersBuilder;
 import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.PolyJDBC;
-import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
 
+import static org.javers.repository.sql.session.ParametersBuilder.parameters;
 import static org.javers.repository.sql.session.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
@@ -103,30 +104,33 @@ public class GlobalIdRepository extends SchemaNameAware {
     }
 
     private long insert(GlobalId globalId, Session session) {
-        InsertQuery query = polyJdbc.query()
-            .insert()
-            .into(getGlobalIdTableNameWithSchema());
+        ParametersBuilder params = parameters();
 
-
+        String queryKey = null;
         if (globalId instanceof ValueObjectId) {
+            queryKey = "insert ValueObjectId";
             ValueObjectId valueObjectId  = (ValueObjectId) globalId;
             long ownerFk = getOrInsertId(valueObjectId.getOwnerId(), session);
-            query.value(GLOBAL_ID_FRAGMENT, valueObjectId.getFragment())
-                 .value(GLOBAL_ID_OWNER_ID_FK, ownerFk);
+            params.add(GLOBAL_ID_FRAGMENT, valueObjectId.getFragment())
+                  .add(GLOBAL_ID_OWNER_ID_FK, ownerFk);
         }
         else if (globalId instanceof InstanceId) {
-           query.value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName())
-                .value(GLOBAL_ID_LOCAL_ID, jsonConverter.toJson(((InstanceId)globalId).getCdoId()));
+            queryKey = "insert InstanceId";
+            params.add(GLOBAL_ID_TYPE_NAME, globalId.getTypeName())
+                  .add(GLOBAL_ID_LOCAL_ID, jsonConverter.toJson(((InstanceId)globalId).getCdoId()));
 
         }
         else if (globalId instanceof UnboundedValueObjectId) {
-            query.value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName());
+            queryKey = "insert UnboundedValueObjectId";
+            params.add(GLOBAL_ID_TYPE_NAME, globalId.getTypeName());
         }
 
-        query.sequence(GLOBAL_ID_PK, getGlobalIdPkSeqWithSchema());
-
-        //TODO measure
-        return polyJdbc.queryRunner().insert(query);
+        return session.insert(
+                queryKey,
+                params.build(),
+                getGlobalIdTableNameWithSchema(),
+                GLOBAL_ID_PK,
+                getGlobalIdPkSeqWithSchema());
     }
 
     public void setJsonConverter(JsonConverter JSONConverter) {

@@ -30,8 +30,8 @@ public class CdoSnapshotRepository extends SchemaNameAware {
     }
 
     private long insertSnapshot(long globalIdPk, long commitIdPk, CdoSnapshot cdoSnapshot, Session session) {
-        // TODO HOTSPOT
-        System.out.println("--HOTSPOT->PREPARED insertSnapshot() globalIdPk:" + globalIdPk+ ", commitIdPk:"+commitIdPk);
+
+        //TODO blind
 
         return session.insert(
                 "insert Snapshot",

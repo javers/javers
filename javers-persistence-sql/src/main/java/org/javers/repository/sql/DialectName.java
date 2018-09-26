@@ -15,13 +15,7 @@ public enum DialectName {
     MYSQL,
 
     /** Microsoft SQL Server*/
-    MSSQL,
-
-    /** incubating */
-    DB2,
-
-    /** incubating */
-    DB2400;
+    MSSQL;
 
     public DialectRegistry getPolyDialectName() {
         return DialectRegistry.valueOf(this.name());

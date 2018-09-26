@@ -1,9 +1,13 @@
 package org.javers.repository.sql.session;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 abstract class Parameter<T> {
     private final String name;
@@ -59,6 +63,32 @@ abstract class Parameter<T> {
         @Override
         void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
             preparedStatement.setInt(order, getValue());
+        }
+    }
+
+    static class BigDecimalParameter extends Parameter<BigDecimal> {
+        BigDecimalParameter(String name, BigDecimal value) {
+            super(name, value);
+        }
+
+        @Override
+        void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setBigDecimal(order, getValue());
+        }
+    }
+
+    static class LocalDateTimeParameter extends Parameter<LocalDateTime> {
+        LocalDateTimeParameter(String name, LocalDateTime value) {
+            super(name, value);
+        }
+
+        @Override
+        void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            preparedStatement.setTimestamp(order, toTimestamp(getValue()));
+        }
+
+        private Timestamp toTimestamp(LocalDateTime value) {
+            return new Timestamp(UtilTypeCoreAdapters.toUtilDate(value).getTime());
         }
     }
 }

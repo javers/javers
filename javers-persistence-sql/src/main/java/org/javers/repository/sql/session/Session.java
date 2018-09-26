@@ -2,7 +2,6 @@ package org.javers.repository.sql.session;
 
 import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
-import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.slf4j.Logger;
@@ -24,7 +23,7 @@ public class Session implements AutoCloseable {
     private final ConnectionProvider connectionProvider;
 
     Session(DialectName dialectName, ConnectionProvider connectionProvider) {
-        this.dialect = Dialect.fromName(dialectName);
+        this.dialect = Dialects.fromName(dialectName);
         this.connectionProvider = connectionProvider;
     }
 
@@ -32,7 +31,8 @@ public class Session implements AutoCloseable {
         Validate.argumentsAreNotNull(queryName, parameters, tableName, primaryKeyFieldName, sequenceName);
 
         if (dialect.supportsSequences()) {
-            long newId = queryForLong(new Select(sequenceName, dialect.nextFromSequence(sequenceName)));
+            KeyGenerator.Sequence seq = dialect.getKeyGenerator();
+            long newId = queryForLong(new Select("next from seq "+ sequenceName, seq.nextFromSequenceAsSelect(sequenceName)));
 
             Insert insertQuery = new Insert(
                     queryName,
@@ -48,7 +48,8 @@ public class Session implements AutoCloseable {
 
             execute(insertQuery);
 
-            long lastId = queryForLong(new Select(sequenceName, dialect.lastInsertedAutoincrement()));
+            KeyGenerator.Autoincrement autoincrement = dialect.getKeyGenerator();
+            long lastId = queryForLong(new Select("last autoincrement id", autoincrement.lastInsertedAutoincrement()));
 
             return lastId;
         }
@@ -87,6 +88,6 @@ public class Session implements AutoCloseable {
                 statementExecutors.values().stream().mapToInt(i -> i.getExecutionCount()).sum(),
                 statementExecutors.values().stream().mapToLong(i -> i.getExecutionTotalMillis()).sum());
 
-        statementExecutors.values().stream().forEach(e -> logger.debug(". "+e.printStats()));
+        statementExecutors.values().stream().forEach(e -> logger.debug("* "+e.printStats()));
     }
 }

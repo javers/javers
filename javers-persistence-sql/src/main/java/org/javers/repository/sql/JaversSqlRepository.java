@@ -77,10 +77,9 @@ public class JaversSqlRepository implements JaversRepository {
             throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT, commit.getId());
         }
 
-        long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getId());
-
-        //TODO try with resources
         try(Session session = sessionFactory.create()) {
+            long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getId(), session);
+
             cdoSnapshotRepository.save(commitPk, commit.getSnapshots(), session);
         }
     }

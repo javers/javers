@@ -8,6 +8,8 @@ import org.javers.repository.sql.session.PolyUtil;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
 import java.time.LocalDateTime;
+
+import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
@@ -16,6 +18,7 @@ import org.polyjdbc.core.type.Timestamp;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import static org.javers.repository.sql.session.ParametersBuilder.parameters;
 import static org.javers.repository.sql.session.PolyUtil.queryForOptionalBigDecimal;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
@@ -31,26 +34,37 @@ public class CommitMetadataRepository extends SchemaNameAware {
         this.polyJDBC = polyjdbc;
     }
 
-    public long save(String author, Map<String, String> properties, LocalDateTime date, CommitId commitId) {
-        long commitPk = insertCommit(author, date, commitId);
-        insertCommitProperties(commitPk, properties);
+    public long save(String author, Map<String, String> properties, LocalDateTime date, CommitId commitId, Session session) {
+        long commitPk = insertCommit(author, date, commitId, session);
+        insertCommitProperties(commitPk, properties, session);
         return commitPk;
     }
 
-    private long insertCommit(String author, LocalDateTime date, CommitId commitId) {
-        System.out.println("-- insertCommit() "+commitId);
+    private long insertCommit(String author, LocalDateTime date, CommitId commitId, Session session) {
+        return session.insert(
+                "insert Commit",
+                parameters()
+                        .add(COMMIT_AUTHOR, author)
+                        .add(COMMIT_COMMIT_DATE, date)
+                        .add(COMMIT_COMMIT_ID, commitId.valueAsNumber())
+                        .build(),
+                getCommitTableNameWithSchema(),
+                COMMIT_PK,
+                getCommitPkSeqWithSchema());
 
+        /* TODO builder
         InsertQuery query = polyJDBC.query().insert().into(getCommitTableNameWithSchema())
                 .value(COMMIT_AUTHOR, author)
                 .value(COMMIT_COMMIT_DATE, toTimestamp(date))
                 .value(COMMIT_COMMIT_ID, commitId.valueAsNumber())
                 .sequence(COMMIT_PK, getCommitPkSeqWithSchema());
-
-        return polyJDBC.queryRunner().insert(query);
+        */
     }
 
-    private void insertCommitProperties(long commitPk, Map<String, String> properties) {
+    private void insertCommitProperties(long commitPk, Map<String, String> properties, Session session) {
         System.out.println("-- insertCommitProperties() "+properties.size());
+
+        //TODO blind
 
         for (Map.Entry<String, String> property : properties.entrySet()) {
             InsertQuery query = polyJDBC.query().insert().into(getCommitPropertyTableNameWithSchema())
