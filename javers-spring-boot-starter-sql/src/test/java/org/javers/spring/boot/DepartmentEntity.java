@@ -1,18 +1,11 @@
 package org.javers.spring.boot;
-
+import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 @Entity
 @Table(name = "department")
 public class DepartmentEntity {
-
   @Id
   @Column
   @GeneratedValue
@@ -40,6 +33,6 @@ public class DepartmentEntity {
 
   @Override
   public String toString() {
-      return "DepartmentEntity{" + "id=" + id + '}';
+    return "DepartmentEntity{" + "id=" + id + '}';
   }
 }

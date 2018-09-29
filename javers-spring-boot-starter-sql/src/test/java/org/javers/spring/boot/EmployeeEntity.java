@@ -1,24 +1,18 @@
 package org.javers.spring.boot;
 
+import javax.persistence.*;
 import java.util.UUID;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 @Entity
 @Table(name = "employee")
 public class EmployeeEntity {
-
   @Id
   @Column
   private UUID id;
 
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "department_id", referencedColumnName = "id")
+
   private DepartmentEntity department;
 
   @org.javers.core.metamodel.annotation.Id
