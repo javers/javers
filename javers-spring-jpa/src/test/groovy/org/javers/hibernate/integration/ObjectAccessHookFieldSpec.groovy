@@ -40,15 +40,6 @@ class ObjectAccessHookFieldSpec extends Specification {
         def savePoint = loadedDeveloper.getBoss(savePointLevel)
         repository.save(savePoint)
 
-        /*
-        Comment-101
-        I think without Person ManyToOne relationship as CASCADE proxy should not be persisted
-        hence latest snapshot should not have the changed state.
-        But since there is auditing performed on the input entity rather than the saved entity hence there
-        is difference between the entity persisted and entity audited.
-
-        Attached screenshot to show the entity and audit snapshot without cascading enabled.
-        */
         then:
         def snapshot = javers.getLatestSnapshot(proxy.id, Person).get()
         snapshot.getPropertyValue("name") == "New Name"

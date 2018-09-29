@@ -1,7 +1,6 @@
 package org.javers.spring.sql
 
 import org.javers.core.Javers
-import org.javers.repository.jql.QueryBuilder
 import org.javers.spring.boot.DummyEntity
 import org.javers.spring.boot.TestApplication
 import org.javers.spring.boot.sql.DummyEntityRepository
@@ -9,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
+
+import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 /**
  * @author pawelszymczyk
@@ -25,15 +26,26 @@ class JaversSqlStarterIntegrationTest extends Specification {
 
     def "should build default javers instance with auto-audit aspect"() {
         when:
-        def persistedEntity = dummyEntityRepository.save(DummyEntity.random())
-        assert dummyEntityRepository.findOne(persistedEntity.id)
+        def entity = dummyEntityRepository.save(DummyEntity.random())
+        assert dummyEntityRepository.findOne(entity.id)
 
-        def snapshots = javers
-                .findSnapshots(QueryBuilder.byInstanceId(persistedEntity.id, DummyEntity).build())
+        def snapshots = javers.findSnapshots(byInstanceId(entity.id, DummyEntity).build())
 
         then:
         assert snapshots.size() == 1
         assert snapshots[0].commitMetadata.properties["key"] == "ok"
         assert snapshots[0].commitMetadata.author == "unauthenticated"
+    }
+
+    def "should call auto-audit aspect when saving iterable "(){
+      given:
+      List entities = (1..5).collect{ DummyEntity.random()}
+
+      when:
+      List persisted = dummyEntityRepository.save(entities)
+
+      then:
+      persisted.collect {p -> javers.getLatestSnapshot(p.id, DummyEntity)}
+               .each {s -> assert s.isPresent() }
     }
 }

@@ -27,9 +27,8 @@ class HibernateSmartUnproxyTest extends Specification {
 
     def "should not initialize proxy of Shallow reference"() {
         given:
-        def shallowEntity = ShallowEntity.random()
-        def shallowPersisted = shallowEntityRepository.save(shallowEntity)
-        def proxy = shallowEntityRepository.getOne(shallowPersisted.id)
+        def shallowEntity = shallowEntityRepository.save(ShallowEntity.random())
+        def proxy = shallowEntityRepository.getOne(shallowEntity.id)
 
         println "proxy.isInitialized: " + Hibernate.isInitialized(proxy)
         println "proxy.class: " + proxy.class
@@ -43,10 +42,10 @@ class HibernateSmartUnproxyTest extends Specification {
         when:
         def entity = DummyEntity.random()
         entity.setShallowEntity(proxy)
-        def dummyPersisted = dummyEntityRepository.save(entity)
+        entity = dummyEntityRepository.save(entity)
 
         then:
-        def entitySnapshot = javers.getLatestSnapshot(dummyPersisted.id, DummyEntity).get()
+        def entitySnapshot = javers.getLatestSnapshot(entity.id, DummyEntity).get()
         InstanceId shallowRef = entitySnapshot.getPropertyValue("shallowEntity")
         shallowRef.typeName == ShallowEntity.class.name
         shallowRef.cdoId == shallowEntity.id

@@ -7,10 +7,14 @@ import org.javers.core.Javers;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
+import java.util.Map;
+
 /**
- * Commits all arguments passed to save() and delete() methods
- * in Spring Data CrudRepository
- * when repositories are annotated with (class-level) @JaversSpringDataAuditable.
+ * Calls {@link Javers#commit(String, Object, Map)} on objects returned from save() methods in Spring Data CrudRepository
+ * when a repository is annotated with (class-level) @JaversSpringDataAuditable.
+ * <br/><br/>
+ *
+ * Calls {@link Javers#commitShallowDelete(String, Object, Map)} on arguments passed to delete() methods.
  */
 @Aspect
 public class JaversSpringDataAuditableRepositoryAspect extends AbstractSpringAuditableRepositoryAspect {
