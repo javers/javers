@@ -1,14 +1,11 @@
 package org.javers.repository.sql.repositories;
 
-import java.util.Optional;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
-import org.javers.repository.sql.session.PolyUtil;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
-import java.time.LocalDateTime;
-
+import org.javers.repository.sql.session.PolyUtil;
 import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.InsertQuery;
@@ -16,11 +13,12 @@ import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
-import static org.javers.repository.sql.session.ParametersBuilder.parameters;
-import static org.javers.repository.sql.session.PolyUtil.queryForOptionalBigDecimal;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import static org.javers.repository.sql.session.PolyUtil.queryForOptionalBigDecimal;
 
 /**
  * @author pawel szymczyk
@@ -41,24 +39,13 @@ public class CommitMetadataRepository extends SchemaNameAware {
     }
 
     private long insertCommit(String author, LocalDateTime date, CommitId commitId, Session session) {
-        return session.insert(
-                "insert Commit",
-                parameters()
-                        .add(COMMIT_AUTHOR, author)
-                        .add(COMMIT_COMMIT_DATE, date)
-                        .add(COMMIT_COMMIT_ID, commitId.valueAsNumber())
-                        .build(),
-                getCommitTableNameWithSchema(),
-                COMMIT_PK,
-                getCommitPkSeqWithSchema());
-
-        /* TODO builder
-        InsertQuery query = polyJDBC.query().insert().into(getCommitTableNameWithSchema())
-                .value(COMMIT_AUTHOR, author)
-                .value(COMMIT_COMMIT_DATE, toTimestamp(date))
-                .value(COMMIT_COMMIT_ID, commitId.valueAsNumber())
-                .sequence(COMMIT_PK, getCommitPkSeqWithSchema());
-        */
+        return session.insert("insert Commit")
+                      .into(getCommitTableNameWithSchema())
+                      .value(COMMIT_AUTHOR, author)
+                      .value(COMMIT_COMMIT_DATE, date)
+                      .value(COMMIT_COMMIT_ID, commitId.valueAsNumber())
+                      .sequence(COMMIT_PK, getCommitPkSeqWithSchema())
+                      .executeAndGetSequence();
     }
 
     private void insertCommitProperties(long commitPk, Map<String, String> properties, Session session) {

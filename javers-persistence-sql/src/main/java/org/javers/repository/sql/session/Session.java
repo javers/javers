@@ -4,12 +4,13 @@ import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
+import org.polyjdbc.core.query.InsertQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * @author bartosz.walacik
@@ -27,7 +28,11 @@ public class Session implements AutoCloseable {
         this.connectionProvider = connectionProvider;
     }
 
-    public long insert(String queryName, List<Parameter> parameters, String tableName, String primaryKeyFieldName, String sequenceName) {
+    public InsertBuilder insert(String queryName) {
+        return new InsertBuilder(queryName);
+    }
+
+    long insertAndGetSequence(String queryName, List<Parameter> parameters, String tableName, String primaryKeyFieldName, String sequenceName) {
         Validate.argumentsAreNotNull(queryName, parameters, tableName, primaryKeyFieldName, sequenceName);
 
         if (dialect.supportsSequences()) {
@@ -52,6 +57,26 @@ public class Session implements AutoCloseable {
             long lastId = queryForLong(new Select("last autoincrement id", autoincrement.lastInsertedAutoincrement()));
 
             return lastId;
+        }
+    }
+
+    void insert(String queryName, List<Parameter> parameters, String tableName, String primaryKeyFieldName, String sequenceName) {
+        Validate.argumentsAreNotNull(queryName, parameters, tableName, primaryKeyFieldName, sequenceName);
+
+        if (dialect.supportsSequences()) {
+            KeyGenerator.Sequence seq = dialect.getKeyGenerator();
+
+            Insert insertQuery = new Insert(
+                    queryName,
+                    Lists.add(parameters,
+                            new Parameter.SqlLiteralParameter(primaryKeyFieldName, seq.nextFromSequenceEmbedded(sequenceName))),
+                    tableName);
+
+            execute(insertQuery);
+        }
+        else {
+            Insert insertQuery = new Insert(queryName, parameters, tableName);
+            execute(insertQuery);
         }
     }
 
@@ -89,5 +114,68 @@ public class Session implements AutoCloseable {
                 statementExecutors.values().stream().mapToLong(i -> i.getExecutionTotalMillis()).sum());
 
         statementExecutors.values().stream().forEach(e -> logger.debug("* "+e.printStats()));
+    }
+
+    public class QueryBuilder<T extends QueryBuilder>  {
+        final String queryName;
+        final List<Parameter> parameters = new ArrayList<>();
+
+        QueryBuilder(String queryName) {
+            this.queryName = queryName;
+        }
+
+        public T value(String name, String value) {
+            parameters.add(new Parameter.StringParameter(name, value));
+            return (T)this;
+        }
+
+        public T value(String name, Integer value) {
+            parameters.add(new Parameter.IntParameter(name, value));
+            return (T)this;
+        }
+
+        public T value(String name, LocalDateTime value) {
+            parameters.add(new Parameter.LocalDateTimeParameter(name, value));
+            return (T)this;
+        }
+
+        public T value(String name, BigDecimal value) {
+            parameters.add(new Parameter.BigDecimalParameter(name, value));
+            return (T)this;
+        }
+
+        public T value(String name, Long value) {
+            parameters.add(new Parameter.LongParameter(name, value));
+            return (T)this;
+        }
+    }
+
+    public class InsertBuilder extends QueryBuilder<InsertBuilder> {
+        private String tableName;
+        private String primaryKeyFieldName;
+        private String sequenceName;
+
+        InsertBuilder(String queryName) {
+            super(queryName);
+        }
+
+        public InsertBuilder into(String tableName) {
+            this.tableName = tableName;
+            return this;
+        }
+
+        public InsertBuilder sequence(String primaryKeyFieldName, String sequenceName) {
+            this.primaryKeyFieldName = primaryKeyFieldName;
+            this.sequenceName = sequenceName;
+            return this;
+        }
+
+        public long executeAndGetSequence()  {
+            return insertAndGetSequence(queryName, Collections.unmodifiableList(parameters), tableName, primaryKeyFieldName, sequenceName);
+        }
+
+        public void execute()  {
+            insert(queryName, Collections.unmodifiableList(parameters), tableName, primaryKeyFieldName, sequenceName);
+        }
     }
 }

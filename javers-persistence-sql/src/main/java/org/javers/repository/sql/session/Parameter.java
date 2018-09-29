@@ -29,7 +29,7 @@ abstract class Parameter<T> {
         return value;
     }
 
-    public String getRawSqlRepresentation() {
+    String getRawSqlRepresentation() {
         return "?";
     }
 
@@ -89,6 +89,21 @@ abstract class Parameter<T> {
 
         private Timestamp toTimestamp(LocalDateTime value) {
             return new Timestamp(UtilTypeCoreAdapters.toUtilDate(value).getTime());
+        }
+    }
+
+    static class SqlLiteralParameter extends Parameter<String> {
+        SqlLiteralParameter(String name, String value) {
+            super(name, value);
+        }
+
+        @Override
+        String getRawSqlRepresentation() {
+            return getValue();
+        }
+
+        @Override
+        void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
         }
     }
 }
