@@ -8,6 +8,7 @@ import spock.lang.Specification
 
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
+@Transactional
 abstract class SpringBootAuditableIntegrationBaseTest extends Specification {
 
     @Autowired
@@ -22,7 +23,6 @@ abstract class SpringBootAuditableIntegrationBaseTest extends Specification {
     @Autowired
     EmployeeRepositoryWithJavers employeeRepositoryWithJavers
 
-    @Transactional
     def "@JaversSpringDataAuditable aspect should work effortlessly with spring-boot"(){
         given:
         def entity = DummyEntity.random()

@@ -9,6 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
+import javax.transaction.Transactional
+
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
 /**
@@ -16,6 +18,7 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
  */
 @SpringBootTest(classes = [TestApplication])
 @ActiveProfiles("test")
+@Transactional
 class JaversSqlStarterIntegrationTest extends Specification {
 
     @Autowired
