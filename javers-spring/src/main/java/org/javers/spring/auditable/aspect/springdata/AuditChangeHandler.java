@@ -5,6 +5,7 @@ import org.springframework.data.repository.core.RepositoryMetadata;
 /**
  * Created by gessnerfl on 22.02.15.
  */
+@FunctionalInterface
 interface AuditChangeHandler {
     /**
      * Creates a new audit log entry for the given domainObject. The handler is executed after

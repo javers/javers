@@ -5,7 +5,7 @@ javers:
   prettyPrint: false
   typeSafeValues: true
   dialect: H2
-  sqlSchemaManagementEnabled: false
+  sqlSchemaManagementEnabled: true
   packagesToScan: my.company.domain.person, my.company.domain.finance
   prettyPrintDateFormats:
     localDateTime: "dd-mm-yyyy"

@@ -70,7 +70,10 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
     }
 
     public JaversSqlRepository build() {
-        logger.info("starting up SqlRepository with dialect {} ...", dialectName);
+        logger.info("starting SqlRepository...");
+        logger.info("  dialect:                 {}", dialectName);
+        logger.info("  schemaManagementEnabled: {}", schemaManagementEnabled);
+        logger.info("  schemaName:              {}", schemaName);
         bootContainer();
 
         SqlRepositoryConfiguration config =

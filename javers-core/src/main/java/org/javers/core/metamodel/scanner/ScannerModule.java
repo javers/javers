@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.scanner;
 
 import org.javers.common.collections.Lists;
+import org.javers.core.JaversBuilder;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.MappingStyle;
 import org.javers.core.pico.LateInstantiatingModule;
@@ -14,7 +15,7 @@ import java.util.Collection;
  * @author bartosz.walacik
  */
 public class ScannerModule extends LateInstantiatingModule {
-    private static final Logger logger = LoggerFactory.getLogger(ScannerModule.class);
+    private static final Logger logger = JaversBuilder.logger;
 
     public ScannerModule(JaversCoreConfiguration configuration, MutablePicoContainer container) {
         super(configuration, container);
@@ -24,7 +25,7 @@ public class ScannerModule extends LateInstantiatingModule {
     protected Collection<Class> getImplementations() {
 
         MappingStyle mappingStyle = getConfiguration().getMappingStyle();
-        logger.info("using "+mappingStyle.name()+ " mappingStyle");
+        logger.info("mappingStyle: "+mappingStyle.name());
 
         Class<? extends PropertyScanner> usedPropertyScanner;
         if (mappingStyle == MappingStyle.BEAN){
