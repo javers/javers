@@ -9,7 +9,7 @@ public class Person {
     @Id
     private String id;
     private String name;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Person boss;
 
     public Person() {

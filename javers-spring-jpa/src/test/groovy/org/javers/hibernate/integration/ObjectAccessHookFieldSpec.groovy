@@ -48,4 +48,5 @@ class ObjectAccessHookFieldSpec extends Specification {
         savePointLevel <<     [0, 1, 0, 1]
         modPointLevel  <<     [1, 1, 2, 2]
     }
+
 }

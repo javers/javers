@@ -1,6 +1,7 @@
 package org.javers.spring.auditable;
 
 import org.aspectj.lang.JoinPoint;
+import org.javers.common.collections.Lists;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,5 +22,12 @@ public class AspectUtil {
             }
         }
         return result;
+    }
+
+    public static Iterable<Object> collectReturnedObjects(Object returnedObject){
+        if (returnedObject instanceof Iterable) {
+            return (Iterable)returnedObject;
+        }
+        return Lists.immutableListOf(returnedObject);
     }
 }

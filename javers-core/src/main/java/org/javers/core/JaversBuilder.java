@@ -74,7 +74,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 public class JaversBuilder extends AbstractContainerBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
+    public static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
     private final Map<Class, ClientsClassDefinition> clientsClassDefinitions = new HashMap<>();
 
@@ -293,7 +293,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 			scanTypeName(c);
 		}
 		long delta = System.currentTimeMillis() - start;
-        logger.info("found {} ManagedClasse(s) with @TypeName in {} ms", scan.size(), delta);
+        logger.info("  found {} ManagedClasse(s) with @TypeName in {} ms", scan.size(), delta);
 
 		return this;
     }
