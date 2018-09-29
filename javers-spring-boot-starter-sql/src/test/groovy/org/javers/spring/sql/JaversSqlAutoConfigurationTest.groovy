@@ -34,7 +34,7 @@ class JaversSqlAutoConfigurationTest extends Specification {
         !javersProperties.isPrettyPrint()
         javersProperties.isTypeSafeValues()
         dialectName == DialectName.H2
-        !javersProperties.isSqlSchemaManagementEnabled()
+        javersProperties.isSqlSchemaManagementEnabled()
         javersProperties.packagesToScan == "my.company.domain.person, my.company.domain.finance"
         javersProperties.prettyPrintDateFormats.localDateTime == "dd-mm-yyyy"
         javersProperties.prettyPrintDateFormats.zonedDateTime == "dd-mm-yyyy HH mm ss Z"
