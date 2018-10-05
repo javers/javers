@@ -10,6 +10,7 @@ import java.util.Optional;
 /**
  * @author bartosz walacik
  */
+@Deprecated
 public class PolyUtil {
     public static List<Long> queryForLongList(SelectQuery query, PolyJDBC poly){
         return poly.queryRunner().queryList(query, resultSet -> resultSet.getLong(1));

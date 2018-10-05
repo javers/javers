@@ -24,7 +24,7 @@ public class CdoSnapshotRepository extends SchemaNameAware {
         for (CdoSnapshot cdoSnapshot : cdoSnapshots) {
             long globalIdPk = globalIdRepository.getOrInsertId(cdoSnapshot.getGlobalId(), session);
 
-            session.insert("insert Snapshot")
+            session.insert("Snapshot")
                     .into(getSnapshotTableNameWithSchema())
                     .value(SNAPSHOT_TYPE, cdoSnapshot.getType().toString())
                     .value(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)

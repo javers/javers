@@ -1,14 +1,13 @@
 package org.javers.repository.sql.repositories;
 
-import org.javers.core.commit.Commit;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
-import org.javers.repository.sql.session.PolyUtil;
 import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.PolyJDBC;
-import org.polyjdbc.core.query.InsertQuery;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
@@ -33,13 +32,17 @@ public class CommitMetadataRepository extends SchemaNameAware {
     }
 
     public long save(String author, Map<String, String> properties, LocalDateTime date, CommitId commitId, Session session) {
+        if (isCommitPersisted(commitId, session)) {
+            throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT, commitId);
+        }
+
         long commitPk = insertCommit(author, date, commitId, session);
         insertCommitProperties(commitPk, properties, session);
         return commitPk;
     }
 
     private long insertCommit(String author, LocalDateTime date, CommitId commitId, Session session) {
-        return session.insert("insert Commit")
+        return session.insert("Commit")
                       .into(getCommitTableNameWithSchema())
                       .value(COMMIT_AUTHOR, author)
                       .value(COMMIT_COMMIT_DATE, date)
@@ -49,50 +52,42 @@ public class CommitMetadataRepository extends SchemaNameAware {
     }
 
     private void insertCommitProperties(long commitPk, Map<String, String> properties, Session session) {
-        System.out.println("-- insertCommitProperties() "+properties.size());
-
-        //TODO blind
-
         for (Map.Entry<String, String> property : properties.entrySet()) {
-            InsertQuery query = polyJDBC.query().insert().into(getCommitPropertyTableNameWithSchema())
-                .value(COMMIT_PROPERTY_COMMIT_FK, commitPk)
-                .value(COMMIT_PROPERTY_NAME, property.getKey())
-                .value(COMMIT_PROPERTY_VALUE, property.getValue());
-            polyJDBC.queryRunner().insert(query);
+            session.insert("CommitPropertshrey")
+                   .into(getCommitPropertyTableNameWithSchema())
+                   .value(COMMIT_PROPERTY_COMMIT_FK, commitPk)
+                   .value(COMMIT_PROPERTY_NAME, property.getKey())
+                   .value(COMMIT_PROPERTY_VALUE, property.getValue())
+                   .execute();
         }
     }
 
-    public boolean isCommitPersisted(Commit commit) {
-        System.out.println("-- isCommitPersisted() " + commit.getId());
+    boolean isCommitPersisted(CommitId commitId, Session session) {
+        long count = session.select("count(*)")
+               .from(getCommitTableNameWithSchema())
+               .where()
+               .and(COMMIT_COMMIT_ID, commitId.valueAsNumber())
+               .queryForLong("isCommitPersisted");
 
-        SelectQuery selectQuery = polyJDBC.query()
-                .select("count(*)")
-                .from(getCommitTableNameWithSchema())
-                .where(COMMIT_COMMIT_ID + " = :id")
-                .withArgument("id", commit.getId().valueAsNumber());
-
-        return PolyUtil.queryForOptionalLong(selectQuery, polyJDBC).get() > 0;
+        return count > 0;
     }
 
     private Timestamp toTimestamp(LocalDateTime commitMetadata) {
         return new Timestamp(UtilTypeCoreAdapters.toUtilDate(commitMetadata));
     }
 
-    public CommitId getCommitHeadId() {
-        Optional<BigDecimal> maxCommitId = selectMaxCommitId();
+    public CommitId getCommitHeadId(Session session) {
+        BigDecimal maxCommitId = selectMaxCommitId(session);
+
+        if (maxCommitId.equals(BigDecimal.ZERO))
 
         return maxCommitId.map(max -> CommitId.valueOf(maxCommitId.get()))
                           .orElse(null);
     }
 
-    private Optional<BigDecimal> selectMaxCommitId() {
-        System.out.println("-- selectMaxCommitId() ");
-
-        SelectQuery query = polyJDBC.query()
-                .select("MAX(" + COMMIT_COMMIT_ID + ")")
-                .from(getCommitTableNameWithSchema());
-
-        return queryForOptionalBigDecimal(query, polyJDBC);
+    private BigDecimal selectMaxCommitId(Session session) {
+        return session.select("MAX(" + COMMIT_COMMIT_ID + ")")
+                .from(getCommitTableNameWithSchema())
+                .queryForBigDecimal("max CommitId");
     }
-
 }

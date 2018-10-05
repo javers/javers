@@ -4,13 +4,14 @@ import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
-import org.polyjdbc.core.query.InsertQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static java.util.Comparator.*;
 
 /**
  * @author bartosz.walacik
@@ -28,16 +29,20 @@ public class Session implements AutoCloseable {
         this.connectionProvider = connectionProvider;
     }
 
+    public SelectBuilder select(String selectClauseSQL) {
+        return new SelectBuilder(selectClauseSQL);
+    }
+
     public InsertBuilder insert(String queryName) {
         return new InsertBuilder(queryName);
     }
 
-    long insertAndGetSequence(String queryName, List<Parameter> parameters, String tableName, String primaryKeyFieldName, String sequenceName) {
+    private long executeInsertAndGetSequence(String queryName, List<Parameter> parameters, String tableName, String primaryKeyFieldName, String sequenceName) {
         Validate.argumentsAreNotNull(queryName, parameters, tableName, primaryKeyFieldName, sequenceName);
 
         if (dialect.supportsSequences()) {
             KeyGenerator.Sequence seq = dialect.getKeyGenerator();
-            long newId = queryForLong(new Select("next from seq "+ sequenceName, seq.nextFromSequenceAsSelect(sequenceName)));
+            long newId = executeQueryForLong(new Select("SELECT next from seq "+ sequenceName, seq.nextFromSequenceAsSelect(sequenceName)));
 
             Insert insertQuery = new Insert(
                     queryName,
@@ -45,7 +50,6 @@ public class Session implements AutoCloseable {
                     tableName);
 
             execute(insertQuery);
-
             return newId;
         }
         else {
@@ -54,22 +58,19 @@ public class Session implements AutoCloseable {
             execute(insertQuery);
 
             KeyGenerator.Autoincrement autoincrement = dialect.getKeyGenerator();
-            long lastId = queryForLong(new Select("last autoincrement id", autoincrement.lastInsertedAutoincrement()));
-
-            return lastId;
+            return executeQueryForLong(new Select("last autoincrement id", autoincrement.lastInsertedAutoincrement()));
         }
     }
 
-    void insert(String queryName, List<Parameter> parameters, String tableName, String primaryKeyFieldName, String sequenceName) {
-        Validate.argumentsAreNotNull(queryName, parameters, tableName, primaryKeyFieldName, sequenceName);
+    private void executeInsert(String queryName, List<Parameter> parameters, String tableName, String primaryKeyFieldName, String sequenceName) {
+        Validate.argumentsAreNotNull(queryName, parameters, tableName);
 
-        if (dialect.supportsSequences()) {
+        if (dialect.supportsSequences() && sequenceName != null) {
             KeyGenerator.Sequence seq = dialect.getKeyGenerator();
 
             Insert insertQuery = new Insert(
                     queryName,
-                    Lists.add(parameters,
-                            new Parameter.SqlLiteralParameter(primaryKeyFieldName, seq.nextFromSequenceEmbedded(sequenceName))),
+                    Lists.add(parameters, new Parameter.SqlLiteralParameter(primaryKeyFieldName, seq.nextFromSequenceEmbedded(sequenceName))),
                     tableName);
 
             execute(insertQuery);
@@ -80,9 +81,14 @@ public class Session implements AutoCloseable {
         }
     }
 
-    private long queryForLong(Select select) {
+    private long executeQueryForLong(Select select) {
         PreparedStatementExecutor executor = getOrCreatePreparedStatement(select);
         return executor.executeQueryForLong(select);
+    }
+
+    private BigDecimal executeQueryForBigDecimal(Select select) {
+        PreparedStatementExecutor executor = getOrCreatePreparedStatement(select);
+        return executor.executeQueryForBigDecimal(select);
     }
 
     private void execute(Insert insertQuery) {
@@ -113,16 +119,15 @@ public class Session implements AutoCloseable {
                 statementExecutors.values().stream().mapToInt(i -> i.getExecutionCount()).sum(),
                 statementExecutors.values().stream().mapToLong(i -> i.getExecutionTotalMillis()).sum());
 
-        statementExecutors.values().stream().forEach(e -> logger.debug("* "+e.printStats()));
+        List<PreparedStatementExecutor> executors = new ArrayList<>(statementExecutors.values());
+        Collections.sort(executors, (e1, e2) -> e2.getExecutionTotalMillis() > e1.getExecutionTotalMillis() ? 1 : -1);
+
+        executors.forEach(e -> logger.debug("* "+e.printStats()));
     }
 
     public class QueryBuilder<T extends QueryBuilder>  {
-        final String queryName;
+        private String queryName;
         final List<Parameter> parameters = new ArrayList<>();
-
-        QueryBuilder(String queryName) {
-            this.queryName = queryName;
-        }
 
         public T value(String name, String value) {
             parameters.add(new Parameter.StringParameter(name, value));
@@ -148,6 +153,62 @@ public class Session implements AutoCloseable {
             parameters.add(new Parameter.LongParameter(name, value));
             return (T)this;
         }
+
+        public T queryName(String queryName) {
+            this.queryName = queryName;
+            return (T)this;
+        }
+
+        public List<Parameter> getParameters() {
+            return Collections.unmodifiableList(parameters);
+        }
+
+        public String getQueryName() {
+            return queryName;
+        }
+    }
+
+    public class SelectBuilder extends QueryBuilder<SelectBuilder> {
+        private String rawSql;
+
+        SelectBuilder(String selectClauseSQL) {
+            rawSql = "SELECT " + selectClauseSQL;
+        }
+
+        public SelectBuilder sql(String sql) {
+            this.rawSql = sql;
+            return this;
+        }
+
+        public SelectBuilder from(String tableName) {
+            rawSql += " FROM " + tableName;
+            return this;
+        }
+
+        public SelectBuilder where() {
+            rawSql += " WHERE 1 = 1";
+            return this;
+        }
+
+        public SelectBuilder and(String columnName, BigDecimal value) {
+            parameters.add(new Parameter.BigDecimalParameter(columnName, value));
+            rawSql += " AND " + columnName +  " = ?";
+            return this;
+        }
+
+        private Select build() {
+            return new Select("SELECT "+ getQueryName(), getParameters(), rawSql);
+        }
+
+        public long queryForLong(String queryName) {
+            queryName(queryName);
+            return executeQueryForLong(build());
+        }
+
+        public BigDecimal queryForBigDecimal(String queryName) {
+            queryName(queryName);
+            return executeQueryForBigDecimal(build());
+        }
     }
 
     public class InsertBuilder extends QueryBuilder<InsertBuilder> {
@@ -156,7 +217,7 @@ public class Session implements AutoCloseable {
         private String sequenceName;
 
         InsertBuilder(String queryName) {
-            super(queryName);
+            queryName("INSERT "+ queryName);
         }
 
         public InsertBuilder into(String tableName) {
@@ -171,11 +232,11 @@ public class Session implements AutoCloseable {
         }
 
         public long executeAndGetSequence()  {
-            return insertAndGetSequence(queryName, Collections.unmodifiableList(parameters), tableName, primaryKeyFieldName, sequenceName);
+            return executeInsertAndGetSequence(getQueryName(), getParameters(), tableName, primaryKeyFieldName, sequenceName);
         }
 
         public void execute()  {
-            insert(queryName, Collections.unmodifiableList(parameters), tableName, primaryKeyFieldName, sequenceName);
+            executeInsert(getQueryName(), getParameters(), tableName, primaryKeyFieldName, sequenceName);
         }
     }
 }

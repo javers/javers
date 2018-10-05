@@ -73,10 +73,6 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public void persist(Commit commit) {
-        if (commitRepository.isCommitPersisted(commit)) {
-            throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT, commit.getId());
-        }
-
         try(Session session = sessionFactory.create()) {
             long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getId(), session);
 

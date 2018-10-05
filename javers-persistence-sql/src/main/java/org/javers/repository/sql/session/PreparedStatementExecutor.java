@@ -2,13 +2,16 @@ package org.javers.repository.sql.session;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.repository.sql.ConnectionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.function.Function;
 
 class PreparedStatementExecutor {
     private final PreparedStatement statement;
@@ -39,11 +42,19 @@ class PreparedStatementExecutor {
     }
 
     long executeQueryForLong(Select select) {
+        return executeQueryForValue(select, resultSet -> resultSet.getLong(1));
+    }
+
+    BigDecimal executeQueryForBigDecimal(Select select) {
+        return executeQueryForValue(select, resultSet -> resultSet.getBigDecimal(1));
+    }
+
+    private <T> T executeQueryForValue(Select select, ObjectMapper<T> objectMapper) {
         return runSql(() -> {
             select.injectValuesTo(statement);
             ResultSet rset = statement.executeQuery();
             rset.next();
-            return rset.getLong(1);
+            return objectMapper.get(rset);
         });
     }
 
@@ -80,24 +91,29 @@ class PreparedStatementExecutor {
 
     private <T> T wrapExceptionAndCall(SqlAction<T> action) {
         try {
-            return action.call();
+            return action.callAndGet();
         } catch (SQLException e) {
             throw new JaversException(JaversExceptionCode.SQL_EXCEPTION, e.getMessage(), rawSql);
         }
     }
 
     String printStats() {
-        return "statement '" + queryName + "' executed " + executionCount +
-               " time(s), in " + executionTotalMillis + " millis, SQL: " + rawSql;
+        return ToStringBuilder.rPad(queryName, 32) + " executed " + executionCount +
+               " time(s) in " + executionTotalMillis + " millis, SQL: " + rawSql;
     }
 
     @FunctionalInterface
     private interface SqlAction<T> {
-        T call() throws SQLException;
+        T callAndGet() throws SQLException;
     }
 
     @FunctionalInterface
     private interface SqlVoidAction {
         void call() throws SQLException;
+    }
+
+    @FunctionalInterface
+    private interface ObjectMapper<T> {
+        T get(ResultSet resultSet) throws SQLException;
     }
 }

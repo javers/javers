@@ -107,21 +107,21 @@ public class GlobalIdRepository extends SchemaNameAware {
 
         String queryKey = null;
         if (globalId instanceof ValueObjectId) {
-            insert = session.insert("insert ValueObjectId");
+            insert = session.insert("ValueObjectId");
             ValueObjectId valueObjectId  = (ValueObjectId) globalId;
             long ownerFk = getOrInsertId(valueObjectId.getOwnerId(), session);
-            insert.value(GLOBAL_ID_FRAGMENT, valueObjectId.getFragment());
-            insert.value(GLOBAL_ID_OWNER_ID_FK, ownerFk);
+            insert.value(GLOBAL_ID_FRAGMENT, valueObjectId.getFragment())
+                  .value(GLOBAL_ID_OWNER_ID_FK, ownerFk);
         }
         else if (globalId instanceof InstanceId) {
-            insert = session.insert("insert InstanceId");
-            insert.value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName());
-            insert.value(GLOBAL_ID_LOCAL_ID, jsonConverter.toJson(((InstanceId)globalId).getCdoId()));
+            insert = session.insert("InstanceId")
+                    .value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName())
+                    .value(GLOBAL_ID_LOCAL_ID, jsonConverter.toJson(((InstanceId)globalId).getCdoId()));
 
         }
         else if (globalId instanceof UnboundedValueObjectId) {
-            insert = session.insert("insert UnboundedValueObjectId");
-            insert.value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName());
+            insert = session.insert("UnboundedValueObjectId")
+                    .value(GLOBAL_ID_TYPE_NAME, globalId.getTypeName());
         }
 
         return insert.into(getGlobalIdTableNameWithSchema())
