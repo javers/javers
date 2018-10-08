@@ -8,6 +8,8 @@ import org.javers.common.validation.Validate;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinitionBuilder;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScanner;
@@ -219,6 +221,15 @@ public class TypeMapper {
 
     public void registerClientsClass(ClientsClassDefinition def) {
         state.register(def);
+    }
+
+    public void registerClientsRemovedType(String typeName) {
+        EntityDefinition definition = EntityDefinitionBuilder
+            .entityDefinition(RemovedEntity.class)
+            .withTypeName(typeName)
+            .build();
+
+        registerClientsClass(definition);
     }
 
     public void registerValueType(Class<?> valueCLass) {

@@ -26,10 +26,6 @@ abstract class FilterDefinition {
         Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
             return new IdFilter(globalIdFactory.createFromDto(globalIdDTO));
         }
-
-        boolean isInstanceIdFilter() {
-            return globalIdDTO instanceof InstanceIdDTO;
-        }
     }
 
     static class IdAndTypeNameFilterDefinition extends FilterDefinition {
@@ -56,7 +52,7 @@ abstract class FilterDefinition {
 
         @Override
         Filter compile(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
-            return new ClassFilter(Sets.transform(requiredClasses, javaClass -> typeMapper.getJaversManagedType(javaClass)));
+            return new ClassFilter(Sets.transform(requiredClasses, typeMapper::getJaversManagedType));
         }
     }
 

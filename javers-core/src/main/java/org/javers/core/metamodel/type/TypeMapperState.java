@@ -1,18 +1,20 @@
 package org.javers.core.metamodel.type;
 
-import java.util.Optional;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -86,7 +88,7 @@ class TypeMapperState {
             return jType;
         }
 
-        return computeIfAbsent(javaType, type -> infer(type));
+        return computeIfAbsent(javaType, this::infer);
     }
 
     void putIfAbsent(Type javaType, final JaversType jType) {
