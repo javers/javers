@@ -8,6 +8,8 @@ import org.javers.common.validation.Validate;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinitionBuilder;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScanner;
@@ -166,6 +168,33 @@ public class TypeMapper {
      */
     public <T extends ManagedType> T getJaversManagedType(String typeName, Class<T> expectedType) {
         return getJaversManagedType(state.getClassByTypeName(typeName), expectedType);
+    }
+
+    /**
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
+     * @since 3.11.7
+     */
+    public <T extends ManagedType> T getJaversManagedTypeIncludingRemoved(String typeName, Class<T> expectedType) {
+        try {
+            return getJaversManagedType(typeName, expectedType);
+        } catch (JaversException e) {
+            if (e.getCode() == JaversExceptionCode.TYPE_NAME_NOT_FOUND) {
+                // the entity type might have been removed, try to register a RemovedEntity for it
+                registerClientsRemovedType(typeName);
+                return getJaversManagedType(typeName, expectedType);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    private void registerClientsRemovedType(String typeName) {
+        EntityDefinition definition = EntityDefinitionBuilder
+            .entityDefinition(RemovedEntity.class)
+            .withTypeName(typeName)
+            .build();
+
+        registerClientsClass(definition);
     }
 
     /**

@@ -45,7 +45,7 @@ public class GlobalIdFactory {
 
         Optional<ObjectAccessProxy> cdoProxy = objectAccessHook.createAccessor(targetCdo);
 
-        Class<?> targetClass = cdoProxy.map((p) -> p.getTargetClass()).orElse(targetCdo.getClass());
+        Class<?> targetClass = cdoProxy.map(ObjectAccessProxy::getTargetClass).orElse(targetCdo.getClass());
         ManagedType targetManagedType = typeMapper.getJaversManagedType(targetClass);
 
         if (targetManagedType instanceof EntityType) {
@@ -65,7 +65,7 @@ public class GlobalIdFactory {
             String pathFromRoot = createPathFromRoot(ownerContext.getOwnerId(), ownerContext.getPath());
 
             if (ownerContext.requiresObjectHasher()) {
-                pathFromRoot += "/" + getObjectHasher().hash(cdoProxy.map((p) -> p.access()).orElse(targetCdo));
+                pathFromRoot += "/" + getObjectHasher().hash(cdoProxy.map(ObjectAccessProxy::access).orElse(targetCdo));
             }
             return new ValueObjectId(targetManagedType.getName(), getRootOwnerId(ownerContext), pathFromRoot);
         }
@@ -107,7 +107,7 @@ public class GlobalIdFactory {
     }
 
     public InstanceId createInstanceId(Object localId, String typeName){
-        EntityType entity = typeMapper.getJaversManagedType(typeName, EntityType.class);
+        EntityType entity = typeMapper.getJaversManagedTypeIncludingRemoved(typeName, EntityType.class);
         return entity.createIdFromLocalId(localId);
     }
 
