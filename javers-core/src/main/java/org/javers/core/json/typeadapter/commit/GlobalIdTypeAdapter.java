@@ -114,6 +114,6 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
 
     private EntityType parseEntity(JsonObject object){
         String entityName = object.get(ENTITY_FIELD).getAsString();
-        return typeMapper.getJaversManagedType(entityName, EntityType.class);
+        return typeMapper.getJaversManagedTypeIncludingRemoved(entityName, EntityType.class);
     }
 }

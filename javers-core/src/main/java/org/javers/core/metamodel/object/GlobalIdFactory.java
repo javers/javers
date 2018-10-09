@@ -107,20 +107,7 @@ public class GlobalIdFactory {
     }
 
     public InstanceId createInstanceId(Object localId, String typeName){
-        EntityType entity;
-
-        try {
-            entity = typeMapper.getJaversManagedType(typeName, EntityType.class);
-        } catch (JaversException e) {
-            if (e.getCode() == JaversExceptionCode.TYPE_NAME_NOT_FOUND) {
-                // the entity type might have been removed, try to register a RemovedEntity for it
-                typeMapper.registerClientsRemovedType(typeName);
-                entity = typeMapper.getJaversManagedType(typeName, EntityType.class);
-            } else {
-                throw e;
-            }
-        }
-
+        EntityType entity = typeMapper.getJaversManagedTypeIncludingRemoved(typeName, EntityType.class);
         return entity.createIdFromLocalId(localId);
     }
 

@@ -172,6 +172,33 @@ public class TypeMapper {
 
     /**
      * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
+     * @since 3.11.7
+     */
+    public <T extends ManagedType> T getJaversManagedTypeIncludingRemoved(String typeName, Class<T> expectedType) {
+        try {
+            return getJaversManagedType(typeName, expectedType);
+        } catch (JaversException e) {
+            if (e.getCode() == JaversExceptionCode.TYPE_NAME_NOT_FOUND) {
+                // the entity type might have been removed, try to register a RemovedEntity for it
+                registerClientsRemovedType(typeName);
+                return getJaversManagedType(typeName, expectedType);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    private void registerClientsRemovedType(String typeName) {
+        EntityDefinition definition = EntityDefinitionBuilder
+            .entityDefinition(RemovedEntity.class)
+            .withTypeName(typeName)
+            .build();
+
+        registerClientsClass(definition);
+    }
+
+    /**
+     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
      * @since 1.4
      */
     public <T extends ManagedType> T getJaversManagedType(DuckType duckType, Class<T> expectedType) {
@@ -221,15 +248,6 @@ public class TypeMapper {
 
     public void registerClientsClass(ClientsClassDefinition def) {
         state.register(def);
-    }
-
-    public void registerClientsRemovedType(String typeName) {
-        EntityDefinition definition = EntityDefinitionBuilder
-            .entityDefinition(RemovedEntity.class)
-            .withTypeName(typeName)
-            .build();
-
-        registerClientsClass(definition);
     }
 
     public void registerValueType(Class<?> valueCLass) {
