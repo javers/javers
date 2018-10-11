@@ -42,10 +42,6 @@ public class EntityType extends ManagedType {
         this.idProperty = idProperty;
     }
 
-    EntityType(ManagedClass entity, JaversProperty idProperty) {
-        this(entity, idProperty, Optional.empty());
-    }
-
     @Override
     EntityType spawn(ManagedClass managedClass, Optional<String> typeName) {
         //when spawning from prototype, prototype.idProperty and child.idProperty are different objects
@@ -57,41 +53,23 @@ public class EntityType extends ManagedType {
         return getIdProperty().getGenericType();
     }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.toString(this,
-                "baseType", getBaseJavaType(),
-                "id", getIdProperty().getName());
-    }
-
-    @Override
-    protected PrettyPrintBuilder prettyPrintBuilder() {
-        return super.prettyPrintBuilder().addField("idProperty", getIdProperty().getName());
-    }
-
     public JaversProperty getIdProperty() {
         return idProperty;
     }
 
-    /**
-     * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
-     * @throws JaversException NOT_INSTANCE_OF
-     */
-    public InstanceId createIdFromInstance(Object instance) {
-        return createIdFromLocalId(getIdOf(instance));
+    private String getIdPropertyName() {
+        return getIdProperty().getName();
     }
 
-    public InstanceId createIdFromLocalId(Object localId) {
-        return new InstanceId(getName(), localId, localIdAsString(localId));
+    public boolean isIdProperty(JaversProperty property) {
+        return idProperty.equals(property);
     }
 
     /**
      * @param instance instance of {@link #getBaseJavaClass()}
      * @return returns ID of given instance (value of idProperty)
-     * @throws JaversException ENTITY_INSTANCE_WITH_NULL_ID
-     * @throws JaversException NOT_INSTANCE_OF
      */
-    private Object getIdOf(Object instance) {
+    public Object getIdOf(Object instance) {
         Validate.argumentIsNotNull(instance);
 
         if (!isInstance(instance)) {
@@ -105,14 +83,27 @@ public class EntityType extends ManagedType {
         return cdoId;
     }
 
+    public InstanceId createIdFromInstance(Object instance) {
+        Object localId = getIdOf(instance);
+        return new InstanceId(getName(), localId, localIdAsString(localId));
+    }
+
+    public InstanceId createIdFromInstanceId(Object localId) {
+        return new InstanceId(getName(), localId, localIdAsString(localId));
+    }
+
     private String localIdAsString(Object localId) {
-        if (getIdProperty().getType() instanceof EntityType) {
-            EntityType idPropertyType = getIdProperty().getType();
+        if (getIdPropertyType() instanceof EntityType) {
+            EntityType idPropertyType = getIdPropertyType();
             return idPropertyType.localIdAsString(idPropertyType.getIdOf(localId));
         }
 
-        PrimitiveOrValueType idPropertyType = getIdProperty().getType();
+        PrimitiveOrValueType idPropertyType = getIdPropertyType();
         return idPropertyType.smartToString(localId);
+    }
+
+    private <T extends JaversType> T getIdPropertyType() {
+        return getIdProperty().getType();
     }
 
     @Override
@@ -127,5 +118,17 @@ public class EntityType extends ManagedType {
     @Override
     public int hashCode() {
         return super.hashCode() + idProperty.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.toString(this,
+                "baseType", getBaseJavaType(),
+                "id", getIdPropertyName());
+    }
+
+    @Override
+    protected PrettyPrintBuilder prettyPrintBuilder() {
+        return super.prettyPrintBuilder().addField("idProperty", getIdPropertyName());
     }
 }

@@ -42,7 +42,7 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
         ManagedType managedType = nodePair.getManagedType();
 
         if (managedType instanceof EntityType) {
-            return ((EntityType)managedType).getIdProperty().equals(property);
+            return ((EntityType)managedType).isIdProperty(property);
         }
         return false;
     }
