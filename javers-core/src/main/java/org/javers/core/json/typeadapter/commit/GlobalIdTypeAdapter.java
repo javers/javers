@@ -2,14 +2,13 @@ package org.javers.core.json.typeadapter.commit;
 
 import com.google.gson.*;
 import org.javers.common.collections.Lists;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.string.ToStringBuilder;
 import org.javers.core.json.JsonTypeAdapter;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.UnboundedValueObjectId;
+import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.TypeMapper;
-import sun.jvm.hotspot.code.Location;
 
 import java.util.List;
 import java.util.Optional;
