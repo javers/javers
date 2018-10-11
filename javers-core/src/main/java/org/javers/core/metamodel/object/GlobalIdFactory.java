@@ -115,7 +115,7 @@ public class GlobalIdFactory {
     public InstanceId createInstanceId(Object localId, String typeName) {
         Optional<EntityType> entity = typeMapper.getJaversManagedTypeMaybe(typeName, EntityType.class);
         return entity.map(e -> e.createIdFromInstanceId(localId))
-                     .orElse(new InstanceId(typeName, localId, ToStringBuilder.smartToString(localId)));
+                     .orElseGet(() -> new InstanceId(typeName, localId, ToStringBuilder.smartToString(localId)));
     }
 
     public GlobalId createFromDto(GlobalIdDTO globalIdDTO){
