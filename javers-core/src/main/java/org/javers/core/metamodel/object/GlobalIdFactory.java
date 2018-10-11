@@ -2,6 +2,7 @@ package org.javers.core.metamodel.object;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectAccessProxy;
 import org.javers.core.graph.ObjectAccessHook;
@@ -101,14 +102,20 @@ public class GlobalIdFactory {
         return new ValueObjectId(valueObjectType.getName(), owner, fragment);
     }
 
-    public InstanceId createInstanceId(Object localId, Class entityClass){
-        EntityType entity = typeMapper.getJaversManagedType(entityClass, EntityType.class);
-        return entity.createIdFromLocalId(localId);
+    public InstanceId createIdFromInstance(Object instance) {
+        EntityType entityType = typeMapper.getJaversManagedType(instance.getClass(), EntityType.class);
+        return entityType.createIdFromInstance(instance);
     }
 
-    public InstanceId createInstanceId(Object localId, String typeName){
-        EntityType entity = typeMapper.getJaversManagedType(typeName, EntityType.class);
-        return entity.createIdFromLocalId(localId);
+    public InstanceId createInstanceId(Object localId, Class entityClass) {
+        EntityType entity = typeMapper.getJaversManagedType(entityClass, EntityType.class);
+        return entity.createIdFromInstanceId(localId);
+    }
+
+    public InstanceId createInstanceId(Object localId, String typeName) {
+        Optional<EntityType> entity = typeMapper.getJaversManagedTypeMaybe(typeName, EntityType.class);
+        return entity.map(e -> e.createIdFromInstanceId(localId))
+                     .orElse(new InstanceId(typeName, localId, ToStringBuilder.smartToString(localId)));
     }
 
     public GlobalId createFromDto(GlobalIdDTO globalIdDTO){

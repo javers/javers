@@ -11,15 +11,14 @@ import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.container.SetChange
 import org.javers.core.diff.changetype.map.EntryChange
 import org.javers.core.diff.changetype.map.MapChange
+import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
-import org.javers.core.metamodel.type.EntityType
-import org.javers.core.metamodel.type.TypeMapper
 
 /**
  * @author bartosz walacik
  */
 class ChangeTestBuilder {
-    static TypeMapper typeMapper = JaversTestBuilder.javersTestAssembly().typeMapper
+    static GlobalIdFactory globalIdFactory = JaversTestBuilder.javersTestAssembly().globalIdFactory
 
     static NewObject newObject(Object newObject) {
         InstanceId globalId = instanceId(newObject)
@@ -72,7 +71,6 @@ class ChangeTestBuilder {
             return null
         }
 
-        EntityType entityType = typeMapper.getJaversType(cdo.getClass())
-        entityType.createIdFromInstance(cdo)
+        globalIdFactory.createIdFromInstance(cdo)
     }
 }

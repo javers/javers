@@ -24,11 +24,11 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  */
 class TypeMapperState {
     private static final Logger logger = LoggerFactory.getLogger(TypeMapperState.class);
+    public static final ValueType OBJECT_TYPE = new ValueType(Object.class);
 
     private final Map<String, JaversType> mappedTypes = new ConcurrentHashMap<>();
     private final Map<DuckType, Class> mappedTypeNames = new ConcurrentHashMap<>();
     private final TypeFactory typeFactory;
-    private final ValueType OBJECT_TYPE = new ValueType(Object.class);
 
     TypeMapperState(TypeFactory typeFactory) {
         this.typeFactory = typeFactory;

@@ -11,6 +11,18 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class ToStringBuilder {
+    public static String smartToString(Object value) {
+        if (value == null){
+            return "";
+        }
+
+        if (value instanceof String) {
+            return (String)value;
+        }
+
+        return value.toString();
+    }
+
     public static String typeName(Type type){
         if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType)type;

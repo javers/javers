@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
+import org.javers.common.string.ToStringBuilder;
 import org.javers.core.diff.custom.CustomValueComparator;
 
 import java.lang.reflect.Type;
@@ -25,16 +26,8 @@ public abstract class PrimitiveOrValueType extends ClassType{
         return valueComparator.equals(left, right);
     }
 
-    public String smartToString(Object cdo) {
-        if (cdo == null){
-            return "";
-        }
-
-        if (cdo instanceof String) {
-            return (String)cdo;
-        }
-
-        return cdo.toString();
+    public String smartToString(Object value) {
+        return ToStringBuilder.smartToString(value);
     }
 
     public boolean isNumber() {

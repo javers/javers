@@ -38,6 +38,10 @@ class ManagedClass {
         }
     }
 
+    static ManagedClass unknown() {
+        return new ManagedClass(Object.class, Collections.emptyList(), Collections.emptyList(), ManagedPropertiesFilter.empty());
+    }
+
     ManagedClass createShallowReference(){
         return new ManagedClass(baseJavaClass, Collections.emptyList(), getLooksLikeId(), ManagedPropertiesFilter.empty());
     }
