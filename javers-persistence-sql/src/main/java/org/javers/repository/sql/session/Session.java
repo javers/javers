@@ -86,9 +86,9 @@ public class Session implements AutoCloseable {
         return executor.executeQueryForLong(select);
     }
 
-    private BigDecimal executeQueryForBigDecimal(Select select) {
+    private Optional<BigDecimal> executeQueryForOptionalBigDecimal(Select select) {
         PreparedStatementExecutor executor = getOrCreatePreparedStatement(select);
-        return executor.executeQueryForBigDecimal(select);
+        return executor.executeQueryForOptionalBigDecimal(select);
     }
 
     private void execute(Insert insertQuery) {
@@ -205,9 +205,9 @@ public class Session implements AutoCloseable {
             return executeQueryForLong(build());
         }
 
-        public BigDecimal queryForBigDecimal(String queryName) {
+        public Optional<BigDecimal> queryForOptionalBigDecimal(String queryName) {
             queryName(queryName);
-            return executeQueryForBigDecimal(build());
+            return executeQueryForOptionalBigDecimal(build());
         }
     }
 

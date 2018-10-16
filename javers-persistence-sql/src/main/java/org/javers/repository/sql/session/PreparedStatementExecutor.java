@@ -4,14 +4,12 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.repository.sql.ConnectionProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.function.Function;
+import java.util.Optional;
 
 class PreparedStatementExecutor {
     private final PreparedStatement statement;
@@ -45,8 +43,8 @@ class PreparedStatementExecutor {
         return executeQueryForValue(select, resultSet -> resultSet.getLong(1));
     }
 
-    BigDecimal executeQueryForBigDecimal(Select select) {
-        return executeQueryForValue(select, resultSet -> resultSet.getBigDecimal(1));
+    Optional<BigDecimal> executeQueryForOptionalBigDecimal(Select select) {
+        return executeQueryForOptionalValue(select, resultSet -> resultSet.getBigDecimal(1));
     }
 
     private <T> T executeQueryForValue(Select select, ObjectMapper<T> objectMapper) {
@@ -55,6 +53,19 @@ class PreparedStatementExecutor {
             ResultSet rset = statement.executeQuery();
             rset.next();
             return objectMapper.get(rset);
+        });
+    }
+
+    private <T> Optional<T> executeQueryForOptionalValue(Select select, ObjectMapper<T> objectMapper) {
+        return runSql(() -> {
+            select.injectValuesTo(statement);
+            ResultSet rset = statement.executeQuery();
+            if (rset.next()) {
+                return Optional.ofNullable(objectMapper.get(rset));
+            }
+            else {
+                return Optional.empty();
+            }
         });
     }
 

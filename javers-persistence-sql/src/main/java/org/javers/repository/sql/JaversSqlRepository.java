@@ -82,7 +82,9 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public CommitId getHeadId() {
-        return commitRepository.getCommitHeadId();
+        try(Session session = sessionFactory.create()) {
+            return commitRepository.getCommitHeadId(session);
+        }
     }
 
     @Override

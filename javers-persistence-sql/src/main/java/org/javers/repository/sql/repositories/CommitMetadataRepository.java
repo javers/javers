@@ -77,17 +77,15 @@ public class CommitMetadataRepository extends SchemaNameAware {
     }
 
     public CommitId getCommitHeadId(Session session) {
-        BigDecimal maxCommitId = selectMaxCommitId(session);
-
-        if (maxCommitId.equals(BigDecimal.ZERO))
+        Optional<BigDecimal> maxCommitId = selectMaxCommitId(session);
 
         return maxCommitId.map(max -> CommitId.valueOf(maxCommitId.get()))
-                          .orElse(null);
+                .orElse(null);
     }
 
-    private BigDecimal selectMaxCommitId(Session session) {
+    private Optional<BigDecimal> selectMaxCommitId(Session session) {
         return session.select("MAX(" + COMMIT_COMMIT_ID + ")")
                 .from(getCommitTableNameWithSchema())
-                .queryForBigDecimal("max CommitId");
+                .queryForOptionalBigDecimal("max CommitId");
     }
 }
