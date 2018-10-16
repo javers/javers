@@ -10,8 +10,8 @@ import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.DuckType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.UnknownType;
 
-import java.sql.SQLOutput;
 import java.util.*;
 
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
@@ -48,7 +48,9 @@ class CdoSnapshotTypeAdapter extends JsonTypeAdapterTemplate<CdoSnapshot> {
         Long version = context.deserialize(jsonObject.get(VERSION), Long.class);
         DuckType duckType = new DuckType(cdoId.getTypeName(), extractPropertyNames(stateObject));
 
-        ManagedType managedType = typeMapper.getJaversManagedType(duckType, ManagedType.class);
+        ManagedType managedType = typeMapper
+                .getJaversManagedTypeMaybe(duckType, ManagedType.class)
+                .orElseGet(() -> new UnknownType(duckType.getTypeName()));
 
         CdoSnapshotBuilder builder = cdoSnapshot()
                 .withGlobalId(cdoId)

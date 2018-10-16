@@ -3,11 +3,15 @@ package org.javers.core.json.typeadapter.commit;
 import com.google.gson.*;
 import org.javers.common.collections.Lists;
 import org.javers.core.json.JsonTypeAdapter;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.UnboundedValueObjectId;
+import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author bartosz walacik
@@ -56,12 +60,17 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
 
     private InstanceId parseInstanceId(JsonObject jsonObject, JsonDeserializationContext context) {
 
-        EntityType entity = parseEntity(jsonObject);
-
         JsonElement cdoIdElement = jsonObject.get(CDO_ID_FIELD);
-        Object cdoId = context.deserialize(cdoIdElement, entity.getIdProperty().getGenericType());
 
-        return entity.createIdFromLocalId(cdoId);
+        String typeName = jsonObject.get(ENTITY_FIELD).getAsString();
+        Optional<EntityType> entityMaybe = typeMapper.getJaversManagedTypeMaybe(typeName, EntityType.class);
+
+        return entityMaybe.map(entity -> {
+            Object cdoId = context.deserialize(cdoIdElement, entity.getIdPropertyGenericType());
+            return entity.createIdFromInstanceId(cdoId);
+        }).orElseGet(() ->
+            new InstanceId(typeName, context.deserialize(cdoIdElement, Object.class), cdoIdElement.getAsString())
+        );
     }
 
     @Override
@@ -110,10 +119,5 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
     private static boolean hasStringField(JsonObject json, String childName) {
         return json.has(childName) && json.get(childName) instanceof JsonPrimitive && ((JsonPrimitive)json.get(childName)).isString();
 
-    }
-
-    private EntityType parseEntity(JsonObject object){
-        String entityName = object.get(ENTITY_FIELD).getAsString();
-        return typeMapper.getJaversManagedType(entityName, EntityType.class);
     }
 }
