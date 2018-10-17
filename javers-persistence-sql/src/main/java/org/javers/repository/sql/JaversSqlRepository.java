@@ -1,7 +1,6 @@
 package org.javers.repository.sql;
 
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -17,16 +16,22 @@ import org.javers.repository.sql.repositories.CdoSnapshotRepository;
 import org.javers.repository.sql.repositories.CommitMetadataRepository;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.JaversSchemaManager;
-import org.javers.repository.sql.session.SessionFactory;
 import org.javers.repository.sql.session.Session;
+import org.javers.repository.sql.session.SessionFactory;
 import org.polyjdbc.core.PolyJDBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.javers.repository.sql.session.Session.SQL_LOGGER_NAME;
 
 public class JaversSqlRepository implements JaversRepository {
+    private static final Logger logger = LoggerFactory.getLogger(SQL_LOGGER_NAME);
 
     private final SessionFactory sessionFactory;
     private final PolyJDBC polyJDBC;
@@ -58,7 +63,24 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        return finder.getLatest(globalId);
+        try(Session session = sessionFactory.create()) {
+            return finder.getLatest(globalId, session);
+        }
+    }
+
+    @Override
+    public List<CdoSnapshot> getLatest(Collection<GlobalId> globalIds) {
+        Validate.argumentIsNotNull(globalIds);
+        try(Session session = sessionFactory.create()) {
+            List<CdoSnapshot> result =  globalIds.stream()
+                    .map(id -> finder.getLatest(id, session))
+                    .filter(it -> it.isPresent())
+                    .map(it -> it.get())
+                    .collect(Collectors.toList());
+
+            session.logStats("get latest for many");
+            return result;
+        }
     }
 
     @Override
@@ -68,15 +90,19 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return finder.getSnapshots(snapshotIdentifiers);
+        try(Session session = sessionFactory.create()) {
+            List<CdoSnapshot> result = finder.getSnapshots(snapshotIdentifiers, session);
+            session.logStats("find snapshots by ids");
+            return result;
+        }
     }
 
     @Override
     public void persist(Commit commit) {
         try(Session session = sessionFactory.create()) {
             long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getId(), session);
-
             cdoSnapshotRepository.save(commitPk, commit.getSnapshots(), session);
+            session.logStats("persist commit");
         }
     }
 
@@ -89,7 +115,11 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        return finder.getStateHistory(globalId, queryParams);
+        try(Session session = sessionFactory.create()) {
+            List<CdoSnapshot> result = finder.getStateHistory(globalId, queryParams, session);
+            session.logStats("find snapshots by id");
+            return result;
+        }
     }
 
     @Override

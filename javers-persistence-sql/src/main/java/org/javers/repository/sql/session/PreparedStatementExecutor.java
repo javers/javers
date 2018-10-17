@@ -47,6 +47,10 @@ class PreparedStatementExecutor {
         return executeQueryForOptionalValue(select, resultSet -> resultSet.getBigDecimal(1));
     }
 
+    Optional<Long> executeQueryForOptionalLong(Select select) {
+        return executeQueryForOptionalValue(select, resultSet -> resultSet.getLong(1));
+    }
+
     private <T> T executeQueryForValue(Select select, ObjectMapper<T> objectMapper) {
         return runSql(() -> {
             select.injectValuesTo(statement);

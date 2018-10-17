@@ -7,8 +7,6 @@ import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.javers.repository.sql.session.Session;
-import org.polyjdbc.core.PolyJDBC;
-import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
 import java.math.BigDecimal;
@@ -17,18 +15,14 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
-import static org.javers.repository.sql.session.PolyUtil.queryForOptionalBigDecimal;
 
 /**
  * @author pawel szymczyk
  */
 public class CommitMetadataRepository extends SchemaNameAware {
 
-    private final PolyJDBC polyJDBC;
-
-    public CommitMetadataRepository(PolyJDBC polyjdbc, TableNameProvider tableNameProvider) {
+    public CommitMetadataRepository(TableNameProvider tableNameProvider) {
         super(tableNameProvider);
-        this.polyJDBC = polyjdbc;
     }
 
     public long save(String author, Map<String, String> properties, LocalDateTime date, CommitId commitId, Session session) {
@@ -53,7 +47,7 @@ public class CommitMetadataRepository extends SchemaNameAware {
 
     private void insertCommitProperties(long commitPk, Map<String, String> properties, Session session) {
         for (Map.Entry<String, String> property : properties.entrySet()) {
-            session.insert("CommitPropertshrey")
+            session.insert("CommitProperty")
                    .into(getCommitPropertyTableNameWithSchema())
                    .value(COMMIT_PROPERTY_COMMIT_FK, commitPk)
                    .value(COMMIT_PROPERTY_NAME, property.getKey())
@@ -65,7 +59,6 @@ public class CommitMetadataRepository extends SchemaNameAware {
     boolean isCommitPersisted(CommitId commitId, Session session) {
         long count = session.select("count(*)")
                .from(getCommitTableNameWithSchema())
-               .where()
                .and(COMMIT_COMMIT_ID, commitId.valueAsNumber())
                .queryForLong("isCommitPersisted");
 

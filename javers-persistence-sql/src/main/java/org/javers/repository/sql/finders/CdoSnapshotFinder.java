@@ -16,6 +16,7 @@ import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.session.Session;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.query.Order;
 import org.polyjdbc.core.query.SelectQuery;
@@ -43,8 +44,8 @@ public class CdoSnapshotFinder {
         this.tableNameProvider = tableNameProvider;
     }
 
-    public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId);
+    public Optional<CdoSnapshot> getLatest(GlobalId globalId, Session session) {
+        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId, session);
         if (!globalIdPk.isPresent()){
             return Optional.empty();
         }
@@ -59,8 +60,8 @@ public class CdoSnapshotFinder {
         return fetchCdoSnapshots(new AnySnapshotFilter(tableNameProvider), Optional.of(queryParams));
     }
 
-    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return fetchCdoSnapshots(new SnapshotIdentifiersFilter(tableNameProvider, globalIdRepository, snapshotIdentifiers), Optional.<QueryParams>empty());
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers, Session session) {
+        return fetchCdoSnapshots(new SnapshotIdentifiersFilter(tableNameProvider, globalIdRepository, snapshotIdentifiers, session), Optional.<QueryParams>empty());
     }
 
     public List<CdoSnapshot> getStateHistory(Set<ManagedType> managedTypes, QueryParams queryParams) {
@@ -74,8 +75,8 @@ public class CdoSnapshotFinder {
         return fetchCdoSnapshots(voOwnerFilter, Optional.of(queryParams));
     }
 
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId);
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams, Session session) {
+        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId, session);
 
         return globalIdPk.map(id ->
                 fetchCdoSnapshots(new GlobalIdFilter(tableNameProvider, id, queryParams.isAggregate()), Optional.of(queryParams)))

@@ -91,6 +91,11 @@ public class Session implements AutoCloseable {
         return executor.executeQueryForOptionalBigDecimal(select);
     }
 
+    private Optional<Long> executeQueryForOptionalLong(Select select) {
+        PreparedStatementExecutor executor = getOrCreatePreparedStatement(select);
+        return executor.executeQueryForOptionalLong(select);
+    }
+
     private void execute(Insert insertQuery) {
         PreparedStatementExecutor executor = getOrCreatePreparedStatement(insertQuery);
         executor.execute(insertQuery);
@@ -99,7 +104,6 @@ public class Session implements AutoCloseable {
     @Override
     public void close() {
         statementExecutors.values().stream().forEach(p -> p.close());
-        logStats();
     }
 
     private PreparedStatementExecutor getOrCreatePreparedStatement(Query query) {
@@ -114,8 +118,8 @@ public class Session implements AutoCloseable {
         return executor;
     }
 
-    private void logStats() {
-        logger.debug("SQL session finished. Executed {} statement(s) in {} millis.",
+    public void logStats(String sessionName) {
+        logger.debug("SQL session '"+sessionName+"' finished. {} statement(s) executed in {} millis.",
                 statementExecutors.values().stream().mapToInt(i -> i.getExecutionCount()).sum(),
                 statementExecutors.values().stream().mapToLong(i -> i.getExecutionTotalMillis()).sum());
 
@@ -181,17 +185,24 @@ public class Session implements AutoCloseable {
         }
 
         public SelectBuilder from(String tableName) {
-            rawSql += " FROM " + tableName;
-            return this;
-        }
-
-        public SelectBuilder where() {
-            rawSql += " WHERE 1 = 1";
+            rawSql += " FROM " + tableName + " WHERE 1 = 1";
             return this;
         }
 
         public SelectBuilder and(String columnName, BigDecimal value) {
             parameters.add(new Parameter.BigDecimalParameter(columnName, value));
+            rawSql += " AND " + columnName +  " = ?";
+            return this;
+        }
+
+        public SelectBuilder and(String columnName, String value) {
+            parameters.add(new Parameter.StringParameter(columnName, value));
+            rawSql += " AND " + columnName +  " = ?";
+            return this;
+        }
+
+        public SelectBuilder and(String columnName, Long value) {
+            parameters.add(new Parameter.LongParameter(columnName, value));
             rawSql += " AND " + columnName +  " = ?";
             return this;
         }
@@ -208,6 +219,10 @@ public class Session implements AutoCloseable {
         public Optional<BigDecimal> queryForOptionalBigDecimal(String queryName) {
             queryName(queryName);
             return executeQueryForOptionalBigDecimal(build());
+        }
+
+        public Optional<Long> queryForOptionalLong() {
+            return executeQueryForOptionalLong(build());
         }
     }
 
