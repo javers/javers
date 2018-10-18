@@ -13,6 +13,7 @@ public class CdoSnapshotSerialized {
     private String commitAuthor;
     private LocalDateTime commitDate;
     private BigDecimal commitId;
+    private long commitPk;
 
     //snapshot
     private long version;
@@ -52,6 +53,12 @@ public class CdoSnapshotSerialized {
         this.commitId = commitId;
         return this;
     }
+
+    public CdoSnapshotSerialized withCommitPk(long commitPk) {
+        this.commitPk = commitPk;
+        return this;
+    }
+
 
     public CdoSnapshotSerialized withVersion(long version) {
         this.version = version;
@@ -157,6 +164,10 @@ public class CdoSnapshotSerialized {
 
     public String getOwnerGlobalIdTypeName() {
         return ownerGlobalIdTypeName;
+    }
+
+    public long getCommitPk() {
+        return commitPk;
     }
 }
 

@@ -26,6 +26,7 @@ public class QueryParamsBuilder {
     private Map<String, String> commitProperties = new HashMap<>();
     private String changedProperty;
     private SnapshotType snapshotType;
+    private boolean loadCommitProps = true;
 
     private QueryParamsBuilder(int limit) {
         this.limit = limit;
@@ -45,6 +46,14 @@ public class QueryParamsBuilder {
      */
     public QueryParamsBuilder withChildValueObjects(boolean aggregate) {
         this.aggregate = aggregate;
+        return this;
+    }
+
+    /**
+     * @param loadCommitProps true by default
+     */
+    public QueryParamsBuilder withCommitProps(boolean loadCommitProps) {
+        this.loadCommitProps = loadCommitProps;
         return this;
     }
 
@@ -159,6 +168,6 @@ public class QueryParamsBuilder {
     }
 
     public QueryParams build() {
-        return new QueryParams(limit, skip, from, to, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType);
+        return new QueryParams(limit, skip, from, to, commitIds, version, author, commitProperties, aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType, loadCommitProps);
     }
 }

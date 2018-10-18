@@ -63,73 +63,71 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        try(Session session = sessionFactory.create()) {
-            return finder.getLatest(globalId, session);
+        try(Session session = sessionFactory.create("get latest snapshot")) {
+            return finder.getLatest(globalId, session, true);
         }
     }
 
     @Override
     public List<CdoSnapshot> getLatest(Collection<GlobalId> globalIds) {
         Validate.argumentIsNotNull(globalIds);
-        try(Session session = sessionFactory.create()) {
-            List<CdoSnapshot> result =  globalIds.stream()
-                    .map(id -> finder.getLatest(id, session))
+        try(Session session = sessionFactory.create("get latest snapshots")) {
+            return globalIds.stream()
+                    .map(id -> finder.getLatest(id, session, false))
                     .filter(it -> it.isPresent())
                     .map(it -> it.get())
                     .collect(Collectors.toList());
-
-            session.logStats("get latest for many");
-            return result;
         }
     }
 
     @Override
     public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
-        return finder.getSnapshots(queryParams);
-    }
-
-    @Override
-    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        try(Session session = sessionFactory.create()) {
-            List<CdoSnapshot> result = finder.getSnapshots(snapshotIdentifiers, session);
-            session.logStats("find snapshots by ids");
-            return result;
+        try(Session session = sessionFactory.create("find snapshots")) {
+            return finder.getSnapshots(queryParams, session);
         }
     }
 
     @Override
     public void persist(Commit commit) {
-        try(Session session = sessionFactory.create()) {
+        try(Session session = sessionFactory.create("persist commit")) {
             long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getId(), session);
             cdoSnapshotRepository.save(commitPk, commit.getSnapshots(), session);
-            session.logStats("persist commit");
         }
     }
 
     @Override
     public CommitId getHeadId() {
-        try(Session session = sessionFactory.create()) {
+        try(Session session = sessionFactory.create("get head id")) {
             return commitRepository.getCommitHeadId(session);
         }
     }
 
     @Override
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        try(Session session = sessionFactory.create("find snapshots by ids")) {
+            return finder.getSnapshots(snapshotIdentifiers, session);
+        }
+    }
+
+    @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        try(Session session = sessionFactory.create()) {
-            List<CdoSnapshot> result = finder.getStateHistory(globalId, queryParams, session);
-            session.logStats("find snapshots by id");
-            return result;
+        try(Session session = sessionFactory.create("find snapshots by globalId")) {
+            return finder.getStateHistory(globalId, queryParams, session);
         }
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
-        return finder.getStateHistory(givenClasses, queryParams);
+        try(Session session = sessionFactory.create("find snapshots by type")) {
+            return finder.getStateHistory(givenClasses, queryParams, session);
+        }
     }
 
     @Override
     public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
-        return finder.getVOStateHistory(ownerEntity, path, queryParams);
+        try(Session session = sessionFactory.create("find VO snapshots by path")) {
+            return finder.getVOStateHistory(ownerEntity, path, queryParams, session);
+        }
     }
 
     /**

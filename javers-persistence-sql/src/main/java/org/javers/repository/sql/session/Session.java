@@ -23,10 +23,12 @@ public class Session implements AutoCloseable {
     private final Dialect dialect;
     private final Map<String, PreparedStatementExecutor> statementExecutors = new HashMap<>();
     private final ConnectionProvider connectionProvider;
+    private final String sessionName;
 
-    Session(DialectName dialectName, ConnectionProvider connectionProvider) {
+    Session(DialectName dialectName, ConnectionProvider connectionProvider, String sessionName) {
         this.dialect = Dialects.fromName(dialectName);
         this.connectionProvider = connectionProvider;
+        this.sessionName = sessionName;
     }
 
     public SelectBuilder select(String selectClauseSQL) {
@@ -104,6 +106,7 @@ public class Session implements AutoCloseable {
     @Override
     public void close() {
         statementExecutors.values().stream().forEach(p -> p.close());
+        logStats();
     }
 
     private PreparedStatementExecutor getOrCreatePreparedStatement(Query query) {
@@ -118,8 +121,8 @@ public class Session implements AutoCloseable {
         return executor;
     }
 
-    public void logStats(String sessionName) {
-        logger.debug("SQL session '"+sessionName+"' finished. {} statement(s) executed in {} millis.",
+    public void logStats() {
+        logger.debug("SQL session '" + sessionName + "' finished. {} statement(s) executed in {} millis.",
                 statementExecutors.values().stream().mapToInt(i -> i.getExecutionCount()).sum(),
                 statementExecutors.values().stream().mapToLong(i -> i.getExecutionTotalMillis()).sum());
 

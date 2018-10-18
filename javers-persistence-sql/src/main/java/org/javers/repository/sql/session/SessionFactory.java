@@ -14,7 +14,7 @@ public class SessionFactory {
         this.schemaName = schemaName;
     }
 
-    public Session create() {
-        return new Session(dialectName, connectionProvider);
+    public Session create(String sessionName) {
+        return new Session(dialectName, connectionProvider, sessionName);
     }
 }

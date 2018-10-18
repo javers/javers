@@ -1,17 +1,13 @@
 package org.javers.repository.sql.finders;
 
 import org.javers.common.string.ToStringBuilder;
-import org.javers.core.commit.CommitId;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters.toUtilDate;
@@ -25,14 +21,14 @@ abstract class SnapshotFilter extends SchemaNameAware {
 
     private static final String BASE_FIELDS =
         SNAPSHOT_STATE + ", " +
-            SNAPSHOT_TYPE + ", " +
-            SNAPSHOT_VERSION + ", " +
-            SNAPSHOT_CHANGED + ", " +
-            SNAPSHOT_MANAGED_TYPE + ", " +
-            COMMIT_PK + ", " +
-            COMMIT_AUTHOR + ", " +
-            COMMIT_COMMIT_DATE + ", " +
-            COMMIT_COMMIT_ID;
+        SNAPSHOT_TYPE + ", " +
+        SNAPSHOT_VERSION + ", " +
+        SNAPSHOT_CHANGED + ", " +
+        SNAPSHOT_MANAGED_TYPE + ", " +
+        COMMIT_PK + ", " +
+        COMMIT_AUTHOR + ", " +
+        COMMIT_COMMIT_DATE + ", " +
+        COMMIT_COMMIT_ID;
 
     static final String BASE_AND_GLOBAL_ID_FIELDS =
         BASE_FIELDS + ", " +
@@ -50,17 +46,17 @@ abstract class SnapshotFilter extends SchemaNameAware {
             " LEFT OUTER JOIN " + getGlobalIdTableNameWithSchema() + " o ON o." + GLOBAL_ID_PK + " = g." + GLOBAL_ID_OWNER_ID_FK;
     }
 
-    String select() {
+    final String select() {
         return BASE_AND_GLOBAL_ID_FIELDS;
     }
 
-    void addFrom(SelectQuery query) {
+    final void addFrom(SelectQuery query) {
         query.from(getFromCommitWithSnapshot());
     }
 
-    abstract  void addWhere(SelectQuery query);
+    abstract void addWhere(SelectQuery query);
 
-    void applyQueryParams(SelectQuery query, QueryParams queryParams) {
+    final void applyQueryParams(SelectQuery query, QueryParams queryParams) {
         if (queryParams.changedProperty().isPresent()){
             query.append(" AND " + SNAPSHOT_CHANGED + " like :changedProperty ")
                   .withArgument("changedProperty", "%\"" + queryParams.changedProperty().get() +"\"%");
