@@ -7,7 +7,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 import static org.javers.core.JaversBuilder.javers
 
-//TODO @Ignore
+@Ignore //TODO
 class NewSqlPerformanceTest extends NewPerformanceTest {
 
     Connection dbConnection
