@@ -19,18 +19,14 @@ public class DiffTypeDeserializer implements JsonDeserializer<Diff> {
 
     @Override
     public Diff deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        if (!(json instanceof JsonObject)) {
-            return null; //when user's class is refactored, a property can have changed type
-        }
-        JsonObject jsonObject = (JsonObject) json;
+        JsonElement changesObject = ((JsonObject)json).get(CHANGES_FIELD);
 
-        if (jsonObject.get(CHANGES_FIELD) != null) {
-            List<Change> changes = context.deserialize(jsonObject.get(CHANGES_FIELD), new TypeToken<List<Change>>(){}.getType());
+        if (changesObject != null) {
+            List<Change> changes = context.deserialize(changesObject, new TypeToken<List<Change>>(){}.getType());
             return new DiffBuilder()
                     .addChanges(changes, Optional.empty())
                     .build();
         }
-        return null;
+        return DiffBuilder.empty();
     }
-
 }
