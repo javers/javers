@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 
@@ -64,6 +66,16 @@ public interface Javers {
      * @param commitProperties for example ["channel":"web", "locale":"pl-PL"]
      */
     Commit commit(String author, Object currentVersion, Map<String, String> commitProperties);
+
+    /**
+     * Async version of commit()
+     * @param author current user
+     * @param currentVersion standalone object or handle to an object graph
+     * @param commitProperties for example ["channel":"web", "locale":"pl-PL"]
+     * @param executor executor to run commit on
+     */
+    CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Map<String, String> commitProperties,
+                                          Executor executor);
 
     /**
      * Marks given object as deleted.
