@@ -1,5 +1,6 @@
 package org.javers.core;
 
+import org.javers.common.collections.Pair;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.changelog.ChangeListTraverser;
@@ -106,12 +107,21 @@ class JaversCore implements Javers {
     @Override
     public CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Map<String, String> commitProperties,
                                                  Executor executor) {
+        long start = System.currentTimeMillis();
         argumentsAreNotNull(author, commitProperties, currentVersion);
         JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
         assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion, jType);
         CompletableFuture<Commit> commit = commitFactory
                 .create(author, commitProperties, currentVersion, executor)
-                .thenApplyAsync(this::persist, executor);
+                .thenApply(it -> new Pair<>(it, System.currentTimeMillis()))
+                .thenApplyAsync(it -> new Pair<>(persist(it.left()), it.right()), executor)
+                .thenApply(it -> {
+                    long stop = System.currentTimeMillis();
+                    Commit persistedCommit = it.left();
+                    Long creationTime = it.right();
+                    logger.info(persistedCommit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(creationTime-start), (stop-creationTime));
+                    return persistedCommit;
+                });
         return commit;
     }
 
