@@ -6,11 +6,14 @@ import org.javers.repository.api.QueryParams;
 import org.javers.repository.sql.schema.TableNameProvider;
 import org.javers.repository.sql.session.Parameter;
 import org.javers.repository.sql.session.Session;
+import org.polyjdbc.core.query.SelectQuery;
 import org.polyjdbc.core.type.Timestamp;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters.toUtilDate;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_TYPE_NAME;
@@ -19,6 +22,7 @@ import static org.javers.repository.sql.session.Parameter.*;
 class SnapshotQuery {
     private final QueryParams queryParams;
     private final Session.SelectBuilder selectBuilder;
+    private final TableNameProvider tableNameProvider;
 
     public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session) {
         this.selectBuilder = session
@@ -47,6 +51,7 @@ class SnapshotQuery {
             .queryName("select snapshots");
 
         this.queryParams = queryParams;
+        this.tableNameProvider = tableNames;
         applyQueryParams();
     }
 
@@ -68,25 +73,23 @@ class SnapshotQuery {
         });
 
         if (queryParams.commitIds().size() > 0) {
-            query.append(" AND " + COMMIT_COMMIT_ID + " IN (" + ToStringBuilder.join(
-                    queryParams.commitIds().stream().map(c -> c.valueAsNumber()).collect(Collectors.toList())) + ")");
+            selectBuilder.and(COMMIT_COMMIT_ID + " IN (" + ToStringBuilder.join(
+                    queryParams.commitIds().stream().map(c -> c.valueAsNumber()).collect(toList())) + ")");
         }
-        if (queryParams.version().isPresent()) {
-            query.append(" AND " + SNAPSHOT_VERSION + " = :version")
-                    .withArgument("version", queryParams.version().get());
-        }
-        if (queryParams.author().isPresent()) {
-            query.append(" AND " + COMMIT_AUTHOR + " = :author")
-                    .withArgument("author",  queryParams.author().get());
-        }
+
+        queryParams.version().ifPresent(ver -> selectBuilder.and(SNAPSHOT_VERSION, ver));
+
+        queryParams.author().ifPresent(author -> selectBuilder.and(COMMIT_AUTHOR, author));
+
         if (queryParams.commitProperties().size() > 0) {
-            addCommitPropertyConditions(query, queryParams.commitProperties());
+            for (Map.Entry<String, String> commitProperty : queryParams.commitProperties().entrySet()) {
+                addCommitPropertyCondition(selectBuilder, commitProperty.getKey(), commitProperty.getValue());
+            }
         }
-        if (queryParams.snapshotType().isPresent()){
-            query.append(" AND " + SNAPSHOT_TYPE + " = :snapshotType")
-                    .withArgument("snapshotType", queryParams.snapshotType().get().name());
-        }
-        query.limit(queryParams.limit(), queryParams.skip());
+
+        queryParams.snapshotType().ifPresent(snapshotType -> selectBuilder.and(SNAPSHOT_TYPE, snapshotType.name()));
+
+        selectBuilder.limit(queryParams.limit(), queryParams.skip());
     }
 
 
@@ -102,5 +105,14 @@ class SnapshotQuery {
 
     List<CdoSnapshotSerialized> run() {
         return null;
+    }
+
+    private void addCommitPropertyCondition(Session.SelectBuilder selectBuilder, String propertyName, String propertyValue) {
+        selectBuilder.and("EXISTS (" +
+                "SELECT * FROM " + tableNameProvider.getCommitPropertyTableNameWithSchema() +
+                " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
+                " AND " + COMMIT_PROPERTY_NAME + " = ?" +
+                " AND " + COMMIT_PROPERTY_VALUE + " ?)",
+                stringParam(propertyName), stringParam(propertyValue));
     }
 }

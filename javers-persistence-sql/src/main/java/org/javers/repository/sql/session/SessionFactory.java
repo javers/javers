@@ -6,12 +6,10 @@ import org.javers.repository.sql.DialectName;
 public class SessionFactory {
     private final DialectName dialectName;
     private final ConnectionProvider connectionProvider;
-    private final String schemaName;
 
-    public SessionFactory(DialectName dialectName, ConnectionProvider connectionProvider, String schemaName) {
+    public SessionFactory(DialectName dialectName, ConnectionProvider connectionProvider) {
         this.dialectName = dialectName;
         this.connectionProvider = connectionProvider;
-        this.schemaName = schemaName;
     }
 
     public Session create(String sessionName) {

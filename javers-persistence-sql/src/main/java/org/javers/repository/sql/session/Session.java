@@ -4,6 +4,7 @@ import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
+import org.javers.repository.sql.schema.TableNameProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,6 +196,11 @@ public class Session implements AutoCloseable {
 
         private Select build() {
             return new Select("SELECT "+ getQueryName(), getParameters(), rawSql);
+        }
+
+        public SelectBuilder limit(int limit, int offset) {
+
+            return this;
         }
 
         public long queryForLong(String queryName) {

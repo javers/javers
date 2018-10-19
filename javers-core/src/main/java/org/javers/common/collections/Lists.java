@@ -27,6 +27,9 @@ public class Lists {
     }
 
     public static <T> List<T> immutableListOf(T... elements) {
+        if (elements == null) {
+            return Collections.emptyList();
+        }
         return unmodifiableList(java.util.Arrays.asList(elements));
     }
 
