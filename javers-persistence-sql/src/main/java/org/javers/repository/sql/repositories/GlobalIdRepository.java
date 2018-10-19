@@ -10,6 +10,8 @@ import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.repository.sql.SqlRepositoryConfiguration;
 import org.javers.repository.sql.schema.SchemaNameAware;
 import org.javers.repository.sql.schema.TableNameProvider;
+import org.javers.repository.sql.session.InsertBuilder;
+import org.javers.repository.sql.session.SelectBuilder;
 import org.javers.repository.sql.session.Session;
 import java.util.Optional;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
@@ -64,7 +66,7 @@ public class GlobalIdRepository extends SchemaNameAware {
     }
 
     private Optional<Long> findGlobalIdPkInDB(GlobalId globalId, Session session) {
-        Session.SelectBuilder select =  session.select(GLOBAL_ID_PK)
+        SelectBuilder select =  session.select(GLOBAL_ID_PK)
                 .from(getGlobalIdTableNameWithSchema());
 
         if (globalId instanceof ValueObjectId) {
@@ -91,7 +93,7 @@ public class GlobalIdRepository extends SchemaNameAware {
     }
 
     private long insert(GlobalId globalId, Session session) {
-        Session.InsertBuilder insert = null;
+        InsertBuilder insert = null;
 
         if (globalId instanceof ValueObjectId) {
             insert = session.insert("ValueObjectId");

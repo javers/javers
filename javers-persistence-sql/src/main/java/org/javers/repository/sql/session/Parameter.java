@@ -1,6 +1,5 @@
 package org.javers.repository.sql.session;
 
-import org.javers.common.validation.Validate;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 
 import java.math.BigDecimal;
@@ -10,11 +9,11 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public abstract class Parameter<T> {
+    /** nullable */
     private final String name;
     private final T value;
 
     Parameter(String name, T value) {
-        Validate.argumentIsNotNull(name);
         this.name = name;
         this.value = value;
     }

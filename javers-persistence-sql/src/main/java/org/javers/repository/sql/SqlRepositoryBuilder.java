@@ -83,7 +83,7 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
         PolyJDBC polyJDBC = PolyJDBCBuilder.polyJDBC(dialectName.getPolyDialect(), config.getSchemaName())
                 .usingManagedConnections(() -> connectionProvider.getConnection()).build();
 
-        SessionFactory sessionFactory = new SessionFactory(dialectName, connectionProvider, schemaName);
+        SessionFactory sessionFactory = new SessionFactory(dialectName, connectionProvider);
 
         addComponent(polyJDBC);
         addComponent(sessionFactory);

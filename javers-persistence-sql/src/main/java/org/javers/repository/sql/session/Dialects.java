@@ -4,6 +4,8 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.repository.sql.DialectName;
 
+import static org.javers.repository.sql.session.Parameter.longParam;
+
 class Dialects {
 
     static Dialect fromName(DialectName dialectName) {
@@ -72,6 +74,18 @@ class Dialects {
                 }
             };
         }
+
+        @Override
+        void limit(SelectBuilder query, long limit, long offset) {
+            if (limit == 0){
+                return;
+            }
+
+            // if (offset == 0) {
+            // query.wrap("select TOP "+limit.getLimit()+" * from (",") a");
+
+            query.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY", longParam(offset), longParam(limit));
+        }
     }
 
     static class PostgresDialect extends Dialect {
@@ -109,6 +123,23 @@ class Dialects {
                     return seqName + ".nextval";
                 }
             };
+        }
+
+        @Override
+        void limit(SelectBuilder query, long limit, long offset) {
+            if (limit == 0) {
+                return;
+            }
+
+            if (offset == 0){
+                query.wrap("SELECT a.*, rownum FROM (", ") a WHERE rownum <= ?", longParam(limit));
+            } else {
+                long lowRownum = offset + 1;
+                long highRownum = offset + limit;
+                query.wrap(
+                        "select b.* from (SELECT a.*, rownum r__ FROM (",
+                        ") a WHERE rownum <= ? ) b where b.r__ >= ?", longParam(highRownum), longParam(lowRownum));
+            }
         }
     }
 }

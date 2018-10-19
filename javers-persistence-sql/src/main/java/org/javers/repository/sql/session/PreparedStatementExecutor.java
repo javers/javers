@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 class PreparedStatementExecutor {
@@ -49,6 +52,20 @@ class PreparedStatementExecutor {
 
     Optional<Long> executeQueryForOptionalLong(Select select) {
         return executeQueryForOptionalValue(select, resultSet -> resultSet.getLong(1));
+    }
+
+    <T> List<T> executeQuery(Select select, ObjectMapper<T> objectMapper) {
+        return runSql(() -> {
+            select.injectValuesTo(statement);
+
+            ResultSet rset = statement.executeQuery();
+            List<T> result = new ArrayList<>();
+            while(rset.next()) {
+                result.add(objectMapper.get(rset));
+            }
+
+            return Collections.unmodifiableList(result);
+        });
     }
 
     private <T> T executeQueryForValue(Select select, ObjectMapper<T> objectMapper) {
@@ -125,10 +142,5 @@ class PreparedStatementExecutor {
     @FunctionalInterface
     private interface SqlVoidAction {
         void call() throws SQLException;
-    }
-
-    @FunctionalInterface
-    private interface ObjectMapper<T> {
-        T get(ResultSet resultSet) throws SQLException;
     }
 }

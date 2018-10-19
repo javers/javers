@@ -4,25 +4,25 @@ import org.javers.common.string.ToStringBuilder;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.sql.schema.TableNameProvider;
-import org.javers.repository.sql.session.Parameter;
+import org.javers.repository.sql.session.ObjectMapper;
+import org.javers.repository.sql.session.SelectBuilder;
 import org.javers.repository.sql.session.Session;
-import org.polyjdbc.core.query.SelectQuery;
-import org.polyjdbc.core.type.Timestamp;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
-import static org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters.toUtilDate;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_TYPE_NAME;
 import static org.javers.repository.sql.session.Parameter.*;
 
 class SnapshotQuery {
     private final QueryParams queryParams;
-    private final Session.SelectBuilder selectBuilder;
+    private final SelectBuilder selectBuilder;
     private final TableNameProvider tableNameProvider;
+    private final CdoSnapshotMapper cdoSnapshotMapper = new CdoSnapshotMapper();
 
     public SnapshotQuery(TableNameProvider tableNames, QueryParams queryParams, Session session) {
         this.selectBuilder = session
@@ -88,10 +88,11 @@ class SnapshotQuery {
         }
 
         queryParams.snapshotType().ifPresent(snapshotType -> selectBuilder.and(SNAPSHOT_TYPE, snapshotType.name()));
-
-        selectBuilder.limit(queryParams.limit(), queryParams.skip());
     }
 
+    void addSnapshotPkFilter(long snapshotPk) {
+        selectBuilder.and(SNAPSHOT_PK, snapshotPk);
+    }
 
     void addGlobalIdFilter(long globalIdPk) {
         if (!queryParams.isAggregate()) {
@@ -104,15 +105,38 @@ class SnapshotQuery {
     }
 
     List<CdoSnapshotSerialized> run() {
-        return null;
+        selectBuilder.orderByDesc(SNAPSHOT_PK);
+        selectBuilder.limit(queryParams.limit(), queryParams.skip());
+        return selectBuilder.executeQuery(cdoSnapshotMapper);
     }
 
-    private void addCommitPropertyCondition(Session.SelectBuilder selectBuilder, String propertyName, String propertyValue) {
+    private void addCommitPropertyCondition(SelectBuilder selectBuilder, String propertyName, String propertyValue) {
         selectBuilder.and("EXISTS (" +
                 "SELECT * FROM " + tableNameProvider.getCommitPropertyTableNameWithSchema() +
                 " WHERE " + COMMIT_PROPERTY_COMMIT_FK + " = " + COMMIT_PK +
                 " AND " + COMMIT_PROPERTY_NAME + " = ?" +
                 " AND " + COMMIT_PROPERTY_VALUE + " ?)",
                 stringParam(propertyName), stringParam(propertyValue));
+    }
+
+    private static class CdoSnapshotMapper implements ObjectMapper<CdoSnapshotSerialized> {
+        @Override
+        public CdoSnapshotSerialized get(ResultSet resultSet) throws SQLException {
+            return new CdoSnapshotSerialized()
+                    .withCommitAuthor(resultSet.getString(COMMIT_AUTHOR))
+                    .withCommitDate(resultSet.getTimestamp(COMMIT_COMMIT_DATE))
+                    .withCommitId(resultSet.getBigDecimal(COMMIT_COMMIT_ID))
+                    .withCommitPk(resultSet.getLong(COMMIT_PK))
+                    .withVersion(resultSet.getLong(SNAPSHOT_VERSION))
+                    .withSnapshotState(resultSet.getString(SNAPSHOT_STATE))
+                    .withChangedProperties(resultSet.getString(SNAPSHOT_CHANGED))
+                    .withSnapshotType(resultSet.getString(SNAPSHOT_TYPE))
+                    .withGlobalIdFragment(resultSet.getString(GLOBAL_ID_FRAGMENT))
+                    .withGlobalIdLocalId(resultSet.getString(GLOBAL_ID_LOCAL_ID))
+                    .withGlobalIdTypeName(resultSet.getString(SNAPSHOT_MANAGED_TYPE))
+                    .withOwnerGlobalIdFragment(resultSet.getString("owner_" + GLOBAL_ID_FRAGMENT))
+                    .withOwnerGlobalIdLocalId(resultSet.getString("owner_" + GLOBAL_ID_LOCAL_ID))
+                    .withOwnerGlobalIdTypeName(resultSet.getString("owner_" + GLOBAL_ID_TYPE_NAME));
+        }
     }
 }

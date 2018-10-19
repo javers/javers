@@ -1,7 +1,5 @@
 package org.javers.repository.sql.finders;
 
-import java.util.Optional;
-
 import org.javers.common.collections.Lists;
 import org.javers.common.collections.Sets;
 import org.javers.core.json.CdoSnapshotSerialized;
@@ -30,7 +28,8 @@ public class CdoSnapshotFinder {
     private final PolyJDBC polyJDBC;
     private final GlobalIdRepository globalIdRepository;
     private final CommitPropertyFinder commitPropertyFinder;
-    private final CdoSnapshotMapper cdoSnapshotMapper;
+    private final CdoSnapshotMapper cdoSnapshotMapper = new CdoSnapshotMapper();
+
     private final CdoSnapshotsEnricher cdoSnapshotsEnricher = new CdoSnapshotsEnricher();
     private JsonConverter jsonConverter;
     private final TableNameProvider tableNameProvider;
@@ -39,7 +38,6 @@ public class CdoSnapshotFinder {
         this.polyJDBC = polyJDBC;
         this.globalIdRepository = globalIdRepository;
         this.commitPropertyFinder = commitPropertyFinder;
-        this.cdoSnapshotMapper = new CdoSnapshotMapper();
         this.tableNameProvider = tableNameProvider;
     }
 
@@ -102,12 +100,9 @@ public class CdoSnapshotFinder {
                          .orElse(Collections.emptyList());
     }
 
-    private List<CdoSnapshot> fetchCdoSnapshots(long globalIdPk, QueryParams queryParams, Session session) {
-        //TODO!!!!!
-
+    private List<CdoSnapshot> fetchCdoSnapshots(long snapshotPk, QueryParams queryParams, Session session) {
         SnapshotQuery query = new SnapshotQuery(tableNameProvider, queryParams, session);
-        query.addGlobalIdFilter(globalIdPk);
-
+        query.addSnapshotPkFilter(snapshotPk);
         List<CdoSnapshotSerialized> serializedSnapshots = query.run();
 
         if (queryParams.isLoadCommitProps()) {
@@ -147,8 +142,8 @@ public class CdoSnapshotFinder {
         if (queryParams.isPresent()) {
             snapshotFilter.applyQueryParams(query, queryParams.get());
         }
-        query.orderBy(SNAPSHOT_PK, Order.DESC);
-        return polyJDBC.queryRunner().queryList(query, cdoSnapshotMapper);
+        query.orderBy(SNAPSHOT_PK, Order.DESC); // TODO !!
+        return polyJDBC.queryRunner().queryList(query, new org.javers.repository.sql.finders.CdoSnapshotMapper());
     }
 
     private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk, Session session) {
