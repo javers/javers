@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import static org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters.toUtilDate;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
+@Deprecated
 abstract class SnapshotFilter extends SchemaNameAware {
 
     SnapshotFilter(TableNameProvider tableNameProvider) {

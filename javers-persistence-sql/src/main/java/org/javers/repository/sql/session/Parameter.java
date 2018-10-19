@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-abstract class Parameter<T> {
+public abstract class Parameter<T> {
     private final String name;
     private final T value;
 
@@ -20,6 +20,22 @@ abstract class Parameter<T> {
     }
 
     abstract void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException;
+
+    public static Parameter<Long> longParam(Long value){
+        return new LongParameter(null, value);
+    }
+
+    public static Parameter<String> stringParam(String value){
+        return new StringParameter(null, value);
+    }
+
+    public static Parameter<BigDecimal> bigDecimalParam(BigDecimal value){
+        return new BigDecimalParameter(null, value);
+    }
+
+    public static Parameter<LocalDateTime> localDateTimeParam(LocalDateTime value){
+        return new LocalDateTimeParameter(null, value);
+    }
 
     String getName() {
         return name;

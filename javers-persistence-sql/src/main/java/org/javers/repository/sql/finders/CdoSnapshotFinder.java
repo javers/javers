@@ -3,7 +3,6 @@ package org.javers.repository.sql.finders;
 import java.util.Optional;
 
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Pair;
 import org.javers.common.collections.Sets;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.core.json.JsonConverter;
@@ -22,10 +21,8 @@ import org.polyjdbc.core.query.Order;
 import org.polyjdbc.core.query.SelectQuery;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
-import static org.javers.repository.sql.session.PolyUtil.queryForOptionalLong;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
 public class CdoSnapshotFinder {
@@ -52,12 +49,12 @@ public class CdoSnapshotFinder {
             return Optional.empty();
         }
 
-        return selectMaxSnapshotPrimaryKey(globalIdPk.get(), session).map(maxSnapshot -> {
+        return selectMaxSnapshotPrimaryKey(globalIdPk.get(), session).map(maxSnapshotId -> {
             QueryParams oneItemLimit = QueryParamsBuilder
                     .withLimit(1)
                     .withCommitProps(loadCommitProps)
                     .build();
-            return fetchCdoSnapshots(new SnapshotIdFilter(tableNameProvider, maxSnapshot), Optional.of(oneItemLimit), session).get(0);
+            return fetchCdoSnapshots(maxSnapshotId, oneItemLimit, session).get(0);
         });
     }
 
@@ -101,13 +98,31 @@ public class CdoSnapshotFinder {
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams, Session session) {
         Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId, session);
 
-        return globalIdPk.map(id ->
-                fetchCdoSnapshots(new GlobalIdFilter(tableNameProvider, id, queryParams.isAggregate()), Optional.of(queryParams), session))
-                .orElse(Collections.emptyList());
+        return globalIdPk.map(id -> fetchCdoSnapshots(id, queryParams, session))
+                         .orElse(Collections.emptyList());
     }
 
+    private List<CdoSnapshot> fetchCdoSnapshots(long globalIdPk, QueryParams queryParams, Session session) {
+        //TODO!!!!!
+
+        SnapshotQuery query = new SnapshotQuery(tableNameProvider, queryParams, session);
+        query.addGlobalIdFilter(globalIdPk);
+
+        List<CdoSnapshotSerialized> serializedSnapshots = query.run();
+
+        if (queryParams.isLoadCommitProps()) {
+            List<CommitPropertyDTO> commitPropertyDTOs = commitPropertyFinder.findCommitPropertiesOfSnaphots(
+                    serializedSnapshots.stream().map(it -> it.getCommitPk()).collect(toList()));
+
+            cdoSnapshotsEnricher.enrichWithCommitProperties(serializedSnapshots, commitPropertyDTOs);
+        }
+
+        return Lists.transform(serializedSnapshots,
+                serializedSnapshot -> jsonConverter.fromSerializedSnapshot(serializedSnapshot));
+    }
+
+    @Deprecated
     private List<CdoSnapshot> fetchCdoSnapshots(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams, Session session) {
- //TODO!!!!!
         List<CdoSnapshotSerialized> serializedSnapshots = queryForCdoSnapshotDTOs(snapshotFilter, queryParams);
 
         if (queryParams.isPresent() && queryParams.get().isLoadCommitProps()) {

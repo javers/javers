@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.Comparator.*;
+import static org.javers.repository.sql.session.Parameter.longParam;
+import static org.javers.repository.sql.session.Parameter.stringParam;
 
 /**
  * @author bartosz.walacik
@@ -136,31 +138,6 @@ public class Session implements AutoCloseable {
         private String queryName;
         final List<Parameter> parameters = new ArrayList<>();
 
-        public T value(String name, String value) {
-            parameters.add(new Parameter.StringParameter(name, value));
-            return (T)this;
-        }
-
-        public T value(String name, Integer value) {
-            parameters.add(new Parameter.IntParameter(name, value));
-            return (T)this;
-        }
-
-        public T value(String name, LocalDateTime value) {
-            parameters.add(new Parameter.LocalDateTimeParameter(name, value));
-            return (T)this;
-        }
-
-        public T value(String name, BigDecimal value) {
-            parameters.add(new Parameter.BigDecimalParameter(name, value));
-            return (T)this;
-        }
-
-        public T value(String name, Long value) {
-            parameters.add(new Parameter.LongParameter(name, value));
-            return (T)this;
-        }
-
         public T queryName(String queryName) {
             this.queryName = queryName;
             return (T)this;
@@ -187,27 +164,33 @@ public class Session implements AutoCloseable {
             return this;
         }
 
-        public SelectBuilder from(String tableName) {
-            rawSql += " FROM " + tableName + " WHERE 1 = 1";
+        public SelectBuilder from(String fromClauseSQL) {
+            rawSql += " FROM " + fromClauseSQL + " WHERE 1 = 1";
             return this;
         }
 
-        public SelectBuilder and(String columnName, BigDecimal value) {
-            parameters.add(new Parameter.BigDecimalParameter(columnName, value));
-            rawSql += " AND " + columnName +  " = ?";
+        public SelectBuilder and(String columnName, String operator, Parameter parameter) {
+            parameters.add(parameter);
+            rawSql += " AND " + columnName + " " + operator + " ?";
             return this;
         }
 
-        public SelectBuilder and(String columnName, String value) {
-            parameters.add(new Parameter.StringParameter(columnName, value));
-            rawSql += " AND " + columnName +  " = ?";
+        public SelectBuilder and(String predicateSQL, Parameter... params) {
+            parameters.addAll(Lists.immutableListOf(params));
+            rawSql += " AND " + predicateSQL;
             return this;
         }
 
         public SelectBuilder and(String columnName, Long value) {
-            parameters.add(new Parameter.LongParameter(columnName, value));
-            rawSql += " AND " + columnName +  " = ?";
-            return this;
+            return and(columnName, "=", longParam(value));
+        }
+
+        public SelectBuilder and(String columnName, String value) {
+            return and(columnName, "=", stringParam(value));
+        }
+
+        public SelectBuilder and(String columnName, BigDecimal value) {
+            return and(columnName, "=", Parameter.bigDecimalParam(value));
         }
 
         private Select build() {
@@ -240,6 +223,31 @@ public class Session implements AutoCloseable {
 
         public InsertBuilder into(String tableName) {
             this.tableName = tableName;
+            return this;
+        }
+
+        public InsertBuilder value(String name, String value) {
+            parameters.add(new Parameter.StringParameter(name, value));
+            return this;
+        }
+
+        public InsertBuilder value(String name, Integer value) {
+            parameters.add(new Parameter.IntParameter(name, value));
+            return this;
+        }
+
+        public InsertBuilder value(String name, LocalDateTime value) {
+            parameters.add(new Parameter.LocalDateTimeParameter(name, value));
+            return this;
+        }
+
+        public InsertBuilder value(String name, BigDecimal value) {
+            parameters.add(new Parameter.BigDecimalParameter(name, value));
+            return this;
+        }
+
+        public InsertBuilder value(String name, Long value) {
+            parameters.add(new Parameter.LongParameter(name, value));
             return this;
         }
 
