@@ -77,21 +77,20 @@ class JaversCore implements Javers {
         long start = System.currentTimeMillis();
 
         argumentsAreNotNull(author, commitProperties, currentVersion);
-
-        JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
-        assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion, jType);
+        assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion);
 
         Commit commit = commitFactory.create(author, commitProperties, currentVersion);
-        long stop_f = System.currentTimeMillis();
+        long stopCreate = System.currentTimeMillis();
 
         persist(commit);
         long stop = System.currentTimeMillis();
 
-        logger.info(commit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(stop_f-start), (stop-stop_f));
+        logger.info(commit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(stopCreate-start), (stop-stopCreate));
         return commit;
     }
 
-    private void assertJaversTypeNotValueTypeOrPrimitiveType(Object currentVersion, JaversType jType) {
+    private void assertJaversTypeNotValueTypeOrPrimitiveType(Object currentVersion) {
+        JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
         if (jType instanceof ValueType || jType instanceof PrimitiveType){
             throw new JaversException(COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED,
                 jType.getClass().getSimpleName(), currentVersion.getClass().getSimpleName());
@@ -111,13 +110,17 @@ class JaversCore implements Javers {
     public CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Map<String, String> commitProperties,
                                                  Executor executor) {
         long start = System.currentTimeMillis();
+       
         argumentsAreNotNull(author, commitProperties, currentVersion);
-        JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
-        assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion, jType);
+        assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion);
+        
         CompletableFuture<Commit> commit = commitFactory
                 .create(author, commitProperties, currentVersion, executor)
                 .thenApply(it -> new CommitWithTimestamp(it, System.currentTimeMillis()))
-                .thenApplyAsync(it -> new CommitWithTimestamp(persist(it.getCommit()), it.getTimestamp()), executor)
+                .thenApplyAsync(it -> {
+                    persist(it.getCommit());
+                    return it;
+                }, executor)
                 .thenApply(it -> logCommitMessage(start, it));
         return commit;
     }
