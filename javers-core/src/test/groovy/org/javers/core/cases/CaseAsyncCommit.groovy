@@ -20,21 +20,24 @@ class CaseAsyncCommit extends Specification {
       def p = new SnapshotEntity(id:1, intProperty:2)
       def javers = JaversBuilder.javers().build()
 
-      def goFlag = new AtomicBoolean(false)
+      def waitFlag = new AtomicBoolean(true)
       def executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(100))
 
       executor.submit({
-          while(goFlag.get()) {}
+          while(waitFlag.get()) {
+          }
+          logger.info("start executor")
       })
 
       when:
       def cf = javers.commitAsync("author", p, [:], executor)
+      def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1,SnapshotEntity).build())
 
       then:
-      !javers.findSnapshots(QueryBuilder.byInstanceId(1,SnapshotEntity).build())
+      snapshots.size() == 0
 
       when:
-      goFlag.set(true)
+      waitFlag.set(false)
       logger.info "waiting for future competition ...."
       while(executor.completedTaskCount < 3) {}
 
