@@ -1,5 +1,7 @@
 package org.javers.spring.jpa;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.Changes;
 import org.javers.core.Javers;
@@ -30,6 +32,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 /**
@@ -51,6 +55,18 @@ public class JaversTransactionalDecorator implements Javers {
         this.delegate = delegate;
         this.javersSqlRepository = javersSqlRepository;
         this.txManager = txManager;
+    }
+
+    @Override
+    public CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Map<String, String> commitProperties, Executor executor) {
+        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED,
+                "javers.commitAsync() is not available for SQL");
+    }
+
+    @Override
+    public CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Executor executor) {
+        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED,
+                "javers.commitAsync() is not available for SQL");
     }
 
     @Override

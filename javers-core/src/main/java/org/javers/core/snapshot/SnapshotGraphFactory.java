@@ -24,7 +24,8 @@ public class SnapshotGraphFactory {
 
         Set<ObjectNode> snapshotNodes = globalIds.stream()
             .map(javersRepository::getLatest)
-            .filter(Optional::isPresent).map(Optional::get)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
             .map(ObjectNode::new)
             .collect(Collectors.toSet());
 

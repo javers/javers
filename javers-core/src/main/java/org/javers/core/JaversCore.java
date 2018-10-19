@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 import static org.javers.common.exception.JaversExceptionCode.COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED;
@@ -63,7 +65,11 @@ class JaversCore implements Javers {
 
     @Override
     public Commit commit(String author, Object currentVersion) {
-        return commit(author, currentVersion, Collections.<String, String>emptyMap());
+        return commit(author, currentVersion, Collections.emptyMap());
+    }
+
+    public CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Executor executor) {
+        return commitAsync(author, currentVersion, Collections.emptyMap(), executor);
     }
 
     @Override
@@ -71,26 +77,60 @@ class JaversCore implements Javers {
         long start = System.currentTimeMillis();
 
         argumentsAreNotNull(author, commitProperties, currentVersion);
+        assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion);
 
+        Commit commit = commitFactory.create(author, commitProperties, currentVersion);
+        long stopCreate = System.currentTimeMillis();
+
+        persist(commit);
+        long stop = System.currentTimeMillis();
+
+        logger.info(commit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(stopCreate-start), (stop-stopCreate));
+        return commit;
+    }
+
+    private void assertJaversTypeNotValueTypeOrPrimitiveType(Object currentVersion) {
         JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
         if (jType instanceof ValueType || jType instanceof PrimitiveType){
             throw new JaversException(COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED,
                 jType.getClass().getSimpleName(), currentVersion.getClass().getSimpleName());
         }
+    }
 
-        Commit commit = commitFactory.create(author, commitProperties, currentVersion);
-        long stop_f = System.currentTimeMillis();
-
+    private Commit persist(Commit commit) {
         if (commit.getSnapshots().isEmpty()) {
             logger.info("Skipping persisting empty commit: {}", commit.toString());
-            return commit;
+        } else {
+            repository.persist(commit);
         }
-
-        repository.persist(commit);
-        long stop = System.currentTimeMillis();
-
-        logger.info(commit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(stop_f-start), (stop-stop_f));
         return commit;
+    }
+
+    @Override
+    public CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Map<String, String> commitProperties,
+                                                 Executor executor) {
+        long start = System.currentTimeMillis();
+       
+        argumentsAreNotNull(author, commitProperties, currentVersion);
+        assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion);
+        
+        CompletableFuture<Commit> commit = commitFactory
+                .create(author, commitProperties, currentVersion, executor)
+                .thenApply(it -> new CommitWithTimestamp(it, System.currentTimeMillis()))
+                .thenApplyAsync(it -> {
+                    persist(it.getCommit());
+                    return it;
+                }, executor)
+                .thenApply(it -> logCommitMessage(start, it));
+        return commit;
+    }
+
+    private Commit logCommitMessage(long start, CommitWithTimestamp it) {
+        long stop = System.currentTimeMillis();
+        Commit persistedCommit = it.getCommit();
+        Long creationTime = it.getTimestamp();
+        logger.info(persistedCommit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(creationTime-start), (stop-creationTime));
+        return persistedCommit;
     }
 
     @Override
@@ -205,5 +245,23 @@ class JaversCore implements Javers {
     public Property getProperty(PropertyChange propertyChange) {
         ManagedType managedType = typeMapper.getJaversManagedType(propertyChange.getAffectedGlobalId());
         return managedType.getProperty(propertyChange.getPropertyName());
+    }
+
+    private static class CommitWithTimestamp {
+        private Commit commit;
+        private Long timestamp;
+
+        CommitWithTimestamp(Commit commit, Long timestamp) {
+            this.commit = commit;
+            this.timestamp = timestamp;
+        }
+
+        Commit getCommit() {
+            return commit;
+        }
+
+        Long getTimestamp() {
+            return timestamp;
+        }
     }
 }
