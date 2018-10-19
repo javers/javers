@@ -1,6 +1,5 @@
 package org.javers.core;
 
-import org.javers.common.collections.Pair;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.changelog.ChangeListTraverser;
@@ -66,7 +65,11 @@ class JaversCore implements Javers {
 
     @Override
     public Commit commit(String author, Object currentVersion) {
-        return commit(author, currentVersion, Collections.<String, String>emptyMap());
+        return commit(author, currentVersion, Collections.emptyMap());
+    }
+
+    public CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Executor executor) {
+        return commitAsync(author, currentVersion, Collections.emptyMap(), executor);
     }
 
     @Override
@@ -113,16 +116,18 @@ class JaversCore implements Javers {
         assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion, jType);
         CompletableFuture<Commit> commit = commitFactory
                 .create(author, commitProperties, currentVersion, executor)
-                .thenApply(it -> new Pair<>(it, System.currentTimeMillis()))
-                .thenApplyAsync(it -> new Pair<>(persist(it.left()), it.right()), executor)
-                .thenApply(it -> {
-                    long stop = System.currentTimeMillis();
-                    Commit persistedCommit = it.left();
-                    Long creationTime = it.right();
-                    logger.info(persistedCommit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(creationTime-start), (stop-creationTime));
-                    return persistedCommit;
-                });
+                .thenApply(it -> new CommitWithTimestamp(it, System.currentTimeMillis()))
+                .thenApplyAsync(it -> new CommitWithTimestamp(persist(it.getCommit()), it.getTimestamp()), executor)
+                .thenApply(it -> logCommitMessage(start, it));
         return commit;
+    }
+
+    private Commit logCommitMessage(long start, CommitWithTimestamp it) {
+        long stop = System.currentTimeMillis();
+        Commit persistedCommit = it.getCommit();
+        Long creationTime = it.getTimestamp();
+        logger.info(persistedCommit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(creationTime-start), (stop-creationTime));
+        return persistedCommit;
     }
 
     @Override
@@ -237,5 +242,23 @@ class JaversCore implements Javers {
     public Property getProperty(PropertyChange propertyChange) {
         ManagedType managedType = typeMapper.getJaversManagedType(propertyChange.getAffectedGlobalId());
         return managedType.getProperty(propertyChange.getPropertyName());
+    }
+
+    private static class CommitWithTimestamp {
+        private Commit commit;
+        private Long timestamp;
+
+        CommitWithTimestamp(Commit commit, Long timestamp) {
+            this.commit = commit;
+            this.timestamp = timestamp;
+        }
+
+        Commit getCommit() {
+            return commit;
+        }
+
+        Long getTimestamp() {
+            return timestamp;
+        }
     }
 }
