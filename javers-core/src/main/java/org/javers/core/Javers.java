@@ -68,11 +68,22 @@ public interface Javers {
     Commit commit(String author, Object currentVersion, Map<String, String> commitProperties);
 
     /**
-     * Async version of commit()
-     * @param author current user
-     * @param currentVersion standalone object or handle to an object graph
-     * @param commitProperties for example ["channel":"web", "locale":"pl-PL"]
-     * @param executor executor to run commit on
+     * Async version of {@link #commit(String, Object)}
+     * <br/><br/>
+     *
+     * <b>Important!</b> Works with MontoDB, not implemented for SQL repositories.
+     *
+     * @param executor ExecutorService to be used to process commit() asynchronously
+     */
+    CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Executor executor);
+
+    /**
+     * Async version of {@link #commit(String, Object, Map)}
+     * <br/><br/>
+     *
+     * <b>Important!</b> Works with MontoDB, not implemented for SQL repositories.
+     *
+     * @param executor ExecutorService to be used to process commit() asynchronously
      */
     CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Map<String, String> commitProperties,
                                           Executor executor);

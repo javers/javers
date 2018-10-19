@@ -64,6 +64,12 @@ public class JaversTransactionalDecorator implements Javers {
     }
 
     @Override
+    public CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Executor executor) {
+        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED,
+                "javers.commitAsync() is not available for SQL");
+    }
+
+    @Override
     @Transactional
     public Commit commit(String author, Object currentVersion) {
         registerRollbackListener();
