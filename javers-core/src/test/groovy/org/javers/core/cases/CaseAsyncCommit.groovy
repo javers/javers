@@ -26,7 +26,7 @@ class CaseAsyncCommit extends Specification {
       !javers.findSnapshots(QueryBuilder.byInstanceId(1,SnapshotEntity).build())
 
       when:
-      while(executor.completedTaskCount < 1) {
+      while(executor.completedTaskCount < 2) {
           println "executor.completedTaskCount: " + executor.completedTaskCount
           println "queue.size:                  " + executor.completedTaskCount
       }

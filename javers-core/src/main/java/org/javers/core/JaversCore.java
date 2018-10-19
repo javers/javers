@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 import static org.javers.common.exception.JaversExceptionCode.COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED;
@@ -73,23 +75,43 @@ class JaversCore implements Javers {
         argumentsAreNotNull(author, commitProperties, currentVersion);
 
         JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
-        if (jType instanceof ValueType || jType instanceof PrimitiveType){
-            throw new JaversException(COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED,
-                jType.getClass().getSimpleName(), currentVersion.getClass().getSimpleName());
-        }
+        assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion, jType);
 
         Commit commit = commitFactory.create(author, commitProperties, currentVersion);
         long stop_f = System.currentTimeMillis();
 
-        if (commit.getSnapshots().isEmpty()) {
-            logger.info("Skipping persisting empty commit: {}", commit.toString());
-            return commit;
-        }
-
-        repository.persist(commit);
+        persist(commit);
         long stop = System.currentTimeMillis();
 
         logger.info(commit.toString()+", done in "+ (stop-start)+ " millis (diff:{}, persist:{})",(stop_f-start), (stop-stop_f));
+        return commit;
+    }
+
+    private void assertJaversTypeNotValueTypeOrPrimitiveType(Object currentVersion, JaversType jType) {
+        if (jType instanceof ValueType || jType instanceof PrimitiveType){
+            throw new JaversException(COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED,
+                jType.getClass().getSimpleName(), currentVersion.getClass().getSimpleName());
+        }
+    }
+
+    private Commit persist(Commit commit) {
+        if (commit.getSnapshots().isEmpty()) {
+            logger.info("Skipping persisting empty commit: {}", commit.toString());
+        } else {
+            repository.persist(commit);
+        }
+        return commit;
+    }
+
+    @Override
+    public CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Map<String, String> commitProperties,
+                                                 Executor executor) {
+        argumentsAreNotNull(author, commitProperties, currentVersion);
+        JaversType jType = typeMapper.getJaversType(currentVersion.getClass());
+        assertJaversTypeNotValueTypeOrPrimitiveType(currentVersion, jType);
+        CompletableFuture<Commit> commit = commitFactory
+                .create(author, commitProperties, currentVersion, executor)
+                .thenApplyAsync(this::persist, executor);
         return commit;
     }
 
