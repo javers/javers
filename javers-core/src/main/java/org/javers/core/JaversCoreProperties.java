@@ -11,6 +11,7 @@ import java.util.Map;
 
 public abstract class JaversCoreProperties {
     private String algorithm = "simple";
+    private String commitIdGenerator = "synchronized_sequence";
     private String mappingStyle = "field";
     private boolean newObjectSnapshot = false;
     private boolean prettyPrint = true;
@@ -20,6 +21,10 @@ public abstract class JaversCoreProperties {
 
     public String getAlgorithm() {
         return algorithm;
+    }
+
+    public String getCommitIdGenerator() {
+        return commitIdGenerator;
     }
 
     public String getMappingStyle() {
@@ -44,6 +49,10 @@ public abstract class JaversCoreProperties {
 
     public void setAlgorithm(String algorithm) {
         this.algorithm = algorithm;
+    }
+
+    public void setCommitIdGenerator(String commitIdGenerator) {
+        this.commitIdGenerator = commitIdGenerator;
     }
 
     public void setMappingStyle(String mappingStyle) {

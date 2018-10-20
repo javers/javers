@@ -677,6 +677,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     public JaversBuilder withProperties(JaversCoreProperties javersProperties) {
         this.withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
+            .withCommitIdGenerator(CommitIdGenerator.valueOf(javersProperties.getCommitIdGenerator().toUpperCase()))
             .withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
             .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
             .withPrettyPrint(javersProperties.isPrettyPrint())
