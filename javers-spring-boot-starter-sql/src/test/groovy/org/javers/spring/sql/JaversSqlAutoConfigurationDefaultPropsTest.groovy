@@ -1,5 +1,6 @@
 package org.javers.spring.sql
 
+import org.javers.core.CommitIdGenerator
 import org.javers.repository.sql.DialectName
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
@@ -34,6 +35,7 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         javersProperties.packagesToScan == ""
         dialectName == DialectName.H2
         javersProperties.isSqlSchemaManagementEnabled()
+        javersProperties.commitIdGenerator == "synchronized_sequence"
         javersProperties.prettyPrintDateFormats.localDateTime == "dd MMM yyyy, HH:mm:ss"
         javersProperties.prettyPrintDateFormats.zonedDateTime == "dd MMM yyyy, HH:mm:ssZ"
         javersProperties.prettyPrintDateFormats.localDate == "dd MMM yyyy"
