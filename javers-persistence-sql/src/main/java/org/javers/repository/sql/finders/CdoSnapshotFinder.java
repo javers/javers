@@ -94,7 +94,7 @@ public class CdoSnapshotFinder {
 
         if (queryParams.isLoadCommitProps()) {
             List<CommitPropertyDTO> commitPropertyDTOs = commitPropertyFinder.findCommitPropertiesOfSnaphots(
-                    serializedSnapshots.stream().map(it -> it.getCommitPk()).collect(toList()));
+                    serializedSnapshots.stream().map(it -> it.getCommitPk()).collect(toList()),session);
             cdoSnapshotsEnricher.enrichWithCommitProperties(serializedSnapshots, commitPropertyDTOs);
         }
 
