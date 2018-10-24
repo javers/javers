@@ -1095,8 +1095,8 @@ class JaversRepositoryE2ETest extends Specification {
         snapshots[0,1].collect{it.globalId.value()} as Set == [
                  "$sName/1#valueObjectRef/networkAddress",
                  "$sName/1#valueObjectRef"] as Set
-        snapshots[2,3,4].collect{it.globalId.value()} as Set ==
-                ["$sName/1#valueObjectRef/networkAddress",
+        snapshots[2,3,4].collect{it.globalId.value()} as Set == [
+                 "$sName/1#valueObjectRef/networkAddress",
                  "$sName/1#valueObjectRef",
                  "$sName/1"
                 ] as Set
