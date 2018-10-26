@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class JaversSqlProperties extends JaversSpringProperties {
 
     private boolean sqlSchemaManagementEnabled = true;
+    private String schema;
 
     public boolean isSqlSchemaManagementEnabled() {
         return sqlSchemaManagementEnabled;
@@ -14,5 +15,13 @@ public class JaversSqlProperties extends JaversSpringProperties {
 
     public void setSqlSchemaManagementEnabled(boolean sqlSchemaManagementEnabled) {
         this.sqlSchemaManagementEnabled = sqlSchemaManagementEnabled;
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
 }

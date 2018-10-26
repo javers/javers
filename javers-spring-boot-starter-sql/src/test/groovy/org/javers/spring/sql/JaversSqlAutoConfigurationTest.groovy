@@ -35,6 +35,7 @@ class JaversSqlAutoConfigurationTest extends Specification {
         !javersProperties.isPrettyPrint()
         javersProperties.isTypeSafeValues()
         dialectName == DialectName.H2
+        javersProperties.schema == "test"
         javersProperties.isSqlSchemaManagementEnabled()
         javersProperties.getCommitIdGenerator() == "random"
         javersProperties.packagesToScan == "my.company.domain.person, my.company.domain.finance"

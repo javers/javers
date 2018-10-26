@@ -1,6 +1,6 @@
 package org.javers.spring.sql
 
-import org.javers.core.CommitIdGenerator
+
 import org.javers.repository.sql.DialectName
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
@@ -25,7 +25,7 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
     @Autowired
     AuthorProvider provider
 
-    def "should provide default props" () {
+    def "should provide default props"() {
         expect:
         javersProperties.getAlgorithm() == "simple"
         javersProperties.getMappingStyle() == "field"
@@ -34,6 +34,7 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         !javersProperties.isTypeSafeValues()
         javersProperties.packagesToScan == ""
         dialectName == DialectName.H2
+        javersProperties.schema == null
         javersProperties.isSqlSchemaManagementEnabled()
         javersProperties.commitIdGenerator == "synchronized_sequence"
         javersProperties.prettyPrintDateFormats.localDateTime == "dd MMM yyyy, HH:mm:ss"
@@ -42,7 +43,7 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         javersProperties.prettyPrintDateFormats.localTime == "HH:mm:ss"
     }
 
-    def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath" () {
+    def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath"() {
         expect:
         provider instanceof SpringSecurityAuthorProvider
     }
