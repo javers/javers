@@ -1,6 +1,6 @@
 package org.javers.spring.sql
 
-import org.javers.core.CommitIdGenerator
+
 import org.javers.repository.sql.DialectName
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
@@ -35,7 +35,7 @@ class JaversSqlAutoConfigurationTest extends Specification {
         !javersProperties.isPrettyPrint()
         javersProperties.isTypeSafeValues()
         dialectName == DialectName.H2
-        javersProperties.schema == "test"
+        javersProperties.sqlSchema == "test"
         javersProperties.isSqlSchemaManagementEnabled()
         javersProperties.getCommitIdGenerator() == "random"
         javersProperties.packagesToScan == "my.company.domain.person, my.company.domain.finance"

@@ -66,7 +66,7 @@ public class JaversSqlAutoConfiguration {
     public JaversSqlRepository javersSqlRepository(ConnectionProvider connectionProvider) {
         return SqlRepositoryBuilder
                 .sqlRepository()
-                .withSchema(javersSqlProperties.getSchema())
+                .withSchema(javersSqlProperties.getSqlSchema())
                 .withConnectionProvider(connectionProvider)
                 .withDialect(javersSqlDialectName())
                 .withSchemaManagementEnabled(javersSqlProperties.isSqlSchemaManagementEnabled())

@@ -34,7 +34,7 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         !javersProperties.isTypeSafeValues()
         javersProperties.packagesToScan == ""
         dialectName == DialectName.H2
-        javersProperties.schema == null
+        javersProperties.sqlSchema == null
         javersProperties.isSqlSchemaManagementEnabled()
         javersProperties.commitIdGenerator == "synchronized_sequence"
         javersProperties.prettyPrintDateFormats.localDateTime == "dd MMM yyyy, HH:mm:ss"
