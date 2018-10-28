@@ -9,6 +9,7 @@ import org.javers.core.JaversCoreProperties.PrettyPrintDateFormats;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactoryModule;
 import org.javers.core.commit.CommitId;
+import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
@@ -25,6 +26,7 @@ import org.javers.core.json.JsonConverterBuilder;
 import org.javers.core.json.JsonTypeAdapter;
 import org.javers.core.json.typeadapter.change.ChangeTypeAdaptersModule;
 import org.javers.core.json.typeadapter.commit.CommitTypeAdaptersModule;
+import org.javers.core.json.typeadapter.commit.DiffTypeDeserializer;
 import org.javers.core.metamodel.annotation.*;
 import org.javers.core.metamodel.clazz.*;
 import org.javers.core.metamodel.scanner.ScannerModule;
@@ -675,6 +677,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     public JaversBuilder withProperties(JaversCoreProperties javersProperties) {
         this.withListCompareAlgorithm(ListCompareAlgorithm.valueOf(javersProperties.getAlgorithm().toUpperCase()))
+            .withCommitIdGenerator(CommitIdGenerator.valueOf(javersProperties.getCommitIdGenerator().toUpperCase()))
             .withMappingStyle(MappingStyle.valueOf(javersProperties.getMappingStyle().toUpperCase()))
             .withNewObjectsSnapshot(javersProperties.isNewObjectSnapshot())
             .withPrettyPrint(javersProperties.isPrettyPrint())
@@ -739,7 +742,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         }
 
         jsonConverterBuilder.registerJsonTypeAdapters(getComponents(JsonTypeAdapter.class));
-
+        jsonConverterBuilder.registerNativeGsonDeserializer(Diff.class, new DiffTypeDeserializer());
         JsonConverter jsonConverter = jsonConverterBuilder.build();
         addComponent(jsonConverter);
 

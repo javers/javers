@@ -21,6 +21,12 @@ import org.javers.repository.api.JaversExtendedRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * @author bartosz walacik
@@ -47,7 +53,7 @@ public class CommitFactory {
     }
 
     public Commit createTerminalByGlobalId(String author, Map<String, String> properties, GlobalId removedId){
-        Validate.argumentsAreNotNull(author, properties, removedId);
+        argumentsAreNotNull(author, properties, removedId);
         Optional<CdoSnapshot> previousSnapshot = javersRepository.getLatest(removedId);
 
         CommitMetadata commitMetadata = newCommitMetadata(author, properties);
@@ -59,21 +65,35 @@ public class CommitFactory {
     }
 
     public Commit createTerminal(String author, Map<String, String> properties, Object removed){
-        Validate.argumentsAreNotNull(author, properties, removed);
+        argumentsAreNotNull(author, properties, removed);
         Cdo removedCdo = liveGraphFactory.createCdo(removed);
         return createTerminalByGlobalId(author, properties, removedCdo.getGlobalId());
     }
 
     public Commit create(String author, Map<String, String> properties, Object currentVersion){
-        Validate.argumentsAreNotNull(author, currentVersion);
-        CommitMetadata commitMetadata = newCommitMetadata(author, properties);
+        argumentsAreNotNull(author, currentVersion);
+        LiveGraph currentGraph = createLiveGraph(currentVersion);
+        return createCommit(author, properties, currentGraph);
+    }
 
-        LiveGraph currentGraph = liveGraphFactory.createLiveGraph(currentVersion);
+    public CompletableFuture<Commit> create(String author, Map<String, String> properties, Object currentVersion, Executor executor) {
+        argumentsAreNotNull(author, currentVersion);
+        LiveGraph currentGraph = createLiveGraph(currentVersion);
+        return supplyAsync( () -> createCommit(author, properties, currentGraph), executor);
+    }
+
+    private Commit createCommit(String author, Map<String, String> properties, LiveGraph currentGraph){
+        CommitMetadata commitMetadata = newCommitMetadata(author, properties);
         ObjectGraph<CdoSnapshot> latestSnapshotGraph = snapshotGraphFactory.createLatest(currentGraph.globalIds());
         List<CdoSnapshot> changedCdoSnapshots =
             changedCdoSnapshotsFactory.create(currentGraph.cdos(), latestSnapshotGraph.cdos(), commitMetadata);
         Diff diff = diffFactory.create(latestSnapshotGraph, currentGraph, Optional.of(commitMetadata));
         return new Commit(commitMetadata, changedCdoSnapshots, diff);
+    }
+
+    private LiveGraph createLiveGraph(Object currentVersion){
+        argumentsAreNotNull(currentVersion);
+        return liveGraphFactory.createLiveGraph(currentVersion);
     }
 
     private CommitMetadata newCommitMetadata(String author, Map<String, String> properties){

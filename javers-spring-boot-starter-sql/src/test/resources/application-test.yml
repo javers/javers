@@ -5,7 +5,9 @@ javers:
   prettyPrint: false
   typeSafeValues: true
   dialect: H2
+  sqlSchema: 'test'
   sqlSchemaManagementEnabled: true
+  commitIdGenerator: random
   packagesToScan: my.company.domain.person, my.company.domain.finance
   prettyPrintDateFormats:
     localDateTime: "dd-mm-yyyy"

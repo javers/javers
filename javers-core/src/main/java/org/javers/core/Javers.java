@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 
@@ -64,6 +66,27 @@ public interface Javers {
      * @param commitProperties for example ["channel":"web", "locale":"pl-PL"]
      */
     Commit commit(String author, Object currentVersion, Map<String, String> commitProperties);
+
+    /**
+     * Async version of {@link #commit(String, Object)}
+     * <br/><br/>
+     *
+     * <b>Important!</b> Works with MontoDB, not implemented for SQL repositories.
+     *
+     * @param executor ExecutorService to be used to process commit() asynchronously
+     */
+    CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Executor executor);
+
+    /**
+     * Async version of {@link #commit(String, Object, Map)}
+     * <br/><br/>
+     *
+     * <b>Important!</b> Works with MontoDB, not implemented for SQL repositories.
+     *
+     * @param executor ExecutorService to be used to process commit() asynchronously
+     */
+    CompletableFuture<Commit> commitAsync(String author, Object currentVersion, Map<String, String> commitProperties,
+                                          Executor executor);
 
     /**
      * Marks given object as deleted.

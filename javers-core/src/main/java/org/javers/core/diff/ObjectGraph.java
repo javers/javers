@@ -23,11 +23,15 @@ public abstract class ObjectGraph<T extends Cdo> {
     }
 
     public Set<T> cdos() {
-        return nodes().stream().map(node -> (T) node.getCdo()).collect(Collectors.toSet());
+        return nodes().stream()
+                .map(node -> (T) node.getCdo())
+                .collect(Collectors.toSet());
     }
 
     public Set<GlobalId> globalIds() {
-        return nodes().stream().map(ObjectNode::getGlobalId).collect(Collectors.toSet());
+        return nodes().stream()
+                .map(ObjectNode::getGlobalId)
+                .collect(Collectors.toSet());
     }
 
     public Optional<T> get(GlobalId globalId) {

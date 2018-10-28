@@ -1,5 +1,6 @@
 package org.javers.spring.boot.mongo
 
+import org.javers.core.CommitIdGenerator
 import org.javers.core.Javers
 import org.javers.core.metamodel.type.EntityType
 import org.javers.spring.auditable.AuthorProvider
@@ -37,6 +38,7 @@ class JaversMongoAutoConfigurationTest extends Specification{
         !javersProperties.newObjectSnapshot
         !javersProperties.prettyPrint
         javersProperties.typeSafeValues
+        javersProperties.commitIdGenerator == "random"
     }
 
     def "shouldReadBeanMappingStyleFromYml"() {

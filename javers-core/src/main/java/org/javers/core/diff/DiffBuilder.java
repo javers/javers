@@ -8,9 +8,13 @@ import java.util.*;
 /**
  * @author bartosz walacik
  */
-class DiffBuilder {
+public class DiffBuilder {
     private final List<Change> changes = new ArrayList<>();
     private final PrettyValuePrinter valuePrinter;
+
+    public DiffBuilder() {
+        this(PrettyValuePrinter.getDefault());
+    }
 
     public DiffBuilder(PrettyValuePrinter valuePrinter) {
         this.valuePrinter = valuePrinter;

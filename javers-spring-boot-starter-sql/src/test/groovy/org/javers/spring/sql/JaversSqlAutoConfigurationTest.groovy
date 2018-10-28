@@ -1,5 +1,6 @@
 package org.javers.spring.sql
 
+
 import org.javers.repository.sql.DialectName
 import org.javers.spring.auditable.AuthorProvider
 import org.javers.spring.auditable.SpringSecurityAuthorProvider
@@ -34,14 +35,14 @@ class JaversSqlAutoConfigurationTest extends Specification {
         !javersProperties.isPrettyPrint()
         javersProperties.isTypeSafeValues()
         dialectName == DialectName.H2
+        javersProperties.sqlSchema == "test"
         javersProperties.isSqlSchemaManagementEnabled()
+        javersProperties.getCommitIdGenerator() == "random"
         javersProperties.packagesToScan == "my.company.domain.person, my.company.domain.finance"
         javersProperties.prettyPrintDateFormats.localDateTime == "dd-mm-yyyy"
         javersProperties.prettyPrintDateFormats.zonedDateTime == "dd-mm-yyyy HH mm ss Z"
         javersProperties.prettyPrintDateFormats.localDate == "dd-mm-yyyy"
         javersProperties.prettyPrintDateFormats.localTime == "HH mm ss"
-
-
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath" () {

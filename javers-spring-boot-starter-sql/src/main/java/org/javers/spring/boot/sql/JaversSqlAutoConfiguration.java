@@ -65,11 +65,12 @@ public class JaversSqlAutoConfiguration {
     @ConditionalOnMissingBean
     public JaversSqlRepository javersSqlRepository(ConnectionProvider connectionProvider) {
         return SqlRepositoryBuilder
-            .sqlRepository()
-            .withConnectionProvider(connectionProvider)
-            .withDialect(javersSqlDialectName())
-            .withSchemaManagementEnabled(javersSqlProperties.isSqlSchemaManagementEnabled())
-            .build();
+                .sqlRepository()
+                .withSchema(javersSqlProperties.getSqlSchema())
+                .withConnectionProvider(connectionProvider)
+                .withDialect(javersSqlDialectName())
+                .withSchemaManagementEnabled(javersSqlProperties.isSqlSchemaManagementEnabled())
+                .build();
     }
 
     @Bean(name = "javers")
