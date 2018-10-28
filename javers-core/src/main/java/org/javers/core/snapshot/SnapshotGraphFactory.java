@@ -21,12 +21,10 @@ public class SnapshotGraphFactory {
     public SnapshotGraph createLatest(Set<GlobalId> globalIds){
         Validate.argumentIsNotNull(globalIds);
 
-        Set<ObjectNode> snapshotNodes = globalIds.stream()
-            .map(javersRepository::getLatest)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(ObjectNode::new)
-            .collect(Collectors.toSet());
+        Set<ObjectNode> snapshotNodes = javersRepository.getLatest(globalIds)
+                .stream()
+                .map(ObjectNode::new)
+                .collect(Collectors.toSet());
 
         return new SnapshotGraph(snapshotNodes);
     }
