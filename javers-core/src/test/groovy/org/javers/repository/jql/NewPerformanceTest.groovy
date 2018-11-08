@@ -14,13 +14,13 @@ abstract class NewPerformanceTest extends Specification {
 
     def "should init database - insert and updates"() {
         given:
-        def n = 20000
-        clearDatabase()
+        def n = 50
+        //clearDatabase()
         start()
 
         when:
         n.times {
-            def root = NewPerformanceEntity.produce(it * 100, 2)
+            def root = NewPerformanceEntity.produce(10)
             javers.commit("author", root, [os: "android", country: "pl"])
 
             root.change()
