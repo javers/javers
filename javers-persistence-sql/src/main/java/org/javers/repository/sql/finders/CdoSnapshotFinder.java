@@ -58,7 +58,6 @@ public class CdoSnapshotFinder {
 
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers, Session session) {
 
-        //TODO batch read ?
         List<SnapshotDbIdentifier> snapshotIdentifiersWithPk = snapshotIdentifiers.stream()
                 .map(si -> globalIdRepository.findGlobalIdPk(si.getGlobalId(), session)
                                              .map(id -> new SnapshotDbIdentifier(si, id)))
