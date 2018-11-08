@@ -2,7 +2,6 @@ package org.javers.repository.sql.schema;
 
 import java.util.Optional;
 import org.javers.repository.sql.SqlRepositoryConfiguration;
-import org.polyjdbc.core.PolyJDBC;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
@@ -20,33 +19,16 @@ public class TableNameProvider {
     public String getGlobalIdTableNameWithSchema() {
         return getGlobalIdTableName().nameWithSchema();
     }
-
-    public DBObjectName getGlobalIdTableName() {
-        return new DBObjectName(schemaName, GLOBAL_ID_TABLE_NAME);
-    }
-
     public String getCommitTableNameWithSchema() {
         return getCommitTableName().nameWithSchema();
-    }
-
-    public DBObjectName getCommitTableName() {
-        return new DBObjectName(schemaName, COMMIT_TABLE_NAME);
     }
 
     public String getCommitPropertyTableNameWithSchema() {
         return getCommitPropertyTableName().nameWithSchema();
     }
 
-    public DBObjectName getCommitPropertyTableName() {
-        return new DBObjectName(schemaName, COMMIT_PROPERTY_TABLE_NAME);
-    }
-
     public String getSnapshotTableNameWithSchema() {
         return getSnapshotTableName().nameWithSchema();
-    }
-
-    public DBObjectName getSnapshotTableName() {
-        return new DBObjectName(schemaName, SNAPSHOT_TABLE_NAME);
     }
 
     public String getSnapshotTablePkSeqWithSchema() {
@@ -71,5 +53,21 @@ public class TableNameProvider {
 
     public String getSequenceNameWithSchema(String pkColName) {
         return new DBObjectName(schemaName, "jv_" + pkColName + "_seq").nameWithSchema();
+    }
+
+    DBObjectName getGlobalIdTableName() {
+        return new DBObjectName(schemaName, GLOBAL_ID_TABLE_NAME);
+    }
+
+    DBObjectName getCommitTableName() {
+        return new DBObjectName(schemaName, COMMIT_TABLE_NAME);
+    }
+
+    DBObjectName getCommitPropertyTableName() {
+        return new DBObjectName(schemaName, COMMIT_PROPERTY_TABLE_NAME);
+    }
+
+    DBObjectName getSnapshotTableName() {
+        return new DBObjectName(schemaName, SNAPSHOT_TABLE_NAME);
     }
 }

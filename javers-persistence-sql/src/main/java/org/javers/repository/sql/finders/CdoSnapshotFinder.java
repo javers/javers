@@ -1,9 +1,6 @@
 package org.javers.repository.sql.finders;
 
-import java.util.Optional;
-
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Pair;
 import org.javers.common.collections.Sets;
 import org.javers.core.json.CdoSnapshotSerialized;
 import org.javers.core.json.JsonConverter;
@@ -14,113 +11,113 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.api.QueryParams;
 import org.javers.repository.api.QueryParamsBuilder;
 import org.javers.repository.api.SnapshotIdentifier;
+import org.javers.repository.sql.finders.SnapshotQuery.SnapshotDbIdentifier;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.TableNameProvider;
-import org.polyjdbc.core.PolyJDBC;
-import org.polyjdbc.core.query.Order;
-import org.polyjdbc.core.query.SelectQuery;
+import org.javers.repository.sql.session.Session;
 
 import java.util.*;
+import java.util.function.Consumer;
 
-import static org.javers.repository.sql.PolyUtil.queryForOptionalLong;
-import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
+import static java.util.stream.Collectors.toList;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_GLOBAL_ID_FK;
+import static org.javers.repository.sql.schema.FixedSchemaFactory.SNAPSHOT_PK;
 
 public class CdoSnapshotFinder {
 
-    private final PolyJDBC polyJDBC;
     private final GlobalIdRepository globalIdRepository;
     private final CommitPropertyFinder commitPropertyFinder;
-    private final CdoSnapshotMapper cdoSnapshotMapper;
     private final CdoSnapshotsEnricher cdoSnapshotsEnricher = new CdoSnapshotsEnricher();
     private JsonConverter jsonConverter;
     private final TableNameProvider tableNameProvider;
 
-    public CdoSnapshotFinder(PolyJDBC polyJDBC, GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, TableNameProvider tableNameProvider) {
-        this.polyJDBC = polyJDBC;
+    public CdoSnapshotFinder(GlobalIdRepository globalIdRepository, CommitPropertyFinder commitPropertyFinder, TableNameProvider tableNameProvider) {
         this.globalIdRepository = globalIdRepository;
         this.commitPropertyFinder = commitPropertyFinder;
-        this.cdoSnapshotMapper = new CdoSnapshotMapper();
         this.tableNameProvider = tableNameProvider;
     }
 
-    public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId);
+    public Optional<CdoSnapshot> getLatest(GlobalId globalId, Session session, boolean loadCommitProps) {
+        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId, session);
         if (!globalIdPk.isPresent()){
             return Optional.empty();
         }
 
-        return selectMaxSnapshotPrimaryKey(globalIdPk.get()).map(maxSnapshot -> {
-            QueryParams oneItemLimit = QueryParamsBuilder.withLimit(1).build();
-            return fetchCdoSnapshots(new SnapshotIdFilter(tableNameProvider, maxSnapshot), Optional.of(oneItemLimit)).get(0);
+        return selectMaxSnapshotPrimaryKey(globalIdPk.get(), session).map(maxSnapshotId -> {
+            QueryParams oneItemLimit = QueryParamsBuilder
+                    .withLimit(1)
+                    .withCommitProps(loadCommitProps)
+                    .build();
+            return fetchCdoSnapshots(q -> q.addSnapshotPkFilter(maxSnapshotId), oneItemLimit, session).get(0);
         });
     }
 
-    public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
-        return fetchCdoSnapshots(new AnySnapshotFilter(tableNameProvider), Optional.of(queryParams));
+    public List<CdoSnapshot> getSnapshots(QueryParams queryParams, Session session) {
+        return fetchCdoSnapshots(q -> {}, queryParams, session);
     }
 
-    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return fetchCdoSnapshots(new SnapshotIdentifiersFilter(tableNameProvider, globalIdRepository, snapshotIdentifiers), Optional.<QueryParams>empty());
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers, Session session) {
+
+        List<SnapshotDbIdentifier> snapshotIdentifiersWithPk = snapshotIdentifiers.stream()
+                .map(si -> globalIdRepository.findGlobalIdPk(si.getGlobalId(), session)
+                                             .map(id -> new SnapshotDbIdentifier(si, id)))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(toList());
+
+        QueryParams queryParams = QueryParamsBuilder.withLimit(Integer.MAX_VALUE).build();
+        return fetchCdoSnapshots(q -> q.addSnapshotIdentifiersFilter(snapshotIdentifiersWithPk), queryParams, session);
     }
 
-    public List<CdoSnapshot> getStateHistory(Set<ManagedType> managedTypes, QueryParams queryParams) {
+    public List<CdoSnapshot> getStateHistory(Set<ManagedType> managedTypes, QueryParams queryParams, Session session) {
         Set<String> managedTypeNames = Sets.transform(managedTypes, managedType -> managedType.getName());
-        ManagedClassFilter classFilter = new ManagedClassFilter(tableNameProvider, managedTypeNames, queryParams.isAggregate());
-        return fetchCdoSnapshots(classFilter, Optional.of(queryParams));
+        return fetchCdoSnapshots(q -> q.addManagedTypesFilter(managedTypeNames), queryParams, session);
     }
 
-    public List<CdoSnapshot> getVOStateHistory(EntityType ownerEntity, String fragment, QueryParams queryParams) {
-        VoOwnerEntityFilter voOwnerFilter = new VoOwnerEntityFilter(tableNameProvider, ownerEntity.getName(), fragment);
-        return fetchCdoSnapshots(voOwnerFilter, Optional.of(queryParams));
+    public List<CdoSnapshot> getVOStateHistory(EntityType ownerEntity, String fragment, QueryParams queryParams, Session session) {
+        return fetchCdoSnapshots(q -> q.addVoOwnerEntityFilter(ownerEntity.getName(), fragment), queryParams, session);
     }
 
-    public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId);
+    public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams, Session session) {
+        Optional<Long> globalIdPk = globalIdRepository.findGlobalIdPk(globalId, session);
 
-        return globalIdPk.map(id ->
-                fetchCdoSnapshots(new GlobalIdFilter(tableNameProvider, id, queryParams.isAggregate()), Optional.of(queryParams)))
-                .orElse(Collections.emptyList());
+        return globalIdPk.map(idPk -> fetchCdoSnapshots(q -> q.addGlobalIdFilter(idPk), queryParams, session))
+                         .orElse(Collections.emptyList());
     }
 
-    private List<CdoSnapshot> fetchCdoSnapshots(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams) {
-        List<Pair<CdoSnapshotSerialized,Long>> serializedSnapshots = queryForCdoSnapshotDTOs(snapshotFilter, queryParams);
+    private List<CdoSnapshot> fetchCdoSnapshots(Consumer<SnapshotQuery> additionalFilter,
+                                                QueryParams queryParams, Session session) {
+        SnapshotQuery query = new SnapshotQuery(tableNameProvider, queryParams, session);
+        additionalFilter.accept(query);
+        List<CdoSnapshotSerialized> serializedSnapshots = query.run();
 
-        List<CommitPropertyDTO> commitPropertyDTOs =
-                commitPropertyFinder.findCommitPropertiesOfSnaphots(Pair.collectRightAsSet(serializedSnapshots));
-
-        cdoSnapshotsEnricher.enrichWithCommitProperties(serializedSnapshots, commitPropertyDTOs);
+        if (queryParams.isLoadCommitProps()) {
+            List<CommitPropertyDTO> commitPropertyDTOs = commitPropertyFinder.findCommitPropertiesOfSnaphots(
+                    serializedSnapshots.stream().map(it -> it.getCommitPk()).collect(toList()),session);
+            cdoSnapshotsEnricher.enrichWithCommitProperties(serializedSnapshots, commitPropertyDTOs);
+        }
 
         return Lists.transform(serializedSnapshots,
-                serializedSnapshot -> jsonConverter.fromSerializedSnapshot(serializedSnapshot.left()));
+                serializedSnapshot -> jsonConverter.fromSerializedSnapshot(serializedSnapshot));
     }
 
-    private List<Pair<CdoSnapshotSerialized,Long>> queryForCdoSnapshotDTOs(SnapshotFilter snapshotFilter, Optional<QueryParams> queryParams) {
-        SelectQuery query =  polyJDBC.query().select(snapshotFilter.select());
-        snapshotFilter.addFrom(query);
-        snapshotFilter.addWhere(query);
-        if (queryParams.isPresent()) {
-            snapshotFilter.applyQueryParams(query, queryParams.get());
-        }
-        query.orderBy(SNAPSHOT_PK, Order.DESC);
-        return polyJDBC.queryRunner().queryList(query, cdoSnapshotMapper);
-    }
+    private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk, Session session) {
 
-    private Optional<Long> selectMaxSnapshotPrimaryKey(long globalIdPk) {
-        SelectQuery query = polyJDBC.query()
-            .select("MAX(" + SNAPSHOT_PK + ")")
-            .from(tableNameProvider.getSnapshotTableNameWithSchema())
-            .where(SNAPSHOT_GLOBAL_ID_FK + " = :globalIdPk")
-            .withArgument("globalIdPk", globalIdPk);
+        Optional<Long> maxPrimaryKey =  session
+                .select("MAX(" + SNAPSHOT_PK + ")")
+                .from(tableNameProvider.getSnapshotTableNameWithSchema())
+                .and(SNAPSHOT_GLOBAL_ID_FK, globalIdPk)
+                .queryName("select max snapshot's PK")
+                .queryForOptionalLong();
 
-        Optional<Long> result = queryForOptionalLong(query, polyJDBC);
-
-        if (result.isPresent() && result.get() == 0){
+        if (maxPrimaryKey.isPresent() && maxPrimaryKey.get() == 0){
             return Optional.empty();
         }
-        return result;
+        return maxPrimaryKey;
     }
 
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
     }
+
 }

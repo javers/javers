@@ -2,6 +2,8 @@ package org.javers.repository.api;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
@@ -15,6 +17,7 @@ import org.javers.core.metamodel.type.ManagedType;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * JaversRepository is responsible for persisting {@link Commit}s calculated by Javers core.
@@ -69,6 +72,16 @@ public interface JaversRepository {
      * Optional#EMPTY if object is not versioned
      */
     Optional<CdoSnapshot> getLatest(GlobalId globalId);
+
+    default List<CdoSnapshot> getLatest(Collection<GlobalId> globalIds) {
+        Validate.argumentsAreNotNull(globalIds);
+
+        return globalIds.stream()
+                .map(id -> getLatest(id))
+                .filter(it -> it.isPresent())
+                .map(it -> it.get())
+                .collect(Collectors.toList());
+    }
 
     /**
      * Snapshots of all objects in reverse chronological order

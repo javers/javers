@@ -13,26 +13,35 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 public class Lists {
 
-    public static List wrapNull(Object list){
-        if (list == null){
+    public static List wrapNull(Object list) {
+        if (list == null) {
             return Collections.emptyList();
         }
-        return (List)list;
+        return (List) list;
     }
 
-    public static <T> List<T> immutableListOf(T... elements){
+    public static <T> List<T> add(List<T> list, T element) {
+        List<T> l = new ArrayList<>(list);
+        l.add(element);
+        return unmodifiableList(l);
+    }
+
+    public static <T> List<T> immutableListOf(T... elements) {
+        if (elements == null) {
+            return Collections.emptyList();
+        }
         return unmodifiableList(java.util.Arrays.asList(elements));
     }
 
     public static <E> List<E> asList(E... elements) {
-        return (List)Arrays.asList(elements);
+        return (List) Arrays.asList(elements);
     }
 
     /**
      * @return index -> value
      */
     public static <T> Map<Integer, T> asMap(List<T> input) {
-        if (input == null){
+        if (input == null) {
             return null;
         }
 
@@ -58,7 +67,7 @@ public class Lists {
     /**
      * returns new list with elements from input that don't satisfies given filter condition
      */
-    public static <T> List<T> negativeFilter(List<T> input, final Predicate<T>  filter) {
+    public static <T> List<T> negativeFilter(List<T> input, final Predicate<T> filter) {
         argumentsAreNotNull(input, filter);
         return input.stream().filter(element -> !filter.test(element)).collect(Collectors.toList());
     }

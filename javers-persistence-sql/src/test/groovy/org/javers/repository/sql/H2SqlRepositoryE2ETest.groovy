@@ -1,8 +1,9 @@
 package org.javers.repository.sql
 
+import org.javers.common.exception.JaversException
+import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.JaversBuilder
 import org.javers.core.model.SnapshotEntity
-import org.polyjdbc.core.exception.QueryExecutionException
 
 import java.sql.Connection
 import java.sql.DriverManager
@@ -36,7 +37,8 @@ class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
         javers.commit("author", new SnapshotEntity(id: 1))
 
         then:
-        thrown(QueryExecutionException)
+        JaversException e = thrown()
+        e.code == JaversExceptionCode.SQL_EXCEPTION
     }
 
     /**

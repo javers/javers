@@ -141,4 +141,17 @@ public class ToStringBuilder {
     public static String addEnumField(String fieldName, Object value) {
         return ", "+fieldName+": ["+ (value != null ? value.toString() : "null")+"]";
     }
+
+    public static String rPad(String string, int len) {
+        if (string == null) return "";
+
+        if (string.length() > len) {
+            return string.substring(0, len - 3) + "...";
+        }
+        String result = string;
+        while (result.length() < len) {
+            result += " ";
+        }
+        return result;
+    }
 }

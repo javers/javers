@@ -30,8 +30,9 @@ public class QueryParams {
     private final boolean newObjectChanges;
     private final String changedProperty;
     private final SnapshotType snapshotType;
+    private final boolean loadCommitProps;
 
-    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty, CommitId toCommitId, SnapshotType snapshotType) {
+    QueryParams(int limit, int skip, LocalDateTime from, LocalDateTime to, Set<CommitId> commitIds, Long version, String author, Map<String, String> commitProperties, boolean aggregate, boolean newObjectChanges, String changedProperty, CommitId toCommitId, SnapshotType snapshotType, boolean loadCommitProps) {
         this.limit = limit;
         this.skip = skip;
         this.from = from;
@@ -45,18 +46,19 @@ public class QueryParams {
         this.changedProperty = changedProperty;
         this.toCommitId = toCommitId;
         this.snapshotType = snapshotType;
+        this.loadCommitProps = loadCommitProps;
     }
 
     public QueryParams changeAggregate(boolean newAggregate) {
         return new QueryParams(
                 limit, skip, from, to, commitIds, version, author, commitProperties,
-                newAggregate, newObjectChanges, changedProperty, toCommitId, snapshotType);
+                newAggregate, newObjectChanges, changedProperty, toCommitId, snapshotType, loadCommitProps);
     }
 
     public QueryParams nextPage() {
         return new QueryParams(
                 limit, skip+limit, from, to, commitIds, version, author, commitProperties,
-                aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType);
+                aggregate, newObjectChanges, changedProperty, toCommitId, snapshotType, loadCommitProps);
     }
 
     /**
@@ -135,6 +137,10 @@ public class QueryParams {
      */
     public boolean isAggregate() {
         return aggregate;
+    }
+
+    public boolean isLoadCommitProps() {
+        return loadCommitProps;
     }
 
     /**

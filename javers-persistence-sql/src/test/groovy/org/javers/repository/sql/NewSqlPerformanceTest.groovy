@@ -44,6 +44,7 @@ class NewSqlPerformanceTest extends NewPerformanceTest {
     }
 
     void execute(String sql){
+        println (sql)
         def stmt = dbConnection.createStatement()
         stmt.executeUpdate(sql)
         stmt.close()

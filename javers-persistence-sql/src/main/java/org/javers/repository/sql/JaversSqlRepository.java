@@ -1,7 +1,6 @@
 package org.javers.repository.sql;
 
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.validation.Validate;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -17,15 +16,24 @@ import org.javers.repository.sql.repositories.CdoSnapshotRepository;
 import org.javers.repository.sql.repositories.CommitMetadataRepository;
 import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.JaversSchemaManager;
+import org.javers.repository.sql.session.Session;
+import org.javers.repository.sql.session.SessionFactory;
 import org.polyjdbc.core.PolyJDBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.javers.repository.sql.session.Session.SQL_LOGGER_NAME;
 
 public class JaversSqlRepository implements JaversRepository {
+    private static final Logger logger = LoggerFactory.getLogger(SQL_LOGGER_NAME);
 
+    private final SessionFactory sessionFactory;
     private final PolyJDBC polyJDBC;
     private final CommitMetadataRepository commitRepository;
     private final GlobalIdRepository globalIdRepository;
@@ -35,10 +43,16 @@ public class JaversSqlRepository implements JaversRepository {
 
     private final SqlRepositoryConfiguration sqlRepositoryConfiguration;
 
-    public JaversSqlRepository(PolyJDBC polyJDBC, CommitMetadataRepository commitRepository, GlobalIdRepository globalIdRepository,
-                               CdoSnapshotRepository cdoSnapshotRepository, CdoSnapshotFinder finder, JaversSchemaManager schemaManager,
+    public JaversSqlRepository(SessionFactory sessionFactory,
+                               PolyJDBC polyJDBC,
+                               CommitMetadataRepository commitRepository,
+                               GlobalIdRepository globalIdRepository,
+                               CdoSnapshotRepository cdoSnapshotRepository,
+                               CdoSnapshotFinder finder,
+                               JaversSchemaManager schemaManager,
                                SqlRepositoryConfiguration sqlRepositoryConfiguration) {
         this.polyJDBC = polyJDBC;
+        this.sessionFactory = sessionFactory;
         this.commitRepository = commitRepository;
         this.globalIdRepository = globalIdRepository;
         this.cdoSnapshotRepository = cdoSnapshotRepository;
@@ -49,61 +63,71 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public Optional<CdoSnapshot> getLatest(GlobalId globalId) {
-        return finder.getLatest(globalId);
+        try(Session session = sessionFactory.create("get latest snapshot")) {
+            return finder.getLatest(globalId, session, true);
+        }
+    }
+
+    @Override
+    public List<CdoSnapshot> getLatest(Collection<GlobalId> globalIds) {
+        Validate.argumentIsNotNull(globalIds);
+        try(Session session = sessionFactory.create("get latest snapshots")) {
+            return globalIds.stream()
+                    .map(id -> finder.getLatest(id, session, false))
+                    .filter(it -> it.isPresent())
+                    .map(it -> it.get())
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
     public List<CdoSnapshot> getSnapshots(QueryParams queryParams) {
-        return finder.getSnapshots(queryParams);
-    }
-
-    @Override
-    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
-        return finder.getSnapshots(snapshotIdentifiers);
+        try(Session session = sessionFactory.create("find snapshots")) {
+            return finder.getSnapshots(queryParams, session);
+        }
     }
 
     @Override
     public void persist(Commit commit) {
-        if (commitRepository.isPersisted(commit)) {
-            throw new JaversException(JaversExceptionCode.CANT_SAVE_ALREADY_PERSISTED_COMMIT, commit.getId());
+        try(Session session = sessionFactory.create("persist commit")) {
+            long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getId(), session);
+            cdoSnapshotRepository.save(commitPk, commit.getSnapshots(), session);
         }
-
-        long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getId());
-        cdoSnapshotRepository.save(commitPk, commit.getSnapshots());
     }
 
     @Override
     public CommitId getHeadId() {
-        return commitRepository.getCommitHeadId();
+        try(Session session = sessionFactory.create("get head id")) {
+            return commitRepository.getCommitHeadId(session);
+        }
     }
 
     @Override
-    public void setJsonConverter(JsonConverter jsonConverter) {
-        globalIdRepository.setJsonConverter(jsonConverter);
-        cdoSnapshotRepository.setJsonConverter(jsonConverter);
-        finder.setJsonConverter(jsonConverter);
-    }
-
-    @Override
-    public void ensureSchema() {
-        if(sqlRepositoryConfiguration.isSchemaManagementEnabled()) {
-            schemaManager.ensureSchema();
+    public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        try(Session session = sessionFactory.create("find snapshots by ids")) {
+            return finder.getSnapshots(snapshotIdentifiers, session);
         }
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(GlobalId globalId, QueryParams queryParams) {
-        return finder.getStateHistory(globalId, queryParams);
+        try(Session session = sessionFactory.create("find snapshots by globalId")) {
+            return finder.getStateHistory(globalId, queryParams, session);
+        }
     }
 
     @Override
     public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
-        return finder.getStateHistory(givenClasses, queryParams);
+        try(Session session = sessionFactory.create("find snapshots by type")) {
+            return finder.getStateHistory(givenClasses, queryParams, session);
+        }
     }
 
     @Override
     public List<CdoSnapshot> getValueObjectStateHistory(EntityType ownerEntity, String path, QueryParams queryParams) {
-        return finder.getVOStateHistory(ownerEntity, path, queryParams);
+        try(Session session = sessionFactory.create("find VO snapshots by path")) {
+            return finder.getVOStateHistory(ownerEntity, path, queryParams, session);
+        }
     }
 
     /**
@@ -147,5 +171,20 @@ public class JaversSqlRepository implements JaversRepository {
      */
     public void evictSequenceAllocationCache() {
         polyJDBC.resetKeyGeneratorCache();
+    }
+
+    @Override
+    public void setJsonConverter(JsonConverter jsonConverter) {
+        //TODO centralize to Session?
+        globalIdRepository.setJsonConverter(jsonConverter);
+        cdoSnapshotRepository.setJsonConverter(jsonConverter);
+        finder.setJsonConverter(jsonConverter);
+    }
+
+    @Override
+    public void ensureSchema() {
+        if(sqlRepositoryConfiguration.isSchemaManagementEnabled()) {
+            schemaManager.ensureSchema();
+        }
     }
 }
