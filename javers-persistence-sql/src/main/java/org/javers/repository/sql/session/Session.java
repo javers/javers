@@ -124,14 +124,14 @@ public class Session implements AutoCloseable {
     }
 
     public void logStats() {
-        logger.debug("SQL session '" + sessionName + "' finished. {} statement(s) executed in {} millis.",
+        logger.trace("SQL session '" + sessionName + "' finished. {} statement(s) executed in {} millis.",
                 statementExecutors.values().stream().mapToInt(i -> i.getExecutionCount()).sum(),
                 statementExecutors.values().stream().mapToLong(i -> i.getExecutionTotalMillis()).sum());
 
         List<PreparedStatementExecutor> executors = new ArrayList<>(statementExecutors.values());
         Collections.sort(executors, (e1, e2) -> e2.getExecutionTotalMillis() > e1.getExecutionTotalMillis() ? 1 : -1);
 
-        executors.forEach(e -> logger.debug("* "+e.printStats()));
+        //executors.forEach(e -> logger.debug("* "+e.printStats()));
     }
 
     Dialect getDialect() {

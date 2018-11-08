@@ -38,12 +38,12 @@ class NewPerformanceEntity {
         }
     }
 
-    static NewPerformanceEntity produce(int startingId, int n){
-        def root = new NewPerformanceEntity(id:startingId)
+    static NewPerformanceEntity produce(int childrenCnt){
+        def root = new NewPerformanceEntity(id: UUID.randomUUID().hashCode())
 
-        def range = startingId+1..startingId+n
+        def range = 1..childrenCnt
         def children = range.collect{
-            new NewPerformanceEntity(id: it)
+            new NewPerformanceEntity(id: UUID.randomUUID().hashCode())
         }
 
         root.refs = children
