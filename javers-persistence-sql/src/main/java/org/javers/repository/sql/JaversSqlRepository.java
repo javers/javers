@@ -18,7 +18,6 @@ import org.javers.repository.sql.repositories.GlobalIdRepository;
 import org.javers.repository.sql.schema.JaversSchemaManager;
 import org.javers.repository.sql.session.Session;
 import org.javers.repository.sql.session.SessionFactory;
-import org.polyjdbc.core.PolyJDBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +33,6 @@ public class JaversSqlRepository implements JaversRepository {
     private static final Logger logger = LoggerFactory.getLogger(SQL_LOGGER_NAME);
 
     private final SessionFactory sessionFactory;
-    private final PolyJDBC polyJDBC;
     private final CommitMetadataRepository commitRepository;
     private final GlobalIdRepository globalIdRepository;
     private final CdoSnapshotRepository cdoSnapshotRepository;
@@ -44,14 +42,12 @@ public class JaversSqlRepository implements JaversRepository {
     private final SqlRepositoryConfiguration sqlRepositoryConfiguration;
 
     public JaversSqlRepository(SessionFactory sessionFactory,
-                               PolyJDBC polyJDBC,
                                CommitMetadataRepository commitRepository,
                                GlobalIdRepository globalIdRepository,
                                CdoSnapshotRepository cdoSnapshotRepository,
                                CdoSnapshotFinder finder,
                                JaversSchemaManager schemaManager,
                                SqlRepositoryConfiguration sqlRepositoryConfiguration) {
-        this.polyJDBC = polyJDBC;
         this.sessionFactory = sessionFactory;
         this.commitRepository = commitRepository;
         this.globalIdRepository = globalIdRepository;
@@ -170,7 +166,7 @@ public class JaversSqlRepository implements JaversRepository {
      * @since 3.1.1
      */
     public void evictSequenceAllocationCache() {
-        polyJDBC.resetKeyGeneratorCache();
+        sessionFactory.resetKeyGeneratorCache();
     }
 
     @Override

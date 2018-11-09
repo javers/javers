@@ -17,4 +17,8 @@ public class SessionFactory {
     public Session create(String sessionName) {
         return new Session(dialect, keyGenerator, connectionProvider, sessionName);
     }
+
+    public void resetKeyGeneratorCache() {
+        keyGenerator.reset();
+    }
 }
