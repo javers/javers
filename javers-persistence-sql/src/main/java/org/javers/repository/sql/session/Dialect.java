@@ -14,10 +14,10 @@ abstract class Dialect {
     }
 
     boolean supportsSequences() {
-        return getKeyGenerator() instanceof KeyGenerator.Sequence;
+        return getKeyGeneratorDefinition() instanceof KeyGeneratorDefinition.SequenceDefinition;
     }
 
-    abstract <T extends KeyGenerator> T getKeyGenerator();
+    abstract <T extends KeyGeneratorDefinition> T getKeyGeneratorDefinition();
 
     DialectName getName() {
         return dialectName;
