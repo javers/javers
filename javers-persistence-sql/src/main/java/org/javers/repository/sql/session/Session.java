@@ -3,7 +3,6 @@ package org.javers.repository.sql.session;
 import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.repository.sql.ConnectionProvider;
-import org.javers.repository.sql.DialectName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,11 +20,13 @@ public class Session implements AutoCloseable {
     private final Map<String, PreparedStatementExecutor> statementExecutors = new HashMap<>();
     private final ConnectionProvider connectionProvider;
     private final String sessionName;
+    private final KeyGenerator keyGenerator;
 
-    Session(DialectName dialectName, ConnectionProvider connectionProvider, String sessionName) {
-        this.dialect = Dialects.fromName(dialectName);
+    Session(Dialect dialect, KeyGenerator keyGenerator, ConnectionProvider connectionProvider, String sessionName) {
+        this.dialect = dialect;
         this.connectionProvider = connectionProvider;
         this.sessionName = sessionName;
+        this.keyGenerator = keyGenerator;
     }
 
     public SelectBuilder select(String selectClauseSQL) {
@@ -40,8 +41,7 @@ public class Session implements AutoCloseable {
         Validate.argumentsAreNotNull(queryName, parameters, tableName, primaryKeyFieldName, sequenceName);
 
         if (dialect.supportsSequences()) {
-            KeyGenerator.Sequence seq = dialect.getKeyGenerator();
-            long newId = executeQueryForLong(new Select("SELECT next from seq "+ sequenceName, seq.nextFromSequenceAsSelect(sequenceName)));
+            long newId = keyGenerator.generateKey(sequenceName, this);
 
             Insert insertQuery = new Insert(
                     queryName,
@@ -56,8 +56,7 @@ public class Session implements AutoCloseable {
 
             execute(insertQuery);
 
-            KeyGenerator.Autoincrement autoincrement = dialect.getKeyGenerator();
-            return executeQueryForLong(new Select("last autoincrement id", autoincrement.lastInsertedAutoincrement()));
+            return keyGenerator.getKeyFromLastInsert(this);
         }
     }
 
@@ -65,11 +64,11 @@ public class Session implements AutoCloseable {
         Validate.argumentsAreNotNull(queryName, parameters, tableName);
 
         if (dialect.supportsSequences() && sequenceName != null) {
-            KeyGenerator.Sequence seq = dialect.getKeyGenerator();
+            long newId = keyGenerator.generateKey(sequenceName, this);
 
             Insert insertQuery = new Insert(
                     queryName,
-                    Lists.add(parameters, new Parameter.SqlLiteralParameter(primaryKeyFieldName, seq.nextFromSequenceEmbedded(sequenceName))),
+                    Lists.add(parameters, new Parameter.LongParameter(primaryKeyFieldName, newId)),
                     tableName);
 
             execute(insertQuery);

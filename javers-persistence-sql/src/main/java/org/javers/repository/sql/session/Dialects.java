@@ -3,6 +3,7 @@ package org.javers.repository.sql.session;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.repository.sql.DialectName;
+import org.javers.repository.sql.session.KeyGeneratorDefinition.SequenceDefinition;
 
 import static org.javers.repository.sql.session.Parameter.longParam;
 
@@ -33,16 +34,8 @@ class Dialects {
         }
 
         @Override
-        KeyGenerator getKeyGenerator() {
-            return new KeyGenerator.Sequence() {
-                public String nextFromSequenceAsSelect(String seqName) {
-                    return "SELECT " + nextFromSequenceEmbedded(seqName);
-                }
-
-                public String nextFromSequenceEmbedded(String seqName) {
-                    return seqName + ".nextval";
-                }
-            };
+        KeyGeneratorDefinition getKeyGeneratorDefinition() {
+            return (SequenceDefinition) seqName -> "SELECT " + seqName + ".nextval";
         }
     }
 
@@ -52,8 +45,8 @@ class Dialects {
         }
 
         @Override
-        KeyGenerator getKeyGenerator() {
-            return (KeyGenerator.Autoincrement) () -> "select last_insert_id()";
+        KeyGeneratorDefinition getKeyGeneratorDefinition() {
+            return (KeyGeneratorDefinition.AutoincrementDefinition) () -> "select last_insert_id()";
         }
     }
 
@@ -63,16 +56,8 @@ class Dialects {
         }
 
         @Override
-        KeyGenerator getKeyGenerator() {
-            return new KeyGenerator.Sequence() {
-                public String nextFromSequenceAsSelect(String seqName) {
-                    return "SELECT + " + nextFromSequenceEmbedded(seqName);
-                }
-
-                public String nextFromSequenceEmbedded(String seqName) {
-                    return "NEXT VALUE FOR "+seqName;
-                }
-            };
+        KeyGeneratorDefinition getKeyGeneratorDefinition() {
+            return (SequenceDefinition) seqName -> "SELECT + " + "NEXT VALUE FOR " + seqName;
         }
 
         @Override
@@ -94,16 +79,8 @@ class Dialects {
         }
 
         @Override
-        KeyGenerator getKeyGenerator() {
-            return new KeyGenerator.Sequence() {
-                public String nextFromSequenceAsSelect(String seqName) {
-                    return "SELECT "+ nextFromSequenceEmbedded(seqName);
-                }
-
-                public String nextFromSequenceEmbedded(String seqName) {
-                    return "nextval('" + seqName + "')";
-                }
-            };
+        KeyGeneratorDefinition getKeyGeneratorDefinition() {
+            return (SequenceDefinition) seqName -> "SELECT nextval('" + seqName + "')";
         }
     }
 
@@ -113,16 +90,8 @@ class Dialects {
         }
 
         @Override
-        KeyGenerator getKeyGenerator() {
-            return new KeyGenerator.Sequence() {
-                public String nextFromSequenceAsSelect(String seqName) {
-                    return "SELECT "+ nextFromSequenceEmbedded(seqName) +" from dual";
-                }
-
-                public String nextFromSequenceEmbedded(String seqName) {
-                    return seqName + ".nextval";
-                }
-            };
+        KeyGeneratorDefinition getKeyGeneratorDefinition() {
+            return (SequenceDefinition) seqName -> "SELECT "+ seqName + ".nextval from dual";
         }
 
         @Override

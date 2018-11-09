@@ -4,15 +4,17 @@ import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 
 public class SessionFactory {
-    private final DialectName dialectName;
+    private final Dialect dialect;
     private final ConnectionProvider connectionProvider;
+    private final KeyGenerator keyGenerator;
 
     public SessionFactory(DialectName dialectName, ConnectionProvider connectionProvider) {
-        this.dialectName = dialectName;
+        this.dialect = Dialects.fromName(dialectName);
         this.connectionProvider = connectionProvider;
+        this.keyGenerator = dialect.getKeyGeneratorDefinition().createKeyGenerator();
     }
 
     public Session create(String sessionName) {
-        return new Session(dialectName, connectionProvider, sessionName);
+        return new Session(dialect, keyGenerator, connectionProvider, sessionName);
     }
 }
