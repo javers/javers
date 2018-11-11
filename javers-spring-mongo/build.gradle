@@ -1,0 +1,16 @@
+repositories {
+    maven {
+        url "http://repo.spring.io/milestone"
+    }
+}
+
+javadoc {
+    failOnError = false
+}
+
+dependencies {
+    compile project(':javers-spring')
+    compile project(':javers-persistence-mongo')
+
+    optional "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
+}
