@@ -24,6 +24,11 @@ public class JaversSpringDataJpaAuditableRepositoryAspect extends AbstractSpring
         onDelete(pjp);
     }
 
+    @AfterReturning("execution(public * deleteById(..)) && this(org.springframework.data.repository.CrudRepository)")
+    public void onDeleteByIdExecuted(JoinPoint pjp) {
+        onDelete(pjp);
+    }
+
     @AfterReturning("execution(public * deleteAll(..)) && this(org.springframework.data.repository.CrudRepository)")
     public void onDeleteAllExecuted(JoinPoint jp) {
         onDelete(jp);
