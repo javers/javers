@@ -23,7 +23,7 @@ class ObjectAccessHookBeanSpec extends Specification {
     @Autowired
     AuthorCrudRepository authorRepository
 
-    def "should unproxy hibernate entity with Bean MappingType and save it to Javers repository"() {
+    def "should unproxy hibernate entity with Bean MappingType and commit it to Javers"() {
         given:
         def author = new Author("1", "George RR Martin")
         authorRepository.save(author);

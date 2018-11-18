@@ -61,7 +61,7 @@ public class JaversSqlAutoConfiguration {
         return dialectMapper.map(hibernateDialect);
     }
 
-    @Bean
+    @Bean(name = "JaversSqlRepositoryFromStarter")
     @ConditionalOnMissingBean
     public JaversSqlRepository javersSqlRepository(ConnectionProvider connectionProvider) {
         return SqlRepositoryBuilder
@@ -73,7 +73,7 @@ public class JaversSqlAutoConfiguration {
                 .build();
     }
 
-    @Bean(name = "javers")
+    @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
     public Javers javers(JaversSqlRepository sqlRepository, PlatformTransactionManager transactionManager) {
         return TransactionalJaversBuilder
@@ -85,27 +85,27 @@ public class JaversSqlAutoConfiguration {
                 .build();
     }
 
-    @Bean(name = "authorProvider")
+    @Bean(name = "SpringSecurityAuthorProvider")
     @ConditionalOnMissingBean
     @ConditionalOnClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
     public AuthorProvider springSecurityAuthorProvider() {
         return new SpringSecurityAuthorProvider();
     }
 
-    @Bean(name = "authorProvider")
+    @Bean(name = "MockAuthorProvider")
     @ConditionalOnMissingBean
     @ConditionalOnMissingClass({"org.springframework.security.core.context.SecurityContextHolder"})
     public AuthorProvider unknownAuthorProvider() {
         return new MockAuthorProvider();
     }
 
-    @Bean(name = "commitPropertiesProvider")
+    @Bean(name = "EmptyPropertiesProvider")
     @ConditionalOnMissingBean
     public CommitPropertiesProvider commitPropertiesProvider() {
         return new EmptyPropertiesProvider();
     }
 
-    @Bean
+    @Bean(name = "JpaHibernateConnectionProvider")
     @ConditionalOnMissingBean
     public ConnectionProvider jpaConnectionProvider() {
         return new JpaHibernateConnectionProvider();
@@ -113,13 +113,13 @@ public class JaversSqlAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "javers.auditableAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider) {
-        return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider());
+    public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider);
     }
 
     @Bean
     @ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversSpringDataJpaAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider) {
-        return new JaversSpringDataJpaAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider());
+    public JaversSpringDataJpaAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversSpringDataJpaAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
     }
 }
