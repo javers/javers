@@ -23,14 +23,14 @@ class ObjectAccessHookBeanSpec extends Specification {
     @Autowired
     AuthorCrudRepository authorRepository
 
-    def "should unproxy hibernate entity with Bean MappingType and save it to Javers repository"() {
+    def "should unproxy hibernate entity with Bean MappingType and commit it to Javers"() {
         given:
         def author = new Author("1", "George RR Martin")
         authorRepository.save(author);
         def ebook = new Ebook("1", "Throne of Games", author, ["great book"])
         ebookRepository.save(ebook)
 
-        def book = ebookRepository.findOne("1")
+        def book = ebookRepository.getOne("1")
         assert book.author instanceof HibernateProxy
         assert !Hibernate.isInitialized(book.author)
 

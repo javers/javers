@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
@@ -29,7 +30,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
 
     def "should not fail on JaVers aspect when deleting an object which not exists in JaVers repository"(){
         when:
-        repository.delete("a")
+        repository.deleteById("a")
 
         then:
         notThrown(Exception)
@@ -63,7 +64,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         def o2 = new DummyObject()
 
         when:
-        repository.save([o1,o2])
+        repository.saveAll([o1,o2])
 
         then:
         javers.findSnapshots(byInstanceId(o1.id, DummyObject).build()).size() == 1
@@ -85,29 +86,38 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         snapshots[1].initial
     }
 
-    def "should commitDelete on audited crudRepository.delete(id)"() {
+    @Unroll
+    def "should commitDelete on audited CrudRepository.#method ()"() {
         given:
         def o =  new DummyObject()
 
         when:
         repository.save(o)
-        repository.delete(o.id)
+        call(repository, o)
 
         then:
         def snapshots = javers.findSnapshots(byInstanceId(o.id, DummyObject).build())
         snapshots.size() == 2
         snapshots[0].terminal
         snapshots[1].initial
+
+        where:
+        method << ['deleteById', 'delete']
+        call << [
+                { def repo, def obj -> repo.deleteById(obj.id) },
+                { def repo, def obj -> repo.delete(obj) }
+        ]
+
     }
 
-    def "should commitDelete on audited crudRepository.delete(Iterable)"() {
+    def "should commitDelete on audited CrudRepository.deleteAll ()"() {
         given:
         def o1 = new DummyObject()
         def o2 = new DummyObject()
 
         when:
-        repository.save([o1, o2])
-        repository.delete([o1, o2] as Iterable)
+        repository.saveAll([o1, o2])
+        repository.deleteAll([o1, o2] as Iterable)
 
         then:
         def snapshots1 = javers.findSnapshots(byInstanceId(o1.id, DummyObject).build())
@@ -126,7 +136,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
 
         when:
         repository.save(o)
-        def result = repository.findOne(o.id)
+        def result = repository.findById(o.id)
 
         then:
         result != null
@@ -158,7 +168,7 @@ class JaversSpringDataAspectIntegrationTest extends Specification {
         when:
         noAuditRepository.save(o)
         noAuditRepository.delete(o)
-        noAuditRepository.findOne(o.id)
+        noAuditRepository.findById(o.id)
 
         then:
         javers.findSnapshots(byInstanceId(o.id, DummyObject).build()).size() == 0

@@ -2,7 +2,7 @@ apply plugin: 'application'
 mainClassName = "org.javers.core.selftest.Application"
 
 dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.22'
+    compile 'org.slf4j:slf4j-api:1.7.25'
     compile "com.google.code.gson:gson:$gsonVersion"
     compile 'org.picocontainer:picocontainer:2.15'
     compile "io.github.classgraph:classgraph:$classgraphVersion"
