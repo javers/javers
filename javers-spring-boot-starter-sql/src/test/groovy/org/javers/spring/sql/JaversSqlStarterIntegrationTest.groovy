@@ -30,7 +30,7 @@ class JaversSqlStarterIntegrationTest extends Specification {
     def "should build default javers instance with auto-audit aspect"() {
         when:
         def entity = dummyEntityRepository.save(DummyEntity.random())
-        assert dummyEntityRepository.findOne(entity.id)
+        assert dummyEntityRepository.getOne(entity.id)
 
         def snapshots = javers.findSnapshots(byInstanceId(entity.id, DummyEntity).build())
 
@@ -45,7 +45,7 @@ class JaversSqlStarterIntegrationTest extends Specification {
       List entities = (1..5).collect{ DummyEntity.random()}
 
       when:
-      List persisted = dummyEntityRepository.save(entities)
+      List persisted = dummyEntityRepository.saveAll(entities)
 
       then:
       persisted.collect {p -> javers.getLatestSnapshot(p.id, DummyEntity)}
