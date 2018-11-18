@@ -1,4 +1,4 @@
-package org.javers.spring.mongo;
+package org.javers.spring.data.mongodb;
 
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.ObjectAccessProxy;
@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 import java.util.Optional;
 
 public class DBRefUnproxyObjectAccessHook implements ObjectAccessHook<Object> {
-
     @Override
     public Optional<ObjectAccessProxy<Object>> createAccessor(Object entity) {
         if (entity instanceof LazyLoadingProxy && ((LazyLoadingProxy) entity).toDBRef() != null) {
