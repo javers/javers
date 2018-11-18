@@ -30,7 +30,7 @@ class ObjectAccessHookBeanSpec extends Specification {
         def ebook = new Ebook("1", "Throne of Games", author, ["great book"])
         ebookRepository.save(ebook)
 
-        def book = ebookRepository.findOne("1")
+        def book = ebookRepository.getOne("1")
         assert book.author instanceof HibernateProxy
         assert !Hibernate.isInitialized(book.author)
 

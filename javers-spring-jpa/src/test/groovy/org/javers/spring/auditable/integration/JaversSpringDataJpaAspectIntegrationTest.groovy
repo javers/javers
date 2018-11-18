@@ -70,7 +70,7 @@ class JaversSpringDataJpaAspectIntegrationTest extends Specification {
         when:
         noAuditRepository.save(o)
         noAuditRepository.delete(o)
-        noAuditRepository.findOne(o.id)
+        noAuditRepository.getOne(o.id)
 
         then:
         javers.findSnapshots(byInstanceId(o.id, DummyObject).build()).size() == 0

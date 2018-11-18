@@ -27,9 +27,9 @@ class ObjectAccessHookFieldSpec extends Specification {
         def director =  new Person("2", "Steve")
         developer.boss = manager
         manager.boss = director
-        repository.save([director, manager, developer])
+        repository.saveAll([director, manager, developer])
 
-        def loadedDeveloper = repository.findOne(developer.id)
+        def loadedDeveloper = repository.getOne(developer.id)
 
         def proxy = loadedDeveloper.getBoss(modPointLevel)
         assert proxy instanceof HibernateProxy
