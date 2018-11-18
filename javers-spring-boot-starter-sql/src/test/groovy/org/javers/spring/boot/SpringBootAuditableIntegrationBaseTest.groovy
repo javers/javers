@@ -29,11 +29,11 @@ abstract class SpringBootAuditableIntegrationBaseTest extends Specification {
         entity.name = "a"
 
         def persistedEntity = dummyEntityRepository.save(entity)
-        assert dummyEntityRepository.findOne(persistedEntity.id).name == "a"
+        assert dummyEntityRepository.getOne(persistedEntity.id).name == "a"
 
         persistedEntity.name = "b"
         persistedEntity = dummyEntityRepository.saveAndFlush(persistedEntity)
-        assert dummyEntityRepository.findOne(persistedEntity.id).name == "b"
+        assert dummyEntityRepository.getOne(persistedEntity.id).name == "b"
 
         when:
         def snapshots = javers.findSnapshots( byInstanceId(persistedEntity.id, DummyEntity).build() )

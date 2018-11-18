@@ -40,7 +40,7 @@ public class JaversMongoAutoConfiguration {
     @Autowired
     private MongoProperties mongoProperties; //from spring-boot-starter-data-mongodb
 
-    @Bean(name = "javers")
+    @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
     public Javers javers() {
         logger.info("Starting javers-spring-boot-starter-mongo ...");
@@ -57,21 +57,21 @@ public class JaversMongoAutoConfiguration {
                 .build();
     }
 
-    @Bean(name = "authorProvider")
+    @Bean(name = "SpringSecurityAuthorProvider")
     @ConditionalOnMissingBean
     @ConditionalOnClass(name = {"org.springframework.security.core.context.SecurityContextHolder"})
     public AuthorProvider springSecurityAuthorProvider() {
         return new SpringSecurityAuthorProvider();
     }
 
-    @Bean(name = "authorProvider")
+    @Bean(name = "MockAuthorProvider")
     @ConditionalOnMissingBean
     @ConditionalOnMissingClass({"org.springframework.security.core.context.SecurityContextHolder"})
     public AuthorProvider unknownAuthorProvider() {
         return new MockAuthorProvider();
     }
 
-    @Bean(name = "commitPropertiesProvider")
+    @Bean(name = "EmptyPropertiesProvider")
     @ConditionalOnMissingBean
     public CommitPropertiesProvider commitPropertiesProvider() {
         return new EmptyPropertiesProvider();
@@ -79,13 +79,13 @@ public class JaversMongoAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "javers.auditableAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider) {
-        return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider());
+    public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider);
     }
 
     @Bean
     @ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider) {
-        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider());
+    public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
+        return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
     }
 }
