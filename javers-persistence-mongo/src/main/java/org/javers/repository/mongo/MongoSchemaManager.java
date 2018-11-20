@@ -81,18 +81,4 @@ class MongoSchemaManager {
     MongoCollection<Document> headCollection() {
         return mongo.getCollection(MongoHeadId.COLLECTION_NAME);
     }
-
-    private static void dropIndexIfExists(MongoCollection<Document> col, String fieldName){
-        for (Document d : col.listIndexes()) {
-            if (d.get("key", Document.class).containsKey(fieldName)) {
-                logger.warn("Schema migration. Dropping index: "+fieldName +" ...");
-
-                try {
-                    col.dropIndex(fieldName);
-                }catch (Exception swallowed){} //because not implemented in Fongo
-
-                return;
-            }
-        }
-    }
 }
