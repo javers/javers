@@ -2,10 +2,11 @@ dependencies {
     compile project(':javers-core')
     compile project(':javers-spring-jpa')
 
-    compile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
-    compile "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
+    optional "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+    optional "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testCompile 'com.h2database:h2:1.4.187'
+    testCompile "org.springframework.security:spring-security-core:$springSecurity"
     testCompile "org.spockframework:spock-spring:$spockVersion"
 }
