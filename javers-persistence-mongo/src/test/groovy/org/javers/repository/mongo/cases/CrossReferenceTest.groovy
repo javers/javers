@@ -1,11 +1,12 @@
 package org.javers.repository.mongo.cases
 
-import com.github.fakemongo.Fongo
+import com.mongodb.client.MongoDatabase
+import de.flapdoodle.embed.mongo.distribution.Version
+import de.flapdoodle.embed.mongo.tests.MongodForTestsFactory
 import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.annotation.DiffIgnore
 import org.javers.core.metamodel.annotation.Value
 import org.javers.repository.mongo.MongoRepository
-import spock.lang.Shared
 import spock.lang.Specification
 
 import javax.persistence.Id
@@ -34,7 +35,7 @@ class CrossReferenceTest extends Specification {
     }
 
     @Value
-    public class CrossReferenceObjectB {
+    class CrossReferenceObjectB {
         public int value;
         public CrossReferenceObjectA a
 
@@ -44,16 +45,13 @@ class CrossReferenceTest extends Specification {
         }
     }
 
-    @Shared def mongoDb
-
-    def setup(){
-        mongoDb = new Fongo("myDb").getDatabase("test")
-    }
-
     def "should not throw StackOverflowError exception for ValueType cross references"() {
         given:
+        MongodForTestsFactory factory = MongodForTestsFactory.with(Version.Main.PRODUCTION)
+        MongoDatabase mongo = factory.newMongo().getDatabase("test")
+
         def javers = JaversBuilder.javers()
-                .registerJaversRepository(new MongoRepository(mongoDb))
+                .registerJaversRepository(new MongoRepository(mongo))
                 .build()
 
         when:

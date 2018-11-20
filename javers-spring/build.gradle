@@ -20,7 +20,8 @@ dependencies {
 
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
-    testCompile "com.github.fakemongo:fongo:$fongoVersion"
+    testCompile "de.flapdoodle.embed:de.flapdoodle.embed.mongo:$embeddedMongo"
+
     testCompile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     testCompile project(':javers-persistence-mongo')
 }
