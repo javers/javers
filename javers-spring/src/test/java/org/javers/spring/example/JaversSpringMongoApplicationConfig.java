@@ -1,6 +1,5 @@
 package org.javers.spring.example;
 
-import com.github.fakemongo.Fongo;
 import com.mongodb.MongoClient;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -10,6 +9,7 @@ import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -44,9 +44,10 @@ public class JaversSpringMongoApplicationConfig {
     /**
      * MongoDB setup
      */
-    @Bean
+    @Bean(name="realMongoClient")
+    @ConditionalOnMissingBean
     public MongoClient mongo() {
-        return new Fongo("test").getMongo();
+        return new MongoClient();
     }
 
     /**
