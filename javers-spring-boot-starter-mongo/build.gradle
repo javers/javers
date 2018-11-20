@@ -10,6 +10,6 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testCompile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     testCompile "de.flapdoodle.embed:de.flapdoodle.embed.mongo:$embeddedMongo"
-    testCompile "org.springframework.security:spring-security-core:$springSecurity"
+    testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
 }
