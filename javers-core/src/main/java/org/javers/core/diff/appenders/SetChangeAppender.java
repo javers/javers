@@ -1,15 +1,8 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Sets;
-import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.container.ContainerElementChange;
-import org.javers.core.diff.changetype.container.SetChange;
-import org.javers.core.diff.changetype.container.ValueAdded;
-import org.javers.core.diff.changetype.container.ValueRemoved;
-import org.javers.core.metamodel.object.DehydrateContainerFunction;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.OwnerContext;
-import org.javers.core.metamodel.object.PropertyOwnerContext;
+import org.javers.core.diff.changetype.container.*;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.*;
 
 import java.util.*;
@@ -56,18 +49,18 @@ public class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
     }
 
     @Override
-    public SetChange calculateChanges(NodePair pair, JaversProperty property) {
-        Collection leftValues = pair.getLeftPropertyValueAndCast(property, Collection.class);
-        Collection rightValues = pair.getRightPropertyValueAndCast(property, Collection.class);
+    public SetChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
+        Collection leftValues = (Collection) leftValue;
+        Collection rightValues = (Collection) rightValue;
 
         CollectionType setType = property.getType();
-        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
+        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
         List<ContainerElementChange> entryChanges =
                 calculateEntryChanges(setType, leftValues, rightValues, owner);
 
         if (!entryChanges.isEmpty()) {
             renderNotParametrizedWarningIfNeeded(setType.getItemType(), "item", "Set", property);
-            return new SetChange(pair.getGlobalId(), property.getName(), entryChanges);
+            return new SetChange(affectedId, property.getName(), entryChanges);
         } else {
             return null;
         }

@@ -10,6 +10,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -94,5 +95,10 @@ public class ArrayType extends ContainerType {
     public boolean equals(Object left, Object right) {
         //see https://github.com/javers/javers/issues/546
         return Arrays.equals((Object[]) left, (Object[]) right);
+    }
+
+    @Override
+    public Object empty() {
+        return Collections.emptyList().toArray();
     }
 }

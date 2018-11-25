@@ -65,7 +65,7 @@ public class TypeMapper {
         }
 
         //Collections
-        addType(new CollectionType(Collection.class)); //only for exception handling
+        addType(new CollectionType(Collection.class));
         addType(new SetType(Set.class));
         if (listCompareAlgorithm == ListCompareAlgorithm.AS_SET) {
             addType(new ListAsSetType(List.class));

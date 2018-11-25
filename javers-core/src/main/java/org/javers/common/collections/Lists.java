@@ -33,6 +33,13 @@ public class Lists {
         return unmodifiableList(java.util.Arrays.asList(elements));
     }
 
+    public static <T> List<T> immutableListOf(Collection elements) {
+        if (elements == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(new ArrayList<>(elements));
+    }
+
     public static <E> List<E> asList(E... elements) {
         return (List) Arrays.asList(elements);
     }

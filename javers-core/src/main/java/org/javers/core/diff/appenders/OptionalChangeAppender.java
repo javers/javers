@@ -1,7 +1,6 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.exception.JaversException;
-import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
@@ -32,14 +31,13 @@ public class OptionalChangeAppender extends CorePropertyChangeAppender<PropertyC
         return propertyType instanceof OptionalType;
     }
 
-    @Override
-    public PropertyChange calculateChanges(NodePair pair, JaversProperty property) {
+    public PropertyChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
 
         OptionalType optionalType = ((JaversProperty) property).getType();
         JaversType contentType = typeMapper.getJaversType(optionalType.getItemType());
 
-        Optional leftOptional =  normalize((Optional) pair.getLeftPropertyValue(property));
-        Optional rightOptional = normalize((Optional) pair.getRightPropertyValue(property));
+        Optional leftOptional =  normalize((Optional) leftValue);
+        Optional rightOptional = normalize((Optional) rightValue);
 
         if (contentType instanceof ManagedType){
             GlobalId leftId  =  getAndDehydrate(leftOptional, contentType);
@@ -48,14 +46,14 @@ public class OptionalChangeAppender extends CorePropertyChangeAppender<PropertyC
             if (Objects.equals(leftId, rightId)) {
                 return null;
             }
-            return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId,
-                    pair.getLeftPropertyValue(property), pair.getRightPropertyValue(property));
+            return new ReferenceChange(affectedId, property.getName(), leftId, rightId,
+                    leftValue, rightValue);
         }
         if (contentType instanceof PrimitiveOrValueType) {
             if (leftOptional.equals(rightOptional)) {
                 return null;
             }
-            return new ValueChange(pair.getGlobalId(), property.getName(), leftOptional, rightOptional);
+            return new ValueChange(affectedId, property.getName(), leftOptional, rightOptional);
         }
 
         throw new JaversException(UNSUPPORTED_OPTIONAL_CONTENT_TYPE, contentType);

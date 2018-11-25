@@ -6,6 +6,8 @@ import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 
+import java.util.Optional;
+
 /**
  * @author bartosz walacik
  */
@@ -28,9 +30,8 @@ public class CustomToNativeAppenderAdapter<T, C extends PropertyChange> implemen
         T leftValue = (T)pair.getLeftPropertyValue(property);
         T rightValue = (T)pair.getRightPropertyValue(property);
 
-        return delegate.compare(leftValue, rightValue, pair.getGlobalId(), property);
+        return delegate.compare(leftValue, rightValue, pair.getGlobalId(), property).orElse(null);
     }
-
 
     @Override
     public int priority() {
