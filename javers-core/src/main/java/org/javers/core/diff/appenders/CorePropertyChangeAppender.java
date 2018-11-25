@@ -1,11 +1,14 @@
 package org.javers.core.diff.appenders;
 
+import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
+import java.util.Optional;
+
 import static org.javers.core.metamodel.type.JaversType.DEFAULT_TYPE_PARAMETER;
 
 /**
@@ -34,6 +37,15 @@ public abstract class CorePropertyChangeAppender<T extends PropertyChange> imple
             printNotParametrizedWarning(parameterName, colType, property);
         }
     }
+
+    @Override
+    final public T calculateChanges(NodePair pair, JaversProperty property) {
+        Object leftValue =  pair.getLeftPropertyValueAndSanitize(property, property.getType());
+        Object rightValue = pair.getRightPropertyValueAndSanitize(property, property.getType());
+        return calculateChanges(leftValue, rightValue, pair.getGlobalId(), property);
+    }
+
+    protected abstract T calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property);
 
     private void printNotParametrizedWarning(String parameterName, String colType, JaversProperty property) {
         logger.warn("Unknown {} type in {} property: {}. Defaulting to {}, see {}.{}",

@@ -4,6 +4,8 @@ import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import java.math.BigDecimal;
+import java.util.Optional;
+
 import static java.math.BigDecimal.ROUND_HALF_UP;
 
 /**
@@ -19,7 +21,7 @@ import static java.math.BigDecimal.ROUND_HALF_UP;
  *
  * @author bartosz walacik
  */
-public class CustomBigDecimalComparator implements CustomPropertyComparator<BigDecimal>{
+public class CustomBigDecimalComparator implements CustomPropertyComparator<BigDecimal, ValueChange>{
     private int significantDecimalPlaces;
 
     public CustomBigDecimalComparator(int significantDecimalPlaces) {
@@ -27,16 +29,15 @@ public class CustomBigDecimalComparator implements CustomPropertyComparator<BigD
     }
 
     @Override
-    public ValueChange compare(BigDecimal left, BigDecimal right, GlobalId affectedId,
-        Property property)
+    public Optional<ValueChange> compare(BigDecimal left, BigDecimal right, GlobalId affectedId, Property property)
     {
         BigDecimal leftRounded = left.setScale(significantDecimalPlaces, ROUND_HALF_UP);
         BigDecimal rightRounded = right.setScale(significantDecimalPlaces, ROUND_HALF_UP);
 
         if (leftRounded.equals(rightRounded)){
-            return null;
+            return Optional.empty();
         }
 
-        return new ValueChange(affectedId, property.getName(), left, right);
+        return Optional.of(new ValueChange(affectedId, property.getName(), left, right));
     }
 }

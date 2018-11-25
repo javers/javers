@@ -1,13 +1,16 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Lists;
-import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.CollectionType;
+import org.javers.core.metamodel.type.JaversProperty;
+import org.javers.core.metamodel.type.MapContentType;
+import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.List;
 
@@ -26,13 +29,12 @@ public class SimpleListChangeAppender extends ListChangeAppender {
         this.typeMapper = typeMapper;
     }
 
-    @Override
-    public ListChange calculateChanges(final NodePair pair, final JaversProperty property) {
-        List leftList = pair.getLeftPropertyValueAndCast(property, List.class);
-        List rightList = pair.getRightPropertyValueAndCast(property, List.class);
+    public ListChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
+        List leftList = (List) leftValue;
+        List rightList = (List) rightValue;
 
-        ListType listType = ((JaversProperty) property).getType();
-        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
+        CollectionType listType = ((JaversProperty) property).getType();
+        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
         MapContentType mapContentType = typeMapper.getMapContentType(listType);
 
         List<EntryChange> entryChanges =
@@ -41,7 +43,7 @@ public class SimpleListChangeAppender extends ListChangeAppender {
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
             renderNotParametrizedWarningIfNeeded(listType.getItemType(), "item", "List", property);
-            return  new ListChange(pair.getGlobalId(), property.getName(), elementChanges);
+            return new ListChange(affectedId, property.getName(), elementChanges);
         }
         else {
             return null;

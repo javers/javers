@@ -418,6 +418,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
        when:
        def diff = javers.compare(s1, s2)
+       println diff
 
        then:
        diff.changes.size() == 2

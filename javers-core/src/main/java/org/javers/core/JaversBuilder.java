@@ -629,7 +629,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * @see CustomType
      * @see CustomPropertyComparator
      */
-    public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T> comparator, Class<T> customType){
+    public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
         registerType(new CustomDefinition(customType, comparator));
         bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;

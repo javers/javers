@@ -5,6 +5,7 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Custom property-scope comparator.
@@ -31,9 +32,10 @@ import java.util.Objects;
  * </pre>
  *
  * @param <T> Custom Type
+ * @param <C> Concrete type of PropertyChange returned by a comparator
  * @author bartosz walacik
  */
-public interface CustomPropertyComparator<T> {
+public interface CustomPropertyComparator<T, C extends PropertyChange> {
     /**
      * Calculates a list of Changes between two objects of type T.
      * <br/>
@@ -43,9 +45,10 @@ public interface CustomPropertyComparator<T> {
      * @param right right (or current) value
      * @param affectedId Id of domain object being compared
      * @param property property being compared
-     * @return should return null if compared objects are the same
+     *
+     * @return should return Optional.empty() if compared objects are the same
      */
-    PropertyChange compare(T left, T right, GlobalId affectedId, Property property);
+    Optional<C> compare(T left, T right, GlobalId affectedId, Property property);
 
     /**
      * This comparator is called by JaVers to calculate collection-to-collection diff,

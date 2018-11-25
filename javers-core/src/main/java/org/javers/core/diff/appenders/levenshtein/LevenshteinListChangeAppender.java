@@ -2,16 +2,14 @@ package org.javers.core.diff.appenders.levenshtein;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.EqualsFunction;
-import org.javers.core.diff.NodePair;
-import org.javers.core.diff.appenders.CorePropertyChangeAppender;
 import org.javers.core.diff.appenders.ListChangeAppender;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.CollectionType;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.ListType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.List;
@@ -32,15 +30,14 @@ public class LevenshteinListChangeAppender extends ListChangeAppender {
     }
 
     @Override
-    public ListChange calculateChanges(final NodePair pair, final JaversProperty property) {
-
-        ListType listType = property.getType();
+    public ListChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
+        CollectionType listType = property.getType();
         JaversType itemType = typeMapper.getJaversType(listType.getItemType());
         DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
-        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
+        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
 
-        final List leftList =  (List) listType.map(pair.getLeftPropertyValueAndCast(property, List.class), dehydrateFunction, owner);
-        final List rightList = (List) listType.map(pair.getRightPropertyValueAndCast(property, List.class), dehydrateFunction, owner);
+        final List leftList =  (List) listType.map(leftValue, dehydrateFunction, owner);
+        final List rightList = (List) listType.map(rightValue, dehydrateFunction, owner);
 
         EqualsFunction equalsFunction = (left, right) -> Objects.equals(left, right);
         Backtrack backtrack = new Backtrack(equalsFunction);
@@ -49,7 +46,7 @@ public class LevenshteinListChangeAppender extends ListChangeAppender {
         final BacktrackSteps[][] steps = backtrack.evaluateSteps(leftList, rightList);
         final List<ContainerElementChange> changes = stepsToChanges.convert(steps, leftList, rightList);
 
-        ListChange result = getListChange(pair.getGlobalId(), property, changes);
+        ListChange result = getListChange(affectedId, property, changes);
         if (result != null) {
             renderNotParametrizedWarningIfNeeded(listType.getItemType(), "item", "List", property);
         }

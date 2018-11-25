@@ -12,9 +12,9 @@ import org.javers.core.metamodel.property.Property;
  *
  * @author bartosz walacik
  */
-class CustomMultimapFakeComparator implements CustomPropertyComparator<Multimap>{
+class CustomMultimapFakeComparator implements CustomPropertyComparator<Multimap, MapChange>{
     @Override
-    MapChange compare(Multimap left, Multimap right, GlobalId affectedId, Property property) {
-        return new MapChange(affectedId, property.name, [new EntryValueChange("a", left.get("a")[0], right.get("a")[0])])
+    Optional<MapChange> compare(Multimap left, Multimap right, GlobalId affectedId, Property property) {
+        return Optional.of(new MapChange(affectedId, property.name, [new EntryValueChange("a", left.get("a")[0], right.get("a")[0])]));
     }
 }

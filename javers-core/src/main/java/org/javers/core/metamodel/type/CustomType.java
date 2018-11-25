@@ -24,9 +24,9 @@ import java.lang.reflect.Type;
  * @author bartosz walacik
  */
 public class CustomType<T> extends ClassType {
-    private CustomPropertyComparator<T> comparator;
+    private CustomPropertyComparator<T, ?> comparator;
 
-    public CustomType(Type baseJavaType, CustomPropertyComparator<T> comparator) {
+    public CustomType(Type baseJavaType, CustomPropertyComparator<T, ?> comparator) {
         super(baseJavaType);
         Validate.argumentIsNotNull(comparator);
         this.comparator = comparator;

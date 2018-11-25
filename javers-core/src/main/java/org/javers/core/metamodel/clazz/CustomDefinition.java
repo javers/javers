@@ -10,15 +10,15 @@ import org.javers.core.metamodel.type.CustomType;
  * @author bartosz walacik
  */
 public class CustomDefinition<T> extends ClientsClassDefinition {
-    private CustomPropertyComparator<T> comparator;
+    private CustomPropertyComparator<T, ?> comparator;
 
-    public CustomDefinition(Class<T> clazz, CustomPropertyComparator<T> comparator) {
+    public CustomDefinition(Class<T> clazz, CustomPropertyComparator<T, ?> comparator) {
         super(clazz);
         Validate.argumentIsNotNull(comparator);
         this.comparator = comparator;
     }
 
-    public CustomPropertyComparator<T> getComparator() {
+    public CustomPropertyComparator<T, ?> getComparator() {
         return comparator;
     }
 }

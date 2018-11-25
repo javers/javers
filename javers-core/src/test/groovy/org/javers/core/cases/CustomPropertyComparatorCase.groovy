@@ -23,11 +23,11 @@ class CustomPropertyComparatorCase extends Specification    {
         private List<Person> partners
     }
 
-    class PersonComparator implements CustomPropertyComparator<Person> {
-        ValueChange compare(Person left, Person right, GlobalId affectedId, Property property) {
+    class PersonComparator implements CustomPropertyComparator<Person, ValueChange> {
+        Optional<ValueChange> compare(Person left, Person right, GlobalId affectedId, Property property) {
             if (left.name.equals(right.name))
-                return null
-            return new ValueChange(affectedId, "entity/name", left.name, right.name)
+                return Optional.empty()
+            return Optional.of(new ValueChange(affectedId, "entity/name", left.name, right.name));
         }
 
         @Override

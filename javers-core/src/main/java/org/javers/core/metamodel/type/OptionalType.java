@@ -33,4 +33,9 @@ public class OptionalType extends CollectionType {
     public boolean isEmpty(Object optional){
         return optional == null || !((Optional)optional).isPresent();
     }
+
+    @Override
+    public Object empty() {
+        return Optional.empty();
+    }
 }
