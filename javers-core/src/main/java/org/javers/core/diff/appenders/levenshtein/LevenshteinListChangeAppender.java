@@ -4,6 +4,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.diff.EqualsFunction;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.CorePropertyChangeAppender;
+import org.javers.core.diff.appenders.ListChangeAppender;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.metamodel.object.*;
@@ -19,7 +20,7 @@ import java.util.Objects;
 /**
  * @author kornel kielczewski
  */
-public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<ListChange> {
+public class LevenshteinListChangeAppender extends ListChangeAppender {
 
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
@@ -28,11 +29,6 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
         Validate.argumentsAreNotNull(typeMapper, globalIdFactory);
         this.typeMapper = typeMapper;
         this.globalIdFactory = globalIdFactory;
-    }
-
-    @Override
-    public boolean supports(JaversType propertyType) {
-        return propertyType instanceof ListType;
     }
 
     @Override

@@ -16,7 +16,7 @@ import static org.javers.common.collections.Lists.asMap;
 /**
  * @author pawel szymczyk
  */
-public class SimpleListChangeAppender extends CorePropertyChangeAppender<ListChange> {
+public class SimpleListChangeAppender extends ListChangeAppender {
 
     private final MapChangeAppender mapChangeAppender;
     private final TypeMapper typeMapper;
@@ -24,11 +24,6 @@ public class SimpleListChangeAppender extends CorePropertyChangeAppender<ListCha
     SimpleListChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper) {
         this.mapChangeAppender = mapChangeAppender;
         this.typeMapper = typeMapper;
-    }
-
-    @Override
-    public boolean supports(JaversType propertyType) {
-        return propertyType instanceof ListType;
     }
 
     @Override

@@ -19,7 +19,7 @@ import static java.math.BigDecimal.ROUND_HALF_UP;
  *
  * @author bartosz walacik
  */
-public class CustomBigDecimalComparator implements CustomPropertyComparator<BigDecimal, ValueChange>{
+public class CustomBigDecimalComparator implements CustomPropertyComparator<BigDecimal>{
     private int significantDecimalPlaces;
 
     public CustomBigDecimalComparator(int significantDecimalPlaces) {

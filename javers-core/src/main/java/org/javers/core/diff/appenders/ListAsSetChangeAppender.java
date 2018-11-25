@@ -10,17 +10,12 @@ import org.javers.core.metamodel.type.ListAsSetType;
 /**
  * @author Sergey Kobyshev
  */
-public class ListAsSetChangeAppender extends CorePropertyChangeAppender<ListChange> {
+public class ListAsSetChangeAppender extends ListChangeAppender {
 
     private final SetChangeAppender setChangeAppender;
 
     ListAsSetChangeAppender(SetChangeAppender setChangeAppender) {
         this.setChangeAppender = setChangeAppender;
-    }
-
-    @Override
-    public boolean supports(JaversType propertyType) {
-        return propertyType instanceof ListAsSetType;
     }
 
     @Override

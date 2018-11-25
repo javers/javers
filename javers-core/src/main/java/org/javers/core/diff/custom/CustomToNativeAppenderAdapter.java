@@ -10,10 +10,10 @@ import org.javers.core.metamodel.type.JaversType;
  * @author bartosz walacik
  */
 public class CustomToNativeAppenderAdapter<T, C extends PropertyChange> implements PropertyChangeAppender<C> {
-    private final CustomPropertyComparator<T, C> delegate;
+    private final CustomPropertyComparator<T> delegate;
     private final Class<T> propertyJavaClass;
 
-    public CustomToNativeAppenderAdapter(CustomPropertyComparator<T, C> delegate, Class<T> propertyJavaClass) {
+    public CustomToNativeAppenderAdapter(CustomPropertyComparator<T> delegate, Class<T> propertyJavaClass) {
         this.delegate = delegate;
         this.propertyJavaClass = propertyJavaClass;
     }
@@ -28,7 +28,7 @@ public class CustomToNativeAppenderAdapter<T, C extends PropertyChange> implemen
         T leftValue = (T)pair.getLeftPropertyValue(property);
         T rightValue = (T)pair.getRightPropertyValue(property);
 
-        return delegate.compare(leftValue, rightValue, pair.getGlobalId(), property);
+        return (C)delegate.compare(leftValue, rightValue, pair.getGlobalId(), property);
     }
 
 
