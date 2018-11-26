@@ -33,9 +33,8 @@ import java.util.Optional;
  */
 public interface CustomPropertyComparator<T, C extends PropertyChange> {
     /**
-     * Calculates changes between two Custom Type objects.
-     * <br/>
-     * This comparator is called by JaVers to calculate property-to-property diff.
+     * Called by JaVers to calculate property-to-property diff
+     * between two Custom Type objects.
      *
      * @param left left (or old) value
      * @param right right (or current) value
@@ -47,13 +46,12 @@ public interface CustomPropertyComparator<T, C extends PropertyChange> {
     Optional<C> compare(T left, T right, GlobalId affectedId, Property property);
 
     /**
-     * This comparator is called by JaVers to calculate collection-to-collection diff,
+     * Called by JaVers to calculate collection-to-collection diff,
      * when Custom Type objects are Collection items.
      * <br/><br/>
      *
      * Both equals() and compare() should return consistent results. When compare() returns
      * Optional.empty(), equals() should return false.
-     *
      */
     boolean equals(T a, T b);
 }
