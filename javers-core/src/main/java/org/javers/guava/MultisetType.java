@@ -69,4 +69,9 @@ public class MultisetType extends CollectionType {
             return (Multiset)sourceSet;
         }
     }
+
+    @Override
+    public Object empty() {
+        return HashMultiset.create();
+    }
 }

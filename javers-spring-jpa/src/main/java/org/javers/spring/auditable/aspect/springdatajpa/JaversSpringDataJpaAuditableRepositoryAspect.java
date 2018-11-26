@@ -24,9 +24,14 @@ public class JaversSpringDataJpaAuditableRepositoryAspect extends AbstractSpring
         onDelete(pjp);
     }
 
+    @AfterReturning("execution(public * deleteById(..)) && this(org.springframework.data.repository.CrudRepository)")
+    public void onDeleteByIdExecuted(JoinPoint pjp) {
+        onDelete(pjp);
+    }
+
     @AfterReturning("execution(public * deleteAll(..)) && this(org.springframework.data.repository.CrudRepository)")
-    public void onDeleteAllExecuted(JoinPoint jp) {
-        onDelete(jp);
+    public void onDeleteAllExecuted(JoinPoint pjp) {
+        onDelete(pjp);
     }
 
     @AfterReturning(value = "execution(public * save(..)) && this(org.springframework.data.repository.CrudRepository)", returning = "responseEntity")
@@ -35,8 +40,8 @@ public class JaversSpringDataJpaAuditableRepositoryAspect extends AbstractSpring
     }
 
     @AfterReturning(value = "execution(public * saveAll(..)) && this(org.springframework.data.repository.CrudRepository)", returning = "responseEntity")
-    public void onSaveAllExecuted(JoinPoint jp, Object responseEntity) {
-        onSave(jp,responseEntity);
+    public void onSaveAllExecuted(JoinPoint pjp, Object responseEntity) {
+        onSave(pjp, responseEntity);
     }
 
     @AfterReturning(value = "execution(public * saveAndFlush(..)) && this(org.springframework.data.jpa.repository.JpaRepository)", returning = "responseEntity")

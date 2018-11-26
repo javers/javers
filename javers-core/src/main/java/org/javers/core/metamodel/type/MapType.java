@@ -91,4 +91,9 @@ public class MapType extends KeyValueType {
             entryConsumer.accept(mappedKey, mappedValue);
         }
     }
+
+    @Override
+    public Object empty() {
+        return Collections.emptyMap();
+    }
 }

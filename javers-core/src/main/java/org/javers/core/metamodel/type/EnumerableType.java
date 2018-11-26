@@ -31,4 +31,6 @@ public abstract class EnumerableType extends ClassType {
     public abstract Object map(Object sourceEnumerable, Function mapFunction);
 
     public abstract boolean isEmpty(Object container);
+
+    public abstract Object empty();
 }

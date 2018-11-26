@@ -64,4 +64,9 @@ public class MultimapType extends KeyValueType {
 
         return targetMultimap;
     }
+
+    @Override
+    public Object empty() {
+        return ArrayListMultimap.create();
+    }
 }

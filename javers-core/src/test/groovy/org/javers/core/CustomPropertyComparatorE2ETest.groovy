@@ -46,8 +46,12 @@ class CustomPropertyComparatorE2ETest extends Specification {
     }
 
     private class DummyCustomPropertyComparator implements CustomPropertyComparator {
-        PropertyChange compare(Object left, Object right, GlobalId affectedId, Property property) {
-            null
+        Optional<PropertyChange> compare(Object left, Object right, GlobalId affectedId, Property property) {
+            Optional.empty()
+        }
+
+        boolean equals(Object a, Object b) {
+            return false
         }
     }
 

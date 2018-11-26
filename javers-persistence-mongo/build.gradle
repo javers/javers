@@ -5,7 +5,7 @@ dependencies {
 
     testCompile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
     testCompile project(path: ":javers-core", configuration: "testArtifacts")
-    testCompile "com.github.fakemongo:fongo:$fongoVersion"
+    testCompile "de.flapdoodle.embed:de.flapdoodle.embed.mongo:$embeddedMongo"
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
 }
 

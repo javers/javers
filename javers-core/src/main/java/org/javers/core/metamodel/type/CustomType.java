@@ -1,29 +1,39 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.validation.Validate;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.custom.CustomPropertyComparator;
 import java.lang.reflect.Type;
 
 /**
- * Custom type in client's domain model.
+ * Custom Type in client's domain model.
  * <br/><br/>
  *
- * JaVers treats a custom type as a black box
- * and doesn't take any assumptions about its content or behavior.
- * It's a 'not modeled' type, somehow similar to unbounded wildcard type {@code <?>}.
+ * JaVers treats a Custom Type as a black box
+ * and doesn't take any assumptions about its content or behaviour.
+ * It's a "not modeled" type, somehow similar to unbounded wildcard {@code <?>}.
  * <br/><br/>
  *
- * Values of custom type are compared by a {@link CustomPropertyComparator}
- * and registering it (see {@link JaversBuilder#registerCustomComparator(CustomPropertyComparator, Class)}
- * is the only way to map a custom type.
+ * Objects of Custom Type are compared by a {@link CustomPropertyComparator},
+ * and registering this comparator (see {@link JaversBuilder#registerCustomComparator(CustomPropertyComparator, Class)}
+ * is the only way to map a Custom Type.
  * <br/><br/>
  *
- * Custom types are serialized to JSON using Gson defaults.
+ * Custom Types are serialized to JSON using Gson defaults.
  *
  * @author bartosz walacik
  */
-public class CustomType extends ClassType {
-    public CustomType(Type baseJavaType) {
+public class CustomType<T> extends ClassType {
+    private CustomPropertyComparator<T, ?> comparator;
+
+    public CustomType(Type baseJavaType, CustomPropertyComparator<T, ?> comparator) {
         super(baseJavaType);
+        Validate.argumentIsNotNull(comparator);
+        this.comparator = comparator;
+    }
+
+    @Override
+    public boolean equals(Object left, Object right) {
+        return comparator.equals((T)left, (T)right);
     }
 }

@@ -42,7 +42,7 @@ class TypeFactory {
 
     JaversType create(ClientsClassDefinition def, ClassScan scan) {
         if (def instanceof CustomDefinition) {
-            return new CustomType(def.getBaseJavaClass());
+            return new CustomType(def.getBaseJavaClass(), ((CustomDefinition) def).getComparator());
         } else if (def instanceof EntityDefinition) {
             return entityTypeFactory.createEntity((EntityDefinition) def, scan);
         } else if (def instanceof ValueObjectDefinition) {
