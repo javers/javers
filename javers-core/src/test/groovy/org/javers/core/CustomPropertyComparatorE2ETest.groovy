@@ -53,9 +53,12 @@ class CustomPropertyComparatorE2ETest extends Specification {
     }
 
     private class CustomMultimapFakeComparator implements CustomPropertyComparator<Multimap, MapChange>{
-        @Override
         Optional<MapChange> compare(Multimap left, Multimap right, GlobalId affectedId, Property property) {
-            return Optional.of(new MapChange(affectedId, property.name, [new EntryValueChange("a", left.get("a")[0], right.get("a")[0])]));
+            return Optional.of(new MapChange(affectedId, property.name, [new EntryValueChange("a", left.get("a")[0], right.get("a")[0])]))
+        }
+
+        boolean equals(Multimap a, Multimap b) {
+            return false
         }
     }
 

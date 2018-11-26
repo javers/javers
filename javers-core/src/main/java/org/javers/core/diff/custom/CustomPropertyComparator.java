@@ -3,30 +3,26 @@ package org.javers.core.diff.custom;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.CustomType;
 
-import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Custom property-scope comparator.
- * Typically, Custom Types are large structures (like Multimap) or complex objects,
- * for simple values use {@link CustomValueComparator}.
+ * Property-scope comparator bounded to {@link CustomType}.
+ * <br/><br/>
+ *
+ * Typically, Custom Types are large structures (like Multimap) or complex objects.
+ * For simple values, it's better to use {@link CustomValueComparator}.
  * <br/><br/>
  *
  * Implementation should calculate a diff between two objects of given Custom Type.
  * <br/><br/>
  *
- * For example, if you are using Multimap from Guava,
- * implement:
- * <pre>
- * {@code public class GuavaCustomComparator implements CustomPropertyComparator<Multimap> {
- *     public MapChange compare(Multimap left, Multimap right, GlobalId affectedId, Property property) {
- *       ... // omitted
- *     }
- *   }
- * }</pre>
+ * Examples and doc:
+ * <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
+ * <br/><br/>
  *
- * and register a custom comparator in JaversBuilder:
+ * Usage:
  * <pre>
  * JaversBuilder.javers().registerCustomComparator(new GuavaCustomComparator(), Multimap.class).build()
  * </pre>
@@ -55,11 +51,9 @@ public interface CustomPropertyComparator<T, C extends PropertyChange> {
      * when Custom Type objects are Collection items.
      * <br/><br/>
      *
-     * Both equals() and compare() should return consistent results. When compare() returns null,
-     * equals() should return false.
+     * Both equals() and compare() should return consistent results. When compare() returns
+     * Optional.empty(), equals() should return false.
      *
      */
-    default boolean equals(T a, T b) {
-        return Objects.equals(a, b);
-    }
+    boolean equals(T a, T b);
 }
