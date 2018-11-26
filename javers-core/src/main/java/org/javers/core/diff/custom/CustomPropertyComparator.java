@@ -37,7 +37,7 @@ import java.util.Optional;
  */
 public interface CustomPropertyComparator<T, C extends PropertyChange> {
     /**
-     * Calculates a list of Changes between two objects of type T.
+     * Calculates changes between two Custom Type objects.
      * <br/>
      * This comparator is called by JaVers to calculate property-to-property diff.
      *
@@ -52,7 +52,7 @@ public interface CustomPropertyComparator<T, C extends PropertyChange> {
 
     /**
      * This comparator is called by JaVers to calculate collection-to-collection diff,
-     * when objects of type T are Collection items.
+     * when Custom Type objects are Collection items.
      * <br/><br/>
      *
      * Both equals() and compare() should return consistent results. When compare() returns null,
