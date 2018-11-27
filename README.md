@@ -3,6 +3,8 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core)<br/>
 [![Build Status](https://travis-ci.org/javers/javers.svg?branch=master)](https://travis-ci.org/javers/javers/)
+[![Code Quality: Java](https://img.shields.io/lgtm/grade/java/g/javers/javers.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/javers/javers/context:java)
+[![Total Alerts](https://img.shields.io/lgtm/alerts/g/javers/javers.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/javers/javers/alerts)
 
 ## What is JaVers
 
