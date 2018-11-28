@@ -35,7 +35,7 @@ class DBRefUnproxyObjectAccessHookTest extends Specification {
         def loaded = dummyEntityRepository.findById(author.getId()).get()
         assert loaded.refEntity instanceof LazyLoadingProxy
 
-        when: "direct commit"
+        when:
         loaded.name = "mad kaz"
         commit(loaded, javers, dummyEntityRepository)
 
