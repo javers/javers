@@ -3,11 +3,12 @@ dependencies {
     compile project(':javers-spring')
     compile project(':javers-spring-mongo')
 
-    compile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
-    compile "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
+    optional "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
+    optional "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testCompile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     testCompile "de.flapdoodle.embed:de.flapdoodle.embed.mongo:$embeddedMongo"
+    testCompile "org.springframework.security:spring-security-core:$springSecurityVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
 }

@@ -1,20 +1,18 @@
 package org.javers.spring.auditable.integration
 
 import org.javers.core.Javers
-import org.javers.spring.example.JaversSpringMongoApplicationConfig
 import org.javers.spring.model.DummyObject
 import org.javers.spring.repository.DummyAuditedCrudRepository
 import org.javers.spring.repository.DummyNoAuditedCrudRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
-import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
 
-@ContextConfiguration(classes = [JaversSpringMongoApplicationConfig])
+@ContextConfiguration(classes = [TestApplicationConfig])
 class JaversSpringDataAspectIntegrationTest extends Specification {
     @Autowired
     ApplicationContext context

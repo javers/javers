@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.clazz;
 
+import org.javers.common.validation.Validate;
+import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.metamodel.type.CustomType;
 
 /**
@@ -7,9 +9,16 @@ import org.javers.core.metamodel.type.CustomType;
  *
  * @author bartosz walacik
  */
-public class CustomDefinition extends ClientsClassDefinition {
+public class CustomDefinition<T> extends ClientsClassDefinition {
+    private CustomPropertyComparator<T, ?> comparator;
 
-    public CustomDefinition(Class<?> clazz) {
+    public CustomDefinition(Class<T> clazz, CustomPropertyComparator<T, ?> comparator) {
         super(clazz);
+        Validate.argumentIsNotNull(comparator);
+        this.comparator = comparator;
+    }
+
+    public CustomPropertyComparator<T, ?> getComparator() {
+        return comparator;
     }
 }

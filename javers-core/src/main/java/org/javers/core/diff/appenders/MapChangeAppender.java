@@ -3,12 +3,8 @@ package org.javers.core.diff.appenders;
 import org.javers.common.collections.Maps;
 import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
-import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.map.*;
-import org.javers.core.metamodel.object.DehydrateMapFunction;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.OwnerContext;
-import org.javers.core.metamodel.object.PropertyOwnerContext;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,21 +42,20 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
         return true;
     }
 
-    @Override
-    public MapChange calculateChanges(NodePair pair, JaversProperty property) {
-        Map leftRawMap =  pair.getLeftPropertyValueAndCast(property, Map.class);
-        Map rightRawMap = pair.getRightPropertyValueAndCast(property, Map.class);
+    public MapChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
+        Map leftRawMap =  (Map) leftValue;
+        Map rightRawMap = (Map) rightValue;
 
         MapType mapType = ((JaversProperty) property).getType();
         MapContentType mapContentType = typeMapper.getMapContentType(mapType);
 
-        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
+        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
         List<EntryChange> changes = calculateEntryChanges(leftRawMap, rightRawMap, owner, mapContentType);
 
         if (!changes.isEmpty()){
             renderNotParametrizedWarningIfNeeded(mapContentType.getKeyType().getBaseJavaType(), "key", "Map", property);
             renderNotParametrizedWarningIfNeeded(mapContentType.getValueType().getBaseJavaType(), "value", "Map", property);
-            return new MapChange(pair.getGlobalId(), property.getName(), changes);
+            return new MapChange(affectedId, property.getName(), changes);
         }
         else {
             return null;

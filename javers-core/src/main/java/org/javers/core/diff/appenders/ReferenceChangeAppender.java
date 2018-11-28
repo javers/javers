@@ -13,7 +13,7 @@ import java.util.Objects;
  * @author bartosz walacik
  * @author pawel szymczyk
  */
-class ReferenceChangeAppender extends CorePropertyChangeAppender<ReferenceChange> {
+class ReferenceChangeAppender implements PropertyChangeAppender<ReferenceChange> {
 
     @Override
     public boolean supports(JaversType propertyType) {
@@ -31,5 +31,10 @@ class ReferenceChangeAppender extends CorePropertyChangeAppender<ReferenceChange
 
         return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId,
             pair.getLeftPropertyValue(property), pair.getRightPropertyValue(property));
+    }
+
+    @Override
+    public int priority() {
+        return LOW_PRIORITY;
     }
 }

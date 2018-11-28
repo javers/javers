@@ -2,7 +2,6 @@ package org.javers.guava;
 
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
-import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.CorePropertyChangeAppender;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.SetChange;
@@ -41,17 +40,18 @@ class MultisetChangeAppender extends CorePropertyChangeAppender<SetChange> {
     }
 
     @Override
-    public SetChange calculateChanges(NodePair pair, JaversProperty property){
-        Multiset left =  (Multiset)pair.getLeftPropertyValue(property);
-        Multiset right = (Multiset)pair.getRightPropertyValue(property);
+    public SetChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
+
+        Multiset left =  (Multiset)leftValue;
+        Multiset right = (Multiset)rightValue;
 
         MultisetType multisetType = ((JaversProperty) property).getType();
-        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
+        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
 
         List<ContainerElementChange> entryChanges = calculateEntryChanges(multisetType, left, right, owner);
         if (!entryChanges.isEmpty()){
             renderNotParametrizedWarningIfNeeded(multisetType.getItemType(), "item", "Multiset", property);
-            return new SetChange(pair.getGlobalId(), property.getName(), entryChanges);
+            return new SetChange(affectedId, property.getName(), entryChanges);
         } else {
             return null;
         }

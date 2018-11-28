@@ -50,4 +50,9 @@ public class CollectionType extends ContainerType {
         Collection sourceCol = wrapNull(sourceEnumerable);
         return sourceCol.stream().map(mapFunction).filter(it -> it != null).collect(Collectors.toSet());
     }
+
+    @Override
+    public Object empty() {
+        return Collections.emptyList();
+    }
 }

@@ -1,16 +1,19 @@
 package org.javers.core.diff.appenders;
 
-import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.container.SetChange;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ListAsSetType;
+import org.javers.core.metamodel.type.ListType;
+
+import java.util.Optional;
 
 /**
  * @author Sergey Kobyshev
  */
-public class ListAsSetChangeAppender extends CorePropertyChangeAppender<ListChange> {
+public class ListAsSetChangeAppender extends ListChangeAppender {
 
     private final SetChangeAppender setChangeAppender;
 
@@ -24,10 +27,10 @@ public class ListAsSetChangeAppender extends CorePropertyChangeAppender<ListChan
     }
 
     @Override
-    public ListChange calculateChanges(final NodePair pair, final JaversProperty property) {
-        SetChange setChange = setChangeAppender.calculateChanges(pair, property);
+    public ListChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
+        SetChange setChange = setChangeAppender.calculateChanges(leftValue, rightValue, affectedId, property);
         if (setChange != null) {
-            return new ListChange(pair.getGlobalId(), property.getName(), setChange.getChanges());
+            return new ListChange(affectedId, property.getName(), setChange.getChanges());
         }
         return null;
     }

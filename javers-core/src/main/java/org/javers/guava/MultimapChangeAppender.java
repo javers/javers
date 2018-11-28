@@ -2,22 +2,15 @@ package org.javers.guava;
 
 import com.google.common.collect.Multimap;
 import org.javers.common.exception.JaversException;
-import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.CorePropertyChangeAppender;
 import org.javers.core.diff.changetype.map.EntryAdded;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.EntryRemoved;
 import org.javers.core.diff.changetype.map.MapChange;
-import org.javers.core.metamodel.object.DehydrateMapFunction;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.OwnerContext;
-import org.javers.core.metamodel.object.PropertyOwnerContext;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static java.util.Collections.EMPTY_LIST;
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
@@ -53,18 +46,18 @@ class MultimapChangeAppender extends CorePropertyChangeAppender<MapChange>{
     }
 
     @Override
-    public MapChange calculateChanges(NodePair pair, JaversProperty property){
-        Multimap left =  (Multimap)pair.getLeftPropertyValue(property);
-        Multimap right = (Multimap)pair.getRightPropertyValue(property);
+    public MapChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
+        Multimap left =  (Multimap)leftValue;
+        Multimap right = (Multimap)rightValue;
 
         MultimapType multimapType = ((JaversProperty) property).getType();
-        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
+        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
 
         List<EntryChange> entryChanges = calculateChanges(multimapType, left, right, owner);
         if (!entryChanges.isEmpty()){
             renderNotParametrizedWarningIfNeeded(multimapType.getKeyType(), "key", "Multimap", property);
             renderNotParametrizedWarningIfNeeded(multimapType.getValueType(), "value", "Multimap", property);
-            return new MapChange(pair.getGlobalId(), property.getName(), entryChanges);
+            return new MapChange(affectedId, property.getName(), entryChanges);
         }else{
             return null;
         }

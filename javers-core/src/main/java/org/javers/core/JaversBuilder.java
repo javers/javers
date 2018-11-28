@@ -616,24 +616,21 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Registers a custom property comparator for a given Custom type.
+     * Registers a custom property comparator for a given Custom Type.
      * <br/><br/>
      *
-     * Custom comparators are used by diff algorithm to calculate property-to-property diff.
-     * <br/><br/>
-     *
-     * Comparator has to calculate and return a subtype of {@link PropertyChange}.
+     * Custom comparators are used by diff algorithm to calculate property-to-property diff
+     * and also collection-to-collection diff.
      * <br/><br/>
      *
      * Internally, given type is mapped as {@link CustomType}.
-     * <br/><br/>
      *
-     * @param <T> custom type
-     * @param customType class literal to define a custom type
+     * @param <T> Custom Type
      * @see CustomType
+     * @see CustomPropertyComparator
      */
     public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
-        registerType(new CustomDefinition(customType));
+        registerType(new CustomDefinition(customType, comparator));
         bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
     }
