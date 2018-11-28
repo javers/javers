@@ -14,7 +14,7 @@ public class DBRefUnproxyObjectAccessHook implements ObjectAccessHook<Object> {
 
             return Optional.of(new ObjectAccessProxy(() -> proxy.getTarget(),
                     proxy.getTarget().getClass(),
-                    proxy.toDBRef().getId()));
+                    proxy.toDBRef().getId().toString()));
         }
         return Optional.empty();
     }

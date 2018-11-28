@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef
 
 class MyDummyEntity {
     private String id
+    private String name
 
     @DBRef(lazy = true)
     private MyDummyRefEntity refEntity
@@ -16,5 +17,9 @@ class MyDummyEntity {
 
     MyDummyRefEntity getRefEntity() {
         return refEntity
+    }
+
+    String getName() {
+        return name
     }
 }
