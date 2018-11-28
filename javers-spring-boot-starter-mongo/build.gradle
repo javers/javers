@@ -1,8 +1,7 @@
 dependencies {
     compile project(':javers-core')
     compile project(':javers-spring')
-    compile project(':javers-persistence-mongo')
-    //compile project(':javers-spring-mongo')
+    compile project(':javers-spring-mongo')
 
     compile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
     compile "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"

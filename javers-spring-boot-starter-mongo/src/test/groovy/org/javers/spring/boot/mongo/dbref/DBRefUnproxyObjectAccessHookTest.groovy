@@ -1,7 +1,7 @@
 package org.javers.spring.boot.mongo.dbref
 
-
-import org.javers.spring.boot.mongo.DBRefUnproxyObjectAccessHook
+import org.javers.core.Javers
+import org.javers.core.metamodel.object.InstanceId
 import org.javers.spring.boot.mongo.TestApplication
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -19,51 +19,28 @@ class DBRefUnproxyObjectAccessHookTest extends Specification {
     @Autowired
     MyDummyRefEntityRepository dummyRefEntityRepository
 
-    def "should unproxy and load"() {
+    @Autowired
+    Javers javers
+
+    def "should unproxy a LazyLoadingProxy of DBRef before direct committing to JaVers"() {
         given:
+        def refEntity = new MyDummyRefEntity(name: "bert")
+        refEntity = dummyRefEntityRepository.save(refEntity)
 
-        def refEntity = new MyDummyRefEntity()
-        refEntity.setName("Bert")
-        refEntity = dummyRefEntityRepository.save(refEntity);
-
-        def author = new MyDummyEntity();
-        author.setRefEntity(refEntity)
+        def author = new MyDummyEntity(refEntity: refEntity)
         author = dummyEntityRepository.save(author)
 
         def loaded = dummyEntityRepository.findById(author.getId()).get()
-        println loaded
-        println loaded.class
-        println loaded.refEntity
-        println loaded.refEntity.class
-
         assert loaded.refEntity instanceof LazyLoadingProxy
 
-        def realObj = ((LazyLoadingProxy) loaded.refEntity).getTarget()
+        when:
+        javers.commit("me", loaded)
+        def authorSnapshot = javers.getLatestSnapshot(author.id, MyDummyEntity)
+        def refEntitySnapshot = javers.getLatestSnapshot(refEntity.id, MyDummyRefEntity)
 
-        assert realObj instanceof MyDummyRefEntity
-        assert "Bert".equals(realObj.name)
-        assert "Bert".equals(loaded.refEntity.name)
-    }
-
-    def "should unproxy and load via hook"() {
-        given:
-
-        def refEntity = new MyDummyRefEntity()
-        refEntity.setName("Bert")
-        refEntity = dummyRefEntityRepository.save(refEntity);
-
-        def author = new MyDummyEntity();
-        author.setRefEntity(refEntity)
-        author = dummyEntityRepository.save(author)
-
-        def loaded = dummyEntityRepository.findById(author.getId()).get()
-
-        def hook = new DBRefUnproxyObjectAccessHook()
-        hook.createAccessor(loaded.refEntity).ifPresent { access ->
-            def realObj = access.access()
-            assert "Bert".equals(realObj.name)
-            assert !(realObj instanceof LazyLoadingProxy)
-            assert realObj instanceof MyDummyRefEntity
-        }
+        then:
+        refEntitySnapshot.isPresent()
+        authorSnapshot.get().getPropertyValue("refEntity") instanceof InstanceId
+        authorSnapshot.get().getPropertyValue("refEntity").value() == MyDummyRefEntity.name + "/" + refEntity.id
     }
 }
