@@ -9,6 +9,7 @@ import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
+import org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,7 @@ public class JaversMongoAutoConfiguration {
         return JaversBuilder.javers()
                 .registerJaversRepository(javersRepository)
                 .withProperties(javersMongoProperties)
+                .withObjectAccessHook(new DBRefUnproxyObjectAccessHook())
                 .build();
     }
 

@@ -1,0 +1,13 @@
+javadoc {
+    failOnError = false
+}
+
+dependencies {
+    compile project(':javers-spring')
+    compile project(':javers-persistence-mongo')
+
+    optional "org.springframework.data:spring-data-mongodb:$springDataMongoVersion"
+
+    testCompile "org.springframework:spring-test:$springVersion"
+    testCompile "org.spockframework:spock-spring:$spockVersion"
+}
