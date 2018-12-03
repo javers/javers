@@ -1,11 +1,14 @@
 package org.javers.core.cases
 
+import org.javers.common.collections.Lists
 import org.javers.core.JaversBuilder
+import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.property.Property
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
  * see https://stackoverflow.com/questions/53418466/using-custompropertycomparator-with-java-util-list
@@ -36,9 +39,12 @@ class CustomPropertyComparatorCase extends Specification    {
         }
     }
 
-    def "should use CustomPropertyComparator for Collection items"(){
+    @Unroll
+    def "should use CustomPropertyComparator for Collection items with #alg"(){
       given:
-      def javers = JaversBuilder.javers().registerCustomComparator(new  PersonComparator(), Person).build()
+      def javers = JaversBuilder.javers()
+              .withListCompareAlgorithm(alg)
+              .registerCustomComparator(new  PersonComparator(), Person).build()
 
       when:
       Company c1 = new Company(id: "1", clients: [new Person(name: "james", ignoreThis: "ignore this")])
@@ -56,11 +62,17 @@ class CustomPropertyComparatorCase extends Specification    {
 
       then:
       diff.changes.size() == 1
+
+      where:
+      alg << Lists.asList(ListCompareAlgorithm.values())
     }
 
-    def "should use CustomPropertyComparator for List items"(){
+    @Unroll
+    def "should use CustomPropertyComparator for List items with #alg"(){
         given:
-        def javers = JaversBuilder.javers().registerCustomComparator(new  PersonComparator(), Person).build()
+        def javers = JaversBuilder.javers()
+                .withListCompareAlgorithm(alg)
+                .registerCustomComparator(new  PersonComparator(), Person).build()
 
         when:
         Company c1 = new Company(id: "1", partners: [new Person(name: "james", ignoreThis: "ignore this")])
@@ -79,5 +91,8 @@ class CustomPropertyComparatorCase extends Specification    {
 
         then:
         diff.changes.size() == 1
+
+        where:
+        alg << Lists.asList(ListCompareAlgorithm.values())
     }
 }
