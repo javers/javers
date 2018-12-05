@@ -27,10 +27,32 @@ public class CollectionType extends ContainerType {
     }
 
     /**
-     * @return immutable Set
+     * @return immutable List
      */
     @Override
     public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
+        return mapToList(sourceEnumerable, mapFunction, owner);
+    }
+
+    /**
+     * @return immutable List
+     */
+    protected Object mapToList(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
+        Validate.argumentsAreNotNull(mapFunction, owner);
+        Collection sourceCol = wrapNull(sourceEnumerable);
+
+        EnumerationAwareOwnerContext enumerationContext = new EnumerationAwareOwnerContext(owner, true);
+        List targetList = new ArrayList();
+        for (Object sourceVal : sourceCol) {
+            targetList.add(mapFunction.apply(sourceVal, enumerationContext));
+        }
+        return Collections.unmodifiableList(targetList);
+    }
+
+    /**
+     * @return immutable Set
+     */
+    protected Object mapToSet(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentsAreNotNull(mapFunction, owner);
         Collection sourceCol = wrapNull(sourceEnumerable);
         Set targetSet = new HashSet(sourceCol.size());
@@ -41,6 +63,7 @@ public class CollectionType extends ContainerType {
         }
         return Collections.unmodifiableSet(targetSet);
     }
+
 
     /**
      * Nulls are filtered

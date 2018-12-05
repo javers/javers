@@ -13,7 +13,7 @@ import spock.lang.Unroll
 /**
  * see https://stackoverflow.com/questions/53418466/using-custompropertycomparator-with-java-util-list
  */
-class CustomPropertyComparatorCase extends Specification    {
+class CustomPropertyComparatorCase extends Specification {
 
     class Person {
         private String name
@@ -40,7 +40,7 @@ class CustomPropertyComparatorCase extends Specification    {
     }
 
     @Unroll
-    def "should use CustomPropertyComparator for Collection items with #alg"(){
+    def "should use CustomPropertyComparator for raw Collection items with #alg"(){
       given:
       def javers = JaversBuilder.javers()
               .withListCompareAlgorithm(alg)
@@ -93,6 +93,6 @@ class CustomPropertyComparatorCase extends Specification    {
         diff.changes.size() == 1
 
         where:
-        alg << Lists.asList(ListCompareAlgorithm.values())
+        alg << [ListCompareAlgorithm.SIMPLE, ListCompareAlgorithm.LEVENSHTEIN_DISTANCE]
     }
 }
