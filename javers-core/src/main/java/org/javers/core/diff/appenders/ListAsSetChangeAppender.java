@@ -1,19 +1,19 @@
 package org.javers.core.diff.appenders;
 
+import org.javers.common.collections.Sets;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ListAsSetType;
-import org.javers.core.metamodel.type.ListType;
 
-import java.util.Optional;
+import java.util.Collection;
 
 /**
  * @author Sergey Kobyshev
  */
-public class ListAsSetChangeAppender extends ListChangeAppender {
+public class ListAsSetChangeAppender extends CorePropertyChangeAppender<ListChange> {
 
     private final SetChangeAppender setChangeAppender;
 

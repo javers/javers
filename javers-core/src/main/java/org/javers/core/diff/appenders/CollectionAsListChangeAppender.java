@@ -6,17 +6,15 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.CollectionType;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
-class CollectionAsListChangeAppender extends CorePropertyChangeAppender<ListChange> {
+class CollectionAsListChangeAppender extends ListToMapAppenderAdapter  {
 
-    private final ListChangeAppender listChangeAppender;
-
-    CollectionAsListChangeAppender(ListChangeAppender listChangeAppender) {
-        this.listChangeAppender = listChangeAppender;
+    CollectionAsListChangeAppender(MapChangeAppender mapChangeAppender, TypeMapper typeMapper) {
+        super(mapChangeAppender, typeMapper);
     }
 
     @Override
@@ -29,6 +27,6 @@ class CollectionAsListChangeAppender extends CorePropertyChangeAppender<ListChan
         List leftList = Lists.immutableListOf((Collection)leftValue);
         List rightList = Lists.immutableListOf((Collection)rightValue);
 
-        return listChangeAppender.calculateChanges(leftList, rightList, affectedId, property);
+        return super.calculateChanges(leftList, rightList, affectedId, property);
     }
 }

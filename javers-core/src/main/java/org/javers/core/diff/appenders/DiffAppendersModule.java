@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 public class DiffAppendersModule extends LateInstantiatingModule {
 
-    private final Class<? extends ListChangeAppender> listChangeAppender;
+    private final Class<? extends PropertyChangeAppender<ListChange>> listChangeAppender;
 
     public DiffAppendersModule(JaversCoreConfiguration javersCoreConfiguration, MutablePicoContainer container) {
         super(javersCoreConfiguration, container);

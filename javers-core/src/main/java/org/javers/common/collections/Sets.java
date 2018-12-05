@@ -68,7 +68,7 @@ public class Sets {
         if (elements == null) {
             return Collections.emptySet();
         }
-        return new HashSet<>(elements);
+        return Collections.unmodifiableSet(new HashSet<>(elements));
     }
 
     /**
