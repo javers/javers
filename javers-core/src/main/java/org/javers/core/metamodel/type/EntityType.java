@@ -73,7 +73,10 @@ public class EntityType extends ManagedType {
         Validate.argumentIsNotNull(instance);
 
         if (!isInstance(instance)) {
-            throw new JaversException(JaversExceptionCode.NOT_INSTANCE_OF, getName(), instance.getClass().getName());
+            throw new JaversException(JaversExceptionCode.NOT_INSTANCE_OF,
+                    getName(),
+                    getBaseJavaClass().getName(),
+                    instance.getClass().getName());
         }
 
         Object cdoId = getIdProperty().get(instance);
