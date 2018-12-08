@@ -13,6 +13,7 @@ before_script:
 - mysql -e 'CREATE DATABASE travis_ci_test;' -u root
 - mysql -e "CREATE USER 'javers'@'localhost' IDENTIFIED BY 'javers';" -u root
 - mysql -e "GRANT ALL PRIVILEGES ON travis_ci_test.* TO 'javers'@'localhost' WITH GRANT OPTION;" -u root
+- sleep 15
 - mongo --eval 'db.version();'
 script:
 - ./gradlew build
