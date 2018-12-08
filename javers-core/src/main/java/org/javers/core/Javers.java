@@ -71,7 +71,7 @@ public interface Javers {
      * Async version of {@link #commit(String, Object)}
      * <br/><br/>
      *
-     * <b>Important!</b> Works with MontoDB, not implemented for SQL repositories.
+     * <b>Important!</b> Works with MongoDB, not implemented for SQL repositories.
      *
      * @param executor ExecutorService to be used to process commit() asynchronously
      */
@@ -81,7 +81,7 @@ public interface Javers {
      * Async version of {@link #commit(String, Object, Map)}
      * <br/><br/>
      *
-     * <b>Important!</b> Works with MontoDB, not implemented for SQL repositories.
+     * <b>Important!</b> Works with MongoDB, not implemented for SQL repositories.
      *
      * @param executor ExecutorService to be used to process commit() asynchronously
      */
