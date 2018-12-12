@@ -13,6 +13,6 @@ class MongoIntegrationTest extends JaversMongoRepositoryE2ETest {
 
     @Override
     protected MongoDatabase getMongoDb() {
-        new MongoClient().getDatabase("j_int_test")
+        new MongoClient('127.0.0.1', 27017).getDatabase("j_int_test")
     }
 }
