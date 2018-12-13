@@ -61,6 +61,10 @@ subprojects {
     test {
         testLogging {
             exceptionFormat = 'full'
+            tasks.test.testLogging {
+                events 'failed', 'passed'
+                showStandardStreams = true
+            }
             events 'failed'
         }
     }
