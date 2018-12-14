@@ -3,7 +3,6 @@ package org.javers.repository.mongo.integration
 import com.mongodb.MongoClient
 import com.mongodb.client.MongoDatabase
 import org.javers.repository.mongo.JaversMongoRepositoryE2ETest
-import spock.lang.Ignore
 
 /**
  * runs e2e test suite with real MongoDB at localhost
