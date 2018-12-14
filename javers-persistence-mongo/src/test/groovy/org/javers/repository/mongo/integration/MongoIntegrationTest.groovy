@@ -10,7 +10,6 @@ import spock.lang.Ignore
  *
  * @author bartosz walacik
  */
-@Ignore //it fails on Travis-CI since 2018-12, we don't know why
 class MongoIntegrationTest extends JaversMongoRepositoryE2ETest {
 
     @Override

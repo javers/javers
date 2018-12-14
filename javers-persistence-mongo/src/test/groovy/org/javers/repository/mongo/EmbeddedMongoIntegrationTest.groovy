@@ -15,7 +15,7 @@ import static org.javers.core.model.DummyUser.dummyUser
 /**
  * @author pawel szymczyk
  */
-class EmbeddedMongoIntegrationTestTest extends Specification {
+class EmbeddedMongoIntegrationTest extends Specification {
 
     @Shared MongoClient mongoClient = MongodForTestsFactory.with(Version.Main.PRODUCTION).newMongo()
 
