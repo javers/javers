@@ -1,21 +1,24 @@
 package org.javers.repository.mongo
 
-
 import com.mongodb.MongoClient
 import com.mongodb.client.MongoDatabase
-
-import de.flapdoodle.embed.mongo.distribution.Version
-import de.flapdoodle.embed.mongo.tests.MongodForTestsFactory
-import spock.lang.Ignore
 import spock.lang.Shared
 
 /**
  * @author bartosz walacik
  */
-@Ignore // due to Travis-CI errors
 class EmbeddedMongoE2ETest extends JaversMongoRepositoryE2ETest {
 
-  @Shared MongoClient mongoClient = MongodForTestsFactory.with(Version.Main.PRODUCTION).newMongo()
+  @Shared def embeddedMongo = EmbeddedMongoFactory.create()
+  @Shared MongoClient mongoClient
+
+  def setupSpec() {
+    mongoClient = embeddedMongo.getClient()
+  }
+
+  void cleanupSpec() {
+    embeddedMongo.stop()
+  }
 
   @Override
   protected MongoDatabase getMongoDb() {

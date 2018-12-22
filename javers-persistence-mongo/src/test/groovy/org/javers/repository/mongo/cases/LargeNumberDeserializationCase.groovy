@@ -6,6 +6,7 @@ import de.flapdoodle.embed.mongo.distribution.Version
 import de.flapdoodle.embed.mongo.tests.MongodForTestsFactory
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
+import org.javers.repository.mongo.EmbeddedMongoFactory
 import org.javers.repository.mongo.MongoRepository
 import spock.lang.Shared
 import spock.lang.Specification
@@ -13,18 +14,24 @@ import spock.lang.Specification
 import javax.persistence.Id
 
 class LargeNumberDeserializationCase extends Specification {
-  public static final long ID_ONE_BILLION = 1000000000L;
-  public static final long ID_ONE_TRILLION = 1000000000L * 1000;
+  public static final long ID_ONE_BILLION = 1000000000L
+  public static final long ID_ONE_TRILLION = 1000000000L * 1000
 
+  @Shared
   Javers javers
 
-  @Shared MongoClient mongoClient = MongodForTestsFactory.with(Version.Main.PRODUCTION).newMongo()
+  @Shared
+  def embeddedMongo = EmbeddedMongoFactory.create()
 
-  def setup() {
-    MongoDatabase mongo = mongoClient.getDatabase("test")
+  def setupSpec() {
+    MongoDatabase mongo = embeddedMongo.getClient().getDatabase("test")
 
     MongoRepository mongoRepo = new MongoRepository(mongo)
     javers = JaversBuilder.javers().registerJaversRepository(mongoRepo).build()
+  }
+
+  void cleanupSpec() {
+    embeddedMongo.stop()
   }
 
   static class MyEntity {
