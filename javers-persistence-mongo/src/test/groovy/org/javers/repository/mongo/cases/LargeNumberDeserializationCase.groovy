@@ -1,9 +1,7 @@
 package org.javers.repository.mongo.cases
 
-import com.mongodb.MongoClient
+
 import com.mongodb.client.MongoDatabase
-import de.flapdoodle.embed.mongo.distribution.Version
-import de.flapdoodle.embed.mongo.tests.MongodForTestsFactory
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.repository.mongo.EmbeddedMongoFactory

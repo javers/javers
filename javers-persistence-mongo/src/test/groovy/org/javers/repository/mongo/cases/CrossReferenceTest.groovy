@@ -1,12 +1,13 @@
 package org.javers.repository.mongo.cases
 
+import com.mongodb.MongoClient
 import com.mongodb.client.MongoDatabase
-import de.flapdoodle.embed.mongo.distribution.Version
-import de.flapdoodle.embed.mongo.tests.MongodForTestsFactory
 import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.annotation.DiffIgnore
 import org.javers.core.metamodel.annotation.Value
+import org.javers.repository.mongo.EmbeddedMongoFactory
 import org.javers.repository.mongo.MongoRepository
+import spock.lang.Shared
 import spock.lang.Specification
 
 import javax.persistence.Id
@@ -18,6 +19,17 @@ import javax.persistence.OneToMany
  * @author hank cp
  */
 class CrossReferenceTest extends Specification {
+
+    @Shared def embeddedMongo = EmbeddedMongoFactory.create()
+    @Shared MongoClient mongoClient
+
+    def setupSpec() {
+        mongoClient = embeddedMongo.getClient()
+    }
+
+    void cleanupSpec() {
+        embeddedMongo.stop()
+    }
 
     class CrossReferenceHost {
         @Id long id
@@ -47,8 +59,7 @@ class CrossReferenceTest extends Specification {
 
     def "should not throw StackOverflowError exception for ValueType cross references"() {
         given:
-        MongodForTestsFactory factory = MongodForTestsFactory.with(Version.Main.PRODUCTION)
-        MongoDatabase mongo = factory.newMongo().getDatabase("test")
+        MongoDatabase mongo = mongoClient.getDatabase("test")
 
         def javers = JaversBuilder.javers()
                 .registerJaversRepository(new MongoRepository(mongo))
