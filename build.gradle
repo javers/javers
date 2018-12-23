@@ -15,7 +15,7 @@ buildscript {
 
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.7.1'
-    id("de.marcphilipp.nexus-publish") version "0.0.1-SNAPSHOT"
+    id "de.marcphilipp.nexus-publish" version "0.1.1"
 }
 
 apply plugin: 'io.codearte.nexus-staging'
