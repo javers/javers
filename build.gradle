@@ -15,6 +15,7 @@ buildscript {
 
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.7.1'
+    id("de.marcphilipp.nexus-publish") version "0.0.1-SNAPSHOT"
 }
 
 apply plugin: 'io.codearte.nexus-staging'
@@ -147,6 +148,13 @@ nexusStaging {
     packageGroup = 'org.javers'
     numberOfRetries = 20
     delayBetweenRetriesInMillis = 3000
+}
+
+nexusPublishing {
+    packageGroup = rootProject.nexusStaging.packageGroup
+    stagingProfileId = rootProject.nexusStaging.stagingProfileId
+    username = rootProject.nexusStaging.username
+    password = rootProject.nexusStaging.password
 }
 
 task wrapper(type: Wrapper) {

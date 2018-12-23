@@ -24,4 +24,4 @@ deploy:
   on:
     tags: true
     all_branches: true
-dist: trusty
+
