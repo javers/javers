@@ -1,4 +1,6 @@
-package org.javers.common.date
+package org.javers.core
+
+import org.javers.common.date.DateProvider
 
 import java.time.LocalDate
 import java.time.LocalDateTime

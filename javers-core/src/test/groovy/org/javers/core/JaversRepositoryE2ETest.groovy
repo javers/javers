@@ -1,6 +1,6 @@
 package org.javers.core
 
-import org.javers.common.date.FakeDateProvider
+import org.javers.common.date.DateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.diff.changetype.ReferenceChange
@@ -31,26 +31,52 @@ import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValue
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
 class JaversRepositoryE2ETest extends Specification {
-    protected FakeDateProvider fakeDateProvider
     protected JaversRepository repository
     protected Javers javers
+    private DateProvider dateProvider
+    private RandomCommitGenerator randomCommitGenerator = null
 
     def setup() {
-        fakeDateProvider = new FakeDateProvider()
+        dateProvider = prepareDateProvider()
         repository = prepareJaversRepository()
-        javers = JaversBuilder.javers().withDateTimeProvider(fakeDateProvider).registerJaversRepository(repository).build()
+
+        def javersBuilder = JaversBuilder
+                .javers()
+                .withDateTimeProvider(dateProvider)
+                .registerJaversRepository(repository)
+
+        if (useRandomCommitIdGenerator()) {
+            randomCommitGenerator = new RandomCommitGenerator()
+            javersBuilder.withCustomCommitIdGenerator(randomCommitGenerator)
+        }
+
+        javers = javersBuilder.build()
     }
 
     protected int commitSeq(CommitMetadata commit) {
+        if (useRandomCommitIdGenerator()) {
+            return randomCommitGenerator.getSeq(commit.id)
+        }
         commit.id.majorId
     }
 
+    protected DateProvider prepareDateProvider() {
+        if (useRandomCommitIdGenerator()) {
+            return new TikDateProvider()
+        }
+        new FakeDateProvider()
+    }
+
     protected setNow(LocalDateTime localDateTime) {
-        fakeDateProvider.set(localDateTime)
+        dateProvider.set(localDateTime)
     }
 
     protected JaversRepository prepareJaversRepository() {
-        return new InMemoryRepository();
+        new InMemoryRepository()
+    }
+
+    protected boolean useRandomCommitIdGenerator() {
+        false
     }
 
     def "should persit commitDate with milliseconds precision"(){

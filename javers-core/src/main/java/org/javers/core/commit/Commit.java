@@ -86,6 +86,7 @@ public final class Commit {
         b.append("Commit(id:" + commitMetadata.getId());
         b.append(", snapshots:" + snapshots.size());
         b.append(", author:" + commitMetadata.getAuthor());
+        //b.append(", date:" + commitMetadata.getCommitDate());
         b.append(", " + diff.changesSummary());
         b.append(")");
         return b.toString();
