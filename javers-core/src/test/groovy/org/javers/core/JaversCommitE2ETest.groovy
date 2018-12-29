@@ -13,6 +13,9 @@ import spock.lang.Specification
 import spock.lang.Unroll
 import org.javers.core.model.*
 
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.model.DummyUser.dummyUser

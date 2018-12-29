@@ -6,7 +6,9 @@ import org.javers.core.diff.Diff;
 import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +68,10 @@ public final class Commit {
         return commitMetadata.getCommitDate();
     }
 
+    public Instant getCommitDateInstant() {
+        return commitMetadata.getCommitDateInstant();
+    }
+
     /**
      * @return unmodifiableList
      */
@@ -86,7 +92,6 @@ public final class Commit {
         b.append("Commit(id:" + commitMetadata.getId());
         b.append(", snapshots:" + snapshots.size());
         b.append(", author:" + commitMetadata.getAuthor());
-        //b.append(", date:" + commitMetadata.getCommitDate());
         b.append(", " + diff.changesSummary());
         b.append(")");
         return b.toString();

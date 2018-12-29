@@ -17,6 +17,8 @@ import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 /**
  * @author bartosz.walacik
@@ -480,7 +482,7 @@ class JqlExample extends Specification {
       def javers = JaversBuilder.javers().withDateTimeProvider(fakeDateProvider).build()
 
       (0..5).each{ i ->
-          def now = new LocalDate(2015+i,01,1)
+          def now = ZonedDateTime.of(2015+i,01,1,0,0,0,0, ZoneId.of("UTC"))
           fakeDateProvider.set( now )
           def bob = new Employee(name:"bob", age:20+i)
           javers.commit("author", bob)

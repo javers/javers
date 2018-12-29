@@ -29,13 +29,13 @@ public enum CommitIdGenerator {
      * Suitable for distributed applications.<br/>
      *
      * <b>Warning!</b> When RANDOM generator is set,
-     * Shadow query runner sorts commits by commitDate.
+     * Shadow query runner sorts commits by commitDateInstant.
      * It means, that Shadow queries would be correct only
      * if all application servers have synchronized clocks.
      */
     RANDOM {
         public Comparator<CommitMetadata> getComparator() {
-            return Comparator.comparing(CommitMetadata::getCommitDate);
+            return Comparator.comparing(CommitMetadata::getCommitDateInstant);
         }
     },
 
@@ -44,7 +44,7 @@ public enum CommitIdGenerator {
      */
     CUSTOM {
         public Comparator<CommitMetadata> getComparator() {
-            return Comparator.comparing(CommitMetadata::getCommitDate);
+            return Comparator.comparing(CommitMetadata::getCommitDateInstant);
         }
     };
 

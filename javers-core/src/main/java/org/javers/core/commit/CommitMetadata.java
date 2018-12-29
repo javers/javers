@@ -2,9 +2,10 @@ package org.javers.core.commit;
 
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
-import java.time.LocalDateTime;
-
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,15 +17,28 @@ public class CommitMetadata implements Serializable {
     private final String author;
     private final Map<String, String> properties;
     private final LocalDateTime commitDate;
+    private final Instant commitDateInstant;
     private final CommitId id;
 
-    public CommitMetadata(String author, Map<String, String> properties, LocalDateTime commitDate, CommitId id) {
+    public CommitMetadata(String author, Map<String, String> properties, LocalDateTime commitDate,
+                          Instant commitDateInstant,
+                          CommitId id) {
         Validate.argumentsAreNotNull(author, properties, commitDate, id);
 
         this.author = author;
         this.properties = new HashMap<>(properties);
         this.commitDate = commitDate;
         this.id = id;
+        this.commitDateInstant = initCommitDateInstant(commitDate, commitDateInstant);
+    }
+
+    private Instant initCommitDateInstant(LocalDateTime commitDate, Instant commitDateInstant) {
+        if (commitDateInstant != null) {
+            return commitDateInstant;
+        }
+
+        //for old records without commitDateInstant
+        return commitDate.toInstant(ZonedDateTime.now().getOffset());
     }
 
     public String getAuthor() {
@@ -35,8 +49,26 @@ public class CommitMetadata implements Serializable {
         return unmodifiableMap(properties);
     }
 
+    /**
+     * Commit creation timestamp in local time zone
+     */
     public LocalDateTime getCommitDate() {
         return commitDate;
+    }
+
+    /**
+     * Commit creation timestamp in UTC
+     * <br/><br/>
+     *
+     * Since 5.1, commitDateInstant is safely persisted in JaversRepository.
+     * <br/>
+     * In commits persisted by JaVers older then 5.1  &mdash;
+     * commitDateInstant is guessed from commitDate and current {@link java.util.TimeZone}
+     *
+     * @since 5.1
+     */
+    public Instant getCommitDateInstant() {
+        return commitDateInstant;
     }
 
     public CommitId getId() {

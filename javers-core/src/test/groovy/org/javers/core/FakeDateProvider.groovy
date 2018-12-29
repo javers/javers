@@ -5,24 +5,21 @@ import org.javers.common.date.DateProvider
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZonedDateTime
 
 class FakeDateProvider implements DateProvider {
-    private LocalDateTime localDateTime
+    private ZonedDateTime dateTime
 
     FakeDateProvider() {
-        this.localDateTime = localDateTime
+        this.dateTime = dateTime
     }
 
     @Override
-    LocalDateTime now() {
-        localDateTime ? localDateTime : LocalDateTime.now()
+    ZonedDateTime now() {
+        dateTime ? dateTime : ZonedDateTime.now()
     }
 
-    void set(LocalDate localDate) {
-        this.localDateTime = localDate.atTime(LocalTime.MIDNIGHT)
-    }
-
-    void set(LocalDateTime localDateTime) {
-        this.localDateTime = localDateTime
+    void set(ZonedDateTime dateTime) {
+        this.dateTime = dateTime
     }
 }
