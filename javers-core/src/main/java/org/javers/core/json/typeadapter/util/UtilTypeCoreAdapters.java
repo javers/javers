@@ -17,8 +17,6 @@ import java.util.List;
 public class UtilTypeCoreAdapters {
     private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    public static final ZoneId UTC = ZoneId.of("UTC");
-
     public static LocalDateTime deserialize(String date) {
         return LocalDateTime.parse(date, ISO_FORMAT);
     }
@@ -33,13 +31,13 @@ public class UtilTypeCoreAdapters {
 
     public static LocalDateTime fromUtilDate(Date date) {
         if (date.getClass() == Date.class) {
-            return LocalDateTime.ofInstant(date.toInstant(), UTC);
+            return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
         }
         return fromUtilDate(new Date(date.getTime())); //hack for old java.sql.Date
     }
 
     public static Date toUtilDate(LocalDateTime localDateTime) {
-        return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public static String serialize(Date date) {

@@ -3,6 +3,7 @@ package org.javers.core.json;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
@@ -12,6 +13,7 @@ public class CdoSnapshotSerialized {
     private Map<String, String> commitProperties;
     private String commitAuthor;
     private LocalDateTime commitDate;
+    private Instant commitDateInstant;
     private BigDecimal commitId;
     private long commitPk;
 
@@ -36,6 +38,11 @@ public class CdoSnapshotSerialized {
 
     public CdoSnapshotSerialized withCommitAuthor(String commitAuthor) {
         this.commitAuthor = commitAuthor;
+        return this;
+    }
+
+    public CdoSnapshotSerialized withCommitDateInstant(String commitDateInstant) {
+        this.commitDateInstant = Instant.parse(commitDateInstant);
         return this;
     }
 
@@ -120,6 +127,10 @@ public class CdoSnapshotSerialized {
 
     public LocalDateTime getCommitDate() {
         return commitDate;
+    }
+
+    public Instant getCommitDateInstant() {
+        return commitDateInstant;
     }
 
     public BigDecimal getCommitId() {

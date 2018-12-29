@@ -44,7 +44,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
 
     def cleanup() {
         connections.each {
-            it.rollback()
+            it.commit()
             it.close()
         }
     }

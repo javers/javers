@@ -49,24 +49,10 @@ public class CommitMetadata implements Serializable {
         return unmodifiableMap(properties);
     }
 
-    /**
-     * Commit creation timestamp in local time zone
-     */
     public LocalDateTime getCommitDate() {
         return commitDate;
     }
 
-    /**
-     * Commit creation timestamp in UTC
-     * <br/><br/>
-     *
-     * Since 5.1, commitDateInstant is safely persisted in JaversRepository.
-     * <br/>
-     * In commits persisted by JaVers older then 5.1  &mdash;
-     * commitDateInstant is guessed from commitDate and current {@link java.util.TimeZone}
-     *
-     * @since 5.1
-     */
     public Instant getCommitDateInstant() {
         return commitDateInstant;
     }

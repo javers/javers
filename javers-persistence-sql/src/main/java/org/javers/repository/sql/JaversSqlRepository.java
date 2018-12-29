@@ -86,7 +86,7 @@ public class JaversSqlRepository implements JaversRepository {
     @Override
     public void persist(Commit commit) {
         try(Session session = sessionFactory.create("persist commit")) {
-            long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getId(), session);
+            long commitPk = commitRepository.save(commit.getAuthor(), commit.getProperties(), commit.getCommitDate(), commit.getCommitDateInstant(), commit.getId(), session);
             cdoSnapshotRepository.save(commitPk, commit.getSnapshots(), session);
         }
     }
