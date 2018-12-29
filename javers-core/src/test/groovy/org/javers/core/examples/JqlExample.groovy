@@ -1,6 +1,6 @@
 package org.javers.core.examples
 
-import org.javers.common.date.FakeDateProvider
+import org.javers.core.FakeDateProvider
 import org.javers.core.Changes
 import org.javers.core.JaversBuilder
 import org.javers.core.commit.CommitId

@@ -38,6 +38,7 @@ import org.javers.guava.GuavaAddOns;
 import org.javers.jodasupport.JodaAddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
+import org.javers.repository.api.ConfigurationAware;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.inmemory.InMemoryRepository;
@@ -760,6 +761,10 @@ public class JaversBuilder extends AbstractContainerBuilder {
         }
 
         repository.setJsonConverter( getContainerComponent(JsonConverter.class));
+
+        if (repository instanceof ConfigurationAware){
+            ((ConfigurationAware) repository).setConfiguration(coreConfiguration());
+        }
 
         bindComponent(JaversRepository.class, repository);
 

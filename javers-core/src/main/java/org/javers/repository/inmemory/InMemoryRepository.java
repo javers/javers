@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -33,18 +34,13 @@ public class InMemoryRepository implements JaversRepository {
 
     private Map<String, LinkedList<String>> snapshots = new ConcurrentHashMap<>();
 
-    private CommitId head;
+    private Map<CommitId, Integer> commits = new ConcurrentHashMap<>();
+    private AtomicInteger counter = new AtomicInteger();
 
+    private CommitId head;
     private JsonConverter jsonConverter;
 
-    private final CommitIdGenerator commitIdGenerator;
-
     public InMemoryRepository() {
-        this(CommitIdGenerator.SYNCHRONIZED_SEQUENCE);
-    }
-
-    public InMemoryRepository(CommitIdGenerator commitIdGenerator) {
-        this.commitIdGenerator = commitIdGenerator;
     }
 
     @Override
@@ -215,12 +211,14 @@ public class InMemoryRepository implements JaversRepository {
     @Override
     public void persist(Commit commit) {
         Validate.argumentsAreNotNull(commit);
+
         List<CdoSnapshot> snapshots = commit.getSnapshots();
         for (CdoSnapshot s : snapshots){
             persist(s);
         }
         logger.debug("{} snapshot(s) persisted", snapshots.size());
         head = commit.getId();
+        commits.put(getHeadId(), counter.incrementAndGet());
     }
 
     @Override
@@ -241,9 +239,13 @@ public class InMemoryRepository implements JaversRepository {
         List<CdoSnapshot> all = new ArrayList<>();
 
         snapshots.keySet().forEach(it -> all.addAll(readSnapshots(it)));
+        Collections.sort(all, Comparator.comparingInt(o1 -> Integer.MAX_VALUE - getSeq(o1.getCommitMetadata().getId())));
 
-        Collections.sort(all, (o1, o2) -> commitIdGenerator.getComparator().compare(o2.getCommitMetadata(), o1.getCommitMetadata()));
         return all;
+    }
+
+    private int getSeq(CommitId commitId) {
+        return commits.get(commitId);
     }
 
     private synchronized void persist(CdoSnapshot snapshot) {
