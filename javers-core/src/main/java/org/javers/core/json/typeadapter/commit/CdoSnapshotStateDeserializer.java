@@ -6,8 +6,11 @@ import org.javers.core.metamodel.object.CdoSnapshotState;
 import org.javers.core.metamodel.object.CdoSnapshotStateBuilder;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapshotState;
@@ -19,8 +22,11 @@ import static org.javers.core.metamodel.object.CdoSnapshotStateBuilder.cdoSnapsh
  * @author bartosz walacik
  */
 class CdoSnapshotStateDeserializer {
+    private static final Logger logger = LoggerFactory.getLogger(CdoSnapshotStateDeserializer.class);
+
     private final TypeMapper typeMapper;
     private final JsonDeserializationContext context;
+
 
     public CdoSnapshotStateDeserializer(TypeMapper typeMapper, JsonDeserializationContext context) {
         this.typeMapper = typeMapper;
@@ -42,13 +48,14 @@ class CdoSnapshotStateDeserializer {
         return builder.build();
     }
 
-    private Object decodePropertyValue(JsonElement propertyElement, JsonDeserializationContext context, Optional<JaversProperty> javersProperty) {
+    private Object decodePropertyValue(JsonElement propertyElement, JsonDeserializationContext context, Optional<JaversProperty> javersPropertyOptional) {
 
-        if (!javersProperty.isPresent()) {
+        if (!javersPropertyOptional.isPresent()) {
             return decodePropertyValueUsingJsonType(propertyElement, context);
         }
 
-        JaversType expectedJaversType = javersProperty.get().getType();
+        JaversProperty javersProperty = javersPropertyOptional.get();
+        JaversType expectedJaversType = javersProperty.getType();
 
         // if primitives on both sides, they should match, otherwise, expectedType is ignored
         if (unmatchedPrimitivesOnBothSides(expectedJaversType, propertyElement)) {
@@ -62,14 +69,17 @@ class CdoSnapshotStateDeserializer {
         }
 
         try {
-            Type expectedJavaType = typeMapper.getDehydratedType(javersProperty.get().getGenericType());
+            Type expectedJavaType = typeMapper.getDehydratedType(javersProperty.getGenericType());
             return context.deserialize(propertyElement, expectedJavaType);
-        } catch (JsonSyntaxException e) {
+        } catch (JsonSyntaxException | DateTimeParseException e) {
+            logger.info("Can't deserialize type-safely the Snapshot property: "+ javersProperty +
+                        ". JSON value: "+propertyElement +
+                        ". Looks like a type mismatch after refactoring of " + javersProperty.getDeclaringClass().getSimpleName()+
+                        " class.");
             // when users's class is refactored, persisted property value
             // can have different type than expected
             return decodePropertyValueUsingJsonType(propertyElement, context);
         }
-
     }
 
     private boolean unmatchedPrimitivesOnBothSides(JaversType expectedJaversType, JsonElement propertyElement) {

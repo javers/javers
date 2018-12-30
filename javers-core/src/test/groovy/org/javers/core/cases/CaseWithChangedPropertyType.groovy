@@ -4,10 +4,12 @@ import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.annotation.TypeName
-import org.joda.time.LocalDateTime
 import spock.lang.Specification
 
 import java.time.Instant
+import java.time.LocalDateTime
+
+import static org.javers.repository.jql.QueryBuilder.*
 
 /**
  * @author https://github.com/lnxmad
@@ -39,20 +41,28 @@ class CaseWithChangedPropertyType extends Specification {
 
 
         when:
-        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, "ModelWithDateTime").build())
+        def snapshots = javers.findSnapshots(byInstanceId(1, "ModelWithDateTime").build())
 
         then:
         snapshots.size() == 2
 
         snapshots[0].getPropertyValue("datetime") == instantNow
-        snapshots[1].getPropertyValue("datetime") == null
+        snapshots[1].getPropertyValue("datetime") == localDateNow.toString()
 
         when:
-        def changes = javers.findChanges(QueryBuilder.byInstanceId(1, "ModelWithDateTime").build())
+        def changes = javers.findChanges(byInstanceId(1, "ModelWithDateTime").build())
 
         then:
         println changes.prettyPrint()
         changes.size() == 1
         changes[0] instanceof ValueChange
+
+        when:
+        def shadows = javers.findShadows(byInstanceId(1, "ModelWithDateTime").build())
+
+        then:
+        shadows.size() == 2
+        shadows[0].get().datetime == instantNow
+        shadows[1].get().datetime == null
     }
 }
