@@ -18,6 +18,7 @@ class MongoSchemaManager {
     static final String SNAPSHOTS = "jv_snapshots";
     static final String COMMIT_ID = "commitMetadata.id";
     static final String COMMIT_DATE = "commitMetadata.commitDate";
+    static final String COMMIT_DATE_INSTANT = "commitMetadata.commitDateInstant";
     static final String COMMIT_AUTHOR = "commitMetadata.author";
     static final String COMMIT_PROPERTIES = "commitMetadata.properties";
     static final String GLOBAL_ID_KEY = "globalId_key";

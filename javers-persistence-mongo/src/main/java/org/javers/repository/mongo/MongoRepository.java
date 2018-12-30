@@ -240,7 +240,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
             findIterable.sort(new Document(COMMIT_ID, DESC));
         }
         else {
-            findIterable.sort(new Document(COMMIT_DATE, DESC));
+            findIterable.sort(new Document(COMMIT_DATE_INSTANT, DESC));
         }
 
         return applyQueryParams(findIterable, queryParams).iterator();
