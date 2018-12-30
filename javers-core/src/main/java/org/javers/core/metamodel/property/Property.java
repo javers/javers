@@ -45,6 +45,10 @@ public class Property {
         return member.getGenericResolvedType();
     }
 
+    public Class<?> getDeclaringClass() {
+        return member.getDeclaringClass();
+    }
+
     /**
      * use getGenericType() when possible, see JaversMember.resolvedReturnType
      */
