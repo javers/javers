@@ -1,6 +1,7 @@
 package org.javers.core.commit;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.CommitIdGenerator;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.metamodel.object.Cdo;
@@ -12,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * JaVers commit is similar notion to GIT <i>commit</i> or SVN <i>revision</i>.
@@ -72,13 +74,17 @@ public final class Commit {
     }
 
     /**
-     * Commit creation timestamp in UTC
+     * Commit creation timestamp in UTC.
      * <br/><br/>
      *
-     * Since 5.1, commitDateInstant is safely persisted in JaversRepository.
-     * <br/>
-     * In commits persisted by JaVers older then 5.1  &mdash;
-     * commitDateInstant is guessed from commitDate and current {@link java.util.TimeZone}
+     * Since 5.1, commitDateInstant is persisted in JaversRepository
+     * to provide reliable chronological ordering, especially when {@link CommitIdGenerator#RANDOM}
+     * is used.
+     *
+     * <br/><br/>
+     *
+     * Commits persisted by JaVers older then 5.1
+     * have commitDateInstant guessed from commitDate and current {@link TimeZone}
      *
      * @since 5.1
      */
