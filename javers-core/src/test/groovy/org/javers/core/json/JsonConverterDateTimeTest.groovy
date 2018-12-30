@@ -6,7 +6,11 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.time.Instant
+import java.time.OffsetDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.TemporalField
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
@@ -21,6 +25,9 @@ class JsonConverterDateTimeTest extends Specification {
 
     @Shared
     long time = 1443807427050
+
+    @Shared
+    int zoneOffset = Instant.ofEpochMilli(time).atZone(ZoneId.systemDefault()).getOffset().getTotalSeconds()/3600
 
     @Unroll
     def "should convert java8.LocalDateTime from json #fromJson to json #expectedJson"(){
@@ -85,11 +92,17 @@ class JsonConverterDateTimeTest extends Specification {
 
     @Unroll
     def "should convert #expectedType to and from JSON (#expectedJson) in ISO format"() {
+        given:
+        println "ZonedDateTime.now: " + ZonedDateTime.now()
+        println "time: "+ Instant.ofEpochMilli(time)
+        println "zone offset: " + zoneOffset + "H"
+        println "givenDate: "+ givenValue.toString()
+        println "converted: " + jsonConverter.toJson(givenValue)
+        println "expected:  "+expectedJson
+
         expect:
-        logger.info ( "date "+ givenValue.toString() +" converted to:" + jsonConverter.toJson(givenValue)+", expected:"+expectedJson)
         jsonConverter.toJson(givenValue) == expectedJson
-        jsonConverter.fromJson(expectedJson, expectedType) == givenValue
-        jsonConverter.fromJson(jsonConverter.toJson(givenValue), expectedType) == givenValue
+        jsonConverter.fromJson(givenJson, expectedType).toString() == givenValue.toString()
 
         where:
         expectedType << [java.util.Date,
@@ -106,14 +119,17 @@ class JsonConverterDateTimeTest extends Specification {
                          new org.joda.time.LocalDateTime(time, DateTimeZone.UTC),
                          new org.joda.time.LocalDate(2015,10,02)
         ]
-        expectedJson << ['"2015-10-02T17:37:07.05"'] * 4 +
+        expectedJson << ['"2015-10-02T'+(17+zoneOffset)+':37:07.05"'] * 4 +
+                        ['"2015-10-02T17:37:07.050"']  +
+                        ['"2015-10-02"']
+        givenJson <<    ['"2015-10-02T17:37:07.05"'] * 4 +
                         ['"2015-10-02T17:37:07.050"']  +
                         ['"2015-10-02"']
     }
 
     def "should deserialize org.joda.time.LocalDateTime from legacy format"(){
       given:
-      def noMillisDate = new org.joda.time.LocalDateTime(time-50, DateTimeZone.UTC)
+      def noMillisDate = new org.joda.time.LocalDateTime(2015,10,02,17,37,07)
 
       expect:
       jsonConverter.fromJson('"2015-10-02T17:37:07"', org.joda.time.LocalDateTime) == noMillisDate

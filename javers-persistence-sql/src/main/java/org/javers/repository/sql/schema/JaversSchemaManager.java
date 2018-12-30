@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.Map;
 
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_COMMIT_DATE_INSTANT;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_OWNER_ID_FK;
 
 /**
@@ -60,7 +61,18 @@ public class JaversSchemaManager extends SchemaNameAware {
             addDbIndexOnOwnerId();
         }
 
+        addCommitDateInstantColumnIfNeeded();
+
         TheCloser.close(schemaManager, schemaInspector);
+    }
+
+    /**
+     * JaVers 5.0 to 5.1 schema migration
+     */
+    private void addCommitDateInstantColumnIfNeeded() {
+        if (!columnExists(getCommitTableNameWithSchema(), COMMIT_COMMIT_DATE_INSTANT)){
+            addStringColumn(getCommitTableNameWithSchema(), COMMIT_COMMIT_DATE_INSTANT, 26);
+        }
     }
 
     /**
