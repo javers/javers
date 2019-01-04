@@ -7,10 +7,8 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.time.Instant
-import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.TemporalField
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
@@ -88,6 +86,29 @@ class JsonConverterDateTimeTest extends Specification {
       where:
       fromJson << ['"2015-10-02T17:37:07.050"']
 
+    }
+
+    def "should convert java8.Instant and using ISO format with millis"(){
+        given:
+        def instant = '2015-10-02T17:37:07.050Z'
+        def instantWithNano = '2015-10-02T17:37:07.050228100Z'
+
+
+        def instantVal =  Instant.parse(instant)
+        def instantValNano = Instant.parse(instantWithNano)
+        assert instantValNano.getNano() == 50228100
+
+        println "instantVal:     " + instantVal
+        println "instantValNano: " + instantValNano
+
+        expect:
+        jsonConverter.fromJson('"' + instant + '"', Instant) == instantVal
+
+        jsonConverter.toJson(instantVal) == '"' + instant + '"'
+        jsonConverter.toJson(instantVal).size() == 26
+
+        jsonConverter.toJson(instantValNano) == '"' + instant + '"'
+        jsonConverter.toJson(instantValNano).size() == 26
     }
 
     @Unroll
