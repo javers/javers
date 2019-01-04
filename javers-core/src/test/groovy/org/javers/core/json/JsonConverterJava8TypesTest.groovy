@@ -26,7 +26,7 @@ class JsonConverterJava8TypesTest extends Specification {
     def jsonConverter = new JaversBuilder().withPrettyPrint(false).build().getJsonConverter()
 
     @Shared
-    def localDate = LocalDateTime.of(2001,01,31,15,14,13,85*1000_000)
+    def localDateTime = LocalDateTime.of(2001,01,31,15,14,13,85*1000_000)
 
     @Unroll
     def "should convert #expectedType (#givenValue) to and from JSON"(){
@@ -48,15 +48,15 @@ class JsonConverterJava8TypesTest extends Specification {
                          Period,
                          Duration
         ]
-        givenValue   << [localDate,
+        givenValue   << [localDateTime,
                          LocalDate.of(2001,01,31),
                          LocalTime.of(12,15,31),
                          Optional.of(5),
                          Optional.empty(),
                          Year.of(2015),
-                         ZonedDateTime.of(localDate, ZoneId.of("Europe/Berlin")),
+                         ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Berlin")),
                          ZoneOffset.of("+05:00"),
-                         OffsetDateTime.of(localDate, ZoneOffset.of("+05:00")),
+                         OffsetDateTime.of(localDateTime, ZoneOffset.of("+05:00")),
                          Instant.parse("2010-01-01T12:00:00Z"),
                          Period.between(LocalDate.of(2014, 1, 1), LocalDate.of(2015, 3, 7)),
                          Duration.ofSeconds(6005)
@@ -74,5 +74,34 @@ class JsonConverterJava8TypesTest extends Specification {
                          '"P1Y2M6D"',
                          '"PT1H40M5S"'
         ]
+    }
+
+    def "should convert java8.Instant and using ISO format with millis"(){
+        given:
+        def instantWithSec =    '2015-10-02T17:37:07Z'
+        def instantWithMilli  = '2015-10-02T17:37:07.050Z'
+        def instantWithNano   = '2015-10-02T17:37:07.050228100Z'
+
+        def instantValSec =   Instant.parse(instantWithSec)
+        def instantValMilli = Instant.parse(instantWithMilli)
+        def instantValNano =  Instant.parse(instantWithNano)
+        assert instantValNano.getNano() == 50228100
+
+        println "instantValSec:    " + instantValSec
+        println "instantValMilli:  " + instantValMilli
+        println "instantValNano:   " + instantValNano
+
+        expect:
+        jsonConverter.fromJson('"' + instantWithMilli + '"', Instant) == instantValMilli
+        jsonConverter.fromJson('"' + instantWithSec + '"', Instant) ==   instantValSec
+
+        jsonConverter.toJson(instantValMilli) == '"' + instantWithMilli + '"'
+        jsonConverter.toJson(instantValMilli).size() == 26
+
+        jsonConverter.toJson(instantValNano) == '"' + instantWithMilli + '"'
+        jsonConverter.toJson(instantValNano).size() == 26
+
+        jsonConverter.toJson(instantValSec) == '"' + instantWithSec + '"'
+        jsonConverter.toJson(instantValSec).size() == 22
     }
 }

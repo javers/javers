@@ -75,42 +75,6 @@ class JsonConverterDateTimeTest extends Specification {
         ]
     }
 
-    def "should convert java8.LocalDateTime and joda.LocalDateTime to the same value"(){
-      when:
-      def jodaTime =  jsonConverter.fromJson(fromJson, org.joda.time.LocalDateTime)
-      def java8Time = jsonConverter.fromJson(fromJson, java.time.LocalDateTime)
-
-      then:
-      jodaTime.toDateTime(DateTimeZone.default).getMillis() == java8Time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-
-      where:
-      fromJson << ['"2015-10-02T17:37:07.050"']
-
-    }
-
-    def "should convert java8.Instant and using ISO format with millis"(){
-        given:
-        def instant = '2015-10-02T17:37:07.050Z'
-        def instantWithNano = '2015-10-02T17:37:07.050228100Z'
-
-
-        def instantVal =  Instant.parse(instant)
-        def instantValNano = Instant.parse(instantWithNano)
-        assert instantValNano.getNano() == 50228100
-
-        println "instantVal:     " + instantVal
-        println "instantValNano: " + instantValNano
-
-        expect:
-        jsonConverter.fromJson('"' + instant + '"', Instant) == instantVal
-
-        jsonConverter.toJson(instantVal) == '"' + instant + '"'
-        jsonConverter.toJson(instantVal).size() == 26
-
-        jsonConverter.toJson(instantValNano) == '"' + instant + '"'
-        jsonConverter.toJson(instantValNano).size() == 26
-    }
-
     @Unroll
     def "should convert #expectedType to and from JSON (#expectedJson) in ISO format"() {
         given:
