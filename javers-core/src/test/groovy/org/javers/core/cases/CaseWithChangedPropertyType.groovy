@@ -47,7 +47,7 @@ class CaseWithChangedPropertyType extends Specification {
         snapshots.size() == 2
 
         snapshots[0].getPropertyValue("datetime") == instantNow
-        snapshots[1].getPropertyValue("datetime") == localDateNow.toString()
+        LocalDateTime.parse(snapshots[1].getPropertyValue("datetime")) == localDateNow
 
         when:
         def changes = javers.findChanges(byInstanceId(1, "ModelWithDateTime").build())
