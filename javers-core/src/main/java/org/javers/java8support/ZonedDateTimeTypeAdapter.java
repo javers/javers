@@ -1,23 +1,23 @@
 package org.javers.java8support;
 
 import org.javers.core.json.BasicStringTypeAdapter;
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
+
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * @author bartosz.walacik
  */
 class ZonedDateTimeTypeAdapter extends BasicStringTypeAdapter<ZonedDateTime> {
-    private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
     @Override
     public String serialize(ZonedDateTime sourceValue) {
-        return sourceValue.format(ISO_FORMAT);
+        return UtilTypeCoreAdapters.serialize(sourceValue);
     }
 
     @Override
     public ZonedDateTime deserialize(String serializedValue) {
-        return ZonedDateTime.parse(serializedValue, ISO_FORMAT);
+        return UtilTypeCoreAdapters.deserializeToZonedDateTime(serializedValue);
     }
 
 

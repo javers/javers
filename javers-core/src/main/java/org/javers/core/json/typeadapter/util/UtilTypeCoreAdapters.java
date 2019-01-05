@@ -3,10 +3,7 @@ package org.javers.core.json.typeadapter.util;
 import org.javers.common.collections.Lists;
 import org.javers.core.json.JsonTypeAdapter;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
@@ -15,18 +12,60 @@ import java.util.List;
  * @author bartosz.walacik
  */
 public class UtilTypeCoreAdapters {
-    private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final DateTimeFormatter ISO_DATE_FORMAT_MILLIS =  DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX").withZone(ZoneId.of("UTC"));
+    private static final DateTimeFormatter ISO_DATE_FORMAT_SECONDS = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX").withZone(ZoneId.of("UTC"));
 
-    public static LocalDateTime deserialize(String date) {
-        return LocalDateTime.parse(date, ISO_FORMAT);
+    private static final DateTimeFormatter ISO_LOCAL_TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_TIME;
+    private static final DateTimeFormatter ISO_LOCAL_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final DateTimeFormatter ISO_ZONED_FORMAT = DateTimeFormatter.ISO_ZONED_DATE_TIME;
+
+    public static LocalDateTime deserializeLocalDateTime(String date) {
+        return LocalDateTime.parse(date, ISO_LOCAL_FORMAT);
+    }
+
+    public static LocalTime deserializeLocalTime(String date) {
+        return LocalTime.parse(date, ISO_LOCAL_TIME_FORMAT);
+    }
+
+    public static ZonedDateTime deserializeToZonedDateTime(String date) {
+        return ZonedDateTime.parse(date, ISO_ZONED_FORMAT);
+    }
+
+    public static Instant deserializeToInstantAtUTC(String date) {
+        return deserializeLocalDateTime(date).toInstant(ZoneOffset.UTC);
     }
 
     public static Instant deserializeToInstant(String date) {
-        return deserialize(date).toInstant(ZoneOffset.UTC);
+        return Instant.parse(date);
+    }
+
+
+    public static Date deserializeToUtilDate(String date) {
+        LocalDateTime localDateTime = UtilTypeCoreAdapters.deserializeLocalDateTime(date);
+        return java.util.Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static String serialize(Instant sourceValue) {
+        if (sourceValue.getNano() == 0) {
+            return ISO_DATE_FORMAT_SECONDS.format(sourceValue);
+        }
+        return ISO_DATE_FORMAT_MILLIS.format(sourceValue);
     }
 
     public static String serialize(LocalDateTime date) {
-        return date.format(ISO_FORMAT);
+        return date.format(ISO_LOCAL_FORMAT);
+    }
+
+    public static String serialize(ZonedDateTime date) {
+        return date.format(ISO_ZONED_FORMAT);
+    }
+
+    public static String serialize(LocalTime date) {
+        return date.format(ISO_LOCAL_TIME_FORMAT);
+    }
+
+    public static String serialize(Date date) {
+        return serialize(fromUtilDate(date));
     }
 
     public static LocalDateTime fromUtilDate(Date date) {
@@ -38,10 +77,6 @@ public class UtilTypeCoreAdapters {
 
     public static Date toUtilDate(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-    }
-
-    public static String serialize(Date date) {
-        return serialize(fromUtilDate(date));
     }
 
     public static List<JsonTypeAdapter> adapters() {

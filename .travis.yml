@@ -17,11 +17,5 @@ before_script:
 script:
 - ./gradlew build
 - ./gradlew integrationTest
-deploy:
-  skip_cleanup: true
-  provider: script
-  script: travis/deployToSonatype.sh
-  on:
-    tags: true
-    all_branches: true
+
 

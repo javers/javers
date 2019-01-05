@@ -2,9 +2,7 @@ package org.javers.java8support;
 
 import org.javers.core.json.BasicStringTypeAdapter;
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
-
 import java.time.LocalDateTime;
-
 
 /**
  * @author bartosz.walacik
@@ -18,7 +16,7 @@ class LocalDateTimeTypeAdapter extends BasicStringTypeAdapter<LocalDateTime> {
 
     @Override
     public LocalDateTime deserialize(String serializedValue) {
-        return LocalDateTime.from(UtilTypeCoreAdapters.deserialize(serializedValue));
+        return LocalDateTime.from(UtilTypeCoreAdapters.deserializeLocalDateTime(serializedValue));
     }
 
     @Override

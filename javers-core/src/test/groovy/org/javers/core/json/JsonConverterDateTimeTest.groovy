@@ -78,38 +78,41 @@ class JsonConverterDateTimeTest extends Specification {
     @Unroll
     def "should convert #expectedType to and from JSON (#expectedJson) in ISO format"() {
         given:
-        println "ZonedDateTime.now: " + ZonedDateTime.now()
-        println "time: "+ Instant.ofEpochMilli(time)
-        println "zone offset: " + zoneOffset + "H"
-        println "givenDate: "+ givenValue.toString()
-        println "converted: " + jsonConverter.toJson(givenValue)
-        println "expected:  "+expectedJson
+        println "ZonedDateTime.now:   " + ZonedDateTime.now()
+        println "time:                " + Instant.ofEpochMilli(time)
+        println "zone offset:         " + zoneOffset + "H"
+        println "givenValue:          " + givenValue.toString() + " " + givenValue.getClass()
+        println "expectedJson:        " + expectedJson
+        println "converted to JSON:   " + jsonConverter.toJson(givenValue)
+        println "converted from JSON: " + jsonConverter.fromJson(expectedJson, expectedType)
 
         expect:
         jsonConverter.toJson(givenValue) == expectedJson
-        jsonConverter.fromJson(givenJson, expectedType).toString() == givenValue.toString()
+        jsonConverter.fromJson(expectedJson, expectedType) == givenValue
 
         where:
         expectedType << [java.util.Date,
-                         java.sql.Date,
                          java.sql.Timestamp,
+                         java.sql.Date,
                          java.sql.Time,
                          org.joda.time.LocalDateTime,
                          org.joda.time.LocalDate
         ]
         givenValue <<   [new java.util.Date(time),
-                         new java.sql.Date(time),
                          new java.sql.Timestamp(time),
+                         new java.sql.Date(time),
                          new java.sql.Time(time),
                          new org.joda.time.LocalDateTime(time, DateTimeZone.UTC),
                          new org.joda.time.LocalDate(2015,10,02)
         ]
-        expectedJson << ['"2015-10-02T'+(17+zoneOffset)+':37:07.05"'] * 4 +
-                        ['"2015-10-02T17:37:07.050"']  +
-                        ['"2015-10-02"']
-        givenJson <<    ['"2015-10-02T17:37:07.05"'] * 4 +
-                        ['"2015-10-02T17:37:07.050"']  +
-                        ['"2015-10-02"']
+        expectedJson << [
+                        '"2015-10-02T'+(17+zoneOffset)+':37:07.05"',
+                        '"2015-10-02T'+(17+zoneOffset)+':37:07.05"',
+                        '"2015-10-02T'+(17+zoneOffset)+':37:07.05"',
+                        '"2015-10-02T'+(17+zoneOffset)+':37:07.05"',
+                        '"2015-10-02T17:37:07.050"',
+                        '"2015-10-02"'
+                        ]
     }
 
     def "should deserialize org.joda.time.LocalDateTime from legacy format"(){
