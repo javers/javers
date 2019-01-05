@@ -10,12 +10,18 @@ import java.time.format.DateTimeFormatter;
  * @author bartosz.walacik
  */
 class InstantTypeAdapter extends BasicStringTypeAdapter<Instant> {
-    private final DateTimeFormatter formatter = DateTimeFormatter.
+    private final DateTimeFormatter formatterMillis = DateTimeFormatter.
             ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX").withZone(ZoneId.of("UTC"));
+
+    private final DateTimeFormatter formatterSec = DateTimeFormatter.
+            ofPattern("yyyy-MM-dd'T'HH:mm:ssX").withZone(ZoneId.of("UTC"));
 
     @Override
     public String serialize(Instant sourceValue) {
-        return formatter.format(sourceValue);
+        if (sourceValue.getNano() == 0) {
+            return formatterSec.format(sourceValue);
+        }
+        return formatterMillis.format(sourceValue);
     }
 
     @Override

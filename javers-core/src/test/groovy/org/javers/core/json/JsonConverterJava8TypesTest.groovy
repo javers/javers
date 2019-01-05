@@ -44,7 +44,6 @@ class JsonConverterJava8TypesTest extends Specification {
                          ZonedDateTime,
                          ZoneOffset,
                          OffsetDateTime,
-                         Instant,
                          Period,
                          Duration
         ]
@@ -57,7 +56,6 @@ class JsonConverterJava8TypesTest extends Specification {
                          ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Berlin")),
                          ZoneOffset.of("+05:00"),
                          OffsetDateTime.of(localDateTime, ZoneOffset.of("+05:00")),
-                         Instant.parse("2010-01-01T12:00:00Z"),
                          Period.between(LocalDate.of(2014, 1, 1), LocalDate.of(2015, 3, 7)),
                          Duration.ofSeconds(6005)
         ]
@@ -70,38 +68,36 @@ class JsonConverterJava8TypesTest extends Specification {
                          '"2001-01-31T15:14:13.085+01:00[Europe/Berlin]"',
                          '"+05:00"',
                          '"2001-01-31T15:14:13.085+05:00"',
-                         '"2010-01-01T12:00:00Z"',
                          '"P1Y2M6D"',
                          '"PT1H40M5S"'
         ]
     }
 
-    def "should convert java8.Instant and using ISO format with millis"(){
+    @Unroll
+    def "should serialize java8.Instant to JSON using ISO format with millis, where givenValueAsSring: #givenValueAsSring"(){
         given:
-        def instantWithSec =    '2015-10-02T17:37:07Z'
-        def instantWithMilli  = '2015-10-02T17:37:07.050Z'
-        def instantWithNano   = '2015-10-02T17:37:07.050228100Z'
-
-        def instantValSec =   Instant.parse(instantWithSec)
-        def instantValMilli = Instant.parse(instantWithMilli)
-        def instantValNano =  Instant.parse(instantWithNano)
-        assert instantValNano.getNano() == 50228100
-
-        println "instantValSec:    " + instantValSec
-        println "instantValMilli:  " + instantValMilli
-        println "instantValNano:   " + instantValNano
+        def givenValue = Instant.parse(givenValueAsSring)
 
         expect:
-        jsonConverter.fromJson('"' + instantWithMilli + '"', Instant) == instantValMilli
-        jsonConverter.fromJson('"' + instantWithSec + '"', Instant) ==   instantValSec
+        jsonConverter.toJson(givenValue) == '"' + expectedSerialized + '"'
 
-        jsonConverter.toJson(instantValMilli) == '"' + instantWithMilli + '"'
-        jsonConverter.toJson(instantValMilli).size() == 26
+        where:
+        givenValueAsSring                | expectedSerialized
+        '2015-10-02T17:37:07Z'           | '2015-10-02T17:37:07Z'
+        '2015-10-02T17:37:07.050Z'       | '2015-10-02T17:37:07.050Z'
+        '2015-10-02T17:37:07.050228100Z' | '2015-10-02T17:37:07.050Z'
+    }
 
-        jsonConverter.toJson(instantValNano) == '"' + instantWithMilli + '"'
-        jsonConverter.toJson(instantValNano).size() == 26
+    @Unroll
+    def "should deserialize java8.Instant from JSON using standard ISO format, where givenJSON: #givenJSON"(){
+        expect:
+        jsonConverter.fromJson('"' + givenJSON + '"', Instant) == Instant.parse(givenJSON)
 
-        jsonConverter.toJson(instantValSec) == '"' + instantWithSec + '"'
-        jsonConverter.toJson(instantValSec).size() == 22
+        where:
+        givenJSON << [
+            '2015-10-02T17:37:07Z',
+            '2015-10-02T17:37:07.050Z',
+            '2015-10-02T17:37:07.050228100Z'
+        ]
     }
 }
