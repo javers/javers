@@ -45,8 +45,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def json = new JsonSlurper().parseText(jsonText)
         json.commitMetadata.id == 1.00
         json.commitMetadata.author == "kazik"
-        json.commitMetadata.commitDate == now.toLocalDateTime().toString()
-        json.commitMetadata.commitDateInstant == UtilTypeCoreAdapters.serialize(now.toInstant()).toString()
+        json.commitMetadata.commitDate == UtilTypeCoreAdapters.serialize(now.toLocalDateTime())
+        json.commitMetadata.commitDateInstant == UtilTypeCoreAdapters.serialize(now.toInstant())
         json.changedProperties == ["name","age"]
 
         json.globalId.entity == "org.javers.core.model.DummyUser"
