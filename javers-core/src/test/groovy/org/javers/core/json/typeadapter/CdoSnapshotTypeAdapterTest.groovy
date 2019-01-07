@@ -6,6 +6,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.FakeDateProvider
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -45,7 +46,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         json.commitMetadata.id == 1.00
         json.commitMetadata.author == "kazik"
         json.commitMetadata.commitDate == now.toLocalDateTime().toString()
-        json.commitMetadata.commitDateInstant == now.toInstant().toString()
+        json.commitMetadata.commitDateInstant == UtilTypeCoreAdapters.serialize(now.toInstant()).toString()
         json.changedProperties == ["name","age"]
 
         json.globalId.entity == "org.javers.core.model.DummyUser"
