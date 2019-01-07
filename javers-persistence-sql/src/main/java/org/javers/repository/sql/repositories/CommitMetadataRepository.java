@@ -37,7 +37,7 @@ public class CommitMetadataRepository extends SchemaNameAware {
                 .into(getCommitTableNameWithSchema())
                 .value(COMMIT_AUTHOR, author)
                 .value(COMMIT_COMMIT_DATE, date)
-                .value(COMMIT_COMMIT_DATE_INSTANT, DateTimeFormatter.ISO_INSTANT.format(dateInstant))
+                .value(COMMIT_COMMIT_DATE_INSTANT, UtilTypeCoreAdapters.serialize(dateInstant))
                 .value(COMMIT_COMMIT_ID, commitId.valueAsNumber())
                 .sequence(COMMIT_PK, getCommitPkSeqWithSchema())
                 .executeAndGetSequence();
