@@ -1,14 +1,11 @@
-package at.aztec.dispatcher.base.session.core.diff.service;
-
-import static java.math.BigDecimal.ROUND_HALF_UP;
-
-import java.math.BigDecimal;
-import java.util.Optional;
+package org.javers.core.diff.custom;
 
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.diff.custom.CustomPropertyComparator;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
+import java.math.BigDecimal;
+import java.util.Optional;
+import static java.math.BigDecimal.ROUND_HALF_UP;
 
 /**
  * Compares BigDecimals with custom precision.
@@ -23,8 +20,7 @@ import org.javers.core.metamodel.property.Property;
  *
  * @author bartosz walacik
  */
-public class CustomBigDecimalComparator implements CustomPropertyComparator<BigDecimal, ValueChange> {
-
+public class CustomBigDecimalComparator implements CustomPropertyComparator<BigDecimal, ValueChange>{
     private int significantDecimalPlaces;
 
     public CustomBigDecimalComparator(int significantDecimalPlaces) {
@@ -32,8 +28,9 @@ public class CustomBigDecimalComparator implements CustomPropertyComparator<BigD
     }
 
     @Override
-    public Optional<ValueChange> compare(BigDecimal left, BigDecimal right, GlobalId affectedId, Property property) {
-        if (equals(left, right)) {
+    public Optional<ValueChange> compare(BigDecimal left, BigDecimal right, GlobalId affectedId, Property property)
+    {
+        if (equals(left, right)){
             return Optional.empty();
         }
 
