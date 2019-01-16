@@ -14,7 +14,7 @@ abstract class ObjectNodeTest extends Specification {
     protected def createEntity
 
     private ObjectNode objectNode(Object cdo, EntityType entity) {
-        new ObjectNode<>(new LiveCdoWrapper(cdo, entity.createIdFromInstance(cdo), entity));
+        new ObjectNode(new LiveCdoWrapper(cdo, entity.createIdFromInstance(cdo), entity));
     }
 
     def "should hold Entity reference"() {
