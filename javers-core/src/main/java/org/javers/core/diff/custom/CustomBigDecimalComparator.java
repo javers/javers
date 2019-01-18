@@ -15,7 +15,7 @@ import static java.math.BigDecimal.ROUND_HALF_UP;
  * Usage example:
  * <pre>
  * JaversBuilder.javers()
- *     .registerCustomComparator(new CustomBigDecimalComparator(2), BigDecimal).build();
+ *     .registerCustomComparator(new CustomBigDecimalComparator(2), BigDecimal.class).build();
  * </pre>
  *
  * @author bartosz walacik
@@ -39,6 +39,14 @@ public class CustomBigDecimalComparator implements CustomPropertyComparator<BigD
 
     @Override
     public boolean equals(BigDecimal a, BigDecimal b) {
+        if (a == null) {
+            return b == null;
+        }
+
+        if (b == null) {
+            return false;
+        }
+
         BigDecimal aRounded = a.setScale(significantDecimalPlaces, ROUND_HALF_UP);
         BigDecimal bRounded = b.setScale(significantDecimalPlaces, ROUND_HALF_UP);
 
