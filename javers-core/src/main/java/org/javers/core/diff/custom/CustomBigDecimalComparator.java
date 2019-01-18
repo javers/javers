@@ -39,11 +39,11 @@ public class CustomBigDecimalComparator implements CustomPropertyComparator<BigD
 
     @Override
     public boolean equals(BigDecimal a, BigDecimal b) {
-        if (a == null) {
-            return b == null;
+        if (a == null && b == null) {
+            return true;
         }
 
-        if (b == null) {
+        if (a == null || b == null) {
             return false;
         }
 
