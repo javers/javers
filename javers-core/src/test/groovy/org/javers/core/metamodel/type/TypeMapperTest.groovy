@@ -66,7 +66,7 @@ class TypeMapperTest extends Specification {
         ([] as String[]).class       || ([] as String[]).class
     }
 
-    def "should return dehydrated type for Map<String,EnumSet<DummyEnum>>"() {
+    def "should return dehydrated type for Map of String to Set of Enum"() {
         given:
         Type givenJavaType = getFieldFromClass(DummyMapWithGenericValue, "mapWithGenericValueArgument").genericType
 
