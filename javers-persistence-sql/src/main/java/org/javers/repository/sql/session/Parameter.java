@@ -1,7 +1,5 @@
 package org.javers.repository.sql.session;
 
-import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
-
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -99,26 +97,8 @@ public abstract class Parameter<T> {
 
         @Override
         void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
-            preparedStatement.setTimestamp(order, toTimestamp(getValue()));
-        }
-
-        private Timestamp toTimestamp(LocalDateTime value) {
-            return new Timestamp(UtilTypeCoreAdapters.toUtilDate(value).getTime());
+            preparedStatement.setTimestamp(order, Timestamp.valueOf(getValue()));
         }
     }
 
-    static class SqlLiteralParameter extends Parameter<String> {
-        SqlLiteralParameter(String name, String value) {
-            super(name, value);
-        }
-
-        @Override
-        String getRawSqlRepresentation() {
-            return getValue();
-        }
-
-        @Override
-        void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
-        }
-    }
 }

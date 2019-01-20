@@ -162,7 +162,7 @@ class SnapshotQuery {
         public CdoSnapshotSerialized get(ResultSet resultSet) throws SQLException {
             return new CdoSnapshotSerialized()
                     .withCommitAuthor(resultSet.getString(COMMIT_AUTHOR))
-                    .withCommitDate(resultSet.getTimestamp(COMMIT_COMMIT_DATE))
+                    .withCommitDate(resultSet.getTimestamp(COMMIT_COMMIT_DATE).toLocalDateTime())
                     .withCommitDateInstant(resultSet.getString(COMMIT_COMMIT_DATE_INSTANT))
                     .withCommitId(resultSet.getBigDecimal(COMMIT_COMMIT_ID))
                     .withCommitPk(resultSet.getLong(COMMIT_PK))
