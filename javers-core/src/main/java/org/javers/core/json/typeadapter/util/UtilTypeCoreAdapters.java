@@ -12,9 +12,7 @@ import java.util.List;
  * @author bartosz.walacik
  */
 public class UtilTypeCoreAdapters {
-    private static final DateTimeFormatter ISO_DATE_FORMAT_MILLIS =  DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX").withZone(ZoneId.of("UTC"));
-    private static final DateTimeFormatter ISO_DATE_FORMAT_SECONDS = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX").withZone(ZoneId.of("UTC"));
-
+    private static final DateTimeFormatter ISO_INSTANT_FORMAT = DateTimeFormatter.ISO_INSTANT;
     private static final DateTimeFormatter ISO_LOCAL_TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_TIME;
     private static final DateTimeFormatter ISO_LOCAL_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static final DateTimeFormatter ISO_ZONED_FORMAT = DateTimeFormatter.ISO_ZONED_DATE_TIME;
@@ -31,14 +29,9 @@ public class UtilTypeCoreAdapters {
         return ZonedDateTime.parse(date, ISO_ZONED_FORMAT);
     }
 
-    public static Instant deserializeToInstantAtUTC(String date) {
-        return deserializeLocalDateTime(date).toInstant(ZoneOffset.UTC);
-    }
-
     public static Instant deserializeToInstant(String date) {
         return Instant.parse(date);
     }
-
 
     public static Date deserializeToUtilDate(String date) {
         LocalDateTime localDateTime = UtilTypeCoreAdapters.deserializeLocalDateTime(date);
@@ -46,10 +39,7 @@ public class UtilTypeCoreAdapters {
     }
 
     public static String serialize(Instant sourceValue) {
-        if (sourceValue.getNano() == 0) {
-            return ISO_DATE_FORMAT_SECONDS.format(sourceValue);
-        }
-        return ISO_DATE_FORMAT_MILLIS.format(sourceValue);
+        return ISO_INSTANT_FORMAT.format(sourceValue);
     }
 
     public static String serialize(LocalDateTime date) {
