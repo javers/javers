@@ -19,4 +19,5 @@ class MySqlIntegrationTest extends JaversSqlRepositoryE2ETest {
     String getSchema() {
         return null
     }
+
 }
