@@ -8,14 +8,13 @@ buildscript {
     dependencies {
         classpath 'org.owasp:dependency-check-gradle:3.1.2'
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
-        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
         classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.12.0'
     }
 }
 
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.7.1'
-    //id "de.marcphilipp.nexus-publish" version "0.1.1"
+    id 'maven-publish'
 }
 
 apply plugin: 'io.codearte.nexus-staging'
@@ -31,7 +30,6 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'groovy'
     apply plugin: 'propdeps'
-    apply plugin: 'com.bmuschko.nexus'
     apply plugin: 'org.owasp.dependencycheck'
 
     sourceCompatibility = 1.8
@@ -89,41 +87,32 @@ subprojects {
         }
     }
 
-    //com.bmuschko.nexus
-    modifyPom {
-        project {
-            name 'JaVers'
-            description 'JaVers - object auditing and diff framework for Java'
-            url 'http://javers.org'
-            inceptionYear '2013'
-
-            scm {
-                connection 'scm:git:https://github.com/javers/javers.git'
-                url 'https://github.com/javers/javers'
-                developerConnection 'scm:git:https://github.com/javers/javers.git'
-            }
-
-            scm {
-                connection 'scm:git:https://github.com/javers/javers.git'
-                url 'https://github.com/javers/javers'
-            }
-
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                }
-            }
-
-            developers {
-                developer {
-                    name 'Bartosz Walacik'
-                }
-                developer {
-                    name 'Pawel Szymczyk'
-                }
-                developer {
-                    name 'Michal Wesolowski'
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                pom {
+                    name = 'JaVers Library'
+                    description = 'JaVers - object auditing and diff framework for Java'
+                    url = 'http://javers.org'
+                    //inceptionYear '2013'
+                    licenses {
+                        license {
+                            name = 'The Apache Software License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'javers'
+                            name = 'JaVers Core Team'
+                            email = 'javers@javers.org'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:https://github.com/javers/javers.git'
+                        developerConnection = 'scm:git:https://github.com/javers/javers.git'
+                        url = 'https://github.com/javers/javers'
+                    }
                 }
             }
         }
