@@ -1,6 +1,6 @@
 ./gradlew -v
 ./gradlew build
-./gradlew publish --info
+./gradlew uploadArchives --info
 ./gradlew closeAndReleaseRepository --info
 
 echo "end"

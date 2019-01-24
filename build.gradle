@@ -26,7 +26,8 @@ scmVersion {
 }
 
 subprojects {
-    apply plugin: 'maven-publish'
+    apply plugin: 'maven'
+    apply plugin: 'signing'
     apply plugin: 'java'
     apply plugin: 'groovy'
     apply plugin: 'propdeps'
@@ -87,14 +88,43 @@ subprojects {
         }
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                pom {
+    //-- begin uploadArchives spell --
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+    signing {
+        sign configurations.archives
+    }
+    // Build, sign, and upload
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+
+                // Sign POM
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                // Destination
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: nexusUsername, password: nexusPassword)
+                }
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: nexusUsername, password: nexusPassword)
+                }
+
+                // Add required metadata to POM
+                pom.project {
                     name = 'JaVers Library'
+                    packaging 'jar'
                     description = 'JaVers - object auditing and diff framework for Java'
                     url = 'http://javers.org'
-                    //inceptionYear '2013'
                     licenses {
                         license {
                             name = 'The Apache Software License, Version 2.0'
@@ -117,18 +147,11 @@ subprojects {
             }
         }
     }
-
+    //-- eof uploadArchives spell --
+    
     test {
         testLogging.exceptionFormat = 'full'
         testLogging.showStackTraces = true
-    }
-
-    publishing {
-        publications {
-            libraryJar(MavenPublication) {
-                from components.java
-            }
-        }
     }
 }
 
