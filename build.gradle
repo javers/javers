@@ -112,10 +112,12 @@ subprojects {
 
                 // Destination
                 repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: nexusUsername, password: nexusPassword)
+                    authentication(userName: project.findProperty('nexusUsername') ?: 'secured', 
+                                   password: project.findProperty('nexusPassword') ?: 'secured')
                 }
                 snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: nexusUsername, password: nexusPassword)
+                    authentication(userName: project.findProperty('nexusUsername') ?: 'secured',
+                                   password: project.findProperty('nexusPassword') ?: 'secured')
                 }
 
                 // Add required metadata to POM
@@ -147,7 +149,7 @@ subprojects {
         }
     }
     //-- eof uploadArchives spell --
-    
+
     test {
         testLogging.exceptionFormat = 'full'
         testLogging.showStackTraces = true
