@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * @author adriano.machado
  */
-public class CaseXXXSortedSets {
+public class Case779SortedSets {
 
     public static class MasterWithSet {
         @Id
@@ -59,7 +59,7 @@ public class CaseXXXSortedSets {
         javers.commit("anonymous", master);
         javers.commit("anonymous", master);
 
-        List<CdoSnapshot> snapshots = javers.findSnapshots(QueryBuilder.byClass(CaseXXXSortedSets.MasterWithSet.class).build());
+        List<CdoSnapshot> snapshots = javers.findSnapshots(QueryBuilder.byClass(MasterWithSet.class).build());
 
         assertThat(snapshots).isNotEmpty();
     }
@@ -79,7 +79,7 @@ public class CaseXXXSortedSets {
         javers.commit("anonymous", master);
         javers.commit("anonymous", master);
 
-        List<CdoSnapshot> snapshots = javers.findSnapshots(QueryBuilder.byClass(CaseXXXSortedSets.MasterWithSortedSet.class).build());
+        List<CdoSnapshot> snapshots = javers.findSnapshots(QueryBuilder.byClass(MasterWithSortedSet.class).build());
 
         assertThat(snapshots).isNotEmpty();
     }
