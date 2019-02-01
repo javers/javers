@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.object;
 
+import java.util.Comparator;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.repository.jql.GlobalIdDTO;
@@ -9,7 +10,7 @@ import java.io.Serializable;
 /**
  * Global ID of Client's domain object (CDO)
  */
-public abstract class GlobalId implements Serializable {
+public abstract class GlobalId implements Serializable, Comparable<GlobalId> {
 
     private final String typeName;
 
@@ -74,5 +75,10 @@ public abstract class GlobalId implements Serializable {
             return "..." + split[split.length-1];
         }
         return getTypeName();
+    }
+
+    @Override
+    public int compareTo(GlobalId o) {
+        return Comparator.comparing(GlobalId::value).compare(this, o);
     }
 }
