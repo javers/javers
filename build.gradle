@@ -8,14 +8,12 @@ buildscript {
     dependencies {
         classpath 'org.owasp:dependency-check-gradle:3.1.2'
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
-        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
         classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.12.0'
     }
 }
 
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.7.1'
-    //id "de.marcphilipp.nexus-publish" version "0.1.1"
 }
 
 apply plugin: 'io.codearte.nexus-staging'
@@ -27,11 +25,11 @@ scmVersion {
 }
 
 subprojects {
-    apply plugin: 'maven-publish'
+    apply plugin: 'maven'
+    apply plugin: 'signing'
     apply plugin: 'java'
     apply plugin: 'groovy'
     apply plugin: 'propdeps'
-    apply plugin: 'com.bmuschko.nexus'
     apply plugin: 'org.owasp.dependencycheck'
 
     sourceCompatibility = 1.8
@@ -89,57 +87,73 @@ subprojects {
         }
     }
 
-    //com.bmuschko.nexus
-    modifyPom {
-        project {
-            name 'JaVers'
-            description 'JaVers - object auditing and diff framework for Java'
-            url 'http://javers.org'
-            inceptionYear '2013'
+    //-- begin uploadArchives spell --
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+    signing {
+        required { gradle.taskGraph.hasTask("uploadArchives") }
+        sign configurations.archives
+    }
+    // Build, sign, and upload
+    uploadArchives {
+        repositories {
+            mavenDeployer {
 
-            scm {
-                connection 'scm:git:https://github.com/javers/javers.git'
-                url 'https://github.com/javers/javers'
-                developerConnection 'scm:git:https://github.com/javers/javers.git'
-            }
+                // Sign POM
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            scm {
-                connection 'scm:git:https://github.com/javers/javers.git'
-                url 'https://github.com/javers/javers'
-            }
-
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                // Destination
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: project.findProperty('nexusUsername') ?: 'secured', 
+                                   password: project.findProperty('nexusPassword') ?: 'secured')
                 }
-            }
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: project.findProperty('nexusUsername') ?: 'secured',
+                                   password: project.findProperty('nexusPassword') ?: 'secured')
+                }
 
-            developers {
-                developer {
-                    name 'Bartosz Walacik'
-                }
-                developer {
-                    name 'Pawel Szymczyk'
-                }
-                developer {
-                    name 'Michal Wesolowski'
+                // Add required metadata to POM
+                pom.project {
+                    name = 'JaVers Library'
+                    packaging 'jar'
+                    description = 'JaVers - object auditing and diff framework for Java'
+                    url = 'http://javers.org'
+                    licenses {
+                        license {
+                            name = 'The Apache Software License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'javers'
+                            name = 'JaVers Core Team'
+                            email = 'javers@javers.org'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:https://github.com/javers/javers.git'
+                        developerConnection = 'scm:git:https://github.com/javers/javers.git'
+                        url = 'https://github.com/javers/javers'
+                    }
                 }
             }
         }
     }
+    //-- eof uploadArchives spell --
 
     test {
         testLogging.exceptionFormat = 'full'
         testLogging.showStackTraces = true
-    }
-
-    publishing {
-        publications {
-            libraryJar(MavenPublication) {
-                from components.java
-            }
-        }
     }
 }
 
