@@ -1,11 +1,11 @@
 package org.javers.common.date;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public class DefaultDateProvider implements DateProvider {
 
     @Override
-    public LocalDateTime now() {
-        return LocalDateTime.now();
+    public ZonedDateTime now() {
+        return ZonedDateTime.now();
     }
 }

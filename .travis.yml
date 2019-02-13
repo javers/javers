@@ -1,6 +1,6 @@
 language: java
 jdk:
-- oraclejdk8
+- openjdk11
 services:
   - postgresql
   - mysql
@@ -17,10 +17,5 @@ before_script:
 script:
 - ./gradlew build
 - ./gradlew integrationTest
-deploy:
-  skip_cleanup: true
-  provider: script
-  script: travis/deployToSonatype.sh
-  on:
-    tags: true
-    all_branches: true
+
+

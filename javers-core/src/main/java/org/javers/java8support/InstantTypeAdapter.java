@@ -1,6 +1,7 @@
 package org.javers.java8support;
 
 import org.javers.core.json.BasicStringTypeAdapter;
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 
 import java.time.Instant;
 
@@ -10,12 +11,12 @@ import java.time.Instant;
 class InstantTypeAdapter extends BasicStringTypeAdapter<Instant> {
     @Override
     public String serialize(Instant sourceValue) {
-        return sourceValue.toString();
+        return UtilTypeCoreAdapters.serialize(sourceValue);
     }
 
     @Override
     public Instant deserialize(String serializedValue) {
-        return Instant.parse(serializedValue);
+        return UtilTypeCoreAdapters.deserializeToInstant(serializedValue);
     }
 
     @Override

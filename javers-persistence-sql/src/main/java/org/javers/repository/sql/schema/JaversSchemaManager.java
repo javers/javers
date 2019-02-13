@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.Map;
 
+import static org.javers.repository.sql.schema.FixedSchemaFactory.COMMIT_COMMIT_DATE_INSTANT;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.GLOBAL_ID_OWNER_ID_FK;
 
 /**
@@ -60,7 +61,20 @@ public class JaversSchemaManager extends SchemaNameAware {
             addDbIndexOnOwnerId();
         }
 
+        addCommitDateInstantColumnIfNeeded();
+
         TheCloser.close(schemaManager, schemaInspector);
+    }
+
+    /**
+     * JaVers 5.0 to 5.1 schema migration
+     */
+    private void addCommitDateInstantColumnIfNeeded() {
+        if (!columnExists(getCommitTableNameWithSchema(), COMMIT_COMMIT_DATE_INSTANT)){
+            addStringColumn(getCommitTableNameWithSchema(), COMMIT_COMMIT_DATE_INSTANT, 30);
+        } else {
+            extendStringColumnIfNeeded(getCommitTableNameWithSchema(), COMMIT_COMMIT_DATE_INSTANT, 30);
+        }
     }
 
     /**
@@ -234,6 +248,29 @@ public class JaversSchemaManager extends SchemaNameAware {
         } else {
             executeSQL("ALTER TABLE " + tableName + " ADD COLUMN " + colName + " " + sqlType);
         }
+    }
+
+    private void extendStringColumnIfNeeded(String tableName, String colName, int len) {
+        ColumnType colType = getTypeOf(tableName, colName);
+        String newType = colType.typeName + "(" + len + ")";
+
+        if (colType.precision < len) {
+            logger.info("extending {}.{} COLUMN length from {} to {}", tableName, colName, colType.precision, len);
+            if (dialect instanceof PostgresDialect) {
+                executeSQL("ALTER TABLE " + tableName + " ALTER COLUMN " + colName + " TYPE "+newType);
+            } else if (dialect instanceof H2Dialect) {
+                executeSQL("ALTER TABLE " + tableName + " ALTER COLUMN " + colName + " "+newType);
+            } else if (dialect instanceof MysqlDialect) {
+                executeSQL("ALTER TABLE " + tableName + " MODIFY " + colName + " "+newType);
+            } else if (dialect instanceof OracleDialect) {
+                executeSQL("ALTER TABLE " + tableName + " MODIFY " + colName + " "+newType);
+            } else if (dialect instanceof MsSqlDialect) {
+                executeSQL("ALTER TABLE " + tableName + " ALTER COLUMN " + colName + " "+newType);
+            } else {
+                handleUnsupportedDialect();
+            }
+        }
+
     }
 
     private void addIndex(DBObjectName tableName, FixedSchemaFactory.IndexedCols indexedCols) {

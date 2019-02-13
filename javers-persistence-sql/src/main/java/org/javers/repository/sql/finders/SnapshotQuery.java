@@ -37,6 +37,7 @@ class SnapshotQuery {
                 COMMIT_PK + ", " +
                 COMMIT_AUTHOR + ", " +
                 COMMIT_COMMIT_DATE + ", " +
+                COMMIT_COMMIT_DATE_INSTANT + ", " +
                 COMMIT_COMMIT_ID + ", " +
                 "g." + GLOBAL_ID_LOCAL_ID + ", " +
                 "g." + GLOBAL_ID_FRAGMENT + ", " +
@@ -162,6 +163,7 @@ class SnapshotQuery {
             return new CdoSnapshotSerialized()
                     .withCommitAuthor(resultSet.getString(COMMIT_AUTHOR))
                     .withCommitDate(resultSet.getTimestamp(COMMIT_COMMIT_DATE))
+                    .withCommitDateInstant(resultSet.getString(COMMIT_COMMIT_DATE_INSTANT))
                     .withCommitId(resultSet.getBigDecimal(COMMIT_COMMIT_ID))
                     .withCommitPk(resultSet.getLong(COMMIT_PK))
                     .withVersion(resultSet.getLong(SNAPSHOT_VERSION))

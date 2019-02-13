@@ -2,8 +2,8 @@ package org.javers.core.json.typeadapter.util;
 
 import org.javers.core.json.BasicStringTypeAdapter;
 
-import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 
 /**
@@ -20,7 +20,8 @@ class JavaSqlTimestampTypeAdapter extends BasicStringTypeAdapter<Timestamp> {
 
     @Override
     public Timestamp deserialize(String serializedValue) {
-        return new Timestamp(java.util.Date.from(UtilTypeCoreAdapters.deserializeToInstant(serializedValue)).getTime());
+        LocalDateTime date = UtilTypeCoreAdapters.deserializeLocalDateTime(serializedValue);
+        return java.sql.Timestamp.valueOf(date);
     }
 
     @Override

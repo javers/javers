@@ -92,7 +92,7 @@ class MultimapChangeAppenderTest extends AbstractDiffAppendersTest {
                         valueObjectId(1, SnapshotEntity, "multimapPrimitiveToValueObject/a/fe9f8f0d164b49489301b7eaefc00c13")]
     }
 
-    def "should not support Map<ValueObject,?>"() {
+    def "should not support Map of ValueObject to ?"() {
         when:
         multimapChangeAppender().supports(getJaversType(new TypeToken<Multimap<DummyAddress, String>>() {}.getType()))
 

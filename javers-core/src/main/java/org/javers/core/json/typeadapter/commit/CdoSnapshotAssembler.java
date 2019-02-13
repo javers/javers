@@ -71,6 +71,7 @@ public class CdoSnapshotAssembler {
         jsonObject.addProperty(AUTHOR, snapshot.getCommitAuthor());
         jsonObject.add(PROPERTIES, CommitPropertiesConverter.toJson(snapshot.getCommitProperties()));
         jsonObject.add(COMMIT_DATE, jsonConverter.toJsonElement(snapshot.getCommitDate()));
+        jsonObject.add(COMMIT_DATE_INSTANT, jsonConverter.toJsonElement(snapshot.getCommitDateInstant()));
         jsonObject.add(COMMIT_ID, jsonConverter.toJsonElement(snapshot.getCommitId()));
 
         return jsonObject;

@@ -1,25 +1,23 @@
 package org.javers.java8support;
 
 import org.javers.core.json.BasicStringTypeAdapter;
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters;
 
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * @author bartosz.walacik
  */
 class LocalTimeTypeAdapter extends BasicStringTypeAdapter<LocalTime> {
-    private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ISO_LOCAL_TIME;
 
     @Override
     public String serialize(LocalTime sourceValue) {
-        return sourceValue.format(ISO_FORMAT);
+        return UtilTypeCoreAdapters.serialize(sourceValue);
     }
 
     @Override
     public LocalTime deserialize(String serializedValue) {
-
-        return LocalTime.parse(serializedValue, ISO_FORMAT);
+        return UtilTypeCoreAdapters.deserializeLocalTime(serializedValue);
     }
 
     @Override

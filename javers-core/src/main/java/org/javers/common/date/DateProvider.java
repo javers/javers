@@ -1,7 +1,11 @@
 package org.javers.common.date;
 
-import java.time.LocalDateTime;
+import org.javers.core.commit.CommitMetadata;
+import java.time.ZonedDateTime;
 
+/**
+ * Date provider for {@link CommitMetadata#getCommitDate()}
+ */
 public interface DateProvider {
-    LocalDateTime now();
+    ZonedDateTime now();
 }

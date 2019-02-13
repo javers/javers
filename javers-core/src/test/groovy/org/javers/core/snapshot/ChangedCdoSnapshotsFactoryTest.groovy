@@ -28,7 +28,7 @@ class ChangedCdoSnapshotsFactoryTest extends Specification {
     }
 
     CommitMetadata someCommitMetadata(){
-        new CommitMetadata("kazik", [:], LocalDateTime.now(), new CommitId(1, 0))
+        new CommitMetadata("kazik", [:], LocalDateTime.now(), null, new CommitId(1, 0))
     }
 
     def "should not mark snapshot as initial even if not present in previous commit but committed before"() {

@@ -1,6 +1,6 @@
 package org.javers.core
 
-import org.javers.common.date.FakeDateProvider
+import org.javers.common.date.DateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.diff.changetype.ReferenceChange
@@ -20,6 +20,9 @@ import spock.lang.Unroll
 import javax.persistence.Id
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 
 import static groovyx.gpars.GParsPool.withPool
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
@@ -31,41 +34,67 @@ import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValue
 import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
 class JaversRepositoryE2ETest extends Specification {
-    protected FakeDateProvider fakeDateProvider
     protected JaversRepository repository
     protected Javers javers
+    private DateProvider dateProvider
+    private RandomCommitGenerator randomCommitGenerator = null
 
     def setup() {
-        fakeDateProvider = new FakeDateProvider()
+        dateProvider = prepareDateProvider()
         repository = prepareJaversRepository()
-        javers = JaversBuilder.javers().withDateTimeProvider(fakeDateProvider).registerJaversRepository(repository).build()
+
+        def javersBuilder = JaversBuilder
+                .javers()
+                .withDateTimeProvider(dateProvider)
+                .registerJaversRepository(repository)
+
+        if (useRandomCommitIdGenerator()) {
+            randomCommitGenerator = new RandomCommitGenerator()
+            javersBuilder.withCustomCommitIdGenerator(randomCommitGenerator)
+        }
+
+        javers = javersBuilder.build()
     }
 
     protected int commitSeq(CommitMetadata commit) {
+        if (useRandomCommitIdGenerator()) {
+            return randomCommitGenerator.getSeq(commit.id)
+        }
         commit.id.majorId
     }
 
-    protected setNow(LocalDateTime localDateTime) {
-        fakeDateProvider.set(localDateTime)
+    protected DateProvider prepareDateProvider() {
+        if (useRandomCommitIdGenerator()) {
+            return new TikDateProvider()
+        }
+        new FakeDateProvider()
+    }
+
+    protected setNow(ZonedDateTime dateTime) {
+        dateProvider.set(dateTime)
     }
 
     protected JaversRepository prepareJaversRepository() {
-        return new InMemoryRepository();
+        new InMemoryRepository()
     }
 
-    def "should persit commitDate with milliseconds precision"(){
-      given:
-      def now = LocalDateTime.now()
-      println now
+    protected boolean useRandomCommitIdGenerator() {
+        false
+    }
 
-      setNow(now)
+    def 'should persist current LocalDateTime and Instant in CommitMetadata' () {
+        given:
+        def now = ZonedDateTime.now()
+        setNow(now)
 
-      when:
-      javers.commit("a", new SnapshotEntity(id:1))
-      def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+        when:
+        javers.commit('author', new SnapshotEntity(id: 1))
+        def snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
 
-      then:
-      snapshots[0].getCommitMetadata().commitDate == now
+        then:
+        ChronoUnit.MILLIS.between(snapshot.commitMetadata.commitDate, now.toLocalDateTime()) == 0
+        snapshot.commitMetadata.commitDateInstant == now.toInstant()
+        snapshot.commitMetadata.author == 'author'
     }
 
     def "should persist various primitive types"(){
@@ -734,26 +763,13 @@ class JaversRepositoryE2ETest extends Specification {
         snapshot.globalId.typeName.endsWith("OldValueObject")
     }
 
-    def '''should use dateProvider.now() as a commitDate and
-           should serialize and deserialize commitDate as local datetime'''() {
-        given:
-        def now = LocalDateTime.parse('2016-01-01T12:12')
-        setNow(now)
-
-        when:
-        javers.commit("author", new SnapshotEntity(id: 1))
-        def snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
-
-        then:
-        snapshot.commitMetadata.commitDate == now
-    }
-
     @Unroll
     def "should query for Entity snapshots with time range filter - #what"() {
         given:
         (1..5).each{
             def entity =  new SnapshotEntity(id: 1, intProperty: it)
-            setNow( LocalDateTime.of(2015,01,1,it,0) )
+            def now = ZonedDateTime.of(LocalDateTime.of(2015,01,1,it,0), ZoneId.of("UTC"))
+            setNow( now )
             javers.commit('author', entity)
         }
 
@@ -898,14 +914,14 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
-    def "should cope with query for 1000 different snapshots"() {
+    def "should cope with query for 200 different snapshots"() {
         given:
-        (1..1000).each {
+        (1..200).each {
             javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
         }
 
         def instanceId = javersTestAssembly().instanceId(new SnapshotEntity(id: 1))
-        def snapshotIdentifiers = (1..1000).collect {
+        def snapshotIdentifiers = (1..200).collect {
             new SnapshotIdentifier(instanceId, it)
         }
 

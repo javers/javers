@@ -1,8 +1,9 @@
 package org.javers.core.json.typeadapter.util;
 
 import org.javers.core.json.BasicStringTypeAdapter;
-import java.util.Date;
 
+import java.time.ZoneId;
+import java.util.Date;
 
 /**
  * Serializes java.util.Date to JSON String using ISO util format yyyy-MM-dd'T'HH:mm:ss.SSS
@@ -13,12 +14,12 @@ class JavaUtilDateTypeAdapter extends BasicStringTypeAdapter<Date> {
 
     @Override
     public String serialize(Date sourceValue) {
-        return UtilTypeCoreAdapters.serialize(sourceValue);
+        return UtilTypeCoreAdapters.serialize(sourceValue.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime() );
     }
 
     @Override
     public Date deserialize(String serializedValue) {
-        return new Date(java.util.Date.from(UtilTypeCoreAdapters.deserializeToInstant(serializedValue)).getTime());
+        return UtilTypeCoreAdapters.deserializeToUtilDate(serializedValue);
     }
 
     @Override

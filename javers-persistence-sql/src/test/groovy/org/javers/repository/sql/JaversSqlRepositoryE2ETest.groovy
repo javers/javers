@@ -150,7 +150,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
 
         then:
         snapshots.size() == 1
-        snapshots[0].commitId.majorId == 1
+        commitSeq(snapshots[0].commitMetadata) == 1
     }
 
     /**
@@ -173,7 +173,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
 
       then:
       snapshots.size() == 1
-      snapshots[0].commitId.majorId == 1
+      commitSeq(snapshots[0].commitMetadata) == 1
     }
 
     def "should persist over 100 snapshots with proper sequence of primary keys"() {

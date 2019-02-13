@@ -2,6 +2,8 @@ package org.javers.repository.sql.schema;
 
 import java.util.Optional;
 import org.javers.repository.sql.SqlRepositoryConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
 
@@ -9,11 +11,17 @@ import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
  * @author Ian Agius
  */
 public class TableNameProvider {
+    private static final Logger logger = LoggerFactory.getLogger(TableNameProvider.class);
 
     private final Optional<String> schemaName;
 
     public TableNameProvider(SqlRepositoryConfiguration configuration) {
         this.schemaName = configuration.getSchemaNameAsOptional();
+
+        logger.info("Commit table:          {}", getCommitTableNameWithSchema());
+        logger.info("CommitProperty table:  {}", getCommitPropertyTableNameWithSchema());
+        logger.info("GlobalId table:        {}", getGlobalIdTableNameWithSchema());
+        logger.info("Snapshot table:        {}", getSnapshotTableNameWithSchema());
     }
 
     public String getGlobalIdTableNameWithSchema() {

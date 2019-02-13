@@ -2,12 +2,14 @@ package org.javers.shadow;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.*;
 
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -75,10 +77,28 @@ class ShadowGraphBuilder {
         mapCustomPropertyNamesToJavaOrigin(cdoSnapshot, jsonElement);
         followReferences(shadowBuilder, jsonElement);
 
-        Object shadowStub = jsonConverter.fromJson(jsonElement, cdoSnapshot.getManagedType().getBaseJavaClass());
+        Object shadowStub = null;
+        try {
+            shadowStub = jsonConverter.fromJson(jsonElement, cdoSnapshot.getManagedType().getBaseJavaClass());
+        } catch(JsonSyntaxException | DateTimeParseException e) {
+            shadowStub = sanitizedDeserialization(jsonElement, cdoSnapshot.getManagedType());
+        }
         shadowBuilder.withStub(shadowStub);
 
         return shadowBuilder;
+    }
+
+    private Object sanitizedDeserialization(JsonObject jsonElement, ManagedType managedType) {
+        managedType.getProperties().forEach(p -> {
+            try {
+                jsonConverter.fromJson(jsonElement.get(p.getName()), p.getRawType());
+            }
+            catch (Exception e) {
+                jsonElement.remove(p.getName());
+            }
+        });
+
+        return jsonConverter.fromJson(jsonElement, managedType.getBaseJavaClass());
     }
 
     private void mapCustomPropertyNamesToJavaOrigin(CdoSnapshot cdoSnapshot, JsonObject jsonElement) {

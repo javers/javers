@@ -74,7 +74,7 @@ public class JaversGetter extends JaversMember<Method> {
 
     @Override
     public String toString() {
-        return "Method " + typeName(getGenericResolvedType())+" " + name() +"; //declared in: " +getDeclaringClass().getSimpleName();
+        return "Getter " + typeName(getGenericResolvedType())+" " + name() +", declared in " +getDeclaringClass().getSimpleName();
     }
 
     private Optional<Method> findSetterForGetter(Method getter) {

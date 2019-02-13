@@ -49,7 +49,7 @@ class JaversTestBuilder {
 
     private JaversTestBuilder (DateProvider dateProvider) {
         javersBuilder = new JaversBuilder()
-        javersBuilder.withDateProvider(dateProvider).build()
+        javersBuilder.withDateTimeProvider(dateProvider).build()
     }
 
     private JaversTestBuilder (JaversRepository javersRepository) {

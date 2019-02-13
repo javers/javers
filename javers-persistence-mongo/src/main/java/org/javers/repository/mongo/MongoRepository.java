@@ -11,6 +11,8 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import java.util.Optional;
 import org.javers.common.string.RegexEscape;
+import org.javers.core.CommitIdGenerator;
+import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -20,10 +22,7 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.ValueObjectType;
-import org.javers.repository.api.JaversRepository;
-import org.javers.repository.api.QueryParams;
-import org.javers.repository.api.QueryParamsBuilder;
-import org.javers.repository.api.SnapshotIdentifier;
+import org.javers.repository.api.*;
 import org.javers.repository.mongo.model.MongoHeadId;
 import java.time.LocalDateTime;
 
@@ -39,12 +38,13 @@ import static org.javers.repository.mongo.MongoSchemaManager.*;
 /**
  * @author pawel szymczyk
  */
-public class MongoRepository implements JaversRepository {
+public class MongoRepository implements JaversRepository, ConfigurationAware {
     private final static int DEFAULT_CACHE_SIZE = 5000;
 
     private static final int DESC = -1;
     private final MongoSchemaManager mongoSchemaManager;
     private JsonConverter jsonConverter;
+    private JaversCoreConfiguration coreConfiguration;
     private final MapKeyDotReplacer mapKeyDotReplacer = new MapKeyDotReplacer();
     private final LatestSnapshotCache cache;
 
@@ -131,6 +131,11 @@ public class MongoRepository implements JaversRepository {
     @Override
     public void setJsonConverter(JsonConverter jsonConverter) {
         this.jsonConverter = jsonConverter;
+    }
+
+    @Override
+    public void setConfiguration(JaversCoreConfiguration coreConfiguration) {
+        this.coreConfiguration = coreConfiguration;
     }
 
     @Override
@@ -229,8 +234,15 @@ public class MongoRepository implements JaversRepository {
 
     private MongoCursor<Document> getMongoSnapshotsCursor(Bson query, Optional<QueryParams> queryParams) {
         FindIterable<Document> findIterable = snapshotsCollection()
-            .find(applyQueryParams(query, queryParams))
-            .sort(new Document(COMMIT_ID, DESC));
+            .find(applyQueryParams(query, queryParams));
+
+        if (coreConfiguration.getCommitIdGenerator() == CommitIdGenerator.SYNCHRONIZED_SEQUENCE) {
+            findIterable.sort(new Document(COMMIT_ID, DESC));
+        }
+        else {
+            findIterable.sort(new Document(COMMIT_DATE_INSTANT, DESC));
+        }
+
         return applyQueryParams(findIterable, queryParams).iterator();
     }
 

@@ -29,6 +29,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
     public static final String COMMIT_PK =            "commit_pk";
     public static final String COMMIT_AUTHOR =        "author";
     public static final String COMMIT_COMMIT_DATE =   "commit_date";
+    public static final String COMMIT_COMMIT_DATE_INSTANT =   "commit_date_instant";
     public static final String COMMIT_COMMIT_ID =     "commit_id";
     public static final String COMMIT_PK_SEQ =        "jv_commit_pk_seq";
 
@@ -96,6 +97,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         relationBuilder
                 .withAttribute().string(COMMIT_AUTHOR).withMaxLength(200).and()
                 .withAttribute().timestamp(COMMIT_COMMIT_DATE).and()
+                .withAttribute().string(COMMIT_COMMIT_DATE_INSTANT).withMaxLength(30).and()
                 .withAttribute().number(COMMIT_COMMIT_ID).withIntegerPrecision(22).withDecimalPrecision(2).and()
                 .build();
 

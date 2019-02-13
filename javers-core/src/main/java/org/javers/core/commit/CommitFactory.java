@@ -1,11 +1,9 @@
 package org.javers.core.commit;
 
 import org.javers.common.collections.Lists;
-import java.util.Optional;
 import org.javers.common.date.DateProvider;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.validation.Validate;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
 import org.javers.core.diff.ObjectGraph;
@@ -19,11 +17,12 @@ import org.javers.core.snapshot.SnapshotFactory;
 import org.javers.core.snapshot.SnapshotGraphFactory;
 import org.javers.repository.api.JaversExtendedRepository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
@@ -97,6 +96,9 @@ public class CommitFactory {
     }
 
     private CommitMetadata newCommitMetadata(String author, Map<String, String> properties){
-        return new CommitMetadata(author, properties, dateProvider.now(), commitIdFactory.nextId());
+        ZonedDateTime now = dateProvider.now();
+        return new CommitMetadata(author, properties,
+                now.toLocalDateTime(), now.toInstant(),
+                commitIdFactory.nextId());
     }
 }
