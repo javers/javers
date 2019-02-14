@@ -213,6 +213,9 @@ public class TypeMapper {
             if (JaversExceptionCode.TYPE_NAME_NOT_FOUND == e.getCode()) {
                 return Optional.empty();
             }
+            if (JaversExceptionCode.MANAGED_CLASS_MAPPING_ERROR == e.getCode()) {
+                return Optional.empty();
+            }
             throw e;
         }
     }
