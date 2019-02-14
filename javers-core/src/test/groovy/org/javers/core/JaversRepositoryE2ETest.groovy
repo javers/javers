@@ -664,40 +664,6 @@ class JaversRepositoryE2ETest extends Specification {
         change.changes[0].addedValue == "2"
     }
 
-    @Unroll
-    def "should manage Entity class name refactor when querying using new class with @TypeName retrofitted to old class name"(){
-        when:
-        javers.commit("author", new OldEntity(id:1, value:5))
-        javers.commit("author", new NewEntity(id:1, value:15))
-
-        def changes = javers.findChanges(byInstanceId(1, type).build())
-
-        then:
-        changes.size() == 1
-        with(changes.find {it.propertyName == "value"}){
-            assert left == 5
-            assert right == 15
-        }
-
-        where:
-        type << [NewEntity, "org.javers.core.examples.typeNames.OldEntity"]
-    }
-
-    def "should manage Entity class name refactor when old and new class uses @TypeName"(){
-        when:
-        javers.commit("author", new OldEntityWithTypeAlias(id:1, val:5))
-        javers.commit("author", new NewEntityWithTypeAlias(id:1, val:15))
-
-        def changes = javers.findChanges(byInstanceId(1, NewEntityWithTypeAlias).build())
-
-        then:
-        changes.size() == 1
-        with(changes.find {it.propertyName == "val"}){
-            assert left == 5
-            assert right == 15
-        }
-    }
-
     def "should manage ValueObject query when both ValueObject and owner Entity uses @TypeName"(){
         when:
         javers.commit("author", new NewEntityWithTypeAlias(id: 1, valueObject: new NewValueObjectWithTypeAlias(some:5)) )
@@ -708,45 +674,6 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         changes.size() == 1
         with (changes.find {it.propertyName == "some"}) {
-            assert left == 5
-            assert right == 6
-        }
-
-    }
-
-    def "should manage ValueObject class name refactor without TypeName when querying by owning Instance"(){
-        when:
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  5)))
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  10)))
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  15)))
-
-        def changes = javers.findChanges(QueryBuilder.byValueObject(EntityWithRefactoredValueObject,"value").build())
-
-        then:
-        changes.size() == 2
-        changes[0].propertyName == "newField"
-        changes[0].left == 10
-        changes[0].right == 15
-
-        changes[1].propertyName == "newField"
-        changes[1].left == 0  //removed properties are treated as nulls
-        changes[1].right == 10
-    }
-
-    def "should manage ValueObject class name refactor when querying using new class with @TypeName retrofitted to old class name"(){
-        when:
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  10)))
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewNamedValueObject(6,  10)))
-
-        def changes = javers.findChanges(QueryBuilder.byClass(NewNamedValueObject).build())
-
-        then:
-        changes.size() == 2
-        with(changes.find {it.propertyName == "newField"}) {
-            assert left == 0 //removed properties are treated as nulls
-            assert right == 10
-        }
-        with(changes.find {it.propertyName == "someValue"}) {
             assert left == 5
             assert right == 6
         }
@@ -941,18 +868,6 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         assert snapshots.size() == 0
-    }
-
-    def "should treat refactored VOs as different versions of the same client's domain object"(){
-        given:
-        javers.commit('author', new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5, 5)))
-        javers.commit('author', new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5, 10)))
-
-        when:
-        def snapshots = javers.findSnapshots(QueryBuilder.byValueObject(EntityWithRefactoredValueObject,'value').build())
-
-        then:
-        snapshots.version == [2, 1]
     }
 
     @Unroll
