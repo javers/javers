@@ -9,7 +9,7 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
 
-import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
+import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 
 /**
  * @author akrystian

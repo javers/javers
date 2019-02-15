@@ -15,7 +15,7 @@ import spock.lang.Unroll
 
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.model.DummyUser.dummyUser
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.core.GlobalIdTestBuilder.instanceId
 
 /**
  * @author bartosz walacik

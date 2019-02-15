@@ -9,12 +9,12 @@ import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.model.*
-import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.core.GlobalIdTestBuilder.instanceId
 
 /**
  * @author bartosz walacik
@@ -176,6 +176,6 @@ class GlobalIdTypeAdapterTest extends Specification {
 
         then:
         idHolder.id instanceof ValueObjectId
-        idHolder.id == ValueObjectIdDTO.valueObjectId(5,DummyUserDetails,"dummyAddress")
+        idHolder.id == valueObjectId(5,DummyUserDetails,"dummyAddress")
     }
 }

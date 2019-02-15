@@ -3,8 +3,6 @@ package org.javers.core.metamodel.object;
 import java.util.Comparator;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.type.ManagedType;
-import org.javers.repository.jql.GlobalIdDTO;
-
 import java.io.Serializable;
 
 /**
@@ -41,19 +39,9 @@ public abstract class GlobalId implements Serializable, Comparable<GlobalId> {
     public boolean equals(Object o) {
         if (this == o) { return true; }
 
-        //for testing
-        if (o instanceof GlobalIdDTO) {
-            return equals((GlobalIdDTO)o);
-        }
-
         if ( !(o instanceof GlobalId) ) {return false;}
 
         return value().equals(((GlobalId) o).value());
-    }
-
-    //for testing
-    private boolean equals(GlobalIdDTO o) {
-        return this.value().equals(o.value());
     }
 
     @Override

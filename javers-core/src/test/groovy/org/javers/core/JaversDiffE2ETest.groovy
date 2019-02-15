@@ -31,7 +31,7 @@ import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUserWithPoint.userWithPoint
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static GlobalIdTestBuilder.instanceId
 
 /**
  * @author bartosz walacik

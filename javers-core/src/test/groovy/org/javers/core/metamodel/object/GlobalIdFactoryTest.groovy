@@ -1,10 +1,6 @@
 package org.javers.core.metamodel.object
 
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyEntityWithEmbeddedId
-import org.javers.core.model.DummyNetworkAddress
-import org.javers.core.model.DummyPoint
-import org.javers.core.model.SnapshotEntity
+import org.javers.core.model.*
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
 import spock.lang.Specification

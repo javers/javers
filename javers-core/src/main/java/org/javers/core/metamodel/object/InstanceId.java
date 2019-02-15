@@ -1,8 +1,5 @@
 package org.javers.core.metamodel.object;
 
-import org.javers.common.exception.JaversException;
-import org.javers.core.metamodel.type.EntityType;
-
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**

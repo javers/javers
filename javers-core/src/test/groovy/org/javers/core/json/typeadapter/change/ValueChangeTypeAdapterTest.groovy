@@ -13,7 +13,7 @@ import spock.lang.Specification
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
 
 /**

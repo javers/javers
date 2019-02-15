@@ -3,24 +3,18 @@ package org.javers.core
 import org.javers.common.exception.JaversException
 import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.commit.CommitAssert
-import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyUserDetails
-import org.javers.core.model.PhoneWithShallowCategory
-import org.javers.core.model.ShallowPhone
-import org.javers.core.model.SnapshotEntity
-import java.time.LocalDate
+import org.javers.core.model.*
+import org.javers.repository.jql.InstanceIdDTO
 import spock.lang.Specification
 import spock.lang.Unroll
-import org.javers.core.model.*
 
-import java.time.LocalDateTime
-import java.time.ZonedDateTime
+import java.time.LocalDate
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.model.DummyUser.dummyUser
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
+import static GlobalIdTestBuilder.instanceId
+import static GlobalIdTestBuilder.valueObjectId
 
 /**
  * @author bartosz walacik
@@ -94,7 +88,7 @@ class JaversCommitE2ETest extends Specification {
 
         where:
         deleteMethod << [ { j -> j.commitShallowDelete("some.login", new SnapshotEntity(id:1)) },
-                          { j -> j.commitShallowDeleteById("some.login", instanceId(1,SnapshotEntity))} ]
+                          { j -> j.commitShallowDeleteById("some.login", InstanceIdDTO.instanceId(1,SnapshotEntity))} ]
         opType << ["using object instance","using globalId"]
     }
 

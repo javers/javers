@@ -14,8 +14,8 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
+import static org.javers.core.GlobalIdTestBuilder.instanceId
+import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 
 /**
  * @author bartosz walacik

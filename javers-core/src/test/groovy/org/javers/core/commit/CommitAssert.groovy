@@ -2,6 +2,7 @@ package org.javers.core.commit
 
 import org.javers.core.diff.Change
 import org.javers.core.diff.DiffAssert
+import org.javers.core.metamodel.object.GlobalId
 import org.javers.repository.jql.GlobalIdDTO
 import org.javers.core.snapshot.SnapshotsAssert
 
@@ -28,7 +29,7 @@ class CommitAssert {
         this
     }
 
-    CommitAssert hasSnapshot(GlobalIdDTO expectedId){
+    CommitAssert hasSnapshot(GlobalId expectedId){
         assert snapshotsAssert.hasSnapshot(expectedId)
         this
     }
