@@ -4,7 +4,6 @@ import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.metamodel.type.ValueType
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
-import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -19,6 +18,7 @@ import java.time.Year
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
+import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.diff.DiffAssert.assertThat
 
@@ -69,7 +69,7 @@ class Java8TypeAdaptersE2ETest extends Specification {
         then:
         diff.changes.size() == 1
         def change = diff.changes[0]
-        change.affectedGlobalId == ValueObjectIdDTO.valueObjectId(1, SnapshotEntity, "optionalValueObject")
+        change.affectedGlobalId == valueObjectId(1, SnapshotEntity, "optionalValueObject")
         change instanceof ValueChange
         change.left == "New York"
         change.right == "Paris"

@@ -1,11 +1,11 @@
 package org.javers.core.diff.appenders
 
-import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 
+import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.core.GlobalIdTestBuilder.instanceId
 
 /**
  * @author bartosz walacik
@@ -82,7 +82,7 @@ class ListReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                   .hasSize(1)
-                  .hasValueAdded(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "listOfValueObjects/1"))
+                  .hasValueAdded(1, valueObjectId(5, SnapshotEntity, "listOfValueObjects/1"))
     }
 
     def "should append ReferenceRemoved in List of ValueObject"() {
@@ -97,7 +97,7 @@ class ListReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
         then:
         assertThat(change)
                   .hasSize(1)
-                  .hasValueRemoved(1, ValueObjectIdDTO.valueObjectId(5, SnapshotEntity, "listOfValueObjects/1"))
+                  .hasValueRemoved(1, valueObjectId(5, SnapshotEntity, "listOfValueObjects/1"))
     }
 
 }

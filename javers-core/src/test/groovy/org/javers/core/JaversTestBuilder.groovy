@@ -23,6 +23,7 @@ import org.javers.core.metamodel.type.TypeMapper
 import org.javers.repository.api.JaversExtendedRepository
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryRunner
+import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.shadow.ShadowFactory
 
 /**
@@ -187,6 +188,7 @@ class JaversTestBuilder {
         getGlobalIdFactory().createInstanceId(localId, entity)
     }
 
+    @Deprecated
     ValueObjectId valueObjectId(Object localId, Class owningEntity, fragment) {
         getGlobalIdFactory().createValueObjectIdFromPath(instanceId(localId, owningEntity), fragment)
     }

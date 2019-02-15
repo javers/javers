@@ -3,7 +3,7 @@ package org.javers.core.json.typeadapter
 import com.google.common.collect.HashMultiset
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import org.javers.core.FakeDateProvider
+import org.javers.core.GlobalIdTestBuilder
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters
@@ -12,18 +12,14 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
 import org.javers.guava.MultimapBuilder
-import org.javers.repository.jql.ValueObjectIdDTO
-
-import java.time.Instant
-import java.time.LocalDateTime
 import spock.lang.Specification
 
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
-import static org.javers.core.JaversBuilder.javers
+import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.model.DummyUser.dummyUser
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
 
 /**
  * @author pawel szymczyk
@@ -438,7 +434,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         def valueObjectId = snapshot.getPropertyValue("dummyAddress")
-        valueObjectId == ValueObjectIdDTO.valueObjectId(1, DummyUserDetails, "dummyAddress")
+        valueObjectId == GlobalIdTestBuilder.valueObjectId(1, DummyUserDetails, "dummyAddress")
     }
 
     def "should deserialize CdoSnapshot state with collections"() {

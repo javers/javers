@@ -6,7 +6,7 @@ import org.javers.core.graph.NodeAssert
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.core.GlobalIdTestBuilder.instanceId
 
 /**
  * @author bartosz walacik

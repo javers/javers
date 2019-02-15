@@ -25,13 +25,13 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
 import static groovyx.gpars.GParsPool.withPool
+import static GlobalIdTestBuilder.instanceId
+import static GlobalIdTestBuilder.unboundedValueObjectId
+import static GlobalIdTestBuilder.valueObjectId
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.QueryBuilder.*
-import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
-import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
 class JaversRepositoryE2ETest extends Specification {
     protected JaversRepository repository
