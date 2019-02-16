@@ -42,7 +42,7 @@ public class CdoSnapshotSerialized {
     }
 
     public CdoSnapshotSerialized withCommitDateInstant(String commitDateInstant) {
-        this.commitDateInstant = Instant.parse(commitDateInstant);
+        this.commitDateInstant = commitDateInstant != null ? Instant.parse(commitDateInstant) : null;
         return this;
     }
 
