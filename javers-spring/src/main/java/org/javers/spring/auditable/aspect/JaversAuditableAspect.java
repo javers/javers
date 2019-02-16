@@ -36,4 +36,9 @@ public class JaversAuditableAspect {
     public void commitAdvice(JoinPoint pjp) {
         javersCommitAdvice.commitSaveMethodArguments(pjp);
     }
+
+    @AfterReturning("@annotation(org.javers.spring.annotation.JaversAuditableDelete)")
+    public void commitDeleteAdvice(JoinPoint pjp) {
+        javersCommitAdvice.commitDeleteMethodArguments(pjp);
+    }
 }

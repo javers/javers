@@ -2,6 +2,7 @@ package org.javers.spring.auditable.aspect;
 
 import org.aspectj.lang.JoinPoint;
 import org.javers.core.Javers;
+import org.javers.core.commit.Commit;
 import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
@@ -38,5 +39,10 @@ class JaversCommitAdvice {
         for (Object arg : AspectUtil.collectArguments(pjp)) {
             commitHandler.commit(author, arg, props);
         }
+    }
+
+    @FunctionalInterface
+    private interface JaversCommitHandler {
+        Commit commit(String author, Object object, Map<String, String> commitProperties);
     }
 }
