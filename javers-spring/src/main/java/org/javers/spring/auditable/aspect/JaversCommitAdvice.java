@@ -23,12 +23,20 @@ class JaversCommitAdvice {
         this.commitPropertiesProvider = commitPropertiesProvider;
     }
 
-    void commitMethodArguments(JoinPoint pjp) {
+    void commitSaveMethodArguments(JoinPoint pjp) {
+        commitMethodArguments(pjp, javers::commit);
+    }
+
+    void commitDeleteMethodArguments(JoinPoint pjp) {
+        commitMethodArguments(pjp, javers::commitShallowDelete);
+    }
+
+    private void commitMethodArguments(JoinPoint pjp, JaversCommitHandler commitHandler) {
         String author = authorProvider.provide();
         Map<String, String> props = commitPropertiesProvider.provide();
 
         for (Object arg : AspectUtil.collectArguments(pjp)) {
-            javers.commit(author, arg, props);
+            commitHandler.commit(author, arg, props);
         }
     }
 }

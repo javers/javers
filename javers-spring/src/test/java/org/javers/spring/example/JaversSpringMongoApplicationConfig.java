@@ -8,6 +8,7 @@ import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
+import org.javers.spring.auditable.aspect.JaversAuditableDeleteAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -67,6 +68,17 @@ public class JaversSpringMongoApplicationConfig {
     @Bean
     public JaversAuditableAspect javersAuditableAspect() {
         return new JaversAuditableAspect(javers(), authorProvider(), commitPropertiesProvider());
+    }
+
+    /**
+     * Enables auto-audit aspect for delete on ordinary repositories.<br/>
+     *
+     * Use {@link org.javers.spring.annotation.JaversAuditableDelete}
+     * to mark data delete methods that you want to audit.
+     */
+    @Bean
+    public JaversAuditableDeleteAspect javersAuditableDeleteAspect() {
+        return new JaversAuditableDeleteAspect(javers(), authorProvider(), commitPropertiesProvider());
     }
 
     /**
