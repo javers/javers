@@ -101,7 +101,6 @@ subprojects {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                artifactId = 'javers'
                 from components.java
                 artifact sourcesJar
                 artifact javadocJar
