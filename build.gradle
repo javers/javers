@@ -25,7 +25,7 @@ scmVersion {
 }
 
 subprojects {
-    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
     apply plugin: 'signing'
     apply plugin: 'java'
     apply plugin: 'groovy'
@@ -87,44 +87,27 @@ subprojects {
         }
     }
 
-    //-- begin uploadArchives spell --
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
+    //-- begin maven-publish.publish  spell --
     task sourcesJar(type: Jar) {
+        from sourceSets.main.allJava
         classifier = 'sources'
-        from sourceSets.main.allSource
+        // archiveClassifier = 'sources' //gradle 5
     }
-    artifacts {
-        archives javadocJar, sourcesJar
+    task javadocJar(type: Jar) {
+        from javadoc
+        classifier = 'javadoc'
+        // archiveClassifier = 'javadoc' //gradle 5
     }
-    signing {
-        required { gradle.taskGraph.hasTask("uploadArchives") }
-        sign configurations.archives
-    }
-    // Build, sign, and upload
-    uploadArchives {
-        repositories {
-            mavenDeployer {
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId = 'javers'
+                from components.java
+                artifact sourcesJar
+                artifact javadocJar
 
-                // Sign POM
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                // Destination
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: project.findProperty('nexusUsername') ?: 'secured', 
-                                   password: project.findProperty('nexusPassword') ?: 'secured')
-                }
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: project.findProperty('nexusUsername') ?: 'secured',
-                                   password: project.findProperty('nexusPassword') ?: 'secured')
-                }
-
-                // Add required metadata to POM
-                pom.project {
+                pom {
                     name = 'JaVers Library'
-                    packaging 'jar'
                     description = 'JaVers - object auditing and diff framework for Java'
                     url = 'http://javers.org'
                     licenses {
@@ -148,8 +131,22 @@ subprojects {
                 }
             }
         }
+        repositories {
+            maven {
+                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                credentials {
+                    username project.findProperty('nexusUsername') ?: 'secured'
+                    password project.findProperty('nexusPassword') ?: 'secured'
+                }
+            }
+        }
     }
-    //-- eof uploadArchives spell --
+    signing {
+        sign publishing.publications
+    }
+    //-- eof maven-publish.publish spell --
 
     test {
         testLogging.exceptionFormat = 'full'
