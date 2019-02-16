@@ -1,6 +1,7 @@
 package org.javers.spring.repository
 
 import org.javers.spring.annotation.JaversAuditable
+import org.javers.spring.annotation.JaversAuditableDelete
 import org.javers.spring.model.DummyObject
 import org.springframework.stereotype.Repository
 
@@ -29,4 +30,20 @@ class DummyAuditedRepository {
         //... omitted
         null
     }
+
+    @JaversAuditableDelete
+    void delete(DummyObject obj) {
+        //... omitted
+    }
+
+    @JaversAuditableDelete
+    void deleteTwo(DummyObject obj, obj2){
+        //... omitted
+    }
+
+    @JaversAuditableDelete
+    void deleteAll(Iterable<DummyObject> objetcs){
+        //... omitted
+    }
+
 }
