@@ -36,4 +36,8 @@ public class CustomType<T> extends ClassType {
     public boolean equals(Object left, Object right) {
         return comparator.equals((T)left, (T)right);
     }
+
+    public CustomPropertyComparator<T, ?> getComparator() {
+        return comparator;
+    }
 }
