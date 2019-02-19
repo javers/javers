@@ -3,6 +3,7 @@ package org.javers.repository.mongo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
 import org.bson.Document;
 import org.javers.repository.mongo.model.MongoHeadId;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ class MongoSchemaManager {
     static final String COMMIT_DATE_INSTANT = "commitMetadata.commitDateInstant";
     static final String COMMIT_AUTHOR = "commitMetadata.author";
     static final String COMMIT_PROPERTIES = "commitMetadata.properties";
+    static final String COMMIT_PROPERTIES_INDEX_NAME = "commitMetadata.properties_key_value";
     static final String GLOBAL_ID_KEY = "globalId_key";
     static final String GLOBAL_ID_ENTITY = "globalId.entity";
     static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
@@ -47,7 +49,8 @@ class MongoSchemaManager {
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
-        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC));
+        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC),
+                new IndexOptions().name(COMMIT_PROPERTIES_INDEX_NAME));
 
         headCollection();
 
