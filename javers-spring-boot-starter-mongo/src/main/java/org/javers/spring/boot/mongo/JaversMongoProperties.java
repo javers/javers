@@ -9,4 +9,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "javers")
 public class JaversMongoProperties extends JaversSpringProperties {
 
+    private boolean documentDbCompatibilityEnabled = false;
+
+    public boolean isDocumentDbCompatibilityEnabled() {
+        return documentDbCompatibilityEnabled;
+    }
+
+    public void setDocumentDbCompatibilityEnabled(boolean documentDbCompatibilityEnabled) {
+        this.documentDbCompatibilityEnabled = documentDbCompatibilityEnabled;
+    }
+
 }

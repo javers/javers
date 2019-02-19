@@ -4,7 +4,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
-import org.javers.repository.api.JaversRepository;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
@@ -50,7 +49,8 @@ public class JaversMongoAutoConfiguration {
 
         logger.info("connecting to database: {}", mongoProperties.getMongoClientDatabase());
 
-        JaversRepository javersRepository = new MongoRepository(mongoDatabase);
+        MongoRepository javersRepository = new MongoRepository(mongoDatabase);
+        javersRepository.setDocumentDbCompatibilityEnabled(javersMongoProperties.isDocumentDbCompatibilityEnabled());
 
         return JaversBuilder.javers()
                 .registerJaversRepository(javersRepository)
