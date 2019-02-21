@@ -114,6 +114,9 @@ class TypeFactory {
             ManagedClass managedClass = managedClassFactory.createFromPrototype(javaRichType.javaClass, javaRichType.getScan(),
                     managedPrototype.getManagedClass().getManagedPropertiesFilter());
             return managedPrototype.spawn(managedClass, javaRichType.getScan().typeName());
+        } else if (prototype instanceof CustomType) {
+            CustomType customTypePrototype = (CustomType) prototype;
+            return new CustomType(customTypePrototype.getBaseJavaType(), customTypePrototype.getComparator());
         } else {
             return prototype.spawn(javaRichType.javaType); //delegate to simple constructor
         }
