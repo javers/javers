@@ -1,6 +1,5 @@
 ./gradlew -v
 ./gradlew clean build
-./gradlew publish --info
-./gradlew closeAndReleaseRepository --info
+./gradlew publishToNexus closeAndReleaseRepository
 
 echo "published"
