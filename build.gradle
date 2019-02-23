@@ -89,13 +89,11 @@ subprojects {
     //-- begin maven-publish.publish  spell --
     task sourcesJar(type: Jar) {
         from sourceSets.main.allJava
-        classifier = 'sources'
-        // archiveClassifier = 'sources' //gradle 5
+        archiveClassifier = 'sources'
     }
     task javadocJar(type: Jar) {
         from javadoc
-        classifier = 'javadoc'
-        // archiveClassifier = 'javadoc' //gradle 5
+        archiveClassifier = 'javadoc'
     }
     publishing {
         publications {
@@ -164,8 +162,4 @@ nexusPublishing {
     stagingProfileId = rootProject.nexusStaging.stagingProfileId
     username = rootProject.nexusStaging.username
     password = rootProject.nexusStaging.password
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.10.3'
 }
