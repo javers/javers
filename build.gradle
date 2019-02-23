@@ -14,7 +14,7 @@ buildscript {
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.7.1'
     id 'io.codearte.nexus-staging' version '0.20.0'
-    id 'de.marcphilipp.nexus-publish' version '0.2.0'
+    id 'de.marcphilipp.nexus-publish' version '0.2.0' apply false
 }
 
 scmVersion {
@@ -30,6 +30,7 @@ subprojects {
     apply plugin: 'groovy'
     apply plugin: 'propdeps'
     apply plugin: 'org.owasp.dependencycheck'
+    apply plugin: 'de.marcphilipp.nexus-publish'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -148,6 +149,13 @@ subprojects {
         testLogging.exceptionFormat = 'full'
         testLogging.showStackTraces = true
     }
+
+    nexusPublishing {
+        packageGroup = rootProject.nexusStaging.packageGroup
+        stagingProfileId = rootProject.nexusStaging.stagingProfileId
+        username = rootProject.nexusStaging.username
+        password = rootProject.nexusStaging.password
+    }
 }
 
 //io.codearte.gradle
@@ -155,11 +163,4 @@ nexusStaging {
     packageGroup = 'org.javers'
     numberOfRetries = 20
     delayBetweenRetriesInMillis = 3000
-}
-
-nexusPublishing {
-    packageGroup = rootProject.nexusStaging.packageGroup
-    stagingProfileId = rootProject.nexusStaging.stagingProfileId
-    username = rootProject.nexusStaging.username
-    password = rootProject.nexusStaging.password
 }
