@@ -9,7 +9,6 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import java.util.Optional;
 import org.javers.common.string.RegexEscape;
 import org.javers.core.CommitIdGenerator;
 import org.javers.core.JaversCoreConfiguration;
@@ -24,7 +23,6 @@ import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.ValueObjectType;
 import org.javers.repository.api.*;
 import org.javers.repository.mongo.model.MongoHeadId;
-import java.time.LocalDateTime;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,6 +45,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     private JaversCoreConfiguration coreConfiguration;
     private final MapKeyDotReplacer mapKeyDotReplacer = new MapKeyDotReplacer();
     private final LatestSnapshotCache cache;
+    private boolean documentDbCompatibilityEnabled;
 
     public MongoRepository(MongoDatabase mongo) {
         this(mongo, null, DEFAULT_CACHE_SIZE);
@@ -63,6 +62,14 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
         this.jsonConverter = jsonConverter;
         this.mongoSchemaManager = new MongoSchemaManager(mongo);
         cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
+}
+
+    public boolean isDocumentDbCompatibilityEnabled() {
+        return documentDbCompatibilityEnabled;
+    }
+
+    public void setDocumentDbCompatibilityEnabled(boolean documentDbCompatibilityEnabled) {
+        this.documentDbCompatibilityEnabled = documentDbCompatibilityEnabled;
     }
 
     @Override
@@ -140,7 +147,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
 
     @Override
     public void ensureSchema() {
-        mongoSchemaManager.ensureSchema();
+        mongoSchemaManager.ensureSchema(!documentDbCompatibilityEnabled);
     }
 
     private Bson createIdQuery(GlobalId id) {

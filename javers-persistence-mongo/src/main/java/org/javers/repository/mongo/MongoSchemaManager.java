@@ -41,7 +41,7 @@ class MongoSchemaManager {
         this.mongo = mongo;
     }
 
-    public void ensureSchema() {
+    public void ensureSchema(boolean allowCompoundIndex) {
         //ensures collections and indexes
         MongoCollection<Document> snapshots = snapshotsCollection();
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_KEY, ASC));
@@ -49,8 +49,14 @@ class MongoSchemaManager {
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
-        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC),
-                new IndexOptions().name(COMMIT_PROPERTIES_INDEX_NAME));
+
+        if (allowCompoundIndex) {
+            snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC),
+                    new IndexOptions().name(COMMIT_PROPERTIES_INDEX_NAME));
+        } else {
+            snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC));
+            snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".value", ASC));
+        }
 
         headCollection();
 
