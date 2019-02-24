@@ -7,6 +7,7 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.api.QueryParamsBuilder
+import spock.lang.Shared
 
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.repository.jql.QueryBuilder.byInstanceId
@@ -19,9 +20,12 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
 abstract class JaversMongoRepositoryE2ETest extends JaversRepositoryShadowE2ETest {
     protected abstract MongoDatabase getMongoDb()
 
+    JaversTestBuilder javersTestBuilder
+
     @Override
     def setup() {
         repository.jsonConverter = javers.jsonConverter
+        javersTestBuilder = JaversTestBuilder.javersTestAssembly()
     }
 
     @Override
@@ -44,10 +48,9 @@ abstract class JaversMongoRepositoryE2ETest extends JaversRepositoryShadowE2ETes
     }
 
     def "should persist head id"() {
-
         given:
-        def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def mongoRepository = new MongoRepository(getMongoDb(), javersTestBuilder.jsonConverter, 100)
+        MongoRepository mongoRepository = (MongoRepository)repository
+
         def commitFactory = javersTestBuilder.commitFactory
 
         def kazikV1 = dummyUser("Kazik").withAge(1)
@@ -72,10 +75,8 @@ abstract class JaversMongoRepositoryE2ETest extends JaversRepositoryShadowE2ETes
     }
 
     def "should persist commit and get latest snapshot"() {
-
         given:
-        def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def mongoRepository = new MongoRepository(getMongoDb(), javersTestBuilder.jsonConverter, 100)
+        MongoRepository mongoRepository = (MongoRepository)repository
         def commitFactory = javersTestBuilder.commitFactory
 
         def kazik = new DummyUser("kazik")
@@ -94,11 +95,9 @@ abstract class JaversMongoRepositoryE2ETest extends JaversRepositoryShadowE2ETes
     }
 
     def "should get last commit by GlobalId"() {
-
         given:
-        //create components
-        def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def mongoRepository = new MongoRepository(getMongoDb(), javersTestBuilder.jsonConverter, 100)
+        MongoRepository mongoRepository = (MongoRepository)repository
+
         def commitFactory = javersTestBuilder.commitFactory
         def id = javersTestBuilder.globalIdFactory.createInstanceId("kazik", DummyUser)
 
@@ -115,11 +114,8 @@ abstract class JaversMongoRepositoryE2ETest extends JaversRepositoryShadowE2ETes
     }
 
     def "should get last commit by InstanceIdDTO"() {
-
         given:
-        //create components
-        def javersTestBuilder = JaversTestBuilder.javersTestAssembly()
-        def mongoRepository = new MongoRepository(getMongoDb(), javersTestBuilder.jsonConverter, 100)
+        MongoRepository mongoRepository = (MongoRepository)repository
         def commitFactory = javersTestBuilder.commitFactory
         def id = javersTestBuilder.instanceId(new DummyUser("kazik"))
 
@@ -136,14 +132,8 @@ abstract class JaversMongoRepositoryE2ETest extends JaversRepositoryShadowE2ETes
     }
 
     def "should get state history"() {
-
         given:
-        def mongoRepository = new MongoRepository(getMongoDb())
-        def javersTestBuilder = JaversTestBuilder.javersTestAssembly(mongoRepository)
-
-        mongoRepository.setJsonConverter(javersTestBuilder.jsonConverter)
-
-        def javers = javersTestBuilder.javers()
+        MongoRepository mongoRepository = (MongoRepository)repository
 
         def kazikV1 = dummyUser("kazik").withAge(12)
         def kazikV2 = dummyUser("kazik").withAge(13)

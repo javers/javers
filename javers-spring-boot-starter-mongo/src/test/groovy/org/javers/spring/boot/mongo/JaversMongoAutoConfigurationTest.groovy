@@ -38,6 +38,7 @@ class JaversMongoAutoConfigurationTest extends Specification{
         !javersProperties.prettyPrint
         javersProperties.typeSafeValues
         javersProperties.commitIdGenerator == "random"
+        javersProperties.documentDbCompatibilityEnabled == true
     }
 
     def "shouldReadBeanMappingStyleFromYml"() {

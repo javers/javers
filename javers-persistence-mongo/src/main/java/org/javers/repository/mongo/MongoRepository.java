@@ -10,6 +10,7 @@ import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.javers.common.string.RegexEscape;
+import org.javers.common.validation.Validate;
 import org.javers.core.CommitIdGenerator;
 import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.commit.Commit;
@@ -31,6 +32,8 @@ import static org.javers.common.collections.Lists.toImmutableList;
 import static org.javers.common.validation.Validate.conditionFulfilled;
 import static org.javers.repository.mongo.DocumentConverter.fromDocument;
 import static org.javers.repository.mongo.DocumentConverter.toDocument;
+import static org.javers.repository.mongo.MongoDialect.DOCUMENT_DB;
+import static org.javers.repository.mongo.MongoDialect.MONGO_DB;
 import static org.javers.repository.mongo.MongoSchemaManager.*;
 
 /**
@@ -45,31 +48,37 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
     private JaversCoreConfiguration coreConfiguration;
     private final MapKeyDotReplacer mapKeyDotReplacer = new MapKeyDotReplacer();
     private final LatestSnapshotCache cache;
-    private boolean documentDbCompatibilityEnabled;
+    private MongoDialect mongoDialect;
 
     public MongoRepository(MongoDatabase mongo) {
-        this(mongo, null, DEFAULT_CACHE_SIZE);
+        this(mongo, DEFAULT_CACHE_SIZE, MONGO_DB);
+    }
+
+    /**
+     * MongoRepository compatible with Amazon DocumentDB.
+     * <br/>
+     *
+     * Compound index on <code>commitProperties</code> isn't created.
+     * <br/><br/>
+     *
+     * See <a href="http://docs.aws.amazon.com/documentdb/latest/developerguide/functional-differences.html">functional differences</a>.
+     */
+    public static MongoRepository mongoRepositoryWithDocumentDBCompatibility(MongoDatabase mongo) {
+        return new MongoRepository(mongo, DEFAULT_CACHE_SIZE, DOCUMENT_DB);
     }
 
     /**
      * @param cacheSize Size of the latest snapshots cache, default is 5000. Set 0 to disable.
      */
     public MongoRepository(MongoDatabase mongo, int cacheSize) {
-        this(mongo, null, cacheSize);
+        this(mongo, cacheSize, MONGO_DB);
     }
 
-    MongoRepository(MongoDatabase mongo, JsonConverter jsonConverter, int cacheSize) {
-        this.jsonConverter = jsonConverter;
+    MongoRepository(MongoDatabase mongo, int cacheSize, MongoDialect dialect) {
+        Validate.argumentsAreNotNull(mongo, dialect);
+        this.mongoDialect = dialect;
         this.mongoSchemaManager = new MongoSchemaManager(mongo);
         cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
-}
-
-    public boolean isDocumentDbCompatibilityEnabled() {
-        return documentDbCompatibilityEnabled;
-    }
-
-    public void setDocumentDbCompatibilityEnabled(boolean documentDbCompatibilityEnabled) {
-        this.documentDbCompatibilityEnabled = documentDbCompatibilityEnabled;
     }
 
     @Override
@@ -147,7 +156,7 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
 
     @Override
     public void ensureSchema() {
-        mongoSchemaManager.ensureSchema(!documentDbCompatibilityEnabled);
+        mongoSchemaManager.ensureSchema(mongoDialect);
     }
 
     private Bson createIdQuery(GlobalId id) {

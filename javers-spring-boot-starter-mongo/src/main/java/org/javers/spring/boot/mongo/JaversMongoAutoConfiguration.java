@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
+import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDocumentDBCompatibility;
+
 /**
  * @author pawelszymczyk
  */
@@ -49,14 +51,21 @@ public class JaversMongoAutoConfiguration {
 
         logger.info("connecting to database: {}", mongoProperties.getMongoClientDatabase());
 
-        MongoRepository javersRepository = new MongoRepository(mongoDatabase);
-        javersRepository.setDocumentDbCompatibilityEnabled(javersMongoProperties.isDocumentDbCompatibilityEnabled());
+        MongoRepository javersRepository = createMongoRepository(javersMongoProperties, mongoDatabase);
 
         return JaversBuilder.javers()
                 .registerJaversRepository(javersRepository)
                 .withProperties(javersMongoProperties)
                 .withObjectAccessHook(new DBRefUnproxyObjectAccessHook())
                 .build();
+    }
+
+    private MongoRepository createMongoRepository(JaversMongoProperties javersMongoProperties, MongoDatabase mongoDatabase) {
+        if (javersMongoProperties.isDocumentDbCompatibilityEnabled()){
+            logger.info("enabling Amazon DocumentDB compatibility");
+            return mongoRepositoryWithDocumentDBCompatibility(mongoDatabase);
+        }
+        return new MongoRepository(mongoDatabase);
     }
 
     @Bean(name = "SpringSecurityAuthorProvider")
