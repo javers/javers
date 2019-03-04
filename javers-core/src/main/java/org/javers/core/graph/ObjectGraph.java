@@ -1,7 +1,5 @@
-package org.javers.core.diff;
+package org.javers.core.graph;
 
-import org.javers.core.graph.ObjectNode;
-import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.Optional;
@@ -12,13 +10,13 @@ import java.util.stream.Collectors;
  * @author bartosz walacik
  */
 public abstract class ObjectGraph<T extends Cdo> {
-    private final Set<ObjectNode> nodes;
+    private final Set<ObjectNode<T>> nodes;
 
-    public ObjectGraph(Set<ObjectNode> nodes) {
+    protected ObjectGraph(Set<ObjectNode<T>> nodes) {
         this.nodes = nodes;
     }
 
-    public Set<ObjectNode> nodes() {
+    public Set<ObjectNode<T>> nodes() {
         return nodes;
     }
 

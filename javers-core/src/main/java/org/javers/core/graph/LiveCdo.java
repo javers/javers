@@ -1,21 +1,39 @@
-package org.javers.core.metamodel.object;
+package org.javers.core.graph;
 
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.object.ValueObjectIdWithHash;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.ManagedType;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import static org.javers.common.validation.Validate.*;
+import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * Wrapper for live client's domain object (aka CDO)
  *
  * @author bartosz walacik
  */
-public abstract class LiveCdo extends Cdo {
+abstract class LiveCdo extends Cdo {
+    private GlobalId globalId;
 
-    public LiveCdo(GlobalId globalId, ManagedType managedType) {
-        super(globalId, managedType);
+    LiveCdo(GlobalId globalId, ManagedType managedType) {
+        super(managedType);
+        this.globalId = globalId;
+    }
+
+    void swapId(GlobalId globalId) {
+        this.globalId = globalId;
+    }
+
+    @Override
+    public GlobalId getGlobalId() {
+        return globalId;
     }
 
     @Override
@@ -45,5 +63,9 @@ public abstract class LiveCdo extends Cdo {
         return property.isNull(wrappedCdo());
     }
 
-    protected abstract Object wrappedCdo();
+    abstract Object wrappedCdo();
+
+    public boolean requiresObjectHasher() {
+        return globalId instanceof ValueObjectIdWithHash;
+    }
 }

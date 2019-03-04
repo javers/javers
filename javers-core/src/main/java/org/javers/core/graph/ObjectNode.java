@@ -1,18 +1,18 @@
 package org.javers.core.graph;
 
-import java.util.Optional;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.ValueObjectType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
@@ -24,17 +24,19 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  *
  * @author bartosz walacik
  */
-public class ObjectNode {
-    private final Cdo cdo;
+public class ObjectNode<T extends Cdo> {
+    private static final int MAX_VO_HASHING_DEPTH = 2;
+
+    private final T cdo;
     private final Map<JaversProperty, Edge> edges = new HashMap<>();
 
-    public ObjectNode(Cdo cdo) {
+    public ObjectNode(T cdo) {
         argumentsAreNotNull(cdo);
         this.cdo = cdo;
     }
 
     /**
-     * @return returns {@link Optional#EMPTY} for snapshots
+     * @return returns {@link Optional#empty()} for snapshots
      */
     public Optional<Object> wrappedCdo() {
         return cdo.getWrappedCdo();
@@ -77,6 +79,28 @@ public class ObjectNode {
         return cdo.isNull(property);
     }
 
+    void enrichHashIfNeeded(LiveCdoFactory liveCdoFactory) {
+        if (cdo instanceof LiveCdo) {
+            LiveCdo liveCdo = (LiveCdo)cdo;
+
+            if (liveCdo.requiresObjectHasher()) {
+                List<LiveCdo> descendants = (List)descendants(MAX_VO_HASHING_DEPTH).stream()
+                        .map(node -> node.getCdo()).collect(Collectors.toList());
+                enrichHash(liveCdo, descendants,liveCdoFactory);
+            }
+        }
+    }
+
+    private void enrichHash(LiveCdo vo, List<LiveCdo> descendants, LiveCdoFactory liveCdoFactory) {
+        List<LiveCdo> descendantVOs = descendants.stream()
+                .filter(cdo -> cdo.getGlobalId() instanceof ValueObjectId)
+                .collect(Collectors.toList());
+
+        ValueObjectId newId = liveCdoFactory.regenerateValueObjectHash(vo, descendantVOs);
+
+        vo.swapId(newId);
+    }
+
     Edge getEdge(Property property) {
         return edges.get(property);
     }
@@ -98,20 +122,42 @@ public class ObjectNode {
         return cdo.getManagedType();
     }
 
-    public Cdo getCdo() {
+    public T getCdo() {
         return cdo;
     }
 
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        ObjectNode that = (ObjectNode) o;
-        return cdo.equals(that.cdo);
+    Set<ObjectNode> descendants(int maxDepth) {
+        return new NodeTraverser(this, maxDepth).descendants;
     }
 
-    public int hashCode() {
-        return cdo.hashCode();
+    private static class NodeTraverser {
+        private final Set<ObjectNode> descendants = new HashSet();
+        private final int maxDepth;
+        private final ObjectNode root;
+
+        NodeTraverser(ObjectNode root, int maxDepth) {
+            this.maxDepth = maxDepth;
+            this.root = root;
+            followEdges(root, 1);
+        }
+
+        void follow(Edge edge, int depth) {
+            edge.getReferences().forEach(n -> {
+               if(!descendants.contains(n) && !n.equals(root)) {
+                   descendants.add(n);
+                   if (depth < maxDepth) {
+                       followEdges(n, depth + 1);
+                   }
+               }
+            });
+        }
+
+        void followEdges(ObjectNode node, int depth) {
+            node.edges.values().forEach(e -> follow((Edge)e, depth));
+        }
+
+        Set<ObjectNode> getDescendants() {
+            return Collections.unmodifiableSet(descendants);
+        }
     }
 }

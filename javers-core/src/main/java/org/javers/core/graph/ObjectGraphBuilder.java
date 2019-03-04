@@ -1,12 +1,17 @@
 package org.javers.core.graph;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.Cdo;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.type.EnumerableType;
+import org.javers.core.metamodel.type.JaversProperty;
+import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -23,9 +28,9 @@ class ObjectGraphBuilder {
     private boolean built;
     private final EdgeBuilder edgeBuilder;
     private final NodeReuser nodeReuser = new NodeReuser();
-    private final CdoFactory cdoFactory;
+    private final LiveCdoFactory cdoFactory;
 
-    public ObjectGraphBuilder(TypeMapper typeMapper, CdoFactory cdoFactory) {
+    ObjectGraphBuilder(TypeMapper typeMapper, LiveCdoFactory cdoFactory) {
         Validate.argumentsAreNotNull(typeMapper, cdoFactory);
         this.typeMapper = typeMapper;
         this.cdoFactory = cdoFactory;
@@ -38,7 +43,7 @@ class ObjectGraphBuilder {
      *               or any node in object graph from where all other nodes are navigable
      * @return graph nodes set
      */
-    public LiveGraph buildGraph(Object handle) {
+    LiveGraph buildGraph(Object handle) {
         argumentIsNotNull(handle);
 
         Cdo cdo = cdoFactory.create(handle, null);
@@ -58,11 +63,23 @@ class ObjectGraphBuilder {
             buildEdges(stub); //edgeBuilder should append new stubs to queue
         }
 
-        logger.debug("{} graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
-                edgeBuilder.graphType(),
+        logger.debug("live graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
                 nodeReuser.nodesCount(), nodeReuser.entitiesCount(), nodeReuser.voCount());
+
+        System.out.println("before enrichHashes");
+        nodeReuser.nodes().forEach(it -> System.out.println("- "+ it.getGlobalId()));
+
+        enrichHashes(nodeReuser.nodes());
+
+        System.out.println("after enrichHashes");
+        nodeReuser.nodes().forEach(it -> System.out.println("- "+it.getGlobalId()));
+
         switchToBuilt();
         return new LiveGraph(root, nodeReuser.nodes());
+    }
+
+    private void enrichHashes(Set<ObjectNode<LiveCdo>> nodes) {
+        nodes.forEach(n -> n.enrichHashIfNeeded(cdoFactory));
     }
 
     private void buildEdges(ObjectNode nodeStub) {

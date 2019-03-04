@@ -2,28 +2,25 @@ package org.javers.core
 
 import org.javers.common.date.DateProvider
 import org.javers.core.commit.CommitFactory
+import org.javers.core.graph.LiveCdo
 import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.LiveCdoWrapper
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.LiveGraphFactory
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.JsonConverterBuilder
-import org.javers.core.metamodel.object.LiveCdo
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.core.metamodel.scanner.ClassScanner
-import org.javers.core.metamodel.type.TypeFactory
-import org.javers.core.model.DummyAddress
-import org.javers.core.snapshot.ObjectHasher
-import org.javers.core.snapshot.SnapshotFactory
 import org.javers.core.metamodel.property.Property
 import org.javers.core.metamodel.type.TypeMapper
+import org.javers.core.model.DummyAddress
+import org.javers.core.graph.ObjectHasher
+import org.javers.core.snapshot.SnapshotFactory
 import org.javers.repository.api.JaversExtendedRepository
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryRunner
-import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.shadow.ShadowFactory
 
 /**

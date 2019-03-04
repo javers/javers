@@ -1,6 +1,5 @@
 package org.javers.core.graph;
 
-import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.ValueObjectId;
 
@@ -11,7 +10,7 @@ import java.util.*;
  */
 class NodeReuser {
     private final Map<Object, ObjectNode> reverseCdoIdMap = new HashMap<>();
-    private final Set<ObjectNode> nodes = new HashSet<>();
+    private final Set<ObjectNode<LiveCdo>> nodes = new HashSet<>();
     private final Queue<ObjectNode> stubs = new LinkedList<>();
     private int reusedNodes;
     private int entities;
@@ -29,7 +28,7 @@ class NodeReuser {
         return reverseCdoIdMap.get(reverseCdoIdMapKey(cdo));
     }
 
-    Set<ObjectNode> nodes() {
+    Set<ObjectNode<LiveCdo>> nodes() {
         return nodes;
     }
 

@@ -2,9 +2,13 @@ package org.javers.core.snapshot;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.graph.Cdo;
+import org.javers.core.metamodel.object.CdoSnapshot;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Builds snapshots for provided live objects.
@@ -25,11 +29,11 @@ public class ChangedCdoSnapshotsFactory {
      * @param latestSnapshots CDO snapshots used to check which of liveObjects have been created or changed
      * @param commitMetadata commit metadata used to create new snapshots
      */
-    public List<CdoSnapshot> create(Set<LiveCdo> liveObjects, Set<CdoSnapshot> latestSnapshots, CommitMetadata commitMetadata) {
+    public List<CdoSnapshot> create(Set<Cdo> liveObjects, Set<CdoSnapshot> latestSnapshots, CommitMetadata commitMetadata) {
         Validate.argumentsAreNotNull(liveObjects, commitMetadata, latestSnapshots);
 
         List<CdoSnapshot> result = new ArrayList<>();
-        for (LiveCdo currentCdo : liveObjects) {
+        for (Cdo currentCdo : liveObjects) {
             Optional<CdoSnapshot> previousSnapshot = latestSnapshots.stream().filter(currentCdo::equals).findFirst();
             CdoSnapshot currentSnapshot = createSnapshot(latestSnapshots, commitMetadata, currentCdo, previousSnapshot);
             if (isCdoChanged(previousSnapshot, currentSnapshot)) {
@@ -40,7 +44,7 @@ public class ChangedCdoSnapshotsFactory {
     }
 
     private CdoSnapshot createSnapshot(Set<CdoSnapshot> previousCdos, CommitMetadata commitMetadata,
-                                       LiveCdo liveCdo, Optional<CdoSnapshot> previousSnapshot) {
+                                       Cdo liveCdo, Optional<CdoSnapshot> previousSnapshot) {
         return isNewlyCreated(liveCdo, previousCdos) ?
                 createInitialSnapshot(commitMetadata, liveCdo) :
                 createUpdateSnapshot(commitMetadata, liveCdo, previousSnapshot.get());
@@ -50,11 +54,11 @@ public class ChangedCdoSnapshotsFactory {
         return !previousCdos.contains(cdo);
     }
 
-    private CdoSnapshot createInitialSnapshot(CommitMetadata commitMetadata, LiveCdo liveCdo) {
+    private CdoSnapshot createInitialSnapshot(CommitMetadata commitMetadata, Cdo liveCdo) {
         return snapshotFactory.createInitial(liveCdo, commitMetadata);
     }
 
-    private CdoSnapshot createUpdateSnapshot(CommitMetadata commitMetadata, LiveCdo liveCdo, CdoSnapshot previousSnapshot) {
+    private CdoSnapshot createUpdateSnapshot(CommitMetadata commitMetadata, Cdo liveCdo, CdoSnapshot previousSnapshot) {
         return snapshotFactory.createUpdate(liveCdo, previousSnapshot, commitMetadata);
     }
 

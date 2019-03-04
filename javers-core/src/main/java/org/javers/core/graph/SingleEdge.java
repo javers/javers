@@ -1,8 +1,11 @@
 package org.javers.core.graph;
 
+import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.JaversProperty;
+
+import java.util.List;
 
 /**
  * OneToOne or ManyToOne relation
@@ -21,7 +24,12 @@ class SingleEdge extends AbstractSingleEdge {
     }
 
     @Override
-    public GlobalId getReference() {
+    GlobalId getReference() {
         return referencedNode.getGlobalId();
+    }
+
+    @Override
+    List<ObjectNode> getReferences() {
+        return Lists.asList(referencedNode);
     }
 }

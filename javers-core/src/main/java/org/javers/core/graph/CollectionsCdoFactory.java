@@ -2,7 +2,6 @@ package org.javers.core.graph;
 
 import org.javers.common.collections.Lists;
 import org.javers.common.reflection.JaversMember;
-import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScanner;

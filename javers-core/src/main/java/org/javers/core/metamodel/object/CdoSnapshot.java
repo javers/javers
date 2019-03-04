@@ -3,6 +3,7 @@ package org.javers.core.metamodel.object;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.graph.Cdo;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.ManagedType;
 
@@ -29,6 +30,7 @@ public final class CdoSnapshot extends Cdo {
     private final SnapshotType type;
     private final List<String> changed;
     private final long version;
+    private final GlobalId globalId;
 
     /**
      * should be assembled by {@link CdoSnapshotBuilder}
@@ -40,13 +42,14 @@ public final class CdoSnapshot extends Cdo {
                 List<String> changed,
                 ManagedType managedType,
                 long version) {
-        super(globalId, managedType);
-        Validate.argumentsAreNotNull(state, commitMetadata, type, managedType);
+        super(managedType);
+        Validate.argumentsAreNotNull(state, commitMetadata, type, managedType, globalId);
         this.state = state;
         this.commitMetadata = commitMetadata;
         this.type = type;
         this.changed = changed;
         this.version = version;
+        this.globalId = globalId;
     }
 
     /**
@@ -55,6 +58,11 @@ public final class CdoSnapshot extends Cdo {
     @Override
     public Optional<Object> getWrappedCdo() {
         return Optional.empty();
+    }
+
+    @Override
+    public GlobalId getGlobalId() {
+        return globalId;
     }
 
     public int size() {

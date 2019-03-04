@@ -1,7 +1,9 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
+import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
 
 /**
@@ -10,16 +12,12 @@ import org.javers.core.metamodel.type.*;
 class EdgeBuilder {
     private final TypeMapper typeMapper;
     private final NodeReuser nodeReuser;
-    private final CdoFactory cdoFactory;
+    private final LiveCdoFactory cdoFactory;
 
-    EdgeBuilder(TypeMapper typeMapper, NodeReuser nodeReuser, CdoFactory cdoFactory) {
+    EdgeBuilder(TypeMapper typeMapper, NodeReuser nodeReuser, LiveCdoFactory cdoFactory) {
         this.typeMapper = typeMapper;
         this.nodeReuser = nodeReuser;
         this.cdoFactory = cdoFactory;
-    }
-
-    String graphType(){
-        return cdoFactory.typeDesc();
     }
 
     /**

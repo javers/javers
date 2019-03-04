@@ -129,6 +129,9 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .andTargetNode()
                 .hasValueObjectId("org.javers.core.model.CategoryVo/#parent/parent/parent")
                 .hasOwnerId("org.javers.core.model.CategoryVo/")
+
+      and: "should get descendants"
+      node.descendants(10).size() == 3
     }
 
     def "should build three nodes linear graph from Entities"() {
@@ -201,6 +204,9 @@ abstract class ObjectGraphBuilderTest extends Specification {
         NodeAssert.assertThat(node).hasEdges(2)
         NodeAssert.assertThat(node).hasSingleEdge("dummyUserDetails")
         NodeAssert.assertThat(node).hasMultiEdge("dummyUserDetailsList").ofSize(3)
+
+        and: "should get descendants"
+        node.descendants(10).size() == 4
     }
 
 
@@ -261,7 +267,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .isMultiEdge("Em1", "Em2", "Em3")
     }
 
-
     def "should manage graph cycles"(){
         //superKaz
         //  \ \   \
@@ -280,7 +285,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(superKaz).root()
 
         then:
-
         //small cycle
         NodeAssert.assertThat(node).hasCdoId("superKaz")
                 .hasEdge("employeesList")
@@ -298,8 +302,10 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .andTargetNode()
                 .hasEdge("supervisor")
                 .isSingleEdgeTo("superKaz")
-    }
 
+        and: "should get descendants"
+        node.descendants(10).size() == 2
+    }
 
     def "should build graph with primitive types Set"() {
         given:
@@ -438,7 +444,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should support large graphs (more than 10000 edges)"() {
         given:
-        def root = new CategoryC(0);
+        def root = new CategoryC(0)
         def parent = root
         10000.times {
             def child = new CategoryC(parent.id+1)
@@ -449,16 +455,21 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def graphBuilder = newBuilder()
 
         when:
-        def node = graphBuilder.buildGraph(root).root()
+        def rootNode = graphBuilder.buildGraph(root).root()
 
         then:
+        def node = rootNode
         (10000-1).times {
             node = node.getEdge("categories").references[0]
             assertThat(node).hasMultiEdge("categories")
             assertThat(node).hasSingleEdge("parent")
         }
-    }
 
+        and: "should limit descendants traversal to given depth"
+        rootNode.descendants(1).size() == 1
+        rootNode.descendants(2).size() == 2
+        rootNode.descendants(3).size() == 3
+    }
 
     @Unroll
     def "should build graph with Optional<#managedType> SingleEdge"() {

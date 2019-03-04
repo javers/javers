@@ -1,8 +1,5 @@
 package org.javers.core.graph;
 
-import org.javers.core.metamodel.object.Cdo;
-import org.javers.core.metamodel.type.TypeMapper;
-
 /**
  * @author pawelszymczyk
  */

@@ -9,9 +9,7 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.appenders.NodeChangeAppender;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
 import org.javers.core.diff.changetype.ObjectRemoved;
-import org.javers.core.graph.LiveGraph;
-import org.javers.core.graph.LiveGraphFactory;
-import org.javers.core.graph.ObjectNode;
+import org.javers.core.graph.*;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.*;
 
@@ -58,7 +56,7 @@ public class DiffFactory {
         return create(buildGraph(oldVersion, itemClass), buildGraph(currentVersion, itemClass), Optional.<CommitMetadata>empty());
     }
 
-    private LiveGraph buildGraph(Collection handle, Class itemClass) {
+    private ObjectGraph buildGraph(Collection handle, Class itemClass) {
         return graphFactory.createLiveGraph(handle, itemClass);
     }
 
@@ -90,7 +88,7 @@ public class DiffFactory {
         return createAndAppendChanges(graphPair, empty());
     }
 
-    private LiveGraph buildGraph(Object handle) {
+    private ObjectGraph buildGraph(Object handle) {
         JaversType jType = typeMapper.getJaversType(handle.getClass());
         if (jType instanceof ValueType || jType instanceof PrimitiveType){
             throw new JaversException(JaversExceptionCode.COMPARING_TOP_LEVEL_VALUES_NOT_SUPPORTED,

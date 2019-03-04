@@ -1,5 +1,6 @@
 package org.javers.core.cases
 
+import groovy.transform.ToString
 import groovy.transform.TupleConstructor
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.container.SetChange
@@ -22,7 +23,7 @@ class CaseWithNestedVOinSet extends Specification {
     def "can detect new element added to set property"() {
         given:
         def a = new Firewall(
-                randomUUID(),
+                1,
                 "foo", [
                     new IngressRule("bar", new Port(80)),
                     new IngressRule("baz", new Port(80))
@@ -39,7 +40,6 @@ class CaseWithNestedVOinSet extends Specification {
         def diff = javers.compare(a, b)
         print diff
 
-
         then:
         diff.hasChanges()
         diff.changes.any { change ->
@@ -48,23 +48,24 @@ class CaseWithNestedVOinSet extends Specification {
             }
         }
     }
-
 }
 
 @TupleConstructor
 class Firewall {
     @Id
-    final UUID id
+    final int id
     final String name
     final Set<IngressRule> ingressRules
 }
 
+@ToString
 @TupleConstructor
 class IngressRule {
     final String name
     final Port port
 }
 
+@ToString
 @TupleConstructor
 class Port {
     final int number

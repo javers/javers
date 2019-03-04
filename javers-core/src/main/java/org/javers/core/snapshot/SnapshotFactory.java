@@ -4,6 +4,7 @@ import org.javers.common.collections.Defaults;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.exception.JaversException;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.graph.Cdo;
 import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.*;
 
@@ -20,7 +21,7 @@ public class SnapshotFactory {
     private final TypeMapper typeMapper;
     private final GlobalIdFactory globalIdFactory;
 
-    public SnapshotFactory(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
+    SnapshotFactory(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
         this.typeMapper = typeMapper;
         this.globalIdFactory = globalIdFactory;
     }
@@ -36,7 +37,7 @@ public class SnapshotFactory {
                 .build();
     }
 
-    public CdoSnapshot createInitial(LiveCdo liveCdo, CommitMetadata commitMetadata) {
+    CdoSnapshot createInitial(Cdo liveCdo, CommitMetadata commitMetadata) {
         return initSnapshotBuilder(liveCdo, commitMetadata)
                 .withState(createSnapshotState(liveCdo))
                 .withType(INITIAL)
@@ -45,7 +46,7 @@ public class SnapshotFactory {
                 .build();
     }
 
-    public CdoSnapshot createUpdate(LiveCdo liveCdo, CdoSnapshot previous, CommitMetadata commitMetadata) {
+    CdoSnapshot createUpdate(Cdo liveCdo, CdoSnapshot previous, CommitMetadata commitMetadata) {
         return initSnapshotBuilder(liveCdo, commitMetadata)
                 .withState(createSnapshotState(liveCdo))
                 .withType(UPDATE)
@@ -54,7 +55,7 @@ public class SnapshotFactory {
                 .build();
     }
 
-    public CdoSnapshotState createSnapshotState(LiveCdo liveCdo){
+    public CdoSnapshotState createSnapshotState(Cdo liveCdo){
         CdoSnapshotStateBuilder stateBuilder = CdoSnapshotStateBuilder.cdoSnapshotState();
         for (JaversProperty property : liveCdo.getManagedType().getProperties()) {
             Object propertyVal = liveCdo.getPropertyValue(property.getName());
@@ -83,7 +84,7 @@ public class SnapshotFactory {
         return  propertyType.map(propertyVal, dehydratorMapFunction, owner);
     }
 
-    private CdoSnapshotBuilder initSnapshotBuilder(LiveCdo liveCdo, CommitMetadata commitMetadata) {
+    private CdoSnapshotBuilder initSnapshotBuilder(Cdo liveCdo, CommitMetadata commitMetadata) {
         return cdoSnapshot()
                 .withGlobalId(liveCdo.getGlobalId())
                 .withCommitMetadata(commitMetadata)

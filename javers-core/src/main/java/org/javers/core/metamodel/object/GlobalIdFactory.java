@@ -4,15 +4,13 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
-import org.javers.core.graph.ObjectAccessProxy;
 import org.javers.core.graph.ObjectAccessHook;
+import org.javers.core.graph.ObjectAccessProxy;
 import org.javers.core.metamodel.type.*;
-import org.javers.core.snapshot.ObjectHasher;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.jql.UnboundedValueObjectIdDTO;
 import org.javers.repository.jql.ValueObjectIdDTO;
-import org.picocontainer.PicoContainer;
 
 import java.util.Optional;
 
@@ -20,22 +18,25 @@ import java.util.Optional;
  * @author bartosz walacik
  */
 public class GlobalIdFactory {
+    private static final String HASH_PLACEHOLDER = "{hashPlaceholder}";
 
     private final TypeMapper typeMapper;
     private ObjectAccessHook objectAccessHook;
     private final GlobalIdPathParser pathParser;
-    private ObjectHasher objectHasher;
-    private final PicoContainer picoContainer;
 
-    public GlobalIdFactory(TypeMapper typeMapper, ObjectAccessHook objectAccessHook, PicoContainer container) {
+    public GlobalIdFactory(TypeMapper typeMapper, ObjectAccessHook objectAccessHook) {
         this.typeMapper = typeMapper;
         this.objectAccessHook = objectAccessHook;
         this.pathParser = new GlobalIdPathParser(typeMapper);
-        this.picoContainer = container;
     }
 
     public GlobalId createId(Object targetCdo) {
         return createId(targetCdo, null);
+    }
+
+    public ValueObjectId replaceHashPlaceholder(ValueObjectId id, String newHash) {
+        return new ValueObjectId(id.getTypeName(), id.getOwnerId(), id.getFragment()
+                .replace(HASH_PLACEHOLDER, newHash));
     }
 
     /**
@@ -66,9 +67,17 @@ public class GlobalIdFactory {
             String pathFromRoot = createPathFromRoot(ownerContext.getOwnerId(), ownerContext.getPath());
 
             if (ownerContext.requiresObjectHasher()) {
-                pathFromRoot += "/" + getObjectHasher().hash(cdoProxy.map((p) -> p.access()).orElse(targetCdo));
+                return new ValueObjectIdWithHash(targetManagedType.getName(),
+                        getRootOwnerId(ownerContext),
+                        pathFromRoot, HASH_PLACEHOLDER);
+            } else if (ownerContext.getOwnerId() instanceof ValueObjectIdWithHash) {
+                return new ValueObjectIdWithHash(targetManagedType.getName(),
+                        (ValueObjectIdWithHash)ownerContext.getOwnerId(),
+                        ownerContext.getPath());
             }
-            return new ValueObjectId(targetManagedType.getName(), getRootOwnerId(ownerContext), pathFromRoot);
+            else {
+                return new ValueObjectId(targetManagedType.getName(), getRootOwnerId(ownerContext), pathFromRoot);
+            }
         }
 
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
@@ -148,17 +157,6 @@ public class GlobalIdFactory {
             return createId(item, context);
         } else {
             return item;
-        }
-    }
-
-    //pico can't resolve cycles
-    private ObjectHasher getObjectHasher(){
-        if (objectHasher != null){
-            return objectHasher;
-        }
-        synchronized (this) {
-            objectHasher = picoContainer.getComponent(ObjectHasher.class);
-            return objectHasher;
         }
     }
 

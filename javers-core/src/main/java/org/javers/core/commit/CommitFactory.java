@@ -6,10 +6,9 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
-import org.javers.core.diff.ObjectGraph;
-import org.javers.core.graph.LiveGraph;
+import org.javers.core.graph.Cdo;
 import org.javers.core.graph.LiveGraphFactory;
-import org.javers.core.metamodel.object.Cdo;
+import org.javers.core.graph.ObjectGraph;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.snapshot.ChangedCdoSnapshotsFactory;
@@ -71,17 +70,17 @@ public class CommitFactory {
 
     public Commit create(String author, Map<String, String> properties, Object currentVersion){
         argumentsAreNotNull(author, currentVersion);
-        LiveGraph currentGraph = createLiveGraph(currentVersion);
+        ObjectGraph currentGraph = createLiveGraph(currentVersion);
         return createCommit(author, properties, currentGraph);
     }
 
     public CompletableFuture<Commit> create(String author, Map<String, String> properties, Object currentVersion, Executor executor) {
         argumentsAreNotNull(author, currentVersion);
-        LiveGraph currentGraph = createLiveGraph(currentVersion);
+        ObjectGraph currentGraph = createLiveGraph(currentVersion);
         return supplyAsync( () -> createCommit(author, properties, currentGraph), executor);
     }
 
-    private Commit createCommit(String author, Map<String, String> properties, LiveGraph currentGraph){
+    private Commit createCommit(String author, Map<String, String> properties, ObjectGraph currentGraph){
         CommitMetadata commitMetadata = newCommitMetadata(author, properties);
         ObjectGraph<CdoSnapshot> latestSnapshotGraph = snapshotGraphFactory.createLatest(currentGraph.globalIds());
         List<CdoSnapshot> changedCdoSnapshots =
@@ -90,7 +89,7 @@ public class CommitFactory {
         return new Commit(commitMetadata, changedCdoSnapshots, diff);
     }
 
-    private LiveGraph createLiveGraph(Object currentVersion){
+    private ObjectGraph createLiveGraph(Object currentVersion){
         argumentsAreNotNull(currentVersion);
         return liveGraphFactory.createLiveGraph(currentVersion);
     }

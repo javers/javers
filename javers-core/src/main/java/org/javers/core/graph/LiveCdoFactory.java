@@ -1,31 +1,50 @@
 package org.javers.core.graph;
 
+import org.javers.common.collections.Lists;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.LiveCdo;
 import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
  * @author bartosz walacik
  */
-public class LiveCdoFactory implements CdoFactory {
+class LiveCdoFactory {
 
     private final GlobalIdFactory globalIdFactory;
     private ObjectAccessHook objectAccessHook;
     private TypeMapper typeMapper;
+    private ObjectHasher objectHasher;
 
-    public LiveCdoFactory(GlobalIdFactory globalIdFactory, ObjectAccessHook objectAccessHook, TypeMapper typeMapper) {
+    LiveCdoFactory(GlobalIdFactory globalIdFactory, ObjectAccessHook objectAccessHook, TypeMapper typeMapper, ObjectHasher objectHasher) {
         this.globalIdFactory = globalIdFactory;
         this.objectAccessHook = objectAccessHook;
         this.typeMapper = typeMapper;
+        this.objectHasher = objectHasher;
     }
 
-    @Override
-    public LiveCdo create(Object cdo, OwnerContext owner) {
+    ValueObjectId regenerateValueObjectHash(LiveCdo valueObject, List<LiveCdo> descendantVOs) {
+
+        System.out.println("enriching hash for: " + valueObject.getGlobalId());
+
+        List<LiveCdo> objectsToBeHashed = Lists.immutableListOf(descendantVOs, valueObject);
+        String newHash = objectHasher.hash(objectsToBeHashed);
+
+        ValueObjectId id = (ValueObjectId) valueObject.getGlobalId();
+
+        ValueObjectId newId = globalIdFactory.replaceHashPlaceholder(id, newHash);
+
+        System.out.println("new hash            " + newId + "\n");
+
+        return newId;
+    }
+
+    LiveCdo create(Object cdo, OwnerContext owner) {
         GlobalId globalId = globalIdFactory.createId(cdo, owner);
 
         Optional<ObjectAccessProxy> objectAccessor = objectAccessHook.createAccessor(cdo);
@@ -40,8 +59,7 @@ public class LiveCdoFactory implements CdoFactory {
         }
     }
 
-    @Override
-    public String typeDesc() {
-        return "live";
+    public GlobalIdFactory getGlobalIdFactory() {
+        return globalIdFactory;
     }
 }

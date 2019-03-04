@@ -1,6 +1,7 @@
 package org.javers.core.snapshot
 
 import org.javers.core.JaversTestBuilder
+import org.javers.core.graph.ObjectHasher
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Shared
