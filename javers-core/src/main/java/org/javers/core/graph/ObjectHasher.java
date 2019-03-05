@@ -19,11 +19,10 @@ class ObjectHasher {
         this.jsonConverter = jsonConverter;
     }
 
-    String hash(List<LiveCdo> objects) {
+    public String hash(List<LiveCdo> objects) {
         String jsonState = objects.stream().map(cdo -> snapshotFactory.createSnapshotState(cdo))
                         .map(state -> jsonConverter.toJson(state))
                         .collect(Collectors.joining( "\n" ));
-
         return ShaDigest.longDigest(jsonState);
     }
 }

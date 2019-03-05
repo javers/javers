@@ -26,5 +26,7 @@ public interface PropertyChangeAppender<T extends PropertyChange> {
 
     T calculateChanges(NodePair pair, JaversProperty property);
 
-    int priority();
+    default int priority() {
+        return LOW_PRIORITY;
+    }
 }

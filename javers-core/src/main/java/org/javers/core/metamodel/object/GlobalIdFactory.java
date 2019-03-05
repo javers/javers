@@ -6,6 +6,8 @@ import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.ObjectAccessProxy;
+import org.javers.core.metamodel.object.ValueObjectIdWithHash.ValueObjectIdWithPlaceholder;
+import org.javers.core.metamodel.object.ValueObjectIdWithHash.ValueObjectIdWithPlaceholderOnParent;
 import org.javers.core.metamodel.type.*;
 import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.InstanceIdDTO;
@@ -18,8 +20,6 @@ import java.util.Optional;
  * @author bartosz walacik
  */
 public class GlobalIdFactory {
-    private static final String HASH_PLACEHOLDER = "{hashPlaceholder}";
-
     private final TypeMapper typeMapper;
     private ObjectAccessHook objectAccessHook;
     private final GlobalIdPathParser pathParser;
@@ -32,11 +32,6 @@ public class GlobalIdFactory {
 
     public GlobalId createId(Object targetCdo) {
         return createId(targetCdo, null);
-    }
-
-    public ValueObjectId replaceHashPlaceholder(ValueObjectId id, String newHash) {
-        return new ValueObjectId(id.getTypeName(), id.getOwnerId(), id.getFragment()
-                .replace(HASH_PLACEHOLDER, newHash));
     }
 
     /**
@@ -67,11 +62,11 @@ public class GlobalIdFactory {
             String pathFromRoot = createPathFromRoot(ownerContext.getOwnerId(), ownerContext.getPath());
 
             if (ownerContext.requiresObjectHasher()) {
-                return new ValueObjectIdWithHash(targetManagedType.getName(),
+                return new ValueObjectIdWithPlaceholder(targetManagedType.getName(),
                         getRootOwnerId(ownerContext),
-                        pathFromRoot, HASH_PLACEHOLDER);
+                        pathFromRoot);
             } else if (ownerContext.getOwnerId() instanceof ValueObjectIdWithHash) {
-                return new ValueObjectIdWithHash(targetManagedType.getName(),
+                return new ValueObjectIdWithPlaceholderOnParent(targetManagedType.getName(),
                         (ValueObjectIdWithHash)ownerContext.getOwnerId(),
                         ownerContext.getPath());
             }

@@ -188,11 +188,11 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
 
     def "should build graph with one SingleEdge and one MultiEdge"(){
-        //       stach - details
-        //       \
-        //        detailsList
-        //         /   |   \
-        //      id    id    id
+        //       stach - details2
+        //           \
+        //           List
+        //         /        |           \
+        //      details1    details2    details3
         given:
         def graphBuilder = newBuilder()
         def stach = dummyUser("Mad Stach").withDetails(2).withDetailsList(3)
@@ -206,7 +206,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
         NodeAssert.assertThat(node).hasMultiEdge("dummyUserDetailsList").ofSize(3)
 
         and: "should get descendants"
-        node.descendants(10).size() == 4
+        node.descendants(10).size() == 3
     }
 
 

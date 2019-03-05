@@ -10,7 +10,7 @@ import java.util.*;
  */
 class NodeReuser {
     private final Map<Object, ObjectNode> reverseCdoIdMap = new HashMap<>();
-    private final Set<ObjectNode<LiveCdo>> nodes = new HashSet<>();
+    private final List<ObjectNode<LiveCdo>> nodes = new ArrayList<>();
     private final Queue<ObjectNode> stubs = new LinkedList<>();
     private int reusedNodes;
     private int entities;
@@ -28,8 +28,8 @@ class NodeReuser {
         return reverseCdoIdMap.get(reverseCdoIdMapKey(cdo));
     }
 
-    Set<ObjectNode<LiveCdo>> nodes() {
-        return nodes;
+    List<ObjectNode<LiveCdo>> nodes() {
+        return Collections.unmodifiableList(nodes);
     }
 
     void saveForReuse(ObjectNode reference) {

@@ -22,8 +22,8 @@ class ReferenceChangeAppender implements PropertyChangeAppender<ReferenceChange>
 
     @Override
     public ReferenceChange calculateChanges(NodePair pair, JaversProperty property) {
-        GlobalId leftId = pair.getLeftGlobalId(property);
-        GlobalId rightId = pair.getRightGlobalId(property);
+        GlobalId leftId = pair.getLeftReference(property);
+        GlobalId rightId = pair.getRightReference(property);
 
         if (Objects.equals(leftId, rightId)) {
             return null;
@@ -31,10 +31,5 @@ class ReferenceChangeAppender implements PropertyChangeAppender<ReferenceChange>
 
         return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId,
             pair.getLeftPropertyValue(property), pair.getRightPropertyValue(property));
-    }
-
-    @Override
-    public int priority() {
-        return LOW_PRIORITY;
     }
 }

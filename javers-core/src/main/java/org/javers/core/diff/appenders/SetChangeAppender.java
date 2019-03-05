@@ -1,6 +1,7 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Sets;
+import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
@@ -10,17 +11,16 @@ import org.javers.core.metamodel.type.*;
 
 import java.util.*;
 
+import static org.javers.core.diff.appenders.CorePropertyChangeAppender.renderNotParametrizedWarningIfNeeded;
+
 /**
  * @author pawel szymczyk
  */
-public class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
+class SetChangeAppender implements PropertyChangeAppender<SetChange> {
     private final TypeMapper typeMapper;
 
-    private final GlobalIdFactory globalIdFactory;
-
-    SetChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
+    SetChangeAppender(TypeMapper typeMapper) {
         this.typeMapper = typeMapper;
-        this.globalIdFactory = globalIdFactory;
     }
 
     @Override
@@ -29,25 +29,43 @@ public class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
     }
 
     @Override
-    public SetChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
+    public SetChange calculateChanges(NodePair pair, JaversProperty property) {
+        GlobalId affectedId = pair.getGlobalId();
 
-        CollectionType setType = property.getType();
-        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
-
-        JaversType itemType = typeMapper.getJaversType(setType.getItemType());
-        DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
-
-        Set leftSet = (Set) setType.map(leftValue, dehydrateFunction, owner);
-        Set rightSet = (Set) setType.map(rightValue, dehydrateFunction, owner);
+        Set leftSet = getLeftSet(pair, property);
+        Set rightSet = getRightSet(pair, property);
 
         List<ContainerElementChange> entryChanges = calculateDiff(leftSet, rightSet);
-
         if (!entryChanges.isEmpty()) {
+            CollectionType setType = property.getType();
             renderNotParametrizedWarningIfNeeded(setType.getItemType(), "item", "Set", property);
             return new SetChange(affectedId, property.getName(), entryChanges);
         } else {
             return null;
         }
+    }
+
+    private Set getLeftSet(NodePair pair, JaversProperty property){
+        if (typeMapper.isContainerOfManagedTypes(property.getType())) {
+            return toSet(pair.getLeftReferences(property));
+        } else {
+            return toSet(pair.getLeftPropertyCollectionAndSanitize(property));
+        }
+    }
+
+    private Set getRightSet(NodePair pair, JaversProperty property){
+        if (typeMapper.isContainerOfManagedTypes(property.getType())) {
+            return toSet(pair.getRightReferences(property));
+        } else {
+            return toSet(pair.getRightPropertyCollectionAndSanitize(property));
+        }
+    }
+
+    private Set toSet(Collection collection) {
+        if (collection instanceof Set) {
+            return (Set) collection;
+        }
+        return new HashSet(collection);
     }
 
     private List<ContainerElementChange> calculateDiff(Set leftSet, Set rightSet) {

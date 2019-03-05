@@ -1,9 +1,9 @@
 package org.javers.core.graph;
 
+import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.JaversProperty;
@@ -13,6 +13,7 @@ import org.javers.core.metamodel.type.ValueObjectType;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.unmodifiableList;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
@@ -25,8 +26,6 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  * @author bartosz walacik
  */
 public class ObjectNode<T extends Cdo> {
-    private static final int MAX_VO_HASHING_DEPTH = 2;
-
     private final T cdo;
     private final Map<JaversProperty, Edge> edges = new HashMap<>();
 
@@ -64,9 +63,41 @@ public class ObjectNode<T extends Cdo> {
             if (propertyValue instanceof GlobalId) {
                 return (GlobalId)propertyValue;
             } else {
-                //when user's class is refactored, a property can have changed type
+                //when user's class is refactored, a property can have different type
                 return null;
             }
+        }
+    }
+
+    /**
+     * returns null if property is not Collection of ManagedType
+     */
+    public Collection<GlobalId> getReferences(Property property) {
+        Edge edge = getEdge(property); //could be null for snapshots
+
+        if (edge instanceof MultiEdge){
+            return unmodifiableList(edge.getReferences()
+                        .stream()
+                        .map(it-> it.getGlobalId())
+                        .collect(Collectors.toList()));
+        }
+
+        Object propertyValue = getPropertyValue(property);
+        if (propertyValue == null || !(propertyValue instanceof Collection)) {
+            return Collections.emptyList();
+        }
+
+        Collection collection = (Collection) propertyValue;
+        if (collection.size() == 0) {
+            return Collections.emptyList();
+        }
+
+        Object firstItem = collection.iterator().next();
+        if (firstItem instanceof GlobalId) {
+            return collection;
+        } else {
+            //when user's class is refactored, a collection can contain different items
+            return Collections.emptyList();
         }
     }
 
@@ -77,28 +108,6 @@ public class ObjectNode<T extends Cdo> {
 
     public boolean isNull(Property property){
         return cdo.isNull(property);
-    }
-
-    void enrichHashIfNeeded(LiveCdoFactory liveCdoFactory) {
-        if (cdo instanceof LiveCdo) {
-            LiveCdo liveCdo = (LiveCdo)cdo;
-
-            if (liveCdo.requiresObjectHasher()) {
-                List<LiveCdo> descendants = (List)descendants(MAX_VO_HASHING_DEPTH).stream()
-                        .map(node -> node.getCdo()).collect(Collectors.toList());
-                enrichHash(liveCdo, descendants,liveCdoFactory);
-            }
-        }
-    }
-
-    private void enrichHash(LiveCdo vo, List<LiveCdo> descendants, LiveCdoFactory liveCdoFactory) {
-        List<LiveCdo> descendantVOs = descendants.stream()
-                .filter(cdo -> cdo.getGlobalId() instanceof ValueObjectId)
-                .collect(Collectors.toList());
-
-        ValueObjectId newId = liveCdoFactory.regenerateValueObjectHash(vo, descendantVOs);
-
-        vo.swapId(newId);
     }
 
     Edge getEdge(Property property) {
@@ -126,12 +135,12 @@ public class ObjectNode<T extends Cdo> {
         return cdo;
     }
 
-    Set<ObjectNode> descendants(int maxDepth) {
-        return new NodeTraverser(this, maxDepth).descendants;
+    List<T> descendants(int maxDepth) {
+        return Lists.immutableListOf(new NodeTraverser(this, maxDepth).descendants);
     }
 
     private static class NodeTraverser {
-        private final Set<ObjectNode> descendants = new HashSet();
+        private final Set<Cdo> descendants = new HashSet();
         private final int maxDepth;
         private final ObjectNode root;
 
@@ -143,8 +152,8 @@ public class ObjectNode<T extends Cdo> {
 
         void follow(Edge edge, int depth) {
             edge.getReferences().forEach(n -> {
-               if(!descendants.contains(n) && !n.equals(root)) {
-                   descendants.add(n);
+               if(!descendants.contains(n.cdo) && !n.equals(root)) {
+                   descendants.add(n.cdo);
                    if (depth < maxDepth) {
                        followEdges(n, depth + 1);
                    }
@@ -155,9 +164,18 @@ public class ObjectNode<T extends Cdo> {
         void followEdges(ObjectNode node, int depth) {
             node.edges.values().forEach(e -> follow((Edge)e, depth));
         }
+    }
 
-        Set<ObjectNode> getDescendants() {
-            return Collections.unmodifiableSet(descendants);
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
         }
+
+        ObjectNode that = (ObjectNode) o;
+        return cdo.equals(that.cdo);
+    }
+
+    public int hashCode() {
+        return cdo.hashCode();
     }
 }

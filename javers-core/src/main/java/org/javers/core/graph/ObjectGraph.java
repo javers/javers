@@ -2,6 +2,7 @@ package org.javers.core.graph;
 
 import org.javers.core.metamodel.object.GlobalId;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,7 +14,7 @@ public abstract class ObjectGraph<T extends Cdo> {
     private final Set<ObjectNode<T>> nodes;
 
     protected ObjectGraph(Set<ObjectNode<T>> nodes) {
-        this.nodes = nodes;
+        this.nodes = Collections.unmodifiableSet(nodes);
     }
 
     public Set<ObjectNode<T>> nodes() {

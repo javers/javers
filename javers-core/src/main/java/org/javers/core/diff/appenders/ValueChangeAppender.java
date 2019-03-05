@@ -38,11 +38,6 @@ class ValueChangeAppender implements PropertyChangeAppender<ValueChange> {
         return new ValueChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);
     }
 
-    @Override
-    public int priority() {
-        return LOW_PRIORITY;
-    }
-
     private boolean isIdProperty(NodePair nodePair, JaversProperty property){
         ManagedType managedType = nodePair.getManagedType();
 

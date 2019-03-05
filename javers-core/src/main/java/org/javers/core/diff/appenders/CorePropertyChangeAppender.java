@@ -27,14 +27,15 @@ public abstract class CorePropertyChangeAppender<T extends PropertyChange> imple
      */
     public static final String GENERIC_TYPE_NOT_PARAMETRIZED = "GENERIC_TYPE_NOT_PARAMETRIZED";
 
-    @Override
-    public int priority() {
-        return LOW_PRIORITY;
-    }
-
-    protected void renderNotParametrizedWarningIfNeeded(Type parameterType, String parameterName, String colType, JaversProperty property){
+    public static void renderNotParametrizedWarningIfNeeded(Type parameterType, String parameterName, String colType, JaversProperty property){
         if (parameterType == DEFAULT_TYPE_PARAMETER){
-            printNotParametrizedWarning(parameterName, colType, property);
+            logger.warn("Unknown {} type in {} property: {}. Defaulting to {}, see {}.{}",
+                    parameterName,
+                    colType,
+                    property.toString(),
+                    DEFAULT_TYPE_PARAMETER.getSimpleName(),
+                    CorePropertyChangeAppender.class.getSimpleName(),
+                    GENERIC_TYPE_NOT_PARAMETRIZED);
         }
     }
 
@@ -46,14 +47,4 @@ public abstract class CorePropertyChangeAppender<T extends PropertyChange> imple
     }
 
     protected abstract T calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property);
-
-    private void printNotParametrizedWarning(String parameterName, String colType, JaversProperty property) {
-        logger.warn("Unknown {} type in {} property: {}. Defaulting to {}, see {}.{}",
-                parameterName,
-                colType,
-                property.toString(),
-                DEFAULT_TYPE_PARAMETER.getSimpleName(),
-                CorePropertyChangeAppender.class.getSimpleName(),
-                GENERIC_TYPE_NOT_PARAMETRIZED);
-    }
 }

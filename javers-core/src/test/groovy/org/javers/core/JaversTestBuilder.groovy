@@ -1,6 +1,7 @@
 package org.javers.core
 
 import org.javers.common.date.DateProvider
+import org.javers.common.string.ShaDigest
 import org.javers.core.commit.CommitFactory
 import org.javers.core.graph.LiveCdo
 import org.javers.core.graph.LiveCdoFactory
@@ -22,6 +23,8 @@ import org.javers.repository.api.JaversExtendedRepository
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryRunner
 import org.javers.shadow.ShadowFactory
+
+import java.util.stream.Collectors
 
 /**
  * This is just a test builder,
@@ -157,16 +160,13 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(JsonConverterBuilder)
     }
 
-    ObjectHasher getObjectHasher() {
-        javersBuilder.getContainerComponent(ObjectHasher)
-    }
-
     String hash(Object obj) {
-        getObjectHasher().hash(obj)
+        def jsonState = jsonConverter.toJson(javers().commit("", obj).snapshots[0].state)
+        ShaDigest.longDigest(jsonState)
     }
 
     String addressHash(String city){
-        getObjectHasher().hash(new DummyAddress(city))
+        hash(new DummyAddress(city))
     }
 
     def getContainerComponent(Class type) {

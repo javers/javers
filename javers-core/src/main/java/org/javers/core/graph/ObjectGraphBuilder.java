@@ -1,7 +1,6 @@
 package org.javers.core.graph;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
@@ -9,9 +8,9 @@ import org.javers.core.metamodel.type.TypeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -23,6 +22,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 class ObjectGraphBuilder {
     private static final Logger logger = LoggerFactory.getLogger(ObjectGraphBuilder.class);
+    private static final int MAX_VO_HASHING_DEPTH = 2;
 
     private final TypeMapper typeMapper;
     private boolean built;
@@ -66,20 +66,25 @@ class ObjectGraphBuilder {
         logger.debug("live graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
                 nodeReuser.nodesCount(), nodeReuser.entitiesCount(), nodeReuser.voCount());
 
-        System.out.println("before enrichHashes");
-        nodeReuser.nodes().forEach(it -> System.out.println("- "+ it.getGlobalId()));
+        List<ObjectNode<LiveCdo>> nodes = nodeReuser.nodes();
 
-        enrichHashes(nodeReuser.nodes());
-
-        System.out.println("after enrichHashes");
-        nodeReuser.nodes().forEach(it -> System.out.println("- "+it.getGlobalId()));
-
+        enrichHashes(nodes);
         switchToBuilt();
-        return new LiveGraph(root, nodeReuser.nodes());
+
+        return new LiveGraph(root, new HashSet<>(nodes));
     }
 
-    private void enrichHashes(Set<ObjectNode<LiveCdo>> nodes) {
-        nodes.forEach(n -> n.enrichHashIfNeeded(cdoFactory));
+    private void enrichHashes(List<ObjectNode<LiveCdo>> nodes) {
+        nodes.forEach(this::enrichHashIfNeeded);
+        nodes.forEach(this::reloadHashFromParentIfNeeded);
+    }
+
+    private void enrichHashIfNeeded(final ObjectNode<LiveCdo> node) {
+        node.getCdo().enrichHashIfNeeded(cdoFactory, () -> node.descendants(MAX_VO_HASHING_DEPTH));
+    }
+
+    private void reloadHashFromParentIfNeeded(final ObjectNode<LiveCdo> node) {
+        node.getCdo().reloadHashFromParentIfNeeded(cdoFactory);
     }
 
     private void buildEdges(ObjectNode nodeStub) {

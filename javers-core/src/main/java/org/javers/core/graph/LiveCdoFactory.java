@@ -1,10 +1,7 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.Lists;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.OwnerContext;
-import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
@@ -14,7 +11,7 @@ import java.util.Optional;
 /**
  * @author bartosz walacik
  */
-class LiveCdoFactory {
+public class LiveCdoFactory {
 
     private final GlobalIdFactory globalIdFactory;
     private ObjectAccessHook objectAccessHook;
@@ -29,19 +26,12 @@ class LiveCdoFactory {
     }
 
     ValueObjectId regenerateValueObjectHash(LiveCdo valueObject, List<LiveCdo> descendantVOs) {
-
-        System.out.println("enriching hash for: " + valueObject.getGlobalId());
-
         List<LiveCdo> objectsToBeHashed = Lists.immutableListOf(descendantVOs, valueObject);
         String newHash = objectHasher.hash(objectsToBeHashed);
 
-        ValueObjectId id = (ValueObjectId) valueObject.getGlobalId();
+        ValueObjectIdWithHash id = (ValueObjectIdWithHash) valueObject.getGlobalId();
 
-        ValueObjectId newId = globalIdFactory.replaceHashPlaceholder(id, newHash);
-
-        System.out.println("new hash            " + newId + "\n");
-
-        return newId;
+        return id.freeze(newHash);
     }
 
     LiveCdo create(Object cdo, OwnerContext owner) {
@@ -59,7 +49,7 @@ class LiveCdoFactory {
         }
     }
 
-    public GlobalIdFactory getGlobalIdFactory() {
+    GlobalIdFactory getGlobalIdFactory() {
         return globalIdFactory;
     }
 }

@@ -20,9 +20,13 @@ public interface NodePair {
 
     Object getRightPropertyValue(Property property);
 
-    GlobalId getRightGlobalId(Property property);
+    GlobalId getRightReference(Property property);
 
-    GlobalId getLeftGlobalId(Property property);
+    GlobalId getLeftReference(Property property);
+
+    Collection<GlobalId> getRightReferences(Property property);
+
+    Collection<GlobalId> getLeftReferences(Property property);
 
     ManagedType getManagedType();
 
@@ -32,6 +36,26 @@ public interface NodePair {
 
     default Object getRightPropertyValueAndSanitize(Property property, JaversType expectedType) {
         return sanitize(getRightPropertyValue(property), expectedType);
+    }
+
+    default Collection getLeftPropertyCollectionAndSanitize(Property property) {
+        return sanitizeCollection(getLeftPropertyValue(property));
+    }
+
+    default Collection getRightPropertyCollectionAndSanitize(Property property) {
+        return sanitizeCollection(getRightPropertyValue(property));
+    }
+
+    default Collection sanitizeCollection(Object value) {
+        if (value == null) {
+            return Collections.emptyList();
+        }
+
+        if (value instanceof Collection) {
+            return (Collection)value;
+        }
+
+        return Collections.emptyList();
     }
 
     default Object sanitize(Object value, JaversType expectedType) {

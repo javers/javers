@@ -1,7 +1,6 @@
 package org.javers.core.graph;
 
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.core.metamodel.object.ValueObjectIdWithHash;
 import org.javers.core.metamodel.property.Property;
@@ -9,7 +8,7 @@ import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
@@ -27,8 +26,22 @@ abstract class LiveCdo extends Cdo {
         this.globalId = globalId;
     }
 
-    void swapId(GlobalId globalId) {
-        this.globalId = globalId;
+    void enrichHashIfNeeded(LiveCdoFactory liveCdoFactory, Supplier<List<LiveCdo>> descendants) {
+        if (requiresObjectHasher()) {
+            List<LiveCdo> descendantVOs = descendants.get().stream()
+                    .filter(cdo -> cdo.getGlobalId() instanceof ValueObjectId)
+                    .collect(Collectors.toList());
+
+            ValueObjectId newId = liveCdoFactory.regenerateValueObjectHash(this, descendantVOs);
+            swapId(newId);
+        }
+    }
+
+    void reloadHashFromParentIfNeeded(LiveCdoFactory liveCdoFactory) {
+        if (hasHashOnParent()) {
+            ValueObjectIdWithHash id = (ValueObjectIdWithHash)getGlobalId();
+            swapId(id.freeze());
+        }
     }
 
     @Override
@@ -65,7 +78,17 @@ abstract class LiveCdo extends Cdo {
 
     abstract Object wrappedCdo();
 
-    public boolean requiresObjectHasher() {
-        return globalId instanceof ValueObjectIdWithHash;
+    private boolean requiresObjectHasher() {
+        return globalId instanceof ValueObjectIdWithHash &&
+                ((ValueObjectIdWithHash) getGlobalId()).requiresHash();
+    }
+
+    private boolean hasHashOnParent() {
+        return globalId instanceof ValueObjectIdWithHash &&
+                ((ValueObjectIdWithHash) getGlobalId()).hasHashOnParent();
+    }
+
+    private void swapId(GlobalId globalId) {
+        this.globalId = globalId;
     }
 }
