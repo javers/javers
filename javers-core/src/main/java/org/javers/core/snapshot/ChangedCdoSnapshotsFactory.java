@@ -3,6 +3,7 @@ package org.javers.core.snapshot;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.Cdo;
+import org.javers.core.graph.LiveGraph;
 import org.javers.core.metamodel.object.CdoSnapshot;
 
 import java.util.ArrayList;
@@ -25,15 +26,15 @@ public class ChangedCdoSnapshotsFactory {
     }
 
     /**
-     * @param liveObjects wrapped CDOs for which snapshot should be created if it differs from latest snapshot
+     * @param liveGraph wrapped CDOs for which snapshots should be created if they differ from latest snapshots
      * @param latestSnapshots CDO snapshots used to check which of liveObjects have been created or changed
      * @param commitMetadata commit metadata used to create new snapshots
      */
-    public List<CdoSnapshot> create(Set<Cdo> liveObjects, Set<CdoSnapshot> latestSnapshots, CommitMetadata commitMetadata) {
-        Validate.argumentsAreNotNull(liveObjects, commitMetadata, latestSnapshots);
+    public List<CdoSnapshot> create(LiveGraph liveGraph, Set<CdoSnapshot> latestSnapshots, CommitMetadata commitMetadata) {
+        Validate.argumentsAreNotNull(liveGraph, commitMetadata, latestSnapshots);
 
         List<CdoSnapshot> result = new ArrayList<>();
-        for (Cdo currentCdo : liveObjects) {
+        for (Cdo currentCdo : liveGraph.cdos()) {
             Optional<CdoSnapshot> previousSnapshot = latestSnapshots.stream().filter(currentCdo::equals).findFirst();
             CdoSnapshot currentSnapshot = createSnapshot(latestSnapshots, commitMetadata, currentCdo, previousSnapshot);
             if (isCdoChanged(previousSnapshot, currentSnapshot)) {

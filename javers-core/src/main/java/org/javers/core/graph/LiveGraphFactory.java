@@ -32,7 +32,7 @@ public class LiveGraphFactory {
     /**
      * delegates to {@link ObjectGraphBuilder#buildGraph(Object)}
      */
-    public ObjectGraph createLiveGraph(Object handle) {
+    public LiveGraph createLiveGraph(Object handle) {
         Object wrappedHandle = wrapTopLevelContainer(handle);
 
         return new ObjectGraphBuilder(typeMapper, liveCdoFactory).buildGraph(wrappedHandle);

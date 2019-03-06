@@ -91,6 +91,8 @@ public class SnapshotFactory {
                 .withManagedType(liveCdo.getManagedType());
     }
 
+    //TODO
+    @Deprecated
     private Object dehydrateProperty(JaversProperty property, Object propertyVal, GlobalId id){
         OwnerContext owner = new PropertyOwnerContext(id, property.getName());
 

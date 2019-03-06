@@ -3,11 +3,13 @@ package org.javers.core
 import org.javers.common.date.DateProvider
 import org.javers.common.string.ShaDigest
 import org.javers.core.commit.CommitFactory
+import org.javers.core.graph.Cdo
 import org.javers.core.graph.LiveCdo
 import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.LiveCdoWrapper
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.LiveGraphFactory
+import org.javers.core.graph.ObjectGraph
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.JsonConverterBuilder
 import org.javers.core.metamodel.object.GlobalIdFactory
@@ -104,7 +106,7 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(Javers)
     }
 
-    LiveCdo createCdoWrapper(Object cdo){
+    Cdo createCdoWrapper(Object cdo){
         def mType = getTypeMapper().getJaversManagedType(cdo.class)
         def id = instanceId(cdo)
 
@@ -173,7 +175,7 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(type)
     }
 
-    LiveGraph createLiveGraph(Object liveCdo) {
+    ObjectGraph createLiveGraph(Object liveCdo) {
         javersBuilder.getContainerComponent(LiveGraphFactory).createLiveGraph(liveCdo)
     }
 

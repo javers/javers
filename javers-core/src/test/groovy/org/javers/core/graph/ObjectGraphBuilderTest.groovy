@@ -1,6 +1,7 @@
 package org.javers.core.graph
 
 import org.javers.core.JaversTestBuilder
+import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.*
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
@@ -22,6 +23,58 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     ObjectGraphBuilder newBuilder(){
         new ObjectGraphBuilder(javers.typeMapper, javers.liveCdoFactory)
+    }
+
+    def "should provide dehydrated property value for references and values"(){
+        given:
+        def graphBuilder = newBuilder()
+        def e = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
+
+        when:
+        def node = graphBuilder.buildGraph(e).root()
+
+        then:
+        with(node.getDehydratedPropertyValue("entityRef")) {
+          it instanceof InstanceId
+          it.value().endsWith("SnapshotEntity/2")
+        }
+
+        node.getDehydratedPropertyValue("id") == 1
+    }
+
+    @Unroll
+    def "should provide dehydrated property value for List of references"(){
+        given:
+        def graphBuilder = newBuilder()
+        def e = new SnapshotEntity(id:1, listOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)])
+
+        when:
+        def node = graphBuilder.buildGraph(e).root()
+
+        then:
+        with(node.getDehydratedPropertyValue("listOfEntities")) {
+            it instanceof List
+            it[0] instanceof InstanceId
+            it[0].value().endsWith("SnapshotEntity/2")
+            it[1].value().endsWith("SnapshotEntity/3")
+        }
+    }
+
+    @Unroll
+    def "should provide dehydrated property value for Set of references"(){
+        given:
+        def graphBuilder = newBuilder()
+        def e = new SnapshotEntity(id:1, setOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)] as Set)
+
+        when:
+        def node = graphBuilder.buildGraph(e).root()
+
+        then:
+        with(node.getDehydratedPropertyValue("setOfEntities")) {
+            it instanceof Set
+            it.size() == 2
+            it.every{it instanceof InstanceId}
+        }
     }
 
     def "should build one node graph from Entity"(){

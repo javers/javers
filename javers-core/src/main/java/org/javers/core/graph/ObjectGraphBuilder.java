@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
@@ -46,27 +45,27 @@ class ObjectGraphBuilder {
     LiveGraph buildGraph(Object handle) {
         argumentIsNotNull(handle);
 
-        Cdo cdo = cdoFactory.create(handle, null);
+        LiveCdo cdo = cdoFactory.create(handle, null);
         // logger.debug("building objectGraph for handle [{}] ...",cdo);
 
         return buildGraphFromCdo(cdo);
     }
 
-    LiveGraph buildGraphFromCdo(Cdo cdo) {
+    LiveGraph buildGraphFromCdo(LiveCdo cdo) {
         argumentIsNotNull(cdo);
 
-        ObjectNode root = edgeBuilder.buildNodeStub(cdo);
+        LiveNode root = edgeBuilder.buildNodeStub(cdo);
 
         //we can't use recursion here, it could cause StackOverflow for large graphs
         while(nodeReuser.hasMoreStubs()){
-            ObjectNode stub = nodeReuser.pollStub();
+            LiveNode stub = nodeReuser.pollStub();
             buildEdges(stub); //edgeBuilder should append new stubs to queue
         }
 
         logger.debug("live graph assembled, object nodes: {}, entities: {}, valueObjects: {}",
                 nodeReuser.nodesCount(), nodeReuser.entitiesCount(), nodeReuser.voCount());
 
-        List<ObjectNode<LiveCdo>> nodes = nodeReuser.nodes();
+        List<LiveNode> nodes = nodeReuser.nodes();
 
         enrichHashes(nodes);
         switchToBuilt();
@@ -74,26 +73,26 @@ class ObjectGraphBuilder {
         return new LiveGraph(root, new HashSet<>(nodes));
     }
 
-    private void enrichHashes(List<ObjectNode<LiveCdo>> nodes) {
+    private void enrichHashes(List<LiveNode> nodes) {
         nodes.forEach(this::enrichHashIfNeeded);
         nodes.forEach(this::reloadHashFromParentIfNeeded);
     }
 
-    private void enrichHashIfNeeded(final ObjectNode<LiveCdo> node) {
+    private void enrichHashIfNeeded(final LiveNode node) {
         node.getCdo().enrichHashIfNeeded(cdoFactory, () -> node.descendants(MAX_VO_HASHING_DEPTH));
     }
 
-    private void reloadHashFromParentIfNeeded(final ObjectNode<LiveCdo> node) {
+    private void reloadHashFromParentIfNeeded(final LiveNode node) {
         node.getCdo().reloadHashFromParentIfNeeded(cdoFactory);
     }
 
-    private void buildEdges(ObjectNode nodeStub) {
+    private void buildEdges(LiveNode nodeStub) {
         nodeReuser.saveForReuse(nodeStub);
         buildSingleEdges(nodeStub);
         buildMultiEdges(nodeStub);
     }
 
-    private void buildSingleEdges(ObjectNode node) {
+    private void buildSingleEdges(LiveNode node) {
         for (JaversProperty singleRef : getSingleReferencesWithManagedTypes(node.getManagedType())) {
             if (node.isNull(singleRef)) {
                 continue;
@@ -105,7 +104,7 @@ class ObjectGraphBuilder {
         }
     }
 
-    private void buildMultiEdges(ObjectNode node) {
+    private void buildMultiEdges(LiveNode node) {
         for (JaversProperty containerProperty : getNonEmptyEnumerablesWithManagedTypes(node))  {
             EnumerableType enumerableType = containerProperty.getType();
 
@@ -127,7 +126,7 @@ class ObjectGraphBuilder {
         return managedType.getProperties(property -> property.getType() instanceof ManagedType);
     }
 
-    private List<JaversProperty> getNonEmptyEnumerablesWithManagedTypes(final ObjectNode node) {
+    private List<JaversProperty> getNonEmptyEnumerablesWithManagedTypes(final LiveNode node) {
         return node.getManagedType().getProperties(property -> {
             if (!(property.getType() instanceof EnumerableType)) {
                 return false;

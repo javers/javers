@@ -13,7 +13,7 @@ class CollectionsGraphBuilder {
     }
 
     public LiveGraph buildGraph(CollectionWrapper wrappedCollection, final Class clazz) {
-        Cdo cdo = collectionsCdoFactory.createCdo(wrappedCollection, clazz);
+        LiveCdo cdo = collectionsCdoFactory.createCdo(wrappedCollection, clazz);
 
         return objectGraphBuilder.buildGraphFromCdo(cdo);
     }

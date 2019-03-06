@@ -9,9 +9,9 @@ import java.util.*;
  * @author bartosz walacik
  */
 class NodeReuser {
-    private final Map<Object, ObjectNode> reverseCdoIdMap = new HashMap<>();
-    private final List<ObjectNode<LiveCdo>> nodes = new ArrayList<>();
-    private final Queue<ObjectNode> stubs = new LinkedList<>();
+    private final Map<Object, LiveNode> reverseCdoIdMap = new HashMap<>();
+    private final List<LiveNode> nodes = new ArrayList<>();
+    private final Queue<LiveNode> stubs = new LinkedList<>();
     private int reusedNodes;
     private int entities;
     private int valueObjects;
@@ -23,16 +23,16 @@ class NodeReuser {
         return reverseCdoIdMap.containsKey(reverseCdoIdMapKey(cdo));
     }
 
-    ObjectNode getForReuse(Cdo cdo) {
+    LiveNode getForReuse(Cdo cdo) {
         reusedNodes++;
         return reverseCdoIdMap.get(reverseCdoIdMapKey(cdo));
     }
 
-    List<ObjectNode<LiveCdo>> nodes() {
+    List<LiveNode> nodes() {
         return Collections.unmodifiableList(nodes);
     }
 
-    void saveForReuse(ObjectNode reference) {
+    void saveForReuse(LiveNode reference) {
         if (reference.getGlobalId() instanceof InstanceId) {
             entities++;
         }
@@ -43,11 +43,11 @@ class NodeReuser {
         nodes.add(reference);
     }
 
-    void enqueueStub(ObjectNode nodeStub) {
+    void enqueueStub(LiveNode nodeStub) {
         stubs.offer(nodeStub);
     }
 
-    ObjectNode pollStub(){
+    LiveNode pollStub(){
        return stubs.poll();
     }
 

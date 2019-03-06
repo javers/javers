@@ -4,7 +4,6 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.JaversProperty;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,7 +25,7 @@ class ShallowSingleEdge extends AbstractSingleEdge {
     }
 
     @Override
-    List<ObjectNode> getReferences() {
+    List<LiveNode> getReferences() {
         return Collections.emptyList();
     }
 }

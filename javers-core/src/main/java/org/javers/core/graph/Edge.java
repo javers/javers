@@ -19,7 +19,7 @@ abstract class Edge {
         this.property = property;
     }
 
-    public JaversProperty getProperty() {
+    JaversProperty getProperty() {
         return property;
     }
 
@@ -38,5 +38,5 @@ abstract class Edge {
         return property.hashCode();
     }
 
-    abstract List<ObjectNode> getReferences();
+    abstract List<LiveNode> getReferences();
 }

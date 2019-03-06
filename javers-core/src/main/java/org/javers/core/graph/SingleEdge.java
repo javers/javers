@@ -15,9 +15,9 @@ import java.util.List;
  * @author bartosz walacik
  */
 class SingleEdge extends AbstractSingleEdge {
-    private final ObjectNode referencedNode;
+    private final LiveNode referencedNode;
 
-    SingleEdge(JaversProperty property, ObjectNode referencedNode) {
+    SingleEdge(JaversProperty property, LiveNode referencedNode) {
         super(property);
         Validate.argumentsAreNotNull(referencedNode);
         this.referencedNode = referencedNode;
@@ -29,7 +29,7 @@ class SingleEdge extends AbstractSingleEdge {
     }
 
     @Override
-    List<ObjectNode> getReferences() {
+    List<LiveNode> getReferences() {
         return Lists.asList(referencedNode);
     }
 }

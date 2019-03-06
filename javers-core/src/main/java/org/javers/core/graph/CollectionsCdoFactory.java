@@ -24,7 +24,7 @@ public class CollectionsCdoFactory {
         this.typeMapper = typeMapper;
     }
 
-    public Cdo createCdo(final CollectionWrapper wrapper, final Class<?> clazz) {
+    public LiveCdo createCdo(final CollectionWrapper wrapper, final Class<?> clazz) {
         Property primaryProperty = classScanner.scan(wrapper.getClass()).getProperties().get(0);
         JaversMember javersMember = memberGenericTypeInjector.create(primaryProperty, clazz);
 

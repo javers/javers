@@ -2,7 +2,6 @@ package org.javers.core.graph;
 
 import org.javers.core.metamodel.type.JaversProperty;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,19 +10,15 @@ import java.util.List;
  * @author bartosz walacik
  */
 class MultiEdge extends Edge {
-    private final List<ObjectNode> references; //should not be empty
+    private final List<LiveNode> references; //should not be empty
 
-    public MultiEdge(JaversProperty property) {
+    MultiEdge(JaversProperty property, List<LiveNode> reference) {
         super(property);
-        references = new ArrayList<>();
+        this.references = Collections.unmodifiableList(reference);
     }
 
     @Override
-    List<ObjectNode> getReferences(){
-        return Collections.unmodifiableList(references);
-    }
-
-    public void addReferenceNode(ObjectNode objectNode) {
-        references.add(objectNode);
+    List<LiveNode> getReferences(){
+        return references;
     }
 }

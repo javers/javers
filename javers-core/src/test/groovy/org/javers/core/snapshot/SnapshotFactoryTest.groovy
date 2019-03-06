@@ -271,17 +271,19 @@ class SnapshotFactoryTest extends Specification{
         where:
         propertyType << ["Primitive", "Value", "Entity", "ValueObject"]
         propertyName << ["setOfIntegers", "setOfDates", "setOfEntities", "setOfValueObjects"]
-        cdo << [new SnapshotEntity(setOfIntegers:     [1, 2]),
+        cdo << [
+                new SnapshotEntity(setOfIntegers:     [1, 2]),
                 new SnapshotEntity(setOfDates:        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)]),
                 new SnapshotEntity(setOfEntities:     [new SnapshotEntity(id:2), new SnapshotEntity(id:3)]),
                 new SnapshotEntity(setOfValueObjects: [new DummyAddress("London"), new DummyAddress("London City")])
         ]
-        expectedVal << [[1, 2] as Set,
-                        [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)] as Set,
-                        [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)] as Set,
-                        [valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London")),
-                         valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London City"))] as Set
-                       ]
+        expectedVal << [
+                [1, 2] as Set,
+                [new LocalDate(2000, 1, 1), new LocalDate(2002, 1, 1)] as Set,
+                [instanceId(2, SnapshotEntity), instanceId(3, SnapshotEntity)] as Set,
+                [valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London")),
+                 valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London City"))] as Set
+        ]
     }
 
     def "should handle property with not parametrized type"() {
