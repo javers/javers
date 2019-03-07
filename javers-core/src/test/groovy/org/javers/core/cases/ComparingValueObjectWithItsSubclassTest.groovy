@@ -37,7 +37,6 @@ class ComparingValueObjectWithItsSubclassTest extends Specification {
         then:
         diff.changes.size() == 1
         diff.changes[0].propertyName == "seatHeight"
-        diff.changes[0].left == null
-        diff.changes[0].right == 1
+        diff.changes[0].value == 1
     }
 }

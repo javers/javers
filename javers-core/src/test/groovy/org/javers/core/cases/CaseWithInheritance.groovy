@@ -40,8 +40,7 @@ class CaseWithInheritance extends Specification{
           assert right == "bb"
       }
       with(diff.changes.find {it.propertyName == "someOtherField"}) {
-          assert left == null
-          assert right == "b"
+          assert value == "b"
       }
 
 

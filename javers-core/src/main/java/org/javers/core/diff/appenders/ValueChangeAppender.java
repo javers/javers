@@ -1,13 +1,21 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
+import org.javers.core.diff.changetype.PropertyAddedChange;
+import org.javers.core.diff.changetype.PropertyChange;
+import org.javers.core.diff.changetype.PropertyRemovedChange;
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.property.MissingProperty;
+import org.javers.core.metamodel.type.EntityType;
+import org.javers.core.metamodel.type.JaversProperty;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.PrimitiveOrValueType;
 
 /**
  * @author bartosz walacik
  */
-class ValueChangeAppender implements PropertyChangeAppender<ValueChange> {
+class ValueChangeAppender implements PropertyChangeAppender<PropertyChange> {
 
     @Override
     public boolean supports(JaversType propertyType) {
@@ -18,9 +26,15 @@ class ValueChangeAppender implements PropertyChangeAppender<ValueChange> {
      * @param property supported property (of PrimitiveType or ValueObjectType)
      */
     @Override
-    public ValueChange calculateChanges(NodePair pair, JaversProperty property) {
+    public PropertyChange calculateChanges(NodePair pair, JaversProperty property) {
         Object leftValue = pair.getLeftPropertyValue(property);
         Object rightValue = pair.getRightPropertyValue(property);
+
+        if(leftValue instanceof MissingProperty){
+            return new PropertyAddedChange(pair.getGlobalId(), property.getName(), rightValue);
+        } else if(rightValue instanceof MissingProperty){
+            return new PropertyRemovedChange(pair.getGlobalId(), property.getName());
+        } else
 
         //special treatment for EmbeddedId - could be ValueObjects without good equals() implementation
         if (isIdProperty(pair, property)) {
