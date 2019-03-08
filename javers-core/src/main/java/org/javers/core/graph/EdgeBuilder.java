@@ -1,6 +1,8 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.EnumerableFunction;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
@@ -46,32 +48,33 @@ class EdgeBuilder {
 
         Object container = node.getPropertyValue(containerProperty);
 
-        MultiEdgeContainerBuilderFunction edgeBuilder = null;
         if (enumerableType instanceof KeyValueType){
-            edgeBuilder = new MultiEdgeMapBuilderFunction();
-        } else if (enumerableType instanceof ContainerType){
-            edgeBuilder = new MultiEdgeContainerBuilderFunction();
-        }
-        enumerableType.map(container, edgeBuilder, owner);
+            KeyValueType mapType = (KeyValueType)enumerableType;
 
-        return new MultiEdge(containerProperty, edgeBuilder.getNodesAccumulator());
+            MultiEdgeMapBuilder edgeBuilder = new MultiEdgeMapBuilder(
+                    typeMapper.getJaversType(mapType.getKeyType()) instanceof ManagedType,
+                    typeMapper.getJaversType(mapType.getValueType()) instanceof ManagedType
+            );
+
+            Object nodesMap = enumerableType.map(container, edgeBuilder, owner);
+            return new MultiKeyValueEdge(containerProperty, nodesMap);
+
+        } else if (enumerableType instanceof ContainerType) {
+            MultiEdgeContainerBuilder edgeBuilder = new MultiEdgeContainerBuilder();
+            enumerableType.map(container, edgeBuilder, owner);
+            return new MultiContainerEdge(containerProperty, edgeBuilder.getNodesAccumulator());
+        }
+        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
     }
 
-    private class MultiEdgeContainerBuilderFunction implements EnumerableFunction {
-        private final List<LiveNode> nodesAccumulator = new ArrayList();
+    private class MultiEdgeContainerBuilder implements EnumerableFunction {
+        final List<LiveNode> nodesAccumulator = new ArrayList();
 
         @Override
         public Object apply(Object input, EnumerationAwareOwnerContext context) {
-            if (!isManagedPosition(input)){
-                return input;
-            }
             LiveNode objectNode = buildNodeStubOrReuse(cdoFactory.create(input, context));
             nodesAccumulator.add(objectNode);
             return null;
-        }
-
-        boolean isManagedPosition(Object input){
-            return true;
         }
 
         List<LiveNode> getNodesAccumulator() {
@@ -79,12 +82,30 @@ class EdgeBuilder {
         }
     }
 
-    private class MultiEdgeMapBuilderFunction extends MultiEdgeContainerBuilderFunction {
-        boolean isManagedPosition(Object input){
-            if (input == null) {
-                return false;
+    private class MultiEdgeMapBuilder implements EnumerableFunction {
+        private final boolean managedKeys;
+        private final boolean managedValues;
+
+        public MultiEdgeMapBuilder(boolean managedKeys, boolean managedValues) {
+            this.managedKeys = managedKeys;
+            this.managedValues = managedValues;
+        }
+
+        @Override
+        public Object apply(Object keyOrValue, EnumerationAwareOwnerContext context) {
+            MapEnumerationOwnerContext mapContext = (MapEnumerationOwnerContext)context;
+
+            if (managedKeys && mapContext.isKey()) {
+                LiveNode objectNode = buildNodeStubOrReuse(cdoFactory.create(keyOrValue, context));
+                return objectNode;
             }
-            return typeMapper.getJaversType(input.getClass()) instanceof ManagedType;
+
+            if (managedValues && !mapContext.isKey()) {
+                LiveNode objectNode = buildNodeStubOrReuse(cdoFactory.create(keyOrValue, context));
+                return objectNode;
+            }
+
+            return keyOrValue;
         }
     }
 

@@ -99,18 +99,17 @@ class ObjectGraphBuilder {
             }
 
             AbstractSingleEdge edge = edgeBuilder.buildSingleEdge(node, singleRef);
-
             node.addEdge(edge);
         }
     }
 
     private void buildMultiEdges(LiveNode node) {
+
         for (JaversProperty containerProperty : getNonEmptyEnumerablesWithManagedTypes(node))  {
             EnumerableType enumerableType = containerProperty.getType();
 
             //looks like we have Container or Map with Entity references or Value Objects
             MultiEdge multiEdge = edgeBuilder.createMultiEdge(containerProperty, enumerableType, node);
-
             node.addEdge(multiEdge);
         }
     }

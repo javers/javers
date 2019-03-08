@@ -5,11 +5,9 @@ import org.javers.common.collections.Maps;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -46,10 +44,10 @@ public class MapType extends KeyValueType {
      * Nulls keys are filtered
      */
     @Override
-    public Object map(Object sourceEnumerable, Function mapFunction) {
+    public Object map(Object source, Function mapFunction) {
         Validate.argumentsAreNotNull(mapFunction);
 
-        Map sourceMap = Maps.wrapNull(sourceEnumerable);
+        Map sourceMap = Maps.wrapNull(source);
         Map targetMap = new HashMap(sourceMap.size());
 
         mapEntrySetFilterNulls(sourceMap.entrySet(), mapFunction, (k,v) -> targetMap.put(k,v));
@@ -95,5 +93,20 @@ public class MapType extends KeyValueType {
     @Override
     public Object empty() {
         return Collections.emptyMap();
+    }
+
+    @Override
+    public List mapToList(Object source, Function mapFunction) {
+        Validate.argumentsAreNotNull(mapFunction);
+
+        Map sourceMap = Maps.wrapNull(source);
+        List targetList = new ArrayList();
+
+        mapEntrySetFilterNulls(sourceMap.entrySet(), mapFunction, (k,v) -> {
+            targetList.add(k);
+            targetList.add(v);
+        });
+
+        return Collections.unmodifiableList(targetList);
     }
 }

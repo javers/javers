@@ -11,6 +11,9 @@ import org.javers.core.metamodel.type.MapEnumerationOwnerContext;
 import org.javers.core.metamodel.type.MapType;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 import static org.javers.guava.Multimaps.toNotNullMultimap;
@@ -63,6 +66,21 @@ public class MultimapType extends KeyValueType {
         MapType.mapEntrySetFilterNulls(sourceMultimap.entries(), mapFunction, (k,v) -> targetMultimap.put(k,v));
 
         return targetMultimap;
+    }
+
+    @Override
+    public List mapToList(Object source, Function mapFunction) {
+        Validate.argumentIsNotNull(mapFunction);
+
+        Multimap sourceMultimap = toNotNullMultimap(source);
+        List target = new ArrayList();
+
+        MapType.mapEntrySetFilterNulls(sourceMultimap.entries(), mapFunction, (k, v) -> {
+            target.add(k);
+            target.add(v);
+        });
+
+        return Collections.unmodifiableList(target);
     }
 
     @Override

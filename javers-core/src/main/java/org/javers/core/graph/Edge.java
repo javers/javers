@@ -39,4 +39,6 @@ abstract class Edge {
     }
 
     abstract List<LiveNode> getReferences();
+
+    abstract Object getDehydratedPropertyValue();
 }

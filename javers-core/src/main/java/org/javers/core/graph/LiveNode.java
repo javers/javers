@@ -3,7 +3,6 @@ package org.javers.core.graph;
 import org.javers.common.collections.Lists;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversProperty;
 
 import java.util.*;
@@ -49,7 +48,7 @@ public class LiveNode extends ObjectNode<LiveCdo>{
     public Collection<GlobalId> getReferences(Property property) {
         Edge edge = getEdge(property); //could be null for snapshots
 
-        if (edge instanceof MultiEdge){
+        if (edge instanceof MultiContainerEdge){
             return unmodifiableList(edge.getReferences()
                     .stream()
                     .map(it-> it.getGlobalId())
@@ -67,17 +66,7 @@ public class LiveNode extends ObjectNode<LiveCdo>{
             return getCdo().getPropertyValue(property);
         }
 
-        if (edge instanceof AbstractSingleEdge) {
-            return ((AbstractSingleEdge)edge).getReference();
-        } else {
-            MultiEdge multiEdge = (MultiEdge)edge;
-            EnumerableType enumerableType = multiEdge.getProperty().getType();
-
-            return enumerableType.map(multiEdge.getReferences(), (input) -> {
-                LiveNode liveNode = (LiveNode)input;
-                return liveNode.getGlobalId();
-            });
-        }
+        return edge.getDehydratedPropertyValue();
     }
 
     void addEdge(Edge edge) {
