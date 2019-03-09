@@ -45,7 +45,7 @@ class SetChangeAppender implements PropertyChangeAppender<SetChange> {
         }
     }
 
-    private Set getLeftSet(NodePair pair, JaversProperty property){
+    private Set getLeftSet(NodePair pair, JaversProperty property) {
         if (typeMapper.isContainerOfManagedTypes(property.getType())) {
             return toSet(pair.getLeftReferences(property));
         } else {

@@ -46,6 +46,22 @@ class ObjectGraphBuilderDehydrationTest extends Specification {
         }
     }
 
+    def "should provide dehydrated property value for Array of references"(){
+        given:
+        def graphBuilder = newBuilder()
+        def e = new SnapshotEntity(id:1, arrayOfEntities: [new SnapshotEntity(id:2), new SnapshotEntity(id:3)] as Set)
+
+        when:
+        def node = graphBuilder.buildGraph(e).root()
+
+        then:
+        with(node.getDehydratedPropertyValue("arrayOfEntities")) {
+            it.class.array
+            it.length == 2
+            it.every{it instanceof InstanceId}
+        }
+    }
+
     def "should provide dehydrated property value for Map with value -> reference "(){
         given:
         def graphBuilder = newBuilder()

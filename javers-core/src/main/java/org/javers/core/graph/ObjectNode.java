@@ -5,6 +5,7 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.EntityType;
+import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.ValueObjectType;
 
@@ -53,9 +54,11 @@ public abstract class ObjectNode<T extends Cdo> {
     /**
      * returns null if property is not Collection of ManagedType
      */
-    public abstract Collection<GlobalId> getReferences(Property property);
+    public abstract List<GlobalId> getReferences(JaversProperty property);
 
-    public abstract Object getDehydratedPropertyValue(String property);
+    protected abstract Object getDehydratedPropertyValue(String propertyName);
+
+    public abstract Object getDehydratedPropertyValue(JaversProperty property);
 
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
@@ -74,16 +77,7 @@ public abstract class ObjectNode<T extends Cdo> {
         return cdo;
     }
 
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        ObjectNode that = (ObjectNode) o;
-        return cdo.equals(that.cdo);
-    }
-
-    public int hashCode() {
+    public int cdoHashCode() {
         return cdo.hashCode();
     }
 }

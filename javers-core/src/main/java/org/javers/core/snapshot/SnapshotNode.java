@@ -4,9 +4,10 @@ import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
-
-import java.util.Collection;
+import org.javers.core.metamodel.type.EnumerableType;
+import org.javers.core.metamodel.type.JaversProperty;
 import java.util.Collections;
+import java.util.List;
 
 class SnapshotNode extends ObjectNode<CdoSnapshot> {
 
@@ -27,28 +28,23 @@ class SnapshotNode extends ObjectNode<CdoSnapshot> {
     }
 
     @Override
-    public Object getDehydratedPropertyValue(String property) {
+    protected Object getDehydratedPropertyValue(String property) {
         return getCdo().getPropertyValue(property);
     }
 
     @Override
-    public Collection<GlobalId> getReferences(Property property) {
+    public Object getDehydratedPropertyValue(JaversProperty property) {
+        return getCdo().getPropertyValue(property);
+    }
 
-        Object propertyValue = getPropertyValue(property);
-        if (propertyValue == null || !(propertyValue instanceof Collection)) {
-            return Collections.emptyList();
+    @Override
+    public List<GlobalId> getReferences(JaversProperty property) {
+        if (property.getType() instanceof EnumerableType) {
+            Object propertyValue = getPropertyValue(property);
+            EnumerableType enumerableType = property.getType();
+            return enumerableType.filterToList(propertyValue, GlobalId.class);
         }
-
-        Collection collection = (Collection) propertyValue;
-        if (collection.size() == 0) {
-            return Collections.emptyList();
-        }
-
-        Object firstItem = collection.iterator().next();
-        if (firstItem instanceof GlobalId) {
-            return collection;
-        } else {
-            //when user's class is refactored, a collection can contain different items
+        else {
             return Collections.emptyList();
         }
     }

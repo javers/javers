@@ -24,9 +24,9 @@ public interface NodePair {
 
     GlobalId getLeftReference(Property property);
 
-    Collection<GlobalId> getRightReferences(Property property);
+    List<GlobalId> getRightReferences(JaversProperty property);
 
-    Collection<GlobalId> getLeftReferences(Property property);
+    List<GlobalId> getLeftReferences(JaversProperty property);
 
     ManagedType getManagedType();
 

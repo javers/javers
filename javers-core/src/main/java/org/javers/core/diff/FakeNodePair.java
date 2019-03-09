@@ -7,7 +7,6 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -65,12 +64,12 @@ class FakeNodePair implements NodePair {
     }
 
     @Override
-    public Collection<GlobalId> getRightReferences(Property property) {
+    public List<GlobalId> getRightReferences(JaversProperty property) {
         return right.getReferences(property);
     }
 
     @Override
-    public Collection<GlobalId> getLeftReferences(Property property) {
+    public List<GlobalId> getLeftReferences(JaversProperty property) {
         return Collections.emptyList();
     }
 }

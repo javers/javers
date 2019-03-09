@@ -58,12 +58,12 @@ public class RealNodePair implements NodePair {
     }
 
     @Override
-    public Collection<GlobalId> getRightReferences(Property property) {
+    public List<GlobalId> getRightReferences(JaversProperty property) {
         return right.getReferences(property);
     }
 
     @Override
-    public Collection<GlobalId> getLeftReferences(Property property) {
+    public List<GlobalId> getLeftReferences(JaversProperty property) {
         return left.getReferences(property);
     }
 

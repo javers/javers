@@ -9,6 +9,7 @@ import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.LiveCdoWrapper
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.LiveGraphFactory
+import org.javers.core.graph.LiveNode
 import org.javers.core.graph.ObjectGraph
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.JsonConverterBuilder
@@ -179,6 +180,10 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(LiveGraphFactory).createLiveGraph(liveCdo)
     }
 
+    LiveNode createLiveNode(Object liveCdo) {
+        javersBuilder.getContainerComponent(LiveGraphFactory).createLiveGraph(liveCdo).root()
+    }
+
     InstanceId instanceId(Object instance){
         getGlobalIdFactory().createId(instance)
     }
@@ -187,7 +192,6 @@ class JaversTestBuilder {
         getGlobalIdFactory().createInstanceId(localId, entity)
     }
 
-    @Deprecated
     ValueObjectId valueObjectId(Object localId, Class owningEntity, fragment) {
         getGlobalIdFactory().createValueObjectIdFromPath(instanceId(localId, owningEntity), fragment)
     }

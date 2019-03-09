@@ -13,6 +13,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
+
+import static org.javers.common.collections.Collections.wrapNull;
 
 /**
  * @author bartosz walacik
@@ -48,32 +51,27 @@ public class ArrayType extends ContainerType {
         return array == null ||  Array.getLength(array) == 0;
     }
 
-    /**
-     * Nulls are filtered
-     */
     @Override
     public Object map(Object sourceArray, Function mapFunction) {
         Validate.argumentsAreNotNull(sourceArray, mapFunction);
 
         int len = Array.getLength(sourceArray);
-        if (len == 0) {
-            return sourceArray;
-        }
+        Object targetArray = newPrimitiveOrObjectArray(len);
 
-        List targetList = new ArrayList();
         for (int i=0; i<len; i++){
-            Object sourceItem = Array.get(sourceArray,i);
-            if (sourceItem == null) continue;
-            targetList.add(mapFunction.apply(sourceItem));
+            Object sourceVal = Array.get(sourceArray,i);
+            Array.set(targetArray, i, mapFunction.apply(sourceVal));
         }
-
-        Object targetArray = newItemTypeOrObjectArray(targetList.get(0), targetList.size());
-        int i=0;
-        for (Object targetItem : targetList) {
-            Array.set(targetArray, i++, targetItem);
-        }
-
         return targetArray;
+    }
+
+    @Override
+    protected Stream<Object> items(Object source) {
+        if (source == null || Array.getLength(source) == 0) {
+            return Stream.empty();
+        }
+
+        return Arrays.asList((Object[])source).stream();
     }
 
     private Object newItemTypeOrObjectArray(Object sample, int len) {

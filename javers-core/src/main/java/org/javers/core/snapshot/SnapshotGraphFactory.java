@@ -22,9 +22,9 @@ public class SnapshotGraphFactory {
     public SnapshotGraph createLatest(Set<GlobalId> globalIds){
         Validate.argumentIsNotNull(globalIds);
 
-        Set<ObjectNode<CdoSnapshot>> snapshotNodes = javersRepository.getLatest(globalIds)
+        Set<SnapshotNode> snapshotNodes = javersRepository.getLatest(globalIds)
                 .stream()
-                .map(ObjectNode::new)
+                .map(SnapshotNode::new)
                 .collect(Collectors.toSet());
 
         return new SnapshotGraph(snapshotNodes);

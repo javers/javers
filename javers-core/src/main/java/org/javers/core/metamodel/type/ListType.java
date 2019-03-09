@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
+
 public class ListType extends CollectionType{
 
     public ListType(Type baseJavaType) {
@@ -32,7 +35,7 @@ public class ListType extends CollectionType{
         for (Object sourceVal : sourceList){
             targetList.add(sourceVal == null ? null : mapFunction.apply(sourceVal, enumerationContext));
         }
-        return Collections.unmodifiableList(targetList);
+        return unmodifiableList(targetList);
     }
 
     /**
@@ -41,6 +44,7 @@ public class ListType extends CollectionType{
     @Override
     public Object map(Object sourceEnumerable, Function mapFunction) {
         List sourceCol = Lists.wrapNull(sourceEnumerable);
-        return sourceCol.stream().map(mapFunction).filter(it -> it != null).collect(Collectors.toList());
+        return unmodifiableList(
+                (List)sourceCol.stream().map(mapFunction).filter(it -> it != null).collect(toList()));
     }
 }

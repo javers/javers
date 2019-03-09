@@ -2,6 +2,7 @@ package org.javers.core.graph
 
 import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.model.*
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
@@ -405,19 +406,15 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ])
 
         when:
-        def node = graphBuilder.buildGraph(user).root()
+        LiveNode node = graphBuilder.buildGraph(user).root()
 
         then:
-        def edge = node.getEdge("setOfValueObjects")
-        println "\nreferences:"
-        edge.references.each {
-            println it.globalId.value()
-        }
+        def expectedIds = [
+                javers.valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London")),
+                javers.valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London City"))
+        ] as Set
 
-        assertThat(node).hasMultiEdge("setOfValueObjects").refersToGlobalIds(
-                [new ValueObjectIdDTO(SnapshotEntity, 1, "setOfValueObjects/"+javers.addressHash("London")),
-                 new ValueObjectIdDTO(SnapshotEntity, 1, "setOfValueObjects/"+javers.addressHash("London City"))
-                ])
+        node.getEdge("setOfValueObjects").references.collect{it.globalId} as Set == expectedIds
     }
 
     def "should assign proper indexes to ValueObjects in List multi edge"() {

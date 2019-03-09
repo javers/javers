@@ -5,11 +5,11 @@ import org.javers.common.collections.Maps;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * @author bartosz walacik
@@ -52,7 +52,7 @@ public class MapType extends KeyValueType {
 
         mapEntrySetFilterNulls(sourceMap.entrySet(), mapFunction, (k,v) -> targetMap.put(k,v));
 
-        return targetMap;
+        return Collections.unmodifiableMap(targetMap);
     }
 
     @Override
@@ -96,17 +96,8 @@ public class MapType extends KeyValueType {
     }
 
     @Override
-    public List mapToList(Object source, Function mapFunction) {
-        Validate.argumentsAreNotNull(mapFunction);
-
+    protected Stream<Map.Entry> entries(Object source) {
         Map sourceMap = Maps.wrapNull(source);
-        List targetList = new ArrayList();
-
-        mapEntrySetFilterNulls(sourceMap.entrySet(), mapFunction, (k,v) -> {
-            targetList.add(k);
-            targetList.add(v);
-        });
-
-        return Collections.unmodifiableList(targetList);
+        return sourceMap.entrySet().stream();
     }
 }

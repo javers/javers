@@ -3,12 +3,13 @@ package org.javers.core.graph;
 import org.javers.common.collections.Lists;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.ArrayType;
+import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversProperty;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 
 public class LiveNode extends ObjectNode<LiveCdo>{
 
@@ -23,12 +24,7 @@ public class LiveNode extends ObjectNode<LiveCdo>{
     }
 
     Edge getEdge(String propertyName) {
-        for (JaversProperty p :  edges.keySet()){
-            if (p.getName().equals(propertyName)){
-                return getEdge(p);
-            }
-        }
-        return null;
+        return getManagedType().findProperty(propertyName).map(p -> getEdge(p)).orElse(null);
     }
 
     @Override
@@ -45,14 +41,14 @@ public class LiveNode extends ObjectNode<LiveCdo>{
     }
 
     @Override
-    public Collection<GlobalId> getReferences(Property property) {
+    public List<GlobalId> getReferences(JaversProperty property) {
         Edge edge = getEdge(property); //could be null for snapshots
 
-        if (edge instanceof MultiContainerEdge){
-            return unmodifiableList(edge.getReferences()
+        if (edge != null){
+            return edge.getReferences()
                     .stream()
                     .map(it-> it.getGlobalId())
-                    .collect(Collectors.toList()));
+                    .collect(toList());
         } else {
             //when user's class is refactored, a collection can contain different items
             return Collections.emptyList();
@@ -60,13 +56,36 @@ public class LiveNode extends ObjectNode<LiveCdo>{
     }
 
     @Override
-    public Object getDehydratedPropertyValue(String property) {
+    protected Object getDehydratedPropertyValue(String propertyName) {
+        return getManagedType().findProperty(propertyName)
+                .map(p -> getDehydratedPropertyValue(p))
+                .orElse(null);
+    }
+
+    /**
+     * Enumerables are copied to new structures (immutable when possible)
+     */
+    @Override
+    public Object getDehydratedPropertyValue(JaversProperty property) {
         Edge edge = getEdge(property);
-        if (edge == null) {
-            return getCdo().getPropertyValue(property);
+
+        if (edge != null) {
+            return edge.getDehydratedPropertyValue();
         }
 
-        return edge.getDehydratedPropertyValue();
+        Object propertyValue = getCdo().getPropertyValue(property);
+        if (propertyValue == null) {
+            return null;
+        }
+
+        //Collections & Maps are copied to a new immutable structure
+        if (property.getType() instanceof EnumerableType) {
+            EnumerableType enumerableType = property.getType();
+
+            return enumerableType.map(propertyValue, it -> it);
+        }
+
+        return getCdo().getPropertyValue(property);
     }
 
     void addEdge(Edge edge) {

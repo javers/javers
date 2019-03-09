@@ -21,7 +21,7 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  */
 class ObjectGraphBuilder {
     private static final Logger logger = LoggerFactory.getLogger(ObjectGraphBuilder.class);
-    private static final int MAX_VO_HASHING_DEPTH = 2;
+    private static final int MAX_VO_HASHING_DEPTH = 1;
 
     private final TypeMapper typeMapper;
     private boolean built;

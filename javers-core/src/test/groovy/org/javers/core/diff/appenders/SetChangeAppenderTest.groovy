@@ -16,9 +16,11 @@ import static org.javers.core.diff.appenders.ContainerChangeAssert.getAssertThat
 class SetChangeAppenderTest extends AbstractDiffAppendersTest {
 
     @Shared
-    CorePropertyChangeAppender setChangeAppender
+    SetChangeAppender setChangeAppender
+
     @Shared
     String commonFieldName
+
     @Shared
     String dateFieldName
 

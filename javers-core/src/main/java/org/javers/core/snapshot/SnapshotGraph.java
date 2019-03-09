@@ -10,7 +10,7 @@ import java.util.Set;
  * @author bartosz walacik
  */
 class SnapshotGraph extends ObjectGraph<CdoSnapshot> {
-    SnapshotGraph(Set<ObjectNode<CdoSnapshot>> snapshots) {
-        super(snapshots);
+    SnapshotGraph(Set<SnapshotNode> snapshots) {
+        super((Set)snapshots);
     }
 }

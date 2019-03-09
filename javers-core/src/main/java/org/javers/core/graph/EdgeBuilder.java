@@ -48,38 +48,22 @@ class EdgeBuilder {
 
         Object container = node.getPropertyValue(containerProperty);
 
+        EnumerableFunction edgeBuilder;
         if (enumerableType instanceof KeyValueType){
             KeyValueType mapType = (KeyValueType)enumerableType;
-
-            MultiEdgeMapBuilder edgeBuilder = new MultiEdgeMapBuilder(
+            edgeBuilder = new MultiEdgeMapBuilder(
                     typeMapper.getJaversType(mapType.getKeyType()) instanceof ManagedType,
                     typeMapper.getJaversType(mapType.getValueType()) instanceof ManagedType
             );
 
-            Object nodesMap = enumerableType.map(container, edgeBuilder, owner);
-            return new MultiKeyValueEdge(containerProperty, nodesMap);
-
         } else if (enumerableType instanceof ContainerType) {
-            MultiEdgeContainerBuilder edgeBuilder = new MultiEdgeContainerBuilder();
-            enumerableType.map(container, edgeBuilder, owner);
-            return new MultiContainerEdge(containerProperty, edgeBuilder.getNodesAccumulator());
-        }
-        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
-    }
-
-    private class MultiEdgeContainerBuilder implements EnumerableFunction {
-        final List<LiveNode> nodesAccumulator = new ArrayList();
-
-        @Override
-        public Object apply(Object input, EnumerationAwareOwnerContext context) {
-            LiveNode objectNode = buildNodeStubOrReuse(cdoFactory.create(input, context));
-            nodesAccumulator.add(objectNode);
-            return null;
+            edgeBuilder = (input, context) -> buildNodeStubOrReuse(cdoFactory.create(input, context));
+        } else {
+            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
         }
 
-        List<LiveNode> getNodesAccumulator() {
-            return nodesAccumulator;
-        }
+        Object nodesEnumerable = enumerableType.map(container, edgeBuilder, owner);
+        return new MultiEdge(containerProperty, nodesEnumerable);
     }
 
     private class MultiEdgeMapBuilder implements EnumerableFunction {

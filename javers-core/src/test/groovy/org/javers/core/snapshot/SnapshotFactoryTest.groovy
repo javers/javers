@@ -4,6 +4,7 @@ import org.javers.common.collections.Arrays
 import org.javers.core.JaversTestBuilder
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
+import org.javers.core.graph.LiveNode
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.PrimitiveEntity
@@ -30,27 +31,27 @@ class SnapshotFactoryTest extends Specification{
         snapshotFactory = javers.snapshotFactory
     }
 
-    def "should mark all not-nul properties as changed of initial snapshot"() {
+    def "should mark all not-null properties as changed of initial snapshot"() {
         given:
         def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1], arrayOfInts:[1])
-        def cdoWrapper = javers.createCdoWrapper(cdo)
+        def node = javers.createLiveNode(cdo)
 
         when:
-        def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def snapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
-        snapshot.changed as Set == ["id","arrayOfIntegers", "arrayOfInts"] as Set
+        snapshot.changed as Set == ["id", "arrayOfIntegers", "arrayOfInts"] as Set
     }
 
     def "should mark nullified properties of update snapshot"() {
         given:
         def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1])
-        def cdoWrapper = javers.createCdoWrapper(cdo)
-        def prevSnapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def node = javers.createLiveNode(cdo)
+        def prevSnapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         when:
         cdo.arrayOfIntegers = null
-        def updateSnapshot = snapshotFactory.createUpdate(cdoWrapper, prevSnapshot, someCommitMetadata())
+        def updateSnapshot = snapshotFactory.createUpdate(node, prevSnapshot, someCommitMetadata())
 
         then:
         updateSnapshot.changed == ["arrayOfIntegers"]
@@ -58,11 +59,11 @@ class SnapshotFactoryTest extends Specification{
 
     def "should update the version of the snapshot"() {
         given:
-        def cdoWrapper = javers.createCdoWrapper(new SnapshotEntity(id: 1))
-        def prevSnapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def node = javers.createLiveNode(new SnapshotEntity(id: 1))
+        def prevSnapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         when:
-        def updateSnapshot = snapshotFactory.createUpdate(cdoWrapper, prevSnapshot, someCommitMetadata())
+        def updateSnapshot = snapshotFactory.createUpdate(node, prevSnapshot, someCommitMetadata())
 
         then:
         updateSnapshot.version == 2L
@@ -70,10 +71,10 @@ class SnapshotFactoryTest extends Specification{
 
     def "should initialize the version of the first snapshot"() {
         given:
-        def cdoWrapper = javers.createCdoWrapper(new SnapshotEntity(id: 1))
+        def node = javers.createLiveNode(new SnapshotEntity(id: 1))
 
         when:
-        def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def snapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
         snapshot.version == 1L
@@ -83,43 +84,45 @@ class SnapshotFactoryTest extends Specification{
         given:
         def ref = new SnapshotEntity(id:2)
         def cdo = new SnapshotEntity(id:1, arrayOfIntegers:[1,1], arrayOfInts:[5,5], entityRef: ref)
-        def cdoWrapper = javers.createCdoWrapper(cdo)
+        def node = javers.createLiveNode(cdo)
 
-        def prevSnapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def prevSnapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         when:
         cdo.arrayOfIntegers[0] = 2
         cdo.arrayOfInts[0] = 2
-        def updateSnapshot = snapshotFactory.createUpdate(cdoWrapper, prevSnapshot, someCommitMetadata())
+
+        def updateSnapshot1 = snapshotFactory.createUpdate(node, prevSnapshot, someCommitMetadata())
 
         then:
-        updateSnapshot.changed as Set == ["arrayOfIntegers","arrayOfInts"] as Set
+        updateSnapshot1.changed as Set == ["arrayOfIntegers","arrayOfInts"] as Set
 
         when:
-        prevSnapshot = updateSnapshot
+        prevSnapshot = updateSnapshot1
         cdo.entityRef = new SnapshotEntity(id:3)
-        updateSnapshot = snapshotFactory.createUpdate(cdoWrapper, prevSnapshot, someCommitMetadata())
+        node = javers.createLiveNode(cdo)
+        def updateSnapshot2 = snapshotFactory.createUpdate(node, prevSnapshot, someCommitMetadata())
 
         then:
-        updateSnapshot.changed == ["entityRef"]
+        updateSnapshot2.changed == ["entityRef"]
 
         when:
-        prevSnapshot = updateSnapshot
+        prevSnapshot = updateSnapshot2
         cdo.dob = LocalDate.now()
-        updateSnapshot = snapshotFactory.createUpdate(cdoWrapper, prevSnapshot, someCommitMetadata())
+        def updateSnapshot3 = snapshotFactory.createUpdate(node, prevSnapshot, someCommitMetadata())
 
         then:
-        updateSnapshot.changed == ["dob"]
+        updateSnapshot3.changed == ["dob"]
     }
 
     def "should create snapshot with given GlobalId"() {
         given:
         def cdo = new SnapshotEntity(id:1)
-        def cdoWrapper = javers.createCdoWrapper(cdo)
+        def node = javers.createLiveNode(cdo)
         def id = javers.instanceId(cdo)
 
         when:
-        def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def snapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
         snapshot.globalId == id
@@ -128,10 +131,10 @@ class SnapshotFactoryTest extends Specification{
     def "should skip primitives with default value"() {
         given:
         def cdo = new PrimitiveEntity()
-        def cdoWrapper = javers.createCdoWrapper(cdo)
+        def node = javers.createLiveNode(cdo)
 
         when:
-        def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def snapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
         snapshot.size() == 1
@@ -140,8 +143,8 @@ class SnapshotFactoryTest extends Specification{
     @Unroll
     def "should record #propertyType property value"() {
         when:
-        def cdoWrapper = javers.createCdoWrapper(cdo)
-        def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def node = javers.createLiveNode(cdo)
+        def snapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == cdo.getAt(propertyName)
@@ -156,8 +159,8 @@ class SnapshotFactoryTest extends Specification{
     @Unroll
     def "should record #propertyType reference"() {
         when:
-        def cdoWrapper = javers.createCdoWrapper(cdo)
-        def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def node = javers.createLiveNode(cdo)
+        def snapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -174,10 +177,10 @@ class SnapshotFactoryTest extends Specification{
     def "should record empty Optional"(){
         given:
         def cdo = new SnapshotEntity(optionalInteger: Optional.empty())
-        def cdoWrapper = javers.createCdoWrapper(cdo)
+        def node = javers.createLiveNode(cdo)
 
         when:
-        def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def snapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
         snapshot.getPropertyValue("optionalInteger") == Optional.empty()
@@ -186,8 +189,8 @@ class SnapshotFactoryTest extends Specification{
     @Unroll
     def "should record Optional of #propertyType"(){
         when:
-        def cdoWrapper = javers.createCdoWrapper(cdo)
-        def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def node = javers.createLiveNode(cdo)
+        def snapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -212,11 +215,12 @@ class SnapshotFactoryTest extends Specification{
     @Unroll
     def "should record #containerType of #propertyType"() {
         when:
-        def cdoWrapper = javers.createCdoWrapper(cdo)
-        def snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def node = javers.createLiveNode(cdo)
+        def snapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
+
         expectedType.isAssignableFrom(snapshot.getPropertyValue(propertyName).class)
         //we need copy
         System.identityHashCode(snapshot.getPropertyValue(propertyName)) !=
@@ -258,10 +262,10 @@ class SnapshotFactoryTest extends Specification{
     @Unroll
     def "should record Set of #propertyType"() {
         given:
-        def cdoWrapper = javers.createCdoWrapper(cdo)
+        def node = javers.createLiveGraph(cdo).root()
 
         when:
-        CdoSnapshot snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        CdoSnapshot snapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal
@@ -289,8 +293,8 @@ class SnapshotFactoryTest extends Specification{
     def "should handle property with not parametrized type"() {
         when:
         def cdo = new SnapshotEntity(nonParametrizedMap:  ["a":1])
-        def cdoWrapper = javers.createCdoWrapper(cdo)
-        def snap = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def node = javers.createLiveNode(cdo)
+        def snap = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
         snap.getPropertyValue("nonParametrizedMap") == ["a":1]
@@ -299,8 +303,8 @@ class SnapshotFactoryTest extends Specification{
     @Unroll
     def "should record Map of #enrtyType"() {
         when:
-        def cdoWrapper = javers.createCdoWrapper(cdo)
-        CdoSnapshot snapshot = snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def node = javers.createLiveNode(cdo)
+        CdoSnapshot snapshot = snapshotFactory.createInitial(node, someCommitMetadata())
 
         then:
         snapshot.getPropertyValue(propertyName) == expectedVal

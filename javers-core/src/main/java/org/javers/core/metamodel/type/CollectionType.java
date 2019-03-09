@@ -9,7 +9,10 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.toSet;
 import static org.javers.common.collections.Collections.wrapNull;
 
 /**
@@ -61,7 +64,7 @@ public class CollectionType extends ContainerType {
         for (Object sourceVal : sourceCol) {
             targetSet.add(mapFunction.apply(sourceVal, enumerationContext));
         }
-        return Collections.unmodifiableSet(targetSet);
+        return unmodifiableSet(targetSet);
     }
 
 
@@ -71,11 +74,17 @@ public class CollectionType extends ContainerType {
     @Override
     public Object map(Object sourceEnumerable, Function mapFunction) {
         Collection sourceCol = wrapNull(sourceEnumerable);
-        return sourceCol.stream().map(mapFunction).filter(it -> it != null).collect(Collectors.toSet());
+        return unmodifiableSet(
+                (Set) sourceCol.stream().map(mapFunction).filter(it -> it != null).collect(toSet()) );
     }
 
     @Override
     public Object empty() {
         return Collections.emptyList();
+    }
+
+    @Override
+    protected Stream<Object> items(Object source) {
+        return wrapNull(source).stream();
     }
 }
