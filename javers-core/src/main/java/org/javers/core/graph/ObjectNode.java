@@ -1,8 +1,6 @@
 package org.javers.core.graph;
 
-import java.util.Optional;
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
@@ -11,8 +9,10 @@ import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.ValueObjectType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.unmodifiableList;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
@@ -24,17 +24,16 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
  *
  * @author bartosz walacik
  */
-public class ObjectNode {
-    private final Cdo cdo;
-    private final Map<JaversProperty, Edge> edges = new HashMap<>();
+public abstract class ObjectNode<T extends Cdo> {
+    private final T cdo;
 
-    public ObjectNode(Cdo cdo) {
+    public ObjectNode(T cdo) {
         argumentsAreNotNull(cdo);
         this.cdo = cdo;
     }
 
     /**
-     * @return returns {@link Optional#EMPTY} for snapshots
+     * @return returns {@link Optional#empty()} for snapshots
      */
     public Optional<Object> wrappedCdo() {
         return cdo.getWrappedCdo();
@@ -50,23 +49,16 @@ public class ObjectNode {
     /**
      * returns null if property is not ManagedType
      */
-    public GlobalId getReference(Property property){
-        Edge edge = getEdge(property); //could be null for snapshots
+    public abstract GlobalId getReference(Property property);
 
-        //TODO this is ugly, how to move this logic to Cdo implementations?
-        if (edge instanceof AbstractSingleEdge){
-            return ((AbstractSingleEdge)edge).getReference();
-        }
-        else {
-            Object propertyValue = getPropertyValue(property);
-            if (propertyValue instanceof GlobalId) {
-                return (GlobalId)propertyValue;
-            } else {
-                //when user's class is refactored, a property can have changed type
-                return null;
-            }
-        }
-    }
+    /**
+     * returns null if property is not Collection of ManagedType
+     */
+    public abstract List<GlobalId> getReferences(JaversProperty property);
+
+    protected abstract Object getDehydratedPropertyValue(String propertyName);
+
+    public abstract Object getDehydratedPropertyValue(JaversProperty property);
 
     public Object getPropertyValue(Property property) {
         Validate.argumentIsNotNull(property);
@@ -77,41 +69,15 @@ public class ObjectNode {
         return cdo.isNull(property);
     }
 
-    Edge getEdge(Property property) {
-        return edges.get(property);
-    }
-
-    Edge getEdge(String propertyName) {
-        for (JaversProperty p :  edges.keySet()){
-            if (p.getName().equals(propertyName)){
-                return getEdge(p);
-            }
-        }
-        return null;
-    }
-
-    void addEdge(Edge edge) {
-        this.edges.put(edge.getProperty(), edge);
-    }
-
     public ManagedType getManagedType() {
         return cdo.getManagedType();
     }
 
-    public Cdo getCdo() {
+    public T getCdo() {
         return cdo;
     }
 
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        ObjectNode that = (ObjectNode) o;
-        return cdo.equals(that.cdo);
-    }
-
-    public int hashCode() {
+    public int cdoHashCode() {
         return cdo.hashCode();
     }
 }

@@ -1,15 +1,16 @@
 package org.javers.core.snapshot;
 
 import org.javers.common.collections.Defaults;
-import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.exception.JaversException;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.graph.Cdo;
+import org.javers.core.graph.LiveNode;
 import org.javers.core.metamodel.object.*;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.JaversProperty;
+import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.Objects;
 
-import static org.javers.common.exception.JaversExceptionCode.NOT_IMPLEMENTED;
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 import static org.javers.core.metamodel.object.SnapshotType.*;
 
@@ -18,11 +19,9 @@ import static org.javers.core.metamodel.object.SnapshotType.*;
  */
 public class SnapshotFactory {
     private final TypeMapper typeMapper;
-    private final GlobalIdFactory globalIdFactory;
 
-    public SnapshotFactory(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
+    SnapshotFactory(TypeMapper typeMapper) {
         this.typeMapper = typeMapper;
-        this.globalIdFactory = globalIdFactory;
     }
 
     public CdoSnapshot createTerminal(GlobalId globalId, CdoSnapshot previous, CommitMetadata commitMetadata) {
@@ -36,67 +35,56 @@ public class SnapshotFactory {
                 .build();
     }
 
-    public CdoSnapshot createInitial(LiveCdo liveCdo, CommitMetadata commitMetadata) {
-        return initSnapshotBuilder(liveCdo, commitMetadata)
-                .withState(createSnapshotState(liveCdo))
+    CdoSnapshot createInitial(LiveNode liveNode, CommitMetadata commitMetadata) {
+        return initSnapshotBuilder(liveNode, commitMetadata)
+                .withState(createSnapshotState(liveNode))
                 .withType(INITIAL)
                 .markAllAsChanged()
                 .withVersion(1L)
                 .build();
     }
 
-    public CdoSnapshot createUpdate(LiveCdo liveCdo, CdoSnapshot previous, CommitMetadata commitMetadata) {
-        return initSnapshotBuilder(liveCdo, commitMetadata)
-                .withState(createSnapshotState(liveCdo))
+    CdoSnapshot createUpdate(LiveNode liveNode, CdoSnapshot previous, CommitMetadata commitMetadata) {
+        return initSnapshotBuilder(liveNode, commitMetadata)
+                .withState(createSnapshotState(liveNode))
                 .withType(UPDATE)
                 .markChanged(previous)
                 .withVersion(previous.getVersion()+1)
                 .build();
     }
 
-    public CdoSnapshotState createSnapshotState(LiveCdo liveCdo){
+    public CdoSnapshotState createSnapshotStateNoRefs(Cdo liveCdo){
         CdoSnapshotStateBuilder stateBuilder = CdoSnapshotStateBuilder.cdoSnapshotState();
         for (JaversProperty property : liveCdo.getManagedType().getProperties()) {
-            Object propertyVal = liveCdo.getPropertyValue(property.getName());
-            if (Objects.equals(propertyVal, Defaults.defaultValue(property.getGenericType()))) {
+            if (property.getType() instanceof ManagedType) {
                 continue;
             }
-            stateBuilder.withPropertyValue(property, dehydrateProperty(property, propertyVal, liveCdo.getGlobalId()));
+
+            Object propertyValue = liveCdo.getPropertyValue(property);
+            if (Objects.equals(propertyValue, Defaults.defaultValue(property.getGenericType()))) {
+                continue;
+            }
+            stateBuilder.withPropertyValue(property, propertyValue);
         }
         return stateBuilder.build();
     }
 
-    private Object extractAndDehydrateEnumerable(Object propertyVal, EnumerableType propertyType, OwnerContext owner) {
-        EnumerableFunction dehydratorMapFunction;
-        if (propertyType instanceof ContainerType) {
-            JaversType itemType = typeMapper.getJaversType( ((ContainerType)propertyType).getItemClass() );
-            dehydratorMapFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
+    public CdoSnapshotState createSnapshotState(LiveNode liveNode){
+        CdoSnapshotStateBuilder stateBuilder = CdoSnapshotStateBuilder.cdoSnapshotState();
+        for (JaversProperty property : liveNode.getManagedType().getProperties()) {
+            Object dehydratedPropertyValue = liveNode.getDehydratedPropertyValue(property);
+            if (Objects.equals(dehydratedPropertyValue, Defaults.defaultValue(property.getGenericType()))) {
+                continue;
+            }
+            stateBuilder.withPropertyValue(property, dehydratedPropertyValue);
         }
-        else if (propertyType instanceof KeyValueType) {
-            MapContentType mapContentType = typeMapper.getMapContentType((KeyValueType) propertyType);
-            dehydratorMapFunction = new DehydrateMapFunction(globalIdFactory, mapContentType);
-        }
-        else {
-            throw new JaversException(NOT_IMPLEMENTED);
-        }
-
-        return  propertyType.map(propertyVal, dehydratorMapFunction, owner);
+        return stateBuilder.build();
     }
 
-    private CdoSnapshotBuilder initSnapshotBuilder(LiveCdo liveCdo, CommitMetadata commitMetadata) {
+    private CdoSnapshotBuilder initSnapshotBuilder(LiveNode liveNode, CommitMetadata commitMetadata) {
         return cdoSnapshot()
-                .withGlobalId(liveCdo.getGlobalId())
+                .withGlobalId(liveNode.getGlobalId())
                 .withCommitMetadata(commitMetadata)
-                .withManagedType(liveCdo.getManagedType());
-    }
-
-    private Object dehydrateProperty(JaversProperty property, Object propertyVal, GlobalId id){
-        OwnerContext owner = new PropertyOwnerContext(id, property.getName());
-
-        if (property.getType() instanceof EnumerableType) {
-            return extractAndDehydrateEnumerable(propertyVal, (EnumerableType) property.getType(), owner);
-        } else {
-            return  globalIdFactory.dehydrate(propertyVal, property.getType(), owner);
-        }
+                .withManagedType(liveNode.getManagedType());
     }
 }

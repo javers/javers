@@ -27,11 +27,10 @@ abstract class ListToMapAppenderAdapter extends CorePropertyChangeAppender<ListC
 
     ListChange calculateChanges(List leftList, List rightList, GlobalId affectedId, JaversProperty property) {
         CollectionType listType = ((JaversProperty) property).getType();
-        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
         MapContentType mapContentType = typeMapper.getMapContentType(listType);
 
         List<EntryChange> entryChanges =
-                mapChangeAppender.calculateEntryChanges(asMap(leftList), asMap(rightList), owner, mapContentType);
+                mapChangeAppender.calculateEntryChanges(asMap(leftList), asMap(rightList), mapContentType);
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());

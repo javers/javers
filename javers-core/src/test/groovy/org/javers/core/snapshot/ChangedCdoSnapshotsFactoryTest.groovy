@@ -80,7 +80,7 @@ class ChangedCdoSnapshotsFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = changedCdoSnapshotsFactory.create(node.cdos(), [] as Set, someCommitMetadata())
+        def snapshots = changedCdoSnapshotsFactory.create(node, [] as Set, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(2)
@@ -97,7 +97,7 @@ class ChangedCdoSnapshotsFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = changedCdoSnapshotsFactory.create(node.cdos(), [] as Set, someCommitMetadata())
+        def snapshots = changedCdoSnapshotsFactory.create(node, [] as Set, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -112,7 +112,7 @@ class ChangedCdoSnapshotsFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = changedCdoSnapshotsFactory.create(node.cdos(), [] as Set, someCommitMetadata())
+        def snapshots = changedCdoSnapshotsFactory.create(node, [] as Set, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(2)
@@ -126,7 +126,7 @@ class ChangedCdoSnapshotsFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = changedCdoSnapshotsFactory.create(node.cdos(), [] as Set, someCommitMetadata())
+        def snapshots = changedCdoSnapshotsFactory.create(node, [] as Set, someCommitMetadata())
 
         then:
         assertThat(snapshots)
@@ -142,7 +142,7 @@ class ChangedCdoSnapshotsFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = changedCdoSnapshotsFactory.create(node.cdos(), [] as Set, someCommitMetadata())
+        def snapshots = changedCdoSnapshotsFactory.create(node, [] as Set, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -170,7 +170,7 @@ class ChangedCdoSnapshotsFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = changedCdoSnapshotsFactory.create(node.cdos(), [] as Set, someCommitMetadata())
+        def snapshots = changedCdoSnapshotsFactory.create(node, [] as Set, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(3)
@@ -192,7 +192,7 @@ class ChangedCdoSnapshotsFactoryTest extends Specification {
         def node = javers.createLiveGraph(cdo)
 
         when:
-        def snapshots = changedCdoSnapshotsFactory.create(node.cdos(), [] as Set, someCommitMetadata())
+        def snapshots = changedCdoSnapshotsFactory.create(node, [] as Set, someCommitMetadata())
 
         then:
         assertThat(snapshots).hasSize(3)

@@ -69,7 +69,7 @@ public class SnapshotDiffer {
     }
 
     private SnapshotGraph snapshotGraph(CdoSnapshot snapshot) {
-        return new SnapshotGraph(Sets.asSet(new ObjectNode(snapshot)));
+        return new SnapshotGraph(Sets.asSet(new SnapshotNode(snapshot)));
     }
 
     private Optional<CommitMetadata> commitMetadata(CdoSnapshot snapshot) {

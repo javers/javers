@@ -1,8 +1,11 @@
 package org.javers.core.diff;
 
+import org.javers.core.graph.ObjectGraph;
 import org.javers.core.graph.ObjectNode;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.Function;
 import static org.javers.common.collections.Sets.difference;
 
 /**
@@ -13,15 +16,17 @@ public class GraphPair {
     private final ObjectGraph leftGraph;
     private final ObjectGraph rightGraph;
 
-    private final Set<ObjectNode> onlyOnLeft;
-    private final Set<ObjectNode> onlyOnRight;
+    private final Collection<ObjectNode> onlyOnLeft;
+    private final Collection<ObjectNode> onlyOnRight;
 
     public GraphPair(ObjectGraph leftGraph, ObjectGraph rightGraph) {
         this.leftGraph = leftGraph;
         this.rightGraph = rightGraph;
 
-        this.onlyOnLeft = difference(leftGraph.nodes(), rightGraph.nodes());
-        this.onlyOnRight = difference(rightGraph.nodes(), leftGraph.nodes());
+        Function<ObjectNode, Integer> hasher = objectNode -> objectNode.cdoHashCode();
+
+        this.onlyOnLeft = difference(leftGraph.nodes(), rightGraph.nodes(), hasher);
+        this.onlyOnRight = difference(rightGraph.nodes(), leftGraph.nodes(), hasher);
     }
 
     //for initial
@@ -40,11 +45,11 @@ public class GraphPair {
         }
     }
 
-    public Set<ObjectNode> getOnlyOnLeft() {
+    public Collection<ObjectNode> getOnlyOnLeft() {
         return onlyOnLeft;
     }
 
-    public Set<ObjectNode> getOnlyOnRight() {
+    public Collection<ObjectNode> getOnlyOnRight() {
         return onlyOnRight;
     }
 

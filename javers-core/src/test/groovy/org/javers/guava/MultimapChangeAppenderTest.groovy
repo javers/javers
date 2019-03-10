@@ -26,7 +26,7 @@ class MultimapChangeAppenderTest extends AbstractDiffAppendersTest {
 
     MultimapChangeAppender multimapChangeAppender() {
         def javers = JaversTestBuilder.javersTestAssembly()
-        new MultimapChangeAppender(javers.typeMapper, javers.globalIdFactory)
+        new MultimapChangeAppender(javers.typeMapper)
     }
 
     def "should append changes on Multimaps of primitives "(){

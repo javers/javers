@@ -1,31 +1,40 @@
 package org.javers.core.graph;
 
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.LiveCdo;
-import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.common.collections.Lists;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
  * @author bartosz walacik
  */
-public class LiveCdoFactory implements CdoFactory {
+public class LiveCdoFactory {
 
     private final GlobalIdFactory globalIdFactory;
     private ObjectAccessHook objectAccessHook;
     private TypeMapper typeMapper;
+    private ObjectHasher objectHasher;
 
-    public LiveCdoFactory(GlobalIdFactory globalIdFactory, ObjectAccessHook objectAccessHook, TypeMapper typeMapper) {
+    LiveCdoFactory(GlobalIdFactory globalIdFactory, ObjectAccessHook objectAccessHook, TypeMapper typeMapper, ObjectHasher objectHasher) {
         this.globalIdFactory = globalIdFactory;
         this.objectAccessHook = objectAccessHook;
         this.typeMapper = typeMapper;
+        this.objectHasher = objectHasher;
     }
 
-    @Override
-    public LiveCdo create(Object cdo, OwnerContext owner) {
+    ValueObjectId regenerateValueObjectHash(LiveCdo valueObject, List<LiveCdo> descendantVOs) {
+        List<LiveCdo> objectsToBeHashed = Lists.immutableListOf(descendantVOs, valueObject);
+        String newHash = objectHasher.hash(objectsToBeHashed);
+
+        ValueObjectIdWithHash id = (ValueObjectIdWithHash) valueObject.getGlobalId();
+
+        return id.freeze(newHash);
+    }
+
+    LiveCdo create(Object cdo, OwnerContext owner) {
         GlobalId globalId = globalIdFactory.createId(cdo, owner);
 
         Optional<ObjectAccessProxy> objectAccessor = objectAccessHook.createAccessor(cdo);
@@ -40,8 +49,7 @@ public class LiveCdoFactory implements CdoFactory {
         }
     }
 
-    @Override
-    public String typeDesc() {
-        return "live";
+    GlobalIdFactory getGlobalIdFactory() {
+        return globalIdFactory;
     }
 }

@@ -428,9 +428,12 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
        def lChange = diff.getChangesByType(ListChange)[0]
        lChange.changes[0] instanceof ValueAdded
-       lChange.changes[0].addedValue.value().endsWith(
-               "SnapshotEntity/1#listOfValueObjects/"+
-               javersTestAssembly().hash(new DummyAddress("Warsaw", "some")))
+
+       def addedId = lChange.changes[0].addedValue.value()
+       def expectedAddedId = SnapshotEntity.class.name + "/1#listOfValueObjects/"+
+               javersTestAssembly().hash(new DummyAddress("Warsaw", "some"))
+
+       addedId == expectedAddedId
     }
 
     def "should compare Values in Lists as Sets when ListCompareAlgorithm.SET is enabled"() {

@@ -42,18 +42,15 @@ public class MultisetType extends CollectionType {
         return Multisets.unmodifiableMultiset(targetMultiset);
     }
 
-    /**
-     * Nulls are filtered
-     */
     @Override
-    public Object map(Object sourceEnumerable, Function mapFunction) {
+    public Object map(Object sourceEnumerable, Function mapFunction, boolean filterNulls) {
         Validate.argumentIsNotNull(mapFunction);
         Multiset sourceMultiset = toNotNullMultiset(sourceEnumerable);
         Multiset targetMultiset = HashMultiset.create();
 
         for (Object sourceVal : sourceMultiset) {
             Object mappedVale = mapFunction.apply(sourceVal);
-            if (mappedVale == null) continue;
+            if (mappedVale == null && filterNulls) continue;
 
             targetMultiset.add(mappedVale);
         }

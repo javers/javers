@@ -17,12 +17,10 @@ import java.util.List;
 public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<ListChange> {
 
     private final TypeMapper typeMapper;
-    private final GlobalIdFactory globalIdFactory;
 
-    LevenshteinListChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
-        Validate.argumentsAreNotNull(typeMapper, globalIdFactory);
+    LevenshteinListChangeAppender(TypeMapper typeMapper) {
+        Validate.argumentsAreNotNull(typeMapper);
         this.typeMapper = typeMapper;
-        this.globalIdFactory = globalIdFactory;
     }
 
     @Override
@@ -34,11 +32,10 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
     public ListChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
         CollectionType listType = property.getType();
         JaversType itemType = typeMapper.getJaversType(listType.getItemType());
-        DehydrateContainerFunction dehydrateFunction = new DehydrateContainerFunction(itemType, globalIdFactory);
         OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
 
-        final List leftList =  (List) listType.map(leftValue, dehydrateFunction, owner);
-        final List rightList = (List) listType.map(rightValue, dehydrateFunction, owner);
+        final List leftList =  (List) leftValue;
+        final List rightList = (List) rightValue;
 
         EqualsFunction equalsFunction = itemType::equals;
         Backtrack backtrack = new Backtrack(equalsFunction);

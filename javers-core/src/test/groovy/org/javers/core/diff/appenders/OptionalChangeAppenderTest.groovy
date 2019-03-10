@@ -51,14 +51,15 @@ class OptionalChangeAppenderTest extends AbstractDiffAppendersTest {
         ReferenceChangeAssert.assertThat( change )
             .hasLeftReference( expectedLeftRef )
             .hasRightReference( expectedRightRef )
-            .hasLeftObject( leftOptional )
-            .hasRightObject( rightOptional )
-        
+
+        change.getLeftObject() == expectedLeftObject
+        change.getRightObject() == rightOptional
+
         where:
-        leftOptional                 | rightOptional                | expectedLeftRef               | expectedRightRef
-        empty()                      | of(new SnapshotEntity(id:2)) | null                          | instanceId(2, SnapshotEntity)
-        null                         | of(new SnapshotEntity(id:2)) | null                          | instanceId(2, SnapshotEntity)
-        of(new SnapshotEntity(id:1)) | of(new SnapshotEntity(id:2)) | instanceId(1, SnapshotEntity) | instanceId(2, SnapshotEntity)
+        expectedLeftObject           | leftOptional                 | rightOptional                | expectedLeftRef               | expectedRightRef
+        empty()                      | empty()                      | of(new SnapshotEntity(id:2)) | null                          | instanceId(2, SnapshotEntity)
+        empty()                      | null                         | of(new SnapshotEntity(id:2)) | null                          | instanceId(2, SnapshotEntity)
+        of(new SnapshotEntity(id:1)) | of(new SnapshotEntity(id:1)) | of(new SnapshotEntity(id:2)) | instanceId(1, SnapshotEntity) | instanceId(2, SnapshotEntity)
     }
 
     @Unroll

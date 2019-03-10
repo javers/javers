@@ -4,12 +4,11 @@ import org.javers.common.validation.Validate;
 import org.javers.core.CommitIdGenerator;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
-import org.javers.core.metamodel.object.Cdo;
+import org.javers.core.graph.Cdo;
 import org.javers.core.metamodel.object.CdoSnapshot;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,7 @@ import java.util.TimeZone;
  * It records <b>change</b> done by user on application data.
  * <br><br>
  *
- * Commit can affect one or more domain objects ({@link Cdo}).
+ * Commit can affect one or more domain objects (aka {@link Cdo}).
  * <br><br>
  *
  * Commit holds following data:

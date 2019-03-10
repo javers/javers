@@ -1,6 +1,8 @@
 package org.javers.core.graph
 
 import org.javers.core.JaversTestBuilder
+import org.javers.core.metamodel.object.InstanceId
+import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.model.*
 import org.javers.repository.jql.ValueObjectIdDTO
 import spock.lang.Shared
@@ -22,6 +24,23 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     ObjectGraphBuilder newBuilder(){
         new ObjectGraphBuilder(javers.typeMapper, javers.liveCdoFactory)
+    }
+
+    def "should provide dehydrated property value for references and values"(){
+        given:
+        def graphBuilder = newBuilder()
+        def e = new SnapshotEntity(id:1, entityRef: new SnapshotEntity(id:2))
+
+        when:
+        def node = graphBuilder.buildGraph(e).root()
+
+        then:
+        with(node.getDehydratedPropertyValue("entityRef")) {
+          it instanceof InstanceId
+          it.value().endsWith("SnapshotEntity/2")
+        }
+
+        node.getDehydratedPropertyValue("id") == 1
     }
 
     def "should build one node graph from Entity"(){
@@ -129,6 +148,9 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .andTargetNode()
                 .hasValueObjectId("org.javers.core.model.CategoryVo/#parent/parent/parent")
                 .hasOwnerId("org.javers.core.model.CategoryVo/")
+
+      and: "should get descendants"
+      node.descendants(10).size() == 3
     }
 
     def "should build three nodes linear graph from Entities"() {
@@ -185,11 +207,11 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
 
     def "should build graph with one SingleEdge and one MultiEdge"(){
-        //       stach - details
-        //       \
-        //        detailsList
-        //         /   |   \
-        //      id    id    id
+        //       stach - details2
+        //           \
+        //           List
+        //         /        |           \
+        //      details1    details2    details3
         given:
         def graphBuilder = newBuilder()
         def stach = dummyUser("Mad Stach").withDetails(2).withDetailsList(3)
@@ -201,6 +223,9 @@ abstract class ObjectGraphBuilderTest extends Specification {
         NodeAssert.assertThat(node).hasEdges(2)
         NodeAssert.assertThat(node).hasSingleEdge("dummyUserDetails")
         NodeAssert.assertThat(node).hasMultiEdge("dummyUserDetailsList").ofSize(3)
+
+        and: "should get descendants"
+        node.descendants(10).size() == 3
     }
 
 
@@ -261,7 +286,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .isMultiEdge("Em1", "Em2", "Em3")
     }
 
-
     def "should manage graph cycles"(){
         //superKaz
         //  \ \   \
@@ -280,7 +304,6 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def node = graphBuilder.buildGraph(superKaz).root()
 
         then:
-
         //small cycle
         NodeAssert.assertThat(node).hasCdoId("superKaz")
                 .hasEdge("employeesList")
@@ -298,8 +321,10 @@ abstract class ObjectGraphBuilderTest extends Specification {
                 .andTargetNode()
                 .hasEdge("supervisor")
                 .isSingleEdgeTo("superKaz")
-    }
 
+        and: "should get descendants"
+        node.descendants(10).size() == 2
+    }
 
     def "should build graph with primitive types Set"() {
         given:
@@ -381,19 +406,15 @@ abstract class ObjectGraphBuilderTest extends Specification {
         ])
 
         when:
-        def node = graphBuilder.buildGraph(user).root()
+        LiveNode node = graphBuilder.buildGraph(user).root()
 
         then:
-        def edge = node.getEdge("setOfValueObjects")
-        println "\nreferences:"
-        edge.references.each {
-            println it.globalId.value()
-        }
+        def expectedIds = [
+                javers.valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London")),
+                javers.valueObjectId(1, SnapshotEntity, "setOfValueObjects/"+javers.addressHash("London City"))
+        ] as Set
 
-        assertThat(node).hasMultiEdge("setOfValueObjects").refersToGlobalIds(
-                [new ValueObjectIdDTO(SnapshotEntity, 1, "setOfValueObjects/"+javers.addressHash("London")),
-                 new ValueObjectIdDTO(SnapshotEntity, 1, "setOfValueObjects/"+javers.addressHash("London City"))
-                ])
+        node.getEdge("setOfValueObjects").references.collect{it.globalId} as Set == expectedIds
     }
 
     def "should assign proper indexes to ValueObjects in List multi edge"() {
@@ -438,7 +459,7 @@ abstract class ObjectGraphBuilderTest extends Specification {
 
     def "should support large graphs (more than 10000 edges)"() {
         given:
-        def root = new CategoryC(0);
+        def root = new CategoryC(0)
         def parent = root
         10000.times {
             def child = new CategoryC(parent.id+1)
@@ -449,16 +470,21 @@ abstract class ObjectGraphBuilderTest extends Specification {
         def graphBuilder = newBuilder()
 
         when:
-        def node = graphBuilder.buildGraph(root).root()
+        def rootNode = graphBuilder.buildGraph(root).root()
 
         then:
+        def node = rootNode
         (10000-1).times {
             node = node.getEdge("categories").references[0]
             assertThat(node).hasMultiEdge("categories")
             assertThat(node).hasSingleEdge("parent")
         }
-    }
 
+        and: "should limit descendants traversal to given depth"
+        rootNode.descendants(1).size() == 1
+        rootNode.descendants(2).size() == 2
+        rootNode.descendants(3).size() == 3
+    }
 
     @Unroll
     def "should build graph with Optional<#managedType> SingleEdge"() {

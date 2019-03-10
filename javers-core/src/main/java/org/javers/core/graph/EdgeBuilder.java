@@ -1,8 +1,15 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.core.metamodel.object.*;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
+import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author bartosz walacik
@@ -10,16 +17,12 @@ import org.javers.core.metamodel.type.*;
 class EdgeBuilder {
     private final TypeMapper typeMapper;
     private final NodeReuser nodeReuser;
-    private final CdoFactory cdoFactory;
+    private final LiveCdoFactory cdoFactory;
 
-    EdgeBuilder(TypeMapper typeMapper, NodeReuser nodeReuser, CdoFactory cdoFactory) {
+    EdgeBuilder(TypeMapper typeMapper, NodeReuser nodeReuser, LiveCdoFactory cdoFactory) {
         this.typeMapper = typeMapper;
         this.nodeReuser = nodeReuser;
         this.cdoFactory = cdoFactory;
-    }
-
-    String graphType(){
-        return cdoFactory.typeDesc();
     }
 
     /**
@@ -27,10 +30,10 @@ class EdgeBuilder {
      */
     AbstractSingleEdge buildSingleEdge(ObjectNode node, JaversProperty singleRef) {
         Object rawReference = node.getPropertyValue(singleRef);
-        Cdo cdo = cdoFactory.create(rawReference, createOwnerContext(node, singleRef));
+        LiveCdo cdo = cdoFactory.create(rawReference, createOwnerContext(node, singleRef));
 
         if (!singleRef.isShallowReference()){
-            ObjectNode targetNode = buildNodeStubOrReuse(cdo);
+            LiveNode targetNode = buildNodeStubOrReuse(cdo);
             return new SingleEdge(singleRef, targetNode);
         }
         return new ShallowSingleEdge(singleRef, cdo);
@@ -41,58 +44,56 @@ class EdgeBuilder {
     }
 
     MultiEdge createMultiEdge(JaversProperty containerProperty, EnumerableType enumerableType, ObjectNode node) {
-        MultiEdge multiEdge = new MultiEdge(containerProperty);
         OwnerContext owner = createOwnerContext(node, containerProperty);
 
         Object container = node.getPropertyValue(containerProperty);
 
-        EnumerableFunction edgeBuilder = null;
+        EnumerableFunction edgeBuilder;
         if (enumerableType instanceof KeyValueType){
-            edgeBuilder = new MultiEdgeMapBuilderFunction(multiEdge);
-        } else if (enumerableType instanceof ContainerType){
-            edgeBuilder = new MultiEdgeContainerBuilderFunction(multiEdge);
-        }
-        enumerableType.map(container, edgeBuilder, owner);
+            KeyValueType mapType = (KeyValueType)enumerableType;
+            edgeBuilder = new MultiEdgeMapBuilder(
+                    typeMapper.getJaversType(mapType.getKeyType()) instanceof ManagedType,
+                    typeMapper.getJaversType(mapType.getValueType()) instanceof ManagedType
+            );
 
-        return multiEdge;
+        } else if (enumerableType instanceof ContainerType) {
+            edgeBuilder = (input, context) -> buildNodeStubOrReuse(cdoFactory.create(input, context));
+        } else {
+            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
+        }
+
+        Object nodesEnumerable = enumerableType.map(container, edgeBuilder, owner);
+        return new MultiEdge(containerProperty, nodesEnumerable);
     }
 
-    private class MultiEdgeContainerBuilderFunction implements EnumerableFunction {
-        private final MultiEdge multiEdge;
+    private class MultiEdgeMapBuilder implements EnumerableFunction {
+        private final boolean managedKeys;
+        private final boolean managedValues;
 
-        public MultiEdgeContainerBuilderFunction(MultiEdge multiEdge) {
-            this.multiEdge = multiEdge;
+        public MultiEdgeMapBuilder(boolean managedKeys, boolean managedValues) {
+            this.managedKeys = managedKeys;
+            this.managedValues = managedValues;
         }
 
         @Override
-        public Object apply(Object input, EnumerationAwareOwnerContext context) {
-            if (!isManagedPosition(input)){
-                return input;
-            }
-            ObjectNode objectNode = buildNodeStubOrReuse(cdoFactory.create(input, context));
-            multiEdge.addReferenceNode(objectNode);
-            return input;
-        }
+        public Object apply(Object keyOrValue, EnumerationAwareOwnerContext context) {
+            MapEnumerationOwnerContext mapContext = (MapEnumerationOwnerContext)context;
 
-        boolean isManagedPosition(Object input){
-            return true;
+            if (managedKeys && mapContext.isKey()) {
+                LiveNode objectNode = buildNodeStubOrReuse(cdoFactory.create(keyOrValue, context));
+                return objectNode;
+            }
+
+            if (managedValues && !mapContext.isKey()) {
+                LiveNode objectNode = buildNodeStubOrReuse(cdoFactory.create(keyOrValue, context));
+                return objectNode;
+            }
+
+            return keyOrValue;
         }
     }
 
-    private class MultiEdgeMapBuilderFunction extends MultiEdgeContainerBuilderFunction {
-        public MultiEdgeMapBuilderFunction(MultiEdge multiEdge) {
-            super(multiEdge);
-        }
-
-        boolean isManagedPosition(Object input){
-            if (input == null) {
-                return false;
-            }
-            return typeMapper.getJaversType(input.getClass()) instanceof ManagedType;
-        }
-    }
-
-    private ObjectNode buildNodeStubOrReuse(Cdo cdo){
+    private LiveNode buildNodeStubOrReuse(LiveCdo cdo){
         if (nodeReuser.isReusable(cdo)){
             return nodeReuser.getForReuse(cdo);
         }
@@ -101,8 +102,8 @@ class EdgeBuilder {
         }
     }
 
-    ObjectNode buildNodeStub(Cdo cdo){
-        ObjectNode newStub = new ObjectNode(cdo);
+    LiveNode buildNodeStub(LiveCdo cdo){
+        LiveNode newStub = new LiveNode(cdo);
         nodeReuser.enqueueStub(newStub);
         return newStub;
     }

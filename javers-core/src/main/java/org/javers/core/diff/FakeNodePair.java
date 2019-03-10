@@ -1,12 +1,15 @@
 package org.javers.core.diff;
 
 import org.javers.common.collections.Defaults;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 
+import java.util.Collections;
 import java.util.List;
 
 class FakeNodePair implements NodePair {
@@ -38,6 +41,16 @@ class FakeNodePair implements NodePair {
     }
 
     @Override
+    public ObjectNode getLeft() {
+        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED, "FakeNodePair.getLeft()");
+    }
+
+    @Override
+    public Object getLeftDehydratedPropertyValueAndSanitize(JaversProperty property) {
+        return Defaults.defaultValue(property.getGenericType());
+    }
+
+    @Override
     public List<JaversProperty> getProperties() {
         return getManagedType().getProperties();
     }
@@ -51,14 +64,23 @@ class FakeNodePair implements NodePair {
     public Object getRightPropertyValue(Property property) {
         return right.getPropertyValue(property);
     }
-
     @Override
-    public GlobalId getRightGlobalId(Property property) {
+    public GlobalId getRightReference(Property property) {
          return right.getReference(property);
     }
 
     @Override
-    public GlobalId getLeftGlobalId(Property property) {
+    public GlobalId getLeftReference(Property property) {
         return null;
+    }
+
+    @Override
+    public List<GlobalId> getRightReferences(JaversProperty property) {
+        return right.getReferences(property);
+    }
+
+    @Override
+    public List<GlobalId> getLeftReferences(JaversProperty property) {
+        return Collections.emptyList();
     }
 }

@@ -204,13 +204,12 @@ abstract class ShadowFactoryTest extends Specification {
 
         where:
         container << ['List', 'Array']
-        className << ['ArrayList', 'SnapshotEntity[]']
+        className << ['UnmodifiableRandomAccessList', 'SnapshotEntity[]']
         cdo << [new SnapshotEntity(id:1,
                         listOfEntities: [new SnapshotEntity(id:2, intProperty:2), new SnapshotEntity(id:3, intProperty:3)]),
                 new SnapshotEntity(id:1,
                         arrayOfEntities: [new SnapshotEntity(id:2, intProperty:2), new SnapshotEntity(id:3, intProperty:3)])]
         pName << ['listOfEntities','arrayOfEntities']
-
     }
 
     def "should support long chain of references with cycle"(){

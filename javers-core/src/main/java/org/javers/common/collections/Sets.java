@@ -18,6 +18,14 @@ public class Sets {
     private Sets() {
     }
 
+
+    public static Set wrapNull(Object set) {
+        if (set == null) {
+            return Collections.emptySet();
+        }
+        return (Set) set;
+    }
+
     /**
      * null args are allowed
      */
@@ -39,7 +47,6 @@ public class Sets {
     public static <E> Set<E> xor(Set<E> first, Set<E> second) {
         Set<E> xor = difference(first, second);
         xor.addAll(difference(second, first));
-
         return xor;
     }
 
@@ -47,17 +54,37 @@ public class Sets {
      * null args are allowed
      */
     public static <E> Set<E> difference(Set<E> first, Set<E> second) {
-        if (first == null) {
-            return EMPTY_SET;
+        if (first == null || first.size() == 0) {
+            return Collections.emptySet();
         }
 
-        if (second == null) {
+        if (second == null || second.size() == 0) {
             return first;
         }
 
         Set<E> difference = new HashSet<>(first);
         difference.removeAll(second);
         return difference;
+    }
+
+    /**
+     * null args are allowed
+     */
+    public static <E> Collection<E> difference(Set<E> first, Set<E> second, Function<E, Integer> hasher) {
+        if (first == null || first.size() == 0) {
+            return Collections.emptyList();
+        }
+
+        if (second == null || second.size() == 0) {
+            return first;
+        }
+
+        Map<Integer, E> map = new HashMap();
+
+        first.stream().forEach(e -> map.put(hasher.apply(e), e));
+        second.stream().forEach(e -> map.remove(hasher.apply(e)));
+
+        return Collections.unmodifiableCollection(map.values());
     }
 
     public static <E> Set<E> asSet(E... elements) {

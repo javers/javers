@@ -137,7 +137,8 @@ class ShadowGraphBuilder {
 
                 Object containerWithRefs = cdoSnapshot.getPropertyValue(property);
                 if (!propertyType.isEmpty(containerWithRefs)) {
-                    currentNode.addEnumerableWiring(property, propertyType.map(containerWithRefs, (value) -> passValueOrCreateNodeFromRef(value, property)));
+                    currentNode.addEnumerableWiring(property, propertyType
+                               .map(containerWithRefs, (value) -> passValueOrCreateNodeFromRef(value, property), true));
                     jsonElement.remove(property.getName());
                 }
             }

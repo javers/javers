@@ -54,8 +54,8 @@ class JaversNapCategoryTreeIntegrationTest extends Specification {
         Diff diff = javers.compare(cat1, cat2)
 
         then:
-        assertThat(diff).has(3906 , NewObject)
-                        .has(3906 , ObjectRemoved)
-                        .hasChanges(3906 * 2)
+        diff.getChangesByType(NewObject).size() == 3906
+        diff.getChangesByType(ObjectRemoved).size() == 3906
+        diff.getChanges().size() == 3906 * 2
     }
 }

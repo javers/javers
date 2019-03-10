@@ -1,6 +1,7 @@
-package org.javers.core.metamodel.object;
+package org.javers.core.graph;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.*;
 
@@ -12,18 +13,14 @@ import java.util.Optional;
  * @author bartosz walacik
  */
 public abstract class Cdo {
-    private final GlobalId globalId;
     private final ManagedType managedType;
 
-    protected Cdo(GlobalId globalId, ManagedType managedType) {
-        Validate.argumentsAreNotNull(globalId, managedType);
-        this.globalId = globalId;
+    protected Cdo(ManagedType managedType) {
+        Validate.argumentsAreNotNull(managedType);
         this.managedType = managedType;
     }
 
-    public GlobalId getGlobalId() {
-        return globalId;
-    }
+    public abstract GlobalId getGlobalId();
 
     public abstract Optional<Object> getWrappedCdo();
 
@@ -35,7 +32,7 @@ public abstract class Cdo {
 
     @Override
     public String toString() {
-        return globalId.toString();
+        return getGlobalId().toString();
     }
 
     @Override
@@ -45,12 +42,12 @@ public abstract class Cdo {
         }
 
         Cdo other = (Cdo) o;
-        return  globalId.equals(other.globalId);
+        return  getGlobalId().equals(other.getGlobalId());
     }
 
     @Override
     public int hashCode() {
-        return globalId.hashCode();
+        return getGlobalId().hashCode();
     }
 
     public ManagedType getManagedType() {

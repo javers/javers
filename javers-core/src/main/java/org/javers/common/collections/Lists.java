@@ -44,6 +44,12 @@ public class Lists {
         return (List) Arrays.asList(elements);
     }
 
+    public static <E> List<E> immutableListOf(List<E> elements, E element) {
+        List<E> list = new ArrayList<>(elements);
+        list.add(element);
+        return Collections.unmodifiableList(list);
+    }
+
     /**
      * @return index -> value
      */

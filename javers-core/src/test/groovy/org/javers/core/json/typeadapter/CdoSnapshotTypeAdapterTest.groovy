@@ -31,7 +31,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def now = ZonedDateTime.now()
         def javers = javersTestAssembly()
 
-        def dummyUserCdo = javers.createCdoWrapper( new DummyUser(name:"kaz", age:5) )
+        def dummyUserCdo = javers.createLiveNode( new DummyUser(name:"kaz", age:5) )
         def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata(now))
 
         when:
@@ -60,7 +60,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 flag:true,
                 _char:'a')
 
-        def dummyUserCdo = javers.createCdoWrapper( dummyUser )
+        def dummyUserCdo = javers.createLiveNode( dummyUser )
         def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata())
 
         when:
@@ -81,8 +81,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         given:
         def javers = javersTestAssembly()
         def dummyUser = dummyUser("kaz").withDetails()
-        def cdoWrapper = javers.createCdoWrapper( dummyUser )
-        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def cdo = javers.createLiveNode( dummyUser )
+        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -97,8 +97,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def javers = javersTestAssembly()
         def dummyUserDetails = DummyUserDetails.dummyUserDetails(1).withAddress("London", "St John Street")
 
-        def cdoWrapper = javers.createCdoWrapper( dummyUserDetails )
-        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def cdo = javers.createLiveNode( dummyUserDetails )
+        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -113,8 +113,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
       def javers = javersTestAssembly()
       def entity = new SnapshotEntity(id:1, mapOfEntities: [(new SnapshotEntity(id:2)) : new SnapshotEntity(id:3)])
 
-      def cdoWrapper = javers.createCdoWrapper( entity )
-      def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+      def cdo = javers.createLiveNode( entity )
+      def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
       when:
       def jsonText = javers.jsonConverter.toJson(snapshot)
@@ -130,8 +130,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def entity = new SnapshotEntity(id: 1,
                 multiMapPrimitiveToEntity: MultimapBuilder.create(["NY": [new SnapshotEntity(id: 2), new SnapshotEntity(id: 3)]]))
 
-        def cdoWrapper = javers.createCdoWrapper( entity )
-        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def cdo = javers.createLiveNode( entity )
+        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
         when:
         def jsonText = javers.jsonConverter.toJson(snapshot)
@@ -155,8 +155,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def javers = javersTestAssembly()
         def entity = new SnapshotEntity(multiSetOfPrimitives: HashMultiset.create(['a','a','b']))
 
-        def cdoWrapper = javers.createCdoWrapper( entity )
-        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def cdo = javers.createLiveNode( entity )
+        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
         when:
         def jsonText = javers.jsonConverter.toJson(snapshot)
@@ -176,8 +176,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 stringSet: ["5", "6"] as Set,
                 primitiveMap: [time: LocalDateTime.of(2000, 1, 1, 12, 0, 0)] )
 
-        def cdoWrapper = javers.createCdoWrapper( dummyUser )
-        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def cdo = javers.createLiveNode( dummyUser )
+        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)

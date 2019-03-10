@@ -1,30 +1,33 @@
 package org.javers.core
 
 import org.javers.common.date.DateProvider
+import org.javers.common.string.ShaDigest
 import org.javers.core.commit.CommitFactory
+import org.javers.core.graph.Cdo
+import org.javers.core.graph.LiveCdo
 import org.javers.core.graph.LiveCdoFactory
 import org.javers.core.graph.LiveCdoWrapper
 import org.javers.core.graph.LiveGraph
 import org.javers.core.graph.LiveGraphFactory
+import org.javers.core.graph.LiveNode
+import org.javers.core.graph.ObjectGraph
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.JsonConverterBuilder
-import org.javers.core.metamodel.object.LiveCdo
 import org.javers.core.metamodel.object.GlobalIdFactory
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.object.ValueObjectId
-import org.javers.core.metamodel.scanner.ClassScanner
-import org.javers.core.metamodel.type.TypeFactory
-import org.javers.core.model.DummyAddress
-import org.javers.core.snapshot.ObjectHasher
-import org.javers.core.snapshot.SnapshotFactory
 import org.javers.core.metamodel.property.Property
 import org.javers.core.metamodel.type.TypeMapper
+import org.javers.core.model.DummyAddress
+import org.javers.core.graph.ObjectHasher
+import org.javers.core.snapshot.SnapshotFactory
 import org.javers.repository.api.JaversExtendedRepository
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.jql.QueryRunner
-import org.javers.repository.jql.ValueObjectIdDTO
 import org.javers.shadow.ShadowFactory
+
+import java.util.stream.Collectors
 
 /**
  * This is just a test builder,
@@ -104,7 +107,7 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(Javers)
     }
 
-    LiveCdo createCdoWrapper(Object cdo){
+    Cdo createCdoWrapper(Object cdo){
         def mType = getTypeMapper().getJaversManagedType(cdo.class)
         def id = instanceId(cdo)
 
@@ -160,24 +163,25 @@ class JaversTestBuilder {
         javersBuilder.getContainerComponent(JsonConverterBuilder)
     }
 
-    ObjectHasher getObjectHasher() {
-        javersBuilder.getContainerComponent(ObjectHasher)
-    }
-
     String hash(Object obj) {
-        getObjectHasher().hash(obj)
+        def jsonState = jsonConverter.toJson(javers().commit("", obj).snapshots[0].state)
+        ShaDigest.longDigest(jsonState)
     }
 
     String addressHash(String city){
-        getObjectHasher().hash(new DummyAddress(city))
+        hash(new DummyAddress(city))
     }
 
     def getContainerComponent(Class type) {
         javersBuilder.getContainerComponent(type)
     }
 
-    LiveGraph createLiveGraph(Object liveCdo) {
+    ObjectGraph createLiveGraph(Object liveCdo) {
         javersBuilder.getContainerComponent(LiveGraphFactory).createLiveGraph(liveCdo)
+    }
+
+    LiveNode createLiveNode(Object liveCdo) {
+        javersBuilder.getContainerComponent(LiveGraphFactory).createLiveGraph(liveCdo).root()
     }
 
     InstanceId instanceId(Object instance){
@@ -188,7 +192,6 @@ class JaversTestBuilder {
         getGlobalIdFactory().createInstanceId(localId, entity)
     }
 
-    @Deprecated
     ValueObjectId valueObjectId(Object localId, Class owningEntity, fragment) {
         getGlobalIdFactory().createValueObjectIdFromPath(instanceId(localId, owningEntity), fragment)
     }

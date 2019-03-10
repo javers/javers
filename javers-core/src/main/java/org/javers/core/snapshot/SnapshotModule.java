@@ -18,7 +18,6 @@ public class SnapshotModule extends InstantiatingModule {
     protected Collection<Class> getImplementations() {
         return (Collection) Lists.asList(
                 SnapshotFactory.class,
-                ObjectHasher.class,
                 SnapshotDiffer.class,
                 SnapshotGraphFactory.class,
                 ChangedCdoSnapshotsFactory.class

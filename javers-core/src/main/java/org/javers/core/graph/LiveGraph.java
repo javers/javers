@@ -1,8 +1,5 @@
 package org.javers.core.graph;
 
-import org.javers.core.diff.ObjectGraph;
-import org.javers.core.metamodel.object.LiveCdo;
-
 import java.util.Set;
 
 /**
@@ -11,12 +8,12 @@ import java.util.Set;
 public class LiveGraph extends ObjectGraph<LiveCdo> {
     private final ObjectNode root;
 
-    LiveGraph(ObjectNode root, Set<ObjectNode> nodes) {
+    LiveGraph(ObjectNode root, Set<ObjectNode<LiveCdo>> nodes) {
         super(nodes);
         this.root = root;
     }
 
-    public ObjectNode root() {
+    ObjectNode root() {
         return root;
     }
 }

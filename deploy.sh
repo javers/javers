@@ -1,5 +1,5 @@
 ./gradlew -v
-./gradlew clean build
-./gradlew publishToNexus closeAndReleaseRepository
+
+./gradlew clean build -x test publish closeAndReleaseRepository
 
 echo "published"

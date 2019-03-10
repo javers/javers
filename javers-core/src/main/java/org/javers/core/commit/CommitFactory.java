@@ -6,10 +6,10 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactory;
-import org.javers.core.diff.ObjectGraph;
+import org.javers.core.graph.Cdo;
 import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.LiveGraphFactory;
-import org.javers.core.metamodel.object.Cdo;
+import org.javers.core.graph.ObjectGraph;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.snapshot.ChangedCdoSnapshotsFactory;
@@ -85,7 +85,7 @@ public class CommitFactory {
         CommitMetadata commitMetadata = newCommitMetadata(author, properties);
         ObjectGraph<CdoSnapshot> latestSnapshotGraph = snapshotGraphFactory.createLatest(currentGraph.globalIds());
         List<CdoSnapshot> changedCdoSnapshots =
-            changedCdoSnapshotsFactory.create(currentGraph.cdos(), latestSnapshotGraph.cdos(), commitMetadata);
+            changedCdoSnapshotsFactory.create(currentGraph, latestSnapshotGraph.cdos(), commitMetadata);
         Diff diff = diffFactory.create(latestSnapshotGraph, currentGraph, Optional.of(commitMetadata));
         return new Commit(commitMetadata, changedCdoSnapshots, diff);
     }

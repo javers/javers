@@ -7,6 +7,7 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -47,18 +48,33 @@ public class RealNodePair implements NodePair {
     }
 
     @Override
-    public GlobalId getRightGlobalId(Property property) {
+    public GlobalId getRightReference(Property property) {
         return right.getReference(property);
     }
 
     @Override
-    public GlobalId getLeftGlobalId(Property property) {
+    public GlobalId getLeftReference(Property property) {
         return left.getReference(property);
+    }
+
+    @Override
+    public List<GlobalId> getRightReferences(JaversProperty property) {
+        return right.getReferences(property);
+    }
+
+    @Override
+    public List<GlobalId> getLeftReferences(JaversProperty property) {
+        return left.getReferences(property);
     }
 
     @Override
     public ObjectNode getRight() {
         return right;
+    }
+
+    @Override
+    public ObjectNode getLeft() {
+        return left;
     }
 
     @Override

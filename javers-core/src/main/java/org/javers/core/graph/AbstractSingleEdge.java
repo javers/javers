@@ -8,5 +8,9 @@ abstract class AbstractSingleEdge extends Edge {
         super(property);
     }
 
-    abstract GlobalId getReference() ;
+    abstract GlobalId getReference();
+
+    public Object getDehydratedPropertyValue() {
+        return getReference();
+    }
 }

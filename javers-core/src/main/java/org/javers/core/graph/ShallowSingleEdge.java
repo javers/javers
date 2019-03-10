@@ -1,9 +1,11 @@
 package org.javers.core.graph;
 
 import org.javers.common.validation.Validate;
-import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.JaversProperty;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author bartosz.walacik
@@ -20,5 +22,10 @@ class ShallowSingleEdge extends AbstractSingleEdge {
     @Override
     GlobalId getReference() {
         return reference.getGlobalId();
+    }
+
+    @Override
+    List<LiveNode> getReferences() {
+        return Collections.emptyList();
     }
 }

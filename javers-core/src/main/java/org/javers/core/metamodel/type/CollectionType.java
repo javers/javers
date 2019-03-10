@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
+import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
@@ -9,7 +10,12 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.javers.common.collections.Collections.wrapNull;
 
 /**
@@ -61,21 +67,32 @@ public class CollectionType extends ContainerType {
         for (Object sourceVal : sourceCol) {
             targetSet.add(mapFunction.apply(sourceVal, enumerationContext));
         }
-        return Collections.unmodifiableSet(targetSet);
+        return unmodifiableSet(targetSet);
     }
 
-
-    /**
-     * Nulls are filtered
-     */
     @Override
-    public Object map(Object sourceEnumerable, Function mapFunction) {
+    public Object map(Object sourceEnumerable, Function mapFunction, boolean filterNulls) {
         Collection sourceCol = wrapNull(sourceEnumerable);
-        return sourceCol.stream().map(mapFunction).filter(it -> it != null).collect(Collectors.toSet());
+        return unmodifiableList((List)sourceCol.stream()
+                .map(sourceVal -> sourceVal == null ? null : mapFunction.apply(sourceVal))
+                .filter(mappedVal -> !filterNulls || mappedVal != null)
+                .collect(toList()));
     }
 
     @Override
     public Object empty() {
         return Collections.emptyList();
+    }
+
+    @Override
+    protected Stream<Object> items(Object source) {
+        return wrapNull(source).stream();
+    }
+
+    public static Collection wrapNull(Object col) {
+        if (col == null) {
+            return Collections.emptyList();
+        }
+        return (Collection) col;
     }
 }

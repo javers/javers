@@ -19,6 +19,7 @@ public class GraphFactoryModule extends InstantiatingModule {
                LiveCdoFactory.class,
                CollectionsCdoFactory.class,
                LiveGraphFactory.class,
+               ObjectHasher.class,
                ObjectGraphBuilder.class,
                ObjectAccessHookDoNothingImpl.class);
     }

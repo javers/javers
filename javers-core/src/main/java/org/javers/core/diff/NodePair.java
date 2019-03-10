@@ -14,39 +14,40 @@ public interface NodePair {
 
     ObjectNode getRight();
 
+    ObjectNode getLeft();
+
     List<JaversProperty> getProperties();
 
     Object getLeftPropertyValue(Property property);
 
     Object getRightPropertyValue(Property property);
 
-    GlobalId getRightGlobalId(Property property);
+    GlobalId getRightReference(Property property);
 
-    GlobalId getLeftGlobalId(Property property);
+    GlobalId getLeftReference(Property property);
+
+    List<GlobalId> getRightReferences(JaversProperty property);
+
+    List<GlobalId> getLeftReferences(JaversProperty property);
 
     ManagedType getManagedType();
 
-    default Object getLeftPropertyValueAndSanitize(Property property, JaversType expectedType) {
-        return sanitize(getLeftPropertyValue(property), expectedType);
+    default Object getRightDehydratedPropertyValueAndSanitize(JaversProperty property) {
+        return sanitize(getRight().getDehydratedPropertyValue(property), property.getType());
     }
 
-    default Object getRightPropertyValueAndSanitize(Property property, JaversType expectedType) {
-        return sanitize(getRightPropertyValue(property), expectedType);
+    default Object getLeftDehydratedPropertyValueAndSanitize(JaversProperty property) {
+        return sanitize(getLeft().getDehydratedPropertyValue(property), property.getType());
     }
 
     default Object sanitize(Object value, JaversType expectedType) {
-        if (value == null) {
-            return null;
-        }
 
-        if (expectedType.isInstance(value)) {
-            return value;
+        //all Enumerables (except Arrays) are sanitized
+        if (expectedType instanceof EnumerableType && !(expectedType instanceof ArrayType)) {
+            if (value == null || !expectedType.isInstance(value)) {
+                return ((EnumerableType)expectedType).empty();
+            }
         }
-
-        if (expectedType instanceof EnumerableType) {
-            return ((EnumerableType)expectedType).empty();
-        }
-
-        return null;
+        return value;
     }
 }

@@ -1,14 +1,12 @@
 package org.javers.core.graph;
 
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.LiveCdo;
 import org.javers.core.metamodel.type.ManagedType;
-
 import static org.javers.common.validation.Validate.argumentCheck;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 class LiveCdoWrapper extends LiveCdo {
-    private final Object wrappedCdo;
+    private Object wrappedCdo;
 
     LiveCdoWrapper(Object wrappedCdo, GlobalId globalId, ManagedType managedType) {
         super(globalId, managedType);
@@ -20,7 +18,7 @@ class LiveCdoWrapper extends LiveCdo {
     }
 
     @Override
-    protected Object wrappedCdo() {
+    Object wrappedCdo() {
         return wrappedCdo;
     }
 }
