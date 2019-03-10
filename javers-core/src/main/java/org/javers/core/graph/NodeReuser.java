@@ -102,5 +102,13 @@ class NodeReuser {
         public int hashCode() {
             return System.identityHashCode(cdo);
         }
+
+        @Override
+        public String toString() {
+            return "SystemIdentityWrapper{" +
+                    "hash:"+hashCode()+", "+
+                    "cdo:" + cdo +
+                    '}';
+        }
     }
 }

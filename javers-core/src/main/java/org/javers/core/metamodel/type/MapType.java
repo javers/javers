@@ -40,17 +40,14 @@ public class MapType extends KeyValueType {
         return Collections.unmodifiableMap(targetMap);
     }
 
-    /**
-     * Nulls keys are filtered
-     */
     @Override
-    public Object map(Object source, Function mapFunction) {
+    public Object map(Object source, Function mapFunction, boolean filterNulls) {
         Validate.argumentsAreNotNull(mapFunction);
 
         Map sourceMap = Maps.wrapNull(source);
         Map targetMap = new HashMap(sourceMap.size());
 
-        mapEntrySetFilterNulls(sourceMap.entrySet(), mapFunction, (k,v) -> targetMap.put(k,v));
+        mapEntrySet(sourceMap.entrySet(), mapFunction, (k,v) -> targetMap.put(k,v), filterNulls);
 
         return Collections.unmodifiableMap(targetMap);
     }
@@ -77,12 +74,13 @@ public class MapType extends KeyValueType {
         }
     }
 
-    public static void mapEntrySetFilterNulls(Collection<Map.Entry<?,?>> sourceEntries,
+    public static void mapEntrySet(Collection<Map.Entry<?,?>> sourceEntries,
                                               Function mapFunction,
-                                              BiConsumer entryConsumer) {
+                                              BiConsumer entryConsumer,
+                                              boolean filterNulls) {
         for (Map.Entry entry : sourceEntries) {
             Object mappedKey = mapFunction.apply(entry.getKey());
-            if (mappedKey == null) continue;;
+            if (mappedKey == null && filterNulls) continue;
 
             Object mappedValue = mapFunction.apply(entry.getValue());
 

@@ -57,13 +57,13 @@ public class MultimapType extends KeyValueType {
      * Nulls keys are filtered
      */
     @Override
-    public Object map(Object sourceEnumerable, Function mapFunction) {
+    public Object map(Object sourceEnumerable, Function mapFunction, boolean filterNulls) {
         Validate.argumentIsNotNull(mapFunction);
 
         Multimap sourceMultimap = toNotNullMultimap(sourceEnumerable);
         Multimap targetMultimap = ArrayListMultimap.create();
 
-        MapType.mapEntrySetFilterNulls(sourceMultimap.entries(), mapFunction, (k,v) -> targetMultimap.put(k,v));
+        MapType.mapEntrySet(sourceMultimap.entries(), mapFunction, (k,v) -> targetMultimap.put(k,v), filterNulls);
 
         return targetMultimap;
     }

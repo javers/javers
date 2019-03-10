@@ -32,11 +32,12 @@ public abstract class EnumerableType extends ClassType {
     /**
      * Returns a new Enumerable (unmodifiable when possible)
      * with items from sourceEnumerable mapped by mapFunction.
-     * <br/>
-     *
-     * Nulls are filtered
      */
-    public abstract Object map(Object sourceEnumerable, Function mapFunction);
+    public Object map(Object sourceEnumerable, Function mapFunction) {
+        return map(sourceEnumerable, mapFunction, false);
+    }
+
+    public abstract Object map(Object sourceEnumerable, Function mapFunction, boolean filterNulls);
 
     public abstract boolean isEmpty(Object container);
 

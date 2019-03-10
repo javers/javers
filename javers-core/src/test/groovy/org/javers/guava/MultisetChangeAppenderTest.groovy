@@ -17,8 +17,7 @@ import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
 
     MultisetChangeAppender multisetChangeAppender() {
-        def javers = JaversTestBuilder.javersTestAssembly()
-        new MultisetChangeAppender(javers.typeMapper, javers.globalIdFactory)
+        new MultisetChangeAppender()
     }
 
     @Unroll

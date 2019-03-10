@@ -10,7 +10,6 @@ import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 /**
  * @author wioleta.gozdzik
  */
-
 class SetOfReferencesChangeAppenderTest extends AbstractDiffAppendersTest {
 
     def "should append ValueAdded in Set of Entities"() {

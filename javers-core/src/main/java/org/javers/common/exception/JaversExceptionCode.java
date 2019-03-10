@@ -40,7 +40,7 @@ public enum JaversExceptionCode {
 
     MISSING_PROPERTY("There is no property '%s' in type '%s'."),
 
-    NOT_IMPLEMENTED("not implemented, %"),
+    NOT_IMPLEMENTED("not implemented, %s"),
 
     IGNORED_AND_INCLUDED_PROPERTIES_MIX("Mapping error in class '%s'. You can either specify Included Properties or Ignored Properties, not both."),
 

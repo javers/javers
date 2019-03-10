@@ -122,4 +122,10 @@ public class LiveNode extends ObjectNode<LiveCdo>{
             node.edges.values().forEach(e -> follow((Edge)e, depth));
         }
     }
+
+    @Override
+    public String toString() {
+        return "LiveNode{" + hashCode() + ", globaId:" + getGlobalId() +
+                ", edges:" +edges.size() +" }";
+    }
 }

@@ -32,8 +32,8 @@ class SetChangeAppender implements PropertyChangeAppender<SetChange> {
     public SetChange calculateChanges(NodePair pair, JaversProperty property) {
         GlobalId affectedId = pair.getGlobalId();
 
-        Set leftSet = getLeftSet(pair, property);
-        Set rightSet = getRightSet(pair, property);
+        Set leftSet = toSet(pair.getLeftDehydratedPropertyValueAndSanitize(property));
+        Set rightSet = toSet(pair.getRightDehydratedPropertyValueAndSanitize(property));
 
         List<ContainerElementChange> entryChanges = calculateDiff(leftSet, rightSet);
         if (!entryChanges.isEmpty()) {
@@ -45,27 +45,11 @@ class SetChangeAppender implements PropertyChangeAppender<SetChange> {
         }
     }
 
-    private Set getLeftSet(NodePair pair, JaversProperty property) {
-        if (typeMapper.isContainerOfManagedTypes(property.getType())) {
-            return toSet(pair.getLeftReferences(property));
-        } else {
-            return toSet(pair.getLeftPropertyCollectionAndSanitize(property));
-        }
-    }
-
-    private Set getRightSet(NodePair pair, JaversProperty property){
-        if (typeMapper.isContainerOfManagedTypes(property.getType())) {
-            return toSet(pair.getRightReferences(property));
-        } else {
-            return toSet(pair.getRightPropertyCollectionAndSanitize(property));
-        }
-    }
-
-    private Set toSet(Collection collection) {
+    private Set toSet(Object collection) {
         if (collection instanceof Set) {
             return (Set) collection;
         }
-        return new HashSet(collection);
+        return new HashSet((Collection)collection);
     }
 
     private List<ContainerElementChange> calculateDiff(Set leftSet, Set rightSet) {

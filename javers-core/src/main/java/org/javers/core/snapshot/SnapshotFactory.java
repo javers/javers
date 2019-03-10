@@ -1,17 +1,16 @@
 package org.javers.core.snapshot;
 
 import org.javers.common.collections.Defaults;
-import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.exception.JaversException;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.Cdo;
 import org.javers.core.graph.LiveNode;
 import org.javers.core.metamodel.object.*;
-import org.javers.core.metamodel.type.*;
+import org.javers.core.metamodel.type.JaversProperty;
+import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.Objects;
 
-import static org.javers.common.exception.JaversExceptionCode.NOT_IMPLEMENTED;
 import static org.javers.core.metamodel.object.CdoSnapshotBuilder.cdoSnapshot;
 import static org.javers.core.metamodel.object.SnapshotType.*;
 
@@ -20,11 +19,9 @@ import static org.javers.core.metamodel.object.SnapshotType.*;
  */
 public class SnapshotFactory {
     private final TypeMapper typeMapper;
-    private final GlobalIdFactory globalIdFactory;
 
-    SnapshotFactory(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
+    SnapshotFactory(TypeMapper typeMapper) {
         this.typeMapper = typeMapper;
-        this.globalIdFactory = globalIdFactory;
     }
 
     public CdoSnapshot createTerminal(GlobalId globalId, CdoSnapshot previous, CommitMetadata commitMetadata) {

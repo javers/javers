@@ -35,9 +35,9 @@ public class ArrayType extends ContainerType {
     public Object map(Object sourceArray, EnumerableFunction mapFunction, OwnerContext owner) {
         Validate.argumentsAreNotNull(sourceArray, mapFunction, owner);
 
-        int len = Array.getLength(sourceArray);
-        Object targetArray = newPrimitiveOrObjectArray(len);
+        Object targetArray = newArray(sourceArray, null, false);
 
+        int len = Array.getLength(sourceArray);
         EnumerationAwareOwnerContext enumerationContext = new IndexableEnumerationOwnerContext(owner);
         for (int i=0; i<len; i++){
             Object sourceVal = Array.get(sourceArray,i);
@@ -52,15 +52,19 @@ public class ArrayType extends ContainerType {
     }
 
     @Override
-    public Object map(Object sourceArray, Function mapFunction) {
+    public Object map(Object sourceArray, Function mapFunction, boolean filterNulls) {
         Validate.argumentsAreNotNull(sourceArray, mapFunction);
 
-        int len = Array.getLength(sourceArray);
-        Object targetArray = newPrimitiveOrObjectArray(len);
+        Object targetArray = newArray(sourceArray, mapFunction, true);
 
-        for (int i=0; i<len; i++){
+        int len = Array.getLength(sourceArray);
+        int t = 0;
+        for (int i=0; i<len; i++) {
             Object sourceVal = Array.get(sourceArray,i);
-            Array.set(targetArray, i, mapFunction.apply(sourceVal));
+
+            Object mappedVal = mapFunction.apply(sourceVal);
+            if (mappedVal == null && filterNulls) continue;
+            Array.set(targetArray, t++, mappedVal);
         }
         return targetArray;
     }
@@ -74,19 +78,24 @@ public class ArrayType extends ContainerType {
         return Arrays.asList((Object[])source).stream();
     }
 
-    private Object newItemTypeOrObjectArray(Object sample, int len) {
-        if (getItemClass().isAssignableFrom(sample.getClass())) {
-            return Array.newInstance(getItemClass(), len);
-
+    private Object newArray(Object sourceArray, Function mapFunction, boolean doSample) {
+        int len = Array.getLength(sourceArray);
+        if (len == 0) {
+            return sourceArray;
         }
-        return new Object[len];
-    }
 
-    private Object newPrimitiveOrObjectArray(int len) {
         if (getItemClass().isPrimitive()){
             return Array.newInstance(getItemClass(), len);
         }
-        return new Object[len];
+
+        if (doSample) {
+            Object sample = mapFunction.apply(Array.get(sourceArray, 0));
+            if (getItemClass().isAssignableFrom(sample.getClass())) {
+                return Array.newInstance(getItemClass(), len);
+            }
+        }
+
+        return Array.newInstance(Object.class, len);
     }
 
     @Override

@@ -110,7 +110,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         if (isClassPresent("org.joda.time.LocalDate")){
             conditionalTypesPlugins.add(new JodaAddOns());
         }
-        if (isClassPresent("com.google.common.mapToList.Multimap")) {
+        if (isClassPresent("com.google.common.collect.Multimap")) {
             conditionalTypesPlugins.add(new GuavaAddOns());
         }
 

@@ -38,13 +38,12 @@ public class ListType extends CollectionType{
         return unmodifiableList(targetList);
     }
 
-    /**
-     * Nulls are filtered
-     */
     @Override
-    public Object map(Object sourceEnumerable, Function mapFunction) {
+    public Object map(Object sourceEnumerable, Function mapFunction, boolean filterNulls) {
         List sourceCol = Lists.wrapNull(sourceEnumerable);
-        return unmodifiableList(
-                (List)sourceCol.stream().map(mapFunction).filter(it -> it != null).collect(toList()));
+        return unmodifiableList((List)sourceCol.stream()
+            .map(sourceVal -> sourceVal == null ? null : mapFunction.apply(sourceVal))
+            .filter(mappedVal -> !filterNulls || mappedVal != null)
+            .collect(toList()));
     }
 }

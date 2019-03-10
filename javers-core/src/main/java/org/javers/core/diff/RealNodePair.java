@@ -73,6 +73,11 @@ public class RealNodePair implements NodePair {
     }
 
     @Override
+    public ObjectNode getLeft() {
+        return left;
+    }
+
+    @Override
     public List<JaversProperty> getProperties() {
         return getManagedType().getProperties();
     }

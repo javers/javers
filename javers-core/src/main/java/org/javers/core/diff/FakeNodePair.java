@@ -1,6 +1,8 @@
 package org.javers.core.diff;
 
 import org.javers.common.collections.Defaults;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
@@ -39,6 +41,16 @@ class FakeNodePair implements NodePair {
     }
 
     @Override
+    public ObjectNode getLeft() {
+        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED, "FakeNodePair.getLeft()");
+    }
+
+    @Override
+    public Object getLeftDehydratedPropertyValueAndSanitize(JaversProperty property) {
+        return Defaults.defaultValue(property.getGenericType());
+    }
+
+    @Override
     public List<JaversProperty> getProperties() {
         return getManagedType().getProperties();
     }
@@ -52,7 +64,6 @@ class FakeNodePair implements NodePair {
     public Object getRightPropertyValue(Property property) {
         return right.getPropertyValue(property);
     }
-
     @Override
     public GlobalId getRightReference(Property property) {
          return right.getReference(property);

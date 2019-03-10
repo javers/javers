@@ -6,6 +6,7 @@ import org.javers.core.metamodel.type.JaversType;
 /**
 * @author bartosz walacik
 */
+@Deprecated
 public class DehydrateContainerFunction implements EnumerableFunction {
     private final JaversType itemType;
     private final GlobalIdFactory globalIdFactory;

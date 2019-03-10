@@ -18,6 +18,14 @@ public class Sets {
     private Sets() {
     }
 
+
+    public static Set wrapNull(Object set) {
+        if (set == null) {
+            return Collections.emptySet();
+        }
+        return (Set) set;
+    }
+
     /**
      * null args are allowed
      */

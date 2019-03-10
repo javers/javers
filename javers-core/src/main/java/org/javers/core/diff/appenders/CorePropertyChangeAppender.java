@@ -7,7 +7,6 @@ import org.javers.core.metamodel.type.JaversProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
-import java.util.Optional;
 
 import static org.javers.core.metamodel.type.JaversType.DEFAULT_TYPE_PARAMETER;
 
@@ -41,8 +40,8 @@ public abstract class CorePropertyChangeAppender<T extends PropertyChange> imple
 
     @Override
     final public T calculateChanges(NodePair pair, JaversProperty property) {
-        Object leftValue =  pair.getLeftPropertyValueAndSanitize(property, property.getType());
-        Object rightValue = pair.getRightPropertyValueAndSanitize(property, property.getType());
+        Object leftValue =  pair.getLeftDehydratedPropertyValueAndSanitize(property);
+        Object rightValue = pair.getRightDehydratedPropertyValueAndSanitize(property);
         return calculateChanges(leftValue, rightValue, pair.getGlobalId(), property);
     }
 

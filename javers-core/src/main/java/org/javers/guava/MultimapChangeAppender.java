@@ -2,18 +2,24 @@ package org.javers.guava;
 
 import com.google.common.collect.Multimap;
 import org.javers.common.exception.JaversException;
-import org.javers.core.diff.appenders.CorePropertyChangeAppender;
+import org.javers.core.diff.NodePair;
+import org.javers.core.diff.appenders.PropertyChangeAppender;
 import org.javers.core.diff.changetype.map.EntryAdded;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.EntryRemoved;
 import org.javers.core.diff.changetype.map.MapChange;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 import static java.util.Collections.EMPTY_LIST;
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
+import static org.javers.core.diff.appenders.CorePropertyChangeAppender.renderNotParametrizedWarningIfNeeded;
 
 /**
  * Compares Guava Multimaps.
@@ -23,14 +29,12 @@ import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NO
  *
  * @author akrystian
  */
-class MultimapChangeAppender extends CorePropertyChangeAppender<MapChange>{
+class MultimapChangeAppender implements PropertyChangeAppender<MapChange> {
 
     private final TypeMapper typeMapper;
-    private final GlobalIdFactory globalIdFactory;
 
-    MultimapChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory){
+    MultimapChangeAppender(TypeMapper typeMapper){
         this.typeMapper = typeMapper;
-        this.globalIdFactory = globalIdFactory;
     }
 
     @Override
@@ -46,34 +50,30 @@ class MultimapChangeAppender extends CorePropertyChangeAppender<MapChange>{
     }
 
     @Override
-    public MapChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
-        Multimap left =  (Multimap)leftValue;
-        Multimap right = (Multimap)rightValue;
+    public MapChange calculateChanges(NodePair pair, JaversProperty property) {
+
+        Multimap left = (Multimap) pair.getLeftDehydratedPropertyValueAndSanitize(property);
+        Multimap right = (Multimap) pair.getRightDehydratedPropertyValueAndSanitize(property);
 
         MultimapType multimapType = ((JaversProperty) property).getType();
-        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
+        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
 
         List<EntryChange> entryChanges = calculateChanges(multimapType, left, right, owner);
         if (!entryChanges.isEmpty()){
             renderNotParametrizedWarningIfNeeded(multimapType.getKeyType(), "key", "Multimap", property);
             renderNotParametrizedWarningIfNeeded(multimapType.getValueType(), "value", "Multimap", property);
-            return new MapChange(affectedId, property.getName(), entryChanges);
-        }else{
+            return new MapChange(pair.getGlobalId(), property.getName(), entryChanges);
+        } else {
             return null;
         }
     }
 
     private List<EntryChange> calculateChanges(MultimapType multimapType, Multimap left, Multimap right, OwnerContext owner){
-        DehydrateMapFunction dehydrateFunction = getDehydrateMapFunction(multimapType);
-
-        Multimap leftMultimap = multimapType.map(left, dehydrateFunction, owner);
-        Multimap rightMultimap = multimapType.map(right, dehydrateFunction, owner);
-
         List<EntryChange> changes = new ArrayList<>();
 
-        for (Object commonKey : Multimaps.commonKeys(leftMultimap, rightMultimap)){
-            Collection leftValues = leftMultimap.get(commonKey);
-            Collection rightValues = rightMultimap.get(commonKey);
+        for (Object commonKey : Multimaps.commonKeys(left, right)){
+            Collection leftValues = left.get(commonKey);
+            Collection rightValues = right.get(commonKey);
 
             Collection difference = difference(leftValues, rightValues);
             difference.addAll(difference(rightValues, leftValues));
@@ -81,7 +81,7 @@ class MultimapChangeAppender extends CorePropertyChangeAppender<MapChange>{
                 calculateValueChanges(changes, commonKey, leftValues, rightValues);
             }
         }
-        calculateKeyChanges(leftMultimap, rightMultimap, changes);
+        calculateKeyChanges(left, right, changes);
         return changes;
     }
 
@@ -134,13 +134,5 @@ class MultimapChangeAppender extends CorePropertyChangeAppender<MapChange>{
                 changes.add( new EntryAdded(commonKey, addedValue));
             }
         }
-    }
-
-    private DehydrateMapFunction getDehydrateMapFunction(MultimapType multimapType){
-        JaversType keyType = typeMapper.getJaversType(multimapType.getKeyType());
-        JaversType valueType = typeMapper.getJaversType(multimapType.getValueType());
-
-        MapContentType multiMapContentType = new MapContentType(keyType, valueType);
-        return new DehydrateMapFunction(globalIdFactory, multiMapContentType);
     }
 }
