@@ -12,6 +12,10 @@ class PhoneWithShallowCategory {
     String number = "123"
     @ShallowReference
     CategoryC shallowCategory
+    @ShallowReference
+    Set<CategoryC> shallowCategories
+    @ShallowReference
+    Map<String, CategoryC> shallowCategoryMap
     CategoryC deepCategory
 
     @Id

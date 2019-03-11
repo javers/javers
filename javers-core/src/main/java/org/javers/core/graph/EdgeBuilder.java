@@ -8,9 +8,6 @@ import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author bartosz walacik
  */
@@ -48,17 +45,24 @@ class EdgeBuilder {
 
         Object container = node.getPropertyValue(containerProperty);
 
-        EnumerableFunction edgeBuilder;
+        EnumerableFunction edgeBuilder = (input, context) -> {
+            final LiveCdo cdo = cdoFactory.create(input, context);
+            if (!containerProperty.isShallowReference()) {
+                return buildNodeStubOrReuse(cdo);
+            } else {
+                return cdo.getGlobalId();
+            }
+        };
+
         if (enumerableType instanceof KeyValueType){
             KeyValueType mapType = (KeyValueType)enumerableType;
             edgeBuilder = new MultiEdgeMapBuilder(
                     typeMapper.getJaversType(mapType.getKeyType()) instanceof ManagedType,
-                    typeMapper.getJaversType(mapType.getValueType()) instanceof ManagedType
+                    typeMapper.getJaversType(mapType.getValueType()) instanceof ManagedType,
+                    edgeBuilder
             );
 
-        } else if (enumerableType instanceof ContainerType) {
-            edgeBuilder = (input, context) -> buildNodeStubOrReuse(cdoFactory.create(input, context));
-        } else {
+        } else if (!(enumerableType instanceof ContainerType)) {
             throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
         }
 
@@ -69,10 +73,12 @@ class EdgeBuilder {
     private class MultiEdgeMapBuilder implements EnumerableFunction {
         private final boolean managedKeys;
         private final boolean managedValues;
+        private final EnumerableFunction edgeBuilder;
 
-        public MultiEdgeMapBuilder(boolean managedKeys, boolean managedValues) {
+        public MultiEdgeMapBuilder(boolean managedKeys, boolean managedValues, EnumerableFunction edgeBuilder) {
             this.managedKeys = managedKeys;
             this.managedValues = managedValues;
+            this.edgeBuilder = edgeBuilder;
         }
 
         @Override
@@ -80,13 +86,11 @@ class EdgeBuilder {
             MapEnumerationOwnerContext mapContext = (MapEnumerationOwnerContext)context;
 
             if (managedKeys && mapContext.isKey()) {
-                LiveNode objectNode = buildNodeStubOrReuse(cdoFactory.create(keyOrValue, context));
-                return objectNode;
+                return edgeBuilder.apply(keyOrValue, context);
             }
 
             if (managedValues && !mapContext.isKey()) {
-                LiveNode objectNode = buildNodeStubOrReuse(cdoFactory.create(keyOrValue, context));
-                return objectNode;
+                return edgeBuilder.apply(keyOrValue, context);
             }
 
             return keyOrValue;

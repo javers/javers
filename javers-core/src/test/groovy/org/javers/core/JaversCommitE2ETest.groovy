@@ -53,6 +53,38 @@ class JaversCommitE2ETest extends Specification {
         commit.snapshots.size() == 1
     }
 
+    def "should not commit snapshot of ShallowReference collection property"() {
+        given:
+        def javers = javers().build()
+        def entity =  new PhoneWithShallowCategory(id:1, shallowCategories:[new CategoryC(1, "old shallow")])
+
+        when:
+        def commit = javers.commit("", entity)
+
+        then:
+        commit.snapshots.each {
+            println it.toString()
+            println ".. props:"+ it.state.propertyNames
+        }
+        commit.snapshots.size() == 1
+    }
+
+    def "should not commit snapshot of ShallowReference map property"() {
+        given:
+        def javers = javers().build()
+        def entity =  new PhoneWithShallowCategory(id:1, shallowCategoryMap:["foo":new CategoryC(1, "old shallow")])
+
+        when:
+        def commit = javers.commit("", entity)
+
+        then:
+        commit.snapshots.each {
+            println it.toString()
+            println ".. props:"+ it.state.propertyNames
+        }
+        commit.snapshots.size() == 1
+    }
+
     def "should mark changed properties"() {
         given:
         def javers = javers().build()
