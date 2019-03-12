@@ -5,8 +5,10 @@ import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.examples.typeNames.NewEntity
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.examples.typeNames.OldEntity
+import org.javers.core.model.CategoryC
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
+import org.javers.core.model.PhoneWithShallowCategory
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Unroll
@@ -600,5 +602,50 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
             it instanceof SnapshotEntity
             it.valueObjectRef instanceof DummyAddress
         }
+    }
+
+    def "should load a shadow snapshot referencing a @ShallowReference"(){
+        given:
+        def a = new PhoneWithShallowCategory(id:1, shallowCategory:new CategoryC(1, "some"))
+        javers.commit("a", a)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, PhoneWithShallowCategory)
+                .withScopeDeepPlus().build()).collect{it.get()}
+
+        then:
+        shadows.size() == 1
+        shadows.first().shallowCategory.id == 1
+        shadows.first().shallowCategory.name == null
+    }
+
+    def "should load a shadow snapshot referencing a @ShallowReference list"(){
+        given:
+        def a = new PhoneWithShallowCategory(id:1, shallowCategories:[new CategoryC(1, "some")])
+        javers.commit("a", a)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, PhoneWithShallowCategory)
+                .withScopeDeepPlus().build()).collect{it.get()}
+
+        then:
+        shadows.size() == 1
+        shadows.first().shallowCategories.first().id == 1
+        shadows.first().shallowCategories.first().name == null
+    }
+
+    def "should load a shadow snapshot referencing a @ShallowReference map"(){
+        given:
+        def a = new PhoneWithShallowCategory(id:1, shallowCategoryMap:["foo":new CategoryC(1, "some")])
+        javers.commit("a", a)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, PhoneWithShallowCategory)
+                .withScopeDeepPlus().build()).collect{it.get()}
+
+        then:
+        shadows.size() == 1
+        shadows.first().shallowCategoryMap["foo"].id == 1L
+        shadows.first().shallowCategoryMap["foo"].name == null
     }
 }
