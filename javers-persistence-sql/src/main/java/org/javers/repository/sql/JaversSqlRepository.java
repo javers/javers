@@ -21,10 +21,7 @@ import org.javers.repository.sql.session.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.javers.repository.sql.session.Session.SQL_LOGGER_NAME;
@@ -100,6 +97,9 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getSnapshots(Collection<SnapshotIdentifier> snapshotIdentifiers) {
+        if (isEmpty(snapshotIdentifiers)) {
+            return Collections.emptyList();
+        }
         try(Session session = sessionFactory.create("find snapshots by ids")) {
             return finder.getSnapshots(snapshotIdentifiers, session);
         }
@@ -114,6 +114,9 @@ public class JaversSqlRepository implements JaversRepository {
 
     @Override
     public List<CdoSnapshot> getStateHistory(Set<ManagedType> givenClasses, QueryParams queryParams) {
+        if (isEmpty(givenClasses)) {
+            return Collections.emptyList();
+        }
         try(Session session = sessionFactory.create("find snapshots by type")) {
             return finder.getStateHistory(givenClasses, queryParams, session);
         }
@@ -182,5 +185,9 @@ public class JaversSqlRepository implements JaversRepository {
         if(sqlRepositoryConfiguration.isSchemaManagementEnabled()) {
             schemaManager.ensureSchema();
         }
+    }
+
+    private boolean isEmpty(Collection c) {
+        return c == null || c.size() == 0;
     }
 }

@@ -130,7 +130,9 @@ public class Session implements AutoCloseable {
         List<PreparedStatementExecutor> executors = new ArrayList<>(statementExecutors.values());
         Collections.sort(executors, (e1, e2) -> e2.getExecutionTotalMillis() > e1.getExecutionTotalMillis() ? 1 : -1);
 
-        //executors.forEach(e -> logger.debug("* "+e.printStats()));
+        if (logger.isTraceEnabled()) {
+            executors.forEach(e -> logger.trace("* " + e.printStats()));
+        }
     }
 
     Dialect getDialect() {
