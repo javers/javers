@@ -46,8 +46,9 @@ class EdgeBuilder {
         Object container = node.getPropertyValue(containerProperty);
 
         EnumerableFunction edgeBuilder = (input, context) -> {
+            final ManagedType inputManagedType = typeMapper.getJaversManagedType(input.getClass());
             final LiveCdo cdo = cdoFactory.create(input, context);
-            if (!containerProperty.isShallowReference()) {
+            if (!containerProperty.isShallowReference() && !inputManagedType.hasShallowReferenceAnn()) {
                 return buildNodeStubOrReuse(cdo);
             } else {
                 return cdo.getGlobalId();

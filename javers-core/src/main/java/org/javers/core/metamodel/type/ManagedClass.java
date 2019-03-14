@@ -22,8 +22,10 @@ class ManagedClass {
     private final List<JaversProperty> managedProperties;
     private final List<JaversProperty> looksLikeId;
     private final ManagedPropertiesFilter managedPropertiesFilter;
+    private final boolean hasShallowReferenceAnn;
 
-    ManagedClass(Class baseJavaClass, List<JaversProperty> managedProperties, List<JaversProperty> looksLikeId, ManagedPropertiesFilter managedPropertiesFilter) {
+    ManagedClass(Class baseJavaClass, List<JaversProperty> managedProperties, List<JaversProperty> looksLikeId,
+                 ManagedPropertiesFilter managedPropertiesFilter, boolean hasShallowReferenceAnn) {
         argumentsAreNotNull(baseJavaClass, managedProperties, looksLikeId, managedPropertiesFilter);
 
         this.baseJavaClass = baseJavaClass;
@@ -31,6 +33,7 @@ class ManagedClass {
         this.propertiesByName = new HashMap<>();
         this.looksLikeId = looksLikeId;
         this.managedPropertiesFilter = managedPropertiesFilter;
+        this.hasShallowReferenceAnn = hasShallowReferenceAnn;
 
         for (JaversProperty property : managedProperties) {
             this.managedProperties.add(property);
@@ -39,11 +42,11 @@ class ManagedClass {
     }
 
     static ManagedClass unknown() {
-        return new ManagedClass(Object.class, Collections.emptyList(), Collections.emptyList(), ManagedPropertiesFilter.empty());
+        return new ManagedClass(Object.class, Collections.emptyList(), Collections.emptyList(), ManagedPropertiesFilter.empty(), false);
     }
 
     ManagedClass createShallowReference(){
-        return new ManagedClass(baseJavaClass, Collections.emptyList(), getLooksLikeId(), ManagedPropertiesFilter.empty());
+        return new ManagedClass(baseJavaClass, Collections.emptyList(), getLooksLikeId(), ManagedPropertiesFilter.empty(), true);
     }
 
     ManagedPropertiesFilter getManagedPropertiesFilter() {
@@ -95,5 +98,9 @@ class ManagedClass {
 
     Class<?> getBaseJavaClass() {
         return baseJavaClass;
+    }
+
+    public boolean hasShallowReferenceAnn() {
+        return hasShallowReferenceAnn;
     }
 }

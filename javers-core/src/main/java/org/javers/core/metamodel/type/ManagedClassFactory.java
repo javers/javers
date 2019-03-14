@@ -27,22 +27,23 @@ class ManagedClassFactory {
         ManagedPropertiesFilter managedPropertiesFilter =
                 new ManagedPropertiesFilter(def.getBaseJavaClass(), allProperties, def.getPropertiesFilter());
 
-        return create(def.getBaseJavaClass(), allProperties, managedPropertiesFilter);
+        return create(def.getBaseJavaClass(), allProperties, managedPropertiesFilter, scan.hasShallowReferenceAnn());
     }
 
     ManagedClass createFromPrototype(Class<?> baseJavaClass, ClassScan scan, ManagedPropertiesFilter prototypePropertiesFilter) {
         List<JaversProperty> allProperties = convert(scan.getProperties());
-        return create(baseJavaClass, allProperties, prototypePropertiesFilter);
+        return create(baseJavaClass, allProperties, prototypePropertiesFilter, scan.hasShallowReferenceAnn());
     }
 
-    private ManagedClass create(Class<?> baseJavaClass, List<JaversProperty> allProperties, ManagedPropertiesFilter propertiesFilter){
+    private ManagedClass create(Class<?> baseJavaClass, List<JaversProperty> allProperties,
+                                ManagedPropertiesFilter propertiesFilter, boolean hasShallowReferenceAnn){
 
         List<JaversProperty> filtered = propertiesFilter.filterProperties(allProperties);
 
         filtered = filterIgnoredType(filtered, baseJavaClass);
 
         return new ManagedClass(baseJavaClass, filtered,
-                positiveFilter(allProperties, p -> p.looksLikeId()), propertiesFilter);
+                positiveFilter(allProperties, p -> p.looksLikeId()), propertiesFilter, hasShallowReferenceAnn);
     }
 
     private List<JaversProperty> convert(List<Property> properties) {

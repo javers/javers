@@ -67,6 +67,10 @@ public abstract class ManagedType extends ClassType {
         return managedClass.getPropertyNames();
     }
 
+    public boolean hasShallowReferenceAnn() {
+        return managedClass.hasShallowReferenceAnn();
+    }
+
     ManagedClass getManagedClass() {
         return managedClass;
     }
