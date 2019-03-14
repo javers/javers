@@ -18,6 +18,7 @@ plugins {
     //id "de.marcphilipp.nexus-publish" version "0.1.1"
 }
 
+apply plugin: 'maven-publish'
 apply plugin: 'io.codearte.nexus-staging'
 
 scmVersion {
@@ -38,7 +39,7 @@ subprojects {
     targetCompatibility = 1.8
 
     project.group = 'org.javers'
-    project.version = "test-btb"
+    project.version = "test-btb-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -142,6 +143,19 @@ subprojects {
         }
     }
 }
+
+
+
+publishing {
+    repositories {
+        maven {
+            // change to point to your repo, e.g. http://my.org/repo
+            url = "http://nexus.wssim.com.br/repository/cloud-snapshot"
+        }
+    }
+}
+
+
 
 //io.codearte.gradle
 nexusStaging {

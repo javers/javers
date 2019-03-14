@@ -6,19 +6,15 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.GlobalId;
 
-public class PropertyAddedChange extends PropertyChange {
+public class ReferenceAddedChange extends PropertyChange {
 
-    private transient Object value;
+    private transient GlobalId value;
 
-    public PropertyAddedChange(final GlobalId affectedCdoId,
-        final String propertyName, final Object value){
-       this(affectedCdoId, propertyName, Optional.empty());
-       this.value = value;
-    }
-
-    protected PropertyAddedChange(final GlobalId affectedCdoId,
-        final String propertyName, final Optional<CommitMetadata> commitMetadata) {
+    public ReferenceAddedChange(final GlobalId affectedCdoId,
+        final String propertyName, final Optional<CommitMetadata> commitMetadata,
+        final GlobalId value) {
         super(affectedCdoId, propertyName, commitMetadata);
+        this.value = value;
     }
 
     @Override
@@ -30,7 +26,7 @@ public class PropertyAddedChange extends PropertyChange {
             valuePrinter.formatWithQuotes(value);
     }
 
-    public Object getValue() {
+    public GlobalId getValue() {
         return value;
     }
 }

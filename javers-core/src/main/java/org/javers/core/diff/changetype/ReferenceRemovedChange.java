@@ -6,17 +6,9 @@ import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.GlobalId;
 
-public class PropertyAddedChange extends PropertyChange {
+public class ReferenceRemovedChange extends PropertyChange {
 
-    private transient Object value;
-
-    public PropertyAddedChange(final GlobalId affectedCdoId,
-        final String propertyName, final Object value){
-       this(affectedCdoId, propertyName, Optional.empty());
-       this.value = value;
-    }
-
-    protected PropertyAddedChange(final GlobalId affectedCdoId,
+    public ReferenceRemovedChange(final GlobalId affectedCdoId,
         final String propertyName, final Optional<CommitMetadata> commitMetadata) {
         super(affectedCdoId, propertyName, commitMetadata);
     }
@@ -26,11 +18,6 @@ public class PropertyAddedChange extends PropertyChange {
         Validate.argumentIsNotNull(valuePrinter);
 
         return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
-            " was added with value " +
-            valuePrinter.formatWithQuotes(value);
-    }
-
-    public Object getValue() {
-        return value;
+            " was removed";
     }
 }
