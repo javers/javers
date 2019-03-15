@@ -5,7 +5,7 @@ import org.javers.core.metamodel.type.JaversProperty;
 
 import java.util.List;
 
-class MultiEdge extends Edge {
+class MultiEdge extends AbstractMultiEdge {
     /**
      * This is the tricky part.
      *

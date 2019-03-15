@@ -5,8 +5,11 @@ import org.javers.common.exception.JaversExceptionCode
 import org.javers.core.examples.typeNames.NewEntity
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
 import org.javers.core.examples.typeNames.OldEntity
+import org.javers.core.model.CategoryC
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyNetworkAddress
+import org.javers.core.model.PhoneWithShallowCategory
+import org.javers.core.model.ShallowPhone
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Unroll
@@ -600,5 +603,76 @@ class JaversRepositoryShadowE2ETest extends JaversRepositoryE2ETest {
             it instanceof SnapshotEntity
             it.valueObjectRef instanceof DummyAddress
         }
+    }
+
+    def "should load a thin Shadow when a property has @ShallowReference"(){
+        given:
+        def a = new PhoneWithShallowCategory(id:1, shallowCategory:new CategoryC(2, "some"))
+        javers.commit("a", a)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, PhoneWithShallowCategory)
+                .withScopeDeepPlus().build()).collect{it.get()}
+
+        then:
+        shadows.size() == 1
+        assertThinShadowOfCategoryC(shadows.first().shallowCategory)
+    }
+
+    def "should load thin Shadows in Container when a property has @ShallowReference" () {
+        given:
+        def entity = new PhoneWithShallowCategory(id:1,
+                shallowCategories:[new CategoryC(2, "shallow")] as Set,
+                shallowCategoriesList:[new CategoryC(2, "shallow")],
+                shallowCategoryMap:["foo":new CategoryC(2, "some")]
+        )
+        javers.commit("a", entity)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, PhoneWithShallowCategory)
+                .withScopeDeepPlus().build()).collect{it.get()}
+
+        then:
+        shadows.size() == 1
+        assertThinShadowOfCategoryC(shadows.first().shallowCategories.first())
+        assertThinShadowOfCategoryC(shadows.first().shallowCategoriesList.first())
+        assertThinShadowOfCategoryC(shadows.first().shallowCategoryMap["foo"])
+    }
+
+    void assertThinShadowOfCategoryC(def shadow) {
+        assert shadow.id == 2L
+        assert shadow instanceof CategoryC
+        assert shadow.name == null
+    }
+
+    def "should load thin Shadows of ShallowReferenceType entities"(){
+        given:
+        def reference = new ShallowPhone(2, "123", new CategoryC(2, "some"))
+        def entity = new SnapshotEntity(id:1,
+                shallowPhone: reference,
+                shallowPhones: [reference] as Set,
+                shallowPhonesList: [reference],
+                shallowPhonesMap: ["key": reference]
+        )
+
+        javers.commit("a", entity)
+
+        when:
+        def shadows = javers.findShadows(QueryBuilder.byInstanceId(1, SnapshotEntity)
+                .withScopeDeepPlus().build()).collect{it.get()}
+
+        then:
+        println shadows[0]
+        assertThinShadowOfPhone(shadows.first().shallowPhone)
+        assertThinShadowOfPhone(shadows.first().shallowPhones.first())
+        assertThinShadowOfPhone(shadows.first().shallowPhonesList.first())
+        assertThinShadowOfPhone(shadows.first().shallowPhonesMap["key"])
+    }
+
+    void assertThinShadowOfPhone(def shadow) {
+        assert shadow.id == 2L
+        assert shadow instanceof ShallowPhone
+        assert shadow.number == null
+        assert shadow.category == null
     }
 }

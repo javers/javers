@@ -38,7 +38,7 @@ public class JaversProperty extends Property {
     }
 
     public boolean isShallowReference(){
-        return (hasShallowReferenceAnn() ||
-                getType() instanceof ShallowReferenceType);
+        return (hasShallowReferenceAnn()
+            || getType() instanceof ShallowReferenceType);
     }
 }

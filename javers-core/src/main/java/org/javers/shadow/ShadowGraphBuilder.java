@@ -158,7 +158,12 @@ class ShadowGraphBuilder {
         }
 
         if (property.isShallowReference()) {
-            return assembleShallowReferenceShadow((InstanceId)globalId, (EntityType)property.getType());
+            if (property.getType() instanceof EntityType) {
+                return assembleShallowReferenceShadow((InstanceId) globalId, property.getType());
+            } else {
+                EntityType entityType = (EntityType)typeMapper.getJaversManagedType(globalId);
+                return assembleShallowReferenceShadow((InstanceId) globalId, entityType);
+            }
         }
 
         CdoSnapshot cdoSnapshot = referenceResolver.apply(rootContext, globalId);

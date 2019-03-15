@@ -21,23 +21,26 @@ import static GlobalIdTestBuilder.valueObjectId
  */
 class JaversCommitE2ETest extends Specification {
 
-    def "should not commit snapshot of ShallowReference Entity"() {
+    def "should not commit snapshot of ShallowReferenceType entities" () {
         given:
         def javers = javers().build()
-        def entity =  new SnapshotEntity(id:1, shallowPhone:new ShallowPhone(1, "123", new CategoryC(1, "some")))
+        def reference = new ShallowPhone(1, "123", new CategoryC(1, "some"))
+        def entity =  new SnapshotEntity(id:1,
+                shallowPhone: reference,
+                shallowPhones: [reference] as Set,
+                shallowPhonesList: [reference],
+                shallowPhonesMap: ["key": reference]
+        )
 
         when:
         def commit = javers.commit("", entity)
 
         then:
-        commit.snapshots.each {
-            println it.toString()
-            println ".. props:"+ it.state.propertyNames
-        }
+        commit.snapshots.each { println it }
         commit.snapshots.size() == 1
     }
 
-    def "should not commit snapshot of ShallowReference property"() {
+    def "should not commit snapshot of a reference when a property has @ShallowReference"() {
         given:
         def javers = javers().build()
         def entity =  new PhoneWithShallowCategory(id:1, shallowCategory:new CategoryC(1, "old shallow"))
@@ -46,11 +49,31 @@ class JaversCommitE2ETest extends Specification {
         def commit = javers.commit("", entity)
 
         then:
-        commit.snapshots.each {
-            println it.toString()
-            println ".. props:"+ it.state.propertyNames
-        }
+        println commit.snapshots[0]
+
         commit.snapshots.size() == 1
+    }
+
+    @Unroll
+    def "should not commit snapshots in #collection when a property has @ShallowReference" () {
+        given:
+        def javers = javers().build()
+
+        when:
+        def commit = javers.commit("", entity)
+
+        then:
+        println commit.snapshots[0]
+
+        commit.snapshots.size() == 1
+
+        where:
+        collection << ["Set", "List", "Map"]
+        entity << [
+            new PhoneWithShallowCategory(id:1, shallowCategories:[new CategoryC(1, "old shallow")] as Set),
+            new PhoneWithShallowCategory(id:1, shallowCategoriesList:[new CategoryC(1, "old shallow")]),
+            new PhoneWithShallowCategory(id:1, shallowCategoryMap:["foo":new CategoryC(1, "old shallow")])
+        ]
     }
 
     def "should mark changed properties"() {

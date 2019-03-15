@@ -109,7 +109,7 @@ class ObjectGraphBuilder {
             EnumerableType enumerableType = containerProperty.getType();
 
             //looks like we have Container or Map with Entity references or Value Objects
-            MultiEdge multiEdge = edgeBuilder.createMultiEdge(containerProperty, enumerableType, node);
+            AbstractMultiEdge multiEdge = edgeBuilder.createMultiEdge(containerProperty, enumerableType, node);
             node.addEdge(multiEdge);
         }
     }
