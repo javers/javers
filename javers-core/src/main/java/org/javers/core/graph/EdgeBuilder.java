@@ -3,7 +3,6 @@ package org.javers.core.graph;
 import org.javers.common.collections.EnumerableFunction;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
@@ -27,73 +26,85 @@ class EdgeBuilder {
      */
     AbstractSingleEdge buildSingleEdge(ObjectNode node, JaversProperty singleRef) {
         Object rawReference = node.getPropertyValue(singleRef);
-        LiveCdo cdo = cdoFactory.create(rawReference, createOwnerContext(node, singleRef));
+        OwnerContext ownerContext = createOwnerContext(node, singleRef);
 
         if (!singleRef.isShallowReference()){
+            LiveCdo cdo = cdoFactory.create(rawReference, ownerContext);
             LiveNode targetNode = buildNodeStubOrReuse(cdo);
             return new SingleEdge(singleRef, targetNode);
         }
-        return new ShallowSingleEdge(singleRef, cdo);
+        return new ShallowSingleEdge(singleRef, cdoFactory.createId(rawReference, ownerContext));
     }
 
     private OwnerContext createOwnerContext(ObjectNode parentNode, JaversProperty property) {
         return new PropertyOwnerContext(parentNode.getGlobalId(), property.getName());
     }
 
-    MultiEdge createMultiEdge(JaversProperty containerProperty, EnumerableType enumerableType, ObjectNode node) {
+    AbstractMultiEdge createMultiEdge(JaversProperty containerProperty, EnumerableType enumerableType, ObjectNode node) {
         OwnerContext owner = createOwnerContext(node, containerProperty);
 
         Object container = node.getPropertyValue(containerProperty);
 
-        EnumerableFunction edgeBuilder = (input, context) -> {
-            final LiveCdo cdo = cdoFactory.create(input, context);
-            if (!containerProperty.isShallowReference()) {
+        boolean isShallow = containerProperty.isShallowReference() ||
+                hasShallowReferenceItems(enumerableType);
+
+        EnumerableFunction itemMapper = (input, context) -> {
+            if (!isShallow) {
+                LiveCdo cdo = cdoFactory.create(input, context);
                 return buildNodeStubOrReuse(cdo);
             } else {
-                return cdo.getGlobalId();
+                return cdoFactory.createId(input, context);
             }
         };
 
-        if (enumerableType instanceof KeyValueType){
-            KeyValueType mapType = (KeyValueType)enumerableType;
-            edgeBuilder = new MultiEdgeMapBuilder(
-                    typeMapper.getJaversType(mapType.getKeyType()) instanceof ManagedType,
-                    typeMapper.getJaversType(mapType.getValueType()) instanceof ManagedType,
-                    edgeBuilder
-            );
+        EnumerableFunction edgeBuilder = createEdgeBuilder(enumerableType, itemMapper);
 
-        } else if (!(enumerableType instanceof ContainerType)) {
-            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
+        Object mappedEnumerable = enumerableType.map(container, edgeBuilder, owner);
+        if (!isShallow) {
+            return new MultiEdge(containerProperty, mappedEnumerable);
+        } else {
+            return new ShallowMultiEdge(containerProperty, mappedEnumerable);
         }
-
-        Object nodesEnumerable = enumerableType.map(container, edgeBuilder, owner);
-        return new MultiEdge(containerProperty, nodesEnumerable);
     }
 
-    private class MultiEdgeMapBuilder implements EnumerableFunction {
-        private final boolean managedKeys;
-        private final boolean managedValues;
-        private final EnumerableFunction edgeBuilder;
-
-        public MultiEdgeMapBuilder(boolean managedKeys, boolean managedValues, EnumerableFunction edgeBuilder) {
-            this.managedKeys = managedKeys;
-            this.managedValues = managedValues;
-            this.edgeBuilder = edgeBuilder;
+    private boolean hasShallowReferenceItems(EnumerableType enumerableType){
+        if (enumerableType instanceof ContainerType) {
+            ContainerType containerType = (ContainerType)enumerableType;
+            return typeMapper.isShallowReferenceType(containerType.getItemType());
         }
+        if (enumerableType instanceof KeyValueType) {
+            KeyValueType keyValueType = (KeyValueType)enumerableType;
+            return typeMapper.isShallowReferenceType(keyValueType.getKeyType()) ||
+                   typeMapper.isShallowReferenceType(keyValueType.getValueType());
+        }
+        return false;
+    }
 
-        @Override
-        public Object apply(Object keyOrValue, EnumerationAwareOwnerContext context) {
-            MapEnumerationOwnerContext mapContext = (MapEnumerationOwnerContext)context;
+    private EnumerableFunction createEdgeBuilder(EnumerableType enumerableType, EnumerableFunction itemMapper) {
+        if (enumerableType instanceof KeyValueType){
+            KeyValueType mapType = (KeyValueType)enumerableType;
 
-            if (managedKeys && mapContext.isKey()) {
-                return edgeBuilder.apply(keyOrValue, context);
-            }
+            final boolean managedKeys = typeMapper.getJaversType(mapType.getKeyType()) instanceof ManagedType;
+            final boolean managedValues = typeMapper.getJaversType(mapType.getValueType()) instanceof ManagedType;
 
-            if (managedValues && !mapContext.isKey()) {
-                return edgeBuilder.apply(keyOrValue, context);
-            }
+            return (keyOrValue, context) -> {
+                MapEnumerationOwnerContext mapContext = (MapEnumerationOwnerContext)context;
 
-            return keyOrValue;
+                if (managedKeys && mapContext.isKey()) {
+                    return itemMapper.apply(keyOrValue, context);
+                }
+
+                if (managedValues && !mapContext.isKey()) {
+                    return itemMapper.apply(keyOrValue, context);
+                }
+
+                return keyOrValue;
+            };
+
+        } else if (enumerableType instanceof ContainerType) {
+            return itemMapper;
+        } else {
+            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
         }
     }
 

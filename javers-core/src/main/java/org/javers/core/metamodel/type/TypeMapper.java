@@ -129,6 +129,10 @@ public class TypeMapper {
         return state.getJaversType(javaType);
     }
 
+    public boolean isShallowReferenceType(Type javaType) {
+        return getJaversType(javaType) instanceof ShallowReferenceType;
+    }
+
     public ClassType getJaversClassType(Type javaType) {
         argumentIsNotNull(javaType);
         JaversType jType = getJaversType(javaType);

@@ -11,17 +11,17 @@ import java.util.List;
  * @author bartosz.walacik
  */
 class ShallowSingleEdge extends AbstractSingleEdge {
-    private final Cdo reference;
+    private final GlobalId reference;
 
-    ShallowSingleEdge(JaversProperty property, Cdo referencedObject) {
+    ShallowSingleEdge(JaversProperty property, GlobalId referenced) {
         super(property);
-        Validate.argumentIsNotNull(referencedObject);
-        this.reference = referencedObject;
+        Validate.argumentIsNotNull(referenced);
+        this.reference = referenced;
     }
 
     @Override
     GlobalId getReference() {
-        return reference.getGlobalId();
+        return reference;
     }
 
     @Override

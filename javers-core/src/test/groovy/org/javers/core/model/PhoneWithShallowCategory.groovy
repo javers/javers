@@ -19,6 +19,9 @@ class PhoneWithShallowCategory {
     Set<CategoryC> shallowCategories
 
     @ShallowReference
+    List<CategoryC> shallowCategoriesList
+
+    @ShallowReference
     Map<String, CategoryC> shallowCategoryMap
 
     @Id

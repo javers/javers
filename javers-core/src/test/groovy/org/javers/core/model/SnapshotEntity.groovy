@@ -71,6 +71,8 @@ class SnapshotEntity {
 
     Set<ShallowPhone> shallowPhones
 
+    List<ShallowPhone> shallowPhonesList
+
     Map<String, ShallowPhone> shallowPhonesMap
 
     Map<DummyAddress,String> mapVoToPrimitive           //not supported

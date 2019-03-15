@@ -49,6 +49,10 @@ public class LiveCdoFactory {
         }
     }
 
+    GlobalId createId(Object cdo, OwnerContext owner) {
+        return globalIdFactory.createId(cdo, owner);
+    }
+
     GlobalIdFactory getGlobalIdFactory() {
         return globalIdFactory;
     }

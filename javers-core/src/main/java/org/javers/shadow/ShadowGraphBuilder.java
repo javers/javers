@@ -58,11 +58,6 @@ class ShadowGraphBuilder {
         built = true;
     }
 
-    private ShadowBuilder assembleShallowReferenceShadow(InstanceId instanceId) {
-        final ManagedType type = typeMapper.getJaversManagedType(instanceId);
-        return assembleShallowReferenceShadow(instanceId, (EntityType) type);
-    }
-
     private ShadowBuilder assembleShallowReferenceShadow(InstanceId instanceId, EntityType shallowReferenceType) {
         CdoSnapshotState state = cdoSnapshotState().withPropertyValue(shallowReferenceType.getIdProperty(), instanceId.getCdoId()).build();
         JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(state);
@@ -164,9 +159,10 @@ class ShadowGraphBuilder {
 
         if (property.isShallowReference()) {
             if (property.getType() instanceof EntityType) {
-                return assembleShallowReferenceShadow((InstanceId) globalId, (EntityType) property.getType());
+                return assembleShallowReferenceShadow((InstanceId) globalId, property.getType());
             } else {
-                return assembleShallowReferenceShadow((InstanceId) globalId);
+                EntityType entityType = (EntityType)typeMapper.getJaversManagedType(globalId);
+                return assembleShallowReferenceShadow((InstanceId) globalId, entityType);
             }
         }
 

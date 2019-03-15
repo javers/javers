@@ -21,13 +21,14 @@ import static GlobalIdTestBuilder.valueObjectId
  */
 class JaversCommitE2ETest extends Specification {
 
-    def "should not commit snapshot of ShallowReference Entities"() {
+    def "should not commit snapshot of ShallowReferenceType entities" () {
         given:
         def javers = javers().build()
         def reference = new ShallowPhone(1, "123", new CategoryC(1, "some"))
         def entity =  new SnapshotEntity(id:1,
                 shallowPhone: reference,
                 shallowPhones: [reference] as Set,
+                shallowPhonesList: [reference],
                 shallowPhonesMap: ["key": reference]
         )
 
@@ -39,7 +40,7 @@ class JaversCommitE2ETest extends Specification {
         commit.snapshots.size() == 1
     }
 
-    def "should not commit snapshot of a reference when a property has @ShallowReference annotation"() {
+    def "should not commit snapshot of a reference when a property has @ShallowReference"() {
         given:
         def javers = javers().build()
         def entity =  new PhoneWithShallowCategory(id:1, shallowCategory:new CategoryC(1, "old shallow"))
@@ -54,7 +55,7 @@ class JaversCommitE2ETest extends Specification {
     }
 
     @Unroll
-    def "should not commit snapshots in #collection when a property has @ShallowReference annotation" () {
+    def "should not commit snapshots in #collection when a property has @ShallowReference" () {
         given:
         def javers = javers().build()
 
@@ -67,9 +68,10 @@ class JaversCommitE2ETest extends Specification {
         commit.snapshots.size() == 1
 
         where:
-        collection << ["Set", "Map"]
+        collection << ["Set", "List", "Map"]
         entity << [
-            new PhoneWithShallowCategory(id:1, shallowCategories:[new CategoryC(1, "old shallow")]),
+            new PhoneWithShallowCategory(id:1, shallowCategories:[new CategoryC(1, "old shallow")] as Set),
+            new PhoneWithShallowCategory(id:1, shallowCategoriesList:[new CategoryC(1, "old shallow")]),
             new PhoneWithShallowCategory(id:1, shallowCategoryMap:["foo":new CategoryC(1, "old shallow")])
         ]
     }
