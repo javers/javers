@@ -168,8 +168,6 @@ class JaversCore implements Javers {
 
     @Override
     public Diff compare(Object oldVersion, Object currentVersion) {
-        argumentsAreNotNull(oldVersion, currentVersion);
-
         return diffFactory.compare(oldVersion, currentVersion);
     }
 

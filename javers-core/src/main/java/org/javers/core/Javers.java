@@ -10,7 +10,9 @@ import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
+import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.ValueObjectType;
 import org.javers.repository.jql.*;
 import org.javers.shadow.Shadow;
 
@@ -131,14 +133,18 @@ public interface Javers {
      * JaVers core function,
      * deeply compares two arbitrary complex object graphs.
      *
-     * <p>
+     * <br/><br/>
      * To calculate a diff, just provide two versions of the
-     * same Domain Object (Entity or ValueObject)
-     * or handles to two versions of the same object graph.
+     * same domain object.
      * <br/>
-     * The handle could be a root of an Aggregate, tree root
-     * or any node in an Domain Object graph from where all other nodes are navigable.
-     * </p>
+     * The domain object can be a root of an Aggregate, tree root
+     * or any node in a domain object graph from where all other nodes are navigable.
+     * <br/><br/>
+     *
+     * Both <code>oldVersion</code> and <code>currentVersion</code>
+     * should be mapped to {@link EntityType} or {@link ValueObjectType},
+     * see <a href="https://javers.org/documentation/domain-configuration/#domain-model-mapping">
+     * Domain model mapping</a>.
      *
      * <h2>Flat collection compare</h2>
      * You can also pass object collections here (List, Sets or Maps),
@@ -154,6 +160,11 @@ public interface Javers {
      * <p>
      * Diffs can be converted to JSON with {@link JsonConverter#toJson(Object)} or pretty-printed with {@link Diff#prettyPrint()}
      * </p>
+     *
+     * @param oldVersion Old version of a domain object, an instance of {@link EntityType} or
+     *                   {@link ValueObjectType}
+     *                   , nullable
+     * @param currentVersion Current version of a domain object, nullable
      *
      * @see <a href="http://javers.org/documentation/diff-examples/">
      *     http://javers.org/documentation/diff-examples</a>

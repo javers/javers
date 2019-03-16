@@ -2,10 +2,12 @@ package org.javers.core.diff;
 
 import org.javers.core.graph.ObjectGraph;
 import org.javers.core.graph.ObjectNode;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
+
 import static org.javers.common.collections.Sets.difference;
 
 /**
@@ -37,12 +39,6 @@ public class GraphPair {
 
         this.onlyOnLeft = Collections.emptySet();
         this.onlyOnRight = rightGraph.nodes();
-    }
-
-    private class EmptyGraph extends ObjectGraph {
-        EmptyGraph() {
-            super(Collections.emptySet());
-        }
     }
 
     public Collection<ObjectNode> getOnlyOnLeft() {
