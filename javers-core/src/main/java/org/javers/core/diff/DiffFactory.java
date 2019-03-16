@@ -9,7 +9,9 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.appenders.NodeChangeAppender;
 import org.javers.core.diff.appenders.PropertyChangeAppender;
 import org.javers.core.diff.changetype.ObjectRemoved;
-import org.javers.core.graph.*;
+import org.javers.core.graph.LiveGraphFactory;
+import org.javers.core.graph.ObjectGraph;
+import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.*;
 
@@ -77,11 +79,9 @@ public class DiffFactory {
     }
 
     /**
-     * @param newDomainObject object or handle to object graph
+     * @param newDomainObject object or handle to object graph, nullable
      */
     public Diff initial(Object newDomainObject) {
-        Validate.argumentIsNotNull(newDomainObject);
-
         ObjectGraph currentGraph = buildGraph(newDomainObject);
 
         GraphPair graphPair = new GraphPair(currentGraph);
@@ -89,6 +89,10 @@ public class DiffFactory {
     }
 
     private ObjectGraph buildGraph(Object handle) {
+        if (handle == null) {
+            return new EmptyGraph();
+        }
+
         JaversType jType = typeMapper.getJaversType(handle.getClass());
         if (jType instanceof ValueType || jType instanceof PrimitiveType){
             throw new JaversException(JaversExceptionCode.COMPARING_TOP_LEVEL_VALUES_NOT_SUPPORTED,

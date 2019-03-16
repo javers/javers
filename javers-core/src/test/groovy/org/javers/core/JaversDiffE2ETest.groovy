@@ -5,6 +5,7 @@ import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.changetype.NewObject
+import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.PropertyChange
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
@@ -42,6 +43,41 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         @DiffInclude int id
         int a
         int b
+    }
+
+    def "should allow passing null to currentVersion"(){
+      given:
+      def javers = JaversBuilder.javers().build()
+
+      when:
+      def diff = javers.compare(new SnapshotEntity(id:1), null)
+
+      then:
+      diff.changes.size() == 1
+      diff.changes.first() instanceof ObjectRemoved
+    }
+
+    def "should allow passing null to oldVersion"(){
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        when:
+        def diff = javers.compare(null, new SnapshotEntity(id:1))
+
+        then:
+        diff.changes.size() == 1
+        diff.changes.first() instanceof NewObject
+    }
+
+    def "should allow passing two nulls to compare()"(){
+        given:
+        def javers = JaversBuilder.javers().build()
+
+        when:
+        def diff = javers.compare(null, null)
+
+        then:
+        diff.changes.size() == 0
     }
 
     @Unroll
