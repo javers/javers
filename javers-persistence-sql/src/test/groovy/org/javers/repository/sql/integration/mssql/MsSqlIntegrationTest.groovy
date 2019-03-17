@@ -2,14 +2,25 @@ package org.javers.repository.sql.integration.mssql
 
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.JaversSqlRepositoryE2ETest
+import org.junit.ClassRule
+import org.junit.Rule
+import org.testcontainers.containers.MSSQLServerContainer
+import spock.lang.Shared
 
 import java.sql.Connection
 import java.sql.DriverManager
 
 class MsSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
 
+    @ClassRule @Shared
+    public MSSQLServerContainer mssqlserver = new MSSQLServerContainer();
+
     Connection createConnection() {
-       DriverManager.getConnection("jdbc:sqlserver://localhost:1433;DatabaseName=polly", "polly", "polly");
+       String url = mssqlserver.jdbcUrl
+       String user = mssqlserver.username
+       String pass = mssqlserver.password
+
+       DriverManager.getConnection(url, user, pass)
     }
 
     DialectName getDialect() {
@@ -17,6 +28,6 @@ class MsSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
     }
 
     String getSchema() {
-        return "public"
+        return null
     }
 }

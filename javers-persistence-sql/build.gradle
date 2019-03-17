@@ -14,7 +14,8 @@ dependencies {
     testCompile 'org.mariadb.jdbc:mariadb-java-client:2.2.3'
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
     testCompile "joda-time:joda-time:$jodaVersion"
-    testCompile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.1.0.jre8'
+    testCompile "org.testcontainers:mssqlserver:1.10.6"
+    testCompile  "com.microsoft.sqlserver:mssql-jdbc:7.2.1.jre8"
 
 }
 
