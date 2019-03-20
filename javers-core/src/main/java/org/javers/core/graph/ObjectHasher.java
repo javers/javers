@@ -24,6 +24,9 @@ class ObjectHasher {
                         .map(state -> jsonConverter.toJson(state))
                         .collect(Collectors.joining( "\n" ));
 
+
+        //TODO remove
+        System.out.println(": " + jsonState);
         return ShaDigest.longDigest(jsonState);
     }
 }
