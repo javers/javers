@@ -71,7 +71,7 @@ class Room {
 
 class Case810DiffIgnore extends Specification {
 
-    def "should  "() {
+    def "should ignore containers of ValueObjects when calculating Object Hash"() {
       when:
       Javers javers = JaversBuilder.javers()
               .withListCompareAlgorithm(ListCompareAlgorithm.LEVENSHTEIN_DISTANCE)
@@ -81,7 +81,6 @@ class Case810DiffIgnore extends Specification {
 
       Room room1 = new Room(name: "Room!", number:"Ignore me")
       Floor floor1 = new Floor(rooms:[room1])
-
 
       Room room2 = new Room(name: "Room!", number:"Different room")
       Floor floor2 = new Floor(rooms:[room2])

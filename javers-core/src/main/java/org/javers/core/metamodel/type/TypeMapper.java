@@ -120,6 +120,14 @@ public class TypeMapper {
         }
     }
 
+    public boolean isManagedType(JaversType javersType){
+        return javersType instanceof ManagedType;
+    }
+
+    public boolean isEnumerableOfManagedTypes(JaversType javersType){
+        return isContainerOfManagedTypes(javersType) || isKeyValueTypeWithManagedTypes(javersType);
+    }
+
     /**
      * Returns mapped type, spawns a new one from a prototype,
      * or infers a new one using default mapping.
