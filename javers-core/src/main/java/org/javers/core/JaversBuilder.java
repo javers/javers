@@ -79,7 +79,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class JaversBuilder extends AbstractContainerBuilder {
     public static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
-    private final Map<Class, ClientsClassDefinition> clientsClassDefinitions = new HashMap<>();
+    private final Map<Class, ClientsClassDefinition> clientsClassDefinitions = new LinkedHashMap<>();
 
     private final Map<Class, Function<Object, String>> mappedToStringFunction = new ConcurrentHashMap<>();
 

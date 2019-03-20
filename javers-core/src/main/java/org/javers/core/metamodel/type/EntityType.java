@@ -132,6 +132,7 @@ public class EntityType extends ManagedType {
 
     @Override
     protected PrettyPrintBuilder prettyPrintBuilder() {
-        return super.prettyPrintBuilder().addField("idProperty", getIdPropertyName());
+        return super.prettyPrintBuilder().addField("idProperty",
+                getIdPropertyName()+ ", mapped to " + getIdPropertyType().getClass().getSimpleName() );
     }
 }
