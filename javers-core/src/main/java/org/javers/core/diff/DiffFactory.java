@@ -88,11 +88,14 @@ public class DiffFactory {
      */
     public Diff initial(Object newDomainObject) {
         Validate.argumentIsNotNull(newDomainObject);
+        final GraphPair insertGraphPair = GraphPair.getInsertGraphPair(buildGraph(newDomainObject));
+        return createAndAppendChanges(insertGraphPair, empty());
+    }
 
-        ObjectGraph currentGraph = buildGraph(newDomainObject);
-
-        GraphPair graphPair = new GraphPair(currentGraph);
-        return createAndAppendChanges(graphPair, empty());
+    public Diff finalDiff(Object removedDomainObject) {
+        Validate.argumentIsNotNull(removedDomainObject);
+        final GraphPair deleteGraphPair = GraphPair.getDeleteGraphPair(buildGraph(removedDomainObject));
+        return createAndAppendChanges(deleteGraphPair, empty());
     }
 
     private LiveGraph buildGraph(Object handle) {

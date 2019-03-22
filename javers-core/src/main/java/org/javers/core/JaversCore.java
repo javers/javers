@@ -179,6 +179,11 @@ class JaversCore implements Javers {
     }
 
     @Override
+    public Diff finalDiff(final Object removedObject) {
+        return diffFactory.finalDiff(removedObject);
+    }
+
+    @Override
     public <T> List<Shadow<T>> findShadows(JqlQuery query) {
         return (List)queryRunner.queryForShadows(query);
     }

@@ -187,6 +187,11 @@ public interface Javers {
     Diff initial(Object newDomainObject);
 
     /**
+     * finalDiff is a snapshot of all objects in the graph that will be removed
+     */
+    Diff finalDiff(Object removedObject);
+
+    /**
      * Queries JaversRepository for object Shadows. <br/>
      * Shadow is a historical version of a domain object restored from a snapshot.
      * <br/><br/>
