@@ -16,10 +16,7 @@ import javax.persistence.Id
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
-/**
- * @author bartosz walacik
- */
-public class TypeMapperIntegrationTest extends Specification {
+class TypeMapperIntegrationTest extends Specification {
 
     def "should map groovy.lang.MetaClass as IgnoredType"(){
         when:
@@ -127,8 +124,30 @@ public class TypeMapperIntegrationTest extends Specification {
         jType.baseJavaClass == DummyAddress
     }
 
+    class SomeEntity {
+        SomeId id
+    }
+
+    class SomeId {
+        int id
+    }
+
+    def "should infer as Value when a class is used as Id and there are no other clues "(){
+        given:
+        def mapper = javersTestAssembly().typeMapper
+        mapper.registerClientsClass(EntityDefinitionBuilder.entityDefinition(SomeEntity).withIdPropertyName("id").build())
+
+        when:
+        def someEntityType = mapper.getJaversType(SomeEntity)
+        def someIdType = mapper.getJaversType(SomeId)
+
+        then:
+        someEntityType.class == EntityType
+        someIdType.class == ValueType
+    }
+
     @Unroll
-    def "should map as ValueType if a class is used as #usedAnn.simpleName in another class"(){
+    def "should infer as Value when a class is used as @#usedAnn.simpleName and there are no other clues"(){
         given:
         def mapper = javersTestAssembly().typeMapper
 

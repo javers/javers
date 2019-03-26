@@ -3,6 +3,7 @@ package org.javers.core.metamodel.type
 import com.google.gson.reflect.TypeToken
 import org.javers.core.JaversTestBuilder
 import org.javers.core.metamodel.annotation.DiffInclude
+import org.javers.core.metamodel.clazz.ValueDefinition
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -240,7 +241,7 @@ class TypeMapperTest extends Specification {
 
     def "annotations should not have priority over explicit prototypes "(){
         given:
-        mapper.registerValueType(AbstractEntityOne)
+        mapper.registerClientsClass(new ValueDefinition(AbstractEntityOne))
 
         when:
         def type = mapper.getJaversType(EntityOne)

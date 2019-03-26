@@ -10,6 +10,7 @@ import org.javers.core.metamodel.scanner.ClassScanner;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import static org.javers.common.reflection.ReflectionUtil.extractClass;
@@ -21,13 +22,15 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author bartosz walacik
  */
 class TypeFactory {
-    private static final Logger logger = getLogger(TypeFactory.class);
+    private static final Logger logger = TypeMapper.logger;
+
+    private final Map<Type, Hint> votes = new ConcurrentHashMap<>();
 
     private final ClassScanner classScanner;
     private final ManagedClassFactory managedClassFactory;
     private final EntityTypeFactory entityTypeFactory;
 
-    public TypeFactory(ClassScanner classScanner, TypeMapper typeMapper) {
+    TypeFactory(ClassScanner classScanner, TypeMapper typeMapper) {
         this.classScanner = classScanner;
 
         //Pico doesn't support cycles, so manual construction
@@ -44,7 +47,9 @@ class TypeFactory {
         if (def instanceof CustomDefinition) {
             return new CustomType(def.getBaseJavaClass(), ((CustomDefinition) def).getComparator());
         } else if (def instanceof EntityDefinition) {
-            return entityTypeFactory.createEntity((EntityDefinition) def, scan);
+            EntityType newType = entityTypeFactory.createEntity((EntityDefinition) def, scan);
+            saveHints(newType);
+            return newType;
         } else if (def instanceof ValueObjectDefinition) {
             return createValueObject((ValueObjectDefinition) def, scan);
         } else if (def instanceof ValueDefinition) {
@@ -59,50 +64,63 @@ class TypeFactory {
         }
     }
 
+    private void saveHints(EntityType newEntityType) {
+        votes.put(newEntityType.getIdPropertyGenericType(), new EntityIdHint());
+    }
+
     private ValueObjectType createValueObject(ValueObjectDefinition definition, ClassScan scan) {
         return new ValueObjectType(managedClassFactory.create(definition, scan), definition.getTypeName(), definition.isDefault());
     }
 
-    JaversType infer(Type javaType) {
+    /**
+     * for tests only
+     */
+    private JaversType infer(Type javaType) {
         return infer(javaType, Optional.empty());
     }
 
     JaversType infer(Type javaType, Optional<JaversType> prototype) {
-        JavaRichType javaRichType = new JavaRichType(javaType);
+
+        Optional<JaversType> tokenType = resolveIfTokenType(javaType);
+        if (tokenType.isPresent()) {
+            return tokenType.get();
+        }
+
+        final JavaRichType javaRichType = new JavaRichType(javaType);
 
         if (prototype.isPresent()) {
             JaversType jType = spawnFromPrototype(javaRichType, prototype.get());
-            logger.debug("javersType of {} spawned as {} from prototype {}",
+            logger.debug("javersType of '{}' spawned as {} from prototype {}",
                     javaRichType.getSimpleName(), jType.getClass().getSimpleName(), prototype.get());
             return jType;
         }
 
         return inferFromAnnotations(javaRichType).map(jType -> {
-            logger.debug("javersType of {} inferred from annotations as {}",
+            logger.debug("javersType of '{}' inferred from annotations as {}",
                     javaRichType.getSimpleName(), jType.getClass().getSimpleName());
             return jType;
-        }).orElseGet(() -> {
-            logger.debug("javersType of {} defaulted to ValueObjectType", javaRichType.getSimpleName());
-            return createDefaultType(javaRichType);
-        });
+        }).orElseGet(() ->  inferFromHints(javaRichType)
+                .orElseGet(() -> createDefaultType(javaRichType)));
     }
 
-    boolean inferredAsEntity(Type javaType) {
+    private Optional<JaversType> resolveIfTokenType(Type javaType) {
         if (javaType instanceof TypeVariable) {
-            return false;
+            logger.debug("javersType of '{}' inferred as TokenType", javaType);
+            return Optional.of(new TokenType((TypeVariable) javaType));
         }
-        JavaRichType t = new JavaRichType(javaType);
-        return t.getScan().hasEntityAnn() || t.getScan().hasIdProperty();
+        return Optional.empty();
     }
 
-    JaversType inferIdPropertyTypeAsValue(Type idPropertyGenericType) {
-        if (idPropertyGenericType instanceof TypeVariable) {
-            logger.debug("javersType of {} inferred as TokenType", idPropertyGenericType);
-            return new TokenType((TypeVariable) idPropertyGenericType);
+    private Optional<JaversType> inferFromHints(JavaRichType richType) {
+        Hint vote = votes.get(richType.javaType);
+
+        if (vote != null) {
+            JaversType jType = vote.vote(richType);
+            logger.debug("javersType of '{}' inferred as {}, based on {} ", richType.getSimpleName(), jType.getClass().getSimpleName(), vote.getClass().getSimpleName());
+            return Optional.of(jType);
         }
-        logger.debug("javersType of {} inferred as ValueType, it's used as id-property type",
-                idPropertyGenericType);
-        return new ValueType(idPropertyGenericType);
+
+        return Optional.empty();
     }
 
     private JaversType spawnFromPrototype(JavaRichType javaRichType, JaversType prototype) {
@@ -123,6 +141,7 @@ class TypeFactory {
     }
 
     private JaversType createDefaultType(JavaRichType t) {
+        logger.debug("javersType of '{}' defaulted to ValueObjectType", t.getSimpleName());
         return create(valueObjectDefinition(t.javaClass)
                 .withTypeName(t.getScan().typeName())
                 .defaultType()
@@ -178,6 +197,17 @@ class TypeFactory {
 
         Optional<String> getAnnTypeName() {
             return getScan().typeName();
+        }
+    }
+
+    private interface Hint {
+        JaversType vote(JavaRichType richType);
+    }
+
+    private static class EntityIdHint implements Hint {
+        @Override
+        public JaversType vote(JavaRichType richType) {
+            return new ValueType(richType.javaType);
         }
     }
 }
