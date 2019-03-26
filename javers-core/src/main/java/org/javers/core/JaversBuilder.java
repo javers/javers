@@ -156,7 +156,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         for (Class c : classesToScan){
             typeMapper().getJaversType(c);
         }
-        typeMapper().addTypes(additionalTypes);
+        typeMapper().addPluginTypes(additionalTypes);
 
         bootRepository();
 

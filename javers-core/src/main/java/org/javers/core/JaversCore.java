@@ -231,7 +231,7 @@ class JaversCore implements Javers {
      * @since 2.3
      */
     public <T extends ManagedType> T getTypeMapping(String typeName) {
-        return (T) typeMapper.getJaversManagedType(typeName);
+        return (T) typeMapper.getJaversManagedType(typeName, ManagedType.class);
     }
 
     @Override

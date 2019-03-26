@@ -1,24 +1,24 @@
 package org.javers.core.metamodel.type;
 
-import org.javers.common.collections.Primitives;
-import org.javers.common.collections.WellKnownValueTypes;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
-import org.javers.common.string.ToStringBuilder;
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
 import org.javers.core.JaversCoreConfiguration;
-import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.metamodel.clazz.ClientsClassDefinition;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.lang.reflect.TypeVariable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
+import static org.javers.common.reflection.ReflectionUtil.extractClass;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
@@ -27,55 +27,29 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public class TypeMapper {
-    private static final Logger logger = LoggerFactory.getLogger(TypeMapper.class);
+    static final Logger logger = LoggerFactory.getLogger("org.javers.TypeMapper");
+    static final ValueType OBJECT_TYPE = new ValueType(Object.class);
 
-    private final TypeMapperState state;
+    private final TypeMapperEngine engine = new TypeMapperEngine();
+    private final TypeFactory typeFactory;
+
     private final DehydratedTypeFactory dehydratedTypeFactory = new DehydratedTypeFactory(this);
 
     public TypeMapper(ClassScanner classScanner, JaversCoreConfiguration javersCoreConfiguration) {
         //Pico doesn't support cycles, so manual construction
         TypeFactory typeFactory = new TypeFactory(classScanner, this);
-        this.state = new TypeMapperState(typeFactory);
-        registerCoreTypes(javersCoreConfiguration.getListCompareAlgorithm());
+
+        engine.registerCoreTypes(javersCoreConfiguration.getListCompareAlgorithm());
+        this.typeFactory = typeFactory;
     }
 
     /**
      * For TypeMapperConcurrentTest only,
      * no better idea how to writhe this test without additional constructor
      */
+    @Deprecated
     protected TypeMapper(TypeFactory typeFactory) {
-        this.state = new TypeMapperState(typeFactory);
-        registerCoreTypes(ListCompareAlgorithm.SIMPLE);
-    }
-
-    private void registerCoreTypes(ListCompareAlgorithm listCompareAlgorithm){
-        //primitives & boxes
-        for (Class primitiveOrBox : Primitives.getPrimitiveAndBoxTypes()) {
-            registerPrimitiveType(primitiveOrBox);
-        }
-
-        registerPrimitiveType(Enum.class);
-
-        //array
-        addType(new ArrayType(Object[].class));
-
-        //well known Value types
-        for (Class valueType : WellKnownValueTypes.getValueTypes()) {
-            registerValueType(valueType);
-        }
-
-        //Collections
-        addType(new CollectionType(Collection.class));
-        addType(new SetType(Set.class));
-        if (listCompareAlgorithm == ListCompareAlgorithm.AS_SET) {
-            addType(new ListAsSetType(List.class));
-        } else {
-            addType(new ListType(List.class));
-        }
-        addType(new OptionalType());
-
-        //& Maps
-        addType(new MapType(Map.class));
+        this.typeFactory = typeFactory;
     }
 
     public MapContentType getMapContentType(KeyValueType mapType){
@@ -120,13 +94,19 @@ public class TypeMapper {
         }
     }
 
+
     /**
      * Returns mapped type, spawns a new one from a prototype,
      * or infers a new one using default mapping.
      */
     public JaversType getJaversType(Type javaType) {
         argumentIsNotNull(javaType);
-        return state.getJaversType(javaType);
+
+        if (javaType == Object.class) {
+            return OBJECT_TYPE;
+        }
+
+        return engine.computeIfAbsent(javaType, j -> typeFactory.infer(j, findPrototype(j)));
     }
 
     public boolean isShallowReferenceType(Type javaType) {
@@ -149,34 +129,30 @@ public class TypeMapper {
 
     /**
      * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
-     * @since 1.4
-     */
-    public ManagedType getJaversManagedType(String typeName){
-        return getJaversManagedType(state.getClassByTypeName(typeName), ManagedType.class);
-    }
-
-    /**
-     * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
-     * @since 1.4
      */
     public ManagedType getJaversManagedType(GlobalId globalId){
-        return getJaversManagedType(state.getClassByTypeName(globalId.getTypeName()), ManagedType.class);
+        return getJaversManagedType(engine.getClassByTypeName(globalId.getTypeName()), ManagedType.class);
     }
 
     /**
      * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
-     * @since 1.4
      */
     public <T extends ManagedType> T getJaversManagedType(String typeName, Class<T> expectedType) {
-        return getJaversManagedType(state.getClassByTypeName(typeName), expectedType);
+        return getJaversManagedType(engine.getClassByTypeName(typeName), expectedType);
+    }
+
+    /**
+     * for tests only
+     */
+    private <T extends ManagedType> T getJaversManagedType(String typeName) {
+        return (T)getJaversManagedType(engine.getClassByTypeName(typeName), ManagedType.class);
     }
 
     /**
      * @throws JaversException TYPE_NAME_NOT_FOUND if given typeName is not registered
-     * @since 1.4
      */
     public <T extends ManagedType> T getJaversManagedType(DuckType duckType, Class<T> expectedType) {
-        return getJaversManagedType(state.getClassByDuckType(duckType), expectedType);
+        return getJaversManagedType(engine.getClassByDuckType(duckType), expectedType);
     }
 
     /**
@@ -234,21 +210,13 @@ public class TypeMapper {
         }
     }
 
-    private void registerPrimitiveType(Class<?> primitiveClass) {
-        addType(new PrimitiveType(primitiveClass));
-    }
-
     public void registerClientsClass(ClientsClassDefinition def) {
-        state.register(def);
-    }
+        JaversType newType = typeFactory.create(def);
 
-    public void registerValueType(Class<?> valueCLass) {
-        addType(new ValueType(valueCLass));
-    }
+        logger.debug("javersType of '{}' " + "mapped explicitly to {}",
+                def.getBaseJavaClass().getSimpleName(), newType.getClass().getSimpleName());
 
-    public boolean isValueObject(Type type) {
-        JaversType jType  = getJaversType(type);
-        return  jType instanceof ValueObjectType;
+        engine.registerExplicitType(newType);
     }
 
     /**
@@ -258,19 +226,44 @@ public class TypeMapper {
         return dehydratedTypeFactory.build(type);
     }
 
-    public void addType(JaversType jType) {
-        Validate.argumentIsNotNull(jType);
-        state.putIfAbsent(jType.getBaseJavaType(), jType);
-    }
-
-    public void addTypes(Collection<JaversType> jTypes) {
+    public void addPluginTypes(Collection<JaversType> jTypes) {
         Validate.argumentIsNotNull(jTypes);
         for (JaversType t : jTypes) {
-            addType(t);
+            engine.registerExplicitType(t);
         }
     }
 
     boolean contains(Type javaType){
-        return state.contains(javaType);
+        return engine.contains(javaType);
+    }
+
+    private Optional<JaversType> findPrototype(Type javaType) {
+        if (javaType instanceof TypeVariable) {
+            return Optional.empty();
+        }
+
+        Class javaClass = extractClass(javaType);
+
+        //this is due too spoiled Java Array reflection API
+        if (javaClass.isArray()) {
+            return Optional.of(getJaversType(Object[].class));
+        }
+
+        JaversType selfClassType = engine.get(javaClass);
+        if (selfClassType != null && javaClass != javaType){
+            return  Optional.of(selfClassType); //returns rawType for ParametrizedTypes
+        }
+
+        List<Type> hierarchy = ReflectionUtil.calculateHierarchyDistance(javaClass);
+
+        for (Type parent : hierarchy) {
+            JaversType jType = engine.get(parent);
+            if (jType != null && jType.canBePrototype()) {
+                logger.debug("proto for {} -> {}", javaType, jType);
+                return Optional.of(jType);
+            }
+        }
+
+        return Optional.empty();
     }
 }
