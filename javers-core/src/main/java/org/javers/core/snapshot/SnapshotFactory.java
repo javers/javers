@@ -56,7 +56,8 @@ public class SnapshotFactory {
     public CdoSnapshotState createSnapshotStateNoRefs(Cdo liveCdo){
         CdoSnapshotStateBuilder stateBuilder = CdoSnapshotStateBuilder.cdoSnapshotState();
         for (JaversProperty property : liveCdo.getManagedType().getProperties()) {
-            if (property.getType() instanceof ManagedType) {
+            if (typeMapper.isManagedType(property.getType()) ||
+                typeMapper.isEnumerableOfManagedTypes(property.getType())) {
                 continue;
             }
 

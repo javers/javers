@@ -15,6 +15,7 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.7.1'
     id 'io.codearte.nexus-staging' version '0.20.0'
     id 'de.marcphilipp.nexus-publish' version '0.2.0' apply false
+    id 'com.adarshr.test-logger' version '1.6.0'
 }
 
 scmVersion {
@@ -31,6 +32,7 @@ subprojects {
     apply plugin: 'propdeps'
     apply plugin: 'org.owasp.dependencycheck'
     apply plugin: 'de.marcphilipp.nexus-publish'
+    apply plugin: 'com.adarshr.test-logger'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -60,11 +62,6 @@ subprojects {
     test {
         testLogging {
             exceptionFormat = 'full'
-            tasks.test.testLogging {
-                events 'failed', 'passed'
-                showStandardStreams = false
-            }
-            events 'failed'
         }
     }
 
