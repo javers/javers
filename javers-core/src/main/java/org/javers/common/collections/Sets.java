@@ -52,10 +52,12 @@ public class Sets {
 
     /**
      * null args are allowed
+     *
+     * @return mutable set
      */
     public static <E> Set<E> difference(Set<E> first, Set<E> second) {
         if (first == null || first.size() == 0) {
-            return Collections.emptySet();
+            return new HashSet<>();
         }
 
         if (second == null || second.size() == 0) {
