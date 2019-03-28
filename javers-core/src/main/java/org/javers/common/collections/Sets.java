@@ -45,17 +45,19 @@ public class Sets {
     }
 
     public static <E> Set<E> xor(Set<E> first, Set<E> second) {
-        Set<E> xor = new HashSet<>(difference(first, second));
+        Set<E> xor = difference(first, second);
         xor.addAll(difference(second, first));
         return xor;
     }
 
     /**
      * null args are allowed
+     *
+     * @return mutable set
      */
     public static <E> Set<E> difference(Set<E> first, Set<E> second) {
         if (first == null || first.size() == 0) {
-            return Collections.emptySet();
+            return new HashSet<>();
         }
 
         if (second == null || second.size() == 0) {
