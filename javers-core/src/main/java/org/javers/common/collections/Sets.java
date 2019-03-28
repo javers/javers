@@ -45,7 +45,7 @@ public class Sets {
     }
 
     public static <E> Set<E> xor(Set<E> first, Set<E> second) {
-        Set<E> xor = difference(first, second);
+        Set<E> xor = new HashSet<>(difference(first, second));
         xor.addAll(difference(second, first));
         return xor;
     }
