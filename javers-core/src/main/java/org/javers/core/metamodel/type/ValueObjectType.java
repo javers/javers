@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.reflection.ReflectionUtil;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -51,5 +53,14 @@ public class ValueObjectType extends ManagedType{
     @Override
     public boolean canBePrototype() {
         return !defaultType;
+    }
+
+    @Override
+    public String smartToString(Object value) {
+        if (value == null){
+            return "";
+        }
+
+        return ReflectionUtil.reflectiveToString(value);
     }
 }

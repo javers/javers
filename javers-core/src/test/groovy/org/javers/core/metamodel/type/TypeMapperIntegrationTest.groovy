@@ -165,7 +165,7 @@ class TypeMapperIntegrationTest extends Specification {
         idType <<  [ObjectId, DummyPoint]
     }
 
-    def "should map as Entity when class has @Id property annotation"() {
+    def "should map as Entity when a class has @Id property annotation"() {
         given:
         def mapper = javersTestAssembly().typeMapper
 
@@ -175,6 +175,20 @@ class TypeMapperIntegrationTest extends Specification {
         then:
         jType.class == EntityType
         jType.baseJavaClass == DummyUser
+        jType.idPropertyName == "name"
+    }
+
+    def "should map as Entity when a class has @EmbeddedId property annotation"(){
+        given:
+        def mapper = javersTestAssembly().typeMapper
+
+        when:
+        def jType = mapper.getJaversType(DummyEntityWithEmbeddedId)
+
+        then:
+        jType.class == EntityType
+        jType.baseJavaClass == DummyEntityWithEmbeddedId
+        jType.idPropertyName == "point"
     }
 
     @Unroll

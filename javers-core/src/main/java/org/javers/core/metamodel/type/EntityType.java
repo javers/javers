@@ -5,6 +5,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.annotation.ValueObject;
 import org.javers.core.metamodel.object.InstanceId;
 
 import java.lang.reflect.Type;
@@ -92,17 +93,36 @@ public class EntityType extends ManagedType {
     }
 
     public InstanceId createIdFromInstanceId(Object localId) {
-        return new InstanceId(getName(), localId, localIdAsString(localId));
+        return new InstanceId(getName(), dehydrateLocalId(localId), localIdAsString(localId));
     }
 
     private String localIdAsString(Object localId) {
-        if (getIdPropertyType() instanceof EntityType) {
+        if (isIdPropertyEntity()) {
             EntityType idPropertyType = getIdPropertyType();
             return idPropertyType.localIdAsString(idPropertyType.getIdOf(localId));
         }
 
-        PrimitiveOrValueType idPropertyType = getIdPropertyType();
+        ClassType idPropertyType = getIdPropertyType();
         return idPropertyType.smartToString(localId);
+    }
+
+    private Object dehydrateLocalId(Object localId) {
+        if (isIdPropertyEntity()) {
+            EntityType idPropertyType = getIdPropertyType();
+            return idPropertyType.getIdOf(localId);
+        }
+        if (isIdPropertyValueObject()) {
+            return localIdAsString(localId);
+        }
+        return localId;
+    }
+
+    private boolean isIdPropertyEntity() {
+        return getIdPropertyType() instanceof EntityType;
+    }
+
+    private boolean isIdPropertyValueObject() {
+        return getIdPropertyType() instanceof ValueObjectType;
     }
 
     private <T extends JaversType> T getIdPropertyType() {
