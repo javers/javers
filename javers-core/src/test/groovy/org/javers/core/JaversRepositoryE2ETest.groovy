@@ -8,6 +8,7 @@ import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
 import org.javers.core.metamodel.annotation.TypeName
+import org.javers.core.metamodel.type.ValueType
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.repository.api.JaversRepository
@@ -122,30 +123,6 @@ class JaversRepositoryE2ETest extends Specification {
 
       then:
       javers.findChanges(QueryBuilder.anyDomainObject().build()).size() == 15
-    }
-
-    def "should support EmbeddedId as Entity Id"(){
-      given:
-      def cdo  = new DummyEntityWithEmbeddedId(point: new DummyPoint(1,2), someVal: 5)
-
-      when:
-      javers.commit("author", cdo)
-
-      then:
-      def snapshot = javers.getLatestSnapshot(new DummyPoint(1,2), DummyEntityWithEmbeddedId).get()
-      snapshot.globalId.cdoId == new DummyPoint(1,2)
-    }
-
-    def "should support long numbers as Entity Id "(){
-        given:
-        def longId = 1000000000L*1000
-        def category = new CategoryC(longId)
-
-        when:
-        javers.commit("author",category)
-
-        then:
-        javers.getLatestSnapshot(longId, CategoryC).get().globalId.cdoId == longId
     }
 
     def "should query for ValueObject changes by owning Entity class"() {

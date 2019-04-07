@@ -2,6 +2,7 @@ package org.javers.core.graph;
 
 import org.javers.common.string.ShaDigest;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.snapshot.SnapshotFactory;
 
 import java.util.List;
@@ -19,7 +20,7 @@ class ObjectHasher {
         this.jsonConverter = jsonConverter;
     }
 
-    public String hash(List<LiveCdo> objects) {
+    String hash(List<LiveCdo> objects) {
         String jsonState = objects.stream().map(cdo -> snapshotFactory.createSnapshotStateNoRefs(cdo))
                         .map(state -> jsonConverter.toJson(state))
                         .collect(Collectors.joining( "\n" ));

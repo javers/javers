@@ -5,6 +5,7 @@ import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.annotation.ValueObject;
 import org.javers.core.metamodel.object.InstanceId;
 
 import java.lang.reflect.Type;
@@ -35,11 +36,13 @@ import java.util.Optional;
  */
 public class EntityType extends ManagedType {
     private final JaversProperty idProperty;
+    private final InstanceIdFactory instanceIdFactory;
 
     EntityType(ManagedClass entity, JaversProperty idProperty, Optional<String> typeName) {
         super(entity, typeName);
         Validate.argumentIsNotNull(idProperty);
         this.idProperty = idProperty;
+        this.instanceIdFactory = new InstanceIdFactory(this);
     }
 
     @Override
@@ -86,27 +89,29 @@ public class EntityType extends ManagedType {
         return cdoId;
     }
 
+    public Type getLocalIdDehydratedType() {
+        return instanceIdFactory.getLocalIdDehydratedType();
+    }
+
     public InstanceId createIdFromInstance(Object instance) {
         Object localId = getIdOf(instance);
-        return new InstanceId(getName(), localId, localIdAsString(localId));
+        return instanceIdFactory.create(localId);
     }
 
     public InstanceId createIdFromInstanceId(Object localId) {
-        return new InstanceId(getName(), localId, localIdAsString(localId));
+        return instanceIdFactory.create(localId);
     }
 
-    private String localIdAsString(Object localId) {
-        if (getIdPropertyType() instanceof EntityType) {
-            EntityType idPropertyType = getIdPropertyType();
-            return idPropertyType.localIdAsString(idPropertyType.getIdOf(localId));
-        }
-
-        PrimitiveOrValueType idPropertyType = getIdPropertyType();
-        return idPropertyType.smartToString(localId);
+    public InstanceId createIdFromDehydratedLocalId(Object dehydratedLocalId) {
+        return instanceIdFactory.createFromDehydratedLocalId(dehydratedLocalId);
     }
 
-    private <T extends JaversType> T getIdPropertyType() {
+    public <T extends JaversType> T getIdPropertyType() {
         return getIdProperty().getType();
+    }
+
+    InstanceIdFactory getInstanceIdFactory() {
+        return instanceIdFactory;
     }
 
     @Override

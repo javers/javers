@@ -16,15 +16,15 @@ abstract class TypeFactoryIdTest extends Specification {
     @Shared
     TypeFactory typeFactory
 
-    def "should use @EmbeddedId property"(){
+    def "should use @EmbeddedId as Id property"(){
         when:
-        def entity = typeFactory.create(new EntityDefinition(DummyEntityWithEmbeddedId.class))
+        def entity = typeFactory.create(new EntityDefinition(DummyEntityWithEmbeddedId))
 
         then:
         entity.idProperty.name == 'point'
     }
 
-    def "should use @Id property by default"() {
+    def "should use @Id property as Id property"() {
         when:
         def entity = typeFactory.create(new EntityDefinition(DummyUser.class))
 

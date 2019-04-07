@@ -1,8 +1,11 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.reflection.ReflectionUtil;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * ValueObject class in client's domain model.
@@ -28,6 +31,7 @@ import java.util.Optional;
  */
 public class ValueObjectType extends ManagedType{
     private final boolean defaultType;
+    private final Optional<Function<Object, String>> toStringFunction = Optional.empty();
 
     ValueObjectType(ManagedClass valueObject){
         super(valueObject);
@@ -51,5 +55,15 @@ public class ValueObjectType extends ManagedType{
     @Override
     public boolean canBePrototype() {
         return !defaultType;
+    }
+
+    public String smartToString(Object value) {
+        if (value == null) {
+            return "";
+        }
+
+        return toStringFunction
+                .map(f -> f.apply(value))
+                .orElse(ReflectionUtil.reflectiveToString(value));
     }
 }

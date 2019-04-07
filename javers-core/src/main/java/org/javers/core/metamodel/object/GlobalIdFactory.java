@@ -13,7 +13,6 @@ import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.jql.UnboundedValueObjectIdDTO;
 import org.javers.repository.jql.ValueObjectIdDTO;
-
 import java.util.Optional;
 
 /**
@@ -137,22 +136,6 @@ public class GlobalIdFactory {
             return createValueObjectIdFromPath(ownerId, idDTO.getPath());
         }
         throw new RuntimeException("type " + globalIdDTO.getClass() + " is not implemented");
-    }
-
-    /**
-     * If item is Primitive or Value - returns it,
-     * if item is Entity or ValueObject - returns its globalId,
-     * if item is already instance of GlobalId - returns it.
-     */
-    public Object dehydrate(Object item, JaversType targetType, OwnerContext context){
-        if (item == null) {
-            return null;
-        }
-        if (!(item instanceof GlobalId) && targetType instanceof ManagedType) {
-            return createId(item, context);
-        } else {
-            return item;
-        }
     }
 
     private boolean hasOwner(OwnerContext context) {
