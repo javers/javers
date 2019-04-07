@@ -6,7 +6,6 @@ import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.ObjectAccessProxy;
-import org.javers.core.graph.ObjectHasher;
 import org.javers.core.metamodel.object.ValueObjectIdWithHash.ValueObjectIdWithPlaceholder;
 import org.javers.core.metamodel.object.ValueObjectIdWithHash.ValueObjectIdWithPlaceholderOnParent;
 import org.javers.core.metamodel.type.*;
@@ -14,8 +13,6 @@ import org.javers.repository.jql.GlobalIdDTO;
 import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.jql.UnboundedValueObjectIdDTO;
 import org.javers.repository.jql.ValueObjectIdDTO;
-
-import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * @author bartosz.walacik
  */
-public class ObjectHasher {
+class ObjectHasher {
     private final SnapshotFactory snapshotFactory;
     private final JsonConverter jsonConverter;
 
@@ -20,17 +20,11 @@ public class ObjectHasher {
         this.jsonConverter = jsonConverter;
     }
 
-    public String hash(List<LiveCdo> objects) {
+    String hash(List<LiveCdo> objects) {
         String jsonState = objects.stream().map(cdo -> snapshotFactory.createSnapshotStateNoRefs(cdo))
                         .map(state -> jsonConverter.toJson(state))
                         .collect(Collectors.joining( "\n" ));
 
-        return ShaDigest.longDigest(jsonState);
-    }
-
-    public String hashSingle(ManagedType managedType, Object instance) {
-        String jsonState = jsonConverter.toJson(
-                snapshotFactory.createSnapshotStateNoRefs(managedType, instance));
         return ShaDigest.longDigest(jsonState);
     }
 }
