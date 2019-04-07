@@ -45,4 +45,6 @@ public abstract class PrimitiveOrValueType extends ClassType{
     public boolean isJsonPrimitive() {
         return isStringy() || isBoolean() || isNumber();
     }
+
+    public abstract String smartToString(Object value);
 }

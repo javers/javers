@@ -34,10 +34,6 @@ abstract class ClassType extends JaversType {
         return true;
     }
 
-    public String smartToString(Object value) {
-        return ToStringBuilder.smartToString(value);
-    }
-
     @Override
     public boolean isInstance(Object cdo) {
         argumentIsNotNull(cdo);

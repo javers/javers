@@ -36,11 +36,13 @@ import java.util.Optional;
  */
 public class EntityType extends ManagedType {
     private final JaversProperty idProperty;
+    private final InstanceIdFactory instanceIdFactory;
 
     EntityType(ManagedClass entity, JaversProperty idProperty, Optional<String> typeName) {
         super(entity, typeName);
         Validate.argumentIsNotNull(idProperty);
         this.idProperty = idProperty;
+        this.instanceIdFactory = new InstanceIdFactory(this);
     }
 
     @Override
@@ -87,46 +89,29 @@ public class EntityType extends ManagedType {
         return cdoId;
     }
 
+    public Type getLocalIdDehydratedType() {
+        return instanceIdFactory.getLocalIdDehydratedType();
+    }
+
     public InstanceId createIdFromInstance(Object instance) {
         Object localId = getIdOf(instance);
-        return new InstanceId(getName(), localId, localIdAsString(localId));
+        return instanceIdFactory.create(localId);
     }
 
     public InstanceId createIdFromInstanceId(Object localId) {
-        return new InstanceId(getName(), dehydrateLocalId(localId), localIdAsString(localId));
+        return instanceIdFactory.create(localId);
     }
 
-    private String localIdAsString(Object localId) {
-        if (isIdPropertyEntity()) {
-            EntityType idPropertyType = getIdPropertyType();
-            return idPropertyType.localIdAsString(idPropertyType.getIdOf(localId));
-        }
-
-        ClassType idPropertyType = getIdPropertyType();
-        return idPropertyType.smartToString(localId);
+    public InstanceId createIdFromDehydratedLocalId(Object dehydratedLocalId) {
+        return instanceIdFactory.createFromDehydratedLocalId(dehydratedLocalId);
     }
 
-    private Object dehydrateLocalId(Object localId) {
-        if (isIdPropertyEntity()) {
-            EntityType idPropertyType = getIdPropertyType();
-            return idPropertyType.getIdOf(localId);
-        }
-        if (isIdPropertyValueObject()) {
-            return localIdAsString(localId);
-        }
-        return localId;
-    }
-
-    private boolean isIdPropertyEntity() {
-        return getIdPropertyType() instanceof EntityType;
-    }
-
-    private boolean isIdPropertyValueObject() {
-        return getIdPropertyType() instanceof ValueObjectType;
-    }
-
-    private <T extends JaversType> T getIdPropertyType() {
+    public <T extends JaversType> T getIdPropertyType() {
         return getIdProperty().getType();
+    }
+
+    InstanceIdFactory getInstanceIdFactory() {
+        return instanceIdFactory;
     }
 
     @Override

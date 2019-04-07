@@ -53,21 +53,25 @@ public class SnapshotFactory {
                 .build();
     }
 
-    public CdoSnapshotState createSnapshotStateNoRefs(Cdo liveCdo){
+    public CdoSnapshotState createSnapshotStateNoRefs(ManagedType managedType, Object instance) {
         CdoSnapshotStateBuilder stateBuilder = CdoSnapshotStateBuilder.cdoSnapshotState();
-        for (JaversProperty property : liveCdo.getManagedType().getProperties()) {
+        for (JaversProperty property : managedType.getProperties()) {
             if (typeMapper.isManagedType(property.getType()) ||
-                typeMapper.isEnumerableOfManagedTypes(property.getType())) {
+                    typeMapper.isEnumerableOfManagedTypes(property.getType())) {
                 continue;
             }
 
-            Object propertyValue = liveCdo.getPropertyValue(property);
+            Object propertyValue = property.get(instance);
             if (Objects.equals(propertyValue, Defaults.defaultValue(property.getGenericType()))) {
                 continue;
             }
             stateBuilder.withPropertyValue(property, propertyValue);
         }
         return stateBuilder.build();
+    }
+
+    public CdoSnapshotState createSnapshotStateNoRefs(Cdo liveCdo){
+        return createSnapshotStateNoRefs(liveCdo.getManagedType(), liveCdo.getWrappedCdo().get());
     }
 
     public CdoSnapshotState createSnapshotState(LiveNode liveNode){

@@ -6,6 +6,7 @@ import org.javers.common.string.ToStringBuilder;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.ObjectAccessProxy;
+import org.javers.core.graph.ObjectHasher;
 import org.javers.core.metamodel.object.ValueObjectIdWithHash.ValueObjectIdWithPlaceholder;
 import org.javers.core.metamodel.object.ValueObjectIdWithHash.ValueObjectIdWithPlaceholderOnParent;
 import org.javers.core.metamodel.type.*;
@@ -14,6 +15,7 @@ import org.javers.repository.jql.InstanceIdDTO;
 import org.javers.repository.jql.UnboundedValueObjectIdDTO;
 import org.javers.repository.jql.ValueObjectIdDTO;
 
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**
@@ -137,22 +139,6 @@ public class GlobalIdFactory {
             return createValueObjectIdFromPath(ownerId, idDTO.getPath());
         }
         throw new RuntimeException("type " + globalIdDTO.getClass() + " is not implemented");
-    }
-
-    /**
-     * If item is Primitive or Value - returns it,
-     * if item is Entity or ValueObject - returns its globalId,
-     * if item is already instance of GlobalId - returns it.
-     */
-    public Object dehydrate(Object item, JaversType targetType, OwnerContext context){
-        if (item == null) {
-            return null;
-        }
-        if (!(item instanceof GlobalId) && targetType instanceof ManagedType) {
-            return createId(item, context);
-        } else {
-            return item;
-        }
     }
 
     private boolean hasOwner(OwnerContext context) {

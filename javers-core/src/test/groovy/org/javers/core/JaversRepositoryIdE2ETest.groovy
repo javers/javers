@@ -70,7 +70,6 @@ class JaversRepositoryIdE2ETest extends Specification {
 
         snapshot.getPropertyValue("id") instanceof ValueObjectId
         snapshot.getPropertyValue("id").value().endsWith("EntityWithVOId/1,5#id")
-
     }
 
     class DummyWithEntityId {
@@ -100,6 +99,5 @@ class JaversRepositoryIdE2ETest extends Specification {
         snapshot.globalId.cdoId == 1
         snapshot.getPropertyValue("entityAsId") instanceof InstanceId
         snapshot.getPropertyValue("entityAsId").value().endsWith("EntityAsId/1")
-
     }
 }

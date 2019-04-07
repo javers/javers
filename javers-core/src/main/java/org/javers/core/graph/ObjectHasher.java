@@ -2,6 +2,7 @@ package org.javers.core.graph;
 
 import org.javers.common.string.ShaDigest;
 import org.javers.core.json.JsonConverter;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.snapshot.SnapshotFactory;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * @author bartosz.walacik
  */
-class ObjectHasher {
+public class ObjectHasher {
     private final SnapshotFactory snapshotFactory;
     private final JsonConverter jsonConverter;
 
@@ -24,6 +25,12 @@ class ObjectHasher {
                         .map(state -> jsonConverter.toJson(state))
                         .collect(Collectors.joining( "\n" ));
 
+        return ShaDigest.longDigest(jsonState);
+    }
+
+    public String hashSingle(ManagedType managedType, Object instance) {
+        String jsonState = jsonConverter.toJson(
+                snapshotFactory.createSnapshotStateNoRefs(managedType, instance));
         return ShaDigest.longDigest(jsonState);
     }
 }

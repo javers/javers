@@ -3,10 +3,7 @@ package org.javers.core.json.typeadapter.commit;
 import com.google.gson.*;
 import org.javers.common.collections.Lists;
 import org.javers.core.json.JsonTypeAdapter;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.InstanceId;
-import org.javers.core.metamodel.object.UnboundedValueObjectId;
-import org.javers.core.metamodel.object.ValueObjectId;
+import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.TypeMapper;
 
@@ -66,8 +63,9 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
         Optional<EntityType> entityMaybe = typeMapper.getJaversManagedTypeMaybe(typeName, EntityType.class);
 
         return entityMaybe.map(entity -> {
-            Object cdoId = context.deserialize(cdoIdElement, entity.getIdPropertyGenericType());
-            return entity.createIdFromInstanceId(cdoId);
+            //TODO
+            Object localId = context.deserialize(cdoIdElement, entity.getLocalIdDehydratedType());
+            return entity.createIdFromDehydratedLocalId(localId);
         }).orElseGet(() ->
             new InstanceId(typeName, context.deserialize(cdoIdElement, Object.class), cdoIdElement.getAsString())
         );
