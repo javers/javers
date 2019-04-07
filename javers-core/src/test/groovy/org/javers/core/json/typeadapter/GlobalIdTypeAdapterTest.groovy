@@ -3,6 +3,8 @@ package org.javers.core.json.typeadapter
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.examples.typeNames.NewEntityWithTypeAlias
+import org.javers.core.metamodel.annotation.Id
+import org.javers.core.metamodel.annotation.ValueObject
 import org.javers.core.metamodel.clazz.JaversEntity
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.InstanceId
@@ -24,6 +26,70 @@ class GlobalIdTypeAdapterTest extends Specification {
     def class IdHolder{
         GlobalId id
     }
+
+    class DummyWithEntityId {
+        @Id EntityAsId entityAsId
+        int value
+    }
+
+    class EntityAsId {
+        @Id
+        int id
+        int value
+    }
+
+
+    def "should deserialize InstanceId with nested Entity Id -- legacy format"(){
+      given:
+      def instanceIdLegacyJson = '''
+            {
+              "entity": "org.javers.core.json.typeadapter.GlobalIdTypeAdapterTest$DummyWithEntityId",
+              "cdoId": {
+                "id": 1,
+                "value": 5
+              }
+            }
+            '''
+
+      when:
+      InstanceId instanceId = javersTestAssembly().jsonConverter.fromJson(instanceIdLegacyJson, InstanceId)
+
+      then:
+      println instanceId.value()
+      instanceId.value().endsWith("DummyWithEntityId/1")
+    }
+
+    class EntityWithVOId {
+        @Id ValueObjectAsId id
+        int value
+    }
+
+    @ValueObject
+    class ValueObjectAsId {
+        int id
+        int value
+    }
+
+    def "should deserialize InstanceId with ValueObject Id -- legacy format"(){
+        given:
+        def instanceIdLegacyJson = '''
+            {
+              "entity": "org.javers.core.json.typeadapter.GlobalIdTypeAdapterTest$EntityWithVOId",
+              "cdoId": {
+                "id": 1,
+                "value": 5
+              }
+            }
+            '''
+
+        when:
+        InstanceId instanceId = javersTestAssembly().jsonConverter.fromJson(instanceIdLegacyJson, InstanceId)
+
+        then:
+        println instanceId.value()
+        instanceId.value().endsWith("EntityWithVOId/1,5")
+    }
+
 
     @Unroll
     def "should deserialize InstanceId with #type cdoId"() {
