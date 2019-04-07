@@ -6,17 +6,19 @@ package org.javers.common.exception;
  * @author Pawel Cierpiatka <pawel.cierpiatka@gmail.com>
  */
 public enum JaversExceptionCode {
+    ID_TYPE_NOT_SUPPORTED("%s is not supported as the type of Id-property. Problematic class: '%s'.") ,
+
     CLASS_EXTRACTION_ERROR(JaversException.BOOTSTRAP_ERROR + "Can't extract Class from Type '%s'.") ,
 
     COMMITTING_TOP_LEVEL_VALUES_NOT_SUPPORTED("Committing top-level %ss like '%s' is not supported. You can commit only Entity or ValueObject instance."),
 
     COMPARING_TOP_LEVEL_VALUES_NOT_SUPPORTED("Comparing top-level %ss like '%s' is not supported. Javers.compare() is designed to deeply compare two arbitrary complex object graphs. For simple values, equals() does the job."),
 
-    ENTITY_WITHOUT_ID ("Class '%s' mapped as Entity has no Id property. Use @Id annotation to mark unique and not-null Entity identifier"),
+    ENTITY_WITHOUT_ID ("Class '%s' mapped as Entity has no Id-property. Use @Id annotation to mark unique and not-null Entity identifier"),
 
     SHALLOW_REF_ENTITY_WITHOUT_ID ("Class '%s' mapped as ShallowReference Entity has no Id property. Use @Id annotation to mark unique and not-null Entity identifier"),
 
-    ENTITY_INSTANCE_WITH_NULL_ID("Found Entity instance '%s' with null idProperty '%s'"),
+    ENTITY_INSTANCE_WITH_NULL_ID("Found Entity instance '%s' with null Id-property '%s'"),
 
     NOT_INSTANCE_OF("Can't create InstanceId for EntityType '%s', class '%s' bounded to EntityType is not assignable from given class '%s'"),
 

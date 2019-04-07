@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.InstanceId;
 
@@ -43,8 +45,13 @@ class InstanceIdFactory {
             return primitiveOrValueType.smartToString(dehydratedLocalId);
         }
 
-        //TODO throw
-        throw new RuntimeException("//TODO");
+        throw idTypeNotSupported();
+    }
+
+    private JaversException idTypeNotSupported() {
+        return new JaversException(JaversExceptionCode.ID_TYPE_NOT_SUPPORTED,
+                entityType.getIdProperty().getType().getName(),
+                entityType.getBaseJavaClass().getName());
     }
 
     Type getLocalIdDehydratedType() {
@@ -59,8 +66,7 @@ class InstanceIdFactory {
             return entityType.getIdPropertyGenericType();
         }
 
-        //TODO throw
-        throw new RuntimeException("//TODO");
+        throw idTypeNotSupported();
     }
 
     private Object dehydratedLocalId(EntityType entityType, Object localId) {
@@ -76,8 +82,7 @@ class InstanceIdFactory {
             return localId;
         }
 
-        //TODO throw
-        throw new RuntimeException("//TODO");
+        throw idTypeNotSupported();
     }
 
     private boolean isIdEntity() {
