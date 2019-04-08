@@ -728,13 +728,13 @@ class JaversRepositoryE2ETest extends Specification {
         changes[0].left == 10
         changes[0].right == 15
 
-        changes[1].propertyName == "oldField"
-        changes[1].left == 5  //removed properties are treated as nulls
-        changes[1].right == 0
+        changes[1].propertyName == "newField"
+        changes[1].left == 0
+        changes[1].right == 10
 
-        changes[2].propertyName == "newField"
-        changes[2].left == 0
-        changes[2].right == 10
+        changes[2].propertyName == "oldField"
+        changes[2].left == 5  //removed properties are treated as nulls
+        changes[2].right == 0
     }
 
     def "should manage ValueObject class name refactor when querying using new class with @TypeName retrofitted to old class name"(){
