@@ -121,6 +121,11 @@ public class JaversTransactionalDecorator implements InitializingBean, Javers {
         return delegate.initial(newDomainObject);
     }
 
+    @Override
+    public Diff finalDiff(final Object removedObject) {
+        return delegate.finalDiff(removedObject);
+    }
+
     @Transactional
     @Override
     public Optional<CdoSnapshot> getLatestSnapshot(Object localId, Class entityClass) {

@@ -723,14 +723,18 @@ class JaversRepositoryE2ETest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byValueObject(EntityWithRefactoredValueObject,"value").build())
 
         then:
-        changes.size() == 2
+        changes.size() == 3
         changes[0].propertyName == "newField"
         changes[0].left == 10
         changes[0].right == 15
 
         changes[1].propertyName == "newField"
-        changes[1].left == 0  //removed properties are treated as nulls
+        changes[1].left == 0
         changes[1].right == 10
+
+        changes[2].propertyName == "oldField"
+        changes[2].left == 5  //removed properties are treated as nulls
+        changes[2].right == 0
     }
 
     def "should manage ValueObject class name refactor when querying using new class with @TypeName retrofitted to old class name"(){
@@ -741,7 +745,7 @@ class JaversRepositoryE2ETest extends Specification {
         def changes = javers.findChanges(QueryBuilder.byClass(NewNamedValueObject).build())
 
         then:
-        changes.size() == 2
+        changes.size() == 3
         with(changes.find {it.propertyName == "newField"}) {
             assert left == 0 //removed properties are treated as nulls
             assert right == 10
@@ -749,6 +753,10 @@ class JaversRepositoryE2ETest extends Specification {
         with(changes.find {it.propertyName == "someValue"}) {
             assert left == 5
             assert right == 6
+        }
+        with(changes.find {it.propertyName == "oldField"}) {
+            assert left == 10 //removed properties are treated as nulls
+            assert right == 0
         }
     }
 

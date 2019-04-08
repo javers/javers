@@ -1,13 +1,14 @@
 package org.javers.core.diff;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
-
-import java.util.List;
 
 /**
  * holds two versions of the same {@link ObjectNode}
@@ -63,7 +64,8 @@ public class RealNodePair implements NodePair {
 
     @Override
     public List<JaversProperty> getProperties() {
-        return getManagedType().getProperties();
+        return Stream.concat(right.getManagedType().getProperties().stream(),
+            left.getManagedType().getProperties().stream()).distinct().collect(Collectors.toList());
     }
 
     @Override

@@ -1,5 +1,14 @@
 package org.javers.core.diff;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.validation.Validate;
@@ -13,15 +22,11 @@ import org.javers.core.graph.LiveGraph;
 import org.javers.core.graph.LiveGraphFactory;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.type.*;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import org.javers.core.metamodel.type.JaversProperty;
+import org.javers.core.metamodel.type.JaversType;
+import org.javers.core.metamodel.type.PrimitiveType;
+import org.javers.core.metamodel.type.TypeMapper;
+import org.javers.core.metamodel.type.ValueType;
 
 /**
  * @author Maciej Zasada
@@ -83,11 +88,14 @@ public class DiffFactory {
      */
     public Diff initial(Object newDomainObject) {
         Validate.argumentIsNotNull(newDomainObject);
+        final GraphPair insertGraphPair = GraphPair.getInsertGraphPair(buildGraph(newDomainObject));
+        return createAndAppendChanges(insertGraphPair, empty());
+    }
 
-        ObjectGraph currentGraph = buildGraph(newDomainObject);
-
-        GraphPair graphPair = new GraphPair(currentGraph);
-        return createAndAppendChanges(graphPair, empty());
+    public Diff finalDiff(Object removedDomainObject) {
+        Validate.argumentIsNotNull(removedDomainObject);
+        final GraphPair deleteGraphPair = GraphPair.getDeleteGraphPair(buildGraph(removedDomainObject));
+        return createAndAppendChanges(deleteGraphPair, empty());
     }
 
     private LiveGraph buildGraph(Object handle) {
@@ -143,17 +151,18 @@ public class DiffFactory {
     }
 
     private void appendChanges(DiffBuilder diff, NodePair pair, JaversProperty property, JaversType javersType, Optional<CommitMetadata> commitMetadata) {
-        for (PropertyChangeAppender appender : propertyChangeAppender) {
-            if (! appender.supports(javersType)){
-                continue;
-            }
 
-            final Change change = appender.calculateChanges(pair, property);
-            if (change != null) {
-                diff.addChange(change, pair.getRight().wrappedCdo());
-                commitMetadata.ifPresent(cm -> change.bindToCommit(cm));
-            }
-            break;
-        }
+        propertyChangeAppender.stream()
+            .filter(appender -> appender.supports(javersType))
+            .findFirst()
+            .ifPresent(appender -> {
+                final Change change = appender.calculateChanges(pair, property);
+
+                if (change != null) {
+                    diff.addChange(change, pair.getRight().wrappedCdo());
+                    commitMetadata.ifPresent(change::bindToCommit);
+                }
+            });
+
     }
 }

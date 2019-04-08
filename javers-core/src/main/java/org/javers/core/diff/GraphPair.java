@@ -1,9 +1,10 @@
 package org.javers.core.diff;
 
-import org.javers.core.graph.ObjectNode;
+import static org.javers.common.collections.Sets.difference;
+
 import java.util.Collections;
 import java.util.Set;
-import static org.javers.common.collections.Sets.difference;
+import org.javers.core.graph.ObjectNode;
 
 /**
  * @author bartosz walacik
@@ -24,17 +25,23 @@ public class GraphPair {
         this.onlyOnRight = difference(rightGraph.nodes(), leftGraph.nodes());
     }
 
-    //for initial
-    public GraphPair(ObjectGraph currentGraph) {
-        this.leftGraph = new EmptyGraph();
-
-        this.rightGraph = currentGraph;
-
-        this.onlyOnLeft = Collections.emptySet();
-        this.onlyOnRight = rightGraph.nodes();
+    private GraphPair(final ObjectGraph leftGraph, final ObjectGraph rightGraph, final Set<ObjectNode> leftNodes, final Set<ObjectNode> rightNodes) {
+        this.leftGraph = leftGraph;
+        this.rightGraph = rightGraph;
+        this.onlyOnLeft = leftNodes;
+        this.onlyOnRight = rightNodes;
     }
 
-    private class EmptyGraph extends ObjectGraph {
+    public static GraphPair getInsertGraphPair(final ObjectGraph currentGraph){
+        return new GraphPair(new EmptyGraph(), currentGraph, Collections.emptySet(), currentGraph.nodes());
+    }
+
+    public static GraphPair getDeleteGraphPair(final ObjectGraph previousGraph) {
+        return new GraphPair(previousGraph, new EmptyGraph(), previousGraph.nodes(), Collections.emptySet());
+    }
+
+    private static class EmptyGraph extends ObjectGraph {
+
         EmptyGraph() {
             super(Collections.emptySet());
         }
