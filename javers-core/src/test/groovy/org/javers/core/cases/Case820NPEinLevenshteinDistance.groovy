@@ -20,7 +20,6 @@ class Case820NPEinLevenshteinDistance extends Specification {
         def diff = javers.compare(null, new Obj(["test"]))
 
         then:
-        println diff.toString()
         diff.changes
 
         when:
@@ -28,7 +27,6 @@ class Case820NPEinLevenshteinDistance extends Specification {
                                               Collections.singletonList(new Obj(["test"])), Obj)
 
         then:
-        println diff2.toString()
         diff2.changes
     }
 
