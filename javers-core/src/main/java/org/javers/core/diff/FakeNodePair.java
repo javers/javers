@@ -47,7 +47,7 @@ class FakeNodePair implements NodePair {
 
     @Override
     public Object getLeftDehydratedPropertyValueAndSanitize(JaversProperty property) {
-        return Defaults.defaultValue(property.getGenericType());
+        return sanitize( Defaults.defaultValue(property.getGenericType()), property.getType());
     }
 
     @Override

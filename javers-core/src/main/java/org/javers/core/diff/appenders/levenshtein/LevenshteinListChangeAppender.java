@@ -32,7 +32,6 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
     public ListChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
         CollectionType listType = property.getType();
         JaversType itemType = typeMapper.getJaversType(listType.getItemType());
-        OwnerContext owner = new PropertyOwnerContext(affectedId, property.getName());
 
         final List leftList =  (List) leftValue;
         final List rightList = (List) rightValue;
