@@ -145,17 +145,16 @@ public class DiffFactory {
     }
 
     private void appendChanges(DiffBuilder diff, NodePair pair, JaversProperty property, JaversType javersType, Optional<CommitMetadata> commitMetadata) {
-        for (PropertyChangeAppender appender : propertyChangeAppender) {
-            if (! appender.supports(javersType)){
-                continue;
-            }
 
-            final Change change = appender.calculateChanges(pair, property);
-            if (change != null) {
-                diff.addChange(change, pair.getRight().wrappedCdo());
-                commitMetadata.ifPresent(cm -> change.bindToCommit(cm));
-            }
-            break;
-        }
+        propertyChangeAppender.stream()
+            .filter(appender -> appender.supports(javersType))
+            .findFirst()
+            .ifPresent( appender -> {
+                final Change change = appender.calculateChanges(pair, property);
+                if (change != null) {
+                    diff.addChange(change, pair.getRight().wrappedCdo());
+                    commitMetadata.ifPresent(change::bindToCommit);
+                }
+            });
     }
 }

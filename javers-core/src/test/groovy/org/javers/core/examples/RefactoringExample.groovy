@@ -136,7 +136,7 @@ class RefactoringExample extends Specification {
       changes.each { println it }
 
       then: 'four ValueChanges are expected'
-      assert changes.size() == 4
-      assert changes.collect{ it.propertyName } as Set == ['street','verified','city'] as Set
+      assert changes.size() == 5
+      assert changes.collect{ it.propertyName } as Set == ['street','verified','city', 'email'] as Set
     }
 }

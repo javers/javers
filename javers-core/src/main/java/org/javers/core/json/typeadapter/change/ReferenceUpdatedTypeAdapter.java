@@ -1,30 +1,26 @@
 package org.javers.core.json.typeadapter.change;
 
+import static java.util.Optional.ofNullable;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.commit.CommitMetadata;
-import org.javers.core.diff.changetype.ReferenceChange;
+import org.javers.core.diff.changetype.ReferenceUpdatedChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.TypeMapper;
 
-import java.util.Optional;
-
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-
-class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
-
+public class ReferenceUpdatedTypeAdapter extends ChangeTypeAdapter<ReferenceUpdatedChange> {
     private static final String LEFT_REFERENCE_FIELD = "left";
     private static final String RIGHT_REFERENCE_FIELD = "right";
 
-    public ReferenceChangeTypeAdapter(TypeMapper typeMapper) {
+    public ReferenceUpdatedTypeAdapter(TypeMapper typeMapper) {
         super(typeMapper);
     }
 
     @Override
-    public ReferenceChange fromJson(JsonElement json, JsonDeserializationContext context) {
+    public ReferenceUpdatedChange fromJson(JsonElement json, JsonDeserializationContext context) {
         JsonObject jsonObject = (JsonObject) json;
         PropertyChangeStub stub = deserializeStub(jsonObject, context);
 
@@ -32,11 +28,11 @@ class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
         GlobalId rightRef = context.deserialize(jsonObject.get(RIGHT_REFERENCE_FIELD), GlobalId.class);
 
         CommitMetadata commitMetadata = deserializeCommitMetadata(jsonObject, context);
-        return new ReferenceChange(stub.id, stub.getPropertyName(), leftRef, rightRef, null, null, ofNullable(commitMetadata));
+        return new ReferenceUpdatedChange(stub.id, stub.getPropertyName(), leftRef, rightRef, null, null, ofNullable(commitMetadata));
     }
 
     @Override
-    public JsonElement toJson(ReferenceChange change, JsonSerializationContext context) {
+    public JsonElement toJson(ReferenceUpdatedChange change, JsonSerializationContext context) {
         final JsonObject jsonObject = createJsonObject(change, context);
 
         jsonObject.add(LEFT_REFERENCE_FIELD,  context.serialize(change.getLeft()));
@@ -47,6 +43,6 @@ class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
 
     @Override
     public Class getValueType() {
-        return ReferenceChange.class;
+        return ReferenceUpdatedChange.class;
     }
 }

@@ -1,28 +1,27 @@
 package org.javers.core.json.typeadapter.change;
 
+import static java.util.Optional.ofNullable;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.ValueUpdatedChange;
 import org.javers.core.metamodel.type.TypeMapper;
 
-import java.util.Optional;
+public class ValueUpdatedTypeAdapter extends ChangeTypeAdapter<ValueUpdatedChange> {
 
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-
-class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
     private static final String LEFT_VALUE_FIELD = "left";
     private static final String RIGHT_VALUE_FIELD = "right";
 
-    public ValueChangeTypeAdapter(TypeMapper typeMapper) {
+    public ValueUpdatedTypeAdapter(TypeMapper typeMapper) {
         super(typeMapper);
     }
 
     @Override
-    public ValueChange fromJson(JsonElement json, JsonDeserializationContext context) {
+    public ValueUpdatedChange fromJson(JsonElement json, JsonDeserializationContext context) {
         JsonObject jsonObject = (JsonObject) json;
         PropertyChangeStub stub = deserializeStub(jsonObject, context);
 
@@ -30,11 +29,11 @@ class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
         Object rightValue = context.deserialize(jsonObject.get(RIGHT_VALUE_FIELD), stub.property.getGenericType());
 
         CommitMetadata commitMetadata = deserializeCommitMetadata(jsonObject, context);
-        return new ValueChange(stub.id, stub.getPropertyName(), leftValue, rightValue, ofNullable(commitMetadata));
+        return new ValueUpdatedChange(stub.id, stub.getPropertyName(), leftValue, rightValue, ofNullable(commitMetadata));
     }
 
     @Override
-    public JsonElement toJson(ValueChange change, JsonSerializationContext context) {
+    public JsonElement toJson(ValueUpdatedChange change, JsonSerializationContext context) {
         JsonObject jsonObject = createJsonObject(change, context);
 
         jsonObject.add(LEFT_VALUE_FIELD, context.serialize(change.getLeft()));
@@ -45,6 +44,6 @@ class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
 
     @Override
     public Class getValueType() {
-        return ValueChange.class;
+        return ValueUpdatedChange.class;
     }
 }

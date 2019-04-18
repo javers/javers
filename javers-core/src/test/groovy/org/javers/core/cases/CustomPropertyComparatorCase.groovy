@@ -4,6 +4,7 @@ import org.javers.common.collections.Lists
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.ValueUpdatedChange
 import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.property.Property
@@ -30,7 +31,7 @@ class CustomPropertyComparatorCase extends Specification {
         Optional<ValueChange> compare(Person left, Person right, GlobalId affectedId, Property property) {
             if (left.name.equals(right.name))
                 return Optional.empty()
-            return Optional.of(new ValueChange(affectedId, "entity/name", left.name, right.name));
+            return Optional.of(new ValueUpdatedChange(affectedId, "entity/name", left.name, right.name));
         }
 
         @Override

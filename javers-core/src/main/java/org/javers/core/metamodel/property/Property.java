@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.property;
 
+import java.lang.reflect.Field;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.JaversMember;
@@ -75,7 +76,16 @@ public class Property {
             return  member.getEvenIfPrivate(target);
         } catch (JaversException e) {
             if (e.getCode() == JaversExceptionCode.MISSING_PROPERTY) {
-                return null;
+                try {
+                    Field f = target.getClass().getDeclaredField(member.name());
+                    f.setAccessible(true);
+                    return f.get(target);
+                } catch (NoSuchFieldException e1) {
+                    return new MissingProperty();
+                } catch (IllegalAccessException e2) {
+                    e2.printStackTrace();
+                }
+
             }
             throw e;
         }

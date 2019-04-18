@@ -5,6 +5,7 @@ import org.javers.core.diff.Diff
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.ValueUpdatedChange
 import org.javers.test.builder.CategoryTestBuilder
 import spock.lang.Specification
 
@@ -28,7 +29,7 @@ class JaversNapCategoryTreeIntegrationTest extends Specification {
         Diff diff = javers.compare(cat1, cat2)
 
         then:
-        assertThat(diff).hasChanges(40).hasAllOfType(ValueChange)
+        assertThat(diff).hasChanges(40).hasAllOfType(ValueUpdatedChange)
     }
 
     def "should manage empty diff on big graphs"() {

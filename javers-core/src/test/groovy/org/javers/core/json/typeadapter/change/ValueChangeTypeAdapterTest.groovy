@@ -33,7 +33,7 @@ class ValueChangeTypeAdapterTest extends Specification {
         then:
         def json = new JsonSlurper().parseText(jsonText)
         json.property == "flag"
-        json.changeType == "ValueChange"
+        json.changeType == "ValueUpdatedChange"
         json.globalId
         json.left == true
         json.right == false
@@ -45,7 +45,7 @@ class ValueChangeTypeAdapterTest extends Specification {
             def json = new JsonBuilder()
             json {
                 property  "bigFlag"
-                changeType "ValueChange"
+                changeType "ValueUpdatedChange"
                 left null
                 right true
                 globalId {
@@ -85,7 +85,7 @@ class ValueChangeTypeAdapterTest extends Specification {
         def json = new JsonBuilder()
         json {
             property  "dob"
-            changeType "ValueChange"
+            changeType "ValueUpdatedChange"
             left null
             right "2001-01-01"
             globalId {

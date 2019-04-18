@@ -34,7 +34,7 @@ class ReferenceChangeTypeAdapterTest extends Specification {
         then:
             def json = new JsonSlurper().parseText(jsonText)
             json.property == "dummyUserDetails"
-            json.changeType == "ReferenceChange"
+            json.changeType == "ReferenceUpdatedChange"
             json.globalId
             json.left.cdoId == 1
             json.left.entity == "org.javers.core.model.DummyUserDetails"
@@ -48,7 +48,7 @@ class ReferenceChangeTypeAdapterTest extends Specification {
             def json = new JsonBuilder()
             json
             {
-                changeType "ReferenceChange"
+                changeType "ReferenceUpdatedChange"
                 globalId {
                 entity "org.javers.core.model.DummyUser"
                 cdoId "kaz"

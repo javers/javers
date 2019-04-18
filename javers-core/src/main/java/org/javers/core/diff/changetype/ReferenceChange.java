@@ -14,39 +14,25 @@ import java.util.Optional;
  *
  * @author bartosz walacik
  */
-public final class ReferenceChange extends PropertyChange {
-    private final GlobalId left;
-    private final GlobalId right;
-    private transient final Optional<Object> leftObject;
-    private transient final Optional<Object> rightObject;
+public abstract class ReferenceChange extends PropertyChange {
 
-    public ReferenceChange(GlobalId affectedCdoId, String propertyName, GlobalId leftReference,
-                           GlobalId rightReference, Object leftObject, Object rightObject) {
-        this(affectedCdoId, propertyName, leftReference, rightReference, leftObject, rightObject, Optional.empty());
+    public ReferenceChange(GlobalId affectedCdoId, String propertyName) {
+        this(affectedCdoId, propertyName, Optional.empty());
     }
 
-    public ReferenceChange(GlobalId affectedCdoId, String propertyName, GlobalId leftReference,
-                           GlobalId rightReference, Object leftObject, Object rightObject, Optional<CommitMetadata> commitMetadata ) {
+    public ReferenceChange(GlobalId affectedCdoId, String propertyName, Optional<CommitMetadata> commitMetadata ) {
         super(affectedCdoId, propertyName, commitMetadata);
-        this.left = leftReference;
-        this.right = rightReference;
-        this.leftObject = Optional.ofNullable(leftObject);
-        this.rightObject = Optional.ofNullable(rightObject);
     }
 
     /**
      * GlobalId of left (or previous) domain object reference
      */
-    public GlobalId getLeft() {
-        return left;
-    }
+    public abstract GlobalId getLeft();
 
     /**
      * GlobalId of right (or current) domain object reference
      */
-    public GlobalId getRight() {
-        return right;
-    }
+    public abstract GlobalId getRight();
 
     /**
      * Domain object reference at left side of a diff.
@@ -55,9 +41,7 @@ public final class ReferenceChange extends PropertyChange {
      * <b>Optional</b> - available only for freshly generated diff.
      * Not available for Changes read from JaversRepository
      */
-    public Optional<Object> getLeftObject() {
-    	return leftObject;
-    }
+    public abstract Optional<Object> getLeftObject();
 
     /**
      * Domain object reference at right side of a diff.
@@ -66,18 +50,10 @@ public final class ReferenceChange extends PropertyChange {
      * <b>Optional</b> - available only for freshly generated diff.
      * Not available for Changes read from JaversRepository
      */
-    public Optional<Object> getRightObject() {
-    	return rightObject;
-    }
+    public abstract Optional<Object> getRightObject();
 
     @Override
-    public String prettyPrint(PrettyValuePrinter valuePrinter) {
-        Validate.argumentIsNotNull(valuePrinter);
-
-        return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
-                " changed from " + valuePrinter.formatWithQuotes(getLeft()) + " to " +
-                valuePrinter.formatWithQuotes(getRight());
-    }
+    public abstract String prettyPrint(PrettyValuePrinter valuePrinter);
 
     @Override
     public boolean equals(Object obj) {
@@ -86,9 +62,8 @@ public final class ReferenceChange extends PropertyChange {
         }
         if (obj instanceof ReferenceChange) {
             ReferenceChange that = (ReferenceChange) obj;
-            return super.equals(that)
-                    && Objects.equals(this.getLeft(), that.getLeft())
-                    && Objects.equals(this.getRight(), that.getRight());
+            return super.equals(that) &&
+                Objects.equals(this.getAffectedGlobalId(), that.getAffectedGlobalId());
         }
         return false;
     }

@@ -13,36 +13,21 @@ import java.util.Optional;
  *
  * @author bartosz walacik
  */
-public final class ValueChange extends PropertyChange {
-    private final Atomic left;
-    private final Atomic right;
-
-    public ValueChange(GlobalId affectedCdoId, String propertyName, Object leftValue, Object rightValue) {
-        this(affectedCdoId, propertyName, leftValue, rightValue, Optional.empty());
+public abstract class ValueChange extends PropertyChange {
+    public ValueChange(GlobalId affectedCdoId, String propertyName) {
+        this(affectedCdoId, propertyName, Optional.empty());
     }
 
-    public ValueChange(GlobalId affectedCdoId, String propertyName, Object leftValue, Object rightValue, Optional<CommitMetadata> commitMetadata) {
+    public ValueChange(GlobalId affectedCdoId, String propertyName, Optional<CommitMetadata> commitMetadata) {
         super(affectedCdoId, propertyName, commitMetadata);
-        this.left = new Atomic(leftValue);
-        this.right = new Atomic(rightValue);
     }
 
-    public Object getLeft() {
-        return left.unwrap();
-    }
+    public abstract Object getLeft();
 
-    public Object getRight() {
-        return right.unwrap();
-    }
+    public abstract Object getRight();
 
     @Override
-    public String prettyPrint(PrettyValuePrinter valuePrinter) {
-        Validate.argumentIsNotNull(valuePrinter);
-
-        return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
-            " changed from " + valuePrinter.formatWithQuotes(getLeft()) + " to " +
-                               valuePrinter.formatWithQuotes(getRight());
-    }
+    public abstract String prettyPrint(PrettyValuePrinter valuePrinter);
 
     @Override
     public boolean equals(Object obj) {

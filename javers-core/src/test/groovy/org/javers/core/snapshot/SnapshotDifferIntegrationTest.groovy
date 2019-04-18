@@ -2,8 +2,12 @@ package org.javers.core.snapshot
 
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
+import org.javers.core.diff.changetype.ReferenceAddedChange
 import org.javers.core.diff.changetype.ReferenceChange
+import org.javers.core.diff.changetype.ReferenceRemovedChange
+import org.javers.core.diff.changetype.ReferenceUpdatedChange
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.ValueUpdatedChange
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
@@ -99,7 +103,7 @@ class SnapshotDifferIntegrationTest extends Specification {
         where:
         oldCdo <<  [dummyUser("kaz").withAge(5), dummyUser("kaz").withDetails(1)]
         newCdo <<  [dummyUser("kaz").withAge(6), dummyUser("kaz").withDetails(2)]
-        expectedChangeType << [ValueChange, ReferenceChange]
+        expectedChangeType << [ValueUpdatedChange, ReferenceUpdatedChange]
         expectedChangedProperty << ["age","dummyUserDetails"]
         expectedLeftValue <<  [5, instanceId(1,DummyUserDetails)]
         expectedRightValue << [6, instanceId(2,DummyUserDetails)]

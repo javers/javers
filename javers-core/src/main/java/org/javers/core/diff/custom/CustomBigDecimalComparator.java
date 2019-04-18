@@ -1,6 +1,7 @@
 package org.javers.core.diff.custom;
 
 import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.ValueUpdatedChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import java.math.BigDecimal;
@@ -34,7 +35,7 @@ public class CustomBigDecimalComparator implements CustomPropertyComparator<BigD
             return Optional.empty();
         }
 
-        return Optional.of(new ValueChange(affectedId, property.getName(), left, right));
+        return Optional.of(new ValueUpdatedChange(affectedId, property.getName(), left, right));
     }
 
     @Override

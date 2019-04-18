@@ -1,5 +1,10 @@
 package org.javers.core.diff;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
@@ -28,7 +33,9 @@ public class RealNodePair implements NodePair {
 
     @Override
     public ManagedType getManagedType() {
-        return right.getManagedType();
+        if(left == null)
+            return right.getManagedType();
+        return left.getManagedType();
     }
 
     @Override
@@ -79,11 +86,19 @@ public class RealNodePair implements NodePair {
 
     @Override
     public List<JaversProperty> getProperties() {
-        return getManagedType().getProperties();
+        List<JaversProperty> rightList = right.getManagedType().getProperties();
+        List<JaversProperty> leftList = left.getManagedType().getProperties();
+        final Set<JaversProperty> collect = new HashSet<>(rightList);
+        final Set<JaversProperty> collect2 = new HashSet<>(leftList);
+        collect.addAll(collect2);
+        return new ArrayList<>(collect);
+
     }
 
     @Override
     public GlobalId getGlobalId() {
+        if(left.getCdo() == null)
+            return right.getGlobalId();
         return left.getGlobalId();
     }
 }

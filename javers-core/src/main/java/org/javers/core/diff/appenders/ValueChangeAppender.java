@@ -1,7 +1,11 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
+import org.javers.core.diff.changetype.ValueAddedChange;
 import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.ValueRemovedChange;
+import org.javers.core.diff.changetype.ValueUpdatedChange;
+import org.javers.core.metamodel.property.MissingProperty;
 import org.javers.core.metamodel.type.*;
 
 /**
@@ -19,8 +23,15 @@ class ValueChangeAppender implements PropertyChangeAppender<ValueChange> {
      */
     @Override
     public ValueChange calculateChanges(NodePair pair, JaversProperty property) {
+
         Object leftValue = pair.getLeftPropertyValue(property);
         Object rightValue = pair.getRightPropertyValue(property);
+
+        if(leftValue instanceof MissingProperty) {
+            return new ValueAddedChange(pair.getGlobalId(), property.getName(), rightValue);
+        } else if(rightValue instanceof MissingProperty) {
+            return new ValueRemovedChange(pair.getGlobalId(), property.getName(), leftValue);
+        }
 
         //special treatment for EmbeddedId - could be ValueObjects without good equals() implementation
         if (isIdProperty(pair, property)) {
@@ -35,7 +46,7 @@ class ValueChangeAppender implements PropertyChangeAppender<ValueChange> {
             }
         }
 
-        return new ValueChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);
+        return new ValueUpdatedChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);
     }
 
     private boolean isIdProperty(NodePair nodePair, JaversProperty property){

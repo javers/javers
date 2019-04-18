@@ -224,8 +224,8 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         def json = new JsonSlurper().parseText(jsonText)
         json.changes.size() == 3
         json.changes[0].changeType == "NewObject"
-        json.changes[1].changeType == "ValueChange"
-        json.changes[2].changeType == "ReferenceChange"
+        json.changes[1].changeType == "ValueUpdatedChange"
+        json.changes[2].changeType == "ReferenceUpdatedChange"
     }
 
     def "should support custom JsonTypeAdapter for ValueChange"() {
@@ -241,7 +241,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         def json = new JsonSlurper().parseText(jsonText)
         def change = json.changes[0];
         change.globalId.valueObject == "org.javers.core.model.DummyUserWithPoint"
-        change.changeType == "ValueChange"
+        change.changeType == "ValueUpdatedChange"
         change.property == "point"
         change.left == "1,2" //this is most important in this test
         change.right == "1,3" //this is most important in this test
