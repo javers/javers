@@ -86,13 +86,10 @@ public class RealNodePair implements NodePair {
 
     @Override
     public List<JaversProperty> getProperties() {
-        List<JaversProperty> rightList = right.getManagedType().getProperties();
-        List<JaversProperty> leftList = left.getManagedType().getProperties();
-        final Set<JaversProperty> collect = new HashSet<>(rightList);
-        final Set<JaversProperty> collect2 = new HashSet<>(leftList);
-        collect.addAll(collect2);
-        return new ArrayList<>(collect);
-
+        return Stream.concat(right.getManagedType().getProperties().stream(),
+            left.getManagedType().getProperties().stream())
+            .distinct()
+            .collect(Collectors.toList());
     }
 
     @Override
