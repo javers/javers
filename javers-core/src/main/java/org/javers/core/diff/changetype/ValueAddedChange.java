@@ -37,7 +37,7 @@ public class ValueAddedChange extends ValueChange {
         Validate.argumentIsNotNull(valuePrinter);
 
         return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
-            " was added with value " + valuePrinter.formatWithQuotes(getLeft());
+            " was added with value " + valuePrinter.formatWithQuotes(getRight());
     }
 
     @Override
