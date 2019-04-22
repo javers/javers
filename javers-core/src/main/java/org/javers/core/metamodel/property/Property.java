@@ -76,16 +76,7 @@ public class Property {
             return  member.getEvenIfPrivate(target);
         } catch (JaversException e) {
             if (e.getCode() == JaversExceptionCode.MISSING_PROPERTY) {
-                try {
-                    Field f = target.getClass().getDeclaredField(member.name());
-                    f.setAccessible(true);
-                    return f.get(target);
-                } catch (NoSuchFieldException e1) {
-                    return new MissingProperty();
-                } catch (IllegalAccessException e2) {
-                    e2.printStackTrace();
-                }
-
+                return new MissingProperty();
             }
             throw e;
         }

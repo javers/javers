@@ -33,9 +33,7 @@ public class RealNodePair implements NodePair {
 
     @Override
     public ManagedType getManagedType() {
-        if(left == null)
-            return right.getManagedType();
-        return left.getManagedType();
+        return right.getManagedType();
     }
 
     @Override
@@ -94,8 +92,6 @@ public class RealNodePair implements NodePair {
 
     @Override
     public GlobalId getGlobalId() {
-        if(left.getCdo() == null)
-            return right.getGlobalId();
-        return left.getGlobalId();
+        return right.getGlobalId();
     }
 }
