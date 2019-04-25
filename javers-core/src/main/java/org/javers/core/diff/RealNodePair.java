@@ -1,19 +1,16 @@
 package org.javers.core.diff;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.PrimitiveOrValueType;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * holds two versions of the same {@link ObjectNode}
@@ -86,12 +83,22 @@ public class RealNodePair implements NodePair {
     public List<JaversProperty> getProperties() {
         return Stream.concat(right.getManagedType().getProperties().stream(),
             left.getManagedType().getProperties().stream())
-            .distinct()
-            .collect(Collectors.toList());
+                .collect(Collectors.groupingBy(Property::getName))
+                .values()
+                .stream()
+                .map(this::getPropertyWithRightType)
+                .collect(Collectors.toList());
     }
 
     @Override
     public GlobalId getGlobalId() {
         return right.getGlobalId();
+    }
+
+    private JaversProperty getPropertyWithRightType(List<JaversProperty> javersProperties) {
+        return javersProperties.stream()
+                .filter(property -> property.getType() instanceof PrimitiveOrValueType)
+                .findAny()
+                .orElse(javersProperties.get(0));
     }
 }
