@@ -9,8 +9,8 @@ class ConcreteSubtype1WithReferenceField extends DummyAbstractSupertype {
 
     DummyEntity typeOneDummyEntity
 
-    ConcreteSubtype1WithReferenceField(int id, String name, DummyEntity sharedReference, DummyEntity typeOneDummyEntity) {
-        super(id, name, sharedReference)
+    ConcreteSubtype1WithReferenceField(int id, String sharedValue, DummyEntity sharedReference, DummyEntity typeOneDummyEntity) {
+        super(id, sharedValue, sharedReference)
         this.typeOneDummyEntity = typeOneDummyEntity
     }
 
