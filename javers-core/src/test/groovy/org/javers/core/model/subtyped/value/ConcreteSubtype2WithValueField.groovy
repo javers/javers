@@ -7,8 +7,8 @@ import org.javers.core.model.subtyped.DummyAbstractSupertype
 class ConcreteSubtype2WithValueField extends DummyAbstractSupertype{
     String concreteTypeTwoProperty
 
-    ConcreteSubtype2WithValueField(int id, String name, String concreteTypeTwoProperty) {
-        super(id, name, null)
+    ConcreteSubtype2WithValueField(int id, String sharedValue, String concreteTypeTwoProperty) {
+        super(id, sharedValue, null)
         this.concreteTypeTwoProperty = concreteTypeTwoProperty
     }
 
