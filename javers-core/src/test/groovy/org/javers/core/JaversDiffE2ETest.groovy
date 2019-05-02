@@ -516,7 +516,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         then:
         changes.size() == 3
         changes[0] instanceof ValueUpdatedChange
-        changes[0].propertyName == "name"
+        changes[0].propertyName == "sharedValue"
         changes[0].left == "Some Name"
         changes[0].right == "Some New Name"
 
