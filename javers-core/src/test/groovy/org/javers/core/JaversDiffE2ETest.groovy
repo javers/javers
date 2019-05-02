@@ -7,8 +7,14 @@ import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.diff.changetype.NewObject
 import org.javers.core.diff.changetype.ObjectRemoved
 import org.javers.core.diff.changetype.PropertyChange
+import org.javers.core.diff.changetype.ReferenceAddedChange
 import org.javers.core.diff.changetype.ReferenceChange
+import org.javers.core.diff.changetype.ReferenceRemovedChange
+import org.javers.core.diff.changetype.ReferenceUpdatedChange
+import org.javers.core.diff.changetype.ValueAddedChange
 import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.ValueRemovedChange
+import org.javers.core.diff.changetype.ValueUpdatedChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.container.ValueAdded
 import org.javers.core.examples.model.Person
@@ -18,6 +24,11 @@ import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.annotation.Id
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
+import org.javers.core.model.subtyped.DummyEntity
+import org.javers.core.model.subtyped.reference.ConcreteSubtype1WithReferenceField
+import org.javers.core.model.subtyped.reference.ConcreteSubtype2WithReferenceField
+import org.javers.core.model.subtyped.value.ConcreteSubtype1WithValueField
+import org.javers.core.model.subtyped.value.ConcreteSubtype2WithValueField
 import spock.lang.Unroll
 
 import javax.persistence.EmbeddedId
@@ -491,5 +502,62 @@ class JaversDiffE2ETest extends AbstractDiffTest {
       changes[0].affectedGlobalId.value() == SnapshotEntity.getName()+"/1"
       changes[0].left == 5
       changes[0].right == 6
+    }
+
+    def "should report which value properties were added, removed or updated for a given object"() {
+        given:
+        def javers = javers().build()
+        def object1 = new ConcreteSubtype1WithValueField(1, "Some Name", "Property one")
+        def object2 = new ConcreteSubtype2WithValueField(1, "Some New Name", "Property two")
+
+        when:
+        def changes = javers.compare(object1, object2).changes
+
+        then:
+        changes.size() == 3
+        changes[0] instanceof ValueUpdatedChange
+        changes[0].propertyName == "name"
+        changes[0].left == "Some Name"
+        changes[0].right == "Some New Name"
+
+        changes[1] instanceof ValueAddedChange
+        changes[1].propertyName == "concreteTypeTwoProperty"
+        changes[1].left == null
+        changes[1].right == "Property two"
+
+        changes[2] instanceof ValueRemovedChange
+        changes[2].propertyName == "concreteTypeOneProperty"
+        changes[2].left == "Property one"
+        changes[2].right == null
+    }
+
+    def "should report with reference properties were added, removed or updated for a given object"() {
+        given:
+        def javers = javers().build()
+        def dummyEntity = new DummyEntity(1, "Dummy Entity Name")
+        def sharedEntity = new DummyEntity(2, "New DummyEntity")
+        def object1 = new ConcreteSubtype1WithReferenceField(1, null, dummyEntity, sharedEntity)
+        def object2 = new ConcreteSubtype2WithReferenceField(1, null, sharedEntity, dummyEntity)
+
+        when:
+        def changes = javers.compare(object1, object2).changes
+
+        then:
+        changes.size() == 3
+
+        changes[0] instanceof ReferenceUpdatedChange
+        changes[0].propertyName == "sharedReference"
+        changes[0].left.toString() == "DummyEntity/1"
+        changes[0].right.toString() == "DummyEntity/2"
+
+        changes[1] instanceof ReferenceAddedChange
+        changes[1].propertyName == "typeTwoDummyEntity"
+        changes[1].left == null
+        changes[1].right.toString() == "DummyEntity/1"
+
+        changes[2] instanceof ReferenceRemovedChange
+        changes[2].propertyName == "typeOneDummyEntity"
+        changes[2].left.toString() == "DummyEntity/2"
+        changes[2].right == null
     }
 }
