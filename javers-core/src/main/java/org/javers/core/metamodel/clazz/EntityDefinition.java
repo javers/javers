@@ -1,8 +1,8 @@
 package org.javers.core.metamodel.clazz;
 
-import java.util.Optional;
 import org.javers.core.metamodel.type.EntityType;
 import java.util.List;
+import static org.javers.common.collections.Lists.immutableCopyOf;
 
 /**
  * Recipe for {@link EntityType}
@@ -11,7 +11,7 @@ import java.util.List;
  * @author bartosz walacik
  */
 public class EntityDefinition  extends ClientsClassDefinition {
-    private final Optional<String> idPropertyName;
+    private final List<String> idPropertyNames;
     private final boolean shallowReference;
 
     /**
@@ -37,16 +37,19 @@ public class EntityDefinition  extends ClientsClassDefinition {
 
     EntityDefinition(EntityDefinitionBuilder builder) {
         super(builder);
-        this.idPropertyName = builder.getIdPropertyName();
+        this.idPropertyNames = immutableCopyOf(builder.getIdPropertyNames());
         this.shallowReference = builder.isShallowReference();
     }
 
-    public boolean hasCustomId() {
-        return idPropertyName.isPresent();
+    public boolean hasExplicitId() {
+        return idPropertyNames.size() > 0;
     }
 
-    public String getIdPropertyName() {
-        return idPropertyName.get();
+    /**
+     * @return an immutable, non-null list
+     */
+    public List<String> getIdPropertyNames() {
+        return idPropertyNames;
     }
 
     public boolean isShallowReference() {

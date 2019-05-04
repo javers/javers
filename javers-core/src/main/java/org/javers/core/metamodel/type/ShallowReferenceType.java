@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.type;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -7,13 +8,13 @@ import java.util.Optional;
  * @author bartosz.walacik
  */
 public class ShallowReferenceType extends EntityType {
-    ShallowReferenceType(ManagedClass entity, JaversProperty idProperty, Optional<String> typeName) {
-        super(entity.createShallowReference(), idProperty, typeName);
+    ShallowReferenceType(ManagedClass entity, List<JaversProperty> idProperties, Optional<String> typeName) {
+        super(entity.createShallowReference(), idProperties, typeName);
     }
 
     @Override
     EntityType spawn(ManagedClass managedClass, Optional<String> typeName) {
-        return new ShallowReferenceType(managedClass, getIdProperty(), typeName);
+        return new ShallowReferenceType(managedClass, getIdProperties(), typeName);
     }
 
     @Override

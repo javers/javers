@@ -12,6 +12,8 @@ import org.javers.core.model.DummyPoint
 import spock.lang.Shared
 import spock.lang.Specification
 
+import java.time.LocalDate
+
 
 class JaversRepositoryIdE2ETest extends Specification {
     @Shared Javers javers = JaversBuilder.javers().build()
@@ -99,5 +101,32 @@ class JaversRepositoryIdE2ETest extends Specification {
         snapshot.globalId.cdoId == 1
         snapshot.getPropertyValue("entityAsId") instanceof InstanceId
         snapshot.getPropertyValue("entityAsId").value().endsWith("EntityAsId/1")
+    }
+
+    class Person {
+        @Id String name
+        @Id String surname
+        @Id LocalDate dob
+        int data
+    }
+
+    def "should support Composite Id assembled from Values"(){
+        given:
+        def first  = new Person(name: "mad", surname: "kaz", dob: LocalDate.of(2019,01,01), data: 1)
+        def second = new Person(name: "mad", surname: "kaz", dob: LocalDate.of(2019,01,01), data: 2)
+
+        when:
+        javers.commit("author", first)
+        javers.commit("author", second)
+        def snapshot = javers.getLatestSnapshot([name: "mad", surname: "kaz", dob: LocalDate.of(2019,01,01)],Person).get()
+
+        then:
+        snapshot.globalId.value().endsWith("Person/2019,1,1,mad,kaz")
+        snapshot.globalId.cdoId == "2019,1,1,mad,kaz"
+        snapshot.getPropertyValue("name") == "mad"
+        snapshot.getPropertyValue("surname") == "kaz"
+        snapshot.getPropertyValue("dob") == LocalDate.of(2019,01,01)
+        snapshot.getPropertyValue("data") == 2
+        snapshot.changed == ["data"]
     }
 }

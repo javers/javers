@@ -175,7 +175,7 @@ class TypeMapperIntegrationTest extends Specification {
         then:
         jType.class == EntityType
         jType.baseJavaClass == DummyUser
-        jType.idPropertyName == "name"
+        jType.idProperty.name == "name"
     }
 
     def "should map as Entity when a class has @EmbeddedId property annotation"(){
@@ -188,7 +188,7 @@ class TypeMapperIntegrationTest extends Specification {
         then:
         jType.class == EntityType
         jType.baseJavaClass == DummyEntityWithEmbeddedId
-        jType.idPropertyName == "point"
+        jType.idProperty.name == "point"
     }
 
     @Unroll

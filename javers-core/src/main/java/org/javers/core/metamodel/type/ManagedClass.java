@@ -7,7 +7,9 @@ import org.javers.common.validation.Validate;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import static org.javers.common.collections.Lists.immutableCopyOf;
 import static org.javers.common.exception.JaversExceptionCode.PROPERTY_NOT_FOUND;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -27,15 +29,13 @@ class ManagedClass {
         argumentsAreNotNull(baseJavaClass, managedProperties, looksLikeId, managedPropertiesFilter);
 
         this.baseJavaClass = baseJavaClass;
-        this.managedProperties = new ArrayList<>();
-        this.propertiesByName = new HashMap<>();
-        this.looksLikeId = looksLikeId;
-        this.managedPropertiesFilter = managedPropertiesFilter;
 
-        for (JaversProperty property : managedProperties) {
-            this.managedProperties.add(property);
-            propertiesByName.put(property.getName(),property);
-        }
+        this.looksLikeId = immutableCopyOf(looksLikeId);
+        this.managedPropertiesFilter = managedPropertiesFilter;
+        this.managedProperties = immutableCopyOf(managedProperties);
+
+        this.propertiesByName = new HashMap<>();
+        managedProperties.forEach(property -> propertiesByName.put(property.getName(),property));
     }
 
     static ManagedClass unknown() {
@@ -54,11 +54,11 @@ class ManagedClass {
      * returns all managed properties
      */
     List<JaversProperty> getManagedProperties() {
-        return Collections.unmodifiableList(managedProperties);
+        return managedProperties;
     }
 
     List<JaversProperty> getLooksLikeId() {
-        return Collections.unmodifiableList(looksLikeId);
+        return looksLikeId;
     }
 
     Set<String> getPropertyNames(){
@@ -83,6 +83,14 @@ class ManagedClass {
             throw new JaversException(PROPERTY_NOT_FOUND, withName, baseJavaClass.getName());
         }
         return propertiesByName.get(withName);
+    }
+
+    /**
+     * @throws JaversException PROPERTY_NOT_FOUND
+     */
+    List<JaversProperty> getProperties(List<String> withNames) {
+        Validate.argumentIsNotNull(withNames);
+        return withNames.stream().map(n -> getProperty(n)).collect(Collectors.toList());
     }
 
     boolean hasProperty(String propertyName) {

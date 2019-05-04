@@ -65,7 +65,9 @@ class TypeFactory {
     }
 
     private void saveHints(EntityType newEntityType) {
-        votes.put(newEntityType.getIdPropertyGenericType(), new EntityIdHint());
+        if (!newEntityType.hasCompositeId()) {
+            votes.put(newEntityType.getIdProperty().getGenericType(), new EntityIdHint());
+        }
     }
 
     private ValueObjectType createValueObject(ValueObjectDefinition definition, ClassScan scan) {
