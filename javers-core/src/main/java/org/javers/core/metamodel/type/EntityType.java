@@ -9,6 +9,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.property.Property;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -107,7 +108,7 @@ public class EntityType extends ManagedType {
             if (compositeId.isEmpty()) {
                 throw new JaversException(ENTITY_INSTANCE_WITH_NULL_COMPOSITE_ID, getName(), getIdPropertyNames());
             }
-            return compositeId;
+            return Collections.unmodifiableMap(compositeId);
         } else {
             Object cdoId = getIdProperty().get(instance);
             if (cdoId == null) {
