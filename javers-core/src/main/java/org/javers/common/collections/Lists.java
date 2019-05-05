@@ -33,8 +33,15 @@ public class Lists {
         return unmodifiableList(java.util.Arrays.asList(elements));
     }
 
-    public static <T> List<T> immutableListOf(Collection elements) {
-        if (elements == null) {
+    public static <T> List<T> immutableListOf(Collection<T> elements) {
+        if (elements == null || elements.size() == 0) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(new ArrayList<>(elements));
+    }
+
+    public static <T> List<T> immutableCopyOf(List<T> elements) {
+        if (elements == null || elements.size() == 0) {
             return Collections.emptyList();
         }
         return Collections.unmodifiableList(new ArrayList<>(elements));

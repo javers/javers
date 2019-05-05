@@ -6,6 +6,8 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.InstanceId;
 
 import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 class InstanceIdFactory {
     private final EntityType entityType;
@@ -33,16 +35,40 @@ class InstanceIdFactory {
     }
 
     String localIdAsString(Object dehydratedLocalId) {
-        if (isIdEntity()) {
-            EntityType idPropertyType = entityType.getIdPropertyType();
-            return idPropertyType.getInstanceIdFactory().localIdAsString(dehydratedLocalId);
+        if (dehydratedLocalId instanceof String) {
+            return (String) dehydratedLocalId;
         }
-        if (isIdValueObject()) {
-            return dehydratedLocalId.toString();
+
+        return localIdAsString(entityType.getIdProperty(), dehydratedLocalId);
+    }
+
+    private Object dehydratedLocalId(EntityType entityType, Object localId) {
+
+        if (entityType.hasCompositeId()) {
+            Map<String,?> compositeLocalId = (Map)localId;
+
+            return String.join(",", compositeLocalId
+                    .entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .map(e -> localIdAsString(entityType.getProperty(e.getKey()), e.getValue()))
+                    .collect(Collectors.toList()));
         }
-        if (isIdPrimitiveOrValue()) {
-            PrimitiveOrValueType primitiveOrValueType = entityType.getIdProperty().getType();
-            return primitiveOrValueType.smartToString(dehydratedLocalId);
+
+        return dehydratedLocalId(entityType.getIdProperty(), localId);
+    }
+
+    String localIdAsString(JaversProperty idProperty, Object dehydratedAtomicLocalId) {
+        if (idProperty.isEntityType()) {
+            EntityType idPropertyType = idProperty.getType();
+            return idPropertyType.getInstanceIdFactory().localIdAsString(dehydratedAtomicLocalId);
+        }
+        if (idProperty.isValueObjectType()) {
+            return dehydratedAtomicLocalId.toString();
+        }
+        if (idProperty.isPrimitiveOrValueType()) {
+            PrimitiveOrValueType primitiveOrValueType = idProperty.getType();
+            return primitiveOrValueType.smartToString(dehydratedAtomicLocalId);
         }
 
         throw idTypeNotSupported();
@@ -55,45 +81,40 @@ class InstanceIdFactory {
     }
 
     Type getLocalIdDehydratedType() {
-        if (isIdEntity()) {
-            EntityType idPropertyType = entityType.getIdPropertyType();
-            return idPropertyType.getIdPropertyGenericType();
-        }
-        if (isIdValueObject()) {
+        if (entityType.hasCompositeId()) {
             return String.class;
         }
-        if (isIdPrimitiveOrValue()) {
-            return entityType.getIdPropertyGenericType();
+
+        JaversProperty idProperty = entityType.getIdProperty();
+
+        if (idProperty.isEntityType()) {
+            EntityType idPropertyType = idProperty.getType();
+            return idPropertyType.getLocalIdDehydratedType();
+        }
+        if (idProperty.isValueObjectType()) {
+            return String.class;
+        }
+        if (idProperty.isPrimitiveOrValueType()) {
+            return idProperty.getGenericType();
         }
 
         throw idTypeNotSupported();
     }
 
-    private Object dehydratedLocalId(EntityType entityType, Object localId) {
-        if (isIdEntity()) {
-            EntityType idPropertyType = entityType.getIdPropertyType();
+
+    private Object dehydratedLocalId(JaversProperty idProperty, Object localId) {
+        if (idProperty.isEntityType()) {
+            EntityType idPropertyType = idProperty.getType();
             return idPropertyType.getIdOf(localId);
         }
-        if (isIdValueObject()) {
-            ValueObjectType valueObjectType = entityType.getIdPropertyType();
+        if (idProperty.isValueObjectType()) {
+            ValueObjectType valueObjectType = idProperty.getType();
             return valueObjectType.smartToString(localId);
         }
-        if (isIdPrimitiveOrValue()) {
+        if (idProperty.isPrimitiveOrValueType()) {
             return localId;
         }
 
         throw idTypeNotSupported();
-    }
-
-    private boolean isIdEntity() {
-        return entityType.getIdProperty().getType() instanceof EntityType;
-    }
-
-    private boolean isIdValueObject() {
-        return entityType.getIdProperty().getType() instanceof ValueObjectType;
-    }
-
-    private boolean isIdPrimitiveOrValue() {
-        return entityType.getIdProperty().getType() instanceof PrimitiveOrValueType;
     }
 }

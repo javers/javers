@@ -20,6 +20,8 @@ public enum JaversExceptionCode {
 
     ENTITY_INSTANCE_WITH_NULL_ID("Found Entity instance '%s' with null Id-property '%s'"),
 
+    ENTITY_INSTANCE_WITH_NULL_COMPOSITE_ID("Found Entity instance '%s' with all Id-properties %s nulled"),
+
     NOT_INSTANCE_OF("Can't create InstanceId for EntityType '%s', class '%s' bounded to EntityType is not assignable from given class '%s'"),
 
     UNDEFINED_PROPERTY(JaversException.BOOTSTRAP_ERROR + "undefined mandatory property '%s'. Define it in your classpath:javers.properties"),

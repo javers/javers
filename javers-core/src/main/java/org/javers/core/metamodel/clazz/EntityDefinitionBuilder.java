@@ -1,17 +1,23 @@
 package org.javers.core.metamodel.clazz;
 
-import java.util.Optional;
+import org.javers.common.collections.Arrays;
 import org.javers.common.validation.Validate;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Collections.*;
 
 /**
  * Fluent builder for {@link EntityDefinition},
  * allows to set all optional attributes:
- * Id-property, ignoredProperties and typeAlias, for example:
+ * Id-properties, ignoredProperties and typeAlias, for example:
  * <pre>
  * EntityDefinitionBuilder.entityDefinition(Person.class)
- *    .withIdPropertyName(idPropertyName)
+ *    .withIdPropertyName("firstName")
+ *    .withIdPropertyName("lastName")
  *    .withIgnoredProperties(ignoredProperties)
- *    .withTypeName(typeName)
+ *    .withTypeName("typeName")
  *    .build();
  *</pre>
  *
@@ -19,7 +25,7 @@ import org.javers.common.validation.Validate;
  * @author bartosz.walacik
  */
 public class EntityDefinitionBuilder extends ClientsClassDefinitionBuilder<EntityDefinitionBuilder>{
-    private Optional<String> idPropertyName = Optional.empty();
+    private List<String> idPropertyNames = new ArrayList<>();
     private boolean shallowReference;
 
     EntityDefinitionBuilder(Class<?> entity) {
@@ -32,7 +38,20 @@ public class EntityDefinitionBuilder extends ClientsClassDefinitionBuilder<Entit
 
     public EntityDefinitionBuilder withIdPropertyName(String idPropertyName) {
         Validate.argumentIsNotNull(idPropertyName);
-        this.idPropertyName = Optional.of(idPropertyName);
+        if (!idPropertyNames.contains(idPropertyName)) {
+            idPropertyNames.add(idPropertyName);
+        }
+        return this;
+    }
+
+    public EntityDefinitionBuilder withIdPropertyNames(String... idPropertyNames) {
+        Validate.argumentIsNotNull(idPropertyNames);
+        return withIdPropertyNames((List) Arrays.asList(idPropertyNames));
+    }
+
+    public EntityDefinitionBuilder withIdPropertyNames(List<String> idPropertyNames) {
+        Validate.argumentIsNotNull(idPropertyNames);
+        idPropertyNames.forEach(this::withIdPropertyName);
         return this;
     }
 
@@ -46,8 +65,8 @@ public class EntityDefinitionBuilder extends ClientsClassDefinitionBuilder<Entit
         return new EntityDefinition(this);
     }
 
-    Optional<String> getIdPropertyName() {
-        return idPropertyName;
+    List<String> getIdPropertyNames() {
+        return idPropertyNames;
     }
 
     boolean isShallowReference() {
