@@ -46,8 +46,8 @@ public class JaversGetter extends JaversMember<Method> {
     public Object getEvenIfPrivate(Object onObject) {
         try {
             return getRawMember().invoke(onObject, EMPTY_ARRAY);
-        } catch (IllegalArgumentException ie){
-            throw new JaversException(JaversExceptionCode.MISSING_PROPERTY, this, ie.getClass().getName());
+        } catch (IllegalArgumentException ie) {
+            return getOnMissingProperty(onObject);
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new JaversException(JaversExceptionCode.PROPERTY_ACCESS_ERROR,
                     this, onObject.getClass().getSimpleName(), e.getClass().getName()+": "+e.getMessage());

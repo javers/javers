@@ -35,12 +35,12 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
     public ChangeTypeAdapter(TypeMapper typeMapper) {
         this.changeTypeMap = new HashMap<>();
         this.typeMapper = typeMapper;
-        initEntry(ValueAddedChange.class);
+        initEntry(ValueChange.class);
         initEntry(ValueRemovedChange.class);
-        initEntry(ValueUpdatedChange.class);
-        initEntry(ReferenceAddedChange.class);
+        initEntry(ValueAddedChange.class);
+        initEntry(ReferenceChange.class);
         initEntry(ReferenceRemovedChange.class);
-        initEntry(ReferenceUpdatedChange.class);
+        initEntry(ReferenceAddedChange.class);
         initEntry(NewObject.class);
         initEntry(ObjectRemoved.class);
         initEntry(MapChange.class);
@@ -56,10 +56,13 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
     @Override
     public T fromJson(JsonElement json, JsonDeserializationContext context) {
         JsonObject jsonObject = (JsonObject) json;
-        String changeTypeField = jsonObject.get(CHANGE_TYPE_FIELD).getAsString();
-        Class<? extends Change> changeType = decode(changeTypeField);
+        Class<? extends Change> changeType = decode(getChangeTypeField(jsonObject));
 
         return context.deserialize(json, changeType);
+    }
+
+    String getChangeTypeField(JsonObject jsonObject) {
+        return jsonObject.get(CHANGE_TYPE_FIELD).getAsString();
     }
 
     @Override

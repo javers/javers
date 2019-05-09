@@ -13,18 +13,18 @@ import static java.util.stream.Collectors.toList;
 
 public class LiveNode extends ObjectNode<LiveCdo>{
 
-    private final Map<JaversProperty, Edge> edges = new HashMap<>();
+    private final Map<String, Edge> edges = new HashMap<>();
 
     public LiveNode(LiveCdo cdo) {
         super(cdo);
     }
 
     Edge getEdge(Property property) {
-        return edges.get(property);
+        return getEdge(property.getName());
     }
 
     Edge getEdge(String propertyName) {
-        return getManagedType().findProperty(propertyName).map(p -> getEdge(p)).orElse(null);
+        return edges.get(propertyName);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class LiveNode extends ObjectNode<LiveCdo>{
     }
 
     void addEdge(Edge edge) {
-        this.edges.put(edge.getProperty(), edge);
+        this.edges.put(edge.getProperty().getName(), edge);
     }
 
     List<LiveCdo> descendants(int maxDepth) {

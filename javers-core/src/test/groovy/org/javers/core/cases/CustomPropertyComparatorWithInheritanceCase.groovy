@@ -3,7 +3,6 @@ package org.javers.core.cases
 
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.diff.changetype.ValueUpdatedChange
 import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.property.Property
@@ -44,7 +43,7 @@ class CustomPropertyComparatorWithInheritanceCase extends Specification {
 		Optional<ValueChange> compare(SimpleValue left, SimpleValue right, GlobalId affectedId, Property property) {
 			if (left.getValue().equals(right.getValue()))
 				return Optional.empty()
-			return Optional.of(new ValueUpdatedChange(affectedId, property.name, left.getValue(), right.getValue()));
+			return Optional.of(new ValueChange(affectedId, property.name, left.getValue(), right.getValue()));
 		}
 
 		@Override

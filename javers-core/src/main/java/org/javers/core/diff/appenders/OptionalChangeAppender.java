@@ -1,23 +1,19 @@
 package org.javers.core.diff.appenders;
 
-import static org.javers.common.exception.JaversExceptionCode.UNSUPPORTED_OPTIONAL_CONTENT_TYPE;
+import org.javers.common.exception.JaversException;
+import org.javers.core.diff.NodePair;
+import org.javers.core.diff.changetype.PropertyChange;
+import org.javers.core.diff.changetype.ReferenceChange;
+import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.GlobalIdFactory;
+import org.javers.core.metamodel.type.*;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.javers.common.exception.JaversException;
-import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.diff.changetype.ReferenceUpdatedChange;
-import org.javers.core.diff.changetype.ValueUpdatedChange;
-import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.type.JaversProperty;
-import org.javers.core.metamodel.type.JaversType;
-import org.javers.core.metamodel.type.ManagedType;
-import org.javers.core.metamodel.type.OptionalType;
-import org.javers.core.metamodel.type.PrimitiveOrValueType;
-import org.javers.core.metamodel.type.TypeMapper;
+
+import static org.javers.common.exception.JaversExceptionCode.UNSUPPORTED_OPTIONAL_CONTENT_TYPE;
 
 /**
  * @author bartosz.walacik
@@ -49,14 +45,15 @@ public class OptionalChangeAppender implements PropertyChangeAppender<PropertyCh
             return null;
         }
         if (contentType instanceof ManagedType) {
-            return new ReferenceUpdatedChange(pair.getGlobalId(), property.getName(),
+            //TODO missing property
+            return new ReferenceChange(pair.getGlobalId(), property.getName(),
                     first(pair.getLeftReferences(property)),
                     first(pair.getRightReferences(property)),
                     flat(pair.getLeftPropertyValue(property)),
                     flat(pair.getRightPropertyValue(property)));
         }
         if (contentType instanceof PrimitiveOrValueType) {
-            return new ValueUpdatedChange(pair.getGlobalId(), property.getName(), leftOptional, rightOptional);
+            return new ValueChange(pair.getGlobalId(), property.getName(), leftOptional, rightOptional);
         }
 
         throw new JaversException(UNSUPPORTED_OPTIONAL_CONTENT_TYPE, contentType);

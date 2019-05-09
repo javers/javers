@@ -1,8 +1,6 @@
 package org.javers.core.json.typeadapter.change;
 
 import org.javers.common.collections.Lists;
-import org.javers.core.diff.changetype.ReferenceRemovedChange;
-import org.javers.core.diff.changetype.ReferenceUpdatedChange;
 import org.javers.core.pico.InstantiatingModule;
 import org.picocontainer.MutablePicoContainer;
 
@@ -25,14 +23,10 @@ public class ChangeTypeAdaptersModule extends InstantiatingModule {
                 ListChangeTypeAdapter.class,
                 SetChangeTypeAdapter.class,
                 NewObjectTypeAdapter.class,
-                ValueAddedTypeAdapter.class,
-                ValueRemovedTypeAdapter.class,
-                ValueUpdatedTypeAdapter.class,
+                ValueChangeTypeAdapter.class,
                 ObjectRemovedTypeAdapter.class,
                 ChangeTypeAdapter.class,
-                ReferenceUpdatedTypeAdapter.class,
-            ReferenceAddedTypeAdapter.class,
-            ReferenceRemovedTypeAdapter.class
+                ReferenceChangeTypeAdapter.class
         );
     }
 }

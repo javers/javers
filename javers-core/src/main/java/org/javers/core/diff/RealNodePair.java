@@ -1,16 +1,18 @@
 package org.javers.core.diff;
 
+import com.google.common.collect.Streams;
+import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.ManagedType;
-import org.javers.core.metamodel.type.PrimitiveOrValueType;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static java.util.Collections.unmodifiableList;
 
 /**
  * holds two versions of the same {@link ObjectNode}
@@ -79,26 +81,32 @@ public class RealNodePair implements NodePair {
         return left;
     }
 
+    boolean sameClass() {
+        return right.getManagedType().getBaseJavaType() == left.getManagedType().getBaseJavaType();
+    }
+
     @Override
     public List<JaversProperty> getProperties() {
-        return Stream.concat(right.getManagedType().getProperties().stream(),
-            left.getManagedType().getProperties().stream())
-                .collect(Collectors.groupingBy(Property::getName))
-                .values()
-                .stream()
-                .map(this::getPropertyWithRightType)
-                .collect(Collectors.toList());
+        if (sameClass()) {
+            return getManagedType().getProperties();
+        }
+        else {
+            return Collections.unmodifiableList(getPropertiesFromBothSides());
+        }
+    }
+
+    private List<JaversProperty> getPropertiesFromBothSides() {
+        Set<String> leftNames = left.getManagedType().getProperties().stream()
+                .map(it -> it.getName()).collect(Collectors.toSet());
+
+
+        return Streams.concat(left.getManagedType().getProperties().stream(),
+                              right.getManagedType().getProperties().stream().filter(it -> !leftNames.contains(it.getName())))
+                       .collect(Collectors.toList());
     }
 
     @Override
     public GlobalId getGlobalId() {
-        return right.getGlobalId();
-    }
-
-    private JaversProperty getPropertyWithRightType(List<JaversProperty> javersProperties) {
-        return javersProperties.stream()
-                .filter(property -> property.getType() instanceof PrimitiveOrValueType)
-                .findAny()
-                .orElse(javersProperties.get(0));
+        return left.getGlobalId();
     }
 }

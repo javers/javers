@@ -1,11 +1,9 @@
 package org.javers.core.diff.appenders;
 
-import java.util.Optional;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ReferenceAddedChange;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ReferenceRemovedChange;
-import org.javers.core.diff.changetype.ReferenceUpdatedChange;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.MissingProperty;
 import org.javers.core.metamodel.type.JaversProperty;
@@ -13,6 +11,7 @@ import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author bartosz walacik
@@ -40,7 +39,7 @@ class ReferenceChangeAppender implements PropertyChangeAppender<ReferenceChange>
             return null;
         }
 
-        return new ReferenceUpdatedChange(pair.getGlobalId(), property.getName(), leftId, rightId,
-            pair.getLeftPropertyValue(property), pair.getRightPropertyValue(property), Optional.empty());
+        return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId,
+            pair.getLeftPropertyValue(property), pair.getRightPropertyValue(property));
     }
 }

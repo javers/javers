@@ -4,7 +4,6 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.ValueAddedChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.changetype.ValueRemovedChange;
-import org.javers.core.diff.changetype.ValueUpdatedChange;
 import org.javers.core.metamodel.property.MissingProperty;
 import org.javers.core.metamodel.type.*;
 
@@ -46,7 +45,7 @@ class ValueChangeAppender implements PropertyChangeAppender<ValueChange> {
             }
         }
 
-        return new ValueUpdatedChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);
+        return new ValueChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);
     }
 
     private boolean isIdProperty(NodePair nodePair, JaversProperty property){

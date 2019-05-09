@@ -51,7 +51,7 @@ class ManagedClass {
     }
 
     /**
-     * returns all managed properties
+     * Returns all managed properties, unmodifiable list
      */
     List<JaversProperty> getManagedProperties() {
         return Collections.unmodifiableList(managedProperties);

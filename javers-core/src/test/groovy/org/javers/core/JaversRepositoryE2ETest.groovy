@@ -5,11 +5,9 @@ import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.diff.changetype.ReferenceChange
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.diff.changetype.ValueUpdatedChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
 import org.javers.core.metamodel.annotation.TypeName
-import org.javers.core.metamodel.type.ValueType
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.repository.api.JaversRepository
@@ -1204,6 +1202,6 @@ class JaversRepositoryE2ETest extends Specification {
       then:
       println changes.prettyPrint()
       changes.size() == 5
-      changes[0] instanceof ValueUpdatedChange
+      changes[0] instanceof ValueChange
     }
 }

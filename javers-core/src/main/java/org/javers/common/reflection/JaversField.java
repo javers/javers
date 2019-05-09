@@ -2,8 +2,10 @@ package org.javers.common.reflection;
 
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+
 import static org.javers.common.string.ToStringBuilder.typeName;
 
 /**
@@ -29,8 +31,8 @@ public class JaversField extends JaversMember<Field> {
     public Object getEvenIfPrivate(Object onObject) {
         try {
             return getRawMember().get(onObject);
-        } catch (IllegalArgumentException ie){
-            throw new JaversException(JaversExceptionCode.MISSING_PROPERTY, this, ie.getClass().getName());
+        } catch (IllegalArgumentException ie) {
+            return getOnMissingProperty(onObject);
         } catch (IllegalAccessException e) {
             throw new JaversException(JaversExceptionCode.PROPERTY_ACCESS_ERROR,
                   this, onObject.getClass().getSimpleName(), e.getClass().getName()+": "+e.getMessage());
