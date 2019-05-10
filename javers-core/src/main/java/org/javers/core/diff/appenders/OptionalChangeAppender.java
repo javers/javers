@@ -6,7 +6,6 @@ import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.*;
 
 import java.util.List;
@@ -20,11 +19,9 @@ import static org.javers.common.exception.JaversExceptionCode.UNSUPPORTED_OPTION
  */
 public class OptionalChangeAppender implements PropertyChangeAppender<PropertyChange> {
 
-    private final GlobalIdFactory globalIdFactory;
     private final TypeMapper typeMapper;
 
-    public OptionalChangeAppender(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
-        this.globalIdFactory = globalIdFactory;
+    public OptionalChangeAppender(TypeMapper typeMapper) {
         this.typeMapper = typeMapper;
     }
 
@@ -45,15 +42,14 @@ public class OptionalChangeAppender implements PropertyChangeAppender<PropertyCh
             return null;
         }
         if (contentType instanceof ManagedType) {
-            //TODO missing property
-            return new ReferenceChange(pair.getGlobalId(), property.getName(),
+            return ReferenceChange.create(pair.getGlobalId(), property.getName(),
                     first(pair.getLeftReferences(property)),
                     first(pair.getRightReferences(property)),
                     flat(pair.getLeftPropertyValue(property)),
                     flat(pair.getRightPropertyValue(property)));
         }
         if (contentType instanceof PrimitiveOrValueType) {
-            return new ValueChange(pair.getGlobalId(), property.getName(), leftOptional, rightOptional);
+            return ValueChange.create(pair.getGlobalId(), property.getName(), leftOptional, rightOptional);
         }
 
         throw new JaversException(UNSUPPORTED_OPTIONAL_CONTENT_TYPE, contentType);

@@ -3,21 +3,21 @@ package org.javers.core.json.typeadapter.change
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
-import org.javers.core.diff.changetype.ValueAddedChange
 import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.diff.changetype.ValueRemovedChange
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters
 import org.javers.core.model.DummyUser
+import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import spock.lang.Specification
 
-import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
 import static org.javers.core.GlobalIdTestBuilder.instanceId
+import static org.javers.core.JaversTestBuilder.javersTestAssembly
+import static org.javers.core.diff.changetype.ValueChange.ValueAddedChange
+import static org.javers.core.diff.changetype.ValueChange.ValueRemovedChange
+import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
 
 /**

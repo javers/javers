@@ -24,6 +24,7 @@ import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.MappingStyle.BEAN
 import static org.javers.core.MappingStyle.FIELD
+import static org.javers.core.diff.changetype.ValueChange.*
 import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition
 import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.valueObjectDefinition
 import static org.javers.core.model.DummyUser.Sex.FEMALE
@@ -491,14 +492,14 @@ class JaversDiffE2ETest extends AbstractDiffTest {
     }
 
     @TypeName("ClassWithValue")
-    class Class1WithValue {
+    static class Class1WithValue {
         @Id int id
         String sharedValue
         String firstProperty
     }
 
     @TypeName("ClassWithValue")
-    class Class2WithValue {
+    static class Class2WithValue {
         @Id int id
         String sharedValue
         String secondProperty
@@ -513,6 +514,8 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         when:
         def diff = javers.compare(object1, object2)
 
+        println diff.prettyPrint()
+
         then:
         diff.changes.size() == 3
 
@@ -521,13 +524,12 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         vChange.left == "Some Name"
         vChange.right == "Some New Name"
 
-        def aChange = diff.changes.find{it.class == ValueAddedChange}
-        aChange instanceof ValueAddedChange
+        def aChange = diff.changes.find{it.class == ValueChange.ValueAddedChange}
         aChange.propertyName == "secondProperty"
         aChange.left == null
         aChange.right == "two"
 
-        def rChange = diff.changes.find{it.class == ValueRemovedChange}
+        def rChange = diff.changes.find{it.class == ValueChange.ValueRemovedChange}
         rChange.propertyName == "firstProperty"
         rChange.left == "one"
         rChange.right == null
@@ -555,6 +557,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
         when:
         def diff = javers.compare(object1, object2)
+        println diff.prettyPrint()
         def changes = diff.getChangesByType(PropertyChange)
 
         then:
@@ -565,12 +568,12 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         vChange.left.value().endsWith "SnapshotEntity/1"
         vChange.right.value().endsWith "SnapshotEntity/2"
 
-        def aChange = changes.find{it.class == ReferenceAddedChange}
+        def aChange = changes.find{it.class == ReferenceChange.ReferenceAddedChange}
         aChange.propertyName == "secondRef"
         aChange.left == null
         aChange.right.value().endsWith "SnapshotEntity/22"
 
-        def rChange = changes.find{it.class == ReferenceRemovedChange}
+        def rChange = changes.find{it.class == ReferenceChange.ReferenceRemovedChange}
         rChange.propertyName == "firstRef"
         rChange.left.value().endsWith "SnapshotEntity/21"
         rChange.right == null

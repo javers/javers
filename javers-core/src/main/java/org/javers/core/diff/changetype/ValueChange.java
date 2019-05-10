@@ -4,6 +4,7 @@ import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.property.MissingProperty;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -17,8 +18,15 @@ public class ValueChange extends PropertyChange {
     private final Atomic left;
     private final Atomic right;
 
-    public ValueChange(GlobalId affectedCdoId, String propertyName, Object leftValue, Object rightValue) {
-        this(affectedCdoId, propertyName, leftValue, rightValue, Optional.empty());
+    public static ValueChange create(GlobalId affectedCdoId, String propertyName, Object leftValue, Object rightValue) {
+        if (MissingProperty.INSTANCE == leftValue) {
+            return new ValueAddedChange(affectedCdoId, propertyName, rightValue, Optional.empty());
+        }
+        if (MissingProperty.INSTANCE == rightValue) {
+            return new ValueRemovedChange(affectedCdoId, propertyName, leftValue, Optional.empty());
+
+        }
+        return new ValueChange(affectedCdoId, propertyName, leftValue, rightValue, Optional.empty());
     }
 
     public ValueChange(GlobalId affectedCdoId, String propertyName, Object leftValue, Object rightValue, Optional<CommitMetadata> commitMetadata) {
@@ -61,5 +69,35 @@ public class ValueChange extends PropertyChange {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getLeft(), getRight());
+    }
+
+    public static class ValueRemovedChange extends ValueChange {
+
+        public ValueRemovedChange(GlobalId affectedCdoId, String propertyName, Object left, Optional<CommitMetadata> commitMetadata) {
+            super(affectedCdoId, propertyName, left, null, commitMetadata);
+        }
+
+        @Override
+        public String prettyPrint(final PrettyValuePrinter valuePrinter) {
+            Validate.argumentIsNotNull(valuePrinter);
+
+            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) + " was removed, value " +
+                   valuePrinter.formatWithQuotes(getLeft());
+        }
+    }
+
+    public static class ValueAddedChange extends ValueChange {
+
+        public ValueAddedChange(GlobalId affectedCdoId, String propertyName, Object right, Optional<CommitMetadata> commitMetadata) {
+            super(affectedCdoId, propertyName, null, right, commitMetadata);
+        }
+
+        @Override
+        public String prettyPrint(final PrettyValuePrinter valuePrinter) {
+            Validate.argumentIsNotNull(valuePrinter);
+
+            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) + " was added with value " +
+                   valuePrinter.formatWithQuotes(getRight());
+        }
     }
 }

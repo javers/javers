@@ -36,8 +36,8 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
         this.changeTypeMap = new HashMap<>();
         this.typeMapper = typeMapper;
         initEntry(ValueChange.class);
-        initEntry(ValueRemovedChange.class);
-        initEntry(ValueAddedChange.class);
+        initEntry(ValueChange.ValueRemovedChange.class);
+        initEntry(ValueChange.ValueAddedChange.class);
         initEntry(ReferenceChange.class);
         initEntry(ReferenceRemovedChange.class);
         initEntry(ReferenceAddedChange.class);

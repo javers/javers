@@ -8,9 +8,12 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.javers.repository.jql.JqlQuery;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static org.javers.common.validation.Validate.argumentIsNotNull;
 
 /**
  * Convenient wrapper for the list of Changes returned by {@link Javers#findChanges(JqlQuery)}.
@@ -91,7 +94,7 @@ public class Changes extends AbstractList<Change> {
             result.add(new ChangesByCommit(k, v, valuePrinter));
         });
 
-        return Collections.unmodifiableList(result);
+        return unmodifiableList(result);
     }
 
     /**
@@ -112,7 +115,7 @@ public class Changes extends AbstractList<Change> {
             result.add(new ChangesByObject(k, v, valuePrinter));
         });
 
-        return Collections.unmodifiableList(result);
+        return unmodifiableList(result);
     }
 
     @Override
@@ -123,6 +126,12 @@ public class Changes extends AbstractList<Change> {
     @Override
     public int size() {
         return changes.size();
+    }
+
+    public <C extends Change> List<C> getChangesByType(final Class<C> type) {
+        argumentIsNotNull(type);
+        return (List) unmodifiableList(
+                changes.stream().filter(input -> type.isAssignableFrom(input.getClass())).collect(Collectors.toList()));
     }
 
     /**

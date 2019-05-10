@@ -26,12 +26,6 @@ class ReferenceChangeAppender implements PropertyChangeAppender<ReferenceChange>
 
     @Override
     public ReferenceChange calculateChanges(NodePair pair, JaversProperty property) {
-        if(pair.getLeftPropertyValue(property) instanceof MissingProperty){
-            return new ReferenceAddedChange(pair.getGlobalId(), property.getName(), Optional.empty(), pair.getRightReference(property), pair.getRight());
-        } else if(pair.getRightPropertyValue(property) instanceof MissingProperty) {
-            return new ReferenceRemovedChange(pair.getGlobalId(), property.getName(), Optional.empty(), pair.getLeftReference(property), pair.getLeft());
-        }
-
         GlobalId leftId = pair.getLeftReference(property);
         GlobalId rightId = pair.getRightReference(property);
 
@@ -39,7 +33,6 @@ class ReferenceChangeAppender implements PropertyChangeAppender<ReferenceChange>
             return null;
         }
 
-        return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId,
-            pair.getLeftPropertyValue(property), pair.getRightPropertyValue(property));
+        return ReferenceChange.create(pair.getGlobalId(), property.getName(), leftId, rightId, pair.getLeftPropertyValue(property), pair.getRightPropertyValue(property));
     }
 }

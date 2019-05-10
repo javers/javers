@@ -36,7 +36,7 @@ public class CustomBigDecimalComparator implements CustomPropertyComparator<BigD
             return Optional.empty();
         }
 
-        return Optional.of(new ValueChange(affectedId, property.getName(), left, right));
+        return Optional.of(ValueChange.create(affectedId, property.getName(), left, right));
     }
 
     @Override

@@ -8,16 +8,14 @@ import org.javers.common.collections.Lists;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitMetadata;
-import org.javers.core.diff.changetype.ValueAddedChange;
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.diff.changetype.ValueRemovedChange;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.List;
-import java.util.Optional;
 
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.javers.core.diff.changetype.ValueChange.ValueAddedChange;
+import static org.javers.core.diff.changetype.ValueChange.ValueRemovedChange;
 
 class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
     private static final String LEFT_VALUE_FIELD = "left";
@@ -41,10 +39,10 @@ class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
             return new ValueChange(stub.id, stub.getPropertyName(), leftValue, rightValue, ofNullable(commitMetadata));
         }
         if (getChangeTypeField(jsonObject).equals("ValueAddedChange")) {
-            return new ValueAddedChange(stub.id, stub.getPropertyName(), rightValue);
+            return new ValueAddedChange(stub.id, stub.getPropertyName(), rightValue, ofNullable(commitMetadata));
         }
         if (getChangeTypeField(jsonObject).equals("ValueRemovedChange")) {
-            return new ValueRemovedChange(stub.id, stub.getPropertyName(), leftValue);
+            return new ValueRemovedChange(stub.id, stub.getPropertyName(), leftValue, ofNullable(commitMetadata));
         }
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
     }
