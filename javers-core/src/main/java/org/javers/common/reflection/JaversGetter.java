@@ -72,11 +72,6 @@ public class JaversGetter extends JaversMember<Method> {
         return getterNameToFieldName(name());
     }
 
-    @Override
-    public String toString() {
-        return "Getter " + typeName(getGenericResolvedType())+" " + name() +", declared in " +getDeclaringClass().getSimpleName();
-    }
-
     private Optional<Method> findSetterForGetter(Method getter) {
         Class<?> clazz = getter.getDeclaringClass();
         String setterName = setterNameForGetterName(getter.getName());
@@ -109,5 +104,10 @@ public class JaversGetter extends JaversMember<Method> {
         }
 
         throw new IllegalArgumentException("Name {"+getterName+"} is not a getter name");
+    }
+
+    @Override
+    public String memberType() {
+        return "Getter";
     }
 }

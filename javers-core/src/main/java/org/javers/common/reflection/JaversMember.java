@@ -55,22 +55,22 @@ public abstract class JaversMember<T extends Member> {
         return rawMember;
     }
 
-    public Type getGenericResolvedType(){
-        if (resolvedReturnType.isPresent()){
+    public Type getGenericResolvedType() {
+        if (resolvedReturnType.isPresent()) {
             return resolvedReturnType.get();
         }
         return getRawGenericType();
     }
 
-    public Class<?> getDeclaringClass(){
+    public Class<?> getDeclaringClass() {
         return rawMember.getDeclaringClass();
     }
 
-    public String name(){
+    public String name() {
         return rawMember.getName();
     }
 
-    public String propertyName(){
+    public String propertyName() {
         return rawMember.getName();
     }
 
@@ -91,12 +91,12 @@ public abstract class JaversMember<T extends Member> {
     public abstract void setEvenIfPrivate(Object target, Object value);
 
     void setAccessibleIfNecessary(Member rawMember) {
-        if(!isPublic(rawMember)) {
-            ((AccessibleObject)rawMember).setAccessible(true); //that's Java Reflection API ...
+        if (!isPublic(rawMember)) {
+            ((AccessibleObject) rawMember).setAccessible(true); //that's Java Reflection API ...
         }
     }
 
-    private boolean isPublic(Member member){
+    private boolean isPublic(Member member) {
         return Modifier.isPublic(member.getModifiers()) && Modifier.isPublic(member.getDeclaringClass().getModifiers());
     }
 
@@ -121,4 +121,6 @@ public abstract class JaversMember<T extends Member> {
 
         return mirror.map(s -> s.getEvenIfPrivate(onObject)).orElse(MissingProperty.INSTANCE);
     }
+
+    public abstract String memberType();
 }

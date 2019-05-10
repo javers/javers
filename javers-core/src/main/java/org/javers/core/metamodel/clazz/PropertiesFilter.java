@@ -1,9 +1,8 @@
 package org.javers.core.metamodel.clazz;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import static org.javers.common.collections.Lists.immutableCopyOf;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 public class PropertiesFilter {
@@ -12,15 +11,15 @@ public class PropertiesFilter {
 
     public PropertiesFilter(List<String> includedProperties, List<String> ignoredProperties) {
         argumentsAreNotNull(ignoredProperties, includedProperties);
-        this.includedProperties = new ArrayList<>(includedProperties);
-        this.ignoredProperties = new ArrayList<>(ignoredProperties);
+        this.includedProperties = immutableCopyOf(includedProperties);
+        this.ignoredProperties = immutableCopyOf(ignoredProperties);
     }
 
     public List<String> getIgnoredProperties() {
-        return Collections.unmodifiableList(ignoredProperties);
+        return ignoredProperties;
     }
 
     public List<String> getIncludedProperties() {
-        return Collections.unmodifiableList(includedProperties);
+        return includedProperties;
     }
 }
