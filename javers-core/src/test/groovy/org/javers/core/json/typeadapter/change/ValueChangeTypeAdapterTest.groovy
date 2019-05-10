@@ -13,6 +13,7 @@ import spock.lang.Unroll
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+import static java.util.Optional.empty
 import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.diff.changetype.ValueChange.ValueAddedChange
@@ -45,9 +46,9 @@ class ValueChangeTypeAdapterTest extends Specification {
         where:
         valueChangeType  << [ValueChange, ValueAddedChange, ValueRemovedChange]
         change << [
-                {id -> new ValueChange(id, "flag", true, false)},
-                {id -> new ValueAddedChange(id, "flag", true)},
-                {id -> new ValueRemovedChange(id, "flag", true)}
+                {id -> new ValueChange(id, "flag", true, false, empty())},
+                {id -> new ValueAddedChange(id, "flag", true, empty())},
+                {id -> new ValueRemovedChange(id, "flag", true, empty())}
         ]
         expectedLeft <<  [true,  null, true]
         expectedRight << [false, true, null]

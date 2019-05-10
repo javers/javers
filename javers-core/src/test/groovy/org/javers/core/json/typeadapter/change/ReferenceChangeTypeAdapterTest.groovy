@@ -4,9 +4,7 @@ package org.javers.core.json.typeadapter.change
 import groovy.json.JsonSlurper
 import org.javers.common.reflection.ReflectionUtil
 import org.javers.core.diff.Change
-import org.javers.core.diff.changetype.ReferenceAddedChange
 import org.javers.core.diff.changetype.ReferenceChange
-import org.javers.core.diff.changetype.ReferenceRemovedChange
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.model.DummyUser
 import spock.lang.Specification
@@ -83,7 +81,7 @@ class ReferenceChangeTypeAdapterTest extends Specification {
         change.propertyName  == "dummyUserDetails"
 
         where:
-        changeType  << [ReferenceChange, ReferenceAddedChange, ReferenceRemovedChange]
+        changeType  << [ReferenceChange, ReferenceChange.ReferenceAddedChange, ReferenceChange.ReferenceRemovedChange]
         expectedLeft << [
                 [ cdoId: 1, entity: "org.javers.core.model.DummyUserDetails"],
                 null,

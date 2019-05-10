@@ -39,8 +39,8 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
         initEntry(ValueChange.ValueRemovedChange.class);
         initEntry(ValueChange.ValueAddedChange.class);
         initEntry(ReferenceChange.class);
-        initEntry(ReferenceRemovedChange.class);
-        initEntry(ReferenceAddedChange.class);
+        initEntry(ReferenceChange.ReferenceRemovedChange.class);
+        initEntry(ReferenceChange.ReferenceAddedChange.class);
         initEntry(NewObject.class);
         initEntry(ObjectRemoved.class);
         initEntry(MapChange.class);

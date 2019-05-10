@@ -1,17 +1,13 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.ReferenceAddedChange;
 import org.javers.core.diff.changetype.ReferenceChange;
-import org.javers.core.diff.changetype.ReferenceRemovedChange;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.property.MissingProperty;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
 import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author bartosz walacik

@@ -43,7 +43,7 @@ class CustomPropertyComparatorWithInheritanceCase extends Specification {
 		Optional<ValueChange> compare(SimpleValue left, SimpleValue right, GlobalId affectedId, Property property) {
 			if (left.getValue().equals(right.getValue()))
 				return Optional.empty()
-			return Optional.of(new ValueChange(affectedId, property.name, left.getValue(), right.getValue()));
+			return Optional.of(new ValueChange(affectedId, property.name, left.getValue(), right.getValue(), Optional.empty()))
 		}
 
 		@Override

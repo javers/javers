@@ -39,10 +39,10 @@ class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
             return new ReferenceChange(stub.id, stub.getPropertyName(), leftRef, rightRef, null, null, ofNullable(commitMetadata));
         }
         if (getChangeTypeField(jsonObject).equals("ReferenceAddedChange")) {
-            return new ReferenceAddedChange(stub.id, stub.getPropertyName(), ofNullable(commitMetadata), rightRef, null);
+            return new ReferenceChange.ReferenceAddedChange(stub.id, stub.getPropertyName(), rightRef, null, ofNullable(commitMetadata));
         }
         if (getChangeTypeField(jsonObject).equals("ReferenceRemovedChange")) {
-            return new ReferenceRemovedChange(stub.id, stub.getPropertyName(), ofNullable(commitMetadata), leftRef, null);
+            return new ReferenceChange.ReferenceRemovedChange(stub.id, stub.getPropertyName(), leftRef, null, ofNullable(commitMetadata));
         }
         throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
 
@@ -60,6 +60,6 @@ class ReferenceChangeTypeAdapter extends ChangeTypeAdapter<ReferenceChange> {
 
     @Override
     public List<Class> getValueTypes() {
-        return Lists.asList(ReferenceChange.class, ReferenceAddedChange.class, ReferenceRemovedChange.class);
+        return Lists.asList(ReferenceChange.class, ReferenceChange.ReferenceAddedChange.class, ReferenceChange.ReferenceRemovedChange.class);
     }
 }
