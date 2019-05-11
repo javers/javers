@@ -118,7 +118,13 @@ class JaversRepositoryIdE2ETest extends Specification {
         when:
         javers.commit("author", first)
         javers.commit("author", second)
-        def snapshot = javers.getLatestSnapshot([name: "mad", surname: "kaz", dob: LocalDate.of(2019,01,01)],Person).get()
+        def snapshot = javers.getLatestSnapshot(
+                [
+                    name: "mad",
+                    surname: "kaz",
+                    dob: LocalDate.of(2019,01,01)
+                ],
+                Person).get()
 
         then:
         snapshot.globalId.value().endsWith("Person/2019,1,1,mad,kaz")
