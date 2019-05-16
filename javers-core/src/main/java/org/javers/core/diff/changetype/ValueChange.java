@@ -21,20 +21,29 @@ public class ValueChange extends PropertyChange {
     }
 
     public Object getLeft() {
-        return left.unwrapAndSanitize();
+        return left.unwrap();
     }
 
     public Object getRight() {
-        return right.unwrapAndSanitize();
+        return right.unwrap();
     }
 
     @Override
     public String prettyPrint(PrettyValuePrinter valuePrinter) {
         Validate.argumentIsNotNull(valuePrinter);
 
-        return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
-            " changed from " + valuePrinter.formatWithQuotes(left.unwrap()) + " to " +
-                               valuePrinter.formatWithQuotes(right.unwrap());
+        if (isPropertyAdded()) {
+            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                    " property with value " + valuePrinter.formatWithQuotes(right.unwrap()) +" added";
+        }
+        else if (isPropertyRemoved()) {
+            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                    " property with value " + valuePrinter.formatWithQuotes(left.unwrap()) +" removed";
+        } else {
+            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                " value changed from " + valuePrinter.formatWithQuotes(left.unwrap()) + " to " +
+                                   valuePrinter.formatWithQuotes(right.unwrap());
+        }
     }
 
     @Override

@@ -513,7 +513,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         when:
         def diff = javers.compare(object1, object2)
 
-
         then:
         println diff.prettyPrint()
         diff.changes.size() == 3

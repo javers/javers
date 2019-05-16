@@ -38,15 +38,11 @@ public class Atomic implements Serializable {
         return Primitives.isJsonBasicType(value);
     }
 
-    public Object unwrapAndSanitize() {
-        return MissingProperty.INSTANCE == value ? null : value;
-    }
-
     /**
      * original Value
      */
     public Object unwrap() {
-        return value;
+        return MissingProperty.INSTANCE == value ? null : value;
     }
 
     @Override

@@ -70,9 +70,18 @@ public class ReferenceChange extends PropertyChange {
     public String prettyPrint(PrettyValuePrinter valuePrinter) {
         Validate.argumentIsNotNull(valuePrinter);
 
-        return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
-                " changed from " + valuePrinter.formatWithQuotes(getLeft()) + " to " +
-                valuePrinter.formatWithQuotes(getRight());
+        if (isPropertyAdded()) {
+            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                    " property with reference " + valuePrinter.formatWithQuotes(getRight()) +" added";
+        }
+        else if (isPropertyRemoved()) {
+            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                    " property with reference " + valuePrinter.formatWithQuotes(getLeft()) +" removed";
+        } else {
+            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                    " reference changed from " + valuePrinter.formatWithQuotes(getLeft()) + " to " +
+                    valuePrinter.formatWithQuotes(getRight());
+        }
     }
 
     @Override
