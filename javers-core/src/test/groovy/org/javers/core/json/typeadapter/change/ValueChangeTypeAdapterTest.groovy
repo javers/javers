@@ -3,22 +3,19 @@ package org.javers.core.json.typeadapter.change
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
+import org.javers.core.diff.changetype.PropertyChange
+import org.javers.core.diff.changetype.PropertyChangeType
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
 import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters
 import org.javers.core.model.DummyUser
-import spock.lang.Specification
-import spock.lang.Unroll
-
 import java.time.LocalDate
 import java.time.LocalDateTime
+import spock.lang.Specification
 
-import static java.util.Optional.empty
-import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.core.diff.changetype.ValueChange.ValueAddedChange
-import static org.javers.core.diff.changetype.ValueChange.ValueRemovedChange
 import static org.javers.core.json.builder.ChangeTestBuilder.valueChange
+import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
 
 /**
@@ -26,44 +23,34 @@ import static org.javers.core.model.DummyUserWithValues.dummyUserWithDate
  */
 class ValueChangeTypeAdapterTest extends Specification {
 
-    @Unroll
-    def "should serialize #valueChangeType.simpleName" () {
+    def "should serialize ValueChange" () {
         given:
-        def jsonConverter = javersTestAssembly().jsonConverter
-        def globalId = instanceId(new DummyUser(name:"kaz"))
+        JsonConverter jsonConverter = javersTestAssembly().jsonConverter
+        ValueChange change = valueChange(new DummyUser(name:"kaz"),"flag",true,false)
 
         when:
-        def json = new JsonSlurper().parseText( jsonConverter.toJson(change(globalId)) )
+        String jsonText = jsonConverter.toJson(change)
 
         then:
-        println "valueChange JSON: " + json
+        def json = new JsonSlurper().parseText(jsonText)
         json.property == "flag"
-        json.changeType == valueChangeType.simpleName
+        json.changeType == "ValueChange"
         json.globalId
-        json.left == expectedLeft
-        json.right == expectedRight
-
-        where:
-        valueChangeType  << [ValueChange, ValueAddedChange, ValueRemovedChange]
-        change << [
-                {id -> new ValueChange(id, "flag", true, false, empty())},
-                {id -> new ValueAddedChange(id, "flag", true, empty())},
-                {id -> new ValueRemovedChange(id, "flag", true, empty())}
-        ]
-        expectedLeft <<  [true,  null, true]
-        expectedRight << [false, true, null]
+        json.left == true
+        json.right == false
+        json.propertyChangeType == 'VALUE_CHANGED'
     }
 
-    @Unroll
-    def "should deserialize #valueChangeType.simpleName"() {
+    def "should deserialize ValueChange"() {
         given:
             JsonConverter jsonConverter = javersTestAssembly().jsonConverter
             def json = new JsonBuilder()
             json {
                 property  "bigFlag"
-                changeType valueChangeType.simpleName
-                left expectedLeft
-                right expectedRight
+                changeType "ValueChange"
+                propertyChangeType "VALUE_CHANGED"
+                left null
+                right true
                 globalId {
                     entity "org.javers.core.model.DummyUser"
                     cdoId  "kaz"
@@ -74,16 +61,11 @@ class ValueChangeTypeAdapterTest extends Specification {
             ValueChange change  = jsonConverter.fromJson(json.toString(),Change)
 
         then:
-            change.class == valueChangeType
             change.affectedGlobalId == instanceId("kaz",DummyUser)
-            change.left == expectedLeft
-            change.right == expectedRight
+            change.left == null
+            change.right == true
             change.propertyName == "bigFlag"
-
-        where:
-        valueChangeType  << [ValueChange, ValueAddedChange, ValueRemovedChange]
-        expectedLeft <<  [true,  null, true]
-        expectedRight << [false, true, null]
+            change.changeType == PropertyChangeType.VALUE_CHANGED
     }
 
     def "should serialize ValueChange with Values using custom TypeAdapter" () {

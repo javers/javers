@@ -3,9 +3,9 @@ package org.javers.core.cases
 import org.javers.common.collections.Lists
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.ListCompareAlgorithm
+import org.javers.core.diff.changetype.PropertyChangeMetadata
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.custom.CustomPropertyComparator
-import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.property.Property
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -27,10 +27,10 @@ class CustomPropertyComparatorCase extends Specification {
     }
 
     class PersonComparator implements CustomPropertyComparator<Person, ValueChange> {
-        Optional<ValueChange> compare(Person left, Person right, GlobalId affectedId, Property property) {
+        Optional<ValueChange> compare(Person left, Person right, PropertyChangeMetadata metadata, Property property) {
             if (left.name.equals(right.name))
                 return Optional.empty()
-            return Optional.of(new ValueChange(affectedId, "entity/name", left.name, right.name));
+            return Optional.of(new ValueChange(metadata, left.name, right.name));
         }
 
         @Override

@@ -2,7 +2,9 @@ package org.javers.core
 
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
+import org.javers.core.diff.NodePair
 import org.javers.core.diff.changetype.PropertyChange
+import org.javers.core.diff.changetype.PropertyChangeMetadata
 import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.diff.custom.CustomPropertyComparator
@@ -43,7 +45,7 @@ class CustomPropertyComparatorE2ETest extends Specification {
     }
 
     private class DummyCustomPropertyComparator implements CustomPropertyComparator {
-        Optional<PropertyChange> compare(Object left, Object right, GlobalId affectedId, Property property) {
+        Optional<PropertyChange> compare(Object left, Object right, PropertyChangeMetadata metadata, Property property) {
             Optional.empty()
         }
 
@@ -53,8 +55,8 @@ class CustomPropertyComparatorE2ETest extends Specification {
     }
 
     private class CustomMultimapFakeComparator implements CustomPropertyComparator<Multimap, MapChange>{
-        Optional<MapChange> compare(Multimap left, Multimap right, GlobalId affectedId, Property property) {
-            return Optional.of(new MapChange(affectedId, property.name, [new EntryValueChange("a", left.get("a")[0], right.get("a")[0])]))
+        Optional<MapChange> compare(Multimap left, Multimap right, PropertyChangeMetadata metadata, Property property) {
+            return Optional.of(new MapChange(metadata, [new EntryValueChange("a", left.get("a")[0], right.get("a")[0])]))
         }
 
         boolean equals(Multimap a, Multimap b) {

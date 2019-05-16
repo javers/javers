@@ -65,8 +65,8 @@ public class DiffFactory {
     public Diff create(ObjectGraph leftGraph, ObjectGraph rightGraph, Optional<CommitMetadata> commitMetadata) {
         Validate.argumentsAreNotNull(leftGraph, rightGraph);
 
-        GraphPair graphPair = new GraphPair(leftGraph, rightGraph);
-        return createAndAppendChanges(graphPair, commitMetadata);
+        GraphPair graphPair = new GraphPair(leftGraph, rightGraph, commitMetadata);
+        return createAndAppendChanges(graphPair);
     }
 
     public Diff singleTerminal(GlobalId removedId, CommitMetadata commitMetadata){
@@ -85,7 +85,7 @@ public class DiffFactory {
         ObjectGraph currentGraph = buildGraph(newDomainObject);
 
         GraphPair graphPair = new GraphPair(currentGraph);
-        return createAndAppendChanges(graphPair, empty());
+        return createAndAppendChanges(graphPair);
     }
 
     private ObjectGraph buildGraph(Object handle) {
@@ -104,32 +104,32 @@ public class DiffFactory {
     /**
      * Graph scope appender
      */
-    private Diff createAndAppendChanges(GraphPair graphPair, Optional<CommitMetadata> commitMetadata) {
+    private Diff createAndAppendChanges(GraphPair graphPair) {
         DiffBuilder diff = new DiffBuilder(javersCoreConfiguration.getPrettyValuePrinter());
 
         //calculate node scope diff
         for (NodeChangeAppender appender : nodeChangeAppenders) {
-            diff.addChanges(appender.getChangeSet(graphPair), commitMetadata);
+            diff.addChanges(appender.getChangeSet(graphPair));
         }
 
         //calculate snapshot of NewObjects
         if (javersCoreConfiguration.isNewObjectsSnapshot()) {
             for (ObjectNode node : graphPair.getOnlyOnRight()) {
-                FakeNodePair pair = new FakeNodePair(node);
-                appendPropertyChanges(diff, pair, commitMetadata);
+                FakeNodePair pair = new FakeNodePair(node, graphPair.getCommitMetadata());
+                appendPropertyChanges(diff, pair);
             }
         }
 
         //calculate property-to-property diff
         for (NodePair pair : nodeMatcher.match(graphPair)) {
-            appendPropertyChanges(diff, pair, commitMetadata);
+            appendPropertyChanges(diff, pair);
         }
 
         return diff.build();
     }
 
     /* Node scope appender */
-    private void appendPropertyChanges(DiffBuilder diff, NodePair pair, final Optional<CommitMetadata> commitMetadata) {
+    private void appendPropertyChanges(DiffBuilder diff, NodePair pair) {
         List<JaversProperty> nodeProperties = pair.getProperties();
         for (JaversProperty property : nodeProperties) {
 
@@ -140,11 +140,11 @@ public class DiffFactory {
 
             JaversType javersType = property.getType();
 
-            appendChanges(diff, pair, property, javersType, commitMetadata);
+            appendChanges(diff, pair, property, javersType);
         }
     }
 
-    private void appendChanges(DiffBuilder diff, NodePair pair, JaversProperty property, JaversType javersType, Optional<CommitMetadata> commitMetadata) {
+    private void appendChanges(DiffBuilder diff, NodePair pair, JaversProperty property, JaversType javersType) {
         for (PropertyChangeAppender appender : propertyChangeAppender) {
             if (! appender.supports(javersType)){
                 continue;
@@ -153,7 +153,6 @@ public class DiffFactory {
             final Change change = appender.calculateChanges(pair, property);
             if (change != null) {
                 diff.addChange(change, pair.getRight().wrappedCdo());
-                commitMetadata.ifPresent(cm -> change.bindToCommit(cm));
             }
             break;
         }

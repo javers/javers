@@ -42,14 +42,14 @@ public class OptionalChangeAppender implements PropertyChangeAppender<PropertyCh
             return null;
         }
         if (contentType instanceof ManagedType) {
-            return ReferenceChange.create(pair.getGlobalId(), property.getName(),
+            return new ReferenceChange(pair.createPropertyChangeMetadata(property),
                     first(pair.getLeftReferences(property)),
                     first(pair.getRightReferences(property)),
                     flat(pair.getLeftPropertyValue(property)),
                     flat(pair.getRightPropertyValue(property)));
         }
         if (contentType instanceof PrimitiveOrValueType) {
-            return ValueChange.create(pair.getGlobalId(), property.getName(), leftOptional, rightOptional);
+            return new ValueChange(pair.createPropertyChangeMetadata(property), leftOptional, rightOptional);
         }
 
         throw new JaversException(UNSUPPORTED_OPTIONAL_CONTENT_TYPE, contentType);

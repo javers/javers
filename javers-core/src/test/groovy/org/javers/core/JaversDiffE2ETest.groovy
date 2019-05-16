@@ -514,22 +514,22 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         when:
         def diff = javers.compare(object1, object2)
 
-        println diff.prettyPrint()
 
         then:
+        println diff.prettyPrint()
         diff.changes.size() == 3
 
-        def vChange = diff.changes.find{it.class == ValueChange}
+        def vChange = diff.changes.find{it.valueChanged}
         vChange.propertyName == "sharedValue"
         vChange.left == "Some Name"
         vChange.right == "Some New Name"
 
-        def aChange = diff.changes.find{it.class == ValueChange.ValueAddedChange}
+        def aChange = diff.changes.find{it.propertyAdded}
         aChange.propertyName == "secondProperty"
         aChange.left == null
         aChange.right == "two"
 
-        def rChange = diff.changes.find{it.class == ValueChange.ValueRemovedChange}
+        def rChange = diff.changes.find{it.propertyRemoved}
         rChange.propertyName == "firstProperty"
         rChange.left == "one"
         rChange.right == null
@@ -561,19 +561,20 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         def changes = diff.getChangesByType(PropertyChange)
 
         then:
+        println diff.prettyPrint()
         changes.size() == 3
 
-        def vChange = changes.find{it.class == ReferenceChange}
+        def vChange = changes.find{it.valueChanged}
         vChange.propertyName == "sharedRef"
         vChange.left.value().endsWith "SnapshotEntity/1"
         vChange.right.value().endsWith "SnapshotEntity/2"
 
-        def aChange = changes.find{it.class == ReferenceChange.ReferenceAddedChange}
+        def aChange = changes.find{it.propertyAdded}
         aChange.propertyName == "secondRef"
         aChange.left == null
         aChange.right.value().endsWith "SnapshotEntity/22"
 
-        def rChange = changes.find{it.class == ReferenceChange.ReferenceRemovedChange}
+        def rChange = changes.find{it.propertyRemoved}
         rChange.propertyName == "firstRef"
         rChange.left.value().endsWith "SnapshotEntity/21"
         rChange.right == null

@@ -28,7 +28,7 @@ public class ListAsSetChangeAppender implements PropertyChangeAppender<ListChang
         SetChange setChange = setChangeAppender.calculateChanges(pair, property);
 
         if (setChange != null) {
-            return new ListChange(pair.getGlobalId(), property.getName(), setChange.getChanges());
+            return new ListChange(pair.createPropertyChangeMetadata(property), setChange.getChanges());
         }
         return null;
     }

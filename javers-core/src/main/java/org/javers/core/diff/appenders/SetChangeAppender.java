@@ -39,7 +39,7 @@ class SetChangeAppender implements PropertyChangeAppender<SetChange> {
         if (!entryChanges.isEmpty()) {
             CollectionType setType = property.getType();
             renderNotParametrizedWarningIfNeeded(setType.getItemType(), "item", "Set", property);
-            return new SetChange(affectedId, property.getName(), entryChanges);
+            return new SetChange(pair.createPropertyChangeMetadata(property), entryChanges);
         } else {
             return null;
         }

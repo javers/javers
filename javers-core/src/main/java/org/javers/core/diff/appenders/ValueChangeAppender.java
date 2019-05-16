@@ -36,7 +36,7 @@ class ValueChangeAppender implements PropertyChangeAppender<ValueChange> {
             }
         }
 
-        return ValueChange.create(pair.getGlobalId(), property.getName(), leftValue, rightValue);
+        return new ValueChange(pair.createPropertyChangeMetadata(property), leftValue, rightValue);
     }
 
     private boolean isIdProperty(NodePair nodePair, JaversProperty property){

@@ -4,18 +4,9 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import org.javers.common.collections.Lists;
-import org.javers.common.exception.JaversException;
-import org.javers.common.exception.JaversExceptionCode;
-import org.javers.core.commit.CommitMetadata;
+import org.javers.core.diff.changetype.PropertyChangeMetadata;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.type.TypeMapper;
-
-import java.util.List;
-
-import static java.util.Optional.ofNullable;
-import static org.javers.core.diff.changetype.ValueChange.ValueAddedChange;
-import static org.javers.core.diff.changetype.ValueChange.ValueRemovedChange;
 
 class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
     private static final String LEFT_VALUE_FIELD = "left";
@@ -28,23 +19,12 @@ class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
     @Override
     public ValueChange fromJson(JsonElement json, JsonDeserializationContext context) {
         JsonObject jsonObject = (JsonObject) json;
-        PropertyChangeStub stub = deserializeStub(jsonObject, context);
+        PropertyChangeMetadata stub = deserializeStub(jsonObject, context);
 
-        Object leftValue  = context.deserialize(jsonObject.get(LEFT_VALUE_FIELD),  stub.property.getGenericType());
-        Object rightValue = context.deserialize(jsonObject.get(RIGHT_VALUE_FIELD), stub.property.getGenericType());
+        Object leftValue  = context.deserialize(jsonObject.get(LEFT_VALUE_FIELD),  getJaversProperty(stub).getGenericType());
+        Object rightValue = context.deserialize(jsonObject.get(RIGHT_VALUE_FIELD), getJaversProperty(stub).getGenericType());
 
-        CommitMetadata commitMetadata = deserializeCommitMetadata(jsonObject, context);
-
-        if (getChangeTypeField(jsonObject).equals("ValueChange")) {
-            return new ValueChange(stub.id, stub.getPropertyName(), leftValue, rightValue, ofNullable(commitMetadata));
-        }
-        if (getChangeTypeField(jsonObject).equals("ValueAddedChange")) {
-            return new ValueAddedChange(stub.id, stub.getPropertyName(), rightValue, ofNullable(commitMetadata));
-        }
-        if (getChangeTypeField(jsonObject).equals("ValueRemovedChange")) {
-            return new ValueRemovedChange(stub.id, stub.getPropertyName(), leftValue, ofNullable(commitMetadata));
-        }
-        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
+        return new ValueChange(stub, leftValue, rightValue);
     }
 
     @Override
@@ -58,7 +38,7 @@ class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
     }
 
     @Override
-    public List<Class> getValueTypes() {
-        return Lists.asList(ValueAddedChange.class, ValueRemovedChange.class, ValueChange.class);
+    public Class getValueType() {
+        return ValueChange.class;
     }
 }

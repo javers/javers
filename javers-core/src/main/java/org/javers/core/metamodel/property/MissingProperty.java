@@ -5,4 +5,9 @@ public class MissingProperty {
 
     private MissingProperty() {
     }
+
+    @Override
+    public String toString() {
+        return "MISSING_PROPERTY";
+    }
 }

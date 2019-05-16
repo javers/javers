@@ -1,6 +1,7 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Lists;
+import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.map.EntryChange;
@@ -25,7 +26,7 @@ abstract class ListToMapAppenderAdapter extends CorePropertyChangeAppender<ListC
         this.typeMapper = typeMapper;
     }
 
-    ListChange calculateChanges(List leftList, List rightList, GlobalId affectedId, JaversProperty property) {
+    ListChange calculateChangesInList(List leftList, List rightList, NodePair pair, JaversProperty property) {
         CollectionType listType = ((JaversProperty) property).getType();
         MapContentType mapContentType = typeMapper.getMapContentType(listType);
 
@@ -35,7 +36,7 @@ abstract class ListToMapAppenderAdapter extends CorePropertyChangeAppender<ListC
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
             renderNotParametrizedWarningIfNeeded(listType.getItemType(), "item", "List", property);
-            return new ListChange(affectedId, property.getName(), elementChanges);
+            return new ListChange(pair.createPropertyChangeMetadata(property), elementChanges);
         }
         else {
             return null;

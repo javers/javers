@@ -35,11 +35,10 @@ public class DiffBuilder {
         return this;
     }
 
-    public DiffBuilder addChanges(Collection<Change> changeSet, final Optional<CommitMetadata> commitMetadata) {
+    public DiffBuilder addChanges(Collection<Change> changeSet) {
 
         changeSet.forEach(change -> {
             addChange(change);
-            commitMetadata.ifPresent(it -> change.bindToCommit(it));
         });
 
         return this;

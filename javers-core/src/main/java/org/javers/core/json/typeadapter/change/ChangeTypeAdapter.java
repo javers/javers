@@ -21,6 +21,7 @@ import org.javers.core.metamodel.type.TypeMapper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
 
@@ -28,6 +29,7 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
     private static final String AFFECTED_CDO_ID_FIELD = "globalId";
     private static final String PROPERTY_FIELD = "property";
     private static final String COMMIT_METADATA = "commitMetadata";
+    private static final String PROPERTY_CHANGE_TYPE = "propertyChangeType";
 
     private final Map<String, Class<? extends Change>> changeTypeMap;
     protected final TypeMapper typeMapper;
@@ -36,11 +38,7 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
         this.changeTypeMap = new HashMap<>();
         this.typeMapper = typeMapper;
         initEntry(ValueChange.class);
-        initEntry(ValueChange.ValueRemovedChange.class);
-        initEntry(ValueChange.ValueAddedChange.class);
         initEntry(ReferenceChange.class);
-        initEntry(ReferenceChange.ReferenceRemovedChange.class);
-        initEntry(ReferenceChange.ReferenceAddedChange.class);
         initEntry(NewObject.class);
         initEntry(ObjectRemoved.class);
         initEntry(MapChange.class);
@@ -53,16 +51,21 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
         return context.deserialize(jsonObject.get(COMMIT_METADATA), CommitMetadata.class);
     }
 
+    protected ManagedType getManagedType(PropertyChangeMetadata stub) {
+        return typeMapper.getJaversManagedType(stub.getAffectedCdoId());
+    }
+
+    protected JaversProperty getJaversProperty(PropertyChangeMetadata stub) {
+        return getManagedType(stub).getProperty(stub.getPropertyName());
+    }
+
     @Override
     public T fromJson(JsonElement json, JsonDeserializationContext context) {
         JsonObject jsonObject = (JsonObject) json;
-        Class<? extends Change> changeType = decode(getChangeTypeField(jsonObject));
+        String changeTypeField = jsonObject.get(CHANGE_TYPE_FIELD).getAsString();
+        Class<? extends Change> changeType = decode(changeTypeField);
 
         return context.deserialize(json, changeType);
-    }
-
-    String getChangeTypeField(JsonObject jsonObject) {
-        return jsonObject.get(CHANGE_TYPE_FIELD).getAsString();
     }
 
     @Override
@@ -70,12 +73,16 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
         return createJsonObject(change, context);
     }
 
-    protected PropertyChangeStub deserializeStub(JsonObject jsonObject, JsonDeserializationContext context) {
+    protected PropertyChangeMetadata deserializeStub(JsonObject jsonObject, JsonDeserializationContext context) {
         GlobalId id = deserializeAffectedCdoId(jsonObject, context);
         String propertyName = jsonObject.get(PROPERTY_FIELD).getAsString();
+        CommitMetadata commitMetadata = deserializeCommitMetadata(jsonObject, context);
 
-        ManagedType managedType = typeMapper.getJaversManagedType(id);
-        return new PropertyChangeStub(id, managedType.getProperty(propertyName));
+        PropertyChangeType propertyChangeType = jsonObject.get(PROPERTY_CHANGE_TYPE) != null
+            ? PropertyChangeType.valueOf(jsonObject.get(PROPERTY_CHANGE_TYPE).getAsString())
+            : PropertyChangeType.VALUE_CHANGED;
+
+        return new PropertyChangeMetadata(id, propertyName, Optional.ofNullable(commitMetadata), propertyChangeType);
     }
 
     protected GlobalId deserializeAffectedCdoId(JsonObject jsonObject, JsonDeserializationContext context) {
@@ -93,6 +100,10 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
 
         if (change instanceof PropertyChange) {
             jsonObject.addProperty(PROPERTY_FIELD, ((PropertyChange) change).getPropertyName());
+            PropertyChangeType changeType =  ((PropertyChange) change).getChangeType();
+            if (changeType != null) {
+                jsonObject.addProperty(PROPERTY_CHANGE_TYPE, changeType.name());
+            }
         }
         return jsonObject;
     }
@@ -100,20 +111,6 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
     @Override
     public Class getValueType() {
         return Change.class;
-    }
-
-    protected class PropertyChangeStub{
-        GlobalId id;
-        JaversProperty property;
-
-        PropertyChangeStub(GlobalId id, JaversProperty property) {
-            this.id = id;
-            this.property = property;
-        }
-
-        String getPropertyName(){
-            return property.getName();
-        }
     }
 
     private void initEntry(Class<? extends Change> valueChangeClass) {

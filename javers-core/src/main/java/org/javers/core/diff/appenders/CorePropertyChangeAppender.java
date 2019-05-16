@@ -42,8 +42,8 @@ public abstract class CorePropertyChangeAppender<T extends PropertyChange> imple
     final public T calculateChanges(NodePair pair, JaversProperty property) {
         Object leftValue =  pair.getLeftDehydratedPropertyValueAndSanitize(property);
         Object rightValue = pair.getRightDehydratedPropertyValueAndSanitize(property);
-        return calculateChanges(leftValue, rightValue, pair.getGlobalId(), property);
+        return calculateChanges(leftValue, rightValue, pair, property);
     }
 
-    protected abstract T calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property);
+    protected abstract T calculateChanges(Object leftValue, Object rightValue, NodePair pair, JaversProperty property);
 }

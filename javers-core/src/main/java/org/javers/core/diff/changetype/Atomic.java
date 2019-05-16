@@ -1,6 +1,7 @@
 package org.javers.core.diff.changetype;
 
 import org.javers.common.collections.Primitives;
+import org.javers.core.metamodel.property.MissingProperty;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -35,6 +36,10 @@ public class Atomic implements Serializable {
         }
 
         return Primitives.isJsonBasicType(value);
+    }
+
+    public Object unwrapAndSanitize() {
+        return MissingProperty.INSTANCE == value ? null : value;
     }
 
     /**

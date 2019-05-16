@@ -12,7 +12,7 @@ class ObjectRemovedAppender implements NodeChangeAppender {
     @Override
     public Set<Change> getChangeSet(GraphPair graphPair) {
         return (Set)graphPair.getOnlyOnLeft().stream()
-                .map(input -> new ObjectRemoved(input.getGlobalId(), input.wrappedCdo()))
+                .map(input -> new ObjectRemoved(input.getGlobalId(), input.wrappedCdo(), graphPair.getCommitMetadata()))
                 .collect(Collectors.toSet());
     }
 }
