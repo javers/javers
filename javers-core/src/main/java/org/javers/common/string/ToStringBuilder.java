@@ -34,7 +34,7 @@ public class ToStringBuilder {
 
             out.append( typeName(args[0]));
             for (int i=1;i<args.length;i++){
-                out.append(", "+typeName(args[0]) );
+                out.append(", "+typeName(args[i]) );
             }
             out.append(">");
             return out.toString();
