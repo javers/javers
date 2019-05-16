@@ -1,7 +1,6 @@
 package org.javers.core.diff;
 
 import com.google.common.collect.Streams;
-import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.PropertyChangeType;
@@ -14,8 +13,6 @@ import org.javers.core.metamodel.type.ManagedType;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.util.Collections.unmodifiableList;
 
 /**
  * holds two versions of the same {@link ObjectNode}
@@ -126,7 +123,7 @@ public class RealNodePair implements NodePair {
 
     public PropertyChangeType getChangeType(JaversProperty property) {
         if (getLeft().getManagedType().getBaseJavaClass() == getRight().getManagedType().getBaseJavaClass()) {
-            return PropertyChangeType.VALUE_CHANGED;
+            return PropertyChangeType.PROPERTY_VALUE_CHANGED;
         }
 
         if (getLeftPropertyValue(property) == MissingProperty.INSTANCE) {
@@ -137,6 +134,6 @@ public class RealNodePair implements NodePair {
             return PropertyChangeType.PROPERTY_REMOVED;
         }
 
-        return PropertyChangeType.VALUE_CHANGED;
+        return PropertyChangeType.PROPERTY_VALUE_CHANGED;
     }
 }

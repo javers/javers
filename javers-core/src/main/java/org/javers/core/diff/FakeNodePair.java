@@ -96,6 +96,6 @@ class FakeNodePair implements NodePair {
 
     @Override
     public PropertyChangeType getChangeType(JaversProperty property) {
-        return PropertyChangeType.VALUE_CHANGED;
+        return PropertyChangeType.PROPERTY_VALUE_CHANGED;
     }
 }

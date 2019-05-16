@@ -58,6 +58,6 @@ class ChangeTestBuilder {
 
     static createMetadata(Object cdo, String propertyName) {
         InstanceId globalId = instanceId(cdo)
-        new PropertyChangeMetadata(globalId, propertyName, Optional.empty(), PropertyChangeType.VALUE_CHANGED)
+        new PropertyChangeMetadata(globalId, propertyName, Optional.empty(), PropertyChangeType.PROPERTY_VALUE_CHANGED)
     }
 }

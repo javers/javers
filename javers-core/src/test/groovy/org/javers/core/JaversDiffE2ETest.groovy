@@ -24,7 +24,6 @@ import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.MappingStyle.BEAN
 import static org.javers.core.MappingStyle.FIELD
-import static org.javers.core.diff.changetype.ValueChange.*
 import static org.javers.core.metamodel.clazz.EntityDefinitionBuilder.entityDefinition
 import static org.javers.core.metamodel.clazz.ValueObjectDefinitionBuilder.valueObjectDefinition
 import static org.javers.core.model.DummyUser.Sex.FEMALE
@@ -519,7 +518,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         println diff.prettyPrint()
         diff.changes.size() == 3
 
-        def vChange = diff.changes.find{it.valueChanged}
+        def vChange = diff.changes.find{it.propertyValueChanged}
         vChange.propertyName == "sharedValue"
         vChange.left == "Some Name"
         vChange.right == "Some New Name"
@@ -564,7 +563,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         println diff.prettyPrint()
         changes.size() == 3
 
-        def vChange = changes.find{it.valueChanged}
+        def vChange = changes.find{it.propertyValueChanged}
         vChange.propertyName == "sharedRef"
         vChange.left.value().endsWith "SnapshotEntity/1"
         vChange.right.value().endsWith "SnapshotEntity/2"

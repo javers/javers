@@ -3,7 +3,6 @@ package org.javers.core.json.typeadapter.change
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.javers.core.diff.Change
-import org.javers.core.diff.changetype.PropertyChange
 import org.javers.core.diff.changetype.PropertyChangeType
 import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.json.JsonConverter
@@ -38,7 +37,7 @@ class ValueChangeTypeAdapterTest extends Specification {
         json.globalId
         json.left == true
         json.right == false
-        json.propertyChangeType == 'VALUE_CHANGED'
+        json.propertyChangeType == 'PROPERTY_VALUE_CHANGED'
     }
 
     def "should deserialize ValueChange"() {
@@ -48,7 +47,7 @@ class ValueChangeTypeAdapterTest extends Specification {
             json {
                 property  "bigFlag"
                 changeType "ValueChange"
-                propertyChangeType "VALUE_CHANGED"
+                propertyChangeType "PROPERTY_VALUE_CHANGED"
                 left null
                 right true
                 globalId {
@@ -65,7 +64,7 @@ class ValueChangeTypeAdapterTest extends Specification {
             change.left == null
             change.right == true
             change.propertyName == "bigFlag"
-            change.changeType == PropertyChangeType.VALUE_CHANGED
+            change.changeType == PropertyChangeType.PROPERTY_VALUE_CHANGED
     }
 
     def "should serialize ValueChange with Values using custom TypeAdapter" () {

@@ -1,16 +1,12 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.common.validation.Validate;
-import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
-import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.ValueObjectId;
 
 import java.util.Objects;
 import java.util.Optional;
 
 import static org.javers.common.validation.Validate.argumentIsNotNull;
-import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
 /**
  * Change on object's property of any type (Value, List, Set, Map, Array or Reference)
@@ -78,9 +74,9 @@ public abstract class PropertyChange extends Change {
 
     /**
      * @see PropertyChangeType
-     * @return <code>changeType == PropertyChangeType.VALUE_CHANGED</code>
+     * @return <code>changeType == PropertyChangeType.PROPERTY_VALUE_CHANGED</code>
      */
-    public boolean isValueChanged() {
-        return changeType == PropertyChangeType.VALUE_CHANGED;
+    public boolean isPropertyValueChanged() {
+        return changeType == PropertyChangeType.PROPERTY_VALUE_CHANGED;
     }
 }

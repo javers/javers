@@ -4,7 +4,7 @@ package org.javers.core.diff.changetype;
  * When two objects being compared have different classes,
  * they can have different sets of properties.
  * <br/>
- * When both objects have the same class, all changes have VALUE_CHANGED type.
+ * When both objects have the same class, all changes have PROPERTY_VALUE_CHANGED type.
  */
 public enum PropertyChangeType {
 
@@ -21,5 +21,5 @@ public enum PropertyChangeType {
     /**
      * Regular value change &mdash; when a property is present in both objects.
      */
-    VALUE_CHANGED
+    PROPERTY_VALUE_CHANGED
 }

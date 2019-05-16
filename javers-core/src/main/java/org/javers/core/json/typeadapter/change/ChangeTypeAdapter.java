@@ -80,7 +80,7 @@ class ChangeTypeAdapter<T extends Change> extends JsonTypeAdapterTemplate<T> {
 
         PropertyChangeType propertyChangeType = jsonObject.get(PROPERTY_CHANGE_TYPE) != null
             ? PropertyChangeType.valueOf(jsonObject.get(PROPERTY_CHANGE_TYPE).getAsString())
-            : PropertyChangeType.VALUE_CHANGED;
+            : PropertyChangeType.PROPERTY_VALUE_CHANGED;
 
         return new PropertyChangeMetadata(id, propertyName, Optional.ofNullable(commitMetadata), propertyChangeType);
     }
