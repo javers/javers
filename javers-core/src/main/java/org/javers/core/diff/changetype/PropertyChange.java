@@ -52,6 +52,10 @@ public abstract class PropertyChange extends Change {
         return Objects.hash(super.hashCode(), propertyName);
     }
 
+    /**
+     * @see PropertyChangeType
+     * @since 5.5.0
+     */
     public PropertyChangeType getChangeType() {
         return changeType;
     }
@@ -59,6 +63,7 @@ public abstract class PropertyChange extends Change {
     /**
      * @see PropertyChangeType
      * @return <code>changeType == PropertyChangeType.PROPERTY_ADDED</code>
+     * @since 5.5.0
      */
     public boolean isPropertyAdded() {
         return changeType == PropertyChangeType.PROPERTY_ADDED;
@@ -67,6 +72,7 @@ public abstract class PropertyChange extends Change {
     /**
      * @see PropertyChangeType
      * @return <code>changeType == PropertyChangeType.PROPERTY_REMOVED</code>
+     * @since 5.5.0
      */
     public boolean isPropertyRemoved() {
         return changeType == PropertyChangeType.PROPERTY_REMOVED;
@@ -75,6 +81,7 @@ public abstract class PropertyChange extends Change {
     /**
      * @see PropertyChangeType
      * @return <code>changeType == PropertyChangeType.PROPERTY_VALUE_CHANGED</code>
+     * @since 5.5.0
      */
     public boolean isPropertyValueChanged() {
         return changeType == PropertyChangeType.PROPERTY_VALUE_CHANGED;

@@ -5,6 +5,8 @@ package org.javers.core.diff.changetype;
  * they can have different sets of properties.
  * <br/>
  * When both objects have the same class, all changes have PROPERTY_VALUE_CHANGED type.
+ *
+ * @since 5.5.0
  */
 public enum PropertyChangeType {
 
