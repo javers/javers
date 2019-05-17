@@ -1,12 +1,12 @@
 package org.javers.core.diff.changetype;
 
-import java.util.Optional;
-
 import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
+
+import java.util.Optional;
 
 /**
  * New object added to a graph
@@ -14,8 +14,9 @@ import org.javers.core.metamodel.object.GlobalId;
  * @author bartosz walacik
  */
 public final class NewObject extends Change {
-    public NewObject(GlobalId newId, Optional<Object> newCdo) {
-        super(newId, newCdo);
+
+    NewObject(GlobalId newId, Optional<Object> newCdo) {
+        this(newId, newCdo, Optional.empty());
     }
 
     public NewObject(GlobalId newId, Optional<Object> newCdo, Optional<CommitMetadata> commitMetadata) {

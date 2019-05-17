@@ -85,7 +85,7 @@ public class Lists {
     }
 
     /**
-     * returns new list with elements from input that don't satisfies given filter condition
+     * returns new list with elements from input that doesn't satisfies given filter condition
      */
     public static <T> List<T> negativeFilter(List<T> input, final Predicate<T> filter) {
         argumentsAreNotNull(input, filter);

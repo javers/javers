@@ -45,7 +45,7 @@ class MultisetChangeAppender implements PropertyChangeAppender<SetChange> {
         List<ContainerElementChange> entryChanges = calculateEntryChanges(multisetType, left, right, owner);
         if (!entryChanges.isEmpty()){
             renderNotParametrizedWarningIfNeeded(multisetType.getItemType(), "item", "Multiset", property);
-            return new SetChange(pair.getGlobalId(), property.getName(), entryChanges);
+            return new SetChange(pair.createPropertyChangeMetadata(property), entryChanges);
         } else {
             return null;
         }

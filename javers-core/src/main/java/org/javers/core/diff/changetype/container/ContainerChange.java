@@ -3,10 +3,13 @@ package org.javers.core.diff.changetype.container;
 import org.javers.common.collections.Lists;
 import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.validation.Validate;
-import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.metamodel.object.GlobalId;
-import java.util.*;
+import org.javers.core.diff.changetype.PropertyChangeMetadata;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Changes on an Array or Collection property
@@ -16,8 +19,8 @@ import java.util.*;
 public abstract class ContainerChange extends PropertyChange {
     private final List<ContainerElementChange> changes;
 
-    ContainerChange(GlobalId affectedCdoId, String propertyName, List<ContainerElementChange> changes, Optional<CommitMetadata> commitMetadata) {
-        super(affectedCdoId, propertyName, commitMetadata);
+    ContainerChange(PropertyChangeMetadata metadata, List<ContainerElementChange> changes) {
+        super(metadata);
         Validate.argumentIsNotNull(changes);
         Validate.argumentCheck(!changes.isEmpty(),"changes list should not be empty");
         this.changes = Collections.unmodifiableList(new ArrayList<>(changes));

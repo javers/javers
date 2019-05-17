@@ -2,6 +2,8 @@ package org.javers.core.examples
 
 import org.javers.common.collections.Sets
 import org.javers.core.JaversBuilder
+import org.javers.core.diff.NodePair
+import org.javers.core.diff.changetype.PropertyChangeMetadata
 import org.javers.core.diff.changetype.container.ContainerElementChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.container.SetChange
@@ -10,6 +12,7 @@ import org.javers.core.diff.changetype.container.ValueRemoved
 import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.property.Property
+import org.javers.core.metamodel.type.JaversProperty
 import spock.lang.Specification
 
 class CustomPropertyComparatorExample extends Specification {
@@ -24,7 +27,7 @@ class CustomPropertyComparatorExample extends Specification {
      */
     class FunnyStringComparator implements CustomPropertyComparator<String, SetChange> {
         @Override
-        Optional<SetChange> compare(String left, String right, GlobalId affectedId, Property property) {
+        Optional<SetChange> compare(String left, String right, PropertyChangeMetadata metadata, Property property) {
             if (equals(left, right)) {
                 return Optional.empty()
             }
@@ -36,7 +39,7 @@ class CustomPropertyComparatorExample extends Specification {
             Sets.difference(leftSet, rightSet).forEach{c -> changes.add(new ValueRemoved(c))}
             Sets.difference(rightSet, leftSet).forEach{c -> changes.add(new ValueAdded(c))}
 
-            return Optional.of(new SetChange(affectedId, property.getName(), changes))
+            return Optional.of(new SetChange(metadata, changes))
         }
 
         @Override

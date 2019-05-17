@@ -4,11 +4,7 @@ import groovy.json.JsonSlurper
 import org.javers.core.diff.AbstractDiffTest
 import org.javers.core.diff.DiffAssert
 import org.javers.core.diff.ListCompareAlgorithm
-import org.javers.core.diff.changetype.NewObject
-import org.javers.core.diff.changetype.ObjectRemoved
-import org.javers.core.diff.changetype.PropertyChange
-import org.javers.core.diff.changetype.ReferenceChange
-import org.javers.core.diff.changetype.ValueChange
+import org.javers.core.diff.changetype.*
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.diff.changetype.container.ValueAdded
 import org.javers.core.examples.model.Person
@@ -16,12 +12,14 @@ import org.javers.core.json.DummyPointJsonTypeAdapter
 import org.javers.core.json.DummyPointNativeTypeAdapter
 import org.javers.core.metamodel.annotation.DiffInclude
 import org.javers.core.metamodel.annotation.Id
+import org.javers.core.metamodel.annotation.TypeName
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.*
 import spock.lang.Unroll
 
 import javax.persistence.EmbeddedId
 
+import static GlobalIdTestBuilder.instanceId
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.MappingStyle.BEAN
@@ -32,7 +30,6 @@ import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.MALE
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUserWithPoint.userWithPoint
-import static GlobalIdTestBuilder.instanceId
 
 /**
  * @author bartosz walacik
@@ -491,5 +488,93 @@ class JaversDiffE2ETest extends AbstractDiffTest {
       changes[0].affectedGlobalId.value() == SnapshotEntity.getName()+"/1"
       changes[0].left == 5
       changes[0].right == 6
+    }
+
+    @TypeName("ClassWithValue")
+    static class Class1WithValue {
+        @Id int id
+        String sharedValue
+        String firstProperty
+    }
+
+    @TypeName("ClassWithValue")
+    static class Class2WithValue {
+        @Id int id
+        String sharedValue
+        String secondProperty
+    }
+
+    def "should report which value properties were added, removed or updated for a given object"() {
+        given:
+        def javers = javers().build()
+        def object1 = new Class1WithValue(id:1, sharedValue: "Some Name",     firstProperty:  "one")
+        def object2 = new Class2WithValue(id:1, sharedValue: "Some New Name", secondProperty: "two")
+
+        when:
+        def diff = javers.compare(object1, object2)
+
+        then:
+        println diff.prettyPrint()
+        diff.changes.size() == 3
+
+        def vChange = diff.changes.find{it.propertyValueChanged}
+        vChange.propertyName == "sharedValue"
+        vChange.left == "Some Name"
+        vChange.right == "Some New Name"
+
+        def aChange = diff.changes.find{it.propertyAdded}
+        aChange.propertyName == "secondProperty"
+        aChange.left == null
+        aChange.right == "two"
+
+        def rChange = diff.changes.find{it.propertyRemoved}
+        rChange.propertyName == "firstProperty"
+        rChange.left == "one"
+        rChange.right == null
+    }
+
+    @TypeName("ClassWithRef")
+    class Class1WithRef {
+        @Id int id
+        SnapshotEntity sharedRef
+        SnapshotEntity firstRef
+    }
+
+    @TypeName("ClassWithRef")
+    class Class2WithRef {
+        @Id int id
+        SnapshotEntity sharedRef
+        SnapshotEntity secondRef
+    }
+
+    def "should report with reference properties were added, removed or updated for a given object"() {
+        given:
+        def javers = javers().build()
+        def object1 = new Class1WithRef(id:1, sharedRef:new SnapshotEntity(id:1), firstRef:  new SnapshotEntity(id:21))
+        def object2 = new Class2WithRef(id:1, sharedRef:new SnapshotEntity(id:2), secondRef: new SnapshotEntity(id:22))
+
+        when:
+        def diff = javers.compare(object1, object2)
+        println diff.prettyPrint()
+        def changes = diff.getChangesByType(PropertyChange)
+
+        then:
+        println diff.prettyPrint()
+        changes.size() == 3
+
+        def vChange = changes.find{it.propertyValueChanged}
+        vChange.propertyName == "sharedRef"
+        vChange.left.value().endsWith "SnapshotEntity/1"
+        vChange.right.value().endsWith "SnapshotEntity/2"
+
+        def aChange = changes.find{it.propertyAdded}
+        aChange.propertyName == "secondRef"
+        aChange.left == null
+        aChange.right.value().endsWith "SnapshotEntity/22"
+
+        def rChange = changes.find{it.propertyRemoved}
+        rChange.propertyName == "firstRef"
+        rChange.left.value().endsWith "SnapshotEntity/21"
+        rChange.right == null
     }
 }

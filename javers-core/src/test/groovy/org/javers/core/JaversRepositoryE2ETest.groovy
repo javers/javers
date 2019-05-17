@@ -8,7 +8,6 @@ import org.javers.core.diff.changetype.ValueChange
 import org.javers.core.diff.changetype.container.ListChange
 import org.javers.core.examples.typeNames.*
 import org.javers.core.metamodel.annotation.TypeName
-import org.javers.core.metamodel.type.ValueType
 import org.javers.core.model.*
 import org.javers.core.model.SnapshotEntity.DummyEnum
 import org.javers.repository.api.JaversRepository

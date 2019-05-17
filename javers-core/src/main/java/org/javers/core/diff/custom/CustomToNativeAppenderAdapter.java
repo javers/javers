@@ -30,7 +30,7 @@ public class CustomToNativeAppenderAdapter<T, C extends PropertyChange> implemen
         T leftValue = (T)pair.getLeftPropertyValue(property);
         T rightValue = (T)pair.getRightPropertyValue(property);
 
-        return delegate.compare(leftValue, rightValue, pair.getGlobalId(), property).orElse(null);
+        return delegate.compare(leftValue, rightValue, pair.createPropertyChangeMetadata(property), property).orElse(null);
     }
 
     @Override

@@ -1,12 +1,12 @@
 package org.javers.core.diff.changetype;
 
-import java.util.Optional;
-
 import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.GlobalId;
+
+import java.util.Optional;
 
 /**
  * Object removed from a graph
@@ -14,8 +14,9 @@ import org.javers.core.metamodel.object.GlobalId;
  * @author bartosz walacik
  */
 public final class ObjectRemoved extends Change {
-    public ObjectRemoved(GlobalId removed, Optional<Object> removedCdo) {
-        super(removed, removedCdo);
+
+    ObjectRemoved(GlobalId removed, Optional<Object> removedCdo) {
+        this(removed, removedCdo, Optional.empty());
     }
 
     public ObjectRemoved(GlobalId removed, Optional<Object> removedCdo, Optional<CommitMetadata> commitMetadata) {

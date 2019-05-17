@@ -56,6 +56,9 @@ public abstract class ManagedType extends ClassType {
         return managedClass.getManagedProperties(query);
     }
 
+    /**
+     * unmodifiable list
+     */
     public List<JaversProperty> getProperties() {
         return managedClass.getManagedProperties();
     }

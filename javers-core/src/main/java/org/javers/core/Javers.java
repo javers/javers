@@ -194,7 +194,10 @@ public interface Javers {
 
     /**
      * Initial diff is a kind of snapshot of a given object graph.
+     *
+     * @deprecated Use {@link Javers#compare(Object, Object)} passing null as the first parameter.
      */
+    @Deprecated
     Diff initial(Object newDomainObject);
 
     /**

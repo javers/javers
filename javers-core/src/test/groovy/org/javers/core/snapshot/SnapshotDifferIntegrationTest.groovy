@@ -9,13 +9,14 @@ import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
 import org.javers.repository.jql.QueryBuilder
-import java.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.time.LocalDate
+
+import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.JaversBuilder.javers
 import static org.javers.core.model.DummyUser.dummyUser
-import static org.javers.core.GlobalIdTestBuilder.instanceId
 
 /**
  * @author bartosz walacik
@@ -87,7 +88,7 @@ class SnapshotDifferIntegrationTest extends Specification {
 
         then:
         def change = changes[0]
-        change.class == expectedChangeType
+        expectedChangeType.isInstance(change)
         change.affectedGlobalId == instanceId("kaz",DummyUser)
         change.propertyName == expectedChangedProperty
         change.left == expectedLeftValue

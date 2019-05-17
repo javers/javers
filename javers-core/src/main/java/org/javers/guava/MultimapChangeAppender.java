@@ -62,7 +62,7 @@ class MultimapChangeAppender implements PropertyChangeAppender<MapChange> {
         if (!entryChanges.isEmpty()){
             renderNotParametrizedWarningIfNeeded(multimapType.getKeyType(), "key", "Multimap", property);
             renderNotParametrizedWarningIfNeeded(multimapType.getValueType(), "value", "Multimap", property);
-            return new MapChange(pair.getGlobalId(), property.getName(), entryChanges);
+            return new MapChange(pair.createPropertyChangeMetadata(property), entryChanges);
         } else {
             return null;
         }

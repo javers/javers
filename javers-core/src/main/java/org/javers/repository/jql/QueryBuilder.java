@@ -176,6 +176,7 @@ public class QueryBuilder {
         return new QueryBuilder(new IdFilterDefinition(ValueObjectIdDTO.valueObjectId(ownerLocalId, ownerEntityClass, path)));
     }
 
+    @Deprecated
     public static QueryBuilder byGlobalId(GlobalIdDTO globalId){
         Validate.argumentIsNotNull(globalId);
         return new QueryBuilder(new IdFilterDefinition(globalId));

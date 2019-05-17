@@ -2,6 +2,7 @@ package org.javers.core.diff.appenders.levenshtein;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.EqualsFunction;
+import org.javers.core.diff.NodePair;
 import org.javers.core.diff.appenders.CorePropertyChangeAppender;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
@@ -29,7 +30,7 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
     }
 
     @Override
-    public ListChange calculateChanges(Object leftValue, Object rightValue, GlobalId affectedId, JaversProperty property) {
+    public ListChange calculateChanges(Object leftValue, Object rightValue, NodePair pair, JaversProperty property) {
         CollectionType listType = property.getType();
         JaversType itemType = typeMapper.getJaversType(listType.getItemType());
 
@@ -43,21 +44,20 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
         final BacktrackSteps[][] steps = backtrack.evaluateSteps(leftList, rightList);
         final List<ContainerElementChange> changes = stepsToChanges.convert(steps, leftList, rightList);
 
-        ListChange result = getListChange(affectedId, property, changes);
+        ListChange result = getListChange(pair, property, changes);
         if (result != null) {
             renderNotParametrizedWarningIfNeeded(listType.getItemType(), "item", "List", property);
         }
         return result;
     }
 
-    private ListChange getListChange(final GlobalId affectedCdoId, final Property property,
-                                     final List<ContainerElementChange> changes) {
+    private ListChange getListChange(NodePair pair, JaversProperty property, List<ContainerElementChange> changes) {
         final ListChange result;
 
         if (changes.size() == 0) {
             result = null;
         } else {
-            result = new ListChange(affectedCdoId, property.getName(), changes);
+            result = new ListChange(pair.createPropertyChangeMetadata(property), changes);
         }
         return result;
     }

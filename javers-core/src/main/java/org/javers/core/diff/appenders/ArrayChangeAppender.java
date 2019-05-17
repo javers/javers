@@ -46,7 +46,7 @@ class ArrayChangeAppender implements PropertyChangeAppender<ArrayChange>{
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
-            return new ArrayChange(pair.getGlobalId(), property.getName(), elementChanges);
+            return new ArrayChange(pair.createPropertyChangeMetadata(property), elementChanges);
         }
         else {
             return null;

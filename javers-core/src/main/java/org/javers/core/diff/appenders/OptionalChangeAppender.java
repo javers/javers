@@ -5,13 +5,10 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.ReferenceChange;
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.diff.changetype.map.MapChange;
 import org.javers.core.metamodel.object.GlobalId;
-import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,11 +19,9 @@ import static org.javers.common.exception.JaversExceptionCode.UNSUPPORTED_OPTION
  */
 public class OptionalChangeAppender implements PropertyChangeAppender<PropertyChange> {
 
-    private final GlobalIdFactory globalIdFactory;
     private final TypeMapper typeMapper;
 
-    public OptionalChangeAppender(GlobalIdFactory globalIdFactory, TypeMapper typeMapper) {
-        this.globalIdFactory = globalIdFactory;
+    public OptionalChangeAppender(TypeMapper typeMapper) {
         this.typeMapper = typeMapper;
     }
 
@@ -47,14 +42,14 @@ public class OptionalChangeAppender implements PropertyChangeAppender<PropertyCh
             return null;
         }
         if (contentType instanceof ManagedType) {
-            return new ReferenceChange(pair.getGlobalId(), property.getName(),
+            return new ReferenceChange(pair.createPropertyChangeMetadata(property),
                     first(pair.getLeftReferences(property)),
                     first(pair.getRightReferences(property)),
                     flat(pair.getLeftPropertyValue(property)),
                     flat(pair.getRightPropertyValue(property)));
         }
         if (contentType instanceof PrimitiveOrValueType) {
-            return new ValueChange(pair.getGlobalId(), property.getName(), leftOptional, rightOptional);
+            return new ValueChange(pair.createPropertyChangeMetadata(property), leftOptional, rightOptional);
         }
 
         throw new JaversException(UNSUPPORTED_OPTIONAL_CONTENT_TYPE, contentType);

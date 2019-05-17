@@ -5,7 +5,6 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.map.*;
-import org.javers.core.metamodel.object.GlobalIdFactory;
 import org.javers.core.metamodel.type.*;
 
 import java.util.ArrayList;
@@ -21,12 +20,10 @@ import static org.javers.core.diff.appenders.CorePropertyChangeAppender.renderNo
 class MapChangeAppender implements PropertyChangeAppender<MapChange> {
 
     private final TypeMapper typeMapper;
-    private final GlobalIdFactory globalIdFactory;
 
-    MapChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
-        Validate.argumentsAreNotNull(typeMapper, globalIdFactory);
+    MapChangeAppender(TypeMapper typeMapper) {
+        Validate.argumentsAreNotNull(typeMapper);
         this.typeMapper = typeMapper;
-        this.globalIdFactory = globalIdFactory;
     }
 
     @Override
@@ -57,7 +54,7 @@ class MapChangeAppender implements PropertyChangeAppender<MapChange> {
         if (!changes.isEmpty()){
             renderNotParametrizedWarningIfNeeded(mapContentType.getKeyType().getBaseJavaType(), "key", "Map", property);
             renderNotParametrizedWarningIfNeeded(mapContentType.getValueType().getBaseJavaType(), "value", "Map", property);
-            return new MapChange(pair.getGlobalId(), property.getName(), changes);
+            return new MapChange(pair.createPropertyChangeMetadata(property), changes);
         }
         else {
             return null;

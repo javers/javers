@@ -13,11 +13,11 @@ abstract class AbstractDiffAppendersTest extends AbstractDiffTest {
     }
 
     MapChangeAppender mapChangeAppender() {
-        new MapChangeAppender(javers.typeMapper, javers.globalIdFactory)
+        new MapChangeAppender(javers.typeMapper)
     }
 
     OptionalChangeAppender optionalChangeAppender(){
-        new OptionalChangeAppender(javers.globalIdFactory, javers.typeMapper)
+        new OptionalChangeAppender(javers.typeMapper)
     }
 
     LevenshteinListChangeAppender levenshteinListChangeAppender() {

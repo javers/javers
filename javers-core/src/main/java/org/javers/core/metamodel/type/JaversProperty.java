@@ -1,6 +1,8 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.core.metamodel.property.Property;
+
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import static org.javers.common.string.ToStringBuilder.typeName;

@@ -30,7 +30,7 @@ class DiffAssert {
     }
 
     DiffAssert hasAllOfType(Class<? extends Change> expectedClass) {
-        actual.changes.each { assert it.class == expectedClass}
+        actual.changes.each { assert expectedClass.isInstance(it)}
         this
     }
 

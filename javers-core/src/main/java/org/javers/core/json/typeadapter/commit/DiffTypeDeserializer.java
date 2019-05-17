@@ -12,7 +12,6 @@ import org.javers.core.diff.DiffBuilder;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Optional;
 
 public class DiffTypeDeserializer implements JsonDeserializer<Diff> {
     private static final String CHANGES_FIELD = "changes";
@@ -24,7 +23,7 @@ public class DiffTypeDeserializer implements JsonDeserializer<Diff> {
         if (changesObject != null) {
             List<Change> changes = context.deserialize(changesObject, new TypeToken<List<Change>>(){}.getType());
             return new DiffBuilder()
-                    .addChanges(changes, Optional.empty())
+                    .addChanges(changes)
                     .build();
         }
         return DiffBuilder.empty();

@@ -2,27 +2,20 @@ package org.javers.core.diff.changetype;
 
 import org.javers.common.string.PrettyValuePrinter;
 import org.javers.common.validation.Validate;
-import org.javers.core.commit.CommitMetadata;
-import org.javers.core.metamodel.object.GlobalId;
 
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Change on a Value property, like int or String
  *
  * @author bartosz walacik
  */
-public final class ValueChange extends PropertyChange {
+public class ValueChange extends PropertyChange {
     private final Atomic left;
     private final Atomic right;
 
-    public ValueChange(GlobalId affectedCdoId, String propertyName, Object leftValue, Object rightValue) {
-        this(affectedCdoId, propertyName, leftValue, rightValue, Optional.empty());
-    }
-
-    public ValueChange(GlobalId affectedCdoId, String propertyName, Object leftValue, Object rightValue, Optional<CommitMetadata> commitMetadata) {
-        super(affectedCdoId, propertyName, commitMetadata);
+    public ValueChange(PropertyChangeMetadata metadata, Object leftValue, Object rightValue){
+        super(metadata);
         this.left = new Atomic(leftValue);
         this.right = new Atomic(rightValue);
     }
@@ -39,9 +32,18 @@ public final class ValueChange extends PropertyChange {
     public String prettyPrint(PrettyValuePrinter valuePrinter) {
         Validate.argumentIsNotNull(valuePrinter);
 
-        return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
-            " changed from " + valuePrinter.formatWithQuotes(getLeft()) + " to " +
-                               valuePrinter.formatWithQuotes(getRight());
+        if (isPropertyAdded()) {
+            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                    " property with value " + valuePrinter.formatWithQuotes(right.unwrap()) +" added";
+        }
+        else if (isPropertyRemoved()) {
+            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                    " property with value " + valuePrinter.formatWithQuotes(left.unwrap()) +" removed";
+        } else {
+            return valuePrinter.formatWithQuotes(getPropertyNameWithPath()) +
+                " value changed from " + valuePrinter.formatWithQuotes(left.unwrap()) + " to " +
+                                   valuePrinter.formatWithQuotes(right.unwrap());
+        }
     }
 
     @Override

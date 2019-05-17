@@ -29,7 +29,8 @@ class ReferenceChangeAppender implements PropertyChangeAppender<ReferenceChange>
             return null;
         }
 
-        return new ReferenceChange(pair.getGlobalId(), property.getName(), leftId, rightId,
-            pair.getLeftPropertyValue(property), pair.getRightPropertyValue(property));
+        return new ReferenceChange(pair.createPropertyChangeMetadata(property), leftId, rightId,
+                pair.getLeftPropertyValue(property),
+                pair.getRightPropertyValue(property));
     }
 }
