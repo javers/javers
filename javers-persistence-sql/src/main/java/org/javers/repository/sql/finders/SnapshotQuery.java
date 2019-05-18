@@ -117,7 +117,7 @@ class SnapshotQuery {
                                  longParam(si.getGlobalIdPk()), longParam(si.getVer()))
         );
 
-        selectBuilder.append(" false)");
+        selectBuilder.append(" 1!=1)");
     }
 
     void addVoOwnerEntityFilter(String ownerTypeName, String fragment) {
