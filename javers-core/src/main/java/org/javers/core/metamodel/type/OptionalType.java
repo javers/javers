@@ -46,6 +46,9 @@ public class OptionalType extends CollectionType {
 
     @Override
     protected Stream<Object> items(Object source) {
+        if (source == null) {
+            return Stream.empty();
+        }
         Optional sourceOptional = (Optional)source;
         return (Stream)sourceOptional.map(it -> Stream.of(it)).orElse(Stream.empty());
     }
