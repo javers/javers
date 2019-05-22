@@ -3,7 +3,6 @@ package org.javers.repository.sql.session;
 import org.javers.repository.sql.session.KeyGeneratorDefinition.AutoincrementDefinition;
 import org.javers.repository.sql.session.KeyGeneratorDefinition.SequenceDefinition;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,7 +67,7 @@ interface KeyGenerator {
         }
 
         private Map<String, Sequence> findDatabaseSequences(Session session) {
-            String databaseUrl = extractDatabaseAndSchemaName(session);
+            String databaseUrl = extractDatabaseUrl(session);
             if (!sequences.containsKey(databaseUrl)) {
                 synchronized (lock) {
                     //double check, condition could change while obtaining the lock
@@ -80,13 +79,9 @@ interface KeyGenerator {
             return sequences.get(databaseUrl);
         }
 
-        private String extractDatabaseAndSchemaName(Session session) {
+        private String extractDatabaseUrl(Session session) {
             try {
-                Connection connection = session.getConnectionProvider().getConnection();
-                return String.join(
-                        "?currentSchema=",
-                        connection.getCatalog(),
-                        connection.getSchema());
+                return session.getConnectionProvider().getConnection().getMetaData().getURL();
             } catch (SQLException e) {
                 throw new SqlUncheckedException("fail to retrieve db url", e);
             }
