@@ -3,6 +3,8 @@ package org.javers.repository.sql.session;
 import org.javers.repository.sql.session.KeyGeneratorDefinition.AutoincrementDefinition;
 import org.javers.repository.sql.session.KeyGeneratorDefinition.SequenceDefinition;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,7 +27,7 @@ interface KeyGenerator {
 
         private final SequenceDefinition sequenceDefinition;
 
-        private Map<String, Sequence> sequences = new ConcurrentHashMap();
+        private Map<String, Map<String, Sequence>> sequences = new ConcurrentHashMap();
 
         private ThreadLocal<Long> lastKey = new ThreadLocal<>();
 
@@ -35,23 +37,9 @@ interface KeyGenerator {
 
         @Override
         public long generateKey(String sequenceName, Session session) {
-            long nextVal = findSequence(sequenceName).nextValue(session);
+            long nextVal = findSequence(sequenceName, session).nextValue(session);
             lastKey.set(nextVal);
             return nextVal;
-        }
-
-        private Sequence findSequence(String sequenceName) {
-            if (!sequences.containsKey(sequenceName)) {
-                synchronized (lock) {
-                    //double check, condition could change while obtaining the lock
-                    if (!sequences.containsKey(sequenceName)) {
-                        Sequence sequence = new Sequence(sequenceName, sequenceDefinition);
-                        sequences.put(sequenceName, sequence);
-                    }
-                }
-            }
-
-            return sequences.get(sequenceName);
         }
 
         @Override
@@ -63,6 +51,44 @@ interface KeyGenerator {
         public void reset() {
             synchronized (lock) {
                 sequences.clear();
+            }
+        }
+
+        private Sequence findSequence(String sequenceName, Session session) {
+            Map<String, Sequence> databaseSequences = findDatabaseSequences(session);
+            if (!databaseSequences.containsKey(sequenceName)) {
+                synchronized (lock) {
+                    //double check, condition could change while obtaining the lock
+                    if (!databaseSequences.containsKey(sequenceName)) {
+                        databaseSequences.computeIfAbsent(sequenceName, sequence -> new Sequence(sequenceName, sequenceDefinition));
+                    }
+                }
+            }
+            return databaseSequences.get(sequenceName);
+        }
+
+        private Map<String, Sequence> findDatabaseSequences(Session session) {
+            String databaseUrl = extractDatabaseAndSchemaName(session);
+            if (!sequences.containsKey(databaseUrl)) {
+                synchronized (lock) {
+                    //double check, condition could change while obtaining the lock
+                    if (!sequences.containsKey(databaseUrl)) {
+                        sequences.computeIfAbsent(databaseUrl, map -> new ConcurrentHashMap<>());
+                    }
+                }
+            }
+            return sequences.get(databaseUrl);
+        }
+
+        private String extractDatabaseAndSchemaName(Session session) {
+            try {
+                Connection connection = session.getConnectionProvider().getConnection();
+                return String.join(
+                        "?currentSchema=",
+                        connection.getCatalog(),
+                        connection.getSchema());
+            } catch (SQLException e) {
+                throw new SqlUncheckedException("fail to retrieve db url", e);
             }
         }
     }

@@ -33,6 +33,10 @@ public class Session implements AutoCloseable {
         return new SelectBuilder(this, selectClauseSQL);
     }
 
+    public ConnectionProvider getConnectionProvider() {
+        return connectionProvider;
+    }
+
     public InsertBuilder insert(String queryName) {
         return new InsertBuilder(this, queryName);
     }
