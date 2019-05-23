@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
@@ -76,8 +77,12 @@ class SnapshotQuery {
         });
 
         if (queryParams.commitIds().size() > 0) {
-            selectBuilder.and(COMMIT_COMMIT_ID + " IN (" + ToStringBuilder.join(
-                    queryParams.commitIds().stream().map(c -> c.valueAsNumber()).collect(toList())) + ")");
+            selectBuilder.and(COMMIT_COMMIT_ID + " IN (" +
+                    queryParams.commitIds()
+                            .stream()
+                            .map(c -> c.valueAsNumber().toString())
+                            .collect(Collectors.joining(",")) +
+                    ")");
         }
 
         queryParams.version().ifPresent(ver -> selectBuilder.and(SNAPSHOT_VERSION, ver));

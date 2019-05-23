@@ -22,12 +22,13 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 
 import static groovyx.gpars.GParsPool.withPool
 import static GlobalIdTestBuilder.instanceId
 import static GlobalIdTestBuilder.unboundedValueObjectId
 import static GlobalIdTestBuilder.valueObjectId
+import static java.lang.Math.abs
+import static java.time.temporal.ChronoUnit.MILLIS
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE
@@ -92,7 +93,7 @@ class JaversRepositoryE2ETest extends Specification {
         def snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
 
         then:
-        ChronoUnit.MILLIS.between(snapshot.commitMetadata.commitDate, now.toLocalDateTime()) == 0
+        abs(MILLIS.between(snapshot.commitMetadata.commitDate, now.toLocalDateTime())) <= 1
         snapshot.commitMetadata.commitDateInstant == now.toInstant()
         snapshot.commitMetadata.author == 'author'
     }
