@@ -13,10 +13,7 @@ import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.*;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -52,6 +49,7 @@ public class JaversSpringJpaApplicationConfig {
                 .sqlRepository()
                 .withConnectionProvider(jpaConnectionProvider())
                 .withDialect(DialectName.H2)
+                .withSchemaManagementEnabled(false)
                 .build();
 
         return TransactionalJaversBuilder
@@ -144,15 +142,25 @@ public class JaversSpringJpaApplicationConfig {
         return new PersistenceExceptionTranslationPostProcessor();
     }
 
-    @Bean
-    public DataSource dataSource(){
+    @Bean(name = "dataSource")
+    @Primary
+    public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.h2.Driver");
         dataSource.setUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
         return dataSource;
     }
 
-    Properties additionalProperties() {
+    @Bean(name = "secondaryDataSource")
+    public DataSource secondaryDataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("org.h2.Driver");
+        dataSource.setUrl("jdbc:h2:mem:test-secondary;DB_CLOSE_DELAY=-1");
+        return dataSource;
+    }
+
+
+    private Properties additionalProperties() {
         Properties properties = new Properties();
         properties.setProperty("hibernate.hbm2ddl.auto", "create");
         properties.setProperty("hibernate.connection.autocommit", "false");

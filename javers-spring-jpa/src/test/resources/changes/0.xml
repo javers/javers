@@ -1,0 +1,85 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="javers" id="0">
+
+        <createSequence sequenceName="jv_commit_pk_seq"/>
+        <createSequence sequenceName="jv_global_id_pk_seq"/>
+        <createSequence sequenceName="jv_snapshot_pk_seq"/>
+
+        <createTable tableName="jv_commit">
+            <column name="commit_pk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author" type="VARCHAR(200)"/>
+            <column name="commit_date" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="commit_id" type="numeric(22, 2)"/>
+            <column name="commit_date_instant" type="VARCHAR2(30)"/>
+        </createTable>
+
+
+        <createTable tableName="jv_commit_property">
+            <column name="property_name" type="VARCHAR(191)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_value" type="VARCHAR(600)"/>
+            <column name="commit_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+
+        <createTable tableName="jv_global_id">
+            <column name="global_id_pk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="local_id" type="VARCHAR(191)"/>
+            <column name="fragment" type="VARCHAR(200)"/>
+            <column name="type_name" type="VARCHAR(200)"/>
+            <column name="owner_id_fk" type="BIGINT"/>
+        </createTable>
+
+
+        <createTable tableName="jv_snapshot">
+            <column name="snapshot_pk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(200)"/>
+            <column name="state" type="TEXT"/>
+            <column name="version" type="BIGINT"/>
+            <column name="changed_properties" type="TEXT"/>
+            <column name="managed_type" type="VARCHAR(200)"/>
+            <column name="global_id_fk" type="BIGINT"/>
+            <column name="commit_fk" type="BIGINT"/>
+        </createTable>
+
+        <createIndex indexName="jv_global_id_owner_id_fk_idx" tableName="jv_global_id">
+            <column name="owner_id_fk"/>
+        </createIndex>
+
+
+        <createIndex indexName="jv_snapshot_commit_fk_idx" tableName="jv_snapshot">
+            <column name="commit_fk"/>
+        </createIndex>
+
+
+        <createIndex indexName="jv_snapshot_global_id_fk_idx_idx" tableName="jv_snapshot">
+            <column name="global_id_fk"/>
+        </createIndex>
+
+        <addPrimaryKey columnNames="commit_fk, property_name" constraintName="jv_commit_property_pk"
+                       tableName="jv_commit_property"/>
+
+        <addPrimaryKey columnNames="commit_pk" constraintName="pk_jv_commit" tableName="jv_commit"/>
+
+
+        <addPrimaryKey columnNames="global_id_pk" constraintName="pk_jv_global_id" tableName="jv_global_id"/>
+
+
+        <addPrimaryKey columnNames="snapshot_pk" constraintName="pk_jv_snapshot" tableName="jv_snapshot"/>
+
+    </changeSet>
+
+</databaseChangeLog>

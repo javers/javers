@@ -67,8 +67,8 @@ public class JaversSqlRepository implements JaversRepository {
         try(Session session = sessionFactory.create("get latest snapshots")) {
             return globalIds.stream()
                     .map(id -> finder.getLatest(id, session, false))
-                    .filter(it -> it.isPresent())
-                    .map(it -> it.get())
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
                     .collect(Collectors.toList());
         }
     }
@@ -185,6 +185,13 @@ public class JaversSqlRepository implements JaversRepository {
         if(sqlRepositoryConfiguration.isSchemaManagementEnabled()) {
             schemaManager.ensureSchema();
         }
+    }
+
+    /**
+     * For test only
+     */
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
     }
 
     private boolean isEmpty(Collection c) {

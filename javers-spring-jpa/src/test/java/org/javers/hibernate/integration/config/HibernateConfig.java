@@ -1,5 +1,8 @@
 package org.javers.hibernate.integration.config;
 
+import liquibase.integration.spring.SpringLiquibase;
+import org.hibernate.engine.jdbc.connections.spi.AbstractDataSourceBasedMultiTenantConnectionProviderImpl;
+import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.javers.core.Javers;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.JaversSqlRepository;
@@ -9,7 +12,12 @@ import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -17,15 +25,23 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HibernateConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(HibernateConfig.class);
     public static final String H2_URL = "jdbc:h2:mem:test";
+    public static final String H2_SECONDARY_URL = "jdbc:h2:mem:test-secondary";
+    public static final String TENANT1 = "tenant1";
+    public static final String TENANT2 = "tenant2";
+
     /**
      * Integrates {@link JaversSqlRepository} with Spring {@link JpaTransactionManager}
      */
@@ -35,7 +51,8 @@ public class HibernateConfig {
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(@Qualifier("dataSource") DataSource dataSource,
+                                                                       @Qualifier("secondaryDataSource") DataSource secondaryDataSource) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
         em.setPackagesToScan("org.javers.hibernate.entity", "org.javers.spring.model");
@@ -43,7 +60,8 @@ public class HibernateConfig {
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         em.setJpaProperties(additionalProperties());
-
+        runLiquibase(dataSource);
+        runLiquibase(secondaryDataSource);
         return em;
     }
 
@@ -60,11 +78,21 @@ public class HibernateConfig {
         return new PersistenceExceptionTranslationPostProcessor();
     }
 
-    @Bean
+
+    @Bean(name = "dataSource")
+    @Primary
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.h2.Driver");
         dataSource.setUrl(H2_URL + ";DB_CLOSE_DELAY=-1");
+        return dataSource;
+    }
+
+    @Bean(name = "secondaryDataSource")
+    public DataSource secondaryDataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("org.h2.Driver");
+        dataSource.setUrl(H2_SECONDARY_URL + ";DB_CLOSE_DELAY=-1");
         return dataSource;
     }
 
@@ -104,13 +132,60 @@ public class HibernateConfig {
         return () -> Collections.unmodifiableMap(rv);
     }
 
-    Properties additionalProperties() {
+    @Bean
+    public MultiTenantConnectionProvider multiTenantConnectionProvider(@Qualifier("dataSource") DataSource dataSource,
+                                                                       @Qualifier("secondaryDataSource") DataSource secondaryDataSource) {
+
+        class MultiTenantConnectionProviderImpl extends AbstractDataSourceBasedMultiTenantConnectionProviderImpl {
+
+            private Map<String, DataSource> datasources = new ConcurrentHashMap<>();
+
+            private MultiTenantConnectionProviderImpl(DataSource dataSource,
+                                                      DataSource secondaryDataSource) {
+                datasources.put(TENANT1, dataSource);
+                datasources.put(TENANT2, secondaryDataSource);
+            }
+
+            @Override
+            protected DataSource selectAnyDataSource() {
+                return datasources.get(TENANT1);
+            }
+
+            @Override
+            protected DataSource selectDataSource(String tenantId) {
+                return datasources.get(tenantId);
+            }
+        }
+        return new MultiTenantConnectionProviderImpl(dataSource, secondaryDataSource);
+    }
+
+    private Properties additionalProperties() {
         Properties properties = new Properties();
-        properties.setProperty("hibernate.hbm2ddl.auto", "create");
+        properties.setProperty("hibernate.hbm2ddl.auto", "validate");
         properties.setProperty("hibernate.connection.autocommit", "false");
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         properties.setProperty("hibernate.current_session_context_class", "thread");
         properties.setProperty("hibernate.enable_lazy_load_no_trans", "true");
+        properties.setProperty("hibernate.multiTenancy", "DATABASE");
+        properties.setProperty("hibernate.tenant_identifier_resolver", TenantContext.TenantIdentifierResolver.class.getName());
+        properties.put("hibernate.multi_tenant_connection_provider", multiTenantConnectionProvider(dataSource(), secondaryDataSource()));
         return properties;
+    }
+
+    private static void runLiquibase(DataSource dataSource) {
+        logger.info("run liquibase on {}", dataSource);
+        SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setResourceLoader(new DefaultResourceLoader());
+        liquibase.setDataSource(dataSource);
+        liquibase.setChangeLog("classpath:changelog.xml");
+        liquibase.setDefaultSchema("public");
+        liquibase.setDropFirst(false);
+        liquibase.setShouldRun(true);
+        try {
+            liquibase.afterPropertiesSet();
+            logger.info("ended");
+        } catch (Exception e) {
+            throw new IllegalStateException("liquibase fail", e);
+        }
     }
 }

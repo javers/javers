@@ -21,4 +21,11 @@ public class SessionFactory {
     public void resetKeyGeneratorCache() {
         keyGenerator.reset();
     }
+
+    /**
+     * For test only
+     */
+    public KeyGenerator getKeyGenerator() {
+        return keyGenerator;
+    }
 }

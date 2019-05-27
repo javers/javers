@@ -53,6 +53,13 @@ interface KeyGenerator {
             }
         }
 
+        /**
+         * For test only
+         */
+        public Map<String, Map<String, Sequence>> getSequences() {
+            return sequences;
+        }
+
         private Sequence findSequence(String sequenceName, Session session) {
             Map<String, Sequence> databaseSequences = findDatabaseSequences(session);
             if (!databaseSequences.containsKey(sequenceName)) {

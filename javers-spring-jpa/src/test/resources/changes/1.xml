@@ -1,0 +1,57 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="javers" id="1">
+
+        <createTable tableName="author">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+
+        <createTable tableName="ebook">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="author_id" type="VARCHAR(255)"/>
+            <column name="comments" type="VARCHAR(255)"/>
+        </createTable>
+
+        <createTable tableName="ebook_comments">
+            <column name="ebook_id" type="VARCHAR(255)"/>
+            <column name="comments" type="VARCHAR(255)"/>
+        </createTable>
+
+
+        <createTable tableName="person">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="boss_id" type="VARCHAR(255)"/>
+        </createTable>
+
+        <createTable tableName="dummyObject">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addPrimaryKey columnNames="id" constraintName="author_id_pk" tableName="author"/>
+        <addPrimaryKey columnNames="id" constraintName="ebook_id_pk" tableName="ebook"/>
+        <addPrimaryKey columnNames="id" constraintName="person_id_pk" tableName="person"/>
+
+        <addForeignKeyConstraint baseColumnNames="boss_id" baseTableName="person"
+                                 constraintName="person_boss_id_fk"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="person"/>
+    </changeSet>
+
+</databaseChangeLog>

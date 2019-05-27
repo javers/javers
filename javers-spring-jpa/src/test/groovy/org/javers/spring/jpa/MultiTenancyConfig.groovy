@@ -2,55 +2,43 @@ package org.javers.spring.jpa
 
 import org.javers.core.Javers
 import org.javers.hibernate.integration.config.HibernateConfig
+import org.javers.repository.sql.ConnectionProvider
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.JaversSqlRepository
 import org.javers.repository.sql.SqlRepositoryBuilder
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
-import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
-import org.springframework.transaction.annotation.TransactionManagementConfigurer
 
-import javax.persistence.EntityManagerFactory
+import javax.persistence.EntityManager
+import javax.persistence.PersistenceContext
 
 @Configuration()
 @EnableJpaRepositories(basePackages = ["org.javers.hibernate.entity"])
 @EnableTransactionManagement()
 @EnableAspectJAutoProxy
 @Import(HibernateConfig)
-class MultipleTxManagersConfig extends HibernateConfig implements TransactionManagementConfigurer {
+class MultiTenancyConfig extends HibernateConfig {
 
-
-    @Override
-    PlatformTransactionManager annotationDrivenTransactionManager() {
-        return transactionManager()
-    }
+    @PersistenceContext
+    private EntityManager entityManager
 
     @Bean
-    PlatformTransactionManager secondTransactionManager(EntityManagerFactory emf) {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(emf);
-
-        return transactionManager;
-    }
-
-    @Bean
-    JaversSqlRepository sqlRepository(){
+    JaversSqlRepository sqlRepository(ConnectionProvider jpaConnectionProvider) {
         SqlRepositoryBuilder
                 .sqlRepository()
-                .withConnectionProvider(jpaConnectionProvider())
+                .withConnectionProvider(jpaConnectionProvider)
                 .withDialect(DialectName.H2)
+                .withSchemaManagementEnabled(false)
                 .build()
     }
 
     @Bean
-    Javers javers(JaversSqlRepository sqlRepository,
-                  @Qualifier("transactionManager") PlatformTransactionManager transactionManager) {
+    Javers javers(JaversSqlRepository sqlRepository, PlatformTransactionManager transactionManager) {
         TransactionalJaversBuilder
                 .javers()
                 .withTxManager(transactionManager)

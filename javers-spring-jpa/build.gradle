@@ -15,4 +15,6 @@ dependencies {
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile "org.spockframework:spock-spring:$spockVersion"
     testCompile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+    testCompile "org.liquibase:liquibase-core:$liquibaseCoreVersion"
+    testCompile "org.liquibase.ext:liquibase-hibernate5:$liquibaseHibernateVersion"
 }
