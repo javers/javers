@@ -30,5 +30,9 @@ class JaversMongoAutoConfigurationDefaultsTest extends Specification{
         javersProperties.auditableAspectEnabled
         javersProperties.springDataAuditableRepositoryAspectEnabled
         javersProperties.packagesToScan == ""
+       !javersProperties.mongodb.database
+       !javersProperties.mongodb.uri
+        javersProperties.mongodb.host == "localhost"
+        javersProperties.mongodb.port == 27017
     }
 }

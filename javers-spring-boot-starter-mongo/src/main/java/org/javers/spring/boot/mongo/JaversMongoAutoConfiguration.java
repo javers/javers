@@ -1,6 +1,5 @@
 package org.javers.spring.boot.mongo;
 
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -11,16 +10,15 @@ import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRe
 import org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.mongo.MongoProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Import;
 
 import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDocumentDBCompatibility;
 
@@ -29,27 +27,24 @@ import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDoc
  */
 @Configuration
 @EnableAspectJAutoProxy
-@EnableConfigurationProperties({JaversMongoProperties.class})
+@Import({JaversMongoConfig.class})
 public class JaversMongoAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(JaversMongoAutoConfiguration.class);
 
-    @Autowired
-    private JaversMongoProperties javersMongoProperties;
+    private final JaversMongoProperties javersMongoProperties;
+    private final MongoDatabase mongoDatabase;
 
-    @Autowired
-    private MongoClient mongoClient; //from spring-boot-starter-data-mongodb
+    public JaversMongoAutoConfiguration(JaversMongoProperties javersMongoProperties
+            , @Qualifier("javersMongoDatabase") MongoDatabase mongoDatabase) {
+        this.javersMongoProperties = javersMongoProperties;
+        this.mongoDatabase = mongoDatabase;
+    }
 
-    @Autowired
-    private MongoProperties mongoProperties; //from spring-boot-starter-data-mongodb
 
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
     public Javers javers() {
         logger.info("Starting javers-spring-boot-starter-mongo ...");
-
-        MongoDatabase mongoDatabase = mongoClient.getDatabase( mongoProperties.getMongoClientDatabase() );
-
-        logger.info("connecting to database: {}", mongoProperties.getMongoClientDatabase());
 
         MongoRepository javersRepository = createMongoRepository(javersMongoProperties, mongoDatabase);
 
