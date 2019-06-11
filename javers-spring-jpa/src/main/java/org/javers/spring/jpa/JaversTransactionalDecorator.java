@@ -178,13 +178,15 @@ public class JaversTransactionalDecorator implements InitializingBean, Javers {
     }
 
     private void ensureSchema() {
-        TransactionTemplate tmpl = new TransactionTemplate(txManager);
-        tmpl.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                javersSqlRepository.ensureSchema();
-            }
-        });
+        if (javersSqlRepository.getConfiguration().isSchemaManagementEnabled()) {
+            TransactionTemplate tmpl = new TransactionTemplate(txManager);
+            tmpl.execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+                    javersSqlRepository.ensureSchema();
+                }
+            });
+        }
     }
 
     @Override
