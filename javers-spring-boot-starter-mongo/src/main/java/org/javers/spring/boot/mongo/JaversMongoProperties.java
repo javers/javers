@@ -1,6 +1,5 @@
 package org.javers.spring.boot.mongo;
 
-import com.mongodb.MongoClientURI;
 import org.javers.spring.JaversSpringProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -12,7 +11,7 @@ public class JaversMongoProperties extends JaversSpringProperties {
 
     private boolean documentDbCompatibilityEnabled = false;
 
-    private Mongodb mongodb = new Mongodb();
+    private Mongodb mongodb;
 
     public boolean isDocumentDbCompatibilityEnabled() {
         return documentDbCompatibilityEnabled;
@@ -31,60 +30,46 @@ public class JaversMongoProperties extends JaversSpringProperties {
     }
 
     /**
-     * Override the spring-boot-starter-data-mongodb
-     * configuration and use the Javers defined properties.
+     * If <code>javers.mongodb</code> configuration is non-empty,
+     * Javers uses it to connect to the dedicated MongoDB.
+     * <br/>
+     * Otherwise, Javers reuses application's MongoDB configured in the standard way
+     * by <code>spring-boot-starter-data-mongodb</code>
+     * (typically defined in <code>spring.data.mongodb</code> configuration).
      */
     public static class Mongodb {
-
         /**
-         * Default port used when the configured port is {@code null}.
-         */
-        public static final int DEFAULT_PORT = 27017;
-
-        /**
-         * Default URI used when the configured URI is {@code null}.
-         */
-        public static final String DEFAULT_URI = "mongodb://localhost/test";
-
-        /**
-         * Default host used when the configured port is {@code null}.
-         */
-        public static final String DEFAULT_HOST = "localhost";
-
-        /**
-         * Mongo server host. Cannot be set with URI.
-         * If not set points to {@literal localhost}
-         */
-        private String host = DEFAULT_HOST;
-
-        /**
-         * Mongo server port. Cannot be set with URI.
-         * If not set value {@literal 27017}
-         */
-        private Integer port = DEFAULT_PORT;
-
-        /**
-         * Mongo database URI. Cannot be set with host, port and credentials.
+         * Should not be set when host is set.
          */
         private String uri;
 
         /**
-         * Database name.
+         * Should not be set when URI is set.
+         */
+        private String host;
+
+        /**
+         * Should not be set when URI is set.
+         */
+        private Integer port;
+
+        /**
+         * Should not be set when URI is set.
          */
         private String database;
 
         /**
-         * Authentication database name.
+         * Should not be set when URI is set.
          */
         private String authenticationDatabase;
 
         /**
-         * Login user of the mongo server. Cannot be set with URI.
+         * Should not be set when URI is set.
          */
         private String username;
 
         /**
-         * Login password of the mongo server. Cannot be set with URI.
+         * Should not be set when URI is set.
          */
         private char[] password;
 
@@ -143,23 +128,9 @@ public class JaversMongoProperties extends JaversSpringProperties {
         public void setPassword(char[] password) {
             this.password = password;
         }
-
-        public String getMongoClientDatabase() {
-            if (this.database != null) {
-                return this.database;
-            }
-            return new MongoClientURI(determineUri()).getDatabase();
-        }
-
-        private String determineUri() {
-            return (this.uri != null) ? this.uri : DEFAULT_URI;
-        }
     }
 
-    public boolean javersMongodbEnabled() {
-        if(getMongodb().getDatabase()!= null || getMongodb().getUri()!= null) {
-            return true;
-        }
-        return false;
+    public boolean isDedicatedMongodbConfigurationEnabled() {
+        return mongodb != null;
     }
 }

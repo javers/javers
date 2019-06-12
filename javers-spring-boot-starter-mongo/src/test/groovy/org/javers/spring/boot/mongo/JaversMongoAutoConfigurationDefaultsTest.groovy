@@ -1,12 +1,11 @@
 package org.javers.spring.boot.mongo
 
+import com.mongodb.MongoClient
+import com.mongodb.client.MongoDatabase
 import org.javers.core.Javers
-import org.javers.core.metamodel.type.EntityType
-import org.javers.spring.auditable.AuthorProvider
-import org.javers.spring.auditable.SpringSecurityAuthorProvider
+import org.javers.repository.jql.QueryBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
 /**
@@ -14,6 +13,11 @@ import spock.lang.Specification
  */
 @SpringBootTest(classes = [TestApplication])
 class JaversMongoAutoConfigurationDefaultsTest extends Specification{
+
+    @Autowired Javers javers
+
+    @Autowired
+    private MongoClient mongoClient; //from spring-boot-starter-data-mongodb
 
     @Autowired
     JaversMongoProperties javersProperties
@@ -30,9 +34,19 @@ class JaversMongoAutoConfigurationDefaultsTest extends Specification{
         javersProperties.auditableAspectEnabled
         javersProperties.springDataAuditableRepositoryAspectEnabled
         javersProperties.packagesToScan == ""
-       !javersProperties.mongodb.database
-       !javersProperties.mongodb.uri
-        javersProperties.mongodb.host == "localhost"
-        javersProperties.mongodb.port == 27017
+       !javersProperties.mongodb
+    }
+
+    def "should connect to Mongo configured in spring.data.mongodb properties"(){
+      when:
+      def dummyEntity = new DummyEntity(UUID.randomUUID().hashCode())
+      javers.commit("a", dummyEntity)
+      def snapshots = javers.findSnapshots(QueryBuilder.byInstance(dummyEntity).build())
+
+      MongoDatabase mongoDatabase = mongoClient.getDatabase( "spring-mongo" )
+
+      then:
+      snapshots.size() == 1
+      mongoDatabase.getCollection("jv_snapshots").countDocuments() == 1
     }
 }
