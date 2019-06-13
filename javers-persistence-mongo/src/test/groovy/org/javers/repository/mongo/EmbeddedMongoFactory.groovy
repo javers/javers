@@ -16,20 +16,17 @@ class EmbeddedMongoFactory {
     static final String BIND_IP = "localhost"
     static int PORT = 12345
 
-    static IMongodConfig mongodConfig = new MongodConfigBuilder()
-            .version(Version.Main.PRODUCTION)
-            .net(new Net(BIND_IP, PORT, Network.localhostIsIPv6()))
-            .build();
-
-
     static class EmbeddedMongo {
         private MongodExecutable mongodExecutable
         private MongoClient mongoClient
 
-        EmbeddedMongo () {
-            mongodExecutable = starter.prepare(mongodConfig)
+        EmbeddedMongo (int port) {
+            mongodExecutable = starter.prepare(new MongodConfigBuilder()
+                    .version(Version.Main.PRODUCTION)
+                    .net(new Net(BIND_IP, port, Network.localhostIsIPv6()))
+                    .build())
             mongodExecutable.start()
-            mongoClient = new MongoClient(BIND_IP, PORT)
+            mongoClient = new MongoClient(BIND_IP, port)
         }
 
         MongoClient getClient () {
@@ -43,7 +40,7 @@ class EmbeddedMongoFactory {
         }
     }
 
-    static EmbeddedMongo create() {
-        return new EmbeddedMongo()
+    static EmbeddedMongo create(int port = PORT) {
+        return new EmbeddedMongo(port)
     }
 }

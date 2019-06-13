@@ -22,3 +22,16 @@ task integrationTest(type: Test) {
 test {
     exclude 'org/javers/repository/mongo/integration/**'
 }
+
+task testJar(type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+
+configurations {
+    testArtifacts
+}
+
+artifacts {
+    testArtifacts testJar
+}

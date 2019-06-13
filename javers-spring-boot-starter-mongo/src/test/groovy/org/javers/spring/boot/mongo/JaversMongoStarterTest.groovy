@@ -14,7 +14,7 @@ import spock.lang.Specification
  */
 @SpringBootTest(classes = [TestApplication])
 @ActiveProfiles("test")
-class JaversMongoAutoConfigurationTest extends Specification{
+class JaversMongoStarterTest extends Specification{
 
     @Autowired
     Javers javers

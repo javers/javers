@@ -7,8 +7,3 @@ javers:
   packagesToScan: org.javers.spring.boot
   commitIdGenerator: random
   documentDbCompatibilityEnabled: true
-
-spring:
-  data:
-    mongodb:
-      database: spring-mongo
