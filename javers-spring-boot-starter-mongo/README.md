@@ -47,7 +47,7 @@ If greater control is required over how Javers configures the `MongoClient` inst
 you can configure a `MongoClientOptions` bean named `javersMongoClientOptions`.
 If there is no such bean, default client options are used. 
 
-For example, if you wan to enable SSL and set socket timeout value,
+For example, if you want to enable SSL and set socket timeout value,
 define this bean:
 
 ```java
