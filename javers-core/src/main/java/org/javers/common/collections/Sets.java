@@ -1,6 +1,7 @@
 package org.javers.common.collections;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.property.MissingProperty;
 
 import java.util.*;
 import java.util.Collections;
@@ -20,7 +21,7 @@ public class Sets {
 
 
     public static Set wrapNull(Object set) {
-        if (set == null) {
+        if (set == null || set == MissingProperty.INSTANCE) {
             return Collections.emptySet();
         }
         return (Set) set;

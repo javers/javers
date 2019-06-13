@@ -504,7 +504,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         String secondProperty
     }
 
-    def "should report which value properties were added, removed or updated for a given object"() {
+    def "should report which value properties were added, removed or updated"() {
         given:
         def javers = javers().build()
         def object1 = new Class1WithValue(id:1, sharedValue: "Some Name",     firstProperty:  "one")
@@ -547,7 +547,7 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         SnapshotEntity secondRef
     }
 
-    def "should report with reference properties were added, removed or updated for a given object"() {
+    def "should report when a reference property is added, removed or updated"() {
         given:
         def javers = javers().build()
         def object1 = new Class1WithRef(id:1, sharedRef:new SnapshotEntity(id:1), firstRef:  new SnapshotEntity(id:21))
@@ -559,7 +559,6 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         def changes = diff.getChangesByType(PropertyChange)
 
         then:
-        println diff.prettyPrint()
         changes.size() == 3
 
         def vChange = changes.find{it.propertyValueChanged}
@@ -576,5 +575,44 @@ class JaversDiffE2ETest extends AbstractDiffTest {
         rChange.propertyName == "firstRef"
         rChange.left.value().endsWith "SnapshotEntity/21"
         rChange.right == null
+    }
+
+    @TypeName("E")
+    class Entity1 {
+        @Id int id
+    }
+
+    @TypeName("E")
+    class Entity2 {
+        @Id int id
+        List<String> propsList
+        Set<String> propsSet
+    }
+
+    def "should report when a list property is added or removed"(){
+      given:
+      def javers = javers().build()
+      def object1 = new Entity1(id:1)
+      def object2 = new Entity2(id:1, propsList: ["p"], propsSet: ["p"] as Set)
+
+      when:
+      def diff = javers.compare(object1, object2)
+      println diff.prettyPrint()
+      def changes = diff.getChangesByType(PropertyChange)
+
+      then:
+      changes.size() == 2
+      changes[0].propertyAdded
+      changes[1].propertyAdded
+
+      when:
+      diff = javers.compare(object2, object1)
+      println diff.prettyPrint()
+      changes = diff.getChangesByType(PropertyChange)
+
+      then:
+      changes.size() == 2
+      changes[0].propertyRemoved
+      changes[1].propertyRemoved
     }
 }

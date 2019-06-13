@@ -1,5 +1,7 @@
 package org.javers.common.collections;
 
+import org.javers.core.metamodel.property.MissingProperty;
+
 import java.util.*;
 import java.util.Collections;
 import java.util.function.Function;
@@ -14,10 +16,10 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class Lists {
 
     public static List wrapNull(Object list) {
-        if (list == null) {
+        if (list == null || list == MissingProperty.INSTANCE) {
             return Collections.emptyList();
         }
-        return (List) list;
+        return (List)list;
     }
 
     public static <T> List<T> add(List<T> list, T element) {
