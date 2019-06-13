@@ -5,7 +5,7 @@ import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest(classes = [TestApplication])
 @ActiveProfiles("dedicated-mongo-uri")
-class JaversMongoAutoConfigurationDedicatedMongoByUriTest extends JaversMongoAutoConfigurationDedicatedMongoTest {
+class JaversMongoStarterDedicatedMongoByUriTest extends JaversMongoStarterDedicatedMongoTest {
 
     def "should read dedicated mongo configuration from URI"(){
         expect:

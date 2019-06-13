@@ -5,7 +5,7 @@ import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest(classes = [TestApplication])
 @ActiveProfiles("dedicated-mongo-host")
-class JaversMongoAutoConfigurationDedicatedMongoByHostTest extends JaversMongoAutoConfigurationDedicatedMongoTest {
+class JaversMongoStarterDedicatedMongoByHostTest extends JaversMongoStarterDedicatedMongoTest {
 
     def "should read dedicated mongo configuration from host"(){
         expect:

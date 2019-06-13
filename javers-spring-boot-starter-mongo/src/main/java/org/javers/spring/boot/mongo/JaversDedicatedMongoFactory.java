@@ -8,6 +8,7 @@ import org.javers.common.exception.JaversExceptionCode;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Helper class for creating {@code MongoClient} based on Javers MongoDB properties.
@@ -17,8 +18,8 @@ class JaversDedicatedMongoFactory {
     private static String DEFAULT_HOST = "localhost";
     private static int DEFAULT_PORT = 27017;
 
-    static MongoDatabase createMongoDatabase(JaversMongoProperties properties) {
-        MongoClientOptions options = MongoClientOptions.builder().build();
+    static MongoDatabase createMongoDatabase(JaversMongoProperties properties, Optional<MongoClientOptions> mongoClientOptions) {
+        MongoClientOptions options = mongoClientOptions.orElse(MongoClientOptions.builder().build());
 
         if(properties.getMongodb().getUri() != null) {
             MongoClientURI mongoClientURI = new MongoClientURI(properties.getMongodb().getUri());

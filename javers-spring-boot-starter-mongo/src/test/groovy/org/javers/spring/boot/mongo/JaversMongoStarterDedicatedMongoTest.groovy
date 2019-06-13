@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification
 
-abstract class JaversMongoAutoConfigurationDedicatedMongoTest extends Specification {
+abstract class JaversMongoStarterDedicatedMongoTest extends Specification {
 
     static int PORT = 32001
 

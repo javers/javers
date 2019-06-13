@@ -12,7 +12,7 @@ import spock.lang.Specification
  * @author pawelszymczyk
  */
 @SpringBootTest(classes = [TestApplication])
-class JaversMongoAutoConfigurationDefaultsTest extends Specification{
+class JaversMongoStarterDefaultsTest extends Specification{
 
     @Autowired Javers javers
 
