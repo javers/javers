@@ -25,6 +25,7 @@ import org.javers.core.metamodel.type.ValueObjectType;
 import org.javers.repository.api.*;
 import org.javers.repository.mongo.model.MongoHeadId;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -273,12 +274,12 @@ public class MongoRepository implements JaversRepository, ConfigurationAware {
                 query =  Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(params.to().get())));
             }
             if (params.toCommitId().isPresent()) {
-                double commitId = params.toCommitId().get().valueAsNumber().doubleValue();
+                BigDecimal commitId = params.toCommitId().get().valueAsNumber();
                 query = Filters.and(query, Filters.lte(COMMIT_ID, commitId));
             }
             if (params.commitIds().size() > 0) {
                 query = Filters.in(COMMIT_ID, params.commitIds().stream()
-                        .map(c -> c.valueAsNumber().doubleValue()).collect(Collectors.toSet()));
+                        .map(CommitId::valueAsNumber).collect(Collectors.toSet()));
             }
             if (params.version().isPresent()) {
                 query = Filters.and(query, createVersionQuery(params.version().get()));
