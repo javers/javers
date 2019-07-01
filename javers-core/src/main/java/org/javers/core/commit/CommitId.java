@@ -6,6 +6,7 @@ import org.javers.common.validation.Validate;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * @see CommitSeqGenerator
@@ -28,7 +29,7 @@ public final class CommitId implements Comparable<CommitId>, Serializable {
         BigDecimal minorFractional = majorDotMinor.subtract(BigDecimal.valueOf(major));
         BigDecimal minor = minorFractional.movePointRight(2);
 
-        return new CommitId(major, minor.setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+        return new CommitId(major, minor.setScale(0, RoundingMode.HALF_UP).intValue());
     }
 
     public static CommitId valueOf(String majorDotMinor) {
@@ -54,7 +55,7 @@ public final class CommitId implements Comparable<CommitId>, Serializable {
     public BigDecimal valueAsNumber(){
         BigDecimal major = BigDecimal.valueOf(majorId);
         BigDecimal minorFractional = BigDecimal.valueOf(minorId).movePointLeft(2);
-        return major.add(minorFractional).setScale(2, BigDecimal.ROUND_HALF_UP);
+        return major.add(minorFractional).setScale(2, RoundingMode.HALF_UP);
     }
 
     public boolean isBeforeOrEqual(CommitId that){

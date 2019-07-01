@@ -6,7 +6,7 @@ import spock.lang.Unroll
 class CommitIdTest extends Specification {
 
     @Unroll
-    def "should create with large majorId=#majorId and minorId=#minorId from BigDecimal #input"() {
+    def "should create CommitId with large majorId=#majorId and minorId=#minorId from BigDecimal #input"() {
         when:
         def commitId = CommitId.valueOf(new BigDecimal(input))
 
