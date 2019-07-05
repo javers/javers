@@ -261,6 +261,9 @@ public class JaversSchemaManager extends SchemaNameAware {
     }
 
     private String convertCase(String identifier, DatabaseMetaData metadata) throws SQLException {
+        if (identifier == null || identifier.isEmpty()) {
+            return identifier;
+        }
         if (metadata.storesLowerCaseIdentifiers()) {
             return identifier.toLowerCase();
         } else {
