@@ -71,7 +71,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
 
     private Schema snapshotTableSchema(Dialect dialect){
         DBObjectName tableName = getSnapshotTableName();
-        Schema schema = new Schema(dialect);
+        Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
         primaryKey(SNAPSHOT_PK, schema, relationBuilder);
         relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
@@ -91,7 +91,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
 
     private Schema commitTableSchema(Dialect dialect) {
         DBObjectName tableName = getCommitTableName();
-        Schema schema = new Schema(dialect);
+        Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
         primaryKey(COMMIT_PK,schema,relationBuilder);
         relationBuilder
@@ -108,7 +108,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
 
     private Schema commitPropertiesTableSchema(Dialect dialect) {
         DBObjectName tableName = getCommitPropertyTableName();
-        Schema schema = new Schema(dialect);
+        Schema schema = emptySchema(dialect);
         RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
         relationBuilder
             .primaryKey(tableName.localName() + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
@@ -134,7 +134,9 @@ public class FixedSchemaFactory extends SchemaNameAware {
 
     private Schema globalIdTableSchema(Dialect dialect){
         DBObjectName tableName = getGlobalIdTableName();
-        Schema schema = new Schema(dialect);
+
+        Schema schema = emptySchema(dialect);
+
         RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
         primaryKey(GLOBAL_ID_PK, schema,relationBuilder);
         relationBuilder
@@ -148,6 +150,10 @@ public class FixedSchemaFactory extends SchemaNameAware {
         columnsIndex(tableName, schema, GLOBAL_ID_OWNER_ID_FK);
 
         return schema;
+    }
+
+    Schema emptySchema(Dialect dialect) {
+        return getSchemaName().map(s -> new Schema(dialect, s)).orElse(new Schema(dialect));
     }
 
     private void foreignKey(DBObjectName tableName, String fkColName, boolean isPartOfPrimaryKey, String targetTableName, String targetPkColName, RelationBuilder relationBuilder){
