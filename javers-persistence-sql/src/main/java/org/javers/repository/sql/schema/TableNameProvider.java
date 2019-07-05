@@ -78,4 +78,8 @@ public class TableNameProvider {
     DBObjectName getSnapshotTableName() {
         return new DBObjectName(schemaName, SNAPSHOT_TABLE_NAME);
     }
+
+    Optional<String> getSchemaName() {
+        return schemaName;
+    }
 }

@@ -9,10 +9,11 @@ import java.sql.DriverManager
 class H2SqlRepositoryE2EWithSchemaTest extends H2SqlRepositoryE2ETest {
 
     Connection createConnection() {
-        DriverManager.getConnection("jdbc:h2:mem:WithSchemaTest")
+        DriverManager.getConnection(
+                "jdbc:h2:mem:javers;INIT=create schema if not exists javers")
     }
 
     String getSchema() {
-        return "public"
+        return "javers"
     }
 }
