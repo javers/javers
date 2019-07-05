@@ -1,30 +1,29 @@
-package org.javers.repository.sql.integration.mssql
+package org.javers.repository.sql.integration.docker
 
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.JaversSqlRepositoryE2ETest
 import org.junit.ClassRule
-import org.junit.Rule
-import org.testcontainers.containers.MSSQLServerContainer
+import org.testcontainers.containers.PostgreSQLContainer;
 import spock.lang.Shared
 
 import java.sql.Connection
 import java.sql.DriverManager
 
-class MsSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
+class PostgresDockerIntegrationTest extends JaversSqlRepositoryE2ETest {
 
     @ClassRule @Shared
-    public MSSQLServerContainer mssqlserver = new MSSQLServerContainer();
+    public PostgreSQLContainer postgres = new PostgreSQLContainer()
 
     Connection createConnection() {
-       String url = mssqlserver.jdbcUrl
-       String user = mssqlserver.username
-       String pass = mssqlserver.password
+       String url = postgres.jdbcUrl
+       String user = postgres.username
+       String pass = postgres.password
 
        DriverManager.getConnection(url, user, pass)
     }
 
     DialectName getDialect() {
-        DialectName.MSSQL
+        DialectName.POSTGRES
     }
 
     String getSchema() {

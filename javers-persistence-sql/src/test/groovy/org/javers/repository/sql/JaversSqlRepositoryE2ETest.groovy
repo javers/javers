@@ -78,7 +78,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
         stmt.close()
     }
 
-    def "should not create javers tables if they already exists"(){
+    def "should not create jv_ tables if they already exists"(){
       given:
       def firstJavers = javers
       println "javers" + javers
