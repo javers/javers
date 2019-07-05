@@ -216,10 +216,13 @@ public class JaversSchemaManager extends SchemaNameAware {
 
     private void ensureTable(String tableName, Schema schema) {
 
+        String schemaName = (schema.getSchemaName() == null || schema.getSchemaName().isEmpty())
+                ? "default" : schema.getSchemaName();
         if (schemaInspector.relationExists(tableName)) {
+            logger.info("table {}.{} exists", schemaName, tableName);
             return;
         }
-        logger.info("creating javers table {} ...", tableName);
+        logger.info("creating javers table {}.{} ...", schemaName, tableName);
         schemaManager.create(schema);
 
     }

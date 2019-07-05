@@ -78,6 +78,19 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
         stmt.close()
     }
 
+    def "should not create javers tables if they already exists "(){
+      given:
+      def firstJavers = javers
+      println "javers" + javers
+
+      when:
+      buildJaversInstance()
+      println "javers" + javers
+
+      then:
+      firstJavers != javers
+    }
+
     def "should select Head using max CommitId and not table PK"(){
         given:
         def sql = new Sql(getConnection())
