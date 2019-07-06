@@ -4,6 +4,7 @@ import com.google.common.html.HtmlEscapers;
 import org.javers.repository.sql.ConnectionProvider;
 import org.polyjdbc.core.PolyJDBC;
 import org.polyjdbc.core.dialect.*;
+import org.polyjdbc.core.exception.SchemaInspectionException;
 import org.polyjdbc.core.schema.SchemaInspector;
 import org.polyjdbc.core.schema.SchemaManager;
 import org.polyjdbc.core.schema.model.IndexBuilder;
@@ -215,13 +216,59 @@ public class JaversSchemaManager extends SchemaNameAware {
     }
 
     private void ensureTable(String tableName, Schema schema) {
+        String schemaName = (schema.getSchemaName() == null || schema.getSchemaName().isEmpty())
+                ? "" : schema.getSchemaName();
 
-        if (schemaInspector.relationExists(tableName)) {
+        if (relationExists(tableName, schema.getSchemaName())) {
+            logger.debug("table {}.{} exists", schemaName, tableName);
             return;
         }
-        logger.info("creating javers table {} ...", tableName);
+        logger.debug("creating javers table {}.{} ...", schemaName, tableName);
         schemaManager.create(schema);
 
+    }
+
+    boolean relationExists(String name, String schemaName) {
+        try {
+            Connection connection = connectionProvider.getConnection();
+
+            DatabaseMetaData metadata = connection.getMetaData();
+            String catalog = connection.getCatalog();
+
+            ResultSet resultSet = metadata.getTables(
+                    catalog,
+                    convertCase(schemaName, metadata),
+                    convertCase(name, metadata),
+                    new String[]{"TABLE"});
+
+            if (schemaName != null) {
+                return resultSet.next();
+            } else {
+                String tableSchemaName;
+                do {
+                    if (!resultSet.next()) {
+                        return false;
+                    }
+
+                    tableSchemaName = resultSet.getString("TABLE_SCHEM");
+                } while(tableSchemaName != null && !tableSchemaName.equalsIgnoreCase("public") && !tableSchemaName.equals("") && (!(this.dialect instanceof MsSqlDialect) || !tableSchemaName.equalsIgnoreCase("dbo")));
+
+                return true;
+            }
+        } catch (SQLException var4) {
+            throw new SchemaInspectionException("RELATION_LOOKUP_ERROR", "Failed to obtain relation list when looking for relation " + name, var4);
+        }
+    }
+
+    private String convertCase(String identifier, DatabaseMetaData metadata) throws SQLException {
+        if (identifier == null || identifier.isEmpty()) {
+            return identifier;
+        }
+        if (metadata.storesLowerCaseIdentifiers()) {
+            return identifier.toLowerCase();
+        } else {
+            return metadata.storesUpperCaseIdentifiers() ? identifier.toUpperCase() : identifier;
+        }
     }
 
     private void addStringColumn(String tableName, String colName, int len) {

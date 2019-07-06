@@ -1,19 +1,19 @@
-package org.javers.repository.sql.integration.mssql
+package org.javers.repository.sql.integration.docker
 
 import org.javers.repository.sql.DialectName
 import org.javers.repository.sql.JaversSqlRepositoryE2ETest
 import org.junit.ClassRule
-import org.junit.Rule
 import org.testcontainers.containers.MSSQLServerContainer
 import spock.lang.Shared
 
 import java.sql.Connection
 import java.sql.DriverManager
 
-class MsSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
+class MSSqlDockerIntegrationWithSchemaTest extends JaversSqlRepositoryE2ETest {
 
     @ClassRule @Shared
-    public MSSQLServerContainer mssqlserver = new MSSQLServerContainer();
+    public MSSQLServerContainer mssqlserver = new MSSQLServerContainer()
+            .withInitScript("init_postgresql_with_schema.sql")
 
     Connection createConnection() {
        String url = mssqlserver.jdbcUrl
@@ -28,6 +28,6 @@ class MsSqlIntegrationTest extends JaversSqlRepositoryE2ETest {
     }
 
     String getSchema() {
-        return null
+        return "javers"
     }
 }

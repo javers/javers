@@ -41,6 +41,10 @@ class JaversRepositoryE2ETest extends Specification {
     private RandomCommitGenerator randomCommitGenerator = null
 
     def setup() {
+        buildJaversInstance()
+    }
+
+    void buildJaversInstance() {
         dateProvider = prepareDateProvider()
         repository = prepareJaversRepository()
 

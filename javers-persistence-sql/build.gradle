@@ -14,9 +14,9 @@ dependencies {
     testCompile 'org.mariadb.jdbc:mariadb-java-client:2.2.3'
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
     testCompile "joda-time:joda-time:$jodaVersion"
-    testCompile "org.testcontainers:mssqlserver:1.10.6"
-    testCompile  "com.microsoft.sqlserver:mssql-jdbc:7.2.1.jre8"
-
+    testCompile "org.testcontainers:mssqlserver:$testcontainers"
+    testCompile "org.testcontainers:postgresql:$testcontainers"
+    testCompile "com.microsoft.sqlserver:mssql-jdbc:7.2.1.jre8"
 }
 
 task integrationTest(type: Test) {
@@ -26,25 +26,6 @@ task integrationTest(type: Test) {
     testLogging {
         exceptionFormat = 'full'
         events 'failed', 'passed'
-    }
-}
-
-task integrationTestMs(type: Test) {
-    dependencies{
-        testCompile files('../libs/sqljdbc4.jar') //sqljdbc4.jar should be manually copied to project /libs and .gitingored
-    }
-    filter {
-        includeTestsMatching 'org.javers.repository.sql.integration.mssql.*'
-    }
-}
-
-task integrationTestOracle(type: Test) {
-    dependencies{
-        testCompile files('../libs/ojdbc6.jar') //ojdbc6.jar should be manually copied to project /libs and .gitingored
-        testCompile files('../libs/xdb6.jar')
-    }
-    filter {
-        includeTestsMatching 'org.javers.repository.sql.integration.oracle.*'
     }
 }
 
