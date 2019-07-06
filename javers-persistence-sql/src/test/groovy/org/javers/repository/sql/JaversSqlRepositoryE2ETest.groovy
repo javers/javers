@@ -228,7 +228,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
         given:
         def cnt = new AtomicInteger()
         def sId = 222
-        def threads = 40
+        def threads = 20
         //initial commit
         javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
         getConnection().commit()

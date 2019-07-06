@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * non-configurable schema factory, gives you schema with default table names
+ * non-configurable schema factory, gives schema with default table names
  *
  * @author bartosz walacik
  */
@@ -72,7 +72,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
     private Schema snapshotTableSchema(Dialect dialect){
         DBObjectName tableName = getSnapshotTableName();
         Schema schema = emptySchema(dialect);
-        RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
+        RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
         primaryKey(SNAPSHOT_PK, schema, relationBuilder);
         relationBuilder.withAttribute().string(SNAPSHOT_TYPE).withMaxLength(200).and()
                        .withAttribute().longAttr(SNAPSHOT_VERSION).and()
@@ -92,7 +92,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
     private Schema commitTableSchema(Dialect dialect) {
         DBObjectName tableName = getCommitTableName();
         Schema schema = emptySchema(dialect);
-        RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
+        RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
         primaryKey(COMMIT_PK,schema,relationBuilder);
         relationBuilder
                 .withAttribute().string(COMMIT_AUTHOR).withMaxLength(200).and()
@@ -109,7 +109,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
     private Schema commitPropertiesTableSchema(Dialect dialect) {
         DBObjectName tableName = getCommitPropertyTableName();
         Schema schema = emptySchema(dialect);
-        RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
+        RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
         relationBuilder
             .primaryKey(tableName.localName() + "_pk").using(COMMIT_PROPERTY_COMMIT_FK, COMMIT_PROPERTY_NAME).and()
             .withAttribute().string(COMMIT_PROPERTY_NAME).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).notNull().and()
@@ -137,7 +137,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
 
         Schema schema = emptySchema(dialect);
 
-        RelationBuilder relationBuilder = schema.addRelation(tableName.nameWithSchema());
+        RelationBuilder relationBuilder = schema.addRelation(tableName.localName());
         primaryKey(GLOBAL_ID_PK, schema,relationBuilder);
         relationBuilder
                 .withAttribute().string(GLOBAL_ID_LOCAL_ID).withMaxLength(MAX_INDEX_KEY_LEN_IN_MYSQL).and()
@@ -179,7 +179,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
         }
         schema.addIndex(indexName)
                 .indexing(indexedCols.indexedColNames())
-                .on(tableName.nameWithSchema())
+                .on(tableName.localName())
                 .build();
     }
 
@@ -190,7 +190,7 @@ public class FixedSchemaFactory extends SchemaNameAware {
     private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder) {
         relationBuilder.withAttribute().longAttr(pkColName).withAdditionalModifiers("AUTO_INCREMENT").notNull().and()
                 .primaryKey("jv_"+pkColName).using(pkColName).and();
-        schema.addSequence(getSequenceNameWithSchema(pkColName)).build();
+        schema.addSequence(getSequenceName(pkColName)).build();
     }
 
     static class IndexedCols {

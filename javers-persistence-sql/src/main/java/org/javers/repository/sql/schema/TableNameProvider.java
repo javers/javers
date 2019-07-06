@@ -59,8 +59,8 @@ public class TableNameProvider {
         return new DBObjectName(schemaName, "jv_cdo_class").nameWithSchema();
     }
 
-    public String getSequenceNameWithSchema(String pkColName) {
-        return new DBObjectName(schemaName, "jv_" + pkColName + "_seq").nameWithSchema();
+    public String getSequenceName(String pkColName) {
+        return new DBObjectName(schemaName, "jv_" + pkColName + "_seq").localName();
     }
 
     DBObjectName getGlobalIdTableName() {

@@ -223,7 +223,7 @@ public class JaversSchemaManager extends SchemaNameAware {
             logger.debug("table {}.{} exists", schemaName, tableName);
             return;
         }
-        logger.info("creating javers table {}.{} ...", schemaName, tableName);
+        logger.debug("creating javers table {}.{} ...", schemaName, tableName);
         schemaManager.create(schema);
 
     }
