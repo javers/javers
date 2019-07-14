@@ -20,7 +20,7 @@ class EdgeAssert {
     }
 
     MultiEdgeAssert isMultiEdge() {
-        assert actual instanceof MultiEdge
+        assert MultiEdge.isAssignableFrom(actual.class)
         MultiEdgeAssert.assertThat(actual)
     }
 

@@ -3,20 +3,23 @@ package org.javers.core.json.typeadapter
 import com.google.common.collect.HashMultiset
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
+import org.javers.core.GlobalIdTestBuilder
 import org.javers.core.commit.CommitId
 import org.javers.core.commit.CommitMetadata
+import org.javers.core.json.typeadapter.util.UtilTypeCoreAdapters
 import org.javers.core.metamodel.object.CdoSnapshot
 import org.javers.core.model.DummyUser
 import org.javers.core.model.DummyUserDetails
 import org.javers.core.model.SnapshotEntity
 import org.javers.guava.MultimapBuilder
-import org.javers.repository.jql.ValueObjectIdDTO
-import java.time.LocalDateTime
 import spock.lang.Specification
 
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+
+import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.model.DummyUser.dummyUser
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
 
 /**
  * @author pawel szymczyk
@@ -25,9 +28,11 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
     def "should serialize CdoSnapshot to Json"() {
         given:
+        def now = ZonedDateTime.now()
         def javers = javersTestAssembly()
-        def dummyUserCdo = javers.createCdoWrapper( new DummyUser(name:"kaz", age:5) )
-        def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata())
+
+        def dummyUserCdo = javers.createLiveNode( new DummyUser(name:"kaz", age:5) )
+        def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata(now))
 
         when:
         def jsonText = javers.jsonConverter.toJson(snapshot)
@@ -36,7 +41,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def json = new JsonSlurper().parseText(jsonText)
         json.commitMetadata.id == 1.00
         json.commitMetadata.author == "kazik"
-        json.commitMetadata.commitDate
+        json.commitMetadata.commitDate == UtilTypeCoreAdapters.serialize(now.toLocalDateTime())
+        json.commitMetadata.commitDateInstant == UtilTypeCoreAdapters.serialize(now.toInstant())
         json.changedProperties == ["name","age"]
 
         json.globalId.entity == "org.javers.core.model.DummyUser"
@@ -54,7 +60,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 flag:true,
                 _char:'a')
 
-        def dummyUserCdo = javers.createCdoWrapper( dummyUser )
+        def dummyUserCdo = javers.createLiveNode( dummyUser )
         def snapshot = javers.snapshotFactory.createInitial(dummyUserCdo, someCommitMetadata())
 
         when:
@@ -75,8 +81,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         given:
         def javers = javersTestAssembly()
         def dummyUser = dummyUser("kaz").withDetails()
-        def cdoWrapper = javers.createCdoWrapper( dummyUser )
-        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def cdo = javers.createLiveNode( dummyUser )
+        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -91,8 +97,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def javers = javersTestAssembly()
         def dummyUserDetails = DummyUserDetails.dummyUserDetails(1).withAddress("London", "St John Street")
 
-        def cdoWrapper = javers.createCdoWrapper( dummyUserDetails )
-        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def cdo = javers.createLiveNode( dummyUserDetails )
+        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -107,8 +113,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
       def javers = javersTestAssembly()
       def entity = new SnapshotEntity(id:1, mapOfEntities: [(new SnapshotEntity(id:2)) : new SnapshotEntity(id:3)])
 
-      def cdoWrapper = javers.createCdoWrapper( entity )
-      def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+      def cdo = javers.createLiveNode( entity )
+      def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
       when:
       def jsonText = javers.jsonConverter.toJson(snapshot)
@@ -124,8 +130,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def entity = new SnapshotEntity(id: 1,
                 multiMapPrimitiveToEntity: MultimapBuilder.create(["NY": [new SnapshotEntity(id: 2), new SnapshotEntity(id: 3)]]))
 
-        def cdoWrapper = javers.createCdoWrapper( entity )
-        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def cdo = javers.createLiveNode( entity )
+        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
         when:
         def jsonText = javers.jsonConverter.toJson(snapshot)
@@ -149,8 +155,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         def javers = javersTestAssembly()
         def entity = new SnapshotEntity(multiSetOfPrimitives: HashMultiset.create(['a','a','b']))
 
-        def cdoWrapper = javers.createCdoWrapper( entity )
-        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def cdo = javers.createLiveNode( entity )
+        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
         when:
         def jsonText = javers.jsonConverter.toJson(snapshot)
@@ -170,8 +176,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 stringSet: ["5", "6"] as Set,
                 primitiveMap: [time: LocalDateTime.of(2000, 1, 1, 12, 0, 0)] )
 
-        def cdoWrapper = javers.createCdoWrapper( dummyUser )
-        def snapshot = javers.snapshotFactory.createInitial(cdoWrapper, someCommitMetadata())
+        def cdo = javers.createLiveNode( dummyUser )
+        def snapshot = javers.snapshotFactory.createInitial(cdo, someCommitMetadata())
 
         when:
         String jsonText = javers.jsonConverter.toJson(snapshot)
@@ -251,7 +257,8 @@ class CdoSnapshotTypeAdapterTest extends Specification {
                 id "1.0"
                 author "author"
                 properties commitProperties
-                commitDate "2000-01-01T12:00:00"
+                commitDate "2000-01-01T12:00:00.001"
+                commitDateInstant "2000-01-01T12:00:00.001Z"
             }
             globalId {
                 entity "org.javers.core.model.DummyUser"
@@ -271,11 +278,38 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         snapshot.commitMetadata.id.value() == "1.0"
         snapshot.commitMetadata.author == "author"
         snapshot.commitMetadata.properties == ["os" : "Solaris"]
-        snapshot.commitMetadata.commitDate == LocalDateTime.of(2000,1,1,12,0,0)
+        snapshot.commitMetadata.commitDate.toString() == "2000-01-01T12:00:00.001"
+        snapshot.commitMetadata.commitDateInstant.toString() == "2000-01-01T12:00:00.001Z"
         snapshot.globalId == instanceId("kaz",DummyUser)
         snapshot.initial == true
         snapshot.changed.collect{it} as Set == ["name", "age"] as Set
         snapshot.version == 5L
+    }
+
+    def "should deserialize CommitMetadata.commitDateInstant guessed from commitDate when missing"(){
+        given:
+        def json = new JsonBuilder()
+        json {
+            commitMetadata {
+                id "1.0"
+                author "author"
+                commitDate "2000-01-01T12:00:00.001"
+            }
+            globalId {
+                entity "org.javers.core.model.DummyUser"
+                cdoId "kaz"
+            }
+            state {
+            }
+        }
+
+        when:
+        def snapshot = javersTestAssembly().jsonConverter.fromJson(json.toString(), CdoSnapshot)
+
+        then:
+        def expectedInstant = snapshot.commitMetadata.commitDate.toInstant(ZonedDateTime.now().getOffset())
+        snapshot.commitMetadata.commitDate.toString() == "2000-01-01T12:00:00.001"
+        snapshot.commitMetadata.commitDateInstant == expectedInstant
     }
 
     def "should deserialize CdoSnapshot.version to 0 when version field is missing"() {
@@ -400,7 +434,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
 
         then:
         def valueObjectId = snapshot.getPropertyValue("dummyAddress")
-        valueObjectId == ValueObjectIdDTO.valueObjectId(1, DummyUserDetails, "dummyAddress")
+        valueObjectId == GlobalIdTestBuilder.valueObjectId(1, DummyUserDetails, "dummyAddress")
     }
 
     def "should deserialize CdoSnapshot state with collections"() {
@@ -452,7 +486,7 @@ class CdoSnapshotTypeAdapterTest extends Specification {
         }
     }
 
-    CommitMetadata someCommitMetadata(){
-        new CommitMetadata("kazik", [:], LocalDateTime.now(), new CommitId(1, 0))
+    CommitMetadata someCommitMetadata(ZonedDateTime now = ZonedDateTime.now()){
+        new CommitMetadata("kazik", [:], now.toLocalDateTime(), now.toInstant(), new CommitId(1, 0))
     }
 }

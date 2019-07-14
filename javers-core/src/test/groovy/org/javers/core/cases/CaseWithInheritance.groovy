@@ -33,6 +33,8 @@ class CaseWithInheritance extends Specification{
       def diff = javers.compare(a,b)
 
       then:
+      println diff.prettyPrint()
+
       diff.changes.size() == 2
 
       with(diff.changes.find {it.propertyName == "field"}) {
@@ -43,8 +45,5 @@ class CaseWithInheritance extends Specification{
           assert left == null
           assert right == "b"
       }
-
-
-      println diff.prettyPrint()
     }
 }

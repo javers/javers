@@ -78,13 +78,18 @@ public class QueryBuilder {
     }
 
     /**
-     * Query for selecting changes (or snapshots) made on a concrete Entity instance.
+     * Query for selecting Changes, Snapshots or Shadows for a given Entity instance.
      * <br/><br/>
      *
-     * For example, last changes on "bob" Person:
+     * For example, last Changes on "bob" Person:
      * <pre>
      * javers.findChanges( QueryBuilder.byInstanceId("bob", Person.class).build() );
      * </pre>
+     *
+     * @param localId Value of an Id-property. When an Entity has Composite-Id (more than one Id-property) &mdash;
+     *                <code>localId</code> should be <code>Map&lt;String, Object&gt;</code> with
+     *                Id-property name to value pairs.
+     * @see <a href="https://github.com/javers/javers/blob/master/javers-core/src/test/groovy/org/javers/core/examples/CompositeIdExample.groovy">CompositeIdExample.groovy</a>
      */
     public static QueryBuilder byInstanceId(Object localId, Class entityClass){
         Validate.argumentsAreNotNull(localId, entityClass);
@@ -93,13 +98,18 @@ public class QueryBuilder {
 
 
     /**
-     * Query for selecting changes (or snapshots) made on a concrete type identified by name.
+     * Query for selecting Changes, Snapshots or Shadows for a given Entity instance, identified by its type name.
      * <br/><br/>
      *
-     * For example, last changes on "bob" Person:
+     * For example, last Changes on "bob" Person:
      * <pre>
      * javers.findChanges( QueryBuilder.byInstanceId("bob", "Person").build() );
      * </pre>
+     *
+     * @param localId Value of an Id-property. When an Entity has Composite-Id (more than one Id-property) &mdash;
+     *                <code>localId</code> should be <code>Map&lt;String, Object&gt;</code> with
+     *                Id-property name to value pairs.
+     * @see <a href="https://github.com/javers/javers/blob/master/javers-core/src/test/groovy/org/javers/core/examples/CompositeIdExample.groovy">CompositeIdExample.groovy</a>
      */
     public static QueryBuilder byInstanceId(Object localId, String typeName){
         Validate.argumentsAreNotNull(localId, typeName);
@@ -176,6 +186,7 @@ public class QueryBuilder {
         return new QueryBuilder(new IdFilterDefinition(ValueObjectIdDTO.valueObjectId(ownerLocalId, ownerEntityClass, path)));
     }
 
+    @Deprecated
     public static QueryBuilder byGlobalId(GlobalIdDTO globalId){
         Validate.argumentIsNotNull(globalId);
         return new QueryBuilder(new IdFilterDefinition(globalId));

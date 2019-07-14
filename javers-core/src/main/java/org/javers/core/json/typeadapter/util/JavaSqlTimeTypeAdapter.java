@@ -18,7 +18,8 @@ class JavaSqlTimeTypeAdapter extends BasicStringTypeAdapter<Time> {
 
     @Override
     public Time deserialize(String serializedValue) {
-        return new Time(java.util.Date.from(UtilTypeCoreAdapters.deserializeToInstant(serializedValue)).getTime());
+        java.util.Date date =  UtilTypeCoreAdapters.deserializeToUtilDate(serializedValue);
+        return new Time(date.getTime());
     }
 
     @Override

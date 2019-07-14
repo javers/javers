@@ -4,8 +4,10 @@ import com.google.gson.*;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitMetadata;
+import org.javers.core.diff.changetype.PropertyChangeMetadata;
 import org.javers.core.diff.changetype.container.*;
 import org.javers.core.metamodel.type.ContainerType;
+import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.lang.reflect.Type;
@@ -30,16 +32,16 @@ abstract class ContainerChangeTypeAdapter<T extends ContainerChange> extends Cha
     @Override
     public T fromJson(JsonElement json, JsonDeserializationContext context) {
         JsonObject jsonObject = (JsonObject) json;
-        PropertyChangeStub stub = deserializeStub(jsonObject, context);
+        PropertyChangeMetadata stub = deserializeStub(jsonObject, context);
 
-        ContainerType containerType = stub.property.getType();
+        ContainerType containerType = getJaversProperty(stub).getType();
+
         List<ContainerElementChange> changes = parseChanges(jsonObject, context, containerType);
 
-        CommitMetadata commitMetadata = deserializeCommitMetadata(jsonObject, context);
-        return (T) newInstance(stub, changes, commitMetadata);
+        return (T) newInstance(stub, changes);
     }
 
-    protected abstract ContainerChange newInstance(PropertyChangeStub stub, List<ContainerElementChange> changes, CommitMetadata commitMetadata);
+    protected abstract ContainerChange newInstance(PropertyChangeMetadata metadata, List<ContainerElementChange> changes);
 
     private List<ContainerElementChange> parseChanges(JsonObject jsonObject, JsonDeserializationContext context, ContainerType containerType) {
         List<ContainerElementChange> result = new ArrayList<>();

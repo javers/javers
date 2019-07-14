@@ -1,10 +1,13 @@
 package org.javers.core.diff;
 
+import org.javers.core.commit.CommitMetadata;
+import org.javers.core.diff.changetype.PropertyChangeMetadata;
+import org.javers.core.diff.changetype.PropertyChangeType;
 import org.javers.core.graph.ObjectNode;
 import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.property.MissingProperty;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.JaversProperty;
-import org.javers.core.metamodel.type.ManagedType;
+import org.javers.core.metamodel.type.*;
 
 import java.util.*;
 
@@ -15,44 +18,48 @@ public interface NodePair {
 
     ObjectNode getRight();
 
+    ObjectNode getLeft();
+
     List<JaversProperty> getProperties();
 
     Object getLeftPropertyValue(Property property);
 
     Object getRightPropertyValue(Property property);
 
-    GlobalId getRightGlobalId(Property property);
+    GlobalId getRightReference(Property property);
 
-    GlobalId getLeftGlobalId(Property property);
+    GlobalId getLeftReference(Property property);
+
+    List<GlobalId> getRightReferences(JaversProperty property);
+
+    List<GlobalId> getLeftReferences(JaversProperty property);
 
     ManagedType getManagedType();
 
-    default <T> T getLeftPropertyValueAndCast(Property property, Class<T> expectedType) {
-        return cast(getLeftPropertyValue(property), expectedType);
+    default Object getRightDehydratedPropertyValueAndSanitize(JaversProperty property) {
+        return sanitize(getRight().getDehydratedPropertyValue(property), property.getType());
     }
 
-    default <T> T getRightPropertyValueAndCast(Property property, Class<T> expectedType) {
-        return cast(getRightPropertyValue(property), expectedType);
+    default Object getLeftDehydratedPropertyValueAndSanitize(JaversProperty property) {
+        return sanitize(getLeft().getDehydratedPropertyValue(property), property.getType());
     }
 
-    default <T> T cast(Object value, Class<T> expectedType) {
-        if (value == null) {
-            return null;
-        }
+    default Object sanitize(Object value, JaversType expectedType) {
 
-        if (expectedType.isAssignableFrom(value.getClass())) {
-            return (T) value;
+        //all Enumerables (except Arrays) are sanitized
+        if (expectedType instanceof EnumerableType && !(expectedType instanceof ArrayType)) {
+            if (value == null || !expectedType.isInstance(value)) {
+                return ((EnumerableType)expectedType).empty();
+            }
         }
-
-        if (expectedType == Collection.class || expectedType == Set.class) {
-            return (T)Collections.emptySet();
-        }
-        if (expectedType == List.class) {
-            return (T)Collections.emptyList();
-        }
-        if (expectedType == Map.class) {
-            return (T)Collections.emptyMap();
-        }
-        return null;
+        return value;
     }
+
+    Optional<CommitMetadata> getCommitMetadata();
+
+    default PropertyChangeMetadata createPropertyChangeMetadata(JaversProperty property) {
+        return new PropertyChangeMetadata(getGlobalId(), property.getName(), getCommitMetadata(), getChangeType(property));
+    }
+
+    PropertyChangeType getChangeType(JaversProperty property);
 }

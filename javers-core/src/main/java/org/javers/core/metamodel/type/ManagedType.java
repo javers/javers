@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+
 /**
  * @author bartosz walacik
  */
@@ -55,6 +56,9 @@ public abstract class ManagedType extends ClassType {
         return managedClass.getManagedProperties(query);
     }
 
+    /**
+     * unmodifiable list
+     */
     public List<JaversProperty> getProperties() {
         return managedClass.getManagedProperties();
     }

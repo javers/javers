@@ -2,9 +2,9 @@ package org.javers.core.diff.appenders;
 
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.JaversProperty;
 import org.javers.core.metamodel.type.JaversType;
+import java.util.Optional;
 
 /**
  * Property-scope comparator,
@@ -15,7 +15,7 @@ import org.javers.core.metamodel.type.JaversType;
  *
  * @author bartosz walacik
  */
-public interface PropertyChangeAppender <T extends PropertyChange> {
+public interface PropertyChangeAppender<T extends PropertyChange> {
     int HIGH_PRIORITY = 1;
     int LOW_PRIORITY = 2;
 
@@ -24,10 +24,9 @@ public interface PropertyChangeAppender <T extends PropertyChange> {
      */
     boolean supports(JaversType propertyType);
 
-    /**
-     * null if no changes
-     */
-    T calculateChanges(NodePair pair, JaversProperty supportedProperty);
+    T calculateChanges(NodePair pair, JaversProperty property);
 
-    int priority();
+    default int priority() {
+        return LOW_PRIORITY;
+    }
 }

@@ -1,5 +1,7 @@
 package org.javers.core.metamodel.type;
 
+import org.javers.common.string.ToStringBuilder;
+
 import java.lang.reflect.Type;
 
 /**
@@ -11,5 +13,10 @@ public class PrimitiveType extends PrimitiveOrValueType {
 
     public PrimitiveType(Type baseJavaType) {
         super(baseJavaType);
+    }
+
+    @Override
+    public String smartToString(Object value) {
+        return ToStringBuilder.smartToString(value);
     }
 }

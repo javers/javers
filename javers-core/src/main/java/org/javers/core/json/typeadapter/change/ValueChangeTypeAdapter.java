@@ -4,14 +4,9 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import org.javers.core.commit.CommitMetadata;
+import org.javers.core.diff.changetype.PropertyChangeMetadata;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.type.TypeMapper;
-
-import java.util.Optional;
-
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 
 class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
     private static final String LEFT_VALUE_FIELD = "left";
@@ -24,13 +19,12 @@ class ValueChangeTypeAdapter extends ChangeTypeAdapter<ValueChange> {
     @Override
     public ValueChange fromJson(JsonElement json, JsonDeserializationContext context) {
         JsonObject jsonObject = (JsonObject) json;
-        PropertyChangeStub stub = deserializeStub(jsonObject, context);
+        PropertyChangeMetadata stub = deserializeStub(jsonObject, context);
 
-        Object leftValue  = context.deserialize(jsonObject.get(LEFT_VALUE_FIELD),  stub.property.getGenericType());
-        Object rightValue = context.deserialize(jsonObject.get(RIGHT_VALUE_FIELD), stub.property.getGenericType());
+        Object leftValue  = context.deserialize(jsonObject.get(LEFT_VALUE_FIELD),  getJaversProperty(stub).getGenericType());
+        Object rightValue = context.deserialize(jsonObject.get(RIGHT_VALUE_FIELD), getJaversProperty(stub).getGenericType());
 
-        CommitMetadata commitMetadata = deserializeCommitMetadata(jsonObject, context);
-        return new ValueChange(stub.id, stub.getPropertyName(), leftValue, rightValue, ofNullable(commitMetadata));
+        return new ValueChange(stub, leftValue, rightValue);
     }
 
     @Override

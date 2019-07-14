@@ -78,6 +78,19 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
         stmt.close()
     }
 
+    def "should not create jv_ tables if they already exists"(){
+      given:
+      def firstJavers = javers
+      println "javers" + javers
+
+      when:
+      buildJaversInstance()
+      println "javers" + javers
+
+      then:
+      firstJavers != javers
+    }
+
     def "should select Head using max CommitId and not table PK"(){
         given:
         def sql = new Sql(getConnection())
@@ -150,7 +163,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
 
         then:
         snapshots.size() == 1
-        snapshots[0].commitId.majorId == 1
+        commitSeq(snapshots[0].commitMetadata) == 1
     }
 
     /**
@@ -173,7 +186,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
 
       then:
       snapshots.size() == 1
-      snapshots[0].commitId.majorId == 1
+      commitSeq(snapshots[0].commitMetadata) == 1
     }
 
     def "should persist over 100 snapshots with proper sequence of primary keys"() {
@@ -215,7 +228,7 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
         given:
         def cnt = new AtomicInteger()
         def sId = 222
-        def threads = 85
+        def threads = 20
         //initial commit
         javers.commit("author", new SnapshotEntity(id: sId, intProperty: cnt.incrementAndGet()))
         getConnection().commit()

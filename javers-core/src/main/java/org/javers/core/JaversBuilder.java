@@ -38,6 +38,7 @@ import org.javers.guava.GuavaAddOns;
 import org.javers.jodasupport.JodaAddOns;
 import org.javers.mongosupport.MongoLong64JsonDeserializer;
 import org.javers.mongosupport.RequiredMongoSupportPredicate;
+import org.javers.repository.api.ConfigurationAware;
 import org.javers.repository.api.JaversExtendedRepository;
 import org.javers.repository.api.JaversRepository;
 import org.javers.repository.inmemory.InMemoryRepository;
@@ -78,7 +79,7 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class JaversBuilder extends AbstractContainerBuilder {
     public static final Logger logger = LoggerFactory.getLogger(JaversBuilder.class);
 
-    private final Map<Class, ClientsClassDefinition> clientsClassDefinitions = new HashMap<>();
+    private final Map<Class, ClientsClassDefinition> clientsClassDefinitions = new LinkedHashMap<>();
 
     private final Map<Class, Function<Object, String>> mappedToStringFunction = new ConcurrentHashMap<>();
 
@@ -155,7 +156,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
         for (Class c : classesToScan){
             typeMapper().getJaversType(c);
         }
-        typeMapper().addTypes(additionalTypes);
+        typeMapper().addPluginTypes(additionalTypes);
 
         bootRepository();
 
@@ -616,24 +617,21 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Registers a custom property comparator for a given Custom type.
+     * Registers a custom property comparator for a given Custom Type.
      * <br/><br/>
      *
-     * Custom comparators are used by diff algorithm to calculate property-to-property diff.
-     * <br/><br/>
-     *
-     * Comparator has to calculate and return a subtype of {@link PropertyChange}.
+     * Custom comparators are used by diff algorithm to calculate property-to-property diff
+     * and also collection-to-collection diff.
      * <br/><br/>
      *
      * Internally, given type is mapped as {@link CustomType}.
-     * <br/><br/>
      *
-     * @param <T> custom type
-     * @param customType class literal to define a custom type
+     * @param <T> Custom Type
      * @see CustomType
+     * @see CustomPropertyComparator
      */
     public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
-        registerType(new CustomDefinition(customType));
+        registerType(new CustomDefinition(customType, comparator));
         bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
     }
@@ -763,6 +761,10 @@ public class JaversBuilder extends AbstractContainerBuilder {
         }
 
         repository.setJsonConverter( getContainerComponent(JsonConverter.class));
+
+        if (repository instanceof ConfigurationAware){
+            ((ConfigurationAware) repository).setConfiguration(coreConfiguration());
+        }
 
         bindComponent(JaversRepository.class, repository);
 

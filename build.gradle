@@ -2,22 +2,22 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        gradlePluginPortal()
         maven { url 'http://repo.spring.io/plugins-release' }
     }
 
     dependencies {
         classpath 'org.owasp:dependency-check-gradle:3.1.2'
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
-        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
-        classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.8.0'
     }
 }
 
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.7.1'
+    id 'pl.allegro.tech.build.axion-release' version '1.10.1'
+    id 'io.codearte.nexus-staging' version '0.20.0'
+    id 'de.marcphilipp.nexus-publish' version '0.2.0' apply false
+    id 'com.adarshr.test-logger' version '1.6.0'
 }
-
-apply plugin: 'io.codearte.nexus-staging'
 
 scmVersion {
     tag {
@@ -27,11 +27,13 @@ scmVersion {
 
 subprojects {
     apply plugin: 'maven-publish'
+    apply plugin: 'signing'
     apply plugin: 'java'
     apply plugin: 'groovy'
     apply plugin: 'propdeps'
-    apply plugin: 'com.bmuschko.nexus'
     apply plugin: 'org.owasp.dependencycheck'
+    apply plugin: 'de.marcphilipp.nexus-publish'
+    apply plugin: 'com.adarshr.test-logger'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -47,8 +49,8 @@ subprojects {
         testCompile 'junit:junit:4.11'
         testCompile "org.spockframework:spock-core:$spockVersion"
         testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
-        testCompile 'org.apache.commons:commons-lang3:3.3.2'
-        testCompile 'ch.qos.logback:logback-classic:1.1.2'
+        testCompile 'org.apache.commons:commons-lang3:3.8.1'
+        testCompile 'ch.qos.logback:logback-classic:1.1.3'
         testCompile 'cglib:cglib-nodep:3.2.0'
         testCompile 'org.objenesis:objenesis:2.1'
         testCompile 'org.easytesting:fest-assert-core:2.0M10'
@@ -61,7 +63,6 @@ subprojects {
     test {
         testLogging {
             exceptionFormat = 'full'
-            events 'failed'
         }
     }
 
@@ -84,67 +85,80 @@ subprojects {
         }
     }
 
-    //com.bmuschko.nexus
-    modifyPom {
-        project {
-            name 'JaVers'
-            description 'JaVers - object auditing and diff framework for Java'
-            url 'http://javers.org'
-            inceptionYear '2013'
+    //-- begin maven-publish.publish  spell --
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allJava
+        archiveClassifier = 'sources'
+    }
+    task javadocJar(type: Jar) {
+        from javadoc
+        archiveClassifier = 'javadoc'
+    }
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact sourcesJar
+                artifact javadocJar
 
-            scm {
-                connection 'scm:git:https://github.com/javers/javers.git'
-                url 'https://github.com/javers/javers'
-                developerConnection 'scm:git:https://github.com/javers/javers.git'
-            }
-
-            scm {
-                connection 'scm:git:https://github.com/javers/javers.git'
-                url 'https://github.com/javers/javers'
-            }
-
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                pom {
+                    name = 'JaVers Library'
+                    description = 'JaVers - object auditing and diff framework for Java'
+                    url = 'http://javers.org'
+                    licenses {
+                        license {
+                            name = 'The Apache Software License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'javers'
+                            name = 'JaVers Core Team'
+                            email = 'javers@javers.org'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:https://github.com/javers/javers.git'
+                        developerConnection = 'scm:git:https://github.com/javers/javers.git'
+                        url = 'https://github.com/javers/javers'
+                    }
                 }
             }
-
-            developers {
-                developer {
-                    name 'Bartosz Walacik'
-                }
-                developer {
-                    name 'Pawel Szymczyk'
-                }
-                developer {
-                    name 'Michal Wesolowski'
+        }
+        repositories {
+            maven {
+                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                credentials {
+                    username project.findProperty('nexusUsername') ?: 'secured'
+                    password project.findProperty('nexusPassword') ?: 'secured'
                 }
             }
         }
     }
+    signing {
+        sign publishing.publications
+    }
+    //-- eof maven-publish.publish spell --
 
     test {
         testLogging.exceptionFormat = 'full'
         testLogging.showStackTraces = true
     }
 
-    publishing {
-        publications {
-            libraryJar(MavenPublication) {
-                from components.java
-            }
-        }
+    //io.codearte.gradle
+    nexusStaging {
+        packageGroup = 'org.javers'
+        numberOfRetries = 20
+        delayBetweenRetriesInMillis = 3000
     }
-}
-
-//io.codearte.gradle
-nexusStaging {
-    packageGroup = 'org.javers'
-    numberOfRetries = 20
-    delayBetweenRetriesInMillis = 3000
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+    
+    nexusPublishing {
+        packageGroup = rootProject.nexusStaging.packageGroup
+        stagingProfileId = rootProject.nexusStaging.stagingProfileId
+        username = project.findProperty('nexusUsername') ?: 'secured'
+        password = project.findProperty('nexusPassword') ?: 'secured'
+    }
 }

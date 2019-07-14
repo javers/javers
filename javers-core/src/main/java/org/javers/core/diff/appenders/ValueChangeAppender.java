@@ -7,7 +7,7 @@ import org.javers.core.metamodel.type.*;
 /**
  * @author bartosz walacik
  */
-class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
+class ValueChangeAppender implements PropertyChangeAppender<ValueChange> {
 
     @Override
     public boolean supports(JaversType propertyType) {
@@ -19,6 +19,7 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
      */
     @Override
     public ValueChange calculateChanges(NodePair pair, JaversProperty property) {
+
         Object leftValue = pair.getLeftPropertyValue(property);
         Object rightValue = pair.getRightPropertyValue(property);
 
@@ -35,7 +36,7 @@ class ValueChangeAppender extends CorePropertyChangeAppender<ValueChange> {
             }
         }
 
-        return new ValueChange(pair.getGlobalId(), property.getName(), leftValue, rightValue);
+        return new ValueChange(pair.createPropertyChangeMetadata(property), leftValue, rightValue);
     }
 
     private boolean isIdProperty(NodePair nodePair, JaversProperty property){

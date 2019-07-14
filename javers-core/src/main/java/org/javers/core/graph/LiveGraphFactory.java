@@ -1,6 +1,5 @@
 package org.javers.core.graph;
 
-import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.type.TypeMapper;
 
 import java.lang.reflect.Array;
@@ -17,13 +16,13 @@ public class LiveGraphFactory {
     private final LiveCdoFactory liveCdoFactory;
     private final CollectionsCdoFactory collectionsCdoFactory;
 
-    public LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, CollectionsCdoFactory collectionsCdoFactory) {
+    LiveGraphFactory(TypeMapper typeMapper, LiveCdoFactory liveCdoFactory, CollectionsCdoFactory collectionsCdoFactory) {
         this.typeMapper = typeMapper;
         this.liveCdoFactory = liveCdoFactory;
         this.collectionsCdoFactory = collectionsCdoFactory;
     }
 
-    public LiveGraph createLiveGraph(Collection handle, Class clazz) {
+    public ObjectGraph createLiveGraph(Collection handle, Class clazz) {
         CollectionWrapper wrappedCollection = (CollectionWrapper) wrapTopLevelContainer(handle);
 
         return new CollectionsGraphBuilder(new ObjectGraphBuilder(typeMapper, liveCdoFactory), collectionsCdoFactory)

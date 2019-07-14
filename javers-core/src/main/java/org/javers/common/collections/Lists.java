@@ -1,5 +1,7 @@
 package org.javers.common.collections;
 
+import org.javers.core.metamodel.property.MissingProperty;
+
 import java.util.*;
 import java.util.Collections;
 import java.util.function.Function;
@@ -14,10 +16,10 @@ import static org.javers.common.validation.Validate.argumentsAreNotNull;
 public class Lists {
 
     public static List wrapNull(Object list) {
-        if (list == null) {
+        if (list == null || list == MissingProperty.INSTANCE) {
             return Collections.emptyList();
         }
-        return (List) list;
+        return (List)list;
     }
 
     public static <T> List<T> add(List<T> list, T element) {
@@ -33,8 +35,28 @@ public class Lists {
         return unmodifiableList(java.util.Arrays.asList(elements));
     }
 
+    public static <T> List<T> immutableListOf(Collection<T> elements) {
+        if (elements == null || elements.size() == 0) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(new ArrayList<>(elements));
+    }
+
+    public static <T> List<T> immutableCopyOf(List<T> elements) {
+        if (elements == null || elements.size() == 0) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(new ArrayList<>(elements));
+    }
+
     public static <E> List<E> asList(E... elements) {
         return (List) Arrays.asList(elements);
+    }
+
+    public static <E> List<E> immutableListOf(List<E> elements, E element) {
+        List<E> list = new ArrayList<>(elements);
+        list.add(element);
+        return Collections.unmodifiableList(list);
     }
 
     /**
@@ -65,7 +87,7 @@ public class Lists {
     }
 
     /**
-     * returns new list with elements from input that don't satisfies given filter condition
+     * returns new list with elements from input that doesn't satisfies given filter condition
      */
     public static <T> List<T> negativeFilter(List<T> input, final Predicate<T> filter) {
         argumentsAreNotNull(input, filter);

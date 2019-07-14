@@ -8,8 +8,8 @@ import spock.lang.Unroll
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.core.diff.appenders.MapChangeAssert.getAssertThat
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
+import static org.javers.core.GlobalIdTestBuilder.instanceId
+import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 
 /**
  * @author bartosz walacik
@@ -62,7 +62,7 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
                         valueObjectId(1,SnapshotEntity,"mapPrimitiveToVO/a")]
     }
 
-    def "should append EntryValueChange for Map<Entity,Entity>"() {
+    def "should append EntryValueChange for Map of Entity to Entity"() {
         given:
         def leftCdo  = new SnapshotEntity(id:1,  mapOfEntities: [(new SnapshotEntity(id:2)): new SnapshotEntity(id:3)])
         def rightCdo = new SnapshotEntity(id:1,  mapOfEntities: [(new SnapshotEntity(id:2)): new SnapshotEntity(id:5)])
@@ -77,7 +77,7 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
                                                instanceId(3, SnapshotEntity), instanceId(5, SnapshotEntity))
     }
 
-    def "should append EntryValueChange for Map<Primitive,Entity>"() {
+    def "should append EntryValueChange for Map of Primitive to Entity"() {
         given:
         def leftCdo  = new SnapshotEntity(id:1,  mapPrimitiveToEntity: [a:new SnapshotEntity(id:2), b:new SnapshotEntity(id:3)])
         def rightCdo = new SnapshotEntity(id:1,  mapPrimitiveToEntity: [a:new SnapshotEntity(id:2), b:new SnapshotEntity(id:5)])
@@ -91,7 +91,7 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
                           .hasEntryValueChange("b",instanceId(3, SnapshotEntity), instanceId(5, SnapshotEntity))
     }
 
-    def "should not support Map<ValueObject,?>, no good idea how to handle this"() {
+    def "should not support Map of ValueObject to ?, no good idea how to handle this"() {
         when:
             mapChangeAppender().supports(getJaversType(new TypeToken<Map<DummyAddress, String>>(){}.getType()))
 
@@ -100,7 +100,7 @@ public class MapReferenceChangeAppenderTest extends AbstractDiffAppendersTest {
             e.code == VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
     }
 
-    def "should NOT append EntryValueChange for Map<?,ValueObject>"() {
+    def "should NOT append EntryValueChange for Map of ? to ValueObject"() {
         given:
             def leftCdo  = new SnapshotEntity(id:1,  mapPrimitiveToVO: [a: new DummyAddress("London")])
             def rightCdo = new SnapshotEntity(id:1,  mapPrimitiveToVO: [a: new DummyAddress("London","Street")])

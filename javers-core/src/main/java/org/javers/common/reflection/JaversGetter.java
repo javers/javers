@@ -46,8 +46,8 @@ public class JaversGetter extends JaversMember<Method> {
     public Object getEvenIfPrivate(Object onObject) {
         try {
             return getRawMember().invoke(onObject, EMPTY_ARRAY);
-        } catch (IllegalArgumentException ie){
-            throw new JaversException(JaversExceptionCode.MISSING_PROPERTY, this, ie.getClass().getName());
+        } catch (IllegalArgumentException ie) {
+            return getOnMissingProperty(onObject);
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new JaversException(JaversExceptionCode.PROPERTY_ACCESS_ERROR,
                     this, onObject.getClass().getSimpleName(), e.getClass().getName()+": "+e.getMessage());
@@ -70,11 +70,6 @@ public class JaversGetter extends JaversMember<Method> {
     @Override
     public String propertyName() {
         return getterNameToFieldName(name());
-    }
-
-    @Override
-    public String toString() {
-        return "Method " + typeName(getGenericResolvedType())+" " + name() +"; //declared in: " +getDeclaringClass().getSimpleName();
     }
 
     private Optional<Method> findSetterForGetter(Method getter) {
@@ -109,5 +104,10 @@ public class JaversGetter extends JaversMember<Method> {
         }
 
         throw new IllegalArgumentException("Name {"+getterName+"} is not a getter name");
+    }
+
+    @Override
+    public String memberType() {
+        return "Getter";
     }
 }

@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 public class DiffAppendersModule extends LateInstantiatingModule {
 
-    private final Class<? extends CorePropertyChangeAppender<ListChange>> listChangeAppender;
+    private final Class<? extends PropertyChangeAppender<ListChange>> listChangeAppender;
 
     public DiffAppendersModule(JaversCoreConfiguration javersCoreConfiguration, MutablePicoContainer container) {
         super(javersCoreConfiguration, container);
@@ -25,14 +25,14 @@ public class DiffAppendersModule extends LateInstantiatingModule {
         return (Collection)Lists.asList(
                 NewObjectAppender.class,
                 MapChangeAppender.class,
+                CollectionAsListChangeAppender.class,
                 listChangeAppender,
                 SetChangeAppender.class,
                 ArrayChangeAppender.class,
                 ObjectRemovedAppender.class,
                 ReferenceChangeAppender.class,
                 OptionalChangeAppender.class,
-                ValueChangeAppender.class,
-                CollectionChangeFakeAppender.class
+                ValueChangeAppender.class
         );
     }
 }

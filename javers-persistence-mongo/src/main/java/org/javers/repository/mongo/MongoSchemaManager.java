@@ -3,12 +3,16 @@ package org.javers.repository.mongo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
 import org.bson.Document;
 import org.javers.repository.mongo.model.MongoHeadId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+
+import static org.javers.repository.mongo.MongoDialect.DOCUMENT_DB;
+import static org.javers.repository.mongo.MongoDialect.MONGO_DB;
 
 /**
  * @author bartosz.walacik
@@ -18,8 +22,10 @@ class MongoSchemaManager {
     static final String SNAPSHOTS = "jv_snapshots";
     static final String COMMIT_ID = "commitMetadata.id";
     static final String COMMIT_DATE = "commitMetadata.commitDate";
+    static final String COMMIT_DATE_INSTANT = "commitMetadata.commitDateInstant";
     static final String COMMIT_AUTHOR = "commitMetadata.author";
     static final String COMMIT_PROPERTIES = "commitMetadata.properties";
+    static final String COMMIT_PROPERTIES_INDEX_NAME = "commitMetadata.properties_key_value";
     static final String GLOBAL_ID_KEY = "globalId_key";
     static final String GLOBAL_ID_ENTITY = "globalId.entity";
     static final String GLOBAL_ID_OWNER_ID_ENTITY = "globalId.ownerId.entity";
@@ -38,7 +44,7 @@ class MongoSchemaManager {
         this.mongo = mongo;
     }
 
-    public void ensureSchema() {
+    public void ensureSchema(MongoDialect dialect) {
         //ensures collections and indexes
         MongoCollection<Document> snapshots = snapshotsCollection();
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_KEY, ASC));
@@ -46,7 +52,15 @@ class MongoSchemaManager {
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(GLOBAL_ID_OWNER_ID_ENTITY, ASC));
         snapshots.createIndex(new BasicDBObject(CHANGED_PROPERTIES, ASC));
-        snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC));
+
+        if (dialect == MONGO_DB) {
+            snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC).append(COMMIT_PROPERTIES + ".value", ASC),
+                    new IndexOptions().name(COMMIT_PROPERTIES_INDEX_NAME));
+        }
+        else if (dialect == DOCUMENT_DB) {
+            snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".key", ASC));
+            snapshots.createIndex(new BasicDBObject(COMMIT_PROPERTIES + ".value", ASC));
+        }
 
         headCollection();
 

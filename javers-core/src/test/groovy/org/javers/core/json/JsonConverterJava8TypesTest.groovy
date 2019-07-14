@@ -26,7 +26,7 @@ class JsonConverterJava8TypesTest extends Specification {
     def jsonConverter = new JaversBuilder().withPrettyPrint(false).build().getJsonConverter()
 
     @Shared
-    def localDate = LocalDateTime.of(2001,01,31,15,14,13,85*1000_000)
+    def localDateTime = LocalDateTime.of(2001,01,31,15,14,13,85*1000_000)
 
     @Unroll
     def "should convert #expectedType (#givenValue) to and from JSON"(){
@@ -44,20 +44,18 @@ class JsonConverterJava8TypesTest extends Specification {
                          ZonedDateTime,
                          ZoneOffset,
                          OffsetDateTime,
-                         Instant,
                          Period,
                          Duration
         ]
-        givenValue   << [localDate,
+        givenValue   << [localDateTime,
                          LocalDate.of(2001,01,31),
                          LocalTime.of(12,15,31),
                          Optional.of(5),
                          Optional.empty(),
                          Year.of(2015),
-                         ZonedDateTime.of(localDate, ZoneId.of("Europe/Berlin")),
+                         ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Berlin")),
                          ZoneOffset.of("+05:00"),
-                         OffsetDateTime.of(localDate, ZoneOffset.of("+05:00")),
-                         Instant.parse("2010-01-01T12:00:00Z"),
+                         OffsetDateTime.of(localDateTime, ZoneOffset.of("+05:00")),
                          Period.between(LocalDate.of(2014, 1, 1), LocalDate.of(2015, 3, 7)),
                          Duration.ofSeconds(6005)
         ]
@@ -70,9 +68,37 @@ class JsonConverterJava8TypesTest extends Specification {
                          '"2001-01-31T15:14:13.085+01:00[Europe/Berlin]"',
                          '"+05:00"',
                          '"2001-01-31T15:14:13.085+05:00"',
-                         '"2010-01-01T12:00:00Z"',
                          '"P1Y2M6D"',
                          '"PT1H40M5S"'
+        ]
+    }
+
+    @Unroll
+    def "should serialize java8.Instant to JSON using ISO format with millis, where givenValueAsSring: #givenValueAsSring"(){
+        given:
+        def givenValue = Instant.parse(givenValueAsSring)
+
+        expect:
+        jsonConverter.toJson(givenValue) == '"' + expectedSerialized + '"'
+
+        where:
+        givenValueAsSring                | expectedSerialized
+        '2015-10-02T17:37:07Z'           | '2015-10-02T17:37:07Z'
+        '2015-10-02T17:37:07.050Z'       | '2015-10-02T17:37:07.050Z'
+        '2015-10-02T17:37:07.050228100Z' | '2015-10-02T17:37:07.050228100Z'
+        '2015-10-02T17:37:07.050228000Z' | '2015-10-02T17:37:07.050228Z'
+    }
+
+    @Unroll
+    def "should deserialize java8.Instant from JSON using standard ISO format, where givenJSON: #givenJSON"(){
+        expect:
+        jsonConverter.fromJson('"' + givenJSON + '"', Instant) == Instant.parse(givenJSON)
+
+        where:
+        givenJSON << [
+            '2015-10-02T17:37:07Z',
+            '2015-10-02T17:37:07.050Z',
+            '2015-10-02T17:37:07.050228100Z'
         ]
     }
 }

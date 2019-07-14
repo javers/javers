@@ -12,7 +12,9 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.core.GlobalIdTestBuilder.instanceId
+import static org.javers.core.json.builder.ChangeTestBuilder.createMetadata
+import static org.javers.core.json.builder.ChangeTestBuilder.setChange
 
 /**
  * @author bartosz walacik
@@ -108,14 +110,14 @@ class ContainerChangeTypeAdapterTest extends Specification{
     def "should serialize #changeType.simpleName with references"()  {
         given:
             def javers = javersTestAssembly()
-            def affectedId = javers.instanceId(new SnapshotEntity(id:1))
+            def cdo = new SnapshotEntity(id:1)
             def ref2  = javers.instanceId(new SnapshotEntity(id:2))
             def ref3 =  javers.instanceId(new SnapshotEntity(id:3))
             def elementChanges = [new ElementValueChange(1, ref2, ref3),
                                   new ValueAdded  (2, ref2),
                                   new ValueRemoved(3, ref3)]
 
-            def change = changeType.newInstance(affectedId, propertyName, elementChanges)
+            def change = changeType.newInstance(createMetadata(cdo, propertyName), elementChanges)
 
         when:
             def jsonText = javers.jsonConverter.toJson(change)
@@ -156,13 +158,13 @@ class ContainerChangeTypeAdapterTest extends Specification{
     def "should serialize #changeType.simpleName with Values using custom TypeAdapter"()  {
         given:
             def javers = javersTestAssembly()
-            def affectedId = javers.instanceId(new SnapshotEntity(id:1))
+            def cdo = new SnapshotEntity(id:1)
 
             def elementChanges = [new ElementValueChange(1, new LocalDate(2001,1,1), new LocalDate(2001,1,2)),
                                   new ValueAdded  (2,new LocalDate(2001,1,3)),
                                   new ValueRemoved(3,new LocalDate(2001,1,4))]
 
-            def change = changeType.newInstance(affectedId, propertyName, elementChanges)
+            def change = changeType.newInstance(createMetadata(cdo, propertyName), elementChanges)
 
         when:
             def jsonText = javers.jsonConverter.toJson(change)
@@ -266,13 +268,13 @@ class ContainerChangeTypeAdapterTest extends Specification{
     def "should serialize #changeType.simpleName with Primitives" () {
         given:
             def javers = javersTestAssembly()
-            def affectedId = javers.instanceId(new SnapshotEntity(id:1))
+            def cdo = new SnapshotEntity(id:1)
 
             def elementChanges = [new ElementValueChange(1, 11, 12),
                                   new ValueAdded  (2,20),
                                   new ValueRemoved(3,30)]
 
-            def change = changeType.newInstance(affectedId, propertyName, elementChanges)
+            def change = changeType.newInstance(createMetadata(cdo, propertyName), elementChanges)
 
         when:
             def jsonText = javers.jsonConverter.toJson(change)
@@ -308,10 +310,8 @@ class ContainerChangeTypeAdapterTest extends Specification{
     def "should serialize SetChange with Primitives" () {
         given:
         def javers = javersTestAssembly()
-        def affectedId = javers.instanceId(new SnapshotEntity(id:1))
-
         def elementChanges = [new ValueAdded  (20), new ValueRemoved(30)]
-        def change = new SetChange(affectedId, "setOfIntegers", elementChanges)
+        def change = setChange(new SnapshotEntity(id:1), "setOfIntegers", elementChanges)
 
         when:
         def jsonText = javers.jsonConverter.toJson(change)

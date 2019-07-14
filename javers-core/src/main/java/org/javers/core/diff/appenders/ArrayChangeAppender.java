@@ -6,6 +6,8 @@ import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.ArrayChange;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.map.EntryChange;
+import org.javers.core.diff.changetype.map.MapChange;
+import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
@@ -16,7 +18,7 @@ import java.util.Map;
 /**
  * @author pawel szymczyk
  */
-class ArrayChangeAppender extends CorePropertyChangeAppender<ArrayChange>{
+class ArrayChangeAppender implements PropertyChangeAppender<ArrayChange>{
     private final MapChangeAppender mapChangeAppender;
     private final TypeMapper typeMapper;
 
@@ -33,19 +35,18 @@ class ArrayChangeAppender extends CorePropertyChangeAppender<ArrayChange>{
     @Override
     public ArrayChange calculateChanges(NodePair pair, JaversProperty property) {
 
-        Map leftMap =  Arrays.asMap(pair.getLeftPropertyValue(property));
-        Map rightMap = Arrays.asMap(pair.getRightPropertyValue(property));
+        Map leftMap =  Arrays.asMap(pair.getLeftDehydratedPropertyValueAndSanitize(property));
+        Map rightMap = Arrays.asMap(pair.getRightDehydratedPropertyValueAndSanitize(property));
 
-        ArrayType arrayType = ((JaversProperty) property).getType();
-        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
+        ArrayType arrayType = property.getType();
         MapContentType mapContentType = typeMapper.getMapContentType(arrayType);
 
         List<EntryChange> entryChanges =
-                mapChangeAppender.calculateEntryChanges(leftMap, rightMap, owner, mapContentType);
+                mapChangeAppender.calculateEntryChanges(leftMap, rightMap, mapContentType);
 
         if (!entryChanges.isEmpty()){
             List<ContainerElementChange> elementChanges = Lists.transform(entryChanges, new MapChangesToListChangesFunction());
-            return new ArrayChange(pair.getGlobalId(), property.getName(), elementChanges);
+            return new ArrayChange(pair.createPropertyChangeMetadata(property), elementChanges);
         }
         else {
             return null;

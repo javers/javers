@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.property;
 
+import java.lang.reflect.Field;
 import org.javers.common.exception.JaversException;
 import org.javers.common.exception.JaversExceptionCode;
 import org.javers.common.reflection.JaversMember;
@@ -45,6 +46,10 @@ public class Property {
         return member.getGenericResolvedType();
     }
 
+    public Class<?> getDeclaringClass() {
+        return member.getDeclaringClass();
+    }
+
     /**
      * use getGenericType() when possible, see JaversMember.resolvedReturnType
      */
@@ -61,20 +66,13 @@ public class Property {
 
     /**
      * Returns property value, even if private.
-     * <br/>
-     * Converts JaversException.MISSING_PROPERTY to null.
+     *
+     * If there is no this property in target -- returns {@link MissingProperty#INSTANCE}
      *
      * @param target invocation target
      */
     public Object get(Object target) {
-        try {
-            return  member.getEvenIfPrivate(target);
-        } catch (JaversException e) {
-            if (e.getCode() == JaversExceptionCode.MISSING_PROPERTY) {
-                return null;
-            }
-            throw e;
-        }
+        return  member.getEvenIfPrivate(target);
     }
 
     /**

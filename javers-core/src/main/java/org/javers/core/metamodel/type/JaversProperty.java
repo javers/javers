@@ -1,7 +1,11 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.core.metamodel.property.Property;
+
+import java.util.Objects;
 import java.util.function.Supplier;
+
+import static org.javers.common.string.ToStringBuilder.typeName;
 
 /**
  * Class property with JaversType
@@ -23,6 +27,18 @@ public class JaversProperty extends Property {
         return (T) propertyType.get();
     }
 
+    public boolean isEntityType() {
+        return getType() instanceof EntityType;
+    }
+
+    public boolean isValueObjectType() {
+        return getType() instanceof ValueObjectType;
+    }
+
+    public boolean isPrimitiveOrValueType() {
+        return getType() instanceof PrimitiveOrValueType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -38,7 +54,16 @@ public class JaversProperty extends Property {
     }
 
     public boolean isShallowReference(){
-        return (hasShallowReferenceAnn() ||
-                getType() instanceof ShallowReferenceType);
+        return (hasShallowReferenceAnn()
+            || getType() instanceof ShallowReferenceType);
+    }
+
+    @Override
+    public String toString() {
+        return getMember().memberType() + " " +
+                getType().getClass().getSimpleName() + ":" +
+                typeName(getMember().getGenericResolvedType()) + " " +
+                getName() + (getMember().memberType().equals("Getter") ? "()" : "")+
+                ", declared in " + getDeclaringClass().getSimpleName();
     }
 }

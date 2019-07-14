@@ -16,10 +16,7 @@ import javax.persistence.Id
 
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 
-/**
- * @author bartosz walacik
- */
-public class TypeMapperIntegrationTest extends Specification {
+class TypeMapperIntegrationTest extends Specification {
 
     def "should map groovy.lang.MetaClass as IgnoredType"(){
         when:
@@ -127,8 +124,30 @@ public class TypeMapperIntegrationTest extends Specification {
         jType.baseJavaClass == DummyAddress
     }
 
+    class SomeEntity {
+        SomeId id
+    }
+
+    class SomeId {
+        int id
+    }
+
+    def "should infer as Value when a class is used as Id and there are no other clues "(){
+        given:
+        def mapper = javersTestAssembly().typeMapper
+        mapper.registerClientsClass(EntityDefinitionBuilder.entityDefinition(SomeEntity).withIdPropertyName("id").build())
+
+        when:
+        def someEntityType = mapper.getJaversType(SomeEntity)
+        def someIdType = mapper.getJaversType(SomeId)
+
+        then:
+        someEntityType.class == EntityType
+        someIdType.class == ValueType
+    }
+
     @Unroll
-    def "should map as ValueType if a class is used as #usedAnn.simpleName in another class"(){
+    def "should infer as Value when a class is used as @#usedAnn.simpleName and there are no other clues"(){
         given:
         def mapper = javersTestAssembly().typeMapper
 
@@ -146,7 +165,7 @@ public class TypeMapperIntegrationTest extends Specification {
         idType <<  [ObjectId, DummyPoint]
     }
 
-    def "should map as Entity when class has @Id property annotation"() {
+    def "should map as Entity when a class has @Id property annotation"() {
         given:
         def mapper = javersTestAssembly().typeMapper
 
@@ -156,6 +175,20 @@ public class TypeMapperIntegrationTest extends Specification {
         then:
         jType.class == EntityType
         jType.baseJavaClass == DummyUser
+        jType.idProperty.name == "name"
+    }
+
+    def "should map as Entity when a class has @EmbeddedId property annotation"(){
+        given:
+        def mapper = javersTestAssembly().typeMapper
+
+        when:
+        def jType = mapper.getJaversType(DummyEntityWithEmbeddedId)
+
+        then:
+        jType.class == EntityType
+        jType.baseJavaClass == DummyEntityWithEmbeddedId
+        jType.idProperty.name == "point"
     }
 
     @Unroll

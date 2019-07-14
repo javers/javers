@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.javers.repository.sql.schema.FixedSchemaFactory.*;
@@ -37,6 +38,7 @@ class SnapshotQuery {
                 COMMIT_PK + ", " +
                 COMMIT_AUTHOR + ", " +
                 COMMIT_COMMIT_DATE + ", " +
+                COMMIT_COMMIT_DATE_INSTANT + ", " +
                 COMMIT_COMMIT_ID + ", " +
                 "g." + GLOBAL_ID_LOCAL_ID + ", " +
                 "g." + GLOBAL_ID_FRAGMENT + ", " +
@@ -75,8 +77,12 @@ class SnapshotQuery {
         });
 
         if (queryParams.commitIds().size() > 0) {
-            selectBuilder.and(COMMIT_COMMIT_ID + " IN (" + ToStringBuilder.join(
-                    queryParams.commitIds().stream().map(c -> c.valueAsNumber()).collect(toList())) + ")");
+            selectBuilder.and(COMMIT_COMMIT_ID + " IN (" +
+                    queryParams.commitIds()
+                            .stream()
+                            .map(c -> c.valueAsNumber().toString())
+                            .collect(Collectors.joining(",")) +
+                    ")");
         }
 
         queryParams.version().ifPresent(ver -> selectBuilder.and(SNAPSHOT_VERSION, ver));
@@ -116,7 +122,7 @@ class SnapshotQuery {
                                  longParam(si.getGlobalIdPk()), longParam(si.getVer()))
         );
 
-        selectBuilder.append(" false)");
+        selectBuilder.append(" 1!=1)");
     }
 
     void addVoOwnerEntityFilter(String ownerTypeName, String fragment) {
@@ -162,6 +168,7 @@ class SnapshotQuery {
             return new CdoSnapshotSerialized()
                     .withCommitAuthor(resultSet.getString(COMMIT_AUTHOR))
                     .withCommitDate(resultSet.getTimestamp(COMMIT_COMMIT_DATE))
+                    .withCommitDateInstant(resultSet.getString(COMMIT_COMMIT_DATE_INSTANT))
                     .withCommitId(resultSet.getBigDecimal(COMMIT_COMMIT_ID))
                     .withCommitPk(resultSet.getLong(COMMIT_PK))
                     .withVersion(resultSet.getLong(SNAPSHOT_VERSION))

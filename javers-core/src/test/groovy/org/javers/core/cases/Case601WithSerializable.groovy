@@ -24,7 +24,6 @@ class Case601WithSerializable extends Specification {
         protected String name
     }
 
-
     class Permission extends AbstractPermission {
         private Set<String> inclusions
     }
@@ -33,7 +32,7 @@ class Case601WithSerializable extends Specification {
         private Set<Permission> permissions
     }
 
-    def "should infer type to EntityType when abstract class implements Serializable "(){
+    def "should resolve type tokens in Id property"(){
       given:
       def javers = JaversBuilder.javers().build()
 

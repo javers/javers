@@ -8,7 +8,7 @@ We'll answer them.
 Bug Reports have to contain:
 
 1. Clear description of your **expectations versus reality**
-1. **Runnable test case** which isolates the bug and allows us to easily reproduce it on our laptops.
+1. [**Runnable test case**](https://github.com/javers/javers/tree/master/javers-core/src/test/groovy/org/javers/core/cases) which isolates the bug and allows us to easily reproduce it on our laptops.
    You can push this test case to your fork of this repository. 
 
 ## Guidelines for Contributors

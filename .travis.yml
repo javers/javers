@@ -1,6 +1,6 @@
 language: java
 jdk:
-- oraclejdk8
+- openjdk11
 services:
   - postgresql
   - mysql
@@ -23,6 +23,5 @@ deploy:
   script: travis/deployToSonatype.sh
   on:
     tags: true
-    all_branches: true
-sudo: false
+    branch: master
 

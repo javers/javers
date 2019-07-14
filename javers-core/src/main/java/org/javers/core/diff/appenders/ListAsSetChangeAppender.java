@@ -10,7 +10,7 @@ import org.javers.core.metamodel.type.ListAsSetType;
 /**
  * @author Sergey Kobyshev
  */
-public class ListAsSetChangeAppender extends CorePropertyChangeAppender<ListChange> {
+public class ListAsSetChangeAppender implements PropertyChangeAppender<ListChange> {
 
     private final SetChangeAppender setChangeAppender;
 
@@ -24,10 +24,11 @@ public class ListAsSetChangeAppender extends CorePropertyChangeAppender<ListChan
     }
 
     @Override
-    public ListChange calculateChanges(final NodePair pair, final JaversProperty property) {
+    public ListChange calculateChanges(NodePair pair, JaversProperty property) {
         SetChange setChange = setChangeAppender.calculateChanges(pair, property);
+
         if (setChange != null) {
-            return new ListChange(pair.getGlobalId(), property.getName(), setChange.getChanges());
+            return new ListChange(pair.createPropertyChangeMetadata(property), setChange.getChanges());
         }
         return null;
     }

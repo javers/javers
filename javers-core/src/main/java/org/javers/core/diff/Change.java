@@ -34,7 +34,7 @@ import static org.javers.common.validation.Validate.*;
  */
 public abstract class Change implements Serializable {
 
-    private CommitMetadata commitMetadata; //optional, can't use Optional here, because it isn't Serializable
+    private final CommitMetadata commitMetadata; //optional, can't use Optional here, because it isn't Serializable
     private final GlobalId affectedCdoId;
     private transient Object affectedCdo;  //optional
 
@@ -43,11 +43,10 @@ public abstract class Change implements Serializable {
     }
 
     protected Change(GlobalId affectedCdoId, Optional<Object> affectedCdo, Optional<CommitMetadata> commitMetadata) {
-        argumentsAreNotNull(affectedCdoId);
+        argumentsAreNotNull(affectedCdoId, affectedCdo, commitMetadata);
         this.affectedCdoId = affectedCdoId;
-        this.commitMetadata = null;
         affectedCdo.ifPresent(cdo -> this.affectedCdo = cdo);
-        commitMetadata.ifPresent(meta -> this.commitMetadata = meta);
+        this.commitMetadata = commitMetadata.orElse(null);
     }
 
     /**
@@ -101,16 +100,6 @@ public abstract class Change implements Serializable {
         argumentIsNotNull(affectedCdo);
         conditionFulfilled(this.affectedCdo == null, "affectedCdo already set");
         this.affectedCdo = affectedCdo;
-    }
-
-    void bindToCommit(CommitMetadata commitMetadata) {
-        argumentIsNotNull(commitMetadata);
-
-        if (this.commitMetadata != null) {
-            throw new IllegalStateException("Change should be effectively immutable");
-        }
-
-        this.commitMetadata = commitMetadata;
     }
 
     @Override

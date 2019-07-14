@@ -9,8 +9,10 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import java.util.Optional;
 import org.javers.common.string.RegexEscape;
+import org.javers.common.validation.Validate;
+import org.javers.core.CommitIdGenerator;
+import org.javers.core.JaversCoreConfiguration;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitId;
 import org.javers.core.json.JsonConverter;
@@ -20,13 +22,10 @@ import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.type.EntityType;
 import org.javers.core.metamodel.type.ManagedType;
 import org.javers.core.metamodel.type.ValueObjectType;
-import org.javers.repository.api.JaversRepository;
-import org.javers.repository.api.QueryParams;
-import org.javers.repository.api.QueryParamsBuilder;
-import org.javers.repository.api.SnapshotIdentifier;
+import org.javers.repository.api.*;
 import org.javers.repository.mongo.model.MongoHeadId;
-import java.time.LocalDateTime;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,33 +33,51 @@ import static org.javers.common.collections.Lists.toImmutableList;
 import static org.javers.common.validation.Validate.conditionFulfilled;
 import static org.javers.repository.mongo.DocumentConverter.fromDocument;
 import static org.javers.repository.mongo.DocumentConverter.toDocument;
+import static org.javers.repository.mongo.MongoDialect.DOCUMENT_DB;
+import static org.javers.repository.mongo.MongoDialect.MONGO_DB;
 import static org.javers.repository.mongo.MongoSchemaManager.*;
 
 /**
  * @author pawel szymczyk
  */
-public class MongoRepository implements JaversRepository {
+public class MongoRepository implements JaversRepository, ConfigurationAware {
     private final static int DEFAULT_CACHE_SIZE = 5000;
 
     private static final int DESC = -1;
     private final MongoSchemaManager mongoSchemaManager;
     private JsonConverter jsonConverter;
+    private JaversCoreConfiguration coreConfiguration;
     private final MapKeyDotReplacer mapKeyDotReplacer = new MapKeyDotReplacer();
     private final LatestSnapshotCache cache;
+    private MongoDialect mongoDialect;
 
     public MongoRepository(MongoDatabase mongo) {
-        this(mongo, null, DEFAULT_CACHE_SIZE);
+        this(mongo, DEFAULT_CACHE_SIZE, MONGO_DB);
+    }
+
+    /**
+     * MongoRepository compatible with Amazon DocumentDB.
+     * <br/>
+     *
+     * Compound index on <code>commitProperties</code> isn't created.
+     * <br/><br/>
+     *
+     * See <a href="http://docs.aws.amazon.com/documentdb/latest/developerguide/functional-differences.html">functional differences</a>.
+     */
+    public static MongoRepository mongoRepositoryWithDocumentDBCompatibility(MongoDatabase mongo) {
+        return new MongoRepository(mongo, DEFAULT_CACHE_SIZE, DOCUMENT_DB);
     }
 
     /**
      * @param cacheSize Size of the latest snapshots cache, default is 5000. Set 0 to disable.
      */
     public MongoRepository(MongoDatabase mongo, int cacheSize) {
-        this(mongo, null, cacheSize);
+        this(mongo, cacheSize, MONGO_DB);
     }
 
-    MongoRepository(MongoDatabase mongo, JsonConverter jsonConverter, int cacheSize) {
-        this.jsonConverter = jsonConverter;
+    MongoRepository(MongoDatabase mongo, int cacheSize, MongoDialect dialect) {
+        Validate.argumentsAreNotNull(mongo, dialect);
+        this.mongoDialect = dialect;
         this.mongoSchemaManager = new MongoSchemaManager(mongo);
         cache = new LatestSnapshotCache(cacheSize, input -> getLatest(createIdQuery(input)));
     }
@@ -134,8 +151,13 @@ public class MongoRepository implements JaversRepository {
     }
 
     @Override
+    public void setConfiguration(JaversCoreConfiguration coreConfiguration) {
+        this.coreConfiguration = coreConfiguration;
+    }
+
+    @Override
     public void ensureSchema() {
-        mongoSchemaManager.ensureSchema();
+        mongoSchemaManager.ensureSchema(mongoDialect);
     }
 
     private Bson createIdQuery(GlobalId id) {
@@ -229,8 +251,15 @@ public class MongoRepository implements JaversRepository {
 
     private MongoCursor<Document> getMongoSnapshotsCursor(Bson query, Optional<QueryParams> queryParams) {
         FindIterable<Document> findIterable = snapshotsCollection()
-            .find(applyQueryParams(query, queryParams))
-            .sort(new Document(COMMIT_ID, DESC));
+            .find(applyQueryParams(query, queryParams));
+
+        if (coreConfiguration.getCommitIdGenerator() == CommitIdGenerator.SYNCHRONIZED_SEQUENCE) {
+            findIterable.sort(new Document(COMMIT_ID, DESC));
+        }
+        else {
+            findIterable.sort(new Document(COMMIT_DATE_INSTANT, DESC));
+        }
+
         return applyQueryParams(findIterable, queryParams).iterator();
     }
 
@@ -245,12 +274,12 @@ public class MongoRepository implements JaversRepository {
                 query =  Filters.and(query, Filters.lte(COMMIT_DATE, UtilTypeCoreAdapters.serialize(params.to().get())));
             }
             if (params.toCommitId().isPresent()) {
-                double commitId = params.toCommitId().get().valueAsNumber().doubleValue();
+                BigDecimal commitId = params.toCommitId().get().valueAsNumber();
                 query = Filters.and(query, Filters.lte(COMMIT_ID, commitId));
             }
             if (params.commitIds().size() > 0) {
                 query = Filters.in(COMMIT_ID, params.commitIds().stream()
-                        .map(c -> c.valueAsNumber().doubleValue()).collect(Collectors.toSet()));
+                        .map(CommitId::valueAsNumber).collect(Collectors.toSet()));
             }
             if (params.version().isPresent()) {
                 query = Filters.and(query, createVersionQuery(params.version().get()));

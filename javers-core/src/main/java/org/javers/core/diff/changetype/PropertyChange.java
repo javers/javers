@@ -1,8 +1,6 @@
 package org.javers.core.diff.changetype;
 
-import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
-import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.ValueObjectId;
 
 import java.util.Objects;
@@ -16,12 +14,13 @@ import static org.javers.common.validation.Validate.argumentIsNotNull;
  * @author bartosz walacik
  */
 public abstract class PropertyChange extends Change {
+    private final PropertyChangeType changeType;
     private final String propertyName;
 
-    protected PropertyChange(GlobalId affectedCdoId, String propertyName, Optional<CommitMetadata> commitMetadata) {
-        super(affectedCdoId, Optional.empty(), commitMetadata);
-        argumentIsNotNull(propertyName);
-        this.propertyName = propertyName;
+    protected PropertyChange(PropertyChangeMetadata propertyChangeMetadata) {
+        super(propertyChangeMetadata.getAffectedCdoId(), Optional.empty(), propertyChangeMetadata.getCommitMetadata());
+        this.propertyName = propertyChangeMetadata.getPropertyName();
+        this.changeType = propertyChangeMetadata.getChangeType();
     }
 
     public String getPropertyName(){
@@ -51,5 +50,40 @@ public abstract class PropertyChange extends Change {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), propertyName);
+    }
+
+    /**
+     * @see PropertyChangeType
+     * @since 5.5.0
+     */
+    public PropertyChangeType getChangeType() {
+        return changeType;
+    }
+
+    /**
+     * @see PropertyChangeType
+     * @return <code>changeType == PropertyChangeType.PROPERTY_ADDED</code>
+     * @since 5.5.0
+     */
+    public boolean isPropertyAdded() {
+        return changeType == PropertyChangeType.PROPERTY_ADDED;
+    }
+
+    /**
+     * @see PropertyChangeType
+     * @return <code>changeType == PropertyChangeType.PROPERTY_REMOVED</code>
+     * @since 5.5.0
+     */
+    public boolean isPropertyRemoved() {
+        return changeType == PropertyChangeType.PROPERTY_REMOVED;
+    }
+
+    /**
+     * @see PropertyChangeType
+     * @return <code>changeType == PropertyChangeType.PROPERTY_VALUE_CHANGED</code>
+     * @since 5.5.0
+     */
+    public boolean isPropertyValueChanged() {
+        return changeType == PropertyChangeType.PROPERTY_VALUE_CHANGED;
     }
 }

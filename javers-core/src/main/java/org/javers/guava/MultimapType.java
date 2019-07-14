@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import org.javers.common.collections.EnumerableFunction;
+import org.javers.common.collections.Maps;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.type.KeyValueType;
@@ -11,7 +12,9 @@ import org.javers.core.metamodel.type.MapEnumerationOwnerContext;
 import org.javers.core.metamodel.type.MapType;
 
 import java.lang.reflect.Type;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.javers.guava.Multimaps.toNotNullMultimap;
 
@@ -54,14 +57,25 @@ public class MultimapType extends KeyValueType {
      * Nulls keys are filtered
      */
     @Override
-    public Object map(Object sourceEnumerable, Function mapFunction) {
+    public Object map(Object sourceEnumerable, Function mapFunction, boolean filterNulls) {
         Validate.argumentIsNotNull(mapFunction);
 
         Multimap sourceMultimap = toNotNullMultimap(sourceEnumerable);
         Multimap targetMultimap = ArrayListMultimap.create();
 
-        MapType.mapEntrySetFilterNulls(sourceMultimap.entries(), mapFunction, (k,v) -> targetMultimap.put(k,v));
+        MapType.mapEntrySet(sourceMultimap.entries(), mapFunction, (k,v) -> targetMultimap.put(k,v), filterNulls);
 
         return targetMultimap;
+    }
+
+    @Override
+    protected Stream<Map.Entry> entries(Object source) {
+        Map sourceMap = Maps.wrapNull(source);
+        return sourceMap.entrySet().stream();
+    }
+
+    @Override
+    public Object empty() {
+        return ArrayListMultimap.create();
     }
 }

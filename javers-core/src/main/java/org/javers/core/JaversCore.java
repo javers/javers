@@ -168,8 +168,6 @@ class JaversCore implements Javers {
 
     @Override
     public Diff compare(Object oldVersion, Object currentVersion) {
-        argumentsAreNotNull(oldVersion, currentVersion);
-
         return diffFactory.compare(oldVersion, currentVersion);
     }
 
@@ -233,7 +231,7 @@ class JaversCore implements Javers {
      * @since 2.3
      */
     public <T extends ManagedType> T getTypeMapping(String typeName) {
-        return (T) typeMapper.getJaversManagedType(typeName);
+        return (T) typeMapper.getJaversManagedType(typeName, ManagedType.class);
     }
 
     @Override

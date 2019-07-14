@@ -20,11 +20,10 @@ import org.javers.repository.sql.JaversSqlRepository;
 import org.javers.shadow.Shadow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.*;
-
-import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
@@ -42,7 +41,7 @@ import java.util.stream.Stream;
  *
  * @author bartosz walacik
  */
-public class JaversTransactionalDecorator implements Javers {
+public class JaversTransactionalDecorator implements InitializingBean, Javers {
     private static final Logger logger = LoggerFactory.getLogger(JaversTransactionalDecorator.class);
 
     private final Javers delegate;
@@ -173,15 +172,21 @@ public class JaversTransactionalDecorator implements Javers {
         return delegate.getTypeMapping(clientsType);
     }
 
-    @PostConstruct
-    public void ensureSchema() {
-        TransactionTemplate tmpl = new TransactionTemplate(txManager);
-        tmpl.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                javersSqlRepository.ensureSchema();
-            }
-        });
+    @Override
+    public void afterPropertiesSet() throws Exception {
+       ensureSchema();
+    }
+
+    private void ensureSchema() {
+        if (javersSqlRepository.getConfiguration().isSchemaManagementEnabled()) {
+            TransactionTemplate tmpl = new TransactionTemplate(txManager);
+            tmpl.execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+                    javersSqlRepository.ensureSchema();
+                }
+            });
+        }
     }
 
     @Override

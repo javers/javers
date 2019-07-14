@@ -65,12 +65,21 @@ class GlobalIdTypeAdapter implements JsonTypeAdapter<GlobalId> {
         String typeName = jsonObject.get(ENTITY_FIELD).getAsString();
         Optional<EntityType> entityMaybe = typeMapper.getJaversManagedTypeMaybe(typeName, EntityType.class);
 
-        return entityMaybe.map(entity -> {
-            Object cdoId = context.deserialize(cdoIdElement, entity.getIdPropertyGenericType());
-            return entity.createIdFromInstanceId(cdoId);
-        }).orElseGet(() ->
+        return entityMaybe.map(entity -> deserializeInstanceId(cdoIdElement, entity, context)
+        ).orElseGet(() ->
             new InstanceId(typeName, context.deserialize(cdoIdElement, Object.class), cdoIdElement.getAsString())
         );
+    }
+
+    private InstanceId deserializeInstanceId(JsonElement cdoIdElement, EntityType entity, JsonDeserializationContext context) {
+        try {
+            Object localId = context.deserialize(cdoIdElement, entity.getLocalIdDehydratedType());
+            return entity.createIdFromDehydratedLocalId(localId);
+        } catch (JsonSyntaxException e) {
+            //legacy format support
+            Object localId = context.deserialize(cdoIdElement, entity.getIdProperty().getGenericType());
+            return entity.createIdFromInstanceId(localId);
+        }
     }
 
     @Override

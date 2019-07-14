@@ -1,7 +1,10 @@
 package org.javers.core.graph;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.core.metamodel.object.*;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+import org.javers.core.metamodel.object.OwnerContext;
+import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
 
 /**
@@ -10,16 +13,12 @@ import org.javers.core.metamodel.type.*;
 class EdgeBuilder {
     private final TypeMapper typeMapper;
     private final NodeReuser nodeReuser;
-    private final CdoFactory cdoFactory;
+    private final LiveCdoFactory cdoFactory;
 
-    EdgeBuilder(TypeMapper typeMapper, NodeReuser nodeReuser, CdoFactory cdoFactory) {
+    EdgeBuilder(TypeMapper typeMapper, NodeReuser nodeReuser, LiveCdoFactory cdoFactory) {
         this.typeMapper = typeMapper;
         this.nodeReuser = nodeReuser;
         this.cdoFactory = cdoFactory;
-    }
-
-    String graphType(){
-        return cdoFactory.typeDesc();
     }
 
     /**
@@ -27,72 +26,89 @@ class EdgeBuilder {
      */
     AbstractSingleEdge buildSingleEdge(ObjectNode node, JaversProperty singleRef) {
         Object rawReference = node.getPropertyValue(singleRef);
-        Cdo cdo = cdoFactory.create(rawReference, createOwnerContext(node, singleRef));
+        OwnerContext ownerContext = createOwnerContext(node, singleRef);
 
         if (!singleRef.isShallowReference()){
-            ObjectNode targetNode = buildNodeStubOrReuse(cdo);
+            LiveCdo cdo = cdoFactory.create(rawReference, ownerContext);
+            LiveNode targetNode = buildNodeStubOrReuse(cdo);
             return new SingleEdge(singleRef, targetNode);
         }
-        return new ShallowSingleEdge(singleRef, cdo);
+        return new ShallowSingleEdge(singleRef, cdoFactory.createId(rawReference, ownerContext));
     }
 
     private OwnerContext createOwnerContext(ObjectNode parentNode, JaversProperty property) {
         return new PropertyOwnerContext(parentNode.getGlobalId(), property.getName());
     }
 
-    MultiEdge createMultiEdge(JaversProperty containerProperty, EnumerableType enumerableType, ObjectNode node) {
-        MultiEdge multiEdge = new MultiEdge(containerProperty);
+    AbstractMultiEdge createMultiEdge(JaversProperty containerProperty, EnumerableType enumerableType, ObjectNode node) {
         OwnerContext owner = createOwnerContext(node, containerProperty);
 
         Object container = node.getPropertyValue(containerProperty);
 
-        EnumerableFunction edgeBuilder = null;
+        boolean isShallow = containerProperty.isShallowReference() ||
+                hasShallowReferenceItems(enumerableType);
+
+        EnumerableFunction itemMapper = (input, context) -> {
+            if (!isShallow) {
+                LiveCdo cdo = cdoFactory.create(input, context);
+                return buildNodeStubOrReuse(cdo);
+            } else {
+                return cdoFactory.createId(input, context);
+            }
+        };
+
+        EnumerableFunction edgeBuilder = createEdgeBuilder(enumerableType, itemMapper);
+
+        Object mappedEnumerable = enumerableType.map(container, edgeBuilder, owner);
+        if (!isShallow) {
+            return new MultiEdge(containerProperty, mappedEnumerable);
+        } else {
+            return new ShallowMultiEdge(containerProperty, mappedEnumerable);
+        }
+    }
+
+    private boolean hasShallowReferenceItems(EnumerableType enumerableType){
+        if (enumerableType instanceof ContainerType) {
+            ContainerType containerType = (ContainerType)enumerableType;
+            return typeMapper.isShallowReferenceType(containerType.getItemType());
+        }
+        if (enumerableType instanceof KeyValueType) {
+            KeyValueType keyValueType = (KeyValueType)enumerableType;
+            return typeMapper.isShallowReferenceType(keyValueType.getKeyType()) ||
+                   typeMapper.isShallowReferenceType(keyValueType.getValueType());
+        }
+        return false;
+    }
+
+    private EnumerableFunction createEdgeBuilder(EnumerableType enumerableType, EnumerableFunction itemMapper) {
         if (enumerableType instanceof KeyValueType){
-            edgeBuilder = new MultiEdgeMapBuilderFunction(multiEdge);
-        } else if (enumerableType instanceof ContainerType){
-            edgeBuilder = new MultiEdgeContainerBuilderFunction(multiEdge);
-        }
-        enumerableType.map(container, edgeBuilder, owner);
+            KeyValueType mapType = (KeyValueType)enumerableType;
 
-        return multiEdge;
-    }
+            final boolean managedKeys = typeMapper.getJaversType(mapType.getKeyType()) instanceof ManagedType;
+            final boolean managedValues = typeMapper.getJaversType(mapType.getValueType()) instanceof ManagedType;
 
-    private class MultiEdgeContainerBuilderFunction implements EnumerableFunction {
-        private final MultiEdge multiEdge;
+            return (keyOrValue, context) -> {
+                MapEnumerationOwnerContext mapContext = (MapEnumerationOwnerContext)context;
 
-        public MultiEdgeContainerBuilderFunction(MultiEdge multiEdge) {
-            this.multiEdge = multiEdge;
-        }
+                if (managedKeys && mapContext.isKey()) {
+                    return itemMapper.apply(keyOrValue, context);
+                }
 
-        @Override
-        public Object apply(Object input, EnumerationAwareOwnerContext context) {
-            if (!isManagedPosition(input)){
-                return input;
-            }
-            ObjectNode objectNode = buildNodeStubOrReuse(cdoFactory.create(input, context));
-            multiEdge.addReferenceNode(objectNode);
-            return input;
-        }
+                if (managedValues && !mapContext.isKey()) {
+                    return itemMapper.apply(keyOrValue, context);
+                }
 
-        boolean isManagedPosition(Object input){
-            return true;
+                return keyOrValue;
+            };
+
+        } else if (enumerableType instanceof ContainerType) {
+            return itemMapper;
+        } else {
+            throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
         }
     }
 
-    private class MultiEdgeMapBuilderFunction extends MultiEdgeContainerBuilderFunction {
-        public MultiEdgeMapBuilderFunction(MultiEdge multiEdge) {
-            super(multiEdge);
-        }
-
-        boolean isManagedPosition(Object input){
-            if (input == null) {
-                return false;
-            }
-            return typeMapper.getJaversType(input.getClass()) instanceof ManagedType;
-        }
-    }
-
-    private ObjectNode buildNodeStubOrReuse(Cdo cdo){
+    private LiveNode buildNodeStubOrReuse(LiveCdo cdo){
         if (nodeReuser.isReusable(cdo)){
             return nodeReuser.getForReuse(cdo);
         }
@@ -101,8 +117,8 @@ class EdgeBuilder {
         }
     }
 
-    ObjectNode buildNodeStub(Cdo cdo){
-        ObjectNode newStub = new ObjectNode(cdo);
+    LiveNode buildNodeStub(LiveCdo cdo){
+        LiveNode newStub = new LiveNode(cdo);
         nodeReuser.enqueueStub(newStub);
         return newStub;
     }

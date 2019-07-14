@@ -1,5 +1,7 @@
 package org.javers.repository.sql.schema;
 
+import java.util.Optional;
+
 /**
  * TODO should be replaced with Java8 interface with default impl
  */
@@ -54,7 +56,11 @@ public abstract class SchemaNameAware {
         return tableNameProvider.getGlobalIdPkSeqWithSchema();
     }
 
-    protected String getSequenceNameWithSchema(String pkColName){
-        return tableNameProvider.getSequenceNameWithSchema(pkColName);
+    protected String getSequenceName(String pkColName){
+        return tableNameProvider.getSequenceName(pkColName);
+    }
+
+    protected Optional<String> getSchemaName() {
+        return tableNameProvider.getSchemaName();
     }
 }

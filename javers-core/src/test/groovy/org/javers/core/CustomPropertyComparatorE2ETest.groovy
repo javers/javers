@@ -2,19 +2,18 @@ package org.javers.core
 
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
+import org.javers.core.diff.NodePair
 import org.javers.core.diff.changetype.PropertyChange
-import org.javers.core.diff.changetype.ValueChange
-import org.javers.core.diff.custom.CustomBigDecimalComparator
+import org.javers.core.diff.changetype.PropertyChangeMetadata
+import org.javers.core.diff.changetype.map.EntryValueChange
+import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.metamodel.object.GlobalId
 import org.javers.core.metamodel.object.UnboundedValueObjectId
 import org.javers.core.metamodel.property.Property
-import org.javers.core.metamodel.type.ValueType
 import org.javers.core.model.DummyAddress
-import org.javers.core.model.DummyUserWithValues
 import org.javers.core.model.GuavaObject
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import static org.javers.core.model.DummyAddress.Kind.HOME
 import static org.javers.core.model.DummyAddress.Kind.OFFICE
@@ -46,8 +45,22 @@ class CustomPropertyComparatorE2ETest extends Specification {
     }
 
     private class DummyCustomPropertyComparator implements CustomPropertyComparator {
-        PropertyChange compare(Object left, Object right, GlobalId affectedId, Property property) {
-            null
+        Optional<PropertyChange> compare(Object left, Object right, PropertyChangeMetadata metadata, Property property) {
+            Optional.empty()
+        }
+
+        boolean equals(Object a, Object b) {
+            return false
+        }
+    }
+
+    private class CustomMultimapFakeComparator implements CustomPropertyComparator<Multimap, MapChange>{
+        Optional<MapChange> compare(Multimap left, Multimap right, PropertyChangeMetadata metadata, Property property) {
+            return Optional.of(new MapChange(metadata, [new EntryValueChange("a", left.get("a")[0], right.get("a")[0])]))
+        }
+
+        boolean equals(Multimap a, Multimap b) {
+            return false
         }
     }
 

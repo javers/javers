@@ -12,7 +12,7 @@ import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.json.builder.ChangeTestBuilder.referenceChanged
 import static org.javers.core.model.DummyUser.dummyUser
 import static org.javers.core.model.DummyUserDetails.dummyUserDetails
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
+import static org.javers.core.GlobalIdTestBuilder.instanceId
 
 /**
  * @author bartosz walacik

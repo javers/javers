@@ -6,12 +6,10 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * @author bartosz walacik
@@ -42,19 +40,16 @@ public class MapType extends KeyValueType {
         return Collections.unmodifiableMap(targetMap);
     }
 
-    /**
-     * Nulls keys are filtered
-     */
     @Override
-    public Object map(Object sourceEnumerable, Function mapFunction) {
+    public Object map(Object source, Function mapFunction, boolean filterNulls) {
         Validate.argumentsAreNotNull(mapFunction);
 
-        Map sourceMap = Maps.wrapNull(sourceEnumerable);
+        Map sourceMap = Maps.wrapNull(source);
         Map targetMap = new HashMap(sourceMap.size());
 
-        mapEntrySetFilterNulls(sourceMap.entrySet(), mapFunction, (k,v) -> targetMap.put(k,v));
+        mapEntrySet(sourceMap.entrySet(), mapFunction, (k,v) -> targetMap.put(k,v), filterNulls);
 
-        return targetMap;
+        return Collections.unmodifiableMap(targetMap);
     }
 
     @Override
@@ -79,16 +74,28 @@ public class MapType extends KeyValueType {
         }
     }
 
-    public static void mapEntrySetFilterNulls(Collection<Map.Entry<?,?>> sourceEntries,
+    public static void mapEntrySet(Collection<Map.Entry<?,?>> sourceEntries,
                                               Function mapFunction,
-                                              BiConsumer entryConsumer) {
+                                              BiConsumer entryConsumer,
+                                              boolean filterNulls) {
         for (Map.Entry entry : sourceEntries) {
             Object mappedKey = mapFunction.apply(entry.getKey());
-            if (mappedKey == null) continue;;
+            if (mappedKey == null && filterNulls) continue;
 
             Object mappedValue = mapFunction.apply(entry.getValue());
 
             entryConsumer.accept(mappedKey, mappedValue);
         }
+    }
+
+    @Override
+    public Object empty() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    protected Stream<Map.Entry> entries(Object source) {
+        Map sourceMap = Maps.wrapNull(source);
+        return sourceMap.entrySet().stream();
     }
 }

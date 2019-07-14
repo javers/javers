@@ -1,6 +1,7 @@
 package org.javers.common.collections;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.property.MissingProperty;
 
 import java.util.*;
 import java.util.Collections;
@@ -16,6 +17,14 @@ import static java.util.Collections.EMPTY_SET;
 public class Sets {
 
     private Sets() {
+    }
+
+
+    public static Set wrapNull(Object set) {
+        if (set == null || set == MissingProperty.INSTANCE) {
+            return Collections.emptySet();
+        }
+        return (Set) set;
     }
 
     /**
@@ -39,25 +48,46 @@ public class Sets {
     public static <E> Set<E> xor(Set<E> first, Set<E> second) {
         Set<E> xor = difference(first, second);
         xor.addAll(difference(second, first));
-
         return xor;
     }
 
     /**
      * null args are allowed
+     *
+     * @return mutable set
      */
     public static <E> Set<E> difference(Set<E> first, Set<E> second) {
-        if (first == null) {
-            return EMPTY_SET;
+        if (first == null || first.size() == 0) {
+            return new HashSet<>();
         }
 
-        if (second == null) {
+        if (second == null || second.size() == 0) {
             return first;
         }
 
         Set<E> difference = new HashSet<>(first);
         difference.removeAll(second);
         return difference;
+    }
+
+    /**
+     * null args are allowed
+     */
+    public static <E> Collection<E> difference(Set<E> first, Set<E> second, Function<E, Integer> hasher) {
+        if (first == null || first.size() == 0) {
+            return Collections.emptyList();
+        }
+
+        if (second == null || second.size() == 0) {
+            return first;
+        }
+
+        Map<Integer, E> map = new HashMap();
+
+        first.stream().forEach(e -> map.put(hasher.apply(e), e));
+        second.stream().forEach(e -> map.remove(hasher.apply(e)));
+
+        return Collections.unmodifiableCollection(map.values());
     }
 
     public static <E> Set<E> asSet(E... elements) {
@@ -68,7 +98,7 @@ public class Sets {
         if (elements == null) {
             return Collections.emptySet();
         }
-        return new HashSet<>(elements);
+        return Collections.unmodifiableSet(new HashSet<>(elements));
     }
 
     /**

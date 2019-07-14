@@ -27,7 +27,6 @@ public class DummyEntity {
     }
 
     @Id
-    @GeneratedValue
     public int getId() {
         return id;
     }

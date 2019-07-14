@@ -9,7 +9,7 @@ import org.javers.core.model.DummyAddress
 import org.javers.core.model.SnapshotEntity
 import spock.lang.Unroll
 
-import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
+import static org.javers.core.GlobalIdTestBuilder.valueObjectId
 
 /**
  * @author akrystian
@@ -17,8 +17,7 @@ import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 class MultisetChangeAppenderTest extends AbstractDiffAppendersTest {
 
     MultisetChangeAppender multisetChangeAppender() {
-        def javers = JaversTestBuilder.javersTestAssembly()
-        new MultisetChangeAppender(javers.typeMapper, javers.globalIdFactory)
+        new MultisetChangeAppender()
     }
 
     @Unroll

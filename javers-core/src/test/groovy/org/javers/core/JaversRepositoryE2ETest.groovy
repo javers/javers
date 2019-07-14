@@ -1,6 +1,6 @@
 package org.javers.core
 
-import org.javers.common.date.FakeDateProvider
+import org.javers.common.date.DateProvider
 import org.javers.common.reflection.ConcreteWithActualType
 import org.javers.core.commit.CommitMetadata
 import org.javers.core.diff.changetype.ReferenceChange
@@ -20,52 +20,86 @@ import spock.lang.Unroll
 import javax.persistence.Id
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 import static groovyx.gpars.GParsPool.withPool
+import static GlobalIdTestBuilder.instanceId
+import static GlobalIdTestBuilder.unboundedValueObjectId
+import static GlobalIdTestBuilder.valueObjectId
+import static java.lang.Math.abs
+import static java.time.temporal.ChronoUnit.MILLIS
 import static org.javers.core.JaversTestBuilder.javersTestAssembly
 import static org.javers.core.metamodel.object.SnapshotType.INITIAL
 import static org.javers.core.metamodel.object.SnapshotType.UPDATE
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
 import static org.javers.repository.jql.QueryBuilder.*
-import static org.javers.repository.jql.UnboundedValueObjectIdDTO.unboundedValueObjectId
-import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
 
 class JaversRepositoryE2ETest extends Specification {
-    protected FakeDateProvider fakeDateProvider
     protected JaversRepository repository
     protected Javers javers
+    private DateProvider dateProvider
+    private RandomCommitGenerator randomCommitGenerator = null
 
     def setup() {
-        fakeDateProvider = new FakeDateProvider()
+        buildJaversInstance()
+    }
+
+    void buildJaversInstance() {
+        dateProvider = prepareDateProvider()
         repository = prepareJaversRepository()
-        javers = JaversBuilder.javers().withDateTimeProvider(fakeDateProvider).registerJaversRepository(repository).build()
+
+        def javersBuilder = JaversBuilder
+                .javers()
+                .withDateTimeProvider(dateProvider)
+                .registerJaversRepository(repository)
+
+        if (useRandomCommitIdGenerator()) {
+            randomCommitGenerator = new RandomCommitGenerator()
+            javersBuilder.withCustomCommitIdGenerator(randomCommitGenerator)
+        }
+
+        javers = javersBuilder.build()
     }
 
     protected int commitSeq(CommitMetadata commit) {
+        if (useRandomCommitIdGenerator()) {
+            return randomCommitGenerator.getSeq(commit.id)
+        }
         commit.id.majorId
     }
 
-    protected setNow(LocalDateTime localDateTime) {
-        fakeDateProvider.set(localDateTime)
+    protected DateProvider prepareDateProvider() {
+        if (useRandomCommitIdGenerator()) {
+            return new TikDateProvider()
+        }
+        new FakeDateProvider()
+    }
+
+    protected setNow(ZonedDateTime dateTime) {
+        dateProvider.set(dateTime)
     }
 
     protected JaversRepository prepareJaversRepository() {
-        return new InMemoryRepository();
+        new InMemoryRepository()
     }
 
-    def "should persit commitDate with milliseconds precision"(){
-      given:
-      def now = LocalDateTime.now()
-      println now
+    protected boolean useRandomCommitIdGenerator() {
+        false
+    }
 
-      setNow(now)
+    def 'should persist current LocalDateTime and Instant in CommitMetadata' () {
+        given:
+        def now = ZonedDateTime.now()
+        setNow(now)
 
-      when:
-      javers.commit("a", new SnapshotEntity(id:1))
-      def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(1, SnapshotEntity).build())
+        when:
+        javers.commit('author', new SnapshotEntity(id: 1))
+        def snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
 
-      then:
-      snapshots[0].getCommitMetadata().commitDate == now
+        then:
+        abs(MILLIS.between(snapshot.commitMetadata.commitDate, now.toLocalDateTime())) <= 1
+        snapshot.commitMetadata.commitDateInstant == now.toInstant()
+        snapshot.commitMetadata.author == 'author'
     }
 
     def "should persist various primitive types"(){
@@ -93,30 +127,6 @@ class JaversRepositoryE2ETest extends Specification {
 
       then:
       javers.findChanges(QueryBuilder.anyDomainObject().build()).size() == 15
-    }
-
-    def "should support EmbeddedId as Entity Id"(){
-      given:
-      def cdo  = new DummyEntityWithEmbeddedId(point: new DummyPoint(1,2), someVal: 5)
-
-      when:
-      javers.commit("author", cdo)
-
-      then:
-      def snapshot = javers.getLatestSnapshot(new DummyPoint(1,2), DummyEntityWithEmbeddedId).get()
-      snapshot.globalId.cdoId == new DummyPoint(1,2)
-    }
-
-    def "should support long numbers as Entity Id "(){
-        given:
-        def longId = 1000000000L*1000
-        def category = new CategoryC(longId)
-
-        when:
-        javers.commit("author",category)
-
-        then:
-        javers.getLatestSnapshot(longId, CategoryC).get().globalId.cdoId == longId
     }
 
     def "should query for ValueObject changes by owning Entity class"() {
@@ -635,40 +645,6 @@ class JaversRepositoryE2ETest extends Specification {
         change.changes[0].addedValue == "2"
     }
 
-    @Unroll
-    def "should manage Entity class name refactor when querying using new class with @TypeName retrofitted to old class name"(){
-        when:
-        javers.commit("author", new OldEntity(id:1, value:5))
-        javers.commit("author", new NewEntity(id:1, value:15))
-
-        def changes = javers.findChanges(byInstanceId(1, type).build())
-
-        then:
-        changes.size() == 1
-        with(changes.find {it.propertyName == "value"}){
-            assert left == 5
-            assert right == 15
-        }
-
-        where:
-        type << [NewEntity, "org.javers.core.examples.typeNames.OldEntity"]
-    }
-
-    def "should manage Entity class name refactor when old and new class uses @TypeName"(){
-        when:
-        javers.commit("author", new OldEntityWithTypeAlias(id:1, val:5))
-        javers.commit("author", new NewEntityWithTypeAlias(id:1, val:15))
-
-        def changes = javers.findChanges(byInstanceId(1, NewEntityWithTypeAlias).build())
-
-        then:
-        changes.size() == 1
-        with(changes.find {it.propertyName == "val"}){
-            assert left == 5
-            assert right == 15
-        }
-    }
-
     def "should manage ValueObject query when both ValueObject and owner Entity uses @TypeName"(){
         when:
         javers.commit("author", new NewEntityWithTypeAlias(id: 1, valueObject: new NewValueObjectWithTypeAlias(some:5)) )
@@ -679,45 +655,6 @@ class JaversRepositoryE2ETest extends Specification {
         then:
         changes.size() == 1
         with (changes.find {it.propertyName == "some"}) {
-            assert left == 5
-            assert right == 6
-        }
-
-    }
-
-    def "should manage ValueObject class name refactor without TypeName when querying by owning Instance"(){
-        when:
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  5)))
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  10)))
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5,  15)))
-
-        def changes = javers.findChanges(QueryBuilder.byValueObject(EntityWithRefactoredValueObject,"value").build())
-
-        then:
-        changes.size() == 2
-        changes[0].propertyName == "newField"
-        changes[0].left == 10
-        changes[0].right == 15
-
-        changes[1].propertyName == "newField"
-        changes[1].left == 0  //removed properties are treated as nulls
-        changes[1].right == 10
-    }
-
-    def "should manage ValueObject class name refactor when querying using new class with @TypeName retrofitted to old class name"(){
-        when:
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5,  10)))
-        javers.commit("author", new EntityWithRefactoredValueObject(id:1, value: new NewNamedValueObject(6,  10)))
-
-        def changes = javers.findChanges(QueryBuilder.byClass(NewNamedValueObject).build())
-
-        then:
-        changes.size() == 2
-        with(changes.find {it.propertyName == "newField"}) {
-            assert left == 0 //removed properties are treated as nulls
-            assert right == 10
-        }
-        with(changes.find {it.propertyName == "someValue"}) {
             assert left == 5
             assert right == 6
         }
@@ -734,26 +671,13 @@ class JaversRepositoryE2ETest extends Specification {
         snapshot.globalId.typeName.endsWith("OldValueObject")
     }
 
-    def '''should use dateProvider.now() as a commitDate and
-           should serialize and deserialize commitDate as local datetime'''() {
-        given:
-        def now = LocalDateTime.parse('2016-01-01T12:12')
-        setNow(now)
-
-        when:
-        javers.commit("author", new SnapshotEntity(id: 1))
-        def snapshot = javers.getLatestSnapshot(1, SnapshotEntity).get()
-
-        then:
-        snapshot.commitMetadata.commitDate == now
-    }
-
     @Unroll
     def "should query for Entity snapshots with time range filter - #what"() {
         given:
         (1..5).each{
             def entity =  new SnapshotEntity(id: 1, intProperty: it)
-            setNow( LocalDateTime.of(2015,01,1,it,0) )
+            def now = ZonedDateTime.of(LocalDateTime.of(2015,01,1,it,0), ZoneId.of("UTC"))
+            setNow( now )
             javers.commit('author', entity)
         }
 
@@ -898,14 +822,14 @@ class JaversRepositoryE2ETest extends Specification {
         }
     }
 
-    def "should cope with query for 1000 different snapshots"() {
+    def "should cope with query for 200 different snapshots"() {
         given:
-        (1..1000).each {
+        (1..200).each {
             javers.commit("author", new SnapshotEntity(id: 1, intProperty: it))
         }
 
         def instanceId = javersTestAssembly().instanceId(new SnapshotEntity(id: 1))
-        def snapshotIdentifiers = (1..1000).collect {
+        def snapshotIdentifiers = (1..200).collect {
             new SnapshotIdentifier(instanceId, it)
         }
 
@@ -925,18 +849,6 @@ class JaversRepositoryE2ETest extends Specification {
 
         then:
         assert snapshots.size() == 0
-    }
-
-    def "should treat refactored VOs as different versions of the same client's domain object"(){
-        given:
-        javers.commit('author', new EntityWithRefactoredValueObject(id:1, value: new OldValueObject(5, 5)))
-        javers.commit('author', new EntityWithRefactoredValueObject(id:1, value: new NewValueObject(5, 10)))
-
-        when:
-        def snapshots = javers.findSnapshots(QueryBuilder.byValueObject(EntityWithRefactoredValueObject,'value').build())
-
-        then:
-        snapshots.version == [2, 1]
     }
 
     @Unroll

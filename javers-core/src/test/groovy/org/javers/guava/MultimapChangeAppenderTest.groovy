@@ -17,8 +17,7 @@ import spock.lang.Unroll
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY
 import static org.javers.guava.MultimapBuilder.create
-import static org.javers.repository.jql.InstanceIdDTO.instanceId
-import static org.javers.repository.jql.ValueObjectIdDTO.valueObjectId
+import static org.javers.core.GlobalIdTestBuilder.*
 
 /**
  * @author akrystian
@@ -27,7 +26,7 @@ class MultimapChangeAppenderTest extends AbstractDiffAppendersTest {
 
     MultimapChangeAppender multimapChangeAppender() {
         def javers = JaversTestBuilder.javersTestAssembly()
-        new MultimapChangeAppender(javers.typeMapper, javers.globalIdFactory)
+        new MultimapChangeAppender(javers.typeMapper)
     }
 
     def "should append changes on Multimaps of primitives "(){
@@ -92,7 +91,7 @@ class MultimapChangeAppenderTest extends AbstractDiffAppendersTest {
                         valueObjectId(1, SnapshotEntity, "multimapPrimitiveToValueObject/a/fe9f8f0d164b49489301b7eaefc00c13")]
     }
 
-    def "should not support Map<ValueObject,?>"() {
+    def "should not support Map of ValueObject to ?"() {
         when:
         multimapChangeAppender().supports(getJaversType(new TypeToken<Multimap<DummyAddress, String>>() {}.getType()))
 

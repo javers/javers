@@ -2,9 +2,13 @@ package org.javers.core.snapshot;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.graph.*;
+import org.javers.core.metamodel.object.CdoSnapshot;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Builds snapshots for provided live objects.
@@ -21,17 +25,20 @@ public class ChangedCdoSnapshotsFactory {
     }
 
     /**
-     * @param liveObjects wrapped CDOs for which snapshot should be created if it differs from latest snapshot
+     * @param liveGraph wrapped CDOs for which snapshots should be created if they differ from latest snapshots
      * @param latestSnapshots CDO snapshots used to check which of liveObjects have been created or changed
      * @param commitMetadata commit metadata used to create new snapshots
      */
-    public List<CdoSnapshot> create(Set<LiveCdo> liveObjects, Set<CdoSnapshot> latestSnapshots, CommitMetadata commitMetadata) {
-        Validate.argumentsAreNotNull(liveObjects, commitMetadata, latestSnapshots);
+    public List<CdoSnapshot> create(LiveGraph liveGraph, Set<CdoSnapshot> latestSnapshots, CommitMetadata commitMetadata) {
+        Validate.argumentsAreNotNull(liveGraph, commitMetadata, latestSnapshots);
 
         List<CdoSnapshot> result = new ArrayList<>();
-        for (LiveCdo currentCdo : liveObjects) {
+        for (ObjectNode node : liveGraph.nodes()) {
+            LiveNode liveNode = (LiveNode) node;
+            Cdo currentCdo = node.getCdo();
+
             Optional<CdoSnapshot> previousSnapshot = latestSnapshots.stream().filter(currentCdo::equals).findFirst();
-            CdoSnapshot currentSnapshot = createSnapshot(latestSnapshots, commitMetadata, currentCdo, previousSnapshot);
+            CdoSnapshot currentSnapshot = createSnapshot(commitMetadata, liveNode, previousSnapshot);
             if (isCdoChanged(previousSnapshot, currentSnapshot)) {
                 result.add(currentSnapshot);
             }
@@ -39,23 +46,23 @@ public class ChangedCdoSnapshotsFactory {
         return result;
     }
 
-    private CdoSnapshot createSnapshot(Set<CdoSnapshot> previousCdos, CommitMetadata commitMetadata,
-                                       LiveCdo liveCdo, Optional<CdoSnapshot> previousSnapshot) {
-        return isNewlyCreated(liveCdo, previousCdos) ?
-                createInitialSnapshot(commitMetadata, liveCdo) :
-                createUpdateSnapshot(commitMetadata, liveCdo, previousSnapshot.get());
+    private CdoSnapshot createSnapshot(CommitMetadata commitMetadata,
+                                       LiveNode liveNode, Optional<CdoSnapshot> previousSnapshot) {
+        return isNewlyCreated(previousSnapshot) ?
+                createInitialSnapshot(commitMetadata, liveNode) :
+                createUpdateSnapshot(commitMetadata, liveNode, previousSnapshot.get());
     }
 
-    private boolean isNewlyCreated(Cdo cdo, Set<CdoSnapshot> previousCdos) {
-        return !previousCdos.contains(cdo);
+    private boolean isNewlyCreated(Optional<CdoSnapshot> previousSnapshot) {
+        return !previousSnapshot.isPresent();
     }
 
-    private CdoSnapshot createInitialSnapshot(CommitMetadata commitMetadata, LiveCdo liveCdo) {
-        return snapshotFactory.createInitial(liveCdo, commitMetadata);
+    private CdoSnapshot createInitialSnapshot(CommitMetadata commitMetadata, LiveNode liveNode) {
+        return snapshotFactory.createInitial(liveNode, commitMetadata);
     }
 
-    private CdoSnapshot createUpdateSnapshot(CommitMetadata commitMetadata, LiveCdo liveCdo, CdoSnapshot previousSnapshot) {
-        return snapshotFactory.createUpdate(liveCdo, previousSnapshot, commitMetadata);
+    private CdoSnapshot createUpdateSnapshot(CommitMetadata commitMetadata, LiveNode liveNode, CdoSnapshot previousSnapshot) {
+        return snapshotFactory.createUpdate(liveNode, previousSnapshot, commitMetadata);
     }
 
     private boolean isCdoChanged(Optional<CdoSnapshot> previousSnapshot, CdoSnapshot currentSnapshot) {

@@ -2,6 +2,7 @@ package org.javers.core.graph;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.type.JaversProperty;
+import java.util.List;
 
 /**
  * Relation between (Entity) instances
@@ -18,7 +19,7 @@ abstract class Edge {
         this.property = property;
     }
 
-    public JaversProperty getProperty() {
+    JaversProperty getProperty() {
         return property;
     }
 
@@ -36,4 +37,8 @@ abstract class Edge {
     public int hashCode() {
         return property.hashCode();
     }
+
+    abstract List<LiveNode> getReferences();
+
+    abstract Object getDehydratedPropertyValue();
 }

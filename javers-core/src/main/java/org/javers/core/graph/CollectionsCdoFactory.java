@@ -2,7 +2,6 @@ package org.javers.core.graph;
 
 import org.javers.common.collections.Lists;
 import org.javers.common.reflection.JaversMember;
-import org.javers.core.metamodel.object.Cdo;
 import org.javers.core.metamodel.object.UnboundedValueObjectId;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.scanner.ClassScanner;
@@ -25,7 +24,7 @@ public class CollectionsCdoFactory {
         this.typeMapper = typeMapper;
     }
 
-    public Cdo createCdo(final CollectionWrapper wrapper, final Class<?> clazz) {
+    public LiveCdo createCdo(final CollectionWrapper wrapper, final Class<?> clazz) {
         Property primaryProperty = classScanner.scan(wrapper.getClass()).getProperties().get(0);
         JaversMember javersMember = memberGenericTypeInjector.create(primaryProperty, clazz);
 

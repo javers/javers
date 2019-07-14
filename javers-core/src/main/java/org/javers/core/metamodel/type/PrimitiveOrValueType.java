@@ -26,10 +26,6 @@ public abstract class PrimitiveOrValueType extends ClassType{
         return valueComparator.equals(left, right);
     }
 
-    public String smartToString(Object value) {
-        return ToStringBuilder.smartToString(value);
-    }
-
     public boolean isNumber() {
         return Number.class.isAssignableFrom(getBaseJavaClass()) ||
                Primitives.isPrimitiveNumber(getBaseJavaClass());
@@ -49,4 +45,6 @@ public abstract class PrimitiveOrValueType extends ClassType{
     public boolean isJsonPrimitive() {
         return isStringy() || isBoolean() || isNumber();
     }
+
+    public abstract String smartToString(Object value);
 }

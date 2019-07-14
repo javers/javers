@@ -6,8 +6,4 @@ javers:
   typeSafeValues: true
   packagesToScan: org.javers.spring.boot
   commitIdGenerator: random
-
-spring:
-  data:
-    mongodb:
-      database: spring-mongo
+  documentDbCompatibilityEnabled: true

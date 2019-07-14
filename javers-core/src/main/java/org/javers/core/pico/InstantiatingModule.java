@@ -47,6 +47,7 @@ public abstract class InstantiatingModule {
         public Object getComponentInstance(PicoContainer pico, Type into) {
             return ReflectionUtil.newInstance(getComponentImplementation(), argumentResolver);
         }
+
         public void verify(PicoContainer container) {
         }
 

@@ -15,12 +15,12 @@ class ChangeAssert {
     }
 
     ChangeAssert isNewObject() {
-        actual.class == NewObject
+        assert actual.class == NewObject
         this
     }
 
     ChangeAssert isObjectRemoved() {
-        actual.class == ObjectRemoved
+        assert actual.class == ObjectRemoved
         this
     }
 

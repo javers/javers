@@ -3,7 +3,6 @@ package org.javers.core.diff.appenders
 import org.javers.core.diff.ChangeAssert
 import org.javers.core.diff.RealNodePair
 import org.javers.core.graph.ObjectNode
-import org.javers.repository.jql.InstanceIdDTO
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.DummyUser
@@ -12,6 +11,7 @@ import org.javers.core.model.DummyUserWithValues
 import java.time.LocalDateTime
 
 import static DummyUserWithValues.dummyUserWithDate
+import static org.javers.core.GlobalIdTestBuilder.instanceId
 import static org.javers.core.diff.appenders.ValueChangeAssert.assertThat
 import static org.javers.core.model.DummyUser.Sex.FEMALE
 import static org.javers.core.model.DummyUser.Sex.OCCASIONALLY
@@ -200,7 +200,7 @@ class ValueChangeAppenderTest extends AbstractDiffAppendersTest {
 
         then:
         assertThat(change)
-                  .hasValueObjectId(DummyAddress, new InstanceIdDTO(DummyUserDetails,1), "dummyAddress")
+                  .hasValueObjectId(DummyAddress, instanceId(1, DummyUserDetails), "dummyAddress")
                   .hasLeftValue("Washington Street")
                   .hasRightValue("Wall Street")
                   .hasPropertyName("street")

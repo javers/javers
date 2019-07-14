@@ -109,6 +109,24 @@ public class ReflectionUtil {
         return fieldFactory.getAllFields();
     }
 
+    public static Optional<JaversMember> getMirrorMember(JaversMember member, Class methodSource) {
+        if (member instanceof JaversGetter) {
+            return (Optional)getMirrorGetter((JaversGetter)member, methodSource);
+        }
+        if (member instanceof JaversField) {
+            return (Optional)getMirrorField((JaversField)member, methodSource);
+        }
+        throw new JaversException(JaversExceptionCode.NOT_IMPLEMENTED);
+    }
+
+    public static Optional<JaversField> getMirrorField(JaversField field, Class methodSource) {
+        return getAllFields(methodSource).stream().filter(f -> f.propertyName().equals(field.propertyName())).findFirst();
+    }
+
+    public static Optional<JaversGetter> getMirrorGetter(JaversGetter getter, Class methodSource) {
+        return getAllGetters(methodSource).stream().filter(f -> f.propertyName().equals(getter.propertyName())).findFirst();
+    }
+
     private static boolean isPersistentField(Field field) {
         return !Modifier.isTransient(field.getModifiers()) &&
                !Modifier.isStatic(field.getModifiers()) &&

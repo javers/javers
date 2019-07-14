@@ -5,31 +5,25 @@ import org.javers.common.exception.JaversException;
 import org.javers.common.validation.Validate;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.map.*;
-import org.javers.core.metamodel.object.DehydrateMapFunction;
-import org.javers.core.metamodel.object.GlobalIdFactory;
-import org.javers.core.metamodel.object.OwnerContext;
-import org.javers.core.metamodel.object.PropertyOwnerContext;
 import org.javers.core.metamodel.type.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
+import static org.javers.core.diff.appenders.CorePropertyChangeAppender.renderNotParametrizedWarningIfNeeded;
 
 /**
  * @author bartosz walacik
  */
-class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
-    private static final Logger logger = LoggerFactory.getLogger(MapChangeAppender.class);
+class MapChangeAppender implements PropertyChangeAppender<MapChange> {
 
     private final TypeMapper typeMapper;
-    private final GlobalIdFactory globalIdFactory;
 
-    MapChangeAppender(TypeMapper typeMapper, GlobalIdFactory globalIdFactory) {
-        Validate.argumentsAreNotNull(typeMapper, globalIdFactory);
+    MapChangeAppender(TypeMapper typeMapper) {
+        Validate.argumentsAreNotNull(typeMapper);
         this.typeMapper = typeMapper;
-        this.globalIdFactory = globalIdFactory;
     }
 
     @Override
@@ -48,19 +42,19 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
 
     @Override
     public MapChange calculateChanges(NodePair pair, JaversProperty property) {
-        Map leftRawMap =  pair.getLeftPropertyValueAndCast(property, Map.class);
-        Map rightRawMap = pair.getRightPropertyValueAndCast(property, Map.class);
+
+        Map left = (Map) pair.getLeftDehydratedPropertyValueAndSanitize(property);
+        Map right = (Map) pair.getRightDehydratedPropertyValueAndSanitize(property);
 
         MapType mapType = ((JaversProperty) property).getType();
         MapContentType mapContentType = typeMapper.getMapContentType(mapType);
 
-        OwnerContext owner = new PropertyOwnerContext(pair.getGlobalId(), property.getName());
-        List<EntryChange> changes = calculateEntryChanges(leftRawMap, rightRawMap, owner, mapContentType);
+        List<EntryChange> changes = calculateEntryChanges(left, right, mapContentType);
 
         if (!changes.isEmpty()){
             renderNotParametrizedWarningIfNeeded(mapContentType.getKeyType().getBaseJavaType(), "key", "Map", property);
             renderNotParametrizedWarningIfNeeded(mapContentType.getValueType().getBaseJavaType(), "value", "Map", property);
-            return new MapChange(pair.getGlobalId(), property.getName(), changes);
+            return new MapChange(pair.createPropertyChangeMetadata(property), changes);
         }
         else {
             return null;
@@ -70,12 +64,7 @@ class MapChangeAppender extends CorePropertyChangeAppender<MapChange> {
     /**
      * @return never returns null
      */
-    List<EntryChange> calculateEntryChanges(Map leftRawMap, Map rightRawMap, OwnerContext owner, MapContentType mapContentType) {
-
-        DehydrateMapFunction dehydrateFunction = new DehydrateMapFunction(globalIdFactory, mapContentType);
-
-        Map leftMap =  MapType.mapStatic(leftRawMap, dehydrateFunction, owner);
-        Map rightMap = MapType.mapStatic(rightRawMap, dehydrateFunction, owner);
+    List<EntryChange> calculateEntryChanges(Map leftMap, Map rightMap, MapContentType mapContentType) {
 
         List<EntryChange> changes = new ArrayList<>();
 
