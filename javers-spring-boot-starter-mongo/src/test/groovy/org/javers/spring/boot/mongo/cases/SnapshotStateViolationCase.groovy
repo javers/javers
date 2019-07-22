@@ -30,10 +30,12 @@ class SnapshotStateViolationCase extends Specification {
 	class SimplePojo implements ISimplePojo {
 		public SimpleEnum name;
 
+		@Override
 		SimpleEnum getName() {
 			return name
 		}
 
+		@Override
 		void setName(SimpleEnum name) {
 			this.name = name
 		}
