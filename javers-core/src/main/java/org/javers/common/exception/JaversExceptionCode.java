@@ -55,7 +55,9 @@ public enum JaversExceptionCode {
     //graph & snapshot
     VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY("found ValueObject on KEY position in Map property '%s'. Please change the key class mapping to Value or Entity"),
 
-    SNAPSHOT_STATE_VIOLATION("snapshots are immutable"),
+    SNAPSHOT_STATE_VIOLATION("attempt to update snapshot state, property '%s' already added"),
+
+    SNAPSHOT_SERIALIZATION_ERROR("error while serializing snapshot of '%s', duplicated property '%s'"),
 
     PROPERTY_NOT_FOUND("Property '%s' not found in class '%s'. If the name is correct - check annotations. Properties with @DiffIgnore or @Transient are not visible for JaVers."),
 

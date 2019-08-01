@@ -1,6 +1,8 @@
 package org.javers.core.snapshot;
 
 import org.javers.common.collections.Defaults;
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.graph.Cdo;
 import org.javers.core.graph.LiveNode;
@@ -80,6 +82,9 @@ public class SnapshotFactory {
             Object dehydratedPropertyValue = liveNode.getDehydratedPropertyValue(property);
             if (Objects.equals(dehydratedPropertyValue, Defaults.defaultValue(property.getGenericType()))) {
                 continue;
+            }
+            if (stateBuilder.contains(property)) {
+                throw new JaversException(JaversExceptionCode.SNAPSHOT_SERIALIZATION_ERROR, liveNode.getGlobalId().value(), property);
             }
             stateBuilder.withPropertyValue(property, dehydratedPropertyValue);
         }
