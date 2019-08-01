@@ -35,6 +35,7 @@ class JaversGetterFactory {
 
     private void findAllGetters(Class currentGetterSource) {
         Class clazz = currentGetterSource;
+
         while (clazz != null && clazz != Object.class) {
             context.addTypeSubstitutions(clazz);
             Arrays.stream(clazz.getDeclaredMethods())
@@ -42,9 +43,12 @@ class JaversGetterFactory {
                     .filter(method -> !isOverridden(method, getters))
                     .map(getter -> createJaversGetter(getter, context))
                     .forEach(getters::add);
+            clazz = clazz.getSuperclass();
+        }
 
+        clazz = currentGetterSource;
+        while (clazz != null && clazz != Object.class) {
             Arrays.stream(clazz.getInterfaces()).forEach(this::findAllGetters);
-
             clazz = clazz.getSuperclass();
         }
     }
@@ -80,6 +84,7 @@ class JaversGetterFactory {
     }
 
     private static boolean isOverridden(Method parent, Collection<JaversGetter> toCheck) {
+        System.out.println("isOverridden, parent " +parent);
         return toCheck.stream()
                 .map(it -> it.getRawMember())
                 .anyMatch(it -> isOverridden(parent, it));

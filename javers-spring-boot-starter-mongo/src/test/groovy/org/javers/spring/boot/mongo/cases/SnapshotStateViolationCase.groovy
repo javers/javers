@@ -17,44 +17,40 @@ class SnapshotStateViolationCase extends Specification {
 
 	@Autowired JaversSpringProperties javersProperties
 
-	enum SimpleEnum {
-		ENUM1, ENUM2
-	}
-
 	interface ISimplePojo {
-		SimpleEnum getName()
+		int getName()
 
-		void setName(SimpleEnum name)
+		void setName(int name)
 	}
 
 	class SimplePojo implements ISimplePojo {
-		public SimpleEnum name;
+		int name;
 
 		@Override
-		SimpleEnum getName() {
+		int getName() {
 			return name
 		}
 
 		@Override
-		void setName(SimpleEnum name) {
+		void setName(int name) {
 			this.name = name
 		}
 	}
 
 	 interface IExtendedPojo extends ISimplePojo {
-		SimpleEnum getAnotherName()
+		int getAnotherName()
 
-		void setAnotherName(SimpleEnum anotherName)
+		void setAnotherName(int anotherName)
 	}
 
 	class ExtendedPojo extends SimplePojo implements IExtendedPojo {
-		private SimpleEnum anotherName
+		int anotherName
 
-		SimpleEnum getAnotherName() {
+		int getAnotherName() {
 			return anotherName
 		}
 
-		void setAnotherName(SimpleEnum anotherName) {
+		void setAnotherName(int anotherName) {
 			this.anotherName = anotherName
 		}
 	}
@@ -64,8 +60,8 @@ class SnapshotStateViolationCase extends Specification {
 		javersProperties.mappingStyle == "bean"
 
 		ExtendedPojo ep = new ExtendedPojo()
-		ep.setAnotherName(SimpleEnum.ENUM1)
-		ep.setName(SimpleEnum.ENUM2)
+		ep.setAnotherName(1)
+		ep.setName(2)
 
 		when:
 		javers.commit("a", ep)
