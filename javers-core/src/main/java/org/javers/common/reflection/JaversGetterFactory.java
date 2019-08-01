@@ -84,7 +84,6 @@ class JaversGetterFactory {
     }
 
     private static boolean isOverridden(Method parent, Collection<JaversGetter> toCheck) {
-        System.out.println("isOverridden, parent " +parent);
         return toCheck.stream()
                 .map(it -> it.getRawMember())
                 .anyMatch(it -> isOverridden(parent, it));
