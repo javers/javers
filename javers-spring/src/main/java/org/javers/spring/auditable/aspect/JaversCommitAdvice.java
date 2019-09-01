@@ -6,6 +6,7 @@ import org.javers.core.commit.Commit;
 import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.CommitPropertiesProviderContext;
 
 import java.util.Map;
 
@@ -25,19 +26,18 @@ class JaversCommitAdvice {
     }
 
     void commitSaveMethodArguments(JoinPoint pjp) {
-        commitMethodArguments(pjp, javers::commit);
+        commitMethodArguments(pjp, CommitPropertiesProviderContext.SAVE_UPDATE, javers::commit);
     }
 
     void commitDeleteMethodArguments(JoinPoint pjp) {
-        commitMethodArguments(pjp, javers::commitShallowDelete);
+        commitMethodArguments(pjp, CommitPropertiesProviderContext.DELETE, javers::commitShallowDelete);
     }
 
-    private void commitMethodArguments(JoinPoint pjp, JaversCommitHandler commitHandler) {
+    private void commitMethodArguments(JoinPoint pjp, CommitPropertiesProviderContext context, JaversCommitHandler commitHandler) {
         String author = authorProvider.provide();
-        Map<String, String> props = commitPropertiesProvider.provide();
 
         for (Object arg : AspectUtil.collectArguments(pjp)) {
-            commitHandler.commit(author, arg, props);
+            commitHandler.commit(author, arg, commitPropertiesProvider.provide(context, arg));
         }
     }
 

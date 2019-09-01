@@ -6,6 +6,7 @@ import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.CommitPropertiesProviderContext;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
@@ -100,6 +101,16 @@ public class JaversSpringMongoApplicationConfig {
     public CommitPropertiesProvider commitPropertiesProvider() {
         final Map<String, String> rv = new HashMap<>();
         rv.put("key", "ok");
-        return () -> Collections.unmodifiableMap(rv);
+        return new CommitPropertiesProvider() {
+            @Override
+            public Map<String, String> provide(CommitPropertiesProviderContext context, Object domainObject) {
+                return Collections.unmodifiableMap(rv);
+            }
+
+            @Override
+            public Map<String, String> provideForDeleteById(Class<?> domainObjectClass, Object domainObjectId) {
+                return Collections.unmodifiableMap(rv);
+            }
+        };
     }
 }

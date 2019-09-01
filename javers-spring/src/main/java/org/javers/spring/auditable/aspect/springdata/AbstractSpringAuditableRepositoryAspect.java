@@ -7,11 +7,11 @@ import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
+import org.javers.spring.auditable.CommitPropertiesProviderContext;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -30,7 +30,8 @@ public class AbstractSpringAuditableRepositoryAspect {
         this.authorProvider = authorProvider;
         this.commitPropertiesProvider = commitPropertiesProvider;
 
-        this.saveHandler = (repositoryMetadata, domainObject) -> javers.commit(authorProvider.provide(), domainObject, commitPropertiesProvider.provide());
+        this.saveHandler = (repositoryMetadata, domainObject) -> javers.commit(authorProvider.provide(), domainObject,
+                commitPropertiesProvider.provide(CommitPropertiesProviderContext.SAVE_UPDATE, domainObject));
         this.deleteHandler = new OnDeleteAuditChangeHandler();
     }
 
@@ -71,21 +72,21 @@ public class AbstractSpringAuditableRepositoryAspect {
 
         @Override
         public void handle(RepositoryMetadata repositoryMetadata, Object domainObjectOrId) {
-            Map<String, String> props = commitPropertiesProvider.provide();
             String author = authorProvider.provide();
 
             if (isIdClass(repositoryMetadata, domainObjectOrId)) {
-                if (javers.findSnapshots(QueryBuilder.byInstanceId(domainObjectOrId, repositoryMetadata.getDomainType()).build()).size() == 0) {
+                Class<?> domainType = repositoryMetadata.getDomainType();
+                if (javers.findSnapshots(QueryBuilder.byInstanceId(domainObjectOrId, domainType).build()).size() == 0) {
                     return;
                 }
 
-                javers.commitShallowDeleteById(author, instanceId(domainObjectOrId, repositoryMetadata.getDomainType()), props);
+                javers.commitShallowDeleteById(author, instanceId(domainObjectOrId, domainType), commitPropertiesProvider.provideForDeleteById(domainType, domainObjectOrId));
             } else if (isDomainClass(repositoryMetadata, domainObjectOrId)) {
                 if (javers.findSnapshots(QueryBuilder.byInstance(domainObjectOrId).build()).size() == 0) {
                     return;
                 }
 
-                javers.commitShallowDelete(author, domainObjectOrId, props);
+                javers.commitShallowDelete(author, domainObjectOrId, commitPropertiesProvider.provide(CommitPropertiesProviderContext.DELETE, domainObjectOrId));
             } else {
                 throw new IllegalArgumentException("Domain object or object id expected");
             }
