@@ -8,7 +8,6 @@ import java.util.UUID;
 public class DepartmentEntity {
   @Id
   @Column
-  @GeneratedValue
   private UUID id;
 
   @OneToMany(mappedBy = "department")

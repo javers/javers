@@ -1,6 +1,11 @@
 package org.javers.spring.auditable;
 
 import org.javers.core.Javers;
+import org.javers.repository.api.JaversRepository;
+import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.javers.spring.auditable.aspect.JaversAuditableAspect;
+
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -17,23 +22,55 @@ import java.util.Map;
 public interface CommitPropertiesProvider {
 
     /**
-     * Provide commit properties when save/update {@link CommitPropertiesProviderContext} a domainObject.
+     * Provides object-specific commit properties when given object is committed (saved or updated)
+     * to {@link JaversRepository}.
      *
-     * @param context the persist context for the domain object parameter.
-     * @param domainObject affected object.
+     * <br/><br/>
+     * This method is called by {@link JaversSpringDataAuditable} aspect after TODO
      *
-     * @return Context dependant commit properties map.
+     * <br/><br/>
+     * Default implementation returns empty Map
+     *
+     * @param domainObject affected object
      */
-    Map<String, String> provide(CommitPropertiesProviderContext context, Object domainObject);
+    default Map<String, String> provideForCommittedObject(Object domainObject) {
+        return Collections.emptyMap();
+    }
 
     /**
-     * Provide commit properties when delete an object via id only.
+     * Provides object-specific commit properties when given object is deleted from {@link JaversRepository}.
      *
-     * @param domainObjectClass class of deleted object.
-     * @param domainObjectId id of deleted object.
+     * <br/><br/>
+     * This method is called by {@link JaversSpringDataAuditable} aspect after TODO
      *
-     * @return commit properties map for case delete by id.
+     * <br/><br/>
+     * Default implementation delegates to {@link #provideForCommittedObject(Object)}
+     *
+     * @param domainObject affected object
      */
-    Map<String, String> provideForDeleteById(Class<?> domainObjectClass, Object domainObjectId);
+    default Map<String, String> provideForDeletedObject(Object domainObject) {
+        return provideForCommittedObject(domainObject);
+    }
 
+    /**
+     * Provides object-specific commit properties when given object is deleted from {@link JaversRepository}
+     * by its Id.
+     *
+     * <br/><br/>
+     * This method is called by {@link JaversSpringDataAuditable} aspect after TODO
+     */
+    default Map<String, String> provideForDeleteById(Class<?> domainObjectClass, Object domainObjectId) {
+        return Collections.emptyMap();
+    }
+
+    /**
+     * This method is deprecated
+     * and replaced with {@link #provideForCommittedObject(Object)}
+     *
+     * @Deprecated
+     */
+    @Deprecated
+    default Map<String, String> provide() {
+        return Collections.emptyMap();
+    }
 }

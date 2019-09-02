@@ -35,9 +35,10 @@ class JaversSqlStarterIntegrationTest extends Specification {
         def snapshots = javers.findSnapshots(byInstanceId(entity.id, DummyEntity).build())
 
         then:
-        assert snapshots.size() == 1
-        assert snapshots[0].commitMetadata.properties["key"] == "ok"
-        assert snapshots[0].commitMetadata.author == "unauthenticated"
+        snapshots.size() == 1
+        snapshots[0].commitMetadata.properties.size() == 1
+        snapshots[0].commitMetadata.properties["commit_is"] == "ok"
+        snapshots[0].commitMetadata.author == "unauthenticated"
     }
 
     def "should call auto-audit aspect when saving iterable "(){

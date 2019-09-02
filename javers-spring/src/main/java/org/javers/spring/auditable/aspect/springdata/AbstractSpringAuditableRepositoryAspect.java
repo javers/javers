@@ -7,56 +7,38 @@ import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
-import org.javers.spring.auditable.CommitPropertiesProviderContext;
+import org.javers.spring.auditable.aspect.JaversCommitAdvice;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 
 import java.util.Optional;
-import java.util.function.Supplier;
-
-import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
 public class AbstractSpringAuditableRepositoryAspect {
-    private final AuditChangeHandler saveHandler;
+    private final JaversCommitAdvice javersCommitAdvice;
     private final AuditChangeHandler deleteHandler;
-
     private final Javers javers;
-    private final AuthorProvider authorProvider;
-    private final CommitPropertiesProvider commitPropertiesProvider;
 
     protected AbstractSpringAuditableRepositoryAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this.javers = javers;
-        this.authorProvider = authorProvider;
-        this.commitPropertiesProvider = commitPropertiesProvider;
+        this.javersCommitAdvice = new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider);
 
-        this.saveHandler = (repositoryMetadata, domainObject) -> javers.commit(authorProvider.provide(), domainObject,
-                commitPropertiesProvider.provide(CommitPropertiesProviderContext.SAVE_UPDATE, domainObject));
         this.deleteHandler = new OnDeleteAuditChangeHandler();
     }
 
     protected void onSave(JoinPoint pjp, Object returnedObject) {
-        onVersionEvent(pjp, saveHandler, () -> AspectUtil.collectReturnedObjects(returnedObject));
-    }
-
-    protected void onDelete(JoinPoint pjp) {
-        onVersionEvent(pjp, deleteHandler, () -> AspectUtil.collectArguments(pjp));
-    }
-
-    private void onVersionEvent(JoinPoint pjp, AuditChangeHandler changeHandler, Supplier<Iterable<Object>> domainObjectsExtractor) {
-        Optional<Class> versionedInterface = getRepositoryInterface(pjp);
-
-        versionedInterface.ifPresent(versioned -> {
-            RepositoryMetadata metadata = getMetadata(versioned);
-            Iterable<Object> domainObjects = domainObjectsExtractor.get();
-            for (Object domainObject : domainObjects) {
-                changeHandler.handle(metadata, domainObject);
-            }
+        getRepositoryInterface(pjp).ifPresent( i -> {
+            AspectUtil.collectReturnedObjects(returnedObject).forEach(o -> javersCommitAdvice.commitObject(o));
         });
     }
 
-    private RepositoryMetadata getMetadata(Class versionedInterface) {
-        return DefaultRepositoryMetadata.getMetadata(versionedInterface);
+    protected void onDelete(JoinPoint pjp) {
+        getRepositoryInterface(pjp).ifPresent( i -> {
+            RepositoryMetadata metadata = DefaultRepositoryMetadata.getMetadata(i);
+            for (Object deletedObject : AspectUtil.collectArguments(pjp)) {
+                deleteHandler.handle(metadata, deletedObject);
+            }
+        });
     }
 
     private Optional<Class> getRepositoryInterface(JoinPoint pjp) {
@@ -72,21 +54,17 @@ public class AbstractSpringAuditableRepositoryAspect {
 
         @Override
         public void handle(RepositoryMetadata repositoryMetadata, Object domainObjectOrId) {
-            String author = authorProvider.provide();
-
             if (isIdClass(repositoryMetadata, domainObjectOrId)) {
                 Class<?> domainType = repositoryMetadata.getDomainType();
                 if (javers.findSnapshots(QueryBuilder.byInstanceId(domainObjectOrId, domainType).build()).size() == 0) {
                     return;
                 }
-
-                javers.commitShallowDeleteById(author, instanceId(domainObjectOrId, domainType), commitPropertiesProvider.provideForDeleteById(domainType, domainObjectOrId));
+                javersCommitAdvice.commitShallowDeleteById(domainObjectOrId, domainType);
             } else if (isDomainClass(repositoryMetadata, domainObjectOrId)) {
                 if (javers.findSnapshots(QueryBuilder.byInstance(domainObjectOrId).build()).size() == 0) {
                     return;
                 }
-
-                javers.commitShallowDelete(author, domainObjectOrId, commitPropertiesProvider.provide(CommitPropertiesProviderContext.DELETE, domainObjectOrId));
+                javersCommitAdvice.commitShallowDelete(domainObjectOrId);
             } else {
                 throw new IllegalArgumentException("Domain object or object id expected");
             }

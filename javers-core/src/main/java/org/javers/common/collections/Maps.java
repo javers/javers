@@ -1,6 +1,7 @@
 package org.javers.common.collections;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,5 +41,26 @@ public class Maps {
         }
 
         return Sets.difference(left.keySet(), right.keySet());
+    }
+
+    public static Map of(Object key, Object val) {
+        Map m = new HashMap();
+        m.put(key, val);
+        return Collections.unmodifiableMap(m);
+    }
+
+    public static  <K,V> Map<K,V> merge(Map<K,V> a, Map<K,V> b) {
+        if (a == null || a.isEmpty()) {
+            return b;
+        }
+
+        if (b == null || b.isEmpty()) {
+            return a;
+        }
+
+        Map m = new HashMap(b);
+        m.putAll(a);
+
+        return Collections.unmodifiableMap(m);
     }
 }

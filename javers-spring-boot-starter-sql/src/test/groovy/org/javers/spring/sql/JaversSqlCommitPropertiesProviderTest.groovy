@@ -17,7 +17,7 @@ import static org.javers.repository.jql.QueryBuilder.byInstanceId
 /**
  * @author Oai Ha
  */
-@SpringBootTest(classes = [TestApplication])
+@SpringBootTest(classes = [TestApplicationWithComplexPropertiesProvider])
 @ActiveProfiles("test")
 @Transactional
 class JaversSqlCommitPropertiesProviderTest extends Specification {
@@ -34,100 +34,81 @@ class JaversSqlCommitPropertiesProviderTest extends Specification {
     @Autowired
     DummyEntityRepository dummyEntityRepository
 
-    def "should commit with properties provided by CommitPropertiesProvider on audited crudRepository.save(Object) and query for the main object from commit properties"() {
+    def """should commit and query with properties provided by CommitPropertiesProvider
+           when saving to audited Repository"""() {
         when:
-        def jEmployee = createEmployee()
-        def jFreshEmployee = employeeRepositoryWithJavers.save(jEmployee)
-        println(jFreshEmployee)
+        def employeeEntity = new EmployeeEntity(id:UUID.randomUUID())
+        employeeRepositoryWithJavers.save(employeeEntity)
 
-        def snapshots = javers.findSnapshots(QueryBuilder.byClass(EmployeeEntity.class)
-                .withCommitProperty("departmentId", jFreshEmployee.department.id.toString()).build())
+        def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject()
+                .withCommitProperty("employeeId", employeeEntity.id.toString()).build())
 
         then:
-        assert snapshots.size() == 1
-        assert snapshots[0].commitMetadata.properties["departmentId"] == jFreshEmployee.department.id.toString()
-        assert snapshots[0].commitMetadata.properties["employeeId"] == jFreshEmployee.id.toString()
-        assert snapshots[0].commitMetadata.author == "unauthenticated"
-    }
+        snapshots.size() == 1
+        snapshots[0].globalId.typeName == EmployeeEntity.name
+        with(snapshots[0].commitMetadata) {
+            assert it.properties.size() == 2
+            assert it.properties["employeeId"] == employeeEntity.id.toString()
+            assert it.properties["commit"] == "seems fine"
+        }
 
-    def "should commit with properties provided by CommitPropertiesProvider on audited crudRepository.save(Object) and query for the tracked linked object from commit properties"() {
         when:
-        def jEmployee = createEmployee()
-        def jFreshEmployee = employeeRepositoryWithJavers.save(jEmployee)
-        println(jFreshEmployee)
+        def shallowEntity = new ShallowEntity(id:1, value: "kaz")
+        shallowEntityRepository.save(shallowEntity)
 
-        def snapshots = javers.findSnapshots(QueryBuilder.byClass(EmployeeEntity.class)
-                .withCommitProperty("departmentId", jFreshEmployee.department.id.toString()).build())
-        def department = javers.findSnapshots(byInstanceId(snapshots[0].commitMetadata.properties["departmentId"], DepartmentEntity.class).build())
+        snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject()
+                .withCommitProperty("ShallowEntity.value", "kaz").build())
 
         then:
-        assert department.size() == 1
-        // Here the commit metadata still share the same with the snaphot one.
-        assert department[0].commitMetadata.properties["departmentId"] == jFreshEmployee.department.id.toString()
-        assert department[0].commitMetadata.properties["employeeId"] == jFreshEmployee.id.toString()
-        assert department[0].commitMetadata.author == "unauthenticated"
+        snapshots.size() == 1
+        snapshots[0].globalId.typeName == ShallowEntity.name
+        with(snapshots[0].commitMetadata) {
+            assert it.properties.size() == 2
+            assert it.properties["ShallowEntity.value"] == "kaz"
+            assert it.properties["commit"] == "seems fine"
+        }
     }
 
-    def "should commit with properties provided by CommitPropertiesProvider on audited crudRepository.save(Object) with different commit properties map"() {
+    def """should commit and query with properties provided by CommitPropertiesProvider
+           when deleting from audited Repository"""() {
         when:
-        def shallow = shallowEntityRepository.save(ShallowEntity.random())
-
-        def entity = DummyEntity.random()
-        entity.name = "a"
-        entity.shallowEntity = shallow
-        dummyEntityRepository.save(entity)
-
-        def dummySnapshots = javers.findSnapshots(QueryBuilder.byClass(DummyEntity.class).withCommitProperty("shallowId", shallow.id.toString()).build())
-        def shallowIdFromCommitProperties = dummySnapshots[0].commitMetadata.properties["shallowId"]
-        def verifyShallow = javers.findSnapshots(byInstanceId(Integer.valueOf(shallowIdFromCommitProperties), ShallowEntity.class).build())
-
-        then:
-        assert verifyShallow.size() == 1
-        assert verifyShallow[0].commitMetadata.properties["key"] == "ok"
-        assert verifyShallow[0].commitMetadata.author == "unauthenticated"
-    }
-
-    def "should commit with properties provided by CommitPropertiesProvider on audited crudRepository.delete(Object)"() {
-        when:
-        def jEmployee = createEmployee()
-        def jFreshEmployee = employeeRepositoryWithJavers.save(jEmployee)
+        def employeeEntity = new EmployeeEntity(id:UUID.randomUUID())
+        def jFreshEmployee = employeeRepositoryWithJavers.save(employeeEntity)
         employeeRepositoryWithJavers.delete(jFreshEmployee)
 
-        def snapshots = javers.findSnapshots(QueryBuilder.byClass(EmployeeEntity.class)
-                .withCommitProperty("departmentId", jFreshEmployee.department.id.toString()).build())
+        def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject()
+                .withCommitProperty("deleted employeeId", employeeEntity.id.toString()).build())
 
         then:
-        assert snapshots.size() == 2
-        assert snapshots[0].commitMetadata.properties.size() == 1
-        assert snapshots[0].commitMetadata.properties["departmentId"] == jFreshEmployee.department.id.toString()
-        assert snapshots[0].commitMetadata.author == "unauthenticated"
-        assert snapshots[1].commitMetadata.properties.size() == 2
-        assert snapshots[1].commitMetadata.properties["departmentId"] == jFreshEmployee.department.id.toString()
-        assert snapshots[1].commitMetadata.properties["employeeId"] == jFreshEmployee.id.toString()
-        assert snapshots[1].commitMetadata.author == "unauthenticated"
+        snapshots.size() == 1
+        snapshots[0].globalId.typeName == EmployeeEntity.name
+        with(snapshots[0].commitMetadata) {
+            assert it.properties.size() == 2
+            assert it.properties["deleted employeeId"] == employeeEntity.id.toString()
+            assert it.properties["commit"] == "seems fine"
+        }
     }
 
-    def "should commit with properties provided by CommitPropertiesProvider on audited crudRepository.saveAll(Object)"() {
+    def """should commit and query with properties provided by CommitPropertiesProvider
+           when saving to audited Repository with saveAll()"""() {
         when:
-        def empWithDepartment = employeeRepositoryWithJavers.save(createEmployee())
-        def employees = []
-        for (int i = 0; i < 3; i++) {
-            def entity = createEmployee()
-            entity.department = empWithDepartment.department
-            employees[i] = entity
-        }
-        def save = employeeRepositoryWithJavers.saveAll(employees)
-        save.add(empWithDepartment)
+        def dept1 = new DepartmentEntity(id: UUID.randomUUID())
+        def dept2 = new DepartmentEntity(id: UUID.randomUUID())
 
-        def employeeSnapshots = javers.findSnapshots(QueryBuilder.byClass(EmployeeEntity.class)
-                .withCommitProperty("departmentId", save.get(0).department.id.toString()).build())
+        def employees = []
+        4.times { employees.add(new EmployeeEntity(id:UUID.randomUUID(), department: dept1)) }
+        4.times { employees.add(new EmployeeEntity(id:UUID.randomUUID(), department: dept2)) }
+
+        def save = employeeRepositoryWithJavers.saveAll(employees)
+
+        def employeeSnapshots = javers.findSnapshots(QueryBuilder.byClass(EmployeeEntity)
+                .withCommitProperty("departmentId", dept1.id.toString()).build())
 
         then:
-        assert employeeSnapshots.size() == 4
-        assert match(save, employeeSnapshots[0].commitMetadata.properties["employeeId"])
-        assert match(save, employeeSnapshots[1].commitMetadata.properties["employeeId"])
-        assert match(save, employeeSnapshots[2].commitMetadata.properties["employeeId"])
-        assert match(save, employeeSnapshots[3].commitMetadata.properties["employeeId"])
+        employeeSnapshots.size() == 4
+        employeeSnapshots.each {
+            it.getPropertyValue("department").cdoId == dept1.id
+        }
     }
 
     def "should commit with properties provided by CommitPropertiesProvider on audited crudRepository.deleteById(Object)"() {
@@ -145,22 +126,5 @@ class JaversSqlCommitPropertiesProviderTest extends Specification {
         assert employeeSnapshots[1].commitMetadata.properties.size() == 2
         assert employeeSnapshots[1].commitMetadata.properties["employeeId"] == empWithDepartment.id.toString()
         assert employeeSnapshots[1].commitMetadata.properties["departmentId"] == empWithDepartment.department.id.toString()
-    }
-
-    boolean match(List<EmployeeEntity> employees, String id) {
-        return employees.stream().filter(new Predicate<EmployeeEntity>() {
-            @Override
-            boolean test(EmployeeEntity e) {
-                return e.id.toString() == id
-            }
-        }).count() == 1
-    }
-
-    EmployeeEntity createEmployee() {
-        DepartmentEntity departmentEntity = new DepartmentEntity()
-        EmployeeEntity employeeEntity = new EmployeeEntity()
-        employeeEntity.setId(UUID.randomUUID())
-        employeeEntity.setDepartment(departmentEntity)
-        employeeEntity
     }
 }
