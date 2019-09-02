@@ -111,20 +111,22 @@ class JaversSqlCommitPropertiesProviderTest extends Specification {
         }
     }
 
-    def "should commit with properties provided by CommitPropertiesProvider on audited crudRepository.deleteById(Object)"() {
-        when:
-        def empWithDepartment = employeeRepositoryWithJavers.save(createEmployee())
-        employeeRepositoryWithJavers.deleteById(empWithDepartment.id)
 
-        def employeeSnapshots = javers.findSnapshots(QueryBuilder.byClass(EmployeeEntity.class)
-                .withCommitProperty("employeeId", empWithDepartment.id.toString()).build())
+    def """should commit and query with properties provided by CommitPropertiesProvider
+           when deleting from audited Repository by Id"""() {
+        when:
+        def employee = employeeRepositoryWithJavers.save(
+                new EmployeeEntity(id:UUID.randomUUID()))
+        employeeRepositoryWithJavers.deleteById(employee.id)
+
+        def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject()
+                .withCommitProperty("employee deletedById", employee.id.toString()).build())
 
         then:
-        assert employeeSnapshots.size() == 2
-        assert employeeSnapshots[0].commitMetadata.properties.size() == 1
-        assert employeeSnapshots[0].commitMetadata.properties["employeeId"] == empWithDepartment.id.toString()
-        assert employeeSnapshots[1].commitMetadata.properties.size() == 2
-        assert employeeSnapshots[1].commitMetadata.properties["employeeId"] == empWithDepartment.id.toString()
-        assert employeeSnapshots[1].commitMetadata.properties["departmentId"] == empWithDepartment.department.id.toString()
+        snapshots.size() == 1
+        snapshots[0].globalId.typeName == EmployeeEntity.name
+        with(snapshots[0].commitMetadata) {
+            assert it.properties["employee deletedById"] == employee.id.toString()
+        }
     }
 }

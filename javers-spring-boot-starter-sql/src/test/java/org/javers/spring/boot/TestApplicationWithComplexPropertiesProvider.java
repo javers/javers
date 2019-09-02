@@ -45,7 +45,7 @@ public class TestApplicationWithComplexPropertiesProvider {
             @Override
             public Map<String, String> provideForDeleteById(Class<?> domainObjectClass, Object domainObjectId) {
                 if (domainObjectClass.isAssignableFrom(EmployeeEntity.class)) {
-                    return Maps.of("employeeId", domainObjectId.toString());
+                    return Maps.of("employee deletedById", domainObjectId.toString());
                 }
                 return Collections.emptyMap();
             }
