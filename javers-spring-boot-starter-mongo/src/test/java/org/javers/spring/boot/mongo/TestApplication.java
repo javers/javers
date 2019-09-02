@@ -24,7 +24,7 @@ public class TestApplication {
         return new CommitPropertiesProvider() {
             @Override
             public Map<String, String> provide() {
-                return Maps.of("key", "ok_1");
+                return Maps.of("key", "ok");
             }
         };
     }
