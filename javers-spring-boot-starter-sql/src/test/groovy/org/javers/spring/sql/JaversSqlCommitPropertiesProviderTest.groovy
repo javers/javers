@@ -111,7 +111,6 @@ class JaversSqlCommitPropertiesProviderTest extends Specification {
         }
     }
 
-
     def """should commit and query with properties provided by CommitPropertiesProvider
            when deleting from audited Repository by Id"""() {
         when:
