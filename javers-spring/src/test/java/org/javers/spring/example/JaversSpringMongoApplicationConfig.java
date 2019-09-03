@@ -1,6 +1,7 @@
 package org.javers.spring.example;
 
 import com.mongodb.MongoClient;
+import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
@@ -98,8 +99,11 @@ public class JaversSpringMongoApplicationConfig {
      */
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
-        final Map<String, String> rv = new HashMap<>();
-        rv.put("key", "ok");
-        return () -> Collections.unmodifiableMap(rv);
+        return new CommitPropertiesProvider() {
+            @Override
+            public Map<String, String> provide() {
+                return Maps.of("key", "ok");
+            }
+        };
     }
 }

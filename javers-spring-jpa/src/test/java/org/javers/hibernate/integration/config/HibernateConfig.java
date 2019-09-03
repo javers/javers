@@ -1,5 +1,6 @@
 package org.javers.hibernate.integration.config;
 
+import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.JaversSqlRepository;
@@ -100,8 +101,12 @@ public class HibernateConfig {
     @Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
         final Map<String, String> rv = new HashMap<>();
-        rv.put("key", "ok");
-        return () -> Collections.unmodifiableMap(rv);
+        return new CommitPropertiesProvider() {
+            @Override
+            public Map<String, String> provide() {
+                return Maps.of("key", "ok_2");
+            }
+        };
     }
 
     Properties additionalProperties() {

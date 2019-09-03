@@ -1,11 +1,13 @@
 package org.javers.spring.boot.mongo;
 
+import org.javers.common.collections.Maps;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,9 +24,7 @@ public class TestApplication {
         return new CommitPropertiesProvider() {
             @Override
             public Map<String, String> provide() {
-                Map<String, String> props = new HashMap<>();
-                props.put("key", "ok");
-                return props;
+                return Maps.of("key", "ok");
             }
         };
     }

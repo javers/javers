@@ -1,11 +1,11 @@
 package org.javers.spring.boot;
 
+import org.apache.groovy.util.Maps;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,9 +19,7 @@ public class TestApplication {
         return new CommitPropertiesProvider() {
             @Override
             public Map<String, String> provide() {
-                Map<String, String> props = new HashMap<>();
-                props.put("key", "ok");
-                return props;
+                return Maps.of("commit_is", "ok");
             }
         };
     }

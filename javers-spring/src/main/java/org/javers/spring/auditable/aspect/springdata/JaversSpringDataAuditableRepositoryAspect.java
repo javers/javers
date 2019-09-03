@@ -6,7 +6,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.javers.core.Javers;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
-
 import java.util.Map;
 
 /**
