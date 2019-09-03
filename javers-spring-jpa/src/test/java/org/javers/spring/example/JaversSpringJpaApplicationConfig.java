@@ -14,6 +14,7 @@ import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdatajpa.JaversSpringDataJpaAuditableRepositoryAspect;
 import org.javers.spring.jpa.JpaHibernateConnectionProvider;
 import org.javers.spring.jpa.TransactionalJaversBuilder;
+import org.javers.spring.model.DummyObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -105,8 +106,11 @@ public class JaversSpringJpaApplicationConfig {
     public CommitPropertiesProvider commitPropertiesProvider() {
         return new CommitPropertiesProvider() {
             @Override
-            public Map<String, String> provide() {
-                return Maps.of("key", "ok");
+            public Map<String, String> provideForCommittedObject(Object domainObject) {
+                if (domainObject instanceof DummyObject) {
+                    return Maps.of("dummyObject.name", ((DummyObject)domainObject).getName());
+                }
+                return Collections.emptyMap();
             }
         };
     }

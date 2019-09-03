@@ -26,7 +26,7 @@ class JaversMongoStarterIntegrationTest extends Specification{
 
         then:
         assert snapshots.size() == 1
-        assert snapshots[0].commitMetadata.properties["key"] == "ok"
+        assert snapshots[0].commitMetadata.properties["dummyEntityId"] == dummyEntity.id + ""
         assert snapshots[0].commitMetadata.author == "unauthenticated"
     }
 

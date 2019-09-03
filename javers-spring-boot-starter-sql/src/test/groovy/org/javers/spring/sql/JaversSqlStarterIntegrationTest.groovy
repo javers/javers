@@ -37,7 +37,9 @@ class JaversSqlStarterIntegrationTest extends Specification {
         then:
         snapshots.size() == 1
         snapshots[0].commitMetadata.properties.size() == 1
-        snapshots[0].commitMetadata.properties["commit_is"] == "ok"
+
+        and: "should support deprecated CommitPropertiesProvider.provide() "
+        snapshots[0].commitMetadata.properties["deprecated commitPropertiesProvider.provide()"] == "still works"
         snapshots[0].commitMetadata.author == "unauthenticated"
     }
 

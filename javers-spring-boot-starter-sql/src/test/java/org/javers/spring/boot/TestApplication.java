@@ -19,7 +19,7 @@ public class TestApplication {
         return new CommitPropertiesProvider() {
             @Override
             public Map<String, String> provide() {
-                return Maps.of("commit_is", "ok");
+                return Maps.of("deprecated commitPropertiesProvider.provide()", "still works");
             }
         };
     }

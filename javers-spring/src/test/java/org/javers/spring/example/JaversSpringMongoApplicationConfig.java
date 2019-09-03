@@ -10,6 +10,7 @@ import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.SpringSecurityAuthorProvider;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
+import org.javers.spring.model.DummyObject;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -101,8 +102,11 @@ public class JaversSpringMongoApplicationConfig {
     public CommitPropertiesProvider commitPropertiesProvider() {
         return new CommitPropertiesProvider() {
             @Override
-            public Map<String, String> provide() {
-                return Maps.of("key", "ok");
+            public Map<String, String> provideForCommittedObject(Object domainObject) {
+                if (domainObject instanceof DummyObject) {
+                    return Maps.of("dummyObject.name", ((DummyObject)domainObject).getName());
+                }
+                return Collections.emptyMap();
             }
         };
     }

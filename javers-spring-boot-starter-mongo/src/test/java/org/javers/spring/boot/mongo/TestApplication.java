@@ -23,8 +23,11 @@ public class TestApplication {
     public CommitPropertiesProvider commitPropertiesProvider() {
         return new CommitPropertiesProvider() {
             @Override
-            public Map<String, String> provide() {
-                return Maps.of("key", "ok");
+            public Map<String, String> provideForCommittedObject(Object domainObject) {
+                if (domainObject instanceof DummyEntity) {
+                    return Maps.of("dummyEntityId", ((DummyEntity)domainObject).getId() + "");
+                }
+                return Collections.emptyMap();
             }
         };
     }
