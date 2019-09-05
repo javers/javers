@@ -1,8 +1,9 @@
 ﻿﻿
 ![logotype.svg](https://javers.org/img/logotype.svg)
 
-[![Financial Contributors on Open Collective](https://opencollective.com/javers/all/badge.svg?label=financial+contributors)](https://opencollective.com/javers) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core)<br/>
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.javers/javers-core)
 [![Build Status](https://travis-ci.org/javers/javers.svg?branch=master)](https://travis-ci.org/javers/javers/)
+[![Financial Contributors on Open Collective](https://opencollective.com/javers/all/badge.svg?label=financial+contributors)](https://opencollective.com/javers)
 
 ## What is JaVers
 
