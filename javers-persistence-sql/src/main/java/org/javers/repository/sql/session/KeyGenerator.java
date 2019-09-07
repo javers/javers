@@ -33,6 +33,10 @@ interface KeyGenerator {
             this.sequenceDefinition = sequenceDefinition;
         }
 
+        String nextFromSequenceAsSQLExpression(String seqName) {
+            return sequenceDefinition.nextFromSequenceAsSQLExpression(seqName);
+        }
+
         @Override
         public long generateKey(String sequenceName, Session session) {
             long nextVal = findSequence(sequenceName).nextValue(session);

@@ -70,6 +70,22 @@ public abstract class Parameter<T> {
         }
     }
 
+    static class InlinedParameter extends Parameter<String> {
+        InlinedParameter(String name, String inlinedExpression) {
+            super(name, inlinedExpression);
+        }
+
+        @Override
+        void injectValuesTo(PreparedStatement preparedStatement, int order) throws SQLException {
+            return;
+        }
+
+        @Override
+        String getRawSqlRepresentation() {
+            return getValue();
+        }
+    }
+
     static class IntParameter extends Parameter<Integer> {
         IntParameter(String name, Integer value) {
             super(name, value);
