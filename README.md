@@ -50,25 +50,27 @@ JaVers is an open source project, so we are open to your contributions.
 Before you start, please read our
 [Contributing Guide](CONTRIBUTING.md#guidelines-for-contributors) and see how to get your changes merged.
 
-## Contributors
-
 ### Code Contributors
 
-This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+This project exists thanks to all the people who contribute their work:
 <a href="https://github.com/javers/javers/graphs/contributors"><img src="https://opencollective.com/javers/contributors.svg?width=890&button=false" /></a>
 
-### Financial Contributors
+## Financial Contributing
 
-Become a financial contributor and help us sustain our community.
+Become a financial contributor and help us sustain the 
+JaVers project.
 [[Contribute](https://opencollective.com/javers/contribute)]
 
-#### Individuals
+#### Individual contributors
 
-<a href="https://opencollective.com/javers"><img src="https://opencollective.com/javers/individuals.svg?width=890"></a>
+<a href="https://opencollective.com/javers">
+<img src="https://opencollective.com/javers/individuals.svg?width=890">
+</a>
 
 #### Organizations
 
-Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/javers/contribute)]
+Support this project with your organization.
+Your logo will show up here with a link to your website.
 
 <a href="https://opencollective.com/javers/organization/0/website"><img src="https://opencollective.com/javers/organization/0/avatar.svg"></a>
 <a href="https://opencollective.com/javers/organization/1/website"><img src="https://opencollective.com/javers/organization/1/avatar.svg"></a>
