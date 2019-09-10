@@ -69,7 +69,7 @@ public class Session implements AutoCloseable {
 
             Insert insertQuery = new Insert(
                     queryName,
-                    Lists.add(parameters, new Parameter.InlinedParameter(primaryKeyFieldName, nextFromSequenceExpression)),
+                    Lists.add(parameters, new Parameter.InlinedParameter(primaryKeyFieldName, nextFromSequenceExpression + " * 100")),
                     tableName);
 
             execute(insertQuery);
