@@ -16,6 +16,7 @@ class DummyAddress extends AbstractDummyAddress{
     DummyNetworkAddress networkAddress
     transient int someTransientField
     static int staticInt
+    List<String> moreCities
 
     DummyAddress() {
     }
