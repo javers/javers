@@ -1,7 +1,6 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Lists;
-import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
 import org.javers.core.diff.changetype.container.*;
 import org.javers.core.metamodel.type.*;
@@ -38,7 +37,7 @@ public class ListAsSetChangeAppender implements PropertyChangeAppender<ListChang
             List leftList= (List)pair.getLeftDehydratedPropertyValueAndSanitize(property);
             List rightList = (List)pair.getRightDehydratedPropertyValueAndSanitize(property);
 
-            List<ContainerElementChange> entryChanges = calculateDiff(leftList, rightList, (a,b) -> ct.equals(a,b));
+            List<ContainerElementChange> entryChanges = calculateDiffWithCustomEquals(leftList, rightList, (a, b) -> ct.equals(a,b));
             if (entryChanges.size() > 0) {
                 return new ListChange(pair.createPropertyChangeMetadata(property), entryChanges);
             }
@@ -52,7 +51,7 @@ public class ListAsSetChangeAppender implements PropertyChangeAppender<ListChang
         return null;
     }
 
-    private List<ContainerElementChange> calculateDiff(List leftList, List rightList, BiFunction<?,?, Boolean> equalsFunction) {
+    private List<ContainerElementChange> calculateDiffWithCustomEquals(List leftList, List rightList, BiFunction<?,?, Boolean> equalsFunction) {
 
         List<ContainerElementChange> changes = new ArrayList<>();
 
