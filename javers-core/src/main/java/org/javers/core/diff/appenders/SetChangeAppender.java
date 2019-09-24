@@ -6,7 +6,6 @@ import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.SetChange;
 import org.javers.core.diff.changetype.container.ValueAdded;
 import org.javers.core.diff.changetype.container.ValueRemoved;
-import org.javers.core.metamodel.object.*;
 import org.javers.core.metamodel.type.*;
 
 import java.util.*;
@@ -30,8 +29,6 @@ class SetChangeAppender implements PropertyChangeAppender<SetChange> {
 
     @Override
     public SetChange calculateChanges(NodePair pair, JaversProperty property) {
-        GlobalId affectedId = pair.getGlobalId();
-
         Set leftSet = toSet(pair.getLeftDehydratedPropertyValueAndSanitize(property));
         Set rightSet = toSet(pair.getRightDehydratedPropertyValueAndSanitize(property));
 
