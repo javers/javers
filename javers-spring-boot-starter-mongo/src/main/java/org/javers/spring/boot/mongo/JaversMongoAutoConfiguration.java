@@ -8,6 +8,7 @@ import org.javers.core.JaversBuilder;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
+import org.javers.spring.auditable.aspect.JaversAuditableAspectAsync;
 import org.javers.spring.auditable.aspect.springdata.JaversSpringDataAuditableRepositoryAspect;
 import org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import java.util.Optional;
+import java.util.concurrent.Executor;
 
 import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDocumentDBCompatibility;
 
@@ -112,6 +114,12 @@ public class JaversMongoAutoConfiguration {
     @ConditionalOnProperty(name = "javers.auditableAspectEnabled", havingValue = "true", matchIfMissing = true)
     public JaversAuditableAspect javersAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         return new JaversAuditableAspect(javers, authorProvider, commitPropertiesProvider);
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "javers.auditableAspectAsyncEnabled", havingValue = "true", matchIfMissing = true)
+    public JaversAuditableAspectAsync javersAuditableAspectAsync(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, Executor executor) {
+        return new JaversAuditableAspectAsync(javers, authorProvider, commitPropertiesProvider,executor);
     }
 
     @Bean
