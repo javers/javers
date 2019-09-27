@@ -27,6 +27,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import java.util.Optional;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static org.javers.repository.mongo.MongoRepository.mongoRepositoryWithDocumentDBCompatibility;
 
@@ -118,7 +119,7 @@ public class JaversMongoAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "javers.auditableAspectAsyncEnabled", havingValue = "true", matchIfMissing = true)
-    public JaversAuditableAspectAsync javersAuditableAspectAsync(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, Executor executor) {
+    public JaversAuditableAspectAsync javersAuditableAspectAsync(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, @Qualifier("javersAsyncExecutor")Executor executor) {
         return new JaversAuditableAspectAsync(javers, authorProvider, commitPropertiesProvider,executor);
     }
 
@@ -126,5 +127,11 @@ public class JaversMongoAutoConfiguration {
     @ConditionalOnProperty(name = "javers.springDataAuditableRepositoryAspectEnabled", havingValue = "true", matchIfMissing = true)
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         return new JaversSpringDataAuditableRepositoryAspect(javers, authorProvider, commitPropertiesProvider);
+    }
+
+    @Bean(name = "javersAsyncExecutor")
+    @ConditionalOnMissingBean(name="javersAsyncExecutor")
+    public Executor javersAsyncExecutor(){
+        return  Executors.newFixedThreadPool(javersMongoProperties.getJaversExecutorThreadCount());
     }
 }
