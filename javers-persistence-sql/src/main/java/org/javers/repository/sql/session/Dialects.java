@@ -91,7 +91,17 @@ class Dialects {
 
         @Override
         KeyGeneratorDefinition getKeyGeneratorDefinition() {
-            return (SequenceDefinition) seqName -> seqName + ".nextval from dual";
+            return new SequenceDefinition() {
+                @Override
+                public String nextFromSequenceAsSQLExpression(String seqName) {
+                    return seqName + ".nextval";
+                }
+
+                @Override
+                public String nextFromSequenceAsSelect(String seqName) {
+                    return "select "+ seqName + ".nextval from dual";
+                }
+            };
         }
 
         @Override

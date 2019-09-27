@@ -7,6 +7,10 @@ interface KeyGeneratorDefinition {
     interface SequenceDefinition extends KeyGeneratorDefinition {
         String nextFromSequenceAsSQLExpression(String seqName);
 
+        default String nextFromSequenceAsSelect(String seqName) {
+            return "SELECT " + nextFromSequenceAsSQLExpression(seqName);
+        }
+
         @Override
         default KeyGenerator createKeyGenerator() {
             return new KeyGenerator.SequenceAllocation(this);
