@@ -26,7 +26,7 @@ final class Sequence {
         if (recalculationNeeded()) {
             long currentSequenceValue = session.executeQueryForLong(
                     new Select("SELECT next from seq "+ sequenceName,
-                    "SELECT " + sequenceGenerator.nextFromSequenceAsSQLExpression(sequenceName)));
+                            sequenceGenerator.nextFromSequenceAsSelect(sequenceName)));
             recalculate(currentSequenceValue);
         }
         return nextLocalValue();

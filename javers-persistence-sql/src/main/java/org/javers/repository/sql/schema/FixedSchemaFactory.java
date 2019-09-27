@@ -172,19 +172,26 @@ public class FixedSchemaFactory extends SchemaNameAware {
 
     private void columnsIndex(DBObjectName tableName, Schema schema, IndexedCols indexedCols){
         String indexName = createIndexName(tableName, indexedCols);
-        if (dialect instanceof OracleDialect &&
-                indexName.length() > ORACLE_MAX_NAME_LEN)
-        {
-            indexName = indexName.substring(0, ORACLE_MAX_NAME_LEN);
-        }
+
         schema.addIndex(indexName)
                 .indexing(indexedCols.indexedColNames())
                 .on(tableName.localName())
                 .build();
     }
 
-    static String createIndexName(DBObjectName tableName, IndexedCols indexedCols) {
-        return tableName.localName() + "_" + indexedCols.concatenatedColNames() + "_idx";
+    String getSchemaNameUsedForSchemaInspection() {
+        String schemaName = getSchemaName().orElse("");
+        return schemaName.isEmpty() ? "" : schemaName;
+    }
+
+    String createIndexName(DBObjectName tableName, IndexedCols indexedCols) {
+        String indexName = tableName.localName() + "_" + indexedCols.concatenatedColNames() + "_idx";
+
+        if (dialect instanceof OracleDialect && indexName.length() > ORACLE_MAX_NAME_LEN)
+        {
+            return indexName.substring(0, ORACLE_MAX_NAME_LEN);
+        }
+        return indexName;
     }
 
     private void primaryKey(String pkColName, Schema schema, RelationBuilder relationBuilder) {
