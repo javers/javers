@@ -8,7 +8,6 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.type.CollectionType;
-import org.javers.core.metamodel.type.SetType;
 
 import java.lang.reflect.Type;
 import java.util.function.Function;
@@ -24,6 +23,11 @@ public class MultisetType extends CollectionType {
 
     public MultisetType(Type baseJavaType) {
         super(baseJavaType);
+    }
+
+    @Override
+    public boolean isInstance(Object cdo) {
+        return super.isInstance(cdo) || cdo instanceof Multiset;
     }
 
     /**

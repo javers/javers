@@ -21,6 +21,11 @@ public class MapType extends KeyValueType {
     }
 
     @Override
+    public boolean isInstance(Object cdo) {
+        return super.isInstance(cdo) || cdo instanceof Map;
+    }
+
+    @Override
     public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
         return mapStatic(sourceEnumerable, mapFunction, owner);
     }

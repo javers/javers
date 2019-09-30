@@ -8,10 +8,8 @@ import org.javers.core.metamodel.object.OwnerContext;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
@@ -20,6 +18,11 @@ public class ListType extends CollectionType{
 
     public ListType(Type baseJavaType) {
         super(baseJavaType);
+    }
+
+    @Override
+    public boolean isInstance(Object cdo) {
+        return super.isInstance(cdo) || cdo instanceof List;
     }
 
     /**

@@ -12,7 +12,7 @@ import org.javers.core.metamodel.type.MapEnumerationOwnerContext;
 import org.javers.core.metamodel.type.MapType;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -66,6 +66,11 @@ public class MultimapType extends KeyValueType {
         MapType.mapEntrySet(sourceMultimap.entries(), mapFunction, (k,v) -> targetMultimap.put(k,v), filterNulls);
 
         return targetMultimap;
+    }
+
+    @Override
+    public boolean isInstance(Object cdo) {
+        return super.isInstance(cdo) || cdo instanceof Multimap;
     }
 
     @Override

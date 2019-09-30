@@ -13,6 +13,12 @@ import java.util.stream.Collectors;
 import static java.util.Collections.unmodifiableSet;
 
 public class SetType extends CollectionType{
+
+    @Override
+    public boolean isInstance(Object cdo) {
+        return super.isInstance(cdo) || cdo instanceof Set;
+    }
+
     public SetType(Type baseJavaType) {
         super(baseJavaType);
     }
