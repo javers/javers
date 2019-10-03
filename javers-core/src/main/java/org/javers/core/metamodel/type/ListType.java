@@ -20,11 +20,6 @@ public class ListType extends CollectionType{
         super(baseJavaType);
     }
 
-    @Override
-    public boolean isInstance(Object cdo) {
-        return super.isInstance(cdo) || cdo instanceof List;
-    }
-
     /**
      * @return immutable List
      */
@@ -48,5 +43,10 @@ public class ListType extends CollectionType{
             .map(sourceVal -> sourceVal == null ? null : mapFunction.apply(sourceVal))
             .filter(mappedVal -> !filterNulls || mappedVal != null)
             .collect(toList()));
+    }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return List.class;
     }
 }

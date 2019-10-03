@@ -69,11 +69,6 @@ public class MultimapType extends KeyValueType {
     }
 
     @Override
-    public boolean isInstance(Object cdo) {
-        return super.isInstance(cdo) || cdo instanceof Multimap;
-    }
-
-    @Override
     protected Stream<Map.Entry> entries(Object source) {
         Map sourceMap = Maps.wrapNull(source);
         return sourceMap.entrySet().stream();
@@ -82,5 +77,10 @@ public class MultimapType extends KeyValueType {
     @Override
     public Object empty() {
         return ArrayListMultimap.create();
+    }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return Multimap.class;
     }
 }

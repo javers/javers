@@ -6,6 +6,7 @@ import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.ArrayType;
 import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversProperty;
+import org.javers.core.metamodel.type.JaversType;
 
 import java.util.*;
 

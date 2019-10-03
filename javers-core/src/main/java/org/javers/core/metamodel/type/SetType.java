@@ -14,13 +14,9 @@ import static java.util.Collections.unmodifiableSet;
 
 public class SetType extends CollectionType{
 
-    @Override
-    public boolean isInstance(Object cdo) {
-        return super.isInstance(cdo) || cdo instanceof Set;
-    }
-
     public SetType(Type baseJavaType) {
         super(baseJavaType);
+        System.out.println("new SetType " + baseJavaType);
     }
 
     @Override
@@ -40,5 +36,10 @@ public class SetType extends CollectionType{
                 .map(sourceVal -> sourceVal == null ? null : mapFunction.apply(sourceVal))
                 .filter(mappedVal -> !filterNulls || mappedVal != null)
                 .collect(Collectors.toSet()));
+    }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return Set.class;
     }
 }

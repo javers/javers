@@ -4,10 +4,7 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.EntityType;
-import org.javers.core.metamodel.type.JaversProperty;
-import org.javers.core.metamodel.type.ManagedType;
-import org.javers.core.metamodel.type.ValueObjectType;
+import org.javers.core.metamodel.type.*;
 
 import java.util.*;
 import java.util.stream.Collectors;

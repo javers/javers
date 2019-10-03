@@ -6,136 +6,91 @@ import org.javers.core.JaversBuilder
 import org.javers.core.diff.changetype.container.SetChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.metamodel.annotation.Id
+import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
+/**
+ * see https://github.com/javers/javers/issues/888
+ */
 class CaseWithSortedCollectionPropertyType extends Specification {
 
+    @Shared
     def javers = JaversBuilder
             .javers()
             .registerValueObject(DummyValueObject)
             .build()
 
-    def "can detect new element added to set property"() {
+    @Unroll
+    def "should detect new element added to Set where leftSet is #leftSet"() {
         given:
-        def a = new DummyEntity(
-                1,
-                "foo",
-                [].toSet()
-        )
+        def a = new DummyEntity(id:1, valueObjectSet: leftSet)
 
-        def b = new DummyEntity(
-                a.id,
-                a.name,
-                a.valueObjectSet + new DummyValueObject("bar"),
-        )
+        def b = new DummyEntity(id:1, valueObjectSet: [new DummyValueObject("bar")] as Set)
 
         when:
         def diff = javers.compare(a, b)
-        println diff
 
         then:
-        diff.hasChanges()
-        diff.changes.any() { change ->
-            change instanceof SetChange
-        }
+        diff.getChangesByType(SetChange).size() == 1
+
+        where:
+        leftSet << [ [] as Set, null ]
     }
 
-    def "can detect new element added to sorted set property"() {
+    @Unroll
+    def "should detect new element added to SortedSet where leftSet is #leftSet"() {
         given:
-        def a = new DummyEntity(
-                1,
-                "foo",
-                null,
-                new TreeSet<DummyValueObject>()
-        )
+        def a = new DummyEntity(id:1, valueObjectSortedSet: leftSet)
 
-        def b = new DummyEntity(
-                a.id,
-                a.name,
-                a.valueObjectSet,
-                a.valueObjectSortedSet + new DummyValueObject("bar"),
-        )
+        def b = new DummyEntity(id:1, valueObjectSortedSet: new TreeSet() + new DummyValueObject("bar"))
 
         when:
         def diff = javers.compare(a, b)
-        println diff
 
         then:
-        diff.hasChanges()
-        diff.changes.any() { change ->
-            change instanceof SetChange
-        }
+        diff.getChangesByType(SetChange).size() == 1
+
+        where:
+        leftSet << [new TreeSet(), null]
     }
 
-    def "can detect new element added to map property"() {
+    def "should detect new element added to Map"() {
         given:
-        def a = new DummyEntity(
-                1,
-                "foo",
-                null,
-                null,
-                [:]
-        )
+        def a = new DummyEntity(id:1, valueObjectMap:[:])
 
-        def b = new DummyEntity(
-                a.id,
-                a.name,
-                a.valueObjectSet,
-                a.valueObjectSortedSet,
-                a.valueObjectMap + ["3": new DummyValueObject("bar")]
-        )
+        def b = new DummyEntity(id:1, valueObjectMap:["3": new DummyValueObject("bar")])
 
         when:
         def diff = javers.compare(a, b)
-        println diff
 
         then:
-        diff.hasChanges()
-        diff.changes.any() { change ->
-            change instanceof MapChange && !change.entryAddedChanges.isEmpty()
-        }
+        diff.getChangesByType(MapChange)[0].entryAddedChanges.size() == 1
     }
 
-    def "can detect new element added to sorted map property"() {
+    def "should detect new element added to SortedMap"() {
         given:
-        def a = new DummyEntity(
-                1,
-                "foo"
-        )
+        def a = new DummyEntity(id:1)
 
-        def sortedMap = new TreeMap<String, DummyValueObject>()
+        def sortedMap = new TreeMap<>()
         sortedMap.put("3", new DummyValueObject("bar"))
-
-        def b = new DummyEntity(
-                a.id,
-                a.name,
-                a.valueObjectSet,
-                a.valueObjectSortedSet,
-                a.valueObjectMap,
-                sortedMap
-        )
+        def b = new DummyEntity(id:1, valueObjectSortedMap:sortedMap)
 
         when:
         def diff = javers.compare(a, b)
-        println diff
 
         then:
-        diff.hasChanges()
-        diff.changes.any() { change ->
-            change instanceof MapChange && !change.entryAddedChanges.isEmpty()
-        }
+        diff.getChangesByType(MapChange)[0].entryAddedChanges.size() == 1
     }
 }
 
-@TupleConstructor
 class DummyEntity {
     @Id
-    final int id
-    final String name
-    final Set<DummyValueObject> valueObjectSet
-    final SortedSet<DummyValueObject> valueObjectSortedSet
-    final Map<String, DummyValueObject> valueObjectMap
-    final SortedMap<String, DummyValueObject> valueObjectSortedMap
+    int id
+    Set<DummyValueObject> valueObjectSet
+    SortedSet<DummyValueObject> valueObjectSortedSet
+    Map<String, DummyValueObject> valueObjectMap
+    SortedMap<String, DummyValueObject> valueObjectSortedMap
 }
 
 @ToString

@@ -25,11 +25,6 @@ public class MultisetType extends CollectionType {
         super(baseJavaType);
     }
 
-    @Override
-    public boolean isInstance(Object cdo) {
-        return super.isInstance(cdo) || cdo instanceof Multiset;
-    }
-
     /**
      * @return immutable Multiset
      */
@@ -74,5 +69,10 @@ public class MultisetType extends CollectionType {
     @Override
     public Object empty() {
         return HashMultiset.create();
+    }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return Multiset.class;
     }
 }

@@ -1,7 +1,6 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.EnumerableFunction;
-import org.javers.common.collections.Lists;
 import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
@@ -9,14 +8,11 @@ import org.javers.core.metamodel.object.OwnerContext;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static org.javers.common.collections.Collections.wrapNull;
 
 /**
  * @author bartosz walacik
@@ -94,5 +90,10 @@ public class CollectionType extends ContainerType {
             return Collections.emptyList();
         }
         return (Collection) col;
+    }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return Collection.class;
     }
 }

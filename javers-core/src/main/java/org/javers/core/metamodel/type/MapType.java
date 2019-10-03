@@ -21,11 +21,6 @@ public class MapType extends KeyValueType {
     }
 
     @Override
-    public boolean isInstance(Object cdo) {
-        return super.isInstance(cdo) || cdo instanceof Map;
-    }
-
-    @Override
     public Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner) {
         return mapStatic(sourceEnumerable, mapFunction, owner);
     }
@@ -102,5 +97,10 @@ public class MapType extends KeyValueType {
     protected Stream<Map.Entry> entries(Object source) {
         Map sourceMap = Maps.wrapNull(source);
         return sourceMap.entrySet().stream();
+    }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return Map.class;
     }
 }
