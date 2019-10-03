@@ -16,7 +16,6 @@ public class SetType extends CollectionType{
 
     public SetType(Type baseJavaType) {
         super(baseJavaType);
-        System.out.println("new SetType " + baseJavaType);
     }
 
     @Override
