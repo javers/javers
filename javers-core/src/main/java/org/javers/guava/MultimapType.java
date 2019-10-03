@@ -12,7 +12,7 @@ import org.javers.core.metamodel.type.MapEnumerationOwnerContext;
 import org.javers.core.metamodel.type.MapType;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -77,5 +77,10 @@ public class MultimapType extends KeyValueType {
     @Override
     public Object empty() {
         return ArrayListMultimap.create();
+    }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return Multimap.class;
     }
 }

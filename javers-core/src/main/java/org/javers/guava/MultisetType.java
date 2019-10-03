@@ -8,7 +8,6 @@ import org.javers.common.validation.Validate;
 import org.javers.core.metamodel.object.EnumerationAwareOwnerContext;
 import org.javers.core.metamodel.object.OwnerContext;
 import org.javers.core.metamodel.type.CollectionType;
-import org.javers.core.metamodel.type.SetType;
 
 import java.lang.reflect.Type;
 import java.util.function.Function;
@@ -70,5 +69,10 @@ public class MultisetType extends CollectionType {
     @Override
     public Object empty() {
         return HashMultiset.create();
+    }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return Multiset.class;
     }
 }

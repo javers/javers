@@ -62,4 +62,9 @@ public class OptionalType extends CollectionType {
     public Object empty() {
         return Optional.empty();
     }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return Optional.class;
+    }
 }

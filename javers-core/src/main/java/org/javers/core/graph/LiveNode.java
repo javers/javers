@@ -3,7 +3,6 @@ package org.javers.core.graph;
 import org.javers.common.collections.Lists;
 import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.property.Property;
-import org.javers.core.metamodel.type.ArrayType;
 import org.javers.core.metamodel.type.EnumerableType;
 import org.javers.core.metamodel.type.JaversProperty;
 

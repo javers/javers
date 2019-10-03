@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.unmodifiableSet;
 
 public class SetType extends CollectionType{
+
     public SetType(Type baseJavaType) {
         super(baseJavaType);
     }
@@ -34,5 +35,10 @@ public class SetType extends CollectionType{
                 .map(sourceVal -> sourceVal == null ? null : mapFunction.apply(sourceVal))
                 .filter(mappedVal -> !filterNulls || mappedVal != null)
                 .collect(Collectors.toSet()));
+    }
+
+    @Override
+    public Class<?> getEnumerableInterface() {
+        return Set.class;
     }
 }

@@ -29,6 +29,8 @@ public abstract class EnumerableType extends ClassType {
      */
     public abstract Object map(Object sourceEnumerable, EnumerableFunction mapFunction, OwnerContext owner);
 
+    public abstract Class<?> getEnumerableInterface();
+
     /**
      * Returns a new Enumerable (unmodifiable when possible)
      * with items from sourceEnumerable mapped by mapFunction.
