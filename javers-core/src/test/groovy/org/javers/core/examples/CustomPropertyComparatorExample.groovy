@@ -46,6 +46,11 @@ class CustomPropertyComparatorExample extends Specification {
         boolean equals(String a, String b) {
             a.toCharArray().toSet() == b.toCharArray().toSet()
         }
+
+        @Override
+        String toString(String value) {
+            return value;
+        }
     }
 
     def "should use FunnyStringComparator to compare String properties"(){

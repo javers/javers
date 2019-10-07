@@ -35,30 +35,29 @@ import java.util.function.Function;
  * @author bartosz walacik
  */
 public class ValueType extends PrimitiveOrValueType {
-    private final Optional<Function<Object, String>> toStringFunction;
 
     public ValueType(Type baseJavaType) {
         super(baseJavaType);
-        toStringFunction = Optional.empty();
     }
 
-    ValueType(Type baseJavaType, CustomValueComparator customValueComparator, Function<Object, String> toStringFunction) {
+    ValueType(Type baseJavaType, CustomValueComparator customValueComparator) {
         super(baseJavaType, customValueComparator);
-        this.toStringFunction = Optional.ofNullable(toStringFunction);
     }
 
     @Override
-    public String smartToString(Object cdo) {
-        if (cdo == null){
+    public String valueToString(Object value) {
+        if (value == null){
             return "";
         }
 
-        if (WellKnownValueTypes.isValueType(cdo)){
-            return cdo.toString();
+        if (hasCustomValueComparator()) {
+            return getValueComparator().toString(value);
         }
 
-        return toStringFunction
-                .map(f -> f.apply(cdo))
-                .orElse(ReflectionUtil.reflectiveToString(cdo));
+        if (WellKnownValueTypes.isValueType(value)){
+            return value.toString();
+        }
+
+        return ReflectionUtil.reflectiveToString(value);
     }
 }

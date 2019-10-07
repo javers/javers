@@ -1,14 +1,25 @@
 package org.javers.core.diff.custom;
 
-import org.javers.core.JaversBuilder;
+import org.javers.core.metamodel.type.CustomType;
 import org.javers.core.metamodel.type.ValueType;
 
 /**
- * Can be used for comparing {@link ValueType}.
- * Register a CustomValueComparator for your class
- * using {@link JaversBuilder#registerValue(Class, CustomValueComparator)}
+ * Registers a custom comparator for your {@link ValueType} class
+ * to be used instead of default {@link Object#equals(Object)}.
+ *
+ * <br/><br/>
+ *
+ * <b>Usage</b>:
+ * <pre>
+ * JaversBuilder.javers()
+ *     .registerValue(BigDecimal.class, new CustomBigDecimalComparator(2)).build()
+ * </pre>
  */
-@FunctionalInterface
 public interface CustomValueComparator<T> {
-    boolean equals(T left, T right);
+    /**
+     * Called by JaVers to compare two Values.
+     */
+    boolean equals(T a, T b);
+
+    String toString(T value);
 }

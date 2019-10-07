@@ -5,6 +5,7 @@ import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
 import org.javers.common.reflection.ReflectionUtil;
+import org.javers.common.validation.Validate;
 import org.javers.core.JaversCoreProperties.PrettyPrintDateFormats;
 import org.javers.core.commit.Commit;
 import org.javers.core.commit.CommitFactoryModule;
@@ -354,6 +355,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *     <li/>Map value
      * </ul>
      *
+     * //TODO!!!
      * Since this comparator is not aligned with {@link Object#hashCode()},
      * it <b>is not used </b> when given Value type is:
      *
@@ -411,10 +413,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *     }
      * }
      *
-     * def "should use custom toString function for complex Id"(){
+     * def "should use custom Value toString() function to build InstanceId"(){
      *   given:
-     *     Entity entity = new Entity(
-     *     id: new Point(x: 1/3, y: 4/3))
+     *     Entity entity = new Entity(id: new Point(x: 1/3, y: 4/3))
      *
      *   when: "default reflectiveToString function"
      *     def javers = JaversBuilder.javers().build()
@@ -425,7 +426,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      *   when: "custom toString function"
      *     javers = JaversBuilder.javers()
-     *             .registerValueWithCustomToString(Point, {it.myToString()}).build()
+     *             .registerValueWithCustomToString(Point, {p -> p.myToString()})
      *     id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
      *
      *   then:
@@ -448,7 +449,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
             registerType(new ValueDefinition(valueClass));
         }
         ValueDefinition def = getClassDefinition(valueClass);
-        def.setToStringFunction((Function)toString);
+        def.setCustomValueComparator(new CustomToStringComparator(toString));
 
         return this;
     }
@@ -617,23 +618,31 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Registers a custom property comparator for a given Custom Type.
+     * Registers a custom comparator for a given class and maps it as {@link CustomType}.
      * <br/><br/>
      *
      * Custom comparators are used by diff algorithm to calculate property-to-property diff
      * and also collection-to-collection diff.
      * <br/><br/>
      *
-     * Internally, given type is mapped as {@link CustomType}.
+     * See docs: <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
      *
      * @param <T> Custom Type
      * @see CustomType
      * @see CustomPropertyComparator
      */
-    public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
+    public <T> JaversBuilder registerCustomType(Class<T> customType, CustomPropertyComparator<T, ?> comparator){
         registerType(new CustomDefinition(customType, comparator));
         bindComponent(comparator, new CustomToNativeAppenderAdapter(comparator, customType));
         return this;
+    }
+
+    /**
+     * @deprecated Renamed to {@link #registerCustomType(Class, CustomPropertyComparator)}
+     */
+    @Deprecated
+    public <T> JaversBuilder registerCustomComparator(CustomPropertyComparator<T, ?> comparator, Class<T> customType){
+        return registerCustomType(customType, comparator);
     }
 
     /**
@@ -774,5 +783,24 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private <T extends ClientsClassDefinition> T getClassDefinition(Class<?> baseJavaClass) {
         return (T)clientsClassDefinitions.get(baseJavaClass);
+    }
+
+    private static class CustomToStringComparator<T> implements CustomValueComparator<T> {
+        private final Function<T,String> toStringFunction;
+
+        CustomToStringComparator(Function<T, String> toStringFunction) {
+            Validate.argumentIsNotNull(toStringFunction);
+            this.toStringFunction = toStringFunction;
+        }
+
+        @Override
+        public boolean equals(T left, T right) {
+            return Objects.equals(left, right);
+        }
+
+        @Override
+        public String toString(T value) {
+            return toStringFunction.apply(value);
+        }
     }
 }

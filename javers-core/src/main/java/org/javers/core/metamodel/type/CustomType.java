@@ -3,6 +3,7 @@ package org.javers.core.metamodel.type;
 import org.javers.common.validation.Validate;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.custom.CustomPropertyComparator;
+
 import java.lang.reflect.Type;
 
 /**
@@ -15,7 +16,7 @@ import java.lang.reflect.Type;
  * <br/><br/>
  *
  * Objects of Custom Type are compared by a {@link CustomPropertyComparator},
- * and registering this comparator (see {@link JaversBuilder#registerCustomComparator(CustomPropertyComparator, Class)}
+ * and registering this comparator (see {@link JaversBuilder#registerCustomType(Class, CustomPropertyComparator)} )}
  * is the only way to map a Custom Type.
  * <br/><br/>
  *
@@ -23,7 +24,7 @@ import java.lang.reflect.Type;
  *
  * @author bartosz walacik
  */
-public class CustomType<T> extends ClassType {
+public class CustomType<T> extends ClassType implements CustomComparableType {
     private CustomPropertyComparator<T, ?> comparator;
 
     public CustomType(Type baseJavaType, CustomPropertyComparator<T, ?> comparator) {
@@ -39,5 +40,16 @@ public class CustomType<T> extends ClassType {
 
     public CustomPropertyComparator<T, ?> getComparator() {
         return comparator;
+    }
+
+    @Override
+    public boolean hasCustomValueComparator() {
+        return true;
+    }
+
+    @Override
+    public String valueToString(Object value) {
+        //TODO!!!!
+        throw new RuntimeException("not IMPLEMENTED");
     }
 }

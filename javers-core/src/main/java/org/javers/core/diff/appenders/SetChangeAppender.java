@@ -2,20 +2,16 @@ package org.javers.core.diff.appenders;
 
 import org.javers.common.collections.Sets;
 import org.javers.core.diff.NodePair;
-import org.javers.core.diff.changetype.container.ContainerElementChange;
-import org.javers.core.diff.changetype.container.SetChange;
-import org.javers.core.diff.changetype.container.ValueAdded;
-import org.javers.core.diff.changetype.container.ValueRemoved;
+import org.javers.core.diff.changetype.container.*;
 import org.javers.core.metamodel.type.*;
 
 import java.util.*;
-
-import static org.javers.core.diff.appenders.CorePropertyChangeAppender.renderNotParametrizedWarningIfNeeded;
+import java.util.stream.Collectors;
 
 /**
  * @author pawel szymczyk
  */
-class SetChangeAppender implements PropertyChangeAppender<SetChange> {
+class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
     private final TypeMapper typeMapper;
 
     SetChangeAppender(TypeMapper typeMapper) {
@@ -28,9 +24,9 @@ class SetChangeAppender implements PropertyChangeAppender<SetChange> {
     }
 
     @Override
-    public SetChange calculateChanges(NodePair pair, JaversProperty property) {
-        Set leftSet = toSet(pair.getLeftDehydratedPropertyValueAndSanitize(property));
-        Set rightSet = toSet(pair.getRightDehydratedPropertyValueAndSanitize(property));
+    protected SetChange calculateChanges(Object leftValue, Object rightValue, NodePair pair, JaversProperty property) {
+        Set leftSet = wrapHashIfNeeded((Set) leftValue, property);
+        Set rightSet = wrapHashIfNeeded((Set) rightValue, property);
 
         List<ContainerElementChange> entryChanges = calculateDiff(leftSet, rightSet);
         if (!entryChanges.isEmpty()) {
@@ -42,11 +38,18 @@ class SetChangeAppender implements PropertyChangeAppender<SetChange> {
         }
     }
 
-    private Set toSet(Object collection) {
-        if (collection instanceof Set) {
-            return (Set) collection;
+    //TODO move
+    Set wrapHashIfNeeded(Set set, JaversProperty property) {
+        JaversType itemType = typeMapper.getContainerItemType(property);
+
+        if (itemType instanceof CustomComparableType && ((CustomComparableType) itemType).hasCustomValueComparator()) {
+            CustomComparableType customType = (CustomComparableType) itemType;
+            return (Set)set.stream()
+                            .map(it -> new HashWrapper(it, itemType::equals, customType::valueToString))
+                            .collect(Collectors.toSet());
         }
-        return new HashSet((Collection)collection);
+
+        return set;
     }
 
     private List<ContainerElementChange> calculateDiff(Set leftSet, Set rightSet) {

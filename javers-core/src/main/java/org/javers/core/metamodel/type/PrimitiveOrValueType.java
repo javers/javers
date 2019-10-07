@@ -1,7 +1,6 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
-import org.javers.common.string.ToStringBuilder;
 import org.javers.core.diff.custom.CustomValueComparator;
 
 import java.lang.reflect.Type;
@@ -9,8 +8,13 @@ import java.lang.reflect.Type;
 /**
  * @author bartosz walacik
  */
-public abstract class PrimitiveOrValueType extends ClassType{
+public abstract class PrimitiveOrValueType extends ClassType implements CustomComparableType {
     private final CustomValueComparator valueComparator;
+
+    @Override
+    public boolean hasCustomValueComparator() {
+        return valueComparator != null;
+    }
 
     PrimitiveOrValueType(Type baseJavaType) {
         this(baseJavaType, null);
@@ -18,12 +22,15 @@ public abstract class PrimitiveOrValueType extends ClassType{
 
     PrimitiveOrValueType(Type baseJavaType, CustomValueComparator customValueComparator) {
         super(baseJavaType);
-        this.valueComparator = customValueComparator == null ? super::equals : customValueComparator;
+        this.valueComparator = customValueComparator;
     }
 
     @Override
     public boolean equals(Object left, Object right) {
-        return valueComparator.equals(left, right);
+        if (valueComparator != null) {
+            return valueComparator.equals(left, right);
+        }
+        return super.equals(left, right);
     }
 
     public boolean isNumber() {
@@ -46,5 +53,7 @@ public abstract class PrimitiveOrValueType extends ClassType{
         return isStringy() || isBoolean() || isNumber();
     }
 
-    public abstract String smartToString(Object value);
+    CustomValueComparator getValueComparator() {
+        return valueComparator;
+    }
 }

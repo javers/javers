@@ -13,7 +13,7 @@ class CustomBigDecimalComparatorTest extends Specification {
     def "should compare BigDecimal properties with desired precision"(){
       given:
       def javers = JaversBuilder.javers()
-             .registerCustomComparator(new CustomBigDecimalComparator(2), BigDecimal).build()
+             .registerValue(BigDecimal, new CustomBigDecimalComparator(2)).build()
 
       expect:
       javers.compare(new Entity(value: 1.123), new Entity(value: 1.124)).changes.size() == 0
@@ -23,7 +23,7 @@ class CustomBigDecimalComparatorTest extends Specification {
     def "should compare BigDecimal list items with desired precision "(){
         given:
         def javers = JaversBuilder.javers()
-                .registerCustomComparator(new CustomBigDecimalComparator(2), BigDecimal).build()
+                .registerValue(BigDecimal, new CustomBigDecimalComparator(2)).build()
 
         expect:
         javers.compare(new Entity(values: [1.123]), new Entity(values: [1.124])).changes.size() == 0

@@ -30,8 +30,8 @@ public class ListAsSetChangeAppender implements PropertyChangeAppender<ListChang
     public ListChange calculateChanges(NodePair pair, JaversProperty property) {
         SetChange setChange = null;
 
-        ListAsSetType listType = property.getType();
-        JaversType itemType = typeMapper.getJaversType(listType.getItemType());
+        JaversType itemType = typeMapper.getContainerItemType(property);
+
         if (itemType instanceof CustomType) {
             CustomType ct = (CustomType)itemType;
             List leftList= (List)pair.getLeftDehydratedPropertyValueAndSanitize(property);

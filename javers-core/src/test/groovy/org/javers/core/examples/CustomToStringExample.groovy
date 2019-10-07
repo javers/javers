@@ -47,7 +47,7 @@ class CustomToStringExample extends Specification {
         }
     }
 
-    def "should use String representation of complex Id instead of its equals()"(){
+    def "should use Value smartToString() function to build InstanceId"(){
       given:
       Point p1 = new Point(x: 1, y: 3)
       Point p2 = new Point(x: 1, y: 3)
@@ -58,22 +58,19 @@ class CustomToStringExample extends Specification {
       def javers = JaversBuilder.javers().build()
 
       expect:
-      println "p1.equals(p2): " + p1.equals(p2)
-      println "GlobalId of entity1: '${javers.getTypeMapping(Entity).createIdFromInstance(entity1).value()}'"
-      println "GlobalId of entity2: '${javers.getTypeMapping(Entity).createIdFromInstance(entity2).value()}'"
-
       !p1.equals(p2)
       javers.compare(entity1, entity2).changes.size() == 0
+
+      def id = javers.getTypeMapping(Entity).createIdFromInstance(entity1)
+      id.value() == "Entity/1.0,3.0"
     }
 
-    def "should use custom toString function for complex Id"(){
+    def "should use custom Value toString() function to build InstanceId"(){
       given:
-      Entity entity = new Entity(
-              id: new Point(x: 1/3, y: 4/3))
+      Entity entity = new Entity(id: new Point(x: 1/3, y: 4/3))
 
       when: "default reflectiveToString function"
-      def javers = JaversBuilder.javers()
-              .build()
+      def javers = JaversBuilder.javers().build()
       GlobalId id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
 
       then:
@@ -81,7 +78,7 @@ class CustomToStringExample extends Specification {
 
       when: "custom toString function"
       javers = JaversBuilder.javers()
-              .registerValueWithCustomToString(Point, {it.myToString()})
+              .registerValueWithCustomToString(Point, {p -> p.myToString()})
               .build()
       id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
 
