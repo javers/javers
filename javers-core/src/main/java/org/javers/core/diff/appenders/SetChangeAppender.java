@@ -38,18 +38,8 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         }
     }
 
-    //TODO move
     Set wrapHashIfNeeded(Set set, JaversProperty property) {
-        JaversType itemType = typeMapper.getContainerItemType(property);
-
-        if (itemType instanceof CustomComparableType && ((CustomComparableType) itemType).hasCustomValueComparator()) {
-            CustomComparableType customType = (CustomComparableType) itemType;
-            return (Set)set.stream()
-                            .map(it -> new HashWrapper(it, itemType::equals, customType::valueToString))
-                            .collect(Collectors.toSet());
-        }
-
-        return set;
+        return HashWrapper.wrapIfNeeded(set, typeMapper.getContainerItemType(property));
     }
 
     private List<ContainerElementChange> calculateDiff(Set leftSet, Set rightSet) {

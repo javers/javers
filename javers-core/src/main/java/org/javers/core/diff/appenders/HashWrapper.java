@@ -1,9 +1,13 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.type.CustomComparableType;
+import org.javers.core.metamodel.type.JaversType;
 
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class HashWrapper {
     private final Object target;
@@ -30,5 +34,20 @@ public class HashWrapper {
 
     public Object unwrap() {
         return target;
+    }
+
+    public static Set wrapIfNeeded(Set set, JaversType itemType) {
+        if (hasCustomValueComparator(itemType)) {
+            CustomComparableType customType = (CustomComparableType) itemType;
+            return (Set)set.stream()
+                    .map(it -> new HashWrapper(it, itemType::equals, customType::valueToString))
+                    .collect(Collectors.toSet());
+        }
+        return set;
+    }
+
+    private static boolean hasCustomValueComparator(JaversType javersType) {
+        return (javersType instanceof CustomComparableType &&
+                ((CustomComparableType) javersType).hasCustomValueComparator());
     }
 }

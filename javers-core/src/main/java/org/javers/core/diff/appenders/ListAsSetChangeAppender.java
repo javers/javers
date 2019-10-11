@@ -50,18 +50,4 @@ public class ListAsSetChangeAppender implements PropertyChangeAppender<ListChang
         }
         return null;
     }
-
-    private List<ContainerElementChange> calculateDiffWithCustomEquals(List leftList, List rightList, BiFunction<?,?, Boolean> equalsFunction) {
-
-        List<ContainerElementChange> changes = new ArrayList<>();
-
-        Lists.difference(leftList, rightList, (BiFunction) equalsFunction)
-                .forEach(valueOrId -> changes.add(new ValueRemoved(valueOrId)));
-
-
-        Lists.difference(rightList, leftList, (BiFunction)equalsFunction)
-                .forEach(valueOrId -> changes.add(new ValueAdded(valueOrId)));
-
-        return changes;
-    }
 }

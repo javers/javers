@@ -11,6 +11,7 @@ import org.javers.core.diff.changetype.map.EntryValueChange
 import org.javers.core.diff.changetype.map.MapChange
 import org.javers.core.diff.custom.CustomPropertyComparator
 import org.javers.core.metamodel.object.UnboundedValueObjectId
+import org.javers.core.metamodel.object.ValueObjectId
 import org.javers.core.metamodel.property.Property
 import org.javers.core.model.DummyAddress
 import org.javers.core.model.GuavaObject
@@ -38,7 +39,7 @@ class CustomPropertyComparatorE2ETest extends Specification {
 
         @Override
         String toString(Object value) {
-            return a.toLowerCase()
+            return value.toLowerCase()
         }
     }
 
@@ -51,16 +52,16 @@ class CustomPropertyComparatorE2ETest extends Specification {
     }
 
     @Unroll
-    def "should compare List of ValueObjects with CustomTypes using #listCompareAlgorithm algorithm" () {
+    def "should compare List of ValueObjects with #what using #listCompareAlgorithm algorithm" () {
         given:
         def left =  new AddressesList([new DummyAddress(city:"NY")])
         def right = new AddressesList([new DummyAddress(city:"ny"),
                                        new DummyAddress(city:"ny", street: "some")])
 
         def javers = JaversBuilder.javers()
-                .registerCustomComparator( new CaseIgnoringCustomComparator(), String)
-                .withListCompareAlgorithm(listCompareAlgorithm)
-                .build()
+        registerComparator(javers)
+        javers.withListCompareAlgorithm(listCompareAlgorithm)
+        javers = javers.build()
 
         when:
         def diff = javers.compare(left, right)
@@ -70,10 +71,20 @@ class CustomPropertyComparatorE2ETest extends Specification {
 
         diff.getChangesByType(ValueChange).size() == 0
         diff.getChangesByType(ListChange).size() == 1
-        diff.getChangesByType(ListChange)[0].changes.size() == 1
+        with(diff.getChangesByType(ListChange)[0]) {
+            changes.size() == 1
+            changes[0] instanceof ValueAdded
+            changes[0].addedValue instanceof ValueObjectId
+            changes[0].addedValue.value().endsWith('$AddressesList/#addresses/1')
+
+        }
 
         where:
-        listCompareAlgorithm << [SIMPLE, AS_SET]
+        listCompareAlgorithm << [SIMPLE, AS_SET] * 2
+        what << ["CustomTypes"] * 2 + ["Values"] * 2
+        registerComparator <<
+                [{builder -> builder.registerCustomType(String, new CaseIgnoringCustomComparator())}] * 2 +
+                [{builder -> builder.registerValue(String, new CaseIgnoringCustomComparator()) }] * 2
     }
 
     class AddressesSet {
@@ -84,15 +95,16 @@ class CustomPropertyComparatorE2ETest extends Specification {
         }
     }
 
-    def "should compare Set of ValueObjects with CustomTypes" () {
+    @Unroll
+    def "should compare Set of ValueObjects with #what" () {
         given:
         def left =  new AddressesSet([new DummyAddress(city:"NY")] as Set)
         def right = new AddressesSet([new DummyAddress(city:"ny"),
                                       new DummyAddress(city:"ny", street: "some")] as Set)
 
         def javers = JaversBuilder.javers()
-                .registerCustomComparator( new CaseIgnoringCustomComparator(), String)
-                .build()
+        registerComparator(javers)
+        javers = javers.build()
 
         when:
         def diff = javers.compare(left, right)
@@ -102,7 +114,19 @@ class CustomPropertyComparatorE2ETest extends Specification {
 
         diff.getChangesByType(ValueChange).size() == 0
         diff.getChangesByType(SetChange).size() == 1
-        diff.getChangesByType(SetChange)[0].changes.size() == 1
+        with(diff.getChangesByType(SetChange)[0]) {
+            changes.size() == 1
+            changes[0] instanceof ValueAdded
+            changes[0].addedValue instanceof ValueObjectId
+            changes[0].addedValue.value().endsWith('$AddressesSet/#addresses/d7713b458f3a759a942fcd6fa8058979')
+        }
+
+        where:
+        what << ["CustomTypes", "Values"]
+        registerComparator << [
+                {builder -> builder.registerCustomType(String, new CaseIgnoringCustomComparator())},
+                {builder -> builder.registerValue(String, new CaseIgnoringCustomComparator())}
+        ]
     }
 
     @Unroll
@@ -161,6 +185,43 @@ class CustomPropertyComparatorE2ETest extends Specification {
         with(change.changes[0]) {
             it instanceof ValueAdded
             it.addedValue == "Paris"
+        }
+
+        where:
+        what << ["CustomTypes", "Values"]
+        registerComparator << [
+                {builder -> builder.registerCustomType(String, new CaseIgnoringCustomComparator())},
+                {builder -> builder.registerValue(String, new CaseIgnoringCustomComparator()) }
+        ]
+    }
+
+    class MapOfStrings {
+        Map<String, String> strings
+    }
+
+    @Unroll
+    def "should compare Map of #what using CustomComparator" () {
+        given:
+        def left =  new MapOfStrings(strings: ["LA":"paris", "AAA":"aa"])
+        def right = new MapOfStrings(strings: ["la":"PARIS", "aAa":"bb"])
+
+        def javers = JaversBuilder.javers()
+        registerComparator(javers)
+        javers = javers.build()
+
+        when:
+        def diff = javers.compare(left,right)
+
+        then:
+        println(diff.prettyPrint())
+        diff.changes.size() == 1
+        MapChange change = diff.changes[0]
+        change.changes.size() == 1
+        with(change.changes[0]) {
+            it instanceof EntryValueChange
+            it.key == "aaa"
+            it.leftValue == "aa"
+            it.rightValue == "bb"
         }
 
         where:

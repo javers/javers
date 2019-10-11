@@ -49,7 +49,6 @@ public class CustomType<T> extends ClassType implements CustomComparableType {
 
     @Override
     public String valueToString(Object value) {
-        //TODO!!!!
-        throw new RuntimeException("not IMPLEMENTED");
+        return value == null ? "" : comparator.toString((T) value);
     }
 }

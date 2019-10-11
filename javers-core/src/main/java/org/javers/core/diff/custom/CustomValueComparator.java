@@ -1,12 +1,13 @@
 package org.javers.core.diff.custom;
 
-import org.javers.core.metamodel.type.CustomType;
 import org.javers.core.metamodel.type.ValueType;
 
 /**
- * Registers a custom comparator for your {@link ValueType} class
+ * Registers a custom comparator for {@link ValueType} class
  * to be used instead of default {@link Object#equals(Object)}.
+ * <br/><br/>
  *
+ * Example implementation: {@link CustomBigDecimalComparator}
  * <br/><br/>
  *
  * <b>Usage</b>:
