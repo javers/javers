@@ -6,7 +6,6 @@ import org.javers.core.diff.changetype.container.*;
 import org.javers.core.metamodel.type.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author pawel szymczyk
@@ -25,8 +24,8 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
 
     @Override
     protected SetChange calculateChanges(Object leftValue, Object rightValue, NodePair pair, JaversProperty property) {
-        Set leftSet = wrapHashIfNeeded((Set) leftValue, property);
-        Set rightSet = wrapHashIfNeeded((Set) rightValue, property);
+        Set leftSet = wrapValuesIfNeeded(toSet(leftValue), property);
+        Set rightSet = wrapValuesIfNeeded(toSet(rightValue), property);
 
         List<ContainerElementChange> entryChanges = calculateDiff(leftSet, rightSet);
         if (!entryChanges.isEmpty()) {
@@ -38,8 +37,15 @@ class SetChangeAppender extends CorePropertyChangeAppender<SetChange> {
         }
     }
 
-    Set wrapHashIfNeeded(Set set, JaversProperty property) {
-        return HashWrapper.wrapIfNeeded(set, typeMapper.getContainerItemType(property));
+    private Set wrapValuesIfNeeded(Set set, JaversProperty property) {
+        return HashWrapper.wrapValuesIfNeeded(set, typeMapper.getContainerItemType(property));
+    }
+
+    private Set toSet(Object collection) {
+        if (collection instanceof Set) {
+            return (Set) collection;
+        }
+        return new HashSet((Collection)collection);
     }
 
     private List<ContainerElementChange> calculateDiff(Set leftSet, Set rightSet) {

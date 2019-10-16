@@ -48,9 +48,12 @@ import org.javers.shadow.ShadowModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -347,29 +350,12 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * default {@link Object#equals(Object)}.
      * <br/><br/>
      *
-     * Given comparator is used when given Value type is:
-     * <ul>
-     *     <li/>simple property
-     *     <li/>List item
-     *     <li/>Array item
-     *     <li/>Map value
-     * </ul>
-     *
-     * //TODO!!!
-     * Since this comparator is not aligned with {@link Object#hashCode()},
-     * it <b>is not used </b> when given Value type is:
-     *
-     * <ul>
-     *     <li/>Map key
-     *     <li/>Set item
-     * </ul>
-     *
-     * For example, BigDecimals are (by default) ValueTypes
+     * For example, BigDecimals are Values
      * compared using {@link java.math.BigDecimal#equals(Object)}.
-     * If you want to compare them in the smarter way, ignoring trailing zeros:
+     * <br/>
+     * If you want to compare them in the right way, ignoring trailing zeros:
      *
-     * <pre>
-     * javersBuilder.registerValue(BigDecimal.class, (a,b) -> a.compareTo(b) == 0);
+     * <pre>javersBuilder.registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals());
      * </pre>
      *
      * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
@@ -386,6 +372,62 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
         return this;
     }
+
+    /**
+     * Lambda-style variant of {@link #registerValue(Class, CustomValueComparator)}
+     * <br/><br/>
+     *
+     * For example, fixed equals for BigDecimals :
+     *
+     * <pre>javersBuilder.registerValue(BigDecimal.class, (a, b) -> a.compareTo(b) == 0,
+     *                                             a -> a.stripTrailingZeros().toString());
+     *
+     * </pre>
+     *
+     * @since 5.8
+     */
+    public <T> JaversBuilder registerValue(Class<T> valueClass,
+                                           BiFunction<T, T, Boolean> equalsFunction,
+                                           Function<T, String> toStringFunction) {
+
+        return registerValue(valueClass, new CustomValueComparator<T>() {
+            @Override
+            public boolean equals(T a, T b) {
+                return equalsFunction.apply(a,b);
+            }
+
+            @Override
+            public String toString(@Nonnull T value) {
+                return toStringFunction.apply(value);
+            }
+        });
+    }
+
+    /**
+     * <b>Deprecated</b>, use {@link #registerValue(Class, CustomValueComparator)}.
+     *
+     * <br/><br/>
+     *
+     * Since this comparator is not aligned with {@link Object#hashCode()},
+     * it calculates incorrect results when used in hashing context
+     * (when comparing Sets with Values or Maps with Values as keys).
+     */
+    @Deprecated
+    public <T> JaversBuilder registerValue(Class<T> valueClass, BiFunction<T, T, Boolean> equalsFunction) {
+        return registerValue(valueClass, new CustomValueComparator<T>() {
+            @Override
+            public boolean equals(T a, T b) {
+                return equalsFunction.apply(a,b);
+            }
+
+            @Override
+            public String toString(@Nonnull T value) {
+                return value.toString();
+            }
+        });
+    }
+
+
 
     /**
      * For complex <code>ValueType</code> classes that are used as Entity Id.

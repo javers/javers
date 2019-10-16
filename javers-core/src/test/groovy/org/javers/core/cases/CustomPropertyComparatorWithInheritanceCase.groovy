@@ -61,7 +61,7 @@ class CustomPropertyComparatorWithInheritanceCase extends Specification {
 	def "should use CustomPropertyComparator for all subclasses"(){
 		given:
 		def javers = JaversBuilder.javers()
-				.registerCustomType(new SimpleValueComparator(), SimpleValue).build()
+				.registerCustomComparator(new SimpleValueComparator(), SimpleValue).build()
 
 		when:
 		MightyWizard w1 = new MightyWizard();

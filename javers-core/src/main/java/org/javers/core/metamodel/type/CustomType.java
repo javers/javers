@@ -2,9 +2,13 @@ package org.javers.core.metamodel.type;
 
 import org.javers.common.validation.Validate;
 import org.javers.core.JaversBuilder;
+import org.javers.core.diff.changetype.PropertyChange;
+import org.javers.core.diff.changetype.PropertyChangeMetadata;
 import org.javers.core.diff.custom.CustomPropertyComparator;
+import org.javers.core.metamodel.property.Property;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 /**
  * Custom Type in client's domain model.
@@ -25,12 +29,12 @@ import java.lang.reflect.Type;
  * @author bartosz walacik
  */
 public class CustomType<T> extends ClassType implements CustomComparableType {
-    private CustomPropertyComparator<T, ?> comparator;
+    private final CustomPropertyComparatorNullSafe<T, ?> comparator;
 
     public CustomType(Type baseJavaType, CustomPropertyComparator<T, ?> comparator) {
         super(baseJavaType);
         Validate.argumentIsNotNull(comparator);
-        this.comparator = comparator;
+        this.comparator = new CustomPropertyComparatorNullSafe(comparator);
     }
 
     @Override
@@ -38,7 +42,7 @@ public class CustomType<T> extends ClassType implements CustomComparableType {
         return comparator.equals((T)left, (T)right);
     }
 
-    public CustomPropertyComparator<T, ?> getComparator() {
+    CustomPropertyComparator<T, ?> getComparator() {
         return comparator;
     }
 
@@ -49,6 +53,23 @@ public class CustomType<T> extends ClassType implements CustomComparableType {
 
     @Override
     public String valueToString(Object value) {
-        return value == null ? "" : comparator.toString((T) value);
+        return comparator.toString((T) value);
+    }
+
+    private static class CustomPropertyComparatorNullSafe<T, C extends PropertyChange>
+            extends CustomValueComparatorNullSafe<T>
+            implements CustomPropertyComparator<T, C>
+    {
+        private final CustomPropertyComparator<T, C> delegate;
+
+        public CustomPropertyComparatorNullSafe(CustomPropertyComparator<T, C> delegate) {
+            super(delegate);
+            this.delegate = delegate;
+        }
+
+        @Override
+        public Optional<C> compare(T left, T right, PropertyChangeMetadata metadata, Property property) {
+            return delegate.compare(left, right, metadata, property);
+        }
     }
 }

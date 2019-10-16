@@ -10,6 +10,7 @@ import org.javers.core.metamodel.type.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.javers.common.exception.JaversExceptionCode.VALUE_OBJECT_IS_NOT_SUPPORTED_AS_MAP_KEY;
 import static org.javers.core.diff.appenders.CorePropertyChangeAppender.renderNotParametrizedWarningIfNeeded;
@@ -43,11 +44,11 @@ class MapChangeAppender implements PropertyChangeAppender<MapChange> {
     @Override
     public MapChange calculateChanges(NodePair pair, JaversProperty property) {
 
-        Map left = (Map) pair.getLeftDehydratedPropertyValueAndSanitize(property);
-        Map right = (Map) pair.getRightDehydratedPropertyValueAndSanitize(property);
-
         MapType mapType = ((JaversProperty) property).getType();
         MapContentType mapContentType = typeMapper.getMapContentType(mapType);
+
+        Map left =  wrapKeysIfNeeded((Map) pair.getLeftDehydratedPropertyValueAndSanitize(property), mapContentType);
+        Map right = wrapKeysIfNeeded((Map) pair.getRightDehydratedPropertyValueAndSanitize(property), mapContentType);
 
         List<EntryChange> changes = calculateEntryChanges(left, right, mapContentType);
 
@@ -59,6 +60,10 @@ class MapChangeAppender implements PropertyChangeAppender<MapChange> {
         else {
             return null;
         }
+    }
+
+    private Map wrapKeysIfNeeded(Map map, MapContentType mapContentType) {
+        return HashWrapper.wrapKeysIfNeeded(map, mapContentType.getKeyType());
     }
 
     /**

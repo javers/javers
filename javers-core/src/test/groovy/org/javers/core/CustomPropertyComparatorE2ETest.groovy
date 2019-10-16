@@ -54,8 +54,8 @@ class CustomPropertyComparatorE2ETest extends Specification {
     @Unroll
     def "should compare List of ValueObjects with #what using #listCompareAlgorithm algorithm" () {
         given:
-        def left =  new AddressesList([new DummyAddress(city:"NY")])
-        def right = new AddressesList([new DummyAddress(city:"ny"),
+        def left =  new AddressesList([new DummyAddress(city:"NY"), new DummyAddress(city:null)])
+        def right = new AddressesList([new DummyAddress(city:"ny"), new DummyAddress(city:null),
                                        new DummyAddress(city:"ny", street: "some")])
 
         def javers = JaversBuilder.javers()
@@ -75,7 +75,7 @@ class CustomPropertyComparatorE2ETest extends Specification {
             changes.size() == 1
             changes[0] instanceof ValueAdded
             changes[0].addedValue instanceof ValueObjectId
-            changes[0].addedValue.value().endsWith('$AddressesList/#addresses/1')
+            changes[0].addedValue.typeName.endsWith('DummyAddress')
 
         }
 
@@ -219,7 +219,7 @@ class CustomPropertyComparatorE2ETest extends Specification {
         change.changes.size() == 1
         with(change.changes[0]) {
             it instanceof EntryValueChange
-            it.key == "aaa"
+            it.key.toLowerCase() == "aaa"
             it.leftValue == "aa"
             it.rightValue == "bb"
         }
@@ -233,13 +233,13 @@ class CustomPropertyComparatorE2ETest extends Specification {
     }
 
     @Unroll
-    def "should properly calculate diff of List of CustomTypes where left: #leftList, right: #rightList" () {
+    def "should properly calculate diff of LIST_AS_SET of CustomTypes where left: #leftList, right: #rightList" () {
         given:
         def left =  new DummyAddress(city:"NY", moreCities: leftList)
         def right = new DummyAddress(city:"NY", moreCities: rightList)
 
         def javers = JaversBuilder.javers()
-                .registerCustomComparator( new CaseIgnoringCustomComparator(), String)
+                .registerCustomType(String, new CaseIgnoringCustomComparator())
                 .withListCompareAlgorithm(AS_SET)
                 .build()
 
@@ -247,6 +247,8 @@ class CustomPropertyComparatorE2ETest extends Specification {
         def diff = javers.compare(left,right)
 
         then:
+        println diff.prettyPrint()
+
         if (expectedChanges == 0) {
             assert diff.changes.size() == 0
         }
@@ -256,11 +258,14 @@ class CustomPropertyComparatorE2ETest extends Specification {
             assert change.changes.size() == expectedChanges
         }
 
+
         where:
         leftList                  | rightList                    | expectedChanges
-        ["la", "LA", "lA"]        | ["Paris", "La", "paris"]     | 2  // added:   'Paris', 'paris'
+        ["la", "LA", "lA"]        | ["Paris", "La", "paris"]     | 1  // added: 'paris'
         ["Paris", "La"]           | ["la", "LA", "lA"]           | 1  // removed: 'Paris'
         null                      | ["la"]                       | 1
+        ["la"]                    | [null]                       | 2
+        [null]                    | ["la"]                       | 2
         ["la"]                    | []                           | 1
         []                        | []                           | 0
         ["la"]                    | ["LA"]                       | 0
@@ -293,8 +298,8 @@ class CustomPropertyComparatorE2ETest extends Specification {
 
         when:
         javers = JaversBuilder.javers()
-                .registerCustomType( new DummyCustomPropertyComparator(), String)
-                .registerCustomType( new DummyCustomPropertyComparator(), DummyAddress.Kind)
+                .registerCustomType(String, new DummyCustomPropertyComparator() )
+                .registerCustomType(DummyAddress.Kind, new DummyCustomPropertyComparator(), )
                 .build()
 
         then:
@@ -320,7 +325,7 @@ class CustomPropertyComparatorE2ETest extends Specification {
         def left =  new GuavaObject(multimap: Multimaps.forMap(["a":1]))
         def right = new GuavaObject(multimap: Multimaps.forMap(["a":2]))
         def javers = JaversBuilder.javers()
-                .registerCustomType(new CustomMultimapFakeComparator(), Multimap).build()
+                .registerCustomType(Multimap, new CustomMultimapFakeComparator()).build()
 
         when:
         def diff = javers.compare(left,right)

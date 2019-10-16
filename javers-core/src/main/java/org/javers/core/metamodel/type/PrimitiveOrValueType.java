@@ -8,8 +8,9 @@ import java.lang.reflect.Type;
 /**
  * @author bartosz walacik
  */
-public abstract class PrimitiveOrValueType extends ClassType implements CustomComparableType {
-    private final CustomValueComparator valueComparator;
+public abstract class PrimitiveOrValueType<T> extends ClassType implements CustomComparableType {
+    //private final CustomValueComparatorNullSafe<T> valueComparator;
+    private final CustomValueComparator<T> valueComparator;
 
     @Override
     public boolean hasCustomValueComparator() {
@@ -20,15 +21,16 @@ public abstract class PrimitiveOrValueType extends ClassType implements CustomCo
         this(baseJavaType, null);
     }
 
-    PrimitiveOrValueType(Type baseJavaType, CustomValueComparator customValueComparator) {
+    PrimitiveOrValueType(Type baseJavaType, CustomValueComparator<T> comparator) {
         super(baseJavaType);
-        this.valueComparator = customValueComparator;
+        this.valueComparator = comparator == null ? null : new CustomValueComparatorNullSafe<>(comparator);
+        //this.valueComparator = comparator == null ? null : new CustomValueComparatorNullSafe<>(comparator);
     }
 
     @Override
     public boolean equals(Object left, Object right) {
         if (valueComparator != null) {
-            return valueComparator.equals(left, right);
+            return valueComparator.equals((T)left, (T)right);
         }
         return super.equals(left, right);
     }

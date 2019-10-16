@@ -1,9 +1,11 @@
 package org.javers.core.diff.appenders;
 
 import org.javers.common.validation.Validate;
+import org.javers.core.metamodel.annotation.Value;
 import org.javers.core.metamodel.type.CustomComparableType;
 import org.javers.core.metamodel.type.JaversType;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -11,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class HashWrapper {
     private final Object target;
-    private final BiFunction<Object,Object, Boolean> equalsFunction;
+    private final BiFunction<Object, Object, Boolean> equalsFunction;
     private final Function<Object, String> toStringFunction;
 
     public HashWrapper(Object target, BiFunction<Object, Object, Boolean> equalsFunction, Function<Object, String> toStringFunction) {
@@ -36,7 +38,7 @@ public class HashWrapper {
         return target;
     }
 
-    public static Set wrapIfNeeded(Set set, JaversType itemType) {
+    public static Set wrapValuesIfNeeded(Set set, JaversType itemType) {
         if (hasCustomValueComparator(itemType)) {
             CustomComparableType customType = (CustomComparableType) itemType;
             return (Set)set.stream()
@@ -44,6 +46,16 @@ public class HashWrapper {
                     .collect(Collectors.toSet());
         }
         return set;
+    }
+
+    public static Map wrapKeysIfNeeded(Map map, JaversType keyType) {
+        if (hasCustomValueComparator(keyType)) {
+            CustomComparableType customType = (CustomComparableType) keyType;
+            return (Map)map.entrySet().stream().collect(Collectors.toMap(
+                    e -> new HashWrapper(((Map.Entry)e).getKey(), keyType::equals, customType::valueToString),
+                    e -> ((Map.Entry)e).getValue()));
+        }
+        return map;
     }
 
     private static boolean hasCustomValueComparator(JaversType javersType) {

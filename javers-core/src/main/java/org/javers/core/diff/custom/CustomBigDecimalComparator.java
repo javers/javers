@@ -30,14 +30,6 @@ public class CustomBigDecimalComparator implements CustomValueComparator<BigDeci
 
     @Override
     public boolean equals(BigDecimal a, BigDecimal b) {
-        if (a == null && b == null) {
-            return true;
-        }
-
-        if (a == null || b == null) {
-            return false;
-        }
-
         return round(a).equals(round(b));
     }
 
