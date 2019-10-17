@@ -14,10 +14,7 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.DiffFactoryModule;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.diff.appenders.DiffAppendersModule;
-import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.diff.custom.CustomPropertyComparator;
-import org.javers.core.diff.custom.CustomToNativeAppenderAdapter;
-import org.javers.core.diff.custom.CustomValueComparator;
+import org.javers.core.diff.custom.*;
 import org.javers.core.graph.GraphFactoryModule;
 import org.javers.core.graph.ObjectAccessHook;
 import org.javers.core.graph.TailoredJaversMemberFactoryModule;
@@ -50,14 +47,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static org.javers.common.reflection.ReflectionUtil.*;
+import static org.javers.common.reflection.ReflectionUtil.findClasses;
+import static org.javers.common.reflection.ReflectionUtil.isClassPresent;
 import static org.javers.common.validation.Validate.argumentIsNotNull;
 import static org.javers.common.validation.Validate.argumentsAreNotNull;
 
@@ -350,15 +347,26 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * default {@link Object#equals(Object)}.
      * <br/><br/>
      *
-     * For example, BigDecimals are Values
-     * compared using {@link java.math.BigDecimal#equals(Object)}.
-     * <br/>
-     * If you want to compare them in the right way, ignoring trailing zeros:
+     * For example, by default, BigDecimals are Values
+     * compared using {@link java.math.BigDecimal#equals(Object)}
+     * and it isn't the mathematical equality:
      *
-     * <pre>javersBuilder.registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals());
+     * <pre>
+     *     new BigDecimal("1.000").equals(new BigDecimal("1.00")) == false
+     * </pre>
+     *
+     * If you want to compare them in the right way &mdash; ignoring trailing zeros &mdash;
+     * register this comparator:
+     *
+     * <pre>
+     * JaversBuilder.javers()
+     *     .registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals())
+     *     .build();
      * </pre>
      *
      * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
+     * @see BigDecimalComparatorWithFixedEquals
+     * @see CustomBigDecimalComparator
      * @since 3.3
      */
     public <T> JaversBuilder registerValue(Class<T> valueClass, CustomValueComparator<T> customValueComparator) {
@@ -374,16 +382,16 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Lambda-style variant of {@link #registerValue(Class, CustomValueComparator)}
+     * Lambda-style variant of {@link #registerValue(Class, CustomValueComparator)}.
      * <br/><br/>
      *
-     * For example, fixed equals for BigDecimals :
+     * For example, you can register the comparator for BigDecimals with fixed equals:
      *
      * <pre>javersBuilder.registerValue(BigDecimal.class, (a, b) -> a.compareTo(b) == 0,
      *                                             a -> a.stripTrailingZeros().toString());
-     *
      * </pre>
      *
+     * @see #registerValue(Class, CustomValueComparator)
      * @since 5.8
      */
     public <T> JaversBuilder registerValue(Class<T> valueClass,
@@ -426,8 +434,6 @@ public class JaversBuilder extends AbstractContainerBuilder {
             }
         });
     }
-
-
 
     /**
      * For complex <code>ValueType</code> classes that are used as Entity Id.
