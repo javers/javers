@@ -1,6 +1,9 @@
 package org.javers.core.diff.custom;
 
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.diff.ListCompareAlgorithm;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.type.ValueType;
 
 /**
@@ -28,7 +31,15 @@ public interface CustomValueComparator<T> {
     boolean equals(T a, T b);
 
     /**
-     * Used instead of {@link Object#hashCode()} when Values are compared in hashing contexts:
+     * This method has two roles.
+     * First, it is used when Values are compared in hashing contexts.
+     * Second, it is used to build Entity Ids from Values.
+     *
+     * <br/><br/>
+     * <h2>Hashcode role</h2>
+     *
+     * When a Value class has custom <code>toString()</code>, it is used
+     * instead of {@link Object#hashCode()} when comparing Values in hashing contexts, so:
      *
      * <ul>
      *     <li>Sets with Values</li>
@@ -36,8 +47,21 @@ public interface CustomValueComparator<T> {
      *     <li>Maps with Values as keys</li>
      * </ul>
      *
-     * Implementation should be aligned with {@link #equals(Object, Object)}
+     * Custom <code>toString()</code> implementation should be aligned with custom {@link #equals(Object, Object)}
      * in the same way like {@link Object#hashCode()} should be aligned with {@link Object#equals(Object)}.
+     *
+     * <br/><br/>
+     * <h2>Entity Id role</h2>
+     *
+     * Each Value can serve as an Entity Id.<br/>
+     *
+     * When a Value has custom <code>toString()</code>
+     * function, it is used for creating {@link InstanceId} for Entities.
+     * If a Value doesn't have a custom <code>toString()</code>
+     * , default {@link ReflectionUtil#reflectiveToString(Object)}) is used.
+     * <br/><br/>
+     *
+     * See full example <a href="https://github.com/javers/javers/blob/master/javers-core/src/test/groovy/org/javers/core/examples/CustomToStringExample.groovy">CustomToStringExample.groovy</a>.
      *
      * @param value not null
      */

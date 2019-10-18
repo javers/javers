@@ -397,6 +397,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
     public <T> JaversBuilder registerValue(Class<T> valueClass,
                                            BiFunction<T, T, Boolean> equalsFunction,
                                            Function<T, String> toStringFunction) {
+        Validate.argumentsAreNotNull(valueClass, equalsFunction, toStringFunction);
 
         return registerValue(valueClass, new CustomValueComparator<T>() {
             @Override
@@ -417,11 +418,15 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * <br/><br/>
      *
      * Since this comparator is not aligned with {@link Object#hashCode()},
-     * it calculates incorrect results when used in hashing context
+     * it calculates incorrect results when a given Value is used in hashing context
      * (when comparing Sets with Values or Maps with Values as keys).
+     *
+     * @see CustomValueComparator
      */
     @Deprecated
     public <T> JaversBuilder registerValue(Class<T> valueClass, BiFunction<T, T, Boolean> equalsFunction) {
+        Validate.argumentsAreNotNull(valueClass, equalsFunction);
+
         return registerValue(valueClass, new CustomValueComparator<T>() {
             @Override
             public boolean equals(T a, T b) {
@@ -436,70 +441,15 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * For complex <code>ValueType</code> classes that are used as Entity Id.
-     * <br/><br/>
+     * <b>Deprecated</b>, use {@link #registerValue(Class, CustomValueComparator)}.
      *
-     * Registers a custom <code>toString</code> function that will be used for creating
-     * <code>GlobalId</code> for Entities,
-     * instead of default {@link ReflectionUtil#reflectiveToString(Object)}.
-     * <br/><br/>
-     *
-     * For example:
-     *
-     * <pre>
-     * class Entity {
-     *     &#64;Id Point id
-     *     String data
-     * }
-     *
-     * class Point {
-     *     double x
-     *     double y
-     *
-     *     String myToString() {
-     *         "("+ (int)x +"," +(int)y + ")"
-     *     }
-     * }
-     *
-     * def "should use custom Value toString() function to build InstanceId"(){
-     *   given:
-     *     Entity entity = new Entity(id: new Point(x: 1/3, y: 4/3))
-     *
-     *   when: "default reflectiveToString function"
-     *     def javers = JaversBuilder.javers().build()
-     *     GlobalId id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
-     *
-     *   then:
-     *     id.value() == "com.mypackage.Entity/0.3333333333,1.3333333333"
-     *
-     *   when: "custom toString function"
-     *     javers = JaversBuilder.javers()
-     *             .registerValueWithCustomToString(Point, {p -> p.myToString()})
-     *     id = javers.getTypeMapping(Entity).createIdFromInstance(entity)
-     *
-     *   then:
-     *     id.value() == "com.mypackage.Entity/(0,1)"
-     * }
-     * </pre>
-     *
-     * For <code>ValueType</code> you can register both
-     * custom <code>toString</code> function and <code>CustomValueComparator</code>.
-     *
-     * @param toString should return String value of a given object
-     * @see ValueType
-     * @see #registerValue(Class, CustomValueComparator)
+     * @see CustomValueComparator
      * @since 3.7.6
      */
-    public <T> JaversBuilder registerValueWithCustomToString(Class<T> valueClass, Function<T, String> toString) {
-        argumentsAreNotNull(valueClass, toString);
-
-        if (!clientsClassDefinitions.containsKey(valueClass)){
-            registerType(new ValueDefinition(valueClass));
-        }
-        ValueDefinition def = getClassDefinition(valueClass);
-        def.setCustomValueComparator(new CustomToStringComparator(toString));
-
-        return this;
+    @Deprecated
+    public <T> JaversBuilder registerValueWithCustomToString(Class<T> valueClass, Function<T, String> toStringFunction) {
+        Validate.argumentsAreNotNull(valueClass, toStringFunction);
+        return registerValue(valueClass, (a,b) -> Objects.equals(a,b), toStringFunction);
     }
 
     /**
@@ -831,24 +781,5 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     private <T extends ClientsClassDefinition> T getClassDefinition(Class<?> baseJavaClass) {
         return (T)clientsClassDefinitions.get(baseJavaClass);
-    }
-
-    private static class CustomToStringComparator<T> implements CustomValueComparator<T> {
-        private final Function<T,String> toStringFunction;
-
-        CustomToStringComparator(Function<T, String> toStringFunction) {
-            Validate.argumentIsNotNull(toStringFunction);
-            this.toStringFunction = toStringFunction;
-        }
-
-        @Override
-        public boolean equals(T left, T right) {
-            return Objects.equals(left, right);
-        }
-
-        @Override
-        public String toString(T value) {
-            return toStringFunction.apply(value);
-        }
     }
 }

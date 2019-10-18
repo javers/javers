@@ -52,4 +52,9 @@ public interface CustomPropertyComparator<T, C extends PropertyChange> extends C
      * @return should return Optional.empty() if compared objects are the same
      */
     Optional<C> compare(T left, T right, PropertyChangeMetadata metadata, Property property);
+
+    @Override
+    default String toString(T value) {
+        return null;
+    }
 }
