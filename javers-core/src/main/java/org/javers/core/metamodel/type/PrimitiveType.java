@@ -16,7 +16,7 @@ public class PrimitiveType extends PrimitiveOrValueType {
     }
 
     @Override
-    public String smartToString(Object value) {
+    public String valueToString(Object value) {
         return ToStringBuilder.smartToString(value);
     }
 }

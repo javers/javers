@@ -37,6 +37,11 @@ class CustomPropertyComparatorCase extends Specification {
         boolean equals(Person left, Person right) {
             return left.name.equals(right.name)
         }
+
+        @Override
+        String toString(Person value) {
+            return value.name
+        }
     }
 
     @Unroll

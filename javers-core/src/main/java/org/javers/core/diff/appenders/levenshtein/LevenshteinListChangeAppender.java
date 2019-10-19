@@ -31,8 +31,7 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
 
     @Override
     public ListChange calculateChanges(Object leftValue, Object rightValue, NodePair pair, JaversProperty property) {
-        CollectionType listType = property.getType();
-        JaversType itemType = typeMapper.getJaversType(listType.getItemType());
+        JaversType itemType = typeMapper.getContainerItemType(property);
 
         final List leftList =  (List) leftValue;
         final List rightList = (List) rightValue;
@@ -46,7 +45,7 @@ public class LevenshteinListChangeAppender extends CorePropertyChangeAppender<Li
 
         ListChange result = getListChange(pair, property, changes);
         if (result != null) {
-            renderNotParametrizedWarningIfNeeded(listType.getItemType(), "item", "List", property);
+            renderNotParametrizedWarningIfNeeded(itemType.getBaseJavaType(), "item", "List", property);
         }
         return result;
     }

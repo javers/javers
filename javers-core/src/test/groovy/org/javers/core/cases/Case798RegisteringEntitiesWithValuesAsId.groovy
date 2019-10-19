@@ -1,23 +1,16 @@
 package org.javers.core.cases
 
-import org.javers.core.metamodel.type.ValueType
-
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
-import java.util.Arrays
-import java.util.LinkedHashMap
-import java.util.Map
-
-import javax.persistence.Id
 import org.javers.core.Javers
 import org.javers.core.JaversBuilder
 import org.javers.core.diff.ListCompareAlgorithm
 import org.javers.core.metamodel.annotation.DiffIgnore
-import org.javers.core.metamodel.clazz.ClientsClassDefinition
 import org.javers.core.metamodel.clazz.EntityDefinition
 import org.javers.core.metamodel.object.InstanceId
 import org.javers.core.metamodel.type.EntityType
+import org.javers.core.metamodel.type.ValueType
 import spock.lang.Specification
+
+import javax.persistence.Id
 
 class Case798RegisteringEntitiesWithValuesAsId extends Specification {
     
@@ -38,12 +31,12 @@ class Case798RegisteringEntitiesWithValuesAsId extends Specification {
         private Integer id 
         private String passportId
         
-        public Passport(String passportId) {
+        Passport(String passportId) {
             this.passportId = passportId
         }
 
         @Override
-        public String toString() {
+        String toString() {
             return "Passport{" +
                     "passportId='" + passportId + '\'' +
                     '}';

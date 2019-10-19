@@ -2,8 +2,10 @@ package org.javers.core.diff.custom;
 
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.diff.changetype.PropertyChangeMetadata;
+import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.metamodel.property.Property;
 import org.javers.core.metamodel.type.CustomType;
+import org.javers.core.metamodel.type.ValueType;
 
 import java.util.Optional;
 
@@ -11,30 +13,37 @@ import java.util.Optional;
  * Property-scope comparator bounded to {@link CustomType}.
  * <br/><br/>
  *
- * Typically, Custom Types are large structures (like Multimap) or complex objects.
- * For simple values, it's better to use {@link CustomValueComparator}.
+ * <b>
+ * Custom Types are not easy to manage, use it as a last resort,<br/>
+ * only for corner cases like comparing custom Collection types.</b>
  * <br/><br/>
  *
- * Implementation should calculate a diff between two objects of given Custom Type.
+ * Typically, Custom Types are large structures (like Multimap).<br/>
+ * Implementation should calculate diff between two objects of given Custom Type.
  * <br/><br/>
  *
- * Examples and doc:
- * <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
- * <br/><br/>
- *
- * Usage:
+ * <b>Usage</b>:
  * <pre>
- * JaversBuilder.javers().registerCustomComparator(new GuavaCustomComparator(), Multimap.class).build()
+ * JaversBuilder.javers()
+ *              .registerCustomType( Multimap.class, new GuavaCustomComparator())
+ *              .build()
  * </pre>
  *
  * @param <T> Custom Type
  * @param <C> Concrete type of PropertyChange returned by a comparator
- * @author bartosz walacik
+ * @see <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
+ * @see CustomValueComparator
  */
-public interface CustomPropertyComparator<T, C extends PropertyChange> {
+public interface CustomPropertyComparator<T, C extends PropertyChange> extends CustomValueComparator<T> {
     /**
      * Called by JaVers to calculate property-to-property diff
-     * between two Custom Type objects.
+     * between two Custom Type objects. Can calculate any of concrete {@link PropertyChange}.
+     *
+     * <br/><br/>
+     * Implementation of <code>compare()</code> should be consistent with
+     * {@link #equals(Object, Object)}.
+     * When <code>compare()</code> returns <code>Optional.empty()</code>,
+     * <code>equals()</code> should return false.
      *
      * @param left left (or old) value
      * @param right right (or current) value
@@ -46,13 +55,8 @@ public interface CustomPropertyComparator<T, C extends PropertyChange> {
      */
     Optional<C> compare(T left, T right, PropertyChangeMetadata metadata, Property property);
 
-    /**
-     * Called by JaVers to calculate collection-to-collection diff,
-     * when Custom Type objects are Collection items.
-     * <br/><br/>
-     *
-     * Both equals() and compare() should return consistent results. When compare() returns
-     * Optional.empty(), equals() should return false.
-     */
-    boolean equals(T a, T b);
+    @Override
+    default String toString(T value) {
+        return null;
+    }
 }

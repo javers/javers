@@ -136,7 +136,9 @@ class JaversDiffE2ETest extends AbstractDiffTest {
 
     def "should use custom toString function when provided for building InstanceId"(){
         given:
-        def javers = JaversBuilder.javers().registerValueWithCustomToString(DummyPoint, {x -> x.getStringId()}).build()
+        def javers = JaversBuilder.javers()
+                .registerValue(DummyPoint, {a,b -> Objects.equals(a,b)}, {x -> x.getStringId()})
+                .build()
         def left  = new DummyCompositePoint(dummyPoint: new DummyPoint(1,2), value:5)
         def right = new DummyCompositePoint(dummyPoint: new DummyPoint(1,2), value:6)
 

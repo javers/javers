@@ -4,7 +4,6 @@ import org.javers.core.metamodel.property.MissingProperty;
 
 import java.util.*;
 import java.util.Collections;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
@@ -119,30 +118,5 @@ public class Lists {
             left.addAll(right);
             return left;
         }, Collections::unmodifiableList);
-    }
-
-    /**
-     * <b>WARNING!</b> This is a simple algorithm with n^2 complexity.
-     *
-     * <br/><br/>
-     *
-     * Null args are allowed
-     */
-    public static <E> List<E> difference(List<E> first, List<E> second, BiFunction<E,E, Boolean> equalsFunction) {
-        if (first == null || first.size() == 0) {
-            return new ArrayList<>();
-        }
-
-        if (second == null || second.size() == 0) {
-            return first;
-        }
-
-        return unmodifiableList(
-            first.stream().filter(it -> !has(second, it, equalsFunction)).collect(Collectors.toList())
-        );
-    }
-
-    private static <E> boolean has(List<E> list, E element, BiFunction<E,E, Boolean> equalsFunction) {
-        return list.stream().anyMatch(it -> equalsFunction.apply(it, element));
     }
 }
