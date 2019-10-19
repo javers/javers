@@ -37,12 +37,13 @@ import java.util.Optional;
 public interface CustomPropertyComparator<T, C extends PropertyChange> extends CustomValueComparator<T> {
     /**
      * Called by JaVers to calculate property-to-property diff
-     * between two Custom Type objects. Can calculate any of concrete
-     * {@link PropertyChange}.
+     * between two Custom Type objects. Can calculate any of concrete {@link PropertyChange}.
      *
      * <br/><br/>
-     * //TODO Both equals() and compare() should return consistent results. When compare() returns
-     * Optional.empty(), equals() should return false.
+     * Implementation of <code>compare()</code> should be consistent with
+     * {@link #equals(Object, Object)}.
+     * When <code>compare()</code> returns <code>Optional.empty()</code>,
+     * <code>equals()</code> should return false.
      *
      * @param left left (or old) value
      * @param right right (or current) value
