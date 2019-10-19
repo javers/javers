@@ -2,12 +2,11 @@ package org.javers.core.diff.custom;
 
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.diff.ListCompareAlgorithm;
-import org.javers.core.metamodel.object.GlobalId;
 import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.type.ValueType;
 
 /**
- * Registers a custom comparator for {@link ValueType} class
+ * A custom comparator for {@link ValueType} classes
  * to be used instead of default {@link Object#equals(Object)}.
  * <br/><br/>
  *
@@ -20,6 +19,9 @@ import org.javers.core.metamodel.type.ValueType;
  *              .registerValue(BigDecimal.class, new CustomBigDecimalComparator(2))
  *              .build()
  * </pre>
+ * @param <T> Value Type
+ * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
+ * @see <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
  */
 public interface CustomValueComparator<T> {
     /**

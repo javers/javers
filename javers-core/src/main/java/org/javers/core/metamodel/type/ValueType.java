@@ -21,8 +21,9 @@ import java.time.LocalDateTime;
  * it's highly important to implement it properly by comparing underlying fields.
  * <br/><br/>
  *
- * If you don't control the equals() implementation in a Value class you can still
- * provide the right comparator by registering a {@link CustomValueComparator}.
+ * If you don't control the <code>equals()</code> implementation in a Value class you can still
+ * provide a {@link CustomValueComparator}
+ * and register it with {@link JaversBuilder#registerValue(Class, CustomValueComparator)}.
  * <br/><br/>
  *
  * It's highly advisable to implement Values as immutable objects,
@@ -31,9 +32,10 @@ import java.time.LocalDateTime;
  *
  * Values are serialized to JSON using Gson defaults,
  * if it's not what you need, implement {@link JsonTypeAdapter} for custom serialization
- * and register it with {@link JaversBuilder#registerValueTypeAdapter(JsonTypeAdapter)}
+ * and register it with {@link JaversBuilder#registerValueTypeAdapter(JsonTypeAdapter)}.
  *
  * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
+ * @see <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
  */
 public class ValueType extends PrimitiveOrValueType {
 

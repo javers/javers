@@ -11,7 +11,9 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**
- * Custom Type in client's domain model.
+ * <b>
+ * Custom Types are not easy to manage, use it as a last resort,<br/>
+ * only for corner cases like comparing custom Collection types.</b>
  * <br/><br/>
  *
  * JaVers treats a Custom Type as a black box
@@ -19,14 +21,14 @@ import java.util.Optional;
  * It's a "not modeled" type, somehow similar to unbounded wildcard {@code <?>}.
  * <br/><br/>
  *
- * Objects of Custom Type are compared by a {@link CustomPropertyComparator},
- * and registering this comparator (see {@link JaversBuilder#registerCustomType(Class, CustomPropertyComparator)} )}
- * is the only way to map a Custom Type.
+ * Objects of Custom Type are compared by a {@link CustomPropertyComparator}.
+ * Registering this comparator is the only way to map a Custom Type.
  * <br/><br/>
  *
  * Custom Types are serialized to JSON using Gson defaults.
  *
- * @author bartosz walacik
+ * @param <T> Custom Type
+ * @see JaversBuilder#registerCustomType(Class, CustomPropertyComparator)
  */
 public class CustomType<T> extends ClassType implements CustomComparableType {
     private final CustomPropertyComparatorNullSafe<T, ?> comparator;

@@ -327,12 +327,13 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * For example, values are: BigDecimal, LocalDateTime.
      * <br/><br/>
      *
-     * Use this method if you are not willing to use {@link Value} annotation.
+     * Use this method if can't use the {@link Value} annotation.
      * <br/><br/>
      *
-     * Values are compared using default {@link Object#equals(Object)}.
-     * If you don't want to use it,
-     * registerType a custom value comparator with {@link #registerValue(Class, CustomValueComparator)}.
+     * By default, Values are compared using {@link Object#equals(Object)}.
+     * You can provide your own <code>equals()</code> function
+     * by registering a {@link CustomValueComparator}.
+     * See {@link #registerValue(Class, CustomValueComparator)}.
      *
      * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
      */
@@ -344,12 +345,12 @@ public class JaversBuilder extends AbstractContainerBuilder {
 
     /**
      * Registers a {@link ValueType} with a custom comparator to be used instead of
-     * default {@link Object#equals(Object)}.
+     * {@link Object#equals(Object)}.
      * <br/><br/>
      *
      * For example, by default, BigDecimals are Values
-     * compared using {@link java.math.BigDecimal#equals(Object)}
-     * and it isn't the mathematical equality:
+     * compared using {@link java.math.BigDecimal#equals(Object)},
+     * sadly it isn't the correct mathematical equality:
      *
      * <pre>
      *     new BigDecimal("1.000").equals(new BigDecimal("1.00")) == false
@@ -364,7 +365,9 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *     .build();
      * </pre>
      *
+     * @param <T> Value Type
      * @see <a href="http://javers.org/documentation/domain-configuration/#ValueType">http://javers.org/documentation/domain-configuration/#ValueType</a>
+     * @see <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
      * @see BigDecimalComparatorWithFixedEquals
      * @see CustomBigDecimalComparator
      * @since 3.3
@@ -391,6 +394,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *                                             a -> a.stripTrailingZeros().toString());
      * </pre>
      *
+     * @param <T> Value Type
      * @see #registerValue(Class, CustomValueComparator)
      * @since 5.8
      */
@@ -616,18 +620,21 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Registers a custom comparator for a given class and maps it as {@link CustomType}.
+     * Registers a {@link CustomPropertyComparator} for a given class and maps this class
+     * to {@link CustomType}.
      * <br/><br/>
      *
-     * Custom comparators are used by diff algorithm to calculate property-to-property diff
-     * and also collection-to-collection diff.
+     * <b>
+     * Custom Types are not easy to manage, use it as a last resort,<br/>
+     * only for corner cases like comparing custom Collection types.</b>
      * <br/><br/>
      *
-     * See docs: <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
+     * In most cases, it's better to customize the Javers' diff algorithm using
+     * much more simpler {@link CustomValueComparator},
+     * see {@link #registerValue(Class, CustomValueComparator)}.
      *
      * @param <T> Custom Type
-     * @see CustomType
-     * @see CustomPropertyComparator
+     * @see <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
      */
     public <T> JaversBuilder registerCustomType(Class<T> customType, CustomPropertyComparator<T, ?> comparator){
         registerType(new CustomDefinition(customType, comparator));

@@ -13,25 +13,26 @@ import java.util.Optional;
  * Property-scope comparator bounded to {@link CustomType}.
  * <br/><br/>
  *
- * Typically, Custom Types are large structures (like Multimap) or complex objects.
- * For simple values, it's better to use {@link ValueType}
- * with {@link CustomValueComparator}.
+ * <b>
+ * Custom Types are not easy to manage, use it as a last resort,<br/>
+ * only for corner cases like comparing custom Collection types.</b>
  * <br/><br/>
  *
+ * Typically, Custom Types are large structures (like Multimap).<br/>
  * Implementation should calculate diff between two objects of given Custom Type.
- * <br/><br/>
- *
- * See docs: <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
  * <br/><br/>
  *
  * <b>Usage</b>:
  * <pre>
- * JaversBuilder.javers().registerCustomComparator(new GuavaCustomComparator(), Multimap.class).build()
+ * JaversBuilder.javers()
+ *              .registerCustomType( Multimap.class, new GuavaCustomComparator())
+ *              .build()
  * </pre>
  *
  * @param <T> Custom Type
  * @param <C> Concrete type of PropertyChange returned by a comparator
- * @author bartosz walacik
+ * @see <a href="https://javers.org/documentation/diff-configuration/#custom-comparators">https://javers.org/documentation/diff-configuration/#custom-comparators</a>
+ * @see CustomValueComparator
  */
 public interface CustomPropertyComparator<T, C extends PropertyChange> extends CustomValueComparator<T> {
     /**
