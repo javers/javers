@@ -331,7 +331,7 @@ public class JaversBuilder extends AbstractContainerBuilder {
      * <br/><br/>
      *
      * By default, Values are compared using {@link Object#equals(Object)}.
-     * You can provide your own <code>equals()</code> function
+     * You can provide external <code>equals()</code> function
      * by registering a {@link CustomValueComparator}.
      * See {@link #registerValue(Class, CustomValueComparator)}.
      *
