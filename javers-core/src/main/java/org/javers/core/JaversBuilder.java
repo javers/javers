@@ -390,8 +390,11 @@ public class JaversBuilder extends AbstractContainerBuilder {
      *
      * For example, you can register the comparator for BigDecimals with fixed equals:
      *
-     * <pre>javersBuilder.registerValue(BigDecimal.class, (a, b) -> a.compareTo(b) == 0,
-     *                                             a -> a.stripTrailingZeros().toString());
+     * <pre>
+     * Javers javers = JaversBuilder.javers()
+     *     .registerValue(BigDecimal.class, (a, b) -> a.compareTo(b) == 0,
+     *                                           a -> a.stripTrailingZeros().toString())
+     *     .build();
      * </pre>
      *
      * @param <T> Value Type
