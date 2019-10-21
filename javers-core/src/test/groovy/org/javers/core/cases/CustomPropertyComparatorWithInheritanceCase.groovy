@@ -51,6 +51,11 @@ class CustomPropertyComparatorWithInheritanceCase extends Specification {
 		boolean equals(SimpleValue left, SimpleValue right) {
 			return left.getValue().equals(right.getValue())
 		}
+
+		@Override
+		String toString(SimpleValue value) {
+			return value.toString()
+		}
 	}
 
 	def "should use CustomPropertyComparator for all subclasses"(){

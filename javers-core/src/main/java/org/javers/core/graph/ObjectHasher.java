@@ -24,7 +24,6 @@ class ObjectHasher {
         String jsonState = objects.stream().map(cdo -> snapshotFactory.createSnapshotStateNoRefs(cdo))
                         .map(state -> jsonConverter.toJson(state))
                         .collect(Collectors.joining( "\n" ));
-
         return ShaDigest.longDigest(jsonState);
     }
 }

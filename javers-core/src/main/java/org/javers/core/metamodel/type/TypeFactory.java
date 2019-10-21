@@ -55,8 +55,7 @@ class TypeFactory {
         } else if (def instanceof ValueDefinition) {
             ValueDefinition valueDefinition = (ValueDefinition) def;
             return new ValueType(valueDefinition.getBaseJavaClass(),
-                    valueDefinition.getComparator(),
-                    valueDefinition.getToStringFunction());
+                    valueDefinition.getComparator());
         } else if (def instanceof IgnoredTypeDefinition) {
             return new IgnoredType(def.getBaseJavaClass());
         } else {

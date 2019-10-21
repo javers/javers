@@ -1,6 +1,7 @@
 package org.javers.core.diff.changetype;
 
 import org.javers.common.collections.Primitives;
+import org.javers.core.diff.appenders.HashWrapper;
 import org.javers.core.metamodel.property.MissingProperty;
 
 import java.io.Serializable;
@@ -20,7 +21,7 @@ public class Atomic implements Serializable {
     private final Object value;
 
     public Atomic(Object value) {
-        this.value = value;
+        this.value = value instanceof HashWrapper ? ((HashWrapper)value).unwrap() : value;
     }
 
     public boolean isNull() {

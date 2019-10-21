@@ -39,6 +39,11 @@ public class JaversProperty extends Property {
         return getType() instanceof PrimitiveOrValueType;
     }
 
+    public boolean isCustomType() {
+        return getType() instanceof CustomType;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

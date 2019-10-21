@@ -10,7 +10,6 @@ import java.util.function.Function;
  */
 public class ValueDefinition extends ClientsClassDefinition {
     private CustomValueComparator customValueComparator;
-    private Function<Object, String> toStringFunction;
 
     public ValueDefinition(Class<?> clazz) {
         super(clazz);
@@ -20,15 +19,7 @@ public class ValueDefinition extends ClientsClassDefinition {
         this.customValueComparator = customValueComparator;
     }
 
-    public void setToStringFunction(Function<Object, String> toStringFunction) {
-        this.toStringFunction = toStringFunction;
-    }
-
     public CustomValueComparator getComparator() {
         return customValueComparator;
-    }
-
-    public Function<Object, String> getToStringFunction() {
-        return toStringFunction;
     }
 }

@@ -8,7 +8,7 @@ package org.javers.common.exception;
 public enum JaversExceptionCode {
     MALFORMED_JAVERS_MONGODB_PROPERTIES("Malformed configuration for dedicated MongoDB in javers.mongodb properties, either host or url mus be defined"),
 
-    ID_TYPE_NOT_SUPPORTED("%s is not supported as the type of Id-property. Problematic class: '%s'.") ,
+    ID_TYPE_NOT_SUPPORTED("%s %s can't be used as Id-property type. Problematic class: '%s'.") ,
 
     CLASS_EXTRACTION_ERROR(JaversException.BOOTSTRAP_ERROR + "Can't extract Class from Type '%s'.") ,
 
