@@ -22,11 +22,11 @@ class CommitIdGeneratorTest extends Specification {
         def earlierInstant = firstInstant.plusSeconds(-1)
         def commitId = new CommitId(2, 0)
 
-        def commitMetadata0 = new CommitMetadata("duro", [:], firstDate, firstInstant, new CommitId(1, 0))
-        def commitMetadata1 = new CommitMetadata("duro", [:], earlierDate, earlierInstant, commitId)
+        def commitMetadata0 = new CommitMetadata("duro", [:], earlierDate, earlierInstant, commitId)
+        def commitMetadata1 = new CommitMetadata("duro", [:], firstDate, firstInstant, new CommitId(1, 0))
         def commitMetadata2 = new CommitMetadata("duro", [:], firstDate, firstInstant, commitId)
-        def commitMetadata3 = new CommitMetadata("duro", [:], laterDate, laterInstant, commitId)
-        def commitMetadata4 = new CommitMetadata("duro", [:], firstDate, firstInstant, new CommitId(3, 0))
+        def commitMetadata3 = new CommitMetadata("duro", [:], firstDate, firstInstant, new CommitId(3, 0))
+        def commitMetadata4 = new CommitMetadata("duro", [:], laterDate, laterInstant, commitId)
 
         when: "List containing duplicate commit ids is sorted"
         def metadataList = new ArrayList<CommitMetadata>()
@@ -37,7 +37,7 @@ class CommitIdGeneratorTest extends Specification {
         metadataList.add(commitMetadata1)
         metadataList.sort(CommitIdGenerator.SYNCHRONIZED_SEQUENCE.comparator)
 
-        then: "Sort includes commit id and timestamp for ordering"
+        then: "Sort includes timestamp and commit id for ordering"
         metadataList.get(0) == commitMetadata0
         metadataList.get(1) == commitMetadata1
         metadataList.get(2) == commitMetadata2
@@ -45,9 +45,9 @@ class CommitIdGeneratorTest extends Specification {
         metadataList.get(4) == commitMetadata4
 
         // Seperately verify timestamps
+        metadataList.get(0).commitDateInstant == commitMetadata0.commitDateInstant
         metadataList.get(1).commitDateInstant == commitMetadata1.commitDateInstant
-        metadataList.get(2).commitDateInstant == commitMetadata2.commitDateInstant
-        metadataList.get(3).commitDateInstant == commitMetadata3.commitDateInstant
+        metadataList.get(4).commitDateInstant == commitMetadata4.commitDateInstant
 
     }
 
