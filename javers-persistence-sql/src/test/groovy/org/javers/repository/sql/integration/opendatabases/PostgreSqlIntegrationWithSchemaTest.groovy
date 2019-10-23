@@ -5,6 +5,7 @@ package org.javers.repository.sql.integration.opendatabases
  */
 class PostgreSqlIntegrationWithSchemaTest extends PostgreSqlIntegrationTest {
 
+    @Override
     String getSchema() {
         return "j_some"
     }

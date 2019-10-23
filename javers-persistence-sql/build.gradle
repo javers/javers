@@ -12,10 +12,12 @@ dependencies {
     testCompile 'com.h2database:h2:1.4.187'
     testCompile 'org.postgresql:postgresql:42.2.5'
     testCompile 'org.mariadb.jdbc:mariadb-java-client:2.2.3'
+    testCompile 'mysql:mysql-connector-java:8.0.14'
     testCompile 'org.codehaus.gpars:gpars:1.2.1'
     testCompile "joda-time:joda-time:$jodaVersion"
     testCompile "org.testcontainers:mssqlserver:$testcontainers"
     testCompile "org.testcontainers:postgresql:$testcontainers"
+    testCompile "org.testcontainers:mysql:$testcontainers"
     testCompile "org.testcontainers:oracle-xe:$testcontainers"
     testCompile "com.microsoft.sqlserver:mssql-jdbc:7.2.1.jre8"
     testCompile "com.oracle.ojdbc:ojdbc8:19.3.0.0"

@@ -97,7 +97,6 @@ public enum JaversExceptionCode {
             "it doesn't exists in JaversRepository"),
 
     CANT_FIND_COMMIT_HEAD_ID("can't find commit head id in JaversRepository"),
-    CANT_SAVE_ALREADY_PERSISTED_COMMIT("can't save already persisted commit '%s'"),
 
     SQL_EXCEPTION("%s\nwhile executing sql: %s"),
 

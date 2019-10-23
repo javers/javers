@@ -12,16 +12,24 @@ import static org.javers.repository.sql.SqlRepositoryBuilder.sqlRepository
 
 class H2SqlRepositoryE2ETest extends JaversSqlRepositoryE2ETest {
 
+    @Override
     Connection createConnection() {
         DriverManager.getConnection("jdbc:h2:mem:test")
     }
 
+    @Override
     DialectName getDialect() {
         DialectName.H2
     }
 
+    @Override
     String getSchema() {
         return null
+    }
+
+    @Override
+    boolean useRandomCommitIdGenerator() {
+        false
     }
 
     def "should fail when schema is not created"(){
