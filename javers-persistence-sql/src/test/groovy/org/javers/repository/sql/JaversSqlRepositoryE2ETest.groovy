@@ -37,16 +37,22 @@ abstract class JaversSqlRepositoryE2ETest extends JaversRepositoryShadowE2ETest 
         connection
     }
 
-    @Override
     def setup() {
         clearTables()
     }
 
     def cleanup() {
         connections.each {
-            it.rollback()
-            it.close()
+            if (it.isValid(1)) {
+                it.commit()
+                it.close()
+            }
         }
+    }
+
+    @Override
+    void databaseCommit() {
+        getConnection().commit();
     }
 
     @Override

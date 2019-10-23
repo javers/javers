@@ -40,6 +40,9 @@ class JaversRepositoryE2ETest extends Specification {
     private DateProvider dateProvider
     private RandomCommitGenerator randomCommitGenerator = null
 
+    void databaseCommit(){
+    }
+
     def setup() {
         buildJaversInstance()
     }
@@ -47,7 +50,10 @@ class JaversRepositoryE2ETest extends Specification {
     void buildJaversInstance() {
         dateProvider = prepareDateProvider()
         repository = prepareJaversRepository()
+        javers = buildNextJaversInstance(repository)
+    }
 
+    Javers buildNextJaversInstance (JaversRepository repository) {
         def javersBuilder = JaversBuilder
                 .javers()
                 .withDateTimeProvider(dateProvider)
@@ -58,7 +64,7 @@ class JaversRepositoryE2ETest extends Specification {
             javersBuilder.withCustomCommitIdGenerator(randomCommitGenerator)
         }
 
-        javers = javersBuilder.build()
+        javersBuilder.build()
     }
 
     protected int commitSeq(CommitMetadata commit) {
@@ -1068,25 +1074,26 @@ class JaversRepositoryE2ETest extends Specification {
         changes.find{it instanceof ReferenceChange}.affectedGlobalId.value() == "$sName/1#valueObjectRef"
     }
 
-    def "should provide cluster-friendly commitId generator"(){
+    def "should persist commits in multiple-instances environment"(){
         given:
         def threads = 10
-        def javersRepo = new InMemoryRepository()
         when:
         withPool threads, {
             (1..threads).collectParallel {
-                def javers = JaversBuilder.javers()
-                        .registerJaversRepository(javersRepo)
-                        .withCommitIdGenerator(CommitIdGenerator.RANDOM)
-                        .build()
-                javers.commit("author", new SnapshotEntity(id: it))
+                def jv = buildNextJaversInstance(repository)
+                jv.commit("author", new SnapshotEntity(id: it))
+                databaseCommit()
             }
         }
 
         then:
-        def javers = JaversBuilder.javers().registerJaversRepository(javersRepo).build()
+        def javers = buildNextJaversInstance(repository)
         def snapshots = javers.findSnapshots(QueryBuilder.anyDomainObject().build())
-        (snapshots.collect{it -> it.commitId} as Set).size() == threads
+        snapshots.size() == threads
+        snapshots.collect{it -> it.getPropertyValue("id")} as Set == (1..threads).collect{it} as Set
+
+        println 'persisted Entity ids: ' + snapshots.collect{it -> it.getPropertyValue("id")}
+        println 'persisted commits ids: ' + snapshots.collect{it -> it.commitId}
     }
 
     def "should not persist commits with zero snapshots" () {
