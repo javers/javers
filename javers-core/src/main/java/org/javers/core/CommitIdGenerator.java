@@ -18,7 +18,8 @@ public enum CommitIdGenerator {
      */
     SYNCHRONIZED_SEQUENCE {
         public Comparator<CommitMetadata> getComparator() {
-            return Comparator.comparing(CommitMetadata::getId);
+            return Comparator.comparing(CommitMetadata::getCommitDateInstant)
+                    .thenComparing(CommitMetadata::getId);
         }
     },
 
