@@ -43,6 +43,7 @@ class JaversSqlAutoConfigurationTest extends Specification {
         javersProperties.prettyPrintDateFormats.zonedDateTime == "dd-mm-yyyy HH mm ss Z"
         javersProperties.prettyPrintDateFormats.localDate == "dd-mm-yyyy"
         javersProperties.prettyPrintDateFormats.localTime == "HH mm ss"
+        javersProperties.getObjectAccessHook() == "org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook"
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath" () {
