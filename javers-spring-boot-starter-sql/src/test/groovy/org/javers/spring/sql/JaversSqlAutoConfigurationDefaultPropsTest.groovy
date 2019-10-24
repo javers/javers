@@ -41,6 +41,7 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         javersProperties.prettyPrintDateFormats.zonedDateTime == "dd MMM yyyy, HH:mm:ssZ"
         javersProperties.prettyPrintDateFormats.localDate == "dd MMM yyyy"
         javersProperties.prettyPrintDateFormats.localTime == "HH:mm:ss"
+        !javersProperties.globalIdCacheDisabled
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath"() {
