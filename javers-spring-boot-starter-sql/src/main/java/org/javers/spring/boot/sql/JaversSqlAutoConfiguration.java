@@ -92,7 +92,7 @@ public class JaversSqlAutoConfiguration {
     private HibernateUnproxyObjectAccessHook createClassObject(String accessHookClassName) {
         try {
             final Class<?> aClass = ReflectionUtil.classForName(accessHookClassName);
-            return (HibernateUnproxyObjectAccessHook) aClass.newInstance();
+            return (HibernateUnproxyObjectAccessHook) aClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new JaversException(e);
         }
