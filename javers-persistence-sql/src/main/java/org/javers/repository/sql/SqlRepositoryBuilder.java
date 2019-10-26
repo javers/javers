@@ -59,8 +59,8 @@ public class SqlRepositoryBuilder extends AbstractContainerBuilder {
      * Since 2.7.2, JaversTransactionalDecorator evicts the cache on transaction rollback,
      * so there are no known reasons to disabling it.
      */
-    public SqlRepositoryBuilder withGlobalIdCacheDisabled() {
-        globalIdCacheDisabled = true;
+    public SqlRepositoryBuilder withGlobalIdCacheDisabled(boolean globalIdCacheDisabled) {
+        this.globalIdCacheDisabled = globalIdCacheDisabled;
         return this;
     }
 
