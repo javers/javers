@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class JaversSqlProperties extends JaversSpringProperties {
 
     private boolean sqlSchemaManagementEnabled = true;
-    private boolean isGlobalIdCacheDisabled = false;
+    private boolean sqlGlobalIdCacheDisabled = false;
     private String sqlSchema;
 
     public boolean isSqlSchemaManagementEnabled() {
@@ -26,11 +26,11 @@ public class JaversSqlProperties extends JaversSpringProperties {
         this.sqlSchema = sqlSchema;
     }
 
-    public boolean isGlobalIdCacheDisabled() {
-        return isGlobalIdCacheDisabled;
+    public boolean isSqlGlobalIdCacheDisabled() {
+        return sqlGlobalIdCacheDisabled;
     }
 
-    public void setGlobalIdCacheDisabled(boolean globalIdCacheDisabled) {
-        isGlobalIdCacheDisabled = globalIdCacheDisabled;
+    public void setSqlGlobalIdCacheDisabled(boolean sqlGlobalIdCacheDisabled) {
+        this.sqlGlobalIdCacheDisabled = sqlGlobalIdCacheDisabled;
     }
 }

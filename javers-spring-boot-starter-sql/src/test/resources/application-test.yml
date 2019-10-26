@@ -9,7 +9,7 @@ javers:
   sqlSchemaManagementEnabled: true
   commitIdGenerator: random
   packagesToScan: my.company.domain.person, my.company.domain.finance
-  globalIdCacheDisabled: true
+  sqlGlobalIdCacheDisabled: true
   prettyPrintDateFormats:
     localDateTime: "dd-mm-yyyy"
     zonedDateTime: "dd-mm-yyyy HH mm ss Z"
