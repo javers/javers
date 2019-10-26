@@ -60,6 +60,10 @@ class ShadowGraphBuilder {
 
     private ShadowBuilder assembleShallowReferenceShadow(InstanceId instanceId, EntityType shallowReferenceType) {
         CdoSnapshotState state = cdoSnapshotState().withPropertyValue(shallowReferenceType.getIdProperty(), instanceId.getCdoId()).build();
+
+        //TODO
+        System.out.println("shallowReference.id " + shallowReferenceType.getIdProperty().getType().getClass().getSimpleName());
+
         JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(state);
         Object shadowStub = jsonConverter.fromJson(jsonElement, shallowReferenceType.getBaseJavaClass());
 

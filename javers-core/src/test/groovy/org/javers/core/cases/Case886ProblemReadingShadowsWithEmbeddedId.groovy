@@ -16,69 +16,63 @@ import javax.persistence.OneToMany
 
 class Case886ProblemReadingShadowsWithEmbeddedId extends Specification {
 
-    def "should read shadows for classes with EmbeddedId"() {
+    @TypeName("Agreement")
+    class Agreement {
 
+        @Id
+        private UUID agreementId
+
+        private UUID locationId
+
+        @OneToMany(mappedBy = "agreement", cascade = CascadeType.ALL, orphanRemoval = true)
+        @ShallowReference
+        private List<AgreementMember> agreementMembers
+    }
+
+    @Embeddable
+    @TypeName("AgreementMemberId")
+    class AgreementMemberId implements Serializable {
+        private UUID agreementId
+        private UUID memberId
+    }
+
+    @TypeName("AgreementMember")
+    class AgreementMember {
+        @EmbeddedId
+        private AgreementMemberId agreementMemberId
+
+        public AgreementMemberId getId() {
+            return agreementMemberId
+        }
+    }
+
+    def "should read shadows for classes with EmbeddedId"() {
         given:
         def javers = JaversBuilder.javers().build()
 
+        println javers.getTypeMapping(Agreement).prettyPrint()
+        println javers.getTypeMapping(UUID).prettyPrint()
+
         when:
-        Agreement agreement = new Agreement()
-        agreement.agreementId = UUID.randomUUID()
-        agreement.locationId = UUID.randomUUID()
+        UUID agreementId = UUID.randomUUID()
 
-        AgreementMember.AgreementMemberId agreementMemberId = new AgreementMember.AgreementMemberId()
-        agreementMemberId.agreementId = agreement.agreementId
-        agreementMemberId.memberId = UUID.randomUUID()
+        AgreementMemberId agreementMemberId = new AgreementMemberId(
+                agreementId: agreementId,
+                memberId: UUID.randomUUID() )
 
-        AgreementMember agreementMember = new AgreementMember()
-        agreementMember.agreementMemberId = agreementMemberId
+        AgreementMember agreementMember = new AgreementMember(agreementMemberId:agreementMemberId)
 
-        List<AgreementMember> agreementMemberList = new ArrayList<>()
-        agreementMemberList.add(agreementMember)
-        agreement.agreementMembers = agreementMemberList
+        Agreement agreement = new Agreement(
+                agreementId: agreementId,
+                locationId: UUID.randomUUID(),
+                agreementMembers: [agreementMember])
 
-        javers.commit("Agreement", agreement)
+        def c = javers.commit("Agreement", agreement)
 
-        JqlQuery query = QueryBuilder.byInstanceId(agreement.agreementId, Agreement.class).build()
+        JqlQuery query = QueryBuilder.byInstanceId(agreementId, Agreement.class).build()
         List<Shadow<Agreement>> shadows = javers.findShadows(query)
 
         then:
         shadows.size() > 0
     }
-
-    @TypeName("Agreement")
-    class Agreement {
-
-        @Id
-        private UUID agreementId;
-
-        private UUID locationId;
-
-        @OneToMany(mappedBy = "agreement", cascade = CascadeType.ALL, orphanRemoval = true)
-        @ShallowReference
-        private List<AgreementMember> agreementMembers;
-
-        //other fields ...
-    }
-
-    @TypeName("AgreementMember")
-    class AgreementMember {
-
-        public AgreementMemberId getId() {
-            return agreementMemberId;
-        }
-
-        @Embeddable
-        @TypeName("AgreementMemberId")
-        public static class AgreementMemberId implements Serializable {
-            private UUID agreementId;
-            private UUID memberId;
-        }
-
-        @EmbeddedId
-        private AgreementMemberId agreementMemberId;
-
-        //other fields ...
-    }
-
 }
