@@ -1,6 +1,7 @@
 package org.javers.spring.boot.mongo;
 
 import org.javers.spring.JaversSpringProperties;
+import org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -8,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "javers")
 public class JaversMongoProperties extends JaversSpringProperties {
+    private static final String DEFAULT_OBJECT_ACCESS_HOOK = DBRefUnproxyObjectAccessHook.class.getName();
 
     private boolean documentDbCompatibilityEnabled = false;
 
@@ -132,5 +134,9 @@ public class JaversMongoProperties extends JaversSpringProperties {
 
     public boolean isDedicatedMongodbConfigurationEnabled() {
         return mongodb != null;
+    }
+
+    protected String defaultObjectAccessHook(){
+        return DEFAULT_OBJECT_ACCESS_HOOK;
     }
 }

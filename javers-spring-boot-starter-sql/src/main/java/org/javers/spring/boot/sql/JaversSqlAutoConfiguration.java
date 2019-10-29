@@ -6,6 +6,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.javers.common.exception.JaversException;
 import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.Javers;
+import org.javers.core.graph.ObjectAccessHook;
 import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
@@ -78,7 +79,7 @@ public class JaversSqlAutoConfiguration {
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
     public Javers javers(JaversSqlRepository sqlRepository, PlatformTransactionManager transactionManager) {
-        final HibernateUnproxyObjectAccessHook objectAccessHook = createClassObject(javersSqlProperties.getObjectAccessHook());
+        final ObjectAccessHook objectAccessHook = createClassObject(javersSqlProperties.getObjectAccessHook());
 
         return TransactionalJaversBuilder
                 .javers()

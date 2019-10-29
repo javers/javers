@@ -39,6 +39,7 @@ class JaversMongoStarterTest extends Specification{
         javersProperties.typeSafeValues
         javersProperties.commitIdGenerator == "random"
         javersProperties.documentDbCompatibilityEnabled == true
+        javersProperties.getObjectAccessHook() == "org.javers.spring.mongodb.DBRefUnproxyObjectAccessHook"
     }
 
     def "shouldReadBeanMappingStyleFromYml"() {
