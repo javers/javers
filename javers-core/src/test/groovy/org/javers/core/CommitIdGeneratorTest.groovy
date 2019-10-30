@@ -50,5 +50,4 @@ class CommitIdGeneratorTest extends Specification {
         metadataList.get(4).commitDateInstant == commitMetadata4.commitDateInstant
 
     }
-
 }

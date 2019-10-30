@@ -73,6 +73,7 @@ public class JaversSqlAutoConfiguration {
                 .withConnectionProvider(connectionProvider)
                 .withDialect(javersSqlDialectName())
                 .withSchemaManagementEnabled(javersSqlProperties.isSqlSchemaManagementEnabled())
+                .withGlobalIdCacheDisabled(javersSqlProperties.isSqlGlobalIdCacheDisabled())
                 .build();
     }
 
