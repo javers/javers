@@ -30,13 +30,11 @@ class Case886ProblemReadingShadowsWithEmbeddedId extends Specification {
     }
 
     @Embeddable
-    @TypeName("AgreementMemberId")
     class AgreementMemberId implements Serializable {
         private UUID agreementId
         private UUID memberId
     }
 
-    @TypeName("AgreementMember")
     class AgreementMember {
         @EmbeddedId
         private AgreementMemberId agreementMemberId
@@ -51,6 +49,8 @@ class Case886ProblemReadingShadowsWithEmbeddedId extends Specification {
         def javers = JaversBuilder.javers().build()
 
         println javers.getTypeMapping(Agreement).prettyPrint()
+        println javers.getTypeMapping(AgreementMember).prettyPrint()
+        println javers.getTypeMapping(AgreementMemberId).prettyPrint()
         println javers.getTypeMapping(UUID).prettyPrint()
 
         when:
