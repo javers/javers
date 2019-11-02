@@ -64,8 +64,7 @@ class ShadowGraphBuilder {
     private ShadowBuilder assembleShallowReferenceShadow(InstanceId instanceId, EntityType shallowReferenceType) {
         CdoSnapshotState state = cdoSnapshotState().withPropertyValue(shallowReferenceType.getIdProperty(), instanceId.getCdoId()).build();
 
-        JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(state);
-        Object shadowStub = jsonConverter.fromJson(jsonElement, shallowReferenceType.getBaseJavaClass());
+        Object shadowStub = jsonConverter.fromJson(toJson(state), shallowReferenceType.getBaseJavaClass());
 
         ShadowBuilder shadowBuilder = new ShadowBuilder(null, shadowStub);
         builtNodes.put(instanceId, shadowBuilder);
@@ -77,19 +76,22 @@ class ShadowGraphBuilder {
         ShadowBuilder shadowBuilder = new ShadowBuilder(cdoSnapshot, null);
         builtNodes.put(cdoSnapshot.getGlobalId(), shadowBuilder);
 
-        JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(cdoSnapshot.getState());
-        mapCustomPropertyNamesToJavaOrigin(cdoSnapshot, jsonElement);
+        JsonObject jsonElement = toJson(cdoSnapshot.getState());
+        mapCustomPropertyNamesToJavaOrigin(cdoSnapshot.getManagedType(), jsonElement);
         followReferences(shadowBuilder, jsonElement);
 
-        Object shadowStub = null;
-        try {
-            shadowStub = jsonConverter.fromJson(jsonElement, cdoSnapshot.getManagedType().getBaseJavaClass());
-        } catch(JsonSyntaxException | DateTimeParseException e) {
-            shadowStub = sanitizedDeserialization(jsonElement, cdoSnapshot.getManagedType());
-        }
-        shadowBuilder.withStub(shadowStub);
+        shadowBuilder.withStub(
+                deserializeObjectFromJsonElement(cdoSnapshot.getManagedType(), jsonElement));
 
         return shadowBuilder;
+    }
+
+    private Object deserializeObjectFromJsonElement(ManagedType managedType, JsonObject jsonElement) {
+        try {
+            return jsonConverter.fromJson(jsonElement, managedType.getBaseJavaClass());
+        } catch(JsonSyntaxException | DateTimeParseException e) {
+            return sanitizedDeserialization(jsonElement, managedType);
+        }
     }
 
     private Object sanitizedDeserialization(JsonObject jsonElement, ManagedType managedType) {
@@ -105,8 +107,8 @@ class ShadowGraphBuilder {
         return jsonConverter.fromJson(jsonElement, managedType.getBaseJavaClass());
     }
 
-    private void mapCustomPropertyNamesToJavaOrigin(CdoSnapshot cdoSnapshot, JsonObject jsonElement) {
-        cdoSnapshot.getManagedType().forEachProperty(javersProperty -> {
+    private void mapCustomPropertyNamesToJavaOrigin(ManagedType managedType, JsonObject jsonElement) {
+        managedType.forEachProperty(javersProperty -> {
                 if (javersProperty.hasCustomName()) {
                     JsonElement value = jsonElement.get(javersProperty.getName());
                     jsonElement.remove(javersProperty.getName());
@@ -179,5 +181,9 @@ class ShadowGraphBuilder {
             return assembleShadowStub(cdoSnapshot);
         }
         return null;
+    }
+
+    private JsonObject toJson(CdoSnapshotState state) {
+        return (JsonObject)jsonConverter.toJsonElement(state);
     }
 }
