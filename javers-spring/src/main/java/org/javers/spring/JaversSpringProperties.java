@@ -1,6 +1,10 @@
 package org.javers.spring;
 
+import org.javers.common.exception.JaversException;
+import org.javers.common.exception.JaversExceptionCode;
+import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.JaversCoreProperties;
+import org.javers.core.graph.ObjectAccessHook;
 
 public abstract class JaversSpringProperties extends JaversCoreProperties {
     private boolean auditableAspectEnabled = true;
@@ -32,4 +36,12 @@ public abstract class JaversSpringProperties extends JaversCoreProperties {
     }
 
     protected abstract String defaultObjectAccessHook();
+
+    public ObjectAccessHook createObjectAccessHookInstance() {
+        Class<?> clazz = ReflectionUtil.classForName(objectAccessHook);
+        if (!ObjectAccessHook.class.isAssignableFrom(clazz)) {
+            throw new JaversException(JaversExceptionCode.CLASS_IS_NOT_INSTANCE_OF, objectAccessHook, ObjectAccessHook.class.getName());
+        }
+        return (ObjectAccessHook)ReflectionUtil.newInstance(clazz);
+    }
 }

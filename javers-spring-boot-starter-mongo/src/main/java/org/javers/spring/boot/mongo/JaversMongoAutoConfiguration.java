@@ -3,11 +3,8 @@ package org.javers.spring.boot.mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.client.MongoDatabase;
-import org.javers.common.exception.JaversException;
-import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
-import org.javers.core.graph.ObjectAccessHook;
 import org.javers.repository.mongo.MongoRepository;
 import org.javers.spring.auditable.*;
 import org.javers.spring.auditable.aspect.JaversAuditableAspect;
@@ -61,22 +58,11 @@ public class JaversMongoAutoConfiguration {
 
         MongoRepository javersRepository = createMongoRepository(mongoDatabase);
 
-        final ObjectAccessHook objectAccessHook = createClassObject(javersMongoProperties.getObjectAccessHook());
-
         return JaversBuilder.javers()
                 .registerJaversRepository(javersRepository)
                 .withProperties(javersMongoProperties)
-                .withObjectAccessHook(objectAccessHook)
+                .withObjectAccessHook(javersMongoProperties.createObjectAccessHookInstance())
                 .build();
-    }
-
-    private ObjectAccessHook createClassObject(String accessHookClassName) {
-        try {
-            final Class<?> aClass = ReflectionUtil.classForName(accessHookClassName);
-            return (ObjectAccessHook) aClass.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new JaversException(e);
-        }
     }
 
     private MongoDatabase initJaversMongoDatabase() {

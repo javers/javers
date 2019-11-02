@@ -82,9 +82,15 @@ public enum JaversExceptionCode {
 
     COMPONENT_NOT_FOUND(JaversException.BOOTSTRAP_ERROR+"component of type '%s' not found in container") ,
 
-    NO_PUBLIC_CONSTRUCTOR(JaversException.BOOTSTRAP_ERROR+"no public constructor in class '%s'"),
+    NO_PUBLIC_CONSTRUCTOR("no public constructor in class '%s'"),
 
-    CLASS_NOT_FOUND("class not found - '%s'") ,
+    NO_PUBLIC_ZERO_ARG_CONSTRUCTOR("no public zero-argument constructor in class '%s'"),
+
+    ERROR_WHEN_INVOKING_CONSTRUCTOR("got exception when invoking constructor of class '%s'"),
+
+    CLASS_NOT_FOUND("class not found - '%s'"),
+
+    CLASS_IS_NOT_INSTANCE_OF("given class '%s' is not instance of '%s'"),
 
     CANT_EXTRACT_CHILD_VALUE_OBJECT(
             "error while extracting child ValueObject from path '%s'" +

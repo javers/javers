@@ -6,9 +6,9 @@ import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 
 import java.util.Optional;
 
-public class DBRefUnproxyObjectAccessHook implements ObjectAccessHook<Object> {
+public class DBRefUnproxyObjectAccessHook<T> implements ObjectAccessHook<T> {
     @Override
-    public Optional<ObjectAccessProxy<Object>> createAccessor(Object entity) {
+    public Optional<ObjectAccessProxy<T>> createAccessor(T entity) {
         if (entity instanceof LazyLoadingProxy) {
             LazyLoadingProxy proxy = (LazyLoadingProxy) entity;
 

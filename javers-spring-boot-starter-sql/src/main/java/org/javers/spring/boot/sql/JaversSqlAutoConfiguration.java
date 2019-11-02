@@ -3,11 +3,7 @@ package org.javers.spring.boot.sql;
 import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.javers.common.exception.JaversException;
-import org.javers.common.reflection.ReflectionUtil;
 import org.javers.core.Javers;
-import org.javers.core.graph.ObjectAccessHook;
-import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
 import org.javers.repository.sql.ConnectionProvider;
 import org.javers.repository.sql.DialectName;
 import org.javers.repository.sql.JaversSqlRepository;
@@ -80,24 +76,13 @@ public class JaversSqlAutoConfiguration {
     @Bean(name = "JaversFromStarter")
     @ConditionalOnMissingBean
     public Javers javers(JaversSqlRepository sqlRepository, PlatformTransactionManager transactionManager) {
-        final ObjectAccessHook objectAccessHook = createClassObject(javersSqlProperties.getObjectAccessHook());
-
         return TransactionalJaversBuilder
                 .javers()
                 .withTxManager(transactionManager)
                 .registerJaversRepository(sqlRepository)
-                .withObjectAccessHook(objectAccessHook)
+                .withObjectAccessHook(javersSqlProperties.createObjectAccessHookInstance())
                 .withProperties(javersSqlProperties)
                 .build();
-    }
-
-    private HibernateUnproxyObjectAccessHook createClassObject(String accessHookClassName) {
-        try {
-            final Class<?> aClass = ReflectionUtil.classForName(accessHookClassName);
-            return (HibernateUnproxyObjectAccessHook) aClass.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new JaversException(e);
-        }
     }
 
     @Bean(name = "SpringSecurityAuthorProvider")

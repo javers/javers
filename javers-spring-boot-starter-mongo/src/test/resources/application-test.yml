@@ -7,3 +7,4 @@ javers:
   packagesToScan: org.javers.spring.boot
   commitIdGenerator: random
   documentDbCompatibilityEnabled: true
+  objectAccessHook: org.javers.spring.boot.mongo.DummyDBRefUnproxyObjectAccessHook

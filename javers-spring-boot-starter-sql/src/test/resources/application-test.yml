@@ -15,4 +15,4 @@ javers:
     zonedDateTime: "dd-mm-yyyy HH mm ss Z"
     localDate: "dd-mm-yyyy"
     localTime: "HH mm ss"
-  objectAccessHook: org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook
+  objectAccessHook: org.javers.spring.boot.DummySqlObjectAccessHook
