@@ -8,11 +8,9 @@ import org.javers.repository.jql.QueryBuilder
 import org.javers.shadow.Shadow
 import spock.lang.Specification
 
-import javax.persistence.CascadeType
 import javax.persistence.Embeddable
 import javax.persistence.EmbeddedId
 import javax.persistence.Id
-import javax.persistence.OneToMany
 
 class Case886ProblemReadingShadowsWithEmbeddedId extends Specification {
 
@@ -24,7 +22,6 @@ class Case886ProblemReadingShadowsWithEmbeddedId extends Specification {
 
         private UUID locationId
 
-        @OneToMany(mappedBy = "agreement", cascade = CascadeType.ALL, orphanRemoval = true)
         @ShallowReference
         private List<AgreementMember> agreementMembers
     }
@@ -39,12 +36,12 @@ class Case886ProblemReadingShadowsWithEmbeddedId extends Specification {
         @EmbeddedId
         private AgreementMemberId agreementMemberId
 
-        public AgreementMemberId getId() {
+        AgreementMemberId getId() {
             return agreementMemberId
         }
     }
 
-    def "should read shadows for classes with EmbeddedId"() {
+    def "should create Shadow with ShallowReference with EmbeddedId replaced with null"() {
         given:
         def javers = JaversBuilder.javers().build()
 
@@ -67,12 +64,13 @@ class Case886ProblemReadingShadowsWithEmbeddedId extends Specification {
                 locationId: UUID.randomUUID(),
                 agreementMembers: [agreementMember])
 
-        def c = javers.commit("Agreement", agreement)
+        javers.commit("Agreement", agreement)
 
         JqlQuery query = QueryBuilder.byInstanceId(agreementId, Agreement.class).build()
         List<Shadow<Agreement>> shadows = javers.findShadows(query)
 
         then:
-        shadows.size() > 0
+        Agreement a = shadows[0].get()
+        a.agreementMembers == []
     }
 }
