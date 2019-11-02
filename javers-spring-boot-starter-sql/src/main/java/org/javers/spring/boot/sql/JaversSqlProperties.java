@@ -1,10 +1,12 @@
 package org.javers.spring.boot.sql;
 
+import org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook;
 import org.javers.spring.JaversSpringProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "javers")
 public class JaversSqlProperties extends JaversSpringProperties {
+    private static final String DEFAULT_OBJECT_ACCESS_HOOK = HibernateUnproxyObjectAccessHook.class.getName();
 
     private boolean sqlSchemaManagementEnabled = true;
     private boolean sqlGlobalIdCacheDisabled = false;
@@ -32,5 +34,9 @@ public class JaversSqlProperties extends JaversSpringProperties {
 
     public void setSqlGlobalIdCacheDisabled(boolean sqlGlobalIdCacheDisabled) {
         this.sqlGlobalIdCacheDisabled = sqlGlobalIdCacheDisabled;
+    }
+
+    protected String defaultObjectAccessHook(){
+        return DEFAULT_OBJECT_ACCESS_HOOK;
     }
 }

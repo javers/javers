@@ -42,6 +42,7 @@ class JaversSqlAutoConfigurationDefaultPropsTest extends Specification {
         javersProperties.prettyPrintDateFormats.localDate == "dd MMM yyyy"
         javersProperties.prettyPrintDateFormats.localTime == "HH:mm:ss"
         !javersProperties.sqlGlobalIdCacheDisabled
+        javersProperties.getObjectAccessHook() == "org.javers.hibernate.integration.HibernateUnproxyObjectAccessHook"
     }
 
     def "shouldHaveSpringSecurityAuthorProviderWhenSpringSecurityOnClasspath"() {
