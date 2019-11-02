@@ -6,7 +6,10 @@ import com.google.gson.JsonSyntaxException;
 import org.javers.common.validation.Validate;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.CdoSnapshotState;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.type.*;
 
 import java.time.format.DateTimeParseException;
@@ -60,6 +63,7 @@ class ShadowGraphBuilder {
 
     private ShadowBuilder assembleShallowReferenceShadow(InstanceId instanceId, EntityType shallowReferenceType) {
         CdoSnapshotState state = cdoSnapshotState().withPropertyValue(shallowReferenceType.getIdProperty(), instanceId.getCdoId()).build();
+
         JsonObject jsonElement = (JsonObject)jsonConverter.toJsonElement(state);
         Object shadowStub = jsonConverter.fromJson(jsonElement, shallowReferenceType.getBaseJavaClass());
 
@@ -158,11 +162,15 @@ class ShadowGraphBuilder {
         }
 
         if (property.isShallowReference()) {
-            if (property.getType() instanceof EntityType) {
-                return assembleShallowReferenceShadow((InstanceId) globalId, property.getType());
+            EntityType shallowReferenceType = property.getType() instanceof EntityType
+                    ? property.getType()
+                    : (EntityType)typeMapper.getJaversManagedType(globalId);
+
+            if (shallowReferenceType.getIdProperty().getType() instanceof ValueObjectType) {
+                //TODO don't know how to reconstruct Id in ShallowReference, which happened to be a ValueObject,
+                return null;
             } else {
-                EntityType entityType = (EntityType)typeMapper.getJaversManagedType(globalId);
-                return assembleShallowReferenceShadow((InstanceId) globalId, entityType);
+                return assembleShallowReferenceShadow((InstanceId) globalId, shallowReferenceType);
             }
         }
 
