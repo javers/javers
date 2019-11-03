@@ -60,13 +60,7 @@ class CaseEmbeddedIdDeserializeProblem extends Specification {
     }
 
     def "should read shadows for classes with EmbeddedId"() {
-
         given:
-        println javers.getTypeMapping(Agreement).prettyPrint()
-        println javers.getTypeMapping(AgreementMember).prettyPrint()
-        println javers.getTypeMapping(AgreementMemberId).prettyPrint()
-        println javers.getTypeMapping(UUID).prettyPrint()
-
         def agreementId = randomUUID()
 
         AgreementMemberId agreementMemberId = new AgreementMemberId(
@@ -91,23 +85,23 @@ class CaseEmbeddedIdDeserializeProblem extends Specification {
 
         then:
         snapshots1.size() > 0
-        snapshots1.get(0).state.getPropertyValue("agreementMembers")[0] instanceof InstanceId
-        snapshots1.get(0).getManagedType().baseJavaClass.getName().equals(this.class.name + "\$Agreement")
+        snapshots1[0].state.getPropertyValue("agreementMembers")[0] instanceof InstanceId
+        snapshots1[0].getManagedType().baseJavaClass.getName().equals(this.class.name + "\$Agreement")
 
         //read same data after restart:
         when:
         def javers2 = buildJaversInstance()
+
+        //This is critical, because fresh Javers instance doesn't know the Agreement class.
+        //On production, JaversBuilder.withPackagesToScan() should be used.
+        javers2.getTypeMapping(Agreement)
+
         List<CdoSnapshot> snapshots2 = javers2.findSnapshots(query)
 
         //expecting the same result but fail:
         then:
-        println snapshots1.get(0).state.getPropertyValue("agreementMembers")[0]
-        println snapshots1.get(0).state.getPropertyValue("agreementMembers")[0].getClass()
-        println snapshots2.get(0).state.getPropertyValue("agreementMembers")[0]
-        println snapshots2.get(0).state.getPropertyValue("agreementMembers")[0].getClass()
         snapshots2.size() > 0
-
-        snapshots2.get(0).state.getPropertyValue("agreementMembers")[0] instanceof InstanceId
-        snapshots2.get(0).getManagedType().baseJavaClass.getName().equals(this.class.name + "\$Agreement")//java.lang.Object
+        snapshots2[0].state.getPropertyValue("agreementMembers")[0] instanceof InstanceId
+        snapshots2[0].getManagedType().baseJavaClass.getName().equals(this.class.name + "\$Agreement")//java.lang.Object
     }
 }
