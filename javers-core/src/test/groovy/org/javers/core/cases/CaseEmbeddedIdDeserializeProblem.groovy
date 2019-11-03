@@ -1,114 +1,84 @@
 package org.javers.core.cases
 
-
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
-import org.javers.common.date.DateProvider
-import org.javers.core.*
-import org.javers.core.commit.CommitMetadata
+import org.javers.core.Javers
+import org.javers.core.JaversBuilder
 import org.javers.core.metamodel.annotation.ShallowReference
 import org.javers.core.metamodel.annotation.TypeName
+import org.javers.core.metamodel.annotation.Value
 import org.javers.core.metamodel.object.CdoSnapshot
+import org.javers.core.metamodel.object.InstanceId
 import org.javers.repository.api.JaversRepository
 import org.javers.repository.inmemory.InMemoryRepository
 import org.javers.repository.jql.JqlQuery
 import org.javers.repository.jql.QueryBuilder
 import spock.lang.Specification
 
-import javax.persistence.*
-import java.time.ZonedDateTime
+import javax.persistence.Id
+import static java.util.UUID.*
 
-
+/**
+ * https://github.com/javers/javers/issues/897
+ */
 class CaseEmbeddedIdDeserializeProblem extends Specification {
 
-    protected JaversRepository repository
+    protected JaversRepository repository = new InMemoryRepository()
     protected Javers javers
-    private DateProvider dateProvider
-    private RandomCommitGenerator randomCommitGenerator = null
 
     def setup() {
-        buildJaversInstance()
+        javers = buildJaversInstance()
     }
 
-    void buildJaversInstance() {
-        dateProvider = prepareDateProvider()
-        repository = prepareJaversRepository()
-
+    Javers buildJaversInstance() {
         def javersBuilder = JaversBuilder
                 .javers()
-                .withDateTimeProvider(dateProvider)
                 .registerJaversRepository(repository)
-                .registerValueGsonTypeAdapter(AgreementMember.AgreementMemberId.class, new AgreementMemberIdTypeAdapter())
 
-        if (useRandomCommitIdGenerator()) {
-            randomCommitGenerator = new RandomCommitGenerator()
-            javersBuilder.withCustomCommitIdGenerator(randomCommitGenerator)
-        }
-
-        javers = javersBuilder.build()
+        javersBuilder.build()
     }
 
-    protected int commitSeq(CommitMetadata commit) {
-        if (useRandomCommitIdGenerator()) {
-            return randomCommitGenerator.getSeq(commit.id)
-        }
-        commit.id.majorId
+    @TypeName("Agreement")
+    class Agreement {
+
+        @Id
+        UUID agreementId
+
+        @ShallowReference
+        List<AgreementMember> agreementMembers
     }
 
-    protected DateProvider prepareDateProvider() {
-        if (useRandomCommitIdGenerator()) {
-            return new TikDateProvider()
-        }
-        new FakeDateProvider()
+    @TypeName("AgreementMember")
+    class AgreementMember {
+
+        @Id
+        AgreementMemberId agreementMemberId
     }
 
-    protected setNow(ZonedDateTime dateTime) {
-        dateProvider.set(dateTime)
-    }
-
-    protected JaversRepository prepareJaversRepository() {
-        new InMemoryRepository()
-    }
-
-    protected boolean useRandomCommitIdGenerator() {
-        false
-    }
-
-    def getNewJaversInstance() {
-        def javersBuilder = JaversBuilder
-                .javers()
-                .withDateTimeProvider(dateProvider)
-                .registerJaversRepository(repository)
-                .registerValueGsonTypeAdapter(AgreementMember.AgreementMemberId.class, new AgreementMemberIdTypeAdapter())
-
-        if (useRandomCommitIdGenerator()) {
-            randomCommitGenerator = new RandomCommitGenerator()
-            javersBuilder.withCustomCommitIdGenerator(randomCommitGenerator)
-        }
-
-        def javers2 = javersBuilder.build()
-        return javers2
+    @Value
+    static class AgreementMemberId implements Serializable {
+        UUID agreementId
+        UUID memberId
     }
 
     def "should read shadows for classes with EmbeddedId"() {
 
         given:
-        //create entity:
-        Agreement agreement = new Agreement()
-        agreement.agreementId = UUID.randomUUID()
-        agreement.locationId = UUID.randomUUID()
+        println javers.getTypeMapping(Agreement).prettyPrint()
+        println javers.getTypeMapping(AgreementMember).prettyPrint()
+        println javers.getTypeMapping(AgreementMemberId).prettyPrint()
+        println javers.getTypeMapping(UUID).prettyPrint()
 
-        AgreementMember.AgreementMemberId agreementMemberId = new AgreementMember.AgreementMemberId()
-        agreementMemberId.agreementId = agreement.agreementId
-        agreementMemberId.memberId = UUID.randomUUID()
+        def agreementId = randomUUID()
 
-        AgreementMember agreementMember = new AgreementMember()
-        agreementMember.agreementMemberId = agreementMemberId
+        AgreementMemberId agreementMemberId = new AgreementMemberId(
+                agreementId:agreementId,
+                memberId:randomUUID()
+        )
 
-        List<AgreementMember> agreementMemberList = new ArrayList<>()
-        agreementMemberList.add(agreementMember)
-        agreement.agreementMembers = agreementMemberList
+        AgreementMember agreementMember = new AgreementMember(agreementMemberId:agreementMemberId)
+        Agreement agreement = new Agreement(
+                agreementId: agreementId,
+                agreementMembers: [agreementMember]
+        )
 
         javers.commit("Agreement", agreement)
 
@@ -121,111 +91,23 @@ class CaseEmbeddedIdDeserializeProblem extends Specification {
 
         then:
         snapshots1.size() > 0
-        snapshots1.get(0).state.getPropertyValue("agreementMembers").getAt("typeName").get(0) == "AgreementMember"
-        snapshots1.get(0).getManagedType().baseJavaClass.getName().equals("org.javers.core.cases.CaseEmbeddedIdDeserializeProblem\$Agreement")
+        snapshots1.get(0).state.getPropertyValue("agreementMembers")[0] instanceof InstanceId
+        snapshots1.get(0).getManagedType().baseJavaClass.getName().equals(this.class.name + "\$Agreement")
 
         //read same data after restart:
         when:
-        def javers2 = getNewJaversInstance()
+        def javers2 = buildJaversInstance()
         List<CdoSnapshot> snapshots2 = javers2.findSnapshots(query)
 
-        //expecing the same result but fail:
+        //expecting the same result but fail:
         then:
+        println snapshots1.get(0).state.getPropertyValue("agreementMembers")[0]
+        println snapshots1.get(0).state.getPropertyValue("agreementMembers")[0].getClass()
+        println snapshots2.get(0).state.getPropertyValue("agreementMembers")[0]
+        println snapshots2.get(0).state.getPropertyValue("agreementMembers")[0].getClass()
         snapshots2.size() > 0
-        snapshots2.get(0).state.getPropertyValue("agreementMembers").getAt("typeName").get(0) == "AgreementMember"//raw serialized data
-        snapshots2.get(0).getManagedType().baseJavaClass.getName().equals("org.javers.core.cases.CaseEmbeddedIdDeserializeProblem\$Agreement")//java.lang.Object
+
+        snapshots2.get(0).state.getPropertyValue("agreementMembers")[0] instanceof InstanceId
+        snapshots2.get(0).getManagedType().baseJavaClass.getName().equals(this.class.name + "\$Agreement")//java.lang.Object
     }
-
-    @TypeName("Agreement")
-    class Agreement {
-
-        @Id
-        private UUID agreementId;
-
-        private UUID locationId;
-
-        @OneToMany(mappedBy = "agreement", cascade = CascadeType.ALL, orphanRemoval = true)
-        @ShallowReference
-        private List<AgreementMember> agreementMembers;
-
-        //other fields ...
-    }
-
-    @TypeName("AgreementMember")
-    class AgreementMember {
-
-        public AgreementMemberId getId() {
-            return agreementMemberId;
-        }
-
-        @Embeddable
-        @TypeName("AgreementMemberId")
-        public static class AgreementMemberId implements Serializable {
-            private UUID agreementId;
-            private UUID memberId;
-
-            UUID getAgreementId() {
-                return agreementId
-            }
-
-            void setAgreementId(UUID agreementId) {
-                this.agreementId = agreementId
-            }
-
-            UUID getMemberId() {
-                return memberId
-            }
-
-            void setMemberId(UUID memberId) {
-                this.memberId = memberId
-            }
-        }
-
-        @EmbeddedId
-        private AgreementMemberId agreementMemberId;
-
-        //other fields ...
-    }
-
-
-    class AgreementMemberIdTypeAdapter extends TypeAdapter<AgreementMember.AgreementMemberId> {
-
-        @Override
-        public void write(JsonWriter jsonWriter, AgreementMember.AgreementMemberId agreementMemberId) throws IOException {
-            if (agreementMemberId != null) {
-                jsonWriter.beginObject();
-                if (agreementMemberId.getAgreementId() != null) {
-                    jsonWriter.name("agreementId").value(agreementMemberId.getAgreementId().toString());
-                }
-                if (agreementMemberId.getMemberId() != null) {
-                    jsonWriter.name("memberId").value(agreementMemberId.getMemberId().toString());
-                }
-                jsonWriter.endObject();
-            }
-        }
-
-        @Override
-        public AgreementMember.AgreementMemberId read(JsonReader jsonReader) throws IOException {
-            AgreementMember.AgreementMemberId agreementMemberId = new AgreementMember.AgreementMemberId();
-
-            jsonReader.beginObject();
-            while (jsonReader.hasNext()) {
-                switch (jsonReader.nextName()) {
-                    case "agreementId":
-                        agreementMemberId.setAgreementId(UUID.fromString(jsonReader.nextString()));
-                        break;
-                    case "memberId":
-                        agreementMemberId.setMemberId(UUID.fromString(jsonReader.nextString()));
-                        break;
-                    default:
-                        break;
-                }
-            }
-            jsonReader.endObject();
-
-            return agreementMemberId;
-        }
-    }
-
-
 }
