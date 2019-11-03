@@ -1,5 +1,6 @@
 package org.javers.core.metamodel.annotation;
 
+import org.javers.core.JaversBuilder;
 import org.javers.repository.api.JaversRepository;
 
 import java.lang.annotation.Retention;
@@ -9,17 +10,18 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Use TypeName annotation to give a distinctive type name for your Entities and ValueObjects.
- * This name will be used <b>everywhere</b> by JaVers, instead of fully-qualified class name.
+ * Gives a persistent and human-readable <b>type name</b> for Entity or ValueObject.
+ * This name is used everywhere by JaVers, instead of a fragile, fully-qualified class name.
  * <br/><br/>
  *
- * TypeName is <b>recommended</b> if you are
- * using {@link JaversRepository},
- * because it gives you freedom of refactoring your package and class names.
+ * Naming types is <b>recommended</b> if you are
+ * using {@link JaversRepository}.
+ * It fosters refactoring of package names and class names.
  * <br/><br/>
  *
  * Usage example:
  * <pre>
+ *{@literal @}Entity
  *{@literal @}TypeName("Person")
  * class Person {
  *    {@literal @}Id
@@ -28,10 +30,18 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * }
  * </pre>
  *
- * TypeName is alias for org.springframework.data.annotation.TypeAlias
- * from Spring Data.
+ * {@literal @}TypeName works similarly to <code>org.springframework.data.annotation.TypeAlias</code>
+ * in Spring Data.
+ *
+ * <br/><br/>
+ *
+ * <b>Important</b><br/>
+ * All classes with {@literal @}TypeName should be registered using {@link JaversBuilder#withPackagesToScan(String)}<br/>
+ * or <code>javers.packagesToScan</code> Spring Boot starter property.
  *
  * @see PropertyName
+ * @see Entity
+ * @see ValueObject
  * @since 1.4
  * @author bartosz.walacik
  */

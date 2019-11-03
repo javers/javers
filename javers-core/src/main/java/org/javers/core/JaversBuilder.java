@@ -4,7 +4,6 @@ import com.google.gson.TypeAdapter;
 import org.javers.common.collections.Lists;
 import org.javers.common.date.DateProvider;
 import org.javers.common.date.DefaultDateProvider;
-import org.javers.common.reflection.ReflectionUtil;
 import org.javers.common.validation.Validate;
 import org.javers.core.JaversCoreProperties.PrettyPrintDateFormats;
 import org.javers.core.commit.Commit;
@@ -277,10 +276,33 @@ public class JaversBuilder extends AbstractContainerBuilder {
     }
 
     /**
-     * Comma separated list of packages.<br/>
-     * Allows you to registerType all your classes with &#64;{@link TypeName} annotation
-     * in order to use them in all kinds of JQL queries<br/>
-     * (without getting TYPE_NAME_NOT_FOUND exception).
+     * Comma separated list of packages scanned by Javers in search of
+     * your classes with the {@link TypeName} annotation.
+     * <br/><br/>
+     *
+     * It's <b>important</b> to declare here all of your packages containing classes with {@literal @}TypeName,<br/>
+     * because Javers needs <i>live</i> class definitions to properly deserialize Snapshots from {@link JaversRepository}.
+     * <br/><br/>
+     *
+     * <b>For example</b>, consider this class:
+     *
+     * <pre>
+     * {@literal @}Entity
+     * {@literal @}TypeName("Person")
+     *  class Person {
+     *     {@literal @}Id
+     *      private int id;
+     *      private String name;
+     *  }
+     * </pre>
+     *
+     * In the scenario when Javers reads a Snapshot of type named 'Person'
+     * before having a chance to map the Person class definition,
+     * the 'Person' type will be mapped to generic {@link UnknownType}.
+     * <br/><br/>
+     *
+     * Since 5.8.4, Javers logs <code>WARNING</code> when UnknownType is created
+     * because Snapshots with UnknownType can't be properly deserialized from {@link JaversRepository}.
      *
      * @param packagesToScan e.g. "my.company.domain.person, my.company.domain.finance"
      * @since 2.3
