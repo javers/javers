@@ -33,15 +33,17 @@ class MapKeyDotReplacer {
         return (Document) snapshot.get("state");
     }
 
-    private Document replaceInMapKeys(Document map, String regexFrom, String from, String to) {
-        for (String key : map.keySet()){
-            if (key.contains(from)){
-                String escaped = key.replaceAll(regexFrom, to);
-                Object val = map.get(key);
-                map.remove(key);
-                map.put(escaped, val);
-            }
-        }
-        return map;
-    }
+	private Document replaceInMapKeys(Document map, String regexFrom, String from, String to) {
+		Document result = new Document();
+		for (String key : map.keySet()) {
+			Object val = map.get(key);
+			if (key.contains(from)) {
+				String escaped = key.replaceAll(regexFrom, to);
+				result.put(escaped, val);
+			} else {
+				result.put(key, val);
+			}
+		}
+		return result;
+	}
 }

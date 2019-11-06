@@ -1,5 +1,7 @@
 package org.javers.repository.mongo.cases
 
+import static org.javers.repository.jql.QueryBuilder.byInstanceId
+
 import javax.persistence.Id
 
 import org.javers.core.JaversBuilder
