@@ -2,6 +2,8 @@ package org.javers.repository.mongo;
 
 import org.bson.Document;
 
+import java.util.HashSet;
+
 /**
  * @author bartosz.walacik
  */
@@ -34,7 +36,7 @@ class MapKeyDotReplacer {
     }
 
     private Document replaceInMapKeys(Document map, String regexFrom, String from, String to) {
-        for (String key : map.keySet()){
+        for (String key : new HashSet<>(map.keySet())){
             if (key.contains(from)){
                 String escaped = key.replaceAll(regexFrom, to);
                 Object val = map.get(key);
