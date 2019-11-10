@@ -20,7 +20,7 @@ import spock.lang.Specification
  *
  * @author luca010
  */
-class KeyMapDotReplacerTest extends Specification {
+class MapKeyDotReplacerTest extends Specification {
 
 	@Shared def embeddedMongo = EmbeddedMongoFactory.create()
 	@Shared MongoClient mongoClient
@@ -36,9 +36,9 @@ class KeyMapDotReplacerTest extends Specification {
 	@EqualsAndHashCode
 	class SampleDoc {
 		@Id
-		int id = 1;
+		int id = 1
 
-		Map<String, Integer> state;
+		Map<String, Integer> state
 	}
 
 	def "should commit and read snapshot of Entity containing state field with dot keys"() {
