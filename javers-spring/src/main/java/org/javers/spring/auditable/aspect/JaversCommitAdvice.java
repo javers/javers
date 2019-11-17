@@ -7,6 +7,8 @@ import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
+import java.util.concurrent.Executor;
+
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
 /**
@@ -14,15 +16,25 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId;
  */
 public class JaversCommitAdvice {
 
-    private final Javers javers;
-    private final AuthorProvider authorProvider;
-    private final CommitPropertiesProvider commitPropertiesProvider;
+    protected final Javers javers;
+    protected final AuthorProvider authorProvider;
+    protected final CommitPropertiesProvider commitPropertiesProvider;
+    protected final Executor executor;
+
 
     public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this.javers = javers;
         this.authorProvider = authorProvider;
         this.commitPropertiesProvider = commitPropertiesProvider;
+        this.executor = null;
     }
+
+	public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, Executor executor) {
+		this.javers = javers;
+		this.authorProvider = authorProvider;
+		this.commitPropertiesProvider = commitPropertiesProvider;
+    	this.executor = executor;
+	}
 
     public void commitSaveMethodArguments(JoinPoint pjp) {
         for (Object arg : AspectUtil.collectArguments(pjp)) {
@@ -35,6 +47,19 @@ public class JaversCommitAdvice {
             commitShallowDelete(arg);
         }
     }
+
+	public void commitSaveMethodArgumentsAsync(JoinPoint pjp) {
+		for (Object arg : AspectUtil.collectArguments(pjp)) {
+			commitObjectAsync(arg);
+		}
+	}
+
+	public void commitObjectAsync(Object domainObject) {
+		String author = this.authorProvider.provide();
+		this.javers.commitAsync(author, domainObject, Maps.merge(
+				commitPropertiesProvider.provideForCommittedObject(domainObject),
+				commitPropertiesProvider.provide()),executor);
+	}
 
     public void commitObject(Object domainObject) {
         String author = authorProvider.provide();

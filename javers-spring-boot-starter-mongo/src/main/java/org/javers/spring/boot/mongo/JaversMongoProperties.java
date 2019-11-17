@@ -15,6 +15,8 @@ public class JaversMongoProperties extends JaversSpringProperties {
 
     private Mongodb mongodb;
 
+    private Integer javersExecutorThreadCount;
+
     public boolean isDocumentDbCompatibilityEnabled() {
         return documentDbCompatibilityEnabled;
     }
@@ -29,6 +31,14 @@ public class JaversMongoProperties extends JaversSpringProperties {
 
     public void setMongodb(Mongodb mongodb) {
         this.mongodb = mongodb;
+    }
+
+    public Integer getJaversExecutorThreadCount() {
+        return javersExecutorThreadCount;
+    }
+
+    public void setSetJaversExecutorThreadCount(Integer javersExecutorThread) {
+        this.javersExecutorThreadCount = javersExecutorThreadCount;
     }
 
     /**
