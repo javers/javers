@@ -1,6 +1,7 @@
 package org.javers.core.metamodel.type;
 
 import org.javers.common.collections.Primitives;
+import org.javers.common.string.PrettyPrintBuilder;
 import org.javers.core.diff.custom.CustomValueComparator;
 
 import java.lang.reflect.Type;
@@ -55,5 +56,10 @@ public abstract class PrimitiveOrValueType<T> extends ClassType implements Custo
 
     CustomValueComparator getValueComparator() {
         return valueComparator;
+    }
+
+    @Override
+    protected PrettyPrintBuilder prettyPrintBuilder() {
+        return super.prettyPrintBuilder().addField("valueComparator", valueComparator);
     }
 }
