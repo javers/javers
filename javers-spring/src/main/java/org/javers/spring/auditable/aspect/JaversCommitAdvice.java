@@ -3,11 +3,16 @@ package org.javers.spring.auditable.aspect;
 import org.aspectj.lang.JoinPoint;
 import org.javers.common.collections.Maps;
 import org.javers.core.Javers;
+import org.javers.core.commit.Commit;
 import org.javers.spring.auditable.AspectUtil;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static org.javers.repository.jql.InstanceIdDTO.instanceId;
 
@@ -16,11 +21,10 @@ import static org.javers.repository.jql.InstanceIdDTO.instanceId;
  */
 public class JaversCommitAdvice {
 
-    protected final Javers javers;
-    protected final AuthorProvider authorProvider;
-    protected final CommitPropertiesProvider commitPropertiesProvider;
-    protected final Executor executor;
-
+    private final Javers javers;
+    private final AuthorProvider authorProvider;
+    private final CommitPropertiesProvider commitPropertiesProvider;
+    private final Executor executor;
 
     public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider) {
         this.javers = javers;
@@ -29,7 +33,7 @@ public class JaversCommitAdvice {
         this.executor = null;
     }
 
-	public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, Executor executor) {
+    public JaversCommitAdvice(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider, Executor executor) {
 		this.javers = javers;
 		this.authorProvider = authorProvider;
 		this.commitPropertiesProvider = commitPropertiesProvider;

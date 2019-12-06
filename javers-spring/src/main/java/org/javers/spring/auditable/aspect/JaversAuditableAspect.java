@@ -4,12 +4,15 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.javers.core.Javers;
+import org.javers.spring.annotation.JaversAuditable;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 import org.javers.spring.auditable.EmptyPropertiesProvider;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
- * Commits all arguments passed to methods with @JaversAuditable annotation
+ * Commits all arguments passed to methods annotated with {@link JaversAuditable}
  * (only if a method exits normally, i.e. no Exception has been thrown).
  * <br/><br/>
  *

@@ -4,38 +4,34 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.javers.core.Javers;
+import org.javers.core.commit.Commit;
+import org.javers.spring.annotation.JaversAuditableAsync;
 import org.javers.spring.auditable.AuthorProvider;
 import org.javers.spring.auditable.CommitPropertiesProvider;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Commits all arguments passed to methods with @JaversAuditableAsync annotation
+ * Commits all arguments passed to methods annotated with {@link JaversAuditableAsync}
  * (only if a method exits normally, i.e. no Exception has been thrown).
- * <br/><br/>
- *
- * Spring @Transactional attributes (like noRollbackFor or noRollbackForClassName)
- * have no effects on this aspect.
  */
 @Aspect
 public class JaversAuditableAspectAsync {
     private final JaversCommitAdvice javersCommitAdvice;
 
     public JaversAuditableAspectAsync(Javers javers, AuthorProvider authorProvider, CommitPropertiesProvider commitPropertiesProvider,Executor executor) {
-        this(new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider,executor));
+        this(new JaversCommitAdvice(javers, authorProvider, commitPropertiesProvider, executor));
     }
 
-    JaversAuditableAspectAsync(JaversCommitAdvice javersCommitAdviceAsync) {
-        this.javersCommitAdvice = javersCommitAdviceAsync;
+    JaversAuditableAspectAsync(JaversCommitAdvice javersCommitAdvice) {
+        this.javersCommitAdvice = javersCommitAdvice;
     }
 
-    @AfterReturning("@annotation(org.javers.spring.annotation.JaversAuditable)")
+    @AfterReturning("@annotation(org.javers.spring.annotation.JaversAuditableAsync)")
     public void commitAdvice(JoinPoint pjp) {
 		javersCommitAdvice.commitSaveMethodArgumentsAsync(pjp);
-    }
-
-    @AfterReturning("@annotation(org.javers.spring.annotation.JaversAuditableDelete)")
-    public void commitDeleteAdvice(JoinPoint pjp) {
-		javersCommitAdvice.commitDeleteMethodArguments(pjp);
     }
 }
