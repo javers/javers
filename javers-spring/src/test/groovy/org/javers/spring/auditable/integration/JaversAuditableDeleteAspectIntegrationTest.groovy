@@ -86,4 +86,50 @@ class JaversAuditableDeleteAspectIntegrationTest extends Specification {
             snapshots[1].initial
         }
     }
+
+    def "should commit delete by id when method is annotated with @JaversAuditableDelete"() {
+        given:
+        def o = new DummyObject()
+
+        when:
+        repository.save(o)
+        repository.deleteById(o.id)
+
+        then:
+        def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(o.id, DummyObject).build())
+        snapshots.size() == 2
+        snapshots[0].terminal
+        snapshots[1].initial
+    }
+
+    def "should commit ids iterable when method is annotated with @JaversAuditableDelete"() {
+        given:
+        def objects = [new DummyObject(), new DummyObject()]
+
+        when: "iterable arg test"
+        repository.saveAll(objects)
+        repository.deleteAllById(objects.collect { it.id })
+
+        then:
+        objects.each {
+            javers.findSnapshots(QueryBuilder.byInstanceId(it.id, DummyObject).build()).size() == 1
+
+            def snapshots = javers.findSnapshots(QueryBuilder.byInstanceId(it.id, DummyObject).build())
+            snapshots.size() == 2
+            snapshots[0].terminal
+            snapshots[1].initial
+        }
+    }
+
+    def "should throw exception if no domain type present when annotated with @JaversAuditableDelete"() {
+        given:
+        def o = new DummyObject()
+
+        when:
+        repository.save(o)
+        repository.deleteByIdNoClass(o.id)
+
+        then:
+        thrown(IllegalStateException)
+    }
 }
