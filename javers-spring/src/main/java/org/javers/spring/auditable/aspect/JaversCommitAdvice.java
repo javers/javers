@@ -41,15 +41,19 @@ public class JaversCommitAdvice {
             if (typeMapping instanceof EntityType) {
                 commitShallowDelete(arg);
             } else if (typeMapping instanceof PrimitiveOrValueType) {
-                JaversAuditableDelete javersAuditableDelete =
-                        ((MethodSignature) jp.getSignature()).getMethod().getAnnotation(JaversAuditableDelete.class);
-                Class<?> domainType = javersAuditableDelete.domainType();
-                if (domainType == Void.class) {
-                    throw new IllegalStateException("Committing by id requires a domain type");
-                }
-                commitShallowDeleteById(arg, domainType);
+                commitShallowDeleteById(arg, getDomainTypeForDelete(jp));
             }
         }
+    }
+
+    private Class<?> getDomainTypeForDelete(JoinPoint jp) {
+        JaversAuditableDelete javersAuditableDelete =
+                ((MethodSignature) jp.getSignature()).getMethod().getAnnotation(JaversAuditableDelete.class);
+        Class<?> domainType = javersAuditableDelete.domainType();
+        if (domainType == Void.class) {
+            throw new IllegalStateException("Committing by id requires a domain type");
+        }
+        return domainType;
     }
 
     public void commitObject(Object domainObject) {
